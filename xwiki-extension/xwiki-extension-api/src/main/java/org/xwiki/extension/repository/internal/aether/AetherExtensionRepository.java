@@ -19,22 +19,20 @@
  */
 package org.xwiki.extension.repository.internal.aether;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.model.Model;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.repository.LocalArtifactRequest;
-import org.sonatype.aether.repository.LocalArtifactResult;
-import org.sonatype.aether.repository.LocalRepository;
+import org.sonatype.aether.impl.ArtifactDescriptorReader;
 import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.resolution.ArtifactDescriptorException;
 import org.sonatype.aether.resolution.ArtifactDescriptorRequest;
 import org.sonatype.aether.resolution.ArtifactDescriptorResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
-import org.sonatype.aether.util.artifact.SubArtifact;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
@@ -48,23 +46,32 @@ public class AetherExtensionRepository implements ExtensionRepository
 
     private PlexusComponentManager plexusComponentManager;
 
-    private RepositorySystem repositorySystem;
-
     private RepositorySystemSession session;
 
     private RemoteRepository remoteRepository;
 
+    private ArtifactDescriptorReader artifactDescriptorReader;
+
+    private Method loadPomMethod;
+
     public AetherExtensionRepository(ExtensionRepositoryId repositoryId, RepositorySystemSession session,
-        PlexusComponentManager mavenComponentManager) throws ComponentLookupException
+        PlexusComponentManager mavenComponentManager) throws Exception
     {
         this.repositoryId = repositoryId;
 
         this.plexusComponentManager = mavenComponentManager;
 
         this.session = session;
-        this.repositorySystem = this.plexusComponentManager.getPlexus().lookup(RepositorySystem.class);
+
+        this.artifactDescriptorReader = this.plexusComponentManager.getPlexus().lookup(ArtifactDescriptorReader.class);
 
         this.remoteRepository = new RemoteRepository(repositoryId.getId(), "default", repositoryId.getURI().toString());
+
+        // FIXME: not very nice
+        this.loadPomMethod =
+            this.artifactDescriptorReader.getClass().getDeclaredMethod("loadPom", RepositorySystemSession.class,
+                ArtifactDescriptorRequest.class, ArtifactDescriptorResult.class);
+        this.loadPomMethod.setAccessible(true);
     }
 
     public ExtensionRepositoryId getId()
@@ -86,44 +93,22 @@ public class AetherExtensionRepository implements ExtensionRepository
 
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
-        Artifact artifact = new DefaultArtifact(extensionId.getId() + ':' + extensionId.getVersion());
-
-        Artifact pomArtifact = new SubArtifact(artifact, "", "pom");
-        LocalArtifactRequest localArtifactRequest = new LocalArtifactRequest();
-        localArtifactRequest.setArtifact(pomArtifact);
-        LocalArtifactResult localArtifactResult =
-            this.session.getLocalRepositoryManager().find(this.session, localArtifactRequest);
-        if (localArtifactResult.getFile() != null) {
-            localArtifactResult.getFile().delete();
+        Model model;
+        try {
+            model = loadPom(this.session, extensionId);
+        } catch (Exception e) {
+            throw new ResolveException("Failed to resolve extension [" + extensionId + "] descriptor", e);
         }
-
-        ArtifactDescriptorRequest artifactDescriptorRequest = new ArtifactDescriptorRequest();
-        artifactDescriptorRequest.setArtifact(artifact);
-        artifactDescriptorRequest.addRepository(this.remoteRepository);
-
-        ArtifactDescriptorResult result = resolveArtifact(extensionId);
-
-        if (result.getRepository() instanceof LocalRepository) {
-            result.getArtifact().getFile().delete();
-            result = resolveArtifact(extensionId);
-        }
-
-        List<Exception> extensions = result.getExceptions();
-
-        if (!extensions.isEmpty()) {
-            throw new ResolveException("Failed to resolve extension [" + extensionId + "]", extensions.get(0));
-        }
-
-        // TODO: get details from the pom.xml file directly using Maven API (use ModelBuilder and ModelResolver)
 
         try {
-            return new AetherExtension(extensionId, result, this, this.plexusComponentManager);
+            return new AetherExtension(extensionId, model, this, this.plexusComponentManager);
         } catch (ComponentLookupException e) {
             throw new ResolveException("Failed to resolve extension [" + extensionId + "]", e);
         }
     }
 
-    private ArtifactDescriptorResult resolveArtifact(ExtensionId extensionId) throws ResolveException
+    private Model loadPom(RepositorySystemSession session, ExtensionId extensionId) throws IllegalArgumentException,
+        IllegalAccessException, InvocationTargetException
     {
         Artifact artifact = new DefaultArtifact(extensionId.getId() + ':' + extensionId.getVersion());
 
@@ -131,14 +116,10 @@ public class AetherExtensionRepository implements ExtensionRepository
         artifactDescriptorRequest.setArtifact(artifact);
         artifactDescriptorRequest.addRepository(this.remoteRepository);
 
-        ArtifactDescriptorResult result;
-        try {
-            result = this.repositorySystem.readArtifactDescriptor(this.session, artifactDescriptorRequest);
-        } catch (ArtifactDescriptorException e) {
-            throw new ResolveException("Failed to resolve aether artifact", e);
-        }
+        ArtifactDescriptorResult artifactDescriptorResult = new ArtifactDescriptorResult(artifactDescriptorRequest);
 
-        return result;
+        return (Model) this.loadPomMethod.invoke(this.artifactDescriptorReader, this.session,
+            artifactDescriptorRequest, artifactDescriptorResult);
     }
 
     public boolean exists(ExtensionId extensionId)

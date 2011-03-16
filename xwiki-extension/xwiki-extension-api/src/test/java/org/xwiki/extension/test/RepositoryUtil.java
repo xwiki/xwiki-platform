@@ -11,6 +11,9 @@ import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.test.MockConfigurationSource;
 
 public class RepositoryUtil
@@ -27,10 +30,13 @@ public class RepositoryUtil
 
     private File aetherRepository;
 
-    public RepositoryUtil(String name, MockConfigurationSource configurationSource)
+    private ComponentManager componentManager;
+
+    public RepositoryUtil(String name, MockConfigurationSource configurationSource, ComponentManager componentManager)
     {
         this.name = name;
         this.configurationSource = configurationSource;
+        this.componentManager = componentManager;
 
         this.workingDirectory = new File("target/" + this.name + "/");
         this.repositoriesDirectory = new File(this.workingDirectory, "repository/");
@@ -53,7 +59,7 @@ public class RepositoryUtil
         return this.aetherRepository;
     }
 
-    public void setup() throws IOException
+    public void setup() throws IOException, ComponentLookupException
     {
         clean();
 
@@ -68,6 +74,14 @@ public class RepositoryUtil
         this.configurationSource.setProperty("extension.localRepository", getLocalRepository().getAbsolutePath());
         this.configurationSource.setProperty("extension.aether.localRepository", getAetherRepository()
             .getAbsolutePath());
+
+        // repositories
+
+        ExtensionRepositoryManager repositoryManager = this.componentManager.lookup(ExtensionRepositoryManager.class);
+
+        ResourceExtensionRepository resourceExtensionrepository =
+            new ResourceExtensionRepository(getClass().getClassLoader(), "repository/remote/");
+        repositoryManager.addRepository(resourceExtensionrepository);
     }
 
     public void copyResourceFolder(File targetFolder, String resourcePackage) throws IOException

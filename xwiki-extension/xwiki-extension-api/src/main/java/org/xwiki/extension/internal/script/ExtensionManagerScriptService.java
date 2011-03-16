@@ -161,8 +161,10 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         InstallRequest installRequest = new InstallRequest();
-        installRequest.addExtension(new ExtensionId(id, null));
-        installRequest.addNamespace(wiki);
+        installRequest.addExtension(new ExtensionId(id, version));
+        if (wiki != null) {
+            installRequest.addNamespace(wiki);
+        }
 
         Task task;
         try {
@@ -186,7 +188,9 @@ public class ExtensionManagerScriptService implements ScriptService
 
         UninstallRequest uninstallRequest = new UninstallRequest();
         uninstallRequest.addExtension(new ExtensionId(id, null));
-        uninstallRequest.addNamespace(wiki);
+        if (wiki != null) {
+            uninstallRequest.addNamespace(wiki);
+        }
 
         Task task;
         try {

@@ -73,7 +73,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
-        this.repositoryUtil = new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource());
+        this.repositoryUtil =
+            new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());
         this.repositoryUtil.setup();
 
         // mock
@@ -246,11 +247,10 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // validate
 
-        XWikiDocument page =
-            this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
+        XWikiDocument page = this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
 
         Assert.assertTrue("Document wiki.space.page has not been removed from the database", page.isNew());
-        
+
         XWikiDocument page1 =
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space1", "page1"), getContext());
 

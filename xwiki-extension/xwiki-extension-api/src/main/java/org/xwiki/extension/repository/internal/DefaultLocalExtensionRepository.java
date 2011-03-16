@@ -20,9 +20,12 @@
 package org.xwiki.extension.repository.internal;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,21 +37,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -82,7 +73,7 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
     @Requirement
     private VersionManager versionManager;
 
-    private DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+    private DefaultLocalExtensionSerializer extensionSerializer;
 
     private ExtensionRepositoryId repositoryId;
 
@@ -107,6 +98,8 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
         this.rootFolder = this.configuration.getLocalRepository();
 
         this.repositoryId = new ExtensionRepositoryId("local", "xwiki", this.rootFolder.toURI());
+
+        this.extensionSerializer = new DefaultLocalExtensionSerializer(this);
 
         loadExtensions();
     }
@@ -390,7 +383,7 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
 
         localExtension.setDependency(dependency);
 
-        localExtension.setFile(getFile(localExtension.getId(), localExtension.getType()));
+        localExtension.setFile(getExtensionFile(localExtension.getId(), localExtension.getType()));
 
         return localExtension;
     }
@@ -440,180 +433,52 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
     private void saveDescriptor(LocalExtension extension) throws ParserConfigurationException, TransformerException,
         IOException
     {
-        DocumentBuilder documentBuilder = this.documentBuilderFactory.newDocumentBuilder();
-        Document document = documentBuilder.newDocument();
-
-        Element extensionElement = document.createElement("extension");
-        document.appendChild(extensionElement);
-
-        addElement(document, extensionElement, "id", extension.getId().getId());
-        addElement(document, extensionElement, "version", extension.getId().getVersion());
-        addElement(document, extensionElement, "type", extension.getType());
-
-        addElement(document, extensionElement, "dependency", String.valueOf(extension.isDependency()));
-        addElement(document, extensionElement, "installed", String.valueOf(extension.isInstalled()));
-        addElement(document, extensionElement, "description", extension.getDescription());
-        addElement(document, extensionElement, "author", extension.getAuthor());
-        addElement(document, extensionElement, "website", extension.getWebSite());
-
-        addDependencies(document, extensionElement, extension);
-        addNamespaces(document, extensionElement, extension);
-
-        TransformerFactory transfac = TransformerFactory.newInstance();
-        Transformer trans = transfac.newTransformer();
-        trans.setOutputProperty(OutputKeys.INDENT, "yes");
-
-        DOMSource source = new DOMSource(document);
         File file = getDescriptorFile(extension.getId());
         FileOutputStream fos = new FileOutputStream(file);
+
         try {
-            Result result = new StreamResult(fos);
-            trans.transform(source, result);
+            this.extensionSerializer.saveDescriptor(extension, fos);
         } finally {
             fos.close();
         }
     }
 
-    private File getFile(ExtensionId id, String type)
+    private File getExtensionFile(ExtensionId id, String type)
     {
-        return new File(getRootFolder(), id.getId() + "-" + id.getVersion() + "." + type);
+        return new File(getRootFolder(), getFileName(id, type));
     }
 
     private File getDescriptorFile(ExtensionId id)
     {
-        return new File(getRootFolder(), id.getId() + "-" + id.getVersion() + ".xed");
+        return new File(getRootFolder(), getFileName(id, "xed"));
     }
 
-    private void addElement(Document document, Element parentElement, String elementName, String elementValue)
+    private String getFileName(ExtensionId id, String extension)
     {
-        Element element = document.createElement(elementName);
-        element.setTextContent(elementValue);
+        String fileName = id.getId() + "-" + id.getVersion() + "." + extension;
+        try {
+            return URLEncoder.encode(fileName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // Should never happen
 
-        parentElement.appendChild(element);
-    }
-
-    private void addDependencies(Document document, Element parentElement, Extension extension)
-    {
-        if (extension.getDependencies() != null && !extension.getDependencies().isEmpty()) {
-            Element dependenciesElement = document.createElement("dependencies");
-            parentElement.appendChild(dependenciesElement);
-
-            for (ExtensionDependency dependency : extension.getDependencies()) {
-                Element dependencyElement = document.createElement("dependency");
-                dependenciesElement.appendChild(dependencyElement);
-
-                addElement(document, dependencyElement, "id", dependency.getId());
-                addElement(document, dependencyElement, "version", dependency.getVersion());
-            }
+            return fileName;
         }
     }
-
-    private void addNamespaces(Document document, Element parentElement, LocalExtension extension)
-    {
-        if (extension.getNamespaces() != null) {
-            Element wikisElement = document.createElement("namespaces");
-            parentElement.appendChild(wikisElement);
-
-            for (String namespace : extension.getNamespaces()) {
-                addElement(document, wikisElement, "namespace", namespace);
-            }
-        }
-    }
-
+    
     private LocalExtension loadDescriptor(File descriptor) throws ParserConfigurationException, SAXException,
         IOException
     {
-        DocumentBuilder documentBuilder = this.documentBuilderFactory.newDocumentBuilder();
-        Document document = documentBuilder.parse(descriptor);
+        FileInputStream fis = new FileInputStream(descriptor);
 
-        Element extensionElement = document.getDocumentElement();
+        try {
+            DefaultLocalExtension localExtension = this.extensionSerializer.loadDescriptor(fis);
 
-        // Mandatory fields
+            localExtension.setFile(getExtensionFile(localExtension.getId(), localExtension.getType()));
 
-        Node idNode = extensionElement.getElementsByTagName("id").item(0);
-        Node versionNode = extensionElement.getElementsByTagName("version").item(0);
-        Node typeNode = extensionElement.getElementsByTagName("type").item(0);
-
-        DefaultLocalExtension localExtension =
-            new DefaultLocalExtension(this, new ExtensionId(idNode.getTextContent(), versionNode.getTextContent()),
-                typeNode.getTextContent());
-
-        localExtension.setFile(getFile(localExtension.getId(), localExtension.getType()));
-
-        // Optional fields
-
-        Node dependencyNode = getNode(extensionElement, "dependency");
-        if (dependencyNode != null) {
-            localExtension.setDependency(Boolean.valueOf(dependencyNode.getTextContent()));
+            return localExtension;
+        } finally {
+            fis.close();
         }
-        Node enabledNode = getNode(extensionElement, "installed");
-        if (enabledNode != null) {
-            localExtension.setInstalled(Boolean.valueOf(enabledNode.getTextContent()));
-        }
-        Node descriptionNode = getNode(extensionElement, "description");
-        if (descriptionNode != null) {
-            localExtension.setDescription(descriptionNode.getTextContent());
-        }
-        Node authorNode = getNode(extensionElement, "author");
-        if (authorNode != null) {
-            localExtension.setAuthor(authorNode.getTextContent());
-        }
-        Node websiteNode = getNode(extensionElement, "website");
-        if (websiteNode != null) {
-            localExtension.setWebsite(websiteNode.getTextContent());
-        }
-
-        // Dependencies
-
-        NodeList dependenciesNodes = extensionElement.getElementsByTagName("dependencies");
-        if (dependenciesNodes.getLength() > 0) {
-            NodeList dependenciesNodeList = dependenciesNodes.item(0).getChildNodes();
-            for (int i = 0; i < dependenciesNodeList.getLength(); ++i) {
-                Node dependency = dependenciesNodeList.item(i);
-
-                if (dependency.getNodeName().equals("dependency")) {
-                    Node dependencyIdNode = getNode(dependency, "id");
-                    Node dependencyVersionNode = getNode(dependency, "version");
-
-                    localExtension.addDependency(new LocalExtensionDependency(dependencyIdNode.getTextContent(),
-                        dependencyVersionNode.getTextContent()));
-                }
-            }
-        }
-
-        // Namespaces
-        NodeList namespacesNodes = extensionElement.getElementsByTagName("namespaces");
-        if (namespacesNodes.getLength() > 0) {
-            NodeList namespaces = namespacesNodes.item(0).getChildNodes();
-            for (int i = 0; i < namespaces.getLength(); ++i) {
-                Node namespaceNode = namespaces.item(i);
-
-                localExtension.addNamespace(namespaceNode.getTextContent());
-            }
-        }
-
-        return localExtension;
-    }
-
-    private Node getNode(Node parentNode, String elementName)
-    {
-        NodeList children = parentNode.getChildNodes();
-        for (int i = 0; i < children.getLength(); ++i) {
-            Node node = children.item(i);
-
-            if (node.getNodeName().equals(elementName)) {
-                return node;
-            }
-        }
-
-        return null;
-    }
-
-    private Node getNode(Element parentElement, String elementName)
-    {
-        NodeList children = parentElement.getElementsByTagName(elementName);
-
-        return children.getLength() > 0 ? children.item(0) : null;
     }
 
     public Collection<LocalExtension> getBackwardDependencies(String id, String namespace) throws ResolveException

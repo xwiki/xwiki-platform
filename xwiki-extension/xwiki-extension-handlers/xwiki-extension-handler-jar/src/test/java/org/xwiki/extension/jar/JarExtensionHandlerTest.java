@@ -19,33 +19,22 @@
  */
 package org.xwiki.extension.jar;
 
-import java.net.URI;
-
 import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.repository.CoreExtensionRepository;
-import org.xwiki.extension.repository.ExtensionRepositoryId;
-import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.test.AbstractExtensionHandlerTest;
 import org.xwiki.extension.test.ConfigurableDefaultCoreExtensionRepository;
-import org.xwiki.model.reference.AttachmentReferenceResolver;
-import org.xwiki.rendering.macro.Macro;
+import org.xwiki.test.TestComponent;
 
 public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
 {
-    private ExtensionRepositoryManager repositoryManager;
-
-    private ExtensionId rubyArtifactId;
-
-    private ConfigurableDefaultCoreExtensionRepository coreExtensionRepository;
+    private ExtensionId testArtifactId;
 
     private LocalExtensionRepository localExtensionRepository;
 
@@ -57,18 +46,9 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
 
         // lookup
 
-        this.repositoryManager = getComponentManager().lookup(ExtensionRepositoryManager.class);
-
-        this.repositoryManager.addRepository(new ExtensionRepositoryId("xwiki-releases", "maven", new URI(
-            "http://maven.xwiki.org/releases/")));
-        this.repositoryManager.addRepository(new ExtensionRepositoryId("central", "maven", new URI(
-            "http://repo1.maven.org/maven2/")));
-
-        this.coreExtensionRepository =
-            (ConfigurableDefaultCoreExtensionRepository) getComponentManager().lookup(CoreExtensionRepository.class);
         this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class);
 
-        this.rubyArtifactId = new ExtensionId("org.xwiki.platform:xwiki-core-rendering-macro-ruby", "2.7");
+        this.testArtifactId = new ExtensionId("org.xwiki.test:test-extension", "test");
     }
 
     @Override
@@ -82,43 +62,28 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
     @Test
     public void testInstallAndUninstallExtension() throws Exception
     {
-        // way too big for a unit test so lets skip it
-        this.coreExtensionRepository.addExtensions("org.jruby:jruby", "1.5");
-        // the following extension should be found in the classpath but maven seems to have some bug around it (it's
-        // working well inside Eclipse)
-        // this.coreExtensionRepository.addExtensions("org.xwiki.platform:xwiki-core-classloader",
-        // this.rubyArtifactId.getVersion());
-        // this.coreExtensionRepository.addExtensions("org.xwiki.platform:xwiki-core-rendering-api",
-        // this.rubyArtifactId.getVersion());
-
-        // emulate environment
-        registerMockComponent(DocumentAccessBridge.class);
-        registerMockComponent(AttachmentReferenceResolver.class, "current");
-
         // actual test
-        LocalExtension localExtension = install(this.rubyArtifactId);
+        LocalExtension localExtension = install(this.testArtifactId);
 
         Assert.assertNotNull(localExtension);
         Assert.assertNotNull(localExtension.getFile());
         Assert.assertTrue(localExtension.getFile().exists());
 
-        Macro< ? > rubyMacro = getComponentManager().lookup(Macro.class, "ruby");
-
-        Assert.assertNotNull(rubyMacro);
+        getComponentManager().lookup(TestComponent.class);
 
         try {
-            install(this.rubyArtifactId);
+            install(this.testArtifactId);
             Assert.fail("installExtension should have failed");
         } catch (InstallException expected) {
             // expected
         }
 
-        uninstall(this.rubyArtifactId);
+        uninstall(this.testArtifactId);
 
-        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(this.rubyArtifactId.getId(), null));
+        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(this.testArtifactId.getId(), null));
 
         try {
-            getComponentManager().lookup(Macro.class, "ruby");
+            getComponentManager().lookup(TestComponent.class);
             Assert.fail("the extension has not been uninstalled");
         } catch (ComponentLookupException expected) {
             // expected

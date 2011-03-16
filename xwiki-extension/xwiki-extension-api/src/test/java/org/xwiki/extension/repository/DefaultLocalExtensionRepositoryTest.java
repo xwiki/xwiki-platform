@@ -42,7 +42,8 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     {
         super.setUp();
 
-        this.repositoryUtil = new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource());
+        this.repositoryUtil =
+            new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());
         this.repositoryUtil.setup();
 
         // lookup

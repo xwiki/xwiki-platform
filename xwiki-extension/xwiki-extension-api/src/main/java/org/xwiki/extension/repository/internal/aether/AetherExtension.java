@@ -25,13 +25,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.graph.Dependency;
-import org.sonatype.aether.resolution.ArtifactDescriptorResult;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.aether.resolution.ArtifactResult;
+import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionException;
@@ -45,11 +46,7 @@ public class AetherExtension implements Extension
 
     private AetherExtensionRepository repository;
 
-    private ArtifactDescriptorResult artifactDescriptorResult;
-
     private ExtensionId id;
-
-    private String extensionType;
 
     private List<ExtensionDependency> dependencies;
 
@@ -57,17 +54,17 @@ public class AetherExtension implements Extension
 
     private RepositorySystem repositorySystem;
 
-    public AetherExtension(ExtensionId id, ArtifactDescriptorResult artifactDescriptorResult,
-        AetherExtensionRepository repository, PlexusComponentManager mavenComponentManager)
-        throws ComponentLookupException
+    private Model mavenModel;
+
+    public AetherExtension(ExtensionId id, Model mavenModel, AetherExtensionRepository repository,
+        PlexusComponentManager mavenComponentManager) throws ComponentLookupException
     {
         this.plexusComponentManager = mavenComponentManager;
 
         this.repository = repository;
 
         this.id = id;
-        this.artifactDescriptorResult = artifactDescriptorResult;
-        this.extensionType = artifactDescriptorResult.getArtifact().getExtension();
+        this.mavenModel = mavenModel;
 
         this.repositorySystem = this.plexusComponentManager.getPlexus().lookup(RepositorySystem.class);
     }
@@ -85,17 +82,17 @@ public class AetherExtension implements Extension
 
     public String getDescription()
     {
-        return null;// return this.project.getDescription();
+        return this.mavenModel.getDescription();
     }
 
     public String getWebSite()
     {
-        return null;// return this.project.getUrl();
+        return this.mavenModel.getUrl();
     }
 
     public String getType()
     {
-        return this.extensionType;
+        return this.mavenModel.getPackaging();
     }
 
     public List<ExtensionDependency> getDependencies()
@@ -103,13 +100,13 @@ public class AetherExtension implements Extension
         if (this.dependencies == null) {
             this.dependencies = new ArrayList<ExtensionDependency>();
 
-            for (Dependency aetherDependency : this.artifactDescriptorResult.getDependencies()) {
+            for (Dependency mavenDependency : this.mavenModel.getDependencies()) {
                 // XXX: not sure what to do about "provided"
-                if (!aetherDependency.isOptional()
-                    && (aetherDependency.getScope().equals("compile") || aetherDependency.getScope().equals("runtime"))) {
-                    this.dependencies.add(new AetherExtensionDependency(new ExtensionId(aetherDependency.getArtifact()
-                        .getGroupId() + ":" + aetherDependency.getArtifact().getArtifactId(), aetherDependency
-                        .getArtifact().getVersion())));
+                if (!mavenDependency.isOptional()
+                    && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime") || mavenDependency
+                        .getScope().equals("provided"))) {
+                    this.dependencies.add(new AetherExtensionDependency(new ExtensionId(mavenDependency.getGroupId()
+                        + ":" + mavenDependency.getArtifactId(), mavenDependency.getVersion())));
                 }
             }
         }
@@ -123,10 +120,10 @@ public class AetherExtension implements Extension
         if (this.suggested == null) {
             this.suggested = new ArrayList<ExtensionId>();
 
-            for (Dependency mavenDependency : this.artifactDescriptorResult.getDependencies()) {
+            for (Dependency mavenDependency : this.mavenModel.getDependencies()) {
                 if (mavenDependency.isOptional()) {
-                    this.suggested.add(new ExtensionId(mavenDependency.getArtifact().getGroupId() + ":"
-                        + mavenDependency.getArtifact().getArtifactId(), mavenDependency.getArtifact().getVersion()));
+                    this.suggested.add(new ExtensionId(mavenDependency.getGroupId() + ":"
+                        + mavenDependency.getArtifactId(), mavenDependency.getVersion()));
                 }
             }
         }
@@ -138,7 +135,8 @@ public class AetherExtension implements Extension
     {
         ArtifactRequest artifactRequest = new ArtifactRequest();
         artifactRequest.addRepository(this.repository.getRemoteRepository());
-        artifactRequest.setArtifact(this.artifactDescriptorResult.getArtifact());
+        artifactRequest.setArtifact(new DefaultArtifact(this.mavenModel.getGroupId(), this.mavenModel.getArtifactId(),
+            getType(), this.mavenModel.getVersion()));
 
         ArtifactResult artifactResult;
         try {

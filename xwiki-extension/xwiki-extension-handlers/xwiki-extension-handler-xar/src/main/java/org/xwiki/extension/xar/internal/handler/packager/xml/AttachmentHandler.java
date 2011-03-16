@@ -22,7 +22,7 @@ package org.xwiki.extension.xar.internal.handler.packager.xml;
 import java.io.IOException;
 
 import org.apache.commons.codec.binary.Base64InputStream;
-import org.apache.tika.io.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentManager;

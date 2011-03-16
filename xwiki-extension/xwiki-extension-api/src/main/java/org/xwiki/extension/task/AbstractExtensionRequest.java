@@ -39,7 +39,7 @@ public class AbstractExtensionRequest extends AbstractRequest
     {
         return this.namespaces;
     }
-    
+
     public boolean hasNamespaces()
     {
         return this.namespaces != null && !this.namespaces.isEmpty();
@@ -49,9 +49,13 @@ public class AbstractExtensionRequest extends AbstractRequest
     {
         return this.extensions.add(extensionId);
     }
-    
+
     public boolean addNamespace(String namespace)
     {
+        if (this.namespaces == null) {
+            this.namespaces = new ArrayList<String>();
+        }
+
         return this.namespaces.add(namespace);
     }
 }

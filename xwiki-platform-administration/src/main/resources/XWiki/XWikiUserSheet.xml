@@ -182,6 +182,9 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
           this.switchTab(tabElement.__name);
         }.bindAsEventListener(this));
       }.bind(this));
+      this.tabsContainer.select('.vertical-tab.active').each(function (activeTab) {
+        document.fire('xwiki:profile:switchedCategory', {'category' : activeTab.__name});
+      });
     },
 
     /*
@@ -224,6 +227,7 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
       });
       $(tab + 'Tab').addClassName('active');
       XWiki.userprofile.adjustTabsContainerHeight();
+      document.fire('xwiki:profile:switchedCategory', {'category' : tab});
     }
   }
 });
@@ -503,6 +507,36 @@ span#avatarUpload {
 
 .vertical-pane .column {
   overflow: hidden;
+}
+
+## --------------------------------------
+## Network sections style
+#networkPane .following ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+#networkPane .following li {
+  padding: 2px 20px 2px 2px;
+}
+#networkPane .following li:hover {
+  background-color: $theme.highlightColor;
+}
+#networkPane .following img {
+  float: left;
+  margin-right: 5px;
+}
+#networkPane .following .user-info {
+  float: left;
+}
+#networkPane .following .user-id {
+  font-size: .8em;
+  font-weight: 900;
+}
+#networkPane .following .unfollow {
+  float: right;
+  margin-right: -16px;
+  padding: 0;
 }</code>
 </property>
 <property>
@@ -548,6 +582,9 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
 #end
 #if("$!avatarURL" == '')
   #set($avatarURL = $xwiki.getDocument("XWiki.XWikiUserSheet").getAttachmentURL('noavatar.png', 'download', 'width=120'))
+#end
+#if ($isMyProfile)
+  #set ($discard = $categories.add(['network', $msg.get('platform.core.profile.category.network'), 'XWiki.XWikiUserNetworkSheet', 'icons/silk/group.gif']))
 #end
 ##
 ## Current category

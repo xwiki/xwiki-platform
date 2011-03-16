@@ -349,21 +349,23 @@ td.recentChangesRight {
   padding: 0 !important;
 }
 
-#profilePane .column h1 {
+.vertical-pane .column h1 {
   font-weight:bold;
   font-size:115%;
   margin:10px 0;
 }
 
-#profilePane .column h2 {
+.vertical-pane .column h2 {
   font-size: 110%;
 }
 
+div.profile-section,
 div.userInfo, div.userRecentChanges, div.userPreferences, div.passwordManagement, div.watchlistManagement, div.watchlistRss, div.watchlistElements {
   margin: 5px 10px 10px;
   padding: 5px 10px 10px;
 }
 
+div.highlighted-profile-section,
 div.userInfo, div.userPreferences, div.watchlistManagement {
   background-color: $theme.backgroundSecondaryColor;
 }

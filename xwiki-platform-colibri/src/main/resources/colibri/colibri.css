@@ -1230,6 +1230,9 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .actionmenu .tmWikiDocumentIndex, .actionmenu .tmSpaceDocumentIndex {
   background-image: url("$xwiki.getSkinFile('icons/silk/book_open.gif')");
 }
+.actionmenu .tmUserNetwork {
+  background-image: url("$xwiki.getSkinFile('icons/silk/group.gif')");
+}
 
 /* @group FORMS */
 /* --------------------------------------------------------------

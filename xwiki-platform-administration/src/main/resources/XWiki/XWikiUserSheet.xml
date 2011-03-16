@@ -172,9 +172,19 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
         Event.observe($('avatar'), 'mouseout', function() { XWiki.userprofile.displayChangePhoto('false') });
         XWiki.userprofile.adjustTabsContainerHeight();
       }
+      this.tabsContainer = $('vertical-tabs');
+      this.tabsContainer.select('.vertical-tab').each(function (tabElement) {
+        if (!tabElement.__name) {
+          tabElement.__name = tabElement.id.replace(/Tab$/, '');
+        }
+        tabElement.observe('click', function(event) {
+          Event.stop(event);
+          this.switchTab(tabElement.__name);
+        }.bindAsEventListener(this));
+      }.bind(this));
     },
 
-    /* 
+    /*
     ** This ugly hack is used as a workaround for IE6 box model (3px jog bug) which prevent from 
     ** putting the  separating border between tabs and panes on the pane div. We put the border 
     ** on the tabs container and adjust its size depending on the size of the right pane.
@@ -565,7 +575,7 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
             #set($tabKey = $listtool.get($tab, 0))
             #set($tabName = $listtool.get($tab, 1))
             #set($tabIcon = $listtool.get($tab, 3))
-            &lt;li id="${tabKey}Tab" class="vertical-tab#if($tabKey == $currentCategory) active#end"&gt;&lt;a href="?category=${tabKey}"&gt;&lt;img src="$xwiki.getSkinFile($tabIcon)" alt="$tabName" /&gt;&lt;span&gt;$tabName&lt;/span&gt;&lt;/a&gt;&lt;script type="text/javascript"&gt;Event.observe($("${tabKey}Tab"), 'click', function(event) { XWiki.userprofile.switchTab("${tabKey}"); Event.stop(event); });&lt;/script&gt;&lt;/li&gt;
+            &lt;li id="${tabKey}Tab" class="vertical-tab#if($tabKey == $currentCategory) active#end"&gt;&lt;a href="?category=${tabKey}"&gt;&lt;img src="$xwiki.getSkinFile($tabIcon)" alt="$tabName" /&gt;&lt;span&gt;$tabName&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
           #end
         &lt;/ul&gt;
       &lt;/div&gt;

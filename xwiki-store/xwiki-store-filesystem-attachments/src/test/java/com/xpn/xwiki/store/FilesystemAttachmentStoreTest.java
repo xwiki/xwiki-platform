@@ -163,7 +163,7 @@ public class FilesystemAttachmentStoreTest extends AbstractMockingComponentTestC
         this.fileTools =
             new DefaultFilesystemStoreTools(new PathStringEntityReferenceSerializer(), storageLocation);
 
-        this.attachStore = new FilesystemAttachmentStore(null, fileTools);
+        this.attachStore = new FilesystemAttachmentStore(fileTools);
         this.storeFile =
             this.fileTools.getAttachmentFileProvider(this.mockAttach).getAttachmentContentFile();
         HELLO_STREAM.reset();

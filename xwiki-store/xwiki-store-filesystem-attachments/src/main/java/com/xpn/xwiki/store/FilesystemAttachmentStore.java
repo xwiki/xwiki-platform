@@ -51,13 +51,6 @@ import org.xwiki.store.TransactionRunnable;
 public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
 {
     /**
-     * This store is deferred to if attachment content is unavailable in filesystem or when deleting.
-     * Also when new attachment files are detected, corresponding attachments will be created.
-     */
-    @Requirement
-    private XWikiAttachmentStoreInterface hibernateAttachStore;
-
-    /**
      * Tools for getting files to store given content in.
      */
     @Requirement
@@ -66,13 +59,10 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     /**
      * Testing Constructor.
      *
-     * @param hibernateAttachStore the attachment store to defer to if an attachment cannot be found.
      * @param fileTools tools for getting files to store given content in and locks.
      */
-    public FilesystemAttachmentStore(final XWikiAttachmentStoreInterface hibernateAttachStore,
-                                     final FilesystemStoreTools fileTools)
+    public FilesystemAttachmentStore(final FilesystemStoreTools fileTools)
     {
-        this.hibernateAttachStore = hibernateAttachStore;
         this.fileTools = fileTools;
     }
 
@@ -229,13 +219,12 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             return;
         }
 
-        // If there is no attachment file then try loading from the Hibernate attachment store.
-        this.hibernateAttachStore.loadAttachmentContent(attachment, context, bTransaction);
-
-        // Then save it as a a file so it will be ported over.
-        this.saveAttachmentContent(attachment, false, context, true);
-
-        // Not deleting content from the old attachment store in order to be as safe as possible.
+        throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                                 XWikiException.ERROR_XWIKI_STORE_FILENOTFOUND,
+                                 "The attachment could not be found in the filesystem attachment store.\n"
+                                 + "This can happen if attachment storage is switched from database to "
+                                 + "filesystem without first moving all of the database attachments over "
+                                 + "to the filesystem using a script.");
     }
 
     /**
@@ -273,7 +262,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                 throw (XWikiException) e;
             }
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
+                                     XWikiException.ERROR_XWIKI_UNKNOWN,
                                      "Exception while deleting attachment.", e);
         }
     }

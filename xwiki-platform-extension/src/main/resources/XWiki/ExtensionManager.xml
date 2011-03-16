@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1284043167000</creationDate>
-<date>1298991189000</date>
-<contentUpdateDate>1298991189000</contentUpdateDate>
+<date>1300292360000</date>
+<contentUpdateDate>1300292360000</contentUpdateDate>
 <version>1.1</version>
 <title>Extension Manager</title>
 <template></template>
@@ -362,7 +362,7 @@ This application is experimental, use it at your own risk.
         {{error}}Failed to resolve extension with id $request.extensionid and version $extensionversion: $lasterror.message{{/error}}
       #else
         #set($extensionclass = "${extension.class}")
-        #foreach($index in [1..$extensionlevel])*#end #if($extensionclass.endsWith('CoreExtension'))**C**#elseif($extensionclass.endsWith('LocalExtension'))**I**#else**R**#end $extension.id.id ($extension.id.version#if($extensionversion != $extension.id.version) was $extensionversion#end)
+        #foreach($index in [1..$extensionlevel])*#end #if($extensionclass.endsWith('CoreExtension'))**C**#elseif($extensionclass.endsWith('LocalExtension'))**I**#else**R**#end $extension.id.id ($extension.type) ($extension.id.version#if($extensionversion != $extension.id.version) was $extensionversion#end)
         #resolveExtensionDependencies($extension)
       #end
     #end
@@ -388,7 +388,11 @@ This application is experimental, use it at your own risk.
     #set($extension = $extensionManager.install($request.extensionid, $request.extensionversion, $extensionwiki))
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
-      {{error}}Failed to install extension with id $request.extensionid: $lasterror.message{{/error}}
+      {{error}}Failed to install extension with id $request.extensionid and version $request.extensionversion#if($extensionwiki) on wiki $extensionwiki#end: $lasterror.message{{/error}}
+    #elseif ($extension.exceptions)
+      {{error}}Failed to install extension with id $request.extensionid and version $request.extensionversion#if($extensionwiki) on wiki $extensionwiki#end: $extension.exceptions[0].message{{/error}}
+    #else
+      {{info}}Extension with id $request.extensionid and version $request.extensionversion has been installed#if($extensionwiki) on wiki $extensionwiki#end.{{/info}} 
     #end
   #else
     #macro(prepareInstall $extensionid $extensionversion $extensionsToInstall $extensionsToUpgrade $extensionsSuggested, $coreExtensionsConflicts)
@@ -458,6 +462,9 @@ This application is experimental, use it at your own risk.
         &lt;fieldset&gt;
           &lt;input name="extensionid" value="${escapetool.xml($request.extensionid)}" type="hidden" /&gt;
           &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;
+          #if ($extensionwiki)
+            &lt;input name="extensionwiki" value="$extensionwiki" type="hidden" /&gt;
+          #end
           &lt;input name="actioninstall" type="hidden" /&gt;
           &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
         &lt;/fieldset&gt;
@@ -475,6 +482,10 @@ This application is experimental, use it at your own risk.
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
       {{error}}Failed to uninstall extension with id $request.extensionid: $lasterror.message{{/error}}
+    #elseif ($extension.exceptions)
+      {{error}}Failed to uninstall extension with id $request.extensionid: $extension.exceptions[0].message{{/error}}
+    #else
+      {{info}}Extension with id $request.extensionid has been uninstalled#if($extensionwiki) from wiki $extensionwiki#end.{{/info}} 
     #end
   #else
     #macro(prepareUninstall $extensionid $extensionsToUninstall)
@@ -522,12 +533,11 @@ This application is experimental, use it at your own risk.
   |=Id|=Version|=Type|=Wikis#if ($hasProgramming)|=Actions#end
 
   #foreach($extension in $extensions)
-  |$extension.id|$extension.id.version|$extension.type##
-        |#if($extension.namespaces)
+  |$extension.id.id|$extension.id.version|$extension.type|#if($extension.namespaces)
           $extension.namespaces##
-         #else
+        #else
           All wikis##
-         #end
+        #end
         #if ($hasProgramming)
           |{{html clean="false"}}
             &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
@@ -539,6 +549,7 @@ This application is experimental, use it at your own risk.
             &lt;/form&gt;
           {{/html}}##
         #end
+
 #end
 #end
 {{/velocity}}

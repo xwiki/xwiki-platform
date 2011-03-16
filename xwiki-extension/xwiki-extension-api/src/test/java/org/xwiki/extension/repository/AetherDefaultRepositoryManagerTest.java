@@ -20,14 +20,11 @@
 package org.xwiki.extension.repository;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.Extension;
@@ -42,7 +39,9 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
 {
     private ExtensionRepositoryManager repositoryManager;
 
-    private ExtensionId rubyArtifactId;
+    private ExtensionId extensionId;
+
+    private ExtensionId dependencyExtensionId;
 
     private RepositoryUtil repositoryUtil;
 
@@ -55,45 +54,42 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
             new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());
         this.repositoryUtil.setup();
 
-        this.rubyArtifactId = new ExtensionId("org.xwiki.platform:xwiki-core-rendering-macro-ruby", "2.4");
+        this.extensionId = new ExtensionId("groupid:artifactid", "version");
+        this.dependencyExtensionId = new ExtensionId("dependencygroupid:dependencyartifactid", "dependencyversion");
 
         // lookup
 
         this.repositoryManager = getComponentManager().lookup(ExtensionRepositoryManager.class);
-
-        this.repositoryManager.addRepository(new ExtensionRepositoryId("central", "maven", new URI(
-            "http://repo1.maven.org/maven2/")));
-        this.repositoryManager.addRepository(new ExtensionRepositoryId("xwiki-releases", "maven", new URI(
-            "http://maven.xwiki.org/releases/")));
-
     }
 
     @Test
     public void testResolve() throws ResolveException
     {
-        Extension artifact = this.repositoryManager.resolve(this.rubyArtifactId);
+        Extension artifact = this.repositoryManager.resolve(this.extensionId);
 
         Assert.assertNotNull(artifact);
-        Assert.assertEquals("org.xwiki.platform:xwiki-core-rendering-macro-ruby", artifact.getId().getId());
-        Assert.assertEquals("2.4", artifact.getId().getVersion());
-        Assert.assertEquals("jar", artifact.getType());
-        Assert.assertEquals("xwiki-releases", artifact.getRepository().getId().getId());
-
-        ExtensionDependency dependency = artifact.getDependencies().get(1);
-        Assert.assertEquals("org.jruby:jruby", dependency.getId());
-        Assert.assertEquals("1.5.0", dependency.getVersion());
+        Assert.assertEquals(this.extensionId.getId(), artifact.getId().getId());
+        Assert.assertEquals(this.extensionId.getVersion(), artifact.getId().getVersion());
+        Assert.assertEquals("type", artifact.getType());
+        Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), artifact.getRepository().getId().getId());
+        Assert.assertEquals("description", artifact.getDescription());
+        Assert.assertEquals("http://website", artifact.getWebSite());
+        
+        ExtensionDependency dependency = artifact.getDependencies().get(0);
+        Assert.assertEquals(this.dependencyExtensionId.getId(), dependency.getId());
+        Assert.assertEquals(this.dependencyExtensionId.getVersion(), dependency.getVersion());
 
         // check that a new resolve of an already resolved extension provide the proper repository
-        artifact = this.repositoryManager.resolve(this.rubyArtifactId);
-        Assert.assertEquals("xwiki-releases", artifact.getRepository().getId().getId());
+        artifact = this.repositoryManager.resolve(this.extensionId);
+        Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), artifact.getRepository().getId().getId());
     }
 
     @Test
     public void testDownload() throws ExtensionException, IOException
     {
-        Extension artifact = this.repositoryManager.resolve(this.rubyArtifactId);
+        Extension artifact = this.repositoryManager.resolve(this.extensionId);
 
-        File file = new File("target/downloaded/rubymacro.jar");
+        File file = new File("target/downloaded/" + this.extensionId.getId() + ".ext");
 
         if (file.exists()) {
             file.delete();
@@ -103,21 +99,6 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
 
         Assert.assertTrue("File has not been downloaded", file.exists());
 
-        ZipInputStream zis = new ZipInputStream(new FileInputStream(file));
-
-        boolean found = false;
-
-        for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
-            if (entry.getName().equals("org/xwiki/rendering/internal/macro/ruby/RubyMacro.class")) {
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            Assert.fail("Does not seems to be the right file");
-        }
-
-        zis.close();
+        Assert.assertEquals("content", FileUtils.readFileToString(file));
     }
 }

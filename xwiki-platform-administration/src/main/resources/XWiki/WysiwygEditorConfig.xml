@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>WysiwygEditorConfig</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.WysiwygEditorConfigTemplate</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1300178545000</creationDate>
+<date>1300272295000</date>
+<contentUpdateDate>1300272295000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get('wysiwyg.config.title')</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.ConfigurableClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<codeToExecute>
+<disabled>0</disabled>
+<editor>---</editor>
+<name>codeToExecute</name>
+<number>7</number>
+<picker>0</picker>
+<prettyName>codeToExecute</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</codeToExecute>
+<configurationClass>
+<disabled>0</disabled>
+<name>configurationClass</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>configurationClass</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</configurationClass>
+<configureGlobally>
+<defaultValue></defaultValue>
+<disabled>0</disabled>
+<displayFormType>checkbox</displayFormType>
+<displayType></displayType>
+<name>configureGlobally</name>
+<number>4</number>
+<prettyName>configureGlobally</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</configureGlobally>
+<displayInSection>
+<disabled>0</disabled>
+<name>displayInSection</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>displayInSection</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</displayInSection>
+<heading>
+<disabled>0</disabled>
+<name>heading</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>heading</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</heading>
+<iconAttachment>
+<disabled>0</disabled>
+<name>iconAttachment</name>
+<number>8</number>
+<picker>0</picker>
+<prettyName>iconAttachment</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</iconAttachment>
+<linkPrefix>
+<disabled>0</disabled>
+<name>linkPrefix</name>
+<number>5</number>
+<picker>0</picker>
+<prettyName>linkPrefix</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</linkPrefix>
+<propertiesToShow>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>propertiesToShow</name>
+<number>6</number>
+<picker>0</picker>
+<prettyName>propertiesToShow</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>20</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</propertiesToShow>
+</class>
+<name>XWiki.WysiwygEditorConfig</name>
+<number>0</number>
+<className>XWiki.ConfigurableClass</className>
+<guid>fadb6db8-1a78-437f-aa47-4c3f165f9954</guid>
+<property>
+<codeToExecute>{{html clean="false"}}
+&lt;form id="$formId" method="post" action="$formAction" class="xform half"&gt;
+{{/html}}{{include document="XWiki.WysiwygEditorConfig" context="new" /}}{{html clean=false}}
+  ## We add in a redirect field to prevent the user from being carried away when they save if they don't have javascript.
+  #set($thisURL = $request.getRequestURL())
+  #if($request.getQueryString() &amp;&amp; $request.getQueryString().length() &gt; 0)
+    #set($thisURL = "${thisURL}?$request.getQueryString()")
+  #end
+  &lt;fieldset&gt;
+    &lt;input type="hidden" id="${escapedAppName}_redirect" name="$redirectParameter" value="$escapetool.xml($thisURL)" /&gt;
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+  &lt;/fieldset&gt;
+  &lt;div class="bottombuttons"&gt;
+    &lt;p class="admin-buttons"&gt;
+      &lt;span class="buttonwrapper"&gt;
+        &lt;input class="button" type="submit" name="action_saveandcontinue" value="$msg.get('admin.save')" /&gt;
+      &lt;/span&gt;
+    &lt;/p&gt;
+  &lt;/div&gt;
+&lt;/form&gt;
+{{/html}}</codeToExecute>
+</property>
+<property>
+<configurationClass></configurationClass>
+</property>
+<property>
+<configureGlobally>1</configureGlobally>
+</property>
+<property>
+<displayInSection>WYSIWYG</displayInSection>
+</property>
+<property>
+<heading></heading>
+</property>
+<property>
+<iconAttachment></iconAttachment>
+</property>
+<property>
+<linkPrefix></linkPrefix>
+</property>
+<property>
+<propertiesToShow/>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.WysiwygEditorConfigClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<attachmentSelectionLimited>
+<defaultValue>0</defaultValue>
+<disabled>0</disabled>
+<displayFormType>radio</displayFormType>
+<displayType></displayType>
+<name>attachmentSelectionLimited</name>
+<number>5</number>
+<prettyName>Attachment selection limited</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</attachmentSelectionLimited>
+<colorPalette>
+<disabled>0</disabled>
+<editor>PureText</editor>
+<name>colorPalette</name>
+<number>8</number>
+<picker>0</picker>
+<prettyName>Color palette</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</colorPalette>
+<colorsPerRow>
+<disabled>0</disabled>
+<name>colorsPerRow</name>
+<number>9</number>
+<numberType>integer</numberType>
+<prettyName>Colors per row</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+</colorsPerRow>
+<externalImages>
+<defaultValue>1</defaultValue>
+<disabled>0</disabled>
+<displayFormType>radio</displayFormType>
+<displayType></displayType>
+<name>externalImages</name>
+<number>6</number>
+<prettyName>External images</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</externalImages>
+<fontNames>
+<disabled>0</disabled>
+<editor>PureText</editor>
+<name>fontNames</name>
+<number>10</number>
+<picker>0</picker>
+<prettyName>Font names</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</fontNames>
+<fontSizes>
+<disabled>0</disabled>
+<editor>PureText</editor>
+<name>fontSizes</name>
+<number>11</number>
+<picker>0</picker>
+<prettyName>Font sizes</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</fontSizes>
+<imageSelectionLimited>
+<defaultValue>0</defaultValue>
+<disabled>0</disabled>
+<displayFormType>radio</displayFormType>
+<displayType></displayType>
+<name>imageSelectionLimited</name>
+<number>7</number>
+<prettyName>Image selection limited</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</imageSelectionLimited>
+<menuBar>
+<disabled>0</disabled>
+<name>menuBar</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>Menu Bar</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</menuBar>
+<plugins>
+<disabled>0</disabled>
+<editor>PureText</editor>
+<name>plugins</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>Plugins</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</plugins>
+<sourceEditorEnabled>
+<defaultValue>1</defaultValue>
+<disabled>0</disabled>
+<displayFormType>radio</displayFormType>
+<displayType></displayType>
+<name>sourceEditorEnabled</name>
+<number>1</number>
+<prettyName>Source editor enabled</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</sourceEditorEnabled>
+<styleNames>
+<disabled>0</disabled>
+<editor>PureText</editor>
+<name>styleNames</name>
+<number>12</number>
+<picker>0</picker>
+<prettyName>Style names</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</styleNames>
+<toolBar>
+<disabled>0</disabled>
+<editor>PureText</editor>
+<name>toolBar</name>
+<number>4</number>
+<picker>0</picker>
+<prettyName>Tool Bar</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</toolBar>
+</class>
+<name>XWiki.WysiwygEditorConfig</name>
+<number>0</number>
+<className>XWiki.WysiwygEditorConfigClass</className>
+<guid>00d7c93f-9a29-4ef8-8ce8-de6365447fb4</guid>
+<property>
+<attachmentSelectionLimited>0</attachmentSelectionLimited>
+</property>
+<property>
+<colorPalette>#000000, #444444, #666666, #999999, #CCCCCC, #EEEEEE, #F3F3F3, #FFFFFF,
+#FF0000, #FF9900, #FFFF00, #00FF00, #00FFFF, #0000FF, #9900FF, #FF00FF,
+#F4CCCC, #FCE5CD, #FFF2CC, #D9EAD3, #D0E0E3, #CFE2F3, #D9D2E9, #EAD1DC,
+#EA9999, #F9CB9C, #FFE599, #B6D7A8, #A2C4C9, #9FC5E8, #B4A7D6, #D5A6BD,
+#E06666, #F6B26B, #FFD966, #93C47D, #76A5AF, #6FA8DC, #8E7CC3, #C27BA0,
+#CC0000, #E69138, #F1C232, #6AA84F, #45818E, #3D85C6, #674EA7, #A64D79,
+#990000, #B45F06, #BF9000, #38761D, #134F5C, #0B5394, #351C75, #741B47,
+#660000, #783F04, #7F6000, #274E13, #0C343D, #073763, #20124D, #4C1130</colorPalette>
+</property>
+<property>
+<colorsPerRow>8</colorsPerRow>
+</property>
+<property>
+<externalImages>1</externalImages>
+</property>
+<property>
+<fontNames>andale mono, arial,arial black, book antiqua, comic sans ms, courier new, georgia, helvetica, impact, symbol, tahoma, terminal, times new roman, trebuchet ms, verdana, webdings, wingdings</fontNames>
+</property>
+<property>
+<fontSizes>8px 10px 12px 14px 18px 24px 36px</fontSizes>
+</property>
+<property>
+<imageSelectionLimited>0</imageSelectionLimited>
+</property>
+<property>
+<menuBar>link image table macro import</menuBar>
+</property>
+<property>
+<plugins>submit readonly line separator embed text valign list indent history format symbol link image table macro import</plugins>
+</property>
+<property>
+<sourceEditorEnabled>1</sourceEditorEnabled>
+</property>
+<property>
+<styleNames>[]</styleNames>
+</property>
+<property>
+<toolBar>bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | paste</toolBar>
+</property>
+</object>
+<content>{{include document="XWiki.WysiwygEditorConfigSheet"/}}</content></xwikidoc>

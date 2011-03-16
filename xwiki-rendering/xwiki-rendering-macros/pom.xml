@@ -37,12 +37,6 @@
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-integration-tests</artifactId>
-      <version>${rendering.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-syntax-wikimodel</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
@@ -53,9 +47,6 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- Seems like there's no transitive dependencies for test-jar types so we need
-         to specify these dependencies even though they are in the xwiki-rendering-integration-tests
-         POM. -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-test</artifactId>

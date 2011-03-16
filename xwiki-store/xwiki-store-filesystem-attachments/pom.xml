@@ -95,17 +95,10 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-junit4</artifactId>
-      <version>2.5.1</version>
-      <scope>test</scope>
-    </dependency>
     <!-- Needed for ClassImposteriser for mocking XWikiContext etc. -->
     <dependency>
       <groupId>org.jmock</groupId>
       <artifactId>jmock-legacy</artifactId>
-      <version>2.5.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

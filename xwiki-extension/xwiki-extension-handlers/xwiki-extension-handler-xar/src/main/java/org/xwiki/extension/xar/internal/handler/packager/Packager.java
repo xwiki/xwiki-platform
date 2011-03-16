@@ -26,6 +26,8 @@ import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
 
+import com.xpn.xwiki.XWikiException;
+
 /**
  * Take care of parsing xar files and handling database actions.
  * 
@@ -34,7 +36,7 @@ import org.xwiki.component.annotation.ComponentRole;
 @ComponentRole
 public interface Packager
 {
-    void importXAR(File xarFile, String wiki) throws IOException;
+    void importXAR(File xarFile, String wiki) throws IOException, XWikiException;
 
     void unimportXAR(File xarFile, String wiki) throws IOException;
 

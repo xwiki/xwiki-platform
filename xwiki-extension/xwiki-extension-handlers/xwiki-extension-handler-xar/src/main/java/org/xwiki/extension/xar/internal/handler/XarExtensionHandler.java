@@ -46,12 +46,12 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     private LocalExtensionRepository xarRepository;
 
     // TODO: support question/answer with the UI to resolve conflicts
-    public void install(LocalExtension localExtension, String namespace) throws InstallException
+    public void install(LocalExtension localExtension, String wiki) throws InstallException
     {
         // import xar into wiki (add new version when the page already exists)
         try {
-            this.packager.importXAR(localExtension.getFile(), namespace);
-        } catch (IOException e) {
+            this.packager.importXAR(localExtension.getFile(), wiki);
+        } catch (Exception e) {
             throw new InstallException("Failed to import xar for extension [" + localExtension + "]", e);
         }
     }

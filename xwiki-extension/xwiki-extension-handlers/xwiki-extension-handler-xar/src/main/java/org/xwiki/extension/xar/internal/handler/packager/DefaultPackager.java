@@ -84,7 +84,29 @@ public class DefaultPackager extends AbstractLogEnabled implements Packager, Ini
         this.parserFactory = SAXParserFactory.newInstance();
     }
 
-    public void importXAR(File xarFile, String wiki) throws IOException
+    public void importXAR(File xarFile, String wiki) throws IOException, XWikiException
+    {
+        if (wiki == null) {
+            XWikiContext context = getXWikiContext();
+            if (context.getWiki().isVirtualMode()) {
+                List<String> wikis = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(context);
+
+                if (!wikis.contains(context.getMainXWiki())) {
+                    importXARToWiki(xarFile, context.getMainXWiki());
+                }
+
+                for (String subwiki : wikis) {
+                    importXARToWiki(xarFile, subwiki);
+                }
+            } else {
+                importXARToWiki(xarFile, context.getMainXWiki());
+            }
+        } else {
+            importXARToWiki(xarFile, wiki);
+        }
+    }
+
+    public void importXARToWiki(File xarFile, String wiki) throws IOException
     {
         FileInputStream fis = new FileInputStream(xarFile);
         ZipInputStream zis = new ZipInputStream(fis);

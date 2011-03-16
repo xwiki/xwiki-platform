@@ -330,6 +330,12 @@
       <artifactId>xwiki-core-xml-script</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
+    <!-- Filesystem attachment storage -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-store-filesystem-attachments</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
   <properties>
     <!-- Don't run CLIRR on the .war since there's no Java code here. -->

@@ -96,7 +96,7 @@ public class HtmlPackager
      */
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
     /**
@@ -114,7 +114,7 @@ public class HtmlPackager
      */
     public String getDescription()
     {
-        return description;
+        return this.description;
     }
 
     /**
@@ -248,7 +248,7 @@ public class HtmlPackager
     {
         context.getResponse().setContentType("application/zip");
         context.getResponse().addHeader("Content-disposition",
-            "attachment; filename=" + Util.encodeURI(name, context) + ".zip");
+            "attachment; filename=" + Util.encodeURI(this.name, context) + ".zip");
         context.setFinished(true);
 
         ZipOutputStream zos = new ZipOutputStream(context.getResponse().getOutputStream());
@@ -277,7 +277,7 @@ public class HtmlPackager
         // Add attachments and generated skin files files to ZIP file
         addDirToZip(tempdir, zos, "", null);
 
-        zos.setComment(description);
+        zos.setComment(this.description);
 
         // Finish ZIP file
         zos.finish();

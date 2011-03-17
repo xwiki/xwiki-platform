@@ -39,6 +39,12 @@
       <artifactId>xwiki-core</artifactId>
       <version>1.7.1</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>

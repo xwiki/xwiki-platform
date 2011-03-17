@@ -550,6 +550,7 @@
                   <excludes>
                     <exclude>org.jmock:*</exclude>
                     <exclude>junit:*</exclude>
+                    <exclude>javax.servlet:servlet-api:*:*:compile</exclude>
                   </excludes>
                 </bannedDependencies>
               </rules>

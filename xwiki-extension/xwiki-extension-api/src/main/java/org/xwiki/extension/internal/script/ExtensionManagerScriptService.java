@@ -146,6 +146,8 @@ public class ExtensionManagerScriptService implements ScriptService
     public Task getCurrentTask()
     {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
+            setError(new TaskException("Need programming right to get current task"));
+
             return null;
         }
 
@@ -155,6 +157,8 @@ public class ExtensionManagerScriptService implements ScriptService
     public Task install(String id, String version, String wiki)
     {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
+            setError(new TaskException("Need programming right to install an extension"));
+
             return null;
         }
 
@@ -181,6 +185,8 @@ public class ExtensionManagerScriptService implements ScriptService
     public Task uninstall(String id, String version)
     {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
+            setError(new TaskException("Need programming right to uninstall an extension"));
+
             return null;
         }
 

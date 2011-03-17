@@ -49,7 +49,7 @@ public class Attachment extends Api
      */
     public Document getDocument()
     {
-        return doc;
+        return this.doc;
     }
 
     /**
@@ -57,7 +57,7 @@ public class Attachment extends Api
      */
     public long getId()
     {
-        return attachment.getId();
+        return this.attachment.getId();
     }
 
     /**
@@ -65,7 +65,7 @@ public class Attachment extends Api
      */
     public long getDocId()
     {
-        return doc.getId();
+        return this.doc.getId();
     }
 
     /**
@@ -73,7 +73,7 @@ public class Attachment extends Api
      */
     public int getFilesize()
     {
-        return attachment.getFilesize();
+        return this.attachment.getFilesize();
     }
 
     /**
@@ -81,7 +81,7 @@ public class Attachment extends Api
      */
     public String getFilename()
     {
-        return attachment.getFilename();
+        return this.attachment.getFilename();
     }
 
     /**
@@ -89,7 +89,7 @@ public class Attachment extends Api
      */
     public String getAuthor()
     {
-        return attachment.getAuthor();
+        return this.attachment.getAuthor();
     }
 
     /**
@@ -97,7 +97,7 @@ public class Attachment extends Api
      */
     public String getVersion()
     {
-        return attachment.getVersion();
+        return this.attachment.getVersion();
     }
 
     /**
@@ -105,7 +105,7 @@ public class Attachment extends Api
      */
     public Version getRCSVersion()
     {
-        return attachment.getRCSVersion();
+        return this.attachment.getRCSVersion();
     }
 
     /**
@@ -113,7 +113,7 @@ public class Attachment extends Api
      */
     public String getComment()
     {
-        return attachment.getComment();
+        return this.attachment.getComment();
     }
 
     /**
@@ -121,7 +121,7 @@ public class Attachment extends Api
      */
     public Date getDate()
     {
-        return attachment.getDate();
+        return this.attachment.getDate();
     }
 
     /**
@@ -135,7 +135,7 @@ public class Attachment extends Api
 
     public byte[] getContentAsBytes() throws XWikiException
     {
-        return attachment.getContent(getXWikiContext());
+        return this.attachment.getContent(getXWikiContext());
     }
 
     public String getContentAsString() throws XWikiException
@@ -157,8 +157,8 @@ public class Attachment extends Api
 
     public Version[] getVersions() throws XWikiException
     {
-        attachment.loadArchive(getXWikiContext());
-        return attachment.getVersions();
+        this.attachment.loadArchive(getXWikiContext());
+        return this.attachment.getVersions();
     }
 
     /**
@@ -167,8 +167,8 @@ public class Attachment extends Api
      */
     public List<Version> getVersionList() throws XWikiException
     {
-        attachment.loadArchive(getXWikiContext());
-        return attachment.getVersionList();
+        this.attachment.loadArchive(getXWikiContext());
+        return this.attachment.getVersionList();
     }
 
     /**
@@ -177,10 +177,11 @@ public class Attachment extends Api
      */
     public XWikiAttachment getAttachment()
     {
-        if (hasProgrammingRights())
-            return attachment;
-        else
+        if (hasProgrammingRights()) {
+            return this.attachment;
+        } else {
             return null;
+        }
     }
 
     /**
@@ -188,7 +189,7 @@ public class Attachment extends Api
      */
     public String getMimeType()
     {
-        return attachment.getMimeType(getXWikiContext());
+        return this.attachment.getMimeType(getXWikiContext());
     }
 
     /**
@@ -196,7 +197,7 @@ public class Attachment extends Api
      */
     public boolean isImage()
     {
-        return attachment.isImage(getXWikiContext());
+        return this.attachment.isImage(getXWikiContext());
     }
 
     /**
@@ -208,7 +209,7 @@ public class Attachment extends Api
      */
     public Attachment getAttachmentRevision(String rev) throws XWikiException
     {
-        XWikiAttachment att = attachment.getAttachmentRevision(rev, getXWikiContext());
-        return att == null ? null : new Attachment(getDocument(), att, context);
+        XWikiAttachment att = this.attachment.getAttachmentRevision(rev, getXWikiContext());
+        return att == null ? null : new Attachment(getDocument(), att, this.context);
     }
 }

@@ -17,6 +17,10 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -151,9 +155,16 @@ public class HtmlPackager
     private void renderDocument(String pageName, ZipOutputStream zos, XWikiContext context, VelocityContext vcontext)
         throws XWikiException, IOException
     {
-        XWikiDocument doc = context.getWiki().getDocument(pageName, context);
+        @SuppressWarnings("unchecked")
+        EntityReferenceResolver<String> resolver = Utils.getComponent(EntityReferenceResolver.class);
+        DocumentReference docReference = new DocumentReference(resolver.resolve(pageName, EntityType.DOCUMENT));
+        XWikiDocument doc = context.getWiki().getDocument(docReference, context);
 
-        String zipname = doc.getDatabase() + POINT + doc.getSpace() + POINT + doc.getName();
+        String zipname = doc.getDocumentReference().getWikiReference().getName();
+        for (EntityReference space : doc.getDocumentReference().getSpaceReferences()) {
+            zipname += POINT + space.getName();
+        }
+        zipname += POINT + doc.getDocumentReference().getName();
         String language = doc.getLanguage();
         if (language != null && language.length() != 0) {
             zipname += POINT + language;
@@ -164,19 +175,24 @@ public class HtmlPackager
         ZipEntry zipentry = new ZipEntry(zipname);
         zos.putNextEntry(zipentry);
 
-        context.setDatabase(doc.getDatabase());
-        context.setDoc(doc);
-        vcontext.put(VCONTEXT_DOC, doc.newDocument(context));
-        vcontext.put(VCONTEXT_CDOC, vcontext.get(VCONTEXT_DOC));
+        String originalDatabase = context.getDatabase();
+        try {
+            context.setDatabase(doc.getDocumentReference().getWikiReference().getName());
+            context.setDoc(doc);
+            vcontext.put(VCONTEXT_DOC, doc.newDocument(context));
+            vcontext.put(VCONTEXT_CDOC, vcontext.get(VCONTEXT_DOC));
 
-        XWikiDocument tdoc = doc.getTranslatedDocument(context);
-        context.put(CONTEXT_TDOC, tdoc);
-        vcontext.put(VCONTEXT_TDOC, tdoc.newDocument(context));
+            XWikiDocument tdoc = doc.getTranslatedDocument(context);
+            context.put(CONTEXT_TDOC, tdoc);
+            vcontext.put(VCONTEXT_TDOC, tdoc.newDocument(context));
 
-        String content = context.getWiki().parseTemplate("view.vm", context);
+            String content = context.getWiki().evaluateTemplate("view.vm", context);
 
-        zos.write(content.getBytes(context.getWiki().getEncoding()));
-        zos.closeEntry();
+            zos.write(content.getBytes(context.getWiki().getEncoding()));
+            zos.closeEntry();
+        } finally {
+            context.setDatabase(originalDatabase);
+        }
     }
 
     /**

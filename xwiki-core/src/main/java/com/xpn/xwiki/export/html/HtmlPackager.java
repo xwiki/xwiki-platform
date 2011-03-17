@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -374,8 +375,6 @@ public class HtmlPackager
             return;
         }
 
-        byte[] tmpBuf = new byte[1024];
-
         for (int i = 0; i < files.length; ++i) {
             File file = files[i];
             if (file.isDirectory()) {
@@ -394,10 +393,7 @@ public class HtmlPackager
                     out.putNextEntry(new ZipEntry(path));
 
                     try {
-                        int len;
-                        while ((len = in.read(tmpBuf)) > 0) {
-                            out.write(tmpBuf, 0, len);
-                        }
+                        IOUtils.copy(in, out);
                     } finally {
                         out.closeEntry();
                     }

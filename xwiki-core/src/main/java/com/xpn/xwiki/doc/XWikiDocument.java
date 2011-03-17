@@ -5488,6 +5488,10 @@ public class XWikiDocument implements DocumentModelBridge
             return list;
         }
 
+        if (!fromDoc.getTitle().equals(toDoc.getTitle())) {
+            list.add(new MetaDataDiff("title", fromDoc.getTitle(), toDoc.getTitle()));
+        }
+
         if (!fromDoc.getParent().equals(toDoc.getParent())) {
             list.add(new MetaDataDiff("parent", fromDoc.getParent(), toDoc.getParent()));
         }

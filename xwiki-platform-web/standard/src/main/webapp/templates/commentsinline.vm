@@ -147,11 +147,11 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       <span class="commenttools">
       #if($xwiki.hasAccessLevel('comment'))
         <span class="commenttool commentreply"><a class="commentreply" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$msg.get('core.viewers.comments.reply')"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>$msg.get('core.viewers.comments.reply')</a></span>
-        #if($comment.author == $xcontext.user)
+        #if($comment.author == $xcontext.user && $hasEdit)
           <span class="commenttool commentedit"><a class="edit" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$xredirect")" title="$msg.get('core.viewers.comments.edit')">$msg.get('core.viewers.comments.edit')</a></span>
         #end
       #end
-      #if($hasEdit) 
+      #if ($hasEdit)
         <span class="commenttool commentdelete"><a class="delete" href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$xredirect")" title="$msg.get('core.viewers.comments.delete')">$msg.get('core.viewers.comments.delete')</a></span>
       #end
       </span>## commenttools

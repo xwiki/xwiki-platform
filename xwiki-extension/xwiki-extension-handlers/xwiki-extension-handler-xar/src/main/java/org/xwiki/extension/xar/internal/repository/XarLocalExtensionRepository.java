@@ -227,4 +227,12 @@ public class XarLocalExtensionRepository extends AbstractLogEnabled implements L
 
         return extension.getType().equals("xar") ? this.localRepository.getBackwardDependencies(id, namespace) : null;
     }
+
+    public Map<String, Collection<LocalExtension>> getBackwardDependencies(ExtensionId extensionId)
+        throws ResolveException
+    {
+        LocalExtension extension = (LocalExtension) this.localRepository.resolve(extensionId);
+
+        return extension.getType().equals("xar") ? this.localRepository.getBackwardDependencies(extensionId) : null;
+    }
 }

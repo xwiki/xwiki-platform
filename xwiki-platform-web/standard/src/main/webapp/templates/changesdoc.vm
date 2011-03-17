@@ -1,14 +1,17 @@
 #macro(changesTableHeader)
   <tr class="changes-table-title">
     <th>$msg.get('core.viewers.diff.property')</th>
-    <th>$msg.get('core.viewers.diff.oldValue')</th>
-    <th>$msg.get('core.viewers.diff.newValue')</th>
+    <th class="diffremoveword">$msg.get('core.viewers.diff.oldValue')</th>
+    <th class="diffaddword">$msg.get('core.viewers.diff.newValue')</th>
   </tr>
 #end
 #macro(displayPropertyChange $diff $propertyName $propertyDisplay)
   <tr>
     <td>$propertyDisplay</td>
-    <td>
+    #if ("$!diff.propType" == 'TextAreaClass')
+      <td colspan="2">$xwiki.diff.getDifferencesAsHTML("$!diff.prevValue", "$!diff.newValue" ,false)</td>
+    #else
+    <td class="diffremoveword">
       #if($propertyName == 'author')
         #set($author = "$!diff.getPrevValue()")
         #if($author != '')
@@ -18,7 +21,7 @@
         $diff.getPrevValue()
       #end
     </td>
-    <td>
+    <td class="diffaddword">
       #if($propertyName == 'author')
         #set($author = "$!diff.getNewValue()")
         #if($author != '')
@@ -28,6 +31,7 @@
         $diff.getNewValue()
       #end
     </td>
+    #end
   </tr>
 #end
 #set($commentsChanges = $util.arrayList)

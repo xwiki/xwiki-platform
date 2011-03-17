@@ -39,6 +39,12 @@
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
       <version>1.6.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -55,6 +61,12 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-archiver</artifactId>
       <version>2.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -72,6 +84,11 @@
       <groupId>jaxen</groupId>
       <version>1.1-beta-9</version>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit-dep</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <!-- We must configure SCM in each module. For more information see:

@@ -49,8 +49,7 @@
     </dependency>
     <dependency>    
       <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.5</version>
+      <artifactId>junit-dep</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -131,12 +131,56 @@ public class DefaultPackager extends AbstractLogEnabled implements Packager, Ini
         }
     }
 
-    public void unimportXAR(File xarFile, String wiki) throws IOException
+    public void unimportXAR(File xarFile, String wiki) throws IOException, XWikiException
     {
-        unimportPages(getEntries(xarFile), wiki);
+        if (wiki == null) {
+            XWikiContext context = getXWikiContext();
+            if (context.getWiki().isVirtualMode()) {
+                List<String> wikis = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(context);
+
+                if (!wikis.contains(context.getMainXWiki())) {
+                    unimportXARFromWiki(xarFile, context.getMainXWiki());
+                }
+
+                for (String subwiki : wikis) {
+                    unimportXARFromWiki(xarFile, subwiki);
+                }
+            } else {
+                unimportXARFromWiki(xarFile, context.getMainXWiki());
+            }
+        } else {
+            unimportXARFromWiki(xarFile, wiki);
+        }
     }
 
-    public void unimportPages(Collection<XarEntry> pages, String wiki)
+    public void unimportXARFromWiki(File xarFile, String wiki) throws IOException
+    {
+        unimportPagesFromWiki(getEntries(xarFile), wiki);
+    }
+
+    public void unimportPages(Collection<XarEntry> pages, String wiki) throws XWikiException
+    {
+        if (wiki == null) {
+            XWikiContext context = getXWikiContext();
+            if (context.getWiki().isVirtualMode()) {
+                List<String> wikis = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(context);
+
+                if (!wikis.contains(context.getMainXWiki())) {
+                    unimportPagesFromWiki(pages, context.getMainXWiki());
+                }
+
+                for (String subwiki : wikis) {
+                    unimportPagesFromWiki(pages, subwiki);
+                }
+            } else {
+                unimportPagesFromWiki(pages, context.getMainXWiki());
+            }
+        } else {
+            unimportPagesFromWiki(pages, wiki);
+        }
+    }
+
+    public void unimportPagesFromWiki(Collection<XarEntry> pages, String wiki)
     {
         WikiReference wikiReference = new WikiReference(wiki);
 

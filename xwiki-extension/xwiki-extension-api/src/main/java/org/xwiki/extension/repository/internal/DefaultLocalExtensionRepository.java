@@ -464,7 +464,7 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
             return fileName;
         }
     }
-    
+
     private LocalExtension loadDescriptor(File descriptor) throws ParserConfigurationException, SAXException,
         IOException
     {
@@ -493,5 +493,30 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
 
         return backwardDependencies != null ? Collections.unmodifiableCollection(backwardDependencies) : Collections
             .<LocalExtension> emptyList();
+    }
+
+    public Map<String, Collection<LocalExtension>> getBackwardDependencies(ExtensionId extensionId)
+        throws ResolveException
+    {
+        Map<String, Collection<LocalExtension>> result;
+
+        LocalExtension localExtension = (LocalExtension) resolve(extensionId);
+
+        Collection<String> namespaces = localExtension.getNamespaces();
+
+        Map<String, Set<LocalExtension>> backwardDependencies =
+            this.backwardDependenciesMap.get(localExtension.getId().getId());
+        if (backwardDependencies != null) {
+            result = new HashMap<String, Collection<LocalExtension>>();
+            for (Map.Entry<String, Set<LocalExtension>> entry : backwardDependencies.entrySet()) {
+                if (namespaces == null || namespaces.contains(entry.getKey())) {
+                    result.put(entry.getKey(), Collections.unmodifiableCollection(entry.getValue()));
+                }
+            }
+        } else {
+            result = Collections.emptyMap();
+        }
+
+        return result;
     }
 }

@@ -20,9 +20,11 @@
 package org.xwiki.extension.repository;
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
@@ -43,5 +45,14 @@ public interface LocalExtensionRepository extends ExtensionRepository
 
     void uninstallExtension(LocalExtension extension, String namespace) throws UninstallException;
 
+    /**
+     * Only look at the backward dependencies in the provided namespace. To get dependencies of a root extension
+     * (namespace=null) use {@link #getBackwardDependencies(ExtensionId)} instead.
+     */
     Collection<LocalExtension> getBackwardDependencies(String id, String namespace) throws ResolveException;
+
+    /**
+     * Get all backward dependencies by namespace for the provided extension.
+     */
+    Map<String, Collection<LocalExtension>> getBackwardDependencies(ExtensionId extensionId) throws ResolveException;
 }

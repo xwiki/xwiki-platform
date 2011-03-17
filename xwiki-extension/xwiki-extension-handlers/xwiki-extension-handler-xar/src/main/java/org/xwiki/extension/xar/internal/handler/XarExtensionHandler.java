@@ -104,7 +104,11 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         install(newLocalExtension, namespace);
 
         // Remove old version pages not anymore in the new version
-        this.packager.unimportPages(previousPages, namespace);
+        try {
+            this.packager.unimportPages(previousPages, namespace);
+        } catch (Exception e) {
+            // TODO: log warning
+        }
     }
 
     public void uninstall(LocalExtension localExtension, String namespace) throws UninstallException
@@ -117,7 +121,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 (XarLocalExtension) this.xarRepository.resolve(localExtension.getId());
             List<XarEntry> pages = xarLocalExtension.getPages();
             this.packager.unimportPages(pages, namespace);
-        } catch (ResolveException e) {
+        } catch (Exception e) {
             // Not supposed to be possible
             throw new UninstallException("Failed to get xar extension [" + localExtension.getId()
                 + "] from xar repository", e);

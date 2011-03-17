@@ -38,9 +38,9 @@ public interface Packager
 {
     void importXAR(File xarFile, String wiki) throws IOException, XWikiException;
 
-    void unimportXAR(File xarFile, String wiki) throws IOException;
+    void unimportXAR(File xarFile, String wiki) throws IOException, XWikiException;
 
     List<XarEntry> getEntries(File xarFile) throws IOException;
 
-    void unimportPages(Collection<XarEntry> pages, String wiki);
+    void unimportPages(Collection<XarEntry> pages, String wiki) throws XWikiException;
 }

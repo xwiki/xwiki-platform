@@ -20,6 +20,7 @@
 package org.xwiki.extension.internal.script;
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -30,7 +31,6 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.internal.VersionManager;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
@@ -85,7 +85,7 @@ public class ExtensionManagerScriptService implements ScriptService
 
         try {
             extension = this.extensionManager.resolveExtension(new ExtensionId(id, version), namespace);
-        } catch (ResolveException e) {
+        } catch (Exception e) {
             setError(e);
 
             extension = null;
@@ -94,15 +94,15 @@ public class ExtensionManagerScriptService implements ScriptService
         return extension;
     }
 
-    public Collection<LocalExtension> getBackwardDependencies(String id, String wiki)
+    public Map<String, Collection<LocalExtension>> getBackwardDependencies(String id, String version)
     {
         setError(null);
 
-        Collection<LocalExtension> extensions;
+        Map<String, Collection<LocalExtension>> extensions;
 
         try {
-            extensions = this.localExtensionRepository.getBackwardDependencies(id, wiki);
-        } catch (ResolveException e) {
+            extensions = this.localExtensionRepository.getBackwardDependencies(new ExtensionId(id, version));
+        } catch (Exception e) {
             setError(e);
 
             extensions = null;
@@ -178,7 +178,7 @@ public class ExtensionManagerScriptService implements ScriptService
         return task;
     }
 
-    public Task uninstall(String id, String wiki)
+    public Task uninstall(String id, String version)
     {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
             return null;
@@ -187,15 +187,12 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         UninstallRequest uninstallRequest = new UninstallRequest();
-        uninstallRequest.addExtension(new ExtensionId(id, null));
-        if (wiki != null) {
-            uninstallRequest.addNamespace(wiki);
-        }
+        uninstallRequest.addExtension(new ExtensionId(id, version));
 
         Task task;
         try {
             task = this.taskManager.uninstall(uninstallRequest);
-        } catch (TaskException e) {
+        } catch (Exception e) {
             setError(e);
 
             task = null;

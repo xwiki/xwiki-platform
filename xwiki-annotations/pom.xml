@@ -31,9 +31,6 @@
   <artifactId>xwiki-core-annotations</artifactId>
   <name>XWiki Platform - Core - Annotations - Parent POM</name>
   <packaging>pom</packaging>
-  <properties>
-    <junit.version>4.6</junit.version>
-  </properties>
   <modules>
     <module>xwiki-annotation-core</module>
     <module>xwiki-annotation-rest</module>

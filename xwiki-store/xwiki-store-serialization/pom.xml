@@ -64,10 +64,5 @@
       <version>${project.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-junit4</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 </project>

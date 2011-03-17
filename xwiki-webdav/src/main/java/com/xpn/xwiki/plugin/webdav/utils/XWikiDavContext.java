@@ -61,8 +61,8 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 import com.xpn.xwiki.web.XWikiServletResponse;
 
 /**
- * Holds context information about a webdav request. 
- * 
+ * Holds context information about a webdav request.
+ * <p>
  * TODO: Get rid of this class (Move to components).
  * 
  * @version $Id$
@@ -73,7 +73,7 @@ public class XWikiDavContext
      * Logger instance.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDavContext.class);
-    
+
     /**
      * Global per-user based storage.
      */
@@ -102,7 +102,7 @@ public class XWikiDavContext
     /**
      * Lock manager.
      */
-    private LockManager lockManager;    
+    private LockManager lockManager;
 
     /**
      * Creates a new xwiki webdav context.
@@ -132,8 +132,7 @@ public class XWikiDavContext
             xwikiContext.setMode(XWikiContext.MODE_SERVLET);
             xwikiContext.setDatabase("xwiki");
 
-            ServletContainerInitializer containerInitializer =
-                Utils.getComponent(ServletContainerInitializer.class);
+            ServletContainerInitializer containerInitializer = Utils.getComponent(ServletContainerInitializer.class);
             containerInitializer.initializeRequest(xwikiContext.getRequest().getHttpServletRequest(), xwikiContext);
             containerInitializer.initializeResponse(xwikiContext.getResponse().getHttpServletResponse());
             containerInitializer.initializeSession(xwikiContext.getRequest().getHttpServletRequest());
@@ -216,8 +215,8 @@ public class XWikiDavContext
             if (right.equals("overwrite")) {
                 String overwriteAccess = exists(fullDocName) ? "delete" : "edit";
                 hasAccess = hasAccess(overwriteAccess, fullDocName);
-            } else if (xwikiContext.getWiki().getRightService().hasAccessLevel(right, xwikiContext.getUser(),
-                fullDocName, xwikiContext)) {
+            } else if (xwikiContext.getWiki().getRightService()
+                .hasAccessLevel(right, xwikiContext.getUser(), fullDocName, xwikiContext)) {
                 hasAccess = true;
             }
         } catch (XWikiException ex) {
@@ -301,25 +300,25 @@ public class XWikiDavContext
         }
         String filename = attachmentName.substring(i + 1);
 
-        // TODO : avoid name clearing when encoding problems will be solved
-        // JIRA : http://jira.xwiki.org/jira/browse/XWIKI-94
-        // filename =
-        // xwikiContext.getWiki().clearName(filename, false, true, xwikiContext);
-
         XWikiAttachment attachment = doc.getAttachment(filename);
         if (attachment == null) {
             attachment = new XWikiAttachment();
-            // Add the attachment in the current doc
             doc.getAttachmentList().add(attachment);
         }
 
         attachment.setContent(data);
         attachment.setFilename(filename);
         attachment.setAuthor(xwikiContext.getUser());
+
         // Add the attachment to the document
         attachment.setDoc(doc);
+
+        doc.setAuthor(xwikiContext.getUser());
+        if (doc.isNew()) {
+            doc.setCreator(xwikiContext.getUser());
+        }
+
         try {
-            doc.saveAttachmentContent(attachment, xwikiContext);
             xwikiContext.getWiki().saveDocument(doc, "[WEBDAV] Attachment " + filename + " added.", xwikiContext);
         } catch (XWikiException ex) {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
@@ -501,7 +500,7 @@ public class XWikiDavContext
      * Deletes the specified xwiki document from the current xwiki.
      * 
      * @param document the xwiki document.
-     * @throws DavException if an error occurs while accessing the wiki. 
+     * @throws DavException if an error occurs while accessing the wiki.
      */
     public void deleteDocument(XWikiDocument document) throws DavException
     {

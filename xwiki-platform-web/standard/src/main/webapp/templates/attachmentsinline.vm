@@ -19,7 +19,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
     <div class="attachment #if($velocityCount % 2 == 0) even #else odd #end">
     <span class="mime">#mimetypeimg($attach.getMimeType().toLowerCase() $attach.getFilename().toLowerCase())</span>
     <div class="information">
-    <span class="name"><a href="$doc.getAttachmentURL(${attach.filename}, 'download')" title="$msg.get('core.viewers.attachments.download')">#packName($attach.filename)</a></span>
+    <span class="name"><a href="$doc.getAttachmentURL(${attach.filename}, 'download')" title="$msg.get('core.viewers.attachments.download')">$escapetool.xml($attach.filename)</a></span>
     <span class="xwikibuttonlinks">
     #if($hasEdit || $hasAdmin)
       ## Delete attachment link

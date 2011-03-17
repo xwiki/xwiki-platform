@@ -38,12 +38,10 @@ import java.security.AccessController;
 import java.security.Permission;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.security.cert.Certificate;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.Attributes;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
@@ -62,14 +60,14 @@ import edu.emory.mathcs.util.io.RedirectingInputStream;
  */
 public class JarProxy implements JarURLConnection.JarOpener
 {
-    private final Map cache = new HashMap();
+    private final Map<URL, CachedJarFile> cache = new HashMap<URL, CachedJarFile>();
 
     public JarFile openJarFile(JarURLConnection conn) throws IOException
     {
         URL url = conn.getJarFileURL();
         CachedJarFile result;
-        synchronized (cache) {
-            result = (CachedJarFile) cache.get(url);
+        synchronized (this.cache) {
+            result = this.cache.get(url);
         }
         if (result != null) {
             SecurityManager security = System.getSecurityManager();
@@ -100,10 +98,15 @@ public class JarProxy implements JarURLConnection.JarOpener
             jarconn.setDoOutput(conn.getDoOutput());
             jarconn.setIfModifiedSince(conn.getIfModifiedSince());
 
-            Map map = conn.getRequestProperties();
-            for (Iterator itr = map.entrySet().iterator(); itr.hasNext();) {
-                Map.Entry entry = (Map.Entry) itr.next();
-                jarconn.setRequestProperty((String) entry.getKey(), (String) entry.getValue());
+            Map<String, List<String>> map = conn.getRequestProperties();
+            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+                StringBuilder value = new StringBuilder();
+                for (String str : entry.getValue()) {
+                    value.append(',').append(str);
+                }
+                if (value.length() >= 1) {
+                    jarconn.setRequestProperty(entry.getKey(), value.substring(1));
+                }
             }
 
             jarconn.setUseCaches(conn.getUseCaches());
@@ -111,9 +114,9 @@ public class JarProxy implements JarURLConnection.JarOpener
             final InputStream in = getJarInputStream(jarconn);
 
             try {
-                result = (CachedJarFile) AccessController.doPrivileged(new PrivilegedExceptionAction()
+                result = AccessController.doPrivileged(new PrivilegedExceptionAction<CachedJarFile>()
                 {
-                    public Object run() throws IOException
+                    public CachedJarFile run() throws IOException
                     {
                         File file = File.createTempFile("jar_cache", "");
                         FileOutputStream out = new FileOutputStream(file);
@@ -140,19 +143,20 @@ public class JarProxy implements JarURLConnection.JarOpener
         }
 
         // if no input came (e.g. due to NOT_MODIFIED), do not cache
-        if (result == null)
+        if (result == null) {
             return null;
+        }
 
         // optimistic locking
-        synchronized (cache) {
-            CachedJarFile asyncResult = (CachedJarFile) cache.get(url);
+        synchronized (this.cache) {
+            CachedJarFile asyncResult = this.cache.get(url);
             if (asyncResult != null) {
                 // some other thread already retrieved the file; return w/o
                 // security check since we already succeeded in getting past it
                 result.closeCachedFile();
                 return asyncResult;
             }
-            cache.put(url, result);
+            this.cache.put(url, result);
             return result;
         }
     }
@@ -164,13 +168,12 @@ public class JarProxy implements JarURLConnection.JarOpener
 
     protected void clear()
     {
-        Map cache;
+        Map<URL, CachedJarFile> cache;
         synchronized (this.cache) {
-            cache = new HashMap(this.cache);
+            cache = new HashMap<URL, CachedJarFile>(this.cache);
             this.cache.clear();
         }
-        for (Iterator itr = cache.values().iterator(); itr.hasNext();) {
-            CachedJarFile jfile = (CachedJarFile) itr.next();
+        for (CachedJarFile jfile : cache.values()) {
             try {
                 jfile.closeCachedFile();
             } catch (IOException e) {
@@ -179,6 +182,7 @@ public class JarProxy implements JarURLConnection.JarOpener
         }
     }
 
+    @Override
     protected void finalize()
     {
         clear();
@@ -194,26 +198,30 @@ public class JarProxy implements JarURLConnection.JarOpener
             this.perm = perm;
         }
 
+        @Override
         public Manifest getManifest() throws IOException
         {
             Manifest orig = super.getManifest();
-            if (orig == null)
+            if (orig == null) {
                 return null;
+            }
             // make sure the original manifest is not modified
             Manifest man = new Manifest();
             man.getMainAttributes().putAll(orig.getMainAttributes());
             for (Map.Entry<String, Attributes> entry : orig.getEntries().entrySet()) {
-                man.getEntries().put(entry.getKey(), new Attributes((Attributes) entry.getValue()));
+                man.getEntries().put(entry.getKey(), new Attributes(entry.getValue()));
             }
             return man;
         }
 
+        @Override
         public ZipEntry getEntry(String name)
         {
             // super.getJarEntry() would result in stack overflow
             return super.getEntry(name);
         }
 
+        @Override
         protected void finalize() throws IOException
         {
             closeCachedFile();
@@ -224,32 +232,10 @@ public class JarProxy implements JarURLConnection.JarOpener
             super.close();
         }
 
+        @Override
         public void close() throws IOException
         {
             // no op; do NOT close file while still in cache
-        }
-
-        private static class Entry extends JarEntry
-        {
-            JarEntry jentry;
-
-            Entry(JarEntry jentry)
-            {
-                super(jentry);
-                this.jentry = jentry;
-            }
-
-            public Certificate[] getCertificates()
-            {
-                Certificate[] certs = jentry.getCertificates();
-                return (certs == null ? null : (Certificate[]) certs.clone());
-            }
-
-            public Attributes getAttributes() throws IOException
-            {
-                Attributes attr = jentry.getAttributes();
-                return (attr == null ? null : new Attributes(attr));
-            }
         }
     }
 }

@@ -29,10 +29,9 @@ import java.util.jar.JarOutputStream;
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.AbstractComponentTestCase;
@@ -45,10 +44,11 @@ import org.xwiki.test.AbstractComponentTestCase;
  */
 public class URIClassLoaderTest extends AbstractComponentTestCase
 {
-    private AttachmentReferenceResolver arf;
+    private AttachmentReferenceResolver<String> arf;
 
     private DocumentAccessBridge dab;
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void registerComponents() throws Exception
     {
@@ -78,14 +78,19 @@ public class URIClassLoaderTest extends AbstractComponentTestCase
         final AttachmentReference attachmentName2 = new AttachmentReference("filename2",
             new DocumentReference("wiki", "space", "page"));
 
-        getMockery().checking(new Expectations() {{
-            allowing(arf).resolve("page@filename1"); will(returnValue(attachmentName1));
-            oneOf(dab).getAttachmentContent(attachmentName1);
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(URIClassLoaderTest.this.arf).resolve("page@filename1");
+                will(returnValue(attachmentName1));
+                oneOf(URIClassLoaderTest.this.dab).getAttachmentContent(attachmentName1);
                 will(returnValue(new ByteArrayInputStream(createJarFile("/nomatch"))));
-            allowing(arf).resolve("filename2"); will(returnValue(attachmentName2));
-            oneOf(dab).getAttachmentContent(attachmentName2);
+                allowing(URIClassLoaderTest.this.arf).resolve("filename2");
+                will(returnValue(attachmentName2));
+                oneOf(URIClassLoaderTest.this.dab).getAttachmentContent(attachmentName2);
                 will(returnValue(new ByteArrayInputStream(createJarFile("/something"))));
-        }});
+            }
+        });
 
         Assert.assertEquals("jar:attachmentjar://filename2!/something", cl.findResource("/something").toString());
     }
@@ -96,7 +101,7 @@ public class URIClassLoaderTest extends AbstractComponentTestCase
         JarOutputStream jos = new JarOutputStream(baos);
         JarEntry entry = new JarEntry(resourceName);
         jos.putNextEntry(entry);
-        jos.write("whatever".getBytes());
+        jos.write("whatever".getBytes("UTF-8"));
         jos.closeEntry();
         jos.close();
         return baos.toByteArray();

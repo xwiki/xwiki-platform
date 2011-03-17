@@ -26,16 +26,16 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLStreamHandler;
 
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLStreamHandler;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 
 /**
  * Special handler that allows building URLs that have their contents in a wiki document's attachment.
- *   
+ * 
  * @version $Id$
  * @since 2.0.1
  */
@@ -48,6 +48,7 @@ public class AttachmentURLStreamHandler extends URLStreamHandler implements Exte
 
     /**
      * {@inheritDoc}
+     * 
      * @see ExtendedURLStreamHandler#getProtocol()
      */
     public String getProtocol()
@@ -59,7 +60,7 @@ public class AttachmentURLStreamHandler extends URLStreamHandler implements Exte
      * Create attachment name from a string reference.
      */
     @Requirement("current")
-    private AttachmentReferenceResolver attachmentReferenceResolver;
+    private AttachmentReferenceResolver<String> attachmentReferenceResolver;
 
     /**
      * Used to get the current document name and document URLs.
@@ -74,6 +75,7 @@ public class AttachmentURLStreamHandler extends URLStreamHandler implements Exte
      * 
      * @see URLStreamHandler#openConnection(URL)
      */
+    @Override
     protected URLConnection openConnection(URL url) throws IOException
     {
         // Get the attachment reference from the URL and transform it into an AttachmentReference object
@@ -82,16 +84,16 @@ public class AttachmentURLStreamHandler extends URLStreamHandler implements Exte
 
         return new AttachmentURLConnection(url, attachmentReference, this.documentAccessBridge);
     }
-    
+
     private String getAttachmentReference(URL url)
     {
         // If the URL doesn't start with the Attachment JAR scheme prefix something is wrong
         String urlAsString = url.toString();
         if (!urlAsString.startsWith(ATTACHMENT_JAR_PREFIX)) {
-            throw new RuntimeException("An attachment JAR URL should start with [" 
-                + ATTACHMENT_JAR_PREFIX + "], got [" + urlAsString + "]"); 
+            throw new RuntimeException("An attachment JAR URL should start with ["
+                + ATTACHMENT_JAR_PREFIX + "], got [" + urlAsString + "]");
         }
-        
+
         String attachmentReference = urlAsString.substring(ATTACHMENT_JAR_PREFIX.length());
         try {
             // Note: we decode using UTF8 since it's the W3C recommendation.

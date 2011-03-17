@@ -25,11 +25,21 @@
  */
 package org.xwiki.classloader;
 
-import java.net.*;
-import java.util.*;
-import java.security.*;
-import java.io.*;
-import java.util.jar.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLStreamHandlerFactory;
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.CodeSource;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 import java.util.jar.Attributes.Name;
 
 import org.xwiki.classloader.internal.ResourceLoader;
@@ -121,7 +131,7 @@ public class URIClassLoader extends ExtendedURLClassLoader
      */
     protected void addURI(URI uri)
     {
-        finder.addURI(uri);
+        this.finder.addURI(uri);
     }
 
     /**
@@ -132,7 +142,7 @@ public class URIClassLoader extends ExtendedURLClassLoader
     @Override
     public void addURL(URL url)
     {
-        finder.addURI(URI.create(url.toExternalForm()));
+        this.finder.addURI(URI.create(url.toExternalForm()));
     }
 
     /**
@@ -148,9 +158,10 @@ public class URIClassLoader extends ExtendedURLClassLoader
         }
     }
 
+    @Override
     public URL[] getURLs()
     {
-        return (URL[]) finder.getUrls().clone();
+        return this.finder.getUrls().clone();
     }
 
     /**
@@ -160,15 +171,16 @@ public class URIClassLoader extends ExtendedURLClassLoader
      * @return the resulting class
      * @exception ClassNotFoundException if the class could not be found
      */
-    protected Class findClass(final String name) throws ClassNotFoundException
+    @Override
+    protected Class< ? > findClass(final String name) throws ClassNotFoundException
     {
         try {
-            return (Class) AccessController.doPrivileged(new PrivilegedExceptionAction()
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<Class< ? >>()
             {
-                public Object run() throws ClassNotFoundException
+                public Class< ? > run() throws ClassNotFoundException
                 {
                     String path = name.replace('.', '/').concat(".class");
-                    ResourceHandle h = finder.getResource(path);
+                    ResourceHandle h = URIClassLoader.this.finder.getResource(path);
                     if (h != null) {
                         try {
                             return defineClass(name, h);
@@ -179,13 +191,13 @@ public class URIClassLoader extends ExtendedURLClassLoader
                         throw new ClassNotFoundException(name);
                     }
                 }
-            }, acc);
+            }, this.acc);
         } catch (java.security.PrivilegedActionException pae) {
             throw (ClassNotFoundException) pae.getException();
         }
     }
 
-    protected Class defineClass(String name, ResourceHandle h) throws IOException
+    protected Class< ? > defineClass(String name, ResourceHandle h) throws IOException
     {
         int i = name.lastIndexOf('.');
         URL url = h.getCodeSourceURL();
@@ -249,15 +261,16 @@ public class URIClassLoader extends ExtendedURLClassLoader
      * @param name the name of the resource
      * @return a <code>URL</code> for the resource, or <code>null</code> if the resource could not be found.
      */
+    @Override
     public URL findResource(final String name)
     {
-        return (URL) AccessController.doPrivileged(new PrivilegedAction()
+        return AccessController.doPrivileged(new PrivilegedAction<URL>()
         {
-            public Object run()
+            public URL run()
             {
-                return finder.findResource(name);
+                return URIClassLoader.this.finder.findResource(name);
             }
-        }, acc);
+        }, this.acc);
     }
 
     /**
@@ -267,15 +280,16 @@ public class URIClassLoader extends ExtendedURLClassLoader
      * @exception IOException if an I/O exception occurs
      * @return an <code>Enumeration</code> of <code>URL</code>s
      */
-    public Enumeration findResources(final String name) throws IOException
+    @Override
+    public Enumeration<URL> findResources(final String name) throws IOException
     {
-        return (Enumeration) AccessController.doPrivileged(new PrivilegedAction()
+        return AccessController.doPrivileged(new PrivilegedAction<Enumeration<URL>>()
         {
-            public Object run()
+            public Enumeration<URL> run()
             {
-                return finder.findResources(name);
+                return URIClassLoader.this.finder.findResources(name);
             }
-        }, acc);
+        }, this.acc);
     }
 
     /**
@@ -292,14 +306,17 @@ public class URIClassLoader extends ExtendedURLClassLoader
      * @see java.lang.System#loadLibrary(java.lang.String)
      * @see java.lang.System#mapLibraryName(java.lang.String)
      */
+    @Override
     protected String findLibrary(String libname)
     {
         ResourceHandle md = getLibraryHandle(libname);
-        if (md == null)
+        if (md == null) {
             return null;
+        }
         URL url = md.getURL();
-        if (!"file".equals(url.getProtocol()))
+        if (!"file".equals(url.getProtocol())) {
             return null;
+        }
         return new File(URI.create(url.toString())).getPath();
     }
 
@@ -324,13 +341,13 @@ public class URIClassLoader extends ExtendedURLClassLoader
      */
     protected ResourceHandle getResourceHandle(final String name)
     {
-        return (ResourceHandle) AccessController.doPrivileged(new PrivilegedAction()
+        return AccessController.doPrivileged(new PrivilegedAction<ResourceHandle>()
         {
-            public Object run()
+            public ResourceHandle run()
             {
-                return finder.getResource(name);
+                return URIClassLoader.this.finder.getResource(name);
             }
-        }, acc);
+        }, this.acc);
     }
 
     /**
@@ -367,15 +384,15 @@ public class URIClassLoader extends ExtendedURLClassLoader
      * @param name the name of the resource
      * @return the ResourceHandle of the resource
      */
-    protected Enumeration getResourceHandles(final String name)
+    protected Enumeration<ResourceHandle> getResourceHandles(final String name)
     {
-        return (Enumeration) AccessController.doPrivileged(new PrivilegedAction()
+        return AccessController.doPrivileged(new PrivilegedAction<Enumeration<ResourceHandle>>()
         {
-            public Object run()
+            public Enumeration<ResourceHandle> run()
             {
-                return finder.getResources(name);
+                return URIClassLoader.this.finder.getResources(name);
             }
-        }, acc);
+        }, this.acc);
     }
 
     private static class URIResourceFinder implements ResourceFinder
@@ -394,9 +411,8 @@ public class URIClassLoader extends ExtendedURLClassLoader
                     new ResourceLoader(handlerFactory != null ? handlerFactory.createURLStreamHandler("jar") : null);
                 URL[] urls = new URL[uris.length];
                 for (int i = 0; i < uris.length; i++) {
-                    urls[i] =
-                        new URL(null, uris[i].toString(), handlerFactory != null
-                            ? handlerFactory.createURLStreamHandler(uris[i].getScheme()) : null);
+                    urls[i] = new URL(null, uris[i].toString(),
+                        handlerFactory != null ? handlerFactory.createURLStreamHandler(uris[i].getScheme()) : null);
                 }
                 this.urls = urls;
             } catch (MalformedURLException e) {
@@ -407,9 +423,8 @@ public class URIClassLoader extends ExtendedURLClassLoader
         public synchronized void addURI(URI uri)
         {
             try {
-                URL url =
-                    new URL(null, uri.toString(), handlerFactory != null ? handlerFactory.createURLStreamHandler(uri
-                        .getScheme()) : null);
+                URL url = new URL(null, uri.toString(), this.handlerFactory != null ? this.handlerFactory
+                    .createURLStreamHandler(uri.getScheme()) : null);
                 int len = this.urls.length;
                 URL[] urls = new URL[len + 1];
                 System.arraycopy(this.urls, 0, urls, 0, len);
@@ -422,27 +437,27 @@ public class URIClassLoader extends ExtendedURLClassLoader
 
         private synchronized URL[] getUrls()
         {
-            return urls;
+            return this.urls;
         }
 
         public ResourceHandle getResource(String name)
         {
-            return loader.getResource(getUrls(), name);
+            return this.loader.getResource(getUrls(), name);
         }
 
-        public Enumeration getResources(String name)
+        public Enumeration<ResourceHandle> getResources(String name)
         {
-            return loader.getResources(getUrls(), name);
+            return this.loader.getResources(getUrls(), name);
         }
 
         public URL findResource(String name)
         {
-            return loader.findResource(getUrls(), name);
+            return this.loader.findResource(getUrls(), name);
         }
 
-        public Enumeration findResources(String name)
+        public Enumeration<URL> findResources(String name)
         {
-            return loader.findResources(getUrls(), name);
+            return this.loader.findResources(getUrls(), name);
         }
     }
 }

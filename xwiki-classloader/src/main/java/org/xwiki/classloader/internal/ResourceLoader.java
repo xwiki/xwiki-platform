@@ -44,7 +44,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +89,7 @@ public class ResourceLoader
 
     final URLStreamHandler jarHandler;
 
-    final Map url2jarInfo = new HashMap();
+    final Map<String, JarInfo> url2jarInfo = new HashMap<String, JarInfo>();
 
     /**
      * Constructs new ResourceLoader with specified JAR file handler which can implement custom JAR caching policy.
@@ -114,7 +113,7 @@ public class ResourceLoader
      */
     public ResourceHandle getResource(URL source, String name)
     {
-        return getResource(source, name, new HashSet(), null);
+        return getResource(source, name, new HashSet<URL>(), null);
     }
 
     /**
@@ -130,11 +129,12 @@ public class ResourceLoader
      */
     public ResourceHandle getResource(URL[] sources, String name)
     {
-        Set visited = new HashSet();
+        Set<URL> visited = new HashSet<URL>();
         for (int i = 0; i < sources.length; i++) {
             ResourceHandle h = getResource(sources[i], name, visited, null);
-            if (h != null)
+            if (h != null) {
                 return h;
+            }
         }
         return null;
     }
@@ -152,9 +152,9 @@ public class ResourceLoader
      * @param name the resource name
      * @return enumeration of resource handles representing the resources
      */
-    public Enumeration getResources(URL source, String name)
+    public Enumeration<ResourceHandle> getResources(URL source, String name)
     {
-        return new ResourceEnumeration(new URL[] {source}, name, false);
+        return new ResourceEnumeration<ResourceHandle>(new URL[] {source}, name, false);
     }
 
     /**
@@ -170,14 +170,13 @@ public class ResourceLoader
      * @param name the resource name
      * @return enumeration of resource handles representing the resources
      */
-    public Enumeration getResources(URL[] sources, String name)
+    public Enumeration<ResourceHandle> getResources(URL[] sources, String name)
     {
-        return new ResourceEnumeration((URL[]) sources.clone(), name, false);
+        return new ResourceEnumeration<ResourceHandle>(sources.clone(), name, false);
     }
 
-    private ResourceHandle getResource(final URL source, String name, Set visitedJars, Set skip)
+    private ResourceHandle getResource(final URL source, String name, Set<URL> visitedJars, Set<URL> skip)
     {
-
         name = ResourceUtils.canonizePath(name);
         if (isDir(source)) {
             // plain resource
@@ -192,8 +191,9 @@ public class ResourceLoader
                 return null;
             }
 
-            if (skip != null && skip.contains(url))
+            if (skip != null && skip.contains(url)) {
                 return null;
+            }
             final URLConnection conn;
             try {
                 conn = url.openConnection();
@@ -204,31 +204,37 @@ public class ResourceLoader
             final String finalName = name;
             return new ResourceHandle()
             {
+                @Override
                 public String getName()
                 {
                     return finalName;
                 }
 
+                @Override
                 public URL getURL()
                 {
                     return url;
                 }
 
+                @Override
                 public URL getCodeSourceURL()
                 {
                     return source;
                 }
 
+                @Override
                 public InputStream getInputStream() throws IOException
                 {
                     return conn.getInputStream();
                 }
 
+                @Override
                 public int getContentLength()
                 {
                     return conn.getContentLength();
                 }
 
+                @Override
                 public void close()
                 {
                     try {
@@ -259,7 +265,7 @@ public class ResourceLoader
      */
     public URL findResource(URL source, String name)
     {
-        return findResource(source, name, new HashSet(), null);
+        return findResource(source, name, new HashSet<URL>(), null);
     }
 
     /**
@@ -275,11 +281,12 @@ public class ResourceLoader
      */
     public URL findResource(URL[] sources, String name)
     {
-        Set visited = new HashSet();
+        Set<URL> visited = new HashSet<URL>();
         for (int i = 0; i < sources.length; i++) {
             URL url = findResource(sources[i], name, visited, null);
-            if (url != null)
+            if (url != null) {
                 return url;
+            }
         }
         return null;
     }
@@ -297,9 +304,9 @@ public class ResourceLoader
      * @param name the resource name
      * @return enumeration of URLs of the resources
      */
-    public Enumeration findResources(URL source, String name)
+    public Enumeration<URL> findResources(URL source, String name)
     {
-        return new ResourceEnumeration(new URL[] {source}, name, true);
+        return new ResourceEnumeration<URL>(new URL[] {source}, name, true);
     }
 
     /**
@@ -315,12 +322,12 @@ public class ResourceLoader
      * @param name the resource name
      * @return enumeration of URLs of the resources
      */
-    public Enumeration findResources(URL[] sources, String name)
+    public Enumeration<URL> findResources(URL[] sources, String name)
     {
-        return new ResourceEnumeration((URL[]) sources.clone(), name, true);
+        return new ResourceEnumeration<URL>(sources.clone(), name, true);
     }
 
-    private URL findResource(final URL source, String name, Set visitedJars, Set skip)
+    private URL findResource(final URL source, String name, Set<URL> visitedJars, Set<URL> skip)
     {
         URL url;
         name = ResourceUtils.canonizePath(name);
@@ -331,16 +338,18 @@ public class ResourceLoader
             } catch (MalformedURLException e) {
                 return null;
             }
-            if (skip != null && skip.contains(url))
+            if (skip != null && skip.contains(url)) {
                 return null;
+            }
             final URLConnection conn;
             try {
                 conn = url.openConnection();
                 if (conn instanceof HttpURLConnection) {
                     HttpURLConnection httpConn = (HttpURLConnection) conn;
                     httpConn.setRequestMethod("HEAD");
-                    if (httpConn.getResponseCode() >= 400)
+                    if (httpConn.getResponseCode() >= 400) {
                         return null;
+                    }
                 } else {
                     conn.getInputStream().close();
                 }
@@ -391,7 +400,7 @@ public class ResourceLoader
 
         String[] index;
 
-        Map package2url;
+        Map<String, URL[]> package2url;
 
         JarInfo(ResourceLoader loader, URL source) throws MalformedURLException
         {
@@ -400,24 +409,14 @@ public class ResourceLoader
             this.base = new URL("jar", "", -1, source + "!/", loader.jarHandler);
         }
 
-        public ResourceHandle getResource(String name)
+        ResourceHandle getResource(String name, Set<URL> visited, Set<URL> skip)
         {
-            return getResource(name, new HashSet());
-        }
-
-        ResourceHandle getResource(String name, Set visited)
-        {
-            return getResource(name, visited, null);
-        }
-
-        ResourceHandle getResource(String name, Set visited, Set skip)
-        {
-            visited.add(source);
+            visited.add(this.source);
             URL url;
             try {
                 // escape spaces etc. to make sure url is well-formed
                 URI relUri = new URI(null, null, null, -1, name, null, null);
-                url = new URL(base, relUri.getRawPath());
+                url = new URL(this.base, relUri.getRawPath());
             } catch (URISyntaxException e) {
                 throw new IllegalArgumentException("Illegal resource name: " + name);
             } catch (MalformedURLException e) {
@@ -426,9 +425,9 @@ public class ResourceLoader
             try {
                 JarFile jfile = getJarFileIfPossiblyContains(name);
                 if (jfile != null) {
-                    JarEntry jentry = jar.getJarEntry(name);
+                    JarEntry jentry = this.jar.getJarEntry(name);
                     if (jentry != null && (skip == null || !skip.contains(url))) {
-                        return new JarResourceHandle(jfile, jentry, url, source);
+                        return new JarResourceHandle(jfile, jentry, url, this.source);
                     }
                 }
             } catch (IOException e) {
@@ -438,34 +437,37 @@ public class ResourceLoader
             // not in here, but check also the dependencies
             URL[] dependencies;
             synchronized (this) {
-                if (package2url != null) {
+                if (this.package2url != null) {
                     int idx = name.lastIndexOf("/");
                     String prefix = (idx > 0) ? name.substring(0, idx) : name;
-                    dependencies = (URL[]) package2url.get(prefix);
+                    dependencies = this.package2url.get(prefix);
                 } else {
                     // classpath might be null only if it was a dependency of
                     // an indexed JAR with out-of-date index (the index brought
                     // us here but resource was not found in the JAR). But this
                     // (out-of-sync index) should be captured by
                     // getJarFileIfPossiblyContains.
-                    assert classPath != null;
-                    dependencies = classPath;
+                    assert this.classPath != null;
+                    dependencies = this.classPath;
                 }
             }
 
-            if (dependencies == null)
+            if (dependencies == null) {
                 return null;
+            }
 
             for (int i = 0; i < dependencies.length; i++) {
                 URL cpUrl = dependencies[i];
-                if (visited.contains(cpUrl))
+                if (visited.contains(cpUrl)) {
                     continue;
+                }
                 JarInfo depJInfo;
                 try {
-                    depJInfo = loader.getJarInfo(cpUrl);
+                    depJInfo = this.loader.getJarInfo(cpUrl);
                     ResourceHandle rh = depJInfo.getResource(name, visited, skip);
-                    if (rh != null)
+                    if (rh != null) {
                         return rh;
+                    }
                 } catch (MalformedURLException e) {
                     // continue with other URLs
                 }
@@ -475,15 +477,15 @@ public class ResourceLoader
             return null;
         }
 
-        synchronized void setIndex(List newIndex)
+        synchronized void setIndex(List<String> newIndex)
         {
-            if (jar != null) {
+            if (this.jar != null) {
                 // already loaded; no need for index
                 return;
             }
-            if (index != null) {
+            if (this.index != null) {
                 // verification - previously declared content must remain there
-                Set violating = new HashSet(Arrays.asList(index));
+                Set<String> violating = new HashSet<String>(Arrays.asList(this.index));
                 violating.removeAll(newIndex);
                 if (!violating.isEmpty()) {
                     throw new RuntimeException("Invalid JAR index: "
@@ -491,59 +493,62 @@ public class ResourceLoader
                         + "they are not present in the new index: " + violating.toString());
                 }
             }
-            this.index = (String[]) newIndex.toArray(new String[newIndex.size()]);
+            this.index = newIndex.toArray(new String[newIndex.size()]);
             Arrays.sort(this.index);
         }
 
         public JarFile getJarFileIfPossiblyContains(String name) throws IOException
         {
-            Map indexes;
+            Map<URL, List<String>> indexes;
             synchronized (this) {
-                if (jar != null) {
+                if (this.jar != null) {
                     // make sure we would be allowed to load it ourselves
                     SecurityManager security = System.getSecurityManager();
                     if (security != null) {
-                        security.checkPermission(perm);
+                        security.checkPermission(this.perm);
                     }
 
                     // other thread may still be updating indexes of dependent
                     // JAR files
                     try {
-                        while (!resolved)
+                        while (!this.resolved) {
                             wait();
+                        }
                     } catch (InterruptedException e) {
                         throw new IOException("Interrupted");
                     }
-                    return jar;
+                    return this.jar;
                 }
 
-                if (index != null) {
+                if (this.index != null) {
                     // we may be able to respond negatively w/o loading the JAR
                     int pos = name.lastIndexOf('/');
-                    if (pos > 0)
+                    if (pos > 0) {
                         name = name.substring(0, pos);
-                    if (Arrays.binarySearch(index, name) < 0)
+                    }
+                    if (Arrays.binarySearch(this.index, name) < 0) {
                         return null;
+                    }
                 }
 
                 // load the JAR
-                URLConnection connection = base.openConnection();
+                URLConnection connection = this.base.openConnection();
                 this.perm = connection.getPermission();
-                
+
                 JarFile jar;
                 if (connection instanceof org.xwiki.classloader.internal.protocol.jar.JarURLConnection) {
-                    jar =  ((org.xwiki.classloader.internal.protocol.jar.JarURLConnection)connection).getJarFile();
+                    jar = ((org.xwiki.classloader.internal.protocol.jar.JarURLConnection) connection).getJarFile();
                 } else {
-                    jar =  ((java.net.JarURLConnection)connection).getJarFile();
+                    jar = ((java.net.JarURLConnection) connection).getJarFile();
                 }
 
                 // conservatively check if index is accurate, that is, does not
                 // contain entries which are not in the JAR file
-                if (index != null) {
-                    Set indices = new HashSet(Arrays.asList(index));
-                    Enumeration entries = jar.entries();
+                if (this.index != null) {
+                    Set<String> indices = new HashSet<String>(Arrays.asList(this.index));
+                    Enumeration<JarEntry> entries = jar.entries();
                     while (entries.hasMoreElements()) {
-                        JarEntry entry = (JarEntry) entries.nextElement();
+                        JarEntry entry = entries.nextElement();
                         String indexEntry = entry.getName();
                         // for non-top, find the package name
                         int pos = indexEntry.lastIndexOf('/');
@@ -553,13 +558,13 @@ public class ResourceLoader
                         indices.remove(indexEntry);
                     }
                     if (!indices.isEmpty()) {
-                        throw new RuntimeException("Invalid JAR index: " + "the following entries not found in JAR: "
+                        throw new RuntimeException("Invalid JAR index: the following entries not found in JAR: "
                             + indices);
                     }
                 }
                 this.jar = jar;
 
-                this.classPath = parseClassPath(jar, source);
+                this.classPath = parseClassPath(jar, this.source);
 
                 indexes = parseJarIndex(this.source, jar);
                 indexes.remove(this.source.toExternalForm());
@@ -570,14 +575,13 @@ public class ResourceLoader
             }
             // just loaded the JAR - need to resolve the index
             try {
-                for (Iterator itr = indexes.entrySet().iterator(); itr.hasNext();) {
-                    Map.Entry entry = (Map.Entry) itr.next();
-                    URL url = (URL) entry.getKey();
+                for (Map.Entry<URL, List<String>> entry : indexes.entrySet()) {
+                    URL url = entry.getKey();
                     if (url.toExternalForm().equals(this.source.toExternalForm())) {
                         continue;
                     }
-                    List index = (List) entry.getValue();
-                    loader.getJarInfo(url).setIndex(index);
+                    List<String> index = entry.getValue();
+                    this.loader.getJarInfo(url).setIndex(index);
                 }
             } finally {
                 synchronized (this) {
@@ -585,49 +589,47 @@ public class ResourceLoader
                     notifyAll();
                 }
             }
-            return jar;
+            return this.jar;
         }
     }
 
-    private static Map package2url(Map indexes)
+    private static Map<String, URL[]> package2url(Map<URL, List<String>> indexes)
     {
-        Map prefix2url = new HashMap();
-        for (Iterator i = indexes.entrySet().iterator(); i.hasNext();) {
-            Map.Entry entry = (Map.Entry) i.next();
-            URL url = (URL) entry.getKey();
-            List idx = (List) entry.getValue();
-            for (Iterator j = idx.iterator(); j.hasNext();) {
-                String prefix = (String) j.next();
-                List prefixList = (List) prefix2url.get(prefix);
+        Map<String, List<URL>> prefix2url = new HashMap<String, List<URL>>();
+        for (Map.Entry<URL, List<String>> entry : indexes.entrySet()) {
+            URL url = entry.getKey();
+            for (String prefix : entry.getValue()) {
+                List<URL> prefixList = prefix2url.get(prefix);
                 if (prefixList == null) {
-                    prefixList = new ArrayList();
+                    prefixList = new ArrayList<URL>();
                     prefix2url.put(prefix, prefixList);
                 }
                 prefixList.add(url);
             }
         }
 
+        Map<String, URL[]> result = new HashMap<String, URL[]>(prefix2url.size());
+
         // replace lists with arrays
-        for (Iterator i = prefix2url.entrySet().iterator(); i.hasNext();) {
-            Map.Entry entry = (Map.Entry) i.next();
-            List list = (List) entry.getValue();
-            entry.setValue(list.toArray(new URL[list.size()]));
+        for (Map.Entry<String, List<URL>> entry : prefix2url.entrySet()) {
+            List<URL> list = entry.getValue();
+            result.put(entry.getKey(), list.toArray(new URL[list.size()]));
         }
-        return prefix2url;
+        return result;
     }
 
     private JarInfo getJarInfo(URL url) throws MalformedURLException
     {
         JarInfo jinfo;
-        synchronized (url2jarInfo) {
+        synchronized (this.url2jarInfo) {
             // fix: no longer use url.equals, since it distinguishes between
             // "" and null in the host part of file URLs. The ""-type urls are
             // correct but "null"-type ones come from file.toURI().toURL()
             // on 1.4.1. (It is fixed in 1.4.2)
-            jinfo = (JarInfo) url2jarInfo.get(url.toExternalForm());
+            jinfo = this.url2jarInfo.get(url.toExternalForm());
             if (jinfo == null) {
                 jinfo = new JarInfo(this, url);
-                url2jarInfo.put(url.toExternalForm(), jinfo);
+                this.url2jarInfo.put(url.toExternalForm(), jinfo);
             }
         }
         return jinfo;
@@ -651,60 +653,70 @@ public class ResourceLoader
             this.codeSource = codeSource;
         }
 
+        @Override
         public String getName()
         {
-            return jentry.getName();
+            return this.jentry.getName();
         }
 
+        @Override
         public URL getURL()
         {
-            return url;
+            return this.url;
         }
 
+        @Override
         public URL getCodeSourceURL()
         {
-            return codeSource;
+            return this.codeSource;
         }
 
+        @Override
         public InputStream getInputStream() throws IOException
         {
-            return jar.getInputStream(jentry);
+            return this.jar.getInputStream(this.jentry);
         }
 
+        @Override
         public int getContentLength()
         {
-            return (int) jentry.getSize();
+            return (int) this.jentry.getSize();
         }
 
+        @Override
         public Manifest getManifest() throws IOException
         {
-            return jar.getManifest();
+            return this.jar.getManifest();
         }
 
+        @Override
         public Attributes getAttributes() throws IOException
         {
-            return jentry.getAttributes();
+            return this.jentry.getAttributes();
         }
 
+        @Override
         public Certificate[] getCertificates()
         {
-            return jentry.getCertificates();
+            return this.jentry.getCertificates();
         }
 
+        @Override
         public void close()
         {
         }
     }
 
-    private static Map parseJarIndex(URL cxt, JarFile jar) throws IOException
+    private static Map<URL, List<String>> parseJarIndex(URL cxt, JarFile jar) throws IOException
     {
         JarEntry entry = jar.getJarEntry(JAR_INDEX_ENTRY_NAME);
-        if (entry == null)
-            return Collections.EMPTY_MAP;
+        if (entry == null) {
+            return Collections.emptyMap();
+        }
         InputStream is = jar.getInputStream(entry);
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 
-        Map result = new LinkedHashMap();
+        Map<URL, List<String>> result = new LinkedHashMap<URL, List<String>>();
 
         String line;
 
@@ -714,7 +726,7 @@ public class ResourceLoader
         } while (line != null && line.trim().length() > 0);
 
         URL currentURL;
-        List currentList = null;
+        List<String> currentList = null;
         while (true) {
             // skip the blank line
             line = reader.readLine();
@@ -723,13 +735,14 @@ public class ResourceLoader
             }
 
             currentURL = new URL(cxt, line);
-            currentList = new ArrayList();
+            currentList = new ArrayList<String>();
             result.put(currentURL, currentList);
 
             while (true) {
                 line = reader.readLine();
-                if (line == null || line.trim().length() == 0)
+                if (line == null || line.trim().length() == 0) {
                     break;
+                }
                 currentList.add(line);
             }
         }
@@ -738,16 +751,19 @@ public class ResourceLoader
     private static URL[] parseClassPath(JarFile jar, URL source) throws IOException
     {
         Manifest man = jar.getManifest();
-        if (man == null)
+        if (man == null) {
             return new URL[0];
+        }
         Attributes attr = man.getMainAttributes();
-        if (attr == null)
+        if (attr == null) {
             return new URL[0];
+        }
         String cp = attr.getValue(Attributes.Name.CLASS_PATH);
-        if (cp == null)
+        if (cp == null) {
             return new URL[0];
+        }
         StringTokenizer tokenizer = new StringTokenizer(cp);
-        List cpList = new ArrayList();
+        List<URL> cpList = new ArrayList<URL>();
         URI sourceURI = URI.create(source.toString());
         while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
@@ -767,10 +783,10 @@ public class ResourceLoader
                 throw new IOException(e.getMessage());
             }
         }
-        return (URL[]) cpList.toArray(new URL[cpList.size()]);
+        return cpList.toArray(new URL[cpList.size()]);
     }
 
-    private class ResourceEnumeration implements Enumeration
+    private class ResourceEnumeration<T> implements Enumeration<T>
     {
         final URL[] urls;
 
@@ -780,9 +796,9 @@ public class ResourceLoader
 
         int idx;
 
-        Object next;
+        T next;
 
-        Set previousURLs = new HashSet();
+        Set<URL> previousURLs = new HashSet<URL>();
 
         ResourceEnumeration(URL[] urls, String name, boolean findOnly)
         {
@@ -795,43 +811,47 @@ public class ResourceLoader
         public boolean hasMoreElements()
         {
             fetchNext();
-            return (next != null);
+            return (this.next != null);
         }
 
-        public Object nextElement()
+        public T nextElement()
         {
             fetchNext();
-            if (next == null)
+            if (this.next == null) {
                 throw new NoSuchElementException();
-            
-            Object nextElement = next;
-            next = null;
-            
+            }
+            ;
+
+            T nextElement = this.next;
+            this.next = null;
+
             return nextElement;
         }
 
+        @SuppressWarnings("unchecked")
         private void fetchNext()
         {
-            if (next != null)
+            if (this.next != null) {
                 return;
-            while (idx < urls.length) {
-                Object found;
-                if (findOnly) {
-                    URL url = findResource(urls[idx], name, new HashSet(), previousURLs);
+            }
+            while (this.idx < this.urls.length) {
+                if (this.findOnly) {
+                    URL url = findResource(this.urls[this.idx], this.name, new HashSet<URL>(), this.previousURLs);
                     if (url != null) {
-                        previousURLs.add(url);
-                        next = url;
+                        this.previousURLs.add(url);
+                        this.next = (T) url;
                         return;
                     }
                 } else {
-                    ResourceHandle h = getResource(urls[idx], name, new HashSet(), previousURLs);
+                    ResourceHandle h =
+                        getResource(this.urls[this.idx], this.name, new HashSet<URL>(), this.previousURLs);
                     if (h != null) {
-                        previousURLs.add(h.getURL());
-                        next = h;
+                        this.previousURLs.add(h.getURL());
+                        this.next = (T) h;
                         return;
                     }
                 }
-                idx++;
+                this.idx++;
             }
         }
     }

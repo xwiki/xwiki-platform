@@ -24,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
@@ -68,6 +67,7 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.util.URIUtil;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -218,6 +218,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     /** Frequently used Document reference, the class which holds virtual wiki definitions. */
     private static final DocumentReference VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE =
         new DocumentReference(DEFAULT_MAIN_WIKI, SYSTEM_SPACE, "XWikiServerClass");
+
+    /** The default encoding, and the internally used encoding when dealing with byte representation of strings. */
+    public static final String DEFAULT_ENCODING = "UTF-8";
 
     /** XWiki configuration loaded from xwiki.cfg. */
     private XWikiConfig config;
@@ -1211,10 +1214,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         }
 
         if (is == null) {
-            return Util.getFileContent(new File(name));
+            // Resources should always be encoded as UTF-8, to reduce the dependency on the system encoding
+            return FileUtils.readFileToString(new File(name), DEFAULT_ENCODING);
         }
 
-        return Util.getFileContent(new InputStreamReader(is));
+        return IOUtils.toString(is, DEFAULT_ENCODING);
     }
 
     public Date getResourceLastModificationDate(String name)
@@ -1242,10 +1246,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         }
 
         if (is == null) {
-            return Util.getFileContentAsBytes(new File(name));
+            return FileUtils.readFileToByteArray(new File(name));
         }
 
-        return Util.getFileContentAsBytes(is);
+        return IOUtils.toByteArray(is);
     }
 
     public boolean resourceExists(String name)
@@ -1907,7 +1911,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                 // Try parsing a document attachment
                 XWikiAttachment attachment = doc.getAttachment(template);
                 if (attachment != null) {
-                    String content = IOUtils.toString(attachment.getContentInputStream(context));
+                    // It's impossible to know the real attachemtn encoding, but let's assume that they respect the
+                    // standard and use UTF-8 (which is required for the files located on the filesystem)
+                    String content = IOUtils.toString(attachment.getContentInputStream(context), DEFAULT_ENCODING);
                     if (!StringUtils.isBlank(content)) {
                         // Let's use this template
                         // Use "" as namespace to register macros in global namespace. That way it

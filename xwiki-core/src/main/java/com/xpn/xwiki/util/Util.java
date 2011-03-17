@@ -67,6 +67,7 @@ import org.xml.sax.SAXException;
 import org.xwiki.container.Container;
 import org.xwiki.xml.XMLUtils;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
@@ -250,7 +251,7 @@ public class Util
     @Deprecated
     public static String getFileContent(File file) throws IOException
     {
-        return FileUtils.readFileToString(file);
+        return FileUtils.readFileToString(file, XWiki.DEFAULT_ENCODING);
     }
 
     /** @deprecated Use {@link org.apache.commons.io.IOUtils#toString(Reader)} */

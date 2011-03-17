@@ -61,13 +61,13 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
         XWikiConfig config = new XWikiConfig();
 
         Mock mockServletContext = mock(ServletContext.class);
-        ByteArrayInputStream bais = new ByteArrayInputStream("code=wiki:code:type:content".getBytes());
+        ByteArrayInputStream bais = new ByteArrayInputStream("code=wiki:code:type:content".getBytes("UTF-8"));
         mockServletContext.stubs().method("getResourceAsStream").with(eq("/templates/macros.txt")).will(
             returnValue(bais));
         mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/oscache.properties")).will(
-            returnValue(new ByteArrayInputStream("".getBytes())));
+            returnValue(new ByteArrayInputStream("".getBytes("UTF-8"))));
         mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/oscache-local.properties")).will(
-            returnValue(new ByteArrayInputStream("".getBytes())));
+            returnValue(new ByteArrayInputStream("".getBytes("UTF-8"))));
         XWikiServletContext engineContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
 
         xwiki = new XWiki(config, getContext(), engineContext, false)

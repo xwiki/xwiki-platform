@@ -84,8 +84,10 @@ public class JarURLStreamHandler extends URLStreamHandler implements ExtendedURL
 
     /**
      * {@inheritDoc}
+     * 
      * @see URLStreamHandler#openConnection(URL)
      */
+    @Override
     public URLConnection openConnection(URL url) throws IOException
     {
         return new JarURLConnection(url, this.opener, this.handlerFactory);
@@ -100,6 +102,7 @@ public class JarURLStreamHandler extends URLStreamHandler implements ExtendedURL
      * 
      * @see URLStreamHandler#parseURL(URL, String, int, int)
      */
+    @Override
     protected void parseURL(URL u, String spec, int start, int limit)
     {
         Matcher matcher;
@@ -107,8 +110,8 @@ public class JarURLStreamHandler extends URLStreamHandler implements ExtendedURL
             // spec is an absolute URL
             String base = matcher.group(1);
             try {
-                // verify
-                URL baseURL = new URL(base);
+                // Verify
+                new URL(base);
             } catch (MalformedURLException e) {
                 throw new IllegalArgumentException(e.toString());
             }

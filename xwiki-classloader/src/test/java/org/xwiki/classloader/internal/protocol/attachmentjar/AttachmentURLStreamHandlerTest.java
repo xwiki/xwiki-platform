@@ -27,29 +27,30 @@ import java.net.URLStreamHandler;
 
 import org.apache.commons.io.IOUtils;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLStreamHandler;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link AttachmentURLStreamHandler}.
- *  
+ * 
  * @version $Id$
  * @since 2.0.1
  */
 public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
 {
-    private AttachmentReferenceResolver arf;
+    private AttachmentReferenceResolver<String> arf;
+
     private DocumentAccessBridge dab;
-    
+
     private ExtendedURLStreamHandler handler;
-    
+
+    @SuppressWarnings("unchecked")
     @Override
     protected void registerComponents() throws Exception
     {
@@ -57,7 +58,7 @@ public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
 
         this.arf = registerMockComponent(AttachmentReferenceResolver.class, "current");
         this.dab = registerMockComponent(DocumentAccessBridge.class);
-        
+
         this.handler = getComponentManager().lookup(ExtendedURLStreamHandler.class, "attachmentjar");
     }
 
@@ -79,15 +80,19 @@ public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
     public void testAttachmentJarURL() throws Exception
     {
         URL url = new URL(null, "attachmentjar://Space.Page@filename", (URLStreamHandler) this.handler);
-        
+
         final AttachmentReference attachmentReference = new AttachmentReference("filename",
             new DocumentReference("wiki", "space", "page"));
-        getMockery().checking(new Expectations() {{
-            oneOf(arf).resolve("Space.Page@filename"); will(returnValue(attachmentReference));
-            oneOf(dab).getAttachmentContent(attachmentReference);
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(AttachmentURLStreamHandlerTest.this.arf).resolve("Space.Page@filename");
+                will(returnValue(attachmentReference));
+                oneOf(AttachmentURLStreamHandlerTest.this.dab).getAttachmentContent(attachmentReference);
                 will(returnValue(new ByteArrayInputStream("content".getBytes())));
-        }});
-        
+            }
+        });
+
         URLConnection connection = url.openConnection();
         InputStream input = null;
         try {
@@ -100,7 +105,7 @@ public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
             }
         }
     }
-    
+
     /**
      * Verify that URL-encoded chars are decoded.
      */
@@ -108,11 +113,14 @@ public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
     public void testAttachmentJarURLWithEncodedChars() throws Exception
     {
         URL url = new URL(null, "attachmentjar://some%20page", (URLStreamHandler) this.handler);
-        
-        getMockery().checking(new Expectations() {{
-            oneOf(arf).resolve("some page");
-        }});
-        
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(AttachmentURLStreamHandlerTest.this.arf).resolve("some page");
+            }
+        });
+
         url.openConnection();
     }
 }

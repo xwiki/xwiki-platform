@@ -103,7 +103,7 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractMockingComp
         version3.setAttachment_content(new StringAttachmentContent("I am version 1.3"));
 
         this.provider = this.fileTools.getAttachmentFileProvider(version1);
-        this.archive = ListAttachmentArchive.newInstance(new ArrayList<XWikiAttachment>() {{
+        this.archive = new ListAttachmentArchive(new ArrayList<XWikiAttachment>() {{
             add(version1);
             add(version2);
             add(version3);

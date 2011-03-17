@@ -71,26 +71,25 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
      */
     public ListAttachmentArchive(final XWikiAttachment attachment)
     {
-        this.attachment = attachment;
+        this(new ArrayList<XWikiAttachment>() { { add(attachment); } });
     }
 
     /**
+     * Constructor from List.
      * Create a new instance of ListAttachmentArchive from a list of attachments.
+     *
      * @param revisions a List of XWikiAttachment revisions to put in this archive.
      *                  All revisions are the same attachment and thus must have the same ID.
-     * @return a new ListAttachmentArchive based on the given attachments.
      */
-    public static ListAttachmentArchive newInstance(final List<XWikiAttachment> revisions)
+    public ListAttachmentArchive(final List<XWikiAttachment> revisions)
     {
-        final ListAttachmentArchive arch = new ListAttachmentArchive(null);
-
         // Empty list:
         if (revisions.size() == 0) {
-            return arch;
+            return;
         }
 
-        arch.revisions.addAll(revisions);
-        Collections.sort(arch.revisions, XWikiAttachmentVersionComparitor.INSTANCE);
+        this.revisions.addAll(revisions);
+        Collections.sort(this.revisions, XWikiAttachmentVersionComparitor.INSTANCE);
 
         // Sanity check, all revisions should have the same ID.
         long id = revisions.get(0).getId();
@@ -103,13 +102,11 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
                                                    + firstAttachName + " ) so they cannot all be "
                                                    + "revisions of the same attachment.");
             }
-            attach.setAttachment_archive(arch);
+            attach.setAttachment_archive(this);
         }
 
         // Set the attachment for this archive to the latest version.
-        arch.setAttachment(arch.revisions.get(arch.revisions.size() - 1));
-
-        return arch;
+        this.attachment = this.revisions.get(revisions.size() - 1);
     }
 
     /**

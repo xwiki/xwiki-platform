@@ -117,6 +117,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
 
     /**
      * Get a TransactionRunnable for saving the attachment content.
+     * If {@link XWikiAttachment#getAttachment_content()} yields null, this runnable will do nothing.
      *
      * @param attachment the XWikiAttachment whose content should be saved.
      * @param updateDocument whether or not to update the document at the same time.
@@ -132,8 +133,8 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     {
         final XWikiAttachmentContent content = attachment.getAttachment_content();
 
-        if (content == null || (!content.isContentDirty() && !attachment.isMetaDataDirty())) {
-            // If content has not been modified then there's nothing to save.
+        if (content == null) {
+            // If content does not exist we should not blank the attachment.
             return new TransactionRunnable<XWikiHibernateTransaction>();
         }
 

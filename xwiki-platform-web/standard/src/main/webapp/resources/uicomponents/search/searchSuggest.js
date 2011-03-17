@@ -16,6 +16,8 @@ var XWiki = (function (XWiki) {
         
       this.searchInput = $(searchInput);
 
+      this.searchInput.observe("keyup", this.onKeyUp.bindAsEventListener(this));
+
       document.observe("xwiki:suggest:clearSuggestions", this.onClearSuggestions.bindAsEventListener(this));
       document.observe("xwiki:suggest:containerCreated", this.onSuggestContainerCreated.bindAsEventListener(this)); 
       document.observe("xwiki:suggest:selected", this.onSuggestionSelected.bindAsEventListener(this));
@@ -113,7 +115,7 @@ var XWiki = (function (XWiki) {
    /**
     * Callback triggered when a key has been typed on the virtual input.
     */
-   onKeyPress: function(event){
+   onKeyUp: function(event){
      var key = event.keyCode;
      switch(key) {
        case Event.KEY_RETURN:
@@ -121,7 +123,6 @@ var XWiki = (function (XWiki) {
            event.stop();
            this.searchInput.up('form').submit();
          }
-       default:
      }
    } 
     

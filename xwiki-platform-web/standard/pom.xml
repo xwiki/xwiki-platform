@@ -548,7 +548,8 @@
               <rules>
                 <bannedDependencies>
                   <excludes>
-                    <exclude>junit:junit</exclude>
+                    <exclude>org.jmock:*</exclude>
+                    <exclude>junit:*</exclude>
                   </excludes>
                 </bannedDependencies>
               </rules>

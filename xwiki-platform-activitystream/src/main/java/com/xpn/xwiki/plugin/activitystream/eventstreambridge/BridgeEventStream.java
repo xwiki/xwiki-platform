@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
@@ -142,8 +143,15 @@ public class BridgeEventStream implements EventStream
      */
     public List<Event> searchEvents(Query query) throws QueryException
     {
-        List<ActivityEvent> events = this.qm.createQuery("select event from ActivityEventImpl event "
-            + query.getStatement(), query.getLanguage()).execute();
+        Query q = this.qm.createQuery("select event from ActivityEventImpl event "
+            + query.getStatement(), query.getLanguage());
+        for (Map.Entry<String, Object> entry : query.getNamedParameters().entrySet()) {
+            q.bindValue(entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<Integer, Object> entry : query.getPositionalParameters().entrySet()) {
+            q.bindValue(entry.getKey(), entry.getValue());
+        }
+        List<ActivityEvent> events = q.execute();
         return convertActivitiesToEvents(events);
     }
 

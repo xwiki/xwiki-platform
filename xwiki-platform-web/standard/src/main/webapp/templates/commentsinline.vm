@@ -151,7 +151,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
           <span class="commenttool commentedit"><a class="edit" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$xredirect")" title="$msg.get('core.viewers.comments.edit')">$msg.get('core.viewers.comments.edit')</a></span>
         #end
       #end
-      #if ($hasEdit)
+      #if ($hasAdmin || (!$isGuest && $hasEdit && $comment.author == $xcontext.user))
         <span class="commenttool commentdelete"><a class="delete" href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$xredirect")" title="$msg.get('core.viewers.comments.delete')">$msg.get('core.viewers.comments.delete')</a></span>
       #end
       </span>## commenttools

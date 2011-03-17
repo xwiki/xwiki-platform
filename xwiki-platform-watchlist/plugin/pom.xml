@@ -49,6 +49,12 @@
       <artifactId>xwiki-core</artifactId>
       <version>${platform.core.version}</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>

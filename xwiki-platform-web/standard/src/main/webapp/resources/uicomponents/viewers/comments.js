@@ -297,7 +297,7 @@ viewers.Comments = Class.create({
    * Add a preview button that generates the rendered comment,
    */
   addPreview : function(form) {
-    if (!form) {
+    if (!form || !XWiki.hasEdit) {
       return;
     }
     var previewURL = "$xwiki.getURL('__space__.__page__', 'preview')".replace("__space__", encodeURIComponent($$("meta[name=space]")[0].content)).replace("__page__", encodeURIComponent($$("meta[name=page]")[0].content));

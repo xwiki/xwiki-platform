@@ -3,7 +3,7 @@
 <web>XWiki</web>
 <name>XWikiUserSheet</name>
 <language></language>
-<defaultLanguage>en</defaultLanguage>
+<defaultLanguage></defaultLanguage>
 <translation>0</translation>
 <parent>Main.XWikiUsers</parent>
 <creator>xwiki:XWiki.Admin</creator>
@@ -167,11 +167,6 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
   userprofile : {
 
     init : function() {
-      if ($('avatar')) {
-        Event.observe($('avatar'), 'mouseover', function() { XWiki.userprofile.displayChangePhoto('true') });
-        Event.observe($('avatar'), 'mouseout', function() { XWiki.userprofile.displayChangePhoto('false') });
-        XWiki.userprofile.adjustTabsContainerHeight();
-      }
       this.tabsContainer = $('vertical-tabs');
       this.tabsContainer.select('.vertical-tab').each(function (tabElement) {
         if (!tabElement.__name) {
@@ -185,6 +180,7 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
       this.tabsContainer.select('.vertical-tab.active').each(function (activeTab) {
         document.fire('xwiki:profile:switchedCategory', {'category' : activeTab.__name});
       });
+      XWiki.userprofile.adjustTabsContainerHeight();
     },
 
     /*
@@ -204,15 +200,6 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
         $('vertical-tabs').setStyle({ height: currentPane.getHeight() + 'px' });
       } else {
         $('vertical-tabs').setStyle({ height: '' });
-      }
-    },
-
-    displayChangePhoto : function(display) {
-      var changePhoto = $('avatarUpload');
-      if (display == true) {
-        changePhoto.removeClassName('hidden');
-      } else {
-        changePhoto.addClassName('hidden');
       }
     },
 
@@ -537,6 +524,38 @@ span#avatarUpload {
   float: right;
   margin-right: -16px;
   padding: 0;
+}
+## --------------------------------------
+## Picker style
+.attachment-picker {
+  position: relative;
+}
+.attachment-picker p {
+  padding: 0;
+  margin: 0;
+}
+
+.attachment-picker .picture {
+  z-index: -1;
+}
+.attachment-picker .buttonwrapper {
+  margin: 0;
+}
+
+.attachment-picker-start {
+  background: url("$xwiki.getSkinFile('icons/silk/picture_edit.gif')") no-repeat center center $theme.pageContentBackgroundColor !important;
+  border: 0 none !important;
+  border-radius-bottomleft: 8px;
+  -moz-border-radius-bottomleft: 8px;
+  -webkit-border-radius-bottomleft: 8px;
+  height: 18px;
+  position: absolute;
+  right: 0;
+  text-align: left;
+  text-indent: -9999px;
+  top: 0;
+  width: 18px !important;
+  z-index: 1;
 }</code>
 </property>
 <property>
@@ -569,20 +588,6 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
 #if($isMyProfile &amp;&amp; $hasWatch)
   #set($discard = $categories.add(['watchlist', $msg.get('platform.core.profile.category.watchlist'), 'XWiki.XWikiUserWatchListSheet', 'icons/silk/star.gif']))
 #end
-##
-## Avatar
-##
-#set($avatarURL = '')
-#if($obj.getProperty("avatar") &amp;&amp; $obj.getProperty("avatar").getValue() != '')
-  #foreach ($attach in $doc.attachmentList)
-    #if($attach.filename == $obj.getProperty("avatar").getValue())
-      #set($avatarURL = "$doc.getAttachmentURL($attach.filename, 'download', 'width=120')")
-    #end
-  #end
-#end
-#if("$!avatarURL" == '')
-  #set($avatarURL = $xwiki.getDocument("XWiki.XWikiUserSheet").getAttachmentURL('noavatar.png', 'download', 'width=120'))
-#end
 #if ($isMyProfile)
   #set ($discard = $categories.add(['network', $msg.get('platform.core.profile.category.network'), 'XWiki.XWikiUserNetworkSheet', 'icons/silk/group.gif']))
 #end
@@ -603,9 +608,12 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
     ##
     &lt;div id="vertical-tabs"&gt;
       &lt;div id="avatar"&gt;
-        &lt;span id="avatarUpload" class="hidden"&gt;$msg.get('platform.core.profile.changePhoto')&lt;/span&gt;
-        &lt;a href="$doc.getURL('edit', 'xpage=changemyavatar')" &gt;&lt;img class="photo" id="xwikiuseravatar" alt="$doc.display('first_name', 'view', $obj)" src="$avatarURL"/&gt;&lt;/a&gt;
-      &lt;/div&gt;
+{{/html}}
+
+{{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($isMyProfile) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="120" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$msg.get('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,gif"/}}
+
+{{html clean="false"}}
+      &lt;/div&gt;## avatar
       &lt;div&gt; 
         &lt;ul&gt;
           #foreach($tab in $categories)

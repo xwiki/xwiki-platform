@@ -19,19 +19,19 @@
  */
 package org.xwiki.cache.tests;
 
-import org.jmock.Mock;
+import org.jmock.Expectations;
+import org.junit.Assert;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Base class for testing cache component implementation.
- * 
+ *
  * @version $Id$
  */
-public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase
+public abstract class AbstractTestCache extends AbstractComponentTestCase
 {
     /**
      * The first key.
@@ -68,23 +68,19 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractXWikiComponentTestCase#setUp()
      */
     @Override
-    protected void setUp() throws Exception
+    protected void registerComponents() throws Exception
     {
-        super.setUp();
-
-        Mock mockConfigurationSource = mock(ConfigurationSource.class);
-        mockConfigurationSource.stubs().method("getProperty").with(eq("cache.defaultCache"), ANYTHING).will(
-            returnValue(this.roleHint));
-
-        DefaultComponentDescriptor<ConfigurationSource> descriptor =
-            new DefaultComponentDescriptor<ConfigurationSource>();
-        descriptor.setRole(ConfigurationSource.class);
-        descriptor.setRoleHint("xwikiproperties");
-        getComponentManager().registerComponent(descriptor, (ConfigurationSource) mockConfigurationSource.proxy());
+        final ConfigurationSource mockConfigurationSource =
+            registerMockComponent(ConfigurationSource.class, "xwikiproperties");
+        getMockery().checking(new Expectations() {
+            {
+                allowing(mockConfigurationSource)
+                    .getProperty(with(equal("cache.defaultCache")), with(any(Object.class)));
+                will(returnValue(roleHint));
+            }
+        });
     }
 
     /**
@@ -97,7 +93,7 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase
 
         CacheFactory factory = cacheManager.getCacheFactory();
 
-        assertNotNull(factory);
+        Assert.assertNotNull(factory);
 
         return factory;
     }

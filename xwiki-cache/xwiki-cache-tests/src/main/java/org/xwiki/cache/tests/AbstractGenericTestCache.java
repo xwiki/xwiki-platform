@@ -19,6 +19,8 @@
  */
 package org.xwiki.cache.tests;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -30,7 +32,6 @@ import org.xwiki.cache.config.CacheConfiguration;
  */
 public abstract class AbstractGenericTestCache extends AbstractTestCache
 {
-
     /**
      * @param roleHint the role hint of the cache component implementation to test.
      */
@@ -47,13 +48,14 @@ public abstract class AbstractGenericTestCache extends AbstractTestCache
      * 
      * @throws Exception error.
      */
+    @Test
     public void testGetFactory() throws Exception
     {
         CacheFactory factory = getCacheFactory();
 
         CacheFactory factory2 = getCacheFactory();
 
-        assertSame(factory, factory2);
+        Assert.assertSame(factory, factory2);
     }
 
     /**
@@ -61,19 +63,20 @@ public abstract class AbstractGenericTestCache extends AbstractTestCache
      * 
      * @throws Exception error.
      */
+    @Test
     public void testCreateAndDestroyCacheSimple() throws Exception
     {
         CacheFactory factory = getCacheFactory();
 
         Cache<Object> cache = factory.newCache(new CacheConfiguration());
 
-        assertNotNull(cache);
+        Assert.assertNotNull(cache);
 
         cache.set(KEY, VALUE);
         cache.set(KEY2, VALUE2);
 
-        assertEquals(VALUE, cache.get(KEY));
-        assertEquals(VALUE2, cache.get(KEY2));
+        Assert.assertEquals(VALUE, cache.get(KEY));
+        Assert.assertEquals(VALUE2, cache.get(KEY2));
 
         cache.dispose();
     }
@@ -83,6 +86,7 @@ public abstract class AbstractGenericTestCache extends AbstractTestCache
      * 
      * @throws Exception error.
      */
+    @Test
     public void testRemove() throws Exception
     {
         CacheFactory factory = getCacheFactory();
@@ -94,8 +98,8 @@ public abstract class AbstractGenericTestCache extends AbstractTestCache
 
         cache.remove(KEY);
 
-        assertNull(cache.get(KEY));
-        assertEquals(VALUE2, cache.get(KEY2));
+        Assert.assertNull(cache.get(KEY));
+        Assert.assertEquals(VALUE2, cache.get(KEY2));
     }
 
     /**
@@ -103,6 +107,7 @@ public abstract class AbstractGenericTestCache extends AbstractTestCache
      * 
      * @throws Exception error.
      */
+    @Test
     public void testRemoveAll() throws Exception
     {
         CacheFactory factory = getCacheFactory();
@@ -114,8 +119,8 @@ public abstract class AbstractGenericTestCache extends AbstractTestCache
 
         cache.removeAll();
 
-        assertNull(cache.get(KEY));
-        assertNull(cache.get(KEY2));
+        Assert.assertNull(cache.get(KEY));
+        Assert.assertNull(cache.get(KEY2));
     }
 
     /**
@@ -123,6 +128,7 @@ public abstract class AbstractGenericTestCache extends AbstractTestCache
      * 
      * @throws Exception error.
      */
+    @Test
     public void testEvents() throws Exception
     {
         CacheFactory factory = getCacheFactory();
@@ -135,24 +141,24 @@ public abstract class AbstractGenericTestCache extends AbstractTestCache
 
         cache.set(KEY, VALUE);
 
-        assertNotNull(eventListener.getAddedEvent());
-        assertSame(cache, eventListener.getAddedEvent().getCache());
-        assertEquals(KEY, eventListener.getAddedEvent().getEntry().getKey());
-        assertEquals(VALUE, eventListener.getAddedEvent().getEntry().getValue());
+        Assert.assertNotNull(eventListener.getAddedEvent());
+        Assert.assertSame(cache, eventListener.getAddedEvent().getCache());
+        Assert.assertEquals(KEY, eventListener.getAddedEvent().getEntry().getKey());
+        Assert.assertEquals(VALUE, eventListener.getAddedEvent().getEntry().getValue());
 
         cache.set(KEY, VALUE2);
 
-        assertNotNull(eventListener.getModifiedEvent());
-        assertSame(cache, eventListener.getModifiedEvent().getCache());
-        assertEquals(KEY, eventListener.getModifiedEvent().getEntry().getKey());
-        assertEquals(VALUE2, eventListener.getModifiedEvent().getEntry().getValue());
+        Assert.assertNotNull(eventListener.getModifiedEvent());
+        Assert.assertSame(cache, eventListener.getModifiedEvent().getCache());
+        Assert.assertEquals(KEY, eventListener.getModifiedEvent().getEntry().getKey());
+        Assert.assertEquals(VALUE2, eventListener.getModifiedEvent().getEntry().getValue());
 
         cache.remove(KEY);
         cache.get(KEY);
 
-        assertNotNull(eventListener.getRemovedEvent());
-        assertSame(cache, eventListener.getRemovedEvent().getCache());
-        assertEquals(KEY, eventListener.getRemovedEvent().getEntry().getKey());
-        assertEquals(VALUE2, eventListener.getRemovedEvent().getEntry().getValue());
+        Assert.assertNotNull(eventListener.getRemovedEvent());
+        Assert.assertSame(cache, eventListener.getRemovedEvent().getCache());
+        Assert.assertEquals(KEY, eventListener.getRemovedEvent().getEntry().getKey());
+        Assert.assertEquals(VALUE2, eventListener.getRemovedEvent().getEntry().getValue());
     }
 }

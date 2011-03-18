@@ -19,6 +19,8 @@
  */
 package org.xwiki.cache.oscache;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -41,6 +43,7 @@ public class OSCacheLocalCacheTest extends AbstractGenericTestCache
     // ///////////////////////////////////////////////////////::
     // Tests
 
+    @Test
     public void testCreateAndDestroyCacheLRUMaxEntries() throws ComponentLookupException, Exception
     {
         CacheFactory factory = getCacheFactory();
@@ -52,20 +55,21 @@ public class OSCacheLocalCacheTest extends AbstractGenericTestCache
 
         Cache<Object> cache = factory.newCache(conf);
 
-        assertNotNull(cache);
+        Assert.assertNotNull(cache);
 
         cache.set(KEY, VALUE);
 
-        assertEquals(VALUE, cache.get(KEY));
+        Assert.assertEquals(VALUE, cache.get(KEY));
 
         cache.set(KEY2, VALUE2);
 
-        assertNull(cache.get(KEY));
-        assertEquals(VALUE2, cache.get(KEY2));
+        Assert.assertNull(cache.get(KEY));
+        Assert.assertEquals(VALUE2, cache.get(KEY2));
 
         cache.dispose();
     }
 
+    @Test
     public void testCreateAndDestroyCacheLRUTimeToLive() throws ComponentLookupException, Exception
     {
         CacheFactory factory = getCacheFactory();
@@ -77,19 +81,20 @@ public class OSCacheLocalCacheTest extends AbstractGenericTestCache
 
         Cache<Object> cache = factory.newCache(conf);
 
-        assertNotNull(cache);
+        Assert.assertNotNull(cache);
 
         cache.set(KEY, VALUE);
 
-        assertEquals(VALUE, cache.get(KEY));
+        Assert.assertEquals(VALUE, cache.get(KEY));
 
         Thread.sleep(1000);
 
-        assertNull(cache.get(KEY));
+        Assert.assertNull(cache.get(KEY));
 
         cache.dispose();
     }
 
+    @Test
     public void testCreateAndDestroyCacheLRUAll() throws ComponentLookupException, Exception
     {
         CacheFactory factory = getCacheFactory();
@@ -102,21 +107,21 @@ public class OSCacheLocalCacheTest extends AbstractGenericTestCache
 
         Cache<Object> cache = factory.newCache(conf);
 
-        assertNotNull(cache);
+        Assert.assertNotNull(cache);
 
         cache.set(KEY, VALUE);
 
-        assertEquals(VALUE, cache.get(KEY));
+        Assert.assertEquals(VALUE, cache.get(KEY));
 
         cache.set(KEY2, VALUE2);
 
-        assertNull(cache.get(KEY));
-        assertEquals(VALUE2, cache.get(KEY2));
+        Assert.assertNull(cache.get(KEY));
+        Assert.assertEquals(VALUE2, cache.get(KEY2));
 
         Thread.sleep(1000);
 
-        assertNull(cache.get(KEY));
-        assertNull(cache.get(KEY2));
+        Assert.assertNull(cache.get(KEY));
+        Assert.assertNull(cache.get(KEY2));
 
         cache.dispose();
     }

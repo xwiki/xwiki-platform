@@ -19,6 +19,8 @@
  */
 package org.xwiki.cache.jbosscache;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -49,6 +51,7 @@ public class JBossCacheLocalCacheEvictionsTest extends AbstractTestCache
      * 
      * @throws Exception error
      */
+    @Test
     public void testCreateAndDestroyCacheLRUTimeToLive() throws Exception
     {
         CacheFactory factory = getCacheFactory();
@@ -65,20 +68,21 @@ public class JBossCacheLocalCacheEvictionsTest extends AbstractTestCache
         CacheEntryListenerTest eventListener = new CacheEntryListenerTest();
         cache.addCacheEntryListener(eventListener);
 
-        assertNotNull(cache);
+        Assert.assertNotNull(cache);
 
         cache.set(KEY, VALUE);
 
-        assertEquals(VALUE, cache.get(KEY));
+        Assert.assertEquals(VALUE, cache.get(KEY));
 
         // Wait for the JBoss Eviction policy to be called
-        assertTrue("No value has been evicted from the cache", eventListener.waitForEntryEvent(EventType.REMOVE));
+        Assert.assertTrue("No value has been evicted from the cache", eventListener.waitForEntryEvent(EventType.REMOVE));
 
-        assertNull(cache.get(KEY));
+        Assert.assertNull(cache.get(KEY));
 
         cache.dispose();
     }
 
+    @Test
     public void testCreateAndDestroyCacheLRUMaxEntries() throws Exception
     {
         CacheFactory factory = getCacheFactory();
@@ -96,19 +100,19 @@ public class JBossCacheLocalCacheEvictionsTest extends AbstractTestCache
         CacheEntryListenerTest eventListener = new CacheEntryListenerTest();
         cache.addCacheEntryListener(eventListener);
 
-        assertNotNull(cache);
+        Assert.assertNotNull(cache);
 
         cache.set("key", "value");
 
-        assertEquals("value", cache.get("key"));
+        Assert.assertEquals("value", cache.get("key"));
 
         cache.set("key2", 2);
 
         // Wait for the JBoss Eviction policy to be called
-        assertTrue("No value has been evicted from the cache", eventListener.waitForEntryEvent(EventType.REMOVE));
+        Assert.assertTrue("No value has been evicted from the cache", eventListener.waitForEntryEvent(EventType.REMOVE));
 
-        assertNull(cache.get("key"));
-        assertEquals(2, cache.get("key2"));
+        Assert.assertNull(cache.get("key"));
+        Assert.assertEquals(2, cache.get("key2"));
 
         cache.dispose();
     }
@@ -130,26 +134,26 @@ public class JBossCacheLocalCacheEvictionsTest extends AbstractTestCache
         CacheEntryListenerTest eventListener = new CacheEntryListenerTest();
         cache.addCacheEntryListener(eventListener);
 
-        assertNotNull(cache);
+        Assert.assertNotNull(cache);
 
         cache.set("key", "value");
 
-        assertEquals("value", cache.get("key"));
+        Assert.assertEquals("value", cache.get("key"));
 
         cache.set("key2", 2);
 
         // Wait for the JBoss Eviction policy to be called
-        assertTrue("No value has been evicted from the cache", eventListener.waitForEntryEvent(EventType.REMOVE));
+        Assert.assertTrue("No value has been evicted from the cache", eventListener.waitForEntryEvent(EventType.REMOVE));
         eventListener.reinitRemovedEvent();
 
-        assertNull(cache.get("key"));
-        assertEquals(2, cache.get("key2"));
+        Assert.assertNull(cache.get("key"));
+        Assert.assertEquals(2, cache.get("key2"));
 
         // Wait for the JBoss Eviction policy to be called
-        assertTrue("No value has been evicted from the cache", eventListener.waitForEntryEvent(EventType.REMOVE));
+        Assert.assertTrue("No value has been evicted from the cache", eventListener.waitForEntryEvent(EventType.REMOVE));
 
-        assertNull(cache.get("key"));
-        assertNull(cache.get("key2"));
+        Assert.assertNull(cache.get("key"));
+        Assert.assertNull(cache.get("key2"));
 
         cache.dispose();
     }

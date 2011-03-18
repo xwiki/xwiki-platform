@@ -11,9 +11,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1284043167000</creationDate>
-<date>1300362489000</date>
-<contentUpdateDate>1300362489000</contentUpdateDate>
-<version>2.77</version>
+<date>1300445839000</date>
+<contentUpdateDate>1300445839000</contentUpdateDate>
+<version>1.1</version>
 <title>Extension Manager</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -333,10 +333,12 @@ This application is experimental, use it at your own risk.
     &lt;input id="extensionversion" name="extensionversion" type="text" title="Extension version" #if($request.extensionversion)value="${escapetool.xml($request.extensionversion)}"#end /&gt;
   &lt;/p&gt;
 
+  #if ($xwiki.isVirtualMode())
   &lt;p&gt;
     &lt;label for="extensionwiki"&gt;Extension wiki&lt;/label&gt;
     &lt;input id="extensionwiki" name="extensionwiki" type="text" title="Extension wiki" #if($extensionwiki)value="${escapetool.xml($extensionwiki)}"#end /&gt;
   &lt;/p&gt;
+  #end
 
   &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Resolve" name="actionresolve" class="button"/&gt;&lt;/span&gt;
   #if ($hasProgramming)
@@ -535,13 +537,15 @@ This application is experimental, use it at your own risk.
 #if ($extensions.isEmpty())
   {{info}}No extension installed.{{/info}}##
 #else
-  |=Id|=Version|=Type|=Wikis#if ($hasProgramming)|=Actions#end
+  |=Id|=Version|=Type#if($xwiki.isVirtualMode())|=Wikis#end#if ($hasProgramming)|=Actions#end
 
   #foreach($extension in $extensions)
-  |$extension.id.id|$extension.id.version|$extension.type|#if($extension.namespaces)
-          $extension.namespaces##
-        #else
-          All wikis##
+  |$extension.id.id|$extension.id.version|$extension.type#if ($xwiki.isVirtualMode())
+          |#if($extension.namespaces)
+            $extension.namespaces##
+          #else
+            All wikis##
+          #end
         #end
         #if ($hasProgramming)
           |{{html clean="false"}}

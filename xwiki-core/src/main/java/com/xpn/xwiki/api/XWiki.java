@@ -1468,8 +1468,8 @@ public class XWiki extends Api
     }
 
     /**
-     * API to copy a translation of a document to another document of the same name in another wiki
-     * additionally resetting the version
+     * API to copy a translation of a document to another document of the same name in another wiki additionally
+     * resetting the version
      * 
      * @param docname source document
      * @param sourceWiki source wiki
@@ -1486,8 +1486,8 @@ public class XWiki extends Api
     }
 
     /**
-     * API to copy a translation of a document to another document of the same name in another wiki
-     * additionally resetting the version and overwriting the previous document
+     * API to copy a translation of a document to another document of the same name in another wiki additionally
+     * resetting the version and overwriting the previous document
      * 
      * @param docname source document
      * @param sourceWiki source wiki
@@ -1842,7 +1842,7 @@ public class XWiki extends Api
      * implementing a new XWikiURLFactory object. The query string will be modified to be added in the way the
      * environment needs it. It is important to not add the query string parameter manually after a URL. Some
      * environments will not accept this (like the Portlet environement).
-     *
+     * 
      * @param reference the reference to the document for which to return the URL for
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
      * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
@@ -1950,7 +1950,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a link to the User Name page displayed with a custom view The link will link to the page on the
+     * API to retrieve a link to the User Name page displayed with a custom view. The link will link to the page on the
      * wiki where the user is registered (in virtual wiki mode) The formating is done using the format parameter which
      * can contain velocity scripting and access all properties of the User profile using variables ($first_name
      * $last_name $email $city)

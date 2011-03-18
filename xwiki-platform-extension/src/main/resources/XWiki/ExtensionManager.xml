@@ -10,9 +10,9 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1284043167000</creationDate>
-<date>1300445839000</date>
-<contentUpdateDate>1300445839000</contentUpdateDate>
+<creationDate>1284039567000</creationDate>
+<date>1300462401000</date>
+<contentUpdateDate>1300462401000</contentUpdateDate>
 <version>1.1</version>
 <title>Extension Manager</title>
 <template></template>
@@ -25,7 +25,7 @@
 <filename>icon.png</filename>
 <filesize>7442</filesize>
 <author>XWiki.Admin</author>
-<date>1285847285000</date>
+<date>1285843685000</date>
 <version>1.1</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAABmJLR0QA/wD/AP+gvaeTAAAcx0lE
 QVR4Xu2deZAcV53nPy9fZlZWdV3drT5ltQ4LS5aNZKNhfGA52AGbYz2YjQFid1jOXWIXFrx/rHcD
@@ -320,32 +320,41 @@ This application is experimental, use it at your own risk.
 
 {{velocity}}
 {{html}}
-&lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
-&lt;fieldset&gt;
-
-  &lt;p&gt;
-    &lt;label for="extensionid"&gt;Extension identifier&lt;/label&gt;
-    &lt;input id="extensionid" name="extensionid" type="text" title="Extension identifier (&amp;lt;groupid&amp;gt;:&amp;lt;artefactid&amp;gt; for a maven extension)" #if($request.extensionid)value="${escapetool.xml($request.extensionid)}"#end /&gt;
-  &lt;/p&gt;
-
-  &lt;p&gt;
-    &lt;label for="extensionversion"&gt;Extension version&lt;/label&gt;
-    &lt;input id="extensionversion" name="extensionversion" type="text" title="Extension version" #if($request.extensionversion)value="${escapetool.xml($request.extensionversion)}"#end /&gt;
-  &lt;/p&gt;
-
+&lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform half"&gt;
+   &lt;dl&gt;
+     &lt;dt&gt;
+       &lt;label for="extensionid"&gt;Extension identifier &lt;span class="xRequired"&gt;(Required)&lt;/span&gt;&lt;/label&gt;
+       &lt;span class="xHint"&gt;&amp;lt;groupid&amp;gt;:&amp;lt;artefactid&amp;gt; for a maven extension&lt;/span&gt;
+     &lt;/dt&gt;
+     &lt;dd&gt;
+       &lt;input id="extensionid" name="extensionid" type="text" class="" #if($request.extensionid)value="${escapetool.xml($request.extensionid)}"#end /&gt;
+     &lt;/dd&gt;
+   &lt;/dl&gt;
+   &lt;dl&gt;
+     &lt;dt&gt;
+        &lt;label for="extensionversion"&gt;Extension version &lt;span class="xRequired"&gt;(Required)&lt;/span&gt;&lt;/label&gt;
+     &lt;/dt&gt;
+     &lt;dd&gt;
+      &lt;input id="extensionversion" name="extensionversion" type="text" #if($request.extensionversion)value="${escapetool.xml($request.extensionversion)}"#end /&gt;
+     &lt;/dd&gt;
+  &lt;/dl&gt;
   #if ($xwiki.isVirtualMode())
+  &lt;dl&gt;
+    &lt;dt&gt;
+      &lt;label for="extensionwiki"&gt;Extension wiki&lt;/label&gt;
+      &lt;span class="xHint"&gt;Leave empty to install on all wikis&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+      &lt;input id="extensionwiki" name="extensionwiki" type="text" title="Extension wiki" #if($extensionwiki)value="${escapetool.xml($extensionwiki)}"#end /&gt;
+    &lt;/dd&gt;
+    &lt;/dl&gt;
+  #end
   &lt;p&gt;
-    &lt;label for="extensionwiki"&gt;Extension wiki&lt;/label&gt;
-    &lt;input id="extensionwiki" name="extensionwiki" type="text" title="Extension wiki" #if($extensionwiki)value="${escapetool.xml($extensionwiki)}"#end /&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Resolve" name="actionresolve" class="button"/&gt;&lt;/span&gt;
+    #if ($hasProgramming)
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Install" name="actioninstall" class="button"/&gt;&lt;/span&gt;
+    #end
   &lt;/p&gt;
-  #end
-
-  &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Resolve" name="actionresolve" class="button"/&gt;&lt;/span&gt;
-  #if ($hasProgramming)
-  &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Install" name="actioninstall" class="button"/&gt;&lt;/span&gt;
-  #end
-
-&lt;/fieldset&gt;
 &lt;/form&gt;
 {{/html}}
 {{/velocity}}
@@ -460,16 +469,18 @@ This application is experimental, use it at your own risk.
 
       #end
       {{html}}
-      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
-        &lt;fieldset&gt;
+      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform"&gt;
+        &lt;div&gt;
           &lt;input name="extensionid" value="${escapetool.xml($request.extensionid)}" type="hidden" /&gt;
           &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;
           #if ($extensionwiki)
             &lt;input name="extensionwiki" value="$extensionwiki" type="hidden" /&gt;
           #end
           &lt;input name="actioninstall" type="hidden" /&gt;
-          &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
-        &lt;/fieldset&gt;
+          &lt;p&gt;
+            &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
+          &lt;/p&gt;
+        &lt;/div&gt;
       &lt;/form&gt;
       {{/html}}
     #end
@@ -516,13 +527,15 @@ This application is experimental, use it at your own risk.
       #end
 
       {{html}}
-      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
-        &lt;fieldset&gt;
+      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform"&gt;
+        &lt;div&gt;
           &lt;input name="extensionid" value="${escapetool.xml($request.extensionid)}" type="hidden" /&gt;
           &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;
           &lt;input name="actionuninstall" type="hidden" /&gt;
-          &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
-        &lt;/fieldset&gt;
+          &lt;p&gt;
+            &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
+          &lt;/p&gt;
+        &lt;/div&gt;
       &lt;/form&gt;
       {{/html}}
     #end

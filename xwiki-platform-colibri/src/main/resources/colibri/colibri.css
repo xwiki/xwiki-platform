@@ -1652,6 +1652,13 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
   padding: 0 1px;
 }
 
+.box>*:first-child {
+  margin-top: 0;
+}
+.box>*:last-child {
+  margin-bottom: 0;
+}
+
 .code, .box {
   background-color: $theme.backgroundSecondaryColor;
   border: 1px dotted $theme.borderColor;

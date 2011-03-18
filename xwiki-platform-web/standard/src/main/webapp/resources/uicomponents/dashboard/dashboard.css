@@ -11,9 +11,8 @@
   background-color: $theme.panelHeaderBackgroundColor;
   border-bottom: 1px dotted $theme.borderColor;
   color: $theme.panelHeaderTextColor;
-  font-size: .8em;
+  font-size: .83em;
   font-weight: 700;
-  letter-spacing: 0;
   margin: 0;
   padding: 6px 20px 6px 15px;
   text-align: left;
@@ -39,7 +38,7 @@
 
 /* gadget handles on the dashboard */
 .gadget .gadget-title .settings-menu .remove {
-  background-image: url("/xwiki/resources/icons/silk/cross.gif");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
   background-repeat: no-repeat;
   height: 16px;
   width: 16px;
@@ -48,7 +47,7 @@
 }
 
 .gadget .gadget-title .settings {
-  background-image: url("/xwiki/resources/icons/silk/cog.gif");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cog.gif')");
   background-position: center;
   background-repeat: no-repeat;
   height: 16px;

@@ -28,6 +28,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.event.ExtensionInstalled;
 import org.xwiki.extension.event.ExtensionUpgraded;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
@@ -171,6 +172,13 @@ public class InstallTask extends AbstractTask<InstallRequest>
 
         if (previousExtension != null) {
             this.extensionHandlerManager.upgrade(previousExtension, localExtension, namespace);
+
+            try {
+                this.localExtensionRepository.uninstallExtension(previousExtension, namespace);
+            } catch (UninstallException e) {
+                // TODO should probably log something here even if that should not happen since we are sure this
+                // extension exists
+            }
 
             this.observationManager.notify(new ExtensionUpgraded(localExtension.getId()), localExtension,
                 previousExtension);

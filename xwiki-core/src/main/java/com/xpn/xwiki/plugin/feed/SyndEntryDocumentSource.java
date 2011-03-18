@@ -407,7 +407,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
 
     protected Date getDefaultPublishedDate(Document doc, Map<String, Object> params, XWikiContext context)
     {
-        return doc.getCreationDate();
+        return doc.getDate();
     }
 
     protected Date getPublishedDate(Document doc, Map<String, Object> params, XWikiContext context)

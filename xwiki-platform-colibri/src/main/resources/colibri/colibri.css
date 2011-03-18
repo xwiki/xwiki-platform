@@ -1443,7 +1443,7 @@ input.button:hover , .buttonwrapper  a:hover{
   background-color: $theme.panelHeaderBackgroundColor;
   color: $theme.panelHeaderTextColor;
 }
-.vertical-menu .current-group * {
+.vertical-menu .current-group *, .vertical-menu .current-group *:visited, .vertical-menu .current-group *:active {
   color: $theme.panelHeaderTextColor;
 }
 

@@ -66,6 +66,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     /**
      * Used to convert a string into a proper Document Name.
      */
+    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.class, "current");
 
@@ -76,6 +77,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
      * another wiki. This should probably be fixed in the future though but it requires changing existing code that
      * depend on this behavior.
      */
+    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.class, "compactwiki");
 
@@ -323,7 +325,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             return null;
         } finally {
             LOG.debug("XWikiAuthServiceImpl.checkAuth(XWikiContext) took " + (System.currentTimeMillis() - time)
-                      + " milliseconds to run.");
+                + " milliseconds to run.");
         }
     }
 

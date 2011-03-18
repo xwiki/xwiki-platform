@@ -22,10 +22,12 @@ package org.xwiki.chart;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.xwiki.chart.internal.DefaultChartGenerator;
 import org.xwiki.chart.model.ChartModel;
 import org.xwiki.chart.model.DefaultChartModel;
-import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Test case for {@link DefaultChartGenerator}.
@@ -33,7 +35,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
  * @version $Id$
  * @since 2.0M1
  */
-public class DefaultChartGeneratorTest extends AbstractXWikiComponentTestCase
+public class DefaultChartGeneratorTest extends AbstractComponentTestCase
 {
     /**
      * The {@link ChartGenerator} component.
@@ -48,9 +50,8 @@ public class DefaultChartGeneratorTest extends AbstractXWikiComponentTestCase
     /**
      * {@inheritDoc}
      */
-    protected void setUp() throws Exception
+    protected void registerComponents() throws Exception
     {
-        super.setUp();
         Short dataArray[][] = { {1, 2, 3}, {1, 3, 5}};
         String rowHeaders[] = {"1", "2"};
         String columnHeaders[] = {"1", "2", "3"};
@@ -63,6 +64,7 @@ public class DefaultChartGeneratorTest extends AbstractXWikiComponentTestCase
      * 
      * @throws ChartGeneratorException if an error occurs while generating the chart.
      */
+    @Test
     public final void testPieChart() throws ChartGeneratorException
     {
         Map<String, String> parameters = new HashMap<String, String>();
@@ -71,7 +73,7 @@ public class DefaultChartGeneratorTest extends AbstractXWikiComponentTestCase
         parameters.put(ChartGenerator.SERIES_PARAM, "rows");
 
         byte[] chart = chartGenerator.generate(model, parameters);
-        assertNotNull(chart);
+        Assert.assertNotNull(chart);
     }
 
     /**
@@ -79,6 +81,7 @@ public class DefaultChartGeneratorTest extends AbstractXWikiComponentTestCase
      * 
      * @throws ChartGeneratorException if an error occurs while generating the chart.
      */
+    @Test
     public final void testBarChart() throws ChartGeneratorException
     {
         Map<String, String> parameters = new HashMap<String, String>();
@@ -87,7 +90,7 @@ public class DefaultChartGeneratorTest extends AbstractXWikiComponentTestCase
         parameters.put(ChartGenerator.SERIES_PARAM, "rows");
 
         byte[] chart = chartGenerator.generate(model, parameters);
-        assertNotNull(chart);
+        Assert.assertNotNull(chart);
     }
 
     /**
@@ -95,6 +98,7 @@ public class DefaultChartGeneratorTest extends AbstractXWikiComponentTestCase
      * 
      * @throws ChartGeneratorException if an error occurs while generating the chart.
      */
+    @Test
     public final void testLineChart() throws ChartGeneratorException
     {
         Map<String, String> parameters = new HashMap<String, String>();
@@ -103,7 +107,7 @@ public class DefaultChartGeneratorTest extends AbstractXWikiComponentTestCase
         parameters.put(ChartGenerator.SERIES_PARAM, "rows");
 
         byte[] chart = chartGenerator.generate(model, parameters);
-        assertNotNull(chart);
+        Assert.assertNotNull(chart);
     }
 
     /**
@@ -111,6 +115,7 @@ public class DefaultChartGeneratorTest extends AbstractXWikiComponentTestCase
      * 
      * @throws ChartGeneratorException if an error occurs while generating the chart.
      */
+    @Test
     public final void testAreaChart() throws ChartGeneratorException
     {
         Map<String, String> parameters = new HashMap<String, String>();
@@ -119,6 +124,6 @@ public class DefaultChartGeneratorTest extends AbstractXWikiComponentTestCase
         parameters.put(ChartGenerator.SERIES_PARAM, "rows");
 
         byte[] chart = chartGenerator.generate(model, parameters);
-        assertNotNull(chart);
+        Assert.assertNotNull(chart);
     }
 }

@@ -71,7 +71,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
      */
     public ListAttachmentArchive(final XWikiAttachment attachment)
     {
-        this(new ArrayList<XWikiAttachment>() { { add(attachment); } });
+        this.attachment = attachment;
     }
 
     /**

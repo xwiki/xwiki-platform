@@ -22,8 +22,6 @@ package com.xpn.xwiki.wysiwyg.server.internal.cleaner;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.xwiki.test.ComponentManagerTestSetup;
-
 /**
  * Unit tests for default {@link org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner} implementation.
  * 

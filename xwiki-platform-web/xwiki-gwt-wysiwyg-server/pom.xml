@@ -232,7 +232,7 @@
             com/xpn/xwiki/wysiwyg/server/internal/plugin/sync/DefaultSyncEngine.java,
             com/xpn/xwiki/wysiwyg/server/internal/plugin/sync/DefaultSyncEngineTest.java,
             com/xpn/xwiki/wysiwyg/server/internal/wiki/DefaultWikiService.java,
-            com/xpn/xwiki/wysiwyg/server/internal/cleaner/ComponentManagerTestSetup
+            com/xpn/xwiki/wysiwyg/server/internal/cleaner/ComponentManagerTestSetup.java
           </excludes>
         </configuration>
       </plugin>

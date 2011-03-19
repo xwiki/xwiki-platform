@@ -24,7 +24,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWikiContext;
@@ -32,7 +31,7 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Extension of {@link org.xwiki.test.AbstractXWikiComponentTestCase} that sets up a bridge between the new Execution
+ * Extension of {@link AbstractXWikiComponentTestCase} that sets up a bridge between the new Execution
  * Context and the old XWikiContext. This allows code that uses XWikiContext to be tested using this Test Case class.
  * 
  * @version $Id$

@@ -26,9 +26,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.io.IOUtils;
 
 /**
  * The content of an attachment. Objects of this class hold the actual content which will be downloaded when a user
@@ -48,9 +48,8 @@ public class XWikiAttachmentContent implements Cloneable
     private FileItem file;
 
     /**
-     * Constructor which clones an existing XWikiAttachmentContent.
-     * used by {@link #clone()}.
-     *
+     * Constructor which clones an existing XWikiAttachmentContent. Used by {@link #clone()}.
+     * 
      * @param original the XWikiAttachmentContent to clone.
      * @since 2.6M1
      */
@@ -81,6 +80,7 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * Set a new FileItem for storage.
+     * 
      * @since 2.6M1
      */
     private void newFileItem()
@@ -96,8 +96,8 @@ public class XWikiAttachmentContent implements Cloneable
             this.file = dfi;
         } catch (IOException e) {
             throw new RuntimeException("Failed to create new attachment temporary file."
-                                       + " Are you sure you have permission to write to "
-                                       + tempFileLocation + "?", e);
+                + " Are you sure you have permission to write to "
+                + tempFileLocation + "?", e);
         }
     }
 
@@ -225,7 +225,7 @@ public class XWikiAttachmentContent implements Cloneable
     public void setContent(InputStream is, int len) throws IOException
     {
         // TODO Fix so this sends a EOS when the limit is reached.
-        //this.setContent(new LimitedInputStream(is, ((long) len)));
+        // this.setContent(new LimitedInputStream(is, ((long) len)));
         this.setContent(is);
     }
 

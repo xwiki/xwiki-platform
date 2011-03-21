@@ -1,9 +1,9 @@
 #template('colorThemeInit.vm')
 
 #macro(__css3 $rule)
-  -moz-${rule};
-  -webkit-${rule};
-  ${rule};
+  -moz-$rule;
+  -webkit-$rule;
+  $rule;
 #end
 
 /* colortheme gadget settings */

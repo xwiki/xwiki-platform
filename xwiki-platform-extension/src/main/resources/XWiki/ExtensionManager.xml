@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1284039567000</creationDate>
-<date>1300464116000</date>
-<contentUpdateDate>1300464116000</contentUpdateDate>
+<date>1300723874000</date>
+<contentUpdateDate>1300723874000</contentUpdateDate>
 <version>1.1</version>
 <title>Extension Manager</title>
 <template></template>
@@ -282,7 +282,7 @@ H7r8uiiT3zld1P8HeoqDVNse6k8AAAAASUVORK5CYII=
 <className>XWiki.ConfigurableClass</className>
 <guid>cef8c7cf-fecf-42cc-9e95-8a3be6ce936b</guid>
 <property>
-<codeToExecute>{{include document="XWiki.ExtensionManager" /}}</codeToExecute>
+<codeToExecute>{{include document="XWiki.ExtensionManager" context="new" /}}</codeToExecute>
 </property>
 <property>
 <configurationClass></configurationClass>
@@ -352,7 +352,7 @@ This application is experimental, use it at your own risk.
 {{velocity output="false"}}
 #set($extensionManager = $services.extension)
 #set($versionManager = $extensionManager.versionManager)
-#if($request.extensionwiki &amp;&amp; $request.extensionwiki.trim() != '')
+#if ($request.extensionwiki &amp;&amp; $request.extensionwiki.trim() != '')
   #set($extensionwiki = $request.extensionwiki)
 #end
 {{/velocity}}
@@ -409,7 +409,7 @@ This application is experimental, use it at your own risk.
       #set($extension = $extensionManager.resolve($extensionid, $extensionversion, $extensionwiki))
       #if (!$extension)
         #set($lasterror = $extensionManager.lastError)
-        {{error}}Failed to resolve extension with id $request.extensionid and version $extensionversion: $lasterror.message{{/error}}
+        {{error}}Failed to resolve extension with id $extensionid and version $extensionversion: $lasterror.message{{/error}}
       #else
         #set($extensionclass = "${extension.class}")
         #foreach($index in [1..$extensionlevel])*#end #if($extensionclass.endsWith('CoreExtension'))**C**#elseif($extensionclass.endsWith('LocalExtension'))**I**#else**R**#end $extension.id.id ($extension.type) ($extension.id.version#if($extensionversion != $extension.id.version) was $extensionversion#end)

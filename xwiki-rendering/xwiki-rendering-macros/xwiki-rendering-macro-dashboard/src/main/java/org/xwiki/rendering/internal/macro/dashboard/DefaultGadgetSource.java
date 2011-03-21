@@ -183,7 +183,9 @@ public class DefaultGadgetSource implements GadgetSource
             parserUtils.removeTopLevelParagraph(contentBlocks);
 
             // create a gadget will all these and add the gadget to the container of gadgets
-            gadgets.add(new Gadget(id, titleBlocks, contentBlocks, position));
+            Gadget gadget = new Gadget(id, titleBlocks, contentBlocks, position);
+            gadget.setTitleSource(title);
+            gadgets.add(gadget);
         }
         return gadgets;
     }

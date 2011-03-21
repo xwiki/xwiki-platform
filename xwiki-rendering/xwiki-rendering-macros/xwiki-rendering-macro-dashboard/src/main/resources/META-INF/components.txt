@@ -1,3 +1,5 @@
 org.xwiki.rendering.internal.macro.dashboard.DashboardMacro
 org.xwiki.rendering.internal.macro.dashboard.DefaultGadgetSource
 org.xwiki.rendering.internal.macro.dashboard.ColumnsDashboardRenderer
+org.xwiki.rendering.internal.macro.dashboard.DefaultGadgetRenderer
+org.xwiki.rendering.internal.macro.dashboard.EditableGadgetRenderer

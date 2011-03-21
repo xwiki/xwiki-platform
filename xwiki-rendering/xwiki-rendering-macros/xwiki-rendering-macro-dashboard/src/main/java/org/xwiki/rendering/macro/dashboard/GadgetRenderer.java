@@ -23,30 +23,22 @@ import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
- * Renders the passed list of gadgets as a piece of XDOM, to be added in a tree after, handling the layout of the
- * gadgets. Various implementations of this class should provide various strategies of layouting the gadgets.
+ * Decorates the passed gadget and renders it as a full piece of XDOM, a single list of blocks that can be added in the
+ * tree after.
  * 
  * @version $Id$
- * @since 3.0M3
+ * @since 3.0rc1
  */
 @ComponentRole
-public interface DashboardRenderer
+public interface GadgetRenderer
 {
     /**
-     * Renders the passed gadgets in a list of blocks, to be added in an XDOM and rendered after.
+     * Decorates the passed gadget and renders it as a list of XDOM blocks.
      * 
-     * @param gadgets the gadgets to render as XDOM
-     * @param gadgetsRenderer the renderer to use to render the gadgets
-     * @param context the macro transformation context where the dashboard is executed
-     * @return the list of {@link Block}s that represent the gadgets list
-     * @throws Exception if anything goes wrong during macro execution
+     * @param gadget the gadget to render
+     * @return the list of blocks resulted from rendering the passed gadget and decorating it (with containers, etc)
      */
-    List<Block> renderGadgets(List<Gadget> gadgets, GadgetRenderer gadgetsRenderer, MacroTransformationContext context)
-        throws Exception;
-
-    // TODO: add here function that takes dashboard layout specification string as param, to allow different layout
-    // types
+    List<Block> decorateGadget(Gadget gadget);
 }

@@ -35,7 +35,7 @@ public class Gadget
      * The identifier of this gadget, to render in the content.
      */
     private String id;
-    
+
     /**
      * The title of this gadget.
      */
@@ -50,6 +50,13 @@ public class Gadget
      * The position of this gadget, to be interpreted by the layouter.
      */
     private String position;
+
+    /**
+     * The string source of the title of this gadget, to make it editable further. <br/>
+     * FIXME: this should be passed in a different way, potentially in metadata block attached to the title block. FTM,
+     * to make it backwards compatible, keep it like this.
+     */
+    private String titleSource;
 
     /**
      * Creates a gadget from a title, content and position.
@@ -129,5 +136,23 @@ public class Gadget
     public void setId(String id)
     {
         this.id = id;
+    }
+
+    /**
+     * @return the titleSource
+     * FIXME: this should be passed in a different way, potentially in metadata block attached to the title block. FTM,
+     * to make it backwards compatible, keep it like this. 
+     */
+    public String getTitleSource()
+    {
+        return titleSource;
+    }
+
+    /**
+     * @param titleSource the titleSource to set
+     */
+    public void setTitleSource(String titleSource)
+    {
+        this.titleSource = titleSource;
     }
 }

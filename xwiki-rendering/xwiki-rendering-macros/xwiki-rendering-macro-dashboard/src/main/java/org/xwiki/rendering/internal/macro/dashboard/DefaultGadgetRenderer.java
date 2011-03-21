@@ -17,24 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.dashboard;
+package org.xwiki.rendering.internal.macro.dashboard;
 
 import java.util.Collections;
 import java.util.List;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.macro.dashboard.Gadget;
+import org.xwiki.rendering.macro.dashboard.GadgetRenderer;
 
 /**
- * Superclass for the dashboard renderers, which provides a method to decorate a gadget in an uniform manner for all the
- * dashboard renderers, regardless of the layout.
+ * Default implementation of the gadget renderer, rendering the title of the gadget in a level 2 heading and the content
+ * as is, in a container that helps group it together and separate from title.
  * 
  * @version $Id$
- * @since 3.0M3
+ * @since 3.0rc1
  */
-public abstract class AbstractDashboardRenderer implements DashboardRenderer
+@Component
+public class DefaultGadgetRenderer implements GadgetRenderer
 {
     /**
      * The HTML class attribute name.
@@ -47,10 +51,10 @@ public abstract class AbstractDashboardRenderer implements DashboardRenderer
     protected static final String ID = "id";
 
     /**
-     * Decorates the passed gadget and renders it as a list of XDOM blocks.
+     * {@inheritDoc}
      * 
-     * @param gadget the gadget to render
-     * @return the list of blocks resulted from rendering the passed gadget and decorating it (with containers, etc)
+     * @see org.xwiki.rendering.macro.dashboard.GadgetRenderer
+     *      #decorateGadget(org.xwiki.rendering.macro.dashboard.Gadget)
      */
     public List<Block> decorateGadget(Gadget gadget)
     {

@@ -31,8 +31,9 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.container.ContainerMacroParameters;
-import org.xwiki.rendering.macro.dashboard.AbstractDashboardRenderer;
+import org.xwiki.rendering.macro.dashboard.DashboardRenderer;
 import org.xwiki.rendering.macro.dashboard.Gadget;
+import org.xwiki.rendering.macro.dashboard.GadgetRenderer;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -55,26 +56,14 @@ class ColumnGadget extends Gadget
     private Integer index;
 
     /**
-     * Creates a column gadget using the passed title, content and position.
-     * 
-     * @param id the id of this gadget
-     * @param title the title of the gadget
-     * @param content the content of the gadget
-     * @param position the position of the gadget
-     */
-    public ColumnGadget(String id, List<Block> title, List<Block> content, String position)
-    {
-        super(id, title, content, position);
-    }
-
-    /**
      * Creates a column gadget which is a copy of the passed gadget.
      * 
      * @param gadget the gadget to copy into a column gadget.
      */
     public ColumnGadget(Gadget gadget)
     {
-        this(gadget.getId(), gadget.getTitle(), gadget.getContent(), gadget.getPosition());
+        super(gadget.getId(), gadget.getTitle(), gadget.getContent(), gadget.getPosition());
+        this.setTitleSource(gadget.getTitleSource());
     }
 
     /**
@@ -121,8 +110,18 @@ class ColumnGadget extends Gadget
  * @since 3.0M3
  */
 @Component("columns")
-public class ColumnsDashboardRenderer extends AbstractDashboardRenderer
+public class ColumnsDashboardRenderer implements DashboardRenderer
 {
+    /**
+     * The HTML class attribute name.
+     */
+    protected static final String CLASS = "class";
+
+    /**
+     * The HTML id attribute name.
+     */
+    protected static final String ID = "id";
+
     /**
      * The component manager, to inject to the {@link BlocksContainerMacro}.
      */
@@ -132,11 +131,11 @@ public class ColumnsDashboardRenderer extends AbstractDashboardRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.dashboard.DashboardRenderer#renderGadgets(java.util.List,
+     * @see org.xwiki.rendering.macro.dashboard.DashboardRenderer#renderGadgets(java.util.List, GadgetRenderer,
      *      MacroTransformationContext)
      */
-    public List<Block> renderGadgets(List<Gadget> gadgets, MacroTransformationContext context)
-        throws MacroExecutionException
+    public List<Block> renderGadgets(List<Gadget> gadgets, GadgetRenderer gadgetsRenderer,
+        MacroTransformationContext context) throws MacroExecutionException
     {
         // transform the passed gagdets in a list of column gadgets
         List<ColumnGadget> columnGadgets = new ArrayList<ColumnGadget>();
@@ -194,7 +193,7 @@ public class ColumnsDashboardRenderer extends AbstractDashboardRenderer
 
         for (ColumnGadget gadget : columnGadgets) {
             int columnIndex = gadget.getColumn() - 1;
-            gadgetContainers.get(columnIndex).addChildren(decorateGadget(gadget));
+            gadgetContainers.get(columnIndex).addChildren(gadgetsRenderer.decorateGadget(gadget));
         }
 
         // and return the result

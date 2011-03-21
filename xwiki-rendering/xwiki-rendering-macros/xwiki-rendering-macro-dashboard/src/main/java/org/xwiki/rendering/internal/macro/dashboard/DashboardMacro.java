@@ -36,6 +36,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.dashboard.DashboardMacroParameters;
 import org.xwiki.rendering.macro.dashboard.DashboardRenderer;
 import org.xwiki.rendering.macro.dashboard.Gadget;
+import org.xwiki.rendering.macro.dashboard.GadgetRenderer;
 import org.xwiki.rendering.macro.dashboard.GadgetSource;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
@@ -163,6 +164,9 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
             getLogger().error(message, e);
             throw new MacroExecutionException(message, e);
         }
+
+        boolean isInEditMode = gadgetSource.isEditing();
+
         DashboardRenderer renderer =
             getDashboardRenderer(StringUtils.isEmpty(parameters.getLayout()) ? "columns" : parameters.getLayout());
         if (renderer == null) {
@@ -171,18 +175,25 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
             getLogger().error(message);
             throw new MacroExecutionException(message);
         }
+
+        GadgetRenderer gadgetRenderer = getGadgetRenderer(isInEditMode);
+        if (gadgetRenderer == null) {
+            String message = "Could not find gadgets renderer.";
+            // log and throw further
+            getLogger().error(message);
+            throw new MacroExecutionException(message);
+        }
+
         // else, layout
         List<Block> layoutedResult;
         try {
-            layoutedResult = renderer.renderGadgets(gadgets, context);
+            layoutedResult = renderer.renderGadgets(gadgets, gadgetRenderer, context);
         } catch (Exception e) {
             String message = "Could not render the gadgets for layout " + parameters.getLayout();
             // log and throw further
             getLogger().error(message, e);
             throw new MacroExecutionException(message, e);
         }
-
-        boolean isInEditMode = gadgetSource.isEditing();
 
         // include the css and js for this macro. here so that it's included after any dependencies have included their
         // css, so that it cascades properly
@@ -236,6 +247,24 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
             return componentManager.lookup(DashboardRenderer.class, layout);
         } catch (ComponentLookupException e) {
             getLogger().warn("Could not find the Dashboard renderer for layout \"" + layout + "\"");
+            return null;
+        }
+    }
+
+    /**
+     * @param isEditing whether this dashboard is in edit mode or in view mode
+     * @return the gadgets renderer used by this dashboard
+     */
+    protected GadgetRenderer getGadgetRenderer(boolean isEditing)
+    {
+        String hint = "default";
+        if (isEditing) {
+            hint = "edit";
+        }
+        try {
+            return componentManager.lookup(GadgetRenderer.class, hint);
+        } catch (ComponentLookupException e) {
+            getLogger().warn("Could not find the Gadgets renderer for hint \"" + hint + "\".");
             return null;
         }
     }

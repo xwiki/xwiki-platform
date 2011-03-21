@@ -19,12 +19,15 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link XClassRelativeStringEntityReferenceResolver}.

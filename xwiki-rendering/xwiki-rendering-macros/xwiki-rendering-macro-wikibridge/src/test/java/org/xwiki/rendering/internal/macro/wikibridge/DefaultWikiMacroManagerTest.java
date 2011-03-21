@@ -23,7 +23,9 @@ import java.io.StringReader;
 import java.util.ArrayList;
 
 import org.jmock.Expectations;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.macro.Macro;

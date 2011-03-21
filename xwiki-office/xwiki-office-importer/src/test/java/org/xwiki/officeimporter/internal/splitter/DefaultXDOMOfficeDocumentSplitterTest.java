@@ -23,10 +23,8 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.jmock.Expectations;
-import org.junit.*;
+import org.junit.Before;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
@@ -34,6 +32,8 @@ import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
+
+import junit.framework.Assert;
 
 /**
  * Test case for {@link DefaultXDOMOfficeDocumentSplitter}.

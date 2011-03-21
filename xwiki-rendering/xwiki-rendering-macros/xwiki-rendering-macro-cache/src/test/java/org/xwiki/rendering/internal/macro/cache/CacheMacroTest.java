@@ -22,7 +22,8 @@ package org.xwiki.rendering.internal.macro.cache;
 import java.io.StringWriter;
 import java.util.List;
 
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.macro.Macro;
@@ -35,7 +36,7 @@ import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.test.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
 
-import static org.xwiki.rendering.test.BlockAssert.*;
+import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
 
 /**
  * Unit tests for {@link CacheMacro}.

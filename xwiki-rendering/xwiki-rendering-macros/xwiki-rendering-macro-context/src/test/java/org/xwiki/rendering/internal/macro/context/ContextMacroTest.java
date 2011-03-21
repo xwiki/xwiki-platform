@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.jmock.Expectations;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.model.reference.DocumentReference;

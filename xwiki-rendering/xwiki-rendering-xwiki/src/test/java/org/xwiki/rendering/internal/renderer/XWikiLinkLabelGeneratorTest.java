@@ -21,7 +21,9 @@ package org.xwiki.rendering.internal.renderer;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.util.ReflectionUtils;

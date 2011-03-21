@@ -19,8 +19,12 @@
  */
 package org.xwiki.chart.internal.source;
 
+import java.io.Reader;
+import java.util.Collections;
+
 import org.jmock.Expectations;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -33,9 +37,6 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
-
-import java.io.Reader;
-import java.util.Collections;
 
 /**
  * Unit tests for {@link MacroContentTableBlockDataSource}.

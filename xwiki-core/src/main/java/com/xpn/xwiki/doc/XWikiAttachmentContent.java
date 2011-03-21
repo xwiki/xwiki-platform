@@ -26,9 +26,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 
 /**
  * The content of an attachment. Objects of this class hold the actual content which will be downloaded when a user
@@ -208,7 +209,7 @@ public class XWikiAttachmentContent implements Cloneable
     public InputStream getContentInputStream()
     {
         try {
-            return this.file.getInputStream();
+            return new AutoCloseInputStream(this.file.getInputStream());
         } catch (IOException e) {
             throw new RuntimeException("Failed to get InputStream", e);
         }

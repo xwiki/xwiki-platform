@@ -197,13 +197,11 @@
         #else
           &lt;ul&gt;
           #foreach ($followedUser in $followedUsers)
+            #set ($authorsParam = $services.model.serialize($services.model.resolveDocument($xcontext.user), 'default'))
             #set ($userDocument = $xwiki.getDocument($followedUser))
             ## Prepare the list of followed users as it appears in the activity macro parameter
             ## (do it here to avoid another foreach loop later)
-            #set ($authorsParam = "$!{authorsParam}${userDocument.fullName},${userDocument.prefixedFullName}")
-            #if ($foreach.hasNext)
-              #set ($authorsParam = "${authorsParam},")
-            #end
+            #set ($authorsParam = "$!{authorsParam},${userDocument.fullName},${userDocument.prefixedFullName}")
             ## Display the user info
             &lt;li class="vcard"&gt;
             #set ($userID = $userDocument.name)

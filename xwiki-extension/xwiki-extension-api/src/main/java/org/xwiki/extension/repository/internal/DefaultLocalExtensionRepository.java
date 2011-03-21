@@ -21,6 +21,7 @@ package org.xwiki.extension.repository.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -40,7 +41,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.xml.sax.SAXException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -51,6 +51,7 @@ import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.InstallException;
+import org.xwiki.extension.InvalidExtensionException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
@@ -465,19 +466,32 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
         }
     }
 
-    private LocalExtension loadDescriptor(File descriptor) throws ParserConfigurationException, SAXException,
-        IOException
+    private LocalExtension loadDescriptor(File descriptor) throws InvalidExtensionException
     {
-        FileInputStream fis = new FileInputStream(descriptor);
+        FileInputStream fis;
+        try {
+            fis = new FileInputStream(descriptor);
+        } catch (FileNotFoundException e) {
+            throw new InvalidExtensionException("Failed to open descriptor for reading", e);
+        }
 
         try {
             DefaultLocalExtension localExtension = this.extensionSerializer.loadDescriptor(fis);
 
             localExtension.setFile(getExtensionFile(localExtension.getId(), localExtension.getType()));
 
+            if (!localExtension.getFile().exists()) {
+                throw new InvalidExtensionException("Failed to load local extension [" + descriptor + "]: ["
+                    + localExtension.getFile() + "] file does not exists");
+            }
+
             return localExtension;
         } finally {
-            fis.close();
+            try {
+                fis.close();
+            } catch (IOException e) {
+                // TODO: log something
+            }
         }
     }
 

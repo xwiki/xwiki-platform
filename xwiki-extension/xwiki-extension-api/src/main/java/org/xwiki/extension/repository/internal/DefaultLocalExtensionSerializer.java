@@ -19,10 +19,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InvalidExtensionException;
 import org.xwiki.extension.LocalExtension;
 
 public class DefaultLocalExtensionSerializer
@@ -36,11 +36,21 @@ public class DefaultLocalExtensionSerializer
         this.repository = repository;
     }
 
-    public DefaultLocalExtension loadDescriptor(InputStream descriptor) throws ParserConfigurationException, SAXException,
-        IOException
+    public DefaultLocalExtension loadDescriptor(InputStream descriptor) throws InvalidExtensionException
     {
-        DocumentBuilder documentBuilder = this.documentBuilderFactory.newDocumentBuilder();
-        Document document = documentBuilder.parse(descriptor);
+        DocumentBuilder documentBuilder;
+        try {
+            documentBuilder = this.documentBuilderFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new InvalidExtensionException("Failed to create new DocumentBuilder", e);
+        }
+
+        Document document;
+        try {
+            document = documentBuilder.parse(descriptor);
+        } catch (Exception e) {
+            throw new InvalidExtensionException("Failed to parse descriptor", e);
+        }
 
         Element extensionElement = document.getDocumentElement();
 
@@ -53,7 +63,6 @@ public class DefaultLocalExtensionSerializer
         DefaultLocalExtension localExtension =
             new DefaultLocalExtension(repository,
                 new ExtensionId(idNode.getTextContent(), versionNode.getTextContent()), typeNode.getTextContent());
-
 
         // Optional fields
 

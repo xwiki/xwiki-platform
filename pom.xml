@@ -182,6 +182,7 @@
     <module>xwiki-store</module>
     <module>xwiki-eventstream</module>
     <module>xwiki-messagestream</module>
+    <module>xwiki-test</module>
   </modules>
   <profiles>
     <profile>

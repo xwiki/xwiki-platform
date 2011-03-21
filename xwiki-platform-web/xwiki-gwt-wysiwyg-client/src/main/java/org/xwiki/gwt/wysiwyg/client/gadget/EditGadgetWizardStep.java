@@ -79,19 +79,21 @@ public class EditGadgetWizardStep extends EditMacroWizardStep
     @Override
     public void init(Object data, AsyncCallback< ? > cb)
     {
-        super.init(data, cb);
+        GadgetInstance gadgetInstance = (GadgetInstance) data;
+        super.init(gadgetInstance.getMacroCall(), cb);
 
         // insert the title on the first position in the content panel
-        getPanel().insert(getTitlePanel(), 0);
+        getPanel().insert(getTitlePanel(gadgetInstance.getTitle()), 0);
         // and focus the title input
         // FIXME: this doesn't work, need to hook on the insert of all the parameter editors in the param displayers
         titleInput.setFocus(true);
     }
 
     /**
+     * @param title the title to fill in the title input by default
      * @return the panel for the title input for this gadget
      */
-    private Panel getTitlePanel()
+    private Panel getTitlePanel(String title)
     {
         Panel container = new FlowPanel();
         container.addStyleName("xMacroParameter");
@@ -103,9 +105,9 @@ public class EditGadgetWizardStep extends EditMacroWizardStep
         description.addStyleName("xMacroParameterDescription");
         container.add(description);
         titleInput = new TextInput(new TextBox());
+        titleInput.setValue(title);
         titleInput.addStyleName("textInput");
         container.add(titleInput);
-        // TODO: prefill the title input with the name of the macro
 
         return container;
     }

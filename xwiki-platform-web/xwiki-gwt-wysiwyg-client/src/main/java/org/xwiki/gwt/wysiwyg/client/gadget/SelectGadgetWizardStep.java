@@ -21,6 +21,7 @@ package org.xwiki.gwt.wysiwyg.client.gadget;
 
 import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.wysiwyg.client.Strings;
+import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroCall;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroServiceAsync;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.ui.SelectMacroWizardStep;
 
@@ -56,5 +57,24 @@ public class SelectGadgetWizardStep extends SelectMacroWizardStep
     public String getStepTitle()
     {
         return Strings.INSTANCE.gadgetInsertDialogTitle();
+    }
+
+    /**
+     * {@inheritDoc} <br />
+     * Overridden here to send a GadgetInstance to the edit gadget step, which will also contain the title of the
+     * gadget, not only the content.
+     * 
+     * @see org.xwiki.gwt.wysiwyg.client.plugin.macro.ui.SelectMacroWizardStep#getResult()
+     */
+    @Override
+    public Object getResult()
+    {
+        MacroCall superResult = (MacroCall) super.getResult();
+        GadgetInstance gadgetInstance = new GadgetInstance();
+        gadgetInstance.setMacroCall(superResult);
+        // prefill the title of the gadget with the name of the macro
+        gadgetInstance.setTitle(superResult.getName());
+
+        return gadgetInstance;
     }
 }

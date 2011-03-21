@@ -451,4 +451,6 @@ public interface Strings extends Constants
     String gadgetTitleLabel();
 
     String gadgetTitleDescription();
+
+    String gadgetEditDialogCaption();
 }

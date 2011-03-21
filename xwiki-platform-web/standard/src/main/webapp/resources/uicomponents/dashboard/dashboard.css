@@ -31,19 +31,26 @@
   padding: 10px 15px;
 }
 
-/* Hide the dashboard metadata */
+/* Hide the dashboard metadata and any metadata that appears in a dashboard (e.g. the gadget metadata) */
 .dashboard .metadata {
   display: none;
 }
 
 /* gadget handles on the dashboard */
-.gadget .gadget-title .settings-menu .remove {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
+.gadget .gadget-title .settings-menu .action {
   background-repeat: no-repeat;
   height: 16px;
   width: 16px;
   cursor: pointer;
   margin: 2px;
+}
+
+.gadget .gadget-title .settings-menu .remove {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
+}
+
+.gadget .gadget-title .settings-menu .edit {
+  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.gif')");
 }
 
 .gadget .gadget-title .settings {
@@ -63,8 +70,6 @@
 }
 
 .gadget .gadget-title .settings-menu {
-  width: 20px;
-  height: 20px;
   position: absolute;
   top: 18px;
   right: 2px;

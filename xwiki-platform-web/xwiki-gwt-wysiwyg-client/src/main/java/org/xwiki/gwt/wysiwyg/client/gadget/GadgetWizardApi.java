@@ -32,6 +32,7 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardStepMap;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.wysiwyg.client.Images;
 import org.xwiki.gwt.wysiwyg.client.Strings;
+import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroCall;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroService;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroServiceAsync;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroServiceAsyncCacheProxy;
@@ -67,6 +68,11 @@ public class GadgetWizardApi implements WizardListener
     private Wizard insertWizard;
 
     /**
+     * The magic wand used to transform the macros in other things.
+     */
+    private Wizard editWizard;
+
+    /**
      * The object used to configure this wizard.
      */
     private final Config config;
@@ -81,6 +87,12 @@ public class GadgetWizardApi implements WizardListener
      */
     @SuppressWarnings("unused")
     private JavaScriptObject insertCallback;
+
+    /**
+     * The javascript callback called when the edit is done.
+     */
+    @SuppressWarnings("unused")
+    private JavaScriptObject editCallback;
 
     /**
      * Creates a new gadget wizard.
@@ -129,6 +141,45 @@ public class GadgetWizardApi implements WizardListener
     }-*/;
 
     /**
+     * Starts the edit wizard, to edit the specified macro call.
+     * 
+     * @param macroCall the macro call to edit, passed as a html comment from the annotated syntax.
+     * @param title the title of the gadget to edit
+     */
+    public void edit(String macroCall, String title)
+    {
+        GadgetInstance gadgetInstance = new GadgetInstance();
+        gadgetInstance.setMacroCall(new MacroCall(macroCall));
+        gadgetInstance.setTitle(title);
+        getEditWizard().start(EDIT_STEP_NAME, gadgetInstance);
+    }
+
+    /**
+     * Sets the native js edit callback to be called when the edit wizard is done.
+     * 
+     * @param editHandler the native js callback to call when the edit wizard is finished successfully.
+     */
+    public void setEditCallback(JavaScriptObject editHandler)
+    {
+        this.editCallback = editHandler;
+    }
+
+    /**
+     * Handles the call of the js callback when the edit is done.
+     * 
+     * @param macroCall the new macro call used as a content of the edited gadget
+     * @param gadgetTitle the title of the gadget
+     */
+    protected native void onEditDone(String macroCall, String gadgetTitle)
+    /*-{
+        var editCallback = this.@org.xwiki.gwt.wysiwyg.client.gadget.GadgetWizardApi::editCallback;
+        if (typeof editCallback == 'function') {
+            var result = {'title' : gadgetTitle, 'content' : macroCall};
+            editCallback(result);
+        }
+    }-*/;
+
+    /**
      * {@inheritDoc}
      * 
      * @see WizardListener#onCancel(Wizard)
@@ -148,6 +199,10 @@ public class GadgetWizardApi implements WizardListener
         if (sender == getInsertWizard()) {
             GadgetInstance gadgetResult = (GadgetInstance) result;
             this.onInsertDone(gadgetResult.getMacroCall().toString(), gadgetResult.getTitle());
+        }
+        if (sender == getEditWizard()) {
+            GadgetInstance gadgetResult = (GadgetInstance) result;
+            this.onEditDone(gadgetResult.getMacroCall().toString(), gadgetResult.getTitle());
         }
     }
 
@@ -182,6 +237,27 @@ public class GadgetWizardApi implements WizardListener
     }
 
     /**
+     * @return {@link #editWizard}
+     */
+    private Wizard getEditWizard()
+    {
+        if (editWizard == null) {
+            EditMacroWizardStep editStep = new EditGadgetWizardStep(config, macroService);
+            editStep.setDirectionName(NavigationDirection.FINISH, Strings.INSTANCE.gadgetInsertActionLabel());
+            editStep.setValidDirections(EnumSet.of(NavigationDirection.FINISH));
+
+            WizardStepMap editSteps = new WizardStepMap();
+            editSteps.put(EDIT_STEP_NAME, editStep);
+
+            editWizard = new Wizard(Strings.INSTANCE.gadgetEditDialogCaption(), new Image(Images.INSTANCE.macroEdit()));
+            editWizard.setProvider(editSteps);
+            editWizard.addWizardListener(this);
+        }
+
+        return editWizard;
+    }
+
+    /**
      * Destroy this wizard.
      */
     public void destroy()
@@ -190,6 +266,12 @@ public class GadgetWizardApi implements WizardListener
             insertWizard.removeWizardListener(this);
             insertWizard.onDirection(NavigationDirection.CANCEL);
             insertWizard = null;
+        }
+
+        if (editWizard != null) {
+            editWizard.removeWizardListener(this);
+            editWizard.onDirection(NavigationDirection.CANCEL);
+            editWizard = null;
         }
     }
 
@@ -209,5 +291,11 @@ public class GadgetWizardApi implements WizardListener
             this.instance.@org.xwiki.gwt.wysiwyg.client.gadget.GadgetWizardApi::setInsertCallback(Lorg/xwiki/gwt/dom/client/JavaScriptObject;)(onComplete);
             this.instance.@org.xwiki.gwt.wysiwyg.client.gadget.GadgetWizardApi::insert()();
         }
+
+        // attach the edit function, which will start the edit wizard
+        $wnd.XWiki.GadgetWizard.prototype.edit = function(macroCall, macroTitle, onComplete) {
+            this.instance.@org.xwiki.gwt.wysiwyg.client.gadget.GadgetWizardApi::setEditCallback(Lorg/xwiki/gwt/dom/client/JavaScriptObject;)(onComplete);
+            this.instance.@org.xwiki.gwt.wysiwyg.client.gadget.GadgetWizardApi::edit(Ljava/lang/String;Ljava/lang/String;)(macroCall, macroTitle);
+        }        
     }-*/;
 }

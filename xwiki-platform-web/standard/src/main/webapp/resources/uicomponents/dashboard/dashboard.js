@@ -51,8 +51,8 @@ XWiki.Dashboard = Class.create( {
       // by default styled by the colibri skin
       var warningElt = new Element('div', {'class' : 'box warningmessage differentsource'});
       // FIXME: I don't like the way these messages are used, should be able to insert the link in the translation
-      var information = "$msg.get('dashboard.actions.edit.differentsource.information')";
-      var warning = "$msg.get('dashboard.actions.edit.differentsource.warning')";
+      var information = "$escapetool.javascript($msg.get('dashboard.actions.edit.differentsource.information'))";
+      var warning = "$escapetool.javascript($msg.get('dashboard.actions.edit.differentsource.warning'))";
       var link = new Element('a', {'href' : this.sourceURL});
       link.update(this.sourceWiki + ':' + this.sourceSpace + '.' + this.sourcePage);
       warningElt.insert(information);
@@ -86,6 +86,30 @@ XWiki.Dashboard = Class.create( {
     // gadget ids are of the form gadget_<id>
     return gadget.readAttribute('id').substring(7);    
   },
+
+  /**
+   * Returns a macro call XHTML comment from the passed macro call, to use as the content of a field in annotated 
+   * XHTML syntax.
+   * @param macroCall the macro call to wrap in a comment.
+   * FIXME: check if there is escaping to do in the macro call to prevent nested comments.
+   */
+  _getMacroCallComment : function(macroCall) {
+    return "<!--" + macroCall + "--><!--stopmacro-->";
+  },
+
+  /**
+   * Parses a macro call XHTML comment and returns the macro call from it.
+   * @param macroCallComment the XHTML comment that annotates the macro call
+   * @return the macro call, parsed from the comment string
+   */
+  _parseMacroCallComment : function(macroCallComment) {
+    var endPos = macroCallComment.indexOf("-->");
+    if (macroCallComment.startsWith("<!--startmacro:") && endPos > 0) {
+      return macroCallComment.substr(4, endPos - 4);
+    } else {
+      return null;
+    }
+  },
   
   /*
    * Drag & drop decorators functions, to display nice placeholders when dragging & dropping.
@@ -95,7 +119,7 @@ XWiki.Dashboard = Class.create( {
       return;
     }
     var placeholder = new Element('div', {'class' : 'gadget-placeholder'})
-      .update('$msg.get("dashboard.gadget.actions.drop")');
+      .update('$escapetool.javascript($msg.get("dashboard.gadget.actions.drop"))');
     container.insert(placeholder);
   },
 
@@ -167,16 +191,20 @@ XWiki.Dashboard = Class.create( {
     // iterate through all the gadgets and add settings handlers
     this.element.select('.gadget').each(function(gadget){
       // create a settings menu button and add it to the gadget-title
-      var itemMenu = new Element('div', {'class' : 'settings', 'title' : '$msg.get("dashboard.gadget.actions.tooltip")'});
+      var itemMenu = new Element('div', {'class' : 'settings', 'title' : '$escapetool.javascript($msg.get("dashboard.gadget.actions.tooltip"))'});
       var gadgetTitle = gadget.down('.gadget-title');
       if (!gadgetTitle) {
         return;
       }
       // create a remove button in the settings menu
-      var removeLink = new Element('div', {'class' : 'remove', 'title' : '$msg.get("dashboard.gadget.actions.delete.tooltip")'});
+      var removeLink = new Element('div', {'class' : 'remove action', 'title' : '$escapetool.javascript($msg.get("dashboard.gadget.actions.delete.tooltip"))'});
       removeLink.observe('click', this.onRemoveGadget.bindAsEventListener(this));
+      // create an edit button in the settings menu
+      var editLink = new Element('div', {'class' : 'edit action', 'title' : '$escapetool.javascript($msg.get("dashboard.gadget.actions.edit.tooltip"))'});
+      editLink.observe('click', this.onEditGadgetClick.bindAsEventListener(this));
       var actionsContainer = new Element('div', {'class' : 'settings-menu'})
       actionsContainer.hide();
+      actionsContainer.insert(editLink);
       actionsContainer.insert(removeLink);
       itemMenu.hide();
       gadgetTitle.insert(itemMenu);
@@ -211,15 +239,9 @@ XWiki.Dashboard = Class.create( {
    */
   addNewGadgetHandler : function() {
     // create the button
-    var addButton = new Element('div', {'class' : 'addgadget', 'title' : "$msg.get('dashboard.actions.add.tooltip')"});
-    addButton.update("$msg.get('dashboard.actions.add.button')");
-    addButton.observe('click', function(event) {
-      // get the gadget wizard and start adding a gadget
-      Wysiwyg.onModuleLoad(function() {
-        gadgetWizard = new XWiki.GadgetWizard();
-        gadgetWizard.add(this.onAddGadget.bind(this));
-      }.bind(this));
-    }.bindAsEventListener(this));
+    var addButton = new Element('div', {'class' : 'addgadget', 'title' : "$escapetool.javascript($msg.get('dashboard.actions.add.tooltip'))"});
+    addButton.update("$escapetool.javascript($msg.get('dashboard.actions.add.button'))");
+    addButton.observe('click', this.onAddGadgetClick.bindAsEventListener(this));
     // check if the warning is there, if it is, put the button under it
     var warning = this.element.down('.differentsource');
     if (warning) {
@@ -232,15 +254,31 @@ XWiki.Dashboard = Class.create( {
   },
 
   /**
+   * Handles the click on the add gadget button, starts the add gadget wizard.
+   * 
+   * @param event the click event on the add gadget button
+   */
+  onAddGadgetClick : function(event) {
+    // get the gadget wizard and start adding a gadget
+    Wysiwyg.onModuleLoad(function() {
+      if (!this.gadgetWizard) {
+        this.gadgetWizard = new XWiki.GadgetWizard();
+      }
+      this.gadgetWizard.add(this.onAddGadgetComplete.bind(this));
+    }.bind(this));    
+  },
+
+  /**
    * Handles the command to actually add the gadget, after the user has filled in the wizard
    * 
-   * @param macroMarker the string representing the HTML of the macro call, to send to the server as the wysiwyg 
-   *        generated value for the gadget content field 
+   * @param gadgetConfig the object representing the gadget instance, with the following fields: 'title', the title of 
+   *                     the gadget, and 'content' the macroCall, to wrap in an XHTML comment and set as the value of 
+   *                     the wysiwyg edited gadget content field. 
    */
-  onAddGadget : function (gadgetConfig) {
+  onAddGadgetComplete : function (gadgetConfig) {
     // compose the parameters for the object add action
     // compose the html comment for the contentField
-    var contentField = "<!--" + gadgetConfig.content + "--><!--stopmacro-->";
+    var contentField = this._getMacroCallComment(gadgetConfig.content);
     // to generate the position of the newly added gadget, on the last position in the last column
     var lastColumn = this.containers.length;
     var lastIndex = this.containers.last().select('.gadget').length + 1;
@@ -257,7 +295,7 @@ XWiki.Dashboard = Class.create( {
     // position
     addParameters.set(this.gadgetsClass + '_position', lastColumn + ', ' + lastIndex);
     // aaaand send the request
-    this._x_notification = new XWiki.widgets.Notification("$msg.get('dashboard.actions.add.loading')", "inprogress"); 
+    this._x_notification = new XWiki.widgets.Notification("$escapetool.javascript($msg.get('dashboard.actions.add.loading'))", "inprogress"); 
     new Ajax.Request(
       this.addURL,
       {
@@ -273,11 +311,116 @@ XWiki.Dashboard = Class.create( {
             failureReason = 'Server not responding';
           }
           this._x_notification.replace(new XWiki.widgets.Notification(
-              "$msg.get('dashboard.actions.add.failed')" + failureReason, "error", {timeout : 5}));
+              "$escapetool.javascript($msg.get('dashboard.actions.add.failed'))" + failureReason, "error", {timeout : 5}));
         }.bind(this),
         on0: function (response) {
           response.request.options.onFailure(response);
         }.bind(this)        
+      }
+    );
+  },
+  
+  /**
+   * Handles the click on the edit gadget button: parses gadget metadata and starts the edit gadget wizard.
+   * 
+   * @param event the click event on the edit gadget button 
+   */
+  onEditGadgetClick : function(event) {
+    var gadget = event.element().up('.gadget');
+    
+    if (gadget) {
+      // check if it is a macro
+      var gadgetMetadata = gadget.down('.metadata');
+      if (!gadgetMetadata) {
+        return;
+      }
+      var macroMetadata = gadgetMetadata.down('.isMacro');
+      if (macroMetadata && macroMetadata.innerHTML == 'true') {
+        // it's a macro, edit it
+        // get the gadget id
+        var gadgetId = this._getGadgetId(gadget);
+        var title, macroCall;
+        // get the gadget metadata, start the wizard
+        var titleMetadata = gadgetMetadata.down(".title");
+        if (titleMetadata) {
+          title = titleMetadata.innerHTML;
+        }
+        var macroCommentMetadata = gadgetMetadata.down('.content');
+        if (macroCommentMetadata) {
+          var macroComment = macroCommentMetadata.innerHTML;
+          macroCall = this._parseMacroCallComment(macroComment);
+        }
+        
+        // and finally start the wizard with all this data
+        Wysiwyg.onModuleLoad(function() {
+          if (!this.gadgetWizard) {
+            this.gadgetWizard = new XWiki.GadgetWizard();
+          }
+          this.gadgetWizard.edit(macroCall, title, function(gadgetInstance) {
+            this.onEditGadgetComplete(gadgetId, gadgetInstance);
+          }.bind(this));
+        }.bind(this));            
+      } else {
+        // this is not a macro, cannot be edited with wysiwyg macro dialog. Display a message, pointing the user to 
+        // object editor.
+        var dialog = new XWiki.widgets.ModalPopup(
+            "$escapetool.javascript($msg.get('dashboard.gadget.actions.edit.error.notmacro'))", 
+            {}, 
+            {title: "$escapetool.javascript($msg.get('dashboard.gadget.actions.edit.error.notmacro.title'))"}
+        );
+        dialog.showDialog();
+      }
+    }    
+  },
+
+  /**
+   * Handles the command to actually edit the gadget's parameters, sends the ajax request to the edit url, after the 
+   * user has completed the wizard.
+   * 
+   * @param gadgetId the id of the gadget to edit
+   * @param gadgetConfig the object representing the gadget instance, with the following fields: 'title', the title of 
+   *                     the gadget, and 'content' the macroCall, to wrap in an XHTML comment and set as the value of 
+   *                     the wysiwyg edited gadget content field.
+   */
+  onEditGadgetComplete : function(gadgetId, gadgetConfig) {    
+    // compose the parameters for the object edit action
+    // compose the html comment for the contentField
+    var contentField = this._getMacroCallComment(gadgetConfig.content);
+    // prepare parameters
+    var editParameters = new Hash();
+    // title
+    editParameters.set(this.gadgetsClass + '_' + gadgetId + '_title', gadgetConfig.title);
+    // content
+    editParameters.set(this.gadgetsClass + '_' + gadgetId + '_content', contentField);
+    editParameters.set('RequiresHTMLConversion', this.gadgetsClass + '_' + gadgetId + '_content');
+    editParameters.set(this.gadgetsClass + '_' + gadgetId + '_content_syntax', "xwiki/2.0");
+    editParameters.set('ajax', '1');
+
+    // TODO: since I will not save position at this point, there will be an issue if a gadget is moved and then its 
+    // parameters are edited, since it will not preserve position    
+
+    // aaaand send the request
+    this._x_notification = new XWiki.widgets.Notification("$escapetool.javascript($msg.get('dashboard.gadget.actions.edit.loading'))", "inprogress"); 
+    new Ajax.Request(
+      this.editURL,
+      {
+        parameters : editParameters,
+        onSuccess : function (response) {
+          // don't hide the notification here, leave it loading, will be removed by the reload
+          // FIXME: reload only that widget
+          window.location.reload();
+        }.bind(this),
+        onFailure : function(response) {
+          var failureReason = response.statusText;
+          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+            failureReason = 'Server not responding';
+          }
+          this._x_notification.replace(new XWiki.widgets.Notification(
+              "$escapetool.javascript($msg.get('dashboard.gadget.actions.edit.failed'))" + failureReason, "error", {timeout : 5}));
+        }.bind(this),
+        on0: function (response) {
+          response.request.options.onFailure(response);
+        }.bind(this)
       }
     );
   },
@@ -316,10 +459,10 @@ XWiki.Dashboard = Class.create( {
       },
       /* Interaction parameters */
       {
-         confirmationText: "$msg.get('dashboard.gadget.actions.delete.confirm')",
-         progressMessageText : "$msg.get('dashboard.gadget.actions.delete.inProgress')",
-         successMessageText : "$msg.get('dashboard.gadget.actions.delete.done')",
-         failureMessageText : "$msg.get('dashboard.gadget.actions.delete.failed')"
+         confirmationText: "$escapetool.javascript($msg.get('dashboard.gadget.actions.delete.confirm'))",
+         progressMessageText : "$escapetool.javascript($msg.get('dashboard.gadget.actions.delete.inProgress'))",
+         successMessageText : "$escapetool.javascript($msg.get('dashboard.gadget.actions.delete.done'))",
+         failureMessageText : "$escapetool.javascript($msg.get('dashboard.gadget.actions.delete.failed'))"
       }      
     );
   },
@@ -330,8 +473,8 @@ XWiki.Dashboard = Class.create( {
    */
   addNewContainerHandler : function() {
     // create the button
-    var addButton = new Element('div', {'class' : 'addcontainer', 'title' : "$msg.get('dashboard.actions.columns.add.tooltip')"});
-    addButton.update("$msg.get('dashboard.actions.columns.add.button')");
+    var addButton = new Element('div', {'class' : 'addcontainer', 'title' : "$escapetool.javascript($msg.get('dashboard.actions.columns.add.tooltip'))"});
+    addButton.update("$escapetool.javascript($msg.get('dashboard.actions.columns.add.button'))");
     addButton.observe('click', this.onAddColumn.bindAsEventListener(this));
     var addGadgetButton = this.element.down('.addgadget');
     addGadgetButton.insert({'before' : addButton});
@@ -401,7 +544,7 @@ XWiki.Dashboard = Class.create( {
           }
           // show the error message at the bottom
           this._x_notification = new XWiki.widgets.Notification(
-              "$msg.get('dashboard.actions.edit.failed')" + failureReason, "error", {timeout : 5});
+              "$escapetool.javascript($msg.get('dashboard.actions.edit.failed'))" + failureReason, "error", {timeout : 5});
           if (onComplete) {
             onComplete();
           }          
@@ -444,7 +587,7 @@ XWiki.Dashboard = Class.create( {
     var eventElt = event.memo.originalEvent.element();
 
     // start to submit the edit, notify
-    this._x_edit_notification = new XWiki.widgets.Notification("$msg.get('dashboard.actions.save.loading')", 
+    this._x_edit_notification = new XWiki.widgets.Notification("$escapetool.javascript($msg.get('dashboard.actions.save.loading'))", 
         "inprogress");
 
     // save the edit

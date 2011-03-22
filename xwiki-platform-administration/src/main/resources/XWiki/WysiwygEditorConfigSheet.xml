@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1290775521000</creationDate>
-<date>1300205615000</date>
-<contentUpdateDate>1300205615000</contentUpdateDate>
+<date>1300789006000</date>
+<contentUpdateDate>1300789006000</contentUpdateDate>
 <version>1.1</version>
 <title>$msg.get('wysiwyg.config.sheet.title')</title>
 <template></template>
@@ -108,7 +108,8 @@ var XWiki = (function (XWiki) {
 XWiki.HSortableList = Class.create({
   sortableOptions : {tag:'li', overlap: 'horizontal', constraint: 'horizontal'},
   listItemTemplate : '&lt;li&gt;&lt;span class="value" title="$escapetool.xml($msg.get('wysiwyg.admin.widgets.sortableList.hint'))"&gt;__value__&lt;/span&gt;&lt;span class="separator"&gt;[&lt;/span&gt;&lt;span title="$escapetool.xml($msg.get('wysiwyg.admin.widgets.sortableList.delete'))" class="delete"&gt;X&lt;/span&gt;&lt;span class="separator"&gt;]&lt;/span&gt;&lt;/li&gt;',
-  initialize : function(values) {
+  initialize : function(values, duplicatesAllowed) {
+    this.duplicatesAllowed = !!duplicatesAllowed;
     this.list = this._createList(values);
     this._registerEventHandlers();
   },
@@ -147,7 +148,7 @@ XWiki.HSortableList = Class.create({
     return false;
   },
   addListItem : function(value) {
-    if (value.length &gt; 0 &amp;&amp; !this.contains(value)) {
+    if (value.length &gt; 0 &amp;&amp; (this.duplicatesAllowed || !this.contains(value))) {
       var item = new Element('ul').update(this.listItemTemplate).firstChild;
       item.down('.value').firstChild.nodeValue = value;
       this.list.appendChild(item);
@@ -165,8 +166,8 @@ XWiki.HSortableList = Class.create({
   }
 });
 XWiki.HSortableListWithInput = Class.create(XWiki.HSortableList, {
-  initialize : function($super, values, possibleValues, inputTip) {
-    ${super}(values);
+  initialize : function($super, values, duplicatesAllowed, possibleValues, inputTip) {
+    ${super}(values, duplicatesAllowed);
     this.container = new Element('div', {'class': 'hSortableWrapper'}).update('&lt;div&gt;&lt;input type="text" class="withTip"/&gt;&lt;input type="image" class="icon" title="$escapetool.xml($msg.get('wysiwyg.admin.widgets.sortableList.add'))" src="$xwiki.getSkinFile('icons/silk/add.gif')" alt="$escapetool.xml($msg.get('wysiwyg.admin.widgets.sortableList.add'))"/&gt;&lt;/div&gt;');
     this.container.firstChild.firstChild.value = this.container.firstChild.firstChild.defaultValue = inputTip;
     this.container.appendChild(this.list);
@@ -195,8 +196,8 @@ XWiki.HSortableListWithInput = Class.create(XWiki.HSortableList, {
   }
 });
 XWiki.SpaceSeparatedList = Class.create(XWiki.HSortableListWithInput, {
-  initialize : function($super, values, possibleValues, inputTip) {
-    ${super}(values.split(/\s+/), possibleValues ? possibleValues.split(/\s+/).sort() : null, inputTip);
+  initialize : function($super, values, duplicatesAllowed, possibleValues, inputTip) {
+    ${super}(values.split(/\s+/), duplicatesAllowed, possibleValues ? possibleValues.split(/\s+/).sort() : null, inputTip);
   },
   addListItem : function($super, value) {
     ${super}(value.replace(/\s+/g, ''));
@@ -842,6 +843,7 @@ return XWiki;
   },
   {
     field: 'XWiki.WysiwygEditorConfigClass_0_toolBar',
+    duplicatesAllowed: true,
     values: '| / bold italic underline strikethrough teletype subscript superscript justifyleft justifycenter justifyright justifyfull unorderedlist orderedlist outdent indent undo redo format fontname fontsize forecolor backcolor hr removeformat symbol paste macro:',
     tip: '$escapetool.javascript($msg.get('wysiwyg.admin.toolBar.add.hint'))'
   },
@@ -850,7 +852,7 @@ return XWiki;
     tip: '$escapetool.javascript($msg.get('wysiwyg.admin.fontSizes.add.hint'))'
   }].each(function(listDescriptor) {
     var field = $(listDescriptor.field);
-    var list = new XWiki.SpaceSeparatedList(field.value, listDescriptor.values, listDescriptor.tip);
+    var list = new XWiki.SpaceSeparatedList(field.value, listDescriptor.duplicatesAllowed, listDescriptor.values, listDescriptor.tip);
     list.attachTo(field.up('.noScript').parentNode);
     Event.observe(document, 'xwiki:actions:save', function() {
       field.value = list.getValue();
@@ -1171,124 +1173,6 @@ input.blurred {
 <name>XWiki.WysiwygEditorConfigSheet</name>
 <number>1</number>
 <className>XWiki.StyleSheetExtension</className>
-<guid>5ee26606-9d26-4b07-aa30-acec56ac3f1e</guid>
-<property>
-<cache>long</cache>
-</property>
-<property>
-<code>.xform dt {
-  font-size: 100%;
-  /* The description/hint shouldn't be displayed using upper case. */
-  text-transform: none;
-}
-
-/*
-  The sheet is written using only wiki syntax and since currently there's no way to write the label HTML element from
-  wiki syntax we used the label CSS class name instead.
-*/
-.xform dt .label {
-  color: $theme.textColor;
-  display: block;
-  font-size: .85em;
-  font-weight: 700;
-  margin-bottom: .3em;
-  text-transform: uppercase;
-}
-
-/* Display the yes/no options on a single line. */
-.xform .radioWrapper div {
-  display: inline;
-  margin-right: .3em;
-}
-.xform .radioWrapper input {
-  min-width: 0;
-}</code>
-</property>
-<property>
-<name>Form Standard</name>
-</property>
-<property>
-<parse>1</parse>
-</property>
-<property>
-<use>onDemand</use>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.StyleSheetExtension</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<cache>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>cache</name>
-<number>5</number>
-<prettyName>Caching policy</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>long|short|default|forbid</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</cache>
-<code>
-<disabled>0</disabled>
-<name>code</name>
-<number>2</number>
-<prettyName>Code</prettyName>
-<rows>20</rows>
-<size>50</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</code>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<prettyName>Name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<parse>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>parse</name>
-<number>4</number>
-<prettyName>Parse content</prettyName>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</parse>
-<use>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>use</name>
-<number>3</number>
-<prettyName>Use this extension</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</use>
-</class>
-<name>XWiki.WysiwygEditorConfigSheet</name>
-<number>2</number>
-<className>XWiki.StyleSheetExtension</className>
 <guid>8243190c-75cd-4b83-b10c-37c40b604b5c</guid>
 <property>
 <cache>long</cache>
@@ -1442,7 +1326,7 @@ ul.hSortable li .separator {
 </use>
 </class>
 <name>XWiki.WysiwygEditorConfigSheet</name>
-<number>3</number>
+<number>2</number>
 <className>XWiki.StyleSheetExtension</className>
 <guid>fc4b82e9-86bf-42de-931d-920b63dff5a5</guid>
 <property>
@@ -1492,6 +1376,7 @@ ul.hSortable li .separator {
 </property>
 </object>
 <content>{{velocity}}
+{{html wiki="true"}}
 #set($editing = $context.action == 'admin' || $context.action == 'edit' || $context.action == 'inline')
 #set($mode = 'view')
 #if($editing)
@@ -1510,72 +1395,95 @@ $xwiki.ssx.use('XWiki.WysiwygEditorConfigSheet')
 == $msg.get('wysiwyg.admin.general') ==
 ##
 
-; (% class="label" %)$doc.displayPrettyName('sourceEditorEnabled', false, false)##
+## Vertical form styles are applied on the label element so we have to use it.
+; &lt;label&gt;$doc.displayPrettyName('sourceEditorEnabled', false, false)&lt;/label&gt;##
 (% class="xHint" %)$msg.get('wysiwyg.admin.sourceEditorEnabled.hint')
-: (% class="radioWrapper" %)$doc.display('sourceEditorEnabled', $mode)
+: $doc.display('sourceEditorEnabled', $mode)
 ##
-; (% class="label" %)$doc.displayPrettyName('plugins', false, false)##
+; &lt;label&gt;$doc.displayPrettyName('plugins', false, false)&lt;/label&gt;##
 (% class="xHint" %)$msg.get('wysiwyg.admin.plugins.hint')
-: (% class="noScript" %)$doc.display('plugins', $mode)
+## TODO: Replace the DIV with a group when XRENDERING-29 is implemented.
+: &lt;div class="noScript"&gt;$doc.display('plugins', $mode)&lt;/div&gt;
 ##
-; (% class="label" %)$doc.displayPrettyName('menuBar', false, false)##
+; &lt;label&gt;$doc.displayPrettyName('menuBar', false, false)&lt;/label&gt;##
 (% class="xHint" %)$msg.get('wysiwyg.admin.menuBar.hint')
-: (% class="noScript" %)$doc.display('menuBar', $mode)
+: &lt;div class="noScript"&gt;$doc.display('menuBar', $mode)&lt;/div&gt;
 ##
-; (% class="label" %)$doc.displayPrettyName('toolBar', false, false)##
+; &lt;label&gt;$doc.displayPrettyName('toolBar', false, false)&lt;/label&gt;##
 (% class="xHint" %)$msg.get('wysiwyg.admin.toolBar.hint')
-: (% class="noScript" %)$doc.display('toolBar', $mode)
+: &lt;div class="noScript"&gt;$doc.display('toolBar', $mode)&lt;/div&gt;
 
 ##
 == $msg.get('wysiwyg.admin.link') ==
 ##
 
-; (% class="label" %)$doc.displayPrettyName('attachmentSelectionLimited', false, false)##
+(% class="xHint" %)(((
+$msg.get('wysiwyg.admin.plugin.settings.hint', ['link'])
+)))
+
+; &lt;label&gt;$doc.displayPrettyName('attachmentSelectionLimited', false, false)&lt;/label&gt;##
 (% class="xHint" %)$msg.get('wysiwyg.admin.attachmentSelectionLimited.hint')
-: (% class="radioWrapper" %)$doc.display('attachmentSelectionLimited', $mode)
+: $doc.display('attachmentSelectionLimited', $mode)
 
 ##
 == $msg.get('wysiwyg.admin.image') ==
 ##
 
-; (% class="label" %)$doc.displayPrettyName('externalImages', false, false)##
+(% class="xHint" %)(((
+$msg.get('wysiwyg.admin.plugin.settings.hint', ['image'])
+)))
+
+; &lt;label&gt;$doc.displayPrettyName('externalImages', false, false)&lt;/label&gt;##
 (% class="xHint" %)$msg.get('wysiwyg.admin.externalImages.hint')
-: (% class="radioWrapper" %)$doc.display('externalImages', $mode)
+: $doc.display('externalImages', $mode)
 ##
-; (% class="label" %)$doc.displayPrettyName('imageSelectionLimited', false, false)##
+; &lt;label&gt;$doc.displayPrettyName('imageSelectionLimited', false, false)&lt;/label&gt;##
 (% class="xHint" %)$msg.get('wysiwyg.admin.imageSelectionLimited.hint')
-: (% class="radioWrapper" %)$doc.display('imageSelectionLimited', $mode)
+: $doc.display('imageSelectionLimited', $mode)
 
 ##
 == $msg.get('wysiwyg.admin.color') ==
 ##
 
-; (% class="label" %)$doc.displayPrettyName('colorsPerRow', false, false)##
+(% class="xHint" %)(((
+$msg.get('wysiwyg.admin.plugin.settings.hint', ['color'])
+)))
+
+; &lt;label&gt;$doc.displayPrettyName('colorsPerRow', false, false)&lt;/label&gt;##
 (% class="xHint" %)$msg.get('wysiwyg.admin.colorsPerRow.hint')
-: (% class="noScript" %)$doc.display('colorsPerRow', $mode)
+: &lt;div class="noScript"&gt;$doc.display('colorsPerRow', $mode)&lt;/div&gt;
 ##
-; (% class="label" %)$doc.displayPrettyName('colorPalette', false, false)##
+; &lt;label&gt;$doc.displayPrettyName('colorPalette', false, false)&lt;/label&gt;##
 (% class="xHint" %)$msg.get('wysiwyg.admin.colorPalette.hint')
-: (% class="noScript" %) $doc.display('colorPalette', $mode)
+: &lt;div class="noScript"&gt;$doc.display('colorPalette', $mode)&lt;/div&gt;
 
 ##
 == $msg.get('wysiwyg.admin.font') ==
 ##
 
-; (% class="label" %)$doc.displayPrettyName('fontNames', false, false)##
+(% class="xHint" %)(((
+$msg.get('wysiwyg.admin.plugin.settings.hint', ['font'])
+)))
+
+; &lt;label&gt;$doc.displayPrettyName('fontNames', false, false)&lt;/label&gt;##
 (% class="xHint" %)$msg.get('wysiwyg.admin.fontNames.hint')
-: (% class="noScript" %)$doc.display('fontNames', $mode)
+: &lt;div class="noScript"&gt;$doc.display('fontNames', $mode)&lt;/div&gt;
 ##
-; (% class="label" %)$doc.displayPrettyName('fontSizes', false, false)##
+; &lt;label&gt;$doc.displayPrettyName('fontSizes', false, false)&lt;/label&gt;##
 (% class="xHint" %)$msg.get('wysiwyg.admin.fontSizes.hint')
-: (% class="noScript" %)$doc.display('fontSizes', $mode)
+: &lt;div class="noScript"&gt;$doc.display('fontSizes', $mode)&lt;/div&gt;
 
 ##
 == $msg.get('wysiwyg.admin.style') ==
 ##
 
-; (% class="label" %)$doc.displayPrettyName('styleNames', false, false)##
-(% class="xHint" %)$msg.get('wysiwyg.admin.styleNames.hint')
-: (% class="noScript" %)$doc.display('styleNames', $mode)
+(% class="xHint" %)(((
+$msg.get('wysiwyg.admin.plugin.settings.hint', ['style'])
 )))
+
+; &lt;label&gt;$doc.displayPrettyName('styleNames', false, false)&lt;/label&gt;##
+(% class="xHint" %)$msg.get('wysiwyg.admin.styleNames.hint')
+: &lt;div class="noScript"&gt;$doc.display('styleNames', $mode)&lt;/div&gt;
+)))
+{{/html}}
 {{/velocity}}</content></xwikidoc>

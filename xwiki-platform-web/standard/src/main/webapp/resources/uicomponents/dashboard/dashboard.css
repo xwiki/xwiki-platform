@@ -6,8 +6,8 @@
   $rule;
 #end
 
-/* colortheme gadget settings */
-.colortheme .gadget .gadget-title {
+/* panels style gadget settings */
+.panels .gadget .gadget-title {
   background-color: $theme.panelHeaderBackgroundColor;
   border-bottom: 1px dotted $theme.borderColor;
   color: $theme.panelHeaderTextColor;
@@ -19,13 +19,13 @@
   text-transform: uppercase;
 }
 
-.colortheme .gadget {
+.panels .gadget {
   border: 1px dotted $theme.borderColor;
   background-color: $theme.panelBackgroundColor;
   margin: 1em 0;
 }
 
-.colortheme .gadget .gadget-content {
+.panels .gadget .gadget-content {
   background-color: $theme.panelBackgroundColor;
   color: $theme.panelTextColor;
   padding: 10px 15px;

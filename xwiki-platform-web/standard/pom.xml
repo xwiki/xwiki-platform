@@ -532,6 +532,9 @@
               <filtering>false</filtering>
             </resource>
           </webResources>
+          <!-- Excluded to prevent conflict in the patched version of Rhino used by yuicompressor used for JSX.
+               See http://jira.xwiki.org/jira/browse/XWIKI-6151 for more details. -->
+          <packagingExcludes>WEB-INF/lib/batik-js-*.jar</packagingExcludes>
         </configuration>
       </plugin>
       <!-- Ensure that some modules are not added as dependencies.  -->

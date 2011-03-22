@@ -20,8 +20,8 @@
 }
 
 .panels .gadget {
-  border: 1px dotted $theme.borderColor;
   background-color: $theme.panelBackgroundColor;
+  border: 1px dotted $theme.borderColor;
   margin: 1em 0;
 }
 
@@ -39,10 +39,10 @@
 /* gadget handles on the dashboard */
 .gadget .gadget-title .settings-menu .action {
   background-repeat: no-repeat;
-  height: 16px;
-  width: 16px;
   cursor: pointer;
+  height: 16px;
   margin: 2px;
+  width: 16px;
 }
 
 .gadget .gadget-title .settings-menu .remove {
@@ -57,12 +57,12 @@
   background-image: url("$xwiki.getSkinFile('icons/silk/cog.gif')");
   background-position: center;
   background-repeat: no-repeat;
-  height: 16px;
-  width: 20px;
-  position: absolute;
-  top: 2px;
-  right: 2px;
   cursor: pointer;
+  height: 16px;
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  width: 20px;
 }
 
 .gadget .gadget-title .settings-open {
@@ -70,10 +70,10 @@
 }
 
 .gadget .gadget-title .settings-menu {
-  position: absolute;
-  top: 18px;
-  right: 2px;
   background-color: $theme.backgroundSecondaryColor;
+  position: absolute;
+  right: 2px;
+  top: 18px;
 }
 
 /* Drag & drop effects */
@@ -82,9 +82,9 @@
 }
 
 .column .gadget-placeholder {
+  background-color: $theme.highlightColor;
   margin-top: 10px;
   padding: 20px;
-  background-color: $theme.highlightColor;
 }
 
 .dashboard-edit .gadget .gadget-title {
@@ -95,13 +95,13 @@
 .dashboard-edit .addgadget, .dashboard-edit .addcontainer {
   background: url($xwiki.getSkinFile("icons/silk/add.gif")) no-repeat 3px center $theme.menuAddEntryBackgroundColor;
   #__css3('border-radius: 4px')
+  color: $theme.menuAddEntryLinkColor;
   cursor: pointer;
   float: right;
   font-size: 83.3%;
   line-height: 1.6em;
-  margin-top: 20px;
   margin-left: 5px;
+  margin-top: 20px;
   min-height: 16px;
   padding: 3px 6px 3px 22px;
-  color: $theme.menuAddEntryLinkColor;
 }

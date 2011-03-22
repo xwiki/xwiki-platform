@@ -28,6 +28,7 @@ import org.xwiki.rendering.internal.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.container.AbstractContainerMacro;
 import org.xwiki.rendering.macro.container.ContainerMacroParameters;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -52,6 +53,13 @@ public class ContainerMacro extends AbstractContainerMacro<ContainerMacroParamet
     private static final String DESCRIPTION = "A macro to enclose multiple groups and add decoration, such as layout.";
 
     /**
+     * The description of the content of this macro.
+     */
+    private static final String CONTENT_DESCRIPTION =
+        "The content to enclose in this container (wiki syntax). "
+            + "For the \"columns\" layout, a group should be added for each column.";
+
+    /**
      * Used to parse the macro content.
      */
     @Requirement
@@ -62,7 +70,8 @@ public class ContainerMacro extends AbstractContainerMacro<ContainerMacroParamet
      */
     public ContainerMacro()
     {
-        super("Container", DESCRIPTION, ContainerMacroParameters.class);
+        super("Container", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false),
+            ContainerMacroParameters.class);
     }
 
     /**

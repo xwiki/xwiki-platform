@@ -32,6 +32,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -62,11 +63,13 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
      * 
      * @param name the name of the macro
      * @param description the description of the macro
+     * @param contentDescriptor the descriptor of the content of this macro 
      * @param parametersBeanClass the type of parameters of this macro
      */
-    protected AbstractContainerMacro(String name, String description, Class< ? > parametersBeanClass)
+    protected AbstractContainerMacro(String name, String description, ContentDescriptor contentDescriptor,
+        Class< ? > parametersBeanClass)
     {
-        super(name, description, parametersBeanClass);
+        super(name, description, contentDescriptor, parametersBeanClass);
     }
 
     /**

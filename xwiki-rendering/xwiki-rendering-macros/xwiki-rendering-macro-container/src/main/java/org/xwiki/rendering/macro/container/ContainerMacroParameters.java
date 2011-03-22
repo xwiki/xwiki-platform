@@ -39,7 +39,7 @@ public class ContainerMacroParameters
      * The style of the layout of this container.
      */
     private String layoutStyle;
-    
+
     /**
      * The css class of this container.
      */
@@ -58,7 +58,8 @@ public class ContainerMacroParameters
      * 
      * @param layoutStyle the style to set, e.g. {@code columns}
      */
-    @PropertyDescription("The style of the container layout (e.g. columns)")
+    @PropertyDescription("The identifier of the container layout (e.g. \"columns\"). If no style is provided, the "
+        + "container content will be rendered as is.")
     public void setLayoutStyle(String layoutStyle)
     {
         this.layoutStyle = layoutStyle;

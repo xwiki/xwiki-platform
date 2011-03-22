@@ -104,30 +104,40 @@
 <property>
 <code>#template('colorThemeInit.vm')
 
-.userstatus-follow {
+.activity-follow {
   padding-bottom: 10px;
   margin-bottom: 20px;
 }
 
-.userstatus-follow .unfollow {
-  background: transparent 2px center url("$xwiki.getSkinFile('icons/silk/cross.gif')") no-repeat;
+.activity-follow .unfollow {
+  background: transparent 0 center url("$xwiki.getSkinFile('icons/silk/cross.gif')") no-repeat;
+  color: $theme.notificationErrorColor;
   display: inline-block;
-  width:16px;
-  text-indent: 20px;
   overflow: hidden;
-  padding: 4px 0;
-  ## padding: 4px 6px 4px 22px;
+  font-size: 83.3%;
+  text-indent: 17px;
+  vertical-align: middle;
+  width: 16px;
+}
+.activity-follow .unfollow:hover {
+  overflow: visible;
+  text-decoration: none;
+  width: auto;
 }
 
-.userstatus-follow .follow, .userstatus-follow .following {
+.activity-follow .follow, .activity-follow .following {
   background: $theme.menuAddEntryBackgroundColor 2px center url("$xwiki.getSkinFile('icons/silk/accept.gif')") no-repeat;
-  border-radius: 4px;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
+  border-radius: 4px;
   color: $theme.menuAddEntryLinkColor !important;
-  padding: 4px 6px 4px 22px;
+  display: inline-block;
+  font-size: 83.3%;
+  line-height: 1.6em;
+  min-height: 16px;
+  padding: 3px 6px 3px 22px;
 }
-.userstatus-follow .follow {
+.activity-follow .follow {
   background-image: url("$xwiki.getSkinFile('icons/silk/add.gif')");
 }</code>
 </property>
@@ -215,7 +225,7 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
         &lt;h1&gt;$msg.get('platform.core.profile.section.activityof', [$xwiki.getUserName($doc.fullName, false)])&lt;/h1&gt;
         #if ($hasWatch)
         $xwiki.ssx.use('XWiki.XWikiUserProfileSheet')##
-        &lt;div class="userstatus-follow"&gt;
+        &lt;div class="activity-follow"&gt;
           #set ($xredirect = $doc.getURL($context.action, $request.queryString))
           #if ($xwiki.watchlist.isUserWatched(${doc.prefixedFullName}))
           &lt;span class="following"&gt;$msg.get('xe.activity.messages.following')&lt;/span&gt;

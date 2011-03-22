@@ -36,7 +36,7 @@ public class DashboardMacroParameters
 
     /**
      * The identifier of the style to be used for this dashboard. No style means that the gadgets will be rendered
-     * plain, as content of the page. "colortheme" style will render the gadgets the same as the panels. Note that this
+     * plain, as content of the page. "panels" style will render the gadgets the same as the panels. Note that this
      * is used as the CSS class of the top level block of the dashboard, so you can pass any value to create your own
      * dashboard style.
      */
@@ -80,7 +80,7 @@ public class DashboardMacroParameters
      * @since 3.0M1
      */
     @PropertyDescription("The identifier of the style to be used for this dashboard. No style means that the gadgets "
-        + "will be rendered plain, as content of the page. \"colortheme\" style will render the gadgets the same as "
+        + "will be rendered plain, as content of the page. \"panels\" style will render the gadgets the same as "
         + "the panels. Note that this is used as the CSS class of the top level block of the dashboard, so you can "
         + "pass any value to create your own dashboard style.")
     public void setStyle(String style)

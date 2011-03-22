@@ -44,6 +44,33 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     private final DocumentReference targetGroup = new DocumentReference("wiki", "XWiki", "MyFriends");
 
     @Test
+    public void testPostPublicMessage() throws Exception
+    {
+        final MessageStream mockStream = getComponentManager().lookup(MessageStream.class);
+        getMockery().checking(new Expectations()
+                    {
+            {
+                exactly(1).of(mockStream).postPublicMessage("Hello World!");
+            }
+        });
+        Assert.assertTrue(this.streamService.postPublicMessage("Hello World!"));
+    }
+
+    @Test
+    public void testPostPublicMessageWithFailure() throws Exception
+    {
+        final MessageStream mockStream = getComponentManager().lookup(MessageStream.class);
+        getMockery().checking(new Expectations()
+                    {
+            {
+                exactly(1).of(mockStream).postPublicMessage("Hello World!");
+                will(throwException(new NullPointerException()));
+            }
+        });
+        Assert.assertFalse(this.streamService.postPublicMessage("Hello World!"));
+    }
+
+    @Test
     public void testPostPersonalMessage() throws Exception
     {
         final MessageStream mockStream = getComponentManager().lookup(MessageStream.class);

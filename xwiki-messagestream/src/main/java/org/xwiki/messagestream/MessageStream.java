@@ -38,6 +38,13 @@ import org.xwiki.model.reference.DocumentReference;
 public interface MessageStream
 {
     /**
+     * Post a message to the current user's stream, visible to everyone.
+     * 
+     * @param message the message to store
+     */
+    void postPublicMessage(String message);
+
+    /**
      * Post a message to the current user's personal stream, displayed on his profile page and aggregated into their
      * follower's streams.
      * 

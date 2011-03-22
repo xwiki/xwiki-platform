@@ -65,6 +65,41 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
     private final DocumentReference targetGroup = new DocumentReference("wiki", "XWiki", "MyFriends");
 
     @Test
+    public void testPostPublicMessage() throws Exception
+    {
+        Event postedMessage = setupForPublicMessage();
+        this.stream.postPublicMessage("Hello World!");
+        Assert.assertEquals("Hello World!", postedMessage.getBody());
+        Assert.assertEquals(Importance.MINOR, postedMessage.getImportance());
+        Assert.assertEquals("publicMessage", postedMessage.getType());
+        Assert.assertEquals(this.currentUser, postedMessage.getRelatedEntity());
+    }
+
+    @Test
+    public void testPostPublicMessageWithNullMessage() throws Exception
+    {
+        Event postedMessage = setupForPublicMessage();
+        this.stream.postPublicMessage(null);
+        Assert.assertEquals(null, postedMessage.getBody());
+    }
+
+    @Test
+    public void testPostPublicMessageWithEmptyMessage() throws Exception
+    {
+        Event postedMessage = setupForPublicMessage();
+        this.stream.postPublicMessage("");
+        Assert.assertEquals("", postedMessage.getBody());
+    }
+
+    @Test
+    public void testPostPublicMessageWithLongMessage() throws Exception
+    {
+        Event postedMessage = setupForPublicMessage();
+        this.stream.postPublicMessage(StringUtils.repeat("a", 10000));
+        Assert.assertEquals(StringUtils.repeat("a", 2000), postedMessage.getBody());
+    }
+
+    @Test
     public void testPostPersonalMessage() throws Exception
     {
         Event postedMessage = setupForPersonalMessage();
@@ -232,7 +267,7 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         final EntityReferenceSerializer<String> mockSerializer =
             getComponentManager().lookup(EntityReferenceSerializer.class);
         getMockery().checking(new Expectations()
-                    {
+        {
             {
                 allowing(mockBridge).getCurrentUser();
                 will(returnValue("XWiki.JohnDoe"));
@@ -264,13 +299,37 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         final ModelContext mockContext = getComponentManager().lookup(ModelContext.class);
         final EventStream mockEventStream = getComponentManager().lookup(EventStream.class);
         getMockery().checking(new Expectations()
-                    {
+        {
             {
                 exactly(1).of(mockEventFactory).createEvent();
                 will(returnValue(e));
                 exactly(1).of(mockContext).getCurrentEntityReference();
                 will(returnValue(new DocumentReference("wiki", "Space", "Page")));
                 exactly(1).of(mockEventStream).addEvent(e);
+            }
+        });
+        return e;
+    }
+
+    private Event setupForPublicMessage() throws ComponentLookupException, Exception
+    {
+        final Event e = setupForNewMessage();
+        final DocumentAccessBridge mockBridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        @SuppressWarnings("unchecked")
+        final EntityReferenceResolver<String> mockResolver =
+            getComponentManager().lookup(EntityReferenceResolver.class, "current");
+        @SuppressWarnings("unchecked")
+        final EntityReferenceSerializer<String> mockSerializer =
+            getComponentManager().lookup(EntityReferenceSerializer.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                exactly(1).of(mockBridge).getCurrentUser();
+                will(returnValue("XWiki.JohnDoe"));
+                atLeast(1).of(mockResolver).resolve("XWiki.JohnDoe", EntityType.DOCUMENT);
+                will(returnValue(MessageStreamTest.this.currentUser));
+                exactly(1).of(mockSerializer).serialize(MessageStreamTest.this.currentUser);
+                will(returnValue("wiki:XWiki.JohnDoe"));
             }
         });
         return e;
@@ -287,7 +346,7 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         final EntityReferenceSerializer<String> mockSerializer =
             getComponentManager().lookup(EntityReferenceSerializer.class);
         getMockery().checking(new Expectations()
-                    {
+        {
             {
                 exactly(1).of(mockBridge).getCurrentUser();
                 will(returnValue("XWiki.JohnDoe"));
@@ -307,7 +366,7 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         final EntityReferenceSerializer<String> mockSerializer =
             getComponentManager().lookup(EntityReferenceSerializer.class);
         getMockery().checking(new Expectations()
-                    {
+        {
             {
                 exactly(1).of(mockSerializer).serialize(MessageStreamTest.this.targetUser);
                 will(returnValue("wiki:XWiki.JaneBuck"));
@@ -323,7 +382,7 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         final EntityReferenceSerializer<String> mockSerializer =
             getComponentManager().lookup(EntityReferenceSerializer.class);
         getMockery().checking(new Expectations()
-                    {
+        {
             {
                 exactly(1).of(mockSerializer).serialize(MessageStreamTest.this.targetGroup);
                 will(returnValue("wiki:XWiki.MyFriends"));
@@ -346,7 +405,7 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         final EntityReferenceSerializer<String> mockSerializer =
             getComponentManager().lookup(EntityReferenceSerializer.class);
         getMockery().checking(new Expectations()
-                    {
+        {
             {
                 allowing(mockBridge).getCurrentUser();
                 will(returnValue("XWiki.JohnDoe"));

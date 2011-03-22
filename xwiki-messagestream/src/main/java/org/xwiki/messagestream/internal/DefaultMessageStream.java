@@ -87,6 +87,21 @@ public class DefaultMessageStream implements MessageStream
     /**
      * {@inheritDoc}
      */
+    public void postPublicMessage(String message)
+    {
+        Event e = createMessageEvent(message, "publicMessage");
+        // FIXME This shouldn't be needed if the current user were already available as a reference.
+        DocumentReference userDoc =
+            new DocumentReference(this.currentResolver.resolve(this.bridge.getCurrentUser(), EntityType.DOCUMENT));
+        e.setRelatedEntity(userDoc);
+        e.setImportance(Importance.MINOR);
+        e.setStream(this.serializer.serialize(userDoc));
+        this.stream.addEvent(e);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void postPersonalMessage(String message)
     {
         Event e = createMessageEvent(message, "personalMessage");

@@ -38,6 +38,22 @@ public class MessageStreamScriptService implements ScriptService
     private MessageStream stream;
 
     /**
+     * Post a message to the user's stream, visible to everyone.
+     * 
+     * @param message the message to store
+     * @return {@code true} if the message was successfully posted, {@code false} otherwise
+     */
+    public boolean postPublicMessage(String message)
+    {
+        try {
+            this.stream.postPublicMessage(message);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    /**
      * Post a message to the user's personal stream, displayed on his profile page and aggregated into their follower's
      * streams.
      * 

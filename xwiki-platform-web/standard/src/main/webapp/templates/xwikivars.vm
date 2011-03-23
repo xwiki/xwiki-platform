@@ -32,13 +32,21 @@
 #set ($showhistory = $settingValue)
 #retrieveSetting('showinformation' $settingValue)
 #set ($showinformation = $settingValue)
-#set($showannotations = false)
-#if($xwiki.exists('AnnotationCode.AnnotationConfig'))
-  #set($annotationConfigObject = $xwiki.getDocument('AnnotationCode.AnnotationConfig').getObject('AnnotationCode.AnnotationConfig'))
-  #if($annotationConfigObject.getProperty('activated').value != 0 && !$annotationConfigObject.getProperty('exceptionSpaces').value.contains($doc.space))
-    #set($showannotations = true)
-    #set($annotationClass = $annotationConfigObject.getProperty('annotationClass').value)
-    #set($annotationCount = $doc.getObjects($annotationClass).size())
+##
+## Annotations are special, they can be hidden from the Page Elements administrative settings,
+## and they can be disabled per-space from the Annotations administration category.
+#retrieveSetting('showannotations' $settingValue)
+#set ($showannotations = $settingValue)
+#if ($showannotations)
+  ## The general settings allow displaying the tab
+  #set ($showannotations = false)
+  #if ($xwiki.exists('AnnotationCode.AnnotationConfig'))
+    #set ($annotationConfigObject = $xwiki.getDocument('AnnotationCode.AnnotationConfig').getObject('AnnotationCode.AnnotationConfig'))
+    #if ($annotationConfigObject.getProperty('activated').value != 0 && !$annotationConfigObject.getProperty('exceptionSpaces').value.contains($doc.space))
+      #set ($showannotations = true)
+      #set ($annotationClass = $annotationConfigObject.getProperty('annotationClass').value)
+      #set ($annotationCount = $doc.getObjects($annotationClass).size())
+    #end
   #end
 #end
 ##

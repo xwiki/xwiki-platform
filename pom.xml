@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons</artifactId>
-    <version>41</version>
+    <version>42-SNAPSHOT</version>
     <relativePath>../../xwiki-commons-pom</relativePath>
   </parent>
   <groupId>org.xwiki.platform</groupId>
@@ -38,8 +38,8 @@
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
-    <rendering.version>3.0-rc-1</rendering.version>
-    <commons.version>3.0-rc-1</commons.version>
+    <rendering.version>${project.version}</rendering.version>
+    <commons.version>${project.version}</commons.version>
     <!-- The previous stable version of this project, used to catch API breakages. -->
     <clirr.previous.version>2.7</clirr.previous.version>
   </properties>

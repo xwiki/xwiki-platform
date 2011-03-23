@@ -111,6 +111,12 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
+     <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

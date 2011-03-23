@@ -30,16 +30,16 @@
     <version>36</version>
   </parent>
   <artifactId>xwiki-application-extension</artifactId>
-  <version>1.3</version>
+  <version>1.4-SNAPSHOT</version>
   <name>XWiki Platform - Applications - Extension</name>
   <packaging>xar</packaging>
   <description>XWiki Extension Manager, an application for managing extensions in a wiki.</description>
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-extension-1.3</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-extension-1.3</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-extension-1.3</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/extension</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/extension</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/extension</url>
   </scm>
   <issueManagement>
     <system>jira</system>

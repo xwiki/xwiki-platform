@@ -28,7 +28,7 @@
     <version>41-SNAPSHOT</version>
     <relativePath>../../commons/xwiki-commons-pom</relativePath>
   </parent>
-  <groupId>com.xpn.xwiki.platform</groupId>
+  <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-web</artifactId>
   <version>3.0-SNAPSHOT</version>
   <name>XWiki Platform - Web - Parent POM</name>

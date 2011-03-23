@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-web</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-web-gwt-dom</artifactId>
   <name>XWiki Platform - Web - GWT - DOM API</name>

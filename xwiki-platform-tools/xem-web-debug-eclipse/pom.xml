@@ -352,13 +352,8 @@
     <!--  -->
 
     <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt-wysiwyg-client</artifactId>
+      <artifactId>xwiki-web-gwt-wysiwyg-server</artifactId>
       <version>${project.version}</version>
     </dependency>
 

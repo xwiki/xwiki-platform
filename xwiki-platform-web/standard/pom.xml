@@ -334,7 +334,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-store-filesystem-attachments</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
     </dependency>
   </dependencies>
   <properties>

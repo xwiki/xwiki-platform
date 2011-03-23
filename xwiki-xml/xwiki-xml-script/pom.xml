@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-xml-parent</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.0-rc-1</version>
   </parent>
   <artifactId>xwiki-core-xml-script</artifactId>
   <name>XWiki Platform - Core - XML - Script Service</name>

@@ -429,7 +429,7 @@
     <dependency>
       <groupId>com.yahoo.platform.yui</groupId>
       <artifactId>yuicompressor</artifactId>
-      <version>2.2.5</version>
+      <version>2.4.2</version>
     </dependency>
     <!-- Better date manipulation than what JDK provides -->
     <dependency>

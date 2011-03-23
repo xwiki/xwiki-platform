@@ -65,7 +65,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-model</artifactId>
-      <version>${commons.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.incava</groupId>

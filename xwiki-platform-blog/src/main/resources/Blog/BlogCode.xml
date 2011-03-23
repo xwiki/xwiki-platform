@@ -333,8 +333,8 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param isGlobal The resulting boolean. If the blog object does not define anything, it is considered in-space.
  *###
 #macro(isBlogGlobal $blogDoc $isGlobal)
-  #set ($result = false)
   #getBlogProperty($blogDoc 'blogType' '' $discard)
+  #set ($result = false)
   #if($discard == 'global')
     #set($result = true)
   #end

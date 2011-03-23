@@ -59,7 +59,7 @@
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-all</artifactId>
-        <version>1.7.7</version>
+        <version>1.7.10</version>
       </dependency>
       <!-- Jython engine -->
       <dependency>

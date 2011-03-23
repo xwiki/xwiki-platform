@@ -30,7 +30,6 @@
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-web-gwt-user</artifactId>
   <name>XWiki Platform - Web - GWT - User</name>
-  <packaging>jar</packaging>
   <description>An extension of the GWT User package, providing improved widgets and additional utility classes.</description>
   <dependencies>
     <!-- GWT core dependencies -->

@@ -27,6 +27,7 @@
     <artifactId>xwiki-web</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
+  <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-web-gwt-wysiwyg-war</artifactId>
   <name>XWiki Platform - Web - GWT - WYSIWYG Editor - WAR Distribution</name>
   <packaging>war</packaging>
@@ -40,6 +41,12 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt-wysiwyg-client</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt-wysiwyg-server</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -102,7 +109,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
-          <archiveClasses>true</archiveClasses>
           <!-- We exclude the SmartClient JavaScript files which are provided by the web-standard war. -->
           <packagingExcludes>**/sc/**</packagingExcludes>
         </configuration>

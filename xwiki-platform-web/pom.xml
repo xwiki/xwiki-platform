@@ -67,6 +67,7 @@
     <module>xwiki-gwt-wysiwyg-plugin-api</module>
     <module>xwiki-gwt-wysiwyg-client</module>
     <module>xwiki-gwt-wysiwyg-server</module>
+    <module>xwiki-gwt-wysiwyg-war</module>
     <module>standard</module>
   </modules>
   <build>

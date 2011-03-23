@@ -30,7 +30,6 @@
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-web-gwt-dom</artifactId>
   <name>XWiki Platform - Web - GWT - DOM API</name>
-  <packaging>jar</packaging>
   <description>An extension of the GWT DOM API, providing W3C Range and Selection support, depth-first pre-order iterator and lots of DOM utility methods</description>
   <dependencies>
     <dependency>

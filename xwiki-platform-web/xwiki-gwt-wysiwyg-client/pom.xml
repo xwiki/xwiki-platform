@@ -30,7 +30,6 @@
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-web-gwt-wysiwyg-client</artifactId>
   <name>XWiki Platform - Web - GWT - WYSIWYG Editor - Client Side</name>
-  <packaging>jar</packaging>
   <description>The client side of XWiki's WYSIWYG editor. This is a reusable rich text editor all written in GWT.</description>
   <dependencies>
     <!-- GWT core dependencies -->
@@ -66,7 +65,6 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-api</artifactId>
       <version>${commons.version}</version>
-      <scope>provided</scope>
     </dependency>
     <!-- Test dependencies -->
     <dependency>

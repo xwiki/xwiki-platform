@@ -22,9 +22,13 @@ package org.xwiki.wysiwyg.server.internal;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.Execution;
+import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.wysiwyg.server.WysiwygEditorConfiguration;
 
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Default WYSIWYG editor configuration source.
@@ -35,23 +39,20 @@ import org.xwiki.wysiwyg.server.WysiwygEditorConfiguration;
 public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfiguration
 {
     /**
-     * A reference to the configuration XClass.
-     */
-    private static final DocumentReference CONFIG_CLASS_REFERENCE =
-        new DocumentReference("xwiki", "XWiki", "WysiwygEditorConfigClass");
-
-    /**
-     * A reference to the document that holds an instance of {@link #CONFIG_CLASS_REFERENCE}.
-     */
-    private static final DocumentReference CONFIG_DOCUMENT_REFERENCE =
-        new DocumentReference(CONFIG_CLASS_REFERENCE.getWikiReference().getName(), CONFIG_CLASS_REFERENCE
-            .getLastSpaceReference().getName(), "WysiwygEditorConfig");
-
-    /**
      * The component used to access documents. This is temporary till XWiki model is moved into components.
      */
     @Requirement
     private DocumentAccessBridge documentAccessBridge;
+
+    /**
+     * The component used to get a reference to the current wiki.
+     */
+    @Requirement
+    private ModelContext modelContext;
+
+    /** Execution context handler, needed for accessing the XWikiContext. */
+    @Requirement
+    private Execution execution;
 
     /**
      * @param propertyName the property name
@@ -60,7 +61,27 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
      */
     private Object getProperty(String propertyName)
     {
-        return documentAccessBridge.getProperty(CONFIG_DOCUMENT_REFERENCE, CONFIG_CLASS_REFERENCE, propertyName);
+        String currentWiki = modelContext.getCurrentEntityReference().getName();
+        DocumentReference configDocumentReference = new DocumentReference(currentWiki, "XWiki", "WysiwygEditorConfig");
+        DocumentReference configClassReference =
+            new DocumentReference("WysiwygEditorConfigClass", configDocumentReference.getLastSpaceReference());
+        Object value = documentAccessBridge.getProperty(configDocumentReference, configClassReference, propertyName);
+        if (value == null) {
+            String mainWiki = getMainWiki();
+            if (!StringUtils.areEqual(currentWiki, mainWiki)) {
+                configDocumentReference.getWikiReference().setName(mainWiki);
+                value = documentAccessBridge.getProperty(configDocumentReference, configClassReference, propertyName);
+            }
+        }
+        return value;
+    }
+
+    /**
+     * @return the name of the main wiki
+     */
+    private String getMainWiki()
+    {
+        return ((XWikiContext) execution.getContext().getProperty("xwikicontext")).getMainXWiki();
     }
 
     /**

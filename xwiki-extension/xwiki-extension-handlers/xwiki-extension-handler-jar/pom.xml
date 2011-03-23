@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-extension-handlers</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core-extension-handler-jar</artifactId>
   <name>XWiki Platform - Core - Extension - Handler - JAR</name>

@@ -39,7 +39,7 @@
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
     <rendering.version>${project.version}</rendering.version>
-    <commons.version>${project.version}</commons.version>
+    <commons.version>3.0-SNAPSHOT</commons.version>
     <!-- The previous stable version of this project, used to catch API breakages. -->
     <clirr.previous.version>2.7</clirr.previous.version>
   </properties>

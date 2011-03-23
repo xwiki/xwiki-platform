@@ -150,6 +150,7 @@ textarea, select {
   background-color: $theme.pageContentBackgroundColor ;
   border: 1px solid $theme.borderColor;
   color: $theme.textColor;
+  max-width: 100%; /* Prevent resizing beyond the visible area in modern browsers */
 }
 
 /* -----------------------Tables-------------------------*/

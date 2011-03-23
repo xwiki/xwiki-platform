@@ -47,6 +47,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt-wysiwyg-plugin-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <!-- SmartGWT is used only for its tree widget. -->
       <groupId>com.smartgwt</groupId>
       <artifactId>smartgwt</artifactId>
@@ -67,6 +72,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt-user</artifactId>
+      <classifier>tests</classifier>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt-wysiwyg-plugin-api</artifactId>
       <classifier>tests</classifier>
       <version>${project.version}</version>
       <scope>test</scope>

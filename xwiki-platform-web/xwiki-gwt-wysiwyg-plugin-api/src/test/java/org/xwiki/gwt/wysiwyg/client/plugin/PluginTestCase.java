@@ -19,38 +19,28 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin;
 
-import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
-
-import com.google.gwt.user.client.Random;
+import com.google.gwt.junit.client.GWTTestCase;
 
 /**
- * Unit tests for any concrete implementation of the {@link UIExtension} interface.
+ * Base class for all WYSIWYG plugin API tests. It returns the name of the module in {@link #getModuleName()} so you
+ * don't have to do it in each test.
  * 
  * @version $Id$
  */
-public abstract class AbstractUIExtensionTest extends WysiwygTestCase
+public class PluginTestCase extends GWTTestCase
 {
     /**
-     * @return A new instance of the concrete {@link UIExtension} being tested.
+     * The name of this GWT module.
      */
-    protected abstract UIExtension newUIExtension();
+    public static final String MODULE_NAME = "org.xwiki.gwt.wysiwyg.Plugin";
 
     /**
-     * Tests the enabling and disabling of a feature.
+     * {@inheritDoc}
+     * 
+     * @see GWTTestCase#getModuleName()
      */
-    public void testEnabled()
+    public String getModuleName()
     {
-        UIExtension uie = newUIExtension();
-
-        String[] features = uie.getFeatures();
-        assertTrue(features.length > 0);
-
-        String feature = features[Random.nextInt(features.length)];
-
-        uie.setEnabled(feature, true);
-        assertTrue(uie.isEnabled(feature));
-
-        uie.setEnabled(feature, false);
-        assertFalse(uie.isEnabled(feature));
+        return MODULE_NAME;
     }
 }

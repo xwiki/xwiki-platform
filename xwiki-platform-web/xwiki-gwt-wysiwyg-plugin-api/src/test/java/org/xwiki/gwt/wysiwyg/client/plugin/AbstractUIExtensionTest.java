@@ -19,36 +19,36 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin;
 
-import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
-import org.xwiki.gwt.wysiwyg.client.plugin.internal.MockPluginFactory;
-
+import com.google.gwt.user.client.Random;
 
 /**
- * Unit tests for any concrete implementation of {@link PluginFactoryManager}.
+ * Unit tests for any concrete implementation of the {@link UIExtension} interface.
  * 
  * @version $Id$
  */
-public abstract class AbstractPluginFactoryManagerTest extends WysiwygTestCase
+public abstract class AbstractUIExtensionTest extends PluginTestCase
 {
     /**
-     * @return A new instance of the concrete {@link PluginFactoryManager} being tested.
+     * @return A new instance of the concrete {@link UIExtension} being tested.
      */
-    protected abstract PluginFactoryManager newPluginFactoryManager();
+    protected abstract UIExtension newUIExtension();
 
     /**
-     * Test the basic operations: add, get and remove a plugin factory.
+     * Tests the enabling and disabling of a feature.
      */
-    public void testCommonUseCase()
+    public void testEnabled()
     {
-        PluginFactoryManager pfm = newPluginFactoryManager();
+        UIExtension uie = newUIExtension();
 
-        String pluginName = "image";
-        PluginFactory pf = new MockPluginFactory(pluginName, null);
+        String[] features = uie.getFeatures();
+        assertTrue(features.length > 0);
 
-        pfm.addPluginFactory(pf);
-        assertEquals(pf, pfm.getPluginFactory(pluginName));
+        String feature = features[Random.nextInt(features.length)];
 
-        pfm.removePluginFactory(pluginName);
-        assertNull(pfm.getPluginFactory(pluginName));
+        uie.setEnabled(feature, true);
+        assertTrue(uie.isEnabled(feature));
+
+        uie.setEnabled(feature, false);
+        assertFalse(uie.isEnabled(feature));
     }
 }

@@ -33,9 +33,6 @@ import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageMetaDataExtractorTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.exec.InsertImageExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.indent.exec.IndentExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.indent.exec.OutdentExecutableTest;
-import org.xwiki.gwt.wysiwyg.client.plugin.internal.DefaultPluginFactoryManagerTest;
-import org.xwiki.gwt.wysiwyg.client.plugin.internal.DefaultPluginManagerTest;
-import org.xwiki.gwt.wysiwyg.client.plugin.internal.FocusWidgetUIExtensionTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.line.LinePluginTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.EmptyLinkFilterTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkMetaDataExtractorTest;
@@ -93,9 +90,6 @@ public class WysiwygTestSuite extends GWTTestSuite
      */
     private static void addPluginTests(TestSuite suite)
     {
-        suite.addTestSuite(DefaultPluginFactoryManagerTest.class);
-        suite.addTestSuite(DefaultPluginManagerTest.class);
-        suite.addTestSuite(FocusWidgetUIExtensionTest.class);
         suite.addTestSuite(HistoryTest.class);
         suite.addTestSuite(FormatBlockExecutableTest.class);
         suite.addTestSuite(RemoveFormatExecutableTest.class);

@@ -393,7 +393,7 @@
 <displayFormType>select</displayFormType>
 <displayType></displayType>
 <name>editcomment</name>
-<number>84</number>
+<number>85</number>
 <prettyName>Enable version summary</prettyName>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -407,7 +407,7 @@
 <displayFormType>select</displayFormType>
 <displayType></displayType>
 <name>editcomment_mandatory</name>
-<number>85</number>
+<number>86</number>
 <prettyName>Make version summary mandatory</prettyName>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -860,7 +860,7 @@
 <displayFormType>select</displayFormType>
 <displayType></displayType>
 <name>minoredit</name>
-<number>86</number>
+<number>87</number>
 <prettyName>Enable minor edits</prettyName>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -1078,6 +1078,20 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </showRightPanels>
+<showannotations>
+<customDisplay></customDisplay>
+<defaultValue></defaultValue>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType></displayType>
+<name>showannotations</name>
+<number>80</number>
+<prettyName>Show document annotations</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</showannotations>
 <showattachments>
 <customDisplay></customDisplay>
 <defaultValue></defaultValue>
@@ -1085,7 +1099,7 @@
 <displayFormType>select</displayFormType>
 <displayType></displayType>
 <name>showattachments</name>
-<number>81</number>
+<number>82</number>
 <prettyName>Show document attachments</prettyName>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -1099,7 +1113,7 @@
 <displayFormType>select</displayFormType>
 <displayType></displayType>
 <name>showcomments</name>
-<number>80</number>
+<number>81</number>
 <prettyName>Show document comments</prettyName>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -1113,7 +1127,7 @@
 <displayFormType>select</displayFormType>
 <displayType></displayType>
 <name>showhistory</name>
-<number>82</number>
+<number>83</number>
 <prettyName>Show document history</prettyName>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -1127,7 +1141,7 @@
 <displayFormType>select</displayFormType>
 <displayType></displayType>
 <name>showinformation</name>
-<number>83</number>
+<number>84</number>
 <prettyName>Show document information</prettyName>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -1981,7 +1995,7 @@
 <displayFormType>select</displayFormType>
 <displayType></displayType>
 <name>editcomment</name>
-<number>84</number>
+<number>85</number>
 <prettyName>Enable version summary</prettyName>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -1995,7 +2009,7 @@
 <displayFormType>select</displayFormType>
 <displayType></displayType>
 <name>editcomment_mandatory</name>
-<number>85</number>
+<number>86</number>
 <prettyName>Make version summary mandatory</prettyName>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -2448,7 +2462,7 @@
 <displayFormType>select</displayFormType>
 <displayType></displayType>
 <name>minoredit</name>
-<number>86</number>
+<number>87</number>
 <prettyName>Enable minor edits</prettyName>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -2666,6 +2680,20 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </showRightPanels>
+<showannotations>
+<customDisplay></customDisplay>
+<defaultValue></defaultValue>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType></displayType>
+<name>showannotations</name>
+<number>80</number>
+<prettyName>Show document annotations</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</showannotations>
 <showattachments>
 <customDisplay></customDisplay>
 <defaultValue></defaultValue>
@@ -2673,7 +2701,7 @@
 <displayFormType>select</displayFormType>
 <displayType></displayType>
 <name>showattachments</name>
-<number>81</number>
+<number>82</number>
 <prettyName>Show document attachments</prettyName>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -2687,7 +2715,7 @@
 <displayFormType>select</displayFormType>
 <displayType></displayType>
 <name>showcomments</name>
-<number>80</number>
+<number>81</number>
 <prettyName>Show document comments</prettyName>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -2701,7 +2729,7 @@
 <displayFormType>select</displayFormType>
 <displayType></displayType>
 <name>showhistory</name>
-<number>82</number>
+<number>83</number>
 <prettyName>Show document history</prettyName>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -2715,7 +2743,7 @@
 <displayFormType>select</displayFormType>
 <displayType></displayType>
 <name>showinformation</name>
-<number>83</number>
+<number>84</number>
 <prettyName>Show document information</prettyName>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -3116,6 +3144,9 @@ Your account on $wikiname has been successfully activated. You can now login at 
 </property>
 <property>
 <showRightPanels>1</showRightPanels>
+</property>
+<property>
+<showannotations></showannotations>
 </property>
 <property>
 <showattachments></showattachments>

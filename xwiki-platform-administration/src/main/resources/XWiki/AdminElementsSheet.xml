@@ -32,7 +32,7 @@
 #set ($params = $util.hashMap)
 #set ($params.header = ['title', 'meta'])
 #set ($params.panels = ['showLeftPanels', 'leftPanels', 'showRightPanels', 'rightPanels'])
-#set ($params.docextra = ['showcomments', 'showattachments', 'showhistory', 'showinformation'])
+#set ($params.docextra = ['showannotations', 'showcomments', 'showattachments', 'showhistory', 'showinformation'])
 #if ("$!editor" == 'globaladmin')
   #set ($params.footer = ['webcopyright', 'version'])
 #end

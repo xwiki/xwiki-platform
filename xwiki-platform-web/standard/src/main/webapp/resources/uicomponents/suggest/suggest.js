@@ -63,6 +63,7 @@ var XWiki = (function(XWiki){
   nInputChars : 0,
   aSuggestions : [],
   iHighlighted : null,
+  isActive : false,
 
   /**
    * Initialize the suggest
@@ -130,7 +131,7 @@ var XWiki = (function(XWiki){
    * though.
    */
   onKeyUp: function(event)
-  { 
+  {
     var key = event.keyCode;
     switch(key) {
       // Ignore special keys, which are treated in onKeyPress
@@ -166,7 +167,7 @@ var XWiki = (function(XWiki){
    * value inside the target field, Escape closes the suggest dropdown, Up and Down move the current selection.
    */
   onKeyPress: function(event) {
-    if(!$(this.suggest)) {
+    if(!$(this.isActive)) {
       // Let the key events pass through if the UI is not displayed
       return;
     }
@@ -450,6 +451,7 @@ var XWiki = (function(XWiki){
    */
   createList: function(arr, source)
   {
+    this.isActive = true;
     var pointer = this;
 
     this.killTimeout();
@@ -711,6 +713,7 @@ var XWiki = (function(XWiki){
    */
   clearSuggestions: function() {
     this.killTimeout();
+    this.isActive = false;
     var ele = $(this.container);
     var pointer = this;
     if (ele && ele.parentNode) {
@@ -722,7 +725,7 @@ var XWiki = (function(XWiki){
         }});
       }
       else {
-        $(this.container).remove();     
+        $(this.container).remove();
       }
       document.fire("xwiki:suggest:clearSuggestions", { 'suggest' : this});
     }

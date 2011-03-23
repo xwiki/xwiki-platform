@@ -8,6 +8,9 @@
   #if($xcontext.action == 'view' && $viewer != 'content')
     #set ($discard = $docextralinks.add(['content', $msg.get('core.links.content'), -1]))
   #end
+  #if($viewer != 'comments' && $showcomments)
+    #set ($discard = $docextralinks.add(["comments", $msg.get("docextra.comments"), $doc.getObjects("XWiki.XWikiComments").size()]))
+  #end
   #if($showannotations)
     #if(!$annotationCount)
       ## Annotation count is supposed to be defined in xwikivars.vm. If for a reason or another it is not
@@ -16,9 +19,6 @@
       #set($annotationCount = $doc.getObjects('AnnotationCode.AnnotationClass').size())
     #end
     #set ($discard = $docextralinks.add(["annotations", $msg.get("docextra.annotations"), $annotationCount]))
-  #end
-  #if($viewer != 'comments' && $showcomments)
-    #set ($discard = $docextralinks.add(["comments", $msg.get("docextra.comments"), $doc.getObjects("XWiki.XWikiComments").size()]))
   #end
   #if($viewer != 'attachments' && $showattachments)
     #set ($discard = $docextralinks.add(["attachments", $msg.get("docextra.attachments"), $doc.getAttachmentList().size()]))

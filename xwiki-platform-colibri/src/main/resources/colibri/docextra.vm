@@ -27,6 +27,11 @@
 ##
 #if (!$docextras)
   #set ($docextras = $util.arrayList)
+  #if ($showcomments)
+    $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
+    $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
+    #set ($discard = $docextras.add(['Comments', 'comments', $msg.get('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size(), 'commentsinline.vm', $msg.get('core.shortcuts.view.comments')]))
+  #end
   #if ($showannotations)
     #if (!$annotationCount)
       ## Annotation count is supposed to be defined in xwikivars.vm. If for a reason or another it is not
@@ -35,11 +40,6 @@
       #set ($annotationCount = $doc.getObjects('AnnotationCode.AnnotationClass').size())
     #end
     #set ($discard = $docextras.add(['Annotations', 'annotations', $msg.get('docextra.annotations'), $annotationCount, 'annotationsinline.vm', $msg.get('core.shortcuts.view.annotations')]))
-  #end
-  #if ($showcomments)
-    $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
-    $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
-    #set ($discard = $docextras.add(['Comments', 'comments', $msg.get('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size(), 'commentsinline.vm', $msg.get('core.shortcuts.view.comments')]))
   #end
   #if ($showattachments)
     $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})

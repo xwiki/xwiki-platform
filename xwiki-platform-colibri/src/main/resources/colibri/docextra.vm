@@ -23,44 +23,44 @@
 <div id="xwikidata" class="layoutsubsection">
 ##
 ## Build the list of documents extras to display, if it does not exist (default).
-## List format : ["ExtraAnchor", "ExtraName", "ExtraTabText", ExtraNumberOfItems, "extratemplate.vm", "keyboardShortcut"]
+## List format : ['ExtraAnchor', 'ExtraName', 'ExtraTabText', ExtraNumberOfItems, 'extratemplate.vm', 'keyboardShortcut']
 ##
 #if (!$docextras)
-  #set($docextras = $util.arrayList)
+  #set ($docextras = $util.arrayList)
   #if ($showannotations)
-    #if(!$annotationCount)
+    #if (!$annotationCount)
       ## Annotation count is supposed to be defined in xwikivars.vm. If for a reason or another it is not
-      ## defined at this point, we tap into the standard annotation class, and do not load again the 
+      ## defined at this point, we tap into the standard annotation class, and do not load again the
       ## config document. This however should not happen.
-      #set($annotationCount = $doc.getObjects('AnnotationCode.AnnotationClass').size())
+      #set ($annotationCount = $doc.getObjects('AnnotationCode.AnnotationClass').size())
     #end
-    #set ($discard = $docextras.add(["Annotations", "annotations", $msg.get("docextra.annotations"), $annotationCount, "annotationsinline.vm", $msg.get("core.shortcuts.view.annotations")]))
+    #set ($discard = $docextras.add(['Annotations', 'annotations', $msg.get('docextra.annotations'), $annotationCount, 'annotationsinline.vm', $msg.get('core.shortcuts.view.annotations')]))
   #end
   #if ($showcomments)
     $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
     $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
-    #set ($discard = $docextras.add(["Comments", "comments", $msg.get("docextra.comments"), $doc.getObjects("XWiki.XWikiComments").size(), "commentsinline.vm", $msg.get("core.shortcuts.view.comments")]))
+    #set ($discard = $docextras.add(['Comments', 'comments', $msg.get('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size(), 'commentsinline.vm', $msg.get('core.shortcuts.view.comments')]))
   #end
   #if ($showattachments)
     $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
     $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
-    #set ($discard = $docextras.add(["Attachments", "attachments", $msg.get("docextra.attachments"), $doc.getAttachmentList().size(), "attachmentsinline.vm",$msg.get("core.shortcuts.view.attachments")]))
+    #set ($discard = $docextras.add(['Attachments', 'attachments', $msg.get('docextra.attachments'), $doc.getAttachmentList().size(), 'attachmentsinline.vm', $msg.get('core.shortcuts.view.attachments')]))
   #end
   #if ($showhistory)
     ## Pagination style
     $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
-    #set ($discard = $docextras.add(["History", "history", $msg.get("docextra.history"), -1, "historyinline.vm", $msg.get("core.shortcuts.view.history")]))
+    #set ($discard = $docextras.add(['History', 'history', $msg.get('docextra.history'), -1, 'historyinline.vm', $msg.get('core.shortcuts.view.history')]))
   #end
   #if ($showinformation)
-    #set ($discard = $docextras.add(["Information", "information", $msg.get("docextra.information"), -1, "informationinline.vm", $msg.get("core.shortcuts.view.information")]))
+    #set ($discard = $docextras.add(['Information', 'information', $msg.get('docextra.information'), -1, 'informationinline.vm', $msg.get('core.shortcuts.view.information')]))
   #end
 #end
 ##
 ## Put anchors before the footer, otherwise the top of each section would be hidden by the floating topmenu
 ##
-#if($docextras.size() > 0)
+#if ($docextras.size() > 0)
 <div id="docextraanchors" class="invisible">
-#foreach($docextra in $docextras)<span id="${listtool.get($docextra, 0)}anchor">&nbsp;</span>#end
+#foreach ($docextra in $docextras)<span id="${docextra.get(0)}anchor">&nbsp;</span>#end
 </div>
 #end
 ##
@@ -71,14 +71,9 @@
     <div class="floatcontainer" id="docExtraTabs">
       <ul class="xwikitabbar" id="docExtrasTabsUl">
         #foreach($docextra in $docextras)
-          #set ($extraAnchor = $listtool.get($docextra, 0))
-          #set ($extraName = $listtool.get($docextra, 1))
-          #set ($extraTabText = $listtool.get($docextra, 2))
-          #set ($extraNbOfItems = $listtool.get($docextra, 3))
-          <li id="${extraAnchor}tab">
-            #set ($args = "viewer=${extraName}")
-            <a id="${extraAnchor}link" href="$doc.getURL('view', $args)">
-              $extraTabText #if($extraNbOfItems >= 0) <span class="itemCount">$msg.get("docextra.extranb", [$extraNbOfItems])</span> #end
+          <li id="${docextra.get(0)}tab">
+            <a id="${docextra.get(0)}link" href="$doc.getURL('view', "viewer=${docextra.get(1)}")">
+              $docextra.get(2) #if($docextra.get(3) >= 0) <span class="itemCount">$msg.get('docextra.extranb', [$docextra.get(3)])</span> #end
             </a>
           </li>
         #end
@@ -89,8 +84,7 @@
     ##
     <div id="docextrapanes">
       #foreach($docextra in $docextras)
-        #set ($extraAnchor = $listtool.get($docextra, 0))
-        <div id="${extraAnchor}pane" class="hidden empty"></div>
+        <div id="${docextra.get(0)}pane" class="hidden empty"></div>
       #end
     </div>
     ##

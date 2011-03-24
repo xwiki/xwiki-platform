@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.internal.plexus;
+package org.xwiki.extension.repository.aether.internal.plexus;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.extension.repository.internal.aether.XWikiLoggerManager;
+import org.xwiki.extension.repository.aether.internal.XWikiLoggerManager;
 
 @Component
 public class DefaultPlexusComponentManager extends AbstractLogEnabled implements PlexusComponentManager, Initializable

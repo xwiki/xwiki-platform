@@ -33,14 +33,18 @@
   <name>XWiki Platform - Core - Extension</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Extension</description>
-  <modules>
-    <module>xwiki-extension-api</module>
-    <module>xwiki-extension-handlers</module>
-  </modules>
   <properties>
+    <maven.version>3.0.3</maven.version>
+  
     <!-- Extension Manager is still in experimental sate and change very often -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
+  <modules>
+    <module>xwiki-extension-api</module>
+    <module>xwiki-extension-repositories</module>
+    <module>xwiki-extension-handlers</module>
+    <module>xwiki-extension-script</module>
+  </modules>
 </project>
 

@@ -17,27 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.internal.aether;
+package org.xwiki.extension.repository.aether.internal.plexus;
 
-import org.xwiki.extension.ExtensionDependency;
-import org.xwiki.extension.ExtensionId;
+import org.codehaus.plexus.PlexusContainer;
+import org.xwiki.component.annotation.ComponentRole;
 
-public class AetherExtensionDependency implements ExtensionDependency
+@ComponentRole
+public interface PlexusComponentManager
 {
-    private ExtensionId artifactId;
-
-    public AetherExtensionDependency(ExtensionId artifactId)
-    {
-        this.artifactId = artifactId;
-    }
-
-    public String getId()
-    {
-        return this.artifactId.getId();
-    }
-
-    public String getVersion()
-    {
-        return this.artifactId.getVersion();
-    }
+    PlexusContainer getPlexus();
 }

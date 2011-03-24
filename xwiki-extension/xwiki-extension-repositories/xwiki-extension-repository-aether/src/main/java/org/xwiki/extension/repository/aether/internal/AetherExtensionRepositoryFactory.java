@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.internal.aether;
+package org.xwiki.extension.repository.aether.internal;
 
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -33,8 +33,8 @@ import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryException;
 import org.xwiki.extension.repository.ExtensionRepositoryFactory;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
-import org.xwiki.extension.repository.internal.aether.configuration.AetherConfiguration;
-import org.xwiki.extension.repository.internal.plexus.PlexusComponentManager;
+import org.xwiki.extension.repository.aether.internal.configuration.AetherConfiguration;
+import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
 
 @Component("maven")
 public class AetherExtensionRepositoryFactory extends AbstractLogEnabled implements ExtensionRepositoryFactory,

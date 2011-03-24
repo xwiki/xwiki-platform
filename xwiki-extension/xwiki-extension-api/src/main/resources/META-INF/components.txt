@@ -1,15 +1,11 @@
 org.xwiki.extension.internal.DefaultExtensionManager
 org.xwiki.extension.internal.DefaultExtensionManagerConfiguration
 org.xwiki.extension.internal.DefaultVersionManager
-org.xwiki.extension.internal.script.ExtensionManagerScriptService
 org.xwiki.extension.handler.internal.DefaultExtensionHandlerManager
 org.xwiki.extension.repository.internal.DefaultExtensionRepositoryManager
 org.xwiki.extension.repository.internal.DefaultLocalExtensionRepository
 org.xwiki.extension.repository.internal.DefaultCoreExtensionRepository
 org.xwiki.extension.repository.internal.ConfigurationExtensionRepositorySource
-org.xwiki.extension.repository.internal.aether.AetherExtensionRepositoryFactory
-org.xwiki.extension.repository.internal.aether.configuration.DefaultAetherConfiguration
-org.xwiki.extension.repository.internal.plexus.DefaultPlexusComponentManager
 org.xwiki.extension.task.internal.DefaultTaskManager
 org.xwiki.extension.task.internal.InstallTask
 org.xwiki.extension.task.internal.UninstallTask

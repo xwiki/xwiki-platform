@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.internal.aether;
+package org.xwiki.extension.repository.aether.internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +38,7 @@ import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.ExtensionRepository;
-import org.xwiki.extension.repository.internal.plexus.PlexusComponentManager;
+import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
 
 public class AetherExtension implements Extension
 {

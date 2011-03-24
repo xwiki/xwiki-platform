@@ -363,6 +363,12 @@
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt-wysiwyg-client</artifactId>
+      <version>${project.version}</version>
+      <classifier>shared</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt-wysiwyg-server</artifactId>
       <version>${project.version}</version>
     </dependency>

@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186679007000</creationDate>
-<date>1278346135000</date>
-<contentUpdateDate>1278346135000</contentUpdateDate>
+<date>1300991417000</date>
+<contentUpdateDate>1300991417000</contentUpdateDate>
 <version>1.1</version>
 <title>Translations</title>
 <template></template>
@@ -96,7 +96,7 @@ wikimanager.successdeletewiki=Wiki \"{0}\" deleted.
 wikimanager.errordeletewiki=Wiki \"{0}\" delete failed: {1}.
 wikimanager.successsettemplate=Wiki \"{0}\" visibility changed to \"{1}\".
 wikimanager.errorsettemplate=Wiki \"{0}\" template property changing failed: {1}.
-wikimanager.successcreatewiki=Your wiki \"{0}\" has been created. You can access it at the following address: {1}.
+wikimanager.successcreatewiki=Your wiki \"{0}\" has been created. You can access it at the following address: [{1}].
 wikimanager.errorcreatewiki=Wiki \"{0}\" creation failed: {1}.
 wikimanager.errorcreatewiki.ERROR_WM_WIKIALREADYEXISTS=This wiki \"{0}\" already exist. Please choose another name.
 wikimanager.listwikiempty=There are no open wikis.

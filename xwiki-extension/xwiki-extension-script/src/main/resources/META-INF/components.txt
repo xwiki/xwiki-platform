@@ -1,1 +1,1 @@
-org.xwiki.extension.internal.script.ExtensionManagerScriptService
+org.xwiki.extension.script.internal.ExtensionManagerScriptService

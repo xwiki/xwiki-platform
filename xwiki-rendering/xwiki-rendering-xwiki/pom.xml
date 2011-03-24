@@ -69,6 +69,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-default</artifactId>
       <version>${commons.version}</version>

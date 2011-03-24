@@ -148,6 +148,18 @@ public class WikiModelGeneratorListener implements Listener
                 this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.INS, createWikiParameters(parameters)
                     .toList()));
                 break;
+            case MONOSPACE:
+                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.MONO, createWikiParameters(parameters)
+                    .toList()));
+                break;
+            case SUBSCRIPT:
+                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.SUB, createWikiParameters(parameters)
+                    .toList()));
+                break;
+            case SUPERSCRIPT:
+                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.SUP, createWikiParameters(parameters)
+                    .toList()));
+                break;
             case NONE:
                 this.wikimodelListener.beginFormat(new WikiFormat(createWikiParameters(parameters).toList()));
                 break;
@@ -176,6 +188,18 @@ public class WikiModelGeneratorListener implements Listener
                 break;
             case UNDERLINED:
                 this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.INS, createWikiParameters(parameters)
+                    .toList()));
+                break;
+            case MONOSPACE:
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.MONO, createWikiParameters(parameters)
+                    .toList()));
+                break;
+            case SUBSCRIPT:
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.SUB, createWikiParameters(parameters)
+                    .toList()));
+                break;
+            case SUPERSCRIPT:
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.SUP, createWikiParameters(parameters)
                     .toList()));
                 break;
             case NONE:

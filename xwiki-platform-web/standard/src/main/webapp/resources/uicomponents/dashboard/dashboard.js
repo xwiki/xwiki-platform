@@ -166,7 +166,7 @@ XWiki.Dashboard = Class.create( {
    * 
    * @param containerId the id of the container to make sortable
    * @param containerIds the list of ids of all containers that are sortable
-   * @param onMove move callback, to be called when 
+   * @param onMove move callback, to be called when an item is dragged from a container to another
    */
   makeSortable : function(containerId, containerIds, onMove) {
     Sortable.create(containerId, {
@@ -183,7 +183,7 @@ XWiki.Dashboard = Class.create( {
       onUpdate: onMove
     });
   },
-  
+
   /**
    * Adds handlers to the gadgets on the dashboard, the remove.
    */
@@ -505,7 +505,9 @@ XWiki.Dashboard = Class.create( {
     this.containers.each(function(container) {
       containerIds.push(container.readAttribute('id'));
     });
-    this.makeSortable(newId, containerIds, this.onMoveGadget.bind(this));
+    // recreate the drag & drops, to take into account the new added container as well. Re-create all because they all 
+    // need to take into account the new one
+    this.createDragAndDrops();
     // insert the css element in the head of this document, to update the columns css to one more column
     var linkElement = new Element('link', 
         {'href' : '$xwiki.getSkinFile("uicomponents/container/columns.css", true)' + '?columns=' + this.containers.length, 

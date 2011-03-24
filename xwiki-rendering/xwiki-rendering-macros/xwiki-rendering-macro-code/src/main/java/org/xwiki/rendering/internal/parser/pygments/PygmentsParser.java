@@ -210,7 +210,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
      * @return the highlighted version of the provided source.
      * @throws ParseException the highlighting failed.
      */
-    private List<Block> highlight(String syntaxId, String code) throws ParseException
+    private synchronized List<Block> highlight(String syntaxId, String code) throws ParseException
     {
         PythonInterpreter interpreter = getPythonInterpreter();
         BlocksGeneratorPygmentsListener listener = new BlocksGeneratorPygmentsListener(this.plainTextParser);

@@ -1739,6 +1739,14 @@ public class Document extends Api
     }
 
     /**
+     * @return the sections in the current document
+     */
+    public List<DocumentSection> getSections() throws XWikiException
+    {
+        return this.doc.getSections();
+    }
+
+    /**
      * Get document children. Children are documents with the current document as parent.
      * 
      * @return The list of children for the current document.

@@ -106,8 +106,8 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     /**
      * Python code to create the lexer.
      */
-    private static final String PY_LEXER_CREATE =
-        PY_LEXER_TRY + " = get_lexer_by_name(\"{0}\", stripnl=False)" + PY_CATCH;
+    private static final String PY_LEXER_CREATE = PY_LEXER_TRY + " = get_lexer_by_name(\"{0}\", stripnl=False)"
+        + PY_CATCH;
 
     /**
      * Python code to create the style.
@@ -204,6 +204,9 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
 
     /**
      * Return a highlighted version of the provided content.
+     * <p>
+     * This method is synchronized because we reuse the same Jython interpreter (because recreating one eaach time would
+     * be costly) and an interpreter is not thread safe.
      * 
      * @param syntaxId the identifier of the source syntax.
      * @param code the content to highlight.

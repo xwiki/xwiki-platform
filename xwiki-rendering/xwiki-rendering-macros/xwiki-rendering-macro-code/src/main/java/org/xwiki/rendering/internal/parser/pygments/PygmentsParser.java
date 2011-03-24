@@ -55,7 +55,7 @@ import org.xwiki.rendering.parser.Parser;
 // Note that we force the Component annotation so that this component is only registered as a Highlight Parser
 // and not a Parser too since we don't want this parser to be visible to users as a valid standard input parser
 // component.
-@Component(roles = {HighlightParser.class })
+@Component(roles = {HighlightParser.class})
 public class PygmentsParser extends AbstractHighlightParser implements Initializable
 {
     /**
@@ -106,8 +106,8 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     /**
      * Python code to create the lexer.
      */
-    private static final String PY_LEXER_CREATE =
-        PY_LEXER_TRY + " = get_lexer_by_name(\"{0}\", stripnl=False)" + PY_CATCH;
+    private static final String PY_LEXER_CREATE = PY_LEXER_TRY + " = get_lexer_by_name(\"{0}\", stripnl=False)"
+        + PY_CATCH;
 
     /**
      * Python code to create the style.
@@ -154,12 +154,9 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
         this.pythonInterpreter = new PythonInterpreter();
 
         // imports Pygments
-        this.pythonInterpreter.exec("import pygments"
-            + "\nfrom pygments.lexers import guess_lexer"
-            + "\nfrom pygments.lexers import get_lexer_by_name"
-            + "\nfrom pygments.styles import get_style_by_name"
-            + "\nfrom pygments.util import ClassNotFound"
-            + "\nfrom pygments.formatters.xdom import XDOMFormatter");
+        this.pythonInterpreter.exec("import pygments" + "\nfrom pygments.lexers import guess_lexer"
+            + "\nfrom pygments.lexers import get_lexer_by_name" + "\nfrom pygments.styles import get_style_by_name"
+            + "\nfrom pygments.util import ClassNotFound" + "\nfrom pygments.formatters.xdom import XDOMFormatter");
     }
 
     /**
@@ -204,6 +201,9 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
 
     /**
      * Return a highlighted version of the provided content.
+     * <p>
+     * This method is synchronized because we reuse the same Jython interpreter (because recreating one eaach time would
+     * be costly) and an interpreter is not thread safe.
      * 
      * @param syntaxId the identifier of the source syntax.
      * @param code the content to highlight.

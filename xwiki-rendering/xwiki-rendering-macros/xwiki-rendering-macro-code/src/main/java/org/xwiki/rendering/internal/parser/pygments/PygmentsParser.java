@@ -154,9 +154,12 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
         this.pythonInterpreter = new PythonInterpreter();
 
         // imports Pygments
-        this.pythonInterpreter.exec("import pygments" + "\nfrom pygments.lexers import guess_lexer"
-            + "\nfrom pygments.lexers import get_lexer_by_name" + "\nfrom pygments.styles import get_style_by_name"
-            + "\nfrom pygments.util import ClassNotFound" + "\nfrom pygments.formatters.xdom import XDOMFormatter");
+        this.pythonInterpreter.exec("import pygments"
+            + "\nfrom pygments.lexers import guess_lexer"
+            + "\nfrom pygments.lexers import get_lexer_by_name"
+            + "\nfrom pygments.styles import get_style_by_name"
+            + "\nfrom pygments.util import ClassNotFound"
+            + "\nfrom pygments.formatters.xdom import XDOMFormatter");
     }
 
     /**

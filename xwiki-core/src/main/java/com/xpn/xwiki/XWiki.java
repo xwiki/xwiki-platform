@@ -687,17 +687,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         textarea.setFilter(filter);
 
         int rows = 25;
-        try {
-            rows = context.getWiki().getUserPreferenceAsInt("editbox_height", context);
-        } catch (Exception e) {
-        }
         textarea.setRows(rows);
-
         int cols = 80;
-        try {
-            cols = context.getWiki().getUserPreferenceAsInt("editbox_width", context);
-        } catch (Exception e) {
-        }
         textarea.setCols(cols);
         textarea.setName("content");
         textarea.setID("content");
@@ -1727,18 +1718,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         textarea textarea = new textarea();
 
         int rows = 25;
-        try {
-            rows = context.getWiki().getUserPreferenceAsInt("editbox_height", context);
-        } catch (Exception e) {
-        }
         textarea.setRows(rows);
-
         int cols = 80;
-        try {
-            cols = context.getWiki().getUserPreferenceAsInt("editbox_width", context);
-        } catch (Exception e) {
-        }
         textarea.setCols(cols);
+
         textarea.setFilter(filter);
         textarea.setName("content");
         textarea.setID("content");
@@ -3121,7 +3104,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
         // New fields for the XWiki 1.0 skin
         needsUpdate |= bclass.addTextField("skin", "skin", 30);
-        needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("avatar", "Avatar", 30);
         needsUpdate |= bclass.addTextField("phone", "Phone", 30);
         needsUpdate |= bclass.addTextAreaField("address", "Address", 40, 3);
@@ -3214,13 +3196,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         needsUpdate |= bclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
 
         needsUpdate |= bclass.addStaticListField("editor", "Default Editor", "---|Text|Wysiwyg");
-        needsUpdate |= bclass.addTextField("editbox_width", "Editbox Width", 5);
-        needsUpdate |= bclass.addTextField("editbox_height", "Editbox Height", 5);
 
         needsUpdate |= bclass.addTextField("webcopyright", "Copyright", 30);
         needsUpdate |= bclass.addTextField("title", "Title", 30);
         needsUpdate |= bclass.addTextField("version", "Version", 30);
-        needsUpdate |= bclass.addTextAreaField("menu", "Menu", 60, 8);
         needsUpdate |= bclass.addTextAreaField("meta", "HTTP Meta Info", 60, 8);
         needsUpdate |= bclass.addTextField("dateformat", "Date Format", 30);
 
@@ -3239,7 +3218,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         needsUpdate |= bclass.addTextField("macros_languages", "Macros Languages", 60);
         needsUpdate |= bclass.addTextField("macros_velocity", "Macros for Velocity", 60);
         needsUpdate |= bclass.addTextField("macros_groovy", "Macros for Groovy", 60);
-        needsUpdate |= bclass.addTextField("macros_wiki", "Macros for the Wiki Parser", 60);
         needsUpdate |= bclass.addTextAreaField("macros_mapping", "Macros Mapping", 60, 15);
 
         needsUpdate |= bclass.addStaticListField("registration_anonymous", "Anonymous", "---|Image|Text");
@@ -3250,10 +3228,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         needsUpdate |= bclass.addStaticListField("comment_registered", "Registered", "---|Image|Text");
 
         needsUpdate |= bclass.addTextField("notification_pages", "Notification Pages", 60);
-
-        needsUpdate |= bclass.addBooleanField("renderXWikiVelocityRenderer", "Render velocity code", "yesno");
-        needsUpdate |= bclass.addBooleanField("renderXWikiGroovyRenderer", "Render Groovy code", "yesno");
-        needsUpdate |= bclass.addBooleanField("renderXWikiRadeoxRenderer", "Render Wiki syntax", "yesno");
 
         needsUpdate |= bclass.addNumberField("upload_maxsize", "Maximum Upload Size", 5, "long");
 
@@ -3272,7 +3246,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         needsUpdate |= bclass.addTextField("rightPanels", "Panels displayed on the right", 60);
         needsUpdate |= bclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
         needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
-        needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("languages", "Supported languages", 30);
         needsUpdate |= bclass.addTextField("convertmail", "convert email type", 1);
         needsUpdate |= bclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
@@ -3303,14 +3276,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         }
 
         needsUpdate |= setClassDocumentFields(doc, "XWiki Preferences");
-
-        String menu = doc.getStringValue("XWiki.XWikiPreferences", "menu");
-        if (menu.indexOf("../..") != -1) {
-            MenuSubstitution msubst = new MenuSubstitution(context.getUtil());
-            menu = msubst.substitute(menu);
-            doc.setLargeStringValue("XWiki.XWikiPreferences", "menu", menu);
-            needsUpdate = true;
-        }
 
         if (needsUpdate) {
             saveDocument(doc, context);

@@ -317,6 +317,16 @@
       <artifactId>xwiki-core-extension-handler-xar</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-extension-script</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-extension-repository-aether</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
     <!-- Legacy / Backward compatibility -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -344,7 +354,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-store-filesystem-attachments</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
     </dependency>
 
     <!--  -->

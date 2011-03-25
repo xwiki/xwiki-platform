@@ -36,12 +36,16 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
@@ -67,6 +71,12 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      */
     @Requirement("currentmixed")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
+
+    /**
+     * Used to serialize full reference of current user.
+     */
+    @Requirement
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
     private XWikiContext getContext()
     {
@@ -894,7 +904,15 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      */
     public String getCurrentUser()
     {
-        return getContext().getUser();
+        XWikiUser user = getContext().getXWikiUser();
+
+        // Make sure to always return the full reference of the user
+        if (user != null) {
+            return this.defaultEntityReferenceSerializer.serialize(this.currentMixedDocumentReferenceResolver.resolve(
+                user.getUser(), new SpaceReference("XWiki", new WikiReference(getContext().getDatabase()))));
+        } else {
+            return XWikiRightService.GUEST_USER_FULLNAME;
+        }
     }
 
     /**

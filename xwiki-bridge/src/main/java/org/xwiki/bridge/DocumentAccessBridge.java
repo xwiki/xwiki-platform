@@ -617,7 +617,7 @@ public interface DocumentAccessBridge
     /**
      * Utility method to retrieve the current user.
      * 
-     * @return the current user.
+     * @return the current user full reference.
      */
     String getCurrentUser();
 

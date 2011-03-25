@@ -1060,7 +1060,6 @@
               **/plugin/svg/SVGMacro.java,
               **/plugin/svg/SVGPluginApi.java,
               **/plugin/svg/SVGPlugin.java,
-              **/plugin/test/testPlugin.java,
               **/plugin/userdirectory/Group.java,
               **/plugin/userdirectory/UserDirectoryPluginAPI.java,
               **/plugin/userdirectory/UserDirectoryPlugin.java,

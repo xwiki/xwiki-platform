@@ -42,6 +42,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
@@ -67,6 +68,12 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      */
     @Requirement("currentmixed")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
+
+    /**
+     * Used to serialize full reference of current user.
+     */
+    @Requirement
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
     private XWikiContext getContext()
     {
@@ -894,7 +901,14 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      */
     public String getCurrentUser()
     {
-        return getContext().getUser();
+        DocumentReference userReference = getContext().getUserReference();
+
+        // Make sure to always return the full reference of the user
+        if (userReference != null) {
+            return this.defaultEntityReferenceSerializer.serialize(userReference);
+        } else {
+            return XWikiRightService.GUEST_USER_FULLNAME;
+        }
     }
 
     /**

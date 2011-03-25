@@ -4801,8 +4801,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     {
         if (context.getXWikiUser() != null) {
             context.setUser(this.defaultEntityReferenceSerializer.serialize(this.currentMixedDocumentReferenceResolver
-                .resolve(context.getXWikiUser().getUser(), new WikiReference(context.getDatabase()))), context
-                .getXWikiUser().isMain());
+                .resolve(context.getXWikiUser().getUser(),
+                    new SpaceReference("XWiki", new WikiReference(context.getDatabase()))), context.getXWikiUser()
+                .isMain()));
         }
     }
 

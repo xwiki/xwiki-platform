@@ -34,6 +34,7 @@ import org.apache.xmlrpc.server.XmlRpcServer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -369,9 +370,17 @@ public class XWikiContext extends Hashtable<Object, Object>
         if (user == null) {
             setUserReference(null);
         } else {
-            setUserReference(this.currentMixedDocumentReferenceResolver.resolve(user, new WikiReference(
-                getDatabase() == null ? "xwiki" : getDatabase())));
+            setUserReference(resolveUserReference(user));
         }
+    }
+
+    /**
+     * Make sure to use "XWiki" as default space when it's not provided in  user name.
+     */
+    private DocumentReference resolveUserReference(String user)
+    {
+        return this.currentMixedDocumentReferenceResolver.resolve(user, new SpaceReference("XWiki", new WikiReference(
+            getDatabase() == null ? "xwiki" : getDatabase())));
     }
 
     /**

@@ -369,7 +369,8 @@ public class XWikiContext extends Hashtable<Object, Object>
         if (user == null) {
             setUserReference(null);
         } else {
-            setUserReference(this.currentMixedDocumentReferenceResolver.resolve(user, new WikiReference(getDatabase())));
+            setUserReference(this.currentMixedDocumentReferenceResolver.resolve(user, new WikiReference(
+                getDatabase() == null ? "xwiki" : getDatabase())));
         }
     }
 
@@ -389,8 +390,12 @@ public class XWikiContext extends Hashtable<Object, Object>
     public String getUser()
     {
         if (this.userReference != null) {
-            return this.compactWikiEntityReferenceSerializer.serialize(this.userReference, new WikiReference(
-                getDatabase()));
+            if (getDatabase() == null) {
+                return this.localEntityReferenceSerializer.serialize(this.userReference);
+            } else {
+                return this.compactWikiEntityReferenceSerializer.serialize(this.userReference, new WikiReference(
+                    getDatabase()));
+            }
         } else {
             return XWikiRightService.GUEST_USER_FULLNAME;
         }

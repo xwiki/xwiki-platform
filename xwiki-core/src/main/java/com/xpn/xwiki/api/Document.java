@@ -178,7 +178,8 @@ public class Document extends Api
      */
     public DocumentReference getDocumentReference()
     {
-        return this.doc.getDocumentReference();
+        // Clone the document reference since it can be modified
+        return new DocumentReference(this.doc.getDocumentReference());
     }
 
     /**

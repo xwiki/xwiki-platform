@@ -18,206 +18,268 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.plugin.graphviz;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.web.XWikiResponse;
 
-public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
+/**
+ * Plugin which wraps the <a href="http://graphviz.org/">GraphViz</a> <tt>dot</tt> executable; transforming dot source
+ * files (representing graphs) into images, image maps, or other output formats supported by GraphViz.
+ * <p>
+ * See http://www.graphviz.org/doc/info/lang.html for the dot language specification. See
+ * http://www.graphviz.org/doc/info/output.html for the possible output formats
+ * </p>
+ * 
+ * @deprecated the plugin technology is deprecated
+ * @version $Id$
+ */
+@Deprecated
+public class GraphVizPlugin extends XWikiDefaultPlugin
 {
-    private static Log mLogger = LogFactory.getLog(com.xpn.xwiki.plugin.graphviz.GraphVizPlugin.class);
+    /** Logging helper object. */
+    private static final Log LOG = LogFactory.getLog(com.xpn.xwiki.plugin.graphviz.GraphVizPlugin.class);
 
+    /** The default output format to use: PNG image. */
+    private static final String DEFAULT_FORMAT = "png";
+
+    /** The default engine to use: dot. */
+    private static final String DOT_ENGINE = "dot";
+
+    /** An alternative engine to use: neato. */
+    private static final String NEATO_ENGINE = "neato";
+
+    /** Temporary directory where generated files are stored. */
     private File tempDir;
 
+    /** The path to the dot executable. */
     private String dotPath;
 
+    /** The path to the neato executable. */
     private String neatoPath;
 
+    /**
+     * The mandatory plugin constructor, this is the method called (through reflection) by the plugin manager.
+     * 
+     * @param name the plugin name
+     * @param className the name of this class, ignored
+     * @param context the current request context
+     */
     public GraphVizPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
         init(context);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiPluginInterface#getName()
+     */
     @Override
     public String getName()
     {
         return "graphviz";
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiPluginInterface#getPluginApi(XWikiPluginInterface, XWikiContext)
+     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new GraphVizPluginApi((GraphVizPlugin) plugin, context);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiPluginInterface#flushCache(XWikiContext)
+     */
     @Override
     public void flushCache()
     {
         try {
-            File[] filelist = this.tempDir.listFiles();
-            for (int i = 0; i < filelist.length; i++) {
-                try {
-                    filelist[i].delete();
-                } catch (Exception e) {
-                }
-            }
+            FileUtils.cleanDirectory(this.tempDir);
         } catch (Exception e) {
+            // Public APIs shouldn't throw errors; this shouldn't happen anyway
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiPluginInterface#init(XWikiContext)
+     */
     @Override
     public void init(XWikiContext context)
     {
         super.init(context);
 
         File dir = context.getWiki().getTempDirectory(context);
-        this.tempDir = new File(dir, "dot");
+        this.tempDir = new File(dir, this.getName());
         try {
             this.tempDir.mkdirs();
         } catch (Exception ex) {
-            mLogger.warn("Failed to create temporary file", ex);
+            LOG.warn("Failed to create temporary file", ex);
         }
 
-        this.dotPath = context.getWiki().Param("xwiki.plugin.graphviz.dotpath", "dot");
-        if (!this.dotPath.equals("dot")) {
+        this.dotPath = context.getWiki().Param("xwiki.plugin.graphviz.dotpath", DOT_ENGINE);
+        if (!this.dotPath.equals(DOT_ENGINE)) {
             try {
                 File dfile = new File(this.dotPath);
                 if (!dfile.exists()) {
-                    mLogger.error("Cannot find graphiz dot program at " + this.dotPath);
+                    LOG.error("Cannot find graphiz dot program at " + this.dotPath);
                 }
             } catch (Exception e) {
+                // Access restrictions, not important
             }
         }
 
-        this.neatoPath = context.getWiki().Param("xwiki.plugin.graphviz.neatopath", "neato");
-        if (!this.neatoPath.equals("neato")) {
+        this.neatoPath = context.getWiki().Param("xwiki.plugin.graphviz.neatopath", NEATO_ENGINE);
+        if (!this.neatoPath.equals(NEATO_ENGINE)) {
             try {
                 File dfile = new File(this.neatoPath);
                 if (!dfile.exists()) {
-                    mLogger.error("Cannot find graphiz neato program at " + this.neatoPath);
+                    LOG.error("Cannot find graphiz neato program at " + this.neatoPath);
                 }
             } catch (Exception e) {
+                // Access restrictions, not important
             }
         }
 
     }
 
-    public byte[] getDotImage(String content, boolean dot) throws IOException
+    /**
+     * Executes GraphViz and returns the URL for the produced file, a PNG image.
+     * 
+     * @param content the dot source
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @param context the current request context
+     * @return the URL which can be used to access the generated image
+     * @throws IOException if writing the input or output files to the disk fails
+     * @see #getDotResultURL(String, boolean, String, XWikiContext) allows to chose another output format instead of PNG
+     */
+    public String getDotImageURL(String content, boolean dot, XWikiContext context) throws IOException
     {
-        return getDotImage(content, "png", dot);
+        return getDotResultURL(content, dot, DEFAULT_FORMAT, context);
     }
 
+    /**
+     * Executes GraphViz and returns the URL for the produced file.
+     * 
+     * @param content the dot source code
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @param outputFormat the output format to use
+     * @param context the current request context
+     * @return the URL which can be used to access the result
+     * @throws IOException if writing the input or output files to the disk fails
+     * @see #getDotImageURL(String, boolean, XWikiContext) if the output should be a simple PNG image
+     */
+    public String getDotResultURL(String content, boolean dot, String outputFormat, XWikiContext context)
+        throws IOException
+    {
+        String filename = writeDotImage(content, outputFormat, dot);
+        return context.getDoc().getAttachmentURL(filename, DOT_ENGINE, context);
+    }
+
+    /**
+     * Executes GraphViz and return the content of the resulting image (PNG format).
+     * 
+     * @param content the dot source code
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @return the content of the generated image
+     * @throws IOException if writing the input or output files to the disk fails
+     */
+    public byte[] getDotImage(String content, boolean dot) throws IOException
+    {
+        return getDotImage(content, DEFAULT_FORMAT, dot);
+    }
+
+    /**
+     * Executes GraphViz and return the content of the resulting image (PNG format).
+     * 
+     * @param content the dot source code
+     * @param extension the output file extension
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @return the content of the generated file
+     * @throws IOException if writing the input or output files to the disk fails
+     */
     public byte[] getDotImage(String content, String extension, boolean dot) throws IOException
     {
         int hashCode = Math.abs(content.hashCode());
         return getDotImage(hashCode, content, extension, dot);
     }
 
-    public byte[] getDotImage(int hashCode, String content, String extension, boolean dot) throws IOException
-    {
-        File dfile = getTempFile(hashCode, "dot", dot);
-        if (!dfile.exists()) {
-            FileWriter fwriter = new FileWriter(dfile);
-            fwriter.write(content);
-            fwriter.flush();
-            fwriter.close();
-        }
-
-        File ofile = getTempFile(hashCode, extension, dot);
-        if (!ofile.exists()) {
-            Runtime rt = Runtime.getRuntime();
-            String[] command = new String[5];
-            command[0] = dot ? this.dotPath : this.neatoPath;
-            command[1] = "-T" + extension;
-            command[2] = dfile.getAbsolutePath();
-            command[3] = "-o";
-            command[4] = ofile.getAbsolutePath();
-            Process p = rt.exec(command);
-            int exitValue = -1;
-            try {
-                int i = 0;
-                int max = 10;
-                for (i = 0; i < max; i++) {
-                    Thread.sleep(1000);
-                    try {
-                        // exitValue() throws an IllegalThreadStateException if the process is still running. 
-                        exitValue = p.exitValue();
-                        break;
-                    } catch (IllegalThreadStateException e) {
-                    }
-                }
-                // No more than 10 seconds to generate graph
-                // Force killing
-                if (i >= max) {
-                    p.destroy();
-                }
-            } catch (InterruptedException e) {
-                mLogger.error("Error while generating image from dot", e);
-            }
-
-            if (exitValue != 0) {
-                BufferedReader os = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                StringBuffer error = new StringBuffer();
-                while (os.ready()) {
-                    error.append(os.readLine());
-                }
-                mLogger.error("Error while generating image from dot: " + error.toString());
-            }
-        }
-        FileInputStream fis = new FileInputStream(ofile);
-        try {
-            byte[] result = new byte[(int) ofile.length()];
-            fis.read(result);
-            return result;
-        } finally {
-            fis.close();
-        }
-    }
-
-    public byte[] readDotImage(File ofile) throws IOException
-    {
-        FileInputStream fis = new FileInputStream(ofile);
-        byte[] result = new byte[(int) ofile.length()];
-        fis.read(result);
-        return result;
-
-    }
-
+    /**
+     * Executes GraphViz, writes the resulting image (PNG format) in a temporary file on disk, and returns the filename
+     * which can be later used in {@link #outputDotImageFromFile(String, XWikiContext)}.
+     * 
+     * @param content the dot source code
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @return the name of the file where the generated output is stored
+     * @throws IOException if writing the input or output files to the disk fails
+     */
     public String writeDotImage(String content, boolean dot) throws IOException
     {
-        return writeDotImage(content, "png", dot);
+        return writeDotImage(content, DEFAULT_FORMAT, dot);
     }
 
+    /**
+     * Executes GraphViz, writes the resulting image (in the requested format) in a temporary file on disk, and returns
+     * the filename which can be later used in {@link #outputDotImageFromFile(String, XWikiContext)}.
+     * 
+     * @param content the dot source code
+     * @param extension the output file extension
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @return the name of the file where the generated output is stored
+     * @throws IOException if writing the input or output files to the disk fails
+     */
     public String writeDotImage(String content, String extension, boolean dot) throws IOException
     {
         int hashCode = Math.abs(content.hashCode());
         getDotImage(hashCode, content, extension, dot);
-        String name = dot ? "dot-" : "neato-";
+        String name = (dot ? DOT_ENGINE : NEATO_ENGINE) + '-';
         return name + hashCode + "." + extension;
     }
 
+    /**
+     * Executes GraphViz and writes the resulting image (PNG format) into the response.
+     * 
+     * @param content the dot source code
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @param context the current request context
+     * @throws IOException if writing the input or output files to the disk fails, or if writing the response body fails
+     */
     public void outputDotImage(String content, boolean dot, XWikiContext context) throws IOException
     {
-        outputDotImage(content, "png", dot, context);
+        outputDotImage(content, DEFAULT_FORMAT, dot, context);
     }
 
+    /**
+     * Executes GraphViz and writes the resulting image (in the requested format) into the response.
+     * 
+     * @param content the dot source code
+     * @param extension the output file extension
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @param context the current request context
+     * @throws IOException if writing the input or output files to the disk fails, or if writing the response body fails
+     */
     public void outputDotImage(String content, String extension, boolean dot, XWikiContext context) throws IOException
     {
         byte[] dotbytes = getDotImage(content, extension, dot);
@@ -230,6 +292,14 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         os.flush();
     }
 
+    /**
+     * Writes an already generated result from the temporary file into the response.
+     * 
+     * @param filename the name of the temporary file, previously returned by
+     *            {@link #writeDotImage(String, String, boolean)}
+     * @param context the current request context
+     * @throws IOException if reading the file from the disk fails, or if writing the response body fails
+     */
     public void outputDotImageFromFile(String filename, XWikiContext context) throws IOException
     {
         File ofile = getTempFile(filename);
@@ -243,36 +313,124 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         os.write(dotbytes);
     }
 
-    public File getTempFile(String filename)
+    /**
+     * Executes GraphViz, writes the resulting image (in the requested format) in a temporary file on disk, and returns
+     * the generated content from that file.
+     * 
+     * @param hashCode the hascode of the content, to be used as the temporary file name
+     * @param content the dot source code
+     * @param extension the output file extension
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @return the content of the generated file
+     * @throws IOException if writing the input or output files to the disk fails, or if writing the response body fails
+     */
+    private byte[] getDotImage(int hashCode, String content, String extension, boolean dot) throws IOException
+    {
+        File dfile = getTempFile(hashCode, "input.dot", dot);
+        if (!dfile.exists()) {
+            FileUtils.write(dfile, content, XWiki.DEFAULT_ENCODING);
+        }
+
+        File ofile = getTempFile(hashCode, extension, dot);
+        if (!ofile.exists()) {
+            Runtime rt = Runtime.getRuntime();
+            String[] command = new String[5];
+            command[0] = dot ? this.dotPath : this.neatoPath;
+            command[1] = "-T" + extension;
+            command[2] = dfile.getAbsolutePath();
+            command[3] = "-o";
+            command[4] = ofile.getAbsolutePath();
+            Process p = rt.exec(command);
+            int exitValue = -1;
+            final Thread thisThread = Thread.currentThread();
+            Thread t = new Thread(new Hangcheck(thisThread), "dot-hangcheck");
+            t.run();
+            try {
+                exitValue = p.waitFor();
+                t.interrupt();
+            } catch (InterruptedException ex) {
+                p.destroy();
+                LOG.error("Timeout while generating image from dot", ex);
+            }
+
+            if (exitValue != 0) {
+                LOG.error("Error while generating image from dot: "
+                    + IOUtils.toString(p.getErrorStream(), XWiki.DEFAULT_ENCODING));
+            }
+        }
+        return FileUtils.readFileToByteArray(ofile);
+    }
+
+    /**
+     * Get the contents of a previously generated temporary file.
+     * 
+     * @param ofile the file to read
+     * @return the content found inside the file, if any
+     * @throws IOException when reading the file fails
+     */
+    private byte[] readDotImage(File ofile) throws IOException
+    {
+        return FileUtils.readFileToByteArray(ofile);
+    }
+
+    /**
+     * Return the temporary disk file corresponding to the given parameters.
+     * 
+     * @param hashcode the hashcode of the dot content, used as the main part for the filename
+     * @param extension the output file extension
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @return the corresponding File
+     */
+    private File getTempFile(int hashcode, String extension, boolean dot)
+    {
+        String name = (dot ? DOT_ENGINE : NEATO_ENGINE) + '-';
+        return getTempFile(name + hashcode + '.' + extension);
+    }
+
+    /**
+     * Return the temporary disk file corresponding to the given filename.
+     * 
+     * @param filename the filename to look for
+     * @return the corresponding File
+     */
+    private File getTempFile(String filename)
     {
         return new File(this.tempDir, filename);
     }
 
-    public File getTempFile(int hashcode, String extension, boolean dot)
-    {
-        String name = dot ? "dot-" : "neato-";
-        return getTempFile(name + hashcode + "." + extension);
-    }
-
-    public String getDotImageURL(String content, boolean dot, XWikiContext context) throws IOException
-    {
-        return getDotResultURL(content, dot, "png", context);
-    }
-
     /**
-     * <p>
-     * Executes graphviz and returns the url for the produced file.
-     * </p>
+     * Hangcheck runnable, which interrupts the main thread after 10 seconds of waiting for the conversion to end. If
+     * the conversion ends normally before the 10 seconds timeout expires, then this runnable should be terminated by
+     * {@link Thread#interrupt() interrupting it}.
      * 
-     * @param content GraphViz source code. View http://www.graphviz.org/doc/info/lang.html for the language
-     *            specification.
-     * @param dot Whether the dot engine should be used instead of the neato engine. Other engines are not supported.
-     * @param format Any GraphViz output format. View http://www.graphviz.org/doc/info/output.html for more information.
-     * @param context XWikiContext
+     * @version $Id$
      */
-    public String getDotResultURL(String content, boolean dot, String format, XWikiContext context) throws IOException
+    private static class Hangcheck implements Runnable
     {
-        String filename = writeDotImage(content, format, dot);
-        return context.getDoc().getAttachmentURL(filename, "dot", context);
+        /** The main thread that should be interrupted if the timeout expires. */
+        private Thread converterThread;
+
+        /**
+         * Simple constructor which specifies the thread to monitor.
+         * 
+         * @param converterThread the thread to monitor
+         */
+        public Hangcheck(Thread converterThread)
+        {
+            this.converterThread = converterThread;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void run()
+        {
+            try {
+                Thread.sleep(10000);
+                this.converterThread.interrupt();
+            } catch (InterruptedException ex) {
+                // Expected result if the dot process terminates on time
+            }
+        }
     }
 }

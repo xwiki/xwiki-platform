@@ -1030,8 +1030,6 @@
               **/plugin/google/GooglePluginApi.java,
               **/plugin/google/GooglePlugin.java,
               **/plugin/graphviz/GraphVizMacro.java,
-              **/plugin/graphviz/GraphVizPluginApi.java,
-              **/plugin/graphviz/GraphVizPlugin.java,
               <!-- XWiki LDAP Utils has a fan out complexity of 21 that needs to be investigated and refactored. -->
               **/plugin/ldap/XWikiLDAPUtils.java,
               **/plugin/mail/MailPluginApi.java,

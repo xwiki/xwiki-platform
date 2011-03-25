@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.plugin.graphviz;
 
 import java.io.IOException;
@@ -60,7 +59,8 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
  * <li><b>width</b>: Image width in pixels.</li>
  * <li><b>alt</b>: Alternative text (alt attribute) for the image, in case it cannot be rendered by the browser.</li>
  * <li><b>format</b>: This attribute specifies what will be GraphViz output and also how it will be rendered in the
- * HTML. <br/>The HTML output of the macro will be one of the following, depending on this attribute:
+ * HTML. <br/>
+ * The HTML output of the macro will be one of the following, depending on this attribute:
  * <ul>
  * <li><tt>object</tt> html tag for: svg, svgz.</li>
  * <li>The text as output by GraphViz for: canon, dot, xdot, imap, cmapx, imap_np, cmpax_np, plain, plain-ext. Remember
@@ -77,9 +77,17 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
  * itself, there's no need for an extra map tag.</li>
  * </ol>
  * </p>
+ * 
+ * @version $Id$
  */
 public class GraphVizMacro extends BaseLocaleMacro
 {
+    /** Special value for the width and height meaning that no value is specified. */
+    private static final String NONE = "none";
+
+    /** Attribute value close quote. */
+    private static final String CLOSE_QUOTE = "\" ";
+
     /**
      * {@inheritDoc}
      * 
@@ -120,8 +128,6 @@ public class GraphVizMacro extends BaseLocaleMacro
         if (StringUtils.isBlank(format)) {
             format = "png";
         }
-        String useMapStr = nullifyBadParameter(params.get("useMap", 5));
-        boolean useMap = BooleanUtils.toBoolean(useMapStr);
         String dottext = params.getContent();
 
         // please KEEP THE ARRAYS SORTED
@@ -136,56 +142,111 @@ public class GraphVizMacro extends BaseLocaleMacro
         } else if (Arrays.binarySearch(embedTagFormats, format) >= 0) {
             // Producing object tag output
             final String resultURL = plugin.getDotResultURL(dottext, dot, format, xcontext);
-            writer.write("<object data=\"");
-            writer.write(resultURL);
-            writer.write("\" type=\"image/svg+xml\" ");
-            if (alt != null) {
-                writer.write("standby=\"");
-                writer.write(alt);
-                writer.write("\" ");
-            }
-            writeDimensionsAntTitle(writer, title, height, width);
-            writer.write(">");
-            if (alt != null) {
-                writer.write(alt);
-            }
-            writer.write("</object>");
+            writeObject(writer, height, width, title, alt, resultURL, plugin);
         } else {
             // Producing img tag output
-            if (useMap) {
-                /* creates the map */
-                byte[] graphvizOutput = plugin.getDotImage(dottext, "cmapx", dot);
-                writer.write(new String(graphvizOutput));
-            }
-            final String resultURL = plugin.getDotResultURL(dottext, dot, format, xcontext);
-            writer.write("<img ");
-            writeImgContent(writer, resultURL, title, height, width, alt);
-            if (useMap) {
-                /*
-                 * to know the name of the map we need to extract it from the graph source
-                 */
-                final Matcher matcher = Pattern.compile("(di)?graph\\s+(\\w+)\\s*\\{").matcher(dottext);
-                if (!matcher.find()) {
-                    // closing the img tag so the error can be properly rendered
-                    writer.write("/>");
-                    throw new IllegalArgumentException("Macro content is not a DOT graph definition or is an "
-                        + "anonymous graph (not supported). Content: " + dottext);
-                }
-                final String graphName = matcher.group(2);
-                writer.write(" usemap=\"#");
-                writer.write(graphName);
-                writer.write('"');
-            }
-            writer.write("/>");
+            writeImage(writer, dottext, dot, format, height, width, title, alt, params, plugin, xcontext);
         }
     }
 
+    /**
+     * Write the markup needed for an embedded output.
+     * 
+     * @param writer where to write
+     * @param height the image height
+     * @param width the image width
+     * @param title the title (tooltip) to show over the image
+     * @param alt the alternative text for the image
+     * @param resultURL the URL from where the output can be retrieved
+     * @param plugin the GraphViz plugin instance
+     * @throws IOException if writing fails
+     */
+    private void writeObject(Writer writer, String height, String width, String title, String alt, String resultURL,
+        GraphVizPlugin plugin) throws IOException
+    {
+        writer.write("<object data=\"");
+        writer.write(resultURL);
+        writer.write("\" type=\"image/svg+xml\" ");
+        if (alt != null) {
+            writer.write("standby=\"");
+            writer.write(alt);
+            writer.write(CLOSE_QUOTE);
+        }
+        writeDimensionsAntTitle(writer, title, height, width);
+        writer.write('>');
+        if (alt != null) {
+            writer.write(alt);
+        }
+        writer.write("</object>");
+    }
+
+    /**
+     * Write the markup needed for image output.
+     * 
+     * @param writer where to write
+     * @param dottext the dot source
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @param format the output format
+     * @param height the image height
+     * @param width the image width
+     * @param title the title (tooltip) to show over the image
+     * @param alt the alternative text for the image
+     * @param params the original macro parameters
+     * @param plugin the GraphViz plugin instance
+     * @param xcontext the current request context
+     * @throws IOException if writing fails
+     */
+    private void writeImage(Writer writer, String dottext, boolean dot, String format, String height, String width,
+        String title, String alt, MacroParameter params, GraphVizPlugin plugin, XWikiContext xcontext)
+        throws IOException
+    {
+        String useMapStr = nullifyBadParameter(params.get("useMap", 5));
+        boolean useMap = BooleanUtils.toBoolean(useMapStr);
+        if (useMap) {
+            /* creates the map */
+            byte[] graphvizOutput = plugin.getDotImage(dottext, "cmapx", dot);
+            writer.write(new String(graphvizOutput));
+        }
+        final String resultURL = plugin.getDotResultURL(dottext, dot, format, xcontext);
+        writer.write("<img ");
+        writeImgContent(writer, resultURL, title, height, width, alt);
+        if (useMap) {
+            /*
+             * to know the name of the map we need to extract it from the graph source
+             */
+            final Matcher matcher = Pattern.compile("(di)?graph\\s+(\\w+)\\s*\\{").matcher(dottext);
+            if (!matcher.find()) {
+                // closing the img tag so the error can be properly rendered
+                writer.write("/>");
+                throw new IllegalArgumentException("Macro content is not a DOT graph definition or is an "
+                    + "anonymous graph (not supported). Content: " + dottext);
+            }
+            final String graphName = matcher.group(2);
+            writer.write(" usemap=\"#");
+            writer.write(graphName);
+            writer.write('"');
+        }
+        writer.write('/');
+        writer.write('>');
+    }
+
+    /**
+     * Write the attributes needed for an image output.
+     * 
+     * @param writer where to write
+     * @param resultURL the URL from where the image can be retrieved
+     * @param title the title (tooltip) to show over the image
+     * @param height the image height
+     * @param width the image width
+     * @param alt the alternative text for the image
+     * @throws IOException if writing fails
+     */
     private void writeImgContent(Writer writer, String resultURL, String title, String height, String width, String alt)
         throws IOException
     {
         writer.write("src=\"");
         writer.write(resultURL);
-        writer.write("\" ");
+        writer.write(CLOSE_QUOTE);
         writeDimensionsAntTitle(writer, title, height, width);
         if (alt != null) {
             writer.write("alt=\"");
@@ -194,29 +255,39 @@ public class GraphVizMacro extends BaseLocaleMacro
         }
     }
 
+    /**
+     * Write some attributes into the output. {@code null} or the special value {@code "none"} represents that a
+     * specific attribute should not be written.
+     * 
+     * @param writer where to write
+     * @param title the optional title attribute value
+     * @param height the optional height attribute value
+     * @param width the optional width attribute value
+     * @throws IOException if writing fails
+     */
     private void writeDimensionsAntTitle(Writer writer, String title, String height, String width) throws IOException
     {
-        if ((!"none".equals(height)) && (height != null)) {
+        if ((!NONE.equals(height)) && (height != null)) {
             writer.write("height=\"");
             writer.write(height);
-            writer.write("\" ");
+            writer.write(CLOSE_QUOTE);
         }
-        if ((!"none".equals(width)) && (width != null)) {
+        if ((!NONE.equals(width)) && (width != null)) {
             writer.write("width=\"");
             writer.write(width);
-            writer.write("\" ");
+            writer.write(CLOSE_QUOTE);
         }
         if (title != null) {
             writer.write("title=\"");
             writer.write(title);
-            writer.write("\" ");
+            writer.write(CLOSE_QUOTE);
         }
     }
 
     /**
      * Checks if a parameter came with a '=' sign and return null in the case. Else, returns the parameter itself.
      * 
-     * @param radeoxParam
+     * @param radeoxParam the raw value of the macro parameter
      * @return String
      */
     private String nullifyBadParameter(String radeoxParam)

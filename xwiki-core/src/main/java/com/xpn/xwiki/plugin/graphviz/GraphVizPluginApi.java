@@ -18,74 +18,147 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.plugin.graphviz;
 
 import java.io.IOException;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.plugin.PluginApi;
 
-public class GraphVizPluginApi extends Api
+/**
+ * Plugin which wraps the <a href="http://graphviz.org/">GraphViz</a> <tt>dot</tt> executable; transforming dot source
+ * files (representing graphs) into images, image maps, or other output formats supported by GraphViz.
+ * <p>
+ * See http://www.graphviz.org/doc/info/lang.html for the dot language specification. See
+ * http://www.graphviz.org/doc/info/output.html for the possible output formats
+ * </p>
+ * 
+ * @deprecated the plugin technology is deprecated
+ * @version $Id$
+ */
+@Deprecated
+public class GraphVizPluginApi extends PluginApi<GraphVizPlugin>
 {
-    private GraphVizPlugin plugin;
-
+    /**
+     * Default plugin API constructor.
+     * 
+     * @param plugin the wrapped plugin instance
+     * @param context the current request context
+     */
     public GraphVizPluginApi(GraphVizPlugin plugin, XWikiContext context)
     {
-        super(context);
-        setPlugin(plugin);
+        super(plugin, context);
     }
 
+    /**
+     * Return the inner plugin object, if the user has the required programming rights.
+     * 
+     * @return The wrapped plugin object.
+     */
     public GraphVizPlugin getPlugin()
     {
-        if (hasProgrammingRights()) {
-            return this.plugin;
-        }
-        return null;
+        return getInternalPlugin();
     }
 
-    public void setPlugin(GraphVizPlugin plugin)
-    {
-        this.plugin = plugin;
-    }
-
+    /**
+     * Executes GraphViz and return the content of the resulting image (PNG format).
+     * 
+     * @param content the dot source code
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @return the content of the generated image
+     * @throws IOException if writing the input or output files to the disk fails
+     */
     public byte[] getDotImage(String content, boolean dot) throws IOException
     {
-        return this.plugin.getDotImage(content, "png", dot);
+        return getProtectedPlugin().getDotImage(content, dot);
     }
 
+    /**
+     * Executes GraphViz and return the content of the resulting image (PNG format).
+     * 
+     * @param content the dot source code
+     * @param extension the output file extension
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @return the content of the generated file
+     * @throws IOException if writing the input or output files to the disk fails
+     */
     public byte[] getDotImage(String content, String extension, boolean dot) throws IOException
     {
-        return this.plugin.getDotImage(content, extension, dot);
+        return getProtectedPlugin().getDotImage(content, extension, dot);
     }
 
+    /**
+     * Executes GraphViz and returns the URL for the produced file, a PNG image.
+     * 
+     * @param content the dot source
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @return the URL which can be used to access the generated image
+     * @throws IOException if writing the input or output files to the disk fails
+     */
     public String getDotImageURL(String content, boolean dot) throws IOException
     {
-        return this.plugin.getDotImageURL(content, dot, getXWikiContext());
+        return getProtectedPlugin().getDotImageURL(content, dot, getXWikiContext());
     }
 
+    /**
+     * Executes GraphViz, writes the resulting image (PNG format) in a temporary file on disk, and returns the filename
+     * which can be later used in {@link #outputDotImageFromFile(String, XWikiContext)}.
+     * 
+     * @param content the dot source code
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @return the name of the file where the generated output is stored
+     * @throws IOException if writing the input or output files to the disk fails
+     */
     public String writeDotImage(String content, boolean dot) throws IOException
     {
-        return this.plugin.writeDotImage(content, "png", dot);
+        return getProtectedPlugin().writeDotImage(content, dot);
     }
 
+    /**
+     * Executes GraphViz, writes the resulting image (in the requested format) in a temporary file on disk, and returns
+     * the filename which can be later used in {@link #outputDotImageFromFile(String, XWikiContext)}.
+     * 
+     * @param content the dot source code
+     * @param extension the output file extension
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @return the name of the file where the generated output is stored
+     * @throws IOException if writing the input or output files to the disk fails
+     */
     public String writeDotImage(String content, String extension, boolean dot) throws IOException
     {
-        return this.plugin.writeDotImage(content, extension, dot);
+        return getProtectedPlugin().writeDotImage(content, extension, dot);
     }
 
+    /**
+     * Executes GraphViz and writes the resulting image (PNG format) into the response.
+     * 
+     * @param content the dot source code
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @throws IOException if writing the input or output files to the disk fails, or if writing the response body fails
+     */
     public void outputDotImage(String content, boolean dot) throws IOException
     {
-        this.plugin.outputDotImage(content, "png", dot, getXWikiContext());
+        getProtectedPlugin().outputDotImage(content, "png", dot, getXWikiContext());
     }
 
+    /**
+     * Executes GraphViz and writes the resulting image (in the requested format) into the response.
+     * 
+     * @param content the dot source code
+     * @param extension the output file extension
+     * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
+     * @throws IOException if writing the input or output files to the disk fails, or if writing the response body fails
+     */
     public void outputDotImage(String content, String extension, boolean dot) throws IOException
     {
-        this.plugin.outputDotImage(content, extension, dot, getXWikiContext());
+        getProtectedPlugin().outputDotImage(content, extension, dot, getXWikiContext());
     }
 
+    /**
+     * Discard all generated output from the temporary file storage.
+     */
     public void flushCache()
     {
-        this.plugin.flushCache();
+        getProtectedPlugin().flushCache();
     }
 }

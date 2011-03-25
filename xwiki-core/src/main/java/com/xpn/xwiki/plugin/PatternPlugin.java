@@ -63,8 +63,10 @@ import com.xpn.xwiki.web.Utils;
  * listing the currently enabled substitutions.
  * </p>
  * 
+ * @deprecated the plugin technology is deprecated, consider rewriting as components
  * @version $Id$
  */
+@Deprecated
 public class PatternPlugin extends XWikiDefaultPlugin implements EventListener
 {
     /** Logging helper object. */

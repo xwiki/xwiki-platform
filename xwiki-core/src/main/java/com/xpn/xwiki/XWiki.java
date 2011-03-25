@@ -4499,12 +4499,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         String wikilanguage, boolean reset, boolean force, boolean resetCreationData, XWikiContext context)
         throws XWikiException
     {
-        String db = context.getDatabase();
+        String currentWiki = context.getDatabase();
+        XWikiUser currentUser = context.getXWikiUser();
+
         String sourceWiki = sourceDocumentReference.getWikiReference().getName();
         String targetWiki = targetDocumentReference.getWikiReference().getName();
 
         try {
+            normalizedContextUser(context);
             context.setDatabase(sourceWiki);
+
             XWikiDocument sdoc = getDocument(sourceDocumentReference, context);
             if (!sdoc.isNew()) {
                 if (LOG.isInfoEnabled()) {
@@ -4666,7 +4670,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             }
             return true;
         } finally {
-            context.setDatabase(db);
+            context.setDatabase(currentWiki);
+            if (currentUser != null) {
+                context.setUser(currentUser.getUser(), currentUser.isMain());
+            } else {
+                context.setUser(null);
+            }
         }
     }
 
@@ -4679,7 +4688,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     public int copySpaceBetweenWikis(String space, String sourceWiki, String targetWiki, String language,
         boolean clean, XWikiContext context) throws XWikiException
     {
-        String db = context.getDatabase();
+        String currentWiki = context.getDatabase();
+        XWikiUser currentUser = context.getXWikiUser();
+
         int nb = 0;
         // Workaround for XWIKI-3915: Do not use XWikiStoreInterface#searchDocumentNames since currently it has the
         // side effect of hidding hidden documents and no other workaround exists than directly using
@@ -4692,7 +4703,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
         if (clean) {
             try {
+                normalizedContextUser(context);
                 context.setDatabase(targetWiki);
+
                 List<String> list = getStore().search(sql, 0, 0, context);
                 if (LOG.isInfoEnabled()) {
                     LOG.info("Deleting " + list.size() + " documents from wiki " + targetWiki);
@@ -4703,12 +4716,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                     deleteDocument(doc, context);
                 }
             } finally {
-                context.setDatabase(db);
+                context.setDatabase(currentWiki);
+                if (currentUser != null) {
+                    context.setUser(currentUser.getUser(), currentUser.isMain());
+                } else {
+                    context.setUser(null);
+                }
             }
         }
 
         try {
+            normalizedContextUser(context);
             context.setDatabase(sourceWiki);
+
             List<String> list = getStore().search(sql, 0, 0, context);
             if (LOG.isInfoEnabled()) {
                 LOG.info("Copying " + list.size() + " documents from wiki " + sourceWiki + " to wiki " + targetWiki);
@@ -4726,7 +4746,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             }
             return nb;
         } finally {
-            context.setDatabase(db);
+            context.setDatabase(currentWiki);
+            if (currentUser != null) {
+                context.setUser(currentUser.getUser(), currentUser.isMain());
+            } else {
+                context.setUser(null);
+            }
         }
     }
 
@@ -4763,6 +4788,22 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         throws XWikiException
     {
         return copySpaceBetweenWikis(null, sourceWiki, targetWiki, language, clean, context);
+    }
+
+    /**
+     * Make sure we can't loose context user if the context wiki change (i.e. set the prefixed full name of the user in
+     * the context).
+     * 
+     * @deprecated this method does not exists and is useless in version 3.1 and more
+     */
+    @Deprecated
+    private void normalizedContextUser(XWikiContext context)
+    {
+        if (context.getXWikiUser() != null) {
+            context.setUser(this.defaultEntityReferenceSerializer.serialize(this.currentMixedDocumentReferenceResolver
+                .resolve(context.getXWikiUser().getUser(), new WikiReference(context.getDatabase()))), context
+                .getXWikiUser().isMain());
+        }
     }
 
     /**

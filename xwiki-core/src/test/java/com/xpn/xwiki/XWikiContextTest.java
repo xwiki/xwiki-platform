@@ -51,7 +51,7 @@ public class XWikiContextTest extends AbstractBridgedComponentTestCase
     }
 
     @Test
-    public void testUser()
+    public void testgetUser()
     {
         getContext().setMainXWiki("wiki");
         getContext().setDatabase("wiki");
@@ -68,6 +68,20 @@ public class XWikiContextTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("space.user", getContext().getLocalUser());
         Assert.assertEquals("wiki:space.user", getContext().getXWikiUser().getUser());
         Assert.assertTrue("space.user", getContext().getXWikiUser().isMain());
+    }
+
+    @Test
+    public void testSetUser()
+    {
+        getContext().setMainXWiki("wiki");
+        getContext().setDatabase("wiki");
+        getContext().setUser("XWiki.user");
+
+        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "user"), getContext().getUserReference());
+
+        getContext().setUser("user");
+
+        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "user"), getContext().getUserReference());
     }
 
     @Test

@@ -50,7 +50,7 @@ public class DocumentEventConverterTest extends AbstractBridgedXWikiComponentTes
         LocalEventData localEvent = new LocalEventData();
         localEvent.setEvent(new DocumentUpdatedEvent(new DocumentReference("wiki","space","page")));
         localEvent.setSource(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
-        localEvent.setData(new XWikiContext());
+        localEvent.setData(getContext());
 
         RemoteEventData remoteEvent = eventConverterManager.createRemoteEventData(localEvent);
 

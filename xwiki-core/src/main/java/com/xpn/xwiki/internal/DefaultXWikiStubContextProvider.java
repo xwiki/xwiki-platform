@@ -66,7 +66,7 @@ public class DefaultXWikiStubContextProvider extends AbstractLogEnabled implemen
 
         this.stubContext.setCacheDuration(0);
 
-        this.stubContext.setUser(null);
+        this.stubContext.setUserReference(null);
         this.stubContext.setLanguage(null);
         this.stubContext.setDatabase(context.getMainXWiki());
         this.stubContext.setDoc(new XWikiDocument());

@@ -33,6 +33,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.xmlrpc.server.XmlRpcServer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
@@ -71,6 +73,10 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private static final String ORIGINAL_WIKI_KEY = "originalWiki";
 
+    private static final String USER_KEY = "user";
+
+    private static final String USERREFERENCE_KEY = "userreference";
+
     private boolean finished = false;
 
     private XWiki wiki;
@@ -89,9 +95,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private String database;
 
-    private XWikiUser user;
-
-    private static final String USER_KEY = "user";
+    private DocumentReference userReference;
 
     private String language;
 
@@ -123,8 +127,8 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     // Used to avoid reloading archives in the same request
     @SuppressWarnings("unchecked")
-    private Map<String, XWikiDocumentArchive> archiveCache =
-        Collections.synchronizedMap(new LRUMap(this.archiveCacheSize));
+    private Map<String, XWikiDocumentArchive> archiveCache = Collections.synchronizedMap(new LRUMap(
+        this.archiveCacheSize));
 
     private List<String> displayedFields = Collections.synchronizedList(new ArrayList<String>());
 
@@ -134,8 +138,23 @@ public class XWikiContext extends Hashtable<Object, Object>
      * the current wiki is used instead of the current document reference's wiki.
      */
     @SuppressWarnings("unchecked")
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "currentmixed");
+
+    /**
+     * Used to convert a proper Document Reference to a string but without the wiki name.
+     */
+    @SuppressWarnings("unchecked")
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.class, "local");
+
+    /**
+     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
+     * wiki).
+     */
+    @SuppressWarnings("unchecked")
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.class, "compactwiki");
 
     public XWikiContext()
     {
@@ -153,6 +172,7 @@ public class XWikiContext extends Hashtable<Object, Object>
             util = new Util();
             this.put("util", util);
         }
+
         return util;
     }
 
@@ -227,7 +247,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * {@inheritDoc}
      * <p>
-     * Make sure to keep {@link #database} field and map synchronized.
+     * Make sure to keep {@link #database} fields and map synchronized.
      * 
      * @see java.util.Hashtable#put(java.lang.Object, java.lang.Object)
      */
@@ -269,11 +289,10 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * Get the "original" database name.
-     * In single wiki mode this will be "xwiki", but in virtual wiki mode this will be
-     * the database name for the wiki which the user requested. If the database is switched
-     * to load some piece of data, this will remember what it should be switched back to.
-     *
+     * Get the "original" database name. In single wiki mode this will be "xwiki", but in virtual wiki mode this will be
+     * the database name for the wiki which the user requested. If the database is switched to load some piece of data,
+     * this will remember what it should be switched back to.
+     * 
      * @return the db name originally requested by the user.
      */
     public String getOriginalDatabase()
@@ -323,40 +342,85 @@ public class XWikiContext extends Hashtable<Object, Object>
         }
     }
 
-    public void setUser(String user, boolean main)
+    public DocumentReference getUserReference()
     {
-        if (user == null) {
-            this.user = null;
+        return this.userReference;
+    }
+
+    public void setUserReference(DocumentReference userReference)
+    {
+        if (userReference == null) {
+            this.userReference = null;
             remove(USER_KEY);
+            remove(USERREFERENCE_KEY);
         } else {
-            this.user = new XWikiUser(user, main);
-            put(USER_KEY, user);
+            this.userReference = new DocumentReference(userReference);
+            put(USER_KEY, getUser());
+            put(USERREFERENCE_KEY, this.userReference);
         }
     }
 
+    /**
+     * @deprecated use {@link #setUserReference(DocumentReference)} instead
+     */
+    @Deprecated
+    public void setUser(String user, boolean main)
+    {
+        if (user == null) {
+            setUserReference(null);
+        } else {
+            setUserReference(this.currentMixedDocumentReferenceResolver.resolve(user, new WikiReference(getDatabase())));
+        }
+    }
+
+    /**
+     * @deprecated use {@link #setUserReference(DocumentReference)} instead
+     */
+    @Deprecated
     public void setUser(String user)
     {
         setUser(user, false);
     }
 
+    /**
+     * @return use {@link #getUserReference()} instead
+     */
+    @Deprecated
     public String getUser()
     {
-        if (this.user != null) {
-            return this.user.getUser();
+        if (this.userReference != null) {
+            return this.compactWikiEntityReferenceSerializer.serialize(this.userReference, new WikiReference(
+                getDatabase()));
         } else {
             return XWikiRightService.GUEST_USER_FULLNAME;
         }
     }
 
+    /**
+     * @return use {@link #getUserReference()} instead
+     */
+    @Deprecated
     public String getLocalUser()
     {
-        String username = getUser();
-        return username.substring(username.indexOf(":") + 1);
+        if (this.userReference != null) {
+            return this.localEntityReferenceSerializer.serialize(this.userReference);
+        } else {
+            return XWikiRightService.GUEST_USER_FULLNAME;
+        }
     }
 
+    /**
+     * @return use {@link #getUserReference()} instead
+     */
+    @Deprecated
     public XWikiUser getXWikiUser()
     {
-        return this.user;
+        if (this.userReference != null) {
+            boolean ismain = isMainWiki(this.userReference.getWikiReference().getName());
+            return new XWikiUser(getUser(), ismain);
+        } else {
+            return null;
+        }
     }
 
     public String getLanguage()
@@ -608,22 +672,22 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     /**
      * After this is called:
-     * 1. {@link com.xpn.xwiki.api.Api#hasProgrammingRights()} will always return false.
-     * 2. {@link com.xpn.xwiki.api.XWiki#getDocumentAsAuthor(org.xwiki.model.reference.DocumentReference)},
-     *    {@link com.xpn.xwiki.api.XWiki#getDocumentAsAuthor(String)},
-     *    {@link com.xpn.xwiki.api.Document#saveAsAuthor()},
-     *    {@link com.xpn.xwiki.api.Document#saveAsAuthor(String)},
-     *    {@link com.xpn.xwiki.api.Document#saveAsAuthor(String, boolean)},
-     *    and {@link com.xpn.xwiki.api.Document#deleteAsAuthor()} will perform all of their actions as
-     *    if the document's content author was the guest user (XWiki.XWikiGuest).
-     *
-     * In effect, no code requiring "programming right" will run, and if the document content author
-     * (see: {@link com.xpn.xwiki.api.Document#getContentAuthor()}) is a user who has "programming right",
-     * there will be no way for code following this call to save another document as this user, blessing
-     * it too with programming right.
-     *
+     * <ul>
+     * <li>1. {@link com.xpn.xwiki.api.Api#hasProgrammingRights()} will always return false.</li>
+     * <li>2. {@link com.xpn.xwiki.api.XWiki#getDocumentAsAuthor(org.xwiki.model.reference.DocumentReference)},
+     * {@link com.xpn.xwiki.api.XWiki#getDocumentAsAuthor(String)}, {@link com.xpn.xwiki.api.Document#saveAsAuthor()},
+     * {@link com.xpn.xwiki.api.Document#saveAsAuthor(String)},
+     * {@link com.xpn.xwiki.api.Document#saveAsAuthor(String, boolean)}, and
+     * {@link com.xpn.xwiki.api.Document#deleteAsAuthor()} will perform all of their actions as if the document's
+     * content author was the guest user (XWiki.XWikiGuest).</li>
+     * </ul>
+     * <p>
+     * In effect, no code requiring "programming right" will run, and if the document content author (see:
+     * {@link com.xpn.xwiki.api.Document#getContentAuthor()}) is a user who has "programming right", there will be no
+     * way for code following this call to save another document as this user, blessing it too with programming right.
+     * <p>
      * Once dropped, permissions cannot be regained for the duration of the request.
-     *
+     * 
      * @since 3.0M3
      */
     public void dropPermissions()

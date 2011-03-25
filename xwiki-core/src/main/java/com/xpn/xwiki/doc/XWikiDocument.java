@@ -3165,7 +3165,7 @@ public class XWikiDocument implements DocumentModelBridge
 
         String creator = eform.getCreator();
         if ((creator != null) && (!creator.equals(getCreator()))) {
-            if ((getCreator().equals(context.getUser()))
+            if ((getCreatorReference().equals(context.getUserReference()))
                 || (context.getWiki().getRightService().hasAdminRights(context))) {
                 setCreator(creator);
             }
@@ -6274,12 +6274,12 @@ public class XWikiDocument implements DocumentModelBridge
 
     public boolean isCurrentUserPage(XWikiContext context)
     {
-        String username = context.getUser();
-        if (username.equals(XWikiRightService.GUEST_USER_FULLNAME)) {
+        DocumentReference userReference = context.getUserReference();
+        if (userReference == null) {
             return false;
         }
 
-        return context.getUser().equals(getFullName());
+        return userReference.equals(getDocumentReference());
     }
 
     public boolean isCurrentLocalUserPage(XWikiContext context)

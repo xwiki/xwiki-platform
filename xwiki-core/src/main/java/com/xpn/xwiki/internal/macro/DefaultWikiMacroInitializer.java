@@ -219,7 +219,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
     {
         LOG.debug("Found macro: " + wikiMacroDocumentReference);
 
-        XWikiUser originalAuthor = xcontext.getXWikiUser();
+        DocumentReference originalAuthor = xcontext.getUserReference();
         try {
             WikiMacro macro = this.wikiMacroFactory.createWikiMacro(wikiMacroDocumentReference);
 
@@ -237,11 +237,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
             // Just log the exception and skip to the next.
             getLogger().error(ex.getMessage(), ex);
         } finally {
-            if (originalAuthor != null) {
-                xcontext.setUser(originalAuthor.getUser(), originalAuthor.isMain());
-            } else {
-                xcontext.setUser(null);
-            }
+            xcontext.setUserReference(originalAuthor);
         }
     }
 

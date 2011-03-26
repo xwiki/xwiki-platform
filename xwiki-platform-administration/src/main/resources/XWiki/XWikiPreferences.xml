@@ -358,34 +358,6 @@
 <values>---|Image|Text</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </edit_registered>
-<editbox_height>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>editbox_height</name>
-<number>24</number>
-<picker>0</picker>
-<prettyName>Editbox Height</prettyName>
-<size>5</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</editbox_height>
-<editbox_width>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>editbox_width</name>
-<number>23</number>
-<picker>0</picker>
-<prettyName>Editbox Width</prettyName>
-<size>5</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</editbox_width>
 <editcomment>
 <customDisplay></customDisplay>
 <defaultValue></defaultValue>
@@ -791,51 +763,6 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </macros_velocity>
-<macros_wiki>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>macros_wiki</name>
-<number>32</number>
-<picker>0</picker>
-<prettyName>Macros for the Wiki Parser</prettyName>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</macros_wiki>
-<macros_wiki2>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>macros_wiki2</name>
-<number>29</number>
-<picker>0</picker>
-<prettyName>Macros for new Wiki Parser</prettyName>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</macros_wiki2>
-<menu>
-<contenttype>FullyRenderedText</contenttype>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>---</editor>
-<name>menu</name>
-<number>8</number>
-<picker>0</picker>
-<prettyName>Menu</prettyName>
-<rows>8</rows>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</menu>
 <meta>
 <contenttype>FullyRenderedText</contenttype>
 <customDisplay></customDisplay>
@@ -896,28 +823,6 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </notification_pages>
-<pageWidth>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>pageWidth</name>
-<number>48</number>
-<picker>1</picker>
-<prettyName>Preferred page width</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<sort>none</sort>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values>default|640|800|1024|1280|1600</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</pageWidth>
 <parent>
 <customDisplay></customDisplay>
 <disabled>0</disabled>
@@ -989,51 +894,6 @@
 <values>---|Image|Text</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </registration_registered>
-<renderXWikiGroovyRenderer>
-<customDisplay></customDisplay>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>renderXWikiGroovyRenderer</name>
-<number>42</number>
-<prettyName>Render Groovy code</prettyName>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</renderXWikiGroovyRenderer>
-<renderXWikiRadeoxRenderer>
-<customDisplay></customDisplay>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>renderXWikiRadeoxRenderer</name>
-<number>43</number>
-<prettyName>Render Wiki syntax</prettyName>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</renderXWikiRadeoxRenderer>
-<renderXWikiVelocityRenderer>
-<customDisplay></customDisplay>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>renderXWikiVelocityRenderer</name>
-<number>41</number>
-<prettyName>Render velocity code</prettyName>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</renderXWikiVelocityRenderer>
 <rightPanels>
 <customDisplay></customDisplay>
 <disabled>0</disabled>
@@ -1331,20 +1191,6 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </version>
-<webbgcolor>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>webbgcolor</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Web Background Color</prettyName>
-<size>10</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</webbgcolor>
 <webcopyright>
 <customDisplay></customDisplay>
 <disabled>0</disabled>
@@ -1960,34 +1806,6 @@
 <values>---|Image|Text</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </edit_registered>
-<editbox_height>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>editbox_height</name>
-<number>24</number>
-<picker>0</picker>
-<prettyName>Editbox Height</prettyName>
-<size>5</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</editbox_height>
-<editbox_width>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>editbox_width</name>
-<number>23</number>
-<picker>0</picker>
-<prettyName>Editbox Width</prettyName>
-<size>5</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</editbox_width>
 <editcomment>
 <customDisplay></customDisplay>
 <defaultValue></defaultValue>
@@ -2393,51 +2211,6 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </macros_velocity>
-<macros_wiki>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>macros_wiki</name>
-<number>32</number>
-<picker>0</picker>
-<prettyName>Macros for the Wiki Parser</prettyName>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</macros_wiki>
-<macros_wiki2>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>macros_wiki2</name>
-<number>29</number>
-<picker>0</picker>
-<prettyName>Macros for new Wiki Parser</prettyName>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</macros_wiki2>
-<menu>
-<contenttype>FullyRenderedText</contenttype>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>---</editor>
-<name>menu</name>
-<number>8</number>
-<picker>0</picker>
-<prettyName>Menu</prettyName>
-<rows>8</rows>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</menu>
 <meta>
 <contenttype>FullyRenderedText</contenttype>
 <customDisplay></customDisplay>
@@ -2498,28 +2271,6 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </notification_pages>
-<pageWidth>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>pageWidth</name>
-<number>48</number>
-<picker>1</picker>
-<prettyName>Preferred page width</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<sort>none</sort>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values>default|640|800|1024|1280|1600</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</pageWidth>
 <parent>
 <customDisplay></customDisplay>
 <disabled>0</disabled>
@@ -2591,51 +2342,6 @@
 <values>---|Image|Text</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </registration_registered>
-<renderXWikiGroovyRenderer>
-<customDisplay></customDisplay>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>renderXWikiGroovyRenderer</name>
-<number>42</number>
-<prettyName>Render Groovy code</prettyName>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</renderXWikiGroovyRenderer>
-<renderXWikiRadeoxRenderer>
-<customDisplay></customDisplay>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>renderXWikiRadeoxRenderer</name>
-<number>43</number>
-<prettyName>Render Wiki syntax</prettyName>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</renderXWikiRadeoxRenderer>
-<renderXWikiVelocityRenderer>
-<customDisplay></customDisplay>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>renderXWikiVelocityRenderer</name>
-<number>41</number>
-<prettyName>Render velocity code</prettyName>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</renderXWikiVelocityRenderer>
 <rightPanels>
 <customDisplay></customDisplay>
 <disabled>0</disabled>
@@ -2933,20 +2639,6 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </version>
-<webbgcolor>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>webbgcolor</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Web Background Color</prettyName>
-<size>10</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</webbgcolor>
 <webcopyright>
 <customDisplay></customDisplay>
 <disabled>0</disabled>
@@ -3036,12 +2728,6 @@ Your account on $wikiname has been successfully activated. You can now login at 
 <edit_registered>---</edit_registered>
 </property>
 <property>
-<editbox_height></editbox_height>
-</property>
-<property>
-<editbox_width></editbox_width>
-</property>
-<property>
 <editcomment></editcomment>
 </property>
 <property>
@@ -3072,24 +2758,6 @@ Your account on $wikiname has been successfully activated. You can now login at 
 <macros_velocity></macros_velocity>
 </property>
 <property>
-<macros_wiki></macros_wiki>
-</property>
-<property>
-<macros_wiki2></macros_wiki2>
-</property>
-<property>
-<menu>&lt;a href="$xwiki.getURL("Main.WebHome","view")"&gt;Home&lt;/a&gt;&lt;span&gt; | &lt;/span&gt; 
-&lt;a href="$xwiki.getURL("Blog.WebHome","view")"&gt;Blog&lt;/a&gt;&lt;span&gt; | &lt;/span&gt; 
-&lt;a href="$xwiki.getURL("Main.WhatsNew","view")"&gt;What's new&lt;/a&gt;&lt;span&gt; | &lt;/span&gt; 
-&lt;a href="$xwiki.getURL("Main.WebSearch","view")"&gt;Search&lt;/a&gt;&lt;span&gt; | &lt;/span&gt; 
-#if($xwiki.hasAdminRights())
-&lt;a href="$xwiki.getURL("XWiki.WebHome","view")"&gt;Admin&lt;/a&gt;&lt;span&gt; | &lt;/span&gt; 
-#end
-&lt;a href="$xwiki.getURL("Doc.WebHome","view")"&gt;Doc&lt;/a&gt;&lt;span&gt; | &lt;/span&gt;
-&lt;a href="$xwiki.getURL("XWiki.RegisterNewUser","view")"&gt;Register&lt;/a&gt;&lt;span&gt; | &lt;/span&gt;
-</menu>
-</property>
-<property>
 <meta>&lt;meta name="revisit-after" content="7 days" /&gt;
 &lt;meta name="description" content="$escapetool.xml($!tdoc.plainTitle)" /&gt;
 #set($keywords = "wiki,$!doc.getTags()")
@@ -3116,9 +2784,6 @@ Your account on $wikiname has been successfully activated. You can now login at 
 <notification_pages></notification_pages>
 </property>
 <property>
-<pageWidth>default</pageWidth>
-</property>
-<property>
 <plugins></plugins>
 </property>
 <property>
@@ -3126,15 +2791,6 @@ Your account on $wikiname has been successfully activated. You can now login at 
 </property>
 <property>
 <registration_registered>---</registration_registered>
-</property>
-<property>
-<renderXWikiGroovyRenderer></renderXWikiGroovyRenderer>
-</property>
-<property>
-<renderXWikiRadeoxRenderer></renderXWikiRadeoxRenderer>
-</property>
-<property>
-<renderXWikiVelocityRenderer></renderXWikiVelocityRenderer>
 </property>
 <property>
 <rightPanels>Panels.QuickLinks,Panels.MyRecentModifications</rightPanels>
@@ -3202,9 +2858,6 @@ $xwiki.getDocument("XWiki.AccountValidation").getExternalURL("view", "validkey=$
 </property>
 <property>
 <version>XWiki Enterprise $xwiki.getVersion() - &lt;a onclick="openURL('http://enterprise.xwiki.org/xwiki/bin/view/Main/Documentation', '_blank'); return false;" href="http://www.xwiki.org/xwiki/bin/view/Main/Documentation"&gt;Documentation&lt;/a&gt;</version>
-</property>
-<property>
-<webbgcolor></webbgcolor>
 </property>
 <property>
 <webcopyright>This wiki is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by/2.0/"&gt;Creative Commons 2.0&lt;/a&gt; license</webcopyright>

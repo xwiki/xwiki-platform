@@ -12,7 +12,7 @@
 <div class="xwikidatatitle2">
 <div class="xwikidatatitle1">&nbsp;</div>
 <div class="xwikidatatitle">
-<a href="" onclick="showhide('xwikicommentscontent'); return false">$msg.get("Comments")</a>:
+<a href="" onclick="showhide('xwikicommentscontent'); return false">$msg.get("comments")</a>:
 $!comments.size() $msg.get("comments") #if($comments.size()>0) $msg.get("by")
 $!xwiki.getUserName($doc.display('author','view',$comments.get(0))) ...
 #end

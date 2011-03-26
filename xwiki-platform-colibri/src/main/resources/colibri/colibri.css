@@ -399,8 +399,21 @@ th.avatar {
   text-align: right;
 }
 
+#headerlanguages a {
+  background: $theme.menuBackgroundColor;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  color: $theme.menuLinkColor;
+  display: inline-block;
+  margin: 2px;
+  padding: 2px 4px;
+}
+
 .language-current {
   font-weight: 700;
+  background: $theme.menuSelectedEntryBackgroundColor !important;
+  color: $theme.menuSelectedEntryLinkColor !important;
 }
 
 .language-default {

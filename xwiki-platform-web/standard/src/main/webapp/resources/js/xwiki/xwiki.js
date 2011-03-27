@@ -1310,7 +1310,7 @@ document.observe('xwiki:dom:loaded', function() {
       this.value=this.defaultValue;
     }
   }
-  $$("input.withTip").each(function(item) {
+  $$("input.withTip", "textarea.withTip").each(function(item) {
     item.observe('focus', onFocus.bindAsEventListener(item));
     item.observe('blur', onBlur.bindAsEventListener(item));
   });
@@ -1550,7 +1550,7 @@ document.observe("xwiki:dom:loaded", function() {
    * This clone prevents layout changes when moving the element outside its parent.
    * The clone will be stored in the __fm_ghost property of the element and is inserted
    * after the element in the DOM. The clone is not visible initially.
-   * 
+   *
    * @param element the element whose position and dimesions should be cloned
    */
   function createGhost(element) {
@@ -1564,7 +1564,7 @@ document.observe("xwiki:dom:loaded", function() {
   /**
    * Pins the provided element at a certain position inside the window. The element's clone is made
    * visible to prevent layout changes.
-   * 
+   *
    * @see #createGhost
    */
   function makeFixed(element, top, left, width) {

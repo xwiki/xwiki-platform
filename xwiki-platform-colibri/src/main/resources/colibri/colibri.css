@@ -1684,7 +1684,7 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 }
 
 /* ----------------------Messages------------------------*/
-.errormessage, .warningmessage, .infomessage, .plainmessage {
+.errormessage, .warningmessage, .infomessage, .successmessage, .plainmessage {
   background: $theme.backgroundSecondaryColor 6px 8px no-repeat;
   border: 1px dotted $theme.borderColor;
   margin: 4px 0;
@@ -1706,6 +1706,11 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 .errormessage {
   background-image: url("$xwiki.getSkinFile('icons/silk/exclamation.gif')");
   color: $theme.notificationErrorColor;
+}
+
+.successmessage {
+  background-image: url("$xwiki.getSkinFile('icons/silk/tick.gif')");
+  color: $theme.notificationSuccessColor;
 }
 
 .messagetype {

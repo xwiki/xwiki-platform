@@ -3,7 +3,7 @@
 <web>XWiki</web>
 <name>XWikiPreferences</name>
 <language></language>
-<defaultLanguage>en</defaultLanguage>
+<defaultLanguage></defaultLanguage>
 <translation>0</translation>
 <parent>XWiki.WebHome</parent>
 <creator>xwiki:XWiki.Admin</creator>
@@ -45,20 +45,6 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </accessibility>
-<ad_clientid>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>ad_clientid</name>
-<number>25</number>
-<picker>0</picker>
-<prettyName>Advertisement Client ID</prettyName>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</ad_clientid>
 <admin_email>
 <customDisplay></customDisplay>
 <disabled>0</disabled>
@@ -230,20 +216,6 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </confirmation_email_content>
-<convertmail>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>convertmail</name>
-<number>50</number>
-<picker>0</picker>
-<prettyName>convert email type</prettyName>
-<size>1</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</convertmail>
 <core.defaultDocumentSyntax>
 <customDisplay>{{velocity}}
 {{html wiki="false" clean="false"}}
@@ -704,65 +676,6 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </leftPanels>
-<macros_groovy>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>macros_groovy</name>
-<number>28</number>
-<picker>0</picker>
-<prettyName>Macros for Groovy</prettyName>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</macros_groovy>
-<macros_languages>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>macros_languages</name>
-<number>26</number>
-<picker>0</picker>
-<prettyName>Macros Languages</prettyName>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</macros_languages>
-<macros_mapping>
-<contenttype>FullyRenderedText</contenttype>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>---</editor>
-<name>macros_mapping</name>
-<number>30</number>
-<picker>0</picker>
-<prettyName>Macros Mapping</prettyName>
-<rows>15</rows>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</macros_mapping>
-<macros_velocity>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>macros_velocity</name>
-<number>27</number>
-<picker>0</picker>
-<prettyName>Macros for Velocity</prettyName>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</macros_velocity>
 <meta>
 <contenttype>FullyRenderedText</contenttype>
 <customDisplay></customDisplay>
@@ -809,20 +722,6 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </multilingual>
-<notification_pages>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>notification_pages</name>
-<number>33</number>
-<picker>0</picker>
-<prettyName>Notification Pages</prettyName>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</notification_pages>
 <parent>
 <customDisplay></customDisplay>
 <disabled>0</disabled>
@@ -1493,20 +1392,6 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </accessibility>
-<ad_clientid>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>ad_clientid</name>
-<number>25</number>
-<picker>0</picker>
-<prettyName>Advertisement Client ID</prettyName>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</ad_clientid>
 <admin_email>
 <customDisplay></customDisplay>
 <disabled>0</disabled>
@@ -1678,20 +1563,6 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </confirmation_email_content>
-<convertmail>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>convertmail</name>
-<number>50</number>
-<picker>0</picker>
-<prettyName>convert email type</prettyName>
-<size>1</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</convertmail>
 <core.defaultDocumentSyntax>
 <customDisplay>{{velocity}}
 {{html wiki="false" clean="false"}}
@@ -2152,65 +2023,6 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </leftPanels>
-<macros_groovy>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>macros_groovy</name>
-<number>28</number>
-<picker>0</picker>
-<prettyName>Macros for Groovy</prettyName>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</macros_groovy>
-<macros_languages>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>macros_languages</name>
-<number>26</number>
-<picker>0</picker>
-<prettyName>Macros Languages</prettyName>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</macros_languages>
-<macros_mapping>
-<contenttype>FullyRenderedText</contenttype>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>---</editor>
-<name>macros_mapping</name>
-<number>30</number>
-<picker>0</picker>
-<prettyName>Macros Mapping</prettyName>
-<rows>15</rows>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</macros_mapping>
-<macros_velocity>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>macros_velocity</name>
-<number>27</number>
-<picker>0</picker>
-<prettyName>Macros for Velocity</prettyName>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</macros_velocity>
 <meta>
 <contenttype>FullyRenderedText</contenttype>
 <customDisplay></customDisplay>
@@ -2257,20 +2069,6 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </multilingual>
-<notification_pages>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>notification_pages</name>
-<number>33</number>
-<picker>0</picker>
-<prettyName>Notification Pages</prettyName>
-<size>60</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</notification_pages>
 <parent>
 <customDisplay></customDisplay>
 <disabled>0</disabled>
@@ -2676,9 +2474,6 @@
 <accessibility>0</accessibility>
 </property>
 <property>
-<ad_clientid></ad_clientid>
-</property>
-<property>
 <admin_email></admin_email>
 </property>
 <property>
@@ -2705,9 +2500,6 @@ Subject: Your account on $wikiname has been activated
 Hello $xwiki.getUserName("$xwikiname", false),
 
 Your account on $wikiname has been successfully activated. You can now login at $xwiki.getDocument("XWiki.XWikiLogin").getExternalURL("login") using your username ($xwiki.getDocument($xwikiname).getName()).</confirmation_email_content>
-</property>
-<property>
-<convertmail></convertmail>
 </property>
 <property>
 <core.defaultDocumentSyntax></core.defaultDocumentSyntax>
@@ -2746,18 +2538,6 @@ Your account on $wikiname has been successfully activated. You can now login at 
 <leftPanels></leftPanels>
 </property>
 <property>
-<macros_groovy></macros_groovy>
-</property>
-<property>
-<macros_languages></macros_languages>
-</property>
-<property>
-<macros_mapping></macros_mapping>
-</property>
-<property>
-<macros_velocity></macros_velocity>
-</property>
-<property>
 <meta>&lt;meta name="revisit-after" content="7 days" /&gt;
 &lt;meta name="description" content="$escapetool.xml($!tdoc.plainTitle)" /&gt;
 #set($keywords = "wiki,$!doc.getTags()")
@@ -2779,9 +2559,6 @@ Your account on $wikiname has been successfully activated. You can now login at 
 </property>
 <property>
 <multilingual>0</multilingual>
-</property>
-<property>
-<notification_pages></notification_pages>
 </property>
 <property>
 <plugins></plugins>

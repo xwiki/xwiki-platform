@@ -9,15 +9,14 @@
 #end
 ## ---------------------------------------------------------------------------------------------------------
 ## This template can be passed a parent document reference in parameter (using the "parent" parameter).
-## If a parent parameter is passed use it as the default parent to use when creating the new Page or Space.
-## If no parent parameter was passed then default the parent to be the current document in the context if
-## we're creating a new page and default it to the current document's space home page if we're creating a
-## new space.
+## If a parent parameter is passed, use it to set the parent when creating the new Page or Space.
+## If no parent parameter was passed, use the current document if we're creating a new page, keep it blank
+## if we're creating a new space.
 ## ---------------------------------------------------------------------------------------------------------
 #set ($parent = "$!request.getParameter('parent')")
 #if ($parent == '' && $tocreate == 'page')
   #set ($parentReference = $services.model.createDocumentReference($doc.documentReference.wikiReference.name,
-    $doc.documentReference.lastSpaceReference.name, ''))
+    $doc.documentReference.lastSpaceReference.name, $doc.documentReference.name))
   #set ($parent = $services.model.serialize($parentReference, 'local'))
 #end
 #set($template = "$!request.getParameter('template')")

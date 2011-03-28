@@ -168,4 +168,14 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("After dropping permissions and attempting to save a document, the user was "
                      + "perminantly switched to guest.", "XWiki.Bob", this.getContext().getUser());
     }
+    
+    public void testUser()
+    {
+        XWikiDocument xdoc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
+        Document document = new Document(xdoc, getContext());
+        
+        assertEquals("", document.getCreator());
+        assertEquals("", document.getAuthor());
+        assertEquals("", document.getContentAuthor());
+    }
 }

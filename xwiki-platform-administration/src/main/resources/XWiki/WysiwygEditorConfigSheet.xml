@@ -1194,6 +1194,18 @@ ul.hSortable li {
   display: inline-block;
   padding: 1px 0.25em;
 }
+* html ul.hSortable {
+  display: inline-block;
+}
+* html ul.hSortable li {
+  float: left;
+}
+*+html ul.hSortable {
+  display: inline-block;
+}
+*+html ul.hSortable li {
+  float: left;
+}
 
 ul.hSortable li:hover {
   background-color: $theme.highlightColor;

@@ -186,7 +186,6 @@ import com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
-import com.xpn.xwiki.util.MenuSubstitution;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.Utils;
@@ -6533,8 +6532,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
     public String getConvertingUserNameType(XWikiContext context)
     {
-        if (context.getWiki().getXWikiPreference("convertmail", context) != null
-            && context.getWiki().getXWikiPreference("convertmail", context).length() > 0) {
+        if (!StringUtils.isBlank(context.getWiki().getXWikiPreference("convertmail", context))) {
             return context.getWiki().getXWikiPreference("convertmail", "0", context);
         }
 

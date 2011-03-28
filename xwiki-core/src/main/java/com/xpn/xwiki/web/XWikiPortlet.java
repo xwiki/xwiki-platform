@@ -18,14 +18,23 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
-import org.xwiki.velocity.VelocityManager;
+import java.io.IOException;
+
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
+import javax.portlet.GenericPortlet;
+import javax.portlet.PortletException;
+import javax.portlet.PortletMode;
+import javax.portlet.PortletPreferences;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+import javax.portlet.WindowState;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.MDC;
@@ -36,23 +45,28 @@ import org.xwiki.container.Container;
 import org.xwiki.container.portlet.PortletContainerException;
 import org.xwiki.container.portlet.PortletContainerInitializer;
 import org.xwiki.context.Execution;
+import org.xwiki.velocity.VelocityManager;
 
-import javax.portlet.*;
-import javax.servlet.http.HttpServletRequest;
-
-import java.io.IOException;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 
 public class XWikiPortlet extends GenericPortlet
 {
-    protected final Log logger = LogFactory.getLog(getClass());
-
-    private String name = "XWiki Portlet";
     public static final PortletMode CONFIG_PORTLET_MODE = new PortletMode("config");
+
     public static final String ROOT_SPACE_PARAM_NAME = "rootSpace";
 
+    /** Logging helper object. */
+    private static final Log LOG = LogFactory.getLog(XWikiPortlet.class);
+
+    private String name = "XWiki Portlet";
+
+    @Override
     protected String getTitle(RenderRequest renderRequest)
     {
-        return name;
+        return this.name;
     }
 
     protected HttpServletRequest processMultipart(HttpServletRequest request)
@@ -63,8 +77,7 @@ public class XWikiPortlet extends GenericPortlet
 
         String contentType = request.getContentType();
 
-        if ((contentType != null)
-                && contentType.startsWith("multipart/form-data")) {
+        if ((contentType != null) && contentType.startsWith("multipart/form-data")) {
             return (new MultipartRequestWrapper(request));
         } else {
             return (request);
@@ -81,10 +94,9 @@ public class XWikiPortlet extends GenericPortlet
         XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
         context.setURLFactory(urlf);
 
-        VelocityManager velocityManager =
-            (VelocityManager) Utils.getComponent(VelocityManager.class);
+        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
         VelocityContext vcontext = velocityManager.getVelocityContext();
-        
+
         return xwiki.prepareDocuments(request, context, vcontext);
     }
 
@@ -92,15 +104,17 @@ public class XWikiPortlet extends GenericPortlet
     {
         try {
             FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
-            if (fileupload != null)
+            if (fileupload != null) {
                 fileupload.cleanFileList(context);
+            }
 
             XWiki xwiki = (context != null) ? context.getWiki() : null;
             // Make sure we cleanup database connections
             // There could be cases where we have some
             if ((context != null) && (xwiki != null)) {
-                if (xwiki.getStore() != null)
+                if (xwiki.getStore() != null) {
                     xwiki.getStore().cleanUp(context);
+                }
             }
         } finally {
             MDC.remove("url");
@@ -111,7 +125,7 @@ public class XWikiPortlet extends GenericPortlet
     {
         if (!(e instanceof XWikiException)) {
             e = new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
-                    "Uncaught exception", e);
+                "Uncaught exception", e);
         }
 
         VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
@@ -138,7 +152,9 @@ public class XWikiPortlet extends GenericPortlet
         }
     }
 
-    protected void doDispatch(RenderRequest aRenderRequest, RenderResponse aRenderResponse) throws PortletException, IOException
+    @Override
+    protected void doDispatch(RenderRequest aRenderRequest, RenderResponse aRenderResponse) throws PortletException,
+        IOException
     {
         WindowState windowState = aRenderRequest.getWindowState();
         if (!windowState.equals(WindowState.MINIMIZED) && aRenderRequest.getPortletMode().equals(CONFIG_PORTLET_MODE)) {
@@ -148,7 +164,8 @@ public class XWikiPortlet extends GenericPortlet
         }
     }
 
-    public void processAction(ActionRequest actionRequest, ActionResponse actionResponse) 
+    @Override
+    public void processAction(ActionRequest actionRequest, ActionResponse actionResponse)
         throws PortletException, IOException
     {
         WindowState windowState = actionRequest.getWindowState();
@@ -174,34 +191,37 @@ public class XWikiPortlet extends GenericPortlet
             }
         }
     }
-    
-    public void processAction(XWikiContext context) 
+
+    public void processAction(XWikiContext context)
         throws PortletException, IOException
     {
         try {
-            if (prepareAction(context.getAction(), context.getRequest(), context.getResponse(), context.getEngineContext(), context) == false)
+            if (prepareAction(context.getAction(), context.getRequest(), context.getResponse(),
+                context.getEngineContext(), context) == false) {
                 return;
+            }
 
             XWikiForm form = null;
 
-            if (context.getAction().equals("save"))
+            if (context.getAction().equals("save")) {
                 form = new EditForm();
-            else if (context.getAction().equals("lock"))
+            } else if (context.getAction().equals("lock")) {
                 form = new EditForm();
-            else if (context.getAction().equals("cancel"))
+            } else if (context.getAction().equals("cancel")) {
                 form = new EditForm();
-            else if (context.getAction().equals("rollback"))
+            } else if (context.getAction().equals("rollback")) {
                 form = new RollbackForm();
-            else if (context.getAction().equals("objectadd"))
+            } else if (context.getAction().equals("objectadd")) {
                 form = new ObjectAddForm();
-            else if (context.getAction().equals("commentadd"))
+            } else if (context.getAction().equals("commentadd")) {
                 form = new ObjectAddForm();
-            else if (context.getAction().equals("objectremove"))
+            } else if (context.getAction().equals("objectremove")) {
                 form = new ObjectRemoveForm();
-            else if (context.getAction().equals("propadd"))
+            } else if (context.getAction().equals("propadd")) {
                 form = new PropAddForm();
-            else if (context.getAction().equals("deleteversions"))
+            } else if (context.getAction().equals("deleteversions")) {
                 form = new DeleteVersionsForm();
+            }
 
             if (form != null) {
                 form.reset(null, context.getRequest());
@@ -209,41 +229,41 @@ public class XWikiPortlet extends GenericPortlet
             }
 
             if (context.getAction().equals("save")) {
-                (new SaveAction()).action(context);
+                new SaveAction().action(context);
             } else if (context.getAction().equals("rollback")) {
-                (new RollbackAction()).action(context);
+                new RollbackAction().action(context);
             } else if (context.getAction().equals("cancel")) {
-                (new CancelAction()).action(context);
+                new CancelAction().action(context);
             } else if (context.getAction().equals("lock")) {
-                (new LockAction()).action(context);
+                new LockAction().action(context);
             } else if (context.getAction().equals("delete")) {
-                (new DeleteAction()).action(context);
+                new DeleteAction().action(context);
             } else if (context.getAction().equals("undelete")) {
-                (new UndeleteAction()).action(context);
+                new UndeleteAction().action(context);
             } else if (context.getAction().equals("propupdate")) {
-                (new PropUpdateAction()).action(context);
+                new PropUpdateAction().action(context);
             } else if (context.getAction().equals("propadd")) {
-                (new PropAddAction()).action(context);
+                new PropAddAction().action(context);
             } else if (context.getAction().equals("objectadd")) {
-                (new ObjectAddAction()).action(context);
+                new ObjectAddAction().action(context);
             } else if (context.getAction().equals("commentadd")) {
-                (new CommentAddAction()).action(context);
+                new CommentAddAction().action(context);
             } else if (context.getAction().equals("objectremove")) {
-                (new ObjectRemoveAction()).action(context);
+                new ObjectRemoveAction().action(context);
             } else if (context.getAction().equals("upload")) {
-                (new UploadAction()).action(context);
+                new UploadAction().action(context);
             } else if (context.getAction().equals("delattachment")) {
-                (new DeleteAttachmentAction()).action(context);
+                new DeleteAttachmentAction().action(context);
             } else if (context.getAction().equals("skin")) {
-                (new SkinAction()).action(context);
+                new SkinAction().action(context);
             } else if (context.getAction().equals("logout")) {
-                (new LogoutAction()).action(context);
+                new LogoutAction().action(context);
             } else if (context.getAction().equals("register")) {
-                (new RegisterAction()).action(context);
+                new RegisterAction().action(context);
             } else if (context.getAction().equals("inline")) {
-                (new InlineAction()).action(context);
+                new InlineAction().action(context);
             } else if (context.getAction().equals("deleteversions")) {
-                (new DeleteVersionsAction()).action(context);
+                new DeleteVersionsAction().action(context);
             }
         } catch (Throwable e) {
             handleException(context.getRequest(), context.getResponse(), e, context);
@@ -252,19 +272,22 @@ public class XWikiPortlet extends GenericPortlet
         }
     }
 
-    private void handleConfigForm(ActionRequest actionRequest, ActionResponse actionResponse) throws PortletException, IOException {
+    private void handleConfigForm(ActionRequest actionRequest, ActionResponse actionResponse) throws PortletException,
+        IOException
+    {
         PortletPreferences preferences = actionRequest.getPreferences();
         String rootSpace = actionRequest.getParameter(ROOT_SPACE_PARAM_NAME);
         preferences.setValue(XWikiPortletRequest.ROOT_SPACE_PREF_NAME, rootSpace);
         actionResponse.setPortletMode(PortletMode.VIEW);
         preferences.store();
-        if (logger.isDebugEnabled()) {
-            logger.debug("New root space is [" + rootSpace + "]");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("New root space is [" + rootSpace + "]");
         }
 
     }
 
-    protected void doView(RenderRequest renderRequest, RenderResponse renderResponse) 
+    @Override
+    protected void doView(RenderRequest renderRequest, RenderResponse renderResponse)
         throws PortletException, IOException
     {
         XWikiContext context = null;
@@ -286,20 +309,22 @@ public class XWikiPortlet extends GenericPortlet
         }
     }
 
-    protected void doView(XWikiContext context) 
+    protected void doView(XWikiContext context)
         throws PortletException, IOException
     {
         try {
-            if (prepareAction(context.getAction(), context.getRequest(), context.getResponse(), context.getEngineContext(), context) == false)
+            if (prepareAction(context.getAction(), context.getRequest(), context.getResponse(),
+                context.getEngineContext(), context) == false) {
                 return;
+            }
 
             XWikiForm form = null;
 
-            if (context.getAction().equals("edit")
-                    || context.getAction().equals("inline"))
+            if (context.getAction().equals("edit") || context.getAction().equals("inline")) {
                 form = new EditForm();
-            else if (context.getAction().equals("preview"))
+            } else if (context.getAction().equals("preview")) {
                 form = new EditForm();
+            }
 
             if (form != null) {
                 form.reset(null, context.getRequest());
@@ -309,55 +334,55 @@ public class XWikiPortlet extends GenericPortlet
             String renderResult = null;
             // Determine what to do
             if (context.getAction().equals("view")) {
-                renderResult = (new ViewAction()).render(context);
+                renderResult = new ViewAction().render(context);
             } else if (context.getAction().equals("viewrev")) {
-                renderResult = (new ViewrevAction()).render(context);
+                renderResult = new ViewrevAction().render(context);
             } else if (context.getAction().equals("inline")) {
-                renderResult = (new InlineAction()).render(context);
+                renderResult = new InlineAction().render(context);
             } else if (context.getAction().equals("edit")) {
-                renderResult = (new EditAction()).render(context);
+                renderResult = new EditAction().render(context);
             } else if (context.getAction().equals("preview")) {
-                renderResult = (new PreviewAction()).render(context);
+                renderResult = new PreviewAction().render(context);
             } else if (context.getAction().equals("delete")) {
-                renderResult = (new DeleteAction()).render(context);
+                renderResult = new DeleteAction().render(context);
             } else if (context.getAction().equals("undelete")) {
-                renderResult = (new UndeleteAction()).render(context);
+                renderResult = new UndeleteAction().render(context);
             } else if (context.getAction().equals("download")) {
-                renderResult = (new DownloadAction()).render(context);
+                renderResult = new DownloadAction().render(context);
             } else if (context.getAction().equals("downloadrev")) {
-                renderResult = (new DownloadRevAction()).render(context);
+                renderResult = new DownloadRevAction().render(context);
             } else if (context.getAction().equals("viewattachrev")) {
-                renderResult = (new ViewAttachRevAction()).render(context);
+                renderResult = new ViewAttachRevAction().render(context);
             } else if (context.getAction().equals("dot")) {
-                renderResult = (new DotAction()).render(context);
+                renderResult = new DotAction().render(context);
             } else if (context.getAction().equals("svg")) {
-                renderResult = (new SVGAction()).render(context);
+                renderResult = new SVGAction().render(context);
             } else if (context.getAction().equals("attach")) {
-                renderResult = (new AttachAction()).render(context);
+                renderResult = new AttachAction().render(context);
             } else if (context.getAction().equals("login")) {
-                renderResult = (new LoginAction()).render(context);
+                renderResult = new LoginAction().render(context);
             } else if (context.getAction().equals("loginsubmit")) {
-                renderResult = (new LoginSubmitAction()).render(context);
+                renderResult = new LoginSubmitAction().render(context);
             } else if (context.getAction().equals("loginerror")) {
-                renderResult = (new LoginErrorAction()).render(context);
+                renderResult = new LoginErrorAction().render(context);
             } else if (context.getAction().equals("register")) {
-                renderResult = (new RegisterAction()).render(context);
+                renderResult = new RegisterAction().render(context);
             } else if (context.getAction().equals("skin")) {
-                renderResult = (new SkinAction()).render(context);
+                renderResult = new SkinAction().render(context);
             } else if (context.getAction().equals("export")) {
-                renderResult = (new ExportAction()).render(context);
+                renderResult = new ExportAction().render(context);
             } else if (context.getAction().equals("import")) {
-                renderResult = (new ImportAction()).render(context);
+                renderResult = new ImportAction().render(context);
             } else if (context.getAction().equals("portletConfig")) {
                 renderResult = "portletConfig";
-            } 
+            }
             if (renderResult != null) {
                 String page = Utils.getPage(context.getRequest(), renderResult);
                 Utils.parseTemplate(page, context);
             }
         } catch (Throwable e) {
-            if (logger.isWarnEnabled()) {
-                logger.warn("oops", e);
+            if (LOG.isWarnEnabled()) {
+                LOG.warn("oops", e);
             }
 
             handleException(context.getRequest(), context.getResponse(), e, context);
@@ -378,27 +403,30 @@ public class XWikiPortlet extends GenericPortlet
         }
     }
 
-    protected void doEdit(RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException, IOException {
+    @Override
+    protected void doEdit(RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException,
+        IOException
+    {
         super.doEdit(renderRequest, renderResponse);
     }
-    
+
     protected XWikiContext initializeXWikiContext(PortletRequest portletRequest, PortletResponse portletResponse)
         throws XWikiException, PortletException
     {
         XWikiRequest request = new XWikiPortletRequest(portletRequest);
         XWikiResponse response = new XWikiPortletResponse(portletResponse);
-        XWikiEngineContext engineContext = new XWikiPortletContext(portletRequest.getPortletSession().getPortletContext());
+        XWikiEngineContext engineContext =
+            new XWikiPortletContext(portletRequest.getPortletSession().getPortletContext());
 
         String action = request.getParameter("action");
         if ((action == null) || (action.equals(""))) {
             if (RenderRequest.class.isAssignableFrom(portletRequest.getClass())) {
-                action = portletRequest.getPortletMode().equals(CONFIG_PORTLET_MODE)
-                    ? "portletConfig" : "view";
+                action = portletRequest.getPortletMode().equals(CONFIG_PORTLET_MODE) ? "portletConfig" : "view";
             } else {
                 action = "view";
             }
         }
-        
+
         XWikiContext context = Utils.prepareContext(action, request, response, engineContext);
 
         // Initialize the Container component which is the new of transporting the Context in the new
@@ -408,15 +436,13 @@ public class XWikiPortlet extends GenericPortlet
         return context;
     }
 
-    protected void initializeContainerComponent(XWikiContext context)
-        throws PortletException
+    protected void initializeContainerComponent(XWikiContext context) throws PortletException
     {
         // Initialize the Container fields (request, response, session).
         // Note that this is a bridge between the old core and the component architecture.
-        // In the new component architecture we use ThreadLocal to transport the request, 
+        // In the new component architecture we use ThreadLocal to transport the request,
         // response and session to components which require them.
-        PortletContainerInitializer containerInitializer =
-            (PortletContainerInitializer) Utils.getComponent(PortletContainerInitializer.class);
+        PortletContainerInitializer containerInitializer = Utils.getComponent(PortletContainerInitializer.class);
 
         try {
             containerInitializer.initializeRequest(
@@ -427,13 +453,13 @@ public class XWikiPortlet extends GenericPortlet
                 ((XWikiPortletRequest) context.getRequest()).getPortletRequest());
         } catch (PortletContainerException e) {
             throw new PortletException("Failed to initialize request/response or session", e);
-        }            
-    }    
+        }
+    }
 
     protected void cleanupComponents()
     {
-        Container container = (Container) Utils.getComponent(Container.class);
-        Execution execution = (Execution) Utils.getComponent(Execution.class);
+        Container container = Utils.getComponent(Container.class);
+        Execution execution = Utils.getComponent(Execution.class);
 
         // We must ensure we clean the ThreadLocal variables located in the Container and Execution
         // components as otherwise we will have a potential memory leak.
@@ -442,15 +468,16 @@ public class XWikiPortlet extends GenericPortlet
         container.removeSession();
         execution.removeContext();
     }
-    
+
     /**
      * {@inheritDoc}
      */
+    @Override
     public void destroy()
     {
-        Container container = (Container) Utils.getComponent(Container.class);
+        Container container = Utils.getComponent(Container.class);
         ApplicationContextListenerManager applicationContextListenerManager =
-            (ApplicationContextListenerManager) Utils.getComponent(ApplicationContextListenerManager.class);
+            Utils.getComponent(ApplicationContextListenerManager.class);
         applicationContextListenerManager.destroyApplicationContext(container.getApplicationContext());
         super.destroy();
     }

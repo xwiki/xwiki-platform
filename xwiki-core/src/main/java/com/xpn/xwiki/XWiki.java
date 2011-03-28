@@ -3215,19 +3215,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         needsUpdate |= bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10);
         needsUpdate |= bclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10);
 
-        needsUpdate |= bclass.addTextField("macros_languages", "Macros Languages", 60);
-        needsUpdate |= bclass.addTextField("macros_velocity", "Macros for Velocity", 60);
-        needsUpdate |= bclass.addTextField("macros_groovy", "Macros for Groovy", 60);
-        needsUpdate |= bclass.addTextAreaField("macros_mapping", "Macros Mapping", 60, 15);
-
         needsUpdate |= bclass.addStaticListField("registration_anonymous", "Anonymous", "---|Image|Text");
         needsUpdate |= bclass.addStaticListField("registration_registered", "Registered", "---|Image|Text");
         needsUpdate |= bclass.addStaticListField("edit_anonymous", "Anonymous", "---|Image|Text");
         needsUpdate |= bclass.addStaticListField("edit_registered", "Registered", "---|Image|Text");
         needsUpdate |= bclass.addStaticListField("comment_anonymous", "Anonymous", "---|Image|Text");
         needsUpdate |= bclass.addStaticListField("comment_registered", "Registered", "---|Image|Text");
-
-        needsUpdate |= bclass.addTextField("notification_pages", "Notification Pages", 60);
 
         needsUpdate |= bclass.addNumberField("upload_maxsize", "Maximum Upload Size", 5, "long");
 
@@ -3247,7 +3240,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         needsUpdate |= bclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
         needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
         needsUpdate |= bclass.addTextField("languages", "Supported languages", 30);
-        needsUpdate |= bclass.addTextField("convertmail", "convert email type", 1);
         needsUpdate |= bclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
 
         // Only used by LDAP authentication service

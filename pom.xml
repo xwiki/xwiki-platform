@@ -41,7 +41,7 @@
     <rendering.version>${project.version}</rendering.version>
     <commons.version>${project.version}</commons.version>
     <!-- The previous stable version of this project, used to catch API breakages. -->
-    <clirr.previous.version>2.7</clirr.previous.version>
+    <clirr.previous.version>3.0</clirr.previous.version>
   </properties>
   <scm>
     <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-3.0</connection>
@@ -204,29 +204,7 @@
               <excludes>
                 <exclude>**/internal/**</exclude>
                 <exclude>**/test/**</exclude>
-                <!-- To be removed when we release 3.0 -->
-                <exclude>com/xpn/xwiki/api/XWiki</exclude>
-                <exclude>com/xpn/xwiki/api/XWikiCompatibilityAspect</exclude>
-                <exclude>com/xpn/xwiki/pdf/api/PdfExport*</exclude>
-                <exclude>org/xwiki/bridge/DocumentModelBridge</exclude>
-                <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeConverter</exclude>
-                <exclude>org/xwiki/properties/ConverterManager</exclude>
-                <exclude>org/xwiki/properties/PropertyDescriptor</exclude>
-                <exclude>org/xwiki/properties/converter/AbstractConverter</exclude>
-                <exclude>org/xwiki/properties/converter/Converter</exclude>
-                <exclude>org/xwiki/rendering/macro/box/AbstractBoxMacro</exclude>
-               	<exclude>org/xwiki/rendering/macro/script/AbstractScriptMacro</exclude>
-                <exclude>org/xwiki/container/Request</exclude>
-                <!-- Changes below are caused by the removal of the deprecated methods/classes in office importer module -->
-                <exclude>org/xwiki/officeimporter/OfficeImporter</exclude>
-                <exclude>org/xwiki/officeimporter/OfficeImporterFilter</exclude>
-                <exclude>org/xwiki/officeimporter/OfficeImporterVelocityBridge</exclude>
-                <exclude>org/xwiki/officeimporter/builder/PresentationBuilder</exclude>
-                <exclude>org/xwiki/officeimporter/builder/XDOMOfficeDocumentBuilder</exclude>
-                <exclude>org/xwiki/officeimporter/builder/XHTMLOfficeDocumentBuilder</exclude>
-                <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeDocumentConverter</exclude>
-                <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager</exclude>
-                <exclude>org/xwiki/officeimporter/splitter/XDOMOfficeDocumentSplitter</exclude>
+                <!-- To be removed when we release 3.0.1 -->
               </excludes>
             </configuration>
           </plugin>

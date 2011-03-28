@@ -734,7 +734,6 @@
             <column name="XWP_DEFAULT_LANGUAGE" length="255"/>
         </property>
         <property name="multilingual" type="integer">
-
             <column name="XWP_MULTI_LINGUAL" />
         </property>
         <property name="authenticate_edit" type="integer">
@@ -744,7 +743,6 @@
             <column name="XWP_AUTHENTICATE_VIEW" />
         </property>
         <property name="auth_active_check" type="integer">
-
             <column name="XWP_AUTH_ACTIVE_CHECK" />
         </property>
         <property name="backlinks" type="integer">
@@ -754,7 +752,6 @@
             <column name="XWP_SKIN" length="255"/>
         </property>
         <property name="stylesheet" type="string">
-
             <column name="XWP_STYLESHEET" length="255"/>
         </property>
         <property name="stylesheets" type="string">
@@ -763,28 +760,16 @@
         <property name="editor" type="string">
             <column name="XWP_EDITOR" length="255"/>
         </property>
-        <property name="editbox_width" type="string">
-
-            <column name="XWP_EDITBOX_WIDTH" length="255"/>
-        </property>
-        <property name="editbox_height" type="string">
-            <column name="XWP_EDITBOX_HEIGHT" length="255"/>
-        </property>
         <property name="webcopyright" type="string">
             <column name="XWP_WEBCOPYRIGHT" length="255"/>
         </property>
         <property name="title" type="string">
-
             <column name="XWP_TITLE" length="255"/>
         </property>
         <property name="version" type="string">
             <column name="XWP_VERSION" length="255"/>
         </property>
-        <property name="menu" type="text">
-            <column name="XWP_MENU" length="60000" />
-        </property>
         <property name="meta" type="text">
-
             <column name="XWP_META" length="60000" />
         </property>
         <property name="use_email_verification" type="integer">
@@ -794,7 +779,6 @@
             <column name="XWP_SMTP_SERVER" length="255"/>
         </property>
         <property name="admin_email" type="string">
-
             <column name="XWP_ADMIN_EMAIL" length="255"/>
         </property>
         <property name="validation_email_content" type="text">
@@ -804,28 +788,7 @@
             <column name="XWP_CONFIRMATION_EMAIL_CONTENT" length="60000" />
         </property>
         <property name="invitation_email_content" type="text">
-
             <column name="XWP_INVITATION_EMAIL_CONTENT" length="60000" />
-        </property>
-        <property name="macros_languages" type="string">
-            <column name="XWP_MACROS_LANGUAGE" length="255" />
-        </property>
-        <property name="macros_velocity" type="string">
-            <column name="XWP_MACROS_VELOCITY" length="255" />
-        </property>
-        <property name="macros_groovy" type="string">
-
-            <column name="XWP_MACROS_GROOVY" length="255" />
-        </property>
-        <property name="macros_wiki2" type="string">
-            <column name="XWP_MACROS_WIKI2" length="255" />
-        </property>
-        <property name="macros_mapping" type="text">
-            <column name="XWP_MACROS_MAPPING" length="60000" />
-        </property>
-        <property name="notification_pages" type="string">
-
-            <column name="XWP_NOTIFICATION_PAGES" length="255" />
         </property>
         <property name="leftPanels" type="string">
             <column name="XWP_LEFT_PANELS" length="2000"/>
@@ -834,17 +797,12 @@
             <column name="XWP_RIGHT_PANELS" length="2000"/>
         </property>
         <property name="showLeftPanels" type="integer">
-
             <column name="XWP_SHOW_LEFT_PANELS" />
         </property>
         <property name="showRightPanels" type="integer">
             <column name="XWP_SHOW_RIGHT_PANELS" />
         </property>
-        <property name="pageWidth" type="string">
-            <column name="XWP_PAGE_WIDTH" length="255" />
-        </property>
         <property name="languages" type="string">
-
             <column name="XWP_LANGUAGES" length="255" />
         </property>
         <property name="registration_anonymous" type="string">
@@ -854,7 +812,6 @@
             <column name="XWP_REGISTRATION_REGISTERED" length="255" />
         </property>
         <property name="edit_anonymous" type="string">
-
             <column name="XWP_EDIT_ANONYMOUS" length="255" />
         </property>
         <property name="edit_registered" type="string">
@@ -864,7 +821,6 @@
             <column name="XWP_COMMENT_ANONYMOUS" length="255" />
         </property>
         <property name="comment_registered" type="string">
-
             <column name="XWP_COMMENT_REGISTERED" length="255" />
         </property>
         <property name="documentBundles" type="string">

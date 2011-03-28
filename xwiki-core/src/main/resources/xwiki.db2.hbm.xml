@@ -763,12 +763,6 @@
     <property name="editor" type="string">
       <column name="XWP_EDITOR" length="255"/>
     </property>
-    <property name="editbox_width" type="string">
-      <column name="XWP_EDITBOX_WIDTH" length="255"/>
-    </property>
-    <property name="editbox_height" type="string">
-      <column name="XWP_EDITBOX_HEIGHT" length="255"/>
-    </property>
 
     <property name="webcopyright" type="string">
       <column name="XWP_WEBCOPYRIGHT" length="255"/>
@@ -780,9 +774,6 @@
       <column name="XWP_VERSION" length="255"/>
     </property>
 
-    <property name="menu" type="string">
-      <column name="XWP_MENU" length="60000" sql-type="clob(60000)"/>
-    </property>
     <property name="meta" type="string">
       <column name="XWP_META" length="60000" sql-type="clob(60000)"/>
     </property>
@@ -806,26 +797,7 @@
     <property name="invitation_email_content" type="string">
       <column name="XWP_INVITATION_EMAIL_CONTENT" length="60000" sql-type="clob(60000)"/>
     </property>
-    <property name="macros_languages" type="string">
-      <column name="XWP_MACROS_LANGUAGE" length="255"/>
-    </property>
 
-    <property name="macros_velocity" type="string">
-      <column name="XWP_MACROS_VELOCITY" length="255"/>
-    </property>
-    <property name="macros_groovy" type="string">
-      <column name="XWP_MACROS_GROOVY" length="255"/>
-    </property>
-    <property name="macros_wiki2" type="string">
-      <column name="XWP_MACROS_WIKI2" length="255"/>
-    </property>
-
-    <property name="macros_mapping" type="string">
-      <column name="XWP_MACROS_MAPPING" length="60000" sql-type="clob(60000)"/>
-    </property>
-    <property name="notification_pages" type="string">
-      <column name="XWP_NOTIFICATION_PAGES" length="255"/>
-    </property>
     <property name="leftPanels" type="string">
       <column name="XWP_LEFT_PANELS" length="2000"/>
     </property>
@@ -840,9 +812,6 @@
       <column name="XWP_SHOW_RIGHT_PANELS"/>
     </property>
 
-    <property name="pageWidth" type="string">
-      <column name="XWP_PAGE_WIDTH" length="255"/>
-    </property>
     <property name="languages" type="string">
       <column name="XWP_LANGUAGES" length="255"/>
     </property>

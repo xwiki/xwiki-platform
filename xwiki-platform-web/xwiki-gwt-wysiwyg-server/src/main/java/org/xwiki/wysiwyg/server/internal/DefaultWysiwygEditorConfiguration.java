@@ -19,11 +19,11 @@
  */
 package org.xwiki.wysiwyg.server.internal;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
-import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.wysiwyg.server.WysiwygEditorConfiguration;
@@ -68,7 +68,7 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
         Object value = documentAccessBridge.getProperty(configDocumentReference, configClassReference, propertyName);
         if (value == null) {
             String mainWiki = getMainWiki();
-            if (!StringUtils.areEqual(currentWiki, mainWiki)) {
+            if (!StringUtils.equals(currentWiki, mainWiki)) {
                 configDocumentReference.getWikiReference().setName(mainWiki);
                 value = documentAccessBridge.getProperty(configDocumentReference, configClassReference, propertyName);
             }

@@ -357,7 +357,7 @@ public class Document extends Api
      */
     public String getAuthor()
     {
-        return this.compactWikiEntityReferenceSerializer.serialize(this.doc.getAuthorReference());
+        return this.doc.getAuthor();
     }
 
     /**
@@ -368,7 +368,7 @@ public class Document extends Api
      */
     public String getContentAuthor()
     {
-        return this.compactWikiEntityReferenceSerializer.serialize(this.doc.getContentAuthorReference());
+        return this.doc.getContentAuthor();
     }
 
     /**
@@ -417,7 +417,7 @@ public class Document extends Api
      */
     public String getCreator()
     {
-        return this.compactWikiEntityReferenceSerializer.serialize(this.doc.getCreatorReference());
+        return this.doc.getCreator();
     }
 
     /**

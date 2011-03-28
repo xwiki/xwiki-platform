@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186679007000</creationDate>
-<date>1278346135000</date>
-<contentUpdateDate>1278346135000</contentUpdateDate>
+<date>1300991417000</date>
+<contentUpdateDate>1300991417000</contentUpdateDate>
 <version>1.1</version>
 <title>Translations</title>
 <template></template>
@@ -100,7 +100,7 @@ wikimanager.prop.wiki.visibility=Visibilitat
 wikimanager.prop.wiki.wikiname=Identificador wiki
 wikimanager.prop.wiki.wikiprettyname=Nom acurat
 wikimanager.readers=Lectors
-wikimanager.successcreatewiki=La vostra wiki "{0}" ha estat creada. Podeu accedir-hi a la seg\u00FCent adre\u00E7a\: {1}.
+wikimanager.successcreatewiki=La vostra wiki "{0}" ha estat creada. Podeu accedir-hi a la seg\u00FCent adre\u00E7a\: [{1}].
 wikimanager.successdeletewiki=Wiki "{0}" eliminada.  
 wikimanager.successsettemplate=Visibilitat de la wiki "{0}" caviada a "{1}".  
 wikimanager.title.createnewalias=Crear nou \u00E0lies.

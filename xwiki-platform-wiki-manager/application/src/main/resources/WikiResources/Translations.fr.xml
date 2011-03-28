@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186679007000</creationDate>
-<date>1278346135000</date>
-<contentUpdateDate>1278346135000</contentUpdateDate>
+<date>1300991417000</date>
+<contentUpdateDate>1300991417000</contentUpdateDate>
 <version>1.1</version>
 <title>Translations</title>
 <template></template>
@@ -100,7 +100,7 @@ wikimanager.prop.wiki.visibility=Visibilit\u00E9
 wikimanager.prop.wiki.wikiname=Identificateur de wiki
 wikimanager.prop.wiki.wikiprettyname=Nom d'affichage
 wikimanager.readers=Lecteurs
-wikimanager.successcreatewiki=Le wiki "{0}" a \u00E9t\u00E9 cr\u00E9\u00E9. Vous pouvez y acc\u00E9der \u00E0 l''adresse suivante \: {1}.
+wikimanager.successcreatewiki=Le wiki "{0}" a \u00E9t\u00E9 cr\u00E9\u00E9. Vous pouvez y acc\u00E9der \u00E0 l''adresse suivante \: [{1}].
 wikimanager.successdeletewiki=Le wiki "{0}" a \u00E9t\u00E9 supprim\u00E9.
 wikimanager.successsettemplate=Le statut de visibilit\u00E9 du wiki "{0}" a \u00E9t\u00E9 chang\u00E9 \u00E0 "{1}".
 wikimanager.title.createnewalias=Cr\u00E9er un nouvel alias

@@ -3,7 +3,7 @@
 <web>XWiki</web>
 <name>WysiwygEditorConfigSheet</name>
 <language></language>
-<defaultLanguage>en</defaultLanguage>
+<defaultLanguage></defaultLanguage>
 <translation>0</translation>
 <parent>XWiki.WysiwygEditorConfigClass</parent>
 <creator>xwiki:XWiki.Admin</creator>
@@ -117,7 +117,7 @@ XWiki.HSortableList = Class.create({
     var items = new Array(values.length + 1).join(this.listItemTemplate);
     var list = new Element('ul', {'class': 'hSortable'}).update(items);
     for(var i = 0; i &lt; values.length; i++) {
-      list.childNodes.item(i).down('.value').firstChild.nodeValue = values[i];
+      $(list.childNodes.item(i)).down('.value').firstChild.nodeValue = values[i];
     }
     return list;
   },
@@ -149,10 +149,10 @@ XWiki.HSortableList = Class.create({
   },
   addListItem : function(value) {
     if (value.length &gt; 0 &amp;&amp; (this.duplicatesAllowed || !this.contains(value))) {
-      var item = new Element('ul').update(this.listItemTemplate).firstChild;
+      var item = $(new Element('ul').update(this.listItemTemplate).firstChild);
       item.down('.value').firstChild.nodeValue = value;
       this.list.appendChild(item);
-      this.list.lastChild.down('.delete').observe('click', this.deleteHandler);
+      $(this.list.lastChild).down('.delete').observe('click', this.deleteHandler);
       // We need to re-create the sortable list whenever we add/remove items.
       Sortable.create(this.list, this.sortableOptions);
     }
@@ -167,7 +167,7 @@ XWiki.HSortableList = Class.create({
 });
 XWiki.HSortableListWithInput = Class.create(XWiki.HSortableList, {
   initialize : function($super, values, duplicatesAllowed, possibleValues, inputTip) {
-    ${super}(values, duplicatesAllowed);
+    $super(values, duplicatesAllowed);
     this.container = new Element('div', {'class': 'hSortableWrapper'}).update('&lt;div&gt;&lt;input type="text" class="withTip"/&gt;&lt;input type="image" class="icon" title="$escapetool.xml($msg.get('wysiwyg.admin.widgets.sortableList.add'))" src="$xwiki.getSkinFile('icons/silk/add.gif')" alt="$escapetool.xml($msg.get('wysiwyg.admin.widgets.sortableList.add'))"/&gt;&lt;/div&gt;');
     this.container.firstChild.firstChild.value = this.container.firstChild.firstChild.defaultValue = inputTip;
     this.container.appendChild(this.list);
@@ -197,7 +197,7 @@ XWiki.HSortableListWithInput = Class.create(XWiki.HSortableList, {
 });
 XWiki.SpaceSeparatedList = Class.create(XWiki.HSortableListWithInput, {
   initialize : function($super, values, duplicatesAllowed, possibleValues, inputTip) {
-    ${super}(values.split(/\s+/), duplicatesAllowed, possibleValues ? possibleValues.split(/\s+/).sort() : null, inputTip);
+    $super(values.split(/\s+/), duplicatesAllowed, possibleValues ? possibleValues.split(/\s+/).sort() : null, inputTip);
   },
   addListItem : function($super, value) {
     ${super}(value.replace(/\s+/g, ''));
@@ -518,7 +518,7 @@ XWiki.ListBox = Class.create({
   _createList : function(items, size, multiple) {
     var options = new Array(items.length + 1).join('&lt;option&gt;__label__&lt;/option&gt;');
     // Use a DIV to create the select otherwise it doesn't work in IE.
-    var select = new Element('div').update('&lt;select size="' + window.parseInt(size) + (!!multiple ? '" multiple="multiple"&gt;' : '"&gt;') + options + '&lt;/select&gt;').firstChild;
+    var select = $(new Element('div').update('&lt;select size="' + window.parseInt(size) + (!!multiple ? '" multiple="multiple"&gt;' : '"&gt;') + options + '&lt;/select&gt;').firstChild);
     for(var i = 0; i &lt; items.length; i++){
       var item = items[i];
       if (typeof item == 'string') {
@@ -536,7 +536,7 @@ XWiki.ListBox = Class.create({
     for(var i = 0; i &lt; options.length; i++) {
       var option = options[i];
       if (option.selected) {
-        selectedOptions.push(option);
+        selectedOptions.push($(option));
       }
     }
     return selectedOptions;
@@ -570,7 +570,7 @@ XWiki.ListBox = Class.create({
     var child = parent.firstChild;
     while(child) {
       if (child.nodeName.toLowerCase() == 'option') {
-        options.push(child);
+        options.push($(child));
       }
       child = child.nextSibling;
     }
@@ -627,8 +627,8 @@ XWiki.FontNameListBox = Class.create(XWiki.ListBox, {
 
     this.inputWrapper = new Element('div').update('&lt;input type="text" class="withTip"/&gt;&lt;input type="image" class="icon" title="$escapetool.xml($msg.get('wysiwyg.admin.widgets.listBox.add'))" src="$xwiki.getSkinFile('icons/silk/add.gif')" alt="$escapetool.xml($msg.get('wysiwyg.admin.widgets.listBox.add'))"/&gt;');
     this.inputWrapper.firstChild.value = this.inputWrapper.firstChild.defaultValue = '$escapetool.javascript($msg.get('wysiwyg.admin.fontNames.add.hint'))';
-    this.inputWrapper.firstChild.observe('keydown', this._onKeyDown.bindAsEventListener(this));
-    this.inputWrapper.lastChild.observe('click', this._onClickAdd.bindAsEventListener(this));
+    $(this.inputWrapper.firstChild).observe('keydown', this._onKeyDown.bindAsEventListener(this));
+    $(this.inputWrapper.lastChild).observe('click', this._onClickAdd.bindAsEventListener(this));
   },
   attachTo : function($super, parent) {
     ${super}(parent);

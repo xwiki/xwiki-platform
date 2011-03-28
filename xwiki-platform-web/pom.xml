@@ -58,7 +58,7 @@
     <platform.skin.toucan.version>1.40-SNAPSHOT</platform.skin.toucan.version>
     <platform.skin.colibri.version>1.33-SNAPSHOT</platform.skin.colibri.version>
     <!-- The previous stable version of this project, used to catch API breakages. -->
-    <clirr.previous.version>2.7</clirr.previous.version>
+    <clirr.previous.version>3.0</clirr.previous.version>
   </properties>
   <modules>
     <module>gwt</module>
@@ -80,31 +80,7 @@
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
-            <!-- To be removed when we release 3.0 -->
-            <exclude>org/xwiki/gwt/dom/client/Style</exclude>
-            <exclude>org/xwiki/gwt/user/client/ui/rta/RichTextArea</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/RichTextEditorController</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/RichTextEditorController$2</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/color/ColorCell</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/color/ColorPicker</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/color/ColorPlugin</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/color/MozillaColorPlugin</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/color/exec/BackColorExecutable</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/color/exec/HiliteColorExecutable</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroDisplayer</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroSelector</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroPlugin</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/submit/exec/EnableExecutable</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/submit/exec/ResetExecutable</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/Plugin</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/PluginFactory</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/PluginFactoryManager</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/PluginManager</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/UIExtension</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/wiki/WikiService</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/wiki/WikiServiceAsync</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/wiki/WikiServiceAsyncCacheProxy</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/Strings</exclude>
+            <!-- To be removed when we release 3.0.1 -->
           </excludes>
         </configuration>
       </plugin>

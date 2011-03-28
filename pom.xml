@@ -208,6 +208,7 @@
                 <exclude>com/xpn/xwiki/api/XWiki</exclude>
                 <exclude>com/xpn/xwiki/api/XWikiCompatibilityAspect</exclude>
                 <exclude>com/xpn/xwiki/pdf/api/PdfExport*</exclude>
+                <exclude>com/xpn/xwiki/pref/api/XWikiPrefService</exclude>
                 <exclude>org/xwiki/bridge/DocumentModelBridge</exclude>
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeConverter</exclude>
                 <exclude>org/xwiki/properties/ConverterManager</exclude>

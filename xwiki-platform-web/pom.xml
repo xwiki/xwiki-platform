@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons</artifactId>
-    <version>42-SNAPSHOT</version>
+    <version>41</version>
     <relativePath>../../commons/xwiki-commons-pom</relativePath>
   </parent>
   <groupId>org.xwiki.platform</groupId>
@@ -49,14 +49,14 @@
     <gwt.maven.plugin.version>2.1.0-1</gwt.maven.plugin.version>
     <smartgwt.version>2.0</smartgwt.version>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
-    <commons.version>${project.version}</commons.version>
-    <rendering.version>${project.version}</rendering.version>
-    <platform.core.version>${project.version}</platform.core.version>
-    <platform.tool.configuration.version>1.46-SNAPSHOT</platform.tool.configuration.version>
+    <commons.version>3.0</commons.version>
+    <rendering.version>3.0</rendering.version>
+    <platform.core.version>3.0</platform.core.version>
+    <platform.tool.configuration.version>1.45</platform.tool.configuration.version>
     <!-- Lock albatross version because it isn't developed anymore. -->
     <platform.skin.albatross.version>1.30</platform.skin.albatross.version>
-    <platform.skin.toucan.version>1.40-SNAPSHOT</platform.skin.toucan.version>
-    <platform.skin.colibri.version>1.32-SNAPSHOT</platform.skin.colibri.version>
+    <platform.skin.toucan.version>1.39</platform.skin.toucan.version>
+    <platform.skin.colibri.version>1.32</platform.skin.colibri.version>
     <!-- The previous stable version of this project, used to catch API breakages. -->
     <clirr.previous.version>2.7</clirr.previous.version>
   </properties>

@@ -56,6 +56,11 @@ public class Object extends Collection
         getBaseObject().setGuid(guid);
     }
 
+    /**
+     * This method's name is misleading since it doesn't return the Object's property value; it"s equivalent to
+     * {@link #display(String, String)} (with {@code type} equals to {@code view}). In order to get the Object's
+     * property value use {@code getProperty(String).getValue()} instead.
+     */
     public java.lang.Object get(String name)
     {
         try {

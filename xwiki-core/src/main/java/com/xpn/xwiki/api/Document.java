@@ -1740,6 +1740,11 @@ public class Document extends Api
     }
 
     /**
+     * Get the top sections contained in the document.
+     * <p>
+     * The section are filtered by xwiki.section.depth property on the maximum depth of the sections to return. This
+     * method is usually used to get "editable" sections.
+     * 
      * @return the sections in the current document
      */
     public List<DocumentSection> getSections() throws XWikiException

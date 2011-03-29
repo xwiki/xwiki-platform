@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>37-SNAPSHOT</version>
+    <version>36</version>
   </parent>
   <artifactId>xwiki-application-administration</artifactId>
   <name>XWiki Platform - Applications - Administration</name>
@@ -49,7 +49,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-parent</artifactId>
-      <version>3.0-milestone-1</version>
+      <version>3.0</version>
       <type>pom</type>
       <scope>runtime</scope>
     </dependency>

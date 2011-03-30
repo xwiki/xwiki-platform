@@ -62,12 +62,12 @@ public class WatchListStore implements EventListener
      * Character used to separated wiki and space in XWiki model.
      */
     public static final String WIKI_SPACE_SEP = ":";
-    
+
     /**
      * Character used to separated space and page in XWiki model.
      */
     public static final String SPACE_PAGE_SEP = ".";
-    
+
     /**
      * Space of the scheduler application.
      */
@@ -142,11 +142,16 @@ public class WatchListStore implements EventListener
      * Property of the watchlist class used to store the list of documents to watch.
      */
     private static final String WATCHLIST_CLASS_DOCUMENTS_PROP = "documents";
-    
+
     /**
      * Property of the watchlist class used to store the list of users to watch.
      */
     private static final String WATCHLIST_CLASS_USERS_PROP = "users";
+
+    /**
+     * Property of the watchlist class used to indicate what should be automatically watched.
+     */
+    private static final String WATCHLIST_CLASS_AUTOMATICWATCH = "automaticwatch";
 
     /**
      * Watchlist jobs document names in the wiki.
@@ -165,7 +170,7 @@ public class WatchListStore implements EventListener
      * @param context the XWiki context
      * @return true if the class properties have been created or modified
      * @throws XWikiException when retrieving of watchlist jobs in the wiki fails
-     */    
+     */
     private boolean initWatchListClassProperties(XWikiDocument watchListClass, XWikiContext context)
         throws XWikiException
     {
@@ -191,6 +196,10 @@ public class WatchListStore implements EventListener
         needsUpdate |= bclass.addTextAreaField(WATCHLIST_CLASS_SPACES_PROP, "Space list", 80, 5);
         needsUpdate |= bclass.addTextAreaField(WATCHLIST_CLASS_DOCUMENTS_PROP, "Document list", 80, 5);
         needsUpdate |= bclass.addTextAreaField(WATCHLIST_CLASS_USERS_PROP, "User list", 80, 5);
+
+        needsUpdate |=
+            bclass.addStaticListField(WATCHLIST_CLASS_AUTOMATICWATCH, "Automatic watching",
+                "default|" + StringUtils.join(AutomaticWatchMode.values(), "|"));
 
         return needsUpdate;
     }
@@ -235,7 +244,7 @@ public class WatchListStore implements EventListener
             doc.setTitle("XWiki WatchList Notification Rules Class");
         }
         if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
-            needsUpdate = true;      
+            needsUpdate = true;
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
@@ -264,7 +273,7 @@ public class WatchListStore implements EventListener
                     + " and obj.id=prop.id.id and prop.value=?", 0, 0, queryParams, context);
         subscribers.put(jobName, subscribersForJob);
     }
-    
+
     /**
      * Destroy subscribers cache for the given job.
      * 
@@ -273,7 +282,7 @@ public class WatchListStore implements EventListener
      */
     private void destroySubscribersCache(String jobName, XWikiContext context)
     {
-        // init subscribers cache        
+        // init subscribers cache
         subscribers.remove(jobName);
     }
 
@@ -287,12 +296,15 @@ public class WatchListStore implements EventListener
     {
         // Retreive jobs in the wiki, must be done first since initWatchListClass relies on them
         jobDocumentNames =
-            context.getWiki().getStore().searchDocumentsNames(
-                ", BaseObject as obj where doc.fullName=obj.name and obj.className='"
-                    + WatchListJobManager.WATCHLIST_JOB_CLASS + "'", context);
+            context
+                .getWiki()
+                .getStore()
+                .searchDocumentsNames(
+                    ", BaseObject as obj where doc.fullName=obj.name and obj.className='"
+                        + WatchListJobManager.WATCHLIST_JOB_CLASS + "'", context);
 
         initWatchListClass(context);
-        
+
         for (String jobDocumentName : jobDocumentNames) {
             initSubscribersCache(jobDocumentName, context);
         }
@@ -326,7 +338,7 @@ public class WatchListStore implements EventListener
     }
 
     /**
-     * Register a new subscriber for the given job. 
+     * Register a new subscriber for the given job.
      * 
      * @param jobId ID of the job
      * @param user subscriber to add
@@ -354,9 +366,9 @@ public class WatchListStore implements EventListener
             subForJob.remove(user);
         }
     }
-    
+
     /**
-     * @return Names of documents which contain a watchlist job object. 
+     * @return Names of documents which contain a watchlist job object.
      */
     public List<String> getJobDocumentNames()
     {
@@ -431,7 +443,7 @@ public class WatchListStore implements EventListener
         throws XWikiException
     {
         String elementToWatch = newWatchedElement;
-        
+
         if (!ElementType.WIKI.equals(type) && !newWatchedElement.contains(WIKI_SPACE_SEP)) {
             elementToWatch = context.getDatabase() + WIKI_SPACE_SEP + newWatchedElement;
         }
@@ -461,7 +473,7 @@ public class WatchListStore implements EventListener
         throws XWikiException
     {
         String elementToRemove = watchedElement;
-        
+
         if (!ElementType.WIKI.equals(type) && !watchedElement.contains(WIKI_SPACE_SEP)) {
             elementToRemove = context.getDatabase() + WIKI_SPACE_SEP + watchedElement;
         }
@@ -469,7 +481,7 @@ public class WatchListStore implements EventListener
         if (!this.isWatched(elementToRemove, user, type, context)) {
             return false;
         }
-        
+
         List<String> watchedElements = getWatchedElements(user, type, context);
         watchedElements.remove(elementToRemove);
 
@@ -522,12 +534,12 @@ public class WatchListStore implements EventListener
      * @param context Context of the request
      * @throws XWikiException if the user's profile cannot be saved
      */
-    private void setWatchListElementsProperty(String user, ElementType type, List<String> elements, 
-        XWikiContext context) throws XWikiException
+    private void setWatchListElementsProperty(String user, ElementType type, List<String> elements, XWikiContext context)
+        throws XWikiException
     {
         XWikiDocument userDocument = context.getWiki().getDocument(user, context);
-        userDocument.setLargeStringValue(WATCHLIST_CLASS, getWatchListClassPropertyForType(type), StringUtils.join(
-            elements, WATCHLIST_ELEMENT_SEP));
+        userDocument.setLargeStringValue(WATCHLIST_CLASS, getWatchListClassPropertyForType(type),
+            StringUtils.join(elements, WATCHLIST_ELEMENT_SEP));
         userDocument.isMinorEdit();
         context.getWiki().saveDocument(userDocument, context.getMessageTool().get("watchlist.save.object"), true,
             context);
@@ -562,11 +574,11 @@ public class WatchListStore implements EventListener
             wikiServers = new ArrayList<String>();
             wikiServers.add(context.getMainXWiki());
         }
-        
+
         String oriDatabase = context.getDatabase();
 
         try {
-            for (String wiki : wikiServers) {                
+            for (String wiki : wikiServers) {
                 String wikiPrefix = wiki + WIKI_SPACE_SEP;
                 context.setDatabase(wiki);
                 try {
@@ -583,7 +595,7 @@ public class WatchListStore implements EventListener
         } finally {
             context.setDatabase(oriDatabase);
         }
-        
+
         return results;
     }
 
@@ -594,7 +606,7 @@ public class WatchListStore implements EventListener
      * @param currentDoc document version after event occurred
      * @param context the XWiki context
      */
-    private void watchListJobObjectsEventHandler(XWikiDocument originalDoc, XWikiDocument currentDoc, 
+    private void watchListJobObjectsEventHandler(XWikiDocument originalDoc, XWikiDocument currentDoc,
         XWikiContext context)
     {
         boolean reinitWatchListClass = false;
@@ -625,7 +637,7 @@ public class WatchListStore implements EventListener
             }
         }
     }
-    
+
     /**
      * Manage events affecting watchlist objects.
      * 
@@ -633,13 +645,12 @@ public class WatchListStore implements EventListener
      * @param currentDoc document version after event occurred
      * @param context the XWiki context
      */
-    private void watchListObjectsEventHandler(XWikiDocument originalDoc, XWikiDocument currentDoc, 
-        XWikiContext context) 
+    private void watchListObjectsEventHandler(XWikiDocument originalDoc, XWikiDocument currentDoc, XWikiContext context)
     {
         String wiki = context.getDatabase();
         BaseObject originalWatchListObj = originalDoc.getObject(WATCHLIST_CLASS);
-        BaseObject currentWatchListObj = currentDoc.getObject(WATCHLIST_CLASS);        
-        
+        BaseObject currentWatchListObj = currentDoc.getObject(WATCHLIST_CLASS);
+
         if (originalWatchListObj != null) {
             // Existing subscriber
 
@@ -659,7 +670,7 @@ public class WatchListStore implements EventListener
 
             // Modification of the interval
             String newInterval = currentWatchListObj.getStringValue(WATCHLIST_CLASS_INTERVAL_PROP);
-            
+
             if (!newInterval.equals(oriInterval)) {
                 removeSubscriberForJob(oriInterval, wiki + WIKI_SPACE_SEP + originalDoc.getFullName());
                 addSubscriberForJob(newInterval, wiki + WIKI_SPACE_SEP + currentDoc.getFullName());
@@ -669,11 +680,90 @@ public class WatchListStore implements EventListener
         if ((originalWatchListObj == null || originalDoc == null) && currentWatchListObj != null) {
             // New subscriber
             String newInterval = currentWatchListObj.getStringValue(WATCHLIST_CLASS_INTERVAL_PROP);
-            
+
             addSubscriberForJob(newInterval, wiki + WIKI_SPACE_SEP + currentDoc.getFullName());
         }
     }
-    
+
+    /**
+     * Get automatic document edition watching mode based on user profile and xwiki.cfg.
+     * 
+     * @param user the user
+     * @param context the XWiki context
+     * @return the mode, if not set return the default one which is {@link AutomaticWatchMode#MAJOR}
+     */
+    private AutomaticWatchMode getAutomaticWatchMode(String user, XWikiContext context)
+    {
+        AutomaticWatchMode mode = null;
+
+        try {
+            BaseObject watchObject = getWatchListObject(user, context);
+
+            String value = watchObject.getStringValue(WATCHLIST_CLASS_AUTOMATICWATCH);
+
+            if (value != null && !value.equals("default")) {
+                mode = AutomaticWatchMode.valueOf(value);
+            }
+        } catch (Exception e) {
+            // Failed for some reason, now try getting it from xwiki.cfg
+        }
+
+        if (mode == null) {
+            String value = context.getWiki().Param("xwiki.plugin.watchlist.automaticwatch");
+
+            if (value != null) {
+                try {
+                    mode = AutomaticWatchMode.valueOf(value);
+                } catch (Exception e) {
+                    LOG.warn("Invalid configuration in xwiki.plugin.watchlist.automaticwatch", e);
+                }
+            }
+        }
+
+        return mode != null ? mode : AutomaticWatchMode.MAJOR;
+    }
+
+    /**
+     * Automatically watch modified document depending on the configuration.
+     * 
+     * @param originalDoc document version before the event occurred
+     * @param currentDoc document version after event occurred
+     * @param context the XWiki context
+     */
+    private void documentModifiedHandler(Event event, XWikiDocument currentDoc, XWikiContext context)
+    {
+        if (!(event instanceof DocumentDeleteEvent)) {
+
+            boolean register = false;
+
+            String user = currentDoc.getContentAuthor();
+
+            AutomaticWatchMode mode = getAutomaticWatchMode(user, context);
+
+            switch (mode) {
+                case ALL:
+                    register = true;
+                    break;
+                case MAJOR:
+                    register = !currentDoc.isMinorEdit();
+                    break;
+                case NEW:
+                    register = event instanceof DocumentSaveEvent;
+                    break;
+                default:
+                    break;
+            }
+
+            if (register) {
+                try {
+                    addWatchedElement(user, currentDoc.getPrefixedFullName(), ElementType.DOCUMENT, context);
+                } catch (XWikiException e) {
+                    LOG.error("Failed to watch document [" + currentDoc.getPrefixedFullName() + "] for user [" + user
+                        + "]", e);
+                }
+            }
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -686,9 +776,10 @@ public class WatchListStore implements EventListener
         XWikiDocument currentDoc = (XWikiDocument) source;
         XWikiDocument originalDoc = currentDoc.getOriginalDocument();
         XWikiContext context = (XWikiContext) data;
-        
+
         watchListJobObjectsEventHandler(originalDoc, currentDoc, context);
         watchListObjectsEventHandler(originalDoc, currentDoc, context);
+        documentModifiedHandler(event, currentDoc, context);
     }
 
     /**

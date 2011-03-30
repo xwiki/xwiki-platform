@@ -713,7 +713,7 @@ public class WatchListStore implements EventListener
 
             if (value != null) {
                 try {
-                    mode = AutomaticWatchMode.valueOf(value);
+                    mode = AutomaticWatchMode.valueOf(value.toUpperCase());
                 } catch (Exception e) {
                     LOG.warn("Invalid configuration in xwiki.plugin.watchlist.automaticwatch", e);
                 }

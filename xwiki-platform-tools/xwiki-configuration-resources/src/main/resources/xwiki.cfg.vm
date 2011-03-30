@@ -589,6 +589,15 @@ xwiki.plugin.image.cache.capacity=30
 #-# Default: 0
 # xwiki.plugin.activitystream.daystokeepevents=0
 
+#-# [Since 3.1M1]
+#-# Indicate which mode to use for automatic document watching.
+#-# The possibles modes are the following:
+#-# * none: never automatically add document in watchlist
+#-# * all: add to watchlist any modified document
+#-# * major: add to watchlist only document which are not edited as minor edit. That's the default mode.
+#-# * new: add to watchlist only newly created documents
+# xwiki.plugin.watchlist.automaticwatch=major
+
 #---------------------------------------
 # Misc
 #

@@ -1936,8 +1936,10 @@ $xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {"forceSkinAction": true
 var $jsVarName = {
 #set($separator = '')
 #foreach($entry in $parameters.entrySet())
+#if($entry.value || "$!entry.value" != '')
   ${separator}$entry.key: '$!{escapetool.javascript($entry.value)}'
 #set($separator = ',')
+#end
 #end
 };
 //]]>
@@ -1954,24 +1956,26 @@ var $jsVarName = {
   *#
 #macro(wysiwyg_storeConfig $parameters $editedDocument $fieldId $full)
 #if(!$parameters.containsKey('hookId'))
-#set($ok = $parameters.put('hookId', $fieldId))
+  #set($ok = $parameters.put('hookId', $fieldId))
 #end
 #set($ok = $parameters.put('syntax', $editedDocument.syntax.toIdString()))
 #set($ok = $parameters.put('convertInput', true))
 #set($ok = $parameters.put('inputURL', $editedDocument.getExternalURL('edit', "xpage=wysiwyginput&token=${services.csrf.getToken()}")))
 #if($full)
-#set($ok = $parameters.put('displayTabs', $services.wysiwyg.config.isSourceEditorEnabled()))
-#set($ok = $parameters.put('defaultEditor', 'wysiwyg'))
+  #set($ok = $parameters.put('displayTabs', $services.wysiwyg.config.isSourceEditorEnabled()))
+  #if($parameters.displayTabs)
+    #set($ok = $parameters.put('defaultEditor', 'wysiwyg'))
+  #end
 #end
-#set($ok = $parameters.put('plugins', "$services.wysiwyg.config.getPlugins()#if($full && $request.sync) sync#end"))
+#set($ok = $parameters.put('plugins', $services.wysiwyg.config.getPlugins()))
 #set($ok = $parameters.put('menu', $services.wysiwyg.config.getMenuBar()))
 #set($ok = $parameters.put('toolbar', $services.wysiwyg.config.getToolBar()))
-#if($services.wysiwyg.config.isAttachmentSelectionLimited())
-#set($ok = $parameters.put('linkfiles', 'currentpage'))
+#if("$!services.wysiwyg.config.isAttachmentSelectionLimited()" == 'true')
+  #set($ok = $parameters.put('linkfiles', 'currentpage'))
 #end
 #set($ok = $parameters.put('allowExternalImages', $services.wysiwyg.config.areExternalImagesAllowed()))
-#if($services.wysiwyg.config.isImageSelectionLimited())
-#set($ok = $parameters.put('insertimages', 'currentpage'))
+#if("$!services.wysiwyg.config.isImageSelectionLimited()" == 'true')
+  #set($ok = $parameters.put('insertimages', 'currentpage'))
 #end
 #set($ok = $parameters.put('colors', $services.wysiwyg.config.getColorPalette()))
 #set($ok = $parameters.put('colorsPerRow', $services.wysiwyg.config.getColorsPerRow()))
@@ -1981,17 +1985,17 @@ var $jsVarName = {
 #set($ok = $parameters.put('wiki', $editedDocument.wiki))
 #set($ok = $parameters.put('space', $editedDocument.space))
 #set($ok = $parameters.put('page', $editedDocument.name))
-#if("$!{oomanager.serverState}" == "Connected")
-#set($ok = $parameters.put('openofficeServerConnected', 'true'))
+#if("$!{oomanager.serverState}" == 'Connected')
+  #set($ok = $parameters.put('openofficeServerConnected', 'true'))
 #end
 #if($full && $request.sync)
-#set($ok = $parameters.put('syncPage', $editedDocument.fullName))
-#if("$!{request.reset}" != "")
-#set($ok = $parameters.put('syncReset', $request.reset))
+  #set($ok = $parameters.put('syncPage', $editedDocument.fullName))
+  #if("$!{request.reset}" != '')
+    #set($ok = $parameters.put('syncReset', $request.reset))
+  #end
 #end
-#end
-#if("$!{request.debug}" != "")
-#set($ok = $parameters.put('debug', $request.debug))
+#if("$!request.debug" != '')
+  #set($ok = $parameters.put('debug', $request.debug))
 #end
 #end
 

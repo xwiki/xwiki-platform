@@ -30,9 +30,10 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface WysiwygEditorConfiguration
 {
     /**
-     * @return {@code true} if the WYSIWYG/Source tabs are enabled, {@code false} otherwise
+     * @return {@code true} if the WYSIWYG/Source tabs are enabled, {@code null} if this configuration property is not
+     *         set, {@code false} otherwise
      */
-    boolean isSourceEditorEnabled();
+    Boolean isSourceEditorEnabled();
 
     /**
      * @return the list of plugins that are loaded by the WYSIWYG editor
@@ -51,22 +52,22 @@ public interface WysiwygEditorConfiguration
 
     /**
      * @return {@code true} if the user is allowed to choose only from the attachments of the edited page when creating
-     *         a link to an attachment, {@code false} otherwise
+     *         a link to an attachment, {@code null} if this configuration property is not set, {@code false} otherwise
      */
-    boolean isAttachmentSelectionLimited();
+    Boolean isAttachmentSelectionLimited();
 
     /**
      * @return {@code true} if users are allowed to insert external images, i.e. images that are not attached to a wiki
-     *         page, {@code false} otherwise
+     *         page, {@code null} if this configuration property is not set, {@code false} otherwise
      */
-    boolean areExternalImagesAllowed();
+    Boolean areExternalImagesAllowed();
 
     /**
      * @return {@code true} if the user is allowed to choose only from the list of images attached to the edited page
-     *         when inserting an image, {@code false} otherwise
+     *         when inserting an image, {@code null} if this configuration property is not set, {@code false} otherwise
      * @see #isAttachmentSelectionLimited()
      */
-    boolean isImageSelectionLimited();
+    Boolean isImageSelectionLimited();
 
     /**
      * @return the colors available in the color picker
@@ -74,9 +75,10 @@ public interface WysiwygEditorConfiguration
     String getColorPalette();
 
     /**
-     * @return the number of colors to display per row in the color picker
+     * @return the number of colors to display per row in the color picker, or {@code null} if this configuration
+     *         property is not set
      */
-    int getColorsPerRow();
+    Integer getColorsPerRow();
 
     /**
      * @return the list of font names available in the font picker

@@ -1,15 +1,12 @@
-table.xRichTextEditorTabPanel {
+.xRichTextEditorTabPanel {
+  background-color: #F0F0EE;
   font-style: normal;
   width: 100%;
   padding: 0;
   margin: 0;
 }
 
-#xwikieditcontent table.xRichTextEditorTabPanel {
-  background-color: #F0F0EE;
-}
-
-table.xRichTextEditorTabPanel td {
+.xRichTextEditorTabPanel td {
   border: 0 none;
   padding: 0;
 }
@@ -31,11 +28,11 @@ table.xRichTextEditorTabPanel td {
   padding: 0;
 }
 
-#xwikieditcontent .xRichTextEditor, .xRichTextEditorTabPanel .xRichTextEditor {
+.xRichTextEditorTabPanel .xRichTextEditor {
   border: 0 none;
 }
 
-#xwikieditcontent .xRichTextEditor .gwt-MenuBar-horizontal, .xRichTextEditorTabPanel .xRichTextEditor .gwt-MenuBar-horizontal {
+.xRichTextEditorTabPanel .xRichTextEditor .gwt-MenuBar-horizontal {
   border-top: 0 none;
 }
 

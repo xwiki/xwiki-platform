@@ -545,9 +545,9 @@ span#avatarUpload {
 .attachment-picker-start {
   background: url("$xwiki.getSkinFile('icons/silk/picture_edit.gif')") no-repeat center center $theme.pageContentBackgroundColor !important;
   border: 0 none !important;
-  border-radius-bottomleft: 8px;
+  border-bottom-left-radius: 8px;
   -moz-border-radius-bottomleft: 8px;
-  -webkit-border-radius-bottomleft: 8px;
+  -webkit-border-bottom-left-radius: 8px;
   height: 18px;
   position: absolute;
   right: 0;

@@ -39,6 +39,11 @@ import com.xpn.xwiki.XWikiContext;
 public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfiguration
 {
     /**
+     * The integer number used to determine if a boolean configuration property is set.
+     */
+    private static final Integer ONE = new Integer(1);
+
+    /**
      * The component used to access documents. This is temporary till XWiki model is moved into components.
      */
     @Requirement
@@ -89,9 +94,10 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
      * 
      * @see WysiwygEditorConfiguration#areExternalImagesAllowed()
      */
-    public boolean areExternalImagesAllowed()
+    public Boolean areExternalImagesAllowed()
     {
-        return (Integer) getProperty("externalImages") == 1;
+        Integer externalImages = (Integer) getProperty("externalImages");
+        return externalImages == null ? null : ONE.equals(externalImages);
     }
 
     /**
@@ -109,7 +115,7 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
      * 
      * @see WysiwygEditorConfiguration#getColorsPerRow()
      */
-    public int getColorsPerRow()
+    public Integer getColorsPerRow()
     {
         return (Integer) getProperty("colorsPerRow");
     }
@@ -179,9 +185,10 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
      * 
      * @see WysiwygEditorConfiguration#isAttachmentSelectionLimited()
      */
-    public boolean isAttachmentSelectionLimited()
+    public Boolean isAttachmentSelectionLimited()
     {
-        return (Integer) getProperty("attachmentSelectionLimited") == 1;
+        Integer attachmentSelectionLimited = (Integer) getProperty("attachmentSelectionLimited");
+        return attachmentSelectionLimited == null ? null : ONE.equals(attachmentSelectionLimited);
     }
 
     /**
@@ -189,9 +196,10 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
      * 
      * @see WysiwygEditorConfiguration#isImageSelectionLimited()
      */
-    public boolean isImageSelectionLimited()
+    public Boolean isImageSelectionLimited()
     {
-        return (Integer) getProperty("imageSelectionLimited") == 1;
+        Integer imageSelectionLimited = (Integer) getProperty("imageSelectionLimited");
+        return imageSelectionLimited == null ? null : ONE.equals(imageSelectionLimited);
     }
 
     /**
@@ -199,8 +207,9 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
      * 
      * @see WysiwygEditorConfiguration#isSourceEditorEnabled()
      */
-    public boolean isSourceEditorEnabled()
+    public Boolean isSourceEditorEnabled()
     {
-        return (Integer) getProperty("sourceEditorEnabled") == 1;
+        Integer sourceEditorEnabled = (Integer) getProperty("sourceEditorEnabled");
+        return sourceEditorEnabled == null ? null : ONE.equals(sourceEditorEnabled);
     }
 }

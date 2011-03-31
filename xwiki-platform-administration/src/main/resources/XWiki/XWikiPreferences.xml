@@ -2492,14 +2492,14 @@
 <comment_registered>---</comment_registered>
 </property>
 <property>
-<confirmation_email_content>#set($wikiurl = $xwiki.getDocument("Main.WebHome").getExternalURL())
-#set($wikiname = $wikiurl.substring($wikiurl.indexOf("//")))
-#set($wikiname = $wikiname.substring(2, $wikiname.indexOf("/", 3)))
-Subject: Your account on $wikiname has been activated
+<confirmation_email_content>#set ($wikiname = $request.serverName)
+#set ($host = ${request.getRequestURL()})
+#set ($host = ${host.substring(0, ${host.indexOf('/', ${mathtool.add(${host.indexOf('//')}, 2)})})})
+Subject: Your account on ${wikiname} has been activated
 
-Hello $xwiki.getUserName("$xwikiname", false),
+Hello ${xwiki.getUserName("$xwikiname", false)},
 
-Your account on $wikiname has been successfully activated. You can now login at $xwiki.getDocument("XWiki.XWikiLogin").getExternalURL("login") using your username ($xwiki.getDocument($xwikiname).getName()).</confirmation_email_content>
+Your account on ${wikiname} has been successfully activated. You can now login at ${host}${xwiki.getURL('XWiki.XWikiLogin', 'login')} using your username (${xwiki.getDocument($xwikiname).getName()}).</confirmation_email_content>
 </property>
 <property>
 <core.defaultDocumentSyntax></core.defaultDocumentSyntax>
@@ -2621,17 +2621,17 @@ Your account on $wikiname has been successfully activated. You can now login at 
 <upload_maxsize>33554432</upload_maxsize>
 </property>
 <property>
-<validation_email_content>#set($wikiurl = $xwiki.getDocument("Main.WebHome").getExternalURL())
-#set($wikiname = $wikiurl.substring($wikiurl.indexOf("//")))
-#set($wikiname = $wikiname.substring(2, $wikiname.indexOf("/", 3)))
-Subject: Validate your account on $wikiname
+<validation_email_content>#set ($wikiname = $request.serverName)
+#set ($host = ${request.getRequestURL()})
+#set ($host = ${host.substring(0, ${host.indexOf('/', ${mathtool.add(${host.indexOf('//')}, 2)})})})
+Subject: Validate your account on ${wikiname}
 
-Hello $xwiki.getUserName("XWiki.$xwikiname", false),
+Hello ${xwiki.getUserName("XWiki.$xwikiname", false)},
 
 This email address was used to register a new account on ${wikiname}. If you did not make the request, please ignore this message.
 
 In order to activate your account, please follow this link:
-$xwiki.getDocument("XWiki.AccountValidation").getExternalURL("view", "validkey=${validkey}&amp;xwikiname=${xwikiname}")</validation_email_content>
+${host}${xwiki.getURL('XWiki.AccountValidation', 'view', "validkey=${validkey}&amp;xwikiname=${xwikiname}")}</validation_email_content>
 </property>
 <property>
 <version>XWiki Enterprise $xwiki.getVersion() - &lt;a onclick="openURL('http://enterprise.xwiki.org/xwiki/bin/view/Main/Documentation', '_blank'); return false;" href="http://www.xwiki.org/xwiki/bin/view/Main/Documentation"&gt;Documentation&lt;/a&gt;</version>

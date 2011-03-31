@@ -56,7 +56,7 @@
     <!-- Lock albatross version because it isn't developed anymore. -->
     <platform.skin.albatross.version>1.30</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.40-SNAPSHOT</platform.skin.toucan.version>
-    <platform.skin.colibri.version>1.31-SNAPSHOT</platform.skin.colibri.version>
+    <platform.skin.colibri.version>1.33-SNAPSHOT</platform.skin.colibri.version>
     <!-- The previous stable version of this project, used to catch API breakages. -->
     <clirr.previous.version>3.0</clirr.previous.version>
   </properties>

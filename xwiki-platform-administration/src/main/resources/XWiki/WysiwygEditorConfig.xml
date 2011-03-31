@@ -308,7 +308,11 @@ HL2ph7uN448AAAAASUVORK5CYII=
 <property>
 <codeToExecute>{{html clean="false"}}
 &lt;form id="$formId" method="post" action="$formAction" class="xform half"&gt;
-{{/html}}{{include document="XWiki.WysiwygEditorConfig" context="new" /}}{{html clean=false}}
+{{/html}}
+
+{{include document="XWiki.WysiwygEditorConfig" context="new" /}}
+
+{{html clean=false}}
   ## We add in a redirect field to prevent the user from being carried away when they save if they don't have javascript.
   #set($thisURL = $request.getRequestURL())
   #if($request.getQueryString() &amp;&amp; $request.getQueryString().length() &gt; 0)

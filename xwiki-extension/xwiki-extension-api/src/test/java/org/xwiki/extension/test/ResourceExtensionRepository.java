@@ -1,6 +1,7 @@
 package org.xwiki.extension.test;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,12 +36,12 @@ public class ResourceExtensionRepository implements ExtensionRepository
         this.baseResource = baseResource;
     }
 
-    InputStream getResourceAsStream(String name)
+    InputStream getResourceAsStream(String name) throws UnsupportedEncodingException
     {
-        return this.classLoader.getResourceAsStream(this.baseResource + name);
+        return this.classLoader.getResourceAsStream(this.baseResource + URLEncoder.encode(name, "UTF-8"));
     }
 
-    InputStream getResourceAsStream(ExtensionId extensionId, String type)
+    InputStream getResourceAsStream(ExtensionId extensionId, String type) throws UnsupportedEncodingException
     {
         return getResourceAsStream(extensionId.getId() + '-' + extensionId.getVersion() + '.' + type);
     }
@@ -52,7 +53,12 @@ public class ResourceExtensionRepository implements ExtensionRepository
 
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
-        InputStream descriptor = getResourceAsStream(extensionId, "xed");
+        InputStream descriptor;
+        try {
+            descriptor = getResourceAsStream(extensionId, "xed");
+        } catch (UnsupportedEncodingException e) {
+            throw new ResolveException("Invalid extension id [" + extensionId + "]", e);
+        }
 
         if (descriptor == null) {
             throw new ResolveException("Extension [" + extensionId + "] not found");

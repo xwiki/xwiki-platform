@@ -131,6 +131,11 @@ public class DefaultImageProcessor implements ImageProcessor
      */
     public boolean isMimeTypeSupported(String mimeType)
     {
-        return Arrays.asList(ImageIO.getReaderMIMETypes()).contains(mimeType);
+        try {
+            return Arrays.asList(ImageIO.getReaderMIMETypes()).contains(mimeType);
+        } catch (NoClassDefFoundError e) {
+            // Happens on certain systems where the javax.imageio package is not available.
+            return false;
+        }
     }
 }

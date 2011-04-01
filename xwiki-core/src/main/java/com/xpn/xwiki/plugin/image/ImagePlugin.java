@@ -202,12 +202,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     @Override
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context)
     {
-        try {
-            if (!this.imageProcessor.isMimeTypeSupported(attachment.getMimeType(context))) {
-                return attachment;
-            }
-        } catch (NoClassDefFoundError ex) {
-            // Happens on certain systems where the javax.imageio package is not available
+        if (!this.imageProcessor.isMimeTypeSupported(attachment.getMimeType(context))) {
             return attachment;
         }
 

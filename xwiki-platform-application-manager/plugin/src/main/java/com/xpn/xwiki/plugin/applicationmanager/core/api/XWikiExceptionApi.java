@@ -1,5 +1,6 @@
 /*
- * Copyright 2006-2007, XpertNet SARL, and individual contributors.
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -17,26 +18,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.api;
+package com.xpn.xwiki.plugin.applicationmanager.core.api;
 
 import java.lang.reflect.Field;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Api;
 
 /**
  * Permit to manipulate XWikiException in velocity code.
- * @todo See http://jira.xwiki.org/jira/browse/XWIKI-1571. If/When that issue is applied in XWiki
- *       Core and when this plugin moves to the version of XWiki Core where it was applied then
- *       remove this class.
+ * 
+ * @version $Id$
  */
 public class XWikiExceptionApi extends Api
 {
     /**
-     * No error
+     * No error.
      */
     public static final int ERROR_NOERROR = -1;
-    
+
     /**
      * Error code that is used when requested error code does not exists.
      */
@@ -47,13 +48,13 @@ public class XWikiExceptionApi extends Api
     /**
      * Managed exception.
      */
-    XWikiException exception;
+    private XWikiException exception;
 
     /**
      * XWikiExceptionApi constructor.
      * 
-     * @param exception Exception to manage.
-     * @param context   Context.
+     * @param exception the XWiki exception to manage.
+     * @param context the XWiki context.
      */
     public XWikiExceptionApi(XWikiException exception, XWikiContext context)
     {
@@ -61,24 +62,39 @@ public class XWikiExceptionApi extends Api
         this.exception = exception;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return this.exception.getMessage();
+    }
+
     // ///////////////////////////////////////////////////////////:
 
     /**
-     * Get static field error code value. This name targeting velocity to be able to use like "exception.SOME_ERROR_CODE".
+     * Get static field error code value. This name targeting velocity to be able to use like
+     * "exception.SOME_ERROR_CODE".
      * 
-     * @param error Static field name.
-     * @return int  Static field value.
-     * 
-     * @throws XWikiException   ERROR_XWIKI_ERROR_DOES_NOT_EXIST No corresponding error code exist.
+     * @param error the static field name.
+     * @return the static field value.
+     * @throws XWikiException ERROR_XWIKI_ERROR_DOES_NOT_EXIST No corresponding error code exist.
      */
     public int get(String error) throws XWikiException
     {
-        if (error.equals("ERROR_NOERROR"))
-            return ERROR_NOERROR;
-        
-        if (error.equals("ERROR_XWIKI_ERROR_DOES_NOT_EXIST"))
-            return ERROR_XWIKI_ERROR_DOES_NOT_EXIST;
-        
+        try {
+            Field field = getClass().getField(error);
+
+            if (field.getType() == int.class) {
+                return ((Integer) field.get(null)).intValue();
+            }
+        } catch (Exception e) {
+            // Error code is not a XWikiExceptionApi field.
+        }
+
         try {
             Field field = this.exception.getClass().getField(error);
 
@@ -86,11 +102,11 @@ public class XWikiExceptionApi extends Api
                 return ((Integer) field.get(null)).intValue();
             }
         } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI, ERROR_XWIKI_ERROR_DOES_NOT_EXIST, "Error \""
-                + error + "\" code does not exist", e);
+            // Error when trying to retrieve error code value.
         }
 
-        throw new XWikiException(XWikiException.MODULE_XWIKI, ERROR_XWIKI_ERROR_DOES_NOT_EXIST, "Error \""
-            + error + "\" code does not exist");
+        throw new XWikiException(XWikiException.MODULE_XWIKI,
+            ERROR_XWIKI_ERROR_DOES_NOT_EXIST,
+            "Error \"" + error + "\" code does not exist");
     }
 }

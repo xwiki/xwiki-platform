@@ -1,5 +1,6 @@
 /*
- * Copyright 2006-2007, XpertNet SARL, and individual contributors.
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -19,240 +20,411 @@
 
 package com.xpn.xwiki.plugin.applicationmanager.doc;
 
-import java.util.List;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.objects.classes.AbstractSuperClass;
-import com.xpn.xwiki.doc.objects.classes.ISuperDocument;
-import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerException;
+import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerMessageTool;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager;
 
-public class XWikiApplicationClass extends AbstractSuperClass
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jfree.util.Log;
+
+/**
+ * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager} implementation for
+ * XAppClasses.XWikiApplicationClass class.
+ * 
+ * @version $Id$
+ * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager
+ * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager
+ */
+public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplication>
 {
+    /**
+     * Default list display type of XAppClasses.XWikiApplicationClass fields.
+     */
+    public static final String DEFAULT_FIELDDT = "input";
+
+    /**
+     * Default list separators of XAppClasses.XWikiApplicationClass fields.
+     */
+    public static final String DEFAULT_FIELDS = "|";
+
+    /**
+     * Name of field <code>appname</code> for the XWiki class XAppClasses.XWikiApplicationClass. The unique name of the
+     * application.
+     */
+    public static final String FIELD_APPNAME = "appname";
+
+    /**
+     * Pretty name of field <code>appname</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELDPN_APPNAME = "Application Name";
+
+    /**
+     * Name of field <code>appprettyname</code> for the XWiki class XAppClasses.XWikiApplicationClass. The displayed
+     * name of the application.
+     */
+    public static final String FIELD_APPPRETTYNAME = "appprettyname";
+
+    /**
+     * Pretty name of field <code>appprettyname</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELDPN_APPPRETTYNAME = "Application Pretty Name";
+
+    /**
+     * Name of field <code>description</code> for the XWiki class XAppClasses.XWikiApplicationClass. The description of
+     * the application.
+     */
+    public static final String FIELD_DESCRIPTION = "description";
+
+    /**
+     * Pretty name of field <code>description</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELDPN_DESCRIPTION = "Description";
+
+    /**
+     * Name of field <code>version</code> for the XWiki class XAppClasses.XWikiApplicationClass. The version of the
+     * application.
+     */
+    public static final String FIELD_APPVERSION = "appversion";
+
+    /**
+     * Pretty name of field <code>version</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELDPN_APPVERSION = "Application Version";
+
+    /**
+     * Name of field <code>appauthors</code> for the XWiki class XAppClasses.XWikiApplicationClass. The description of
+     * the application.
+     */
+    public static final String FIELD_APPAUTHORS = "appauthors";
+
+    /**
+     * Pretty name of field <code>appauthors</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELDPN_APPAUTHORS = "Authors";
+
+    /**
+     * Name of field <code>license</code> for the XWiki class XAppClasses.XWikiApplicationClass. The description of the
+     * application.
+     */
+    public static final String FIELD_LICENSE = "license";
+
+    /**
+     * Pretty name of field <code>license</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELDPN_LICENSE = "License";
+
+    /**
+     * Name of field <code>dependencies</code> for the XWiki class XAppClasses.XWikiApplicationClass. The list of
+     * plugins on which application depends.
+     */
+    public static final String FIELD_DEPENDENCIES = "dependencies";
+
+    /**
+     * Pretty name of field <code>dependencies</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELDPN_DEPENDENCIES = "Dependencies";
+
+    /**
+     * Name of field <code>applications</code> for the XWiki class XAppClasses.XWikiApplicationClass. The list of other
+     * applications on which current application depends.
+     */
+    public static final String FIELD_APPLICATIONS = "applications";
+
+    /**
+     * Pretty name of field <code>applications</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELDPN_APPLICATIONS = "Applications";
+
+    /**
+     * Name of field <code>documents</code> for the XWiki class XAppClasses.XWikiApplicationClass. The list of documents
+     * application contains.
+     */
+    public static final String FIELD_DOCUMENTS = "documents";
+
+    /**
+     * Pretty name of field <code>documents</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELDPN_DOCUMENTS = "Documents";
+
+    /**
+     * Name of field <code>docstoinclude</code> for the XWiki class XAppClasses.XWikiApplicationClass. The list of
+     * document application contains that will be included in place of copy from wiki template.
+     */
+    public static final String FIELD_DOCSTOINCLUDE = "docstoinclude";
+
+    /**
+     * Pretty name of field <code>docstoinclude</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELDPN_DOCSTOINCLUDE = "Documents to include";
+
+    /**
+     * Name of field <code>docstolink</code> for the XWiki class XAppClasses.XWikiApplicationClass. The list of document
+     * application contains that will be linked in place of copy from wiki template.
+     */
+    public static final String FIELD_DOCSTOLINK = "docstolink";
+
+    /**
+     * Pretty name of field <code>docstolink</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELDPN_DOCSTOLINK = "Documents to link";
+
+    /**
+     * Name of field <code>translationdocs</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELD_TRANSLATIONDOCS = "translationdocs";
+
+    /**
+     * Pretty name of field <code>translationdocs</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELDPN_TRANSLATIONDOCS = "Translations documents";
+
+    // ///
+
     /**
      * Space of class document.
      */
     private static final String CLASS_SPACE_PREFIX = "XApp";
+
     /**
      * Prefix of class document.
      */
     private static final String CLASS_PREFIX = "XWikiApplication";
 
-    // ///
+    /**
+     * The default parent page of an application descriptor document.
+     */
+    private static final String DEFAULT_APPLICATION_PARENT = CLASS_SPACE_PREFIX + "Manager.WebHome";
 
     /**
-     * Name of field <code>appname</code>.
+     * The default application version of an application descriptor document.
      */
-    public static final String FIELD_appname = "appname";
-    /**
-     * Pretty name of field <code>appname</code>.
-     */
-    public static final String FIELDPN_appname = "Application Name";
+    private static final String DEFAULT_APPLICATION_VERSION = "1.0";
 
     /**
-     * Name of field <code>description</code>.
+     * Unique instance of XWikiApplicationClass.
      */
-    public static final String FIELD_description = "description";
-    /**
-     * Pretty name of field <code>description</code>.
-     */
-    public static final String FIELDPN_description = "Description";
+    private static XWikiApplicationClass instance;
 
     /**
-     * Name of field <code>version</code>.
+     * Construct the overload of AbstractXClassManager with spaceprefix={@link #CLASS_SPACE_PREFIX} and prefix=
+     * {@link #CLASS_PREFIX}.
      */
-    public static final String FIELD_appversion = "appversion";
-    /**
-     * Pretty name of field <code>version</code>.
-     */
-    public static final String FIELDPN_appversion = "Application Version";
+    protected XWikiApplicationClass()
+    {
+        super(CLASS_SPACE_PREFIX, CLASS_PREFIX);
+    }
 
     /**
-     * Name of field <code>dependencies</code>.
-     */
-    public static final String FIELD_dependencies = "dependencies";
-    /**
-     * Pretty name of field <code>dependencies</code>.
-     */
-    public static final String FIELDPN_dependencies = "Dependencies";
-
-    /**
-     * Name of field <code>applications</code>.
-     */
-    public static final String FIELD_applications = "applications";
-    /**
-     * Pretty name of field <code>applications</code>.
-     */
-    public static final String FIELDPN_applications = "Applications";
-
-    /**
-     * Name of field <code>documents</code>.
-     */
-    public static final String FIELD_documents = "documents";
-    /**
-     * Pretty name of field <code>documents</code>.
-     */
-    public static final String FIELDPN_documents = "Documents";
-
-    /**
-     * Name of field <code>docstoinclude</code>.
-     */
-    public static final String FIELD_docstoinclude = "docstoinclude";
-    /**
-     * Pretty name of field <code>docstoinclude</code>.
-     */
-    public static final String FIELDPN_docstoinclude = "Documents to include";
-
-    /**
-     * Name of field <code>docstolink</code>.
-     */
-    public static final String FIELD_docstolink = "docstolink";
-    /**
-     * Pretty name of field <code>docstolink</code>.
-     */
-    public static final String FIELDPN_docstolink = "Documents to link";
-    
-    /**
-     * Name of field <code>translationdocs</code>.
-     */
-    public static final String FIELD_translationdocs = "translationdocs";
-    /**
-     * Pretty name of field <code>translationdocs</code>.
-     */
-    public static final String FIELDPN_translationdocs = "Translations documents";
-
-    // ///
-
-    /**
-     * Unique instance of XWikiApplicationClass;
-     */
-    private static XWikiApplicationClass instance = null;
-
-    /**
-     * Return unique instance of XWikiApplicationClass and update documents for this context.
+     * Return unique instance of XWikiApplicationClass and update documents for this context. It also check if the
+     * corresponding XWiki class/template/sheet exist in context's database and create it if not.
      * 
-     * @param context Context.
-     * @return XWikiApplicationClass Instance of XWikiApplicationClass.
-     * @throws XWikiException
+     * @param context the XWiki context.
+     * @param check indicate if class existence has to be checked in the wiki.
+     * @return a unique instance of XWikiApplicationClass.
+     * @throws XWikiException error when checking for class, class template and class sheet.
      */
-    public static XWikiApplicationClass getInstance(XWikiContext context) throws XWikiException
+    public static XWikiApplicationClass getInstance(XWikiContext context, boolean check) throws XWikiException
     {
         synchronized (XWikiApplicationClass.class) {
-            if (instance == null)
+            if (instance == null) {
                 instance = new XWikiApplicationClass();
+            }
         }
 
-        instance.check(context);
+        if (check) {
+            instance.check(context);
+        }
 
         return instance;
     }
 
     /**
-     * Default constructor for XWikiApplicationClass.
+     * Return unique instance of XWikiApplicationClass and update documents for this context. It also check if the
+     * corresponding Xwiki class/template/sheet exist in context's database and create it if not.
+     * 
+     * @param context the XWiki context.
+     * @return a unique instance of XWikiApplicationClass.
+     * @throws XWikiException error when checking for class, class template and class sheet.
      */
-    private XWikiApplicationClass()
+    public static XWikiApplicationClass getInstance(XWikiContext context) throws XWikiException
     {
-        super(CLASS_SPACE_PREFIX, CLASS_PREFIX);
+        return getInstance(context, true);
     }
 
+    /**
+     * Indicate if the provided document contains application descriptor.
+     * 
+     * @param doc the document.
+     * @return true if the document contains an application descriptor, false otherwise.
+     */
+    public static boolean isApplication(XWikiDocument doc)
+    {
+        boolean isApplication = false;
+
+        try {
+            XWikiApplicationClass xclass = getInstance(null, false);
+            isApplication = xclass.isInstance(doc);
+        } catch (XWikiException e) {
+            Log.error("Fail to get unique instance of " + XWikiApplicationClass.class.getName(), e);
+        }
+
+        return isApplication;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#updateBaseClass(com.xpn.xwiki.objects.classes.BaseClass)
+     */
+    @Override
     protected boolean updateBaseClass(BaseClass baseClass)
     {
         boolean needsUpdate = super.updateBaseClass(baseClass);
 
-        needsUpdate |= baseClass.addTextField(FIELD_appname, FIELDPN_appname, 30);
-        needsUpdate |= baseClass.addTextAreaField(FIELD_description, FIELDPN_description, 40, 5);
-        needsUpdate |= baseClass.addTextField(FIELD_appversion, FIELDPN_appversion, 30);
-        
-        StaticListClass slc;
-        needsUpdate |= baseClass.addStaticListField(FIELD_dependencies, FIELDPN_dependencies, 80, true, "", "input");
+        needsUpdate |= baseClass.addTextField(FIELD_APPNAME, FIELDPN_APPNAME, 80);
+        needsUpdate |= baseClass.addTextField(FIELD_APPPRETTYNAME, FIELDPN_APPPRETTYNAME, 30);
+        needsUpdate |= baseClass.addTextAreaField(FIELD_DESCRIPTION, FIELDPN_DESCRIPTION, 40, 5);
+        needsUpdate |= baseClass.addTextField(FIELD_APPVERSION, FIELDPN_APPVERSION, 30);
 
-        // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
-        // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
-        // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_dependencies);
-        slc.setSeparators("|");
-        slc.setSeparator("|");
+        needsUpdate |= baseClass.addTextField(FIELD_APPAUTHORS, FIELDPN_APPAUTHORS, 30);
 
-        needsUpdate |= baseClass.addStaticListField(FIELD_applications, FIELDPN_applications, 80, true, "", "input");
+        needsUpdate |= baseClass.addTextField(FIELD_LICENSE, FIELDPN_LICENSE, 30);
 
-        // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
-        // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
-        // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_dependencies);
-        slc.setSeparators("|");
-        slc.setSeparator("|");
+        needsUpdate |=
+            baseClass.addStaticListField(FIELD_DEPENDENCIES, FIELDPN_DEPENDENCIES, 80, true, "", DEFAULT_FIELDDT,
+                DEFAULT_FIELDS);
 
-        needsUpdate |= baseClass.addStaticListField(FIELD_documents, FIELDPN_documents, 80, true, "", "input");
+        needsUpdate |=
+            baseClass.addStaticListField(FIELD_APPLICATIONS, FIELDPN_APPLICATIONS, 80, true, "", DEFAULT_FIELDDT,
+                DEFAULT_FIELDS);
 
-        // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
-        // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
-        // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_dependencies);
-        slc.setSeparators("|");
-        slc.setSeparator("|");
+        needsUpdate |=
+            baseClass.addStaticListField(FIELD_DOCUMENTS, FIELDPN_DOCUMENTS, 80, true, "", DEFAULT_FIELDDT,
+                DEFAULT_FIELDS);
 
-        needsUpdate |= baseClass.addStaticListField(FIELD_docstoinclude, FIELDPN_docstoinclude, 80, true, "", "input");
+        needsUpdate |=
+            baseClass.addStaticListField(FIELD_DOCSTOINCLUDE, FIELDPN_DOCSTOINCLUDE, 80, true, "", DEFAULT_FIELDDT,
+                DEFAULT_FIELDS);
 
-        // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
-        // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
-        // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_dependencies);
-        slc.setSeparators("|");
-        slc.setSeparator("|");
+        needsUpdate |=
+            baseClass.addStaticListField(FIELD_DOCSTOLINK, FIELDPN_DOCSTOLINK, 80, true, "", DEFAULT_FIELDDT,
+                DEFAULT_FIELDS);
 
-        needsUpdate |= baseClass.addStaticListField(FIELD_docstolink, FIELDPN_docstolink, 80, true, "", "input");
-
-        // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
-        // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
-        // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_dependencies);
-        slc.setSeparators("|");
-        slc.setSeparator("|");
-
-        needsUpdate |= baseClass.addStaticListField(FIELD_translationdocs, FIELDPN_translationdocs, 80, true, "", "input");
-
-        // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
-        // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
-        // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_dependencies);
-        slc.setSeparators("|");
-        slc.setSeparator("|");
+        needsUpdate |=
+            baseClass.addStaticListField(FIELD_TRANSLATIONDOCS, FIELDPN_TRANSLATIONDOCS, 80, true, "", DEFAULT_FIELDDT,
+                DEFAULT_FIELDS);
 
         return needsUpdate;
     }
 
-    private XWikiDocument getApplicationDocument(String appName, XWikiContext context,
-        boolean validate) throws XWikiException
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#updateClassTemplateDocument(com.xpn.xwiki.doc.XWikiDocument)
+     */
+    @Override
+    protected boolean updateClassTemplateDocument(XWikiDocument doc)
+    {
+        boolean needsUpdate = false;
+
+        if (!(DEFAULT_APPLICATION_PARENT).equals(doc.getParent())) {
+            doc.setParent(DEFAULT_APPLICATION_PARENT);
+            needsUpdate = true;
+        }
+
+        needsUpdate |= updateDocStringValue(doc, FIELD_APPVERSION, DEFAULT_APPLICATION_VERSION);
+
+        return needsUpdate;
+    }
+
+    /**
+     * Get the XWiki document descriptor of containing XAppClasses.XWikiApplication XWiki object with "appname" field
+     * equals to <code>appName</code>.
+     * 
+     * @param appName the name of the application.
+     * @param context the XWiki context.
+     * @param validate indicate if it return new {@link XWikiDocument} or throw exception if application descriptor does
+     *            not exist.
+     * @return the {@link XWikiDocument} representing application descriptor.
+     * @throws XWikiException error when searching for application descriptor document.
+     * @see #getApplication(String, XWikiContext, boolean)
+     */
+    protected XWikiDocument getApplicationDocument(String appName, XWikiContext context, boolean validate)
+        throws XWikiException
     {
         XWiki xwiki = context.getWiki();
 
-        List listApp = searchItemDocumentsByField(FIELD_appname, appName, StringProperty.class.getSimpleName(), context);
+        String[][] fieldDescriptors = new String[][] {{FIELD_APPNAME, StringProperty.class.getSimpleName(), appName}};
+        List<Object> parameterValues = new ArrayList<Object>();
+        String where = createWhereClause(fieldDescriptors, parameterValues);
 
-        if (listApp.size() == 0) {
-            if (validate)
-                throw new ApplicationManagerException(ApplicationManagerException.ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST,
-                    appName + " application does not exist");
-            else
-                return xwiki.getDocument(getItemDocumentDefaultFullName(appName, context),
-                    context);
+        List<XWikiDocument> listApp = context.getWiki().getStore().searchDocuments(where, parameterValues, context);
+
+        if (listApp.isEmpty()) {
+            if (validate) {
+                throw new ApplicationManagerException(ApplicationManagerException.ERROR_AM_DOESNOTEXIST,
+                    ApplicationManagerMessageTool.getDefault(context).get(
+                        ApplicationManagerMessageTool.ERROR_APPDOESNOTEXISTS, appName));
+            } else {
+                return xwiki.getDocument(getItemDocumentDefaultFullName(appName, context), context);
+            }
         }
 
-        return (XWikiDocument) listApp.get(0);
+        return listApp.get(0);
     }
 
-    public XWikiApplication getApplication(String appName, XWikiContext context, boolean validate)
+    /**
+     * Get the XWiki document descriptor of containing XAppClasses.XWikiApplication XWiki object with "appname" field
+     * equals to <code>appName</code>.
+     * 
+     * @param appName the name of the application.
+     * @param context the XWiki context.
+     * @param validate indicate if it return new XWikiDocument or throw exception if application descriptor does not
+     *            exist.
+     * @return the XWikiApplication representing application descriptor.
+     * @throws XWikiException error when searching for application descriptor document.
+     * @see #getApplicationDocument(String, XWikiContext, boolean)
+     */
+    public XWikiApplication getApplication(String appName, boolean validate, XWikiContext context)
         throws XWikiException
     {
-        return (XWikiApplication)newSuperDocument(getApplicationDocument(appName, context, validate), context);
+        XWikiDocument doc = getApplicationDocument(appName, context, validate);
+
+        int objectId = 0;
+        for (BaseObject obj : doc.getObjects(getClassFullName())) {
+            if (obj.getStringValue(FIELD_APPNAME).equalsIgnoreCase(appName)) {
+                break;
+            }
+
+            ++objectId;
+        }
+
+        if (objectId == doc.getObjects(getClassFullName()).size()) {
+            objectId = 0;
+        }
+
+        return newXObjectDocument(doc, objectId, context);
     }
-    
-    public ISuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context)
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#newXObjectDocument(com.xpn.xwiki.doc.XWikiDocument,
+     *      int, com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public XWikiApplication newXObjectDocument(XWikiDocument doc, int objId, XWikiContext context)
+        throws XWikiException
     {
-        return (ISuperDocument)doc.newDocument(XWikiApplication.class.getName(), context);
+        return new XWikiApplication(doc, objId, context);
     }
 }

@@ -23,21 +23,29 @@ package com.xpn.xwiki.plugin.tag;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.PluginApi;
 
 /**
- * API for the TagPlugin.
- * 
- * TagPlugin is a plugin that allows to manipulate tags easily.
- * It allows to get, rename and delete tags.
+ * API for the TagPlugin. TagPlugin is a plugin that allows to manipulate tags easily. It allows to get, rename and
+ * delete tags.
  * 
  * @see PluginApi
  * @version $Id$
  */
 public class TagPluginApi extends PluginApi<TagPlugin>
 {
+    /** Logging helper object. */
+    private static final Log LOG = LogFactory.getLog(TagPluginApi.class);
+
+    /** The required access level for modifying document tags. */
+    private static final String TAG_ACCESS_RIGHT = "edit";
+
     /**
      * XWiki Plugin API constructor.
      * 
@@ -49,121 +57,236 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     {
         super(plugin, context);
     }
-            
+
     /**
      * Get tags within the wiki.
      * 
      * @return list of tags.
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
-     * 
      */
     public List<String> getAllTags() throws XWikiException
     {
-        return this.getProtectedPlugin().getAllTags(context);
+        return this.getProtectedPlugin().getAllTags(this.context);
     }
-    
+
     /**
-     * Get tags within the wiki with their occurences counts.
+     * Get cardinality map of tags within the wiki.
      * 
      * @return map of tags with their occurences counts.
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
-     * 
      */
     public Map<String, Integer> getTagCount() throws XWikiException
     {
-        return this.getProtectedPlugin().getTagCount(context);
+        return this.getProtectedPlugin().getTagCount(this.context);
     }
-    
+
+    /**
+     * Get cardinality map of tags for a specific wiki space.
+     * 
+     * @param space the space to get tags in
+     * @return map of tags with their occurences counts
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 1.2
+     */
+    public Map<String, Integer> getTagCount(String space) throws XWikiException
+    {
+        return this.getProtectedPlugin().getTagCount(space, this.context);
+    }
+
+    /**
+     * Get cardinality map of tags matching an hql query. Examples of usage:
+     * <ul>
+     * <li>
+     * <code>
+     * $xwiki.tag.getTagCountForQuery("","doc.creator='XWiki.JohnDoe'")
+     * </code> will return the cardinality map of tags for documents created by user XWiki.JohnDoe</li>
+     * <li>
+     * <code>
+     * $xwiki.tag.getTagCountForQuery(", BaseObject as obj", 
+     *    "obj.name=doc.fullName and obj.className='Blog.BlogPostClass'")
+     * </code> will return the cardinality map of tags associated to blog post documents</li>
+     * <li>
+     * <code>
+     * $xwiki.tag.getTagCountForQuery("", "")
+     * </code> will return all tags within the wiki</li>
+     * </ul>
+     * 
+     * @param from the from fragment of the query
+     * @param where the where fragment from the query
+     * @return map of tags with their occurrences counts
+     * @throws XWikiException if search query fails (possible failures: DB access problems, incorrect query fragments).
+     * @since 1.2
+     * @see TagPluginApi#getTagCountForQuery(String, String, java.util.List)
+     */
+    public Map<String, Integer> getTagCountForQuery(String from, String where) throws XWikiException
+    {
+        return getTagCountForQuery(from, where, null);
+    }
+
+    /**
+     * Get cardinality map of tags matching an hql query (parametrized version). Example of usage:
+     * <ul>
+     * <li>
+     * <code>
+     * $xwiki.tag.getTagCountForQuery("", "doc.creator = ?", ["$!{request.creator}"])
+     * </code> will return the cardinality map of tags for documents created by user-provided creator name</li>
+     * </ul>
+     * 
+     * @param from the from fragment of the query
+     * @param where the parameterized where fragment from the query
+     * @param parameterValues list of parameter values for the query
+     * @return map of tags with their occurrences counts
+     * @throws XWikiException if search query fails (possible failures: DB access problems, incorrect query fragments).
+     * @since 1.18
+     */
+    public Map<String, Integer> getTagCountForQuery(String from, String where, List< ? > parameterValues)
+        throws XWikiException
+    {
+        return this.getProtectedPlugin().getTagCountForQuery(from, where, parameterValues, this.context);
+    }
+
     /**
      * Get all the documents containing the given tag.
      * 
      * @param tag tag to match.
      * @return list of pages.
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
-     * 
      */
     public List<String> getDocumentsWithTag(String tag) throws XWikiException
     {
-        return this.getProtectedPlugin().getDocumentsWithTag(tag, context);
+        return this.getProtectedPlugin().getDocumentsWithTag(tag, this.context);
     }
 
     /**
-     * Get tags from a document. 
-     *  
-     * @param fullName name of the document.
+     * Get tags from a document.
+     * 
+     * @param documentName name of the document.
      * @return list of tags.
      * @throws XWikiException if document read fails (possible failures: insufficient rights, DB access problems, etc).
-     * 
      */
-    public List<String> getTagsFromDocument(String fullName) throws XWikiException
+    public List<String> getTagsFromDocument(String documentName) throws XWikiException
     {
-        return this.getProtectedPlugin().getTagsFromDocument(fullName, context);
+        return this.getProtectedPlugin().getTagsFromDocument(documentName, this.context);
     }
-    
+
     /**
-     * Add a tag to a document.
-     * The document is saved (minor edit) after this operation.
+     * Add a tag to a document. The document is saved (minor edit) after this operation.
      * 
      * @param tag tag to set.
-     * @param fullName name of the document.
-     * @return true if the tag has been added, false if the tag was already present.
-     * @throws XWikiException if document save fails (possible failures: insufficient rights, DB access problems, etc). 
-     * 
+     * @param documentName name of the document.
+     * @return the {@link TagOperationResult result} of the operation
      */
-    public boolean addTagToDocument(String tag, String fullName)  throws XWikiException
+    public TagOperationResult addTagToDocument(String tag, String documentName)
     {
-        return this.getProtectedPlugin().addTagToDocument(tag, fullName, context);
+        TagOperationResult result;
+        try {
+            XWikiDocument document = this.context.getWiki().getDocument(documentName, this.context);
+            if (this.context.getWiki().checkAccess(TAG_ACCESS_RIGHT, document, this.context)) {
+                result = this.getProtectedPlugin().addTagToDocument(tag, document, this.context);
+            } else {
+                result = TagOperationResult.NOT_ALLOWED;
+            }
+        } catch (Exception ex) {
+            LOG.warn("Failed to add tag to document: " + ex.getMessage());
+            result = TagOperationResult.FAILED;
+        }
+        return result;
     }
-    
+
     /**
-     * Remove a tag from a document.
-     * The document is saved (minor edit) after this operation.
+     * Add a list of tags to a document. The document is saved (minor edit) after this operation
+     * 
+     * @param tags the comma separated list of tags to set; whitespace around the tags is stripped
+     * @param documentName the name of the target document
+     * @return the {@link TagOperationResult result} of the operation. {@link TagOperationResult#NO_EFFECT} is returned
+     *         only if all the tags were already set on the document, {@link TagOperationResult#OK} is returned even if
+     *         only some of the tags are new.
+     */
+    public TagOperationResult addTagsToDocument(String tags, String documentName)
+    {
+        TagOperationResult result;
+        try {
+            XWikiDocument document = this.context.getWiki().getDocument(documentName, this.context);
+            if (this.context.getWiki().checkAccess(TAG_ACCESS_RIGHT, document, this.context)) {
+                result = this.getProtectedPlugin().addTagsToDocument(tags, document, this.context);
+            } else {
+                result = TagOperationResult.NOT_ALLOWED;
+            }
+        } catch (Exception ex) {
+            LOG.warn("Failed to add tags to document: " + ex.getMessage());
+            result = TagOperationResult.FAILED;
+        }
+        return result;
+    }
+
+    /**
+     * Remove a tag from a document. The document is saved (minor edit) after this operation.
      * 
      * @param tag tag to remove.
-     * @param fullName name of the document.
-     * @return true if the tag has been removed, false if the tag was not present.
-     * @throws XWikiException if document save fails (possible failures: insufficient rights, DB access problems, etc). 
-     * 
+     * @param documentName name of the document.
+     * @return the {@link TagOperationResult result} of the operation
      */
-    public boolean removeTagFromDocument(String tag, String fullName) throws XWikiException
+    public TagOperationResult removeTagFromDocument(String tag, String documentName)
     {
-        return this.getProtectedPlugin().removeTagFromDocument(tag, fullName, context);
+        TagOperationResult result;
+        try {
+            XWikiDocument document = this.context.getWiki().getDocument(documentName, this.context);
+            if (this.context.getWiki().checkAccess(TAG_ACCESS_RIGHT, document, this.context)) {
+                result = this.getProtectedPlugin().removeTagFromDocument(tag, documentName, this.context);
+            } else {
+                result = TagOperationResult.NOT_ALLOWED;
+            }
+        } catch (Exception ex) {
+            LOG.warn("Failed to remove tag from document: " + ex.getMessage());
+            result = TagOperationResult.FAILED;
+        }
+        return result;
     }
-    
+
     /**
-     * Rename a tag in all the documents that contains it. Requires admin rights.
-     * Document containing this tag are saved (minor edit) during this operation.
+     * Rename a tag in all the documents that contains it. Requires admin rights. Document containing this tag are saved
+     * (minor edit) during this operation.
      * 
      * @param tag tag to rename.
      * @param newTag new tag.
-     * @return true if the rename has succeeded.
-     * @throws XWikiException if document save fails (possible failures: insufficient rights, DB access problems, etc).
-     * 
+     * @return the {@link TagOperationResult result} of the operation
      */
-    public boolean renameTag(String tag, String newTag) throws XWikiException
+    public TagOperationResult renameTag(String tag, String newTag)
     {
-        if (hasAdminRights()) {
-            return this.getProtectedPlugin().renameTag(tag, newTag, context);
-        } else {
-            return false;
+        TagOperationResult result;
+        try {
+            if (hasAdminRights()) {
+                result = this.getProtectedPlugin().renameTag(tag, newTag, this.context);
+            } else {
+                result = TagOperationResult.NOT_ALLOWED;
+            }
+        } catch (Exception ex) {
+            LOG.warn("Failed to rename tag: " + ex.getMessage());
+            result = TagOperationResult.FAILED;
         }
+        return result;
     }
-    
+
     /**
-     * Delete a tag from all the documents that contains it. Requires admin rights.
-     * Document containing this tag are saved (minor edit) during this operation.
+     * Delete a tag from all the documents that contains it. Requires admin rights. Document containing this tag are
+     * saved (minor edit) during this operation.
      * 
      * @param tag tag to delete.
-     * @return true if the delete has succeeded.
-     * @throws XWikiException if document save fails (possible failures: insufficient rights, DB access problems, etc).
-     * 
+     * @return the {@link TagOperationResult result} of the operation
      */
-    public boolean deleteTag(String tag)  throws XWikiException
-    {        
-        if (hasAdminRights()) {
-            return this.getProtectedPlugin().deleteTag(tag, context);
-        } else {  
-            return false;
+    public TagOperationResult deleteTag(String tag)
+    {
+        TagOperationResult result;
+        try {
+            if (hasAdminRights()) {
+                result = this.getProtectedPlugin().deleteTag(tag, this.context);
+            } else {
+                result = TagOperationResult.NOT_ALLOWED;
+            }
+        } catch (Exception ex) {
+            LOG.warn("Failed to delete tag: " + ex.getMessage());
+            result = TagOperationResult.FAILED;
         }
+        return result;
     }
 }

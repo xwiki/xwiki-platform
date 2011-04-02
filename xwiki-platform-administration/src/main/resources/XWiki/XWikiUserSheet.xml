@@ -168,6 +168,9 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
 
     init : function() {
       this.tabsContainer = $('vertical-tabs');
+      if (!this.tabsContainer) {
+        return;
+      }
       this.tabsContainer.select('.vertical-tab').each(function (tabElement) {
         if (!tabElement.__name) {
           tabElement.__name = tabElement.id.replace(/Tab$/, '');

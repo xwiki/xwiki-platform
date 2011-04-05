@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>CreatePost</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Blog.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1227218107000</creationDate>
+<date>1227681885000</date>
+<contentUpdateDate>1227681885000</contentUpdateDate>
+<version>1.1</version>
+<title>Create a new blog post</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>true</hidden>
+<content>{{include document="Blog.BlogCode"/}}
+
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
+#if($hasEdit)
+$xwiki.jsx.use($blogScriptsDocumentName)##
+##
+##
+##
+#set($name = "$!request.entryTitle")
+#if($name == '')
+  ## First step, display the create form
+  #set($space = "$!request.entrySpace")
+  #if($space == '')
+    #set($space = $doc.space)
+  #end
+  &lt;form action="${xwiki.getURL('Blog.CreatePost', 'view', 'xpage=plain')}" id="newBlogPost" method="post" class="xformInline"&gt;
+  &lt;div&gt;
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+    &lt;input type="hidden" name="entrySpace" value="$!{escapetool.xml($space)}"/&gt;
+    #if($doc.getObject($blogCategoryClassname))
+      &lt;input type="hidden" name="category" value="${escapetool.xml(${doc.fullName})}"/&gt;
+    #end
+    &lt;label class="createPost" for="entryTitle"&gt;$msg.get('xe.blog.post.createpost') &lt;/label&gt;&lt;input type="text" id="entryTitle" name="entryTitle" value="$msg.get('xe.blog.post.title')" class="withTip" size="30" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="${escapetool.xml($msg.get('xe.blog.post.create'))}" class="button"/&gt;&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;/form&gt;
+#else
+  ## Second step, form submitted, create the document
+  #set($space = "$!request.entrySpace")
+  #if($space == '')
+    #set($space = 'Main')
+  #end
+  ## Remove . and : from the document name, as they have a special meaning in XWiki document names
+  #set($postDocName = "${space}.${name.replaceAll('[.:]', '')}")
+  ## Get the target blog document, to set it as the parent
+  #getBlogDocument($space $blogDoc)
+  #set($parent = $blogDoc.fullName)
+  #set($title = "$!{escapetool.url($name)}")
+  #if("$!request.category" != '')
+    #set($category = "&amp;${blogPostClassname}_${blogPostObjectNumber}_category=${escapetool.url(${request.category})}")
+  #end
+  $response.sendRedirect($xwiki.getURL($postDocName, 'inline', "template=${blogPostTemplate}&amp;parent=${parent}&amp;title=${title}&amp;${blogPostClassname}_0_title=${title}$!{category}&amp;form_token=$!{request.getParameter('form_token')}"))
+#end## name == ''
+#elseif("$!request.entryTitle" != '')## !hasEdit &amp;&amp; form submitted
+  #template('accessdenied.vm')
+#end## hasEdit
+{{/html}}
+{{/velocity}}</content>
+</xwikidoc>

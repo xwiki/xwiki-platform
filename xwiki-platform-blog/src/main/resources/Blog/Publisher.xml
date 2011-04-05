@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>Publisher</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Blog.WenHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1226240773000</creationDate>
+<date>1227675504000</date>
+<contentUpdateDate>1227675504000</contentUpdateDate>
+<version>1.1</version>
+<title>Publish blog posts</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>true</hidden>
+<content>{{include document="Blog.BlogCode"/}}
+
+{{velocity output="false"}}
+#set($xredirect = "$!{request.xredirect}")
+#if($xredirect == '')
+  #set($xredirect = $xwiki.getURL('Blog.WebHome'))
+#end
+#set($entryName = "$!{request.entryName}")
+#if($entryName != '')
+  #if($xwiki.hasAccessLevel('edit', $xcontext.user, $entryName) &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+    #set($entryDoc = $xwiki.getDocument($entryName))
+    #if ($entryDoc)
+      #getEntryObject($entryDoc $entryObj)
+      #if("$!{entryObj.getProperty('published').value}" == '0')
+        #set($discard = $entryObj.set('hidden', 0))
+        #set($discard = $entryObj.set('published', 1))
+        ## Uncomment if you want to always set the publication date to the date when the post was actually published.
+        ## #set($discard = $entryObj.set('publishDate', $util.date))
+        $entryDoc.save($msg.get('xe.blog.publisher.published'))
+      #end
+    #end
+  #end
+#end
+$response.sendRedirect($xredirect)
+{{/velocity}}</content>
+</xwikidoc>

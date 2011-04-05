@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>RssCode</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Blog.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1229906880000</creationDate>
+<date>1229907556000</date>
+<contentUpdateDate>1229907556000</contentUpdateDate>
+<version>1.1</version>
+<title>Macros for displaying Blog-related RSS feeds</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>true</hidden>
+<content>{{include document="Blog.BlogCode"/}}
+
+{{velocity output="false"}}
+##
+##
+##
+#**
+ * Display a blog as a RSS feed. The output corresponds to the RSS 1.0 specification, and it makes use of the Dublin
+ * Core module to specify metadata.
+ * 
+ * @param blogDoc The XDocument corresponding to the blog to be syndicated.
+ * @param entries The entries to display. Usually, these are the last entries belonging to the blog.
+ *###
+#macro(displayBlogRss $blogDoc $entries)
+  ## Create a Jodatime date formatter that will be used to format dates
+  #set($dateFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern("yyyy-MM-dd'T'hh:mm:ssZZ"))
+  ## Set the right mimetype
+  $!response.setContentType('application/rss+xml')##
+  #setBlogRssCacheSettings()
+  #printBlogRssHeader()
+  #printBlogRssChannelDescription($blogDoc $entries)
+  #printBlogRssImage($blogDoc)
+  #printBlogRssItems($entries)
+  #printBlogRssFooter()
+#end
+##
+##
+##
+#**
+ * Display blog entries from all the wiki as a RSS feed. The output corresponds to the RSS 1.0 specification, and it
+ * makes use of the Dublin Core module to specify metadata.
+ * 
+ * @param entries The entries to display. Usually, these are the last entries belonging to the blog.
+ *###
+#macro(displayGlobalBlogRss $entries)
+  ## Create a Jodatime date formatter that will be used to format dates
+  #set($dateFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern("yyyy-MM-dd'T'hh:mm:ssZZ"))
+  ## Set the right mimetype
+  $!response.setContentType('application/rss+xml')##
+  #setBlogRssCacheSettings()
+  #printBlogRssHeader()
+  #printGlobalBlogRssChannelDescription($entries)
+  #printWikiRssImage($blogDoc)
+  #printBlogRssItems($entries)
+  #printBlogRssFooter()
+#end
+##
+##
+##
+#**
+ * Display blog entries belonging to a target category as a RSS feed. The output corresponds to the RSS 1.0
+ * specification, and it makes use of the Dublin Core module to specify metadata.
+ * 
+ * @param blogDoc The XDocument corresponding to the blog to be syndicated.
+ * @param categoryDoc The XDocument corresponding to the blog category to be syndicated.
+ * @param entries The entries to display. Usually, these are the last entries belonging to the blog.
+ *###
+#macro(displayBlogCategoryRss $blogDoc $categoryDoc $entries)
+  ## Create a Jodatime date formatter that will be used to format dates
+  #set($dateFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern("yyyy-MM-dd'T'hh:mm:ssZZ"))
+  ## Set the right mimetype
+  $!response.setContentType('application/rss+xml')##
+  #setBlogRssCacheSettings()
+  #printBlogRssHeader()
+  #printBlogCategoryRssChannelDescription($categoryDoc $entries)
+  #printBlogRssItems($entries)
+  #printBlogRssFooter()
+#end
+##
+##
+##
+#**
+ * Set the proper cache settings, both for the client (HTTP headers) and for the server (rendering cache).
+ *###
+#macro(setBlogRssCacheSettings)
+  ## Internally cache the rendered RSS for 30 minutes, for better performance
+  ## TODO: This is disabled for security reasons. Since the cache doesn't take into account the current user, it might
+  ## serve hidden/unpublished entries to non-creators.
+  ## $!xcontext.setCacheDuration(1800)
+  ## Instruct the client to cache the response for 1 hour
+  #set($expires = $xwiki.jodatime.getMutableDateTime())##
+  $!expires.addHours(1)##
+  ## TODO: This has no effect, as the core contains a no-cache setting in com.xpn.xwiki.web.Utils
+  $!response.setDateHeader('Expires', $expires.millis)##
+  $!response.setHeader('Cache-Control', 'public')##
+#end
+##
+##
+##
+#**
+ * Print the start of the RSS: XML declaration and open root element.
+ *###
+#macro(printBlogRssHeader)
+  &lt;?xml version="1.0" encoding="$xwiki.encoding" ?&gt;
+  &lt;rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/"&gt;
+#end
+##
+##
+##
+#**
+ * Print the blog channel description: title, link, description, logo, creator, copyright, and the list of entries.
+ * 
+ * @param blogDoc The XDocument corresponding to the blog to be displayed.
+ * @param entries The entries to display. Usually, these are the last entries belonging to the blog.
+ *###
+#macro(printBlogRssChannelDescription $blogDoc $entries)
+  &lt;channel rdf:about="$blogDoc.getURL()"&gt;
+    #getBlogTitle($blogDoc $title)
+    &lt;title&gt;$title&lt;/title&gt;
+    &lt;link&gt;$blogDoc.getExternalURL()&lt;/link&gt;
+    ## TODO: Add a Description field in the blog class
+    &lt;description&gt;Most recent blog posts in the $blogDoc.space space&lt;/description&gt;
+    #getWikiLogo($logoUrl)
+    &lt;image rdf:resource="$logoUrl"/&gt;
+    &lt;dc:language&gt;$blogDoc.defaultLanguage&lt;/dc:language&gt;
+    &lt;dc:rights&gt;$escapetool.xml($xwiki.spaceCopyright)&lt;/dc:rights&gt;
+    ## TODO: Usually this is not something meaningful. Maybe add some Blog object properties for these.
+    ## &lt;dc:publisher&gt;$escapetool.xml($xwiki.getUserName($blogDoc.author, false))&lt;/dc:publisher&gt;
+    ## &lt;dc:creator&gt;$escapetool.xml($xwiki.getUserName($blogDoc.creator, false))&lt;/dc:creator&gt;
+    &lt;items&gt;
+      &lt;rdf:Seq&gt;
+      ## This is just a list of blog entries, which are detailed below.
+      #foreach ($entryDoc in $entries)
+        #if($xwiki.hasAccessLevel('view', ${entryDoc.fullName}))
+        &lt;rdf:li rdf:resource="$entryDoc.getExternalURL('view', "language=${entryDoc.realLanguage}")" /&gt;
+        #end
+      #end
+      &lt;/rdf:Seq&gt;
+    &lt;/items&gt;
+  &lt;/channel&gt;
+#end
+##
+##
+##
+#**
+ * Print the wiki-wide channel description: title, link, description, logo, creator, copyright, and the list of entries.
+ * 
+ * @param entries The entries to display. Usually, these are the last entries published in the wiki.
+ *###
+#macro(printGlobalBlogRssChannelDescription $entries)
+  ## TODO: Replace hardcoded Main.WebHome with a setting once the core provides this information.
+  #set($mainDoc = $xwiki.getDocument('Main.WebHome'))
+  &lt;channel rdf:about="$mainDoc.getExternalURL()"&gt;
+    &lt;title&gt;$escapetool.xml($mainDoc.plainTitle)&lt;/title&gt;
+    &lt;link&gt;$mainDoc.getExternalURL()&lt;/link&gt;
+    ## TODO: Add a Description field in the blog class
+    &lt;description&gt;Most recent blog posts in the wiki&lt;/description&gt;
+    #getWikiLogo($logoUrl)
+    &lt;image rdf:resource="$logoUrl"/&gt;
+    &lt;dc:rights&gt;$escapetool.xml($xwiki.spaceCopyright)&lt;/dc:rights&gt;
+    &lt;dc:publisher&gt;XWiki&lt;/dc:publisher&gt;
+    &lt;items&gt;
+      &lt;rdf:Seq&gt;
+      ## This is just a list of blog entries, which are detailed below.
+      #foreach ($entryDoc in $entries)
+        #if($xwiki.hasAccessLevel('view', ${entryDoc.fullName}))
+        &lt;rdf:li rdf:resource="$entryDoc.getExternalURL('view', "language=${entryDoc.realLanguage}")" /&gt;
+        #end
+      #end
+      &lt;/rdf:Seq&gt;
+    &lt;/items&gt;
+  &lt;/channel&gt;
+#end
+##
+##
+##
+#**
+ * Print the blog channel description: title, link, description, logo, creator, copyright, and the list of entries.
+ * 
+ * @param blogDoc The XDocument corresponding to the blog to be displayed.
+ * @param entries The entries to display. Usually, these are the last entries belonging to the blog.
+ *###
+#macro(printBlogCategoryRssChannelDescription $categoryDoc $entries)
+  &lt;channel rdf:about="$categoryDoc.getURL()"&gt;
+    &lt;title&gt;$categoryDoc.display('name')&lt;/title&gt;
+    &lt;link&gt;$categoryDoc.getExternalURL()&lt;/link&gt;
+    ## TODO: Add a Description field in the blog class
+    &lt;description&gt;Most recent blog posts in the $categoryDoc.display('name') category&lt;/description&gt;
+    &lt;dc:rights&gt;$escapetool.xml($xwiki.spaceCopyright)&lt;/dc:rights&gt;
+    &lt;items&gt;
+      &lt;rdf:Seq&gt;
+      ## This is just a list of blog entries, which are detailed below.
+      #foreach ($entryDoc in $entries)
+        #if($xwiki.hasAccessLevel('view', ${entryDoc.fullName}))
+        &lt;rdf:li rdf:resource="$entryDoc.getExternalURL('view', "language=${entryDoc.realLanguage}")" /&gt;
+        #end
+      #end
+      &lt;/rdf:Seq&gt;
+    &lt;/items&gt;
+  &lt;/channel&gt;
+#end
+##
+##
+##
+#**
+ * Print the blog image description. Currently, this is the logo of the wiki.
+ * 
+ * @param blogDoc The XDocument corresponding to the displayed blog.
+ *###
+#macro(printBlogRssImage $blogDoc)
+  #getWikiLogo($logoUrl)
+  &lt;image rdf:about="$logoUrl"&gt;
+    &lt;title&gt;Wiki Logo&lt;/title&gt;
+    &lt;url&gt;$logoUrl&lt;/url&gt;
+    &lt;link&gt;$blogDoc.getExternalURL()&lt;/link&gt;
+  &lt;/image&gt;
+#end
+##
+##
+##
+#**
+ * Print the syndicated blog entries. These are the detailed "item"s, which must be referenced above, in the channel
+ * description, as otherwise they are ignored.
+ * 
+ * @param entries The entries to display. Usually, these are the last entries belonging to the blog.
+ *###
+#macro(printBlogRssItems $entries)
+  ## Print all the entry details
+  #foreach ($entryDoc in $entries)
+    #if($xwiki.hasAccessLevel('view', ${entryDoc.fullName}))
+      #printBlogRssItem($entryDoc)
+    #end
+  #end
+#end
+##
+##
+##
+#**
+ * Print a blog entry in the RSS feed. besides the mandatory RSS elements (title, link, and description), also print
+ * some metadata in the Dublin Core vocabulary (creator, categories, date).
+ * 
+ * @param entryDoc The XDocument corresponding to the displayed blog entry.
+ *###
+#macro(printBlogRssItem $entryDoc)
+  #set($entryUrl = $entryDoc.getExternalURL('view', "language=${entryDoc.realLanguage}"))
+  #getEntryObject($entryDoc $entryObj)
+  #getEntryContent($entryDoc $entryObj true $entryContent)
+  #if($!entryDoc.syntax.toIdString() == 'xwiki/1.0')
+    #set($desc = $entryContent)
+  #else
+    #set($desc = $entryDoc.getRenderedContent($entryContent, $entryDoc.getSyntax().toIdString()))
+  #end
+  #set($desc = $escapetool.xml($desc))
+  &lt;item rdf:about="$entryUrl"&gt;
+    &lt;title&gt;$escapetool.xml($entryDoc.display("title", "view", $entryObj))&lt;/title&gt;
+    &lt;link&gt;$entryUrl&lt;/link&gt;
+    &lt;description&gt;$desc&lt;/description&gt;
+    ## Some metadata, using the Dublin Core extension to RSS.
+    ## TODO: Display this in a better way.
+    &lt;dc:subject&gt;$escapetool.xml($entryObj.display('category', 'view'))&lt;/dc:subject&gt;
+    &lt;dc:date&gt;$dateFormatter.print($entryDoc.date.time)&lt;/dc:date&gt;
+    &lt;dc:creator&gt;$escapetool.xml($xwiki.getUserName($entryDoc.creator, false))&lt;/dc:creator&gt;
+    #if($entryDoc.creator != $entryDoc.author)
+      &lt;dc:contributor&gt;
+        &lt;rdf:Description link="$xwiki.getURL($entryDoc.author)"&gt;
+          &lt;rdf:value&gt;$escapetool.xml($xwiki.getUserName($entryDoc.author, false))&lt;/rdf:value&gt;
+        &lt;/rdf:Description&gt;
+      &lt;/dc:contributor&gt;
+    #end
+  &lt;/item&gt;
+#end
+##
+##
+##
+#**
+ * Print the end of the RSS: close the root element.
+ *###
+#macro(printBlogRssFooter)
+  &lt;/rdf:RDF&gt;
+#end
+##
+##
+##
+#**
+ * Normally, this should be a Template eXtension, which would be used to display a blog as a RSS feed. Since TX are not
+ * yet implemented, the target blog should be passed in the URL. This macro determines exactly which blog should be
+ * syndicated. If the "blog" request parameter is not present, then the default Blog is used.
+ * 
+ * @param blogDoc The resulting XDocument of the target blog.
+ *###
+#macro(getTargetBlog $blogDoc)
+  #if("$!{request.blog}" != '')
+    #set($result = $xwiki.getDocument($request.blog))
+  #else
+    #getBlogDocument('Blog' $result)
+  #end
+  #set ($blogDoc = $util.null)
+  #setVariable ("$blogDoc" $result)
+  ## TODO: Check if the document has a Blog.BlogClass object.
+#end
+##
+##
+##
+#macro(printFieldContent $entryDoc $entryObj $fieldName)
+$escapetool.xml($entryDoc.display($fieldName, 'view', $entryObj))#end
+##
+##
+##
+#macro(getWikiLogo $logoUrl)
+  #set ($path = $xwiki.getSkinFile($xwiki.getSkinPreference('logo', 'logo.png')))
+  #set ($port = '')
+  #if (($request.scheme == 'http') &amp;&amp; ($request.serverPort != 80))
+    #set ($port = ":${request.serverPort}")
+  #elseif (($request.scheme == 'https') &amp;&amp; ($request.serverPort != 443))
+    #set ($port = ":${request.serverPort}")
+  #end
+  #set ($logoUrl = $util.null)
+  #setVariable ("$logoUrl" "${request.scheme}://${request.serverName}${port}${path}")
+#end
+{{/velocity}}</content>
+</xwikidoc>

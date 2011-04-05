@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>BlogScripts</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>Blog.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1226272589000</creationDate>
+<date>1227681663000</date>
+<contentUpdateDate>1227681663000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>true</hidden>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>onDemand=On demand|always=Always</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>Blog.BlogScripts</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>fee8479f-4003-4fb8-837a-97642e3ff753</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>## includeMacros outputs a {pre}{/pre}, which normally is consumed by Radeox, but since the skin extensions are not
+## rendered, this would remain in the source as invalid JavaScript code, which causes the whole extension to fail. The
+## workaround is to wrap it in a comment, which will be discarded when minimizing the output.
+/* #includeMacros("Blog.BlogParameters") */
+
+if(typeof(XWiki) == 'undefined') {
+  XWiki = new Object();
+}
+XWiki.Blog = {
+  blogToolsValues: {
+    show: {
+      title: "This blog post is not visible to other users. Make it visible",
+      imageSrc: "$xwiki.getSkinFile('icons/silk/lock_open.gif')",
+      imageAlt: "show",
+      comment: "Made%20entry%20visible"
+    },
+    hide: {
+      title: "Hide this blog post from other users",
+      imageSrc: "$xwiki.getSkinFile('icons/silk/lock.gif')",
+      imageAlt: "hide",
+      comment: "Hidden%20entry"
+    },
+    loading: {
+      title: "Loading...",
+      imageSrc: "$xwiki.getSkinFile('icons/xwiki/spinner.gif')",
+      imageAlt: "loading"
+    }
+  },
+
+  initialize : function() {
+    XWiki.Blog.addBehaviorToBlogTools();
+  },
+
+  addBehaviorToBlogTools : function() {
+    $$(".blog-tool-hide").each(function(button) {
+      button.blogCallback = XWiki.Blog.makeEntryInvisible.bindAsEventListener(button);
+    });
+    $$(".blog-tool-show").each(function(button) {
+      button.blogCallback = XWiki.Blog.makeEntryVisible.bindAsEventListener(button);
+    });
+    $$(".blog-tool-show, .blog-tool-hide").each(function(button) {
+      button.href = button.href.replace(/&amp;xredirect=.*?(&amp;|$)/, "&amp;ajax=1$1");
+      Event.observe(button, "click", XWiki.Blog.linkDisabler.bindAsEventListener(button));
+      Event.observe(button, "click", button.blogCallback);
+    });
+    var addCategoryButton = $("blog_AddCategoryButton");
+    if (addCategoryButton) {
+      Event.observe(addCategoryButton, "click", XWiki.Blog.createBlogCategory.bindAsEventListener(addCategoryButton.form));
+    }
+  },
+
+  makeEntryInvisible : function(event) {
+    Event.stopObserving(this, "click", this.blogCallback);
+    XWiki.Blog.setToolLoadingStatus(this, XWiki.Blog.blogToolsValues.loading);
+    new Ajax.Request(this.href, {
+      method: "get",
+      onSuccess: XWiki.Blog.onEntryMadeInvisible.bind(this),
+      on1223: function(response) {response.request.options.onSuccess(response)},
+      on403: function() {alert("You are not allowed to perform this action")},
+      on401: function() {alert("You have been logged out, please login")},
+      onFailure: function() {alert("Failed to change blog post visibility")}
+    });
+  },
+  makeEntryVisible : function(event) {
+    Event.stopObserving(this, "click", this.blogCallback);
+    XWiki.Blog.setToolLoadingStatus(this, XWiki.Blog.blogToolsValues.loading);
+    new Ajax.Request(this.href, {
+      method: "get",
+      onSuccess: XWiki.Blog.onEntryMadeVisible.bind(this),
+      on1223: function(response) {response.request.options.onSuccess(response)},
+      on403: function() {alert("You are not allowed to perform this action")},
+      on401: function() {alert("You have been logged out, please login")},
+      onFailure: function() {alert("Failed to change blog post visibility")}
+    });
+  },
+  onEntryMadeVisible : function() {
+    var entry = XWiki.Blog.getEntry(this);
+    if (entry) {
+      XWiki.Blog.setEntryVisibility(entry, true);
+    }
+    XWiki.Blog.updateShowHideButton(this, XWiki.Blog.blogToolsValues.hide);
+    this.blogCallback = XWiki.Blog.makeEntryInvisible.bindAsEventListener(this);
+    Event.observe(this, "click", this.blogCallback);
+    $$(".entry-content").each(function(content) {
+      content.previous(".warningmessage").hide();
+    });
+  },
+  onEntryMadeInvisible : function() {
+    var entry = XWiki.Blog.getEntry(this);
+    if (entry &amp;&amp; !entry.hasClassName("single-article")) {
+      XWiki.Blog.setEntryVisibility(entry, false);
+    }
+    XWiki.Blog.updateShowHideButton(this, XWiki.Blog.blogToolsValues.show);
+    this.blogCallback = XWiki.Blog.makeEntryVisible.bindAsEventListener(this);
+    Event.observe(this, "click", this.blogCallback);
+    $$(".entry-content").each(function(content) {
+      if(content.previous(".warningmessage")) {
+        content.previous(".warningmessage").show();
+      } else {
+        // &lt;div class="warningmessage"&gt;&lt;span class="messagetype"&gt;Warning: &lt;/span&gt;This blog post is hidden.&lt;/div&gt;
+        var wrapper = document.createElement("div").addClassName("warningmessage");
+        var label = document.createElement("span").addClassName("messagetype");
+        label.appendChild(document.createTextNode("Warning: "));
+        wrapper.appendChild(label);
+        wrapper.appendChild(document.createTextNode("This blog post is hidden."));
+        content.up().insertBefore(wrapper, content);
+      }
+    });
+  },
+
+  updateShowHideButton : function(button, resources) {
+    button.title = resources.title;
+    button.down("img").src = resources.imageSrc;
+    button.down("img").alt = resources.alt;
+    button.href = button.href.replace(/&amp;comment=(.*?)(&amp;|$)/, "&amp;comment=" + resources.comment + "$2");
+    if (button.href.match(/_hidden=1/)) {
+      button.href = button.href.replace(/_hidden=1/, "_hidden=0");
+    } else {
+      button.href = button.href.replace(/_hidden=0/, "_hidden=1");
+    }
+  },
+  getEntry : function(startElement) {
+    return startElement.up(".hentry");
+  },
+  setEntryVisibility : function(entry, visible) {
+    if (visible) {
+      entry.removeClassName("hidden-article");
+    } else {
+      entry.addClassName("hidden-article");
+    }
+  },
+  setToolLoadingStatus : function(button, resources) {
+    button.title = resources.title;
+    button.down("img").src = resources.imageSrc;
+    button.down("img").alt = resources.alt;
+  },
+  linkDisabler : function(event) {
+    Event.stop(event);
+  },
+  createBlogCategory : function() {
+    var name = this.newCategoryName.value;
+    var safeName = encodeURI(name.replace(/'/g, "").replace(/"/g, ""));
+    var title = encodeURI(name);
+    var parentCategory = this.newCategoryParent.value;
+    var parentSpace = encodeURI(parentCategory.substring(0, parentCategory.indexOf(".")));
+    var parent = encodeURI(parentCategory);
+    new Ajax.Request("${xwiki.getURL('__name__', 'save', "ajax=1&amp;template=${blogCategoryTemplate}&amp;form_token=$!{services.csrf.getToken()}")}".replace(/__name__/g, safeName) + "&amp;parent=" + parent + "&amp;title=" + title + "&amp;${blogCategoryClassname}_0_name=" + title, {
+      method: "get",
+      onSuccess: XWiki.Blog.updateCategoryTree.bindAsEventListener(this, name, parentCategory, parentSpace),
+      on1223: function(response) {response.request.options.onSuccess(response)},
+      on409: function() {alert("This category already exists")},
+      on403: function() {alert("You are not allowed to perform this action")},
+      on401: function() {alert("You have been logged out, please login")},
+      onFailure: function() {alert("Failed to add category")}
+    });
+  },
+
+  updateCategoryTree : function(event, name, parentCategory, parentSpace) {
+    var parentElement = $("blog_category_" + parentCategory);
+    if (!parentElement) {
+      parentElement = $("blog_category_container");
+    } else {
+      parentElement = parentElement.up();
+    }
+    var parentUl = parentElement.down("ul");
+    if (!parentUl) {
+      parentUl = document.createElement("ul");
+      parentElement.appendChild(parentUl);
+    }
+    var children = parentUl.childElements();
+    var found = false;
+    var myId = "blog_category_" + parentSpace + "." + name;
+    var li = document.createElement("li");
+    var label = document.createElement("label");
+    label.id = myId;
+    li.appendChild(label);
+    var checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = "checked";
+    checkbox.name = "${blogPostClassname}_0_category";
+    checkbox.value = parentSpace + "." + name;
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(" " + name));
+    var option = document.createElement("option");
+    option.id = myId + "_option";
+    option.value = parentSpace + "." + name;
+    var depth = 0;
+    var tmpParent = parentElement;
+    while(tmpParent &amp;&amp; tmpParent != $("blog_category_container")) {
+      depth++;
+      tmpParent = tmpParent.up("li");
+    }
+    option.appendChild(document.createTextNode("&amp;nbsp;".unescapeHTML().times(2*depth) + name)); // TODO: Indent
+    var selectBox = $("blog_category_selectBox");
+    for (var i = 0; i &lt; children.size(); ++i) {
+      if (children[i].down("label").id &gt; myId) {
+        parentUl.insertBefore(li, children[i]);
+        var optionSibling = $(children[i].down("label").id + "_option");
+        selectBox.insertBefore(option, optionSibling);
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      parentUl.appendChild(li);
+      var tmpParent = parentElement;
+      var optionAfter;
+      while (!optionAfter &amp;&amp; tmpParent) {
+        optionAfter = tmpParent.next("li");
+        tmpParent = tmpParent.up("li")
+      }
+      if (optionAfter) {
+        selectBox.insertBefore(option, $(optionAfter.down("label").id + "_option"));
+      } else {
+        selectBox.appendChild(option);
+      }
+    }
+  }
+}
+
+function publishEntry(publishServiceName, blogPostName, sourceElement) {
+  new Ajax.Request("${xwiki.getURL('__name__', 'view', '')}".replace(/__name__/g, publishServiceName) + "?entryName=" + blogPostName, {method: "get", onSuccess: function() {alert("done");
+  sourceElement.parentNode.removeChild(sourceElement);}});
+  return false;
+}
+document.observe("dom:loaded", XWiki.Blog.initialize);</code>
+</property>
+<property>
+<name>Blog enhancement scripts</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<content></content>
+</xwikidoc>

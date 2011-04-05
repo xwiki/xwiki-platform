@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>BlogParameters</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Blog.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1226707953000</creationDate>
+<date>1227679304000</date>
+<contentUpdateDate>1227679304000</contentUpdateDate>
+<version>1.1</version>
+<title>Constants and variables for the Blog application</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>true</hidden>
+<content>{{velocity output="false"}}
+## Blog
+#set($blogClassname = 'Blog.BlogClass')
+#set($blogTemplate = 'Blog.BlogTemplate')
+#set($blogSheet = 'Blog.BlogSheet')
+## Blog entries
+#set($blogPostClassname = 'Blog.BlogPostClass')
+#set($blogPostTemplate = 'Blog.BlogPostTemplate')
+#set($blogPostSheet = 'Blog.BlogPostSheet')
+#set($blogPostObjectNumber = $xwiki.getDocument($blogPostTemplate).getObject($blogPostClassname).number)
+#set($oldArticleClassname = 'XWiki.ArticleClass')
+## Categories
+#set($blogCategoryClassname = 'Blog.CategoryClass')
+#set($blogCategoryTemplate = 'Blog.CategoryTemplate')
+#set($blogCategorySheet = 'Blog.CategorySheet')
+#set($oldBlogCategoryClassname = 'Blog.Categories')
+#set($defaultCategoryParent = 'Blog.Categories')
+## Style
+#set($blogStyleDocumentName = 'Blog.BlogStyle')
+#set($blogStyleDocument = $xwiki.getDocument($blogStyleDocumentName))
+## Clientside scripts
+#set($blogScriptsDocumentName = 'Blog.BlogScripts')
+#set($blogPublisher = $xwiki.getDocument('Blog.Publisher'))
+## Misc
+#set($thisURL = $doc.getURL($xcontext.action, $request.queryString))
+##
+##
+##
+#**
+ * Displays an image, taken from the blog style document.
+ * 
+ * @param $imgName The name of the icon to use (without the extension).
+ * @param alt The alternate text that should be displayed when images are not viewable.
+ *#
+#macro(toolImage $imgName $alt)&lt;img class="icon-manage" src="$xwiki.getSkinFile("icons/silk/${imgName}.gif")" alt="${alt}"/&gt;#end
+{{/velocity}}</content>
+</xwikidoc>

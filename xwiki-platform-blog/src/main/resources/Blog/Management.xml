@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>Management</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Blog.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1227677018000</creationDate>
+<date>1227680561000</date>
+<contentUpdateDate>1227680561000</contentUpdateDate>
+<version>1.1</version>
+<title>Manage blogs on this wiki</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>true</hidden>
+<content>{{include document="Blog.BlogCode"/}}
+
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
+#if($hasAdmin)
+##
+##
+## List existing blogs.
+## TODO: Display the number of articles in each blog
+## TODO: Provide some management links: delete, edit title, configure...
+##
+= $msg.get('xe.blog.manage.existing') =
+
+#foreach($item in $xwiki.wrapDocs($xwiki.searchDocuments(", BaseObject obj where obj.name = doc.fullName and obj.className = '$blogClassname'")))
+  #getBlogTitle($item $title)
+  #if($title != '')
+    * [[$title&gt;&gt;$item.fullName]]
+  #else
+    * [[$item.displayTitle&gt;&gt;$item.fullName]]
+&lt;p/&gt;
+  #end
+#end
+##
+##
+## New blog
+##
+
+= $msg.get('xe.blog.manage.createnew') =
+
+#set($title = "$!request.blogTitle")
+#if($title != '')
+  #set($space = "$!request.blogSpace")
+  #if($space == '')
+    #warning($msg.get('xe.blog.manage.nospace'))
+  #else
+    #if("$!request.blogType" == 'main')
+      #set($blogDocName = "${space}.WebHome")
+    #else
+      #set($blogDocName = "${space}.Blog")
+    #end
+    #set($title = $escapetool.url($title))
+    #set($parent = 'Main.WebHome')
+    $response.sendRedirect($xwiki.getURL($blogDocName, 'save', "parent=${parent}&amp;title=${escapetool.url($title)}&amp;template=${blogTemplate}&amp;${blogClassname}_0_title=${escapetool.url($title)}&amp;form_token=$!{request.getParameter('form_token')}"))
+  #end
+#end
+##
+## Show the form
+&lt;form action="${xwiki.getURL('Blog.Management')}" id="newBlog" method="post"&gt;
+&lt;div&gt;
+  &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+&lt;dl&gt;
+  &lt;dt&gt;&lt;label for="blogSpace"&gt;$msg.get('xe.blog.manage.space')&lt;/label&gt;&lt;/dt&gt;
+  &lt;dd&gt;&lt;input type="text" name="blogSpace" id="blogSpace" value=""/&gt;&lt;/dd&gt;
+  &lt;dt&gt;&lt;label for="blogTitle"&gt;$msg.get('xe.blog.manage.title')&lt;/label&gt;&lt;/dt&gt;
+  &lt;dd&gt;&lt;input type="text" name="blogTitle" id="blogTitle" value="$msg.get('xe.blog.manage.blogtitle')"/&gt;&lt;/dd&gt;
+  &lt;dt&gt;&lt;label for="blogType"&gt;$msg.get('xe.blog.manage.blogtype')&lt;/label&gt;&lt;/dt&gt;
+  &lt;dd&gt;&lt;select name="blogType" id="blogType"&gt;
+    &lt;option value="inner" selected="selected"&gt;$msg.get('xe.blog.manage.inside')&lt;/option&gt;
+    &lt;option value="main"&gt;$msg.get('xe.blog.manage.main')&lt;/option&gt;
+  &lt;/select&gt;&lt;/dd&gt;
+&lt;/dl&gt;
+  &lt;input type="submit" value="${escapetool.xml($msg.get('xe.blog.manage.create'))}"/&gt;
+&lt;/div&gt;
+&lt;/form&gt;
+#else ## !hasAdmin
+  #xwikimessageboxstart($msg.get('error') $msg.get('notallowed'))
+  #xwikimessageboxend()
+#end
+
+{{/html}}
+{{/velocity}}</content>
+</xwikidoc>

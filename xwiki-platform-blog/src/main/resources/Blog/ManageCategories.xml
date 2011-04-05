@@ -1,0 +1,741 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>ManageCategories</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Blog.Categories</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1220506750000</creationDate>
+<date>1227250570000</date>
+<contentUpdateDate>1227250570000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get('xe.blog.manageCategories.title')</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>Blog.ManageCategories</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>c013b1cc-0ac3-44b5-b309-ccebd5cf86ba</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>// Make sure the XWiki 'namespace' exists.
+
+if (typeof(XWiki) == 'undefined') {
+  XWiki = new Object();
+}
+// Make sure the XWiki.blog 'namespace' exists.
+if (typeof(XWiki.blog) == 'undefined') {
+  XWiki.blog = new Object();
+}
+
+/**
+ * Javascript enhancements for the blog categories management.
+ */
+XWiki.blog.Categories = Class.create({
+  categoriesSelector : ".blog-category-level",
+  activeForm: false,
+  /** Constructor. Adds all the JS improvements of the categories tree. */
+  initialize : function() {
+    if ($$(".blog-categories-list")) {
+      this.addHoverListener();
+      this.addDeleteListener();
+      this.addAddSubcategoryListener();
+      this.addAddCategoryListener();
+      this.addRenameListener();
+    }
+  },
+  activateForm : function(form) {
+    if (this.activeForm) {
+      this.activeForm.hide();
+    }
+    form.show();
+    this.activeForm = form;
+    form.down('input[type=text]').focus();
+  },
+  addHoverListener : function() {
+    if (Prototype.Browser.IE) {
+      $$(this.categoriesSelector).each(function(item) {
+        item.observe('mouseover', function() {item.addClassName('blog-category-level-hover');});
+        item.observe('mouseout', function() {item.removeClassName('blog-category-level-hover');});
+      });
+    }
+  },
+  /**
+   * Ajax category rename.
+   * For all buttons, listen to "click", and make ajax request to rename the category.
+   */
+  addRenameListener : function() {
+    $$(".blog-category-level").each(function(item) {
+      // Prototype bug in Opera: $$(".blog-category-level a.rename") returns only the first result.
+      // Quick fix until Prototype 1.6.1 is integrated.
+      item = item.down('a.rename');
+      if (!item) {
+        return;
+      }
+      item.observe('click', function(event) {
+        item.blur();
+        event.stop();
+        if (item.disabled) {
+          // Do nothing if the button was already clicked and it's waiting for a response from the server.
+          return;
+        } else {
+          this.createRenameForm(item);
+        }
+      }.bindAsEventListener(this));
+    }.bind(this));
+  },
+  createRenameForm : function (item) {
+    var parent = item.up('.blog-categories-list');
+    if (!parent._x_rename_form) {
+      if (!parent.disabled) {
+        new Ajax.Request(
+          "$doc.getURL('view', 'xpage=plain&amp;display=renameForm&amp;ajax=1')",
+          {
+            onCreate : function () {
+              // ignore "cascade" clicks
+              parent.disabled = true;
+              parent.notification = new XWiki.widgets.Notification("$msg.get('xe.blog.manageCategories.js.fetchingForm')", "inprogress");
+            },
+            onSuccess : function (response) {
+              var container = new Element("div");
+              container.update(response.responseText);
+              parent._x_rename_form = container.down('form');
+              this.ajaxifyRenameForm(parent._x_rename_form);
+              this.insertRenameForm(item, parent._x_rename_form);
+            }.bind(this),
+            onFailure : function (response) {
+              new XWiki.widgets.Notification(response.responseText || "$msg.get('core.widgets.ajaxRequest.error.noServer')", "error");
+            },
+            // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+            on0 : function(response) {
+              response.request.options.onFailure(response);
+            },
+            onComplete : function () {
+              parent.disabled = false;
+              parent.notification.hide();
+            }
+          }
+        );
+      }
+    } else {
+      this.insertRenameForm(item, parent._x_rename_form);
+    }
+  },
+  insertRenameForm : function(item, form) {
+    form._x_item = item;
+    item.up('.blog-category-tools').insert({after : form});
+    var category = form.down('input[name=category]');
+    category.value = decodeURIComponent(item.href.substring(item.href.indexOf('category=') + 9).replace(/\+/g, ' '));
+    this.activateForm(form);
+  },
+  ajaxifyRenameForm : function(form) {
+    form.setAttribute('autocomplete', 'off');
+    form.down('input[type=text]').setAttribute('autocomplete', 'off');
+    form.down('input[type=text]').setAttribute('autocomplete', 'off');
+    form.observe('submit', function(event) {
+      event.stop();
+      form.down('input[type=text]').focus();
+      if (form.newCategoryName.value != '') {
+        new Ajax.Request(
+          form.action + '?ajax=1&amp;xpage=plain&amp;display=list&amp;' + form.serialize(),
+          {
+            onCreate : function () {
+              // ignore "cascade" clicks
+              form.disable();
+              form.notification = new XWiki.widgets.Notification("$msg.get('xe.blog.manageCategories.js.rename.inProgress')", "inprogress");
+            },
+            onSuccess : function (response) {
+              $$(".blog-categories-list").first().replace(response.responseText);
+              this.initialize();
+              form.reset();
+            }.bind(this),
+            onFailure : function (response) {
+              new XWiki.widgets.Notification(response.responseText || "$msg.get('core.widgets.ajaxRequest.error.noServer')", "error");
+            },
+            onComplete : function () {
+              form.enable();
+              form.notification.hide();
+            },
+            on403 : function(response) {
+              new XWiki.widgets.Notification("$msg.get('xe.blog.manageCategories.js.rename.error.403')", "error");
+            },
+            on404 : function(response) {
+              new XWiki.widgets.Notification("$msg.get('xe.blog.manageCategories.js.rename.error.404')", "error");
+            },
+            on409 : function(response) {
+              new XWiki.widgets.Notification("$msg.get('xe.blog.manageCategories.js.rename.error.409')", "error");
+            },
+            // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+            on0 : function(response) {
+              response.request.options.onFailure(response);
+            }
+          }
+        );
+      }
+    }.bindAsEventListener(this));
+    form.down('a').observe('click', function(event) {
+      this.reset();
+      event.stop();
+    }.bindAsEventListener(form));
+    form.observe('reset', function() {
+      form.hide();
+    });
+  },
+  /**
+   * Ajax category creation.
+   * For all buttons, listen to "click", and make ajax request to add the category.
+   */
+  addAddSubcategoryListener : function() {
+    $$(".blog-category-level").each(function(item) {
+      // Prototype bug in Opera: $$(".blog-category-level a.add-subcategory") returns only the first result.
+      // Quick fix until Prototype 1.6.1 is integrated.
+      item = item.down('a.add-subcategory');
+      if (!item) {
+        return;
+      }
+      item.observe('click', function(event) {
+        item.blur();
+        event.stop();
+        if (item.disabled) {
+          // Do nothing if the button was already clicked and it's waiting for a response from the server.
+          return;
+        } else {
+          this.createAddSubcategoryForm(item);
+        }
+      }.bindAsEventListener(this));
+    }.bind(this));
+  },
+  addAddCategoryListener : function() {
+    $$(".blog-add-category-label a").each(function(item) {
+      item.observe('click', function(event) {
+        item.blur();
+        event.stop();
+        this.createAddSubcategoryForm(item);
+      }.bindAsEventListener(this));
+    }.bind(this));
+  },
+  createAddSubcategoryForm : function (item) {
+    var parent = item.up('.blog-categories-list');
+    if (!parent._x_add_form) {
+      if (!parent.disabled) {
+        new Ajax.Request(
+          "$doc.getURL('view', 'xpage=plain&amp;display=addForm&amp;ajax=1')",
+          {
+            onCreate : function () {
+              // ignore "cascade" clicks
+              parent.disabled = true;
+              parent.notification = new XWiki.widgets.Notification("$msg.get('xe.blog.manageCategories.js.fetchingForm')", "inprogress");
+            },
+            onSuccess : function (response) {
+              var container = new Element("div");
+              container.update(response.responseText);
+              parent._x_add_form = container.down('form');
+              this.ajaxifyAddForm(parent._x_add_form);
+              this.insertAddForm(item, parent._x_add_form);
+            }.bind(this),
+            onFailure : function (response) {
+              new XWiki.widgets.Notification(response.responseText || "$msg.get('core.widgets.ajaxRequest.error.noServer')", "error");
+            },
+            // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+            on0 : function(response) {
+              response.request.options.onFailure(response);
+            },
+            onComplete : function () {
+              parent.disabled = false;
+              parent.notification.hide();
+            }
+          }
+        );
+      }
+    } else {
+      this.insertAddForm(item, parent._x_add_form);
+    }
+  },
+  insertAddForm : function(item, form) {
+    form._x_item = item;
+    var select = form.down('select');
+    select.selectedIndex = 0;
+    if (item.hasClassName('tool')) {
+      item.up('.blog-category-tools').insert({after : form});
+      var selector = 'option[value=\'' + decodeURIComponent(item.href.substring(item.href.indexOf('parentCategory=') + 15).replace(/\+/g, ' ')).replace(/\\/g, "\\\\").replace(/'/g, "\\'") + '\']';
+      var option = select.down(selector);
+      if (option) {
+        select.selectedIndex = option.index;
+      }
+      select.up('label').hide();
+    } else {
+      item.up('ul').insert({after : form});
+      select.up('label').show();
+    }
+    this.activateForm(form);
+  },
+  ajaxifyAddForm : function(form) {
+    form.setAttribute('autocomplete', 'off');
+    form.down('input[type=text]').setAttribute('autocomplete', 'off');
+    form.down('input[type=text]').setAttribute('autocomplete', 'off');
+    form.observe('submit', function(event) {
+      event.stop();
+      form.down('input[type=text]').focus();
+      if (form.newCategoryName.value != '') {
+        new Ajax.Request(
+          #if("$!{request.mode}" == 'select')
+            form.action + '?ajax=1&amp;xpage=plain&amp;mode=select&amp;' + form.serialize(),
+          #else
+            form.action + '?ajax=1&amp;xpage=plain&amp;' + form.serialize(),
+          #end
+          {
+            onCreate : function () {
+              // ignore "cascade" clicks
+              form.disable();
+              form.notification = new XWiki.widgets.Notification("$msg.get('xe.blog.manageCategories.js.add.inProgress')", "inprogress");
+            },
+            onSuccess : function (response) {
+              /* var reference = form._x_item.up('.blog-category-level');
+              if (reference) {
+                reference.nextSiblings().each(Element.remove);
+                reference.insert({after : response.responseText});
+                this.initialize();
+              }*/
+              $$(".blog-categories-list").first().replace(response.responseText);
+              this.initialize();
+              form.reset();
+            }.bind(this),
+            onFailure : function (response) {
+              new XWiki.widgets.Notification(response.responseText || "$msg.get('core.widgets.ajaxRequest.error.noServer')", "error");
+            },
+            onComplete : function () {
+              form.enable();
+              form.notification.hide();
+            },
+            on401 : function(response) {
+              new XWiki.widgets.Notification("$msg.get('xe.blog.manageCategories.js.add.error.401')", "error");
+            },
+            on403 : function(response) {
+              new XWiki.widgets.Notification("$msg.get('xe.blog.manageCategories.js.add.error.403')", "error");
+            },
+            on409 : function(response) {
+              new XWiki.widgets.Notification("$msg.get('xe.blog.manageCategories.js.add.error.409')", "error");
+            },
+            // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+            on0 : function(response) {
+              response.request.options.onFailure(response);
+            }
+          }
+        );
+      }
+    }.bindAsEventListener(this));
+    form.down('a').observe('click', function(event) {
+      this.reset();
+      event.stop();
+    }.bindAsEventListener(form));
+    form.observe('reset', function() {
+      form.hide();
+    });
+  },
+  /**
+   * Ajax category deletion.
+   * For all delete buttons, listen to "click", and make ajax request to remove the category. Remove the corresponding
+   * HTML element on success (replace it with a small notification message). Display error message (alert) on failure.
+   */
+  addDeleteListener : function() {
+    $$(".blog-category-level").each(function(item) {
+      // Prototype bug in Opera: $$(".blog-category-level a.delete") returns only the first result.
+      // Quick fix until Prototype 1.6.1 is integrated.
+      item = item.down('a.delete');
+      if (!item) {
+        return;
+      }
+      item.observe('click', function(event) {
+        item.blur();
+        event.stop();
+        if (item.disabled) {
+          // Do nothing if the button was already clicked and it's waiting for a response from the server.
+          return;
+        } else {
+          new XWiki.widgets.ConfirmedAjaxRequest(
+            /* Ajax request URL */
+            item.href + "&amp;display=list&amp;xpage=plain&amp;ajax=1",
+            /* Ajax request parameters */
+            {
+              onCreate : function() {
+                // Disable the button, to avoid a cascade of clicks from impatient users
+                item.disabled = true;
+              },
+              onSuccess : function(response) {
+                // Reload the category tree, since the subcategories of the deleted one must go up one level.
+                $$(".blog-categories-list").first().replace(response.responseText);
+                this.initialize();
+              }.bind(this),
+              onComplete : function() {
+                // In the end: re-enable the button
+                item.disabled = false;
+              }
+            },
+            /* Interaction parameters */
+            {
+               confirmationText: "$msg.get('xe.blog.manageCategories.js.delete.confirm')",
+               progressMessageText : "$msg.get('xe.blog.manageCategories.js.delete.inProgress')",
+               successMessageText : "$msg.get('xe.blog.manageCategories.js.delete.done')",
+               failureMessageText : "$msg.get('xe.blog.manageCategories.js.delete.failed')"
+            }
+          );
+        }
+      }.bindAsEventListener(this));
+    }.bind(this));
+  }
+});
+// ======================================
+document.observe('xwiki:dom:loaded', function() {
+  new XWiki.blog.Categories();
+  $$(".blog-categories-list.subcategories").each(function(item) {
+    var toggler = new Element("a", {style : "display: block; cursor: pointer; float: right; font-style: italic;"}).update("show »");
+    var list = item.down("div", 1);
+    toggler.observe("click", function() {
+      list.toggle();
+      toggler.update(list.visible() ? "« hide" : "show »");
+    });
+    item.down("strong").insert({after : toggler});
+    item.down("strong").insert({after : "&amp;nbsp;&amp;nbsp;"});
+    list.toggle();
+  });
+});</code>
+</property>
+<property>
+<name>Category management scripts</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>Blog.ManageCategories</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>fd160bce-cab7-4830-a18e-2632cd47fc00</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>#template('colorThemeInit.vm')
+
+.blog-categories-list {
+  float: left;
+  padding: 8px 0;
+}
+.subcategories {
+  background: $theme.backgroundSecondaryColor;
+  margin-top: 1.4em;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+.blog-categories-list ul {
+  list-style-type: none !important;
+  padding: 0;
+}
+.blog-category-level {
+  padding: 1px 2px 3px;
+  display: block;
+  position: relative;
+}
+.blog-category-level:hover,
+.blog-category-level-hover {
+  background: $theme.highlightColor;
+  padding-bottom: 2px;
+  border-bottom: 1px solid $theme.borderColor; 
+}
+.blog-category-level img {
+  vertical-align: middle;
+}
+.blog-category {
+  margin-right: 80px;
+  display: block;
+}
+.blog-category-tools {
+  visibility: hidden;
+  position: absolute;
+  top: 0; right: 0;
+  display: inline;
+}
+.blog-category-level:hover .blog-category-tools,
+.blog-category-level-hover .blog-category-tools {
+  visibility: visible;
+}
+.blog-add-category-label {
+  font-style: italic;
+  padding-left: 20px;
+  background: transparent url($xwiki.getSkinFile('icons/silk/bullet_add.gif')) 2px center no-repeat;
+}
+
+.blog-add-category-label a {
+  color: $theme.textSecondaryColor;
+}
+
+.category-add-form, .category-rename-form {
+  margin-left: 40px;
+  border: 1px solid $theme.borderColor;
+  vertical-align: top !important;
+}
+* html .category-add-form, * html .category-rename-form {
+  width: 17em;
+}
+li .category-add-form, li .category-rename-form{
+  margin-left: 16px;
+}
+.category-add-form div, .category-rename-form div {
+  background: $theme.backgroundSecondaryColor;
+  overflow: hidden;
+  padding: 4px 8px;
+}
+
+.category-add-form label, .category-rename-form label {
+  font-size: 80%;
+  margin: 2px 0;
+  color: $theme.textSecondaryColor;
+}
+
+.category-add-form .buttonwrapper, .category-rename-form .buttonwrapper {
+  margin: 0 12px 0 0;
+}
+
+input.category-name-input {
+  border: 1px solid $theme.borderColor;
+  height: 80%;
+  margin-right: 3px;
+  width: 16em;
+}</code>
+</property>
+<property>
+<name>Category management style</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<content>{{include document="Blog.CategoriesCode"/}}
+
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
+#set($space = "$!request.space")
+##
+##
+######################################################
+## Execute actions
+######################################################
+#if ("$!request.xaction" == 'delete')
+  #foreach($item in $request.getParameterValues('category'))
+    #deleteCategory($item)
+  #end
+#elseif("$!request.xaction" == 'rename')
+  #set ($newFullName = "$!{request.newCategoryName}")
+  #if($newFullName.trim().equals(''))
+    $response.setStatus(400)
+    #error($msg.get('xe.blog.manageCategories.rename.error.emptyName'))
+  #elseif(!$xwiki.exists($request.category))
+    $response.setStatus(404)
+    #error($msg.get('thispagedoesnotexist'))
+  #elseif($xwiki.exists($newFullName))
+    $response.setStatus(409)
+    #error($msg.get('core.rename.alreadyExists', [$newFullName, $xwiki.getURL($newFullName)]))
+  #elseif(!$xwiki.hasAccessLevel('edit', $xcontext.user, $newFullName))
+    $response.setStatus(403)
+    #error($msg.get('core.rename.targetNotWritable', [$newFullName]))
+  #else
+    #renameCategory($request.category, $newFullName)
+  #end
+#elseif("$!request.xaction" == 'create')
+  #set($title = "$!{request.newCategoryName}")
+  #if ($title.trim().equals(''))
+    $response.setStatus(400)
+    #error($msg.get('xe.blog.manageCategories.create.error.emptyName'))
+  #else
+    #set($name = "${doc.space}.${title}")
+    #set($title = $util.encodeURI($title))
+    #set($newCategoryParent = $util.encodeURI($request.newCategoryParent))
+    #if($request.ajax)
+      #if("$!{request.mode}" == 'select')
+        #set($xredirect = ${doc.getURL('view', "xpage=plain&amp;display=list&amp;listType=selectable&amp;root=${newCategoryParent}")})
+      #else
+        #set($xredirect = ${doc.getURL('view', "xpage=plain&amp;display=list&amp;root=${newCategoryParent}")})
+      #end
+      $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=$util.encodeURI($xredirect)&amp;form_token=$!{services.csrf.getToken()}"))
+    #else ## request.ajax
+      $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${util.encodeURI(${doc.getURL()})}&amp;form_token=$!{services.csrf.getToken()}"))
+    #end
+  #end ## empty title
+#end
+#####################################################
+## Action execution done
+#####################################################
+#if ("$!request.display" == 'list')
+  #set($displayType = "$!{request.listType}")
+  #if($displayType == '')
+    #set($displayType = 'editable')
+  #end
+  #displayCategoryManagementTree('' $displayType)
+#elseif ("$!request.display" == 'addForm')
+  #getCategoriesHierarchy('' $tree)
+  #addCategoryForm()
+#elseif ("$!request.display" == 'renameForm')
+  #renameCategoryForm()
+#else
+##
+$xwiki.ssx.use('Blog.ManageCategories')##
+$xwiki.jsx.use('Blog.ManageCategories', {'minify':false})##
+##
+#displayCategoryManagementTree('' 'editable')
+#end
+{{/html}}
+{{/velocity}}</content>
+</xwikidoc>

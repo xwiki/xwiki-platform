@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>BlogPostSheet</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Blog.BlogPostClass</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1226267213000</creationDate>
+<date>1227223071000</date>
+<contentUpdateDate>1227223071000</contentUpdateDate>
+<version>1.1</version>
+<title>Sheet for displaying blog entries</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>true</hidden>
+<object>
+<class>
+<name>XWiki.SheetClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultEditMode>
+<name>defaultEditMode</name>
+<number>1</number>
+<prettyName>Default Edit Mode</prettyName>
+<size>15</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultEditMode>
+</class>
+<name>Blog.BlogPostSheet</name>
+<number>0</number>
+<className>XWiki.SheetClass</className>
+<guid>c3a48d28-a427-465c-9949-145bb521497c</guid>
+<property>
+<defaultEditMode></defaultEditMode>
+</property>
+</object>
+<content>{{include document="Blog.BlogCode"/}}
+
+{{include document="Blog.CategoriesCode"/}}
+
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
+$xwiki.jsx.use('Blog.ManageCategories', {'mode' : 'select'})##
+$xwiki.ssx.use('Blog.ManageCategories')##
+#getEntryObject($doc $entryObj)
+#if("$!entryObj" == '')
+  #warning($msg.get('xe.blog.sheet.notpost'))
+#elseif($xcontext.action != 'inline')
+  ## View mode
+  #isPublished($entryObj $isPublished)
+  #isHidden($entryObj $isHidden)
+  ## displayBlog requires a list of documents, and whether to display only an extract or the full entry.
+  #displayBlog([$tdoc] 'single' false false)
+#else
+  &lt;dl&gt;
+  &lt;dt&gt;$msg.get('xe.blog.sheet.title')&lt;/dt&gt;
+  &lt;dd&gt;$doc.display('title', 'edit', $entryObj)&lt;/dd&gt;
+  &lt;dt&gt;$msg.get('xe.blog.sheet.content')&lt;/dt&gt;
+  &lt;dd&gt;$doc.display('content', 'edit', $entryObj)&lt;/dd&gt;
+  &lt;dt&gt;$msg.get('xe.blog.sheet.summary')&lt;/dt&gt;
+  &lt;dd&gt;$doc.display('extract', 'edit', $entryObj)&lt;/dd&gt;
+  &lt;dt&gt;$msg.get('xe.blog.sheet.category')&lt;/dt&gt;
+  &lt;dd&gt;
+  #displayCategoryManagementTree('' 'selectable')
+  &lt;div class="clearfloats"&gt;&lt;/div&gt;
+  &lt;/dd&gt;
+  &lt;/dl&gt;
+  #template('tagedit.vm')
+  #isPublished($entryObj $isPublished)
+  #if($isPublished)
+    #if($doc.creator == $xcontext.user)
+      #publishMessageBox($msg.get('xe.blog.sheet.publicationdate', [${doc.display('publishDate', 'view', $entryObj)}]))
+      #set($hideArticle = ${doc.display('hidden', 'edit', $entryObj)})
+      #hideMessageBox($msg.get('xe.blog.sheet.hidearticle', [${hideArticle}]))
+    #end
+  #else
+    #set($defaultDate = $xwiki.getDocument($blogPostTemplate).getObject($blogPostClassname).getProperty('publishDate').value.time)
+    #if($entryObj.getProperty('publishDate').value.time == $defaultDate)
+      ## The publish date was not set, force it to be the creation date
+      $entryObj.set('publishDate', $doc.creationDate)
+    #end
+    #publishMessageBox("$msg.get('xe.blog.sheet.notpublished') &lt;label&gt;**$msg.get('xe.blog.sheet.publish') ${doc.display('published', 'edit', $entryObj)}**&lt;/label&gt;\\&lt;label&gt;$msg.get('xe.blog.sheet.setdate') ${doc.display('publishDate', 'edit', $entryObj)}&lt;/label&gt;")
+  #end
+#end
+{{/html}}
+{{/velocity}}</content>
+</xwikidoc>

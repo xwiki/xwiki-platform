@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>CategoryRss</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Blog.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1230080962000</creationDate>
+<date>1230091357000</date>
+<contentUpdateDate>1230091357000</contentUpdateDate>
+<version>1.1</version>
+<title>Blog category RSS Feed Generator</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>true</hidden>
+<content>{{include document="Blog.RssCode"/}}
+
+{{include document="Blog.CategoriesCode"/}}
+
+{{velocity filter="none"}}
+#if("$!{request.xpage}" == 'plain' || "$!{request.xpage}" == 'rdf')
+$response.setContentType('application/rss+xml')
+{{html clean="false" wiki="false"}}
+##
+##
+##
+#macro(getTargetCategory $categoryDoc)
+  #set($category = "$!{request.category}")
+  #if($category == '')
+    #set($category = $defaultCategoryParent)
+  #end
+  #set ($categoryDoc = $util.null)
+  #setVariable ("$categoryDoc" $xwiki.getDocument($category))
+#end
+#getTargetCategory($categoryDoc)
+#set($tempCategoryDoc = $categoryDoc)
+#getEntriesForCategory($tempCategoryDoc.fullName $entries $totalEntries)
+#set($categoryDoc = $tempCategoryDoc)
+#set($entries = $xwiki.wrapDocs($entries))
+#displayBlogCategoryRss($categoryDoc $categoryDoc $entries)
+{{/html}}
+#end
+{{/velocity}}</content>
+</xwikidoc>

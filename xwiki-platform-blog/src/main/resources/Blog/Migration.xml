@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>Migration</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Blog.Management</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1229212898000</creationDate>
+<date>1229214636000</date>
+<contentUpdateDate>1229214636000</contentUpdateDate>
+<version>1.1</version>
+<title>Blog migration</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>true</hidden>
+<content>{{velocity filter="none"}}
+#if($request.migrate &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+  #set($newContent = '#includeForm("Blog.BlogPostSheet")')
+  #set($query = ", BaseObject obj where obj.name = doc.fullName and obj.className = 'XWiki.ArticleClass'")
+  #foreach($article in $xwiki.searchDocuments($query))
+    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $article))
+      #set($articleDoc = $xwiki.getDocument($article))
+    #set($articleObj = $articleDoc.getObject('XWiki.ArticleClass'))
+      #set($entryObj = $articleDoc.newObject('Blog.BlogPostClass'))
+      #foreach($property in ['title', 'content', 'extract', 'category'])
+        $!entryObj.set($property, $articleObj.getProperty($property).value)
+      #end
+      $!entryObj.set('published', 1)
+      $!entryObj.set('publishDate', $articleDoc.creationDate)
+      $!entryObj.set('hidden', 0)
+      #set($discard = $articleDoc.removeObjects('XWiki.ArticleClass'))
+      $articleDoc.setContent($newContent)
+      $!articleDoc.save($msg.get('xe.blog.migration.migrated'), true)
+      * $msg.get('xe.blog.migration.updated') [[$entryObj.title&gt;&gt;${article}]] ($msg.get('xe.blog.migration.inspace') [[$articleDoc.space&gt;&gt;${articleDoc.space}.WebHome]])
+    #else
+      * $msg.get('xe.blog.migration.skipping') [[$article]]
+    #end
+  #end
+  $msg.get('xe.blog.migration.done') [[$msg.get('xe.blog.migration.backtoblog')&gt;&gt;Blog.WebHome]]
+#else
+$msg.get('xe.blog.migration.pleaseconfirm')
+
+{{html clean="false" wiki="true"}}
+  &lt;form action="$doc.getURL()" method="post"&gt;
+    &lt;div&gt;
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+    &lt;input type="submit" name="migrate" value="$msg.get('xe.blog.migration.confirm')"/&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+{{/html}}
+
+[[$msg.get('xe.blog.migration.backtoblog')&gt;&gt;Blog.WebHome]]
+#end
+{{/velocity}}</content>
+</xwikidoc>

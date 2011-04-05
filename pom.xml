@@ -150,39 +150,39 @@
     </dependency>
   </dependencies>
   <modules>
-    <module>xwiki-model</module>
-    <module>xwiki-xmlrpc</module>
-    <module>xwiki-cache</module>
-    <module>xwiki-xml</module>
-    <module>xwiki-core</module>
-    <module>xwiki-component</module>
-    <module>xwiki-url</module>
-    <module>xwiki-containers</module>
-    <module>xwiki-action</module>
-    <module>xwiki-velocity</module>
-    <module>xwiki-observation</module>
-    <module>xwiki-bridge</module>
-    <module>xwiki-rendering</module>
-    <module>xwiki-configuration</module>
-    <module>xwiki-query</module>
-    <module>xwiki-webdav</module>
-    <module>xwiki-office</module>
-    <module>xwiki-rest</module>
-    <module>xwiki-refactoring</module>
-    <module>xwiki-chart</module>
-    <module>xwiki-formula</module>
-    <module>xwiki-classloader</module>
-    <module>xwiki-captcha</module>
-    <module>xwiki-annotations</module>
-    <module>xwiki-crypto</module>
-    <module>xwiki-csrf</module>
-    <module>xwiki-extension</module>
-    <module>xwiki-legacy</module>
-    <module>xwiki-skin</module>
-    <module>xwiki-store</module>
-    <module>xwiki-eventstream</module>
-    <module>xwiki-messagestream</module>
-    <module>xwiki-test</module>
+    <module>xwiki-platform-model</module>
+    <module>xwiki-platform-xmlrpc</module>
+    <module>xwiki-platform-cache</module>
+    <module>xwiki-platform-xml</module>
+    <module>xwiki-platform-core</module>
+    <module>xwiki-platform-component</module>
+    <module>xwiki-platform-url</module>
+    <module>xwiki-platform-containers</module>
+    <module>xwiki-platform-action</module>
+    <module>xwiki-platform-velocity</module>
+    <module>xwiki-platform-observation</module>
+    <module>xwiki-platform-bridge</module>
+    <module>xwiki-platform-rendering</module>
+    <module>xwiki-platform-configuration</module>
+    <module>xwiki-platform-query</module>
+    <module>xwiki-platform-webdav</module>
+    <module>xwiki-platform-office</module>
+    <module>xwiki-platform-rest</module>
+    <module>xwiki-platform-refactoring</module>
+    <module>xwiki-platform-chart</module>
+    <module>xwiki-platform-formula</module>
+    <module>xwiki-platform-classloader</module>
+    <module>xwiki-platform-captcha</module>
+    <module>xwiki-platform-annotations</module>
+    <module>xwiki-platform-crypto</module>
+    <module>xwiki-platform-csrf</module>
+    <module>xwiki-platform-extension</module>
+    <module>xwiki-platform-legacy</module>
+    <module>xwiki-platform-skin</module>
+    <module>xwiki-platform-store</module>
+    <module>xwiki-platform-eventstream</module>
+    <module>xwiki-platform-messagestream</module>
+    <module>xwiki-platform-test</module>
   </modules>
   <profiles>
     <profile>

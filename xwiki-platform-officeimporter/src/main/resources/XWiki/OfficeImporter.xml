@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>OfficeImporter</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1217261143000</creationDate>
+<date>1288979323000</date>
+<contentUpdateDate>1288979323000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get("xe.officeimporter.import.title")</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.OfficeImporter</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>7ee47a14-e816-4742-aaea-ea2e2352d781</guid>
+<property>
+<cache></cache>
+</property>
+<property>
+<code>
+.office_importer_box {
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  background-color: #EEE;
+  height: auto!important;
+  padding: 0;
+  margin-bottom: 4em;
+}
+
+.office_importer_box label.radio input {
+        vertical-align:bottom;
+}
+
+.office_importer_box h1,.office_importer_box h2 {
+  padding: 10px;
+  margin: 0;
+  border-bottom: 2px solid #fff;
+}
+
+.office_importer_box h2 {
+  padding: 5px 10px 5px 10px;
+  border-top: 2px solid #fff;
+  border-bottom: none;
+  background-color: #e9e9e9;
+  font-size: 1em;
+  font-weight: bold;
+  color: #000;
+  clear: both;
+}
+
+.office_importer_box p {
+  padding: 10px;
+  margin: 0;
+  overflow: auto;
+}
+
+.office_importer_box p.office_importer_target,
+.office_importer_box p.office_importer_styles,
+.office_importer_box p.office_importer_splitting {
+  float: left;
+  display: inline;
+  width: 50%;
+}
+
+.office_importer_box p.help_message {
+  float: left;
+  display: inline;
+  width: 40%;
+  color: #666;
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+.office_importer_buttons {
+  clear: both;
+  text-align: center;
+  border-top: 2px solid #fff;
+  padding: 10px;
+}
+
+.office_importer_buttons span.buttonwrapper {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+.office_importer_box p.office_importer_document {
+  padding: 10px;
+  margin: 0;
+  position: relative;
+}
+
+.office_importer_splitting label {
+  display: block;
+}
+
+.office_importer_splitting .message {
+  display: block;
+  float: left;
+  width: 200px;
+  padding: 2px 10px 0 0;
+  font-weight: bold;
+}
+
+.office_importer_splitting select.headingLevelsToSplit {
+  padding: 3px 5px;
+  margin-bottom: 1em;
+  height: 8.5em;
+  
+}
+
+.office_importer_splitting #headinghelper {
+  margin-left: 310px;
+  font-size: .8em;
+  color: #777;
+  font-style: italic;
+  font-weight: normal;
+}
+
+select#childPagesNamingMethod {
+  height: auto;
+}
+
+.office_importer_splitting label span {
+  padding: 0 0 5px 0;
+  display: block;
+}
+
+.office_importer_splittingcontent label.radio {
+        display: block;
+        margin-top: 10px;
+        padding: 10px;  
+}
+
+.office_importer_splitting label.radio span{
+  width: 110px;
+}
+
+.office_importer_target label {
+  display: block;
+  padding: 0;
+        margin-top: 10px;
+}
+
+.office_importer_target span.description {
+  display: block;
+  padding: 0 0 10px 70px;
+  font-size: .8em;
+  color: #777;
+  font-style: italic;
+  font-weight: normal;
+}
+
+.office_importer_target label span {
+  display: block;
+  float: left;
+  display: inline;
+  width: 115px;
+  padding: 3px 0 0 0;
+  font-weight: normal;
+}
+
+.office_importer_styles label input ,
+.office_importer_target #appenContent input {
+  margin-top: 5px;
+
+}
+</code>
+</property>
+<property>
+<name>OfficeImporterStyle</name>
+</property>
+<property>
+<parse></parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<content>#set($ok = $xwiki.ssx.use("XWiki.OfficeImporter"))
+#if($isguest)
+  #error($msg.get("xe.officeimporter.notallowed"))
+#elseif("$!{oomanager.serverState}" != "Connected")
+  #if($hasAdmin)
+    #error($msg.get("xe.officeimporter.error.adminuser"))
+  #else
+    #error($msg.get("xe.officeimporter.error.normaluser"))
+  #end
+#else
+  #if($request.page)
+    #set($targetdoc = $xwiki.getDocument($request.page))
+  #end
+&lt;div class="office_importer_box"&gt;
+&lt;form action="$xwiki.getURL('XWiki.OfficeImporterResults','view')" enctype="multipart/form-data" method="post"&gt;
+&lt;p class="office_importer_document"&gt;
+&lt;label for="filepath"&gt;$msg.get("xe.officeimporter.import.document") : &lt;/label&gt;
+&lt;input id="filepath" type="file" name="filePath" value="" size="40" onchange="javascript:XWiki.officeImporter.populateTargetPageInputField(this.value);"/&gt;&lt;/p&gt;
+&lt;h2&gt;$msg.get("xe.officeimporter.import.target")&lt;/h2&gt;
+&lt;p class="office_importer_target"&gt;
+&lt;label for="targetSpaceInputId"  class="inputtext"&gt;
+&lt;span&gt;$msg.get("xe.officeimporter.import.targetspace") : &lt;/span&gt;
+&lt;input id="targetSpaceInputId" type="text" name="targetSpace" class="suggestSpaces suggested" value="$!{targetdoc.space}"/&gt;
+&lt;/label&gt;
+&lt;label for="targetPageInputId" class="inputtext"&gt;
+&lt;span&gt;$msg.get("xe.officeimporter.import.targetpage") : &lt;/span&gt;
+&lt;input id="targetPageInputId" name="targetPage" type="text" value="$!{targetdoc.name}" onchange="javascript:validateUserInputs();"/&gt;
+&lt;/label&gt;
+&lt;label for="appendContentInputId" id="appenContent" class="radio"&gt;
+&lt;span&gt;$msg.get("xe.officeimporter.import.appendresult") : &lt;/span&gt;
+&lt;input id="appendContentInputId" name="appendContent" type="checkbox" value="true" /&gt;&lt;/label&gt;
+&lt;/p&gt;
+&lt;p class="help_message"&gt;$msg.get("xe.officeimporter.import.help.target")&lt;/p&gt;
+&lt;h2&gt;$msg.get("xe.officeimporter.import.styles")&lt;/h2&gt;
+&lt;p class="office_importer_styles"&gt;
+&lt;label for="filterStylesInputId" class="radio"&gt;$msg.get("xe.officeimporter.import.filterstyles") : &lt;input id="filterStylesInputId" name="filterStyles" type="checkbox" value="strict"/&gt;&lt;/label&gt;
+&lt;/p&gt;
+&lt;p class="help_message"&gt;$msg.get("xe.officeimporter.import.help.styles")&lt;/p&gt;
+&lt;h2&gt;$msg.get("xe.officeimporter.import.splitting")&lt;/h2&gt;
+&lt;div class="office_importer_splittingcontent"&gt;
+&lt;label for="splitDocumentInputId" class="radio"&gt;&lt;span&gt;$msg.get("xe.officeimporter.import.splitting.splitdocument") : &lt;/span&gt;&lt;input id="splitDocumentInputId" name="splitDocument" type="checkbox" value="true"/&gt;&lt;/label&gt;
+&lt;p class="office_importer_splitting"&gt;
+&lt;label for="headingLevelsToSplitInputId" class="multipleselect"&gt;&lt;span&gt;$msg.get("xe.officeimporter.import.splitting.headinglevels") : &lt;/span&gt; 
+&lt;select id="headingLevelsToSplitInputId" size="5" multiple="multiple" name="headingLevelsToSplit" class="headingLevelsToSplit"&gt;#foreach($h in [1..6]) &lt;option value="${h}"&gt;$msg.get("xe.officeimporter.import.splitting.heading")-${h}&lt;/option&gt;#end&lt;/select&gt;
+&lt;/label&gt;
+&lt;label for="childPagesNamingMethodInputId" class="select"&gt;&lt;span&gt;
+$msg.get("xe.officeimporter.import.splitting.naming") : &lt;/span&gt;&lt;select id="childPagesNamingMethodInputId" name="childPagesNamingMethod"&gt;&lt;option value="headingNames"&gt;$msg.get("xe.officeimporter.import.splitting.naming.headingnames")&lt;/option&gt;&lt;option value="mainPageNameAndHeading"&gt;$msg.get("xe.officeimporter.import.splitting.naming.mainpagenameandheading")&lt;/option&gt;&lt;option value="mainPageNameAndNumbering"&gt;$msg.get("xe.officeimporter.import.splitting.naming.mainpagenameandnumbering")&lt;/option&gt;&lt;/select&gt;
+&lt;/label&gt;
+&lt;/p&gt;&lt;p class="help_message"&gt;$msg.get("xe.officeimporter.import.help.splitting")&lt;/p&gt;
+&lt;input type="hidden" name="groovyFilter" value="" /&gt;
+&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+&lt;/div&gt;
+&lt;div class="office_importer_buttons"&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.officeimporter.import.import')" class="button"/&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;/form&gt;
+&lt;/div&gt;
+#end
+{pre}
+&lt;script type="text/javascript"&gt;
+/* &lt;![CDATA[ */
+  if (typeof(XWiki) == "undefined") {
+    XWiki = new Object();
+  }
+  if (typeof(XWiki.officeImporter) == 'undefined') {
+    XWiki.officeImporter = new Object();
+  }
+  XWiki.officeImporter.populateTargetPageInputField = function(fileName) {
+    var dot = fileName.lastIndexOf(".");
+    if (-1 != dot) {
+      fileName = fileName.substring(0, dot);
+    }
+    fileName = fileName.replace(/[\.:]/g, "-");
+    document.getElementById("targetPageInputId").value = fileName;
+  }
+/* ]]&gt; */
+&lt;/script&gt;
+{/pre}
+</content>
+</xwikidoc>

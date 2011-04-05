@@ -1,7 +1,7 @@
 ###
 ### Rename document template
 ###
-#if(!$xwiki.hasAccessLevel('delete'))
+#if(!$xwiki.checkAccess($doc.fullName, 'delete'))
   #template("accessdenied.vm")
 #elseif($doc.isNew())
   $response.setStatus(404)

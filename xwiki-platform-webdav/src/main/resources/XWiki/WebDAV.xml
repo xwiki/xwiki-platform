@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>WebDAV</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1231841324000</creationDate>
+<date>1236074871000</date>
+<contentUpdateDate>1236074871000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>onDemand=On demand|always=Always</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.WebDAV</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>e164508e-ef2c-45d1-9620-b82f16fb27bb</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+function displayDavLink(node) {
+  node.down("a[class*='editlink']").removeClassName("hidden");
+}
+XWiki.WebDAV = {
+  displayDavLinks: function(domNode) {
+    // un-hide Dav links only if the browser is going to support it
+    if(window.ActiveXObject || window.InstallTrigger) {
+      domNode.select(".attachment").each(displayDavLink);
+    }
+  },
+  davEdit: function(davURL) {
+    if (window.ActiveXObject) {
+      var editor;
+      try {
+        editor = new window.ActiveXObject("SharePoint.OpenDocuments");
+      } catch (err) {
+        window.alert("$msg.get('xe.webdav.initialize.activex')");
+        return;
+      }
+      if (editor) {
+        editor.EditDocument(davURL);
+      } else {
+        window.alert("$msg.get('xe.webdav.initialize.error')");
+        return;
+      }
+    } else if (window.InstallTrigger) {
+      if ("createEvent" in document) {
+        var element = document.createElement("FoXWikiDomEventData");
+        element.setAttribute("davURL", davURL);
+        element.setAttribute("foxwiki", "false");
+        document.documentElement.appendChild(element);
+        var evt = document.createEvent("Events");
+        evt.initEvent("FoXWikiDomEvent", true, false);
+        element.dispatchEvent(evt);
+        if (element.getAttribute("foxwiki") == "false") {
+          if (window.confirm("$msg.get('xe.webdav.install.foxwiki')")) {
+            window.InstallTrigger.install( {"FoXWiki" :"https://addons.mozilla.org/en-US/firefox/downloads/file/39674/foxwiki-1.0b-fx.xpi"});
+          }
+        }
+      } else {
+        window.alert("$msg.get('xe.webdav.error')");
+      }
+    } else {
+      window.alert("$msg.get('xe.webdav.sorry')");
+    }
+  }
+};
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));</code>
+</property><property><name>WebDAVJSX</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>always</use>
+</property>
+</object>
+<content>#info($msg.get('xe.webdav.info'))</content>
+</xwikidoc>

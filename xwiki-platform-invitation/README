@@ -1,0 +1,19 @@
+XWiki Invitation Application
+-------------------------------------------
+
+Works on XWiki 2.4M2
+XWiki Syntax: 2.0
+
+This application creates a document called InvitationMessages and one called InvitationConfig the first time it runs. 
+You may configure InvitationMessages to be a different file by navigating to the invitation section of the administration
+interface and setting the field "Document containing email XObjects".
+
+It is space agnostic and will create the documents in the same space as itself although it will be installed in the 
+Invitation space by default.
+
+Allows users to invite friends to join the wiki. Allows administrators to invite multiple people at once.
+Administrators can define a template which augments the users' email message and subject line.
+All messages are stored locally as well as sent.
+If recipients of email feel that it is spam then they can click a unique link which will set a spam
+flag on the email and the user who sent it will be unable to send more email until an administrator
+marks the email as having been investigated.

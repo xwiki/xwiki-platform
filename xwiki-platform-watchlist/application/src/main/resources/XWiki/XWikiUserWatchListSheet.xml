@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>XWikiUserWatchListSheet</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.XWikiUserSheet</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1264167993000</creationDate>
+<date>1301505486000</date>
+<contentUpdateDate>1301505486000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+#set($obj = $doc.getObject("XWiki.XWikiUsers"))
+#if(!$obj)
+= $msg.get('xe.admin.users.sheet') =
+
+{{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}##
+#else
+#set($watchOject = $doc.getObject('XWiki.WatchListClass'))
+{{html clean="false" wiki="true"}}
+$xwiki.ssx.use("XWiki.XWikiUserSheet")##
+  &lt;div class="#if($context.action == 'view')half #{else}full #{end}column"&gt;
+    &lt;div class="watchlistManagement"&gt;
+      #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
+        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=watchlist')"&gt;&lt;span class="hidden"&gt;$msg.get('platform.core.profile.category.watchlist.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+      #end
+      &lt;h1&gt;$msg.get('platform.core.profile.section.watchlistManagement')&lt;/h1&gt;
+      &lt;dl&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.watchlist.notifier')&lt;/label&gt;&lt;/dt&gt;
+        #set($notifierDocs = $xwiki.watchlist.getNotifiers())
+        #set($currentNotifier = $watchOject.getProperty('interval').getValue())
+        &lt;dd&gt;
+          #if($xcontext.action=='view')
+            #if("$!currentNotifier" != "")
+              #foreach($notifierDoc in $notifierDocs)
+                #if($notifierDoc.getFullName() == $currentNotifier)
+                  $notifierDoc.getPlainTitle()
+                #end
+              #end
+            #end
+          #else
+            &lt;select name="XWiki.WatchListClass_0_interval"&gt;
+              &lt;option value=""&gt;&amp;nbsp;&lt;/option&gt;
+              #foreach($notifierDoc in $notifierDocs)
+                &lt;option value="$notifierDoc.getFullName()"#if($notifierDoc.getFullName()==$currentNotifier) selected="selected"#end&gt;$notifierDoc.getPlainTitle()&lt;/option&gt;
+              #end
+            &lt;/select&gt;
+          #end
+        &lt;/dd&gt;
+        &lt;dt class="label"&gt;&lt;label for="XWiki.WatchListClass_0_automaticwatch"&gt;$msg.get('XWiki.WatchListClass_automaticwatch')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd&gt;
+          $watchOject.automaticwatch
+        &lt;/dd&gt;
+      &lt;/dl&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  #if ($xcontext.action == 'view')
+    &lt;div class="half column"&gt;
+      &lt;div class="watchlistRss"&gt;
+        &lt;h1&gt;$msg.get('watchlist.staytuned.rss')&lt;/h1&gt;
+        &lt;a id="watchlistRssLink" rel="_blank" href="$xwiki.getURL("XWiki.WatchListRss", "view", "xpage=plain&amp;amp;outputSyntax=plain")"&gt;$msg.get("watchlist.staytuned.rss.info")&lt;/a&gt;
+      &lt;/div&gt;
+    #end
+    #if ($xcontext.action == 'view')
+      &lt;div class="watchlistElements"&gt;
+        &lt;h1&gt;$msg.get('platform.core.profile.section.watchlistElements')&lt;/h1&gt;
+        #set($collist = ["type", "wiki","space", "document", "actions"])
+        #set($colprops = { 
+                  "type": { "sortable":false },
+                  "wiki": { "sortable":false },
+                  "space": { "sortable":false },
+                  "document": { "sortable":false }})
+        #set($options = { "resultPage" : "XWiki.XWikiUserWatchListLiveTableResults",
+                  "rowCount": 10,
+                  "description": "This table lists all watched elements.",
+                  "translationPrefix": "watchlist.table.",
+                  "callback": "function (row, i, table) {
+                                  var tr = new Element('tr');
+                                  tr.insert(new Element('td').insert(new Element('span').addClassName(row.type + 'WatchlistType')));
+                                  tr.insert(new Element('td').insert(new Element('a', { href : row.wikiUrl}).update(row.wikiName)));
+                                  if (row.spaceUrl != '') {
+                                    tr.insert(new Element('td').insert(new Element('a', { href : row.spaceUrl}).update(row.spaceName)));
+                                  } else {
+                                    tr.insert(new Element('td').update(row.spaceName));
+                                  }
+                                  if (row.pageUrl != '') {
+                                    tr.insert(new Element('td').insert(new Element('a', { href : row.pageUrl}).update(row.pageName)));
+                                  } else {
+                                    tr.insert(new Element('td').update(row.pageName));
+                                  }
+                                  var deleteLink = new Element('a', {
+                                    href : row.deleteUrl
+                                  });
+                                  deleteLink.insert(new Element('img', {
+                                    'src' : '${xwiki.getSkinFile('icons/silk/cross.gif')}'
+                                  }));
+                                  deleteLink.observe('click', function(event) {
+                                    Event.stop(event);
+                                    if (row.deleteUrl.indexOf('/') == 0) {
+                                      // DeleteURL is from the same domain
+                                      var surl = row.deleteUrl;
+                                      var myAjax = new Ajax.Request(
+                                        surl,
+                                        {
+                                          method: 'get',
+                                          onComplete: function(transport) {
+                                            this.clearCache();
+                                            this.showRows(this.currentOffset, this.limit);
+                                          }.bind(this)
+                                        }
+                                      );
+                                    } else {
+                                      // DeleteURL is from another domain, which prevents an AJAX request to be used here. We make a browser request and use xredirect to come back to the current page.
+                                      var separator = (row.deleteUrl.indexOf('?') == -1) ? '?' : '&amp;';
+                                      window.location = row.deleteUrl + separator + 'xredirect=' + window.location;
+                                    }
+                                  }.bind(this));
+                                  tr.insert(new Element('td').insert(deleteLink));
+                                  return tr;
+                               }" })
+          #livetable("mywatchlist" $collist $colprops $options)
+      &lt;/div&gt;
+    &lt;/div&gt;
+  #end
+  &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
+{{/html}}##
+#end
+{{/velocity}}</content></xwikidoc>

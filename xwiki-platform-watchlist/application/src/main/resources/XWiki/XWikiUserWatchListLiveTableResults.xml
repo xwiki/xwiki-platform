@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>XWikiUserWatchListLiveTableResults</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.XWikiUserWatchListSheet</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1249395964000</creationDate>
+<date>1249395964000</date>
+<contentUpdateDate>1249395964000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity wiki="false"}}
+#if($xcontext.action == 'get')
+##
+## Constants
+##
+#set($wikiType = 'wiki')
+#set($spaceType = 'space')
+#set($pageType = 'page')
+##
+## Build watched elements list
+##
+#set($wikis = $xwiki.watchlist.getWatchedWikis())
+#set($spaces = $xwiki.watchlist.getWatchedSpaces())
+#set($pages = $xwiki.watchlist.getWatchedDocuments())
+#set($elements = $util.getArrayList())
+## Wikis
+#foreach($wiki in $wikis)
+  #if("$!wiki" != '')
+    #set($wikiRef = $services.model.createDocumentReference($wiki, '', ''))
+    #set($wikiDoc = $xwiki.getDocument($wikiRef))
+    #set($discard = $elements.add([$wiki, $wikiType, $wiki, $wikiDoc.getURL(), $msg.get('watchlist.table.allspaces'), '', $msg.get('watchlist.table.alldocuments'), '', $wikiDoc.getURL('view', 'xpage=watch&amp;do=removewiki')]))
+  #end
+#end
+## Spaces
+#foreach($space in $spaces)
+  #if("$!space" != '')
+    #set($wiki = $space.substring(0, $space.indexOf(':')))
+    #set($dotsindex = $space.indexOf(':') + 1)
+    #set($spaceName = $space.substring($dotsindex))
+    #set($wikiRef = $services.model.createDocumentReference($wiki, '', ''))
+    #set($spaceRef = $services.model.createDocumentReference($wiki, $spaceName, ''))
+    #set($wikiDoc = $xwiki.getDocument($wikiRef))
+    #set($spaceDoc = $xwiki.getDocument($spaceRef))
+    #set($discard = $elements.add([$space, $spaceType, $wiki, $wikiDoc.getURL(), $spaceName, $spaceDoc.getURL(), $msg.get('watchlist.table.alldocuments'), '', $spaceDoc.getURL('view', 'xpage=watch&amp;do=removespace')]))
+  #end
+#end
+## Pages
+#foreach($page in $pages)
+  #if ("$!page" != '')
+    #set($wiki = $page.substring(0, $page.indexOf(':')))
+    #set($dotsindex = $page.indexOf(':') + 1)
+    #set($spaceName = $page.substring($dotsindex, $page.indexOf('.')))
+    #set($dotindex = $page.indexOf('.') + 1)
+    #set($pageName = $page.substring($dotindex))
+    #set($wikiRef = $services.model.createDocumentReference($wiki, '', ''))
+    #set($spaceRef = $services.model.createDocumentReference($wiki, $spaceName, ''))
+    #set($pageRef = $services.model.createDocumentReference($wiki, $spaceName, $pageName))
+    #set($wikiDoc = $xwiki.getDocument($wikiRef))
+    #set($spaceDoc = $xwiki.getDocument($spaceRef))
+    #set($pageDoc = $xwiki.getDocument($pageRef))
+    #set($discard = $elements.add([$page, $pageType, $wiki, $wikiDoc.getURL(), $spaceName, $spaceDoc.getURL(), $pageName, $pageDoc.getURL(), $pageDoc.getURL('view', 'xpage=watch&amp;do=removedocument')]))
+  #end
+#end
+##
+## JSON
+##
+{
+  "totalrows": $elements.size(),
+  "reqNo"    : $!request.reqNo,
+  "returnedrows": $elements.size(),
+  "offset"   : $!request.offset,
+  "rows": [
+    #foreach($element in $elements)
+      #if ($velocityCount &gt; 1),#end
+      {
+        "id"        : "$!listtool.get($element, 0)",
+        "type"      : "$!listtool.get($element, 1)",
+        #set($wikiName = $!listtool.get($element, 2))
+        #if($xwiki.isVirtualMode() &amp;&amp; $xwiki.wikimanager)
+          #set($wikiPrettyName = $xwiki.wikimanager.getWikiDocument($wikiName).getWikiPrettyName())
+          #if("$!wikiPrettyName.trim()" != '')
+            #set($wikiName = $wikiPrettyName)
+          #end
+        #end
+        "wikiName"  : "$wikiName",
+        "wikiUrl"   : "$!listtool.get($element, 3)",
+        "spaceName" : "$!listtool.get($element, 4)",
+        "spaceUrl"  : "$!listtool.get($element, 5)",
+        "pageName"  : "$!listtool.get($element, 6)",
+        "pageUrl"   : "$!listtool.get($element, 7)",
+        "deleteUrl" : "$!listtool.get($element, 8)"
+      }
+    #end
+  ]
+}
+#end
+{{/velocity}}</content></xwikidoc>

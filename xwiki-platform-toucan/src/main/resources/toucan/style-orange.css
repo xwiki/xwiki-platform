@@ -1,0 +1,4 @@
+@import "$xwiki.getSkinFile('css/microformats.css')";
+@import "rss.css";
+@import "toucan.css";
+@import "css/colors/orange.css";

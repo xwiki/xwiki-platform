@@ -1,0 +1,31 @@
+
+body#body,
+#allviewpanels .accordionTabContentBox{background-image: url( ../../images/colors/red/H4x4-RED.png); }
+
+body#body #xwikimaincontainer,
+body.hideright #xwikimaincontainer,
+body#body.hideright  #xwikimaincontainerinner,
+body.importbody #xwikimaincontainerinner,
+body.exportbody #xwikimaincontainerinner,
+body.adminbody #xwikimaincontainerinner,
+body.hidelefthideright #xwikimaincontainerinner,
+body#body.hidelefthideright  #xwikimaincontainerinner 
+{  background-image :url( ../../images/colors/red/bg-RED3.png) ; }
+
+#xwikimaincontainerinner,
+body#body.editbody #xwikimaincontainerinner,
+body#body.eportbody #xwikimaincontainer,
+body#body.importbody #xwikimaincontainer,
+body#body.adminbody #xwikimaincontainer,
+body#body.hidelefthideright #xwikimaincontainer,
+body#body.hideleft #xwikimaincontainer,
+body#body.editbody #xwikimaincontainer
+ {  background-image :url(../../images/colors/red/bg-RED.png) ;}
+ 
+body#body.editbody #globallinks,
+#globallinks,
+#rightPanels,
+#editPanels.panels{  background-image: url( ../../images/colors/red/bgx-RED.png);}
+
+#company { background-image: url( ../../images/colors/red/bgxleft-RED.png); }
+

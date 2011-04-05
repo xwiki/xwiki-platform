@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XAppManager</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>1</translation>
+<parent>Main.WebHome</parent>
+<creator></creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1192218584000</creationDate>
+<date>1278348010000</date>
+<contentUpdateDate>1278348010000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
+<content>#set($AppManager = $xwiki.applicationmanager)
+#if(!$AppManager)
+  #error($msg.get("xapp.pluginnotenabled"))
+#end
+##
+#set($Exception = $AppManager.DefaultException)
+##
+#set($action = $request.getParameter("action"))
+#set($confirm = $request.getParameter("confirm"))
+##
+#set($appname = $request.getParameter("appname"))
+#set($packagename = $request.getParameter("packagename"))
+#set($recurse = $request.getParameter("recurse"))
+#set($withversion = $request.getParameter("withversion"))
+##
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js")##
+$xwiki.ssfx.use("js/xwiki/table/table.css")##
+##
+#############################################################################
+##
+#if($action)
+  #if($action == "delete")
+    #includeInContext("XAppCode.DeleteAppCode")
+  #elseif($action == "export")
+    #includeInContext("XAppCode.ExportAppCode")
+  #elseif($action == "import")
+    #includeInContext("XAppCode.ImportAppCode")
+  #elseif($action == "reload")
+    #includeInContext("XAppCode.ReloadAppCode")
+  #end
+#end
+##
+#############################################################################
+##
+1 $msg.get("xapp.appmanager")
+##
+#set($listApp = $AppManager.getApplicationDocumentList())
+##
+$msg.get("xapp.totalnumberofapp") : $listApp.size()
+\\
+[$msg.get("xapp.createapplication")&gt;XAppManager.CreateApplication]
+##
+#if($listApp.size() &gt; 0)
+  &lt;table id="wikiTable" class="grid sortable filterable doOddEven"&gt;
+    &lt;tr class="sortHeader"&gt;
+      &lt;th scope="col"&gt;$msg.get("xapp.appname")&lt;/th&gt;
+      &lt;th scope="col"&gt;$msg.get("version")&lt;/th&gt;
+      &lt;th scope="col"&gt;$msg.get("xapp.description")&lt;/th&gt;
+      &lt;th scope="col"&gt;$msg.get("more")&lt;/th&gt;
+    &lt;/tr&gt;
+    #foreach($app in $listApp)
+      &lt;tr&gt;
+        &lt;td&gt;[#if($app.appprettyname &amp;&amp; $app.appprettyname.trim() != "")$app.appprettyname ($app.appname)#else$app.appname#end&gt;$app.getFullName()]&lt;/td&gt;
+        &lt;td&gt;$app.appversion&lt;/td&gt;
+        &lt;td&gt;$app.description&lt;/td&gt;
+        &lt;td&gt;&lt;a href="$doc.getURL("view", "action=delete&amp;amp;appname=$app.appname")"&gt;$msg.get("delete")&lt;/a&gt; &lt;a href="$doc.getURL("view", "action=export&amp;amp;appname=$app.appname")"&gt;$msg.get("xapp.action.exportrecurse")&lt;/a&gt; &lt;a href="$doc.getURL("view", "action=reload&amp;amp;appname=$app.appname")"&gt;$msg.get("xapp.action.reloadapp")&lt;/a&gt; &lt;a href="$app.getURL("inline")"&gt;$msg.get("edit")&lt;/a&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+    #end
+  &lt;/table&gt;
+#end
+##
+#############################################################################
+##
+#if($xcontext.hasAdminRights())
+  1.1 $msg.get("xapp.availablefilestoimport")
+  ##
+  #set($listpackage=$doc.getAttachmentList())
+  #foreach ($package in $listpackage)
+  - [$package.getFilename()&gt;?action=import&amp;amp;packagename=$package.getFilename()]
+  #end
+#end</content></xwikidoc>

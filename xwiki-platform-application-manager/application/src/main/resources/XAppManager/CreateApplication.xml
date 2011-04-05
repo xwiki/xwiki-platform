@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XAppManager</web>
+<name>CreateApplication</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XAppManager.WebHome</parent>
+<creator></creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1192218584000</creationDate>
+<date>1278409664000</date>
+<contentUpdateDate>1278409664000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
+<content>#set($AppManager = $xwiki.applicationmanager)
+#if(!$AppManager)
+  #error($msg.get("xapp.pluginnotenabled"))
+#end
+##
+#set($Exception = $AppManager.DefaultException)
+##
+#set($appdocument = $AppManager.createApplicationDocument())
+#set($appdocumentobject = $appdocument.updateObjectFromRequest("XAppClasses.XWikiApplicationClass"))
+##
+#set($action = $request.getParameter("action"))
+##
+#############################################################################
+##
+1 $msg.get("xapp.createapplication")
+##
+#if($action)
+  #if($action == "create")
+    #set($result = $AppManager.createApplication($appdocument, true))
+    #if ($result == $Exception.ERROR_NOERROR)
+      &lt;font color=green&gt;
+        $msg.get("xapp.successcreateapp", [$appdocument.appname, $appdocument.getFullName()])
+      &lt;/font&gt;
+    #else
+      &lt;font color=red&gt;
+        #if ($result == $Exception.ERROR_AM_APPDOCALREADYEXISTS)
+          $msg.get("xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS", [$appdocument.appname])
+        #else
+          $msg.get("xapp.errorcreateapp", [$appdocument.appname, $result])
+        #end
+      &lt;/font&gt;
+    #end
+  #end
+#end
+##
+&lt;form method="get" action=""&gt;
+  &lt;div&gt;
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+    &lt;input type="hidden" name="action" value="create" /&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="XAppClasses.XWikiApplicationClass_0_appname"&gt;$msg.get("xapp.appname")&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;$appdocument.display("appname", "edit")&lt;/dd&gt;
+      &lt;dt&gt;&lt;label for="XAppClasses.XWikiApplicationClass_0_description"&gt;$msg.get("xapp.description")&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;$appdocument.display("description", "edit")&lt;/dd&gt;
+      &lt;dt&gt;&lt;label for="XAppClasses.XWikiApplicationClass_0_appversion"&gt;$msg.get("version")&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;$appdocument.display("appversion", "edit")&lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/div&gt;
+  &lt;p&gt;
+    &lt;input class="button" type="submit" value="$msg.get("create")" /&gt;
+  &lt;/p&gt;
+&lt;/form&gt;</content></xwikidoc>

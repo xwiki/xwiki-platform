@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XAppCode</web>
+<name>ExportAppCode</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XAppCode.WebHome</parent>
+<creator></creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1192218584000</creationDate>
+<date>1278410830000</date>
+<contentUpdateDate>1278410830000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
+<content>#if($action &amp;&amp; $action == "export")
+  #if($confirm &amp;&amp; $confirm == 1)
+    #if($recurse &amp;&amp; $recurse == 1)
+      #set($recurse = true)
+    #else
+      #set($recurse = false)
+    #end
+    #if($withversion &amp;&amp; $withversion == 1)
+      #set($withversion = true)
+    #else
+      #set($withversion = false)
+    #end
+    #set($result = $AppManager.exportApplicationXAR($appname, $recurse, $withversion))
+    #if ($result == $Exception.ERROR_NOERROR)
+      #info($msg.get("xapp.successexportapp", [$appname]))
+    #elseif ($result == $Exception.ERROR_XWIKI_ACCESS_DENIED)
+      #error($msg.get("notallowed"))
+    #else
+      #error($msg.get("xapp.errorexportapp", [$appname, $result]))
+    #end
+  #else
+    &lt;form id="exportForm" action="" method="get"&gt;
+      #xwikimessageboxstart($msg.get("xapp.answer.exportapp.title", [$appname]) "")
+        &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+        &lt;input type="hidden" id="confirm" name="confirm" value="1" /&gt;
+        &lt;input type="hidden" id="action" name="action" value="$action" /&gt;
+        &lt;input type="hidden" id="appname" name="appname" value="$appname" /&gt;
+
+        &lt;input type="checkbox" id="recurse" name="recurse" value="1" checked="checked"/&gt;&lt;label for="recurse"&gt;$msg.get("xapp.answer.exportapp.recursive")&lt;/label&gt;&lt;br/&gt;
+        &lt;input type="checkbox" id="withdetails" name="withdetails" value="1"/&gt;&lt;label for="withdetails"&gt;$msg.get("xapp.answer.exportapp.withdetails")&lt;/label&gt;
+
+        #submitButton("exportok", $null, $msg.get("ok"))
+      #xwikimessageboxend()
+    &lt;/form&gt;
+  #end
+#end</content></xwikidoc>

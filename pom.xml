@@ -31,7 +31,7 @@
     <relativePath>../../xwiki-commons-pom</relativePath>
   </parent>
   <groupId>org.xwiki.platform</groupId>
-  <artifactId>xwiki-core-parent</artifactId>
+  <artifactId>xwiki-platform-parent</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
   <version>3.1-SNAPSHOT</version>

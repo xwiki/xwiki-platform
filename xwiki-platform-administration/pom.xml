@@ -48,7 +48,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-parent</artifactId>
+      <artifactId>xwiki-platform-parent</artifactId>
       <version>3.0</version>
       <type>pom</type>
       <scope>runtime</scope>

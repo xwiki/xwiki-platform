@@ -36,19 +36,6 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
     /**
      * {@inheritDoc}
      * 
-     * @see BehaviorAdjuster#adjustDragDrop(Document)
-     */
-    public native void adjustDragDrop(Document document)
-    /*-{
-        // block default drag and drop mechanism to not allow content to be dropped on this document 
-        document.addEventListener("dragdrop", function(event) {
-            event.stopPropagation();
-        }, true);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see BehaviorAdjuster#navigateOutsideTableCell(Event, boolean)
      */
     protected void navigateOutsideTableCell(Event event, boolean before)

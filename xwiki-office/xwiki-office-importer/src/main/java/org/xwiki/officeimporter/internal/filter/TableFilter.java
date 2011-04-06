@@ -29,9 +29,7 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 import org.xwiki.xml.html.filter.ElementSelector;
 
 /**
- * Presently xwiki rendering module doesn't support complex table cell items. This filter is used to rip-off or modify
- * html tables so that they can be rendered properly. The corresponding JIRA issue is located at
- * http://jira.xwiki.org/jira/browse/XWIKI-2804.
+ * This filter is used to rip-off or modify HTML tables so that they can be rendered properly.
  * 
  * @version $Id$
  * @since 1.8M1
@@ -39,12 +37,6 @@ import org.xwiki.xml.html.filter.ElementSelector;
 @Component("officeimporter/table")
 public class TableFilter extends AbstractHTMLFilter
 {
-    /**
-     * If these tags are found within a cell item (td), cell's content will be considered as an embedded document.
-     */
-    private static final String[] FILTER_TAGS = new String[] {
-        TAG_P, TAG_H1, TAG_H2, TAG_H3, TAG_H4, TAG_H5, TAG_H6, TAG_BR, TAG_UL, TAG_OL, TAG_IMG, TAG_TABLE};
-
     /**
      * {@inheritDoc}
      */
@@ -58,18 +50,7 @@ public class TableFilter extends AbstractHTMLFilter
                 replaceWithChildren(paragraphs.get(0));
             }
         }
-        // Filter resulting cell content.
-        tableCells = filterDescendants(document.getDocumentElement(), new String[] {TAG_TD, TAG_TH});
-        for (Element cell : tableCells) {
-            List<Element> dangerTags = filterDescendants(cell, FILTER_TAGS);
-            if (!dangerTags.isEmpty()) {
-                Element div = document.createElement(TAG_DIV);
-                div.setAttribute(ATTRIBUTE_CLASS, "xwiki-document");
-                moveChildren(cell, div);
-                cell.appendChild(div);
-            }
-        }
-        // Strip off empty table rows. see http://jira.xwiki.org/jira/browse/XWIKI-3136.
+        // Strip off empty table rows. See http://jira.xwiki.org/jira/browse/XWIKI-3136.
         List<Element> emptyRows =
             filterDescendants(document.getDocumentElement(), new String[] {TAG_TR}, new ElementSelector()
             {

@@ -31,7 +31,7 @@ $pdfdoc.use('XWiki.PDFClass')
   </div>
   #if ($request.includechilds)
     #set ($clevel = $util.parseInt($request.includechilds))
-    #includeChildren($cdoc.fullName $withPageBreaks)
+    #includeChildren($cdoc $withPageBreaks)
   #elseif ($request.includelinks)
     #set ($clevel = $util.parseInt($request.includelinks))
     #includeLinks($cdoc.fullName $withPageBreaks)

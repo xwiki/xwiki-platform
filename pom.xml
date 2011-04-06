@@ -150,39 +150,41 @@
     </dependency>
   </dependencies>
   <modules>
-    <module>xwiki-platform-model</module>
-    <module>xwiki-platform-xmlrpc</module>
-    <module>xwiki-platform-cache</module>
-    <module>xwiki-platform-xml</module>
-    <module>xwiki-platform-core</module>
-    <module>xwiki-platform-component</module>
-    <module>xwiki-platform-url</module>
-    <module>xwiki-platform-containers</module>
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-action</module>
-    <module>xwiki-platform-velocity</module>
-    <module>xwiki-platform-observation</module>
-    <module>xwiki-platform-bridge</module>
-    <module>xwiki-platform-rendering</module>
-    <module>xwiki-platform-configuration</module>
-    <module>xwiki-platform-query</module>
-    <module>xwiki-platform-webdav</module>
-    <module>xwiki-platform-office</module>
-    <module>xwiki-platform-rest</module>
-    <module>xwiki-platform-refactoring</module>
-    <module>xwiki-platform-chart</module>
-    <module>xwiki-platform-formula</module>
-    <module>xwiki-platform-classloader</module>
-    <module>xwiki-platform-captcha</module>
+    <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-annotations</module>
+    <module>xwiki-platform-bridge</module>
+    <module>xwiki-platform-cache</module>
+    <module>xwiki-platform-captcha</module>
+    <module>xwiki-platform-chart</module>
+    <module>xwiki-platform-classloader</module>
+    <module>xwiki-platform-component</module>
+    <module>xwiki-platform-configuration</module>
+    <module>xwiki-platform-containers</module>
+    <module>xwiki-platform-core</module>
     <module>xwiki-platform-crypto</module>
     <module>xwiki-platform-csrf</module>
+    <module>xwiki-platform-eventstream</module>
     <module>xwiki-platform-extension</module>
+    <module>xwiki-platform-formula</module>
     <module>xwiki-platform-legacy</module>
+    <module>xwiki-platform-messagestream</module>
+    <module>xwiki-platform-model</module>
+    <module>xwiki-platform-observation</module>
+    <module>xwiki-platform-office</module>
+    <module>xwiki-platform-query</module>
+    <module>xwiki-platform-refactoring</module>
+    <module>xwiki-platform-rendering</module>
+    <module>xwiki-platform-rest</module>
     <module>xwiki-platform-skin</module>
     <module>xwiki-platform-store</module>
-    <module>xwiki-platform-eventstream</module>
-    <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-test</module>
+    <module>xwiki-platform-url</module>
+    <module>xwiki-platform-velocity</module>
+    <module>xwiki-platform-xml</module>
+    <module>xwiki-platform-xmlrpc</module>
+    <module>xwiki-platform-webdav</module>
   </modules>
   <profiles>
     <profile>

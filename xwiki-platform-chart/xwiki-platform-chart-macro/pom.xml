@@ -28,6 +28,7 @@
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
     <version>3.1-SNAPSHOT</version>
+    <relativePath>../../xwiki-platform-rendering/xwiki-platform-rendering-macros</relativePath>
   </parent>
   <artifactId>xwiki-platform-chart-macro</artifactId>
   <name>XWiki Platform - Chart - Macro</name>

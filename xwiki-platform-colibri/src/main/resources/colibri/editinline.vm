@@ -5,6 +5,9 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 #set($saveaction = "save")
 #set($previewenabled = true)
 <div class="main layoutsubsection">
+  <div id="contentmenu" class="actionmenu">
+    #template("editmenu.vm")
+  </div>
 <div id="mainContentArea">
 #template("hierarchy.vm")
 #template('editmeta.vm')

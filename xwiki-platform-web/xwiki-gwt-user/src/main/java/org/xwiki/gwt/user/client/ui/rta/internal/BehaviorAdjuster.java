@@ -431,16 +431,6 @@ public class BehaviorAdjuster
      */
     protected void onLoad(Event event)
     {
-        adjustDragDrop(textArea.getDocument());
-    }
-
-    /**
-     * Prevents the drag and drop default behavior by disabling the default events.
-     * 
-     * @param document the document in the loaded rich text area.
-     */
-    protected void adjustDragDrop(Document document)
-    {
         // Nothing here by default. May be overridden by browser specific implementations.
     }
 }

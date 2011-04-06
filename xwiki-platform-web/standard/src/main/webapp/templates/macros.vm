@@ -590,23 +590,33 @@ $fn
 ##
 #set($clevel = 1)
 
-##
-## Macro to include children at multiple levels
+#**
+ * Macro to include children at multiple levels. The children are rendered in the generated output. The number of nested levels to
+ * render is defined in a global variable called "$clevel".
+ *
+ * @param $page the document whose children should be rendered; preferably a Document object, but a document name works as well
+ * @param $withPageBreaks a boolean indicating whether a page break should be generated before each new child document
+ *###
 #macro(includeChildren $page $withPageBreaks)
- #if($clevel!=0)
-  #foreach($childDocName in $xwiki.searchDocuments("where doc.parent='$page' order by doc.creationDate"))
-    #set($childDoc = $xwiki.getDocument($childDocName))
-    #if(($childDoc)&&($childDoc.getSpace()!="Panels")&&($childDoc.getSpace()!="XWiki"))
-     #if($withPageBreaks)
-     #pagebreak()
-     #end
-     $childDoc.getRenderedContent()
-     #set($clevel = $xwiki.add($clevel,-1))
-     #includeChildren($childDocName $withPageBreaks)
-     #set($clevel = $xwiki.add($clevel,1))
+  #if ($clevel > 0)
+    #if ("$!page.fullName" == '')
+      ## Not a Document, probably a String (document name)
+      ## Make it backwards compatible with older versions of the macro
+      #set ($page = $xwiki.getDocument($page))
+    #end
+    #foreach ($childDocName in $page.children)
+      #set ($childDoc = $xwiki.getDocument($childDocName))
+      #if ($childDoc && !$blacklistedSpaces.contains($childDoc.getSpace()))
+        #if ($withPageBreaks)
+          #pagebreak()
+        #end
+        $childDoc.getRenderedContent()
+        #set ($clevel = $clevel - 1)
+        #includeChildren($childDoc $withPageBreaks)
+        #set ($clevel = $clevel + 1)
+      #end
     #end
   #end
- #end
 #end
 
 ##

@@ -275,13 +275,15 @@ span.wikicreatelink a:after {
 
 .edit_section a {
   background: transparent url("$xwiki.getSkinFile('icons/xwiki/edit-section.png')") no-repeat left top;
-  margin: 0 -52px 0 0;
+  line-height: 999px;
+  margin: 0;
   overflow: hidden;
-  padding: 0 0 0 50px;
+  padding: 0;
   position: absolute;
   right: 0;
   top: 0;
   visibility:visible;
+  width: 20px;
 }
 
 /* -----------------General Elements---------------------*/

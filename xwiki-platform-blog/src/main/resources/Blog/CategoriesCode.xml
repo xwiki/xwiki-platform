@@ -43,6 +43,7 @@
   #if ("$!{blogCategoryEntriesCache.containsKey($!{category})}" == 'true')
     #setVariable ("$entries" $blogCategoryEntriesCache.get($!{category}).get(0))
     #setVariable ("$totalEntries" $blogCategoryEntriesCache.get($!{category}).get(1))
+    #preparePagedViewParams ($totalEntries 10)
   #else
     #getCategoriesHierarchy ('' $tree)
     #set ($subcategories = [])

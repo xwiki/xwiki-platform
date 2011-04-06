@@ -26,22 +26,21 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-rendering-macros-parent</artifactId>
+    <artifactId>xwiki-platform-rendering-macros</artifactId>
     <version>3.1-SNAPSHOT</version>
-    <relativePath>../../xwiki-rendering/xwiki-rendering-macros/pom.xml</relativePath>
   </parent>
-  <artifactId>xwiki-core-rendering-macro-formula</artifactId>
-  <name>XWiki Platform - Core - Rendering - Macro - Mathematical Formulae</name>
+  <artifactId>xwiki-platform-rendering-macro-formula</artifactId>
+  <name>XWiki Platform - Rendering - Macro - Mathematical Formulae</name>
   <description>Macro for displaying methematical formulae</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-formula-renderer</artifactId>
+      <artifactId>xwiki-platform-formula-renderer</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-bridge</artifactId>
+      <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

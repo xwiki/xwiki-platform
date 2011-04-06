@@ -26,45 +26,41 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-observation</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-classloader</artifactId>
-  <name>XWiki Platform - ClassLoader</name>
+  <groupId>org.xwiki.platform</groupId>
+  <artifactId>xwiki-platform-observation-local</artifactId>
+  <name>XWiki Platform - Observation - Local</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - ClassLoader</description>
+  <description>XWiki Platform - Observation - Local</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
+      <artifactId>xwiki-commons-observation-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-observation</artifactId>
+      <version>${commons.version}</version>
     </dependency>
-    <dependency>
-      <groupId>edu.emory.mathcs.util</groupId>
-      <artifactId>emory-util-classloader</artifactId>
-      <version>2.1</version>
-    </dependency>
+    
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-test</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-default</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

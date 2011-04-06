@@ -510,7 +510,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-observation-local</artifactId>
+      <artifactId>xwiki-platform-observation-local</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -545,7 +545,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-bridge</artifactId>
+      <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -636,17 +636,17 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-formula-renderer</artifactId>
+      <artifactId>xwiki-platform-formula-renderer</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-cache-api</artifactId>
+      <artifactId>xwiki-platform-cache-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-cache-jbosscache</artifactId>
+      <artifactId>xwiki-platform-cache-jbosscache</artifactId>
       <version>${project.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
@@ -701,7 +701,7 @@
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-macro-script</artifactId>
+      <artifactId>xwiki-platform-rendering-macro-script</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
@@ -709,14 +709,14 @@
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-macro-velocity</artifactId>
+      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-macro-groovy</artifactId>
+      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

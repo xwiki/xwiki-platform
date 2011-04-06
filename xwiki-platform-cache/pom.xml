@@ -34,10 +34,10 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Cache - Parent POM</description>
   <modules>
-    <module>xwiki-cache-api</module>
-    <module>xwiki-cache-tests</module>
-    <module>xwiki-cache-oscache</module>
-    <module>xwiki-cache-jbosscache</module>
+    <module>xwiki-platform-cache-api</module>
+    <module>xwiki-platform-cache-tests</module>
+    <module>xwiki-platform-cache-oscache</module>
+    <module>xwiki-platform-cache-jbosscache</module>
   </modules>
 </project>
        

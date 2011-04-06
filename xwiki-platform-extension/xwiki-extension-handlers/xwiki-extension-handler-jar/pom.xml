@@ -36,7 +36,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-classloader</artifactId>
+      <artifactId>xwiki-platform-classloader</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Use default because of ComponentAnnotationLoader -->
@@ -59,7 +59,7 @@
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-observation-local</artifactId>
+      <artifactId>xwiki-platform-observation-local</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

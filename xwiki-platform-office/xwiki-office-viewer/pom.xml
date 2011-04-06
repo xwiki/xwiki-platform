@@ -43,7 +43,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-bridge</artifactId>
+      <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -53,7 +53,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-cache-api</artifactId>
+      <artifactId>xwiki-platform-cache-api</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

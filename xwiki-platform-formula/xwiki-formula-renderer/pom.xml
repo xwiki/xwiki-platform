@@ -27,7 +27,7 @@
     <artifactId>xwiki-core-formula</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-formula-renderer</artifactId>
+  <artifactId>xwiki-platform-formula-renderer</artifactId>
   <name>XWiki Platform - Core - Renderer for mathematical formulae</name>
   <packaging>jar</packaging>
   <description>XWiki component for rendering mathematical formulae into images</description>
@@ -49,7 +49,7 @@
     <!-- Other XWiki modules -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-cache-api</artifactId>
+      <artifactId>xwiki-platform-cache-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -59,7 +59,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-container-api</artifactId>
+      <artifactId>xwiki-platform-container-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

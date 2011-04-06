@@ -26,45 +26,31 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-rendering-macros</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-classloader</artifactId>
-  <name>XWiki Platform - ClassLoader</name>
-  <packaging>jar</packaging>
-  <description>XWiki Platform - ClassLoader</description>
+  <artifactId>xwiki-core-rendering-macro-code</artifactId>
+  <name>XWiki Platform - Core - Rendering - Macro - Code</name>
+  <description>XWiki Platform - Core - Rendering - Macro - Code</description>
   <dependencies>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>edu.emory.mathcs.util</groupId>
-      <artifactId>emory-util-classloader</artifactId>
-      <version>2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-default</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-box</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.python</groupId>
+      <artifactId>jython-standalone</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>pygments</groupId>
+      <artifactId>pygments</artifactId>
+      <version>1.4-xwiki</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

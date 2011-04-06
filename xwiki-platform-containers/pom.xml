@@ -26,24 +26,24 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-parent</artifactId>
+    <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-containers-parent</artifactId>
-  <name>XWiki Platform - Core - Containers - Parent POM</name>
+  <artifactId>xwiki-platform-containers</artifactId>
+  <name>XWiki Platform - Containers - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Core - Containers - Parent POM</description>
+  <description>XWiki Platform - Containers - Parent POM</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-url-api</artifactId>
+      <artifactId>xwiki-platform-url-api</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
   <modules>
-    <module>xwiki-container-api</module>
-    <module>xwiki-container-servlet</module>
-    <module>xwiki-container-portlet</module>
+    <module>xwiki-platform-container-api</module>
+    <module>xwiki-platform-container-servlet</module>
+    <module>xwiki-platform-container-portlet</module>
   </modules>
 </project>
        

@@ -26,29 +26,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-containers-parent</artifactId>
+    <artifactId>xwiki-platform-containers</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-container-portlet</artifactId>
-  <name>XWiki Platform - Core - Containers - Portlet</name>
+  <artifactId>xwiki-platform-container-api</artifactId>
+  <name>XWiki Platform - Containers - API</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Containers - Portlet</description>
+  <description>XWiki Platform - Containers - API</description>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-container-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-context</artifactId>
+      <artifactId>xwiki-commons-component-api</artifactId>
       <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>portlet-api</groupId>
-      <artifactId>portlet-api</artifactId>
-      <version>1.0</version>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>
@@ -62,12 +51,11 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-            **/container/portlet/PortletApplicationContext.java,
-            **/container/portlet/PortletContainerInitializer.java,
-            **/container/portlet/PortletRequest.java,
-            **/container/portlet/PortletResponse.java,
-            **/container/portlet/PortletSession.java,
-            **/container/portlet/internal/DefaultPortletContainerInitializer.java
+            **/container/ApplicationContext.java,
+            **/container/Container.java,
+            **/container/ContainerFactory.java,
+            **/container/Request.java,
+            **/container/internal/DefaultContainer.java
           </excludes>
         </configuration>
       </plugin>

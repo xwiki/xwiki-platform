@@ -26,17 +26,17 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-containers-parent</artifactId>
+    <artifactId>xwiki-platform-url</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-container-servlet</artifactId>
-  <name>XWiki Platform - Core - Containers - Servlet</name>
+  <artifactId>xwiki-platform-url-container</artifactId>
+  <name>XWiki Platform - URL - Container</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Containers - Servlet</description>
+  <description>XWiki Platform - URL - Container</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-container-api</artifactId>
+      <artifactId>xwiki-platform-container-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -44,44 +44,5 @@
       <artifactId>xwiki-commons-context</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-action</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-url-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <!--
-          Apply the Checkstyle configurations defined in the top level
-          pom.xml file
-        -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-            **/servlet/ServletApplicationContext.java,
-            **/servlet/ServletContainerException.java,
-            **/servlet/ServletContainerInitializer.java,
-            **/servlet/ServletRequest.java,
-            **/servlet/ServletResponse.java,
-            **/servlet/ServletSession.java,
-            **/servlet/filters/internal/SetCharacterEncodingFilter.java,
-            **/servlet/internal/DefaultServletContainerInitializer.java
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
-

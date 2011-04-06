@@ -26,23 +26,22 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-url</artifactId>
+    <artifactId>xwiki-platform-url</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <groupId>org.xwiki.platform</groupId>
-  <artifactId>xwiki-core-url-container</artifactId>
-  <name>XWiki Platform - Core - URL - Container</name>
+  <artifactId>xwiki-platform-url-api</artifactId>
+  <name>XWiki Platform - URL - API</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - URL - Container</description>
+  <description>XWiki Platform - URL - API</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-container-api</artifactId>
+      <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-context</artifactId>
+      <artifactId>xwiki-commons-component-default</artifactId>
       <version>${commons.version}</version>
     </dependency>
   </dependencies>

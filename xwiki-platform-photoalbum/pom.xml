@@ -26,7 +26,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-parent</artifactId>
+    <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-application-photoalbum</artifactId>
@@ -48,7 +48,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-parent</artifactId>
+      <artifactId>xwiki-platform-core</artifactId>
       <version>[2.5-milestone-2,)</version>
       <type>pom</type>
       <scope>runtime</scope>

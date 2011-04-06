@@ -26,17 +26,17 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-parent</artifactId>
+    <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-url</artifactId>
-  <name>XWiki Platform - Core - URL - Parent POM</name>
+  <artifactId>xwiki-platform-url</artifactId>
+  <name>XWiki Platform - URL - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Core - Parent POM</description>
+  <description>XWiki Platform - URL - Parent POM</description>
   <modules>
-    <module>xwiki-url-api</module>
-    <module>xwiki-url-default</module>
-    <module>xwiki-url-container</module>
+    <module>xwiki-platform-url-api</module>
+    <module>xwiki-platform-url-default</module>
+    <module>xwiki-platform-url-container</module>
   </modules>
 </project>
        

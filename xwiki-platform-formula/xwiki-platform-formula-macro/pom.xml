@@ -28,10 +28,11 @@
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
     <version>3.1-SNAPSHOT</version>
+    <relativePath>../../xwiki-platform-rendering/xwiki-platform-rendering-macros</relativePath>
   </parent>
-  <artifactId>xwiki-platform-rendering-macro-formula</artifactId>
-  <name>XWiki Platform - Rendering - Macro - Mathematical Formulae</name>
-  <description>Macro for displaying methematical formulae</description>
+  <artifactId>xwiki-platform-formula-macro</artifactId>
+  <name>XWiki Platform - Formula - Macro</name>
+  <description>Macro for displaying mathematical formulae</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

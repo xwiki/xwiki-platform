@@ -24,13 +24,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-webdav</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <groupId>com.xpn.xwiki.platform</groupId>
-  <artifactId>xwiki-webdav</artifactId>
+  <artifactId>xwiki-platform-webdav-server</artifactId>
   <packaging>jar</packaging>
-  <name>XWiki Platform - Core - WebDAV</name>
+  <name>XWiki Platform - WebDAV - Server</name>
   <description>Service for accessing XWiki through WebDAV</description>
   <properties>
     <jackrabbit.version>1.4</jackrabbit.version>
@@ -59,8 +58,8 @@
       <version>${jackrabbit.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

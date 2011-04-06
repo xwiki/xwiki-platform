@@ -37,9 +37,12 @@
   <version>3.1-SNAPSHOT</version>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
-    <!-- Versions of XWiki dependencies used in Core modules -->
+    <!-- Versions of XWiki dependencies used in Platform modules -->
     <rendering.version>${project.version}</rendering.version>
     <commons.version>${project.version}</commons.version>
+    <!-- Platform Tools versions -->
+    <platform.tool.xar-handler.version>1.10-SNAPSHOT</platform.tool.xar-handler.version>
+    <platform.tool.xar-plugin.version>1.15-SNAPSHOT</platform.tool.xar-plugin.version>
     <!-- The previous stable version of this project, used to catch API breakages. -->
     <clirr.previous.version>3.0</clirr.previous.version>
   </properties>
@@ -95,6 +98,11 @@
             </archive>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.xwiki.platform.tools</groupId>
+          <artifactId>xwiki-xar-plugin</artifactId>
+          <version>${platform.tool.xar-plugin.version}</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -113,6 +121,14 @@
         </executions>
       </plugin>
     </plugins>
+    <!-- Needed to add support for the XAR packaging -->
+    <extensions>
+      <extension>
+        <groupId>org.xwiki.platform.tools</groupId>
+        <artifactId>xwiki-xar-handlers</artifactId>
+        <version>${platform.tool.xar-handler.version}</version>
+      </extension>
+    </extensions>
   </build>
   <dependencies>
     <dependency>
@@ -162,7 +178,7 @@
     <module>xwiki-platform-component</module>
     <module>xwiki-platform-configuration</module>
     <module>xwiki-platform-containers</module>
-    <module>xwiki-platform-core</module>
+    <module>xwiki-platform-oldcore</module>
     <module>xwiki-platform-crypto</module>
     <module>xwiki-platform-csrf</module>
     <module>xwiki-platform-eventstream</module>

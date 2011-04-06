@@ -26,15 +26,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-webdav</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-formula</artifactId>
-  <packaging>pom</packaging>
-  <name>XWiki Platform - Formula</name>
-  <description>Support for mathematical formulae inside XWiki</description>
-  <modules>
-    <module>xwiki-platform-formula-renderer</module>
-    <module>xwiki-platform-formula-macro</module>
-  </modules>
+  <artifactId>xwiki-platform-webdav-ui</artifactId>
+  <packaging>xar</packaging>
+  <name>XWiki Platform - WebDAV - UI</name>
+  <description>Holds utility functions required for WebDAV UI integration.</description>
 </project>

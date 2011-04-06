@@ -29,11 +29,10 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <groupId>com.xpn.xwiki.platform</groupId>
-  <artifactId>xwiki-core</artifactId>
-  <name>XWiki Platform - Core - Core</name>
+  <artifactId>xwiki-platform-oldcore</artifactId>
+  <name>XWiki Platform - Old Core</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Core</description>
+  <description>XWiki Platform - Old Core</description>
   <dependencies>
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
@@ -505,7 +504,7 @@
     <!-- Other XWiki modules -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-configuration-default</artifactId>
+      <artifactId>xwiki-platform-configuration-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -515,12 +514,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-observation-remote</artifactId>
+      <artifactId>xwiki-platform-observation-remote</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-velocity-webapp</artifactId>
+      <artifactId>xwiki-platform-velocity-webapp</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -535,12 +534,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-container-portlet</artifactId>
+      <artifactId>xwiki-platform-container-portlet</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-xmlrpc-model</artifactId>
+      <artifactId>xwiki-platform-xmlrpc-model</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -555,40 +554,40 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-xwiki</artifactId>
+      <artifactId>xwiki-platform-rendering-xwiki</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-chart-renderer</artifactId>
+      <artifactId>xwiki-platform-chart-renderer</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-url-default</artifactId>
+      <artifactId>xwiki-platform-url-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-url-container</artifactId>
+      <artifactId>xwiki-platform-url-container</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Used by com.xpn.xwiki.web.CommentAction -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-captcha</artifactId>
+      <artifactId>xwiki-platform-captcha</artifactId>
       <version>${project.version}</version>
       <!-- Core does not depend on this to run so it shouldn't be pulled in unless it is a dependency somewhere else. -->
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-macro-wikibridge</artifactId>
+      <artifactId>xwiki-platform-rendering-macro-wikibridge</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-macro-context</artifactId>
+      <artifactId>xwiki-platform-rendering-macro-context</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- XWiki syntax parsers -->
@@ -653,7 +652,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-cache-oscache</artifactId>
+      <artifactId>xwiki-platform-cache-oscache</artifactId>
       <version>${project.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
@@ -665,30 +664,30 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-query-manager</artifactId>
+      <artifactId>xwiki-platform-query-manager</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-office-importer</artifactId>
+      <artifactId>xwiki-platform-office-importer</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-multi</artifactId>
+      <artifactId>xwiki-platform-component-multi</artifactId>
       <version>${project.version}</version>
       <!-- Only required at runtime (ie in the distribution) -->
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-query-xwql</artifactId>
+      <artifactId>xwiki-platform-query-xwql</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-csrf</artifactId>
+      <artifactId>xwiki-platform-csrf</artifactId>
       <version>${project.version}</version>
     </dependency>
 

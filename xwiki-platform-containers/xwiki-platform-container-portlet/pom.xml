@@ -30,7 +30,7 @@
     <version>3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-container-portlet</artifactId>
-  <name>XWiki Platform  - Containers - Portlet</name>
+  <name>XWiki Platform - Containers - Portlet</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Containers - Portlet</description>
   <dependencies>

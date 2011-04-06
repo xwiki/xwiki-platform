@@ -24,16 +24,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-annotations</artifactId>
+    <artifactId>xwiki-platform-annotations</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-annotations-rest</artifactId>
-  <name>XWiki Platform - Core - Annotations - REST Services</name>
+  <artifactId>xwiki-platform-annotation-rest</artifactId>
+  <name>XWiki Platform - Annotations - REST Services</name>
   <packaging>jar</packaging>
   <dependencies>
     <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rest-server</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-server</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -43,12 +43,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-annotations-core</artifactId>
+      <artifactId>xwiki-platform-annotation-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-model</artifactId>
+      <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

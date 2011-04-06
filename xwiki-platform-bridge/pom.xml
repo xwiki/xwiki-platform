@@ -29,14 +29,14 @@
     <artifactId>xwiki-platform-parent</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-bridge</artifactId>
-  <name>XWiki Platform - Core - Bridge</name>
+  <artifactId>xwiki-platform-bridge</artifactId>
+  <name>XWiki Platform - Bridge</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Temporary bridge between new components and the old core, until the old core is completely split into components</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-model</artifactId>
+      <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

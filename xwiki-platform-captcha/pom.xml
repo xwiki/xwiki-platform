@@ -26,13 +26,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-parent</artifactId>
+    <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-captcha</artifactId>
-  <name>XWiki Platform - Core - Captcha</name>
+  <artifactId>xwiki-platform-captcha</artifactId>
+  <name>XWiki Platform - Captcha</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Captcha</description>
+  <description>XWiki Platform - Captcha</description>
   <dependencies>
     <!-- CaptchaActions are components -->
     <dependency>
@@ -43,7 +43,7 @@
     <!-- CaptchaAction extends Action -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-action</artifactId>
+      <artifactId>xwiki-platform-action</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- CaptchaVelocityContextInitializer needs ConfigurationSource to tell whether captchas should be enabled -->

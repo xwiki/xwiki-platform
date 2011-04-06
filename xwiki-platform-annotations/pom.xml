@@ -24,18 +24,19 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-parent</artifactId>
+    <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-annotations</artifactId>
-  <name>XWiki Platform - Core - Annotations - Parent POM</name>
+  <artifactId>xwiki-platform-annotations</artifactId>
+  <name>XWiki Platform - Annotations - Parent POM</name>
   <packaging>pom</packaging>
   <modules>
-    <module>xwiki-annotation-core</module>
-    <module>xwiki-annotation-rest</module>
-    <module>xwiki-annotation-reference</module>
-    <module>xwiki-annotation-io</module>
-    <module>xwiki-annotation-maintainer</module>
-    <module>xwiki-annotation-scripting</module>
+    <module>xwiki-platform-annotation-core</module>
+    <module>xwiki-platform-annotation-io</module>
+    <module>xwiki-platform-annotation-maintainer</module>
+    <module>xwiki-platform-annotation-reference</module>
+    <module>xwiki-platform-annotation-rest</module>
+    <module>xwiki-platform-annotation-scripting</module>
+    <module>xwiki-platform-annotation-ui</module>
   </modules>
 </project>

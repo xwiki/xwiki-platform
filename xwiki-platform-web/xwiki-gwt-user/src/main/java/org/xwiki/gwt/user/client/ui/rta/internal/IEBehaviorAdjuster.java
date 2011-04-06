@@ -19,7 +19,6 @@
  */
 package org.xwiki.gwt.user.client.ui.rta.internal;
 
-import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.dom.client.internal.ie.NativeSelection;
 
@@ -42,24 +41,6 @@ public class IEBehaviorAdjuster extends BehaviorAdjuster
         super.onLoad(event);
         NativeSelection.ensureSelectionIsPreserved(getTextArea().getDocument());
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BehaviorAdjuster#adjustDragDrop(Document)
-     */
-    public native void adjustDragDrop(Document document)
-    /*-{
-        // block default drag and drop mechanism to not allow content to be dropped on this document 
-        document.body.attachEvent("ondrop", function(event) {
-            event.returnValue = false;
-        });
-        // block dragging from this object too, because default behaviour is to cut & paste and 
-        // we loose content from the editor 
-        document.body.attachEvent("ondrag", function(event) {
-            event.returnValue = false;
-        });
-    }-*/;
 
     /**
      * {@inheritDoc}

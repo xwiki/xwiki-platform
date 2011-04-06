@@ -26,9 +26,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <artifactId>xwiki-plugins</artifactId>
-    <version>31-SNAPSHOT</version>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-parent</artifactId>
+    <version>3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-adwords</artifactId>
   <version>0.1-SNAPSHOT</version>

@@ -14,13 +14,14 @@ atlassian-ide-plugin.xml
 .project
 .settings
 .checkstyle
+.fbprefs
 bin
+
+# NetBeans
+nbproject
 
 # Other
 *.log.*
 *.log
 .sonar-ide.properties
 .clover
-nbproject
-.hg*
-.fbprefs

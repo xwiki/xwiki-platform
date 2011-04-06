@@ -19,8 +19,14 @@
  */
 package org.xwiki.officeimporter.internal.cleaner;
 
+import java.io.StringReader;
+
+import junit.framework.Assert;
+
+import org.w3c.dom.Document;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
 import org.xwiki.xml.html.HTMLCleaner;
+import org.xwiki.xml.html.HTMLUtils;
 
 /**
  * Abstract class for all HTML cleaner tests.
@@ -55,8 +61,20 @@ public abstract class AbstractHTMLCleaningTest extends AbstractOfficeImporterTes
      */
     public void setUp() throws Exception
     {
-        super.setUp();        
+        super.setUp();
         this.openOfficeHTMLCleaner = getComponentManager().lookup(HTMLCleaner.class, "openoffice");
         this.wysiwygHTMLCleaner = getComponentManager().lookup(HTMLCleaner.class, "wysiwyg");
-    }        
+    }
+
+    /**
+     * Asserts that the given dirty HTML fragment equals the expected clean HTML after the cleaning process.
+     * 
+     * @param dirtyHTML the HTML fragment to be cleaned
+     * @param expectedCleanHTML expected clean HTML
+     */
+    protected void assertCleanHTML(String dirtyHTML, String expectedCleanHTML)
+    {
+        Document document = openOfficeHTMLCleaner.clean(new StringReader(header + dirtyHTML + footer));
+        Assert.assertEquals(header + expectedCleanHTML + footer, HTMLUtils.toString(document, true, true).trim());
+    }
 }

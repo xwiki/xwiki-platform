@@ -29,13 +29,13 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rendering-parent</artifactId>
-  <name>XWiki Platform - Core - Rendering - Parent POM</name>
+  <artifactId>xwiki-platform-rendering</artifactId>
+  <name>XWiki Platform - Rendering - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Core - Rendering - Parent POM</description>
+  <description>XWiki Platform - Rendering - Parent POM</description>
   <modules>
-    <module>xwiki-rendering-macros</module>
-    <module>xwiki-rendering-xwiki</module>
+    <module>xwiki-platform-rendering-macros</module>
+    <module>xwiki-platform-rendering-xwiki</module>
   </modules>
   <dependencies>
     <dependency>

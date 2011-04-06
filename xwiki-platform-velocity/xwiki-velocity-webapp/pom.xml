@@ -41,7 +41,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-container-api</artifactId>
+      <artifactId>xwiki-platform-container-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

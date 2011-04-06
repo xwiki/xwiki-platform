@@ -30,9 +30,9 @@
     <version>3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core-configuration-default</artifactId>
-  <name>XWiki Platform - Core - Configuration - Default</name>
+  <name>XWiki Platform - Configuration - Default</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Configuration - Default</description>
+  <description>XWiki Platform - Configuration - Default</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -41,12 +41,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-container-api</artifactId>
+      <artifactId>xwiki-platform-container-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-bridge</artifactId>
+      <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

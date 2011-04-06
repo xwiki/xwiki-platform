@@ -29,12 +29,12 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-observation</artifactId>
-  <name>XWiki Platform - Core - Observation - Parent</name>
+  <artifactId>xwiki-platform-observation</artifactId>
+  <name>XWiki Platform - Observation - Parent</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Core - Observation - Parent</description>
+  <description>XWiki Platform - Observation - Parent</description>
   <modules>
-    <module>xwiki-observation-local</module>
-    <module>xwiki-observation-remote</module>
+    <module>xwiki-platform-observation-local</module>
+    <module>xwiki-platform-observation-remote</module>
   </modules>
 </project>

@@ -29,12 +29,12 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-chart</artifactId>
+  <artifactId>xwiki-platform-chart</artifactId>
   <packaging>pom</packaging>
-  <name>XWiki Platform - Core - Charting</name>
+  <name>XWiki Platform - Charting</name>
   <description>Support for generating charts inside XWiki</description>
   <modules>
-    <module>xwiki-chart-renderer</module>
-    <module>xwiki-chart-macro</module>
+    <module>xwiki-platform-chart-renderer</module>
+    <module>xwiki-platform-chart-macro</module>
   </modules>
 </project>

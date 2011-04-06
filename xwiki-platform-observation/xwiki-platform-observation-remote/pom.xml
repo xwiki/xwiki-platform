@@ -26,19 +26,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-observation</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-legacy</artifactId>
-  <name>XWiki Platform - Core - Legacy</name>
+  <artifactId>xwiki-platform-observation-remote</artifactId>
+  <name>XWiki Platform - Observation - Remote</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Legacy</description>
+  <description>XWiki Platform - Observation - Remote</description>
   <dependencies>
-    <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-api</artifactId>
@@ -51,37 +46,83 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
+      <artifactId>xwiki-platform-container-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
-    <!-- Testing dependencies -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-observation-local</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-configuration-api</artifactId>
+      <version>${commons.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-context</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <!-- Note that jgroups depends on Java 6 since 2.9 branch. -->
+    <dependency>
+      <groupId>jgroups</groupId>
+      <artifactId>jgroups</artifactId>
+      <version>2.8.0.GA</version>
+    </dependency>
+
+    <!-- Tests dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-test</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-observation-local</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>test-jar</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>**/remote/*.class</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <excludes>
-              **/LDAP*.java
-          </excludes>
+          <!-- 
+           * Some JDK implementations have problems with jgroups IPv6 Since the tests only ever use IPv4
+           * Prefer IPv4 stack while running the tests. See: http://www.jgroups.org/tutorial/html/ch01.html
+          -->
+          <argLine>-Djava.net.preferIPv4Stack=true</argLine>
         </configuration>
       </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Maven Repository Group</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+    </repository>
+  </repositories>
 </project>
        

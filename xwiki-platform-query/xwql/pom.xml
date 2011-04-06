@@ -46,7 +46,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-bridge</artifactId>
+      <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

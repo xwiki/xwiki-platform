@@ -1088,7 +1088,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .submenuitem a {
-  background: no-repeat 0px 0px;
+  background: no-repeat 0;
   height: 16px;
   line-height: 20px;
   margin-bottom: 4px;
@@ -1099,6 +1099,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   font-weight: normal;
   height: auto;
   line-height: 1.2em;
+  min-height: 14px; /* Make sure the menu icons fit */
   padding: 2px 20px 0;
   text-align: left;
   text-transform: none;

@@ -30,8 +30,8 @@
     <version>3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
-  <name>XWiki Platform - Core - Rendering - Macro - Groovy</name>
-  <description>XWiki Platform - Core - Rendering - Macro - Groovy</description>
+  <name>XWiki Platform - Rendering - Macro - Groovy</name>
+  <description>XWiki Platform - Rendering - Macro - Groovy</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

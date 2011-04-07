@@ -29,12 +29,12 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-velocity-parent</artifactId>
-  <name>XWiki Platform - Core - Velocity - Parent POM</name>
+  <artifactId>xwiki-platform-velocity</artifactId>
+  <name>XWiki Platform - Velocity - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Core - Velocity - Parent POM</description>
+  <description>XWiki Platform - Velocity - Parent POM</description>
   <modules>
-    <module>xwiki-velocity-webapp</module>
+    <module>xwiki-platform-velocity-webapp</module>
   </modules>
   <dependencies>
     <dependency>

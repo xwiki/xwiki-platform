@@ -59,7 +59,7 @@
     <!-- Make sure the Multi Components components are available for the tests -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-multi</artifactId>
+      <artifactId>xwiki-platform-component-multi</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

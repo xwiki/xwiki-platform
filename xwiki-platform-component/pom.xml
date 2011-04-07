@@ -29,12 +29,12 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-component</artifactId>
-  <name>XWiki Platform - Core - Component - Parent POM</name>
+  <artifactId>xwiki-platform-component</artifactId>
+  <name>XWiki Platform - Component - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Core - Component - Parent POM</description>
+  <description>XWiki Platform - Component - Parent POM</description>
   <modules>
-    <module>xwiki-component-multi</module>
+    <module>xwiki-platform-component-multi</module>
   </modules>
 </project>
        

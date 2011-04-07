@@ -29,12 +29,12 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-configuration</artifactId>
-  <name>XWiki Platform - Core - Configuration - Parent POM</name>
+  <artifactId>xwiki-platform-configuration</artifactId>
+  <name>XWiki Platform - Configuration - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Core - Configuration - Parent POM</description>
+  <description>XWiki Platform - Configuration - Parent POM</description>
   <modules>
-    <module>xwiki-configuration-default</module>
+    <module>xwiki-platform-configuration-default</module>
   </modules>
 </project>
        

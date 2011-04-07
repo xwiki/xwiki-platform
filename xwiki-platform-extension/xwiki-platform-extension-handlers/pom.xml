@@ -26,24 +26,24 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-extension</artifactId>
+    <artifactId>xwiki-platform-extension</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-extension-repositories</artifactId>
-  <name>XWiki Platform - Core - Extension - Repositories</name>
+  <artifactId>xwiki-platform-extension-handlers</artifactId>
+  <name>XWiki Platform - Extension - Handler - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Core - Extension - Repositories</description>
+  <description>XWiki Platform - Extension - Handler - Parent POM</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-extension-api</artifactId>
+      <artifactId>xwiki-platform-extension-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-extension-api</artifactId>
+      <artifactId>xwiki-platform-extension-api</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
@@ -56,7 +56,8 @@
     </dependency>
   </dependencies>
   <modules>
-    <module>xwiki-extension-repository-aether</module>
+    <module>xwiki-platform-extension-handler-jar</module>
+    <module>xwiki-platform-extension-handler-xar</module>
   </modules>
 </project>
        

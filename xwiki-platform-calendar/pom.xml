@@ -26,33 +26,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-extension</artifactId>
+    <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-extension-script</artifactId>
-  <name>XWiki Platform - Core - Extension - Script</name>
-  <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Extension - Script</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-extension-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  
-    <!-- Scripting -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <artifactId>xwiki-platform-calendar</artifactId>
+  <name>XWiki Platform - Calendar - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>XWiki Platform - Calendar - Parent POM</description>
+  <modules>
+    <module>xwiki-platform-calendar-api</module>
+    <module>xwiki-platform-calendar-ui</module>
+  </modules>
 </project>

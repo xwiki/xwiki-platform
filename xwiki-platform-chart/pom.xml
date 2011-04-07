@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-platform-chart</artifactId>
   <packaging>pom</packaging>
-  <name>XWiki Platform - Charting</name>
+  <name>XWiki Platform - Chart - Parent POM</name>
   <description>Support for generating charts inside XWiki</description>
   <modules>
     <module>xwiki-platform-chart-renderer</module>

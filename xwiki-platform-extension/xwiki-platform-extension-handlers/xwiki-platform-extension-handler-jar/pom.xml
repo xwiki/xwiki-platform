@@ -26,27 +26,28 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-extension</artifactId>
+    <artifactId>xwiki-platform-extension-handlers</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-extension-api</artifactId>
-  <name>XWiki Platform - Core - Extension - API</name>
+  <artifactId>xwiki-platform-extension-handler-jar</artifactId>
+  <name>XWiki Platform - Extension - Handler - JAR</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Extension - API</description>
+  <description>XWiki Platform - Extension - Handler - JAR</description>
   <dependencies>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-classloader</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Use default because of ComponentAnnotationLoader -->
+    <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
+      <artifactId>xwiki-commons-component-default</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-configuration-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-context</artifactId>
+      <artifactId>xwiki-commons-script</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
@@ -54,42 +55,15 @@
       <artifactId>xwiki-commons-observation-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
-    
-    <!-- Core extensions -->
-    <dependency>
-      <groupId>org.reflections</groupId>
-      <artifactId>reflections</artifactId>
-      <version>0.9.5-RC2</version>
-      <exclusions>
-        <exclusion>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model</artifactId>
-      <version>${maven.version}</version>
-    </dependency>
 
     <!-- Test dependencies -->
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-observation-local</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
   <build>
     <plugins>
       <plugin>
@@ -97,13 +71,14 @@
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
-            <id>test-jar</id>
+            <phase>package</phase>
             <goals>
-              <goal>test-jar</goal>
+              <goal>jar</goal>
             </goals>
             <configuration>
+              <classifier>client</classifier>
               <includes>
-                <include>**/test/**.class</include>
+                <include>**/service/*</include>
               </includes>
             </configuration>
           </execution>
@@ -111,12 +86,5 @@
       </plugin>
     </plugins>
   </build>
-
-  <repositories>
-    <repository>
-      <id>reflections-repo</id>
-      <name>Reflections Maven2 Repository</name>
-      <url>http://reflections.googlecode.com/svn/repo</url>
-    </repository>
-  </repositories>
 </project>
+       

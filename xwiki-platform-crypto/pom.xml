@@ -29,9 +29,9 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-crypto</artifactId>
-  <name>XWiki Platform - Core - Cryptographic Services</name>
-  <description>XWiki Platform - Core - Cryptographic Services</description>
+  <artifactId>xwiki-platform-crypto</artifactId>
+  <name>XWiki Platform - Cryptographic Services</name>
+  <description>XWiki Platform - Cryptographic Services</description>
   <dependencies>
     <!-- Used by CryptoScriptService which provides a service to Velocity scripts -->
     <dependency>
@@ -58,7 +58,7 @@
     <!-- Used exclusively by UserDocumentUtils -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-model</artifactId>
+      <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Used exclusively by UserDocumentUtils -->
@@ -77,15 +77,6 @@
   </dependencies>
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/*Test.java</include>
-          </includes>
-        </configuration>
-      </plugin>
       <plugin>
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>

@@ -26,13 +26,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-rest</artifactId>
+    <artifactId>xwiki-platform-rest</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <groupId>com.xpn.xwiki.platform</groupId>
-  <artifactId>xwiki-core-rest-server</artifactId>
+  <artifactId>xwiki-platform-rest-server</artifactId>
   <packaging>jar</packaging>
-  <name>XWiki Platform - Core - REST - Server</name>
+  <name>XWiki Platform - REST - Server</name>
   <description>Service for accessing XWiki through a RESTful API</description>
   <dependencies>
     <dependency>
@@ -56,12 +55,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rest-model</artifactId>
+      <artifactId>xwiki-platform-rest-model</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -85,18 +84,6 @@
       <version>2.1.8</version>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
   <repositories>
     <repository>
       <id>maven-restlet</id>

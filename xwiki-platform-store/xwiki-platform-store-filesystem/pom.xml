@@ -26,43 +26,27 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-store-parent</artifactId>
+    <artifactId>xwiki-platform-store</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-store-serialization</artifactId>
-  <name>XWiki Platform - Core - Storage - Serialization</name>
-  <description>Serializers and deserializers for storing objects on the disk or exporting them.</description>
+  <artifactId>xwiki-platform-store-filesystem</artifactId>
+  <name>XWiki Platform - Store - Filesystem</name>
+  <description>Tools for manipulating files on the filesystem in a transaction safe way.</description>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
-
-    <!-- Used by XMLSerializer and XMLWriter -->
     <dependency>
-      <groupId>dom4j</groupId>
-      <artifactId>dom4j</artifactId>
-      <version>1.6.1</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-transaction</artifactId>
+      <version>${project.version}</version>
     </dependency>
-
-    <!-- XMLSerializer uses Base64OutputStream -->
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-    </dependency>
-
-    <!-- CloseShieldOutputStream and IOUtils used by XMLWriter -->
+    <!-- IOUtils is used by FileSaveTransactionRunnable -->
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-store-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
   </dependencies>
 </project>

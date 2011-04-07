@@ -26,11 +26,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-store-parent</artifactId>
+    <artifactId>xwiki-platform-store</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-store-filesystem-attachments</artifactId>
-  <name>XWiki Platform - Core - Storage - Filesystem - Attachments</name>
+  <artifactId>xwiki-platform-store-filesystem-attachments</artifactId>
+  <name>XWiki Platform - Store - Filesystem - Attachments</name>
   <description>A means to store XWikiAttachments on the filesystem with versioning.</description>
   <dependencies>
     <dependency>
@@ -49,28 +49,28 @@
     <!-- Used to serialize the metadata for attachments -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-store-serialization</artifactId>
+      <artifactId>xwiki-platform-store-serialization</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- StreamProvider -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-store-api</artifactId>
+      <artifactId>xwiki-platform-store-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- TransactionRunnable -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-store-transaction</artifactId>
+      <artifactId>xwiki-platform-store-transaction</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- FileSaveTransactionRunnable, FileDeleteTransactionRunnable -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-store-filesystem</artifactId>
+      <artifactId>xwiki-platform-store-filesystem</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -81,8 +81,8 @@
      * XWikiAttachmentRecyclebinStore
      --> 
     <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
 

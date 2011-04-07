@@ -26,26 +26,32 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-query-parent</artifactId>
+    <artifactId>xwiki-platform-query</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <groupId>org.xwiki.platform</groupId>
-  <artifactId>xwiki-core-query-jpql-parser</artifactId>
-  <name>XWiki Platform - Core - Query - JPQL Parser</name>
-  <description>Simple Java Persistence Query Language parser based on SableCC</description>
+  <artifactId>xwiki-platform-query-manager</artifactId>
+  <name>XWiki Platform - Query - Manager</name>
   <packaging>jar</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-bridge</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-test</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>sablecc-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-          </execution>
-        </executions>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

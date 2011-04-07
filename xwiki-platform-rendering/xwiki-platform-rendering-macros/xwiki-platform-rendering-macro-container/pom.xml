@@ -29,8 +29,8 @@
     <artifactId>xwiki-platform-rendering-macros</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rendering-macro-container</artifactId>
-  <name>XWiki Platform - Core - Rendering - Macro - Container</name>
+  <artifactId>xwiki-platform-rendering-macro-container</artifactId>
+  <name>XWiki Platform - Rendering - Macro - Container</name>
   <description>Arrange and decorate its contents according to the parameters, such as layout style.</description>
   <build>
     <plugins>
@@ -53,7 +53,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-skin</artifactId>
+      <artifactId>xwiki-platform-skin-api</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

@@ -29,10 +29,10 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-test</artifactId>
-  <name>XWiki Platform - Core - Test Framework</name>
+  <artifactId>xwiki-platform-test</artifactId>
+  <name>XWiki Platform - Test Framework</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Test Framework</description>
+  <description>XWiki Platform - Test Framework</description>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

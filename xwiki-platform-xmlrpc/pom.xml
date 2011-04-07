@@ -29,16 +29,16 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-xmlrpc-parent</artifactId>
-  <name>XWiki Platform - Core - XMLRPC Parent POM</name>
+  <artifactId>xwiki-platform-xmlrpc</artifactId>
+  <name>XWiki Platform - XMLRPC - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Core - XMLRPC Parent POM</description>
+  <description>XWiki Platform - XMLRPC - Parent POM</description>
   <properties>
     <!-- Version of swizzle-confluence dependencie used in XMLRPC modules -->
     <swizzle.swizzle-confluence.version>1.2-20080419</swizzle.swizzle-confluence.version>    
   </properties>  
   <modules>
-    <module>xwiki-xmlrpc-model</module>
-    <module>xwiki-xmlrpc-client</module>
+    <module>xwiki-platform-xmlrpc-model</module>
+    <module>xwiki-platform-xmlrpc-client</module>
   </modules>
 </project>

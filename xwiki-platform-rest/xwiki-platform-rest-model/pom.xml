@@ -26,11 +26,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-rest</artifactId>
+    <artifactId>xwiki-platform-rest</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rest-model</artifactId>
-  <name>XWiki Platform - Core - REST - Model</name>
+  <artifactId>xwiki-platform-rest-model</artifactId>
+  <name>XWiki Platform - REST - Model</name>
   <description>The (JAXB) model for XML resource representations served by the REST module.</description>
   <dependencies>
     <dependency>
@@ -78,14 +78,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
       </plugin>
     </plugins>
   </build>

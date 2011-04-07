@@ -29,10 +29,10 @@
     <artifactId>xwiki-platform-rendering</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rendering-xwiki</artifactId>
-  <name>XWiki Platform - Core - Rendering - XWiki-specific implementation</name>
+  <artifactId>xwiki-platform-rendering-xwiki</artifactId>
+  <name>XWiki Platform - Rendering - XWiki-specific implementation</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Rendering - XWiki-specific implementation</description>
+  <description>XWiki Platform - Rendering - XWiki-specific implementation</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

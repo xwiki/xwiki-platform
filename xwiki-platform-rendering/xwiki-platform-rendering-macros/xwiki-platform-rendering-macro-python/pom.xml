@@ -29,9 +29,9 @@
     <artifactId>xwiki-platform-rendering-macros</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rendering-macro-python</artifactId>
-  <name>XWiki Platform - Core - Rendering - Macro - Python</name>
-  <description>XWiki Platform - Core - Rendering - Macro - Python</description>
+  <artifactId>xwiki-platform-rendering-macro-python</artifactId>
+  <name>XWiki Platform - Rendering - Macro - Python</name>
+  <description>XWiki Platform - Rendering - Macro - Python</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

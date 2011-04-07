@@ -29,12 +29,12 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rest</artifactId>
+  <artifactId>xwiki-platform-rest</artifactId>
   <packaging>pom</packaging>
-  <name>XWiki Platform - Core - REST - Parent POM</name>
+  <name>XWiki Platform - REST - Parent POM</name>
   <description>Service for accessing XWiki through a RESTful API</description>
   <modules>
-    <module>xwiki-rest-model</module>
-    <module>xwiki-rest-server</module>
+    <module>xwiki-platform-rest-model</module>
+    <module>xwiki-platform-rest-server</module>
   </modules>
 </project>

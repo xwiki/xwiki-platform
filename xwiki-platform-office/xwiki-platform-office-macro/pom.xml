@@ -26,32 +26,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-office</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-application-officeimporter</artifactId>
-  <packaging>xar</packaging>
-  <name>XWiki Platform - Applications - Office Importer</name>
-  <version>1.21-SNAPSHOT</version>
-  <description>An XWiki application used to transform office documents into wiki pages.</description>
-  <!-- We must configure SCM in each module. For more information see:
-       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/officeimporter</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/officeimporter</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/officeimporter</url>
-  </scm>
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.xwiki.org/jira/browse/XAOFFICE</url>
-  </issueManagement>
+  <artifactId>xwiki-platform-office-macro</artifactId>
+  <name>XWiki Platform - Office - Macro</name>
+  <description>View office attachments (doc, ppt, xls, odt, odp, ods etc.) inside wiki pages without downloading or
+    importing them.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-core</artifactId>
-      <version>[2.5-milestone-2,)</version>
-      <type>pom</type>
-      <scope>runtime</scope>
+      <artifactId>xwiki-platform-office-viewer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-transformation-macro</artifactId>
+      <version>${rendering.version}</version>
     </dependency>
   </dependencies>
 </project>

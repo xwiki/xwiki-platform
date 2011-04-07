@@ -26,28 +26,22 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-skin</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-plugin-skinx</artifactId>
-  <name>XWiki Platform - Plugins - Skin Extensions</name>
-  <version>1.23-SNAPSHOT</version>
-  <description>XWiki Platform - Plugins - Skin Extensions</description>
-  <properties>
-    <platform.core.version>3.0-SNAPSHOT</platform.core.version>
-  </properties>
+  <artifactId>xwiki-platform-skin-skinx</artifactId>
+  <name>XWiki Platform - Skin - Skin Extensions</name>
+  <description>XWiki Platform - Skin - Skin Extensions</description>
   <dependencies>
     <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
-      <version>${platform.core.version}</version>
-      <scope>provided</scope>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-skin</artifactId>
-      <version>${platform.core.version}</version>
-      <scope>provided</scope>
+      <artifactId>xwiki-platform-skin-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-logging</groupId>
@@ -64,17 +58,6 @@
       <version>1.6.7</version>
     </dependency>
   </dependencies>
-  <!-- We must configure SCM in each module. For more information see:
-       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/skinx</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/skinx</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/skinx</url>
-  </scm>
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.xwiki.org/jira/browse/XSKINX</url>
-  </issueManagement>
   <build>
     <plugins>
       <!-- Apply Backward compatibility Aspects using the strategy described at

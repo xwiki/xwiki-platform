@@ -30,7 +30,7 @@
     <version>3.1-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.platform</groupId>
-  <artifactId>xwiki-core-query-manager</artifactId>
+  <artifactId>xwiki-platform-query-manager</artifactId>
   <name>XWiki Platform - Core - Query - Manager</name>
   <packaging>jar</packaging>
   <dependencies>

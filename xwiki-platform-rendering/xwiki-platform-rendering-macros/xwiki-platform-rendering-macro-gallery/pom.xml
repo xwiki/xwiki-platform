@@ -29,7 +29,7 @@
     <artifactId>xwiki-platform-rendering-macros</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rendering-macro-gallery</artifactId>
+  <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
   <name>XWiki Platform - Core - Rendering - Macro - Gallery</name>
   <description>A simple image gallery. Images are collected from the macro content and displayed using a slide-show view.</description>
   <dependencies>

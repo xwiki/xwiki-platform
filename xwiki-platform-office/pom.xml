@@ -29,14 +29,15 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-office-parent</artifactId>
-  <name>XWiki Platform - Core - Office - Parent POM</name>
+  <artifactId>xwiki-platform-office</artifactId>
+  <name>XWiki Platform - Office - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Core - Office - Parent POM</description>
+  <description>XWiki Platform - Office - Parent POM</description>
   <modules>
-    <module>xwiki-office-importer</module>
-    <module>xwiki-office-viewer</module>
-    <module>xwiki-office-macro</module>
+    <module>xwiki-platform-office-importer</module>
+    <module>xwiki-platform-office-viewer</module>
+    <module>xwiki-platform-office-macro</module>
+    <module>xwiki-platform-office-ui</module>
   </modules>
   <dependencies>
     <dependency>

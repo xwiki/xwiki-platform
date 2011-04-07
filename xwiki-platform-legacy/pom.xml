@@ -29,14 +29,14 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-legacy</artifactId>
-  <name>XWiki Platform - Core - Legacy</name>
+  <artifactId>xwiki-platform-legacy</artifactId>
+  <name>XWiki Platform - Legacy</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Legacy</description>
+  <description>XWiki Platform - Legacy</description>
   <dependencies>
     <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

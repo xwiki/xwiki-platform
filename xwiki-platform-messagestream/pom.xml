@@ -29,8 +29,8 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-messagestream</artifactId>
-  <name>XWiki Platform - Core - User Message Stream</name>
+  <artifactId>xwiki-platform-messagestream</artifactId>
+  <name>XWiki Platform - Message Stream</name>
   <description>Publish and display user status messages in different streams.</description>
   <dependencies>
     <dependency>
@@ -40,12 +40,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-eventstream</artifactId>
+      <artifactId>xwiki-platform-eventstream</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-query-manager</artifactId>
+      <artifactId>xwiki-platform-query-manager</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

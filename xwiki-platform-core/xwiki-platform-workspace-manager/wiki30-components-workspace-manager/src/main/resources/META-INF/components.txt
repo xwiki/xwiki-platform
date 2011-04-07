@@ -1,0 +1,2 @@
+org.xwiki.contrib.wiki30.internal.DefaultWorkspaceManager
+org.xwiki.contrib.wiki30.internal.WorkspaceManagerScriptService

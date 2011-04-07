@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.manager</groupId>
+    <artifactId>xwiki-enterprise-manager-wikis</artifactId>
+    <version>3.0-SNAPSHOT</version>
+  </parent>
+  <groupId>org.xwiki.contrib.wiki30</groupId>
+  <artifactId>wiki30-applications-workspace-manager-template</artifactId>
+  <packaging>xar</packaging>
+  <name>Workspace template</name>
+  <description>Template workspace to be used when creating a new workspace.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.enterprise</groupId>
+      <artifactId>xwiki-enterprise-wiki</artifactId>
+      <version>${product.enterprise.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform.applications</groupId>
+      <artifactId>xwiki-application-application-manager</artifactId>
+      <version>${platform.plugin.applicationmanager.version}</version>
+      <type>xar</type>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.platform.tools</groupId>
+        <artifactId>xwiki-xar-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- Disable local user registration. -->
+            <exclude>**/XWiki/AdminRegistrationSheet.xml</exclude>
+            <exclude>**/XWiki/RegistrationConfig.xml</exclude>
+            <exclude>**/XWiki/RegistrationHelp.xml</exclude>
+            <!-- Disable local user management. -->
+            <exclude>**/XWiki/AdminUsersSheet.xml</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -32,6 +32,12 @@
   <artifactId>xwiki-platform-skin-skinx</artifactId>
   <name>XWiki Platform - Skin - Skin Extensions</name>
   <description>XWiki Platform - Skin - Skin Extensions</description>
+  <properties>
+    <!-- TODO: Find out why CLIRR chokes with the following error and enable CLIRR again:
+         [ERROR] Unable to locate enclosing class com.xpn.xwiki.web.sx.JsExtension for nested class
+         com.xpn.xwiki.web.sx.JsExtension$1 -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

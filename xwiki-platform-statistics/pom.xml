@@ -33,4 +33,8 @@
   <name>XWiki Platform - Statistics</name>
   <packaging>xar</packaging>
   <description>Panels and pages providing XWiki statistics</description>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
 </project>

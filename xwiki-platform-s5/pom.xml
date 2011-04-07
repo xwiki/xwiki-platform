@@ -33,4 +33,8 @@
   <name>XWiki Platform - S5</name>
   <packaging>xar</packaging>
   <description>Application to create slides with S5</description>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
 </project>

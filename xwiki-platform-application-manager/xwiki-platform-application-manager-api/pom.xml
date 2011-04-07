@@ -26,30 +26,44 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-application-manager</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-colibri</artifactId>
-  <name>XWiki Platform - Colibri</name>
-  <packaging>pom</packaging>
-  <description>
-    Colibri Skin. It is based on Toucan and requires that Albatross be set as the base skin
-    in xwiki.cfg to work.
-  </description>
+  <artifactId>xwiki-platform-application-manager-api</artifactId>
+  <name>XWiki Platform - Application Manager - API</name>
+  <description>XWiki Platform - Application Manager - API</description>
   <dependencies>
-    <!-- Toucan skin requires the Albatross Skin v1.1 or greater at runtime -->
     <dependency>
-      <groupId>org.xwiki.platform.skins</groupId>
-      <artifactId>xwiki-platform-albatross</artifactId>
-      <type>zip</type>
-      <scope>runtime</scope>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Needed at test time. Some versions of Maven don't inherit provided dependencies. -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-test</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
     <plugins>
       <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

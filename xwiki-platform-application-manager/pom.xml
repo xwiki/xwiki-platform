@@ -29,28 +29,12 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-colibri</artifactId>
-  <name>XWiki Platform - Colibri</name>
+  <artifactId>xwiki-platform-application-manager</artifactId>
+  <name>XWiki Platform - Application Manager - Parent POM</name>
   <packaging>pom</packaging>
-  <description>
-    Colibri Skin. It is based on Toucan and requires that Albatross be set as the base skin
-    in xwiki.cfg to work.
-  </description>
-  <dependencies>
-    <!-- Toucan skin requires the Albatross Skin v1.1 or greater at runtime -->
-    <dependency>
-      <groupId>org.xwiki.platform.skins</groupId>
-      <artifactId>xwiki-platform-albatross</artifactId>
-      <type>zip</type>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
+  <description>XWiki Platform - Application Manager - Parent POM</description>
+  <modules>
+    <module>xwiki-platform-application-manager-api</module>
+    <module>xwiki-platform-application-manager-ui</module>
+  </modules>
 </project>

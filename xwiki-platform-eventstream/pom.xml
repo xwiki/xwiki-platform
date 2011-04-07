@@ -29,8 +29,8 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-eventstream</artifactId>
-  <name>XWiki Platform - Core - Event Stream</name>
+  <artifactId>xwiki-platform-eventstream</artifactId>
+  <name>XWiki Platform - Event Stream</name>
   <description>Store and query events from the wiki</description>
   <dependencies>
     <dependency>
@@ -40,12 +40,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-query-manager</artifactId>
+      <artifactId>xwiki-platform-query-manager</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-model</artifactId>
+      <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Test dependencies -->

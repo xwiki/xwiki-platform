@@ -33,6 +33,10 @@
   <packaging>xar</packaging>
   <name>XWiki Platform - Office - UI</name>
   <description>An XWiki application used to transform office documents into wiki pages.</description>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

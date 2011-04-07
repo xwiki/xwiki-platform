@@ -29,20 +29,12 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-application-ircbot</artifactId>
-  <name>XWiki Platform - Applications - IRC Bot</name>
-  <version>1.1-SNAPSHOT</version>
+  <artifactId>xwiki-platform-ircbot</artifactId>
+  <name>XWiki Platform - IRC Bot</name>
   <packaging>xar</packaging>
   <description>IRC Bot Application for XWiki</description>
-  <!-- We must configure SCM in each module. For more information see:
-       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/ircbot</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/ircbot</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/ircbot</url>
-  </scm>
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.xwiki.org/jira/browse/XAIRCBOT</url>
-  </issueManagement>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
 </project>

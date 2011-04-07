@@ -33,4 +33,8 @@
   <name>XWiki Platform - Administration</name>
   <packaging>xar</packaging>
   <description>Application for administrating wiki features like users, groups, rights etc.</description>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
 </project>

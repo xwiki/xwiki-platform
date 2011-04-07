@@ -29,29 +29,12 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-application-invitation</artifactId>
-  <name>XWiki Platform - Applications - Invitation</name>
-  <version>1.6-SNAPSHOT</version>
+  <artifactId>xwiki-platform-invitation</artifactId>
+  <name>XWiki Platform - Invitation</name>
   <packaging>xar</packaging>
   <description>Application allowing users to invite friends to join a wiki by email.</description>
-  <!-- We must configure SCM in each module. For more information see:
-       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/invitation</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/invitation</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/invitation</url>
-  </scm>
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.xwiki.org/jira/browse/XAINVITATION</url>
-  </issueManagement>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-core</artifactId>
-      <version>[2.5-rc-1,)</version>
-      <type>pom</type>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
 </project>

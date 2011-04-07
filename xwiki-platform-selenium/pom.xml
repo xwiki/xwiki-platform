@@ -34,4 +34,8 @@
   <name>XWiki Platform - Selenium</name>
   <packaging>xar</packaging>
   <description>Selenium Application</description>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
 </project>

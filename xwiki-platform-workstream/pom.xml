@@ -33,6 +33,10 @@
   <name>XWiki Platform - Workstream</name>
   <packaging>xar</packaging>
   <description>Workstream : wiki users updates streams</description>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

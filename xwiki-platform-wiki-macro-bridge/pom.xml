@@ -29,20 +29,12 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-application-wiki-macro-bridge</artifactId>
-  <name>XWiki Platform - Applications - Wiki Macro Bridge</name>
-  <version>1.6-SNAPSHOT</version>
+  <artifactId>xwiki-platform-wiki-macro-bridge</artifactId>
+  <name>XWiki Platform - Wiki Macro Bridge</name>
   <packaging>xar</packaging>
   <description>XWiki Platform - Applications - Wiki Macro Bridge</description>
-  <!-- We must configure SCM in each module. For more information see:
-       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/wiki-macro-bridge</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/wiki-macro-bridge</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/wiki-macro-bridge</url>
-  </scm>
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.xwiki.org/jira/browse/XAWMB</url>
-  </issueManagement>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
 </project>

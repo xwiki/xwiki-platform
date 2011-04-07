@@ -33,4 +33,8 @@
   <name>XWiki Platform - Extension - UI</name>
   <packaging>xar</packaging>
   <description>XWiki Extension Manager, an application for managing extensions in a wiki.</description>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
 </project>

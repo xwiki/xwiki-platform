@@ -51,12 +51,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-annotations-core</artifactId>
+      <artifactId>xwiki-platform-annotation-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-scheduler</artifactId>
+      <artifactId>xwiki-platform-scheduler-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

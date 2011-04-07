@@ -31,6 +31,10 @@
   </parent>
   <artifactId>xwiki-platform-photoalbum</artifactId>
   <name>XWiki Platform - Photo Album</name>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
   <packaging>xar</packaging>
   <description>Photo album application for XWiki</description>
 </project>

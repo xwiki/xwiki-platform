@@ -33,6 +33,10 @@
   <name>XWiki Platform - Calendar - UI</name>
   <packaging>xar</packaging>
   <description>Calendar application for XWiki</description>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

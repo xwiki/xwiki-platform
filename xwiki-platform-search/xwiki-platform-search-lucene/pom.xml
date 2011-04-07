@@ -25,24 +25,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <artifactId>xwiki-plugins</artifactId>
-    <version>31-SNAPSHOT</version>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-search</artifactId>
+    <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-plugin-lucene</artifactId>
-  <name>XWiki Platform - Plugins - Lucene search</name>
-  <version>1.25-SNAPSHOT</version>
-  <description>XWiki Platform - Plugins - Lucene search</description>
+  <artifactId>xwiki-platform-search-lucene</artifactId>
+  <name>XWiki Platform - Search - Lucene</name>
+  <description>XWiki Platform - Search - Lucene</description>
   <properties>
     <commons.version>3.0-SNAPSHOT</commons.version>
-    <platform.core.version>3.0-SNAPSHOT</platform.core.version>
   </properties>
   <dependencies>
     <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
-      <version>${platform.core.version}</version>
-      <scope>provided</scope>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
@@ -88,22 +85,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
-      <version>${platform.core.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <!-- We must configure SCM in each module. For more information see:
-       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/lucene</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/lucene</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/lucene</url>
-  </scm>
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.xwiki.org/jira/browse/XPLUCENE</url>
-  </issueManagement>
 </project>

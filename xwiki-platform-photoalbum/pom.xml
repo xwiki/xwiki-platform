@@ -29,29 +29,8 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-application-photoalbum</artifactId>
-  <name>XWiki Platform - Applications - Photo Album</name>
-  <version>1.1-SNAPSHOT</version>
+  <artifactId>xwiki-platform-photoalbum</artifactId>
+  <name>XWiki Platform - Photo Album</name>
   <packaging>xar</packaging>
   <description>Photo album application for XWiki</description>
-  <!-- We must configure SCM in each module. For more information see:
-       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/photoalbum</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/photoalbum</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/photoalbum</url>
-  </scm>
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.xwiki.org/jira/browse/XAPHOTO</url>
-  </issueManagement>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-core</artifactId>
-      <version>[2.5-milestone-2,)</version>
-      <type>pom</type>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
 </project>

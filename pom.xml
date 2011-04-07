@@ -186,11 +186,10 @@
     <module>xwiki-platform-component</module>
     <module>xwiki-platform-configuration</module>
     <module>xwiki-platform-containers</module>
-    <module>xwiki-platform-exoplatform</module>
-    <module>xwiki-platform-oldcore</module>
     <module>xwiki-platform-crypto</module>
     <module>xwiki-platform-csrf</module>
     <module>xwiki-platform-eventstream</module>
+    <module>xwiki-platform-exoplatform</module>
     <module>xwiki-platform-extension</module>
     <module>xwiki-platform-formula</module>
     <module>xwiki-platform-invitation</module>
@@ -203,18 +202,32 @@
     <module>xwiki-platform-model</module>
     <module>xwiki-platform-observation</module>
     <module>xwiki-platform-office</module>
+    <module>xwiki-platform-oldcore</module>
+    <module>xwiki-platform-panels</module>
+    <module>xwiki-platform-photoalbum</module>
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-refactoring</module>
     <module>xwiki-platform-rendering</module>
     <module>xwiki-platform-rest</module>
+    <module>xwiki-platform-s5</module>
+    <module>xwiki-platform-scheduler</module>
+    <module>xwiki-platform-search</module>
+    <module>xwiki-platform-selenium</module>
     <module>xwiki-platform-skin</module>
+    <module>xwiki-platform-statistics</module>
     <module>xwiki-platform-store</module>
+    <module>xwiki-platform-swizzle</module>
+    <module>xwiki-platform-tag</module>
     <module>xwiki-platform-test</module>
+    <module>xwiki-platform-toucan</module>
     <module>xwiki-platform-url</module>
     <module>xwiki-platform-velocity</module>
+    <module>xwiki-platform-watchlist</module>
+    <module>xwiki-platform-webdav</module>
+    <module>xwiki-platform-wiki-manager</module>
+    <module>xwiki-platform-workstream</module>
     <module>xwiki-platform-xml</module>
     <module>xwiki-platform-xmlrpc</module>
-    <module>xwiki-platform-webdav</module>
   </modules>
   <profiles>
     <profile>

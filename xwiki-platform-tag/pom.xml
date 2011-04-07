@@ -29,8 +29,12 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-panels</artifactId>
-  <name>XWiki Platform - Panels</name>
-  <packaging>xar</packaging>
-  <description>Panels and Panel Wizard to easily create menus for XWiki</description>
+  <artifactId>xwiki-platform-tag</artifactId>
+  <name>XWiki Platform - Tag - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>XWiki Platform - Tag - Parent POM</description>
+  <modules>
+    <module>xwiki-platform-tag-api</module>
+    <module>xwiki-platform-tag-ui</module>
+  </modules>
 </project>

@@ -25,44 +25,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.platform.applications</groupId>
-    <artifactId>xwiki-applications</artifactId>
-    <version>37-SNAPSHOT</version>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-application-manager</artifactId>
+    <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-application-application-manager</artifactId>
-  <name>XWiki Platform - Applications - Application Manager</name>
-  <version>1.20-SNAPSHOT</version>
+  <artifactId>xwiki-platform-application-manager-ui</artifactId>
+  <name>XWiki Platform - Application Manager - UI</name>
   <packaging>xar</packaging>
   <description>Manages creation and installation of XWiki Applications</description>
-  <properties>
-    <platform.plugin.applicationmanager.version>${project.version}</platform.plugin.applicationmanager.version>
-  </properties>
   <dependencies>
     <dependency>
-      <groupId>com.xpn.xwiki.platform.plugins</groupId>
-      <artifactId>xwiki-plugin-application-manager</artifactId>
-      <version>${platform.plugin.applicationmanager.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-core</artifactId>
-      <version>2.5</version>
-      <type>pom</type>
+      <artifactId>xwiki-platform-application-manager-api</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-  <!-- We must configure SCM in each module. For more information see:
-       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml --> 
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/application-manager</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/application-manager</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/application-manager</url>
-  </scm>
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.xwiki.org/jira/browse/XAAM</url>
-  </issueManagement>
   <build>
     <plugins>
       <!-- For applicatiosn based on ApplicationManager, ensure application version in applications descriptors page is correct -->

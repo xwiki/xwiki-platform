@@ -29,20 +29,8 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-application-s5</artifactId>
-  <name>XWiki Platform - Applications - S5</name>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
+  <artifactId>xwiki-platform-s5</artifactId>
+  <name>XWiki Platform - S5</name>
+  <packaging>xar</packaging>
   <description>Application to create slides with S5</description>
-  <modules>
-    <module>wiki</module>
-    <!--module>web</module-->
-  </modules>
-  <!-- We must configure SCM in each module. For more information see:
-       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/s5</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/s5</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/s5</url>
-  </scm>  
 </project>

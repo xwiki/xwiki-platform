@@ -26,17 +26,10 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-rendering-macros</artifactId>
+    <artifactId>xwiki-platform-store</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-rendering-macro-useravatar</artifactId>
-  <name>XWiki Platform - Rendering - Macro - User Avatar</name>
-  <description>XWiki Platform - Rendering - Macro - User Avatar</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <artifactId>xwiki-platform-store-api</artifactId>
+  <name>XWiki Platform - Store - Api</name>
+  <description>Generic interfaces relating to storage.</description>
 </project>

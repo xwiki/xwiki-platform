@@ -30,12 +30,12 @@
     <version>3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
-  <name>XWiki Platform - Core - Rendering - Macro - Gallery</name>
+  <name>XWiki Platform - Rendering - Macro - Gallery</name>
   <description>A simple image gallery. Images are collected from the macro content and displayed using a slide-show view.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-skin</artifactId>
+      <artifactId>xwiki-platform-skin-api</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

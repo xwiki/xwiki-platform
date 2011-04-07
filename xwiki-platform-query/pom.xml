@@ -29,13 +29,13 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-query-parent</artifactId>
-  <name>XWiki Platform - Core - Query - Parent POM</name>
+  <artifactId>xwiki-platform-query</artifactId>
+  <name>XWiki Platform - Query - Parent POM</name>
   <packaging>pom</packaging>
   <modules>
-    <module>manager</module>
-    <module>jpql-parser</module>
-    <module>xwql</module>
+    <module>xwiki-platform-query-jpql-parser</module>
+    <module>xwiki-platform-query-manager</module>
+    <module>xwiki-platform-query-xwql</module>
   </modules>
 </project>
 

@@ -29,13 +29,13 @@
     <artifactId>xwiki-platform-rendering-macros</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rendering-macro-dashboard</artifactId>
-  <name>XWiki Platform - Core - Rendering - Macro - Dashboard</name>
+  <artifactId>xwiki-platform-rendering-macro-dashboard</artifactId>
+  <name>XWiki Platform - Rendering - Macro - Dashboard</name>
   <description>Displays the macro instances (gadgets) inside in a dashboard.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-macro-container</artifactId>
+      <artifactId>xwiki-platform-rendering-macro-container</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -45,12 +45,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-skin</artifactId>
+      <artifactId>xwiki-platform-skin-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

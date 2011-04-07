@@ -29,8 +29,8 @@
     <artifactId>xwiki-platform-rendering-macros</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rendering-macro-php</artifactId>
-  <name>XWiki Platform - Core - Rendering - Macro - PHP</name>
+  <artifactId>xwiki-platform-rendering-macro-php</artifactId>
+  <name>XWiki Platform - Rendering - Macro - PHP</name>
   <description>XWiki macro for interpreting PHP code.</description>
   <dependencies>
     <dependency>

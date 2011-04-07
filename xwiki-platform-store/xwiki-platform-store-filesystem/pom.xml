@@ -26,17 +26,27 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-rendering-macros</artifactId>
+    <artifactId>xwiki-platform-store</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-rendering-macro-useravatar</artifactId>
-  <name>XWiki Platform - Rendering - Macro - User Avatar</name>
-  <description>XWiki Platform - Rendering - Macro - User Avatar</description>
+  <artifactId>xwiki-platform-store-filesystem</artifactId>
+  <name>XWiki Platform - Store - Filesystem</name>
+  <description>Tools for manipulating files on the filesystem in a transaction safe way.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
+      <artifactId>xwiki-platform-store-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-transaction</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- IOUtils is used by FileSaveTransactionRunnable -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -26,76 +26,92 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-rendering-macros</artifactId>
+    <artifactId>xwiki-platform-store</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-rendering-macro-include</artifactId>
-  <name>XWiki Platform - Rendering - Macro - Include</name>
-  <description>XWiki Platform - Rendering - Macro - Include</description>
+  <artifactId>xwiki-platform-store-filesystem-attachments</artifactId>
+  <name>XWiki Platform - Store - Filesystem - Attachments</name>
+  <description>A means to store XWikiAttachments on the filesystem with versioning.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-context</artifactId>
+      <artifactId>xwiki-commons-component-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+
+    <!-- Needed for DocumentReferenceSerializer implementation. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <!-- Used to serialize the metadata for attachments -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-context</artifactId>
+      <artifactId>xwiki-platform-store-serialization</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- Testing dependencies -->
+    <!-- StreamProvider -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- TransactionRunnable -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-transaction</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- FileSaveTransactionRunnable, FileDeleteTransactionRunnable -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-filesystem</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!--
+     * Needed for:
+     * XWikiAttachment, XWikiDocument, XWikiHibernateStore,
+     * XWikiAttachmentStoreInterface, XWikiAttachmentVersioningStore,
+     * XWikiAttachmentRecyclebinStore
+     --> 
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+   <!-- Testing Dependencies -->
+
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-velocity</artifactId>
+      <artifactId>xwiki-commons-test</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- Needed for ClassImposteriser for mocking XWikiContext etc. -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-script</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-observation-local</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-legacy</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
     <plugins>
       <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-            org/xwiki/rendering/internal/macro/include/IncludeMacro.java
+            <!-- This is excluded because of a fan out violation. TODO: FIX! -->
+            **/com/xpn/xwiki/store/FilesystemAttachmentRecycleBinStore.java
           </excludes>
         </configuration>
       </plugin>

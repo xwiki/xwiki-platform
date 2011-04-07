@@ -29,9 +29,9 @@
     <artifactId>xwiki-platform-rendering-macros</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rendering-macro-context</artifactId>
-  <name>XWiki Platform - Core - Rendering - Macro - Context</name>
-  <description>XWiki Platform - Core - Rendering - Macro - Context</description>
+  <artifactId>xwiki-platform-rendering-macro-context</artifactId>
+  <name>XWiki Platform - Rendering - Macro - Context</name>
+  <description>XWiki Platform - Rendering - Macro - Context</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -25,24 +25,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.platform.applications</groupId>
-    <artifactId>xwiki-applications</artifactId>
-    <version>37-SNAPSHOT</version>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-extension</artifactId>
+    <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-application-extension</artifactId>
-  <version>1.4-SNAPSHOT</version>
-  <name>XWiki Platform - Applications - Extension</name>
+  <artifactId>xwiki-platform-extension-ui</artifactId>
+  <name>XWiki Platform - Extension - UI</name>
   <packaging>xar</packaging>
   <description>XWiki Extension Manager, an application for managing extensions in a wiki.</description>
-  <!-- We must configure SCM in each module. For more information see:
-       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/extension</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/extension</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/extension</url>
-  </scm>
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.xwiki.org/jira/browse/XAEXTENSION</url>
-  </issueManagement>
 </project>

@@ -26,13 +26,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-extension-repositories</artifactId>
+    <artifactId>xwiki-platform-extension-repositories</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-extension-repository-aether</artifactId>
-  <name>XWiki Platform - Core - Extension - Repository - Aether</name>
+  <artifactId>xwiki-platform-extension-repository-aether</artifactId>
+  <name>XWiki Platform - Extension - Repository - Aether</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Extension - Repository - Aether</description>
+  <description>XWiki Platform - Extension - Repository - Aether</description>
   <properties>
     <aether.version>1.11</aether.version>
     <maven.version>3.0.3</maven.version>

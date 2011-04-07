@@ -26,55 +26,31 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-configuration</artifactId>
+    <artifactId>xwiki-platform-extension</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-configuration-default</artifactId>
-  <name>XWiki Platform - Configuration - Default</name>
+  <artifactId>xwiki-platform-extension-script</artifactId>
+  <name>XWiki Platform - Extension - Script</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Configuration - Default</description>
+  <description>XWiki Platform - Extension - Script</description>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-configuration-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-container-api</artifactId>
+      <artifactId>xwiki-platform-extension-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+  
+    <!-- Scripting -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-properties</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-configuration</groupId>
-      <artifactId>commons-configuration</artifactId>
-      <!--  Exclude BeanUtils Core since we're already packaging the full BeanUtils JAR -->
-      <exclusions>
-        <exclusion>
-          <groupId>commons-beanutils</groupId>
-          <artifactId>commons-beanutils-core</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!-- Testing dependencies -->
+
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-default</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>

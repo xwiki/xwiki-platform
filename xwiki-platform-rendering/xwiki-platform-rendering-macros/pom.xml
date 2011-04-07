@@ -30,7 +30,7 @@
     <version>3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macros</artifactId>
-  <name>XWiki Platform - Core - Rendering - Macros - Parent POM</name>
+  <name>XWiki Platform - Rendering - Macros - Parent POM</name>
   <packaging>pom</packaging>
   <description>Macros implementations supported by XWiki Platform</description>
   <dependencies>

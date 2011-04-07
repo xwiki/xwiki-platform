@@ -29,10 +29,10 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-extension</artifactId>
-  <name>XWiki Platform - Core - Extension</name>
+  <artifactId>xwiki-platform-extension</artifactId>
+  <name>XWiki Platform - Extension - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Core - Extension</description>
+  <description>XWiki Platform - Extension - Parent POM</description>
   <properties>
     <maven.version>3.0.3</maven.version>
   
@@ -41,10 +41,11 @@
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <modules>
-    <module>xwiki-extension-api</module>
-    <module>xwiki-extension-repositories</module>
-    <module>xwiki-extension-handlers</module>
-    <module>xwiki-extension-script</module>
+    <module>xwiki-platform-extension-api</module>
+    <module>xwiki-platform-extension-handlers</module>
+    <module>xwiki-platform-extension-repositories</module>
+    <module>xwiki-platform-extension-script</module>
+    <module>xwiki-platform-extension-ui</module>
   </modules>
 </project>
 

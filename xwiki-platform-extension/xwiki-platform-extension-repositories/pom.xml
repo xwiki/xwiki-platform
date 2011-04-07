@@ -26,37 +26,37 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-extension-handlers</artifactId>
+    <artifactId>xwiki-platform-extension</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-extension-handler-xar</artifactId>
-  <name>XWiki Platform - Core - Extension - Handler - XAR</name>
-  <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Extension - Handler - XAR</description>
+  <artifactId>xwiki-platform-extension-repositories</artifactId>
+  <name>XWiki Platform - Extension - Repository - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>XWiki Platform - Extension - Repository - Parent POM</description>
   <dependencies>
     <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-    </dependency>
-    
+
     <!-- Test dependencies -->
     <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-api</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-    <!-- Used to mock XWiki class -->
     <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-legacy</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-test</artifactId>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <modules>
+    <module>xwiki-platform-extension-repository-aether</module>
+  </modules>
 </project>
+       

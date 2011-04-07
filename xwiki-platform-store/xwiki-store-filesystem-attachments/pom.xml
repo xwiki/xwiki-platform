@@ -42,7 +42,7 @@
     <!-- Needed for DocumentReferenceSerializer implementation. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-model</artifactId>
+      <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
 

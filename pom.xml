@@ -169,22 +169,36 @@
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-action</module>
     <module>xwiki-platform-activitystream</module>
+    <module>xwiki-platform-administration</module>
+    <module>xwiki-platform-adwords</module>
+    <module>xwiki-platform-albatross</module>
+    <module>xwiki-platform-alexa</module>
     <module>xwiki-platform-annotations</module>
+    <module>xwiki-platform-application-manager</module>
+    <module>xwiki-platform-blog</module>
     <module>xwiki-platform-bridge</module>
     <module>xwiki-platform-cache</module>
+    <module>xwiki-platform-calendar</module>
     <module>xwiki-platform-captcha</module>
     <module>xwiki-platform-chart</module>
     <module>xwiki-platform-classloader</module>
+    <module>xwiki-platform-colibri</module>
     <module>xwiki-platform-component</module>
     <module>xwiki-platform-configuration</module>
     <module>xwiki-platform-containers</module>
+    <module>xwiki-platform-exoplatform</module>
     <module>xwiki-platform-oldcore</module>
     <module>xwiki-platform-crypto</module>
     <module>xwiki-platform-csrf</module>
     <module>xwiki-platform-eventstream</module>
     <module>xwiki-platform-extension</module>
     <module>xwiki-platform-formula</module>
+    <module>xwiki-platform-invitation</module>
+    <module>xwiki-platform-ircbot</module>
+    <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-legacy</module>
+    <module>xwiki-platform-localization</module>
+    <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-model</module>
     <module>xwiki-platform-observation</module>

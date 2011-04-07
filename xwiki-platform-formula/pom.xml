@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-platform-formula</artifactId>
   <packaging>pom</packaging>
-  <name>XWiki Platform - Formula</name>
+  <name>XWiki Platform - Formula - Parent POM</name>
   <description>Support for mathematical formulae inside XWiki</description>
   <modules>
     <module>xwiki-platform-formula-renderer</module>

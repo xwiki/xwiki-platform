@@ -39,8 +39,9 @@
   <dependencies>
     <!-- Toucan skin requires the Albatross Skin v1.1 or greater at runtime -->
     <dependency>
-      <groupId>org.xwiki.platform.skins</groupId>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-albatross</artifactId>
+      <version>${project.version}</version>
       <type>zip</type>
       <scope>runtime</scope>
     </dependency>

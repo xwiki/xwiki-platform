@@ -30,8 +30,8 @@
     <version>3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-cache</artifactId>
-  <name>XWiki Platform - Core - Rendering - Macro - Cache</name>
-  <description>XWiki Platform - Core - Rendering - Macro - Cache</description>
+  <name>XWiki Platform - Rendering - Macro - Cache</name>
+  <description>XWiki Platform - Rendering - Macro - Cache</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

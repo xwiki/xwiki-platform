@@ -189,14 +189,12 @@
     <module>xwiki-platform-crypto</module>
     <module>xwiki-platform-csrf</module>
     <module>xwiki-platform-eventstream</module>
-    <module>xwiki-platform-exoplatform</module>
     <module>xwiki-platform-extension</module>
     <module>xwiki-platform-formula</module>
     <module>xwiki-platform-invitation</module>
     <module>xwiki-platform-ircbot</module>
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-legacy</module>
-    <module>xwiki-platform-localization</module>
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-model</module>

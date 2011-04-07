@@ -69,6 +69,11 @@ public class WatchListStore implements EventListener
     public static final String SPACE_PAGE_SEP = ".";
 
     /**
+     * Character used to separated values in XProperties lists.
+     */
+    public static final String PIPE_SEP = "|";
+
+    /**
      * Space of the scheduler application.
      */
     public static final String SCHEDULER_SPACE = "Scheduler";
@@ -188,7 +193,7 @@ public class WatchListStore implements EventListener
         Collections.sort(jobDocumentNames);
         if (!ListUtils.isEqualList(intervalValues, jobDocumentNames)) {
             needsUpdate = true;
-            intervalClass.setValues(StringUtils.join(jobDocumentNames, "|"));
+            intervalClass.setValues(StringUtils.join(jobDocumentNames, PIPE_SEP));
         }
 
         // Create storage properties
@@ -199,7 +204,7 @@ public class WatchListStore implements EventListener
 
         needsUpdate |=
             bclass.addStaticListField(WATCHLIST_CLASS_AUTOMATICWATCH, "Automatic watching",
-                "default|" + StringUtils.join(AutomaticWatchMode.values(), "|"));
+                "default|" + StringUtils.join(AutomaticWatchMode.values(), PIPE_SEP));
 
         return needsUpdate;
     }
@@ -534,8 +539,8 @@ public class WatchListStore implements EventListener
      * @param context Context of the request
      * @throws XWikiException if the user's profile cannot be saved
      */
-    private void setWatchListElementsProperty(String user, ElementType type, List<String> elements, XWikiContext context)
-        throws XWikiException
+    private void setWatchListElementsProperty(String user, ElementType type, List<String> elements,
+        XWikiContext context) throws XWikiException
     {
         XWikiDocument userDocument = context.getWiki().getDocument(user, context);
         userDocument.setLargeStringValue(WATCHLIST_CLASS, getWatchListClassPropertyForType(type),
@@ -726,7 +731,7 @@ public class WatchListStore implements EventListener
     /**
      * Automatically watch modified document depending on the configuration.
      * 
-     * @param originalDoc document version before the event occurred
+     * @param event the observation event we check for a deleted document event
      * @param currentDoc document version after event occurred
      * @param context the XWiki context
      */

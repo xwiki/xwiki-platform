@@ -3,66 +3,50 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
   xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <!-- <parent> -->
-  <!-- <artifactId>wiki30</artifactId> -->
-  <!-- <groupId>org.xwiki.contrib.wiki30</groupId> -->
-  <!-- <version>1.0-SNAPSHOT</version> -->
-  <!-- </parent> -->
+  <parent>
+    <groupId>org.xwiki.contrib.wiki30</groupId>
+    <artifactId>wiki30-social</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
   <groupId>org.xwiki.contrib.wiki30</groupId>
   <artifactId>wiki30-components-workspace-manager</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <name>XWiki Macro - Hello World Component</name>
-  <description>XWiki Macro - Hello World Component</description>
-  <properties>
-    <platform.core.version>3.0-SNAPSHOT</platform.core.version>
-    <platform.plugin.applicationmanager.version>1.19-SNAPSHOT</platform.plugin.applicationmanager.version>
-  </properties>
+
+  <name>Wiki3.0 - Workspaces - Component</name>
+  <description>XWiki component that manages workspaces.</description>
+
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>${platform.core.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-default</artifactId>
-      <version>${platform.core.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-default</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-script</artifactId>
-      <version>${platform.core.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-script</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-shared-tests</artifactId>
-      <version>${platform.core.version}</version>
-      <scope>test</scope>
-    </dependency>
+
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-wiki-manager</artifactId>
-      <version>1.26-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-application-manager</artifactId>
-      <version>${platform.plugin.applicationmanager.version}</version>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-test</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

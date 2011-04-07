@@ -1,36 +1,39 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.platform.applications</groupId>
-    <artifactId>xwiki-applications</artifactId>
-    <version>36-SNAPSHOT</version>
+    <groupId>org.xwiki.contrib.wiki30</groupId>
+    <artifactId>wiki30-social</artifactId>
+    <version>1.0-SNAPSHOT</version>
   </parent>
+
   <groupId>org.xwiki.contrib.wiki30</groupId>
   <artifactId>wiki30-applications-workspace-manager</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <packaging>xar</packaging>
+
   <name>Wiki3.0 - Workspaces - Application</name>
   <description>XWiki application that manages workspaces.</description>
-  <properties>
-    <platform.plugin.wikimanager.version>1.26-SNAPSHOT</platform.plugin.wikimanager.version>
-    <platform.tool.xmldoc.version>1.5-SNAPSHOT</platform.tool.xmldoc.version>
-    <product.enterprise.version>3.0-SNAPSHOT</product.enterprise.version>
-  </properties>
+
   <dependencies>
-  	<dependency>
-  	  <groupId>org.xwiki.contrib.wiki30</groupId>
-  	  <artifactId>wiki30-components-workspace-manager</artifactId>
-  	  <version>1.0-SNAPSHOT</version>
-  	  <scope>runtime</scope>
-  	</dependency>
-  	<dependency>
-  	  <groupId>com.xpn.xwiki.platform.plugins</groupId>
-  	  <artifactId>xwiki-plugin-wiki-manager</artifactId>
-  	  <version>${platform.plugin.wikimanager.version}</version>
-  	  <scope>runtime</scope>
-  	</dependency>
+    <dependency>
+      <groupId>org.xwiki.contrib.wiki30</groupId>
+      <artifactId>wiki30-components-workspace-manager</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.plugins</groupId>
+      <artifactId>xwiki-plugin-wiki-manager</artifactId>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <build>
+    <extensions>
+      <extension>
+        <groupId>org.xwiki.platform.tools</groupId>
+        <artifactId>xwiki-xar-handlers</artifactId>
+      </extension>
+    </extensions>
     <plugins>
       <!-- Step 1: Download workspace template xar -->
       <plugin>
@@ -47,7 +50,7 @@
                 <artifactItem>
                   <groupId>org.xwiki.contrib.wiki30</groupId>
                   <artifactId>wiki30-applications-workspace-manager-template</artifactId>
-                  <version>${product.enterprise.version}</version>
+                  <version>${project.version}</version>
                   <type>xar</type>
                   <overWrite>true</overWrite>
                   <outputDirectory>${project.build.directory}/template</outputDirectory>
@@ -58,12 +61,11 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <!-- Step 2: Attach template xar to WikiManager install page -->
       <plugin>
         <groupId>org.xwiki.platform.tools</groupId>
         <artifactId>xwiki-xmldoc-update-plugin</artifactId>
-        <version>${platform.tool.xmldoc.version}</version>
         <executions>
           <execution>
             <phase>generate-resources</phase>

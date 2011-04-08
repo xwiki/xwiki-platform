@@ -1,0 +1,26 @@
+<public:attach event="ondocumentready" onevent="CSSHover()" />
+<script>
+// <![CDATA[
+/**
+ *  Whatever:hover - V3.01.090909
+ *  ------------------------------------------------------------
+ *  Author  - Peter Nederlof, http://www.xs4all.nl/~peterned
+ *          - Sergiu Dumitriu, http://purl.org/net/sergiu/
+ *  License - http://creativecommons.org/licenses/LGPL/2.1
+ *
+ *  Whatever:hover is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  Whatever:hover is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  howto: body { behavior:url("csshover3.htc"); }
+ *  ------------------------------------------------------------
+ */
+window.CSSHover=(function(){var C=/((^|\s)((([^a]([^ ]+)?)|(a([^#.][^ ]+)+)):(hover|active|focus)))|((input|textarea)([#.][^ ]+)?:unknown)/i,F=/(.*?)\:(hover|active|focus|unknown)/i,A=/[^:]+:([a-z-]+).*/i,N=/(\.([a-z0-9_-]+):[a-z]+)|(:[a-z]+)/i,I=/\.([a-z0-9_-]*on(hover|active|focus|unknown))/i,L=/msie (5|6|7)/i,K=/msie 7/i,B=/backcompat/i;REG_RELATIVE_URL=new RegExp("url\\s*\\(\\s*[\"']?([^/\"'].*?)[\"']?\\s*\\)","gi");var J=["text-kashida","text-kashida-space","text-justify","layout-grid-mode"];var G={};var D=function(S){var R=S.split("-"),O=R.length;if(O==1){return R[0]}var Q=S.charAt(0)=="-"?R[0].charAt(0).toUpperCase()+R[0].substring(1):R[0];for(var P=1;P<O;P++){Q+=R[P].charAt(0).toUpperCase()+R[P].substring(1)}return Q};var H={elements:[],callbacks:{},counters:{},init:function(){H.instance=this;this.compatibilityMode=B.test(window.document.compatMode);this.isIE7=K.test(navigator.userAgent);if(!L.test(navigator.userAgent)&&!this.compatibilityMode){return }for(var P=0;P<J.length;++P){G[D(J[P])]=window.document.getElementById("body").currentStyle[D(J[P])]}this.newRules="";var R=window.document.styleSheets,O=R.length;for(var P=0;P<O;P++){this.parseStylesheet(R[P])}if(this.newRules){var Q=window.document.createElement("style");window.document.documentElement.firstChild.appendChild(Q);Q.styleSheet.cssText=this.newRules}},parseStylesheet:function(T){if(T.imports){try{var P=T.imports,O=P.length;for(var S=0;S<O;S++){this.parseStylesheet(T.imports[S])}}catch(R){}}try{var U=T.rules,O=U.length;for(var Q=0;Q<O;Q++){this.parseCSSRule(U[Q],T)}}catch(R){}},parseCSSRule:function(V,U){var W=V.selectorText;while(C.test(W)){var O=V.style.cssText;if(O.indexOf("url")>0){var S=U.href;var P=S.lastIndexOf("/");if(P>=0){S=S.substring(0,P+1)}O=O.replace(REG_RELATIVE_URL,'url("'+S+'$1")')}var Q=F.exec(W.replace(/on(hover|focus|unknown|active)/g,""))[1];var X=W.replace(A,"on$1");if(this.isIE7&&!this.compatibilityMode&&X=="onhover"){return }var Z=W.replace(N,".$2"+X);var T=I.exec(Z)[1];var R=Q+T;if(!this.callbacks[R]){var Y=this.getProperty(Q);this.newRules+=Q+"{"+Y+':expression(CSSHover(this, "'+X+'", "'+Y+'"));}\n';this.callbacks[R]=true}this.newRules+=Z+"{"+O+"}\n";W=Z}},getProperty:function(O){if(!this.counters[O]){this.counters[O]=0}return J[this.counters[O]++]},patch:function(Q,P,R){R=D(R);Q.style[R]=G[R];if(!Q.csshover){Q.csshover={}}if(!Q.csshover[P]){Q.csshover[P]=true;var O=new M(Q,P);this.elements.push(O)}return""},unload:function(){try{var O=this.elements.length;for(var P=0;P<O;P++){this.elements[P].unload()}this.elements=[];this.callbacks={}}catch(Q){}}};window.attachEvent("onbeforeunload",function(){H.unload()});var E={onhover:{activator:"onmouseenter",deactivator:"onmouseleave"},onactive:{activator:"onmousedown",deactivator:"onmouseup"},onfocus:{activator:"onfocus",deactivator:"onblur"},onunknown:{activator:"onfocus",deactivator:"onblur"}};function M(Q,P){this.node=Q;this.type=P;var O=new RegExp("(^|\\s)"+className+"(\\s|$)","g");this.activator=function(){var S=Q.className.split(/\s+/);for(var R=0;R<S.length;++R){Q.className+=" "+S[R]+P}Q.className+=" "+P};this.deactivator=function(){var S=Q.className.split(/\s+/);for(var R=0;R<S.length;++R){if(Q.className.indexOf(S[R]+P)>=0){Q.className=Q.className.replace(new RegExp("\\s+"+S[R]+P,"gi"),"")}}Q.className=Q.className.replace(new RegExp("\\s+"+P,"gi"),"")};Q.attachEvent(E[P].activator,this.activator);Q.attachEvent(E[P].deactivator,this.deactivator)}M.prototype={unload:function(){this.node.detachEvent(E[this.type].activator,this.activator);this.node.detachEvent(E[this.type].deactivator,this.deactivator);this.activator=null;this.deactivator=null;this.node=null;this.type=null}};return function(Q,P,O,R){if(Q){return H.patch(Q,P,O,R)}else{H.init()}}})()
+// ]]>
+</script>

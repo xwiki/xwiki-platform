@@ -1,0 +1,146 @@
+<html>
+<head>
+<title>{$lang_insert_macro_title}</title>
+<script language="javascript" src="../../tiny_mce_popup.js"></script>
+<script language="javascript">
+    var baseurl = tinyMCE.getParam("wiki_macro_path");
+    var strMacro = "";
+</script>
+<script language="javascript">
+    function init() {
+        editor_id = tinyMCE.getWindowArg('editor_id');
+    }
+    function insertMacro() {
+        if (window.opener) {
+            var macro = strMacro.toString();
+            window.opener.wikiEditor.insertMacro(editor_id, macro);
+            tinyMCEPopup.close();
+        }
+    }
+    function cancelAction() {
+        tinyMCEPopup.close();
+    }
+    //------------------
+    // threadsafe asynchronous XMLHTTPRequest code
+    function executeCommand(url, callback) {
+        // we use a javascript feature here called "inner functions"
+        // using these means the local variables retain their values after the outer function
+        // has returned. this is useful for thread safety, so
+        // reassigning the onreadystatechange function doesn't stomp over earlier requests.
+        function ajaxBindCallback() {
+            if (ajaxRequest.readyState == 4) {
+                if (ajaxRequest.status == 200) {
+                    if (ajaxCallback) {
+                        ajaxCallback(ajaxRequest.responseText);
+                    } else {
+                        alert('no callback defined');
+                    }
+                } else {
+                    alert("There was a problem retrieving the xml data:\n" + ajaxRequest.status + ":\t" + ajaxRequest.statusText + "\n" + ajaxRequest.responseText);
+                }
+            }
+        }
+        // addMessage(url);
+        // use a local variable to hold our request and callback until the inner function is called...
+        var ajaxRequest = null;
+        var ajaxCallback = callback;
+
+        // bind our callback then hit the server...
+        if (window.XMLHttpRequest) {
+            ajaxRequest = new XMLHttpRequest();
+            ajaxRequest.onreadystatechange = ajaxBindCallback;
+            ajaxRequest.open("GET", url, true);
+            ajaxRequest.send(null);
+        } else if (window.ActiveXObject) {
+            // ie
+            ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
+            if (ajaxRequest) {
+                ajaxRequest.onreadystatechange = ajaxBindCallback;
+                ajaxRequest.open("GET", url, true);
+                ajaxRequest.send();
+            }
+            else{
+                alert("your browser does not support xmlhttprequest" )
+            }
+        }
+        else{
+            alert("your browser does not support xmlhttprequest" )
+        }
+    }
+    function loadMacroList(baseurl) {
+        var url = baseurl + "?xpage=macrowysiwyg";
+        executeCommand(url, loadMacroListCallback);
+    }
+
+    function loadMacroListCallback(e) {
+      var macroEl = document.getElementById("macros");
+      document.getElementById("loading").style.display = "none";
+      document.getElementById("action").style.display = "block";
+      macroEl.innerHTML = e;
+    }
+
+</script>
+<script type="text/javascript">
+    function inputMacro() {
+        var selObj = document.getElementById("selmacro");
+        var selectedindex = selObj.selectedIndex;
+        var selectedMacro = document.getElementById("selmacro").options[selectedindex].value;
+        document.getElementById("input").innerHTML = document.getElementById(selectedMacro).innerHTML ;
+    }
+    function checkForm() {
+        var macroparamstr = document.getElementById("macroparam").value;
+        if (macroparamstr != null && macroparamstr != "") {
+            macroparams = macroparamstr.split(",");
+            for(var i=0; i < macroparams.length; i++) {
+                var elementID = macroparams[i].toString().replace(/\r\n|&nbsp;/g,"");
+                values = document.getElementById(elementID).value;
+                if (values == null || values == "" ) {
+                    alert("You must choose at least a macro and fill all the fields !");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    function setMacro() {
+        var macroparamstr = document.getElementById("macroparam").value;
+        var macrocontent = document.getElementById("content").value;
+        var macroname = document.getElementById("macroname").value;
+        var macro = "";
+        if (macroparamstr != null && macroparamstr != "") {
+            macro = "{" + macroname + ":";
+            macroparams = macroparamstr.split(",");
+            for(var i=0; i < macroparams.length; i++) {
+                var elementID = macroparams[i].toString().replace(/\r\n|&nbsp;/g,"");
+                macro += elementID.toString() + "=" + document.getElementById(elementID).value;
+                if (i != macroparams.length-1 )  macro += "|";
+            }
+            macro += "}";
+            if ((macrocontent !=null && macrocontent !="")) {
+                macro +=  macrocontent + "{" +macroname+ "}";
+            }
+        } else  macro = "{" + macroname +"}";
+
+        strMacro = macro;
+    }
+</script>
+</head>
+<body onload="init();">
+<div id="macros"></div>
+<div id="loading" align="center">
+    <div class="loadingAjax"></div>
+    {$lang_loading_macros}    
+</div>
+<script type="text/javascript">
+    loadMacroList(baseurl);
+</script>
+<div id="action" class="mceActionPanel"  style="display:none">
+    <div style="float: left">
+        <input type="button" id="insert" name="insert" value="{$lang_insert_macro}" onclick="if(checkForm()){setMacro(); insertMacro();}" >
+    </div>
+    <div style="float: right">
+          <input type="button" id="cancel" name="cancel" value="{$lang_cancel}" onClick="cancelAction();">
+    </div>
+</div>
+</body>
+</html>

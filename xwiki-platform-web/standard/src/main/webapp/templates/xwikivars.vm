@@ -1,0 +1,108 @@
+#template("frequentlyUsedDocs.vm")
+#set ($isGuest = $xcontext.getUser().equals('XWiki.XWikiGuest'))
+#set ($isSuperAdmin = ($xcontext.user == 'XWiki.superadmin'))
+#set ($hasEdit = $xwiki.hasAccessLevel('edit'))
+#set ($hasAdmin = $xwiki.hasAccessLevel('admin'))
+#set ($hasComment = $xwiki.hasAccessLevel('comment'))
+## Note: In order to know if the user has the right to create a space we compute a space name that doesn't exist and check edit rights on that space
+#set ($hasCreateSpace = $xwiki.hasAccessLevel('edit', "${doc.space}${mathtool.random(0, 999)}.DocumentReservedForInternalXWikiUsage"))
+## Note: In order to know if the user has the right to create a page we compute a page name that doesn't exist and check edit rights on that page 
+#set ($hasCreatePage = $xwiki.hasAccessLevel('edit', "${doc.space}.DocumentReservedForInternalXWikiUsage${mathtool.random(0, 999)}"))
+#set ($hasGlobalAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, 'XWiki.XWikiPreferences'))
+## Note: The document name is not internally used to determine if a user has programming access level. We pass XWiki.XWikiPreferences for consistency with the call for global admin
+#set ($hasProgramming = $xwiki.hasAccessLevel('programming', $xcontext.user, 'XWiki.XWikiPreferences'))
+#set ($hasSpaceAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, "${doc.space}.WebPreferences"))
+#set ($hasWatch = $xwiki.watchlist && !$isGuest && !$isSuperAdmin && $xwiki.exists($services.model.serialize($services.model.createDocumentReference($xcontext.wiki, 'XWiki', 'XWikiUserWatchListSheet'), 'local')))
+##
+## Are comments, attachments, history etc. enabled?
+##
+#macro (retrieveSetting $settingName $settingValue)
+  #set ($settingValue = $xwiki.getSpacePreference($settingName))
+  #if ("$!{settingValue}" != "false" && "$!{settingValue}" != "no" && "$!{settingValue}" != "0")
+    #set ($settingValue = true)
+  #else
+    #set ($settingValue = false)
+  #end
+#end
+#retrieveSetting('showcomments' $settingValue)
+#set ($showcomments = $settingValue)
+#retrieveSetting('showattachments' $settingValue)
+#set ($showattachments = $settingValue)
+#retrieveSetting('showhistory' $settingValue)
+#set ($showhistory = $settingValue)
+#retrieveSetting('showinformation' $settingValue)
+#set ($showinformation = $settingValue)
+##
+##
+#set ($isReadOnly = $xwiki.isReadOnly())
+#set ($spaceViewUrl = $spaceDoc.getURL('view'))
+#set ($viewUrl = $doc.getURL('view'))
+#set ($userObj = $!crtUserDoc.getObject('XWiki.XWikiUsers', 0))
+## =====================================================================================
+## Advanced users are:
+## - super admin
+## - user documents who have their usertype property set to "Advanced"
+## - guest users who have admin rights (i.e. when the wiki is empty with no rights set)
+## =====================================================================================
+#if ($isSuperAdmin)
+  #set ($isAdvancedUser = true)
+#elseif ($isGuest && $hasAdmin)
+  #set ($isAdvancedUser = true)
+#elseif (!$userObj.getProperty('usertype').value)
+  #set ($isAdvancedUser = false)
+#else
+  #set ($isAdvancedUser = ($userObj.getProperty('usertype').value == 'Advanced'))
+#end
+## ======================================================================================
+## Compute list of spaces to blacklist so that simple users don't see them.
+## TODO : replace this list by a hidden space feature.
+## ======================================================================================
+#if ($hasAdmin || $isAdvancedUser)
+  #set ($blacklistedSpaces = [])
+#else
+  #set ($blacklistedSpaces = ['Import', 'Panels', 'Scheduler', 'Stats', 'XAppClasses', 'XAppSheets', 'XAppTemplates', 'XWiki', 'WatchCode', 'WatchSheets', 'XApp', 'WatchAdmin', 'Watch', 'ColorThemes', 'AnnotationCode'])
+#end
+## ======================================================================================
+## Since the WysiwygService does not trigger the evaluation of the xwikivars.vm, we need a way to make this variable
+## visible to the GWT Service calls (and potentially other java code). We set it on the session so it's set when the 
+## page to be edited with the wysiwyg is displayed, and it's available on the session for the WysiwygService functions, 
+## such as getSpaceNames(). This hack is to be removed when the blacklistedSpaces will be set as a configuration 
+## preference and all public API will do the hidden spaces filtering by default. 
+## ======================================================================================
+#set ($discard = $request.getSession().setAttribute('blacklistedSpaces', $blacklistedSpaces))
+#set ($parent ="<a href='$parentDoc.getURL()'>$escapetool.xml(${parentDoc.displayTitle})</a>")
+#if ($tdoc)
+  #set ($headertitle = "<a href='$viewUrl'>$escapetool.xml(${tdoc.displayTitle})</a>")
+#else
+  #set ($headertitle = "<a href='$viewUrl'>$escapetool.xml(${doc.displayTitle})</a>")
+#end
+#set ($skin = $xwiki.getSkin())
+#set ($copyright = $xwiki.getSpaceCopyright())
+#set ($xwikimode = $xcontext.getMode())
+#set ($logredir = $escapetool.xml($xwiki.getRequestURL()))
+##
+#if ($xwiki.exists('XWiki.MaintenanceInfo'))
+  #set ($maintenanceinfo = 'XWiki.MaintenanceInfo')
+#elseif ($xwiki.exists('xwiki:XWiki.MaintenanceInfo'))
+  #set ($maintenanceinfo = 'xwiki:XWiki.MaintenanceInfo')
+#end
+## Check language option
+#set ($languageparams = '')
+#if ($xwiki.isMultiLingual() && ("$!{tdoc.realLanguage}" != ''))
+  #set ($languageparams = "language=${tdoc.realLanguage}")
+#end
+## Check revision option
+#if ($request.rev)
+  #set ($revparams = "rev=$!{escapetool.url(${request.rev})}")
+#else
+  #set ($revparams = '')
+#end
+#if ($revparams != '' && $languageparams != '')
+  #set ($docvariant = "$languageparams&amp;$revparams")
+#else
+  #set ($docvariant = "${languageparams}${revparams}")
+#end
+#set ($keyboardShortcutsEnabled = $isAdvancedUser)
+#set ($isInServletMode = $xwikimode == 0)
+#set ($isInPortletMode = $xwikimode == 1)
+#template("deprecatedVars.vm")

@@ -1,0 +1,15 @@
+<div style="text-align: center; width: 100%;">
+<h1>
+#set($title = "$!pdfdoc.display('title', 'rendered')")
+#if($title == '')
+  $escapetool.xml($!tdoc.plainTitle)
+#else
+  $escapetool.xml($title)
+#end
+</h1>
+<br />
+<br />
+$!xwiki.getUserName($tdoc.author, false)
+<br />
+$!xwiki.formatDate($tdoc.date)
+</div>

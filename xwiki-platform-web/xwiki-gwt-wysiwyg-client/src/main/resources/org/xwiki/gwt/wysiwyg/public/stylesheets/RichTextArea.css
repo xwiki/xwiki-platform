@@ -1,0 +1,143 @@
+#template('colorThemeInit.vm')
+/*
+  The BODY element can have a smaller width and height than the HTML element allowing the user to click inside the HTML
+  element but outside of the BODY element. In IE this leads to the HTML element being activated and the selection
+  within the BODY element being cleared. This is very annoying for the user which expects to see the caret when he
+  clicks inside the rich text area. Also, GWT's rich text area listens to DOM events generated within the BODY element
+  and thus events triggered by the HTML element are ignored. We cannot prevent the activation of the HTML element
+  because this will make scrolling with the mouse impossible. The best way to avoid this problem is to ensure through
+  CSS that the BODY element has at least the width and height of the HTML element. In other words, initially when the
+  document is empty the BODY should have the width and height of the rich text area. Once the user starts adding
+  content and this content grows beyond the height/width of the rich text area requiring the vertical/horizontal scroll
+  bar then the BODY element should increase its height/width to be able to wrap the content.
+*/
+html {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+* html {
+  overflow-y: scroll !important;
+}
+
+body {
+  background-color: $theme.pageContentBackgroundColor !important;
+  background-image: none !important;
+  color: $theme.textColor !important;
+  /*
+    We use float:left in order to remove the body from the normal flow and thus prevent collapsing margins between
+    body and its first in-flow block-level child. Otherwise the vertical scroll bar would be visible because of the
+    min-height:100% rule. See http://www.w3.org/TR/CSS21/box.html#collapsing-margins
+  */
+  float: left !important;
+  height: auto !important;
+  margin: 0 !important;
+  min-height: 100% !important;
+  min-width: 100% !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  position: static !important;
+  width: auto !important;
+}
+
+* html body {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/*
+  Overwrite no matter what list-style-position to outside position to avoid the Firefox issues with editing lists
+  with inside list style. 
+*/
+ul, ol {
+  list-style-position: outside !important;
+}
+
+/*
+  XWiki 2.0 renderer places the contents of a header inside a span, which is styled in the skin. Since this is not
+  common to all the syntaxes and the CSS rules can be applied directly to the header, the editor doesn't generate this
+  span when applying header style to the selection. In order to view headers as in view mode we have to block some of
+  the CSS rules applied to the span and add then to the header. 
+*/
+h1 span, h2 span, h3 span, h4 span {
+  border-bottom: 0 none !important;
+  margin: 0 !important;
+  /* IE behaves strangely when the span is displayed as block. */
+  display: inline !important;
+  /*
+    IE behaves strangely when the span doesn't have static position.
+    See XWIKI-3339: New TOC overlaps with titles in WYSIWYG edition in IE6
+  */
+  position: static !important;
+}
+
+h1, h2, h3, h4 {
+  border-bottom: 1px solid #CCCCCC !important;
+  margin: 20px 0 !important;
+  /*
+    Headings with overflow:hidden are painful to edit in IE because they are treated as fixed size boxes (resize
+    handlers are present).
+  */
+  overflow: visible !important;
+}
+
+h1 {
+  margin: 25px 0 20px 0 !important;
+  /* Letter spacing affects the behavior of the Delete and Backspace keys in IE */
+  letter-spacing: normal !important;
+}
+
+.macro {
+  background-color: transparent;
+  border: 1px dashed #CCCCCC;
+  font-size: 100%;
+  /* Prevent vertical resizing in IE */
+  height: auto !important;
+  /* Remove button padding in IE */
+  overflow: visible;
+  padding: 1px;
+  text-align: left;
+  /* Prevent word wrapping inside a macro container in IE */
+  white-space: nowrap;
+}
+
+.macro-inline {
+  display: inline;
+  margin: 0px;
+  /* Prevent horizontal resizing in IE */
+  width: auto !important;
+}
+
+.macro-block {
+  display: block;
+  margin-right: auto;
+  /*
+    In IE6 the horizontal scroll bar appears even if we remove the padding and the border from the macro. In IE7 the
+    horizontal scroll bar appears when the macro is selected and the resize handlers are shown. Using a width of 99%
+    seems to prevent the horizontal scroll bar in IE.
+  */
+  width: 99% !important;
+}
+
+.macro-selected {
+  background-color: #E8F2FE;
+}
+
+.macro .macro-placeholder {
+  background-image: url(../images/macro.gif);
+  background-position: left center;
+  background-repeat: no-repeat;
+  color: gray;
+  font-size: 87.5%;
+  font-style: italic;
+  padding-left: 20px;
+}
+
+.xEmbeddedObject {
+  background-image: url(../images/embed.gif);
+  background-position: center center;
+  background-repeat: no-repeat;
+  border: 1px solid #CCC;
+  height: 20px;
+  width: 40px;
+}

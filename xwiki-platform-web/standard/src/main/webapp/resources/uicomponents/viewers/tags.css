@@ -1,0 +1,83 @@
+#template("colorThemeInit.vm")
+.doc-tags {
+  float: left;
+  width: 48%;
+}
+.tag-wrapper {
+  padding: 2px 1px;
+}
+.tag-wrapper .separator {
+  display: none;
+}
+.tag {
+  word-wrap: break-word;
+}
+a.tag-delete, a.tag-delete:visited {
+  color: $theme.pageContentBackgroundColor;
+  font-size: 70%;
+  font-weight: bold;
+  text-decoration: none !important;
+  vertical-align: super;
+}
+.tag-wrapper:hover a.tag-delete {
+  color: $theme.textPrimaryColor;
+}
+.tag-wrapper a.tag-delete:hover {
+  color: #C00;
+}
+.tag-add {
+  color: $theme.textPrimaryColor;
+  display: inline;
+}
+.tag-add a, .tag-add a:visited {
+  color: $theme.textPrimaryColor;
+  font-size: 80%;
+  text-decoration: none;
+}
+.tag-add a:hover {
+  color: $theme.linkColor;
+}
+
+.tag-add-form {
+  border: 1px outset $theme.borderColor;
+  position: absolute;
+  vertical-align: top !important;
+  z-index: 1000;
+}
+* html .tag-add-form {
+  width: 190px;
+}
+.tag-add-form div {
+  background: $theme.backgroundSecondaryColor;
+  overflow: hidden;
+  padding: 4px 8px;
+}
+
+.tag-add-form label {
+  color: $theme.textColor;
+  font-size: 80%;
+  margin: 2px 0;
+}
+
+.tag-add-form .input-tag {
+  width: 16em;
+  height: 80%;
+  margin-right: 3px;
+}
+
+.tag-add-form .buttonwrapper {
+  margin-left: 0;
+}
+
+#body .tag-add-form .button {
+  font-size: 80%;
+  padding: 3px 5px !important;
+  cursor: pointer;
+  display: inline-block;
+  min-height: 0 !important;
+}
+
+.tag-add-form .button-add-tag-cancel {
+  font-size: 80%;
+  padding: 4px 5px !important;
+}

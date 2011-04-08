@@ -1,0 +1,55 @@
+.xnotification-container {
+  position : fixed;
+  bottom: 0;
+  left: 0%;
+  width: 100%;
+  text-align: center;
+  z-index: 1200;
+  display: block !important;
+}
+.xnotification-wrapper {
+  padding-top: 1px;
+}
+.xnotification {
+  cursor: pointer;
+  display: inline;
+  background: #333 2px center no-repeat;
+  border: none;
+  padding: 0px 6px;
+  color: #fff;
+  font-weight: bold;
+  line-height: 20px;
+}
+
+#set($notificationCustommization = [])
+## each element:                       [notification type, bg color, text color, icon]
+#set($discard = $notificationCustommization.add(["info", "#268", "#fff"]))
+#set($discard = $notificationCustommization.add(["warning", "#fd8", "#330"]))
+#set($discard = $notificationCustommization.add(["error", "#a00", "#fff"]))
+#set($discard = $notificationCustommization.add(["inprogress", "#333", "#fff", "icons/xwiki/spinner-white.gif"]))
+#set($discard = $notificationCustommization.add(["done", "#160", "#fff"]))
+##
+#foreach($item in $notificationCustommization)
+  #set($notificationType  = ${item.get(0)})
+  #set($bgColor = ${item.get(1)})
+  #set($textColor = ${item.get(2)})
+  #set($imgUrl = '')
+  #if ($item.size() >= 4)
+    #set($imgName = "$!{item.get(3)}")
+    #if($imgName.indexOf("/") >= 0)
+      #set($imgUrl = $xwiki.getSkinFile($imgName))
+    #else
+      #set($imgUrl = $xwiki.getSkinFile("icons/silk/${imgName}.gif"))
+    #end
+  #end
+/** $notificationType */
+.xnotification-${notificationType} {
+  background-color: $bgColor;
+  color:  $textColor;
+  border-color:  $textColor;
+#if($imgUrl != '')
+  background-image: url(${imgUrl});
+  padding-left: 22px;
+#end
+}
+#end

@@ -1,0 +1,8 @@
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="mainContentArea">
+#template("exceptioninline.vm")
+<div class="clearfloats"></div>
+</div>## mainContentArea
+</div>## main
+#template("endpage.vm")

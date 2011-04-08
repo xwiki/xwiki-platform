@@ -1,0 +1,59 @@
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wikieditor/wikibits.js")"></script>
+<script type="text/javascript">
+## Syntax elements is a list of: [identifier, start markup, end markup, image name].
+## The identifier is used to display the button title, and the sample text.
+## The image is retrieved from /resources/icons/silk/imageName.gif
+#set($syntax10Elements = [])
+#set($discard = $syntax10Elements.add(['bold', '*', '*', 'text_bold']))
+#set($discard = $syntax10Elements.add(['italics', '~~', '~~', 'text_italic']))
+#set($discard = $syntax10Elements.add(['underline', '__', '__', 'text_underline']))
+#set($discard = $syntax10Elements.add(['strikethrough', '--', '--', 'text_strikethrough']))
+#set($discard = $syntax10Elements.add(['ulist', '\n* ', '\n', 'text_list_bullets']))
+#set($discard = $syntax10Elements.add(['olist', '\n# ', '\n', 'text_list_numbers']))
+#set($discard = $syntax10Elements.add(['ilink', '[', ']', 'link']))
+#set($discard = $syntax10Elements.add(['elink', '[', ']', 'link_go']))
+#set($discard = $syntax10Elements.add(['h1', '\n1 ', '\n', 'text_heading_1']))
+#set($discard = $syntax10Elements.add(['h2', '\n1.1 ', '\n', 'text_heading_2']))
+#set($discard = $syntax10Elements.add(['h3', '\n1.1.1 ', '\n', 'text_heading_3']))
+#set($discard = $syntax10Elements.add(['h4', '\n1.1.1.1 ', '\n', 'text_heading_4']))
+#set($discard = $syntax10Elements.add(['hr', '\n----\n', '', 'text_horizontalrule']))
+#set($discard = $syntax10Elements.add(['img', '{image:', '}', 'image']))
+#set($tmp = '#sign("' + $xcontext.user + '")')
+#set($discard = $syntax10Elements.add(['sign', $tmp, '', 'text_signature']))
+#set($syntax20Elements = [])
+#set($discard = $syntax20Elements.add(['bold', '**', '**', 'text_bold']))
+#set($discard = $syntax20Elements.add(['italics', '//', '//', 'text_italic']))
+#set($discard = $syntax20Elements.add(['underline', '__', '__', 'text_underline']))
+#set($discard = $syntax20Elements.add(['strikethrough', '--', '--', 'text_strikethrough']))
+#set($discard = $syntax20Elements.add(['subscript', ',,', ',,', 'text_subscript']))
+#set($discard = $syntax20Elements.add(['superscript', '^^', '^^', 'text_superscript']))
+#set($discard = $syntax20Elements.add(['ulist', '\n* ', '\n', 'text_list_bullets']))
+#set($discard = $syntax20Elements.add(['olist', '\n1. ', '\n', 'text_list_numbers']))
+#set($discard = $syntax20Elements.add(['ilink', '[[', ']]', 'link']))
+#set($discard = $syntax20Elements.add(['elink20', '[[', ']]', 'link_go']))
+#set($discard = $syntax20Elements.add(['h1', '\n= ', '=\n', 'text_heading_1']))
+#set($discard = $syntax20Elements.add(['h2', '\n== ', '==\n', 'text_heading_2']))
+#set($discard = $syntax20Elements.add(['h3', '\n=== ', '===\n', 'text_heading_3']))
+#set($discard = $syntax20Elements.add(['h4', '\n==== ', '====\n', 'text_heading_4']))
+#set($discard = $syntax20Elements.add(['hr', '\n----\n', '', 'text_horizontalrule']))
+#set($discard = $syntax20Elements.add(['img', '[[image:', ']]', 'image']))
+#set($discard = $syntax20Elements.add(['html', '\n{{html}}\n', '\n{{/html}}\n', 'html']))
+#set($discard = $syntax20Elements.add(['velocity', '\n{{velocity}}\n', '\n{{/velocity}}\n', 'cog']))
+#if($doc.syntax.toIdString() == 'xwiki/1.0')
+  #set($syntaxElements = $syntax10Elements)
+#elseif($doc.syntax.toIdString() == "xwiki/2.0" || $doc.syntax.toIdString() == "xwiki/2.1")
+  #set($syntaxElements = $syntax20Elements)
+#end
+// <![CDATA[
+document.writeln("<div class='leftmenu2'>");
+#foreach($item in $syntaxElements)
+  #set($imageFile = $xwiki.getSkinFile("icons/silk/${item.get(3)}.gif"))
+  #set($speedTip = $msg.get("core.edit.wikiToolbar.${item.get(0)}").replaceAll("'", "\\'"))
+  #set($tagOpen = ${item.get(1)})
+  #set($tagClose = ${item.get(2)})
+  #set($sampleText = $msg.get("core.edit.wikiToolbar.${item.get(0)}text").replaceAll("'", "\\'"))
+  addButton('$imageFile', '$speedTip', '$tagOpen', '$tagClose', '$sampleText');
+#end
+document.writeln("<" + "/div>");
+// ]]>
+</script>

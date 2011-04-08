@@ -1,0 +1,16 @@
+###
+### Comments page in the "view" mode
+###
+###
+#if("$!request.xpage" == 'comments')
+  $response.sendRedirect($doc.getURL('view', 'viewer=comments'))
+#else
+  <div id="document-title"><h1>$msg.get('core.viewers.comments.title', [$escapetool.xml($doc.getPlainTitle()), $doc.getURL()])</h1></div>
+  ## ----------------------------
+  ## Display the shortcuts
+  ## ----------------------------
+  #if($displayShortcuts)
+    #template("shortcuts.vm")
+  #end
+  #template("commentsinline.vm")
+#end

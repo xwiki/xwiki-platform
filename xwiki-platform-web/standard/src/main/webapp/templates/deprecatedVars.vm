@@ -1,0 +1,3 @@
+#set($hasedit = $hasEdit)
+#set($hasadmin = $hasAdmin)
+#set($isguest = $isGuest)

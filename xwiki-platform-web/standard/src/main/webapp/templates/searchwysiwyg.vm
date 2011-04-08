@@ -1,0 +1,34 @@
+<div class="xwikidatacontent">
+#set ($space = "$!{request.getParameter('space')}")
+#set ($page = "$!{request.getParameter('page')}")
+#if ($space != '')
+  #set ($sql = 'where doc.space = ? and doc.name like ? order by doc.date desc')
+  #set ($params = [${space}, "%${page}%"])
+#else
+  #set ($sql = "where doc.name like ? order by doc.date desc")
+  #set ($params = ["%${page}%"])
+#end
+<p><strong>$msg.get('listofresultspages'): </strong></p>
+<div class="panel_result">
+#set ($documents = $xwiki.searchDocuments($sql, 50, 0, ${params}))
+#if ($documents.size() > 0)
+  <ul>
+  #set ($currentSpaceEscaped = $escapetool.xml($escapetool.javascript($doc.space)))
+  #foreach ($item in $documents)
+    #if ($xwiki.hasAccessLevel('view', "${xcontext.database}:${item}"))
+      <li>
+      #set ($bentrydoc = $xwiki.getDocument($item))
+      ## JavaScript inside HTML!
+      #set ($itemSpace = $escapetool.xml($escapetool.javascript($bentrydoc.space)))
+      #set ($itemName = $escapetool.xml($escapetool.javascript($bentrydoc.name)))
+      <a href="#" onclick="document.forms[0].wiki_page.value='$itemName';if ('$currentSpaceEscaped' != '$itemSpace') document.forms[0].wiki_space.value='$itemSpace'; else document.forms[0].wiki_space.value=''; return false;">
+      $escapetool.xml($bentrydoc.name)</a>  $msg.get('lastmodifiedby')  $xwiki.getUserName($bentrydoc.author) $msg.get('lastmodifiedon') $xwiki.formatDate($bentrydoc.date, 'MMMM dd, yyyy HH:mm')
+      </li>
+    #end
+  #end
+  </ul>
+#else
+  $msg.get('nopagesatthemoment')
+#end
+</div>## panel_result
+</div>## xwikidatacontent

@@ -1,0 +1,21 @@
+#set($fullname = $request.get("fullname"))
+#set($obj = $doc.getObject("XWiki.XWikiGroups", "member", $fullname))
+#set($discard = $doc.removeObject($obj))
+
+## add a new empty group object so the group does not dissappears
+#if($doc.getObjects("XWiki.XWikiGroups").size() == 0)
+  #set($discard = $doc.newObject("XWiki.XWikiGroups"))
+  added empty group
+#end
+#if ($!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+#set($discard = $doc.save())
+#if($request.ajax)
+  ok
+#elseif($request.xredirect)
+  $response.sendRedirect($request.xredirect)
+#else
+  $response.sendRedirect($doc.getURL('view'))
+#end
+#else
+  notallowed
+#end

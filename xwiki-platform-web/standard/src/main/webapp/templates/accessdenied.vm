@@ -1,0 +1,26 @@
+###
+### Access denied message
+###
+###
+#if(!$response.containsHeader('WWW-Authenticate'))
+  $response.setStatus(403)
+  ## Otherwise, unauthenticated user with Basic authentication, a 401 status has been set in Java.
+#end
+#if("$!request.ajax" != '')
+$msg.get('notallowed')
+#else
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="mainContentArea">
+#if ($xwiki.isReadOnly())
+#xwikimessageboxstart($msg.get("error") $msg.get("readonly"))
+#else
+#xwikimessageboxstart($msg.get("error") $msg.get("notallowed"))
+#end
+$!exception
+#xwikimessageboxend()
+<div class="clearfloats"></div>
+</div>## mainContentArea
+</div>## main
+#template("endpage.vm")
+#end

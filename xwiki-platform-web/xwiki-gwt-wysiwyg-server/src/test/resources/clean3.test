@@ -1,0 +1,12 @@
+#
+# Tests that two nesting levels for anchors are removed.
+#
+<p><!--startwikilink:http://www.xwiki.org--><span class="wikiexternallink">\
+<a class="wikimodel-freestanding" href="http://www.xwiki.org"><span class="wikigeneratedlinkcontent">\
+<a href="http://www.xwiki.orgs">http://www.<strong>xwiki</strong>.org</a>\
+</span></a></span><!--stopwikilink--></p>
+---
+<p><!--startwikilink:http://www.xwiki.org--><span class="wikiexternallink">\
+<a class="wikimodel-freestanding" href="http://www.xwiki.org"><span class="wikigeneratedlinkcontent">\
+http://www.<strong>xwiki</strong>.org\
+</span></a></span><!--stopwikilink--></p>

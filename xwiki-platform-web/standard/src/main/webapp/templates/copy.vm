@@ -1,0 +1,76 @@
+###
+### Copy document template
+###
+#if(!$xwiki.hasAccessLevel("edit"))
+  #template("accessdenied.vm")
+#elseif($doc.isNew())
+  $response.setStatus(404)
+  #template("startpage.vm")
+  <div class="main layoutsubsection">
+  <div id="mainContentArea">
+    #error("$msg.get('core.rename.nonexistingDocument')")
+  </div>## mainContentArea
+  </div>## main
+  #template("endpage.vm")
+#else
+  #template("startpage.vm")
+  <div class="main layoutsubsection">
+  <div id="mainContentArea">
+    <div id="document-title"><h1>$msg.get('core.copy.copydoc')</h1></div>
+    #set($sourcedoc = "$!{request.sourcedoc}")
+    #set($targetdoc = "$!{request.targetdoc}")
+    #if("$!request.language" != "" && "$!{request.language}" != 'ALL')
+      #set($language = "$!{request.language}")
+      #set($escapedLanguage = "$!{escapetool.xml($request.language)}")
+    #end
+    #set($sourcewiki = $xcontext.database)
+    #set($targetwiki = $xcontext.database)
+    #if($targetdoc != "" && $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+    #set($ok = $xwiki.copyDocument($sourcedoc, $targetdoc, $sourcewiki, $targetwiki, $language, false, true))
+    #set($prefixedSourcedoc = "#if($sourcewiki!=$xcontext.database)$sourcewiki:#end$sourcedoc")
+    #set($prefixedTargetdoc = "#if($targetwiki!=$xcontext.database)$targetwiki:#end$targetdoc")
+    #if($escapedLanguage)
+      #set($fromurl = $xwiki.getURL("$prefixedSourcedoc", "view", "language=${escapedLanguage}"))
+      #set($tourl = $xwiki.getURL("$prefixedTargetdoc", "view", "language=${escapedLanguage}"))
+    #else
+      #set($fromurl = $xwiki.getURL("$prefixedSourcedoc"))
+      #set($tourl = $xwiki.getURL("$prefixedTargetdoc"))
+    #end
+    #set($sourcelink = "<a href='${fromurl}'>$!{escapetool.xml($prefixedSourcedoc)} #if($escapedLanguage)($escapedLanguage)#end</a>")
+    #set($targetlink = "<a href='${tourl}'>$!{escapetool.xml($prefixedTargetdoc)}</a>")
+    #info("$msg.get('core.copy.copyingdoc', [$sourcelink, $targetlink])")
+    #else
+    <form action="">
+    <div class="hidden">
+      ## CSRF prevention
+      <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+      <input type="hidden" name="xpage" value="copy" />
+    </div>
+    <dl>
+      <dt>$msg.get("core.copy.sourcedoc"):</dt>
+      <dd>$!{escapetool.xml($doc.fullName)} <input type="hidden" name="sourcedoc" value="$!{escapetool.xml($doc.fullName)}" size="60"/></dd>
+      #set ($docTranslations = $doc.getTranslationList())
+      #if ($docTranslations.size() > 0)
+      <dt><label for="language">$msg.get("language")</label>:</dt>
+      <dd>
+        <select id="language" name="language">
+          ## Add a special "All Translations" combo box entry to copy all translations.
+          <option value="ALL" selected="selected">$msg.get("core.copy.allTranslations")</option>
+          ## Add all the existing translations
+          #foreach ($docTranslation in $docTranslations)
+            <option>$docTranslation</option>
+          #end
+        </select>
+      </dd>
+      #end
+      <dt><label for="targetdoc">$msg.get("core.copy.targetdoc")</label>:</dt>
+      <dd><input type="text" id="targetdoc" name="targetdoc" value="$!{escapetool.xml($targetdoc)}" size="60" /></dd>
+    </dl>
+    <div><span class="buttonwrapper"><input type="submit" value="Copy" class="button"/></span></div>
+    </form>
+    #end
+    <div class="clearfloats"></div>
+  </div>## mainContentArea
+  </div>## main
+#template("endpage.vm")
+#end

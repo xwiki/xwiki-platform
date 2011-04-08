@@ -1,0 +1,352 @@
+<public:attach event="ondocumentready" onevent="CSSHover()" />
+<script>
+// <![CDATA[
+/*!*
+ *  Whatever:hover - V3.01.090909
+ *  ------------------------------------------------------------
+ *  Author  - Peter Nederlof, http://www.xs4all.nl/~peterned
+ *          - Sergiu Dumitriu, http://purl.org/net/sergiu/
+ *  License - http://creativecommons.org/licenses/LGPL/2.1
+ *
+ *  Whatever:hover is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  Whatever:hover is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  howto: body { behavior:url("csshover3.htc"); }
+ *  ------------------------------------------------------------
+ */
+
+window.CSSHover = (function(){
+  // regular expressions, used and explained later on.
+  // Used for detecting CSS rules which need to be processed: elements other than "a" with :hover, :active or :focus
+  // pseudoclasses, and "textarea" or "input" with an :unknown pseudoclass, which IE6 returns instead of :focus.
+  var REG_INTERACTIVE = /((^|\s)((([^a]([^ ]+)?)|(a([^#.][^ ]+)+)):(hover|active|focus)))|((input|textarea)([#.][^ ]+)?:unknown)/i,
+    // Extracts the selector part up to the pseudoclass (exclusive).
+    // For example, "ul.menu li:hover ul.submenu" becomes "ul.menu li".
+    REG_AFFECTED = /(.*?)\:(hover|active|focus|unknown)/i,
+    // Extracts the pseudoclass present in the selector.
+    // For example "ul.menu li:hover ul.submenu" becomes "hover".
+    REG_PSEUDO = /[^:]+:([a-z-]+).*/i,
+    // Extracts the (eventual) class and the pseudoclass selectors from the affected element in the rule. For example,
+    // "ul.menu li:hover .submenu" becomes ":hover" and "ul.menu li.menuitem:hover .submenu" becomes ".menuitem:hover".
+    REG_SELECT = /(\.([a-z0-9_-]+):[a-z]+)|(:[a-z]+)/i,
+    // Extracts the generated classname from the modified selector, the one which combines the eventual classname from
+    // the original selector and the pseudoclass. For example, it matches "menuitemonhover" from
+    // "ul.menu li.menuitemonhover .submenu", obtained from "ul.menu li.menuitem:hover .submenu".
+    REG_CLASS = /\.([a-z0-9_-]*on(hover|active|focus|unknown))/i,
+    // Matches the IE version (5, 6 or 7) from the user agent string.
+    REG_MSIE = /msie (5|6|7)/i,
+    // Matches only IE version 7 from the user agent string.
+    REG_MSIE7 = /msie 7/i,
+    // Detects if IE8 runs in compatibility mode.
+    REG_COMPAT = /backcompat/i;
+    // Matches relative URLs inside CSS rules.
+    REG_RELATIVE_URL = new RegExp("url\\s*\\(\\s*[\"']?([^/\"'].*?)[\"']?\\s*\\)", 'gi');
+
+  // "Borrowed" CSS properties which can be used for attaching the expression. In order to avoid useless repeated
+  // executions of the binding method, these must be valid properties. Only four are needed, since at most 4 methods
+  // are needed for each element, one for each pseudoclass.
+  var PROPERTIES = [
+      'text-kashida',
+      'text-kashida-space',
+      'text-justify',
+      'layout-grid-mode'
+  ];
+  // Map with the default values for the borrowed properties. Will be filled in later with the current values for the
+  // body element. These values will be used in the element inline style, so that the binding CSS expression is executed
+  // only once for each element.
+  var DEFAULT_VALUES = {};
+
+  // Transform a CSS property name into a DOM style property. For example "scroll-face-color" becomes "scrollFaceColor".
+  var camelize = function(str) {
+    var parts = str.split('-'), len = parts.length;
+    if (len == 1) return parts[0];
+
+    var camelized = str.charAt(0) == '-'
+      ? parts[0].charAt(0).toUpperCase() + parts[0].substring(1)
+      : parts[0];
+
+    for (var i = 1; i < len; i++) {
+      camelized += parts[i].charAt(0).toUpperCase() + parts[i].substring(1);
+    }
+    return camelized;
+  };
+
+  /**
+   *  Local CSSHover object
+   *  --------------------------
+   */
+  var CSSHover = {
+    // array of CSSHoverElements, used to unload created events
+    elements: [],
+
+    // buffer used for checking on duplicate expressions
+    callbacks: {},
+
+    // Counts which css properties are already used for each selector prefix, to uniquely use one of the borrowed CSS
+    // properties for each binding method (onhover, onfocus, onactive).
+    counters : {},
+
+    // init, called once ondomcontentready via the exposed window.CSSHover function
+    init:function() {
+      CSSHover.instance = this;
+      // don't run in IE8 standards; expressions don't work in standards mode anyway,
+      // and the stuff we're trying to fix should already work properly
+      this.compatibilityMode = REG_COMPAT.test(window.document.compatMode);
+      this.isIE7 = REG_MSIE7.test(navigator.userAgent);
+      if(!REG_MSIE.test(navigator.userAgent) && !this.compatibilityMode) return;
+
+      // Initialize the default values for the borrowed CSS properties.
+      for (var i = 0; i < PROPERTIES.length; ++i) {
+        DEFAULT_VALUES[camelize(PROPERTIES[i])] = window.document.getElementById('body').currentStyle[camelize(PROPERTIES[i])];
+      }
+      // Gather new styles here. For performance, we don't interactively add rules one by one, but all at the end.
+      this.newRules = '';
+      // start parsing the existing stylesheets
+      var sheets = window.document.styleSheets, l = sheets.length;
+      for(var i=0; i<l; i++) {
+        this.parseStylesheet(sheets[i]);
+      }
+      if (this.newRules) {
+        var newSheet = window.document.createElement('style');
+        window.document.documentElement.firstChild.appendChild(newSheet);
+        newSheet.styleSheet.cssText = this.newRules;
+      }
+    },
+
+    // called from init, parses individual stylesheets
+    parseStylesheet:function(sheet) {
+      // check sheet imports and parse those recursively
+      if(sheet.imports) {
+        try {
+          var imports = sheet.imports, l = imports.length;
+          for(var i=0; i<l; i++) {
+            this.parseStylesheet(sheet.imports[i]);
+          }
+        } catch(securityException){
+          // trycatch for various possible errors,
+          // todo; might need to be placed inside the for loop, since an error
+          // on an import stops following imports from being processed.
+        }
+      }
+
+      // iterate the sheet's rules and send them to the parser
+      try {
+        var rules = sheet.rules, l = rules.length;
+        for(var j=0; j<l; j++) {
+          this.parseCSSRule(rules[j], sheet);
+        }
+      } catch(securityException){
+        // trycatch for various errors, most likely accessing the sheet's rules,
+        // don't see how individual rules would throw errors, but you never know.
+      }
+    },
+
+    // magic starts here ...
+    parseCSSRule:function(rule, sheet) {
+      // only parse a rule if it contains an interactive pseudo.
+      var select = rule.selectorText;
+      while (REG_INTERACTIVE.test(select)) {
+        var style = rule.style.cssText;
+
+        // Make sure relative URLs point to the same location
+        if (style.indexOf('url') > 0) {
+          var baseUrl = sheet.href;
+          var trim = baseUrl.lastIndexOf('/');
+          if (trim >= 0) {
+            baseUrl = baseUrl.substring(0, trim + 1);
+          }
+          style = style.replace(REG_RELATIVE_URL, 'url("' + baseUrl + '$1")');
+        }
+
+        // affected elements are found by truncating the selector after the interactive pseudo,
+        // eg: "div li:hover" >> "div li", "ul.menu li:hover ul.submenu" >> "ul.menu li".
+        var affected = REG_AFFECTED.exec(select.replace(/on(hover|focus|unknown|active)/g, ''))[1];
+
+        // that pseudo is needed for a classname, and defines the type of interaction (focus, hover, active)
+        // eg: "li:hover" >> "onhover", "ul.menu li:hover ul.submenu" >> "onhover".
+        var pseudo = select.replace(REG_PSEUDO, 'on$1');
+
+        // IE7 already supports :hover on any element in standards mode
+        if (this.isIE7 && !this.compatibilityMode && pseudo == 'onhover') {
+          return;
+        }
+
+        // the new selector is going to use that classname in a new css rule,
+        // since IE6 doesn't support multiple classnames, this is merged into one classname
+        // eg: "li:hover" >> "li.onhover",  "li.folder:hover" >> "li.folderonhover",
+        // "ul.menu li.menuitem:hover .submenu" >> "ul.menu li.menuitemonhover .submenu".
+        var newSelect = select.replace(REG_SELECT, '.$2' + pseudo);
+
+        // the classname is needed for the events that are going to be set on affected nodes
+        // eg: "li.folder:hover" >> "folderonhover", "ul.menu li.menuitem:hover .submenu" >> "menuitemonhover"
+        var className = REG_CLASS.exec(newSelect)[1];
+
+        // no need to set the same callback more than once when the same selector uses the same classname
+        var hash = affected + className;
+        if(!this.callbacks[hash]) {
+          // Affected elements are given an expression under a borrowed css property.
+          // The expression does a callback to CSSHover.patch, rerouted via the exposed window.CSSHover function.
+
+          // Because the expression is added to the stylesheet, and styles are always applied to html that is
+          // dynamically added to the dom, the expression will also trigger for new elements (provided they are selected
+          // by the affected selector).
+
+          // Which CSS property to use? getProperty keeps track of used properties for each "affected".
+          var property = this.getProperty(affected);
+          this.newRules += affected + "{" + property + ':expression(CSSHover(this, "'+pseudo+'", "'+property+'"));}\n';
+
+          // Hash it, so an identical selector/pseudoclass combo does not duplicate the expression.
+          this.callbacks[hash] = true;
+        }
+
+        // duplicate expressions need not be set, but the style could differ
+        this.newRules += newSelect + "{" + style + "}\n";
+        select = newSelect;
+      }
+    },
+
+    // Returns the next unused CSS property to use for binding an expression.
+    getProperty : function(affected) {
+      if (!this.counters[affected]) {
+        this.counters[affected] = 0;
+      }
+      return PROPERTIES[this.counters[affected]++];
+    },
+
+    // Called via the expression, patches individual nodes
+    patch : function(node, type, property) {
+      // Prevent further calls of this method for the same DOM node by hardcoding a value for the triggering property
+      // in the element style, which has a higher priority than the expression rule, and thus making the expression
+      // obsolete for this node.
+      property = camelize(property);
+      node.style[property] = DEFAULT_VALUES[property];
+
+      // just to make sure, also keep track of patched classnames locally on the node
+      if(!node.csshover) node.csshover = {};
+
+      // and check for it to prevent duplicate events with the same type from being set
+      if(!node.csshover[type]) {
+        node.csshover[type] = true;
+
+        // create an instance for the given type and class
+        var element = new CSSHoverElement(node, type);
+
+        // and store that instance for unloading later on
+        this.elements.push(element);
+      }
+
+      // returns a dummy value to the expression
+      return '';
+    },
+
+    // unload stuff onbeforeunload
+    unload:function() {
+      try {
+
+        // remove events
+        var l = this.elements.length;
+        for(var i=0; i<l; i++) {
+          this.elements[i].unload();
+        }
+
+        // and set properties to null
+        this.elements = [];
+        this.callbacks = {};
+      } catch (e) {
+      }
+    }
+  };
+
+  // add the unload to the onbeforeunload event
+  window.attachEvent('onbeforeunload', function(){
+    CSSHover.unload();
+  });
+
+  /**
+   *  CSSHoverElement
+   *  --------------------------
+   */
+
+  // the event types associated with the interactive pseudos
+  var CSSEvents = {
+    onhover:  { activator: 'onmouseenter', deactivator: 'onmouseleave' },
+    onactive: { activator: 'onmousedown',  deactivator: 'onmouseup' },
+    onfocus:  { activator: 'onfocus',      deactivator: 'onblur' },
+    onunknown:  { activator: 'onfocus',    deactivator: 'onblur' }
+  };
+
+  // CSSHoverElement constructor, called via CSSHover.patch
+  function CSSHoverElement(node, type) {
+
+    // the CSSHoverElement patches individual nodes by manually applying the events that should
+    // have fired by the css pseudoclasses, eg mouseenter and mouseleave for :hover.
+
+    this.node = node;
+    this.type = type;
+    var replacer = new RegExp('(^|\\s)'+className+'(\\s|$)', 'g');
+
+    // store event handlers for removal onunload
+    this.activator = function() {
+      var classNames = node.className.split(/\s+/);
+      for (var i = 0; i < classNames.length; ++i) {
+        node.className += ' ' + classNames[i] + type;
+      }
+      node.className += ' ' + type;
+    };
+    this.deactivator = function() {
+      var classNames = node.className.split(/\s+/);
+      for (var i = 0; i < classNames.length; ++i) {
+        if (node.className.indexOf(classNames[i] + type) >= 0) {
+          node.className = node.className.replace(new RegExp('\\s+' + classNames[i] + type, "gi"), '');
+        }
+      }
+      node.className = node.className.replace(new RegExp('\\s+' + type, "gi"), '');
+    };
+
+    // add the events
+    node.attachEvent(CSSEvents[type].activator, this.activator);
+    node.attachEvent(CSSEvents[type].deactivator, this.deactivator);
+  }
+
+  CSSHoverElement.prototype = {
+    // onbeforeunload, called via CSSHover.unload
+    unload:function() {
+
+      // remove events
+      this.node.detachEvent(CSSEvents[this.type].activator, this.activator);
+      this.node.detachEvent(CSSEvents[this.type].deactivator, this.deactivator);
+
+      // and set properties to null
+      this.activator = null;
+      this.deactivator = null;
+      this.node = null;
+      this.type = null;
+    }
+  };
+
+  /**
+   *  Public hook
+   *  --------------------------
+   */
+
+  return function(node, type, className, property) {
+    if(node) {
+      // called via the css expression; patches individual nodes
+      return CSSHover.patch(node, type, className, property);
+    } else {
+      // called ondomcontentready via the public:attach node
+      CSSHover.init();
+    }
+  };
+
+})();
+
+// ]]>
+</script>

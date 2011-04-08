@@ -1,0 +1,10 @@
+#* 
+ * Voluntary left empty.
+ * This template is intended to be used by custom skin that want to override values from layoutvars.vm safely.
+ *  
+ * Some example of variables that can be overridden here :
+ * #set($displayContentMenu = false)
+ * #set($displayMainMenu = false)
+ * #set($displayDocExtra = false)
+ * #set($displayShortcuts = false)
+ *#

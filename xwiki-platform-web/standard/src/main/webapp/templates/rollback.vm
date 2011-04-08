@@ -1,0 +1,28 @@
+#if ($request.getParameter("raw").equals("1"))
+#template("code.vm")
+#else
+#template("xwikivars.vm")
+#template("layoutvars.vm")
+#template("htmlheader.vm")
+#template("header.vm")
+<div class="layoutsection">
+  <div id="contentcolumn" class="content hideleft hideright">
+    #xwikimessageboxstart($msg.get('rollback') "$msg.get('readytorollback') $!{escapetool.xml($request.get('rev'))}?")
+    <form action="" method="post">
+      <div>
+        ## CSRF prevention
+        <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+        <input type="hidden" name="confirm" value="1" />
+        <span class="buttonwrapper"><input type="submit" class="button" value="$msg.get('yes')"/></span>
+        <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL('view')">$msg.get('no')</a></span>
+      </div>
+    </form>
+    #xwikimessageboxend()
+  </div>
+</div>
+##
+##
+##
+#template("footer.vm")
+#template("htmlfooter.vm")
+#end

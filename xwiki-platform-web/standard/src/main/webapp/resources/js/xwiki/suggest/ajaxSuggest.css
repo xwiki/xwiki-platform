@@ -1,0 +1,66 @@
+#template('colorThemeInit.vm')
+
+.xhover {
+	background:red;
+}
+
+input[type="text"].suggest {
+  border-width: 1px;
+}
+
+body {
+	position: relative;
+}
+
+div.suggestItems {
+  position:absolute;
+  border: 1px solid $theme.borderColor;
+  border-top: none;
+  background: white; /* theme color ? */
+  z-index: 100013;
+  text-align:left;
+}
+
+div.suggestItems ul {
+  margin: 0px;
+}
+
+div.suggestItems li {
+  overflow:hidden;
+  white-space:nowrap;
+  margin-right:2px;
+}
+
+ul.suggestList {
+  margin:0px !important;
+  text-transform:none;
+  color:$theme.textColor;
+  font-weight:normal;
+}
+
+ul.suggestList .xhighlight {
+    background-color: $theme.highlightColor;
+}
+
+div.suggestItemName {
+    text-indent: 0;
+}
+
+div.suggestItemInfo {
+    color: #556677;
+    font-size: 0.8em;
+    padding-left: 20px;
+    text-indent: 0;
+}
+
+div.suggestItemName,
+div.suggestItemInfo {
+    text-decoration: inherit;
+}
+
+.highlight {
+  background-color: $theme.highlightColor;
+  font-weight:bold;
+  text-decoration: inherit;
+}
+

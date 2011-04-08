@@ -1,0 +1,52 @@
+#template('xwikivars.vm')
+$response.setContentType('application/x-json')
+#set($offset = $util.parseInt($request.get('offset')))
+#set($off = $offset - 1 )
+#set($limit = $util.parseInt($request.get('limit')))
+#set($order = true)
+#if("$!{request.dir}" == 'desc')
+  #set($order = false)
+#end
+##
+#set($rm = $xwiki.rightsmanager)
+#if($request.member && !$request.member.trim().equals(''))
+  #set($countm = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, 0, 0, $order).size())
+  #set($members = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, $limit, $off, $order))
+#else
+  #set($countm  = $rm.countAllMembersNamesForGroup($doc.fullName))
+  #set($members = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $util.null, $limit, $off, $order))
+#end
+
+{
+"totalrows": $countm,
+"returnedrows": #if($members.size() < $limit) $members.size() #else $limit #end,
+"offset": $offset,
+"rows": [
+#foreach( $m in $members )
+    #if($xcontext.user == $m && $doc.fullName == 'XWiki.XWikiAdminGroup')
+      #set($grayed = true)
+    #else
+      #set($grayed = false)
+    #end
+    #set($wikiname = $xwiki.getDocument($m).getWiki())
+    #if($wikiname != 'xwiki' || $wikiname == $xcontext.database) #set($wikiname = 'local') #end
+    #set($emptyValue = $msg.get('xe.admin.groups.emptyvalue'))
+    #if( $velocityCount > 1 ) , #end
+   {
+    "fullname"     : "$m",
+    "prettyname"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) (#if($wikiname != 'local')$wikiname:#end$m)#end",
+    "wikiname"     : "$wikiname",
+    "memberurl"    : "$xwiki.getURL($m)",
+    "docurl"       : "$doc.getURL()",
+    "grayed"       : $grayed,
+## livetable data
+    "doc_viewable" : ${xwiki.hasAccessLevel('view', $xcontext.user, $m)},
+    "doc_hasadmin" : ${xwiki.hasAccessLevel('admin', $xcontext.user, $doc.fullName)},
+    "member"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) (#if($wikiname != 'local')$wikiname:#end$m)#end",
+    "member_url" : "$xwiki.getURL($m)",
+    "doc_delete_url" : "$doc.getURL('view', "xpage=deletegroupmember&fullname=${m}&ajax=true")",
+    "_avatar" : "$escapetool.javascript("#mediumUserAvatar($m)").trim()",
+    "_avatar_url" : "$xwiki.getURL($m)"
+   }
+#end
+]}

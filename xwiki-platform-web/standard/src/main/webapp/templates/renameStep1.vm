@@ -1,0 +1,60 @@
+###
+### Rename document template, step 1: choose new name + updated backlinks + updated parents
+###
+## TODO: check if this information should be displayed?
+<h1><span>$msg.get('core.rename.title', [$escapetool.xml($doc.fullName)])</span></h1>
+#set($newname = $msg.get('core.rename.inputPrompt'))
+<form action="?xpage=rename&amp;step=2" method="post"
+    onsubmit="if(this.newPageName.value=='${escapetool.xml($newname)}') this.newPageName.value=''">
+  <h2><span>$msg.get('core.rename.title.newName')</span></h2>
+  ## CSRF prevention
+  <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
+  #set($pweb = $doc.space)
+  <div class="padded">
+    <dl>
+      <dt><label for="newSpaceName">$msg.get('core.rename.newspace')</label></dt>
+      <dd>
+        <select id="newSpaceName" name="newSpaceName">
+          #set ($spaces = $xwiki.getSpaces())
+          #foreach ($space in $spaces)
+            <option #if ($space == $pweb) selected="selected" #end>$escapetool.xml($space)</option>
+          #end
+        </select>
+      </dd>
+      <dt><label for="newPageName">$msg.get('core.rename.newpage')</label></dt>
+      <dd>
+        <input type="text" id="newPageName" name="newPageName" value="${escapetool.xml($newname)}" class="panelinput withTip"/>
+      </dd>
+    </dl>
+  </div>
+  #set($backlinks = $doc.getBacklinks())
+  #if($backlinks.size() > 0)
+    <h2><span>$msg.get('core.rename.title.updateDocs')</span></h2>
+    #foreach($backlink in $backlinks)
+      #if(!$xwiki.hasAccessLevel('edit', $xcontext.user, $backlink))
+        <div><input id="backlink_$velocityCount" type="checkbox" disabled="disabled"/> <a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a></div>
+      #elseif($xwiki.getDocument($backlink).isProgrammaticContent())
+        <div><input id="backlink_$velocityCount" type="checkbox" name="backlink_$escapetool.xml($backlink)"/> <a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a></div>
+      #else
+        <div><input id="backlink_$velocityCount" type="checkbox" name="backlink_$escapetool.xml($backlink)" checked="checked"/> <a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a></div>
+      #end
+    #end
+  #end
+  #set($children = $doc.getChildren())
+  #if($children.size() > 0)
+    <h2><span>$msg.get('core.rename.title.updateChildren')</span></h2>
+    #foreach($child in $children)
+      #if(!$xwiki.hasAccessLevel('edit', $xcontext.user, $child))
+        <div><input id="children_$velocityCount" type="checkbox" disabled="disabled"/> <a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a></div>
+      #elseif($xwiki.getDocument($child).isProgrammaticContent())
+        <div><input id="children_$velocityCount" type="checkbox" name="child_$escapetool.xml($child)"/> <a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a></div>
+      #else
+        <div><input id="children_$velocityCount" type="checkbox" name="child_$escapetool.xml($child)" checked="checked"/> <a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a></div>
+      #end
+    #end
+  #end
+  <div class="padded">
+    <span class="buttonwrapper"><input class="button" type="submit" name="formactionrename" value="$msg.get('core.rename.submit')"/></span>
+    <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL()">$msg.get('cancel')</a></span>
+  </div>
+</form>

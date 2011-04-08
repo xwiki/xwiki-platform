@@ -1,0 +1,62 @@
+.xMacro {
+  padding: 6px 0 6px 3px;
+}
+
+* html .xMacro {
+  /* Prevent horizontal scroll bar in IE6 */
+  padding: 6px 0;
+}
+
+.xMacroParameter {
+  padding: 14px 0 6px 0;
+}
+
+.xMacroLabel, .xMacroParameterLabel {
+  padding-top: 0;
+}
+
+.xMacroDescription {
+  margin-bottom: 0;
+  margin-top: 3px;
+}
+
+.xMacroParameterDescription:first-letter {
+  text-transform: capitalize;
+}
+
+.xMacroParameter textarea {
+  height: 150px;
+}
+
+.xMacroParameter option {
+  text-transform: capitalize;
+}
+
+.xMacroFilter {
+  padding: 2px 0;
+}
+
+.xMacroFilter .xSearchBox {
+  width: 215px;
+}
+
+.xMacroCategoryList {
+  margin-right: 6px;
+  text-transform: capitalize;
+  width: 215px;
+}
+
+.xMacroSelector {
+  margin-top: 0;
+  height: 346px;
+}
+
+.xMacroSelector .xListBox {
+  overflow: auto;
+}
+
+.xMacroButton {
+  background-image: url(../images/macro.gif);
+  background-position: center center;
+  background-repeat: no-repeat;
+}

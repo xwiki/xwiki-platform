@@ -1,0 +1,20 @@
+.xdialog-box .buttons {
+  margin-top: 10px;
+  text-align: right;
+}
+
+.xdialog-box #jmp_target {
+  width: 98%;
+  padding: 1px 2px;
+}
+
+/* The "Jump to any page..." text inserted in the QuickLinks panel */
+.jmp-activator {
+  cursor: pointer;
+  font-size: 80%;
+  font-weight: 900;
+}
+
+.jmp-activator:hover {
+  text-decoration: underline;
+}

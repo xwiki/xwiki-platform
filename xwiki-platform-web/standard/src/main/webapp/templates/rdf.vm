@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="$xwiki.encoding" ?>
+#template("xwikivars.vm")
+$response.setContentType("application/rdf+xml")
+$cdoc.getRenderedContent()

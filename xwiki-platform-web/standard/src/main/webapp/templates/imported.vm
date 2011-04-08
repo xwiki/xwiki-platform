@@ -1,0 +1,28 @@
+#template("xwikivars.vm")
+#macro(showfilelist $list $text)
+  #if($list.size()>0)
+    <h4 class="legend">$msg.get("import_listof${text}files")</h4>
+    <ul>
+      #foreach($item in $list)
+        <li><a href="$xwiki.getURL($item)">$escapetool.xml($item)</a></li>
+      #end
+    </ul>
+  #end
+#end
+#if($hasAdmin)
+  #set($status = $msg.get("import_install_${xwiki.package.status}"))
+  #info("$msg.get('importing') $!escapetool.xml($request.name): $status")
+  <ul>
+    <li>$xwiki.package.installed.size() $msg.get('import_documentinstalled')</li>
+    <li>$xwiki.package.skipped.size() $msg.get('import_documentskipped')</li>
+    <li>$xwiki.package.errors.size() $msg.get('import_documenterrors')</li>
+  </ul>
+  #showfilelist($xwiki.package.installed 'installed')
+  #showfilelist($xwiki.package.skipped 'skipped')
+  #showfilelist($xwiki.package.errors 'error')
+#else
+  ## If the current user does not have admin and this template is being displayed
+  ## it means security settings have been changed with the import (probably a defaut XE XAR import)
+  ## We display a warning and invite the user to log in to further administrate the wiki
+  #warning("$msg.get('core.importer.securitySettingsChanged', [$xwiki.getURL('XWiki.XWikiLogin', 'login')])")
+#end

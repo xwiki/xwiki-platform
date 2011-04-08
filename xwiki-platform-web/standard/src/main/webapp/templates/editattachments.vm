@@ -1,0 +1,2 @@
+## Deprecated, attachments should be used in view mode only.
+#template('attachments.vm')

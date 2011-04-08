@@ -1,0 +1,199 @@
+#template('colorThemeInit.vm')
+/*
+ * Search results list
+ */
+#searchResults {
+  clear: both;
+  display: table;
+  width: 100%;
+}
+.resultItem {
+  clear: both;
+  display: block;
+  padding-top: 1em;
+}
+.resultContainer {
+  clear: both;
+  width: 100%;
+}
+.itemDescription {
+  background: transparent url("$xwiki.getSkinFile('icons/silk/page_white_text.gif')") no-repeat left top;
+  display: inline-block;
+  float: left;
+  padding-left: 20px;
+  width: 82%;
+}
+.resultItem .type-comment {
+  background-image: url("$xwiki.getSkinFile('icons/silk/comment.gif')");
+}
+.resultItem .type-attachment {
+  background-image: url("$xwiki.getSkinFile('icons/silk/attach.gif')");
+}
+.itemTitle {
+  font-weight: bold;
+  font-size: 1em;
+  margin: 0;
+}
+.itemTitle span {
+  border: none;
+  margin: 0;
+}
+.itemTitle a, .itemTitle a:hover {
+  color: $theme.titleColor;
+  font-size: 130%;
+  font-weight: bold;
+}
+.itemLocation, .itemModified {
+  color: $theme.textPrimaryColor;
+  font-size: 90%;
+}
+.itemContext em {
+  background-color: $theme.highlightColor;
+  margin: 0;
+  padding: 0;
+}
+.itemOthers {
+  font-size: 80%;
+}
+.itemOthers .itemComments, .itemOthers .itemAttachments, .itemOthers .itemRating {
+  clear: none;
+  display: inline;
+  float: left;
+  font-size: 80%;
+  padding-right: 5px;
+}
+.itemOthers .itemComments a, .itemOthers .itemAttachments a {
+  background: transparent no-repeat right center;
+  display: inline-block;
+  padding-right: 16px;
+}
+.itemOthers .itemComments a {
+  background-image: url("$xwiki.getSkinFile('icons/silk/comment.gif')");
+}
+.itemOthers .itemAttachments a {
+  background-image: url("$xwiki.getSkinFile('icons/silk/attach.gif')");
+}
+.itemRating {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/rating.png')");
+  background-position: left top;
+  height: 11px;
+  margin: 1px 0 0 0 !important;
+  overflow: hidden;
+  padding: 0 !important;
+  position: relative;
+  width: 55px;
+}
+.relevance .currentRelevance, .itemRating .currentRating {
+  border: none;
+  left: 0;
+  outline: none;
+  overflow: hidden;
+  position: absolute;
+  text-indent: -1000em;
+  top: 0;
+  z-index: 1;
+}
+.itemRating .currentRating {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/rating.png')");
+  background-position: left center;
+  height: 11px;
+  line-height: 11px;
+}
+.itemRelevance {
+  display: inline-block;
+  float: left;
+  text-align: right;
+  width: 15%;
+}
+.relevance {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/relevance.png')");
+  background-position: left bottom;
+  float: right;
+  height: 8px;
+  list-style: none;
+  margin: 5px 0 0 0 !important;
+  overflow: hidden;
+  padding: 0 !important;
+  position: relative;
+  width: 48px;
+}
+.relevance .currentRelevance {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/relevance.png')");
+  background-position: left top;
+  height: 8px;
+  line-height: 8px;
+}
+.relevanceText {
+  float: right;
+  font-size: 80%;
+  margin-right: 5px;
+}
+
+/*
+ * Item actions
+ */
+.itemActions {
+  clear: both;
+  color: $theme.textPrimaryColor;
+  display: block;
+  font-size: 90%;
+  padding-left: 20px;
+}
+.itemActions .tool {
+  background: transparent no-repeat center center;
+  float: left;
+  height: 16px;
+  line-height: 40em;
+  margin: 0 2px;
+  overflow: hidden;
+  text-indent: 1000em;
+  width: 16px;
+}
+.itemActions .copy {
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_copy.gif')");
+}
+.itemActions .delete {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
+}
+.itemActions .rename {
+  background-image: url("$xwiki.getSkinFile('icons/silk/textfield_rename.gif')");
+}
+.itemActions .rights {
+  background-image: url("$xwiki.getSkinFile('icons/silk/lock_edit.gif')");
+}
+/*
+ * Search box
+ */
+#searchBar {
+  clear: both;
+  margin-bottom: 1em;
+  padding-left: 5px;
+}
+#searchBar select {
+  border: 2px solid $theme.borderColor;
+  color: $theme.textColor;
+  font-size: 1.1em;
+}
+#searchBar .searchQuery {
+  background: transparent url("$xwiki.getSkinFile('icons/xwiki/search.png')") left center no-repeat;
+  border: 2px solid $theme.borderColor;
+  color: $theme.textColor;
+  display: inline-block;
+  font-size: 1.1em;
+  padding-left: 18px;
+  width: 400px;
+}
+#searchBar .searchButton {
+  background-color: $theme.buttonPrimaryBackgroundColor;
+  border: 2px solid $theme.buttonPrimaryBackgroundColor;
+  color: $theme.buttonPrimaryTextColor;
+  font-size: 90%;
+  font-variant: small-caps;
+  font-weight: bold;
+  height: 2em;
+  line-height: 1em;
+}
+.searchHelp {
+  font-size: 80%;
+  color: $theme.textPrimaryColor;
+}

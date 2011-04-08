@@ -1,0 +1,46 @@
+<div class="xwikidatacontent">
+#set ($action = "$!{request.getParameter('action')}")
+#if ($action == 'view')
+  #set ($statsService = $xwiki.getStatsService())
+  #if ($statsService.isEnabledGlobally())
+    #set ($documents = $statsService.getRecentActions('view', 13))
+    #set ($title = $msg.get('listofrecentlyviewedpages'))
+  #else
+    #warning($msg.get('warningstartspluginisnotactivated'))
+    #set($documents = [])
+  #end
+#else
+  #set ($sql = 'where 1=1 order by doc.date desc')
+  #set ($documents = $xwiki.searchDocuments($sql, 50, 0))
+  #set ($title = $msg.get('listofrecentlymodifiedpages'))
+#end
+
+#set ($hasDocuments = false)
+#set ($counter = 0)
+#set($currentSpaceEscaped = $escapetool.xml($escapetool.javascript($doc.space)))
+#foreach ($item in $documents)
+  #if ($xwiki.hasAccessLevel('view', $item))
+    #if (!$hasDocuments)
+      <p><strong>${title}: </strong></p>
+      <ul>
+      #set ($hasDocuments = true)
+    #end
+    #if ($counter < 13)
+      <li>
+      #set ($bentrydoc = $xwiki.getDocument($item))
+      #set ($itemSpace = $escapetool.xml($escapetool.javascript($bentrydoc.space)))
+      #set ($itemName = $escapetool.xml($escapetool.javascript($bentrydoc.name)))
+      <a href="#" onclick="document.forms[0].wiki_page.value='$itemName';if ('$currentSpaceEscaped' != '$itemSpace') document.forms[0].wiki_space.value='$itemSpace'; else document.forms[0].wiki_space.value=''; return false;">
+      $escapetool.xml($bentrydoc.name)</a> $msg.get('inspace') $escapetool.xml($bentrydoc.space) $msg.get('wikiweb'), $msg.get('lastmodifiedby')
+      $xwiki.getUserName($bentrydoc.author) $msg.get('lastmodifiedon') $xwiki.formatDate($bentrydoc.date, 'MMMM dd, yyyy HH:mm')
+      </li>
+      #set ($counter = $counter + 1)
+    #else
+      #break
+    #end
+  #end
+#end
+#if ($hasDocuments)
+  </ul>
+#end
+</div>

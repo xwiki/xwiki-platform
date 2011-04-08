@@ -1,0 +1,39 @@
+###
+### Change a user's password
+###
+###
+#template("startpage.vm")
+<div class="minwidthb"></div>
+<div class="main layoutsubsection">
+<div id="mainContentArea">
+#if($doc.getObject("XWiki.XWikiUsers", 0))
+#set($i = $xcontext.user.indexOf(":")+1)
+#if($xcontext.user.substring($i) == $doc.fullName || $hasAdmin)
+  <div id="document-title"><h1>$msg.get("platform.core.profile.passwd.title", [$escapetool.xml($xwiki.getUserName($doc.fullName, false))])</h1></div>
+  <form class="xform third" action="$doc.getURL("save")" method="post" onsubmit="if($('xwikipassword').value != $('xwikipassword2').value) {alert('$msg.get("platform.core.profile.passwd.passwordMissmatch")'); return false; } else if($('xwikipassword').value == '') {alert('$msg.get("platform.core.profile.passwd.passwordCannotBeEmpty")'); return false;}">
+    ## CSRF prevention
+    <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
+    <dl>
+      <dt><label id="xwikipasswordlabel" for="xwikipassword">$msg.get("platform.core.profile.passwd.newPassword")</label></dt>
+      <dd><input id="xwikipassword" type="password" name="XWiki.XWikiUsers_0_password" value="" size="60"/></dd>
+      <dt><label id="xwikipassword2label" for="xwikipassword2">$msg.get("platform.core.profile.passwd.reenterPassword")</label></dt>
+      <dd><input id="xwikipassword2" type="password" name="password2" value="" size="60"/></dd>
+    </dl>
+    <div class="padded buttons">
+      <span class="buttonwrapper"><input type="submit" value="$msg.get("platform.core.profile.passwd.submit")" class="button"/></span>
+      <span class="buttonwrapper"><a href="$doc.getURL("view")" class="secondary button">$msg.get("platform.core.profile.passwd.cancel")</a></span>
+    </div>
+  </form>
+#else
+$response.setStatus(403)
+#xwikimessageboxstart($msg.get("platform.core.errorMessageType") $msg.get("platform.core.profile.passwd.notAllowed"))
+#xwikimessageboxend()
+#end
+#else
+$response.setStatus(400)
+#xwikimessageboxstart($msg.get("platform.core.noticeMessageType") $msg.get("platform.core.profile.passwd.notaUser"))
+#xwikimessageboxend()
+#end
+</div>## mainContentArea
+</div>## main
+#template("endpage.vm")

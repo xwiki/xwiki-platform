@@ -1,0 +1,16 @@
+/* default settings for the gwt dialog boxes */
+.gwt-DialogBox {
+    border: solid black 1px;
+    background-color: #FFFFFF;
+}
+
+.gwt-DialogBox .Caption {
+    text-align: center;
+    background-color: #000000;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-weight: bold;
+    font-size: 110%;
+    color: #ffffff;
+    min-height: 1em;
+}

@@ -1,0 +1,41 @@
+### Buttons displayed in the preview interface: cancel, back to edit, save and continue, save and view.
+###
+#if("$!showactions" != '0')
+  $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
+  $xwiki.ssfx.use('js/xwiki/actionbuttons/actionButtons.css', true)
+  #set($backToEditAction = "$!{request.xeditaction}")
+  #if($backToEditAction == '')
+    #set($backToEditAction = 'edit')
+  #end
+  #set($keyboardShortcutsEnabled = true)
+  #set($editorUrl = "$!request.xcontinue")
+  #if($editorUrl == '')
+    #set($editorUrl = "$!request.getHeader('Referer')")
+    #if($editorUrl == '')
+      #if($doc.content.indexOf("includeForm(") != -1)
+        #set($editorUrl = $tdoc.getURL('inline', "$!docvariant"))
+      #else
+        #if($xwiki.getUserPreference('editor') == 'Wysiwyg' && (!$tdoc.isAdvancedContent()))
+          #set($editorUrl = $tdoc.getURL("edit", "editor=wysiwyg&amp;$docvariant"))
+        #else
+          #set($editorUrl = $tdoc.getURL("edit", "editor=wiki&amp;$docvariant"))
+        #end
+      #end
+    #end
+  #end
+<form id="backtoedit" action="$!{escapetool.xml($editorUrl)}" method="post">
+  <div>
+  #foreach($param in $request.getParameterNames())
+    #if(!$param.startsWith('action_'))
+      #foreach($value in $request.getParameterValues($param))
+        <input type="hidden" name="$!{escapetool.xml($param)}" value="$!{escapetool.xml($value)}"/>
+      #end
+    #end
+  #end
+  #editActionButton("$!{escapetool.xml($backToEditAction)}", 'backtoedit')
+  #editActionButton('saveandcontinue', 'saveandcontinue')
+  #editActionButton('save', 'saveandview')
+  #editActionButton('cancel', 'cancel')
+  </div>
+</form>
+#end ## showactions

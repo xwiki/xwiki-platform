@@ -1,0 +1,9 @@
+#if($isInServletMode)## Visible only in a page
+<div id="actionmenu" class="layoutsubsection">
+<div class="centered">
+<div class="editinfo">
+$msg.get("editing"): <a href="$doc.getURL()">$escapetool.xml($doc.name)</a>
+</div>
+</div>
+</div>
+#end

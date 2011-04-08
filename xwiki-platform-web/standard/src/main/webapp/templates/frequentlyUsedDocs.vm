@@ -1,0 +1,11 @@
+###
+### Frequently used documents
+###
+### Define variables useful for most templates
+###
+#set($spaceHome = $!xwiki.getDocument("${doc.space}.WebHome").getTranslatedDocument())
+#set($spaceDoc = $!spaceHome)
+#set($parentDoc = $!{xwiki.getDocument($tdoc.parent).getTranslatedDocument()})
+#set($preferencesDoc = $!xwiki.getDocument("XWiki.XWikiPreferences"))
+#set($crtUserDoc = $!xwiki.getDocument($xcontext.user))
+#set($searchDoc = $!xwiki.getDocument("Main.WebSearch"))

@@ -1,0 +1,19 @@
+###
+### Generic message
+###
+### Generally, this provides common code for error.vm, warning.vm and notice.vm, but can freely be
+### used by other code.
+###
+### Does not set an HTTP status code, as there is no generic code. Instead, the status code should
+### be set where the need for this message was detected.
+###
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="mainContentArea">
+#xwikimessageboxstart("$!messageType" "$!message")
+$!details
+#xwikimessageboxend()
+<div class="clearfloats"></div>
+</div>## mainContentArea
+</div>## main
+#template("endpage.vm")

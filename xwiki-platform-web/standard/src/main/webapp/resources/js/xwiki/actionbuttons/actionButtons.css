@@ -1,0 +1,27 @@
+#template('colorThemeInit.vm')
+.meta-versionSummary label {
+  color: $theme.textSecondaryColor;
+  display: block;
+  font-size: .85em;
+  font-weight: 700;
+  margin: 10px 0 4px !important; /* !important overrides Toucan rules */
+  text-align: left !important; /* !important overrides Toucan rules */
+  text-transform: uppercase;
+}
+.meta-versionSummary span {
+  text-transform: none;
+  font-weight: 400;
+}
+.meta-minorEdit {
+  float: right;
+}
+.meta-minorEdit label {
+  margin: 0 !important;
+}
+.meta-minorEdit * {
+  vertical-align: text-bottom;
+}
+
+#commentinput {
+  width: 99.7%; /* 100% - 2px border; FIXME when calc() becomes standard */
+}

@@ -1,0 +1,23 @@
+#template('colorThemeInit.vm')
+
+div.suggestItems.searchSuggest {
+  border-top: 1px solid $theme.borderColor;
+  -moz-box-shadow:3px 3px 5px;
+  -webkit-box-shadow:3px 3px 5px;
+  box-shadow:3px 3px 5px;
+}
+
+ul.xlist li.showAllResuts {
+  padding:0;
+}
+
+ul.xlist li.showAllResuts div.xitemcontainer {
+  margin-left:0;
+  padding-left:10px;
+  border: 1px solid #EEEEEE;
+  font-size: 1em;
+  height: 25px;
+  padding-right: 10px;
+  padding-top: 3px;
+  text-align: right;
+}

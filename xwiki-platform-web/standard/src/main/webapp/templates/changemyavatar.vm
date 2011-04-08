@@ -1,0 +1,38 @@
+###
+### Change a user's avatar
+###
+### Upload file form
+### TODO: Check extension
+###
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="mainContentArea">
+#if($doc.getObject("XWiki.XWikiUsers", 0))
+  #if($services.model.resolveDocument($xcontext.user) == $doc.documentReference || $hasAdmin)
+    <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" onsubmit="if(this.filepath.value == ''){ return false; }" class="xform"><div>
+      <div id="document-title"><h1>$msg.get("changephoto", [$xwiki.getUserName($doc.fullName, false)])</h1></div>
+      ## CSRF prevention
+      <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+      <input type="hidden" name="xredirect" value="$doc.getURL("view", "xpage=changeavatar&amp;form_token=$!{services.csrf.getToken()}")"/>
+      <dl>
+        <dt><label id="xwikiuploadfilelabel" for="xwikiuploadfile">$msg.get('uploadavatarfile')</label></dt>
+        <dd><input id="xwikiuploadfile" type="file" name="filepath" value="" size="60"/></dd>
+      </dl>
+      <div class="padded buttons">
+        <span class="buttonwrapper"><input type="submit" value="$msg.get('setthisavatar')" class="button"/></span>
+        <span class="buttonwrapper"><a href="$doc.getURL("view")" class="secondary button">$msg.get('platform.core.profile.changePhoto.cancel')</a></span>
+      </div>
+    </div></form>
+  #else
+    $response.setStatus(403)
+    #xwikimessageboxstart($msg.get('error') $msg.get('notallowed'))
+    #xwikimessageboxend()
+  #end
+#else
+  $response.setStatus(400)
+  #xwikimessageboxstart($msg.get('avatar') $msg.get('notauser'))
+  #xwikimessageboxend()
+#end
+</div>## mainContentArea
+</div>## main
+#template("endpage.vm")

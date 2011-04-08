@@ -1,0 +1,81 @@
+###
+### Delete page confirm message
+###
+###
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="mainContentArea">
+#if($message)
+  <div id="xwikimessage">$message</div>
+#end
+#if("$!{request.id}" == '')
+#set($links = $doc.getBacklinks())
+#set($orphans = $xwiki.searchDocuments(' where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))', [${doc.fullName}, ${doc.fullName}, ${doc.name}, ${doc.space}]))
+#if($request.xredirect)
+  #set($redirectparam = "&amp;xredirect=$escapetool.url($request.xredirect)")
+#end
+#set($quote = '"')
+#set($hasInlinks = false)
+#set($fullmsg = '')
+#if($links && $links.size() > 0)
+  #set($tmpmsg = '</p><ul>')
+  #foreach($docname in $links)
+    #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
+    #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>$escapetool.xml(${rdoc.getPlainTitle()})</a></li>")
+  #end
+  #set($tmpmsg = "${tmpmsg}</ul><p class='xwikimessage'>")
+  #set($tmpmsg = $msg.get('core.delete.backlinksWarning', [$tmpmsg]))
+  #set($fullmsg = "${fullmsg}${tmpmsg}</p><p class='xwikimessage'>")
+  #set($hasInlinks = true)
+#end
+#if($orphans && $orphans.size() > 0)
+  #set($tmpmsg = '</p><ul>')
+  #foreach($docname in $orphans)
+    #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
+    #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>$escapetool.xml(${rdoc.getPlainTitle()})</a></li>")
+  #end
+  #set($tmpmsg = "${tmpmsg}</ul><p class='xwikimessage'>")
+  #set($tmpmsg = $msg.get('core.delete.orphansWarning', [$tmpmsg]))
+  #set($fullmsg = "${fullmsg}${tmpmsg}</p><p class='xwikimessage'>")
+  #set($hasInlinks = true)
+#end
+#if($xwiki.hasRecycleBin())
+  #if($hasInlinks)
+    #set($fullmsg = "${fullmsg}${msg.get('core.recyclebin.confirmWithInlinks')}")
+  #else
+    #set($fullmsg = $msg.get('core.recyclebin.confirm'))
+  #end
+#else
+  #if($hasInlinks)
+    #set($fullmsg = "${fullmsg}${msg.get('core.delete.confirmWithInlinks')}")
+  #else
+    #set($fullmsg = $msg.get('core.delete.confirm'))
+  #end
+#end
+#xwikimessagebox($msg.get('core.delete') $fullmsg $doc.getURL('delete', "confirm=1$!{redirectparam}&amp;form_token=$!{services.csrf.getToken()}&amp;$languageparams") $doc.getURL('view') $msg.get('yes') $msg.get('no'))
+#else ## request.id
+  #xwikimessageboxstart($msg.get('core.delete') $msg.get('core.recyclebin.completelyDeleteConfirm'))
+    <form action="" method="post">
+      <div class="hidden">
+        ## CSRF prevention
+        <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+        <input type="hidden" name="confirm" value="1"/>
+        <input type="hidden" name="id" value="$!{escapetool.xml($request.id)}"/>
+        #if("$!{request.xredirect}" != '')
+          <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
+        #end
+      </div>
+      <div class="buttonwrapper"><input type="submit" class="button" value="$msg.get('yes')"/></div>
+      #if("$!{request.xredirect}" != '')
+        #set($cancelUrl = "$request.xredirect")
+      #else
+        #set($cancelUrl = $doc.getURL())
+      #end
+      <div class="buttonwrapper"><a class="secondary button" href="$!{escapetool.xml(${cancelUrl})}">$msg.get('no')</a></div>
+    </form>
+  #xwikimessageboxend()
+#end
+<div class="clearfloats"></div>
+</div>## mainContentArea
+</div>## main
+#template("endpage.vm")

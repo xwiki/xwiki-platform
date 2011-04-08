@@ -1,0 +1,46 @@
+#set($attachments = $doc.attachmentList)
+<div id="xwikiattachmentscontent" class="xwikidatacontent">
+  <form id="attach" action="$doc.getURL('upload')" enctype="multipart/form-data" method="post">
+    <div class="hidden">
+    ## CSRF prevention
+    <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+    <input type="hidden" name="xredirect" value="" />
+    </div>
+    <p>
+      ##$msg.get('choosetargetfilename'):
+      ##<input type="text" name="filename" value="" size="20" />
+      ##<br /><br />
+      $msg.get('choosefiletoupload'):
+      <input type="file" name="filepath" value="" size="40"  /> <br /><br />
+      <input type="submit" id="attachment" name="attachment" value="$msg.get('attachthisfile')" />
+    </p>
+  </form>
+  #set($hasAttachments = false)
+  #foreach($attachment in $attachments)
+    #if((!$request.images) || $attachment.isImage())
+      #if(!$hasAttachments)
+        <table width="95%">
+        <tr class="title"><th scope="col"></th><th scope="col">$msg.get('filename')</th><th scope="col">$msg.get('version')</th><th scope="col">$msg.get('author')</th></tr>
+        #set($hasAttachments = true)
+      #end
+      <tr>
+        <td>
+          #if($attachment.isImage())
+            <a href="$doc.getAttachmentURL(${attachment.filename})" onclick="document.forms[0].href.value='$escapetool.xml($escapetool.javascript($attachment.filename))'; return false;" >
+              <img src="$doc.getAttachmentURL(${attachment.filename}, 'download', 'width=80')" alt="$escapetool.xml($attachment.filename)" width="80" border="0" />
+            </a>
+          #end
+        </td><td align="center"><a href="$doc.getAttachmentURL(${attachment.filename})" onclick="document.forms[0].href.value='$escapetool.xml($escapetool.javascript($attachment.filename))'; return false;">$escapetool.xml($attachment.filename)</a></td>
+        <td align="center">$!escapetool.xml($attachment.version)</td><td align="center">$xwiki.getUserName($attachment.author)</td>
+      </tr>
+    #end
+  #end
+  #if($hasAttachments)
+    </table>
+    </div>
+  #end
+  <div class="xwikidatafooter2">
+    <div class="xwikidatafooter1">&nbsp;</div>
+    <div class="xwikidatafooter">&nbsp;</div>
+  </div>
+</div>

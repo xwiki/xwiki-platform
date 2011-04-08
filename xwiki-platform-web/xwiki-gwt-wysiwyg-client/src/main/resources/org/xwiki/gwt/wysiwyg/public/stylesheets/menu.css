@@ -1,0 +1,179 @@
+.gwt-MenuBar {
+  cursor: default;
+}
+
+.gwt-MenuBar .gwt-MenuItem {
+  cursor: default;
+}
+
+.gwt-MenuBar .gwt-MenuItem-selected {
+  background: #E0EDFE;
+}
+
+.gwt-MenuBar .gwt-MenuItem-disabled {
+  color: #C0C0C0;
+  background-color: transparent !important;
+}
+
+.gwt-MenuBar-horizontal {
+  background-color: #F0F0EE;
+}
+
+.gwt-MenuBar-horizontal table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.gwt-MenuBar-horizontal .gwt-MenuItem {
+  padding: 0px 10px;
+  color: #666;
+  font-weight: bold;
+  background-color: #EAEAEA;
+  border: 0 none;
+  border-top:1px solid #DDD;
+  border-right:1px solid #DDD;
+  height: 24px;
+}
+
+.gwt-MenuBar-horizontal .gwt-MenuItemSeparator {
+  width: 1px;
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
+  border-left: 1px solid #888888;
+  background: white;
+}
+
+.gwt-MenuBar-horizontal .gwt-MenuItemSeparator .menuSeparatorInner {
+  width: 1px;
+  height: 1px;
+  background: white; 
+}
+
+.gwt-MenuBar-vertical table {
+  border-collapse: collapse;
+  background-color: #F0F0EE;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #fff #aaa #aaa #fff;
+  font-size: 12px;
+}
+
+.gwt-MenuBar-vertical .gwt-MenuItem {
+  padding: 4px 8px;
+}
+
+.gwt-MenuBar-vertical .gwt-MenuItemSeparator {
+  padding: 2px 0px;
+}
+
+.gwt-MenuBar-vertical .gwt-MenuItemSeparator .menuSeparatorInner {
+  height: 1px;
+  padding: 0px;
+  border-top: 1px solid #aaa;
+  overflow: hidden;
+  margin: 0px 5px;
+}
+
+.gwt-MenuBar-vertical .subMenuIcon {
+  padding-right: 4px;
+}
+
+.gwt-MenuBar-vertical .subMenuIcon-selected {
+  background-color: #E0EDFE;
+}
+
+.gwt-MenuBarPopup {
+  margin: 0px 0px 0px 3px;
+}
+
+.gwt-MenuBarPopup .menuPopupTopLeftInner {
+  width: 5px;
+  height: 5px;
+  zoom: 1;
+}
+
+.gwt-MenuBarPopup .menuPopupTopRightInner {
+  width: 8px;
+  height: 5px;
+  zoom: 1;
+}
+
+.gwt-MenuBarPopup .menuPopupTopCenterInner{
+  display: none;
+}
+
+.gwt-MenuBarPopup .menuPopupBottomLeftInner {
+  width: 5px;
+  height: 8px;
+  zoom: 1;
+}
+
+.gwt-MenuBarPopup .menuPopupBottomRightInner {
+  width: 8px;
+  height: 8px;
+  zoom: 1;
+}
+
+* html .gwt-MenuBarPopup .menuPopupTopLeftInner {
+  width: 5px;
+  height: 41px;
+  margin-top: -36px;
+  overflow: hidden;
+}
+
+* html .gwt-MenuBarPopup .menuPopupTopRightInner {
+  width: 13px;
+  height: 41px;
+  margin-left: -5px;
+  margin-top: -36px;
+  overflow: hidden;
+}
+
+* html .gwt-MenuBarPopup .menuPopupBottomLeftInner {
+  width: 5px;
+  height: 49px;
+  margin-top: -41px;
+  overflow: hidden;
+}
+
+* html .gwt-MenuBarPopup .menuPopupBottomRightInner {
+  width: 13px;
+  height: 49px;
+  margin-left: -5px;
+  margin-top: -41px;
+  overflow: hidden;
+}
+
+* html .gwt-MenuBar-vertical table {
+  border-collapse: collapse;
+  background-color: #F0F0EE;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #fff #aaa #aaa #fff;
+  font-size: 12px;
+}
+
+.gwt-MenuItem .gwt-MenuItemIcon {
+  float: left;
+  margin-left: -5px;
+  vertical-align: middle;
+}
+
+.gwt-MenuBar-vertical .gwt-MenuItem .gwt-MenuItemIcon {
+  margin-left: 0px;
+}
+
+.gwt-MenuItem .gwt-MenuItemLabel {
+  float: left;
+  line-height: 20px;
+  padding-left: 3px;
+}
+
+.gwt-MenuItem .gwt-MenuItemShortcutKeyLabel {
+  float: right;
+  line-height: 20px;
+  margin-left: 30px;
+}

@@ -1,0 +1,61 @@
+.xRichTextEditorTabPanel {
+  background-color: #F0F0EE;
+  font-style: normal;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.xRichTextEditorTabPanel td {
+  border: 0 none;
+  padding: 0;
+}
+
+.xRichTextEditorTabPanel .gwt-TabBar .gwt-TabBarItem {
+  background-color :#DDDDDD
+}
+
+.xRichTextEditorTabPanel .gwt-TabBar .gwt-TabBarItem-selected {
+  background-color: #CCCCCC;
+}
+
+.xRichTextEditorTabPanel .gwt-TabPanelBottom {
+  border-color: #CCCCCC;
+}
+
+.xRichTextEditorTabPanel .gwt-TabPanelBottom {
+  background-color: #FFFFFF;
+  padding: 0;
+}
+
+.xRichTextEditorTabPanel .xRichTextEditor {
+  border: 0 none;
+}
+
+.xRichTextEditorTabPanel .xRichTextEditor .gwt-MenuBar-horizontal {
+  border-top: 0 none;
+}
+
+.xRichTextEditor {
+  border: 1px solid #DDD;
+  border-top: 0 none;
+  font-style: normal;
+}
+
+.xRichTextEditor .gwt-RichTextArea {
+  width:100%;
+  background:#FFFFFF none repeat scroll 0%;
+  border:0 none;
+  margin:0;
+  padding:0;
+}
+
+.xRichTextEditor .gwt-MenuBar-horizontal {
+  border-top: 1px solid #DDD;
+}
+
+.xPlainTextEditor {
+  border: 0 none;
+  width: 100%;
+  height: 100%;
+}

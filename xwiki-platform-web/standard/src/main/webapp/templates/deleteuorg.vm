@@ -1,0 +1,10 @@
+## CSRF check
+#if(${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+#set($docname = $request.get("docname"))
+#set($d = $xwiki.getDocument($docname))
+$d.delete()
+## $d.delete doesn't return anything, so we need to print some text in order to avoid a "This template does not exist" response.
+OK
+#else
+FAIL
+#end

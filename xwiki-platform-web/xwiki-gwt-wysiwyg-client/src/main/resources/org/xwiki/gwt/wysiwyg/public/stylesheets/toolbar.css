@@ -1,0 +1,107 @@
+.xToolbar div.clearfloats {
+  background-color:transparent;
+  clear:both;
+  float:none;
+  height:1px;
+  line-height:1px;
+  font-size:1px;
+  margin:0px;
+}
+
+.xToolbar {
+  background:#F0F0EE none repeat scroll 0%;
+  border-top:1px solid #DDD;
+  border-bottom:1px solid #DDD;
+  width:100%;
+}
+
+.xToolbar div {
+  float:left;
+  height:23px;
+}
+
+.xToolbar .gwt-PushButton-up,
+.xToolbar .gwt-PushButton-down,
+.xToolbar .gwt-PushButton-up-hovering,
+.xToolbar .gwt-PushButton-down-hovering,
+.xToolbar .gwt-PushButton-up-disabled,
+.xToolbar .gwt-PushButton-down-disabled,
+.xToolbar .gwt-ToggleButton-up,
+.xToolbar .gwt-ToggleButton-down,
+.xToolbar .gwt-ToggleButton-up-hovering,
+.xToolbar .gwt-ToggleButton-down-hovering,
+.xToolbar .gwt-ToggleButton-up-disabled,
+.xToolbar .gwt-ToggleButton-down-disabled {
+  border:1px solid #F0F0EE !important;
+  cursor:default;
+  height:20px;
+  width:20px;
+  margin:1px 0px 0px 1px;
+}
+
+.xToolbar .gwt-PushButton-up-hovering,
+.xToolbar .gwt-PushButton-down-hovering,
+.xToolbar .gwt-ToggleButton-up-hovering,
+.xToolbar .gwt-ToggleButton-down-hovering {
+  background-color:#B6BDD2 !important;
+  border:1px solid #0A246A !important;
+}
+
+.xToolbar .gwt-ToggleButton-down {
+  border:1px solid #C0C0BB !important;
+}
+
+.xToolbar .gwt-PushButton-up-disabled,
+.xToolbar .gwt-PushButton-down-disabled,
+.xToolbar .gwt-ToggleButton-up-disabled,
+.xToolbar .gwt-ToggleButton-down-disabled {
+  opacity:0.4;
+}
+
+/* XWIKI-2915: WYSIWYG editor crashes on key press in IE6 */
+html>body .xToolbar .gwt-PushButton-up-disabled,
+html>body .xToolbar .gwt-PushButton-down-disabled,
+html>body .xToolbar .gwt-ToggleButton-up-disabled,
+html>body .xToolbar .gwt-ToggleButton-down-disabled {
+  filter:alpha(opacity=40);
+  zoom:1;
+}
+* html .xToolbar .gwt-PushButton-up-disabled,
+* html .xToolbar .gwt-PushButton-down-disabled,
+* html .xToolbar .gwt-ToggleButton-up-disabled,
+* html .xToolbar .gwt-ToggleButton-down-disabled {
+  background-color:#E6E6E6;
+}
+
+.xToolbar .gwt-ListBox {
+  background:#F0F0EE none repeat scroll 0% !important;
+  border:2px inset white !important;
+  font-size:smaller;
+  height: 20px;
+  margin-top:3px;
+  padding:0px !important;
+  vertical-align:top;
+}
+
+.xToolbar .gwt-ListBox optgroup {
+  margin-top:6px;
+}
+
+.xToolbar .separator {
+  background-color:#F0F0EE;
+  border-color:buttonshadow buttonhighlight buttonhighlight buttonshadow;
+  border-style:solid;
+  border-width:1px;
+  height:17px;
+  margin:2px 2px 2px 4px;
+  width:0px;
+}
+
+.xToolbar .xStyleNamePicker option {
+  padding-left: 17px;
+  text-transform: capitalize;
+}
+
+.xToolbar .xStyleNamePicker .selected {
+  background:url(../images/checked-black.gif) no-repeat scroll 2px center #E0E0E0;
+}

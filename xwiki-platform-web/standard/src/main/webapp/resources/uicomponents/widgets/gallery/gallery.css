@@ -1,0 +1,167 @@
+#macro(ieOpacity $selector $value)
+/* start IE opacity setting */
+$selector {
+  /* We need to quote the property value because the equal sign is not valid inside a CSS property value. */
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=$value)";
+}
+
+#foreach($item in $selector.split('\s*,\s*'))
+*+html $item, ##
+#end {
+  /* This is for IE7, which doesn't accept the quoted value but fortunately understands the escape syntax. */
+  filter: alpha(opacity\=$value);
+  /* Unicode escape works too. */
+  /*filter: alpha(opacity\003d $value);*/
+}
+
+#foreach($item in $selector.split('\s*,\s*'))
+* html $item, ##
+#end {
+  /* This is for IE6, which doesn't understand the escaped equal sign (not even the unicode escape) but fortunately
+  accepts the quoted value. */
+  filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=$value)";
+}
+/* end IE opacity setting */
+#end
+
+#set($imageMaxWidth = 492)
+#set($imageMaxHeight = 369)
+
+.xGallery {
+  background-color: black;
+  padding: 10px;
+  /* Position relative is required because some of the inner elements have position absolute and the gallery container
+  must be their offset parent. */
+  position: relative;
+  width: ${mathtool.add($imageMaxWidth, 128)}px;
+}
+
+/* Mouse cursor is invisible in IE7 when moved over the gallery. This happens because IE7 shows the text cursor which is
+black and thus it's not visible on gallery's black background. */
+*+html .xGallery {
+  cursor: default;
+}
+
+.xGallery.maximized {
+  left: 0;
+  position: fixed;
+  top: 0;
+  z-index: 1001;
+}
+
+/* IE6 position:fixed workaround. */
+* html .xGallery.maximized {
+  height: 100%;
+  position: absolute;
+  width: 100%
+}
+
+.xGallery .currentImageWrapper {
+  height: ${imageMaxHeight}px;
+  line-height: ${imageMaxHeight}px;
+  /* This is just in case the browser doesn't support the max-height and max-width CSS properties. */
+  overflow: hidden;
+  text-align: center;
+  width: 100%;
+}
+
+.xGallery .currentImage {
+  max-height: ${imageMaxHeight}px;
+  max-width: ${imageMaxWidth}px;
+  vertical-align: middle;
+}
+
+/* This is required to center the image vertically on IE6. See http://www.brunildo.org/test/IElineheight.html */
+.xGallery .currentImagePinPoint {
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  width: 0;
+}
+
+.xGallery .previous, .xGallery .next {
+  color: #A0A0A0;
+  cursor: pointer;
+  font-family: courier,monospace;
+  font-size: 32px;
+  font-weight: 100;
+  height: 124px;
+  line-height: 124px;
+  margin-top: -64px;
+  position: absolute;
+  text-align: center;
+  top: 50%;
+  width: 32px;
+}
+
+.xGallery .previous:hover, .xGallery .next:hover {
+  color: white;
+}
+
+.xGallery .previous {
+  left: 0;
+}
+
+.xGallery .next {
+  right: 0;
+}
+
+.xGallery .index {
+  bottom: 10px;
+  color: #C0C0C0;
+  font-family: sans-serif;
+  font-size: smaller;
+  left: 10px;
+  position: absolute;
+}
+
+.xGallery .loading {
+  background-image: url('loading.gif') !important;
+}
+
+.xGallery .focusCatcher {
+  background-color: black;
+  border: 0 none;
+  color: black;
+  height: 1px;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  width: 1px;
+  z-index: -1;
+}
+
+.xGallery .maximize, .xGallery .minimize {
+  cursor: pointer;
+  height: 16px;
+  opacity: .5;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 16px;
+}
+
+.xGallery .maximize:hover, .xGallery .minimize:hover {
+  opacity: 1;
+}
+
+#ieOpacity('.xGallery .maximize, .xGallery .minimize' 50)
+
+#ieOpacity('.xGallery .maximize:hover, .xGallery .minimize:hover' 100)
+
+.xGallery .maximize {
+  background: transparent url('maximize.gif') no-repeat scroll center;
+}
+
+.xGallery .minimize {
+  background: transparent url('minimize.gif') no-repeat scroll center;
+}
+
+html.maximized, html.maximized body {
+  height: 100% !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  width: 100% !important;
+}

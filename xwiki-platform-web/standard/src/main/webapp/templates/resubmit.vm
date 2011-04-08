@@ -1,0 +1,23 @@
+###
+### Resubmission page
+###
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="mainContentArea">
+#xwikimessageboxstart("$!msg.get('warning')" "$!msg.get('csrf.confirmation')")
+#set($resubmit = "$!{escapetool.xml($request.getParameter('resubmit'))}")
+#set($xback = "$!{escapetool.xml($request.getParameter('xback'))}")
+<form action="$resubmit" method="post">
+  <div class="hidden">
+    ## Valid CSRF token
+    <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+  </div>
+  <div class="buttonwrapper"><input type="submit" class="button" value="$msg.get('yes')"/></div>
+  <div class="buttonwrapper"><a class="secondary button" href="$xback">$msg.get('no')</a></div>
+</form>
+#xwikimessageboxend()
+<div class="clearfloats"></div>
+</div>## mainContentArea
+</div>## main
+#template("endpage.vm")
+

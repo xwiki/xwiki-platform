@@ -1,0 +1,30 @@
+#set($editors = $xcontext.getEditorWysiwyg())
+#if($editors)
+#if($doc.syntax.toIdString() == "xwiki/1.0")
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wysiwyg/tinymce/tiny_mce/tiny_mce.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wysiwyg/tinymce/wiki_editor/wiki_editor.js")"></script>
+<script type="text/javascript">
+//<![CDATA[
+    wikiEditor.init({
+        elements : "$!{escapetool.javascript($editors)}",
+        language: "en",
+        mode: "exact",
+        content_css: "$xwiki.getSkinFile("style.css")",
+        debug : false,
+        remove_linebreaks : false,
+        plugins: 'table, contextmenu, paste, searchreplace',
+        wiki_use_style: '$xwiki.useWysiwygStyleToolbar()',
+        wiki_images_path : '${doc.getURL('download')}/',
+        wiki_attach_path : '${doc.URL}',
+        wiki_macro_path : '${doc.URL}',
+        wiki_plugins: 'core, attachments, macros'
+    });
+//]]>
+</script>
+#elseif($services.wysiwyg.isSyntaxSupported($doc.syntax.toIdString()))
+## Load the rich text object properties using a compact WYSIWYG editor.
+#wysiwyg_editProperties($doc $editors false)
+#else
+#warning("The new GWT-based WYSIWYG editor doesn't support the syntax of the current document: <em>$doc.syntax.toIdString()</em>.")
+#end
+#end

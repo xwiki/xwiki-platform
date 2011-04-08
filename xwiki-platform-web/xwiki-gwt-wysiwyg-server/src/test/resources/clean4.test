@@ -1,0 +1,10 @@
+#
+# Tests that three levels nesting of anchors are cleaned correctly.
+#
+<p><!--startwikilink:http://www.xwiki.org--><span><a class="wikimodel-freestanding" href="http://www.xwiki.com"><span>\
+<a href="http://www.xwiki.orgs"><a href="http://www.xwiki.com">http://www.xwiki.org</a>com</a>\
+</span></a></span><!--stopwikilink--></p>
+---
+<p><!--startwikilink:http://www.xwiki.org--><span><a class="wikimodel-freestanding" href="http://www.xwiki.com"><span>\
+http://www.xwiki.orgcom\
+</span></a></span><!--stopwikilink--></p>

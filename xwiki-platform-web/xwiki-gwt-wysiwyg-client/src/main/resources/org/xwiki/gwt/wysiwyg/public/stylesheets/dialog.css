@@ -1,0 +1,259 @@
+/* General dialog shapes, sizes, look & feel */
+.gwt-PopupPanel {
+  z-index: 1001;
+}
+
+* html div.gwt-PopupPanel, * html div.gwt-PopupPanel div {
+  display: block;
+}
+
+* html .gwt-PopupPanel {
+  width: 1px;
+}
+
+.gwt-PopupPanelGlass {
+  background-color: black;
+  opacity: .5;
+  z-index: 1000;
+}
+/* start IE opacity setting */
+.gwt-PopupPanelGlass {
+  /* This is for IE8. We need to quote the property value because the equal sign is not valid inside a CSS property value. */
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+}
+
+*+html .gwt-PopupPanelGlass {
+  /* This is for IE7, which doesn't accept the quoted value but fortunately understands the escape syntax. */
+  filter: alpha(opacity\=50);
+  /* Unicode escape works too. */
+  /*filter: alpha(opacity\003d 50);*/
+}
+
+* html .gwt-PopupPanelGlass {
+  /* This is for IE6, which doesn't understand the escaped equal sign (not even the unicode escape) but fortunately accepts the quoted value. */
+  filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+}
+/* end IE opacity setting */
+
+.xDialogBox {
+  padding: 3px;
+  background-color: white;
+}
+
+.xDialogBox div.clearfloats{
+  margin: 0px !important;
+}
+
+.xDialogBox-dragging {
+  background-color: transparent !important;
+  border: 1px dashed #333;
+}
+
+.xDialogCaptionBar {
+  background-color: #DDD;
+  color: #777;
+  font-weight: bold;
+  letter-spacing: -1px;
+  line-height: 27px;
+  padding: 0 27px 0 25px;
+  position: relative;
+  cursor: default;
+}
+
+* html .xDialogCaptionBar {
+  width: 100%;
+}
+
+.xDialogIcon {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+}
+
+.xDialogCaption {
+  height: 27px;
+  line-height: 27px;
+  white-space: nowrap;
+}
+
+.xDialogCloseIcon {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}
+
+.xDialogContent {
+  border: 2px solid #DDD;
+  border-top: 1px solid #DDD;
+}
+
+.xDialogHeader, .xDialogFooter {
+  padding: 10px;
+  line-height: 25px;
+}
+
+.xDialogHeader {
+  font-weight: lighter;
+  color: #333;
+  letter-spacing: 1px;
+}
+
+.xDialogBody {
+  border-top: 2px solid #EEE;
+  border-bottom: 2px solid #EEE;
+  height: 350px;
+  width: 459px;
+  overflow: auto;
+  margin: 0 6px;
+  font-size: 85%;
+}
+
+.xDialogBody input {
+  font-size: inherit;
+}
+
+/* Dialog buttons settings */
+.xDialogFooter {
+  text-align: right;
+}
+
+.xDialogFooter button {
+  -moz-border-radius-bottomleft: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -moz-border-radius-topleft: 5px;
+  -moz-border-radius-topright: 5px;
+  border: 1px solid #AAA;
+  height: 25px;
+  line-height: 17px;
+  vertical-align: middle;
+  margin-left: 5px;  
+}
+
+/* Re-style the default tab panel */
+.xDialogBody .gwt-TabPanel {
+  width: 100%;
+  height: 100%;
+}
+
+.xDialogBody .gwt-TabPanel .gwt-TabBar tr {
+  background-color: #eeeeee;
+}
+
+.xDialogBody .gwt-TabBar .gwt-TabBarItem {
+  background-color: #eeeeee;
+  font-weight: normal;
+  padding: 0 6px;
+  margin-left: 0;
+}
+
+.xDialogBody .gwt-TabBar .gwt-TabBarItem .gwt-Label {
+  height: 25px;
+  line-height: 25px;
+}
+
+.xDialogBody .gwt-TabBar .gwt-TabBarItem-selected {
+  background-color: #ffffff;
+}
+
+.xDialogBody .gwt-TabPanel .gwt-TabPanelBottom {
+  border: none;
+  padding: 0;
+  height: 325px;
+}
+
+/* Styles for dialog elements (such as labels, inputs, etc), common to all dialogs */
+.xInfoLabel, .xMacroLabel, .xMacroParameterLabel, .xPagePreviewTitle,
+.xImporterInfoLabel, .xImporterDialog .xDialogFooter .gwt-CheckBox {
+  color: #666;
+  font-weight: bolder;
+  margin-bottom: 3px;
+  text-transform: capitalize;
+  padding-top: 14px;
+}
+
+.xHelpLabel, .xMacroDescription, .xMacroParameterDescription,
+.xPagePreviewFullname, .xImporterHelpLabel {
+  color: #777;
+  font-size: 90%;
+  font-style: italic;
+  margin-bottom: 3px;
+  width: 433px;
+}
+
+.xMandatory {
+  color: #777;
+  font-size: 90%;
+  font-style: italic;
+  font-weight: normal;
+  margin-left: 1ex;
+}
+
+.xLinkToUrl .gwt-TextBox, .xLinkConfig .gwt-TextBox, 
+.xLinkToNewPage .gwt-TextBox, .xUploadPanel .gwt-FileUpload,
+.xExternalImage .gwt-TextBox, .xImageConfig .gwt-TextBox,
+.xMacroParameter .textInput, .xTablePanel .gwt-TextBox,
+.xImporterTabPanel .gwt-FileUpload, .xExplorer input, .xSearchForm input {
+  width: 433px;
+  border: 1px solid #AAA;
+  padding: 2px;
+}
+
+.xLinkToUrl span.gwt-CheckBox, .xLinkConfig span.gwt-CheckBox, 
+.xTablePanel span.gwt-CheckBox {
+  display: block;
+}
+
+.xImageConfig .gwt-RadioButton {
+  color: #666;
+}
+
+.xMacroParameter textarea, .xImporterClipboardTabEditor {
+  width: 433px;
+  border: 1px solid #AAA;
+  padding: 2px;
+}
+
+.xMacroParameterLabel-mandatory, .xInfoLabel-mandatory {
+  color: #5A1;
+}
+
+.xErrorMsg {
+  font-size: 75%;
+  color: #dd2222;
+  margin-bottom: 3px;
+}
+
+.xErrorField {
+  border: 1px solid #dd5555 !important;
+}
+
+/* Sizes for the top-level containers in the dialogs, those that need to resize to 100% of the dialog content */
+/* without aggregator */
+.xAttachmentsSelector, .xPagesSelector, .xExplorerPanel, 
+.xImagesSelector, .xImagesExplorer, .xMacroSelector {
+  margin-top: 5px;
+  /* Make sure this panel expands to the whole dialog body and stays expanded, on all IEs. width: 
+        100% does not do it, nor default overflow. */
+  width: 459px;
+  overflow: auto;
+  height: 340px;
+}
+
+/* with aggregator */
+.xSelectorAggregatorStep {
+  /* dialog body height minus its border to make sure it fits  well in IE6 too */
+  height: 346px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  /* selector overflow is hidden due to an issue with table sizes in IE: all scrolls are to be handled inside */
+  overflow: hidden;
+  /* make sure this panel expands to the whole dialog and stays there on IE browsers */
+  width: 459px;
+}
+
+.xSelectorAggregatorStep .xAttachmentsSelector, .xSelectorAggregatorStep .xPagesSelector, 
+.xSelectorAggregatorStep .xExplorerPanel, .xSelectorAggregatorStep .xImagesSelector, 
+.xSelectorAggregatorStep .xImagesExplorer {
+  height: 315px;
+}

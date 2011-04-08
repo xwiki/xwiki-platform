@@ -1,0 +1,104 @@
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+<module rename-to="xwe">
+  <inherits name='org.xwiki.gwt.user.User' />
+  <inherits name='org.xwiki.gwt.wysiwyg.Plugin' />
+  <inherits name="com.smartgwt.SmartGwtNoScript" />
+
+  <stylesheet src="stylesheets/Wysiwyg.css" />
+  <entry-point class="org.xwiki.gwt.wysiwyg.client.Wysiwyg" />
+
+  <extend-property name="locale" values="ca,de,es,fr,it,lv,ru,sk,sv,zh,zh_TW" />
+
+  <!-- Custom linker that adds the document type declaration to the generated permutations. -->
+  <define-linker name="StandardsMode" class="org.xwiki.gwt.core.linker.StandardsModeIFrameLinker" />
+  <add-linker name="StandardsMode" />
+
+  <!-- ReadOnlyPlugin -->
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.readonly.ReadOnlyKeyboardHandler">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.readonly.ReadOnlyKeyboardHandler" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.readonly.SafariReadOnlyKeyboardHandler">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.readonly.ReadOnlyKeyboardHandler" />
+    <when-property-is name="user.agent" value="safari" />
+  </replace-with>
+
+  <!-- LinePlugin -->
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.MozillaLinePlugin">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />
+    <when-property-is name="user.agent" value="gecko1_8" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.IELinePlugin">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
+  </replace-with>
+
+  <!-- SubmitPlugin -->
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPlugin">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPlugin" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.submit.IESubmitPlugin">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPlugin" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
+  </replace-with>
+
+  <!-- ImageConfigDOMWriter -->
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.image.internal.IEImageConfigDOMWriter">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter" />
+    <when-property-is name="user.agent" value="ie6" />
+  </replace-with>
+
+  <!-- List behavior adjuster -->
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.list.internal.IEListBehaviorAdjuster">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.list.internal.MozillaListBehaviorAdjuster">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster" />
+    <when-property-is name="user.agent" value="gecko1_8" />
+  </replace-with>
+</module>

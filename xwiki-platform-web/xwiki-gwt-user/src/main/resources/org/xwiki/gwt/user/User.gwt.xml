@@ -1,0 +1,146 @@
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+<module>
+  <inherits name='com.google.gwt.user.User' />
+  <inherits name='com.google.gwt.json.JSON' />
+  <inherits name="org.xwiki.gwt.dom.DOM" />
+
+  <extend-property name="locale" values="ca,de,es,fr,it,ru,sv,zh,zh_TW" />
+
+  <!-- RichTextArea -->
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplIE6">
+    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplMozilla">
+    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl" />
+    <when-property-is name="user.agent" value="gecko1_8" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplSafari">
+    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl" />
+    <any>
+      <when-property-is name="user.agent" value="safari" />
+    </any>
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplOpera">
+    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl" />
+    <any>
+      <when-property-is name="user.agent" value="opera" />
+    </any>
+  </replace-with>
+
+  <!-- BehaviorAdjuster -->
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.MozillaBehaviorAdjuster">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster" />
+    <when-property-is name="user.agent" value="gecko1_8" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.IEBehaviorAdjuster">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
+  </replace-with>
+
+  <!-- ReloaderImpl -->
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImpl">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImpl" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImplIE">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImpl" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImplOpera">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImpl" />
+    <when-property-is name="user.agent" value="opera" />
+  </replace-with>
+
+  <!-- Console -->
+  <replace-with class="org.xwiki.gwt.user.client.Console">
+    <when-type-is class="org.xwiki.gwt.user.client.Console" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.user.client.internal.FirebugConsole">
+    <when-type-is class="org.xwiki.gwt.user.client.Console" />
+    <when-property-is name="user.agent" value="gecko1_8" />
+  </replace-with>
+
+  <!-- DOMImpl for widgets -->
+  <replace-with class="org.xwiki.gwt.user.client.internal.IEDOMImpl">
+    <when-type-is class="com.google.gwt.user.client.impl.DOMImpl" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
+  </replace-with>
+
+  <!-- TextBoxImpl -->
+  <replace-with class="org.xwiki.gwt.user.client.ui.internal.TextBoxImplIE6">
+    <when-type-is class="com.google.gwt.user.client.ui.impl.TextBoxImpl" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
+  </replace-with>
+
+  <!-- DeleteExecutable -->
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImpl">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImpl" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImplIE">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImpl" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
+  </replace-with>
+
+  <!-- InsertHTMLExecutableImpl -->
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImpl">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImpl" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImplIE">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImpl" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
+  </replace-with>
+</module>

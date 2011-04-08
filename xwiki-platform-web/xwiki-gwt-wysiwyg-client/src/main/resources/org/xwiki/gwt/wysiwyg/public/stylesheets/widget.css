@@ -1,0 +1,33 @@
+.xListBox {
+}
+
+.xListItem {
+}
+
+.xListItem-selected {
+  background-color: #D4E8FF;
+}
+
+.xFontSizePicker {
+  width: 18ex;
+}
+
+.xFontFamilyPicker {
+  width: 23ex;
+}
+
+.xFontFamilyPicker option {
+  font-size: small !important;
+}
+
+.gwt-TextBox-labeled {
+  color: gray;
+}
+
+.xSearchBox {
+  background-image: url(../images/search.gif);
+  background-position: 2px center;
+  background-repeat: no-repeat;
+  border: 1px solid #666;
+  padding: 2px 2px 2px 19px;
+}

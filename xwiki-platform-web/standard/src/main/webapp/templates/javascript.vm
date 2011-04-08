@@ -1,0 +1,139 @@
+##
+## CSS files related to JS libraries.
+##
+<link href="$xwiki.getSkinFile("uicomponents/suggest/suggest.css", true)" rel="stylesheet" type="text/css" />
+<link href="$xwiki.getSkinFile("js/xwiki/lightbox/lightbox.css", true)" rel="stylesheet" type="text/css" />
+<!--[if IE]>
+  <link href="$xwiki.getSkinFile("js/xwiki/lightbox/lightboxIE.css", true)" rel="stylesheet" type="text/css" />
+<![endif]-->
+##
+## JS Libraries.
+##
+$xwiki.jsfx.use('js/scriptaculous/effects.js', true)
+$xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)
+$xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', true)
+$xwiki.jsfx.use('js/xwiki/widgets/jumpToPage.js', true)
+$xwiki.ssfx.use('js/xwiki/widgets/jumpToPage.css', {'forceSkinAction' : true, 'language' : $context.language})
+$xwiki.jsfx.use('uicomponents/widgets/confirmationBox.js', true)
+$xwiki.ssfx.use('uicomponents/widgets/confirmationBox.css', true)
+$xwiki.jsfx.use('uicomponents/widgets/confirmedAjaxRequest.js', true)
+$xwiki.jsfx.use('uicomponents/widgets/notification.js', true)
+$xwiki.ssfx.use('uicomponents/widgets/notification.css', true)
+$xwiki.jsfx.use('uicomponents/widgets/list/xlist.js')
+$xwiki.jsfx.use('uicomponents/suggest/suggest.js')
+#if($xwiki.exists('XWiki.SearchSuggestConfig'))
+  ## Hook to request the search suggest script if search suggest configuration is present.
+  ## We can't just have it as a always-use SSX yet since we compute a hash to be sure to refresh
+  ## the file when the configuration changes.
+  ## Ideally, this code should be located in a interface extension, in the search application.
+  #set($searchSuggestConfigDocument = $xwiki.getDocument('XWiki.SearchSuggestConfig'))
+  #set($searchSuggestConfigObject = $searchSuggestConfigDocument.getObject('XWiki.SearchSuggestConfig'))
+  #if($searchSuggestConfigObject.getProperty('activated').value == 1)
+   #set($searchSuggestConfigHash = '')
+   #foreach($source in $searchSuggestConfigDocument.getObjects('XWiki.SearchSuggestSourceClass'))
+     #if($source.getProperty('activated').value == 1)
+       #set($sourceId = "${source.get('name')}:${source.get('url')}:${source.get('highlight')}:${source.get('icon')}}")
+       #set($searchSuggestConfigHash = "${searchSuggestConfigHash}|${sourceId}")
+     #end
+   #end
+   $xwiki.jsfx.use('uicomponents/search/searchSuggest.js', {
+    'forceSkinAction' : true,  
+    'h' : $searchSuggestConfigHash.hashCode()  
+   })
+   $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)
+  #end
+#end
+<script type="text/javascript" src="$xwiki.getSkinFile("js/prototype/prototype.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/xwiki.js", true)"></script>
+<script type="text/javascript">
+// <![CDATA[
+XWiki.webapppath = "${xwiki.webAppPath}";
+XWiki.servletpath = "${xwiki.servletPath}";
+XWiki.contextPath = "${request.contextPath}";
+XWiki.mainWiki = "$!{escapetool.javascript(${xcontext.mainWikiName})}";
+XWiki.currentWiki = "$!{escapetool.javascript(${xcontext.database})}";
+XWiki.currentSpace = "$!{escapetool.javascript($doc.space)}";
+XWiki.currentPage = "$!{escapetool.javascript($doc.name)}";
+XWiki.editor = "$!{escapetool.javascript($editor)}";
+XWiki.viewer = "$!{escapetool.javascript($viewer)}";
+XWiki.contextaction = "${xcontext.getAction()}";
+XWiki.docisnew = $!doc.isNew();
+XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
+XWiki.blacklistedSpaces = [ #foreach($space in $blacklistedSpaces)#if($velocityCount > 1),#end"$space"#end ];
+XWiki.hasEdit = $hasEdit;
+XWiki.hasProgramming = $hasProgramming;
+XWiki.hasBackupPackImportRights =#if ($xwiki.package) $xwiki.package.hasBackupPackImportRights()#else false#end;
+window.docviewurl = "${doc.getURL('view')}";
+window.docediturl = "${doc.getURL('edit')}";
+window.docsaveurl = "${doc.getURL('save')}";
+window.docgeturl = "${doc.getURL('get')}";
+// ]]>
+</script>
+#if(($xcontext.action=="inline")||($xcontext.action=="edit") || ($xcontext.action=="admin"))
+$xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js')
+$xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
+<script type="text/javascript">
+// <![CDATA[
+var cancelEditNextOnunload;
+var cancelCancelEditFlag = true;
+var lockEditFlag = false;
+
+function cancelEditResponse() {
+}
+
+function cancelEdit() {
+  if (cancelCancelEditFlag) {
+    var surl = "$doc.getExternalURL('cancel', 'ajax=1')";
+    var myAjax = new Ajax.Request(surl, {
+      method: 'get',
+      parameters: "",
+      asynchronous: true,
+      discardResponse: true
+    });
+    cancelCancelEditFlag = false;
+  }
+  if (cancelEditNextOnunload) {
+    cancelEditNextOnunload();
+  }
+}
+
+function lockEdit() {
+  if (!lockEditFlag) {
+#if ($xcontext.action == 'inline')
+    var surl = "$doc.getExternalURL('lock', "action=inline&ajax=1&${docvariant.replace('&amp;', '&')}")";
+#else
+    var surl = "$doc.getExternalURL('lock', "ajax=1&${docvariant.replace('&amp;', '&')}")";
+#end
+    var myAjax = new Ajax.Request(surl, {
+      method: 'get',
+      parameters: "",
+      asynchronous: true
+    });
+    lockEditFlag = false;
+  }
+}
+
+function prepareCancelEdit() {
+  lockEdit();
+}
+function cancelCancelEdit() {
+  cancelCancelEditFlag = false;
+}
+Event.observe(window, "unload", cancelEdit);
+Event.observe(window, "pagehide", cancelEdit);
+Event.observe(document, "dom:loaded", prepareCancelEdit);
+// ]]>
+</script>
+#end
+##
+## Hooks for inserting JavaScript skin extensions
+##
+## - Skin file extension hook. Placed first since skin extensions might need to have xwiki or external libraries included first to be able to work properly
+<!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin -->
+## - Skin extension hook
+<!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->
+##
+## Compatibility "aspect" file for deprecated code.
+## Placed at the very end of the stream so that skin file extensions code can be deprecated easily as well.
+##
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/compatibility.js", false)" defer="defer"></script>

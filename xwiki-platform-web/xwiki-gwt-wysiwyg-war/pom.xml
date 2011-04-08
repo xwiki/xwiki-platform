@@ -1,0 +1,176 @@
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-web</artifactId>
+    <version>3.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-web-gwt-wysiwyg-war</artifactId>
+  <name>XWiki Platform - Web - GWT - WYSIWYG Editor - WAR Distribution</name>
+  <packaging>war</packaging>
+  <description>WAR distribution of XWiki's WYSIWYG editor.</description>
+  <properties>
+    <gwt.style>OBF</gwt.style>
+    <gwt.output.directory>${project.build.directory}/${project.build.finalName}/resources/js/xwiki/wysiwyg</gwt.output.directory>
+    <xwe.directory>${gwt.output.directory}/xwe</xwe.directory>
+    <xwe.module>org.xwiki.gwt.wysiwyg.Wysiwyg</xwe.module>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt-wysiwyg-client</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt-wysiwyg-server</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>gwt-maven-plugin</artifactId>
+        <version>${gwt.maven.plugin.version}</version>
+        <configuration>
+          <module>${xwe.module}</module>
+          <webappDirectory>${gwt.output.directory}</webappDirectory>
+          <style>${gwt.style}</style>
+          <disableCastChecking>true</disableCastChecking>
+          <disableClassMetadata>true</disableClassMetadata>
+          <!--
+            In order to prevent the "java.lang.InternalError: Can't connect to X11 window server using ':1.0' as the
+            value of the DISPLAY variable." error message we have to run the GWT compiler with the headless AWT option.
+            See http://code.google.com/support/bin/answer.py?hl=en&answer=71442
+          -->
+          <extraJvmArgs>-Xmx1024m -Xss1024k -Djava.awt.headless=true</extraJvmArgs>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <!--
+                We need to copy the jar with the classes shared by the client and server side of the WYSIWYG editor to
+                the library directory of the generated war. We do it like this because we can't exclude all transitive
+                dependencies of the shared jar at once.
+              -->
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-web-gwt-wysiwyg-client</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>shared</classifier>
+                  <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <!-- We exclude the SmartClient JavaScript files which are provided by the web-standard war. -->
+          <packagingExcludes>**/sc/**</packagingExcludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <!-- JavaScript and CSS files compression and concatenation -->
+        <groupId>net.sf.alchim</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <version>0.7.1</version>
+        <configuration>
+          <!-- Overwrite the resource files with the minimized version. -->
+          <nosuffix>true</nosuffix>
+        </configuration>
+        <executions>
+          <execution>
+            <id>aggregate-css</id>
+            <!-- Compress and aggregate the CSS files after the GWT code is compiled, just before packaging the war. -->
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>compress</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${xwe.directory}/stylesheets</sourceDirectory>
+              <outputDirectory>${xwe.directory}/stylesheets</outputDirectory>
+              <aggregations>
+                <aggregation>
+                  <removeIncluded>true</removeIncluded>
+                  <!-- If we overwrite directly Wysiwyg.css then it's content is not included in the aggregation. -->
+                  <output>${xwe.directory}/stylesheets/Wysiwyg-all.css</output>
+                  <includes>
+                    <include>*.css</include>
+                  </includes>
+                  <excludes>
+                    <!--
+                      RichTextArea.css is included by the editing template and applies only to the edited content (the
+                      document of the in-line frame). The rest of the CSS files are applied to the page hosting the
+                      WYSIWYG editor (the document that contains the in-line frame).
+                    -->
+                    <exclude>RichTextArea.css</exclude>
+                  </excludes>
+                </aggregation>
+                <aggregation>
+                  <removeIncluded>true</removeIncluded>
+                  <!-- Rename the CSS aggregation file. -->
+                  <output>${xwe.directory}/stylesheets/Wysiwyg.css</output>
+                  <includes>
+                    <include>Wysiwyg-all.css</include>
+                  </includes>
+                </aggregation>
+              </aggregations>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>dev</id>
+      <properties>
+        <gwt.style>DETAILED</gwt.style>
+        <xwe.module>org.xwiki.gwt.wysiwyg.WysiwygDev</xwe.module>
+      </properties>
+    </profile>
+  </profiles>
+</project>

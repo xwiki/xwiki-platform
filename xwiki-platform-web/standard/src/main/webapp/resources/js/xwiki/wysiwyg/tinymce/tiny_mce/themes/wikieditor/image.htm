@@ -1,0 +1,166 @@
+<html>
+<head>
+<title>{$lang_insert_image_title}</title>
+<script language="javascript" src="../../tiny_mce_popup.js"></script>
+<script type="text/javascript" language="javascript" src="jscripts/image.js"></script>
+<base target="_self" />
+<script language="javascript">
+    var baseurl = tinyMCE.getParam("wiki_attach_path");
+</script>
+<script language="javascript">
+    // threadsafe asynchronous XMLHTTPRequest code
+    function executeCommand(url, callback) {
+        // we use a javascript feature here called "inner functions"
+        // using these means the local variables retain their values after the outer function
+        // has returned. this is useful for thread safety, so
+        // reassigning the onreadystatechange function doesn't stomp over earlier requests.
+        function ajaxBindCallback() {
+            if (ajaxRequest.readyState == 4) {
+                if (ajaxRequest.status == 200) {
+                    if (ajaxCallback) {
+                        ajaxCallback(ajaxRequest.responseText);
+                    } else {
+                        alert('no callback defined');
+                    }
+                } else {
+                    alert("There was a problem retrieving the xml data:\n" + ajaxRequest.status + ":\t" + ajaxRequest.statusText + "\n" + ajaxRequest.responseText);
+                }
+            }
+        }
+
+        // addMessage(url);
+        // use a local variable to hold our request and callback until the inner function is called...
+        var ajaxRequest = null;
+        var ajaxCallback = callback;
+
+        // bind our callback then hit the server...
+        if (window.XMLHttpRequest) {
+            // moz et al
+            ajaxRequest = new XMLHttpRequest();
+            ajaxRequest.onreadystatechange = ajaxBindCallback;
+            ajaxRequest.open("GET", url, true);
+            ajaxRequest.send(null);
+        } else if (window.ActiveXObject) {
+            // ie
+            ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
+            if (ajaxRequest) {
+                ajaxRequest.onreadystatechange = ajaxBindCallback;
+                ajaxRequest.open("GET", url, true);
+                ajaxRequest.send();
+            }
+            else{
+                alert("your browser does not support xmlhttprequest" )
+            }
+        }
+        else{
+            alert("your browser does not support xmlhttprequest" )
+        }
+    }
+
+    function loadAttachmentList(baseurl) {
+        var url = baseurl + "?xpage=attachwysiwyg&images=1";
+        executeCommand(url, loadAttachmentListCallback);
+    }
+
+    function loadAttachmentListCallback(e) {
+      var attachEl = document.getElementById("attachments");
+      attachEl.innerHTML = e;
+    }
+
+    function updateAttachName(form) {
+      form.xredirect.value=location;
+
+      var fname = form.filepath.value;
+      if (fname=="") {
+        return false;
+      }
+
+      var i = fname.lastIndexOf('\\');
+      if (i==-1)
+       i = fname.lastIndexOf('/');
+
+      fname = fname.substring(i+1);
+      if (form.filename.value==fname)
+       return true;
+
+      if (form.filename.value=="") {
+          form.filename.value = fname;
+      } else {
+          if(form.filename.value.lastIndexOf('.') < 0 && fname.lastIndexOf('.') > 0){
+              var extension = fname.substr(fname.lastIndexOf('.'), fname.length - fname.lastIndexOf('.'));
+              form.filename.value += extension; 
+          }
+      }
+      return true;
+    }
+</script>
+</head>
+<body id="image" onload="tinyMCEPopup.executeOnLoad('init();');">
+<div class="panel_wrapper">
+    <div class="panel_insert">
+        <form onsubmit="insertImage();return false;" action="#">
+            <table border="0" cellpadding="0" cellspacing="0" width="200">
+            <tr>
+              <td align="center" valign="middle"><table border="0" cellpadding="4" cellspacing="0">
+                  <tr>
+                    <td colspan="2" class="title" nowrap="nowrap">{$lang_insert_image_title}</td>
+                  </tr>
+                  <tr>
+                    <td nowrap="nowrap">{$lang_insert_image_name}:</td>
+                    <td><table border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                          <td><input name="href" type="text" id="href" value="" style="width: 200px" /></td>
+                          <td id="browser"></td>
+                        </tr>
+                      </table></td>
+                  </tr>
+                  <tr>
+                    <td nowrap="nowrap">{$lang_insert_image_dimensions}:</td>
+                    <td><input name="width" type="text" id="width" value="" size="3" maxlength="3" />
+                      x
+                      <input name="height" type="text" id="height" value="" size="3" maxlength="3" /></td>
+                  </tr>
+                  <tr>
+                      <td nowrap="nowrap">{$lang_insert_image_align}:</td>
+                      <td><select name="align" style="width: 100px">
+                          <option value="">{$lang_insert_image_align_default}</option>
+                          <option value="left">{$lang_insert_image_align_left}</option>
+                          <option value="right">{$lang_insert_image_align_right}</option>
+                          <option value="baseline">{$lang_insert_image_align_baseline}</option>
+                          <option value="top">{$lang_insert_image_align_top}</option>
+                          <option value="middle">{$lang_insert_image_align_middle}</option>
+                          <option value="bottom">{$lang_insert_image_align_bottom}</option>
+                          <option value="texttop">{$lang_insert_image_align_texttop}</option>
+                      </select>
+                      </td>
+                  </tr>
+                   <tr>
+                      <td nowrap="nowrap">{$lang_insert_image_halign}:</td>
+                      <td><select name="halign" style="width: 100px">
+                          <option value="">{$lang_insert_image_halign_default}</option>
+                          <option value="floatleft">{$lang_insert_image_halign_floatleft}</option>
+                          <option value="left">{$lang_insert_image_halign_left}</option>
+                          <option value="center">{$lang_insert_image_halign_center}</option>
+                          <option value="right">{$lang_insert_image_halign_right}</option>
+                          <option value="floatright">{$lang_insert_image_halign_floatright}</option>                          
+                      </select>
+                      </td>
+                  </tr>
+                  <tr>
+                    <td nowrap="nowrap"><input type="button" id="insert" name="insert" value="{$lang_insert}" onclick="insertImage();">
+                    </td>
+                    <td align="right"><input type="button" id="cancel" name="cancel" value="{$lang_cancel}" onclick="cancelAction();"></td>
+                  </tr>
+                </table></td>
+            </tr>
+          </table>
+        </form>
+    </div>
+    <h3 class="title" style="margin: 3px">{$lang_upload_image_title}</h3>
+    <div style="margin: 3px" id="attachments" width="100%"></div>
+    <script type="text/javascript">
+        loadAttachmentList(baseurl);
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,120 @@
+#template('colorThemeInit.vm')
+
+.xhover {
+  background:red;
+}
+
+input[type="text"].suggest {
+  border-width: 1px;
+}
+
+body {
+  position: relative;
+}
+
+div.suggestItems {
+  position:absolute;
+  border: 1px solid $theme.borderColor;
+  border-top: none;
+  background: white; /* theme color ? */
+  z-index: 100013;
+  text-align:left;
+}
+
+div.suggestItems ul {
+  margin: 0px;
+}
+
+div.suggestItems li {
+  overflow:hidden;
+  white-space:nowrap;
+}
+
+div.suggestItems * {
+  line-height:1.6em;
+}
+
+div.suggestItems em {
+  font-weight:700;
+  margin-right:2px;
+}
+
+div.suggestItems div.info {
+  color: $theme.textSecondaryColor;
+  font-size: 0.8em;
+  padding-left:5px;
+}
+
+div.suggestItems div.info span.legend {
+  font-weight: normal;
+}
+
+ul.suggestList {
+  margin:0px !important;
+  text-transform:none;
+  color:$theme.textColor;
+  font-weight:normal;
+}
+
+ul.suggestList .xhighlight {
+  background-color: $theme.highlightColor;
+  cursor:pointer;
+}
+
+div.suggestItemName {
+  text-indent: 0;
+}
+
+div.suggestItem, li.noSuggestion div {
+  color: $theme.textColor;
+  font-size: 0.875em;
+}
+
+div.suggestItemName,
+div.suggestItemInfo {
+  text-decoration: inherit;
+}
+
+.highlight {
+  background-color: $theme.highlightColor;
+  font-weight:bold;
+  text-decoration: inherit;
+}
+
+div.resultContainer div.sourceName {
+  background-color:$theme.panelCollapsedBackgroundColor;
+  font-variant: small-caps;
+  font-weight: 700;
+  color:$theme.panelHeaderBackgroundColor;
+  padding-top:3px;
+  font-size:0.875em;
+  background-position:3px 3px;
+  background-repeat:no-repeat;
+}
+
+.horizontalLayout div.resultContainer div.sourceName {
+  float:left;
+  width:150px;
+  margin-right:3px;
+  padding-right:20px;
+  text-align:right;
+  background-position:right center;
+}
+
+.horizontalLayout div.resultContainer div.xitemcontainer {
+  margin-left:10px;
+}
+
+.horizontalLayout div.resultContainer div.results {
+  clear:both;
+  background-color:$theme.panelCollapsedBackgroundColor;
+}
+
+.horizontalLayout div.resultContainer ul.suggestList {
+  background-color:white;
+}
+
+div.resultContainer div.sourceContent.loading {
+  background-position:center center;
+  min-height:30px;
+}

@@ -1,0 +1,14 @@
+###
+### History reset confirmation message
+###
+###
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="mainContentArea">
+#xwikimessageboxstart($msg.get("resetversions") $msg.get("resetversionsdone"))
+$!message
+#xwikimessageboxend()
+<div class="clearfloats"></div>
+</div>## mainContentArea
+</div>## main
+#template("endpage.vm")

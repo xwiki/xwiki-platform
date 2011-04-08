@@ -1,0 +1,15 @@
+$response.setContentType("application/x-json")
+#set($uorg = $request.get("uorg"))
+#set($fullname = $request.get("name"))
+
+#if($uorg == "user" || $uorg == "group")
+  ## verify if the user or group is already in the group
+  #set($exists = "$!doc.getObject('XWiki.XWikiGroups', 'member', $fullname)")
+  #if($exists == "" && $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+    1
+    #set($obj = $doc.newObject("XWiki.XWikiGroups"))
+    $obj.set("member", $fullname)
+    #set($discard = $doc.save())
+  #else 0
+  #end
+#end

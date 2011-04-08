@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>XWikiGroups</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.WebHome</parent>
+<author>xwiki:XWiki.WikiWiki</author>
+<creationDate>1107712019000</creationDate>
+<date>1109538231000</date>
+<version>1.3</version>
+<class>
+<name>XWiki.XWikiGroups</name>
+<member>
+<name>member</name>
+<prettyName>Member</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</member>
+</class>
+<content>1 Create a new group:
+
+&lt;form&gt;
+&lt;input type="text" name="name" value=""&gt;
+&lt;input type="button" value="Create Group" onClick="go(this.form.name.value)"&gt;
+&lt;/form&gt;
+
+&lt;script&gt;
+function go(value) {
+location = "/xwiki/bin/edit/XWiki/" + value + "?parent=XWiki.XWikiGroups&amp;template=XWiki.XWikiGroupTemplate";
+} 
+&lt;/script&gt;
+
+1 Current XWiki Groups
+
+#set ($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.XWikiGroups'")
+#foreach ($item in $xwiki.searchDocuments($sql))
+   * [$item]
+#end
+
+1 Admin
+
+   * [XWikiGroupTemplate]
+   * [XWikiGroupSheet]</content>
+</xwikidoc>

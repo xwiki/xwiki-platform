@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype>
+  <id>xwiki-archetype-macro</id>
+  <sources>
+    <source>src/main/java/ExampleMacroParameters.java</source>
+    <source>src/main/java/internal/ExampleMacro.java</source>
+  </sources>
+  <testSources>
+    <source>src/test/java/RenderingTests.java</source>
+  </testSources>
+  <resources>
+    <resource>src/main/resources/META-INF/components.txt</resource>
+  </resources>
+  <testResources>
+    <resource>src/test/resources/example1.test</resource>
+  </testResources>
+</archetype>

@@ -1,0 +1,2 @@
+${packageName}.internal.DefaultHelloWorld
+${packageName}.internal.HelloWorldScriptService

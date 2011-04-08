@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Main</web>
+<name>FilsRss</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Main.WebHome</parent>
+<author>XWiki.Admin</author>
+<creationDate>1107712020000</creationDate>
+<date>1107712020000</date>
+<version>1.2</version>
+<object>
+<class>
+<name>XWiki.ArticleClass</name>
+<title>
+<name>title</name>
+<prettyName>Title</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>80</size>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</title>
+<category>
+<name>category</name>
+<prettyName>Category</prettyName>
+<unmodifiable>0</unmodifiable>
+<relationalStorage>1</relationalStorage>
+<displayType>select</displayType>
+<multiSelect>1</multiSelect>
+<size>5</size>
+<number>2</number>
+<sql>select prop.value from BaseObject as obj, StringProperty as prop where obj.className='Blog.Categories' and prop.id.id = obj.id and prop.id.name='name'</sql>
+<classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+</category>
+<content>
+<name>content</name>
+<prettyName>Content</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>80</size>
+<rows>15</rows>
+<number>3</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<extract>
+<name>extract</name>
+<prettyName>Extract</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>80</size>
+<rows>5</rows>
+<number>4</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</extract>
+</class>
+<name>Main.FilsRss</name>
+<number>0</number>
+<className>XWiki.ArticleClass</className>
+<property>
+<category>
+<value>News</value>
+</category>
+</property>
+<property>
+<category2>Wiki/Blog Nature</category2>
+</property>
+<property>
+<content>This wiki as two RSS feed which allow to keep up to date with modifications:
+
+* [Feed for all pages of the Wiki&gt;Main.WebRss?xpage=rdf] 
+* [Feed for all news articles of the Blog&gt;Main.BlogRss?xpage=rdf].
+
+</content>
+</property>
+<property>
+<extract></extract>
+</property>
+<property>
+<title>RSS Feed</title>
+</property>
+</object>
+<content>#includeForm("XWiki.ArticleClassSheet")</content>
+</xwikidoc>

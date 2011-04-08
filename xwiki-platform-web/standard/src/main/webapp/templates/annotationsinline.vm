@@ -1,0 +1,2 @@
+## this document is in xwiki 2.0 syntax, include it without {pre}s around it if it happens to be included from a 1.0 context
+$xwiki.includeForm("AnnotationCode.Tab", false)

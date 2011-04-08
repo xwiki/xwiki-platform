@@ -1,0 +1,34 @@
+###
+### User inactive message
+###
+###
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="mainContentArea">
+#if($xwiki.exists("XWiki.UserInactive"))
+    $xwiki.includeForm("XWiki.UserInactive", false)
+#else
+#if ($cause == 'disabled')
+  #xwikimessageboxstart($msg.get("notice") $msg.get("accountdisabled"))
+#else
+#xwikimessageboxstart($msg.get("notice") $msg.get("accountnotactive"))
+#set($confirmdoc = $xwiki.getDocument("XWiki.AccountValidation"))
+#if(!$confirmdoc.isNew())
+$msg.get("accountnotactive_email")
+<form action="${confirmdoc.getURL()}" method="post" class="xformInline">
+<div>
+## CSRF prevention
+<input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+<input type="hidden" name="xwikiname" value="${escapetool.xml($xcontext.user)}" />
+<label for="validKey">$msg.get('core.users.activation.validationKey.label') <input type="text" name="validkey" size="16" id="validKey"/></label>
+<span class="buttonwrapper"><input type="submit" value="$msg.get('confirmaccount')" class="button"/></span>
+</div>
+</form>
+#end
+#end
+#xwikimessageboxend()
+#end
+<div class="clearfloats"></div>
+</div>## mainContentArea
+</div>## main
+#template("endpage.vm")

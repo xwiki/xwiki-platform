@@ -1,0 +1,19 @@
+<form action="" method="post" class="xform half">
+<dl>
+  <dt><label for="name">$msg.get('export_packagename')</label></dt>
+  <dd><input type="text" name="name" id="name" value=""/></dd>
+  <dt><label for="description">$msg.get('export_description')</label></dt>
+  <dd><textarea name="description" id="description" rows="6" cols="40"></textarea></dd>
+  <dt><label for="licence">$msg.get('export_licence')</label></dt>
+  <dd><input type="text" name="licence" id="licence" value=""/></dd>
+  <dt><label for="author">$msg.get('export_author')</label></dt>
+  <dd><input type="text" name="author" id="author" value="$xcontext.user"/></dd>
+  <dt><label for="version">$msg.get('export_version')</label></dt>
+  <dd><input type="text" name="version" id="version" value=""/></dd>
+  <dt><label for="history"><input type="checkbox" name="history" id="history" value="true"/> $msg.get('export_addhistory')</label></dt>
+  <dt><label for="backup"><input type="checkbox" name="backup" id="backup" value="true"/> $msg.get('export_backuppack') ($msg.get('export_authorpreserved'))</label></dt>
+</dl>
+<div class="buttons">
+<span class="buttonwrapper"><input type="submit" value="$msg.get('export')" class="button"/></span>
+</div>
+</form>

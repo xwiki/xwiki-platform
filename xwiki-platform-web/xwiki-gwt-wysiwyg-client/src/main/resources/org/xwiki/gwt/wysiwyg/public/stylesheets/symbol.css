@@ -1,0 +1,31 @@
+.xSymbolPalette {  
+  border-right:1px solid #EFEFEF;
+  border-bottom:1px solid #EFEFEF;
+  margin: 2px 3px 3px 2px;
+}
+
+.xSymbolPalette td {
+  border-left:1px solid #EFEFEF;
+  border-top:1px solid #EFEFEF;
+  height:17px;
+  width:17px;
+  margin:2pt;
+  padding:0px;
+}
+
+.xSymbolPalette .symbolCell {
+  height:15px;
+  width:15px;
+  padding:2px;
+  margin:0px;
+  font-size:90%;  
+  text-align:center;
+  vertical-align:middle;
+  background-color: #FFFFFF;
+  color: #191970;  
+  cursor: default;
+}
+
+.xSymbolPalette .symbolCell-hover {  
+  background-color:#778899;
+}

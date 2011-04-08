@@ -1,0 +1,31 @@
+### Buttons displayed in the edit interface: cancel, preview (when enabled), save and continue, save and view.
+###
+#if ("$!showactions" != '0')
+  $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
+  $xwiki.ssfx.use('js/xwiki/actionbuttons/actionButtons.css', true)
+  #set ($keyboardShortcutsEnabled = ($editor != 'wysiwyg'))
+  ## This allows the preview form to redirect back to the correct editor when pressing "Back to edit":
+  <div class="meta-versionSummary metamodifs">
+  <input type="hidden" name="xeditaction" value="$!xcontext.action" />
+  #if ((!$tdoc.isNew()) && (!$minorFieldAdded) && ($xwiki.hasMinorEdit()))
+    #set ($minorFieldAdded = 1)
+    <div class="meta-minorEdit"><label for="minorEdit"><input type="checkbox" name="minorEdit" id="minorEdit" #if($request.minorEdit)checked="checked" #end/> $msg.get('core.minoredit')</label></div>
+  #end
+  #if ((!$commentFieldAdded) && $xwiki.hasEditComment())
+    #set ($commentFieldAdded = 1)
+    #if ($xwiki.isEditCommentFieldHidden())
+      <input type="hidden" name="comment" id="comment" value="$!{escapetool.xml($request.comment)}" />
+    #else
+      <label for="commentinput">$msg.get('core.comment') <span>$msg.get('core.comment.details')</span>
+      <input type="text" name="comment" id="commentinput" value="$!{escapetool.xml($request.comment)}" size="40" title="$msg.get('core.comment.tooltip')" />
+      </label>
+    #end
+  #end
+  </div> ## meta-versionSummary
+  <div class="buttons">
+    #if ($previewenabled) #editActionButton('preview', 'preview') #end
+    #editActionButton('saveandcontinue', 'saveandcontinue')
+    #editActionButton($saveaction, 'saveandview')
+    #editActionButton('cancel', 'cancel')
+  </div> ## buttons
+#end

@@ -1,0 +1,379 @@
+##
+## #versions()
+## Displays links to the last 4 versions (including the current one), and to the full history
+## page of the current document.
+##
+#macro(versions)
+  #foreach ($rev in $tdoc.getRecentRevisions(4))
+    <a href="$doc.getURL('view', "rev=${rev}")">${rev}</a><span class="xwikisep"> | </span>
+  #end
+  #if ($tdoc.realLanguage != '')
+    <a href="$doc.getURL('view', "xpage=diff&amp;language=${tdoc.realLanguage}")">$msg.get('diff')</a><span class="xwikisep"> | </span>
+  #else
+    <a href="$doc.getURL('view', "xpage=diff")">$msg.get('diff')</a><span class="xwikisep"> | </span>
+  #end
+#end
+##
+##
+## #errorMarkup()
+## Display all queued Struts errors
+##
+#macro(errorMarkup)
+  #if ($errors && $!errors.exist() )
+    <ul>
+    #foreach ($e in $errors.all )
+      $e
+    #end
+    </ul>
+  #end
+#end
+##
+##
+## #errorMarkupForProperty("prop")
+## Display all queued Struts errors for a particular property
+##
+#macro(errorMarkupForProperty $property)
+  #if ($errors && $!errors.exist($property) )
+    <ul>
+    #foreach ($er in $errors.get($property))
+      $er
+    #end
+    </ul>
+  #end
+#end
+##
+##
+## #jabber("jabberId")
+## Displays the status for the given Jabber id
+##
+#macro(jabber $id)
+<img src="http://edgar.netflint.net/status.php?jid=${escapetool.xml($id)}&amp;type=image&amp;iconset=phpbb" alt="jabber ${escapetool.xml($id)}" />
+#end
+##
+##
+## #aim("aimId")
+## Displays the status for the given AIM id
+##
+#macro(aim $id)
+#set($onurl = "${escapetool.url(${request.scheme})}://${escapetool.url(${request.serverName})}${xwiki.getSkinFile('aimonline.gif')}")
+#set($offurl = "${escapetool.url(${request.scheme})}://${escapetool.url(${request.serverName})}${xwiki.getSkinFile('aimoffline.gif')}")
+<img border="0" src="http://big.oscar.aol.com/${escapetool.url($id)}?on_url=${escapetool.url(${onurl})}&amp;off_url=${escapetool.url(${offurl})}" alt="Online detector" />
+#end
+##
+##
+## #msn("msnId")
+## Displays the status for the given MSN id
+##
+#macro(msn $id)
+#set($onurl = "${request.serverName}${xwiki.getSkinFile('msnonline.gif')}")
+#set($offurl = "${request.serverName}${xwiki.getSkinFile('msnoffline.gif')}")
+<img border="0" src="http://turdinc.kicks-ass.net:6969/msn/${escapetool.url($id)}/onurl=${escapetool.url(${onurl})}/offurl=${escapetool.url(${offurl})}/unknownurl=${escapetool.url(${offurl})}" />
+#end
+##
+##
+## #im("XWiki.Username")
+## Displays the instant messaging account status of the given user. The IM network and the account
+## name are taken from the user profile.
+##
+#macro(im $user)
+#set ($userdoc = $xwiki.getDocument($user))
+#set ($userobj = $userdoc.getObject('XWiki.XWikiUsers'))
+#set ($imtype = $userdoc.display('imtype', 'view', $userobj))
+#set ($imaccount = $userdoc.display('imaccount', 'view', $userobj))
+#if ($imtype == 'Yahoo')
+#yahoo("$imaccount")
+#elseif ($imtype == 'AIM')
+#aim("$imaccount")
+#elseif ($imtype == 'MSN')
+#msn("$imaccount")
+#elseif ($imtype == 'Jabber')
+#jabber("$imaccount")
+#elseif ($imtype == 'Skype')
+#skype("$imaccount")
+#end
+#end
+##
+##
+#macro(flickr $rss)
+{rss:feed=${rss}|full=1}
+#end
+##
+#macro(flickrtag $tag)
+#flickr("http://www.flickr.com/services/feeds/photos_public.gne?tags=$!{escapetool.url($tag)}&format=rss_200")
+#end
+##
+#macro(flickruser $id)
+#flickr("http://www.flickr.com/services/feeds/photos_public.gne?id=$!{escapetool.url($id)}&format=rss_200")
+#end
+##
+#macro(flickrusertag $id $tag)
+#flickr("http://www.flickr.com/services/feeds/photos_public.gne?id=$!{escapetool.url($id)}&tags=$!{escapetool.url($tag)}&format=rss_200")
+#end
+##
+#macro(map $address $cp $linktext)
+<a href="http://www.viamichelin.com/viamichelin/fra/dyn/controller/mapPerformPage?strAddress=$!{escapetool.url($address)}&amp;strLocation=&amp;strCP=$!{escapetool.url($cp)}&amp;strCountry=1424&amp;x=30&amp;y=9">$!{escapetool.xml($linktext)}</a>
+#end
+##
+##
+#macro(mindmap $mindmap $width $height)
+#if (!$width)
+#set ($width = '100%')
+#end
+#if (!$height)
+#set ($height = '600')
+#end
+#if (!$mindmap)
+#set ($mindmap = '')
+#set ($mmurl = '')
+#else
+#if ($mindmap.startsWith('http'))
+#set ($mmurl = $mindmap)
+#else
+#set ($mmurl1 = $doc.getAttachmentURL($mindmap))
+#set($mmurl = "${escapetool.url(${request.scheme})}://${escapetool.url(${request.serverName})}:${escapetool.url(${request.serverPort})}${mmurl1}")
+#end
+#end
+<applet code="freemind.main.FreeMindApplet.class" archive="${escapetool.xml(${request.contextPath})}/freemind/freemind.jar" width="${escapetool.xml(${width})}" height="${escapetool.xml(${height})}">
+<param name="type" value="application/x-java-applet;version=1.4" />
+<param name="scriptable" value="false" />
+<param name="modes" value="freemind.modes.browsemode.BrowseMode" />
+<param name="browsemode_initial_map" value="$mmurl" />
+<param name="initial_mode" value="Browse" />
+<param name="selection_method" value="selection_method_direct" />
+</applet>
+#end
+##
+## Warning: Written in syntax xwiki/1.0, there is no way to properly escape the links
+## Do not use
+##
+#macro(exportPackage)
+#set ($export = "$!request.get('export')")
+#if ($export == '1')
+  #set ($dateFormat = 'dd MMM yyyy ? HH:mm')
+  #set ($diff = $request.get('diff'))
+  #set ($SpaceName = $request.get('SpaceName'))
+
+  1.1 Space : $!escapetool.xml($SpaceName)
+
+  <form method="POST" action="${doc.getURL('view', 'export=2')}">
+
+  #set ($docs = $xwiki.getSpaceDocsName($SpaceName))
+  <table border="1" style="text-align:center;">
+  <tr><td>Name</td><td>Export</td><td colspan="3">Default Action</td></tr>
+  <tr><td colspan="2"></td><td>overwrite</td><td>merge objects</td><td>skip</td></tr>
+  #foreach ($doc in $docs)
+    #if ($xwiki.hasAccessLevel('view', "${xcontext.database}:${SpaceName}.${doc}"))
+
+    <tr><td>[${doc}>${SpaceName}.${doc}]</td><td><input type="checkbox" name="ToExport" value="$!{escapetool.xml(${SpaceName})}.$!{escapetool.xml(${doc})}" /></td><td><input type="radio" name="$!{escapetool.xml(${SpaceName})}.$!{escapetool.xml(${doc})}_default" value="overwrite" checked="true" /></td> <td><input type="radio" name="$!{escapetool.xml(${SpaceName})}.$!{escapetool.xml(${doc})}_default" value="merge" /></td> <td><input type="radio" name="$!{escapetool.xml(${SpaceName})}.$!{escapetool.xml(${doc})}_default" value="skip" /></td> </tr>
+
+    #end
+  #end
+  </table>
+
+  #if($SpaceName != "XWiki")
+
+
+    1.1 Space : XWiki
+
+    #set ($docs = $xwiki.getSpaceDocsName('XWiki'))
+    <table border="1" style="text-align:center;">
+    <tr><td>Name</td><td>Export</td><td colspan="3">Default Action</td></tr>
+    <tr><td colspan="2"></td><td>overwrite</td><td>merge objects</td><td>skip</td></tr>
+    #foreach ($doc in $docs)
+      #if ($xwiki.hasAccessLevel('view', "${xcontext.database}:XWiki.${doc}"))
+
+      <tr><td>[${doc}>XWiki.${doc}]</td><td><input type="checkbox" name="ToExport" value="XWiki.$!{escapetool.xml(${doc})}" /></td><td><input type="radio" name="XWiki.$!{escapetool.xml(${doc})}_default" value="overwrite" checked="true" /></td> <td><input type="radio" name="XWiki.$!{escapetool.xml(${doc})}_default" value="merge" /></td> <td><input type="radio" name="XWiki.$!{escapetool.xml(${doc})}_default" value="skip" /></td> </tr>
+
+      #end
+    #end
+    </table>
+  #end
+
+  <input type="submit" name="submitted" value="Valider">
+  </form>
+
+
+
+#elseif ($export == '2')
+  #set ($ToExport = $request.getParameterValues('ToExport'))
+  $response.setContentType('application/zip')
+  #set ($export = $xwiki.export)
+  #foreach ($itemexp in $ToExport)
+    #set ($defaultAction = $request.get("${itemexp}_default"))
+    $export.add($itemexp, $defaultAction)
+  #end
+  $export.export()
+#else
+  <form method="POST" action="$doc.getURL('view', 'export=1')">
+  Select the space you want to export : <br />
+  #set($spaces = $xwiki.getSpaces())
+  <select name="SpaceName">
+  #foreach ($space in $spaces)
+    <option value="$!{escapetool.xml($space)}">$!{escapetool.xml($space)}</option>
+  #end
+
+  </select>
+  <input type="submit" name="submitted" value="Export">
+  </form>
+#end
+#end
+##
+##
+## Warning: Written in syntax xwiki/1.0, there is no way to properly escape the links
+## Do not use
+##
+#macro(importPackage)
+#set ($toexport = $request.get('export'))
+#if ($toexport == '1')
+  #set ($appName = $request.get('App'))
+  #set ($alist = $doc.getAttachmentList())
+  #foreach ($oAttach in $alist)
+    #if ($oAttach.getFilename() == $appName)
+      #set ($import = $xwiki.import)
+      $import.importPackage($oAttach.getContent())
+
+      #set ($docs = $import.getDocuments())
+
+      #foreach ($docInfo in $docs)
+        #set ($right = '')
+        #set ($right = $request.get("$docInfo.getFullName()_default"))
+        #if ($right)
+          $import.setDocumentAction($docInfo.getFullName(), $right)
+        #end
+      #end
+
+
+      #set ($ret = $import.install())
+      $import.getTestInstallToString($ret)
+    #end
+  #end
+
+
+#else
+  #set ($alist = $doc.getAttachmentList())
+  #if ($alist.size() == 0)
+    Add the package in attachment
+  #end
+  #foreach ($oAttach in $alist)
+    #set ($import = $xwiki.import)
+
+    1.1 $oAttach.getFilename()
+
+    $import.importPackage($oAttach.getContent())
+
+    1.1.1 Infos
+
+    Author : $!{escapetool.xml($import.getAuthor())} <br />
+    Name : $!{escapetool.xml($import.getName())} <br />
+    Description : $!{escapetool.xml($import.getDescription())} <br />
+    Licence : $!{escapetool.xml($import.getLicence())} <br />
+    Version : $!{escapetool.xml($import.getVersion())} <br />
+
+    #set ($canInstall = $import.testInstall())
+    install : $import.getTestInstallToString($canInstall)
+
+    1.1.1 Status of each Files
+    #set ($docs = $import.getDocuments())
+
+    <form method="POST" action="$request.getRequestURL()?export=1">
+    <input type="hidden" name="App" value="$!{escapetool.xml($oAttach.getFilename())}" />
+    <table border="1" style="text-align:center;">
+    <tr><td>Name</td><td>infos</td><td colspan="3">Action</td></tr>
+    <tr><td colspan="2"></td><td>overwrite</td><td>merge objects</td><td>skip</td></tr>
+
+
+    #foreach ($docInfo in $docs)
+
+
+      <tr><td>[$docInfo.getFullName()>$docInfo.getFullName()]</td> <td>__$import.getTestInstallToString($docInfo.isInstallable())__</td>
+      #if($import.getTestInstallToString($docInfo.isInstallable()) == 'Already exist')
+        #if ($import.getActionToString($docInfo.getDefaultAction()) == 'overwrite')
+          <td><input type="radio" name="$!{escapetool.xml($docInfo.getFullName())}_default" value="overwrite" checked="true" /></td>
+        #else
+          <td><input type="radio" name="$!{escapetool.xml($docInfo.getFullName())}_default" value="overwrite" /></td>
+        #end
+        #if ($import.getActionToString($docInfo.getDefaultAction()) == 'merge')
+          <td><input type="radio" name="$!{escapetool.xml($docInfo.getFullName())}_default" value="merge" checked="true" /></td>
+        #else
+          <td><input type="radio" name="$!{escapetool.xml($docInfo.getFullName())}_default" value="merge" /></td>
+        #end
+        #if ($import.getActionToString($docInfo.getDefaultAction()) == 'skip')
+          <td><input type="radio" name="$!{escapetool.xml($docInfo.getFullName())}_default" value="skip" checked="true" /></td> </tr>
+        #else
+          <td><input type="radio" name="$!{escapetool.xml($docInfo.getFullName())}_default" value="skip" /></td> </tr>
+        #end
+      #else
+        <td colspan="3"></td>
+      #end
+
+
+    #end
+    </table>
+    #if ($canInstall != 0)
+      1.1.1 You can install this application
+      <input type="submit" name="submitted" value="Install">
+    #else
+      1.1.1 You can't install this application.
+    #end
+    </form>
+  #end
+#end
+#end
+##
+##
+#macro(formfield $fieldtext $html)
+<div class="xmblabel">$fieldtext</div>
+<div class="xmbfield">
+$html
+</div>
+#end
+##
+#macro(defaultDisplayObj $document $obj)
+ #set($class = $obj.xWikiClass)
+ #foreach($prop in $class.properties)
+  #formfield(${prop.prettyName} $document.display($prop.getName(), "edit", $obj))
+ #end
+#end
+##
+#macro(defaultViewDisplayObj $document $obj)
+ #set($class = $obj.xWikiClass)
+ #foreach($prop in $class.properties)
+  #formfield(${prop.prettyName} $document.display($prop.getName(), "view", $obj))
+ #end
+#end
+##
+##
+##  Generate navigation links for paged documents
+## Deprecated, replaced by #printPagedViewLinks
+##
+#macro(pagedViewLinks $itemsPerPage $totalPages $crtPageNumber)
+#if($totalPages > 0)
+<div class="pagedNavigation">
+#if($crtPageNumber > 0)
+#set($prevPage = $crtPageNumber - 1)
+<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=0&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.firstPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${prevPage}&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.previousPage")</a></span>
+#else
+<span class="pagedLink inactive">$msg.get("web.paging.firstPage")</span>
+<span class="pagedLink inactive">$msg.get("web.paging.previousPage")</span>
+#end
+#set($displayCrtPageNumber = $crtPageNumber + 1)
+#set($displayTotalPages = $totalPages + 1)
+<span class="pagedStatus">$msg.get("web.paging.pageNumberOf", [$displayCrtPageNumber, $displayTotalPages])</span>
+#if($crtPageNumber < $totalPages)
+#set($nextPage = $crtPageNumber + 1)
+<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${nextPage}&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.nextPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${totalPages}&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.lastPage")</a></span>
+#else
+<span class="pagedLink inactive">$msg.get("web.paging.nextPage")</span>
+<span class="pagedLink inactive">$msg.get("web.paging.lastPage")</span>
+#end
+</div>
+#end
+#end
+##
+##
+## Deprecated name, use #includeChildren
+#macro(includeChilds $page $withPageBreaks)
+  #includeChildren($page $withPageBreaks)
+#end

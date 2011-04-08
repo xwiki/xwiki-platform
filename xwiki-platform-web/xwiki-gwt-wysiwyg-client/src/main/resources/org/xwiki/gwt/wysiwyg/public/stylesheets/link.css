@@ -1,0 +1,70 @@
+.xExplorer .listGrid {
+  border: none;
+}
+
+/* IE needs this to correctly return the clientHeight of the tree wrapper, offsetHeight - border width, etc. 
+   Otherwise, for the default overflow: visible, it returns 0 even if offsetHeight is correct */
+.xExplorer {
+  /* it could also be auto, since it always matches its content, but just to make sure we never get a scrollbar */
+  overflow: hidden; 
+}
+
+.xAttachmentsSelector .xListBox, .xPagesSelector .xListBox {
+  overflow: auto;
+}
+
+.xAttachmentsSelector .xAttachPreview, .xAttachmentsSelector .xNewFilePreview, 
+.xPagesSelector .xPagePreview, .xPagesSelector .xNewPagePreview {
+  padding: 5px 5px 5px 20px;
+  cursor: pointer;
+  background-position: left center;
+  background-repeat: no-repeat;
+}
+
+.xAttachmentsSelector .xAttachPreview {
+  background-image: url(../images/attach.gif);
+}
+
+.xPagesSelector .xPagePreview {
+  background-image: url(../images/page_white_text.gif);
+}
+
+.xAttachmentsSelector .xNewFilePreview, .xPagesSelector .xNewPagePreview {
+  background-image: url(../images/bullet_add.gif);
+}
+
+.xPagePreview .xPagePreviewTitle {
+  padding-top: 0;
+  text-transform: none;
+}
+
+.xPagePreview .xPagePreviewFullname {
+  margin-bottom: 0;
+  margin-top: 3px;
+  overflow: hidden;
+  width: 413px;
+}
+
+/* Search tab style */
+.xPagesSearch .xSearchForm {
+  height: 25px;
+  line-height: 19px;
+}
+
+.xSearchForm button {
+  -moz-border-radius-bottomleft: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -moz-border-radius-topleft: 5px;
+  -moz-border-radius-topright: 5px;
+  border: 1px solid #AAA;
+  margin-left: 5px;
+  /* good trade-off between too large buttons on IE and to small buttons on FF: 
+     even if slightly larger on FF, they fit good on IE, and look good overall */
+  height: 23px;
+  /* not very flexible but good enough, should match well all i18ns*/
+  width: 83px;
+}
+ 
+.xSearchForm input {
+  width: 365px;
+}

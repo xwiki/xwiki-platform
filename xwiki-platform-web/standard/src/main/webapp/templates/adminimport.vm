@@ -1,0 +1,10 @@
+<style type="text/css">
+input[type="checkbox"], input[type="radio"] {
+ float: none;
+}
+</style>
+<div id="xwikieditcontent">
+<div class="padded">
+#template("importinline.vm")
+</div>
+</div>

@@ -1,0 +1,11 @@
+###
+### Changes page in the "view" mode
+###
+<div id="document-title"><h1>$msg.get('core.viewers.diff.title', [$escapetool.xml($doc.getPlainTitle()), $doc.getURL()])</h1></div>
+## ----------------------------
+## Display the shortcuts
+## ----------------------------
+#if($displayShortcuts)
+  #template("shortcuts.vm")
+#end
+#template("changesinline.vm")

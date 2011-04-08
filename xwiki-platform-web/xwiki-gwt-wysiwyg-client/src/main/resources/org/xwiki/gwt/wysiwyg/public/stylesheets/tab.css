@@ -1,0 +1,36 @@
+table.gwt-TabBar {
+  margin: 0;
+}
+
+.gwt-TabBar .gwt-TabBarFirst {
+  width: 5px;  /* first tab distance from the left */
+}
+
+.gwt-TabBar .gwt-TabBarRest {
+}
+
+.gwt-TabBar .gwt-TabBarItem {
+  margin-left: 6px;
+  padding: 3px 6px 3px 6px;
+  cursor: pointer;
+  color: black;
+  font-weight: bold;
+  text-align: center;
+  background: #d0e4f6; 
+}
+
+.gwt-TabBar .gwt-TabBarItem-selected {
+  cursor: default;
+  background: #92c1f0;
+} 
+
+.gwt-TabPanel {
+}
+
+.gwt-TabPanelBottom {
+  border-color: #92c1f0;
+  border-style: solid;
+  border-width: 3px 2px 2px;
+  overflow: hidden;
+  padding: 6px;
+}

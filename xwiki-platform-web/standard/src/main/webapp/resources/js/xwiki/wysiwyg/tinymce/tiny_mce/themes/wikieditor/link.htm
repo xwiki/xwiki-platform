@@ -1,0 +1,481 @@
+<html>
+<head>
+<title>{$lang_insert_link_title}</title>
+	<script language="javascript" type="text/javascript" src="../../utils/mctabs.js"></script>
+	<script language="javascript" type="text/javascript" src="../../utils/form_utils.js"></script>
+    <script language="javascript" type="text/javascript" src="../../tiny_mce_popup.js"></script>
+    <script language="javascript" type="text/javascript" src="jscripts/link.js"></script>
+	<link href="css/editor_popup.css" rel="stylesheet" type="text/css" />
+<base target="_self" />
+<script language="javascript">
+    var baseurl = tinyMCE.getParam("wiki_attach_path").toString();
+</script>
+<script language="javascript">
+var url = tinyMCE.getParam("external_link_list_url");
+if (url != null) {
+	// Fix relative
+	if (url.charAt(0) != '/')
+		url = tinyMCE.documentBasePath + "/" + url;
+	document.write('<sc'+'ript language="javascript" type="text/javascript" src="' + url + '"></sc'+'ript>');
+}
+</script>
+<script language="javascript">
+    // threadsafe asynchronous XMLHTTPRequest code
+    function executeCommand(url, callback) {
+        // we use a javascript feature here called "inner functions"
+        // using these means the local variables retain their values after the outer function
+        // has returned. this is useful for thread safety, so
+        // reassigning the onreadystatechange function doesn't stomp over earlier requests.
+        function ajaxBindCallback() {
+            if (ajaxRequest.readyState == 4) {
+                if (ajaxRequest.status == 200) {
+                    if (ajaxCallback) {
+                        ajaxCallback(ajaxRequest.responseText);
+                    } else {
+                        alert('no callback defined');
+                    }
+                } else {
+                    alert("There was a problem retrieving the xml data:\n" + ajaxRequest.status + ":\t" + ajaxRequest.statusText + "\n" + ajaxRequest.responseText);
+                }
+            }
+        }
+
+        // addMessage(url);
+        // use a local variable to hold our request and callback until the inner function is called...
+        var ajaxRequest = null;
+        var ajaxCallback = callback;
+
+        // bind our callback then hit the server...
+        if (window.XMLHttpRequest) {
+            // moz et al
+            ajaxRequest = new XMLHttpRequest();
+            ajaxRequest.onreadystatechange = ajaxBindCallback;
+            ajaxRequest.open("GET", url, true);
+            ajaxRequest.send(null);
+        } else if (window.ActiveXObject) {
+            // ie
+            ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
+            if (ajaxRequest) {
+                ajaxRequest.onreadystatechange = ajaxBindCallback;
+                ajaxRequest.open("GET", url, true);
+                ajaxRequest.send();
+            }
+            else{
+                alert("your browser does not support xmlhttprequest" )
+            }
+        }
+        else{
+            alert("your browser does not support xmlhttprequest" )
+        }
+    }
+
+    function loadAttachmentList(baseurl) {
+        var url = baseurl + "?xpage=listattachwysiwyg";
+        executeCommand(url, loadAttachmentListCallback);
+    }
+
+    function loadAttachmentListCallback(e) {
+      var attachEl = document.getElementById("attachments");
+      attachEl.innerHTML = e;
+    }
+
+    function loadSearchResultList(baseurl , callback) {
+        var selObj, selectedindex, search_space = "", search_page= "";
+        if (callback != null) {
+            selObj = document.getElementById("search_space");
+            selectedindex = selObj.selectedIndex;
+            search_space = document.getElementById("search_space").options[selectedindex].value.toString();
+            search_page = document.getElementById("search_page").value;
+        }
+        var url = baseurl + "?xpage=searchwysiwyg" + "&space=" + search_space + "&page=" + search_page;
+        executeCommand(url, loadSearchResultListCallback);
+    }
+
+    function loadSearchResultListCallback(e) {
+        var searchEl = document.getElementById("searchresults");
+        searchEl.innerHTML = e;
+    }
+
+    function loadBrowseList(baseurl, space) {
+        var selectedindex, spacefilter = "";
+        if (space != null) {
+            var selectedindex = document.getElementById('space').selectedIndex;
+            var spacefilter = document.getElementById('space').options[selectedindex].value;
+        }
+        var url = baseurl + "?xpage=browsewysiwyg" + "&text=" + spacefilter;
+        executeCommand(url, loadBrowseListCallback);
+    }
+
+    function loadBrowseListCallback(e) {
+        var browseEl = document.getElementById("listtobrowse");
+        browseEl.innerHTML = e;
+    }
+
+    function loadSpaceList(baseurl) {
+        var url = baseurl + "?xpage=listspacewysiwyg";
+        executeCommand(url, loadSpaceListCallback);
+    }
+
+    function loadSpaceListCallback(e) {
+        var spaceEl = document.getElementById("spaces");
+        var spaceE2 = document.getElementById("search_spaces");
+        spaceEl.innerHTML = '<select id="space" name="space" onchange="loadBrowseList(baseurl, this);">' + e+  '</select>';
+        spaceE2.innerHTML = '<select id="search_space" name="search_space" >' + e + '</select>';
+    }
+    function loadRecentlyList(baseurl, action) {
+        var url = baseurl + "?xpage=recentdocwysiwyg";
+        if (action != null && action != "" && action == "view") {
+            url += "&action=" + action;
+            executeCommand(url, loadRecentlyViewedCallback);
+        } else 
+            executeCommand(url, loadRecentlyModifiedCallback);
+    }
+
+    function loadRecentlyViewedCallback(e) {
+        var recentEl = document.getElementById("recentviewed");
+        recentEl.innerHTML = e;
+    }
+
+    function loadRecentlyModifiedCallback(e) {
+        var recentE2 = document.getElementById("recentmodified");
+        recentE2.innerHTML = e;
+    }
+
+    function loadUploadAttachs(baseurl) {
+        var url = baseurl + "?xpage=uploadattachwysiwyg";
+        executeCommand(url, loadUploadAttachsCallback);
+    }
+
+    function loadUploadAttachsCallback(e) {
+      var attachEl = document.getElementById("uploadattach");
+      attachEl.innerHTML = e;
+    }
+</script>
+</head>
+<body id="link" onload="tinyMCEPopup.executeOnLoad('init();');"  style="display: none">
+    <form id="attach" name="attach" onsubmit="insertLink(); return false;" action="#" enctype="multipart/form-data" method="post">
+        <div class="title">
+            {$lang_insert_link_title}
+        </div>
+        <br />
+        <div class="tabs">
+            <ul>
+                <script type="text/javascript">
+                    if (linkPopupHasTab("wiki_tab")) {
+                        document.writeln("<li id=\"wiki_tab\"><span><a href=\"javascript:mcTabs.displayTab('wiki_tab','wiki_panel');\" onmousedown=\"return false;\">{$lang_link_wiki_tab}</a></span></li>")
+                    }
+                    if (linkPopupHasTab("web_tab")) {
+                        document.writeln("<li id=\"web_tab\"><span><a href=\"javascript:mcTabs.displayTab('web_tab','web_panel');\" onmousedown=\"return false;\">{$lang_link_web_tab}</a></span></li>");
+                    }
+                    if (linkPopupHasTab("attachments_tab")) {
+                        document.writeln("<li id=\"attachments_tab\" ><span><a href=\"javascript:mcTabs.displayTab('attachments_tab','attachments_panel');\" onmousedown=\"return false;\">{$lang_link_attachments_tab}</a></span></li>");
+                    }
+                    if (linkPopupHasTab("file_tab")) {
+                        document.writeln("<li id=\"file_tab\"><span><a href=\"javascript:mcTabs.displayTab('file_tab','file_panel');\" onmousedown=\"return false;\">{$lang_link_file_tab}</a></span></li>");
+                    }
+                    if (linkPopupHasTab("email_tab")) {
+                        document.writeln("<li id=\"email_tab\"><span><a href=\"javascript:mcTabs.displayTab('email_tab','email_panel');\" onmousedown=\"return false;\">{$lang_link_email_tab}</a></span></li>");
+                    }
+                </script>
+            </ul>
+        </div>
+        <div class="panel_wrapper" style="border: 1px solid #d3e3f5;" >
+            <div id="wiki_panel" class="panel">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td align="center" valign="middle">
+                            <table border="0" cellpadding="4" cellspacing="0" width="100%">
+                                <tr>
+                                    <td>
+                                        <table border="0" cellpadding="4" cellspacing="0" width="200">
+                                            <tr>
+                                                <td nowrap="nowrap">{$lang_link_text_title} :</td>
+                                                <td>
+                                                    <input type="text" id="wiki_text" name="wiki_text" value="" style="width: 200px" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td nowrap="nowrap">{$lang_link_space_title} :</td>
+                                                <td>
+                                                    <input type="text" id="wiki_space" name="wiki_space"  value="" style="width: 200px" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td nowrap="nowrap">{$lang_link_page_title} :</td>
+                                                <td>
+                                                    <input type="text" id="wiki_page" name="wiki_page"  value="" style="width: 200px" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td nowrap="nowrap">{$lang_link_target_title} :</td>
+                                                <td>
+                                                    <input type="text" id="wiki_target" name="wiki_target"  value="" style="width: 200px" />
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="innertabs">
+                                            <ul>
+                                                <li id="browse_tab" class="current"><span><a href="javascript:mcTabs.displayTab('browse_tab','browse_panel');" onmousedown="return false;">{$lang_link_wiki_browse_tab}</a></span></li>
+                                                <li id="search_tab"><span><a href="javascript:mcTabs.displayTab('search_tab','search_panel');" onmousedown="return false;">{$lang_link_wiki_search_tab}</a></span></li>
+                                                <li id="recent_viewed_tab"><span><a href="javascript:mcTabs.displayTab('recent_viewed_tab','recent_viewed_panel');" onmousedown="return false;">{$lang_link_wiki_recent_viewed_tab}</a></span></li>
+                                                <li id="recent_modified_tab"><span><a href="javascript:mcTabs.displayTab('recent_modified_tab','recent_modified_panel');" onmousedown="return false;">{$lang_link_wiki_recent_modified_tab}</a></span></li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="panel_wrapper" style="border: 1px solid #d3e3f5;" width="100%">
+                                            <div id="browse_panel" class="panel current" >
+                                                <table border="0" cellpadding="4" cellspacing="0" width="100%">
+                                                     <tr>
+                                                        <td>
+                                                            <table border="0" cellpadding="4" cellspacing="0" width="100%">
+                                                                <tr>
+                                                                    <td nowrap="nowrap">{$lang_link_space_title} :
+                                                                        <span id="spaces" name="spaces"></span>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <script type="text/javascript">
+                                                                loadBrowseList(baseurl);
+                                                            </script>
+                                                            <div style="margin:3px;" id="listtobrowse">
+                                                                <div class="loadajaxwrap" align="center">
+                                                                    <div class="loadingAjax"></div>
+                                                                    {$lang_loading}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+
+                                            <div id="search_panel" class="panel">
+                                                <table border="0" cellpadding="4" cellspacing="0" width="100%">
+                                                    <tr>
+                                                        <td>
+                                                            <table border="0" cellpadding="4" cellspacing="0" width="100%">
+                                                                <tr>
+                                                                    <td nowrap="nowrap">{$lang_link_space_title} :
+                                                                        <span id="search_spaces" name="search_spaces"></span>
+                                                                        <script type="text/javascript">
+                                                                            loadSpaceList(baseurl);
+                                                                        </script>
+                                                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                        {$lang_link_page_title} :
+                                                                        <input type="text" id="search_page" name="search_page" size="25" value=""/>
+                                                                        &nbsp;&nbsp;&nbsp;
+                                                                        <input type="button" id="search" name="search" onclick="loadSearchResultList(baseurl , this)" value="Search"/>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <div style="margin: 3px" id="searchresults">
+                                                                <div class="loadajaxwrap" align="center">
+                                                                    <div class="loadingAjax"></div>
+                                                                    {$lang_loading}
+                                                                </div>
+                                                            </div>
+                                                            <script type="text/javascript">
+                                                                loadSearchResultList(baseurl);
+                                                            </script>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+
+                                            <div id="recent_viewed_panel" class="panel">
+                                                <table border="0" cellpadding="4" cellspacing="0" width="100%">
+                                                    <tr>
+                                                        <td>
+                                                            <div style="margin: 3px" id="recentviewed">
+                                                                <div class="loadajaxwrap" align="center">
+                                                                    <div class="loadingAjax"></div>
+                                                                    {$lang_loading}
+                                                                </div>
+                                                            </div>
+                                                            <script type="text/javascript">
+                                                                loadRecentlyList(baseurl, "view");
+                                                            </script>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+
+                                            <div id="recent_modified_panel" class="panel">
+                                                <table border="0" cellpadding="4" cellspacing="0" width="100%">
+                                                    <tr>
+                                                        <td>
+                                                            <div style="margin: 3px" id="recentmodified">
+                                                                <div class="loadajaxwrap" align="center">
+                                                                    <div class="loadingAjax"></div>
+                                                                    {$lang_loading}
+                                                                </div>
+                                                            </div>
+                                                            <script type="text/javascript">
+                                                                loadRecentlyList(baseurl);
+                                                            </script>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="web_panel" class="panel">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td align="left" valign="middle">
+                            <table border="0" cellpadding="4" cellspacing="0" width="200">
+                                <tr>
+                                    <td nowrap="nowrap">{$lang_link_text_title} :</td>
+                                    <td>
+                                        <input type="text" id="web_text" name="web_text" value="" style="width: 200px" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap">{$lang_link_page_title} :</td>
+                                    <td>
+                                        <input type="text" id="web_page" name="web_page"  value="http://" style="width: 200px" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap">{$lang_link_target_title} :</td>
+                                    <td>
+                                        <input type="text" id="web_target" name="web_target"  value="" style="width: 200px" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap" colspan="2"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="file_panel" class="panel">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td align="left" valign="middle">
+                            <table border="0" cellpadding="4" cellspacing="0" width="200">
+                                <tr>
+                                    <td nowrap="nowrap">{$lang_link_text_title} :</td>
+                                    <td align="left">
+                                        <input type="text" id="file_text" name="file_text" value="" style="width: 200px" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap">{$lang_link_file_title} :</td>
+                                    <td>
+                                        <input type="file" id="filepaths" name="filepaths" value="" size="32" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap" colspan="2"><div class="warning">{$lang_link_file_warning_title}</div></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="attachments_panel" class="panel">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td align="left" valign="middle">
+                            <table border="0" cellpadding="4" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <table border="0" cellpadding="4" cellspacing="0" width="200">
+                                            <tr>
+                                                <td nowrap="nowrap">{$lang_link_attach_title} :</td>
+                                                <td>
+                                                    <input type="text" id="attach_text" name="attach_text" value="" style="width: 200px" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td nowrap="nowrap">{$lang_link_attachment_title} :</td>
+                                                <td>
+                                                    <input type="text" id="attach_file" name="attach_file"  value="" style="width: 200px" />
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap"><a id="linkattach" href="#" class="arrowcollapsed" onclick="if (document.getElementById('uploadattach').innerHTML == '') {loadUploadAttachs(baseurl); this.className='arrowexpanded';}else {document.getElementById('uploadattach').innerHTML = '' ; this.className='arrowcollapsed';}">{$lang_link_upload_attachment_title}</a>
+                                        <div style="margin: 3px" id="uploadattach"></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td nowrap="nowrap">
+                            <div style="margin: 3px" id="attachments"></div>
+                            <script type="text/javascript">
+                                loadAttachmentList(baseurl);
+                            </script>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="email_panel" class="panel">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td align="left" valign="middle">
+                            <table border="0" cellpadding="4" cellspacing="0" width="200">
+                                <tr>
+                                    <td nowrap="nowrap">{$lang_link_text_title} :</td>
+                                    <td>
+                                        <input type="text" id="email_text" name="email_text" value="" style="width: 200px" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap">{$lang_link_email_title} :</td>
+                                    <td>
+                                        <input type="text" id="email" name="email"  value="" style="width: 200px" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap" colspan="2"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="mceActionPanel">
+            <div style="float: left">
+                <input type="button" id="insert" name="insert" value="{$lang_insert}" onclick="insertLink();" />
+            </div>
+
+            <div style="float: right">
+                <input type="button" id="cancel" name="cancel" value="{$lang_cancel}" onclick="tinyMCEPopup.close();" />
+            </div>
+        </div>
+    </form>
+</body>
+</html>

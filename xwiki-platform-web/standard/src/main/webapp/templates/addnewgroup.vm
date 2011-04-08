@@ -1,0 +1,10 @@
+<div id="addnewgroup">
+<span style="padding-left:13px;">$msg.get("rightsmanager.createnewgroup")</span>
+<form method="post" onsubmit="return false;">
+<div>
+<span style="padding-left:13px;"><input type="text" name="newgroup" value="" id="newgroupi" /></span>
+<span class="buttonwrapper"><input class="button" type="submit" value="$msg.get("rightsmanager.creategroup")" onclick="new Ajax.Request('$xwiki.getURL("XWiki.__groupname__", "save", "form_token=$!{services.csrf.getToken()}&template=XWiki.XWikiGroupTemplate")'.replace('__groupname__', this.form.newgroup.value), { onFailure: function(transport) { alert('$msg.get("rightsmanager.groupexist").replaceAll('"', '&quot;')'.replace('__name__', $('newgroupi').value)); }, onSuccess: function(transport) { window.lb.lbSaveForm(); } });" /></span>
+<span class="buttonwrapper"><input class="button" type="submit" name="formactioncancel" value="$msg.get("cancel")" onclick=" window.lb.lbHide(); window.lb.lbClearData(); return false;"/></span>
+</div>
+</form>
+</div>

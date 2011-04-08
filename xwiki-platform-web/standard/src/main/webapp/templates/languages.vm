@@ -1,0 +1,17 @@
+#if ($xwiki.isMultiLingual()==true)
+#set($preflanguage = $xwiki.languagePreference)
+#set($languageactive = (($preflanguage == "")||($preflanguage == "default")||($preflanguage==$doc.defaultLanguage)))
+<span class="xwikisep2expl">$msg.get("language"):</span>
+<span class="xwikisep2"> | </span>
+#set($defaultLanguage = $doc.defaultLanguage)
+#if ($doc.defaultLanguage == "")
+#set($defaultLanguage = "default")
+#end
+<a #if ($languageactive) class="xwikilanguageactive" #end href="$doc.getURL("view","language=${defaultLanguage}")">
+$msg.get($defaultLanguage)
+</a>
+#foreach ($language in $doc.translationList)
+#set($languageactive = ($preflanguage==$language))
+<span class="xwikisep2"> | </span><a #if ($languageactive) class="xwikilanguageactive" #end href="$doc.getURL("view","language=${language}")">$language</a>
+#end
+#end

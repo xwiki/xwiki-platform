@@ -1,0 +1,95 @@
+## -------------------------------------------------------------------------------------------------------------------
+## In non-Servlet mode (in Portlet mode for example) we don't display the <HTML>, <HEAD> and <BODY>
+## elements.
+## -------------------------------------------------------------------------------------------------------------------
+#if($isInServletMode)
+<?xml version="1.0" encoding="$xwiki.encoding" ?>
+## TODO this should be more specific
+#if("$!request.noDoctype" != "true")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+#end
+<html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.language" xml:lang="$xcontext.language">
+  <head>
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Ensure that the Content-Type meta directive is the first one in the header.
+    ## See http://www.w3.org/International/tutorials/tutorial-char-enc/
+    ## ---------------------------------------------------------------------------------------------------------------
+    <meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Compute the title.
+    ## ---------------------------------------------------------------------------------------------------------------
+    #if(!$title)
+      #set($title = $!xwiki.getSpacePreference('title'))
+      #if($title != '')
+        #set($title = "$escapetool.xml($xwiki.parseContent($title))")
+      #else
+        #set($title = "XWiki - $escapetool.xml($!doc.space) - $escapetool.xml($!tdoc.displayTitle)")
+      #end
+    #else
+      #set($title = $escapetool.xml($title))
+    #end
+    <title>$title</title>
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Define the default scripting language that is used for intrinsic events (e.g. onmouseover attributes).
+    ## ---------------------------------------------------------------------------------------------------------------
+    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Disable the toolbar that comes up when you mouse over an image in MSIE
+    ## TODO: Shouldn't this be moved to the Admin Presentation preferences instead (user-defined META), since
+    ## it's possible to imagine that the user might want it?  
+    ## ---------------------------------------------------------------------------------------------------------------
+    <meta http-equiv="imagetoolbar" content="no"/>
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Universal edit button. See http://universaleditbutton.org
+    ## ---------------------------------------------------------------------------------------------------------------
+    #if($xcontext.action=="view")
+      <link rel="alternate" type="application/x-wiki" title="Edit" href="$doc.getURL("edit")" />
+    #end
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Make sure search engine spiders give the plain page instead of ?viewer=comments, ?viewer=code etc.
+    ## ---------------------------------------------------------------------------------------------------------------    
+    <link rel="canonical" href="$doc.getURL('view')" />
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Store the space name, page name, wiki name, full document name (for convenience since it can be reconstructed
+    ## from the individual wiki/space/page names), and other metadata, so that it can be accessed from Javascript code.
+    ## For example, to pass it to the server side using an Ajax query.
+    ## Usage example: var name = $$("meta[name='page']")[0].content;
+    ## ---------------------------------------------------------------------------------------------------------------
+    <meta name="document" content="$escapetool.xml($doc.fullName)"/>
+    <meta name="wiki" content="$escapetool.xml($doc.wiki)"/>
+    <meta name="space" content="$escapetool.xml($doc.space)"/>
+    <meta name="page" content="$escapetool.xml($doc.name)"/>
+    <meta name="version" content="$doc.version"/>
+    <meta name="restURL" content="${request.contextPath}/rest/wikis/${xcontext.database}/spaces/$escapetool.url(${doc.space})/pages/$escapetool.url(${doc.name})"/>
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Localize GWT applications.
+    ## ---------------------------------------------------------------------------------------------------------------
+    <meta name="gwt:property" content="locale=$!{xcontext.language}" />
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Add user-defined Meta directives
+    ## ---------------------------------------------------------------------------------------------------------------
+    $xwiki.parseContent($!xwiki.getSpacePreference("meta"))
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
+    ## ---------------------------------------------------------------------------------------------------------------
+    <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
+    #template("stylesheets.vm")
+    #template("analytics.vm")
+    #template("javascript.vm")
+  </head>
+  #set($bodyTagName = 'body')
+#else ## Portlet Mode
+  #template("stylesheets.vm")
+  #template("javascript.vm")
+  #set($bodyTagName = 'div')
+#end
+## TODO: fix this from css
+#set($bodyAction = $xcontext.action)
+#if($xcontext.action == "admin" || $xcontext.action == "import" || $xcontext.action == "export")
+  #set($bodyAction = "view")
+#end
+## These elements will be closed in the htmlfooter.vm file
+<$bodyTagName id="body" class="wiki-${xcontext.database} space-${escapetool.xml($doc.space.replaceAll(' ', '_'))} ${bodyAction}body #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end">
+<div id="xwikimaincontainer">
+<div id="xwikimaincontainerinner">

@@ -1,0 +1,107 @@
+#template('colorThemeInit.vm')
+
+#macro(__css3 $rule)
+  -moz-$rule;
+  -webkit-$rule;
+  $rule;
+#end
+
+/* panels style gadget settings */
+.panels .gadget .gadget-title {
+  background-color: $theme.panelHeaderBackgroundColor;
+  border-bottom: 1px dotted $theme.borderColor;
+  color: $theme.panelHeaderTextColor;
+  font-size: .83em;
+  font-weight: 700;
+  margin: 0;
+  padding: 6px 20px 6px 15px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.panels .gadget {
+  background-color: $theme.panelBackgroundColor;
+  border: 1px dotted $theme.borderColor;
+  margin: 1em 0;
+}
+
+.panels .gadget .gadget-content {
+  background-color: $theme.panelBackgroundColor;
+  color: $theme.panelTextColor;
+  padding: 10px 15px;
+}
+
+/* Hide the dashboard metadata and any metadata that appears in a dashboard (e.g. the gadget metadata) */
+.dashboard .metadata {
+  display: none;
+}
+
+/* gadget handles on the dashboard */
+.gadget .gadget-title .settings-menu .action {
+  background-repeat: no-repeat;
+  cursor: pointer;
+  height: 16px;
+  margin: 2px;
+  width: 16px;
+}
+
+.gadget .gadget-title .settings-menu .remove {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
+}
+
+.gadget .gadget-title .settings-menu .edit {
+  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.gif')");
+}
+
+.gadget .gadget-title .settings {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cog.gif')");
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  height: 16px;
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  width: 20px;
+}
+
+.gadget .gadget-title .settings-open {
+  background-color: $theme.backgroundSecondaryColor;
+}
+
+.gadget .gadget-title .settings-menu {
+  background-color: $theme.backgroundSecondaryColor;
+  position: absolute;
+  right: 2px;
+  top: 18px;
+}
+
+/* Drag & drop effects */
+.gadget-container-hover-highlight {
+  background-color: $theme.highlightColor;
+}
+
+.column .gadget-placeholder {
+  background-color: $theme.highlightColor;
+  margin-top: 10px;
+  padding: 20px;
+}
+
+.dashboard-edit .gadget .gadget-title {
+  cursor: move;
+}
+
+/* Add button decoration */
+.dashboard-edit .addgadget, .dashboard-edit .addcontainer {
+  background: url($xwiki.getSkinFile("icons/silk/add.gif")) no-repeat 3px center $theme.menuAddEntryBackgroundColor;
+  #__css3('border-radius: 4px')
+  color: $theme.menuAddEntryLinkColor;
+  cursor: pointer;
+  float: right;
+  font-size: 83.3%;
+  line-height: 1.6em;
+  margin-left: 5px;
+  margin-top: 20px;
+  min-height: 16px;
+  padding: 3px 6px 3px 22px;
+}

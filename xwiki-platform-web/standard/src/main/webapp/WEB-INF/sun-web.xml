@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sun-web-app PUBLIC
+  '-//Sun Microsystems, Inc.//DTD Sun ONE Application Server 7.0 Servlet 2.3//EN'
+  'http://www.sun.com/software/sunone/appserver/dtds/sun-web-app_2_3-0.dtd'>
+
+<sun-web-app>
+  <!-- Change the class lookup behavior so that it looks first in the application's libs,
+       and then in the container's system libs. -->
+  <class-loader delegate="false" />
+</sun-web-app>

@@ -1,0 +1,21 @@
+#set ($attachments = $doc.attachmentList)
+<div id="xwikiattachmentscontent" class="xwikidatacontent">
+#set ($hasAttachments = false)
+#foreach ($attachment in $attachments)
+  #if ((!$request.images) || $attachment.isImage())
+    #if (!$hasAttachments)
+      <p><strong>$msg.get('listofallattachments') :</strong></p>
+      <ul>
+      #set ($hasAttachments = true)
+    #end
+    <li><a href="#" onclick="document.forms[0].attach_file.value='$escapetool.xml($escapetool.javascript($attachment.filename))'; return false;">$escapetool.xml($attachment.filename)</a>
+    $msg.get('attachedby') $xwiki.getUserName($attachment.author) $msg.get('lastmodifiedon') $xwiki.formatDate($attachment.date)
+    </li>
+  #end
+#end
+#if ($hasAttachments)
+  </ul>
+#else
+  $msg.get('noattachmentsonthispage')
+#end
+</div>## xwikiattachmentscontent

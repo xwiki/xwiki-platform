@@ -1,0 +1,96 @@
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.commons</groupId>
+    <artifactId>xwiki-commons</artifactId>
+    <version>42-SNAPSHOT</version>
+    <relativePath>../../commons/xwiki-commons-pom</relativePath>
+  </parent>
+  <groupId>org.xwiki.platform</groupId>
+  <artifactId>xwiki-web</artifactId>
+  <version>3.0-SNAPSHOT</version>
+  <name>XWiki Platform - Web - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>Common web resources for the XWiki Platform WAR</description>
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-3.0</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-3.0</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-3.0</url>
+  </scm>
+  <issueManagement>
+    <system>jira</system>
+    <url>http://jira.xwiki.org/jira/browse/XWIKI</url>
+  </issueManagement>
+  <properties>
+    <!-- Used by gwt and wysiwyg modules -->
+    <gwt.version>2.1.1</gwt.version>
+    <gwt.maven.plugin.version>2.1.0-1</gwt.maven.plugin.version>
+    <smartgwt.version>2.0</smartgwt.version>
+    <!-- Versions of XWiki dependencies used in Platform/Web modules -->
+    <commons.version>${project.version}</commons.version>
+    <rendering.version>${project.version}</rendering.version>
+    <platform.core.version>${project.version}</platform.core.version>
+    <platform.tool.configuration.version>1.46-SNAPSHOT</platform.tool.configuration.version>
+    <!-- Lock albatross version because it isn't developed anymore. -->
+    <platform.skin.albatross.version>1.30</platform.skin.albatross.version>
+    <platform.skin.toucan.version>1.40-SNAPSHOT</platform.skin.toucan.version>
+    <platform.skin.colibri.version>1.33-SNAPSHOT</platform.skin.colibri.version>
+    <!-- The previous stable version of this project, used to catch API breakages. -->
+    <clirr.previous.version>3.0</clirr.previous.version>
+  </properties>
+  <modules>
+    <module>gwt</module>
+    <module>xwiki-gwt-dom</module>
+    <module>xwiki-gwt-user</module>
+    <module>xwiki-gwt-wysiwyg-plugin-api</module>
+    <module>xwiki-gwt-wysiwyg-client</module>
+    <module>xwiki-gwt-wysiwyg-server</module>
+    <module>xwiki-gwt-wysiwyg-war</module>
+    <module>standard</module>
+  </modules>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <configuration>
+          <comparisonVersion>${clirr.previous.version}</comparisonVersion>
+          <excludes>
+            <exclude>**/internal/**</exclude>
+            <exclude>**/test/**</exclude>
+            <!-- To be removed when we release 3.0.1 -->
+            <exclude>org/xwiki/wysiwyg/server/WysiwygEditorConfiguration</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <repositories>
+    <repository>
+      <id>smartgwt-maven</id>
+      <url>http://www.smartclient.com/maven2</url>
+    </repository>
+  </repositories>
+</project>

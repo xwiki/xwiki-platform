@@ -1,0 +1,23 @@
+#template("startpage.vm")
+<div class="main layoutsubsection">
+  <div id="mainContentArea">
+    ## ---------------------------------------------------------------------------------------------------------
+    ## Since this template can be used for creating a Page or a Space, compute its title based on the passed
+    ## "tocreate" parameter which can be either "page" or "space". If no "tocreate" parameter is passed then we
+    ## default to creating a Page. 
+    ## ---------------------------------------------------------------------------------------------------------
+    #set($tocreate = $request.getParameter('tocreate'))
+    #if(!$tocreate || ($tocreate == '') || ($tocreate != 'space'))
+      #if($doc.isNew())
+        #set ($title = $msg.get('core.create.newPageTitle', [$!{escapetool.xml($doc.fullName)}]))
+      #else
+        #set ($title = $msg.get('core.create.pageTitle'))
+      #end
+    #else
+      #set ($title = $msg.get('core.create.spaceTitle'))
+    #end
+    <div id="document-title"><h1>$title</h1></div>
+    #template("createinline.vm")
+  </div>## mainContentArea
+</div>## main
+#template("endpage.vm")

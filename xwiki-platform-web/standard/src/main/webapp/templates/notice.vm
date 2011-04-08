@@ -1,0 +1,5 @@
+###
+### Generic notification message
+###
+#set($messageType = $msg.get("platform.core.noticeMessageType"))
+#template("message.vm")

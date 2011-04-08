@@ -1,0 +1,54 @@
+###
+### Display document information
+###
+<div id="informationcontent" class="xwikiintracontent">
+<div id="_information">
+  <div id="informationleft" class="half column">
+    <dl>
+      <dt>$msg.get('core.viewers.information.parent')</dt>
+      <dd>
+        ## <input type="text" id="xwikidocparentinput2" name="parent" value="$!tdoc.parent" size="30"/>
+        #if("$!tdoc.parent" != '')
+          #displayDocumentList([$tdoc.parent] false [])
+        #else
+          $msg.get('core.viewers.information.noParent')
+        #end
+      </dd>
+      <dt>$msg.get('core.viewers.information.children')</dt>
+      <dd>
+        #set($children = $doc.getChildren())
+        #if($children.size() > 0)
+          #displayDocumentList($children true $blacklistedSpaces)
+        #else
+          $msg.get('core.viewers.information.noChildren')
+        #end
+      </dd>
+    </dl>
+  </div>## informationleft
+  <div id="informationright" class="half column">
+    <dl>
+      #if($tdoc.realLanguage != $doc.realLanguage)
+        <dt>$msg.get('core.viewers.information.translationCreation', [$tdoc.realLanguage])</dt>
+        <dd>$msg.get('core.viewers.information.translationCreationData', [$xwiki.getUserName($tdoc.creator), $xwiki.formatDate($tdoc.creationDate)])</dd>
+      #end
+      #if($isAdvancedUser)
+        #set($pages = $tdoc.includedPages)
+        #if($pages.size() > 0)
+          <dt>$msg.get('core.viewers.information.includedPages')</dt>
+          <dd>
+            #displayDocumentList($pages true $blacklistedSpaces)
+          </dd>
+      #end
+      #end
+      #set($blinks = $sorttool.sort($doc.getBacklinks()))
+      #if($blinks.size()>0)
+        <dt>$msg.get('core.viewers.information.backlinks')</dt>
+        <dd>
+          #displayDocumentList($blinks true $blacklistedSpaces)
+        </dd>
+      #end
+    </dl>
+  </div>## informationright
+  <div class="clearfloats">&nbsp;</div>
+</div>## _information
+</div>## informationcontent

@@ -1,0 +1,15 @@
+############################################################################
+## Render current document content with some possible
+## URL parameters:
+## * outputSyntax: the syntax name to use to render the XDOM,
+##                 if not provided use xhtml/1.0
+## * outputVersion: the syntax version to use to render the XDOM
+##                  if not provided use the last version of the outputSyntax
+## 
+############################################################################
+#set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
+#if ($outputSyntax)
+$cdoc.getRenderedContent($outputSyntax)##
+#else
+$cdoc.getRenderedContent()##
+#end

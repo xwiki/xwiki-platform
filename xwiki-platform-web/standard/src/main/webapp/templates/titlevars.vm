@@ -1,0 +1,41 @@
+## ----------------------------------------------------------------------------
+## Compute the title by using the set title if defined or extract it from the
+## content, taking into account the new title handling introduced in XWiki
+## Platform 2.0.
+##
+## Prerequisite: Have the $renderedContent variable defined before calling
+##               this template.
+## Output: In output the $renderedContent variable will be modified if needed
+##         and the $titleToDisplay variable created.
+## ----------------------------------------------------------------------------
+##
+## ----------------------------------------------------------------------------------
+## Remove the first rendered HTML header (H1-H6) if the following conditions are met:
+## - the title compatibility flag is on
+## - the title extracted from the rendered content is the same as the set title
+##
+## We need to do this since we've changed how titles are used and we need to
+## ensure we don't break existing documents that have not yet migrated to the
+## new way.
+## ----------------------------------------------------------------------------------
+#set ($titleToDisplay = $tdoc.displayTitle)
+#if ($tdoc.title.length() == 0 || $xwiki.isTitleInCompatibilityMode())
+  ## Look for first H1-H6 either in lowercase or uppercase
+  #set ($regexResult = $regextool.find($renderedContent, "<([hH][1-6]).*?>(?:<span>)?(.*?)(?:</span>)?</[hH][1-6]>"))
+  #if (!$regexResult.isEmpty() && $regexResult.get(2).group.equals($titleToDisplay))
+    ## We are extracting the title but putting it back but hidden since there are javascript code such as the
+    ## javascript used to display section edition which needs the header to be there to work properly.
+    #set ($hiddenTitle = "<${regexResult.get(1).group} class='hidden'>${regexResult.get(2).group}</${regexResult.get(1).group}>")
+    #if ($regexResult.get(0).end < $mathtool.sub($renderedContent.length(), 1))
+      #set ($renderedContent = "${renderedContent.substring(0, $regexResult.get(0).start)}${hiddenTitle}${renderedContent.substring($regexResult.get(0).end)}")
+    #else
+      #set ($renderedContent = "${hiddenTitle}$renderedContent.substring(0, $regexResult.get(0).start)")
+    #end
+    #set ($titleToDisplay = $regexResult.get(2).group)
+  #end
+#end
+## If the title comes from a heading in the content, special XML characters are already escaped.
+## If the title comes from the title field or from the document name it must be manually escaped for security.
+#if ("$!{tdoc.title}" != '' || $tdoc.name == $titleToDisplay)
+  #set ($titleToDisplay = $escapetool.xml($titleToDisplay))
+#end

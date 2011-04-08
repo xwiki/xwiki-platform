@@ -1,0 +1,6 @@
+## Don't display panels in print view
+#set($showLeftPanels = "0")
+#set($showRightPanels = "0")
+## Set a flag stating we're in print view so that we can use the print.css CSS in stylesheet.vm
+#set($printss = true)
+#template("view.vm")

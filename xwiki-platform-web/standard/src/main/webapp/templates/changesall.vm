@@ -1,0 +1,40 @@
+###
+### Shows differences between each consecutive document versions
+###
+###
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="mainContentArea">
+#set ($type= "$!{escapetool.xml($request.get('type'))}")
+#if ($type == '')
+  #set($type = 'html')
+#end
+#if ($tdoc.realLanguage != '')
+  #set ($lang = "&amp;language=${tdoc.realLanguage}")
+#else
+  #set($lang = '')
+#end
+$msg.get('currentdifftype'): $type (
+<a href="$doc.getURL("view", "xpage=changesall&amp;type=wiki$lang")">$msg.get("wikidiff")</a>
+<a href="$doc.getURL("view", "xpage=changesall&amp;type=source$lang")">$msg.get("sourcediff")</a>
+<a href="$doc.getURL("view", "xpage=changesall&amp;type=html$lang")">$msg.get("htmldiff")</a>
+)
+#set ($firstrev = $tdoc.getVersion())
+#set ($nextversion = $firstrev)
+#foreach ($version in $tdoc.getRecentRevisions(0))
+  #if ($version != $firstrev)
+    #set ($origdoc = '')
+    #set ($newdoc = '')
+    #set ($origdoc = $xwiki.getDocument($tdoc, $version))
+    #set($newdoc = $xwiki.getDocument($tdoc, $nextversion))
+    #template("changesdoc.vm")
+    #set($nextversion = $version)
+  #end
+#end
+#set ($newdoc = $origdoc)
+#set ($origdoc = $xwiki.getDocument($tdoc, '1.0'))
+#template("changesdoc.vm")
+<div class="clearfloats"></div>
+</div> ## mainContentArea
+</div> ## main
+#template("endpage.vm")

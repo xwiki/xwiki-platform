@@ -1,0 +1,43 @@
+.xColorPicker {
+  border:1px solid #B5B6B5;
+  z-index:99;
+}
+
+.xColorPalette {
+  border-bottom:1px solid #EFEFEF;
+  border-right:1px solid #EFEFEF;
+}
+
+.xColorPalette td {
+  border-left:1px solid #EFEFEF;
+  border-top:1px solid #EFEFEF;
+  height:21px;
+  width:21px;
+  margin:0;
+  padding:0;
+  text-align:center;
+  vertical-align:middle;
+}
+
+.xColorPalette .colorCell {
+  height:15px;
+  width:15px;
+  padding:0;
+  margin:0;
+  border:3px solid white; 
+}
+
+.xColorPalette .colorCell-hover {
+  border:3px solid #CCCCCC;
+}
+
+.xColorPalette .colorCell-selected-dark, .xColorPalette .colorCell-selected-light {
+  background-position:center center;
+  background-repeat:no-repeat  
+}
+.xColorPalette .colorCell-selected-dark {
+  background-image:url("../images/checked-white.gif");
+}
+.xColorPalette .colorCell-selected-light {
+  background-image:url("../images/checked-black.gif");
+}

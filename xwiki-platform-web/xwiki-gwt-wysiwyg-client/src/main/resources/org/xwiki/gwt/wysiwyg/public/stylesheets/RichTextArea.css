@@ -1,0 +1,146 @@
+#template('colorThemeInit.vm')
+html, body {
+  background-color: $theme.pageContentBackgroundColor !important;
+  background-image: none !important;
+  color: $theme.textColor !important;
+  height: auto !important;
+  min-height: 0 !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  width: auto !important;
+}
+
+* html {
+  /* Force IE6 to always display the vertical scroll bar, otherwise it remains hidden. */
+  overflow-y: scroll !important;
+}
+
+*+html {
+  /* Force IE7 to always display the vertical scroll bar, otherwise it remains hidden. */
+  overflow-y: scroll !important;
+}
+
+body {
+  /* The BODY line height must match the paragraph line height. See XWIKI-3763. */
+  line-height: 1.4em !important;
+  /* The BODY margin must match the paragraph margin. See XWiki-4343. */
+  margin: 0.5em 0 !important;
+}
+
+/*
+  Overwrite no matter what list-style-position to outside position to avoid the Firefox issues with editing lists
+  with inside list style. 
+*/
+ul, ol {
+  list-style-position: outside !important;
+}
+
+/*
+  XWiki 2.0 renderer places the contents of a header inside a span, which is styled in the skin. Since this is not
+  common to all the syntaxes and the CSS rules can be applied directly to the header, the editor doesn't generate this
+  span when applying header style to the selection. In order to view headers as in view mode we have to block some of
+  the CSS rules applied to the span and add then to the header. 
+*/
+h1 span, h2 span, h3 span, h4 span {
+  border-bottom: 0 none !important;
+  margin: 0 !important;
+  /* IE behaves strangely when the span is displayed as block. */
+  display: inline !important;
+  /*
+    IE behaves strangely when the span doesn't have static position.
+    See XWIKI-3339: New TOC overlaps with titles in WYSIWYG edition in IE6
+  */
+  position: static !important;
+}
+
+h1, h2, h3, h4 {
+  border-bottom: 1px solid #CCCCCC !important;
+  margin: 20px 0 !important;
+  /*
+    Headings with overflow:hidden are painful to edit in IE because they are treated as fixed size boxes (resize
+    handlers are present).
+  */
+  overflow: visible !important;
+}
+
+h1 {
+  margin: 25px 0 20px 0 !important;
+  /* Letter spacing affects the behavior of the Delete and Backspace keys in IE */
+  letter-spacing: normal !important;
+}
+
+/* Fix for XWIKI-3752 by overriding path/to/firefox/res/contenteditable.css rules */
+a:-moz-read-write {
+  color: $theme.linkColor !important;
+  text-decoration: none !important;
+}
+a:hover:-moz-read-write {
+  text-decoration: underline !important;
+}
+
+.readOnly {
+  /* Use a hidden border so that the read-only container is not resized when hovered. */
+  border: 1px dotted transparent;
+}
+
+.readOnly:hover {
+  /* Show the boundaries of a read-only region when hovering. */
+  border: 1px dotted #CCC;
+}
+
+.macro {
+}
+
+.macro-selected {
+  background-color: AliceBlue;
+  border: 1px dotted #CCC;
+}
+
+.macro-collapsed {
+  border: 1px dotted #CCC;
+  padding: 2px;
+}
+
+.macro-block.macro-collapsed {
+  /* Separate two consecutive collapsed block macros. */
+  margin-top: 1px;
+}
+
+.macro-collapsed .macro-placeholder {
+  /* Show the macro content place-holder only when the macro is collapsed. */
+  display: inline !important;
+}
+
+.macro-collapsed .macro-output {
+  /* Hide the macro output when the macro is collapsed. */
+  display: none !important;
+}
+
+.macro .macro-placeholder .macro-icon {
+  background-image: url(../images/macro.gif);
+  background-repeat: no-repeat;
+  display: inline-block;
+  height: 16px;
+  padding-right: 2px;
+  vertical-align: middle;
+  width: 16px;
+}
+
+.main .macro .macro-placeholder {
+  color: gray;
+  /* Hide the macro content place-holder by default. Display it only when the macro is collapsed. */
+  display: none;
+  font-family: monospace;
+  /* Keep the macro icon and the macro name on the same line. */
+  white-space: nowrap;
+}
+
+.xEmbeddedObject {
+  background-image: url(../images/embed.gif);
+  background-position: center center;
+  background-repeat: no-repeat;
+  border: 1px solid #CCC;
+  height: 20px;
+  width: 40px;
+}

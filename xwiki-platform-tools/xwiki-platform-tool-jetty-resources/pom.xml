@@ -25,13 +25,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.platform.tools</groupId>
-    <artifactId>xwiki-tools</artifactId>
-    <version>31-SNAPSHOT</version>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-tools</artifactId>
+    <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-jetty-resources</artifactId>
+  <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
   <name>XWiki Platform - Tools - Jetty Configuration Resources</name>
-  <version>1.21-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>Packages a Jetty installation</description>
   <properties>
@@ -74,13 +73,6 @@
       <version>${jetty.version}</version>
     </dependency>        
   </dependencies>
-  <!-- We must configure SCM in each module. For more information see:
-       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-jetty-resources</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-jetty-resources</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-jetty-resources</url>
-  </scm>
   <build>
     <plugins>
       <plugin>

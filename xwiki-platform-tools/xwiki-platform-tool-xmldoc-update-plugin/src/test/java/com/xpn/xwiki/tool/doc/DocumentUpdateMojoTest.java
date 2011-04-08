@@ -23,21 +23,23 @@ import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
 
-import com.xpn.xwiki.doc.XWikiDocument;
+import org.junit.*;
 
-import junit.framework.TestCase;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
  * Tests for {@link AbstractDocumentMojo}.
  * 
  * @version $Id$
  */
-public class DocumentUpdateMojoTest extends TestCase
+public class DocumentUpdateMojoTest extends AbstractBridgedComponentTestCase
 {
     /**
      * Test that a document loaded in memory from XML by the mojo then written back to XML does not lose any
      * information/is not affected by the process
      */
+    @Test
     public void testXMLDocumentLoading() throws Exception
     {
         AttachMojo mojo = new AttachMojo();
@@ -49,10 +51,10 @@ public class DocumentUpdateMojoTest extends TestCase
         fr.read(bytes);
         String inputContent = new String(bytes);
 
-        assertTrue(inputContent.contains("<class>"));
+        Assert.assertTrue(inputContent.contains("<class>"));
 
         XWikiDocument doc = mojo.loadFromXML(resourceFile);
-        assertEquals(doc.getName(), "Install");
+        Assert.assertEquals(doc.getName(), "Install");
 
         File outputFile = File.createTempFile("output", "xml");
         mojo.writeToXML(doc, outputFile);
@@ -63,6 +65,6 @@ public class DocumentUpdateMojoTest extends TestCase
         String outputContent = new String(bytes);
 
         // Check that we did not lose the class definition during the loading from XML/writing to XML process.
-        assertTrue(outputContent.contains("<class>"));
+        Assert.assertTrue(outputContent.contains("<class>"));
     }
 }

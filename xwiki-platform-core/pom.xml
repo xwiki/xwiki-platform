@@ -25,36 +25,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.commons</groupId>
-    <artifactId>xwiki-commons</artifactId>
-    <version>42-SNAPSHOT</version>
-    <relativePath>../xwiki-commons-pom</relativePath>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform</artifactId>
+    <version>3.1-SNAPSHOT</version>
   </parent>
-  <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
-  <version>3.1-SNAPSHOT</version>
   <description>XWiki Platform - Core - Parent POM</description>
-  <properties>
-    <!-- Versions of XWiki dependencies used in Platform modules -->
-    <rendering.version>${project.version}</rendering.version>
-    <commons.version>${project.version}</commons.version>
-    <!-- Platform Tools versions -->
-    <platform.tool.xar-handler.version>1.10-SNAPSHOT</platform.tool.xar-handler.version>
-    <platform.tool.xar-plugin.version>1.15-SNAPSHOT</platform.tool.xar-plugin.version>
-    <!-- The previous stable version of this project, used to catch API breakages. -->
-    <clirr.previous.version>3.0</clirr.previous.version>
-  </properties>
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</url>
-  </scm>
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.xwiki.org/jira/browse/XWIKI</url>
-  </issueManagement>
   <dependencyManagement>
     <dependencies>
       <!-- Standard dependencies used in several modules -->
@@ -99,9 +77,9 @@
           </configuration>
         </plugin>
         <plugin>
-          <groupId>org.xwiki.platform.tools</groupId>
-          <artifactId>xwiki-xar-plugin</artifactId>
-          <version>${platform.tool.xar-plugin.version}</version>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-tool-xar-plugin</artifactId>
+          <version>${project.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -124,9 +102,9 @@
     <!-- Needed to add support for the XAR packaging -->
     <extensions>
       <extension>
-        <groupId>org.xwiki.platform.tools</groupId>
-        <artifactId>xwiki-xar-handlers</artifactId>
-        <version>${platform.tool.xar-handler.version}</version>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tool-xar-handlers</artifactId>
+        <version>${project.version}</version>
       </extension>
     </extensions>
   </build>

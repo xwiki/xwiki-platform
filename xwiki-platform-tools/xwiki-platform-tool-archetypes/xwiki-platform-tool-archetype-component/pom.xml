@@ -25,22 +25,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.platform.tools</groupId>
-    <artifactId>xwiki-archetypes</artifactId>
-    <version>1-SNAPSHOT</version>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-tool-archetypes</artifactId>
+    <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-archetype-component</artifactId>
-  <name>XWiki Platform - Tools - XWiki Component Archetype</name>
-  <version>1.0-SNAPSHOT</version>
+  <artifactId>xwiki-platform-tool-archetype-component</artifactId>
+  <name>XWiki Platform - Tools - Archetypes - XWiki Component Archetype</name>
   <packaging>maven-archetype</packaging>
   <description>
     Make it easy to create a maven project for creating XWiki Components.
   </description>
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-archetypes/xwiki-archetype-compnent</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-archetypes/xwiki-archetype-component</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-archetypes/xwiki-archetype-component</url>
-  </scm>
   <build>
     <extensions>
       <extension>

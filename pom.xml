@@ -25,22 +25,35 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform</artifactId>
+    <groupId>org.xwiki.commons</groupId>
+    <artifactId>xwiki-commons-pom</artifactId>
     <version>3.1-SNAPSHOT</version>
+    <relativePath>../xwiki-commons/xwiki-commons-pom</relativePath>
   </parent>
-  <artifactId>xwiki-platform-tools</artifactId>
-  <name>XWiki Platform - Tools - Parent POM</name>
+  <groupId>org.xwiki.platform</groupId>
+  <artifactId>xwiki-platform</artifactId>
+  <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Tools - Parent POM</description>
+  <version>3.1-SNAPSHOT</version>
+  <description>XWiki Platform - Parent POM</description>
+  <properties>
+    <!-- Versions of XWiki dependencies used in Platform modules -->
+    <rendering.version>${project.version}</rendering.version>
+    <commons.version>${project.version}</commons.version>
+    <!-- The previous stable version of this project, used to catch API breakages. -->
+    <clirr.previous.version>3.0</clirr.previous.version>
+  </properties>
+  <scm>
+    <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
+    <developerConnection>scm:git:git@github.com:xwiki/xwiki-platform.git</developerConnection>
+    <url>https://github.com/xwiki/xwiki-platform</url>
+  </scm>
+  <issueManagement>
+    <system>jira</system>
+    <url>http://jira.xwiki.org/jira/browse/XWIKI</url>
+  </issueManagement>
   <modules>
-    <module>xwiki-platform-tool-archetypes</module>
-    <module>xwiki-platform-tool-configuration-resources</module>
-    <module>xwiki-platform-tool-jetty-resources</module>
-    <module>xwiki-platform-tool-rootwebapp</module>
-    <module>xwiki-platform-tool-standards-validator</module>
-    <module>xwiki-platform-tool-xar-handlers</module>
-    <module>xwiki-platform-tool-xar-plugin</module>
-    <module>xwiki-platform-tool-xmldoc-update-plugin</module>
+    <module>xwiki-platform-tools</module>
+    <module>xwiki-platform-core</module>
   </modules>
 </project>

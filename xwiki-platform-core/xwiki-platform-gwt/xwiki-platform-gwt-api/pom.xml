@@ -24,32 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-web</artifactId>
+    <artifactId>xwiki-platform-gwt</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
   <groupId>com.xpn.xwiki.platform</groupId>
-  <artifactId>xwiki-web-gwt</artifactId>
-  <name>XWiki Platform - Web - GWT API</name>
+  <artifactId>xwiki-platform-gwt-api</artifactId>
+  <name>XWiki Platform - GWT - XWiki API</name>
   <packaging>jar</packaging>
   <description>The Common GWT API XWiki JAR</description>
   <dependencies>
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-servlet</artifactId>
-      <version>${gwt.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-user</artifactId>
-      <version>${gwt.version}</version>
-      <!-- This JAR is used to generate JS files and shouldn't be included in the server side
-           WAR -->
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
-      <version>${platform.core.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
       <!-- We don't want all the Core libs to be put in WEB-INF/lib as this GWT WAR will be
            overlayed with the Standard WAR which already contains all the required libs -->
       <scope>provided</scope>

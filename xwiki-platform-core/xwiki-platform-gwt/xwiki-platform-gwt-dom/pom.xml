@@ -24,31 +24,19 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-web</artifactId>
+    <artifactId>xwiki-platform-gwt</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-web-gwt-dom</artifactId>
-  <name>XWiki Platform - Web - GWT - DOM API</name>
+  <artifactId>xwiki-platform-gwt-dom</artifactId>
+  <name>XWiki Platform - GWT - DOM API</name>
   <packaging>jar</packaging>
   <description>An extension of the GWT DOM API, providing W3C Range and Selection support, depth-first pre-order iterator and lots of DOM utility methods</description>
   <dependencies>
     <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-user</artifactId>
-      <version>${gwt.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <!-- This dependency is required for the custom linker. -->
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
-      <version>${gwt.version}</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

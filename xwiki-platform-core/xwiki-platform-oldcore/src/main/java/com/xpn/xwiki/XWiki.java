@@ -1874,9 +1874,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
     public String parseTemplate(String template, String skin, XWikiContext context)
     {
+        String currentWiki = context.getDatabase();
         try {
             XWikiDocument doc = getDocument(skin, context);
             if (!doc.isNew()) {
+                context.setDatabase(doc.getDocumentReference().getWikiReference().getName());
+
                 // Try parsing the object property
                 BaseObject object =
                     doc.getXObject(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiSkins"));
@@ -1906,6 +1909,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                 }
             }
         } catch (Exception e) {
+        } finally {
+            context.setDatabase(currentWiki);
         }
 
         // Try parsing a file located in the directory with the same name.

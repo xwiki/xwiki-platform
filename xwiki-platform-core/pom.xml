@@ -33,6 +33,11 @@
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Parent POM</description>
+  <properties>
+    <gwt.version>2.1.1</gwt.version>
+    <gwt.maven.plugin.version>2.1.0-1</gwt.maven.plugin.version>
+    <smartgwt.version>2.0</smartgwt.version>
+  </properties>
   <dependencyManagement>
     <dependencies>
       <!-- Standard dependencies used in several modules -->
@@ -61,6 +66,29 @@
         <artifactId>jcommon</artifactId>
         <version>1.0.15</version>
       </dependency>
+      <!-- Standard dependencies used in GWT modules -->
+      <dependency>
+        <groupId>com.google.gwt</groupId>
+        <artifactId>gwt-user</artifactId>
+        <version>${gwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.gwt</groupId>
+        <artifactId>gwt-servlet</artifactId>
+        <version>${gwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.gwt</groupId>
+        <artifactId>gwt-dev</artifactId>
+        <version>${gwt.version}</version>
+      </dependency>
+      <dependency>
+        <!-- SmartGWT is used only for its tree widget. -->
+        <!-- If you remove or move this dependency don't forget to update the repository section at the bottom. -->
+        <groupId>com.smartgwt</groupId>
+        <artifactId>smartgwt</artifactId>
+        <version>${smartgwt.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
@@ -80,6 +108,49 @@
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-tool-xar-plugin</artifactId>
           <version>${project.version}</version>
+        </plugin>
+        <plugin>
+          <!-- Default configuration for the GWT maven plugin -->
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>gwt-maven-plugin</artifactId>
+          <version>${gwt.maven.plugin.version}</version>
+          <configuration>
+            <mode>htmlunit</mode>
+            <testTimeOut>600</testTimeOut>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>test</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <!--
+              We exclude the GWT client tests because of http://jira.codehaus.org/browse/SUREFIRE-508 (Cannot run
+              GWTTestCases with Surefire). GWT client tests are currently run by gwt-maven-plugin.
+            -->
+            <excludes>
+              <exclude>**/gwt/**/client/**/*.java</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.atlassian.maven.plugins</groupId>
+          <artifactId>maven-clover2-plugin</artifactId>
+          <configuration>
+            <!--
+              Exclude GWT client code since otherwise it would mean they would get instrumented by Clover and GWT would
+              complain that it doesn't find the sources for Clover at runtime.
+            -->
+            <excludes>
+              <exclude>**/gwt/**/client/**/*.java</exclude>
+            </excludes>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -203,6 +274,7 @@
     <module>xwiki-platform-webdav</module>
     <module>xwiki-platform-wiki-manager</module>
     <module>xwiki-platform-workstream</module>
+    <module>xwiki-platform-wysiwyg</module>
     <module>xwiki-platform-xml</module>
     <module>xwiki-platform-xmlrpc</module>
   </modules>
@@ -237,5 +309,29 @@
         <xwiki.clirr.skip>false</xwiki.clirr.skip>
       </properties>
     </profile>
+    <profile>
+      <id>gwtTestManual</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>gwt-maven-plugin</artifactId>
+            <configuration>
+              <mode>manual</mode>
+              <productionMode>true</productionMode>
+              <style>DETAILED</style>
+              <!-- HACK: We inject the GWT arguments in the out parameter because we have no other option. -->
+              <out>target/www-test -port 54321 -codeServerPort 12345 -userAgents gecko1_8</out>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
+  <repositories>
+    <repository>
+      <id>smartgwt-maven</id>
+      <url>http://www.smartclient.com/maven2</url>
+    </repository>
+  </repositories>
 </project>

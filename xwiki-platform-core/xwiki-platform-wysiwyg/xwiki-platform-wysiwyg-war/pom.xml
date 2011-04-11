@@ -24,11 +24,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-web</artifactId>
+    <artifactId>xwiki-platform-wysiwyg</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-web-gwt-wysiwyg-war</artifactId>
-  <name>XWiki Platform - Web - GWT - WYSIWYG Editor - WAR Distribution</name>
+  <artifactId>xwiki-platform-wysiwyg-war</artifactId>
+  <name>XWiki Platform - WYSIWYG Editor - WAR Distribution</name>
   <packaging>war</packaging>
   <description>WAR distribution of XWiki's WYSIWYG editor.</description>
   <properties>
@@ -40,13 +40,13 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt-wysiwyg-client</artifactId>
+      <artifactId>xwiki-platform-wysiwyg-client</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt-wysiwyg-server</artifactId>
+      <artifactId>xwiki-platform-wysiwyg-server</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
@@ -55,7 +55,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
-        <version>${gwt.maven.plugin.version}</version>
         <configuration>
           <module>${xwe.module}</module>
           <webappDirectory>${gwt.output.directory}</webappDirectory>
@@ -94,7 +93,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-web-gwt-wysiwyg-client</artifactId>
+                  <artifactId>xwiki-platform-wysiwyg-client</artifactId>
                   <version>${project.version}</version>
                   <classifier>shared</classifier>
                   <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>

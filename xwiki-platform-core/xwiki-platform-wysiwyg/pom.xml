@@ -29,35 +29,27 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-gwt</artifactId>
-  <name>XWiki Platform - GWT - Parent POM</name>
+  <artifactId>xwiki-platform-wysiwyg</artifactId>
+  <name>XWiki Platform - WYSIWYG Editor - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Parent POM for the GWT modules</description>
+  <description>Parent POM for the WYSIWYG editor modules</description>
   <modules>
-    <module>xwiki-platform-gwt-api</module>
-    <module>xwiki-platform-gwt-dom</module>
-    <module>xwiki-platform-gwt-user</module>
+    <module>xwiki-platform-wysiwyg-client</module>
+    <module>xwiki-platform-wysiwyg-plugin-api</module>
+    <module>xwiki-platform-wysiwyg-server</module>
+    <module>xwiki-platform-wysiwyg-war</module>
   </modules>
-  <dependencies>
-    <!-- GWT core dependencies -->
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-user</artifactId>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <configuration>
-            <failsOnError>true</failsOnError>
-            <includeTestSourceDirectory>true</includeTestSourceDirectory>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file. -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <failsOnError>true</failsOnError>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>

@@ -27,7 +27,6 @@
     <artifactId>xwiki-platform-gwt</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <groupId>com.xpn.xwiki.platform</groupId>
   <artifactId>xwiki-platform-gwt-api</artifactId>
   <name>XWiki Platform - GWT - XWiki API</name>
   <packaging>jar</packaging>

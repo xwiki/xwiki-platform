@@ -45,13 +45,8 @@
   </issueManagement>
   <properties>
     <!-- Used by gwt and wysiwyg modules -->
-    <gwt.version>2.1.1</gwt.version>
-    <gwt.maven.plugin.version>2.1.0-1</gwt.maven.plugin.version>
     <smartgwt.version>2.0</smartgwt.version>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
-    <commons.version>${project.version}</commons.version>
-    <rendering.version>${project.version}</rendering.version>
-    <platform.core.version>${project.version}</platform.core.version>
     <platform.tool.configuration.version>1.46-SNAPSHOT</platform.tool.configuration.version>
     <!-- Lock albatross version because it isn't developed anymore. -->
     <platform.skin.albatross.version>1.30</platform.skin.albatross.version>
@@ -61,13 +56,6 @@
     <clirr.previous.version>3.0</clirr.previous.version>
   </properties>
   <modules>
-    <module>gwt</module>
-    <module>xwiki-gwt-dom</module>
-    <module>xwiki-gwt-user</module>
-    <module>xwiki-gwt-wysiwyg-plugin-api</module>
-    <module>xwiki-gwt-wysiwyg-client</module>
-    <module>xwiki-gwt-wysiwyg-server</module>
-    <module>xwiki-gwt-wysiwyg-war</module>
     <module>standard</module>
   </modules>
   <build>

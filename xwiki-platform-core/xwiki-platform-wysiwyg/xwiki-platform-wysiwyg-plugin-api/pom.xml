@@ -24,29 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-web</artifactId>
+    <artifactId>xwiki-platform-wysiwyg</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-web-gwt-wysiwyg-plugin-api</artifactId>
-  <name>XWiki Platform - Web - GWT - WYSIWYG Editor - Plugin API</name>
+  <artifactId>xwiki-platform-wysiwyg-plugin-api</artifactId>
+  <name>XWiki Platform - WYSIWYG Editor - Plugin API</name>
   <packaging>jar</packaging>
   <description>The API that is used to write plugins for the WYSIWYG editor.</description>
   <dependencies>
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
-      <version>${gwt.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt-user</artifactId>
+      <artifactId>xwiki-platform-gwt-user</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
@@ -79,29 +73,8 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
-        <version>${gwt.maven.plugin.version}</version>
         <configuration>
-          <mode>htmlunit</mode>
-          <testTimeOut>600</testTimeOut>
           <includes>org/xwiki/gwt/wysiwyg/PluginTestSuite.java</includes>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <!--
-            We skip the tests because of http://jira.codehaus.org/browse/SUREFIRE-508 (Cannot run GWTTestCases with
-            Surefire). GWT tests are currently run by gwt-maven-plugin.
-          -->
-          <skip>true</skip>
         </configuration>
       </plugin>
       <plugin>
@@ -115,53 +88,6 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file. -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <failsOnError>true</failsOnError>
-          <includeTestSourceDirectory>true</includeTestSourceDirectory>
-          <!-- New code should follow checkstyle rules. -->
-        </configuration>
-      </plugin>
     </plugins>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>com.atlassian.maven.plugins</groupId>
-          <artifactId>maven-clover2-plugin</artifactId>
-          <configuration>
-            <!--
-              Exclude Client code since otherwise it would mean they would get instrumented by Clover and GWT would
-              complain that it doesn't find the sources for Clover at runtime.
-            -->
-            <excludes>
-              <exclude>**/client/**/*.java</exclude>
-            </excludes>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
-  <profiles>
-    <profile>
-      <id>manual</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>gwt-maven-plugin</artifactId>
-            <configuration>
-              <mode>manual</mode>
-              <productionMode>true</productionMode>
-              <style>DETAILED</style>
-              <!-- HACK: We inject the GWT arguments in the out parameter because we have no other option. -->
-              <out>target/www-test -port 54321 -codeServerPort 12345 -userAgents gecko1_8</out>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

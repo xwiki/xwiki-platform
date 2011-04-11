@@ -898,7 +898,7 @@ class IRCBot extends PircBot
         def docname = "IRC.${channelName}Archive${docdate}"
         def doc = xwiki.getDocument(docname, context)
         if (doc.isNew()) {
-            doc.parent = "IRC.WebHome"
+            doc.setParent('IRC.WebHome')
             def archiveClass = xwiki.getDocument(archiveClassName, context)
             if (!archiveClass.isNew()) {
                 def archiveObject = doc.getObject(archiveClassName, true, context)

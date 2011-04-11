@@ -20,7 +20,7 @@
 package org.xwiki.wikistream.structure;
 
 /**
- * Represents a XWiki user
+ * Represents a Wiki user
  * 
  * @version $Id$
  */

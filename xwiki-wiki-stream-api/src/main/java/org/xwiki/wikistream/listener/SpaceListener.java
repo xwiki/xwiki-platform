@@ -19,7 +19,7 @@
  */
 package org.xwiki.wikistream.listener;
 
-import org.xwiki.wikistream.structure.MetaData;
+import org.xwiki.rendering.listener.MetaData;
 
 /**
  * Contains call back events for Wiki Space

@@ -19,11 +19,12 @@
  */
 package org.xwiki.wikistream.listener;
 
-import org.xwiki.wikistream.structure.MetaData;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.wikistream.structure.User;
 
 /**
  * Contains call back events for document
+ * 
  * @version $Id$
  */
 public interface DocumentListener extends org.xwiki.rendering.listener.Listener
@@ -46,7 +47,7 @@ public interface DocumentListener extends org.xwiki.rendering.listener.Listener
     /**
      * Call back event for title.
      * 
-     * @param title The title of  wiki document
+     * @param title The title of wiki document
      */
     void onTitle(String title);
 
@@ -64,6 +65,6 @@ public interface DocumentListener extends org.xwiki.rendering.listener.Listener
      */
     void endRevision(MetaData metadata);
 
-    //TODO
-    //Add attachment related events.
+    // TODO
+    // Add attachment related events.
 }

@@ -20,39 +20,25 @@
 package org.xwiki.wikistream;
 
 import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
-import org.xwiki.wikistream.listener.Listener;
 import org.xwiki.wikistream.type.WikiStreamType;
-import org.xwiki.wikistream.type.WikiType;
 
 /**
- * WikiStream parses and generates listener events for various wiki types.
+ * <p>
+ * WikiStream class should be inherited by all the stream based classes to implement the type and descriptor which
+ * describes a wiki stream with list of bean class parameters.
+ * </p>
  * 
  * @version $Id$
  */
 public interface WikiStream<P>
 {
     /**
-     * @return The WikiStream type.
+     * @return The {@link WikiStreamType}, which identifies a wiki stream input and output components using a role hint.
      */
     WikiStreamType getType();
 
     /**
-     * @return The WikiStreamDescriptor describes a WikiStream and has the list of bean class parameters required for the WikiStream.convert() method.
+     * @return The WikiStreamDescriptor describes a WikiStream and has the list of bean class parameters or properties.
      */
     WikiStreamDescriptor getDescriptor();
-
-    /**
-     * This uses default {@link Listener} implemented for the given {@link WikiType} type.
-     * 
-     * @param parameters The list of parameters required for the stream parser.
-     * @throws WikiStreamException
-     */
-    void convert(P parameters) throws WikiStreamException;
-    
-    /**
-     * @param parameters The list of parameters required for the stream parser.
-     * @param listener The listener has the list of events which are called by the parser.
-     * @throws WikiStreamException
-     */
-    void convert(P parameters, Listener listener) throws WikiStreamException;
 }

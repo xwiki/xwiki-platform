@@ -19,10 +19,9 @@
  */
 package org.xwiki.wikistream.listener;
 
-import org.xwiki.wikistream.structure.MetaData;
+import org.xwiki.rendering.listener.MetaData;
 
 /**
- * 
  * @version $Id$
  */
 public interface WikiListener

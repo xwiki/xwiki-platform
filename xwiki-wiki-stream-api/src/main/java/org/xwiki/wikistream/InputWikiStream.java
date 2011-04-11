@@ -17,12 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.structure;
+package org.xwiki.wikistream;
+
+import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.rendering.listener.Listener;
 
 /**
+ * @param <P>
  * @version $Id$
  */
-public class MetaData
+@ComponentRole
+public interface InputWikiStream<P> extends WikiStream<P>
 {
 
+    /**
+     * @param parameters
+     * @param listener
+     * @throws InputWikiStreamException
+     */
+    void parse(P parameters, Listener listener) throws WikiStreamException;
 }

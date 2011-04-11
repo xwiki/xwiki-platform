@@ -31,10 +31,10 @@ import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.DocumentDeleteEvent;
-import org.xwiki.observation.event.DocumentSaveEvent;
-import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -112,9 +112,9 @@ public class WatchListStore implements EventListener
     private static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
     {
         {
-            add(new DocumentSaveEvent());
-            add(new DocumentUpdateEvent());
-            add(new DocumentDeleteEvent());
+            add(new DocumentCreatedEvent());
+            add(new DocumentUpdatedEvent());
+            add(new DocumentDeletedEvent());
         }
     };
 
@@ -737,7 +737,7 @@ public class WatchListStore implements EventListener
      */
     private void documentModifiedHandler(Event event, XWikiDocument currentDoc, XWikiContext context)
     {
-        if (!(event instanceof DocumentDeleteEvent)) {
+        if (!(event instanceof DocumentDeletedEvent)) {
 
             boolean register = false;
 
@@ -753,7 +753,7 @@ public class WatchListStore implements EventListener
                     register = !currentDoc.isMinorEdit();
                     break;
                 case NEW:
-                    register = event instanceof DocumentSaveEvent;
+                    register = event instanceof DocumentCreatedEvent;
                     break;
                 default:
                     break;

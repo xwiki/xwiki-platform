@@ -286,7 +286,7 @@ public class WatchListJobManager
             if (StringUtils.isBlank(doc.getContent())) {
                 needsUpdate = true;
                 doc.setContent("{{include document=\"XWiki.SchedulerJobSheet\"/}}");
-                doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+                doc.setSyntax(Syntax.XWIKI_2_0);
             }
 
             if (needsUpdate) {

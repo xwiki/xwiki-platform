@@ -57,12 +57,6 @@
       <artifactId>xwiki-platform-activitystream</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- TODO: To be removed ASAP -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-legacy</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
   <build>
     <plugins>

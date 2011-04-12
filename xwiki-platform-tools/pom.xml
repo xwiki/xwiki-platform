@@ -42,5 +42,6 @@
     <module>xwiki-platform-tool-xar-handlers</module>
     <module>xwiki-platform-tool-xar-plugin</module>
     <module>xwiki-platform-tool-xmldoc-update-plugin</module>
+    <module>xwiki-platform-tool-packager-plugin</module>
   </modules>
 </project>

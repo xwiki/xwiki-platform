@@ -29,9 +29,9 @@
     <artifactId>xwiki-platform-rendering-macros</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-rendering-macro-wikibridge</artifactId>
-  <name>XWiki Platform - Rendering - Macro - Wiki Bridge</name>
-  <description>XWiki Platform - Rendering - Macro - Wiki Bridge</description>
+  <artifactId>xwiki-platform-rendering-wikimacro</artifactId>
+  <name>XWiki Platform - Rendering - Wiki Macro Bridge</name>
+  <description>XWiki Platform - Rendering - Wiki Macro Bridge</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

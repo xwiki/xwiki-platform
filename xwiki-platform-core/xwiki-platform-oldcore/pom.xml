@@ -582,7 +582,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-wikibridge</artifactId>
+      <artifactId>xwiki-platform-rendering-wikimacro</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

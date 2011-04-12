@@ -36,6 +36,7 @@
   <modules>
     <module>xwiki-platform-rendering-macros</module>
     <module>xwiki-platform-rendering-xwiki</module>
+    <module>xwiki-platform-rendering-wikimacro</module>
   </modules>
   <dependencies>
     <dependency>

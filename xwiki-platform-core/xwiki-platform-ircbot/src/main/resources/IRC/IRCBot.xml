@@ -898,6 +898,9 @@ class IRCBot extends PircBot
         def docname = "IRC.${channelName}Archive${docdate}"
         def doc = xwiki.getDocument(docname, context)
         if (doc.isNew()) {
+            def formattedDocumentTitleDate = xwiki.formatDate(doc.getDate(),"dd MMMM yyyy", context)
+            doc.setParent('IRC.WebHome')
+            doc.setTitle("IRC Archive for channel ${channel} on ${formattedDocumentTitleDate}")
             def archiveClass = xwiki.getDocument(archiveClassName, context)
             if (!archiveClass.isNew()) {
                 def archiveObject = doc.getObject(archiveClassName, true, context)
@@ -929,7 +932,6 @@ class IRCBot extends PircBot
             def archiveObject = doc.getObject("IRC.IRCArchiveClass", false, context)
             archiveObject.set("content", archiveObject.get("content").value + message, context)
             doc.author = "IRCBot"
-            doc.title = "IRC Archive for channel ${channel}"
             xwiki.saveDocument(doc, "Logging from IRC", true, context)
         } catch (e) {
             sendMessage(channel, "Failed to log message. Reason: " + e.getMessage())

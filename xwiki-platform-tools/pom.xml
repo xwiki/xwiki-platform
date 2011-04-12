@@ -37,11 +37,11 @@
     <module>xwiki-platform-tool-archetypes</module>
     <module>xwiki-platform-tool-configuration-resources</module>
     <module>xwiki-platform-tool-jetty-resources</module>
+    <module>xwiki-platform-tool-packager-plugin</module>
     <module>xwiki-platform-tool-rootwebapp</module>
     <module>xwiki-platform-tool-standards-validator</module>
     <module>xwiki-platform-tool-xar-handlers</module>
     <module>xwiki-platform-tool-xar-plugin</module>
     <module>xwiki-platform-tool-xmldoc-update-plugin</module>
-    <module>xwiki-platform-tool-packager-plugin</module>
   </modules>
 </project>

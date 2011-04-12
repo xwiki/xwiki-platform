@@ -24,11 +24,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
+import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.importer.ImportServiceAsync;
+import org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteFilter;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -71,6 +73,11 @@ public class ImportOfficePasteWizardStep implements WizardStep, LoadHandler
      * The component used to clean content copy&pasted from office documents.
      */
     private final ImportServiceAsync importService;
+
+    /**
+     * The object used to filter the pasted document before cleaning it on the server.
+     */
+    private final PasteFilter pasteFilter = GWT.create(PasteFilter.class);
 
     /**
      * Creates an instance of {@link ImportOfficePasteWizardStep}.
@@ -193,6 +200,7 @@ public class ImportOfficePasteWizardStep implements WizardStep, LoadHandler
      */
     public void onSubmit(final AsyncCallback<Boolean> async)
     {
+        pasteFilter.filter(textArea.getDocument());
         String officeHTML = textArea.getHTML();
         if (officeHTML.trim().equals("")) {
             async.onSuccess(false);

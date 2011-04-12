@@ -271,6 +271,7 @@
     <module>xwiki-platform-url</module>
     <module>xwiki-platform-velocity</module>
     <module>xwiki-platform-watchlist</module>
+    <module>xwiki-platform-web</module>
     <module>xwiki-platform-webdav</module>
     <module>xwiki-platform-wiki-manager</module>
     <module>xwiki-platform-workstream</module>

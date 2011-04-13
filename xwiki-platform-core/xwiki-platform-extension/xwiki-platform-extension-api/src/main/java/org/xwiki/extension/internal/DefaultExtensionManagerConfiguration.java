@@ -28,14 +28,18 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 
 @Component
+@Singleton
 public class DefaultExtensionManagerConfiguration extends AbstractLogEnabled implements ExtensionManagerConfiguration
 {
     private static final String USERHOME = System.getProperty("user.home");
@@ -46,12 +50,18 @@ public class DefaultExtensionManagerConfiguration extends AbstractLogEnabled imp
 
     private static final Pattern REPOSITORYIDPATTERN = Pattern.compile("([^:]+):([^:]+):(.+)");
 
-    @Requirement("xwikiproperties")
+    @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource configurationSource;
 
     // Cache
 
     private File localRepository;
+
+    public File getHome()
+    {
+        return EXTENSIONSHOME;
+    }
 
     public File getLocalRepository()
     {
@@ -59,7 +69,7 @@ public class DefaultExtensionManagerConfiguration extends AbstractLogEnabled imp
             String localRepositoryPath = this.configurationSource.getProperty("extension.localRepository");
 
             if (localRepositoryPath == null) {
-                this.localRepository = new File(EXTENSIONSHOME, "repository/");
+                this.localRepository = new File(getHome(), "repository/");
             } else {
                 this.localRepository = new File(localRepositoryPath);
             }

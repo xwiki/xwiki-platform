@@ -33,80 +33,50 @@ import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
-import org.xwiki.extension.Extension;
+import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
 
-public class AetherExtension implements Extension
+public class AetherExtension extends AbstractExtension
 {
+    private String PKEY_GROUPID = "aether.groupid";
+
+    private String PKEY_ARTIFACTID = "aether.artifactid";
+
     private PlexusComponentManager plexusComponentManager;
 
-    private AetherExtensionRepository repository;
-
-    private ExtensionId id;
-
-    private List<ExtensionDependency> dependencies;
-
     private List<ExtensionId> suggested;
-
-    private RepositorySystem repositorySystem;
 
     private Model mavenModel;
 
     public AetherExtension(ExtensionId id, Model mavenModel, AetherExtensionRepository repository,
         PlexusComponentManager mavenComponentManager) throws ComponentLookupException
     {
+        super(repository, id, mavenModel.getPackaging());
+
         this.plexusComponentManager = mavenComponentManager;
-
-        this.repository = repository;
-
-        this.id = id;
         this.mavenModel = mavenModel;
 
-        this.repositorySystem = this.plexusComponentManager.getPlexus().lookup(RepositorySystem.class);
-    }
+        setName(this.mavenModel.getName());
+        setDescription(this.mavenModel.getDescription());
+        // setAuthor();
+        setWebsite(this.mavenModel.getUrl());
 
-    public ExtensionId getId()
-    {
-        return this.id;
-    }
-
-    public String getAuthor()
-    {
-        // TODO
-        return null;
-    }
-
-    public String getDescription()
-    {
-        return this.mavenModel.getDescription();
-    }
-
-    public String getWebSite()
-    {
-        return this.mavenModel.getUrl();
-    }
-
-    public String getType()
-    {
-        return this.mavenModel.getPackaging();
+        putProperty(PKEY_GROUPID, this.mavenModel.getGroupId());
+        putProperty(PKEY_ARTIFACTID, this.mavenModel.getArtifactId());
     }
 
     public List<ExtensionDependency> getDependencies()
     {
         if (this.dependencies == null) {
-            this.dependencies = new ArrayList<ExtensionDependency>();
-
             for (Dependency mavenDependency : this.mavenModel.getDependencies()) {
-                // XXX: not sure what to do about "provided"
                 if (!mavenDependency.isOptional()
                     && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime") || mavenDependency
                         .getScope().equals("provided"))) {
-                    this.dependencies.add(new AetherExtensionDependency(new ExtensionId(mavenDependency.getGroupId()
-                        + ":" + mavenDependency.getArtifactId(), mavenDependency.getVersion())));
+                    addDependency(new AetherExtensionDependency(new ExtensionId(mavenDependency.getGroupId() + ":"
+                        + mavenDependency.getArtifactId(), mavenDependency.getVersion())));
                 }
             }
         }
@@ -133,14 +103,23 @@ public class AetherExtension implements Extension
 
     public void download(File file) throws ExtensionException
     {
+        RepositorySystem repositorySystem;
+        try {
+            repositorySystem = this.plexusComponentManager.getPlexus().lookup(RepositorySystem.class);
+        } catch (ComponentLookupException e) {
+            throw new ExtensionException("Failed to get org.sonatype.aether.RepositorySystem component", e);
+        }
+
+        AetherExtensionRepository aetherRepository = (AetherExtensionRepository) getRepository();
+
         ArtifactRequest artifactRequest = new ArtifactRequest();
-        artifactRequest.addRepository(this.repository.getRemoteRepository());
+        artifactRequest.addRepository(aetherRepository.getRemoteRepository());
         artifactRequest.setArtifact(new DefaultArtifact(this.mavenModel.getGroupId(), this.mavenModel.getArtifactId(),
             getType(), this.mavenModel.getVersion()));
 
         ArtifactResult artifactResult;
         try {
-            artifactResult = this.repositorySystem.resolveArtifact(this.repository.getSession(), artifactRequest);
+            artifactResult = repositorySystem.resolveArtifact(aetherRepository.getSession(), artifactRequest);
         } catch (ArtifactResolutionException e) {
             throw new ExtensionException("Failed to resolve artifact", e);
         }
@@ -152,10 +131,5 @@ public class AetherExtension implements Extension
         } catch (IOException e) {
             new ExtensionException("Failed to copy file", e);
         }
-    }
-
-    public ExtensionRepository getRepository()
-    {
-        return this.repository;
     }
 }

@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.inject.Singleton;
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -47,14 +49,17 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionCollectException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.CoreExtensionRepository;
+import org.xwiki.extension.repository.ExtensionCollector;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 
 import com.google.common.base.Predicates;
 
 @Component
+@Singleton
 public class DefaultCoreExtensionRepository extends AbstractLogEnabled implements CoreExtensionRepository,
     Initializable
 {
@@ -314,8 +319,10 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
         return this.extensions.get(id);
     }
 
-    public Collection< ? extends CoreExtension> getExtensions(int nb, int offset)
+    public void collectExtensions(ExtensionCollector collector) throws ExtensionCollectException
     {
-        return new ArrayList<CoreExtension>(this.extensions.values()).subList(offset, offset + nb);
+        for (CoreExtension coreExtension : this.extensions.values()) {
+            collector.addExtension(coreExtension);
+        }
     }
 }

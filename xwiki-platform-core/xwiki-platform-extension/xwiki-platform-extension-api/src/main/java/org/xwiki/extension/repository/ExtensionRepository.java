@@ -19,21 +19,20 @@
  */
 package org.xwiki.extension.repository;
 
-import java.util.Collection;
-
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionCollectException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 
 public interface ExtensionRepository
 {
     ExtensionRepositoryId getId();
-    
+
     Extension resolve(ExtensionId extensionId) throws ResolveException;
 
     boolean exists(ExtensionId extensionId);
-    
+
     int countExtensions();
-    
-    Collection< ? extends Extension> getExtensions(int nb, int offset);
+
+    void collectExtensions(ExtensionCollector collector) throws ExtensionCollectException;
 }

@@ -21,6 +21,7 @@ package org.xwiki.extension;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.extension.repository.ExtensionRepository;
 
@@ -30,6 +31,8 @@ public interface Extension
 
     String getType();
 
+    String getName();
+    
     String getDescription();
 
     String getWebSite();
@@ -41,4 +44,11 @@ public interface Extension
     void download(File file) throws ExtensionException;
 
     ExtensionRepository getRepository();
+
+    /**
+     * Extends {@link Extension} standard properties (used to be stored in local extension descriptor, index etc...)
+     */
+    Map<String, Object> getProperties();
+
+    <T> T getProperty(String key);
 }

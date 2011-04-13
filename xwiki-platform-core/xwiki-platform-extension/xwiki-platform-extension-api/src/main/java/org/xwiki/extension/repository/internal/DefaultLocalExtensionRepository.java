@@ -38,15 +38,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionCollectException;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManagerConfiguration;
@@ -57,21 +60,23 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.internal.VersionManager;
 import org.xwiki.extension.repository.CoreExtensionRepository;
+import org.xwiki.extension.repository.ExtensionCollector;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 
 //TODO: make it threadsafe bulletproof
 @Component
+@Singleton
 public class DefaultLocalExtensionRepository extends AbstractLogEnabled implements LocalExtensionRepository,
     Initializable
 {
-    @Requirement
+    @Inject
     private ExtensionManagerConfiguration configuration;
 
-    @Requirement
+    @Inject
     private CoreExtensionRepository coreExtensionRepository;
 
-    @Requirement
+    @Inject
     private VersionManager versionManager;
 
     private DefaultLocalExtensionSerializer extensionSerializer;
@@ -276,9 +281,11 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
         }
     }
 
-    private void addLocalExtension(LocalExtension localExtension, String namespace)
+    private void addLocalExtension(DefaultLocalExtension localExtension, String namespace)
     {
         addLocalExtension(localExtension);
+
+        localExtension.setInstalled(true, namespace);
 
         addLocalExtensionBackwardDependencies(localExtension, namespace);
     }
@@ -378,7 +385,7 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
         return null;
     }
 
-    private LocalExtension createExtension(Extension extension, boolean dependency)
+    private DefaultLocalExtension createExtension(Extension extension, boolean dependency)
     {
         DefaultLocalExtension localExtension = new DefaultLocalExtension(this, extension);
 
@@ -394,29 +401,32 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
         return this.extensions.size();
     }
 
-    public Collection< ? extends LocalExtension> getExtensions(int nb, int offset)
+    public void collectExtensions(ExtensionCollector collector) throws ExtensionCollectException
     {
-        return new ArrayList<LocalExtension>(this.extensions.values()).subList(offset, offset + nb);
+        for (LocalExtension localExtension : this.extensions.values()) {
+            collector.addExtension(localExtension);
+        }
     }
 
     public LocalExtension installExtension(Extension extension, boolean dependency, String namespace)
         throws InstallException
     {
-        LocalExtension localExtension = getInstalledExtension(extension.getId().getId(), namespace);
+        DefaultLocalExtension localExtension = (DefaultLocalExtension) this.extensions.get(extension.getId());
 
-        if (localExtension == null || !extension.getId().getVersion().equals(localExtension.getId().getVersion())
-            || (localExtension.getNamespaces() != null && !localExtension.getNamespaces().contains(namespace))) {
-            localExtension = createExtension(extension, dependency);
-
-            try {
+        try {
+            if (localExtension == null) {
+                localExtension = createExtension(extension, dependency);
                 extension.download(localExtension.getFile());
-                saveDescriptor(localExtension);
                 addLocalExtension(localExtension, namespace);
-            } catch (Exception e) {
-                // TODO: clean
-
-                throw new InstallException("Failed to download extension [" + extension + "]", e);
+                saveDescriptor(localExtension);
+            } else if (!localExtension.isInstalled(namespace)) {
+                addLocalExtension(localExtension, namespace);
+                saveDescriptor(localExtension);
             }
+        } catch (Exception e) {
+            // TODO: clean
+
+            throw new InstallException("Failed to save extensoin [" + extension + "] descriptor", e);
         }
 
         return localExtension;

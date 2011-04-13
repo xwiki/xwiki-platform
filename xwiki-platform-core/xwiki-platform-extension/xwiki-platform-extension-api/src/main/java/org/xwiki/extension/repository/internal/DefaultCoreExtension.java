@@ -29,15 +29,11 @@ import org.xwiki.extension.ExtensionId;
 
 public class DefaultCoreExtension extends AbstractExtension implements CoreExtension
 {
-    private URL url;
-
-    private boolean guessed;
-
     public DefaultCoreExtension(DefaultCoreExtensionRepository repository, URL url, ExtensionId id, String type)
     {
         super(repository, id, type);
 
-        this.url = url;
+        putProperty(PKEY_URL, url);
     }
 
     // Extension
@@ -56,21 +52,21 @@ public class DefaultCoreExtension extends AbstractExtension implements CoreExten
 
     public URL getURL()
     {
-        return this.url;
+        return getProperty(PKEY_URL);
     }
 
     public boolean isGuessed()
     {
-        return this.guessed;
+        return getProperty(PKEY_GUESSED, false);
     }
 
     public void setGuessed(boolean guessed)
     {
-        this.guessed = guessed;
+        putProperty(PKEY_GUESSED, guessed);
     }
-    
+
     // Object
-    
+
     @Override
     public String toString()
     {

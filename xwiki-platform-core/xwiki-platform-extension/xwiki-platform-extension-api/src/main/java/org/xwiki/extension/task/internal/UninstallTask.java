@@ -22,8 +22,11 @@ package org.xwiki.extension.task.internal;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
@@ -34,16 +37,18 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.task.UninstallRequest;
 import org.xwiki.observation.ObservationManager;
 
-@Component("uninstall")
+@Component
+@Singleton
+@Named("uninstall")
 public class UninstallTask extends AbstractTask<UninstallRequest>
 {
-    @Requirement
+    @Inject
     private LocalExtensionRepository localExtensionRepository;
 
-    @Requirement
+    @Inject
     private ExtensionHandlerManager extensionHandlerManager;
 
-    @Requirement
+    @Inject
     private ObservationManager observationManager;
 
     @Override

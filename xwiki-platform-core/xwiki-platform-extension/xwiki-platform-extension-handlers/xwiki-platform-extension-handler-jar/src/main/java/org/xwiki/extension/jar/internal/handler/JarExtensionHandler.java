@@ -28,9 +28,10 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.inject.Inject;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
@@ -45,10 +46,10 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
 {
     private ComponentAnnotationLoader jarLoader;
 
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
-    @Requirement
+    @Inject
     private JarExtensionClassLoader jarExtensionClassLoader;
 
     /**

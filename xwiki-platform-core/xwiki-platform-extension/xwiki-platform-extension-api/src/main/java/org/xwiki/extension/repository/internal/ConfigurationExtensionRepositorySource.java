@@ -21,16 +21,19 @@ package org.xwiki.extension.repository.internal;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositorySource;
 
 @Component
+@Singleton
 public class ConfigurationExtensionRepositorySource implements ExtensionRepositorySource
 {
-    @Requirement
+    @Inject
     private ExtensionManagerConfiguration configuration;
 
     public List<ExtensionRepositoryId> getExtensionRepositories()

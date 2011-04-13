@@ -19,12 +19,7 @@
  */
 package org.xwiki.extension;
 
-/**
- * Any exception raised in the XWiki Extension Manager must raise an exception of this type.
- * 
- * @version $Id: ExtensionException.java 31328 2010-09-23 16:22:16Z sdumitriu $
- */
-public class ExtensionException extends Exception
+public class ExtensionCollectException extends ExtensionException
 {
     /**
      * Constructs a new exception with the specified detail message. The cause is not initialized, and may subsequently
@@ -32,7 +27,7 @@ public class ExtensionException extends Exception
      * 
      * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
      */
-    public ExtensionException(String message)
+    public ExtensionCollectException(String message)
     {
         super(message);
     }
@@ -44,7 +39,7 @@ public class ExtensionException extends Exception
      * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is
      *            permitted, and indicates that the cause is nonexistent or unknown
      */
-    public ExtensionException(String message, Throwable cause)
+    public ExtensionCollectException(String message, Throwable cause)
     {
         super(message, cause);
     }

@@ -21,8 +21,10 @@ package org.xwiki.extension.internal;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -41,18 +43,19 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
  * TODO: cut installation process in steps (create and validate an install plan, install, etc.)
  */
 @Component
+@Singleton
 public class DefaultExtensionManager extends AbstractLogEnabled implements ExtensionManager, Initializable
 {
-    @Requirement
+    @Inject
     private ExtensionRepositoryManager repositoryManager;
 
-    @Requirement
+    @Inject
     private List<ExtensionRepositorySource> repositoriesSources;
 
-    @Requirement
+    @Inject
     private CoreExtensionRepository coreExtensionRepository;
 
-    @Requirement
+    @Inject
     private LocalExtensionRepository localExtensionRepository;
 
     /**

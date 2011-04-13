@@ -24,8 +24,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
@@ -36,13 +39,16 @@ import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 import org.xwiki.extension.xar.internal.repository.XarLocalExtension;
 
-@Component("xar")
+@Component
+@Singleton
+@Named("xar")
 public class XarExtensionHandler extends AbstractExtensionHandler
 {
-    @Requirement
+    @Inject
     private Packager packager;
 
-    @Requirement("xar")
+    @Inject
+    @Named("xar")
     private LocalExtensionRepository xarRepository;
 
     // TODO: support question/answer with the UI to resolve conflicts

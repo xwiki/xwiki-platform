@@ -22,8 +22,10 @@ package org.xwiki.extension.repository.internal;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -37,34 +39,45 @@ import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 
 @Component
+@Singleton
 public class DefaultExtensionRepositoryManager extends AbstractLogEnabled implements ExtensionRepositoryManager
 {
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
-    private Map<ExtensionRepositoryId, ExtensionRepository> repositories =
-        new ConcurrentHashMap<ExtensionRepositoryId, ExtensionRepository>();
+    private Map<String, ExtensionRepository> repositories = new ConcurrentHashMap<String, ExtensionRepository>();
 
-    public void addRepository(ExtensionRepositoryId repositoryId) throws ExtensionRepositoryException
+    public ExtensionRepository addRepository(ExtensionRepositoryId repositoryId) throws ExtensionRepositoryException
     {
+        ExtensionRepository repository;
+
         try {
             ExtensionRepositoryFactory repositoryFactory =
                 this.componentManager.lookup(ExtensionRepositoryFactory.class, repositoryId.getType());
 
-            addRepository(repositoryFactory.createRepository(repositoryId));
+            repository = repositoryFactory.createRepository(repositoryId);
+
+            addRepository(repository);
         } catch (ComponentLookupException e) {
             throw new ExtensionRepositoryException("Unsupported repository type[" + repositoryId.getType() + "]", e);
         }
+
+        return repository;
     }
 
     public void addRepository(ExtensionRepository repository)
     {
-        this.repositories.put(repository.getId(), repository);
+        this.repositories.put(repository.getId().getId(), repository);
     }
 
-    public void removeRepository(ExtensionRepositoryId repositoryId)
+    public void removeRepository(String repositoryId)
     {
         this.repositories.remove(repositoryId);
+    }
+
+    public ExtensionRepository getRepository(String repositoryId)
+    {
+        return this.repositories.get(repositoryId);
     }
 
     public Extension resolve(ExtensionId extensionId) throws ResolveException

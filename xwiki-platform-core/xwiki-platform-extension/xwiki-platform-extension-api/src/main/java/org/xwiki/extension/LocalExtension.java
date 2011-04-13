@@ -24,6 +24,12 @@ import java.util.Collection;
 
 public interface LocalExtension extends Extension
 {
+    String PKEY_FILE = "local.file";
+
+    String PKEY_INSTALLED = "local.installed";
+
+    String PKEY_DEPENDENCY = "local.dependency";
+
     File getFile();
 
     boolean isInstalled();

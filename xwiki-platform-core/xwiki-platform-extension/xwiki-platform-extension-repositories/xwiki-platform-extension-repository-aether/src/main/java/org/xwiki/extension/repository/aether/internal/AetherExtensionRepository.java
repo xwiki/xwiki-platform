@@ -34,8 +34,10 @@ import org.sonatype.aether.resolution.ArtifactDescriptorRequest;
 import org.sonatype.aether.resolution.ArtifactDescriptorResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionCollectException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.repository.ExtensionCollector;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
@@ -68,6 +70,9 @@ public class AetherExtensionRepository implements ExtensionRepository
         this.remoteRepository = new RemoteRepository(repositoryId.getId(), "default", repositoryId.getURI().toString());
 
         // FIXME: not very nice
+        // * use a private method of a library we don't control is not the nicest thing...
+        // * having to parse the pom.xml since we are supposed to support anything supported by aether is not very clean
+        // either
         this.loadPomMethod =
             this.artifactDescriptorReader.getClass().getDeclaredMethod("loadPom", RepositorySystemSession.class,
                 ArtifactDescriptorRequest.class, ArtifactDescriptorResult.class);
@@ -136,5 +141,10 @@ public class AetherExtensionRepository implements ExtensionRepository
     public RemoteRepository getRemoteRepository()
     {
         return remoteRepository;
+    }
+
+    public void collectExtensions(ExtensionCollector collector) throws ExtensionCollectException
+    {
+        // TODO
     }
 }

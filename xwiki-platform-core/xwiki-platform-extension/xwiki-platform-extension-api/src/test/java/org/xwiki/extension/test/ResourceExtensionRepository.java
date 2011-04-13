@@ -3,13 +3,14 @@ package org.xwiki.extension.test;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionCollectException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.repository.ExtensionCollector;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.internal.DefaultLocalExtension;
@@ -80,16 +81,18 @@ public class ResourceExtensionRepository implements ExtensionRepository
 
     public boolean exists(ExtensionId extensionId)
     {
+        // TODO
         return false;
     }
 
     public int countExtensions()
     {
+        // TODO
         return 0;
     }
 
-    public Collection< ? extends Extension> getExtensions(int nb, int offset)
+    public void collectExtensions(ExtensionCollector collector) throws ExtensionCollectException
     {
-        return null;
+        // TODO        
     }
 }

@@ -23,8 +23,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
@@ -33,15 +36,17 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 
-@Component("JarHandlerApplicationStartedListener")
+@Component
+@Singleton
+@Named("JarHandlerApplicationStartedListener")
 public class JarHandlerApplicationStartedListener extends AbstractLogEnabled implements EventListener
 {
     private static final List<Event> EVENTS = Collections.<Event> singletonList(new ApplicationStartedEvent());
 
-    @Requirement
+    @Inject
     private LocalExtensionRepository localExtensionRepository;
 
-    @Requirement
+    @Inject
     private ExtensionHandlerManager extensionHandlerManager;
 
     public List<Event> getEvents()

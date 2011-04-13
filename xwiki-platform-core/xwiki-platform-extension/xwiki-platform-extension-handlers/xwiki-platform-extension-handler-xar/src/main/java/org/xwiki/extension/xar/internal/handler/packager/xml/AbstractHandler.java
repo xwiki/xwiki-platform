@@ -23,12 +23,13 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
@@ -38,7 +39,7 @@ import com.xpn.xwiki.XWikiContext;
 
 public class AbstractHandler extends DefaultHandler
 {
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     private Object currentBean;

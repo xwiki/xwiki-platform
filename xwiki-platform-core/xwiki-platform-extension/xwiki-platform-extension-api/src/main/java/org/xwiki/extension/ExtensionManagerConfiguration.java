@@ -28,6 +28,8 @@ import org.xwiki.extension.repository.ExtensionRepositoryId;
 @ComponentRole
 public interface ExtensionManagerConfiguration
 {
+    File getHome();
+    
     File getLocalRepository();
     
     List<ExtensionRepositoryId> getRepositories();

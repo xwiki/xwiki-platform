@@ -27,11 +27,13 @@ import org.xwiki.extension.ResolveException;
 @ComponentRole
 public interface ExtensionRepositoryManager
 {
-    void addRepository(ExtensionRepositoryId repositoryId) throws ExtensionRepositoryException;
+    ExtensionRepository addRepository(ExtensionRepositoryId repositoryId) throws ExtensionRepositoryException;
 
     void addRepository(ExtensionRepository repository);
 
-    void removeRepository(ExtensionRepositoryId repositoryId);
+    void removeRepository(String repositoryId);
+
+    ExtensionRepository getRepository(String repositoryId);
 
     Extension resolve(ExtensionId extensionId) throws ResolveException;
 }

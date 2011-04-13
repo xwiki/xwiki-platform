@@ -19,8 +19,11 @@
  */
 package org.xwiki.extension.task.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
@@ -39,25 +42,27 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.task.InstallRequest;
 import org.xwiki.observation.ObservationManager;
 
-@Component("install")
+@Component
+@Singleton
+@Named("install")
 public class InstallTask extends AbstractTask<InstallRequest>
 {
-    @Requirement
+    @Inject
     private ExtensionRepositoryManager repositoryManager;
 
-    @Requirement
+    @Inject
     private CoreExtensionRepository coreExtensionRepository;
 
-    @Requirement
+    @Inject
     private LocalExtensionRepository localExtensionRepository;
 
-    @Requirement
+    @Inject
     private VersionManager versionManager;
 
-    @Requirement
+    @Inject
     private ExtensionHandlerManager extensionHandlerManager;
 
-    @Requirement
+    @Inject
     private ObservationManager observationManager;
 
     @Override

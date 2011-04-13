@@ -19,8 +19,11 @@
  */
 package org.xwiki.extension.jar.internal.handler;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextInitializer;
@@ -28,13 +31,15 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.EntityReference;
 
-@Component("jarextension")
+@Component
+@Singleton
+@Named("jarextension")
 public class JarExtensionExecutionContextInitializer implements ExecutionContextInitializer
 {
-    @Requirement
+    @Inject
     private JarExtensionClassLoader jarExtensionClassLoader;
-    
-    @Requirement
+
+    @Inject
     private ModelContext modelContext;
 
     /**
@@ -45,18 +50,20 @@ public class JarExtensionExecutionContextInitializer implements ExecutionContext
     public void initialize(ExecutionContext context) throws ExecutionContextException
     {
         String currentWikiId = null;
-        
+
         EntityReference currentEntityReference = this.modelContext.getCurrentEntityReference();
         if (currentEntityReference != null) {
-            EntityReference currentWikiReference = this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
-            
+            EntityReference currentWikiReference =
+                this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
+
             if (currentWikiReference != null) {
                 currentWikiId = currentWikiReference.getName();
             }
         }
 
-        ExtensionURLClassLoader extensionClassLoader = this.jarExtensionClassLoader.getURLClassLoader(currentWikiId, false);
-        
+        ExtensionURLClassLoader extensionClassLoader =
+            this.jarExtensionClassLoader.getURLClassLoader(currentWikiId, false);
+
         if (extensionClassLoader != null) {
             Thread.currentThread().setContextClassLoader(extensionClassLoader);
         }

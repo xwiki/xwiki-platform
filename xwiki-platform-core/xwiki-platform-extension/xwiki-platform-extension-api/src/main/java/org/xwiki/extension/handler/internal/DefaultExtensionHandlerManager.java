@@ -19,8 +19,10 @@
  */
 package org.xwiki.extension.handler.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.InstallException;
@@ -30,9 +32,10 @@ import org.xwiki.extension.handler.ExtensionHandler;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
 
 @Component
+@Singleton
 public class DefaultExtensionHandlerManager implements ExtensionHandlerManager
 {
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     private ExtensionHandler getExtensionHandler(LocalExtension localExtension) throws ComponentLookupException

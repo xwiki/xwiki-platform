@@ -31,7 +31,7 @@ import com.xpn.xwiki.XWikiException;
 /**
  * Take care of parsing xar files and handling database actions.
  * 
- * @version $Id$
+ * @version $Id: Packager.java 35671 2011-03-17 11:58:12Z tmortagne $
  */
 @ComponentRole
 public interface Packager

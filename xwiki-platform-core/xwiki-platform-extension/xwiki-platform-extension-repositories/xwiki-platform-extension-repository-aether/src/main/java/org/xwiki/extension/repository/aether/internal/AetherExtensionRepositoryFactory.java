@@ -19,13 +19,16 @@
  */
 package org.xwiki.extension.repository.aether.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.util.DefaultRepositorySystemSession;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -36,14 +39,16 @@ import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.aether.internal.configuration.AetherConfiguration;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
 
-@Component("maven")
+@Component
+@Singleton
+@Named("maven")
 public class AetherExtensionRepositoryFactory extends AbstractLogEnabled implements ExtensionRepositoryFactory,
     Initializable
 {
-    @Requirement
+    @Inject
     private PlexusComponentManager aetherComponentManager;
 
-    @Requirement
+    @Inject
     private AetherConfiguration aetherConfiguration;
 
     private DefaultRepositorySystemSession session;

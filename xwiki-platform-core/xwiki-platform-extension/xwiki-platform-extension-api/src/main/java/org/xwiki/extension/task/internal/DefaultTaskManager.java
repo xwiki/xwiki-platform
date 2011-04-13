@@ -19,8 +19,10 @@
  */
 package org.xwiki.extension.task.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.task.InstallRequest;
@@ -32,9 +34,10 @@ import org.xwiki.extension.task.TaskManager;
 import org.xwiki.extension.task.UninstallRequest;
 
 @Component
+@Singleton
 public class DefaultTaskManager implements TaskManager
 {
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     private Task currentTask;

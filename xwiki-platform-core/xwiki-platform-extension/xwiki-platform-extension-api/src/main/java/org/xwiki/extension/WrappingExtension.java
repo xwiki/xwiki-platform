@@ -21,6 +21,7 @@ package org.xwiki.extension;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.extension.repository.ExtensionRepository;
 
@@ -48,6 +49,11 @@ public class WrappingExtension implements Extension
     public String getType()
     {
         return getExtension().getType();
+    }
+
+    public String getName()
+    {
+        return getExtension().getName();
     }
 
     public String getDescription()
@@ -78,5 +84,15 @@ public class WrappingExtension implements Extension
     public ExtensionRepository getRepository()
     {
         return getExtension().getRepository();
+    }
+
+    public Map<String, Object> getProperties()
+    {
+        return getExtension().getProperties();
+    }
+
+    public <T> T getProperty(String key)
+    {
+        return getExtension().getProperty(key);
     }
 }

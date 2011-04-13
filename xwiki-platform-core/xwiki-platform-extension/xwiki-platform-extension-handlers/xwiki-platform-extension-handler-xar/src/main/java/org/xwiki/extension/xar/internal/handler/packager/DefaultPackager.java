@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -40,7 +43,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
@@ -61,15 +63,17 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
+@Singleton
 public class DefaultPackager extends AbstractLogEnabled implements Packager, Initializable
 {
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
-    @Requirement
+    @Inject
     private Execution execution;
 
-    @Requirement("explicit/reference")
+    @Inject
+    @Named("explicit/reference")
     private DocumentReferenceResolver<EntityReference> resolver;
 
     private SAXParserFactory parserFactory;

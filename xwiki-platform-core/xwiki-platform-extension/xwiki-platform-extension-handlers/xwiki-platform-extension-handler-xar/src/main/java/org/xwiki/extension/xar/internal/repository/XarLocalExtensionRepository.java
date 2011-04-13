@@ -28,12 +28,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionCollectException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
@@ -42,6 +46,7 @@ import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.event.ExtensionInstalled;
 import org.xwiki.extension.event.ExtensionUninstalled;
 import org.xwiki.extension.event.ExtensionUpgraded;
+import org.xwiki.extension.repository.ExtensionCollector;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
@@ -49,19 +54,21 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
-@Component("xar")
+@Component
+@Singleton
+@Named("xar")
 public class XarLocalExtensionRepository extends AbstractLogEnabled implements LocalExtensionRepository, Initializable
 {
     private static final List<Event> EVENTS = Arrays.<Event> asList(new ExtensionInstalled(),
         new ExtensionUninstalled(), new ExtensionUpgraded());
 
-    @Requirement
+    @Inject
     private LocalExtensionRepository localRepository;
 
-    @Requirement
+    @Inject
     private Packager packager;
 
-    @Requirement
+    @Inject
     private ObservationManager observation;
 
     private ExtensionRepositoryId repositoryId;
@@ -175,6 +182,11 @@ public class XarLocalExtensionRepository extends AbstractLogEnabled implements L
         return new ArrayList<LocalExtension>(this.extensions.values()).subList(offset, offset + nb);
     }
 
+    public void collectExtensions(ExtensionCollector collector) throws ExtensionCollectException
+    {
+        
+    }
+    
     public Collection<LocalExtension> getLocalExtensions()
     {
         return Collections.<LocalExtension> unmodifiableCollection(this.extensions.values());

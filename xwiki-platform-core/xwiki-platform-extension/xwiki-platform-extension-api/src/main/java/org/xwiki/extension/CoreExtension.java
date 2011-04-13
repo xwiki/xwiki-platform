@@ -23,6 +23,10 @@ import java.net.URL;
 
 public interface CoreExtension extends Extension
 {
+    String PKEY_URL = "core.url";
+
+    String PKEY_GUESSED = "core.guessed";
+
     URL getURL();
 
     /**

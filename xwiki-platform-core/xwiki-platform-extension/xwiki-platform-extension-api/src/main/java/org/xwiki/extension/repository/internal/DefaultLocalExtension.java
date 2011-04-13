@@ -38,17 +38,12 @@ import org.xwiki.extension.LocalExtension;
 
 public class DefaultLocalExtension extends AbstractExtension implements LocalExtension
 {
-    private File file;
-
-    private boolean installed = true;
-
-    private boolean isDependency;
-
     private Set<String> namespaces;
 
     public DefaultLocalExtension(DefaultLocalExtensionRepository repository, ExtensionId id, String type)
     {
         super(repository, id, type);
+
     }
 
     public DefaultLocalExtension(DefaultLocalExtensionRepository repository, Extension extension)
@@ -58,56 +53,49 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
 
     public void setFile(File file)
     {
-        this.file = file;
+        putProperty(PKEY_FILE, file);
     }
 
-    public void setInstalled(boolean enabled)
+    public void setInstalled(boolean installed)
     {
-        this.installed = enabled;
+        putProperty(PKEY_INSTALLED, installed);
     }
 
-    public void setInstalled(boolean enabled, String namespace)
+    public void setInstalled(boolean installed, String namespace)
     {
-        if (enabled) {
-            setInstalled(true);
-
-            if (namespace != null) {
+        if (namespace == null) {
+            setInstalled(installed);
+            setNamespaces(null);
+        } else {
+            if (installed) {
+                setInstalled(true);
                 addNamespace(namespace);
             } else {
-                this.namespaces = null;
-            }
-        } else {
-            if (this.namespaces != null) {
-                this.namespaces.remove(namespace);
+                if (this.namespaces != null) {
+                    this.namespaces.remove(namespace);
 
-                if (namespace == null || this.namespaces.isEmpty()) {
-                    this.namespaces = null;
+                    if (this.namespaces.isEmpty()) {
+                        setInstalled(false);
+                        this.namespaces = null;
+                    }
                 }
             }
-
-            setInstalled(this.namespaces != null);
         }
     }
 
-    public void setDependency(boolean isDependency)
+    public void setDependency(boolean dependency)
     {
-        this.isDependency = isDependency;
+        putProperty(PKEY_DEPENDENCY, dependency);
     }
 
     public Collection<String> getNamespaces()
     {
-        return this.namespaces;
+        return namespaces;
     }
 
     public void setNamespaces(Collection<String> namespaces)
     {
-        if (this.namespaces == null) {
-            this.namespaces = new HashSet<String>();
-        } else {
-            this.namespaces.clear();
-        }
-
-        this.namespaces.addAll(namespaces);
+        this.namespaces = namespaces != null ? new HashSet<String>(namespaces) : null;
     }
 
     public void addNamespace(String namespace)
@@ -162,12 +150,12 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
 
     public File getFile()
     {
-        return this.file;
+        return getProperty(PKEY_FILE);
     }
 
     public boolean isInstalled()
     {
-        return this.installed;
+        return getProperty(PKEY_INSTALLED, false);
     }
 
     public boolean isInstalled(String namespace)
@@ -177,6 +165,6 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
 
     public boolean isDependency()
     {
-        return this.isDependency;
+        return getProperty(PKEY_DEPENDENCY, false);
     }
 }

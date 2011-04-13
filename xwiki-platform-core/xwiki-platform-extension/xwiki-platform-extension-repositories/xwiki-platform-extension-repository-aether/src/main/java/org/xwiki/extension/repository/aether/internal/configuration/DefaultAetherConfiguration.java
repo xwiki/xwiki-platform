@@ -21,19 +21,24 @@ package org.xwiki.extension.repository.aether.internal.configuration;
 
 import java.io.File;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.extension.ExtensionManagerConfiguration;
 
 @Component
+@Singleton
 public class DefaultAetherConfiguration extends AbstractLogEnabled implements AetherConfiguration
 {
-    @Requirement("xwikiproperties")
+    @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource configurationSource;
 
-    @Requirement
+    @Inject
     private ExtensionManagerConfiguration extensionManagerConfiguration;
 
     public File getLocalRepository()

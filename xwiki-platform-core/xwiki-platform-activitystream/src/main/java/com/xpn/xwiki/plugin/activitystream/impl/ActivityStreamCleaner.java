@@ -22,6 +22,7 @@ package com.xpn.xwiki.plugin.activitystream.impl;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -191,7 +192,7 @@ public final class ActivityStreamCleaner
             if (StringUtils.isBlank(doc.getContent())) {
                 needsUpdate = true;
                 doc.setContent("{{include document=\"XWiki.SchedulerJobSheet\"/}}");
-                doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+                doc.setSyntax(Syntax.XWIKI_2_0);
             }
 
             if (needsUpdate) {

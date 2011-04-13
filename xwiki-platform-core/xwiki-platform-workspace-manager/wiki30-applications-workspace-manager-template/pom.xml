@@ -19,11 +19,13 @@
       <groupId>org.xwiki.enterprise</groupId>
       <artifactId>xwiki-enterprise-wiki</artifactId>
       <type>xar</type>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform.applications</groupId>
       <artifactId>xwiki-application-application-manager</artifactId>
       <type>xar</type>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 

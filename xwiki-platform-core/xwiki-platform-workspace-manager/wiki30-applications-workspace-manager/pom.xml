@@ -26,6 +26,13 @@
       <artifactId>xwiki-plugin-wiki-manager</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>wiki30-applications-workspace-manager-template</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   <build>
     <extensions>

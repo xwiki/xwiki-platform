@@ -718,10 +718,11 @@
                version.properties file so that it's included when displaying XWiki's version.
                Note: This plugin works by making the buildNumber property available. We then filter
                the version.properties file so that the property is replaced by its value. -->
+          <!-- Uncomment when a way to make it work with git will be found 
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>buildnumber-maven-plugin</artifactId>
-            <version>1.0-beta-1</version>
+            <version>1.0-beta-4</version>
             <executions>
               <execution>
                 <phase>validate</phase>
@@ -735,6 +736,7 @@
               <doUpdate>true</doUpdate>
             </configuration>
           </plugin>
+          -->
           <!-- Javascript and CSS files compression -->
           <plugin>
             <groupId>net.alchim31.maven</groupId>

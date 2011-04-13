@@ -582,7 +582,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-wikimacro</artifactId>
+      <artifactId>xwiki-platform-rendering-wikimacro-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

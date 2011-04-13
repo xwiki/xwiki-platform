@@ -345,12 +345,13 @@ xwiki.editcomment.mandatory=$xwikiCfgEditCommentMandatory
 # LDAP
 #-------------------------------------------------------------------------------------
 
-#-# new LDAP authentication service
+#-# LDAP authentication service
 # xwiki.authentication.authclass=com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl
 
 #-# Turn LDAP authentication on - otherwise only XWiki authentication
-#-# 0: disable
-#-# 1: enable
+#-# - 0: disable
+#-# - 1: enable
+#-# The default is 1
 # xwiki.authentication.ldap=1
 
 #-# LDAP Server (Active Directory, eDirectory, OpenLDAP, etc.)
@@ -367,29 +368,20 @@ xwiki.authentication.ldap.bind_pass={1}
 #-# The default is ({0}={1})
 # xwiki.authentication.ldap.ldap_user_search_fmt=({0}={1})
 
-#-# Bypass standard LDAP bind validation by doing a direct password comparison.
-#-# If you don't know what you do, don't use that. It's covering very rare and bad use cases.
-#-# 0: disable
-#-# 1: enable
-# xwiki.authentication.ldap.validate_password=0
-
-#-# only members of the following group will be verified in the LDAP
+#-# Only members of the following group will be verified in the LDAP
 #-# otherwise only users that are found after searching starting from the base_DN
 # xwiki.authentication.ldap.user_group=cn=developers,ou=groups,o=MegaNova,c=US
 
 #-# [Since 1.5RC1, XWikiLDAPAuthServiceImpl]
-#-# only users not member of the following group can autheticate
+#-# Only users not member of the following group can autheticate
 # xwiki.authentication.ldap.exclude_group=cn=admin,ou=groups,o=MegaNova,c=US
 
-#-# base DN for searches
+#-# The Base DN used in LDAP searches
 xwiki.authentication.ldap.base_DN=
 
-#-# Specifies the LDAP attribute containing the identifier to be used as the XWiki name (default=cn)
+#-# Specifies the LDAP attribute containing the identifier to be used as the XWiki name
+#-# The default is cn
 # xwiki.authentication.ldap.UID_attr=cn
-
-#-# [Since 1.5M1, XWikiLDAPAuthServiceImpl]
-#-# Specifies the LDAP attribute containing the password to be used "when xwiki.authentication.ldap.validate_password" is set to 1
-# xwiki.authentication.ldap.password_field=userPassword
 
 #-# [Since 1.5M1, XWikiLDAPAuthServiceImpl]
 #-# The potential LDAP groups classes. Separated by commas.
@@ -403,31 +395,38 @@ xwiki.authentication.ldap.base_DN=
 xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email=mail
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
-#-# on every login update the mapped attributes from LDAP to XWiki otherwise this happens only once when the XWiki account is created.
+#-# On every login update the mapped attributes from LDAP to XWiki otherwise this happens only once when the XWiki account is created.
+#-# - 0: only when creating user
+#-# - 1: at each authentication
+#-# The default is 1
 # xwiki.authentication.ldap.update_user=1
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
-#-# mapps XWiki groups to LDAP groups, separator is "|"
+#-# Mapps XWiki groups to LDAP groups, separator is "|"
 # xwiki.authentication.ldap.group_mapping=XWiki.XWikiAdminGroup=cn=AdminRole,ou=groups,o=MegaNova,c=US|\
 #                                         XWiki.Organisation=cn=testers,ou=groups,o=MegaNova,c=US
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
-#-# time in s after which the list of members in a group is refreshed from LDAP (default=3600*6)
+#-# Time in s after which the list of members in a group is refreshed from LDAP
+#-# The default is 2800
 # xwiki.authentication.ldap.groupcache_expiration=21800
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# - create : synchronize group membership only when the user is first created
 #-# - always: synchronize on every login
+#-# The default is always
 # xwiki.authentication.ldap.mode_group_sync=always
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# if ldap authentication fails for any reason, try XWiki DB authentication with the same credentials
+#-# The default is 1
 xwiki.authentication.ldap.trylocal=1
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# SSL connection to LDAP server
-#-# 0: normal
-#-# 1: SSL
+#-# - 0: normal
+#-# - 1: SSL
+#-# The default is 0
 # xwiki.authentication.ldap.ssl=0
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
@@ -436,8 +435,19 @@ xwiki.authentication.ldap.trylocal=1
 
 #-# [Since 1.5M1, XWikiLDAPAuthServiceImpl]
 #-# The java secure provider used in SSL connection
+#-# The default is com.sun.net.ssl.internal.ssl.Provider
 # xwiki.authentication.ldap.ssl.secure_provider=com.sun.net.ssl.internal.ssl.Provider
 
+#-# Bypass standard LDAP bind validation by doing a direct password comparison.
+#-# If you don't know what you do, don't use that. It's covering very rare and bad use cases.
+#-# - 0: disable
+#-# - 1: enable
+#-# The default is 0
+# xwiki.authentication.ldap.validate_password=0
+
+#-# [Since 1.5M1, XWikiLDAPAuthServiceImpl]
+#-# Specifies the LDAP attribute containing the password to be used "when xwiki.authentication.ldap.validate_password" is set to 1
+# xwiki.authentication.ldap.password_field=userPassword
 
 #---------------------------------------
 # Cache

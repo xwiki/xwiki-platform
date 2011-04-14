@@ -19,13 +19,11 @@
       <groupId>org.xwiki.enterprise</groupId>
       <artifactId>xwiki-enterprise-wiki</artifactId>
       <type>xar</type>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform.applications</groupId>
       <artifactId>xwiki-application-application-manager</artifactId>
       <type>xar</type>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 
@@ -42,6 +40,7 @@
         <artifactId>xwiki-xar-plugin</artifactId>
         <configuration>
           <excludes>
+            <exclude>**/META-INF/**</exclude>
             <!-- Disable local user registration. -->
             <exclude>**/XWiki/AdminRegistrationSheet.xml</exclude>
             <exclude>**/XWiki/RegistrationConfig.xml</exclude>

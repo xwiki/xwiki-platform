@@ -56,7 +56,7 @@ public class GlobalSearchException extends PluginException
      */
     public GlobalSearchException(int code, String message)
     {
-        super(GlobalSearchException.class, code, message);
+        super(GlobalSearchPlugin.class, code, message);
     }
 
     /**
@@ -71,7 +71,7 @@ public class GlobalSearchException extends PluginException
      */
     public GlobalSearchException(int code, String message, Throwable e, Object[] args)
     {
-        super(GlobalSearchException.class, code, message, e, args);
+        super(GlobalSearchPlugin.class, code, message, e, args);
     }
 
     /**
@@ -83,7 +83,7 @@ public class GlobalSearchException extends PluginException
      */
     public GlobalSearchException(int code, String message, Throwable e)
     {
-        super(GlobalSearchException.class, code, message, e);
+        super(GlobalSearchPlugin.class, code, message, e);
     }
 
     // //////
@@ -93,7 +93,7 @@ public class GlobalSearchException extends PluginException
      */
     private GlobalSearchException()
     {
-        super(GlobalSearchException.class, 0, "No error");
+        super(GlobalSearchPlugin.class, 0, "No error");
     }
 
     /**

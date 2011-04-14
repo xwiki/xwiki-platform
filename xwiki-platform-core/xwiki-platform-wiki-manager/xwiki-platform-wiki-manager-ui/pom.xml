@@ -38,14 +38,14 @@
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <!-- TODO: Add back this dependency when the wiki-manager plugin is back -->
-  <!--dependencies>
+  <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wiki-manager-api</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-  </dependencies-->
+  </dependencies>
   <build>
     <plugins>
       <!-- For applicatiosn based on ApplicationManager, ensure application version in applications descriptors page is correct -->

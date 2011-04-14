@@ -1322,6 +1322,7 @@ document.observe('xwiki:dom:loaded', function() {
  * To activate this behavior on an input elements, add one of the following classname to it :
  * <ul>
  * <li><tt>suggestDocuments</tt> to suggest from any available document</li>
+ * <li><tt>suggestSpaces</tt> to suggest space names</li>
  * <li><tt>suggestUsers</tt> to suggest from documents that contains user objects</li>
  * <li><tt>suggestGroups</tt> to suggest from documents that contains group objects</li>
  * </ul>

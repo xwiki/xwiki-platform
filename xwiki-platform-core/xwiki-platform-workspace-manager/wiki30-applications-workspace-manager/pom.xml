@@ -35,12 +35,6 @@
     </dependency>
   </dependencies>
   <build>
-    <extensions>
-      <extension>
-        <groupId>org.xwiki.platform.tools</groupId>
-        <artifactId>xwiki-xar-handlers</artifactId>
-      </extension>
-    </extensions>
     <plugins>
       <!-- Step 1: Download workspace template xar -->
       <plugin>

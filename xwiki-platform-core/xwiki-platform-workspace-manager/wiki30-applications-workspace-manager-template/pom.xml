@@ -28,12 +28,6 @@
   </dependencies>
 
   <build>
-    <extensions>
-      <extension>
-        <groupId>org.xwiki.platform.tools</groupId>
-        <artifactId>xwiki-xar-handlers</artifactId>
-      </extension>
-    </extensions>
     <plugins>
       <plugin>
         <groupId>org.xwiki.platform.tools</groupId>

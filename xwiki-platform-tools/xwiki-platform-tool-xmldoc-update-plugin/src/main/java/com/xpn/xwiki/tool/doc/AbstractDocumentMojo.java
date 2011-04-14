@@ -33,11 +33,19 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.model.reference.DocumentReference;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * An abstract Mojo that knows how to load a XWikiDocument from XML and to write XML from a XWikiDocument
@@ -46,7 +54,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  */
 public abstract class AbstractDocumentMojo extends AbstractMojo
 {
-
     /**
      * The maven project.
      * 
@@ -76,7 +83,40 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
      * An empty context that will hold the base classes encountered in the passed XML document. This is needed in order
      * not to lose the class definition when writing back to XML.
      */
-    private XWikiContext context = new XWikiContext();
+    private XWikiContext context;
+
+    public AbstractDocumentMojo() throws MojoExecutionException
+    {
+        this.context = createXWikiContext();
+    }
+
+    protected XWikiContext createXWikiContext() throws MojoExecutionException
+    {
+        EmbeddableComponentManager ecm = new EmbeddableComponentManager();
+        ecm.initialize(this.getClass().getClassLoader());
+        Utils.setComponentManager(ecm);
+
+        // We need to initialize the Component Manager so that the components can be looked up
+        XWikiContext context = new XWikiContext();
+        context.put(ComponentManager.class.getName(), ecm);
+
+        // Initialize the Container fields (request, response, session).
+        ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
+        Execution execution = Utils.getComponent(Execution.class);
+        try {
+            ExecutionContext ec = new ExecutionContext();
+
+            // Bridge with old XWiki Context, required for old code.
+            ec.setProperty("xwikicontext", context);
+
+            ecim.initialize(ec);
+            execution.setContext(ec);
+        } catch (ExecutionContextException e) {
+            throw new MojoExecutionException("Failed to initialize Execution Context.", e);
+        }
+
+        return context;
+    }
 
     /**
      * Loads a XWikiDocument from a XML file
@@ -87,7 +127,7 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
      */
     protected XWikiDocument loadFromXML(File file) throws MojoExecutionException
     {
-        XWikiDocument doc = new XWikiDocument();
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "WebHome"));
         FileInputStream fis;
         try {
             // Load the document as a XWikiDocument from XML

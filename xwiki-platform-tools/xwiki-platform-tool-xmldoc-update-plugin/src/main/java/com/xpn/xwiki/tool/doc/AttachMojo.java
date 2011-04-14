@@ -52,6 +52,10 @@ public class AttachMojo extends AbstractDocumentMojo
      */
     private File file;
 
+    public AttachMojo() throws MojoExecutionException
+    {
+    }
+
     public void execute() throws MojoExecutionException, MojoFailureException
     {
         try {
@@ -61,20 +65,17 @@ public class AttachMojo extends AbstractDocumentMojo
             XWikiAttachment attachment = createAttachment(file, author);
 
             // Add the attachment to the document attachments list
-            List attachlist = doc.getAttachmentList();
+            List<XWikiAttachment> attachlist = doc.getAttachmentList();
             attachlist.add(attachment);
             doc.setAttachmentList(attachlist);
 
             // output the file
-            File outputFile =
-                new File(getSpaceDirectory(outputDirectory, sourceDocument), sourceDocument
-                    .getName());
+            File outputFile = new File(getSpaceDirectory(outputDirectory, sourceDocument), sourceDocument.getName());
             writeToXML(doc, outputFile);
 
         } catch (Exception e) {
-            throw new MojoExecutionException("Error while attaching the file [" + file
-                + "] on document [" + sourceDocument.getParentFile().getName() + "."
-                + sourceDocument.getName() + "]", e);
+            throw new MojoExecutionException("Error while attaching the file [" + file + "] on document ["
+                + sourceDocument.getParentFile().getName() + "." + sourceDocument.getName() + "]", e);
         }
     }
 
@@ -85,29 +86,26 @@ public class AttachMojo extends AbstractDocumentMojo
      * @return the attachment
      * @throws MojoExecutionException
      */
-    private XWikiAttachment createAttachment(File file, String author)
-        throws MojoExecutionException
+    private XWikiAttachment createAttachment(File file, String author) throws MojoExecutionException
     {
         try {
             // Create an empty attachment
             XWikiAttachment attachment = new XWikiAttachment();
 
-            // Read the file data. I don't know if it's the proper way of doing this.
-            // Could possibly not handle huge files
-            byte[] data = new byte[(int) file.length()];
-            FileInputStream fis = new FileInputStream(file);
-            fis.read(data);
-            fis.close();
-
             // Feed the attachment
-            attachment.setContent(data);
+            FileInputStream fis = new FileInputStream(file);
+            try {
+                attachment.setContent(fis);
+            } finally {
+                fis.close();
+            }
+
             attachment.setAuthor(author);
             attachment.setFilename(file.getName());
 
             return attachment;
         } catch (Exception e) {
-            throw new MojoExecutionException("Error while creating attachment for file ["
-                + file.getName() + "]", e);
+            throw new MojoExecutionException("Error while creating attachment for file [" + file.getName() + "]", e);
         }
     }
 }

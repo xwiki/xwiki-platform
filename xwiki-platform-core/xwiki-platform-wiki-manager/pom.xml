@@ -34,6 +34,7 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Wiki Manager - Parent POM</description>
   <modules>
+    <module>xwiki-platform-wiki-manager-api</module>
     <module>xwiki-platform-wiki-manager-ui</module>
   </modules>
 </project>

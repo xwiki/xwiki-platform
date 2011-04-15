@@ -32,6 +32,9 @@ import java.util.Locale;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -55,16 +58,13 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         boolean needsUpdate = false;
 
         try {
-            doc = xwiki.getDocument("XWiki.CalendarEvent", context);
+            doc = xwiki.getDocument(new DocumentReference(context.getDatabase(), "XWiki", "CalendarEvent"), context);
         } catch (Exception e) {
-            doc = new XWikiDocument();
-            doc.setSpace("XWiki");
-            doc.setName("CalendarEvent");
+            doc = new XWikiDocument(new DocumentReference(context.getDatabase(), "XWiki", "CalendarEvent"));
             needsUpdate = true;
         }
 
-        BaseClass bclass = doc.getxWikiClass();
-        bclass.setName("XWiki.CalendarEvent");
+        BaseClass bclass = doc.getXClass();
         needsUpdate |= bclass.addTextField("user", "User", 30);
         needsUpdate |= bclass.addDateField("startDate", "Start Date", "MM/dd/yyyy HH:mm");
         needsUpdate |= bclass.addDateField("endDate", "End Date", "MM/dd/yyyy HH:mm");
@@ -78,11 +78,12 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 CalendarEvent");
-            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+            doc.setSyntax(Syntax.XWIKI_1_0);
         }
 
-        if (needsUpdate)
+        if (needsUpdate) {
             xwiki.saveDocument(doc, context);
+        }
         return bclass;
     }
 
@@ -143,16 +144,18 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         String id = (String) calendarParams.get("id");
         if (id == null) {
             id = (String) context.get("calendarId");
-            if (id == null)
+            if (id == null) {
                 id = "1";
-            else
+            } else {
                 id = "" + (Integer.parseInt(id.trim()) + 1);
+            }
             context.put("calendarId", id);
         }
         // formatter Month-Year title of calendar
         String dateFormat = (String) calendarParams.get("dateformat");
-        if (dateFormat == null)
+        if (dateFormat == null) {
             dateFormat = "MMMM yyyy";
+        }
         SimpleDateFormat formatTitle = new SimpleDateFormat(dateFormat, locale);
 
         // build week day names
@@ -215,21 +218,20 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
             continue;
         }
         output.append("</tr>");
-        int weeks =
-            (int) Math.ceil((dayCal.getActualMaximum(Calendar.DAY_OF_MONTH) + (dayCal.get(Calendar.DAY_OF_WEEK)
-                - dayCal.getFirstDayOfWeek() + 7) % 7) / 7.0);
+        int weeks = (int) Math.ceil((dayCal.getActualMaximum(Calendar.DAY_OF_MONTH) + (dayCal.get(Calendar.DAY_OF_WEEK)
+            - dayCal.getFirstDayOfWeek() + 7) % 7) / 7.0);
         for (int w = 0; w < weeks; w++) {
             output.append("<tr>");
             for (int d = 0; d < 7; d++) {
                 String content;
                 String script = (String) calendarParams.get("script");
 
-                if (script == null)
-                    content =
-                        calendarData.getContent(cal, (String) calendarParams.get("user"), (String) calendarParams
-                            .get("location"), (List) calendarParams.get("categories"), context);
-                else
+                if (script == null) {
+                    content = calendarData.getContent(cal, (String) calendarParams.get("user"),
+                        (String) calendarParams.get("location"), (List) calendarParams.get("categories"), context);
+                } else {
                     content = calendarData.getContent(cal, script, context);
+                }
 
                 if // day is today then use today style
                 ((cal.get(Calendar.DAY_OF_MONTH) == todayCal.get(Calendar.DAY_OF_MONTH))
@@ -309,11 +311,13 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         return mDayNames;
     }
 
+    @Override
     public String getName()
     {
         return "calendar";
     }
 
+    @Override
     public void init(XWikiContext context)
     {
         try {
@@ -323,6 +327,7 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         }
     }
 
+    @Override
     public void virtualInit(XWikiContext context)
     {
         try {
@@ -332,6 +337,7 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         }
     }
 
+    @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new CalendarPluginApi((CalendarPlugin) plugin, context);

@@ -33,20 +33,20 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public interface PdfExport
 {
-    /** Valid export types. */
-    public static enum ExportType
+    /** Describes export types. */
+    static class ExportType
     {
         /** Export type: PDF. */
-        PDF("application/pdf", "pdf"),
+        public static final ExportType PDF = new ExportType("application/pdf", "pdf");
 
         /** Export type: RTF. */
-        RTF("application/rtf", "rtf");
+        public static final ExportType RTF = new ExportType("application/rtf", "rtf");
 
         /** The MIME type corresponding to this export type. */
-        public String mimeType;
+        private final String mimeType;
 
         /** The file extension corresponding to this export type. */
-        public String extension;
+        private final String extension;
 
         /**
          * Constructor, specifying the target MIME type and file extension.
@@ -54,10 +54,26 @@ public interface PdfExport
          * @param mimeType the standard MIME type for this export type
          * @param extension the filename extension for this export type
          */
-        ExportType(String mimeType, String extension)
+        public ExportType(String mimeType, String extension)
         {
             this.mimeType = mimeType;
             this.extension = extension;
+        }
+
+        /**
+         * @return the export content type
+         */
+        public String getMimeType()
+        {
+            return mimeType;
+        }
+
+        /**
+         * @return the filename extension corresponding to this export type
+         */
+        public String getExtension()
+        {
+            return extension;
         }
     }
 
@@ -74,11 +90,11 @@ public interface PdfExport
     void exportToPDF(XWikiDocument doc, OutputStream out, XWikiContext context) throws XWikiException;
 
     /**
-     * Export a wiki Document into PDF or RTF. The content of the document is rendered into HTML using the {@code
-     * pdf.vm} template, the resulting HTML is cleaned up into valid XHTML using JTidy, and custom CSS is applied to it.
-     * If an OpenOffice service is configured and the output format is RTF, then the XHTML source is converted to RTF
-     * using it. Otherwise, the XHTML document is transformed into an XSL-FO document, which is finally processed using
-     * Apache FOP.
+     * Export a wiki Document into PDF or RTF. The content of the document is rendered into HTML using the
+     * {@code pdf.vm} template, the resulting HTML is cleaned up into valid XHTML using JTidy, and custom CSS is applied
+     * to it. If an OpenOffice service is configured and the output format is RTF, then the XHTML source is converted to
+     * RTF using it. Otherwise, the XHTML document is transformed into an XSL-FO document, which is finally processed
+     * using Apache FOP.
      * 
      * @param doc the document to export
      * @param out where to write the resulting document

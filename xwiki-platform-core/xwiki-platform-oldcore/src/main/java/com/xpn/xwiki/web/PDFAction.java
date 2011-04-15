@@ -52,11 +52,11 @@ public class PDFAction extends XWikiAction
         handleRevision(context);
 
         try {
-            context.getResponse().setContentType(ExportType.PDF.mimeType);
+            context.getResponse().setContentType(ExportType.PDF.getMimeType());
             context.getResponse().addHeader(
                 "Content-disposition", "inline; filename="
                 + Util.encodeURI(doc.getDocumentReference().getLastSpaceReference().getName(), context) + "_"
-                + Util.encodeURI(doc.getDocumentReference().getName(), context) + "." + ExportType.PDF.extension);
+                + Util.encodeURI(doc.getDocumentReference().getName(), context) + "." + ExportType.PDF.getExtension());
 
             pdfexport.export(doc, context.getResponse().getOutputStream(), ExportType.PDF, context);
         } catch (IOException e) {

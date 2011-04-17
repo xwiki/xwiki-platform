@@ -1194,6 +1194,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url("$xwiki.getSkinFile('icons/silk/page_white_acrobat.gif')");
 }
 
+.actionmenu .tmExportOdt {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/odf_textdocument.png')");
+}
+
 .actionmenu .tmExportRtf {
   background-image: url("$xwiki.getSkinFile('icons/silk/page_white_word.gif')");
 }

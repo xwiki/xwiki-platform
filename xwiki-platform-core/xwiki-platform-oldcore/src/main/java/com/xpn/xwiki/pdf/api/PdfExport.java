@@ -92,9 +92,7 @@ public interface PdfExport
     /**
      * Export a wiki Document into PDF or RTF. The content of the document is rendered into HTML using the
      * {@code pdf.vm} template, the resulting HTML is cleaned up into valid XHTML using JTidy, and custom CSS is applied
-     * to it. If an OpenOffice service is configured and the output format is RTF, then the XHTML source is converted to
-     * RTF using it. Otherwise, the XHTML document is transformed into an XSL-FO document, which is finally processed
-     * using Apache FOP.
+     * to it. The XHTML document is transformed into an XSL-FO document, which is finally processed using Apache FOP.
      * 
      * @param doc the document to export
      * @param out where to write the resulting document

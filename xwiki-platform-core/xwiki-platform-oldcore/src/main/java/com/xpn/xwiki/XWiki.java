@@ -5102,7 +5102,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     {
         int active = 1;
 
-        // These users are necessarly active
+        // These users are necessarily active
         if (user.equals(XWikiRightService.GUEST_USER_FULLNAME)
             || (user.equals(XWikiRightService.SUPERADMIN_USER_FULLNAME))) {
             return active;
@@ -5110,8 +5110,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
         String checkactivefield = getXWikiPreference("auth_active_check", context);
         if (checkactivefield.equals("1")) {
-            String username = context.getUser();
-            XWikiDocument userdoc = getDocument(username, context);
+            XWikiDocument userdoc = getDocument(user, context);
             active = userdoc.getIntValue("XWiki.XWikiUsers", "active");
         }
 

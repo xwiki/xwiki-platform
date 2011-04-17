@@ -47,6 +47,9 @@
 #if(!$doc.isNew())
   #xwikitopmenuentrystart('' $msg.get('core.menu.export') 'tmExport' '')
   #submenuitem($doc.getURL('export', "format=pdf&amp;$!docvariant") $msg.get('core.menu.export.pdf') 'tmExportPdf', '')
+  #if("$!{oomanager.serverState}" == "Connected")
+    #submenuitem($doc.getURL('export', "format=odt&amp;$!docvariant") $msg.get('core.menu.export.odt') 'tmExportOdt', '')
+  #end
   #submenuitem($doc.getURL('export', "format=rtf&amp;$!docvariant") $msg.get('core.menu.export.rtf') 'tmExportRtf', '')
   #submenuitem($doc.getURL('export', "format=html&amp;$!docvariant") $msg.get('core.menu.export.html') 'tmExportHtml', '')
   #if($hasAdmin)

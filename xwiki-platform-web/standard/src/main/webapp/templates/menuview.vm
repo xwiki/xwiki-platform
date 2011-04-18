@@ -114,7 +114,7 @@
 #xwikitopmenuentrystart('javascript:window.print()' $msg.get('core.menu.print') 'tmPrint')
 #submenuitem($doc.getURL('view', "xpage=print&amp;$!docvariant") $msg.get('core.menu.preview') 'tmPrintPreview')
 #submenuseparator()
-#submenuitem($doc.getURL('export', "format=pdf&amp;$!docvariant") $msg.get('core.menu.export.pdf') 'tmExportPdf')
+#submenuitem($doc.getURL('view', "xpage=pdfoptions&amp;$!docvariant") $msg.get('core.menu.export.pdf') 'tmExportPdf')
 #if("$!{oomanager.serverState}" == "Connected")
   #submenuitem($doc.getURL('export', "format=odt&amp;$!docvariant") $msg.get('core.menu.export.odt') 'tmExportOdt')
 #end

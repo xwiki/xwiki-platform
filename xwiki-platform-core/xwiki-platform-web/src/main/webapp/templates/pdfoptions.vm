@@ -1,0 +1,98 @@
+###
+### PDF Export Options Template
+###
+#if(!$xwiki.hasAccessLevel("view"))
+  #template("accessdenied.vm")
+#elseif($doc.isNew())
+  $response.setStatus(404)
+  #template("startpage.vm")
+  <div class="main layoutsubsection">
+  <div id="mainContentArea">
+    #error("$msg.get('core.rename.nonexistingDocument')")
+  </div>## mainContentArea
+  </div>## main
+  #template("endpage.vm")
+#else
+  #template("startpage.vm")
+  <div class="main layoutsubsection">
+  <div id="mainContentArea">
+    <div id="document-title"><h1>$msg.get('core.export.pdf.options.title')</h1></div>
+    <form id="pdfExportOptions" method="get" class="xform half" action="$doc.getURL('export')">
+      <div class="hidden">
+        <input type="hidden" name="format" value="pdf" />
+      </div>
+      <dl>
+        #if($xwiki.isMultiLingual() && $listtool.size($doc.translationList) > 0)
+          <dt>
+            <label for="language">$msg.get("language")</label>
+            <span class="xHint">$msg.get('core.export.pdf.options.language.hint')</span>
+          </dt>
+          <dd>
+            <select size="1" id="language" name="language">
+            #set($defaultLanguage = "$!doc.defaultLanguage")
+            #if($defaultLanguage == '')
+              #set($defaultLanguage = "$!doc.language")
+              #if($defaultLanguage == '')
+                #set($defaultLanguage = 'default')
+              #end
+            #end
+            #set($languages = $doc.translationList)
+            #set($discard =  $languages.add($defaultLanguage))
+            #foreach($lang in $languages)
+              ## By default, we suggest that the export is done for current language set
+              #if($lang == $tdoc.realLanguage)
+                <option value="$lang" selected="selected">$lang $msg.get('core.export.pdf.options.currentLanguage')</option>
+              #else
+                <option value="$lang">$lang</option>
+              #end
+            #end
+            </select>
+          </dd>
+        #end  ## multi-lingual
+        ## Cover
+        <dt>
+          <label for="pdfcover">
+            <input id="pdfcover" name="pdfcover" type="checkbox" checked="checked" value="1" />
+            <input name="pdfcover" type="hidden" value="0" />
+            $msg.get('core.export.pdf.options.cover')
+          </label>
+          <span class="xHint">$msg.get('core.export.pdf.options.cover.hint')</span>
+        </dt>
+        ## ToC
+        <dt>
+          <label for="pdftoc">
+            <input id="pdftoc" name="pdftoc" type="checkbox" checked="checked" value="1" />
+            <input name="pdftoc" type="hidden" value="0" />
+            $msg.get('core.export.pdf.options.toc')
+          </label>
+          <span class="xHint">$msg.get('core.export.pdf.options.toc.hint')</span>
+        </dt>
+        ## Comments
+        <dt>
+          <label for="comments">
+            <input id="comments" type="checkbox" name="comments" value="1" />
+            <input name="comments" type="hidden" value="0" />
+            $msg.get('core.export.pdf.options.comments')
+          </label>
+          <span class="xHint">$msg.get('core.export.pdf.options.comments.hint')</span>
+        </dt>
+        ## Attachments
+        <dt>
+          <label for="attachments">
+            <input id="attachments" type="checkbox" name="attachments" value="1" />
+            <input name="attachments" type="hidden" value="0" />
+            $msg.get('core.export.pdf.options.images')
+          </label>
+          <span class="xHint">$msg.get('core.export.pdf.options.images.hint')</span>
+        </dt>
+      </dl>
+      <div class="buttons">
+        <span class="buttonwrapper"><input type="submit" value="$msg.get('export')" class="button" /></span>
+        <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL()">$msg.get('cancel')</a></span>
+      </div>
+    </form>
+    <div class="clearfloats"></div>
+  </div>## mainContentArea
+  </div>## main
+  #template("endpage.vm")
+#end

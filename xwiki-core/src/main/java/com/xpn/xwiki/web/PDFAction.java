@@ -25,6 +25,7 @@ import java.io.IOException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.pdf.api.PdfExport.ExportType;
 import com.xpn.xwiki.pdf.impl.PdfExportImpl;
 import com.xpn.xwiki.util.Util;
 
@@ -45,13 +46,13 @@ public class PDFAction extends XWikiAction
         handleRevision(context);
 
         try {
-            context.getResponse().setContentType("application/pdf");
+            context.getResponse().setContentType(ExportType.PDF.getMimeType());
             context.getResponse().addHeader(
                 "Content-disposition",
                 "inline; filename=" + Util.encodeURI(doc.getSpace(), context) + "_"
-                    + Util.encodeURI(doc.getName(), context) + ".pdf");
+                    + Util.encodeURI(doc.getName(), context) + "." + ExportType.PDF.getExtension());
 
-            pdfexport.export(doc, context.getResponse().getOutputStream(), PdfExportImpl.PDF, context);
+            pdfexport.export(doc, context.getResponse().getOutputStream(), ExportType.PDF, context);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);

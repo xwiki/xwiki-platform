@@ -28,11 +28,55 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public interface PdfExport
 {
-    public void exportXHtml(byte[] xhtml, OutputStream out, int type, XWikiContext context) throws XWikiException;
+    /** Describes export types. */
+    static class ExportType
+    {
+        /** Export type: PDF. */
+        public static final ExportType PDF = new ExportType("application/pdf", "pdf");
 
-    public void exportHtml(String xhtml, OutputStream out, int type, XWikiContext context) throws XWikiException;
+        /** Export type: RTF. */
+        public static final ExportType RTF = new ExportType("application/rtf", "rtf");
 
-    public void export(XWikiDocument doc, OutputStream out, int type, XWikiContext context) throws XWikiException;
+        /** The MIME type corresponding to this export type. */
+        private final String mimeType;
+
+        /** The file extension corresponding to this export type. */
+        private final String extension;
+
+        /**
+         * Constructor, specifying the target MIME type and file extension.
+         * 
+         * @param mimeType the standard MIME type for this export type
+         * @param extension the filename extension for this export type
+         */
+        public ExportType(String mimeType, String extension)
+        {
+            this.mimeType = mimeType;
+            this.extension = extension;
+        }
+
+        /**
+         * @return the export content type
+         */
+        public String getMimeType()
+        {
+            return mimeType;
+        }
+
+        /**
+         * @return the filename extension corresponding to this export type
+         */
+        public String getExtension()
+        {
+            return extension;
+        }
+    }
+
+    public void exportXHtml(byte[] xhtml, OutputStream out, ExportType type, XWikiContext context) throws XWikiException;
+
+    public void exportHtml(String xhtml, OutputStream out, ExportType type, XWikiContext context) throws XWikiException;
+
+    public void export(XWikiDocument doc, OutputStream out, ExportType type, XWikiContext context) throws XWikiException;
 
     public void exportToPDF(XWikiDocument doc, OutputStream out, XWikiContext context) throws XWikiException;
 

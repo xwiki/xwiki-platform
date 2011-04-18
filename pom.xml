@@ -195,9 +195,11 @@
                      exclude it for the moment. See http://bit.ly/c5Jnho Remove this exclude when the problem is fixed
                      in CLIRR. -->
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager$ManagerState</exclude>
-                <!-- To be removed when we release 2.7 -->
+                <!-- To be removed when we release 2.7.2 -->
                 <exclude>org/xwiki/url/standard/StandardURLConfiguration</exclude>
                 <exclude>org/xwiki/rendering/scaffolding/RenderingTestCase</exclude>
+                <exclude>com/xpn/xwiki/pdf/api/PdfExport</exclude>
+                <exclude>com/xpn/xwiki/pdf/api/PdfExport$ExportType</exclude>
               </excludes>
             </configuration>
           </plugin>

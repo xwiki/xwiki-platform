@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-skin-colibri</artifactId>
   <name>XWiki Platform - Skins - Colibri</name>
-  <version>1.27</version>
+  <version>2.7-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>
     Colibri Skin. It is based on Toucan and requires that Albatross be set as the base skin

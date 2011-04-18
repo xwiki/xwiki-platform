@@ -26,7 +26,6 @@ import info.informatica.doc.dom4j.XHTMLDocument;
 import info.informatica.doc.dom4j.XHTMLDocumentFactory;
 import info.informatica.doc.xml.dtd.DefaultEntityResolver;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,10 +34,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -85,9 +82,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager.ManagerState;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -138,9 +132,6 @@ public class PdfExportImpl implements PdfExport
 
     /** Velocity engine manager, used for interpreting velocity. */
     private static VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-
-    /** The OpenOffice manager used for generating RTF. */
-    private static OpenOfficeManager oooManager = Utils.getComponent(OpenOfficeManager.class);
 
     /** DOM parser factory. */
     private static DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -376,6 +367,10 @@ public class PdfExportImpl implements PdfExport
 
     /**
      * Convert a valid XHTML document into PDF. No further processing of the XHTML occurs.
+     * <p>
+     * Note: This method is protected just allow other exporters to hook their code and use the PDF export
+     * infrastructure. This is just a temporary solution. The PDF export code needs to be redesigned because it has
+     * parts than can be reused for other export formats.
      * 
      * @param xhtml the source document to transform
      * @param out where to write the resulting document
@@ -383,28 +378,22 @@ public class PdfExportImpl implements PdfExport
      * @param context the current request context
      * @throws XWikiException if the conversion fails for any reason
      */
-    private void exportXHTML(String xhtml, OutputStream out, ExportType type, XWikiContext context)
+    protected void exportXHTML(String xhtml, OutputStream out, ExportType type, XWikiContext context)
         throws XWikiException
     {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Final XHTML for export: " + xhtml);
         }
 
-        // If OpenOffice server is connected use it instead of FOP which does not support RTF very well
-        // Only switch to openoffice server for RTF because FOP is supposedly a lot more powerful for PDF
-        if (type != ExportType.PDF && oooManager.getState() == ManagerState.CONNECTED) {
-            exportViaOfficeManager(xhtml, out, type, context);
-        } else {
-            // XSL Transformation to XML-FO
-            String xmlfo = convertXHtmlToXMLFO(xhtml, context);
+        // XSL Transformation to XML-FO
+        String xmlfo = convertXHtmlToXMLFO(xhtml, context);
 
-            // Debug output
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("XSL-FO source: " + xmlfo);
-            }
-
-            renderXSLFO(xmlfo, out, type);
+        // Debug output
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("XSL-FO source: " + xmlfo);
         }
+
+        renderXSLFO(xmlfo, out, type);
     }
 
     /**
@@ -442,7 +431,7 @@ public class PdfExportImpl implements PdfExport
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
 
             // Construct fop with desired output format
-            Fop fop = fopFactory.newFop(type.mimeType, foUserAgent, out);
+            Fop fop = fopFactory.newFop(type.getMimeType(), foUserAgent, out);
 
             // Identity transformer
             Transformer transformer = transformerFactory.newTransformer();
@@ -595,49 +584,6 @@ public class PdfExportImpl implements PdfExport
     }
 
     /**
-     * Export a valid XHTML document into PDF using the OpenOffice converter.
-     * 
-     * @param xhtml the source document to transform
-     * @param out where to write the resulting document
-     * @param type the type of the output: PDF or RTF
-     * @param context the current request context
-     * @throws XWikiException if the conversion fails for any reason
-     */
-    private void exportViaOfficeManager(String xhtml, OutputStream out, ExportType type, XWikiContext context)
-        throws XWikiException
-    {
-        String html = xhtml;
-
-        // FIXME: put that in some XSL transformation instead (no time and knowledge to do that before 2.4)
-        // html = applyXsl(xhtml, getXhtmlOfficexsl(context));
-        html = html.replaceAll("(<div[^>]+class=\"pdftoc\"[^>]*>)", "<p style=\"page-break-before: always;\" />\n$1");
-        html = html.replaceAll("(<div[^>]+id=\"xwikimaincontainer\"[^>]*>)",
-            "<p style=\"page-break-before: always;\" />\n$1");
-
-        // OpenOffice does not support XHTML so we remove the XML marker and let it parse it as if it was HTML content
-        html = html.substring(xhtml.indexOf("?>") + 2);
-
-        // id attribute on body element makes openoffice converter to fail
-        html = html.replaceFirst("(<body[^>]+)id=\"body\"([^>]*>)", "$1$2");
-
-        OpenOfficeConverter documentConverter = oooManager.getConverter();
-
-        String inputFileName = "export_input.html";
-        String outputFileName = "export_output." + type.extension;
-
-        Map<String, InputStream> inputStreams =
-            Collections.<String, InputStream> singletonMap(inputFileName, new ByteArrayInputStream(html.getBytes()));
-
-        try {
-            Map<String, byte[]> ouput = documentConverter.convert(inputStreams, inputFileName, outputFileName);
-
-            out.write(ouput.values().iterator().next());
-        } catch (Exception e) {
-            throw createException(e, type, XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION);
-        }
-    }
-
-    /**
      * Get the XSLT for converting (valid) XHTML to XSL-FO. The content is searched in:
      * <ol>
      * <li>the <tt>xhtmlxsl</tt> property of the current PDFTemplate</li>
@@ -746,6 +692,6 @@ public class PdfExportImpl implements PdfExport
     private XWikiException createException(Throwable source, ExportType exportType, int errorType)
     {
         return new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, errorType, "Exception while exporting "
-            + exportType.extension, source);
+            + exportType.getExtension(), source);
     }
 }

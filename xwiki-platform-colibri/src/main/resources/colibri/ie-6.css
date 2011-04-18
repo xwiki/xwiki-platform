@@ -1,0 +1,78 @@
+#actionmenu {
+  position: absolute;
+}
+
+#company {
+  float: left;
+}
+
+#globallinks {
+  width: 230px;
+}
+
+.globalsearchinput {
+  width: 190px;
+}
+
+#xdocFooter {
+  overflow: visible !important;
+}
+
+ol, ul {
+  list-style-position: outside;
+}
+
+input#xwikidoctitleinput {
+  width: 99.8%;
+}
+
+h1 span, h2 span, h3 span, h4 span  {
+  position: relative;
+}
+
+fieldset.xwikimessage {
+  display: block;
+  width: 27em;
+}
+
+.xwikiintracontent fieldset label {
+  display: block;
+  margin: 5px 0px;
+}
+
+ul.xlist, ul.xlist ul {
+  display: inline-block;
+}
+
+#informationcontent dd {
+  display: inline-block;
+}
+
+/* Should be in AdminSheet ssx */
+#userstable, #groupstable, #usersandgroupstable, #alldocstable,
+#userstable td, #groupstable td, #usersandgroupstable td, #alldocstable td {
+  border: 0;
+}
+
+/* Should be in BlogStyle ssx */
+#body .blogdate {
+  position: relative;
+}
+
+/* Should be in comments.css */
+.commentthread {
+  line-height: 0px;
+}
+
+/* xwiki/2.0 create links.
+   Since IE6 doesn't understand :after, use a static image to display the question mark. */
+span.wikicreatelink a {
+  background: transparent url("$xwiki.getSkinFile('icons/xwiki/create-link.png')") no-repeat right;
+  padding-right: 13px;
+}
+
+/* XAADMINISTRATION-75, crazy impossible bug in IE6. This is already stated in some other places as well, but IE6 sets a
+   4px top padding for the Rights icon in the administration UI. */
+#admin-icons li {
+  padding: 0;
+}

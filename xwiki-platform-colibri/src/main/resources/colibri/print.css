@@ -1,0 +1,97 @@
+/* #template('colorThemeInit.vm') */
+
+#body, #xwikimaincontainer, #xwikimaincontainerinner, #xwikicontent, #mainContentArea {
+  background-image: none !important;
+  background-color: #FFF !important;
+  float: none !important;
+  border: none !important;
+  width: auto !important;
+  margin: 0px !important;
+  padding: 10px !important;
+  overflow: visible !important;
+}
+* html #body {
+  overflow: auto !important;
+}
+/* Hide unneeded stuff */
+.edit_section,
+#rightPanels, #leftPanels, #mainmenu, #contentmenu, #editmenu,
+#globallinks, #footerglobal,
+#commentform, .xwikitabbar li, #Historyshortcut, #Informationshortcut, .separator,
+.commentheader .commenttools a, a.tag-delete , .tag-add a {
+  display: none !important;
+}
+#printcontainer {
+  overflow: visible !important; 
+  border: none; 
+  padding: 10px; 
+  text-align: justify;
+  float: none !important;
+}
+
+#headerglobal {
+  float: none;
+}
+#headerspace {
+  margin:0 !important;
+}
+#contentcolumn .main {
+  margin:0 !important;
+}
+/*-------------------------------------------------------------------*/
+.main {
+  background-color: white;
+  padding: 10px;
+}
+
+.xwikitabbar li.active {
+  display: block;
+}
+
+#docextrapanes #AddComment {
+  border: none;
+}
+
+#xwikidatacontents, #docExtraTabs {
+  background: white;
+}
+
+#xdocFooter, #docextrapanes {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#xwikicontent a , #xdocFooter a, #docextrapanes .commentauthor a, #breadcrumbs a{
+  color: $theme.textPrimaryColor !important;
+}
+
+#docExtraTabs ul.xwikitabbar {
+  padding: 0px;
+  background: white;
+}
+
+.leftsidecolumns, #contentcolumn {
+  float: none !important;
+}
+
+#docextrapanes { /* display all comments */
+  float: none !important;
+  overflow: visible !important;
+}
+
+/* Remove shortcuts */
+#document-info>div+div,
+#historyshortcut, #informationshortcut, #annotationsshortcut {
+  display: none;
+}
+.xdocLastModification {
+  width: auto;
+}
+.recentChangesMoreActions {
+  display: none;
+}
+
+/* Fix XWIKI-5567 */
+.box {
+  overflow: visible;
+}

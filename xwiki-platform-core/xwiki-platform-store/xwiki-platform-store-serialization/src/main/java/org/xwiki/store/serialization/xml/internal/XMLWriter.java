@@ -232,7 +232,6 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
         base64.close();
 
         // The last char written was a newline, not a > so it will not indent unless it is done manually.
-        super.writePrintln();
         super.setIndentLevel(this.parent.size() - 1);
         super.indent();
 

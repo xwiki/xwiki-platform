@@ -35,8 +35,10 @@ import org.xwiki.crypto.internal.Convert;
 public class ConvertTest
 {
     /** Text containing unicode characters. */
-    private static final String NONLATIN = "Kryptographie (von griechisch: κρυπτός, „verborgen“ und γράφειν, „schreiben“) "
-                                         + "ist die Wissenschaft der Verschlüsselung von Informationen.";
+    private static final String NONLATIN = "Kryptographie (von griechisch: \u03ba\u03c1\u03c5\u03c0\u03c4\u03cc\u03c2,"
+                                         + " \u201everborgen\u201c und \u03b3\u03c1\u03ac\u03c6\u03b5\u03b9\u03bd,"
+                                         + " \u201eschreiben\u201c) ist die Wissenschaft der Verschl\u00fcsselung von"
+                                         + " Informationen.";
 
     /** Random generator. */
     private Random rnd = new Random(System.currentTimeMillis());

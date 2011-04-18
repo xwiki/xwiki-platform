@@ -1,0 +1,74 @@
+#template('colorThemeInit.vm')
+body {
+  behavior: url("$xwiki.getSkinFile('/htc/csshover3.htc')");
+}
+
+* html div {
+  display: inline-block;
+}
+
+*+html #docextrapanes {
+  display: inline-block;
+}
+
+.minwidth, .minwidthb, .minwidthc, .minwidthd {
+  display: none;
+  height: 0;
+  font: normal 1px / 1px sans-serif;
+}
+
+#globallinks {
+  margin-left: -230px;
+}
+
+fieldset.xwikimessage legend span {
+  float: left;
+}
+fieldset.xwikimessage legend span span {
+  float: none;
+}
+
+.xwikiintracontent legend {
+  margin: -5px 0 5px 0;
+}
+
+*+html .xwikiintracontent legend {
+  margin: 5px 0 10px -7px;
+}
+
+#commentscontent #AddComment .commentcontainer label {
+  display: none;
+}
+
+*+html input.button {
+  padding: 0 0 1px;
+}
+
+fieldset.xwikimessage {
+  display: inline;
+}
+
+table.xwikilogintable input#j_password , table.xwikilogintable input#j_username{
+  width: 160px;
+}
+
+/* xwiki/2.0 create links.
+   Since IE7 doesn't understand :after, use a static image to display the question mark.
+   This should be in ie-7.css, but that file doesn't exist yet. */
+*+html span.wikicreatelink a {
+  background: transparent url("$xwiki.getSkinFile('icons/xwiki/create-link.png')") no-repeat right;
+  padding-right: 13px;
+}
+
+/* ----------------Changes----------------*/
+/* IE6/7 don't understand :before and :after, so just display a plain image instead of the CSS arrow */
+* html #changes-info {
+  background: $theme.backgroundSecondaryColor url("$xwiki.getSkinFile('icons/xwiki/diff-header.png')") no-repeat 50% 2.5em;
+}
+*+html #changes-info {
+  background: $theme.backgroundSecondaryColor url("$xwiki.getSkinFile('icons/xwiki/diff-header.png')") no-repeat 50% 2.5em;
+}
+/* IE7 has problems with percentage margins, this will just leave the "to" box floating on the right */
+*+html #changes-info-box-to {
+  margin-left: 0;
+}

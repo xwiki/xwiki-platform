@@ -105,9 +105,9 @@
           </configuration>
         </plugin>
         <plugin>
-          <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-platform-tool-xar-plugin</artifactId>
-          <version>${project.version}</version>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+          <version>${commons.version}</version>
         </plugin>
         <plugin>
           <!-- Default configuration for the GWT maven plugin -->
@@ -173,9 +173,9 @@
     <!-- Needed to add support for the XAR packaging -->
     <extensions>
       <extension>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-tool-xar-handlers</artifactId>
-        <version>${project.version}</version>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
+        <version>${commons.version}</version>
       </extension>
     </extensions>
   </build>

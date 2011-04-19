@@ -40,8 +40,6 @@
     <module>xwiki-platform-tool-packager-plugin</module>
     <module>xwiki-platform-tool-rootwebapp</module>
     <module>xwiki-platform-tool-standards-validator</module>
-    <module>xwiki-platform-tool-xar-handlers</module>
-    <module>xwiki-platform-tool-xar-plugin</module>
     <module>xwiki-platform-tool-xmldoc-update-plugin</module>
   </modules>
 </project>

@@ -7,12 +7,13 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.xwiki.contrib.wiki30</groupId>
-  <artifactId>wiki30-applications-workspace-manager-template</artifactId>
+  <artifactId>wiki30-applications-workspace-manager-template
+  </artifactId>
   <packaging>xar</packaging>
 
   <name>Wiki3.0 - Workspaces - Application - Workspace Template</name>
-  <description>Template workspace to be used when creating a new workspace.</description>
+  <description>Template workspace to be used when creating a new
+    workspace.</description>
 
   <dependencies>
     <dependency>
@@ -25,6 +26,12 @@
       <artifactId>xwiki-application-application-manager</artifactId>
       <type>xar</type>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>rt-application</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
   </dependencies>
 
   <build>
@@ -32,6 +39,24 @@
       <plugin>
         <groupId>org.xwiki.platform.tools</groupId>
         <artifactId>xwiki-xar-plugin</artifactId>
+        <executions>
+          <!-- Unpack XE xar so that we can transform XWiki.XWikiPreferences -->
+          <execution>
+            <id>unxar-xwiki-enterprise-wiki</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unxar</goal>
+            </goals>
+            <configuration>
+              <artifactId>xwiki-enterprise-wiki</artifactId>
+              <groupId>org.xwiki.enterprise</groupId>
+              <outputDirectory>${project.build.outputDirectory}
+              </outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+        <!-- XAR/UnXAR everything, excluding some pages that need to be excluded 
+          for the workspace template -->
         <configuration>
           <excludes>
             <exclude>**/META-INF/**</exclude>
@@ -42,6 +67,45 @@
             <!-- Disable local user management. -->
             <exclude>**/XWiki/AdminUsersSheet.xml</exclude>
           </excludes>
+        </configuration>
+      </plugin>
+
+      <!-- Update XWiki.XWikiPreferences page and register skin + translations -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>xml-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>register-skin-and-translations</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <transformationSets>
+            <transformationSet>
+              <dir>${project.build.outputDirectory}</dir>
+              <outputDir>${project.build.outputDirectory}</outputDir>
+              <includes>
+                <include>XWiki/XWikiPreferences.xml</include>
+              </includes>
+              <stylesheet>src/main/build/transformation/register.xsl
+              </stylesheet>
+              <parameters>
+                <parameter>
+                  <name>translations</name>
+                  <value>xwiki:WorkspaceManager.TemplateTranslations,
+                    XWiki.RtI18N</value>
+                </parameter>
+                <parameter>
+                  <name>skin</name>
+                  <value>XWiki.RtSkin</value>
+                </parameter>
+              </parameters>
+            </transformationSet>
+          </transformationSets>
         </configuration>
       </plugin>
     </plugins>

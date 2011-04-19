@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.plugin.activitystream.eventstreambridge;
 
@@ -26,9 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventFactory;
@@ -55,34 +57,37 @@ import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
  * @version $Id$
  */
 @Component
+@Singleton
 public class BridgeEventStream implements EventStream
 {
     /** Needed for creating raw events. */
-    @Requirement
+    @Inject
     private EventFactory eventFactory;
 
     /** Needed for accessing the current request context. */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /** Needed for running queries. */
-    @Requirement
+    @Inject
     private QueryManager qm;
 
     /** Needed for serializing document names. */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> serializer;
 
     /** Needed for serializing the wiki and space names. */
-    @Requirement("local")
+    @Inject
+    @Named("local")
     private EntityReferenceSerializer<String> localSerializer;
 
     /** Needed for deserializing document names. */
-    @Requirement
+    @Inject
     private EntityReferenceResolver<String> resolver;
 
     /** Needed for deserializing related entities. */
-    @Requirement("explicit")
+    @Inject
+    @Named("explicit")
     private EntityReferenceResolver<String> explicitResolver;
 
     /**

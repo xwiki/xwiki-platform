@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.annotation.internal;
 
 import java.io.StringReader;
@@ -26,6 +25,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationService;
@@ -36,7 +38,6 @@ import org.xwiki.annotation.io.IOTargetService;
 import org.xwiki.annotation.maintainer.AnnotationState;
 import org.xwiki.annotation.renderer.AnnotationPrintRenderer;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
@@ -54,30 +55,31 @@ import org.xwiki.rendering.transformation.TransformationManager;
  * @since 2.3M1
  */
 @Component
+@Singleton
 public class DefaultAnnotationService implements AnnotationService
 {
     /**
      * The storage service for annotations.
      */
-    @Requirement
+    @Inject
     private IOService ioService;
 
     /**
      * Component manager used to lookup the content alterer needed for the specific document.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
      * The storage service for annotation targets (documents).
      */
-    @Requirement
+    @Inject
     private IOTargetService targetIoService;
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.annotation.target.AnnotationTarget#addAnnotation(String, String, String, int, String, Map)
+     * @see AnnotationService#addAnnotation(String, String, String, int, String, Map)
      */
     public void addAnnotation(String target, String selection, String selectionContext, int offset, String author,
         Map<String, Object> metadata) throws AnnotationServiceException

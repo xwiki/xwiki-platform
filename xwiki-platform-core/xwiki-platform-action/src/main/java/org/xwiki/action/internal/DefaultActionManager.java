@@ -16,15 +16,17 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.action.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.action.Action;
 import org.xwiki.action.ActionException;
 import org.xwiki.action.ActionManager;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
@@ -33,15 +35,17 @@ import org.xwiki.url.XWikiURL;
 import org.xwiki.url.XWikiURLType;
 
 @Component
+@Singleton
 public class DefaultActionManager implements ActionManager
 {
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
-    @Requirement
+    @Inject
     private Container container;
 
-    @Requirement("error")
+    @Inject
+    @Named("error")
     private Action errorAction;
 
     public void handleRequest() throws ActionException
@@ -71,7 +75,7 @@ public class DefaultActionManager implements ActionManager
     {
         // Actions are registered with a role hint corresponding to the action name
         try {
-            Action action = (Action) this.componentManager.lookup(Action.class, actionName);
+            Action action = this.componentManager.lookup(Action.class, actionName);
             action.execute(additionalData);
         } catch (Exception e) {
             this.errorAction.execute(e);

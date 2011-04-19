@@ -21,6 +21,7 @@
 package com.xpn.xwiki.plugin.tag;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -404,11 +405,11 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         throws XWikiException
     {
         List<String> documentTags = getTagsFromDocument(document);
-        String[] newTags = tags.split("\\s*+,\\s*+");
+        String[] newTags = tags.trim().split("\\s*+,\\s*+");
         boolean added = false;
 
         for (String tag : newTags) {
-            if (!StringUtils.isBlank(tag) && !documentTags.contains(tag)) {
+            if (!StringUtils.isBlank(tag) && !containsIgnoreCase(documentTags, tag)) {
                 documentTags.add(tag);
                 added = true;
             }
@@ -416,15 +417,28 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
         if (added) {
             setDocumentTags(document, documentTags, context);
-            List<String> commentArgs = new ArrayList<String>();
-            commentArgs.add(tags);
-            String comment = context.getMessageTool().get(DOC_COMMENT_TAG_ADDED, commentArgs);
+            String comment = context.getMessageTool().get(DOC_COMMENT_TAG_ADDED, Collections.singletonList(tags));
             context.getWiki().saveDocument(document, comment, true, context);
 
             return TagOperationResult.OK;
         }
 
         return TagOperationResult.NO_EFFECT;
+    }
+
+    /**
+     * @param collection a collection of strings
+     * @param item a string
+     * @return {@code true} if there is an item in the given collection that equals ignoring case the given string
+     */
+    private boolean containsIgnoreCase(Collection<String> collection, String item)
+    {
+        for (String existingItem : collection) {
+            if (existingItem.equalsIgnoreCase(item)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

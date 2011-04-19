@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-web</artifactId>
+    <artifactId>xwiki-platform-web</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
   <groupId>com.xpn.xwiki.platform</groupId>
@@ -49,7 +49,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
       <!-- We don't want all the Core libs to be put in WEB-INF/lib as this GWT WAR will be
            overlayed with the Standard WAR which already contains all the required libs -->
       <scope>provided</scope>

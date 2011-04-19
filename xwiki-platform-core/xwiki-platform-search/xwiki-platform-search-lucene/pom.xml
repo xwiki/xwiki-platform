@@ -32,9 +32,6 @@
   <artifactId>xwiki-platform-search-lucene</artifactId>
   <name>XWiki Platform - Search - Lucene</name>
   <description>XWiki Platform - Search - Lucene</description>
-  <properties>
-    <commons.version>3.0-SNAPSHOT</commons.version>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

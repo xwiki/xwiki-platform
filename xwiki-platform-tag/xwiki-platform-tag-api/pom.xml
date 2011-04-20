@@ -25,19 +25,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <artifactId>xwiki-plugins</artifactId>
-    <version>28</version>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-tag</artifactId>
+    <version>2.7-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-plugin-tag</artifactId>
-  <name>XWiki Platform - Plugins - Tag</name>
-  <version>1.18</version>
-  <description>XWiki Platform - Plugins - Tag</description>
+  <artifactId>xwiki-platform-tag-api</artifactId>
+  <name>XWiki Platform - Tag - API</name>
+  <description>XWiki Platform - Tag - API</description>
+  <properties>
+    <!-- Don't run CLIRR here becaue there is not previous version with the new artifactId. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>2.0.4</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -51,17 +54,6 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-  <!-- We must configure SCM in each module. For more information see:
-       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-tag-1.18</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-tag-1.18</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-tag-1.18</url>
-  </scm>
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.xwiki.org/jira/browse/XATAG</url>
-  </issueManagement>
   <build>
     <plugins>
       <plugin>

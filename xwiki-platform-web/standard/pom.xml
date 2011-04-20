@@ -23,19 +23,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki.platform</groupId>
-    <artifactId>xwiki-web</artifactId>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-web</artifactId>
     <version>2.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-web-standard</artifactId>
   <name>XWiki Platform - Web - Standard</name>
   <packaging>war</packaging>
   <description>The standard XWiki WAR</description>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <!-- Add the GWT JAR so that XWiki Core is GWT-ready and so that the XWiki GWT Servlet can
          be activated by default in web.xml -->
@@ -54,44 +58,44 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-webdav</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <!-- The REST module -->
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-rest-server</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <!-- The annotations modules -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-annotations-core</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-annotations-reference</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-annotations-io</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-annotations-maintainer</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-annotations-rest</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-annotations-velocity</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <!-- Skin modules
          Note: even though the dependency plugin below doesn't need explicit dependencies set
@@ -109,9 +113,9 @@
       <type>zip</type>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform.skins</groupId>
-      <artifactId>xwiki-skin-colibri</artifactId>
-      <version>${platform.skin.colibri.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-colibri</artifactId>
+      <version>${project.version}</version>
       <type>zip</type>
     </dependency>
     <!-- needed for slf4j clients such as QueryPlugin and JCRStore 
@@ -136,31 +140,31 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-captcha</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <!-- Crypto Module -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-crypto</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <!-- CSRF protection -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-csrf</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <!-- Extension Manager -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-extension-handler-jar</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <!-- Legacy / Backward compatibility -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-legacy</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -250,8 +254,8 @@
                   <outputDirectory>${project.build.directory}/skin</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xwiki.platform.skins</groupId>
-                  <artifactId>xwiki-skin-colibri</artifactId>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-colibri</artifactId>
                   <type>zip</type>
                   <outputDirectory>${project.build.directory}/skin</outputDirectory>
                 </artifactItem>
@@ -340,8 +344,15 @@
               <rules>
                 <bannedDependencies>
                   <excludes>
-                    <exclude>junit:junit</exclude>
+                    <exclude>org.jmock:*</exclude>
+                    <exclude>junit:*</exclude>
+                    <exclude>javax.servlet:servlet-api:*:*:compile</exclude>
                   </excludes>
+                  <includes>
+                    <!-- Allow only JUnit and JMock with scope test because -->
+                    <include>org.jmock:*:*:*:test</include>
+                    <include>junit:*:*:*:test</include>
+                  </includes>
                 </bannedDependencies>
               </rules>
             </configuration>

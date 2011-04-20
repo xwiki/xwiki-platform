@@ -23,10 +23,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki.platform</groupId>
-    <artifactId>xwiki-web</artifactId>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-web</artifactId>
     <version>2.7-SNAPSHOT</version>
   </parent>
+  <groupId>com.xpn.xwiki.platform</groupId>
   <artifactId>xwiki-web-gwt</artifactId>
   <name>XWiki Platform - Web - GWT API</name>
   <packaging>jar</packaging>
@@ -48,7 +49,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>${platform.core.version}</version>
+      <version>${project.version}</version>
       <!-- We don't want all the Core libs to be put in WEB-INF/lib as this GWT WAR will be
            overlayed with the Standard WAR which already contains all the required libs -->
       <scope>provided</scope>

@@ -29,47 +29,12 @@
     <artifactId>xwiki-core-parent</artifactId>
     <version>2.7-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-colibri</artifactId>
-  <name>XWiki Platform - Colibri Skin</name>
+  <artifactId>xwiki-platform-tag</artifactId>
+  <name>XWiki Platform - Tag - Parent POM</name>
   <packaging>pom</packaging>
-  <description>
-    Colibri Skin. It is based on Toucan and requires that Albatross be set as the base skin
-    in xwiki.cfg to work.
-  </description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
-  <dependencies>
-    <!-- Toucan skin requires the Albatross Skin v1.1 or greater at runtime -->
-    <dependency>
-      <groupId>org.xwiki.platform.skins</groupId>
-      <artifactId>xwiki-skin-albatross</artifactId>
-      <version>1.30</version>
-      <type>zip</type>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <appendAssemblyId>false</appendAssemblyId>
-          <descriptors>
-            <descriptor>${basedir}/src/assemble/skin.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  <description>XWiki Platform - Tag - Parent POM</description>
+  <modules>
+    <module>xwiki-platform-tag-api</module>
+    <module>xwiki-platform-tag-ui</module>
+  </modules>
 </project>

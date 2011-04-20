@@ -24,25 +24,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki</artifactId>
-    <version>38</version>
-    <relativePath>../pom</relativePath>
+    <artifactId>xwiki-core-parent</artifactId>
+    <version>2.7-SNAPSHOT</version>
   </parent>
-  <groupId>com.xpn.xwiki.platform</groupId>
-  <artifactId>xwiki-web</artifactId>
-  <version>2.7-SNAPSHOT</version>
+  <artifactId>xwiki-platform-web</artifactId>
   <name>XWiki Platform - Web - Parent POM</name>
   <packaging>pom</packaging>
   <description>Common web resources for all XWiki WARs</description>
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-2.7</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-2.7</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-2.7</url>
-  </scm>
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.xwiki.org/jira/browse/XWIKI</url>
-  </issueManagement>
   <properties>
     <!-- Used by gwt and wysiwyg modules -->
     <gwt.version>2.0.4</gwt.version>
@@ -50,10 +38,8 @@
     <junit.version>3.8.2</junit.version>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tool.configuration.version>1.45</platform.tool.configuration.version>
-    <platform.core.version>${project.version}</platform.core.version>
     <platform.skin.albatross.version>1.30</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.37</platform.skin.toucan.version>
-    <platform.skin.colibri.version>1.27</platform.skin.colibri.version>
   </properties>
   <profiles>
     <profile>

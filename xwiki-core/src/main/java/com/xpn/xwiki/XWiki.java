@@ -1901,7 +1901,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             XWikiDocument doc = getDocument(skin, context);
             if (!doc.isNew()) {
                 // Try parsing the object property
-                BaseObject object = doc.getXObject(new DocumentReference(context.getDatabase(), "XWiki", "XWikiSkins"));
+                BaseObject object = doc.getXObject(new DocumentReference(
+                    doc.getDocumentReference().getWikiReference().getName(), "XWiki", "XWikiSkins"));
                 if (object != null) {
                     String content = object.getStringValue(template);
                     if (!StringUtils.isBlank(content)) {
@@ -2059,7 +2060,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             XWikiDocument doc = getDocument(skin, context);
             if (!doc.isNew()) {
                 // Look for an object property
-                BaseObject object = doc.getXObject(new DocumentReference(context.getDatabase(), "XWiki", "XWikiSkins"));
+                BaseObject object = doc.getXObject(new DocumentReference(
+                    doc.getDocumentReference().getWikiReference().getName(), "XWiki", "XWikiSkins"));
                 if (object != null) {
                     String content = object.getStringValue(filename);
                     if (!StringUtils.isBlank(content)) {

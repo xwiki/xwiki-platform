@@ -27,10 +27,10 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
  * Uses the Entity Reference values defined in the Model Configuration.
- *
+ * 
  * @version $Id$
  * @since 2.3M1
- * @see org.xwiki.model.internal.DefaultModelConfiguration 
+ * @see org.xwiki.model.internal.DefaultModelConfiguration
  */
 @Component
 public class DefaultEntityReferenceValueProvider implements EntityReferenceValueProvider
@@ -40,6 +40,7 @@ public class DefaultEntityReferenceValueProvider implements EntityReferenceValue
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.model.reference.EntityReferenceValueProvider#getDefaultValue(org.xwiki.model.EntityType)
      */
     public String getDefaultValue(EntityType type)

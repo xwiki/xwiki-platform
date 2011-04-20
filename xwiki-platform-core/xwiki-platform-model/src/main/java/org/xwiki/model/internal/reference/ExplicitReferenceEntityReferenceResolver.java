@@ -27,7 +27,7 @@ import org.xwiki.model.reference.EntityReference;
 /**
  * Resolver that resolves a Reference passed as a String into an absolute reference. For missing reference parts, the
  * resolver takes default values from a parameter which must be of type {@link EntityReference}.
- *
+ * 
  * @version $Id$
  * @since 2.23
  */
@@ -35,10 +35,8 @@ import org.xwiki.model.reference.EntityReference;
 public class ExplicitReferenceEntityReferenceResolver extends AbstractReferenceEntityReferenceResolver
 {
     /**
-     * {@inheritDoc}
-     *
-     * Expects an EntityReference parameter from which to extract the default values.
-     *
+     * {@inheritDoc} Expects an EntityReference parameter from which to extract the default values.
+     * 
      * @see AbstractStringEntityReferenceResolver#getDefaultValue
      */
     @Override

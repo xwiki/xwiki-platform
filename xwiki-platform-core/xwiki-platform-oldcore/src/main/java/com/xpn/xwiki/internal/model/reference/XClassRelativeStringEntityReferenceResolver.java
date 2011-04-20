@@ -26,16 +26,15 @@ import org.xwiki.model.reference.EntityReference;
 
 /**
  * Resolve a String representing an Entity Reference into an {@link org.xwiki.model.reference.EntityReference} object.
- * The behavior is the one defined in
- * {@link org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver} except that it uses a space with
- * the "XWiki" value if no space is specified and that an optional parameter can be passed to specify what page name
- * to use if no page is specified in the passed string representation.
- *
+ * The behavior is the one defined in {@link org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver}
+ * except that it uses a space with the "XWiki" value if no space is specified and that an optional parameter can be
+ * passed to specify what page name to use if no page is specified in the passed string representation.
+ * 
  * @version $Id$
  * @since 2.2.3
- * @deprecated this is only a backward compatibility resolver since the old behavior for class reference was to use
- *             the "XWiki" space when no space was specified. Since we now pass absolute references there's no need
- *             to resolve anything...
+ * @deprecated this is only a backward compatibility resolver since the old behavior for class reference was to use the
+ *             "XWiki" space when no space was specified. Since we now pass absolute references there's no need to
+ *             resolve anything...
  */
 @Deprecated
 @Component("xclass")
@@ -43,6 +42,7 @@ public class XClassRelativeStringEntityReferenceResolver extends AbstractStringE
 {
     /**
      * {@inheritDoc}
+     * 
      * @see AbstractStringEntityReferenceResolver#getDefaultValue(org.xwiki.model.EntityType, Object...)
      */
     @Override
@@ -60,11 +60,11 @@ public class XClassRelativeStringEntityReferenceResolver extends AbstractStringE
 
     /**
      * {@inheritDoc}
+     * 
      * @see AbstractStringEntityReferenceResolver#resolve(String, org.xwiki.model.EntityType, Object...)
      */
     @Override
-    public EntityReference resolve(String entityReferenceRepresentation, EntityType type,
-        Object... parameters)
+    public EntityReference resolve(String entityReferenceRepresentation, EntityType type, Object... parameters)
     {
         // We allow to pass a page reference in parameter. If the passed representation doesn't contain a page then the
         // page from the parameter will be used.

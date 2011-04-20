@@ -27,8 +27,8 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 /**
  * Generic implementation that resolve {@link org.xwiki.model.reference.EntityReference} objects from their string
  * representation. This implementation uses fixed default values when parts of the Reference are missing in the string
- * representation. Default values are retrieved from the {@link org.xwiki.model.ModelConfiguration} class.  
- *
+ * representation. Default values are retrieved from the {@link org.xwiki.model.ModelConfiguration} class.
+ * 
  * @version $Id$
  * @since 2.2M1
  */
@@ -40,6 +40,7 @@ public class DefaultStringEntityReferenceResolver extends AbstractStringEntityRe
 
     /**
      * {@inheritDoc}
+     * 
      * @see AbstractStringEntityReferenceResolver#getDefaultValue
      */
     @Override

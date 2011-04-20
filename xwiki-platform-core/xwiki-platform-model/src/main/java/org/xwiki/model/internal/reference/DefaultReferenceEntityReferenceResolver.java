@@ -39,6 +39,7 @@ public class DefaultReferenceEntityReferenceResolver extends AbstractReferenceEn
     @Requirement
     private EntityReferenceValueProvider provider;
 
+    @Override
     protected String getDefaultValue(EntityType type, Object... parameters)
     {
         return this.provider.getDefaultValue(type);

@@ -1874,15 +1874,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
     public String parseTemplate(String template, String skin, XWikiContext context)
     {
-        String currentWiki = context.getDatabase();
         try {
             XWikiDocument doc = getDocument(skin, context);
             if (!doc.isNew()) {
-                context.setDatabase(doc.getDocumentReference().getWikiReference().getName());
-
                 // Try parsing the object property
-                BaseObject object =
-                    doc.getXObject(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiSkins"));
+                BaseObject object = doc.getXObject(new DocumentReference(
+                    doc.getDocumentReference().getWikiReference().getName(), SYSTEM_SPACE, "XWikiSkins"));
                 if (object != null) {
                     String content = object.getStringValue(template);
                     if (!StringUtils.isBlank(content)) {
@@ -1909,8 +1906,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                 }
             }
         } catch (Exception e) {
-        } finally {
-            context.setDatabase(currentWiki);
         }
 
         // Try parsing a file located in the directory with the same name.
@@ -2044,8 +2039,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             XWikiDocument doc = getDocument(skin, context);
             if (!doc.isNew()) {
                 // Look for an object property
-                BaseObject object =
-                    doc.getXObject(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiSkins"));
+                BaseObject object = doc.getXObject(new DocumentReference(
+                    doc.getDocumentReference().getWikiReference().getName(), SYSTEM_SPACE, "XWikiSkins"));
                 if (object != null) {
                     String content = object.getStringValue(filename);
                     if (!StringUtils.isBlank(content)) {

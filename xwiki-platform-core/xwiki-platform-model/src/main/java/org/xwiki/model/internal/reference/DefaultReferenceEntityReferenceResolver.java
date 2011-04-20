@@ -19,8 +19,11 @@
  */
 package org.xwiki.model.internal.reference;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
@@ -33,10 +36,12 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  * @version $Id$
  * @since 2.2M1
  */
-@Component("default/reference")
+@Component
+@Named("default/reference")
+@Singleton
 public class DefaultReferenceEntityReferenceResolver extends AbstractReferenceEntityReferenceResolver
 {
-    @Requirement
+    @Inject
     private EntityReferenceValueProvider provider;
 
     @Override

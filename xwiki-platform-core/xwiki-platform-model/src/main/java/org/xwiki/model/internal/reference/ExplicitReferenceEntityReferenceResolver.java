@@ -19,9 +19,11 @@
  */
 package org.xwiki.model.internal.reference;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.AbstractStringEntityReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 
 /**
@@ -31,7 +33,9 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 2.23
  */
-@Component("explicit/reference")
+@Component
+@Named("explicit/reference")
+@Singleton
 public class ExplicitReferenceEntityReferenceResolver extends AbstractReferenceEntityReferenceResolver
 {
     /**

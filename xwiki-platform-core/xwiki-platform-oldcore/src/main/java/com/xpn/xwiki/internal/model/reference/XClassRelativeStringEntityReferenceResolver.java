@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.AbstractStringEntityReferenceResolver;
@@ -37,7 +40,9 @@ import org.xwiki.model.reference.EntityReference;
  *             resolve anything...
  */
 @Deprecated
-@Component("xclass")
+@Component
+@Named("xclass")
+@Singleton
 public class XClassRelativeStringEntityReferenceResolver extends AbstractStringEntityReferenceResolver
 {
     /**

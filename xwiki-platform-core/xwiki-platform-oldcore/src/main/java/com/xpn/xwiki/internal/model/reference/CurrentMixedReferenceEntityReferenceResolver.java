@@ -19,8 +19,11 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.AbstractReferenceEntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
@@ -33,10 +36,13 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  * @version $Id$
  * @since 2.3M1
  */
-@Component("currentmixed/reference")
+@Component
+@Named("currentmixed/reference")
+@Singleton
 public class CurrentMixedReferenceEntityReferenceResolver extends AbstractReferenceEntityReferenceResolver
 {
-    @Requirement("currentmixed")
+    @Inject
+    @Named("currentmixed")
     private EntityReferenceValueProvider provider;
 
     /**

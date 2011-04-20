@@ -19,8 +19,11 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
@@ -46,13 +49,15 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 2.3M1
  */
-@Component("current")
+@Component
+@Named("current")
+@Singleton
 public class CurrentEntityReferenceValueProvider extends DefaultEntityReferenceValueProvider
 {
-    @Requirement
+    @Inject
     private ModelContext modelContext;
 
-    @Requirement
+    @Inject
     private Execution execution;
 
     @Override

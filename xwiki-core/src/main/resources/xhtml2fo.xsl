@@ -2029,7 +2029,14 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <!-- The actual image reference -->
         <xsl:attribute name="src">
             <xsl:text>url('</xsl:text>
-            <xsl:value-of select="@src"/>
+            <xsl:choose>
+                <xsl:when test="contains(@src, '?') and starts-with(@src, 'file:')">
+                    <xsl:value-of select="substring-before(@src, '?')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="@src"/>
+                </xsl:otherwise>
+            </xsl:choose>
             <xsl:text>')</xsl:text>
         </xsl:attribute>
         <xsl:if test="@alt">

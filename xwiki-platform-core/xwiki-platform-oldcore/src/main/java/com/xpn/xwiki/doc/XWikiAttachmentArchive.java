@@ -192,6 +192,9 @@ public class XWikiAttachmentArchive implements Cloneable
             } else {
                 this.archive = new Archive(lines, getAttachment().getFilename(), getAttachment().getVersion());
             }
+            // Set a standard author, since by default the operating system user is set, and it might contain confusing
+            // characters (JRCS is very fragile and breaks easily if a wrong value is used)
+            this.archive.findNode(this.archive.getRevisionVersion()).setAuthor("xwiki");
         } catch (Exception e) {
             Object[] args = {getAttachment().getFilename()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,

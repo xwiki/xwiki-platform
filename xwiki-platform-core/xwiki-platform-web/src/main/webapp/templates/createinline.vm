@@ -19,10 +19,15 @@
     $doc.documentReference.lastSpaceReference.name, $doc.documentReference.name))
   #set ($parent = $services.model.serialize($parentReference, 'local'))
 #end
-#set($template = "$!request.getParameter('template')")
-#set($redirectparams = "parent=$!{escapetool.url($parent)}&template=$!{escapetool.url($template)}")
 ## ---------------------------------------------------------------------------------------------------------
-## Set the space, page, title variables from the current doc if its new, from the passed parameters if any
+## Get the passed template provider, if any
+## ---------------------------------------------------------------------------------------------------------
+#set($templateProvider = "$!request.templateprovider")
+## get the template as well, since in case template provider is missing, template should be used, 
+## to allow creation from template directly, without necessarily going through template provider.
+#set($template = "$!request.getParameter('template')")
+## ---------------------------------------------------------------------------------------------------------
+## Set the space, page variables from the current doc if its new, from the passed parameters if any
 ## ---------------------------------------------------------------------------------------------------------
 #if ($doc.isNew())
   #set ($space = $doc.getSpace())
@@ -31,93 +36,24 @@
   #set ($space = "$!request.getParameter('space')")
   #set ($page = "$!request.getParameter('page')")
 #end
-#set ($title = "$!{escapetool.url($request.getParameter('title'))}")
-#if ($title == '')
-  #if($tocreate == 'page')
-    #set($title = $escapetool.url($page))
-  #else
-    #set($title = $escapetool.url($space))
-  #end
-#end
-#set($redirectparams = "${redirectparams}&title=${title}")
 ## ---------------------------------------------------------------------------------------------------------
-## Determine the edit action (edit/inline) for the newly created document, if a template is passed it is
-## used to determine the action. Default is 'edit'.
+## If there was an exception creating the page because of invalid space, notify. 
+## Should set the other variables only if there is no exception. Otherwise, if there's an exception other than the 
+## 11016 one, nothing will be displayed, depending on the other passed parameters.
 ## ---------------------------------------------------------------------------------------------------------
-#if ($template != '' && $xwiki.exists($template))
-  #set ($editAction = $xwiki.getDocument($template).getDefaultEditMode())
-#else
-  #set ($editAction = 'edit')
-#end
-## ---------------------------------------------------------------------------------------------------------
-## Build the list of available template providers
-## ---------------------------------------------------------------------------------------------------------
-#set ($templateProviders = $services.query.xwql("from doc.object(XWiki.TemplateProviderClass) as template where doc.fullName not like 'XWiki.TemplateProviderTemplate'").execute())
-#set ($availableTemplateProviders = $util.getArrayList())
-#foreach ($templateProvider in $templateProviders)
-  #set ($tpobj = $xwiki.getDocument($templateProvider).getObject('XWiki.TemplateProviderClass'))
-  #if ($tpobj.getProperty('spaces').getValue().isEmpty() || $tpobj.getProperty('spaces').getValue().contains($doc.space))
-    #set ($discard = $availableTemplateProviders.add($tpobj))
-  #end
-#end
-## ---------------------------------------------------------------------------------------------------------
-## Perform a redirection to the edit mode if required
-## ---------------------------------------------------------------------------------------------------------
-#set ($paramsMap = $request.getParameterMap())
-#if ($tocreate == 'space' && $space != '')
-  ##
-  ## If a space is ready to be created, redirect to the space home in edit mode
-  ##
-  #set ($docReference = $services.model.createDocumentReference($xcontext.database, $space, 'WebHome'))
-  #set ($redirecturl = $xwiki.getDocument($docReference).getURL('edit', $redirectparams))
-#end
-#if ($tocreate == 'page' && $space != '' && $page != ''
-    && ($paramsMap.containsKey('template') || $availableTemplateProviders.isEmpty()))
-  ##
-  ## If a page is ready to be created, redirect to the specified page in the specified edit action
-  ##
-  #set ($docReference = $services.model.createDocumentReference($xcontext.database, $space, $page))
-  #set ($redirecturl = $xwiki.getDocument($docReference).getURL($editAction, $redirectparams))
-  ##
-  ## Check that the chosen space is allowed with the given template, if not:
-  ## - Cancel the redirect
-  ## - Display a message
-  ## - Reset the space variable (the user will have to chose the space again)
-  ##
-  #if (!$availableTemplateProviders.isEmpty() && $template != '')
-    #set ($templateProviderResult = $xwiki.searchDocuments(", BaseObject obj, StringProperty prop where doc.fullName=obj.name and obj.className='XWiki.TemplateProviderClass' and obj.id=prop.id.id and prop.id.name='template' and prop.value=?", [$template]))
-    ## If the template does not have an associated template provider, the result of the query is empty
-    #if (!$templateProviderResult.isEmpty())
-      #set ($templateProvider = $templateProviderResult.get(0))
-      #set ($tpobj = $xwiki.getDocument($templateProvider).getObject('XWiki.TemplateProviderClass'))
-      #set ($allowedSpaces = $tpobj.getProperty('spaces').getValue())
-      #if(!$allowedSpaces.isEmpty() && !$allowedSpaces.contains($space))
-        #set ($space = '')
-        #set ($redirecturl = '')
-        <div class="box errormessage">
-          #if ($allowedSpaces.size() == 1)
-            $msg.get('core.create.template.allowedspace.inline', [$tpobj.display('name', 'view'), $allowedSpaces.get(0)])
-          #else
-            $msg.get('core.create.template.allowedspaces.inline', [$tpobj.display('name', 'view'), $allowedSpaces.toString()])
-          #end
-        </div>
-      #end
+#set($exception = $context.get("exception"))
+## check that the exception is of the right type
+#if("$!exception" != '' && $exception.code == 11016)
+  ## reset the space, user will have to fill in again
+  #set ($space = '')
+  <div class="box errormessage">
+    #set($allowedSpaces = $context.get("allowedSpaces"))
+    #if ($allowedSpaces.size() == 1)
+      $msg.get('core.create.template.allowedspace.inline', [$templateProvider, $allowedSpaces.get(0)])
+    #else
+      $msg.get('core.create.template.allowedspaces.inline', [$templateProvider, $allowedSpaces.toString()])
     #end
-  #end
-#end
-#if("$!redirecturl" != '')
-  #if($paramsMap.containsKey('ajax'))
-    ##
-    ## If this template is displayed from a modal popup, send a header in the response notifying that a redirect
-    ## must be performed in the calling page.
-    ##
-    $response.setHeader('redirect', $redirecturl)
-  #else
-    ##
-    ## Perform the redirect
-    ##
-    $response.sendRedirect($redirecturl)
-  #end
+  </div>
 #end
 ## ---------------------------------------------------------------------------------------------------------
 ## Compute the default space value to be the space of the current document.
@@ -170,6 +106,19 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
   };
 //]]>
 </script>
+
+## ---------------------------------------------------------------------------------------------------------
+## Build the list of available template providers
+## ---------------------------------------------------------------------------------------------------------
+#set ($templateProviders = $services.query.xwql("from doc.object(XWiki.TemplateProviderClass) as template where doc.fullName not like 'XWiki.TemplateProviderTemplate'").execute())
+#set ($availableTemplateProviders = $util.getArrayList())
+#foreach ($templateProvider in $templateProviders)
+  #set ($tpdoc = $xwiki.getDocument($templateProvider))
+  #set ($tpobj = $tpdoc.getObject('XWiki.TemplateProviderClass'))
+  #if ($tpobj.getProperty('spaces').getValue().isEmpty() || $tpobj.getProperty('spaces').getValue().contains($doc.space))
+    #set ($discard = $availableTemplateProviders.add($tpdoc))
+  #end
+#end
 ## ---------------------------------------------------------------------------------------------------------
 ## Display the form.
 ## ---------------------------------------------------------------------------------------------------------
@@ -185,7 +134,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
     ## ---------------------------------------------------------------------------------------------------------
     ## Template field
     ## ---------------------------------------------------------------------------------------------------------
-    #if(!$availableTemplateProviders.isEmpty() && $template == '')
+    #if(!$availableTemplateProviders.isEmpty() && $templateProvider == '' && $template == '')
       #set($jsSpaceInclusionValidationContainer = $util.getArrayList())
       <dl>
         <dt>
@@ -194,14 +143,17 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
         </dt>
         <dd>
           <label for="xwiki-create-form-0" class="xwiki-form-listclass">
-            <input id="xwiki-create-form-0" type="radio" name="template" value="" checked="checked"/>
+            <input id="xwiki-create-form-0" type="radio" name="templateprovider" value="" checked="checked"/>
             $msg.get('core.create.template.empty')
           </label>
           #set($discard = $jsSpaceInclusionValidationContainer.add(['xwiki-create-form-0', [], '']))
-          #foreach($tpobj in $availableTemplateProviders)
+          #foreach($tpdoc in $availableTemplateProviders)
+            #set ($tpobj = $tpdoc.getObject('XWiki.TemplateProviderClass'))          
             #set($inputId = "xwiki-create-form-${velocityCount}")
             <label for="$inputId" class="xwiki-form-listclass">
-              <input id="$inputId" type="radio" name="template" value="$escapetool.xml(${tpobj.getProperty('template').getValue()})"/>
+              ## pass the template provider to the create action. Prepare the template provider reference
+              #set($tpdocRef = $services.model.serialize($tpdoc.documentReference, 'local'))
+              <input id="$inputId" type="radio" name="templateprovider" value="$escapetool.xml(${tpdocRef})"/>
               $escapetool.xml($tpobj.display('name', 'view'))
             </label>
             #set($jsAllowedSpacesArray = '')## Reset previous value
@@ -241,7 +193,11 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
       //]]>
       </script>
     #else
-      <input type="hidden" id="template" name="template" value="$!{escapetool.xml($template)}" />
+      #if ($templateProvider != '')
+        <input type="hidden" id="template" name="templateprovider" value="$!{escapetool.xml($templateProvider)}" />
+      #else
+        <input type="hidden" id="template" name="template" value="$!{escapetool.xml($template)}" />
+      #end
     #end
     ## ---------------------------------------------------------------------------------------------------------
     ## Space field

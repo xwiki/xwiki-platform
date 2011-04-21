@@ -94,7 +94,8 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
             try {
                 entry.getValue().send(message);
             } catch (Exception e) {
-                getLogger().error("Fail to send message to the channel [" + entry.getKey() + "]", e);
+                getLogger().error("Failed to send message [" + remoteEvent + "] to the channel [" + entry.getKey()
+                    + "]", e);
             }
         }
     }
@@ -140,7 +141,7 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
 
         this.channels.remove(channelId);
 
-        getLogger().info(MessageFormat.format("Channel [{0}] stoped", channelId));
+        getLogger().info(MessageFormat.format("Channel [{0}] stopped", channelId));
     }
 
     /**
@@ -188,7 +189,7 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
      */
     private ProtocolStackConfigurator loadChannelConfiguration(String channelId) throws IOException, ChannelException
     {
-        ProtocolStackConfigurator configurator = null;
+        ProtocolStackConfigurator configurator;
 
         String path = "/WEB-INF/" + CONFIGURATION_PATH + channelId + ".xml";
 
@@ -199,7 +200,7 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
         } else {
             getLogger().warn(
                 "Can't find a configuration for channel [" + channelId + "] at [" + path + "]. Using "
-                    + JChannel.DEFAULT_PROTOCOL_STACK + " JGRoups default configuration.");
+                    + JChannel.DEFAULT_PROTOCOL_STACK + " JGroups default configuration.");
 
             configurator = ConfiguratorFactory.getStackConfigurator(JChannel.DEFAULT_PROTOCOL_STACK);
         }
@@ -220,6 +221,6 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
 
         this.channels.clear();
 
-        getLogger().info("All channels stoped");
+        getLogger().info("All channels stopped");
     }
 }

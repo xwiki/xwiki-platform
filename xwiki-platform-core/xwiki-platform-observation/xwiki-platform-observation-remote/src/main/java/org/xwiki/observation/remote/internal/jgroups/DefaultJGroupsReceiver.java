@@ -34,7 +34,7 @@ import org.xwiki.observation.remote.RemoteObservationManager;
 import org.xwiki.observation.remote.jgroups.JGroupsReceiver;
 
 /**
- * Default implementation of JGroupsReceiver. Receive remote event and sent them as is to
+ * Default implementation of JGroupsReceiver. Receive remote events and send them as is to
  * {@link RemoteObservationManager} to be converted and injected as local events.
  * 
  * @version $Id$
@@ -50,7 +50,7 @@ public class DefaultJGroupsReceiver extends AbstractLogEnabled implements JGroup
     private RemoteObservationManager remoteObservationManager;
 
     /**
-     * Used to lookup for {@link RemoteObservationManager}. To avoid cross dependency issues.
+     * Used to lookup {@link RemoteObservationManager}. To avoid cross-dependency issues.
      */
     @Inject
     private ComponentManager componentManager;

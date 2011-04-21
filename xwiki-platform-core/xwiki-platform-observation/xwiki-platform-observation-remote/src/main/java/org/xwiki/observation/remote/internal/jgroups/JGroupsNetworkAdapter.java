@@ -21,6 +21,7 @@ package org.xwiki.observation.remote.internal.jgroups;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.management.MBeanServer;
 
 import org.jgroups.ChannelException;
 import org.jgroups.JChannel;
@@ -35,6 +37,7 @@ import org.jgroups.Message;
 import org.jgroups.conf.ConfiguratorFactory;
 import org.jgroups.conf.ProtocolStackConfigurator;
 import org.jgroups.conf.XmlConfigurator;
+import org.jgroups.jmx.JmxConfigurator;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -121,6 +124,14 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
             throw new RemoteEventException("Failed to create channel [" + channelId + "]", e);
         }
 
+        // Register the channel against the JMX Server
+        try {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            JmxConfigurator.registerChannel(channel, mbs, channel.getClusterName());
+        } catch (Exception e) {
+            getLogger().warn("Failed to register channel [" + channelId + "] against the JMX Server", e);
+        }
+
         getLogger().info(MessageFormat.format("Channel [{0}] started", channelId));
     }
 
@@ -140,6 +151,14 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
         channel.close();
 
         this.channels.remove(channelId);
+
+        // Unregister the channel from the JMX Server
+        try {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            JmxConfigurator.unregister(channel, mbs, channel.getClusterName());
+        } catch (Exception e) {
+            getLogger().warn("Failed to unregister channel [" + channelId + "] from the JMX Server", e);
+        }
 
         getLogger().info(MessageFormat.format("Channel [{0}] stopped", channelId));
     }

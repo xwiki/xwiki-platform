@@ -116,7 +116,7 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
                 + this.configuration.getNetworkAdapter() + "]", e);
         }
 
-        // start configured channels
+        // Start configured channels and register them against the JMX server
         for (String channelId : this.configuration.getChannels()) {
             try {
                 startChannel(channelId);

@@ -19,6 +19,9 @@
  */
 package org.xwiki.configuration.internal;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -30,7 +33,9 @@ import org.xwiki.model.reference.DocumentReference;
  * @version $Id$
  * @since 2.0M2
  */
-@Component("space")
+@Component
+@Named("space")
+@Singleton
 public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigurationSource
 {
     private static final String DOCUMENT_NAME = "WebPreferences";

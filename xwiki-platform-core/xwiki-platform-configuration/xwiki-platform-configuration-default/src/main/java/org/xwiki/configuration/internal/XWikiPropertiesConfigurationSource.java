@@ -21,10 +21,13 @@ package org.xwiki.configuration.internal;
 
 import java.net.URL;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.container.Container;
@@ -35,7 +38,9 @@ import org.xwiki.container.Container;
  * @version $Id$
  * @since 2.0M1
  */
-@Component("xwikiproperties")
+@Component
+@Named("xwikiproperties")
+@Singleton
 public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSource implements Initializable
 {
     private static final String XWIKI_PROPERTIES_FILE = "/WEB-INF/xwiki.properties";
@@ -43,11 +48,12 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
     /**
      * Injected by the Component Manager.
      */
-    @Requirement
+    @Inject
     private Container container;
-    
+
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -71,9 +77,9 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
         } catch (Exception e) {
             // Note: if we cannot read the configuration file for any reasonwe log a warning but continue since XWiki
             // will use default values for all configurable elements.
-            getLogger().warn("Failed to load configuration file [" + XWIKI_PROPERTIES_FILE 
+            getLogger().warn("Failed to load configuration file [" + XWIKI_PROPERTIES_FILE
                 + "]. Using default configuration values. " + " Internal error [" + e.getMessage() + "]");
-            
+
             // Use a default Commons Configuration implementation since we couldn't use a Properties configuration.
             setConfiguration(new BaseConfiguration());
         }

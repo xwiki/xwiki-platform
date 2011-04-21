@@ -19,8 +19,11 @@
  */
 package org.xwiki.configuration.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
@@ -32,27 +35,31 @@ import org.xwiki.configuration.ConfigurationSource;
  *   <li>wiki preferences wiki page</li>
  *   <li>xwiki properties file (xwiki.properties)</li>
  * </ul>
- * 
- * Should be used when a configuration should not be overriden by the user in his/her profile 
- * (in which case the {@link AllConfigurationSource} should be used.
+ * Should be used when a configuration should not be overriden by the user in his/her profile (in which case the
+ * {@link AllConfigurationSource} should be used.
  * 
  * @version $Id$
  * @since 2.0M1
  */
 @Component
+@Singleton
 public class DefaultConfigurationSource extends CompositeConfigurationSource implements Initializable
 {
-    @Requirement("xwikiproperties")
+    @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource xwikiPropertiesSource;
 
-    @Requirement("wiki")
+    @Inject
+    @Named("wiki")
     private ConfigurationSource wikiPreferencesSource;
 
-    @Requirement("space")
+    @Inject
+    @Named("space")
     private ConfigurationSource spacePreferencesSource;
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException

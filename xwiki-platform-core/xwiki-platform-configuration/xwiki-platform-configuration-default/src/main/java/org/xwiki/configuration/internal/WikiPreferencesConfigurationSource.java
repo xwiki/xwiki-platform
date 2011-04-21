@@ -19,19 +19,24 @@
  */
 package org.xwiki.configuration.internal;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 /**
- * Configuration source taking its data in the Wiki Preferences wiki document
- * (using data from the XWiki.XWikiPreferences object attached to that document). 
- *  
+ * Configuration source taking its data in the Wiki Preferences wiki document (using data from the
+ * XWiki.XWikiPreferences object attached to that document).
+ * 
  * @version $Id$
  * @since 2.0M2
  */
-@Component("wiki")
+@Component
+@Named("wiki")
+@Singleton
 public class WikiPreferencesConfigurationSource extends AbstractDocumentConfigurationSource
 {
     private static final String SPACE_NAME = "XWiki";

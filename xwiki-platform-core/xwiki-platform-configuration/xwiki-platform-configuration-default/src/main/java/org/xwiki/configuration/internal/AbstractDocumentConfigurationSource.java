@@ -23,14 +23,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import javax.inject.Inject;
+
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Common features for all Document sources (ie configuration data coming from wiki pages).
- *  
+ * 
  * @version $Id$
  * @since 2.0M2
  */
@@ -39,15 +40,15 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
     /**
      * @see #getDocumentAccessBridge()
      */
-    @Requirement
-    private DocumentAccessBridge documentAccessBridge; 
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
 
     /**
-     * @return the document reference of the document containing an XWiki Object with configuration data or null
-     *         if there no such document in which case this configuration source will be skipped
+     * @return the document reference of the document containing an XWiki Object with configuration data or null if
+     *         there no such document in which case this configuration source will be skipped
      */
     protected abstract DocumentReference getDocumentReference();
-    
+
     /**
      * @return the XWiki Class reference of the XWiki Object containing the configuration properties
      */
@@ -60,9 +61,10 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
     {
         return this.documentAccessBridge;
     }
-    
+
     /**
      * {@inheritDoc}
+     * 
      * @see ConfigurationSource#containsKey(String)
      */
     public boolean containsKey(String key)
@@ -75,6 +77,7 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfigurationSource#getKeys()
      */
     public List<String> getKeys()
@@ -84,6 +87,7 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfigurationSource#getProperty(String, Object)
      */
     @SuppressWarnings("unchecked")
@@ -94,6 +98,7 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfigurationSource#getProperty(String, Class)
      */
     public <T> T getProperty(String key, Class<T> valueClass)
@@ -103,15 +108,15 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
         DocumentReference documentReference = getFailsafeDocumentReference();
         DocumentReference classReference = getFailsafeClassReference();
         if (documentReference != null && classReference != null) {
-            result = (T) getDocumentAccessBridge().getProperty(documentReference, classReference, key);
-        
+            result = valueClass.cast(getDocumentAccessBridge().getProperty(documentReference, classReference, key));
+
             // Make sure we don't return null values for List and Properties (they must return empty elements
             // when using the typed API).
             if (result == null) {
-                if (List.class.getName().equals(valueClass.getName())) {
-                    result = (T) Collections.emptyList();
-                } else if (Properties.class.getName().equals(valueClass.getName())) {
-                    result = (T) new Properties();
+                if (List.class.isAssignableFrom(valueClass)) {
+                    result = valueClass.cast(Collections.emptyList());
+                } else if (Properties.class.isAssignableFrom(valueClass)) {
+                    result = valueClass.cast(new Properties());
                 }
             }
         }
@@ -121,6 +126,7 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfigurationSource#getProperty(String)
      */
     public <T> T getProperty(String key)
@@ -132,11 +138,12 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
             result = (T) getDocumentAccessBridge().getProperty(documentReference, classReference, key);
         }
 
-        return result; 
+        return result;
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfigurationSource#isEmpty()
      */
     public boolean isEmpty()
@@ -148,7 +155,7 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
     {
         T result = getProperty(key, valueClass);
         if (result == null) {
-            result = defaultValue; 
+            result = defaultValue;
         }
         return result;
     }

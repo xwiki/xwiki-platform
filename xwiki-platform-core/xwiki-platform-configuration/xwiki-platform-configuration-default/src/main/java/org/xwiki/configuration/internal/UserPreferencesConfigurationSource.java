@@ -19,19 +19,23 @@
  */
 package org.xwiki.configuration.internal;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Configuration source taking its data in the User Preferences wiki document
- * (the user profile page) using data from a XWikiUsers object attached
- * to that document. 
- *  
+ * Configuration source taking its data in the User Preferences wiki document (the user profile page) using data from a
+ * XWikiUsers object attached to that document.
+ * 
  * @version $Id$
  * @since 2.0M2
  */
-@Component("user")
-public class UserPreferencesConfigurationSource  extends AbstractDocumentConfigurationSource
+@Component
+@Named("user")
+@Singleton
+public class UserPreferencesConfigurationSource extends AbstractDocumentConfigurationSource
 {
     @Override
     protected DocumentReference getClassReference()

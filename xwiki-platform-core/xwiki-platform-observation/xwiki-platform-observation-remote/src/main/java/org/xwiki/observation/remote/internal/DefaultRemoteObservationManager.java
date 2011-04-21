@@ -73,7 +73,7 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
     private ObservationManager observationManager;
 
     /**
-     * Used to set some extra informations about the current event injected to the local {@link ObservationManager}.
+     * Used to set some extra information about the current event injected to the local {@link ObservationManager}.
      */
     @Inject
     private RemoteObservationManagerContext remoteEventManagerContext;
@@ -141,7 +141,7 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
         // Convert local->remote
         RemoteEventData remoteEvent = this.eventConverterManager.createRemoteEventData(localEvent);
 
-        // if remote event data is not filled it mean the message should not be sent to the network
+        // if remote event data is not filled it means the message should not be sent to the network
         if (remoteEvent != null) {
             this.networkAdapter.send(remoteEvent);
         }
@@ -163,7 +163,7 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
     public void notify(RemoteEventData remoteEvent)
     {
         // Make sure the Execution context is properly initialized
-        initiContext();
+        initializeContext();
 
         LocalEventData localEvent = this.eventConverterManager.createLocalEventData(remoteEvent);
 
@@ -202,7 +202,7 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
     /**
      * Make sure an ExecutionContext initialized for remote->local thread.
      */
-    private void initiContext()
+    private void initializeContext()
     {
         if (this.execution.getContext() == null) {
             ExecutionContext context = new ExecutionContext();

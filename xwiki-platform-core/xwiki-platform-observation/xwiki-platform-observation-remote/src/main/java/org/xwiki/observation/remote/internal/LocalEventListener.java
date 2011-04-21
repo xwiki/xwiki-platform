@@ -112,7 +112,7 @@ public class LocalEventListener extends AbstractLogEnabled implements EventListe
             try {
                 this.remoteObservationManager = this.componentManager.lookup(RemoteObservationManager.class);
             } catch (ComponentLookupException e) {
-                getLogger().error("Fail to initialize RemoteObservationManager", e);
+                getLogger().error("Failed to initialize the Remote Observation Manager", e);
             }
         }
 

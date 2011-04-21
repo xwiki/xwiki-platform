@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>Blog</web>
 <name>Archive</name>
 <language></language>
-<defaultLanguage>en</defaultLanguage>
+<defaultLanguage></defaultLanguage>
 <translation>0</translation>
 <parent>Blog.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1229907788000</creationDate>
-<date>1229914744000</date>
-<contentUpdateDate>1229914744000</contentUpdateDate>
+<date>1303397326000</date>
+<contentUpdateDate>1303397326000</contentUpdateDate>
 <version>1.1</version>
 <title>Blog Archive</title>
 <template></template>
@@ -146,5 +145,4 @@
   #end
 #end
 {{/html}}
-{{/velocity}}</content>
-</xwikidoc>
+{{/velocity}}</content></xwikidoc>

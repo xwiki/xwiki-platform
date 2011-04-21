@@ -11,18 +11,18 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1187017247000</creationDate>
-<date>1303401484000</date>
-<contentUpdateDate>1303401484000</contentUpdateDate>
-<version>4.1</version>
+<date>1303407212000</date>
+<contentUpdateDate>1303407212000</contentUpdateDate>
+<version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>false</minorEdit>
+<minorEdit>true</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>{{velocity filter="none"}}
+<content>{{velocity}}
 #set($WikiManager = $xwiki.wikimanager)
 #if(!$WikiManager)
   {{error}}$msg.get("wikimanager.pluginnotenabled"){{/error}}
@@ -30,7 +30,7 @@
 #if(!$xwiki.applicationmanager)
   {{error}}$msg.get("xapp.pluginnotenabled"){{/error}}
 #end
-
+##
 #set($Exception = $WikiManager.DefaultException)
 #set($templateList = $WikiManager.getWikiTemplateList())
 #if($templateList.size() == 0)

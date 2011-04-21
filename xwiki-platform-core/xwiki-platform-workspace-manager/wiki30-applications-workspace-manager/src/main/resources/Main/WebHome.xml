@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>Main</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1166007764000</creationDate>
+<date>1303399746000</date>
+<contentUpdateDate>1303399746000</contentUpdateDate>
+<version>10.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>tags</name>
+<number>1</number>
+<prettyName>Tags</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator>|</separator>
+<separators>|,</separators>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>Main.WebHome</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<guid>73f59313-fd83-429d-8d27-ce81eb9ea30d</guid>
+<property>
+<tags/>
+</property>
+</object>
+<content>= Welcome to Wiki3.0 XWiki distribution =
+
+{{include document="WorkspaceManager.Install" context="new"/}} 
+
+The Wiki3.0 project aims at developing a next generation collaboration platform that integrates real-time editing and interactions, social-networking features, and that will take advantage of cloud infrastructures. The 3.0 generation, as it is envisioned by the partners of the project, is characterized by the following elements: conceiving and taking advantage of realtime functionalities on the Web, integrating social-networking and advanced collaboration capabilities, enriching the content using semantic annotations, and scaling-up the platform by adopting and integrating a cloud infrastructure.
+
+The final outcome of the Wiki 3.0 project is to deliver a solution that will greatly ehnance the productivity in terms of knowledge exchange and creation. This solution will consist of an enhanced version of the XWiki platform that will include real-time collaboration and social-network-oriented features.
+
+All the software developed in the context of the Wiki3.0 project will be released under the LGPL (GNU Lesser General Public License) and the documentation will be released under a Creative Commons BY-NC-ND 3.0 license.
+
+== Features in this distribution ==
+* Workspaces
+* User's social network
+* Status updates
+* Dashboards
+* Extended searches
+* Realtime editing</content></xwikidoc>

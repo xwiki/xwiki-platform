@@ -25,6 +25,10 @@ import java.text.MessageFormat;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jgroups.ChannelException;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
@@ -32,7 +36,6 @@ import org.jgroups.conf.ConfiguratorFactory;
 import org.jgroups.conf.ProtocolStackConfigurator;
 import org.jgroups.conf.XmlConfigurator;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -48,7 +51,9 @@ import org.xwiki.observation.remote.jgroups.JGroupsReceiver;
  * @version $Id$
  * @since 2.0RC1
  */
-@Component("jgroups")
+@Component
+@Named("jgroups")
+@Singleton
 public class JGroupsNetworkAdapter extends AbstractLogEnabled implements NetworkAdapter
 {
     /**
@@ -59,13 +64,13 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
     /**
      * The container used to access configuration files.
      */
-    @Requirement
+    @Inject
     private Container container;
 
     /**
      * Used to lookup the receiver corresponding to the channel identifier.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**

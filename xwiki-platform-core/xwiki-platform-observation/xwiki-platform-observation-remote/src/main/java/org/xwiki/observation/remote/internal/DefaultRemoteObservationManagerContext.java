@@ -19,8 +19,10 @@
  */
 package org.xwiki.observation.remote.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
@@ -32,6 +34,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
  * @since 2.0M3
  */
 @Component
+@Singleton
 public class DefaultRemoteObservationManagerContext implements RemoteObservationManagerContext
 {
     /**
@@ -43,7 +46,7 @@ public class DefaultRemoteObservationManagerContext implements RemoteObservation
     /**
      * Used to store remote observation manager context properties.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**

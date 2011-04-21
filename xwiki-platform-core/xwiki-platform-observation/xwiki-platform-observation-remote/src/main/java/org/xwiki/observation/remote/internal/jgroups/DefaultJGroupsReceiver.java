@@ -19,11 +19,13 @@
  */
 package org.xwiki.observation.remote.internal.jgroups;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.jgroups.Address;
 import org.jgroups.Message;
 import org.jgroups.View;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -39,6 +41,7 @@ import org.xwiki.observation.remote.jgroups.JGroupsReceiver;
  * @since 2.0M3
  */
 @Component
+@Singleton
 public class DefaultJGroupsReceiver extends AbstractLogEnabled implements JGroupsReceiver
 {
     /**
@@ -49,7 +52,7 @@ public class DefaultJGroupsReceiver extends AbstractLogEnabled implements JGroup
     /**
      * Used to lookup for {@link RemoteObservationManager}. To avoid cross dependency issues.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
@@ -66,7 +69,7 @@ public class DefaultJGroupsReceiver extends AbstractLogEnabled implements JGroup
             try {
                 this.remoteObservationManager = componentManager.lookup(RemoteObservationManager.class);
             } catch (ComponentLookupException e) {
-                getLogger().error("Failed to lookup RemoteObservationManager componenent.", e);
+                getLogger().error("Failed to lookup the Remote Observation Manager.", e);
             }
         }
 

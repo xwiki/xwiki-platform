@@ -19,8 +19,10 @@
  */
 package org.xwiki.observation.remote.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -48,49 +50,50 @@ import org.xwiki.observation.remote.converter.EventConverterManager;
  * @since 2.0M3
  */
 @Component
+@Singleton
 public class DefaultRemoteObservationManager extends AbstractLogEnabled implements RemoteObservationManager,
     Initializable
 {
     /**
      * Access {@link RemoteObservationManager} configuration.
      */
-    @Requirement
+    @Inject
     private RemoteObservationManagerConfiguration configuration;
 
     /**
      * Used to convert local event from and to remote event.
      */
-    @Requirement
+    @Inject
     private EventConverterManager eventConverterManager;
 
     /**
      * Used to inject event coming from network.
      */
-    @Requirement
+    @Inject
     private ObservationManager observationManager;
 
     /**
      * Used to set some extra informations about the current event injected to the local {@link ObservationManager}.
      */
-    @Requirement
+    @Inject
     private RemoteObservationManagerContext remoteEventManagerContext;
 
     /**
      * Used to initialize ExecutionContext for the remote->local thread.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
      * Used to initialize ExecutionContext for the remote->local thread.
      */
-    @Requirement
+    @Inject
     private ExecutionContextManager executionContextManager;
 
     /**
      * Used to lookup the network adapter.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**

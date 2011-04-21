@@ -22,8 +22,11 @@ package org.xwiki.observation.remote.internal;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -41,7 +44,9 @@ import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
  * @version $Id$
  * @since 2.0M3
  */
-@Component("observation.remote")
+@Component
+@Named(LocalEventListener.NAME)
+@Singleton
 public class LocalEventListener extends AbstractLogEnabled implements EventListener
 {
     /**
@@ -52,13 +57,13 @@ public class LocalEventListener extends AbstractLogEnabled implements EventListe
     /**
      * Used to know if remote observation manager is enabled.
      */
-    @Requirement
+    @Inject
     private RemoteObservationManagerConfiguration configuration;
 
     /**
      * Used to lookup for {@link RemoteObservationManager} if it's enabled. To avoid initializing it if it's not needed.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**

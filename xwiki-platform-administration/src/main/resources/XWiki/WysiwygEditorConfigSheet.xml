@@ -522,7 +522,8 @@ XWiki.ListBox = Class.create({
     for(var i = 0; i &lt; items.length; i++){
       var item = items[i];
       if (typeof item == 'string') {
-        select.options[i].text = item;
+        // In IE6 and IE7 the option value doesn't default to the option label when not set.
+        select.options[i].value = select.options[i].text = item;
       }
     }
     return select;
@@ -595,7 +596,12 @@ XWiki.ListBox = Class.create({
       return alice.label.localeCompare(bob.label);
     });
     for(var i = 0; i &lt; options.length; i++) {
-      options[i].text = data[i].label;
+      // We can't assign the label to options[i].text because we get "Invalid index" in IE6..
+      if (options[i].textContent) {
+        options[i].textContent = data[i].label;
+      } else {
+        options[i].innerText = data[i].label;
+      }
       options[i].value = data[i].value;
     }
   },
@@ -1032,6 +1038,10 @@ Event.observe(document, 'xwiki:dom:loaded', function() {
   width: auto !important;
 }
 
+.xform dd input[type="radio"] {
+  min-width: 0;
+}
+
 .xform dd input.icon {
   margin-left: .3em;
   min-width: 0;
@@ -1045,6 +1055,10 @@ Event.observe(document, 'xwiki:dom:loaded', function() {
   float: left;
 }
 
+.listBoxWrapper.floatLeft {
+  margin-right: 3em;
+}
+
 input.blurred {
   color: $theme.textSecondaryColor;
 }
@@ -1055,7 +1069,6 @@ input.blurred {
 #styleNamesInputPanel {
   background-color: #F7F7F7;
   float: left;
-  margin-left: 3em;
   padding: 1em;
 }
 

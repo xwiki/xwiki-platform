@@ -23,7 +23,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
@@ -52,18 +51,7 @@ public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigu
     @Override
     protected DocumentReference getClassReference()
     {
-        DocumentReference classReference = null;
-
-        DocumentReference currentDocumentReference = getDocumentAccessBridge().getCurrentDocumentReference();
-        if (currentDocumentReference != null) {
-            // Add the current current wiki references to the XWiki Preferences class reference to form
-            // an absolute reference.
-            classReference =
-                new DocumentReference(CLASS_PAGE_NAME, CLASS_SPACE_NAME, currentDocumentReference.extractReference(
-                    EntityType.WIKI).getName());
-        }
-
-        return classReference;
+        return new DocumentReference(getCurrentWiki().getName(), CLASS_SPACE_NAME, CLASS_PAGE_NAME);
     }
 
     /**

@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 
 /**
  * Configuration source taking its data in the Wiki Preferences wiki document (using data from the
@@ -54,7 +53,6 @@ public class WikiPreferencesConfigurationSource extends AbstractDocumentConfigur
     @Override
     protected DocumentReference getDocumentReference()
     {
-        return new DocumentReference(PAGE_NAME,
-            new SpaceReference(SPACE_NAME, new WikiReference(getDocumentAccessBridge().getCurrentWiki())));
+        return new DocumentReference(PAGE_NAME, new SpaceReference(SPACE_NAME, getCurrentWiki()));
     }
 }

@@ -27,7 +27,11 @@ import javax.inject.Inject;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelConfiguration;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 /**
  * Common features for all Document sources (ie configuration data coming from wiki pages).
@@ -42,6 +46,14 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
      */
     @Inject
     private DocumentAccessBridge documentAccessBridge;
+
+    /** @see #getCurrentWiki() */
+    @Inject
+    private ModelContext modelContext;
+
+    /** @see #getCurrentWiki() */
+    @Inject
+    private ModelConfiguration modelConfig;
 
     /**
      * @return the document reference of the document containing an XWiki Object with configuration data or null if
@@ -60,6 +72,17 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
     protected DocumentAccessBridge getDocumentAccessBridge()
     {
         return this.documentAccessBridge;
+    }
+
+    /**
+     * @return the reference pointing to the current wiki
+     */
+    protected WikiReference getCurrentWiki()
+    {
+        if (this.modelContext.getCurrentEntityReference() != null) {
+            return (WikiReference) this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
+        }
+        return new WikiReference(this.modelConfig.getDefaultReferenceValue(EntityType.WIKI));
     }
 
     /**

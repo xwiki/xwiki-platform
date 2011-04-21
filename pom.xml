@@ -200,6 +200,7 @@
     <module>xwiki-platform-colibri</module>
     <module>xwiki-platform-web</module>
     <module>xwiki-platform-tag</module>
+    <module>xwiki-platform-administration</module>
   </modules>
   <profiles>
     <profile>

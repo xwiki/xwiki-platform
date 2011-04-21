@@ -45,7 +45,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
  * @since 2.0M3
  */
 @Component
-@Named(LocalEventListener.NAME)
+@Named("observation.remote")
 @Singleton
 public class LocalEventListener extends AbstractLogEnabled implements EventListener
 {

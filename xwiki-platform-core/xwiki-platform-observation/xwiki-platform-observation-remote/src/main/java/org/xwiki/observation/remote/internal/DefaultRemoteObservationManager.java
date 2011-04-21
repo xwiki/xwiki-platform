@@ -169,13 +169,15 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
 
         // send event
         if (localEvent != null) {
-            // indicate all the following events are remote events
+            // Indicate all the following events are remote events
             this.remoteEventManagerContext.pushRemoteState();
 
-            this.observationManager.notify(localEvent.getEvent(), localEvent.getSource(), localEvent.getData());
-
-            // indicate all the following events are remote events
-            this.remoteEventManagerContext.popRemoteState();
+            try {
+                this.observationManager.notify(localEvent.getEvent(), localEvent.getSource(), localEvent.getData());
+            } finally {
+                // Indicate all the following events are local events
+                this.remoteEventManagerContext.popRemoteState();
+            }
         }
     }
 

@@ -121,7 +121,7 @@
 <highlight>0</highlight>
 </property>
 <property>
-<icon>$xwiki.getSkinFile('icons/silk/chart_organisation_add.gif')</icon>
+<icon>$xwiki.getSkinFile('icons/silk/chart_organisation.gif')</icon>
 </property>
 <property>
 <name>Workspaces</name>

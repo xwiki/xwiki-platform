@@ -70,11 +70,13 @@
         </configuration>
       </plugin>
 
-      <!-- Update XWiki.XWikiPreferences page and register skin + translations -->
+      <!-- Update XWiki pages to register certain extensions or set default 
+        values. -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>xml-maven-plugin</artifactId>
         <executions>
+          <!-- Update XWiki.XWikiPreferences page and register skin + translations -->
           <execution>
             <id>register-skin-and-translations</id>
             <phase>process-resources</phase>
@@ -106,6 +108,36 @@
               </transformationSets>
             </configuration>
           </execution>
+          <!-- Update XWiki.XWikiPreferences page and enable the workspace 
+            information panel. -->
+          <execution>
+            <id>register-panel</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformationSets>
+                <transformationSet>
+                  <dir>${project.build.outputDirectory}</dir>
+                  <outputDir>${project.build.outputDirectory}</outputDir>
+                  <includes>
+                    <include>XWiki/XWikiPreferences.xml</include>
+                  </includes>
+                  <stylesheet>src/main/build/transformation/register-panel.xsl
+              </stylesheet>
+                  <parameters>
+                    <parameter>
+                      <name>panel</name>
+                      <value>Panels.WorkspaceInformationPanel</value>
+                    </parameter>
+                  </parameters>
+                </transformationSet>
+              </transformationSets>
+            </configuration>
+          </execution>
+          <!-- Extend XWiki.SearchSuggestConfig to show Workspaces as search 
+            suggestions. -->
           <execution>
             <id>register-workspace-search-extension</id>
             <phase>process-resources</phase>

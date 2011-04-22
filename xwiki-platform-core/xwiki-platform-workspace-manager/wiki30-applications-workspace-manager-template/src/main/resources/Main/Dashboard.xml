@@ -6,14 +6,14 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent>Main.WebHome</parent>
-<creator>XWiki.Admin</creator>
+<creator>xwiki:XWiki.Admin</creator>
 <author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1252458000000</creationDate>
-<date>1301408109000</date>
-<contentUpdateDate>1301408109000</contentUpdateDate>
-<version>7.26</version>
+<date>1303429635000</date>
+<contentUpdateDate>1303429635000</contentUpdateDate>
+<version>1.1</version>
 <title>$msg.get("xe.dashboard.wiki")</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -74,7 +74,7 @@
 <name>Main.Dashboard</name>
 <number>0</number>
 <className>XWiki.GadgetClass</className>
-<guid>15aaa4f1-f949-4308-a997-98d54b1a4bf2</guid>
+<guid>6ad7ff1f-6971-4a95-a0e5-94c0d2adf3aa</guid>
 <property>
 <content>{{velocity}}
 #if ($doc.space == "Main")
@@ -141,7 +141,7 @@
 <name>Main.Dashboard</name>
 <number>1</number>
 <className>XWiki.GadgetClass</className>
-<guid>b354dc2a-ec41-4b20-ab72-0273753f78fe</guid>
+<guid>35c8969a-8419-4a70-abda-9b6bb1c0d709</guid>
 <property>
 <content>{{velocity}}
 #set($tagSpace = $util.null)
@@ -209,7 +209,7 @@
 <name>Main.Dashboard</name>
 <number>2</number>
 <className>XWiki.GadgetClass</className>
-<guid>19fdf0e2-1b79-4474-a61a-f56810c04c5e</guid>
+<guid>092deb30-707f-43d3-b4e8-8b01b932c0eb</guid>
 <property>
 <content>{{velocity}}
 #set($aSpace = $util.null)
@@ -277,7 +277,7 @@
 <name>Main.Dashboard</name>
 <number>3</number>
 <className>XWiki.GadgetClass</className>
-<guid>b723d74f-35f9-424a-be2e-6d0d0b2bf75a</guid>
+<guid>acb59a4e-cbfe-4a33-8a38-1bb6f65efa7b</guid>
 <property>
 <content>{{velocity}}
 #set ($currentWiki = $xcontext.database)
@@ -290,9 +290,11 @@
   {{error}}The current wiki is not a workspace.{{/error}}
 #else
   #set($wikiDescriptor = $workspace.wikiDescriptor)
-  Welcome to the **$wikiDescriptor.wikiprettyname** workspace.
+  #set($prettyName = $wikiDescriptor.getValue('wikiprettyname'))
+  Welcome to the **$prettyName** workspace.
   #set ($workspaceDescription = $wikiDescriptor.description)
   #if ("$!workspaceDescription" != '')
+
     $workspaceDescription
   #end
   ## User's rights
@@ -318,11 +320,11 @@
     #set ($hasJoin = ("$!currentUserGroupObject" == ''))
     #if ($hasJoin)
       #set ($joinPageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'JoinWorkspaceCode'))
-      #set ($joinUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiprettyname}"))
+      #set ($joinUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=$prettyName"))
       You are not currently a member of this workspace. If you like, you can {{html}}&lt;a href="$joinUrl"&gt;join this workspace&lt;a/&gt;{{/html}}.
     #elseif (!$hasOwner)
       #set ($leavePageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'LeaveWorkspaceCode'))
-      #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiprettyname}"))
+      #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=$prettyName"))
       You are currently a member of this workspace. If you like, you can {{html}}&lt;a href="$leaveUrl"&gt;leave this workspace&lt;a/&gt;{{/html}}.
     #end
   #end
@@ -388,7 +390,7 @@
 <name>Main.Dashboard</name>
 <number>4</number>
 <className>XWiki.GadgetClass</className>
-<guid>5191c05e-7772-41c1-acb8-60b78bcd16ae</guid>
+<guid>3cfb2ec3-76e5-4627-a681-46882fd06cc9</guid>
 <property>
 <content>{{velocity}}
 #set($AppManager = $xwiki.applicationmanager)
@@ -419,7 +421,9 @@
         #end
       #end
     #end
-    * [[#if($application.appprettyname &amp;&amp; $application.appprettyname.trim() != "")$application.appprettyname#{else}$application.appname#{end}&gt;&gt;$entryPoint]]
+    #set ($appPrettyName = $application.getValue('appprettyname'))
+    #set ($appName = $application.getValue('appname'))
+    * [[#if("$!{appPrettyName.trim()}" != '')$appPrettyName#{else}$appName#{end}&gt;&gt;$entryPoint]]
   #end
   #if ($hasAdmin)
 
@@ -487,7 +491,7 @@
 <name>Main.Dashboard</name>
 <number>5</number>
 <className>XWiki.GadgetClass</className>
-<guid>a1de016c-b90e-4340-b534-f38dc12722b2</guid>
+<guid>4505776f-6e41-4c59-a0b2-c2082743e60d</guid>
 <property>
 <content>{{velocity}}
 #set($contributors = $xcontext.xWiki.store.search("select ase.user from ActivityEventImpl ase GROUP BY ase.user ORDER BY count(*) DESC", 5, 0, $xcontext.context))
@@ -498,7 +502,7 @@
     #set($userDocumentReference = $services.model.resolveDocument($contributor))
     #set($userDocument = $xwiki.getDocument($userDocumentReference))
     #set($userObject = $userDocument.getObject('XWiki.XWikiUser'))
-    #set($displayName = "$!{userDocument.first_name} $!{userDocument.last_name}")
+    #set($displayName = "$!{userDocument.getValue('first_name')} $!{userDocument.getValue('last_name')}")
     #set($displayName = $displayName.trim())
     #if("$!displayName" == '')
       #set($displayName = $userDocumentReference.name)

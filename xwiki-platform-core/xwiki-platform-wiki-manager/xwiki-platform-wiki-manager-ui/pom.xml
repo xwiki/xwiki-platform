@@ -48,7 +48,7 @@
   </dependencies>
   <build>
     <plugins>
-      <!-- For applicatiosn based on ApplicationManager, ensure application version in applications descriptors page is correct -->
+      <!-- For application based on ApplicationManager, ensure application version in applications descriptors page is correct -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>xml-maven-plugin</artifactId>

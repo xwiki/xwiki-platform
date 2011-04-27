@@ -51,7 +51,7 @@ public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigu
     @Override
     protected DocumentReference getClassReference()
     {
-        return new DocumentReference(getCurrentWiki().getName(), CLASS_SPACE_NAME, CLASS_PAGE_NAME);
+        return new DocumentReference(getCurrentWikiReference().getName(), CLASS_SPACE_NAME, CLASS_PAGE_NAME);
     }
 
     /**

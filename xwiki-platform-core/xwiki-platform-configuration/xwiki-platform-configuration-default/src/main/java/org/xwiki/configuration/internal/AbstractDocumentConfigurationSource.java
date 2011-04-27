@@ -47,11 +47,11 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
-    /** @see #getCurrentWiki() */
+    /** @see #getCurrentWikiReference() */
     @Inject
     private ModelContext modelContext;
 
-    /** @see #getCurrentWiki() */
+    /** @see #getCurrentWikiReference() */
     @Inject
     private ModelConfiguration modelConfig;
 
@@ -77,7 +77,7 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
     /**
      * @return the reference pointing to the current wiki
      */
-    protected WikiReference getCurrentWiki()
+    protected WikiReference getCurrentWikiReference()
     {
         if (this.modelContext.getCurrentEntityReference() != null) {
             return (WikiReference) this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);

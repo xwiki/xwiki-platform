@@ -40,6 +40,11 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-bridge</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-classloader-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -73,6 +78,12 @@
       <artifactId>xwiki-rendering-transformation-macro</artifactId>
       <version>${rendering.version}</version>
       <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-classloader-protocol-attachmentjar</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

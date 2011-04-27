@@ -39,6 +39,11 @@
       <artifactId>xwiki-platform-classloader-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Use default because of ComponentAnnotationLoader -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

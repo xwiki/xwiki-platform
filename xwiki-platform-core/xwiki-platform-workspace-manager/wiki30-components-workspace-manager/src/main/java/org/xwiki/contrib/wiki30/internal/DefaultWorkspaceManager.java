@@ -238,7 +238,7 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
 
         String comment = String.format("Created new workspace '%s'", workspaceName);
         XWikiServer result =
-            wikiManagerInternal.createNewWikiFromTemplate(newWikiXObjectDocument, "workspacetemplate", true, comment,
+            LocalWikiManager.createNewWikiFromTemplate(newWikiXObjectDocument, "workspacetemplate", true, comment,
                 deprecatedContext);
 
         /* Use the XWiki.XWikiAllGroup of the new wiki and add the owner as a member. */

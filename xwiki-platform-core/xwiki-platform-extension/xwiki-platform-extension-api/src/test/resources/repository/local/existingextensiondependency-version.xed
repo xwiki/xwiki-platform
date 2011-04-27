@@ -5,7 +5,7 @@
   <version>version</version>
   <type>type</type>
   <dependency>true</dependency>
-  <enabled>true</enabled>
+  <installed>true</installed>
   <description>description</description>
   <author>author</author>
   <website>http://website</website>

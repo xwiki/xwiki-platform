@@ -20,7 +20,6 @@
 
 package org.xwiki.extension.xar;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,14 +30,14 @@ import org.jmock.lib.action.CustomAction;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.InstallException;
-import org.xwiki.extension.event.ExtensionInstalled;
-import org.xwiki.extension.handler.ExtensionHandler;
-import org.xwiki.extension.repository.internal.DefaultLocalExtension;
+import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.task.InstallRequest;
+import org.xwiki.extension.task.Task;
+import org.xwiki.extension.task.TaskManager;
+import org.xwiki.extension.task.UninstallRequest;
 import org.xwiki.extension.test.RepositoryUtil;
-import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
+import org.xwiki.extension.xar.internal.repository.XarLocalExtension;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -54,19 +53,15 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     private Map<DocumentReference, Map<String, XWikiDocument>> documents =
         new HashMap<DocumentReference, Map<String, XWikiDocument>>();
 
-    private XarExtensionHandler handler;
-
-    private ObservationManager observationManager;
-
-    private ExtensionId localXarExtensiontId;
-
-    private DefaultLocalExtension localXarExtension;
+    private ExtensionId localXarExtensiontId1;
 
     private ExtensionId localXarExtensiontId2;
 
-    private DefaultLocalExtension localXarExtension2;
-
     private RepositoryUtil repositoryUtil;
+    
+    private TaskManager taskManager;
+    
+    private LocalExtensionRepository localExtensionRepository;
 
     @Before
     public void setUp() throws Exception
@@ -83,13 +78,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         getContext().setWiki(this.mockXWiki);
         getContext().setDatabase("xwiki");
 
-        this.localXarExtensiontId = new ExtensionId("test", "1.0");
-        this.localXarExtension = new DefaultLocalExtension(null, this.localXarExtensiontId, "xar");
-        this.localXarExtension.setFile(new File(this.repositoryUtil.getLocalRepository(), "test-1.0.xar"));
-
+        this.localXarExtensiontId1 = new ExtensionId("test", "1.0");
         this.localXarExtensiontId2 = new ExtensionId("test", "2.0");
-        this.localXarExtension2 = new DefaultLocalExtension(null, this.localXarExtensiontId2, "xar");
-        this.localXarExtension2.setFile(new File(this.repositoryUtil.getLocalRepository(), "test-2.0.xar"));
 
         // checking
 
@@ -163,14 +153,34 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // lookup
 
-        this.handler = (XarExtensionHandler) getComponentManager().lookup(ExtensionHandler.class, "xar");
-        this.observationManager = (ObservationManager) getComponentManager().lookup(ObservationManager.class);
+        this.taskManager = getComponentManager().lookup(TaskManager.class);
+        this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class, "xar");
     }
 
-    private void install() throws InstallException
+    private XarLocalExtension install(ExtensionId extensionId, String namespace) throws Exception
     {
-        this.handler.install(this.localXarExtension, "wiki");
-        this.observationManager.notify(new ExtensionInstalled(this.localXarExtension.getId()), this.localXarExtension);
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.addExtension(extensionId);
+        installRequest.addNamespace(namespace);
+        Task installTask = this.taskManager.install(installRequest);
+
+        if (installTask.getExceptions() != null) {
+            throw installTask.getExceptions().get(0);
+        }
+
+        return (XarLocalExtension) this.localExtensionRepository.resolve(extensionId);
+    }
+    
+    protected void uninstall(ExtensionId extensionId, String namespace) throws Exception
+    {
+        UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest.addExtension(extensionId);
+        uninstallRequest.addNamespace(namespace);
+        Task uninstallTask = this.taskManager.uninstall(uninstallRequest);
+
+        if (uninstallTask.getExceptions() != null) {
+            throw uninstallTask.getExceptions().get(0);
+        }
     }
 
     @Test
@@ -178,7 +188,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     {
         // install
 
-        install();
+        install(this.localXarExtensiontId1, "wiki");
 
         // validate
 
@@ -204,11 +214,11 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     @Test
     public void testUpgrade() throws Exception
     {
-        install();
+        install(this.localXarExtensiontId1, "wiki");
 
         // upgrade
 
-        this.handler.upgrade(this.localXarExtension, this.localXarExtension2, "wiki");
+        install(this.localXarExtensiontId2, "wiki");
 
         // validate
 
@@ -239,11 +249,11 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     @Test
     public void testUninstall() throws Exception
     {
-        install();
+        install(this.localXarExtensiontId1, "wiki");
 
         // uninstall
 
-        this.handler.uninstall(this.localXarExtension, "wiki");
+        uninstall(this.localXarExtensiontId1, "wiki");
 
         // validate
 

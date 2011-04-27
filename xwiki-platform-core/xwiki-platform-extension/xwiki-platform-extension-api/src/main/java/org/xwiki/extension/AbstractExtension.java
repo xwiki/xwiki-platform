@@ -63,7 +63,10 @@ public abstract class AbstractExtension implements Extension
         setAuthor(extension.getAuthor());
         setWebsite(extension.getWebSite());
 
-        this.dependencies.addAll(extension.getDependencies());
+        List<ExtensionDependency> dependencies = extension.getDependencies();
+        if (!dependencies.isEmpty()) {
+            this.dependencies = new ArrayList<ExtensionDependency>(extension.getDependencies());
+        }
     }
 
     protected void setId(ExtensionId id)
@@ -163,9 +166,9 @@ public abstract class AbstractExtension implements Extension
         return Collections.unmodifiableMap(this.properties);
     }
 
-    public <T> T getProperty(String key)
+    public Object getProperty(String key)
     {
-        return (T) this.properties.get(key);
+        return this.properties.get(key);
     }
 
     public <T> T getProperty(String key, T def)

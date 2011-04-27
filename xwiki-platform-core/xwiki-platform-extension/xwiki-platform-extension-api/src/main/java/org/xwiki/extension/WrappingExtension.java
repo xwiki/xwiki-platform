@@ -91,7 +91,7 @@ public class WrappingExtension implements Extension
         return getExtension().getProperties();
     }
 
-    public <T> T getProperty(String key)
+    public Object getProperty(String key)
     {
         return getExtension().getProperty(key);
     }

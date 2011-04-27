@@ -52,7 +52,7 @@ public class DefaultCoreExtension extends AbstractExtension implements CoreExten
 
     public URL getURL()
     {
-        return getProperty(PKEY_URL);
+        return getProperty(PKEY_URL, null);
     }
 
     public boolean isGuessed()

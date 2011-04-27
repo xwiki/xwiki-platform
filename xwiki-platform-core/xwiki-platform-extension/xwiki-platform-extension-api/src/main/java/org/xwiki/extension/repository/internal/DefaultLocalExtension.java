@@ -150,7 +150,7 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
 
     public File getFile()
     {
-        return getProperty(PKEY_FILE);
+        return getProperty(PKEY_FILE, null);
     }
 
     public boolean isInstalled()

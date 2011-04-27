@@ -50,5 +50,5 @@ public interface Extension
      */
     Map<String, Object> getProperties();
 
-    <T> T getProperty(String key);
+    Object getProperty(String key);
 }

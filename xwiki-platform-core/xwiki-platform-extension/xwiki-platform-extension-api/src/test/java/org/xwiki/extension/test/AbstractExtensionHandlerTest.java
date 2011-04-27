@@ -1,7 +1,6 @@
 package org.xwiki.extension.test;
 
 import org.junit.Before;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.repository.LocalExtensionRepository;
@@ -43,7 +42,7 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
         ConfigurableDefaultCoreExtensionRepository.register(getComponentManager());
     }
 
-    protected LocalExtension install(ExtensionId extensionId) throws ComponentLookupException, Exception
+    protected LocalExtension install(ExtensionId extensionId) throws Exception
     {
         InstallRequest installRequest = new InstallRequest();
         installRequest.addExtension(extensionId);
@@ -56,7 +55,7 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
         return (LocalExtension) this.localExtensionRepository.resolve(extensionId);
     }
 
-    protected LocalExtension uninstall(ExtensionId extensionId) throws ComponentLookupException, Exception
+    protected void uninstall(ExtensionId extensionId) throws Exception
     {
         UninstallRequest uninstallRequest = new UninstallRequest();
         uninstallRequest.addExtension(extensionId);
@@ -65,7 +64,5 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
         if (uninstallTask.getExceptions() != null) {
             throw uninstallTask.getExceptions().get(0);
         }
-
-        return (LocalExtension) this.localExtensionRepository.resolve(extensionId);
     }
 }

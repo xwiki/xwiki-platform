@@ -37,7 +37,8 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 
 /**
- * Listens to script evaluation events ({@link org.xwiki.script.event.ScriptEvaluatingEvent} and {@link org.xwiki.script.event.ScriptEvaluatedEvent}).
+ * Listens to script evaluation events ({@link org.xwiki.script.event.ScriptEvaluatingEvent} and
+ * {@link org.xwiki.script.event.ScriptEvaluatedEvent}).
  * Sets the context class loader for the evaluation and restores the original class loader afterwards.
  * 
  * @version $Id$

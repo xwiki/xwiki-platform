@@ -536,8 +536,9 @@ public class ResourceLoader
                 this.perm = connection.getPermission();
 
                 JarFile jar;
-                if (connection instanceof org.xwiki.classloader.internal.protocol.jar.JarURLConnection) {
-                    jar = ((org.xwiki.classloader.internal.protocol.jar.JarURLConnection) connection).getJarFile();
+
+                if (connection instanceof org.xwiki.classloader.internal.JarURLConnection) {
+                    jar = ((org.xwiki.classloader.internal.JarURLConnection) connection).getJarFile();
                 } else {
                     jar = ((java.net.JarURLConnection) connection).getJarFile();
                 }

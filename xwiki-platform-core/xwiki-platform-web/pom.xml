@@ -346,6 +346,14 @@
       <artifactId>xwiki-platform-store-filesystem-attachments</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Package support for attachmentjar protocol for classloaders to be able to add jars attached to wiki pages to
+         classloaders -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-classloader-protocol-attachmentjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <properties>
     <!-- Don't run CLIRR on the .war since there's no Java code here. -->

@@ -47,7 +47,7 @@ import java.util.jar.Manifest;
  * @version $Id$
  * @since 2.0.1
  */
-public class JarURLConnection extends java.net.URLConnection
+public class JarURLConnection extends java.net.URLConnection implements org.xwiki.classloader.internal.JarURLConnection
 {
     private URLStreamHandlerFactory handlerFactory;
 

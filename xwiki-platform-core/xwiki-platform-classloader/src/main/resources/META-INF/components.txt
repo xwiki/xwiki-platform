@@ -1,3 +1,0 @@
-org.xwiki.classloader.internal.protocol.jar.JarURLStreamHandler
-org.xwiki.classloader.internal.protocol.attachmentjar.AttachmentURLStreamHandler
-org.xwiki.classloader.internal.ExtendedURLStreamHandlerFactory

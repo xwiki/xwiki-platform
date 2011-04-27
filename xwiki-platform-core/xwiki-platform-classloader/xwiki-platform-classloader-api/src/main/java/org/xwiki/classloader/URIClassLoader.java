@@ -90,7 +90,7 @@ public class URIClassLoader extends ExtendedURLClassLoader
      * Creates URIClassLoader with the specified search path.
      * 
      * @param uris the search path
-     * @param jarHandler stream handler for JAR files; implements caching policy
+     * @param handlerFactory the URLStreamHandlerFactory to use when creating URLs
      */
     public URIClassLoader(URI[] uris, URLStreamHandlerFactory handlerFactory)
     {
@@ -115,7 +115,7 @@ public class URIClassLoader extends ExtendedURLClassLoader
      * 
      * @param uris the search path
      * @param parent the parent class loader.
-     * @param jarHandler stream handler for JAR files; implements caching policy
+     * @param handlerFactory the URLStreamHandlerFactory to use when creating URLs
      */
     public URIClassLoader(URI[] uris, ClassLoader parent, URLStreamHandlerFactory handlerFactory)
     {

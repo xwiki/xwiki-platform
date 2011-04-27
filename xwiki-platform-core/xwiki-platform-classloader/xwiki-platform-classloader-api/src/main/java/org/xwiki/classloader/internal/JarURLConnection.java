@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- *
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,22 +16,29 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
--->
+ */
+package org.xwiki.classloader.internal;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-classloader</artifactId>
-  <name>XWiki Platform - ClassLoader - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - ClassLoader - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-classloader-api</module>
-    <module>xwiki-platform-classloader-protocols</module>
-  </modules>
-</project>
+import java.io.IOException;
+import java.util.jar.JarFile;
+
+/**
+ * Common interface to be implemented by all {@link java.net.URLConnection} implementations that wish to override the
+ * {@code getJarFile()} method from {@link java.net.JarURLConnection}.
+ *
+ * @version $Id$
+ * @since 3.1M1
+ */
+public interface JarURLConnection
+{
+    /**
+     * Return the JAR file for this connection.
+     *
+     * @return the JAR file for this connection. If the connection is a connection to an entry of a JAR file, the JAR
+     *         file object is returned
+     * @exception IOException if an IOException occurs while trying to connect to the JAR file for this connection.
+     *
+     * @see java.net.JarURLConnection#getJarFile()
+     */
+    JarFile getJarFile() throws IOException;
+}

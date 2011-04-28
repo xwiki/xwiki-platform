@@ -5,14 +5,14 @@
 <language></language>
 <defaultLanguage></defaultLanguage>
 <translation>0</translation>
-<parent></parent>
+<parent>WorkspaceManager.WebHome</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1293832800000</creationDate>
-<date>1293832800000</date>
-<contentUpdateDate>1293832800000</contentUpdateDate>
+<date>1303995006000</date>
+<contentUpdateDate>1303995006000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -31,18 +31,26 @@
 <defaultWeb></defaultWeb>
 <nameField></nameField>
 <validationScript></validationScript>
-<foobar>
+<membershipType>
+<cache>0</cache>
 <customDisplay></customDisplay>
 <disabled>0</disabled>
-<name>foobar</name>
-<number>1</number>
+<displayType>radio</displayType>
+<multiSelect>0</multiSelect>
+<name>membershipType</name>
+<number>2</number>
 <picker>0</picker>
-<prettyName>foobar</prettyName>
-<size>30</size>
+<prettyName>Membership Type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>3</size>
+<sort>none</sort>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
 <validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</foobar>
+<values>open=Open for any user to join|request=Any user can request to join but an admin must accept|invite=Only an admin can invite a user</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</membershipType>
 </class>
-<content></content></xwikidoc>
+<content>Marks a wiki as being a workspace and specifies some additional, workspace-specific, properties.</content></xwikidoc>

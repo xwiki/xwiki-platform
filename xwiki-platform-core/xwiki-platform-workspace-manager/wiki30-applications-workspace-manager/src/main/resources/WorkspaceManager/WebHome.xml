@@ -11,15 +11,15 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1293832800000</creationDate>
-<date>1293832800000</date>
-<contentUpdateDate>1293832800000</contentUpdateDate>
-<version>1.1</version>
+<date>1303999994000</date>
+<contentUpdateDate>1303999994000</contentUpdateDate>
+<version>4.20</version>
 <title>$msg.get("workspacemanager.browse")</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>false</minorEdit>
+<minorEdit>true</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
@@ -121,11 +121,12 @@
 </property>
 </object>
 <content>{{velocity}}
-#set($columns = ['wikiprettyname', 'description', 'owner'])
+#set($columns = ['wikiprettyname', 'description', 'owner', 'membershipType'])
 #set($columnsProperties = {
     'wikiprettyname' : { 'type' : 'text', 'link' : 'field' },
     'description' : { 'type' : 'text' , 'size' : 50 },
-    'owner' : { 'type' : 'text', 'link' : 'field' }
+    'owner' : { 'type' : 'text', 'link' : 'field' },
+    'membershipType' : { 'type' : 'text', 'class' : 'WorkspaceManager.WorkspaceClass'}
 })
 #set($options = {
    'className' : 'XWiki.XWikiServerClass',
@@ -137,5 +138,6 @@
   #set($discard = $columns.add('_actions'))
   #set($discard = $columnsProperties.put('_actions', { 'actions' : ['join', 'leave'] }))
 #end
+[[Create a new Workspace&gt;&gt;CreateNewWorkspace]]
 #livetable('workspaces', $columns, $columnsProperties, $options)
 {{/velocity}}</content></xwikidoc>

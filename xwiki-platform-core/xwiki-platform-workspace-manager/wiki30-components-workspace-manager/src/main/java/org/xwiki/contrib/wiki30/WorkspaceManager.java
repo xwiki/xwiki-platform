@@ -79,9 +79,9 @@ public interface WorkspaceManager
      * @param workspaceName name of the workspace to edit.
      * @param modifiedWikiXObjectDocument an in-memory modified wiki descriptor document. This method will take care of
      *            saving the changes.
-     * @throws XWikiException
+     * @throws WorkspaceManagerException
      */
-    void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument) throws XWikiException;
+    void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument) throws WorkspaceManagerException;
 
     /**
      * Retrieves a workspace by name.

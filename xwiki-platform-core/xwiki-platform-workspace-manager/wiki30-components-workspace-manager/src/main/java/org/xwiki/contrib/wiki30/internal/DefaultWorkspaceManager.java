@@ -21,6 +21,7 @@ package org.xwiki.contrib.wiki30.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.xwiki.component.annotation.Component;
@@ -40,7 +41,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseElement;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.plugin.wikimanager.WikiManager;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerPluginApi;
@@ -65,6 +68,12 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
 
     /** Format string for the wiki preferences page of a certain wiki (absolute reference). */
     private static final String WIKI_PREFERENCES_PREFIXED_FORMAT = "%s:" + WIKI_PREFERENCES_LOCAL;
+    
+    /** Membership type property name. */
+    private static final String WORKSPACE_MEMBERSHIP_TYPE_PROPERTY = "membershipType";
+    
+    /** Membership type default value. */
+    private static final String WORKSPACE_MEMBERSHIP_TYPE_DEFAULT = "open";
 
     /** Execution context. */
     @Requirement
@@ -281,8 +290,15 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
         DocumentReference workspaceClassReference =
             new DocumentReference(mainWikiName, "WorkspaceManager", "WorkspaceClass");
 
-        XWikiDocument wikiDocument = result.getDocument();
-        wikiDocument.createXObject(workspaceClassReference, deprecatedContext);
+        XWikiDocument wikiDocument = newWikiXObjectDocument.getDocument();
+        BaseObject workspaceObject = wikiDocument.getXObject(workspaceClassReference);
+        if (workspaceObject == null) {
+            workspaceObject = wikiDocument.newXObject(workspaceClassReference, deprecatedContext);
+        }
+        /* Make sure the required values are set. */
+        if (workspaceObject.getStringValue(WORKSPACE_MEMBERSHIP_TYPE_PROPERTY) == null) {
+            workspaceObject.setStringValue(WORKSPACE_MEMBERSHIP_TYPE_PROPERTY, WORKSPACE_MEMBERSHIP_TYPE_DEFAULT);
+        }
 
         deprecatedContext.getWiki().saveDocument(wikiDocument, comment, deprecatedContext);
 
@@ -305,12 +321,55 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.contrib.wiki30.WorkspaceManager#editWorkspace(java.lang.String, java.util.Map)
+     * @see org.xwiki.contrib.wiki30.WorkspaceManager#editWorkspace(java.lang.String,
+     *      com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer)
      */
-    public void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument) throws XWikiException
+    public void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument)
+        throws WorkspaceManagerException
     {
-        // TODO Auto-generated method stub
+        Workspace workspace = getWorkspace(workspaceName);
 
+        XWikiContext deprecatedContext = getXWikiContext();
+        XWiki xwiki = deprecatedContext.getWiki();
+        DocumentReference xwikiServerClassReference =
+            new DocumentReference(deprecatedContext.getMainXWiki(), "XWiki", "XWikiServerClass");
+
+        Wiki wikiDocument = workspace.getWikiDocument();
+        XWikiDocument coreWikiDocument = wikiDocument.getDocument();
+        BaseObject currentWikiObject = coreWikiDocument.getXObject(xwikiServerClassReference);
+
+        BaseObject modifiedWikiObject = modifiedWikiXObjectDocument.getDocument().getXObject(xwikiServerClassReference);
+
+        /* Merge the two. */
+        updateObject(modifiedWikiObject, currentWikiObject);
+
+        /* Save the changes. */
+        try {
+            xwiki.saveDocument(coreWikiDocument, "Workspace edited", true, deprecatedContext);
+        } catch (XWikiException e) {
+            throw new WorkspaceManagerException("Failed to save modifications.", e);
+        }
+    }
+
+    /**
+     * Update the contents of an object using the contents of another. Objects must be of the same class.
+     * 
+     * @param source object that provides the new contents to update with.
+     * @param destination object that is to be updated.
+     * @throws WorkspaceManagerException if objects' classes differ.
+     */
+    private void updateObject(BaseObject source, BaseObject destination) throws WorkspaceManagerException
+    {
+        if (!source.getXClassReference().equals(destination.getXClassReference())) {
+            throw new WorkspaceManagerException(String.format("Objects classes are not equal: %s vs %s", source
+                .getXClassReference().toString(), destination.getXClassReference().toString()));
+        }
+
+        Iterator<String> itfields = source.getPropertyList().iterator();
+        while (itfields.hasNext()) {
+            String name = (String) itfields.next();
+            destination.safeput(name, (PropertyInterface) ((BaseElement) source.safeget(name)).clone());
+        }
     }
 
     public Workspace getWorkspace(String workspaceId) throws WorkspaceManagerException

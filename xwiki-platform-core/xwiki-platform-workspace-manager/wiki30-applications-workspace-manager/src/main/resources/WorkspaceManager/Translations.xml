@@ -11,15 +11,15 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1293832800000</creationDate>
-<date>1303401293000</date>
-<contentUpdateDate>1303401293000</contentUpdateDate>
-<version>2.1</version>
+<date>1303997504000</date>
+<contentUpdateDate>1303997504000</contentUpdateDate>
+<version>3.9</version>
 <title>Translations</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>false</minorEdit>
+<minorEdit>true</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content># Workspace Manager translation page
@@ -43,6 +43,7 @@ workspacemanager.browse.emptyvalue=N/A
 workspacemanager.browse.wikiprettyname=Name
 workspacemanager.browse.description=Description
 workspacemanager.browse.owner=Owner
+workspacemanager.browse.membershipType=Membership Type
 workspacemanager.browse._actions=Actions
 workspacemanager.browse._actions.join=Join
 workspacemanager.browse._actions.leave=Leave
@@ -57,11 +58,12 @@ workspacemanager.install.translations=The translations page has been automatical
 workspacemanager.error.workspacedoesnotexist=Workspace [{0}] does not exist
 
 # PROPERTIES
-workspacemanager.prop.wiki.wikiname=WORKSPACE IDENTIFIER
-workspacemanager.prop.wiki.wikiprettyname=PRETTY NAME
-workspacemanager.prop.wiki.description=DESCRIPTION
-workspacemanager.prop.wiki.server=ALIAS
-workspacemanager.prop.wiki.owner=OWNER
+workspacemanager.prop.wiki.wikiname=Workspace Identifier
+workspacemanager.prop.wiki.wikiprettyname=Pretty Name
+workspacemanager.prop.wiki.description=Description
+workspacemanager.prop.wiki.server=Alias
+workspacemanager.prop.wiki.owner=Owner
+workspacemanager.prop.workspace.membershipType.label=Membership Type
 
 # DOCUMENTATION
 workspacemanager.doc.createwiki.wikiname=The unique identifier of the new workspace.
@@ -69,4 +71,5 @@ workspacemanager.doc.createwiki.desc.wikiprettyname=The display name of the work
 workspacemanager.doc.createwiki.desc.description=A brief description of the workspace and its purpose.
 workspacemanager.doc.createwiki.desc.owner=A user who will have all the rights on the workspace.
 workspacemanager.doc.createwiki.members=The users that can participate in the workspace.\n\
-Tip: Use CTRL+Click to select multiple users.</content></xwikidoc>
+Tip: Use CTRL+Click to select multiple users.
+workspacemanager.prop.workspace.membershipType.hint=The way users can join this workspace.</content></xwikidoc>

@@ -3126,6 +3126,7 @@ document.observe('xwiki:dom:loaded', function() {
   {
     'id' : 'configuration',
     'children': [
+       {'id' : 'XWiki.ManageWorkspace'},
        {'id' : 'Editing'},
        {'id' : 'Localization'},
        {'id' : 'Email'},

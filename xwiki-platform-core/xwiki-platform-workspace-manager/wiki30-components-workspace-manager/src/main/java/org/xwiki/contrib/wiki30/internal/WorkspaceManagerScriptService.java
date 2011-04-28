@@ -27,6 +27,7 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
 import org.xwiki.contrib.wiki30.Workspace;
 import org.xwiki.contrib.wiki30.WorkspaceManager;
+import org.xwiki.contrib.wiki30.WorkspaceManagerException;
 import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiContext;
@@ -133,24 +134,18 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
      * @see org.xwiki.contrib.wiki30.WorkspaceManager#editWorkspace(java.lang.String,
      *      com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer)
      */
-    public int editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument)
+    public void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument)
     {
-        int returncode = XWikiExceptionApi.ERROR_NOERROR;
-
         try {
-            if (!canDeleteWorkspace(getXWikiContext().getUser(), workspaceName)) {
-                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, String.format(
-                    "Access denied to edit the workspace '%s'", workspaceName));
+            if (!canEditWorkspace(getXWikiContext().getUser(), workspaceName)) {
+                error(new WorkspaceManagerException(String.format("Access denied to edit the workspace '%s'",
+                    workspaceName)));
             }
 
             workspaceManager.editWorkspace(workspaceName, modifiedWikiXObjectDocument);
-        } catch (XWikiException e) {
+        } catch (Exception e) {
             error(String.format("Failed to edit workspace '%s'.", workspaceName), e);
-
-            returncode = e.getCode();
         }
-
-        return returncode;
     }
 
     /** @return the deprecated xwiki context used to manipulate xwiki objects */

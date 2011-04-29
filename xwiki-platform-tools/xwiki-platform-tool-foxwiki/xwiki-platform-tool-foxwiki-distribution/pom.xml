@@ -29,7 +29,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tool-foxwiki</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1M1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-foxwiki-distribution</artifactId>
   <packaging>pom</packaging>

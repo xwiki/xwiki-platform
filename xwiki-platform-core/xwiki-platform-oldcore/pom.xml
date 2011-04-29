@@ -595,35 +595,6 @@
       <artifactId>xwiki-platform-rendering-macro-context</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- XWiki syntax parsers -->
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-doxia</artifactId>
-      <version>${rendering.version}</version>
-      <!-- Only needed at runtime since it's a component implementation -->
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xwiki2</artifactId>
-      <version>${rendering.version}</version>
-      <!-- Only needed at runtime since it's a component implementation -->
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
-      <version>${rendering.version}</version>
-      <!-- Only needed at runtime since it's a component implementation -->
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xwiki10</artifactId>
-      <version>${rendering.version}</version>
-      <!-- Only needed at runtime since it's a component implementation -->
-      <scope>runtime</scope>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-transformation-icon</artifactId>
@@ -722,6 +693,26 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- XWiki syntax parsers -->
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xwiki2</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xwiki10</artifactId>
+      <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
 

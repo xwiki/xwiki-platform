@@ -66,6 +66,8 @@
             <exclude>**/XWiki/RegistrationHelp.xml</exclude>
             <!-- Disable local user management. -->
             <exclude>**/XWiki/AdminUsersSheet.xml</exclude>
+            <!-- Disable local admin. -->
+            <exclude>**/XWiki/Admin.xml</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -154,6 +156,35 @@
                   </includes>
                   <stylesheet>src/main/build/transformation/register-workspace-search.xsl
               </stylesheet>
+                </transformationSet>
+              </transformationSets>
+            </configuration>
+          </execution>
+          <!-- WORKAROUND for http://jira.xwiki.org/jira/browse/XWIKI-6261 -->
+          <!-- Override the author of each page to be xwiki:XWiki.Admin. -->
+          <!-- TODO: Remove this when XWiki-6261 is fixed -->
+          <execution>
+            <id>override-page-author-and-modifier</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformationSets>
+                <transformationSet>
+                  <dir>${project.build.outputDirectory}</dir>
+                  <outputDir>${project.build.outputDirectory}</outputDir>
+                  <includes>
+                    <include>**/**.xml</include>
+                  </includes>
+                  <stylesheet>src/main/build/transformation/override-page-creator-and-author.xsl
+              </stylesheet>
+                  <parameters>
+                    <parameter>
+                      <name>creatorAndAuthor</name>
+                      <value>xwiki:XWiki.Admin</value>
+                    </parameter>
+                  </parameters>
                 </transformationSet>
               </transformationSets>
             </configuration>

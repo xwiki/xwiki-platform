@@ -78,8 +78,8 @@ $xwiki.jsx.use("Blog.ManageCategories")##
     #end
     &lt;div class="clearfloats"&gt;&lt;/div&gt;
 
-    #getEntriesForCategory($doc.fullName $entries $total)
-    #if($total == 0)
+    #getEntriesForCategory($doc.fullName $entries $totalEntries)
+    #if($totalEntries == 0)
       #info('No entries in this category')
     #else
       #displayBlog($entries 'category' true true)

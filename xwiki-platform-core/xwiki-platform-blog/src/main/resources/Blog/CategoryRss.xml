@@ -4,13 +4,13 @@
 <web>Blog</web>
 <name>CategoryRss</name>
 <language></language>
-<defaultLanguage>en</defaultLanguage>
+<defaultLanguage></defaultLanguage>
 <translation>0</translation>
 <parent>Blog.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1230080962000</creationDate>
 <date>1230091357000</date>
 <contentUpdateDate>1230091357000</contentUpdateDate>

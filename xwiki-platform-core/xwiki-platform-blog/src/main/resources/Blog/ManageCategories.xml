@@ -121,7 +121,6 @@ XWiki.blog.Categories = Class.create({
   /** Constructor. Adds all the JS improvements of the categories tree. */
   initialize : function() {
     if ($$(".blog-categories-list")) {
-      this.addHoverListener();
       this.addDeleteListener();
       this.addAddSubcategoryListener();
       this.addAddCategoryListener();
@@ -135,14 +134,6 @@ XWiki.blog.Categories = Class.create({
     form.show();
     this.activeForm = form;
     form.down('input[type=text]').focus();
-  },
-  addHoverListener : function() {
-    if (Prototype.Browser.IE) {
-      $$(this.categoriesSelector).each(function(item) {
-        item.observe('mouseover', function() {item.addClassName('blog-category-level-hover');});
-        item.observe('mouseout', function() {item.removeClassName('blog-category-level-hover');});
-      });
-    }
   },
   /**
    * Ajax category rename.
@@ -595,8 +586,7 @@ document.observe('xwiki:dom:loaded', function() {
   display: block;
   position: relative;
 }
-.blog-category-level:hover,
-.blog-category-level-hover {
+.blog-category-level:hover {
   background: $theme.highlightColor;
   padding-bottom: 2px;
   border-bottom: 1px solid $theme.borderColor; 
@@ -614,8 +604,7 @@ document.observe('xwiki:dom:loaded', function() {
   top: 0; right: 0;
   display: inline;
 }
-.blog-category-level:hover .blog-category-tools,
-.blog-category-level-hover .blog-category-tools {
+.blog-category-level:hover .blog-category-tools {
   visibility: visible;
 }
 .blog-add-category-label {

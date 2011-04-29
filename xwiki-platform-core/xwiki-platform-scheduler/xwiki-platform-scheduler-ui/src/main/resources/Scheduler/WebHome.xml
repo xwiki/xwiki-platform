@@ -193,7 +193,7 @@ $msg.get('xe.scheduler.welcome')
 &lt;input type="hidden" name="name" value=""/&gt;
 &lt;input type="hidden" name="parent" value="${doc.fullName}"/&gt;
 &lt;label class="hidden" for="title"&gt;Job page name&lt;/label&gt;
-&lt;input id="title" name="title" size="30" type="text" value="Job page name"&gt;&lt;/input&gt;
+&lt;input id="title" name="title" size="30" type="text" value="Job page name" /&gt;
 &lt;span class="buttonwrapper"&gt;&lt;input type="button" class="button" value="$msg.get('xe.scheduler.jobs.add')" onclick='if (updateName(this.form.title,this.form.name)) { action="../../inline/" + this.form.webname.value + "/" + this.form.name.value; this.form.submit(); }' /&gt;&lt;/span&gt;
 &lt;/div&gt;
 &lt;/form&gt;

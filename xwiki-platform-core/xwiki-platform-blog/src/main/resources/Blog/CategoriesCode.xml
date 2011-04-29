@@ -239,7 +239,7 @@
  * control for choosing the parent category among existing categories.
  *###
 ## DO NOT CHANGE INDENTATION
-#macro(addCategoryForm) &lt;form action="$doc.getURL()" method="post" class="category-add-form"&gt;&lt;div class='create-category'&gt; &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt; &lt;input type="hidden" name="xaction" value="create"/&gt; &lt;label&gt;$msg.get("xe.blog.categories.new")&lt;br/&gt; &lt;input type="text" name="newCategoryName" class="category-name-input"&gt;&lt;/input&gt;&lt;/label&gt;&lt;br/&gt;#if("$!{request.parentCategory}" == "")&lt;label&gt;#* $msg.get("xe.blog.categories.parent")*# Subcategory of:&lt;br/&gt; &lt;select name="newCategoryParent" id="blog_category_selectBox" class="category-add-input"&gt; &lt;option value="${defaultCategoryParent}" selected="selected"&gt;None&lt;/option&gt; $!processedCategories.clear() #displayCategoriesHierarchy($tree 'option') &lt;/select&gt; &lt;br/&gt;&lt;/label&gt;#else&lt;input type="hidden" name="newCategoryParent" value="${escapetool.xml($request.parentCategory)}"/&gt;#end&lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" value="Add"&gt;&lt;/input&gt;&lt;/span&gt; &lt;a href="$doc.getURL()"&gt;Cancel&lt;/a&gt; &lt;/div&gt;&lt;/form&gt; #end
+#macro(addCategoryForm) &lt;form action="$doc.getURL()" method="post" class="category-add-form"&gt;&lt;div class='create-category'&gt; &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt; &lt;input type="hidden" name="xaction" value="create"/&gt; &lt;label&gt;$msg.get("xe.blog.categories.new")&lt;br/&gt; &lt;input type="text" name="newCategoryName" class="category-name-input" /&gt;&lt;/label&gt;&lt;br/&gt;#if("$!{request.parentCategory}" == "")&lt;label&gt;#* $msg.get("xe.blog.categories.parent")*# Subcategory of:&lt;br/&gt; &lt;select name="newCategoryParent" id="blog_category_selectBox" class="category-add-input"&gt; &lt;option value="${defaultCategoryParent}" selected="selected"&gt;None&lt;/option&gt; $!processedCategories.clear() #displayCategoriesHierarchy($tree 'option') &lt;/select&gt; &lt;br/&gt;&lt;/label&gt;#else&lt;input type="hidden" name="newCategoryParent" value="${escapetool.xml($request.parentCategory)}"/&gt;#end&lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" value="Add" /&gt;&lt;/span&gt; &lt;a href="$doc.getURL()"&gt;Cancel&lt;/a&gt; &lt;/div&gt;&lt;/form&gt; #end
 ##
 ##
 ##
@@ -252,8 +252,8 @@
 &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 &lt;input type="hidden" name="xaction" value="rename"/&gt;##
 &lt;input type="hidden" name="category" value="${escapetool.xml($request.category)}"/&gt;##
-&lt;label&gt;$msg.get("xe.blog.categories.newName")&lt;br/&gt; &lt;input type="text" name="newCategoryName" class="category-name-input"&gt;&lt;/input&gt;&lt;/label&gt;&lt;br/&gt;##
-&lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" value="Rename"&gt;&lt;/input&gt;&lt;/span&gt; ##
+&lt;label&gt;$msg.get("xe.blog.categories.newName")&lt;br/&gt; &lt;input type="text" name="newCategoryName" class="category-name-input" /&gt;&lt;/label&gt;&lt;br/&gt;##
+&lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" value="Rename" /&gt;&lt;/span&gt; ##
 &lt;a href="$doc.getURL()"&gt;Cancel&lt;/a&gt;##
 &lt;/div&gt;&lt;/form&gt;##
 #end
@@ -372,7 +372,7 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
   &lt;div class='create-category'&gt;
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input type="hidden" name="xaction" value="create"/&gt;
-    &lt;label&gt;$msg.get("xe.blog.categories.new") &lt;input type="text" name="newCategoryName"&gt;&lt;/input&gt;&lt;/label&gt;
+    &lt;label&gt;$msg.get("xe.blog.categories.new") &lt;input type="text" name="newCategoryName" /&gt;&lt;/label&gt;
     &lt;label&gt;$msg.get("xe.blog.categories.parent")
       &lt;select name="newCategoryParent" id="blog_category_selectBox"&gt;
         &lt;option value="${defaultCategoryParent}" selected="selected"&gt;None&lt;/option&gt;
@@ -380,7 +380,7 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
         #displayCategoriesHierarchy($tree 'option')
       &lt;/select&gt;
     &lt;/label&gt;
-    &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="button" value="Add" id="blog_AddCategoryButton"&gt;&lt;/input&gt;&lt;/span&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="button" value="Add" id="blog_AddCategoryButton" /&gt;&lt;/span&gt;
   &lt;/div&gt;
 #end
 ##

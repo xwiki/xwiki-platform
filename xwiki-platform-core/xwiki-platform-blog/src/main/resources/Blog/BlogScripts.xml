@@ -7,10 +7,10 @@
 <defaultLanguage></defaultLanguage>
 <translation>0</translation>
 <parent>Blog.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1226272589000</creationDate>
 <date>1227681663000</date>
 <contentUpdateDate>1227681663000</contentUpdateDate>

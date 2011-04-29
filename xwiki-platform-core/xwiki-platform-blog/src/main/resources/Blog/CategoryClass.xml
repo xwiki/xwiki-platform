@@ -4,13 +4,13 @@
 <web>Blog</web>
 <name>CategoryClass</name>
 <language></language>
-<defaultLanguage>en</defaultLanguage>
+<defaultLanguage></defaultLanguage>
 <translation>0</translation>
 <parent>Blog.WebHome</parent>
-<creator>xwiki:XWiki.Sergiu</creator>
-<author>XWiki.Admin</author>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1220440219000</creationDate>
 <date>1226817929000</date>
 <contentUpdateDate>1226817929000</contentUpdateDate>

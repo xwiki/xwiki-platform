@@ -571,7 +571,7 @@ document.observe('xwiki:dom:loaded', function() {
   float: left;
   padding: 8px 0;
 }
-.subcategories {
+.blog-categories-list .subcategories {
   background: $theme.backgroundSecondaryColor;
   margin-top: 1.4em;
   padding-right: 15px;
@@ -581,20 +581,20 @@ document.observe('xwiki:dom:loaded', function() {
   list-style-type: none !important;
   padding: 0;
 }
-.blog-category-level {
+.blog-categories-list .blog-category-level {
   padding: 1px 2px 3px;
   display: block;
   position: relative;
 }
-.blog-category-level:hover {
+.blog-categories-list .blog-category-level:hover {
   background: $theme.highlightColor;
   padding-bottom: 2px;
   border-bottom: 1px solid $theme.borderColor; 
 }
-.blog-category-level img {
+.blog-categories-list .blog-category-level img {
   vertical-align: middle;
 }
-.blog-category {
+.blog-categories-list .blog-category {
   margin-right: 80px;
   display: block;
 }

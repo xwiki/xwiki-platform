@@ -25,6 +25,7 @@ import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 import java.io.File;
@@ -82,6 +83,9 @@ public class AbstractPackager
         context.setUser("XWiki.superadmin");
         context.setDatabase(databaseName);
         context.setMainXWiki(databaseName);
+
+        // Use a dummy Request even in daemon mode so that XWiki's initialization can create a Servlet URL Factory.
+        context.setRequest(new XWikiServletRequestStub());
 
         // Use a dummy URL so that XWiki's initialization can create a Servlet URL Factory. We could also have
         // registered a custom XWikiURLFactory against XWikiURLFactoryService but it's more work.

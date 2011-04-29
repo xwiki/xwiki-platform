@@ -26,18 +26,16 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.platform.tools</groupId>
-    <artifactId>xwiki-tools</artifactId>
-    <version>20</version>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-tools</artifactId>
+    <version>3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-backup-sample-basic-import-export</artifactId>
   <packaging>pom</packaging>
   <name>Maven XWiki Backup Plugin Basic Import/Export Sample</name>
   <description>Maven XWiki Backup Plugin Basic Import/Export Sample</description>
-  <version>1.0-SNAPSHOT</version>
   <build>
     <plugins>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-remote-resources-plugin</artifactId>
@@ -49,20 +47,25 @@
             </goals>
             <configuration>
               <resourceBundles>
-                <resourceBundle>org.xwiki.platform.tools:xwiki-configuration-resources:1.34</resourceBundle>
+                <resourceBundle>org.xwiki.platform:xwiki-platform-tool-configuration-resources:${project.version}</resourceBundle>
               </resourceBundles>
               <properties>
                 <xwikiDbConnectionUrl>jdbc:hsqldb:mem:.</xwikiDbConnectionUrl>
+                <xwikiDbConnectionUsername>sa</xwikiDbConnectionUsername>
+                <xwikiDbConnectionPassword />
+                <xwikiDbConnectionDriverClass>org.hsqldb.jdbcDriver</xwikiDbConnectionDriverClass>
+                <xwikiDbDialect>org.hibernate.dialect.HSQLDialect</xwikiDbDialect>
+                <xwikiDbHbmXwiki>xwiki.hbm.xml</xwikiDbHbmXwiki>
+                <xwikiDbHbmFeeds>feeds.hbm.xml</xwikiDbHbmFeeds>
               </properties>
             </configuration>
           </execution>
         </executions>
       </plugin>
-
       <plugin>
-        <groupId>org.xwiki.platform.tools</groupId>
-        <artifactId>xwiki-packager-plugin</artifactId>
-        <version>1.16-SNAPSHOT</version>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+        <version>${project.version}</version>
         <configuration>
           <hibernateConfig>${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml</hibernateConfig>
         </configuration>

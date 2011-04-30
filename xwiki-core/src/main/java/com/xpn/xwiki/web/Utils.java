@@ -571,7 +571,7 @@ public class Utils
                 for (FileItem item : fileItems) {
                     if (item.isFormField()) {
                         String sName = item.getFieldName();
-                        String sValue = item.getString();
+                        String sValue = item.getString(context.getWiki().getEncoding());
                         mpreq.setParameter(sName, sValue);
                     }
                 }

@@ -269,6 +269,7 @@
     <module>xwiki-platform-test</module>
     <module>xwiki-platform-toucan</module>
     <module>xwiki-platform-url</module>
+    <module>xwiki-platform-users</module>
     <module>xwiki-platform-velocity</module>
     <module>xwiki-platform-watchlist</module>
     <module>xwiki-platform-web</module>

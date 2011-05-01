@@ -11,9 +11,9 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1211797918000</creationDate>
-<date>1299773184000</date>
-<contentUpdateDate>1299773184000</contentUpdateDate>
-<version>1.1</version>
+<date>1304114997000</date>
+<contentUpdateDate>1304114997000</contentUpdateDate>
+<version>3.1</version>
 <title>AdminSheet</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -21,13 +21,12 @@
 <comment></comment>
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<attachment>
+<hidden>false</hidden><attachment>
 <filename>applications.png</filename>
 <filesize>7358</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1296854749000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAchUlEQVR4Xu2da5BlV3men7X25exz
 6+5zunumu0eauzVCEiPBJEYIRJEyd8tACqNcCIgkRSUhmPyIkrKdYEsQsEmCoVImGFGUAnJhbEy4
 IyA2sYpIYLAkRmg00kgjjeam6Zm+3845+7JWdq9adar3rj46dJ+e7hHMq/q091l795yzz3O+b33r
@@ -162,8 +161,8 @@ RK5CYII=
 <filename>registration.png</filename>
 <filesize>7935</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1296853602000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAexklEQVR4Xu19ebAcxZnnL6vvfueh
 93TfPIlBSAIElm0Y4ZN7ZiBmbROxC2yEsfH4+sPh+WMiiFi8YU/EnI4xSxh7Y8IOO9besdfG4WUA
 G+wZxsgWl40AydbDgtGJ3nuS3v26u6orc7K+qIzM7uyqanU9EMEoFamsPCq7X//y932Z35dZlcV/
@@ -307,8 +306,8 @@ AAAAAElFTkSuQmCC</content></attachment><attachment>
 <filename>users.png</filename>
 <filesize>12054</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1296853435000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAu3UlEQVR4XuyWT2sbRxjGZ2b/SKuV
 dldyJVsOaQgBF9JADs7Z+QQp6aHn9N5P0EMIgQRMP0ZzCA3NKSdDe4j7DVwkaFJyadzUcRXHOHJs
 aVfT553selhNlkVgG9N24OH1O+/MeNBvnpe12f/jP6cj6HEcHxcAbuSQUTPmS+Z0PvNc4b2KhzRy
@@ -524,8 +523,8 @@ WMx5HHJ9pfQKYFwiaNXoG9gY516OZKOlib7HUWJB6GXEC4ExLRcZ4DtQrng8Xi07Ozu6IEe7bJvL
 <filename>export.png</filename>
 <filesize>7585</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1296854234000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAdaElEQVR4Xuxd268kx1n/dU9fZ85l
 Lmfv9tpeO46JzcZEMUEEIZAgIkJCSIjn8M5fwBMJUpD4A1AeEMoreQiPsUT8ACQhisFEXmdj7Pi2
 8V59rnPOmTMz3TPd1FeqUqmquqo5s4MiQWpVW93Vl9PVv/59X33fV1UT4f9d+mWSoONb3/oHuFK3
@@ -664,8 +663,8 @@ rkJggg==
 <filename>editing.png</filename>
 <filesize>14726</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1301306187000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAABmJLR0QA/wD/AP+gvaeTAAA5O0lE
 QVR4XuyXO28bRxDHZ/ceJI8U70XSlhg4hmAylQM1UeJOlVMageHagdp8grTqUsRNDKhQIQF+wDIQ
 FSrsJl3glDEcOEWU2kEMyZaMRBJ5r83M3WlxOvBImRQCIdFfHM1yd+/A29/OzpwK/zudS0IXQsCk
@@ -929,8 +928,8 @@ Ov8+xKrbHwYAAAAASUVORK5CYII=
 <filename>localization.png</filename>
 <filesize>10655</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1299769742000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAABmJLR0QA/wD/AP+gvaeTAAApVElE
 QVR4XuyaSY8kRxXH38uqzNq6u5ZephdbM5qlzcmMQMKHOSBuIGQkgzAXJHPnE/AROGCJAyfEyVxs
 4/Fp8AELsRhhNoHRGDRtjyxZ2J4ZT2/Ty1RlVuXjRSj7qSIU0dHZ2dKwzGtFRnZEVFapfvF/70VE
@@ -1122,8 +1121,8 @@ OL0cvBqR/v1GyQC//Ilc+QWwVRmkqqqix7Aa4P8fMsgfzChX60aoj/EAAAAASUVORK5CYII=
 <filename>elements.png</filename>
 <filesize>5339</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1301147407000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAABmJLR0QA/wD/AP+gvaeTAAAUkElE
 QVR4Xu2da4wcVXaAz+3nYx49PT1+4wd+Ecs8DImxd2WMwoZ4NxD2xxKIkhhWRETJZhcRbYK0JIEl
 2kVixf4IkUNIhBDkB2TRZhNpA46wSLwEbBRBYuMXXsCswTMe2/N+dlV3nZxzp2qur6qriqm+dk+G
@@ -1222,8 +1221,8 @@ nj17FsCPLbYkdXEg5vMhLfk/mgbnrITC89sAAAAASUVORK5CYII=
 <filename>presentation.png</filename>
 <filesize>9312</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1299702971000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAkJ0lEQVR4Xux9aYwlx33fr7rfe939
 3pt5c+/Ozl7cY3aXqyVFihIhQeIhmdRByJRkGYoEIcxlG0k+5EO+RPniI5GRQIHtDzEUJIooOBBk
 kVZiITEpMrQoyzJlUjy1uyR3eS/33rnezLv6qkpXdxeq6tVUMuAbAoaiXvRWd3V39ev6/e9/VU0F
@@ -1391,8 +1390,8 @@ HzCQjvjUmwFJAAAAAElFTkSuQmCC</content></attachment><attachment>
 <filename>templates.png</filename>
 <filesize>5760</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1284765598000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAABmJLR0QA/wD/AP+gvaeTAAAWNUlE
 QVR4Xuyav28bRxbH3yx/LkVySUWWJSuRFMQnC7LiGOcUcQK3BzssDkiKwK6MK6+41mUQ3B/gLt0h
 XQykSZM0/gMSuwjgAx2kODvwD0VSQuoHRZGUqOW8vLfYLAYcrrjS0D4L2Sd88YZvVytgP/N9y51R
@@ -1498,8 +1497,8 @@ QmCC</content></attachment><attachment>
 <filename>groups.png</filename>
 <filesize>10977</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1296853321000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAqqElEQVR4XuyZTY8UxxnHq2q6e/pl
 Xnr2fUEGCcMarzigcOIcWbIUkQPrHIiUOPfckXxCiFM+QLhEFgefgkK4cLSQiJNL9oSF1tpJuMBi
 WMGyi3dm57W78jw9Vd2qqultz6w2lmyXeOZ5uuqp2p751b+qurHIz+UnZyl0zrnRGEXRUQBQ/TrH
@@ -1696,8 +1695,8 @@ GZZqt6b4TPlPyv/yN1+1bpLB6fI+AAAAAElFTkSuQmCC</content></attachment><attachment>
 <filename>email.png</filename>
 <filesize>8309</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1299769724000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAABmJLR0QA/wD/AP+gvaeTAAAgKklE
 QVR4Xuxd228c13n/Zndn79wruVySoi6kKMuiJauKLdsN2qQBmgZtH4oGRR/T9/4FfWpSIAX6BxR5
 KNo8N0XyVMRI4YeisaqHwHZsSbZI6mJREiWS4i6X973N9Pud2Q+ey84Mqdk4QOpjH5+58czld37f
@@ -1848,8 +1847,8 @@ uv5vwcHgRzEcDs2Ozl9a6cImx5eXVv4Ck51qSkc9KTMAAAAASUVORK5CYII=
 <filename>import.png</filename>
 <filesize>8456</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1296854813000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAgz0lEQVR4Xu19a6wkx3Xed6rnfZ8P
 3n3ysdwlV9wlRUmmJNJ2kAgIAluQDARWIiMPxMmP/HCC/AqQwD+EWAGcIEB+5A+tKEFABbATO7AN
 xJFEJWYUx7LkmBJlkeKSWD6WXGqX3LuP+37MdE/XyemDLtQWerp77twRlFBq4GxVV1ff3pmvvnNO
@@ -2003,8 +2002,8 @@ KFnIGDFDutMAAAAASUVORK5CYII=
 <filename>content.png</filename>
 <filesize>8456</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1296854234000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAgz0lEQVR4Xu19a6wkx3Xed6rnfZ8P
 3n3ysdwlV9wlRUmmJNJ2kAgIAluQDARWIiMPxMmP/HCC/AqQwD+EWAGcIEB+5A+tKEFABbATO7AN
 xJFEJWYUx7LkmBJlkeKSWD6WXGqX3LuP+37MdE/XyemDLtQWerp77twRlFBq4GxVV1ff3pmvvnNO
@@ -2158,8 +2157,8 @@ KFnIGDFDutMAAAAASUVORK5CYII=
 <filename>lf.png</filename>
 <filesize>4901</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1296853696000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAS7ElEQVR4Xu2d3Y/c1nXAz+UMOR/7
 MTv7pV2tZXslRZYiVVolLgyjNdzaL4UbPwVJH9M3P/Qv6FOTAinQP8Bw46LwcwOkLy5sAzXsCkGN
 uoCFKJVcWbaiSLLWu9Ls98fMkEPennNyR9ckhxR9Z7TW2DzC0eVccmZI/uace3jOJbcI3zrJ5T50
@@ -2250,8 +2249,8 @@ Rw52Dj97Ru7HP/4rSJIf/OBlePXVV5O/aGgkl+K37++g5vL/dmrHZnVCF2wAAAAASUVORK5CYII=
 <filename>usersgroups.png</filename>
 <filesize>10977</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1296853310000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAqqElEQVR4XuyZTY8UxxnHq2q6e/pl
 Xnr2fUEGCcMarzigcOIcWbIUkQPrHIiUOPfckXxCiFM+QLhEFgefgkK4cLSQiJNL9oSF1tpJuMBi
 WMGyi3dm57W78jw9Vd2qqultz6w2lmyXeOZ5uuqp2p751b+qurHIz+UnZyl0zrnRGEXRUQBQ/TrH
@@ -2448,8 +2447,8 @@ GZZqt6b4TPlPyv/yN1+1bpLB6fI+AAAAAElFTkSuQmCC</content></attachment><attachment>
 <filename>configuration.png</filename>
 <filesize>9805</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1299688703000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAmFElEQVR4XuxdB5QcxZn+qyfszmwO
 CrvKmVUWSRmBhIIRKCCECYcJxjYgm3u23jOGs5/NPUzwg3eHAXMY25KRTLaNsEAEgUBYEgpIKOeM
 8uak3Z2Zrvv/v7a3rrund2ZHc8/3fLQouru6Okx99ee/av3w9fb/rrSBLqX8GoB/8iKE0KBb5fXX
@@ -2627,8 +2626,8 @@ gg==
 <filename>rights.png</filename>
 <filesize>10836</filesize>
 <author>xwiki:XWiki.Admin</author>
-<date>1296853523000</date>
-<version>1.1</version>
+<date>1304081649000</date>
+<version>1.2</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAqG0lEQVR4XuyXTW8bRRjHn9k3e732
 7tqp06SpaCkoKKVV2nAGcYFL2wPqgQ+RfgEOPRVRVaL9ApRLJdQLvXBA4lCQohZBgUOLSNKIVOLQ
 JG1emjc7tvdl+M/I67BZPCl21QMw0qNn55lZz+7zm/8za4P+b/8560APw3C/uUwRU1734Jkivm/s
@@ -2895,7 +2894,7 @@ TkSuQmCC</content></attachment>
 <name>XWiki.AdminSheet</name>
 <number>0</number>
 <className>XWiki.JavaScriptExtension</className>
-<guid>4e754542-66c4-41c6-816a-96ed94c54205</guid>
+<guid>fccdfe03-b0fa-4b09-960f-265e015c8e01</guid>
 <property>
 <cache>long</cache>
 </property>
@@ -2998,7 +2997,7 @@ document.observe('xwiki:dom:loaded', function() {
 <name>XWiki.AdminSheet</name>
 <number>0</number>
 <className>XWiki.StyleSheetExtension</className>
-<guid>672fe873-2dc7-4ae0-9826-fb75e67eb350</guid>
+<guid>8e8fd38b-82b3-4402-9a0e-5bb0c2465d6d</guid>
 <property>
 <cache>long</cache>
 </property>
@@ -3104,7 +3103,7 @@ document.observe('xwiki:dom:loaded', function() {
 <use>onDemand</use>
 </property>
 </object>
-<content>{{include document="XWiki.ConfigurableClassMacros" /}}
+<content>{{include document="XWiki.ConfigurableClassMacros"/}}
 
 {{velocity output="false"}}
 #if ($request.xaction == 'switchContext')
@@ -3144,6 +3143,7 @@ document.observe('xwiki:dom:loaded', function() {
   {
     'id' : 'usersgroups',
     'children': [
+       {'id' : 'XWiki.WorkspaceUsers'},
        {'id' : 'Groups'},
        {'id' : 'Rights', 'perSpace' : true}
     ]

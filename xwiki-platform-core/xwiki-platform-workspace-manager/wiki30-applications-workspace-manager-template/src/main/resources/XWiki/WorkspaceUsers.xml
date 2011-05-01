@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>WorkspaceUsers</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1304114838000</creationDate>
+<date>1304263512000</date>
+<contentUpdateDate>1304263512000</contentUpdateDate>
+<version>42.1</version>
+<title>Workspace users</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.XWikiGroups</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<member>
+<disabled>0</disabled>
+<name>member</name>
+<number>1</number>
+<prettyName>Member</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</member>
+</class>
+<name>XWiki.WorkspaceUsers</name>
+<number>0</number>
+<className>XWiki.XWikiGroups</className>
+<guid>267e1cd9-e91d-433e-a22f-249533f16c39</guid>
+<property>
+<member>xwiki:XWiki.bat</member>
+</property>
+</object>
+<content>{{velocity output="false"}}
+#set($mainwk = $xcontext.isMainWiki())
+$xwiki.jsfx.use('js/xwiki/usersandgroups/usersandgroups.js', true)
+$xwiki.ssfx.use('js/xwiki/usersandgroups/usersandgroups.css')
+$xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
+$xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
+
+## Use the XWikiAllGroup as the group target
+#set($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
+
+#macro(hasGroupRight $right $hasGroupRight)
+  #set($result = false)
+  #if($!xwiki.hasAccessLevel("$!right", $xcontext.user, $groupDoc.fullName) &amp;&amp; $groupDoc.getObject('XWiki.XWikiGroups', false))
+    #set($result = true)
+  #end
+  #set($hasGroupRight = $util.null)
+  #setVariable("$hasGroupRight" $result)
+#end
+#hasGroupRight('edit' $hasEditGroupRight)
+#hasGroupRight('delete' $hasDeleteGroupRight)
+##
+##
+{{/velocity}}
+
+{{velocity}}
+## In the original sheet, this was displayed only when in inline edit mode. 
+#if($hasEditGroupRight)
+{{html}}
+  &lt;div id="addNewMember"&gt;
+    &lt;table&gt;
+      &lt;tr&gt;
+        &lt;td class="addlabel"&gt;$msg.get('workspacemanager.member.add')         
+          ## We are only interested in global users
+          &lt;input type="hidden" name="wiki" value="global" /&gt;&lt;/td&gt;          
+        &lt;td&gt;
+          &lt;input id="userSuggest" type="text" size="30" name="newMember" autocomplete="off" /&gt;
+        &lt;/td&gt;
+        &lt;td&gt;
+          &lt;input type="button" id="addNewUser" class="button" value="$msg.get('xe.admin.groups.addUser.submit')" /&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;&lt;td colspan="3" id="errMsg"&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+  ##
+  ##
+  &lt;script type="text/javascript"&gt;
+    // &lt;![CDATA[
+      if (typeof XWiki == "undefined") {
+        var XWiki = {}; 
+      }
+      Object.extend(XWiki, {
+        groupmanager : {
+          /*
+          ** Initialize Group Manager javascript widgets (called on document load).
+          */
+          userSuggest: null,
+
+          groupSuggest: null,
+
+          init: function() {
+              /* Initialize everything also in view mode */
+              this.initSuggestWidget();
+              this.initAddNewMemberWidget();            
+          },
+          initSuggestWidget: function() {
+            if ($('userSuggest')) {
+              $('userSuggest').observe('focus', this.createSuggest.bind(this, $('userSuggest'), 'user', true));
+            }            
+          },
+          initAddNewMemberWidget: function() {
+            if ($('addNewUser')) {
+              $('addNewUser').observe('click', this.addNewMember.bind(this, 'user', $('userSuggest')));
+            }          
+          },
+          createSuggest: function(input, uorg, suggestObj) {
+            // Clear the errors
+            $('errMsg').innerHTML = "";
+            suggesturl = "${doc.getURL('view', 'xpage=uorgsuggest&amp;classname=XWiki.XWikiUsers')}";            
+            suggesturl += "&amp;uorg=user&amp;wiki=global" + "&amp;";
+            icon = "$xwiki.getSkinFile('icons/silk/user.gif')";
+             
+            return new XWiki.widgets.Suggest(input, { script: suggesturl, varname:'input', icon:icon });
+          },
+          addNewMember: function(uorg, input) {
+            if (input) {
+              var url = "${groupDoc.getURL()}?xpage=adduorg&amp;uorg=" + encodeURIComponent(uorg) + "&amp;name=" + encodeURIComponent(input.value) + "&amp;form_token=$!{escapetool.url($services.csrf.getToken())}";
+              new Ajax.Request(url, {
+                method: 'get',
+                onSuccess: function(transport) {
+                  $('userSuggest').value = "";             
+                  var nr = parseInt(transport.responseText);
+                  if (nr == 0) {
+                    if (uorg == "user") {
+                      $('errMsg').innerHTML = "$msg.get('xe.admin.groups.addUser.duplicate')";
+                    } 
+                  } else {
+                    var end = editgrouptable.limit;
+                    var start = editgrouptable.lastOffset;
+                    editgrouptable.clearCache();
+                    if (start &lt; 1) {
+                      start = 1;
+                    }
+                    editgrouptable.getRows(start, end, start, end);
+                  }
+                }
+              });
+            }
+          }
+        }
+      });
+      XWiki.groupmanager.init();
+    // ]]&gt;
+  &lt;/script&gt;
+{{/html}}#end
+#set($columnOptions = {
+  "member" : {'link': 'auto', 'type': 'text'},
+  '_avatar' : { 'type' : 'none', 'link' : 'field', 'html' : 'true', 'sortable' : false },
+  "_actions" : {
+    'actions': ['delete'],
+    'actionCallbacks': {'delete': 'table.deleteRow(i);'},
+    'ajaxActions': {'delete': true}
+   }
+})
+#if($hasDeleteGroupRight)
+  #set($columns = ['_avatar', 'member', '_actions'])
+#else
+  #set($columns = ['_avatar', 'member'])
+#end
+#livetable('groupusers', $columns, $columnOptions, {'url' : "${groupDoc.getURL('view', 'xpage=getgroupmembers')}", 'translationPrefix' : 'xe.admin.groups.', 'javascriptName' : 'editgrouptable'})
+{{/velocity}}</content></xwikidoc>

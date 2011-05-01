@@ -11,15 +11,15 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1303158348000</creationDate>
-<date>1303912755000</date>
-<contentUpdateDate>1303912755000</contentUpdateDate>
-<version>1.1</version>
+<date>1304263523000</date>
+<contentUpdateDate>1304263523000</contentUpdateDate>
+<version>3.1</version>
 <title>TemplateTranslations</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>true</minorEdit>
+<minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content># Various translations that are used in the workspace template and, implicitly, in the created workspaces.
@@ -39,6 +39,7 @@ workspacemanager.prop.description.label=Description
 workspacemanager.prop.owner.label=Owner
 workspacemanager.prop.membershipType.label=Membership Type
 workspacemanager.prop.secure.label=Secure (SSL)
+workspacemanager.member.add=Add user to workspace:
 
 # HINTS
 workspacemanager.prop.wikiprettyname.hint=The display name of the workspace.

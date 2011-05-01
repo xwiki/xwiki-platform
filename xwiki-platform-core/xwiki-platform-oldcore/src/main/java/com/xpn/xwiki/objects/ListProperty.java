@@ -26,10 +26,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.ecs.filter.CharacterFilter;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.collection.PersistentCollection;
+import org.xwiki.xml.XMLUtils;
 
 public class ListProperty extends BaseProperty implements Cloneable
 {
@@ -97,22 +97,14 @@ public class ListProperty extends BaseProperty implements Cloneable
     @Override
     public String toFormString()
     {
-        CharacterFilter filter = new CharacterFilter();
-        filter.addAttribute(this.formStringSeparator, "\\" + this.formStringSeparator);
-
         List<String> list = getList();
-        Iterator<String> it = list.iterator();
-        if (!it.hasNext()) {
-            return "";
-        }
-        StringBuffer result = new StringBuffer();
-        result.append(it.next());
-        while (it.hasNext()) {
+        StringBuilder result = new StringBuilder();
+        for (String item : list) {
+            result.append(XMLUtils.escape(item).replace(this.formStringSeparator, "\\" + this.formStringSeparator));
             result.append(this.formStringSeparator);
-            result.append(filter.process(it.next()));
         }
 
-        return result.toString();
+        return StringUtils.chomp(result.toString(), this.formStringSeparator);
     }
 
     /**

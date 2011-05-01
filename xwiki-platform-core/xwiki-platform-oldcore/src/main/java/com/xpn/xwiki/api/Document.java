@@ -628,19 +628,9 @@ public class Document extends Api
     }
 
     /**
-     * Get the document's content escaped.
-     * Gets the user's translation of this document and passes it through
-     * {@link org.apache.ecs.filter.CharacterFilter} which replaces:
-     * <ul>
-     * <li>" with &amp;#34;</li>
-     * <li>' with &amp;#8217;</li>
-     * <li>& with &amp;#160;</li>
-     * </ul>
-     * CAUTION: &amp;#8217; is not the same as ' and &amp;#160; is non breaking space, NOT &.
-     * If you wish to XML escape the content of the document, it is recommended that you use 
-     * {@link org.apache.velocity.tools.generic.EscapeTool}
+     * Get the document's content XML-escaped.
      * 
-     * @return a escaped version of the content of this document.
+     * @return an XML-escaped version of the content of this document.
      */
     public String getEscapedContent() throws XWikiException
     {

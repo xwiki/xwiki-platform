@@ -457,17 +457,6 @@ public class XWiki extends Api
     }
 
     /**
-     * Output content in the edit content htmlarea
-     * 
-     * @param content content to output
-     * @return the htmlarea text content
-     */
-    public String getHTMLArea(String content)
-    {
-        return this.xwiki.getHTMLArea(content, getXWikiContext());
-    }
-
-    /**
      * Get the list of available classes in the wiki
      * 
      * @return list of classes names

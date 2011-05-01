@@ -77,9 +77,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
-import org.apache.ecs.Filter;
-import org.apache.ecs.filter.CharacterFilter;
-import org.apache.ecs.xhtml.textarea;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
@@ -678,25 +675,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
     public static String getTextArea(String content, XWikiContext context)
     {
-        Filter filter = new CharacterFilter();
-        filter.removeAttribute("'");
-        String scontent = filter.process(content);
+        StringBuilder result = new StringBuilder();
 
-        textarea textarea = new textarea();
-        textarea.setFilter(filter);
-
-        int rows = 25;
-        textarea.setRows(rows);
-        int cols = 80;
-        textarea.setCols(cols);
-        textarea.setName("content");
-        textarea.setID("content");
         // Forcing a new line after the <textarea> tag, as
         // http://www.w3.org/TR/html4/appendix/notes.html#h-B.3.1 causes an empty line at the start
         // of the document content to be trimmed.
-        textarea.addElement("\n" + scontent);
+        result.append("<textarea name=\"content\" id=\"content\" rows=\"25\" cols=\"80\">\n");
+        result.append(XMLUtils.escape(content));
+        result.append("</textarea>");
 
-        return textarea.toString();
+        return result.toString();
     }
 
     /**
@@ -1705,27 +1693,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     public void setMetaclass(MetaClass metaclass)
     {
         this.metaclass = metaclass;
-    }
-
-    public String getHTMLArea(String content, XWikiContext context)
-    {
-        Filter filter = new CharacterFilter();
-        filter.removeAttribute("'");
-        String scontent = filter.process(content);
-
-        scontent = context.getUtil().substitute("s/\\r\\n/<br class=\"htmlarea\"\\/>/g", scontent);
-        textarea textarea = new textarea();
-
-        int rows = 25;
-        textarea.setRows(rows);
-        int cols = 80;
-        textarea.setCols(cols);
-
-        textarea.setFilter(filter);
-        textarea.setName("content");
-        textarea.setID("content");
-        textarea.addElement(scontent);
-        return textarea.toString();
     }
 
     public List<String> getClassList(XWikiContext context) throws XWikiException

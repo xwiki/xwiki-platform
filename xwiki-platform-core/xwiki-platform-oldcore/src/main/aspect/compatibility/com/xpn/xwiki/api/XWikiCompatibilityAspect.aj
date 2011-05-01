@@ -665,4 +665,17 @@ public privileged aspect XWikiCompatibilityAspect
     {
         return XMLUtils.escape(content);
     }
+
+    /**
+     * Output content in the edit content htmlarea
+     * 
+     * @param content content to output
+     * @return the htmlarea text content
+     * @deprecated Removed since it isn't used; since 3.1M2.
+     */
+    @Deprecated
+    public String XWiki.getHTMLArea(String content)
+    {
+        return this.xwiki.getHTMLArea(content, getXWikiContext());
+    }
 }

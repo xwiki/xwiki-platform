@@ -33,6 +33,8 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.xml.XMLUtils;
+
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWiki} class.
  * 
@@ -260,5 +262,23 @@ public privileged aspect XWikiCompatibilityAspect
         }
 
         return parseMessage(message, context);
+    }
+
+    /**
+     * @deprecated Removed since it isn't used; since 3.1M2.
+     */
+    @Deprecated
+    public String XWiki.getHTMLArea(String content, XWikiContext context)
+    {
+        StringBuilder result = new StringBuilder();
+
+        String scontent = XMLUtils.escape(content);
+        scontent = scontent.replaceAll("\r?+\n", "<br class=\"htmlarea\"/>");
+
+        result.append("<textarea name=\"content\" id=\"content\" rows=\"25\" cols=\"80\">");
+        result.append(scontent);
+        result.append("</textarea>");
+
+        return result.toString();
     }
 }

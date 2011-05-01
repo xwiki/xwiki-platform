@@ -357,7 +357,14 @@ public class Document extends Api
      */
     public String getAuthor()
     {
-        return this.doc.getAuthor();
+        String author = "";
+        DocumentReference authorReference = this.doc.getAuthorReference();
+        if (authorReference != null) {
+            author =
+                this.compactWikiEntityReferenceSerializer.serialize(authorReference, this.doc.getDocumentReference());
+        }
+
+        return author;
     }
 
     /**
@@ -368,7 +375,15 @@ public class Document extends Api
      */
     public String getContentAuthor()
     {
-        return this.doc.getContentAuthor();
+        String contentAuthor = "";
+        DocumentReference contentAuthorReference = this.doc.getContentAuthorReference();
+        if (contentAuthorReference != null) {
+            contentAuthor =
+                this.compactWikiEntityReferenceSerializer.serialize(contentAuthorReference, this.doc
+                    .getDocumentReference());
+        }
+
+        return contentAuthor;
     }
 
     /**
@@ -417,7 +432,13 @@ public class Document extends Api
      */
     public String getCreator()
     {
-        return this.doc.getCreator();
+        String creator = "";
+        DocumentReference creatorReference = this.doc.getCreatorReference();
+        if (creatorReference != null) {
+            creator = this.compactWikiEntityReferenceSerializer.serialize(creatorReference, getDocumentReference());
+        }
+
+        return creator;
     }
 
     /**
@@ -449,7 +470,7 @@ public class Document extends Api
     @Deprecated
     public String getSyntaxId()
     {
-        return this.doc.getSyntaxId();
+        return this.doc.getSyntax().toIdString();
     }
 
     /**
@@ -465,7 +486,12 @@ public class Document extends Api
 
     public String getTemplate()
     {
-        return this.doc.getTemplate();
+        String templateReferenceAsString = "";
+        DocumentReference templateDocumentReference = this.doc.getTemplateDocumentReference();
+        if (templateDocumentReference != null) {
+            templateReferenceAsString = this.localEntityReferenceSerializer.serialize(templateDocumentReference);
+        }
+        return templateReferenceAsString;
     }
 
     /**

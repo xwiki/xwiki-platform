@@ -58,7 +58,6 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ecs.filter.CharacterFilter;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -109,6 +108,7 @@ import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWiki;
@@ -992,8 +992,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String getEscapedContent(XWikiContext context) throws XWikiException
     {
-        CharacterFilter filter = new CharacterFilter();
-        return filter.process(getTranslatedContent(context));
+        return XMLUtils.escape(getTranslatedContent(context));
     }
 
     /**

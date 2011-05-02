@@ -24,4 +24,13 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language sv generated from http://www.l10n.xwiki.org
+XWiki.XWikiServerClass_visibility_private=Privat
+XWiki.XWikiServerClass_visibility_public=Publik
+error.ERROR_XWIKI_ACCESS_DENIED=Du har ej de r\u00E4ttigheter som kr\u00E4vs f\u00F6r att utf\u00F6ra denna operation.
+wikimanager.action.createwiki.hidedoc=D\u00F6lj dokumentation
+wikimanager.action.createwiki.nonstepbystep=V\u00E4xla till normalt visningsl\u00E4ge
+wikimanager.action.createwiki.showdoc=Visa dokumentation
+wikimanager.action.createwiki.stepbystep=V\u00E4xla till guidat visningsl\u00E4ge
+wikimanager.action.next=N\u00E4sta
+wikimanager.action.previous=F\u00F6reg\u00E5ende
 </content></xwikidoc>

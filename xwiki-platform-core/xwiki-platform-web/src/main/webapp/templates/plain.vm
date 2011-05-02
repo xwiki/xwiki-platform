@@ -1,8 +1,9 @@
-#template("xwikivars.vm")
-#if ($request.getParameter("raw").equals("1"))
-<pre>
-$cdoc.getEscapedContent()
-</pre>
+#if ("$!request.getParameter('raw')" == '1')
+<pre>$services.xml.escapeForElementContent($cdoc.getTranslatedContent())</pre>
+#elseif ("$!request.getParameter('raw')" == '2')
+$response.setContentType('text/plain')##
+$cdoc.getTranslatedContent()
 #else
-#template("rendercontent.vm")
+#template('xwikivars.vm')
+#template('rendercontent.vm')
 #end

@@ -593,7 +593,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         try {
             final URL servurl = getServerURL(context);
             // if use apache mod_proxy we needed to know external host address
-            return new URL(url.getProtocol(), servurl.getHost(), servurl.getPort(), url.getFile());
+            return new URL(servurl.getProtocol(), servurl.getHost(), servurl.getPort(), url.getFile());
         } catch (MalformedURLException ex) {
             // This should not happen
             ex.printStackTrace();

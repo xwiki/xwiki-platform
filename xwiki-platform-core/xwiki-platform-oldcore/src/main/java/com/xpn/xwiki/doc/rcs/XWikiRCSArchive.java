@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.net.URLCodec;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.suigeneris.jrcs.diff.PatchFailedException;
@@ -77,7 +78,7 @@ public class XWikiRCSArchive extends Archive
                 node.setDate(nodeInfo.getDate());
                 node.setLog(nodeInfo.getComment());
                 XWikiRCSNodeContent content = nodeInfo.getContent(context);
-                node.setText(content.getPatch().getContent());
+                node.setText(StringUtils.defaultString(content.getPatch().getContent()));
                 node.setDiff(nodeInfo.isDiff());
                 this.nodes.put(node.getVersion(), node);
             }

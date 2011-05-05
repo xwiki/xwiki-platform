@@ -113,21 +113,7 @@ public class OfficeExporter extends PdfExportImpl
     private void exportXHTML(String xhtml, OutputStream out, DocumentFormat format, XWikiContext context)
         throws XWikiException
     {
-        String html = xhtml;
-
-        // FIXME: put that in some XSL transformation instead (no time and knowledge to do that before 2.4)
-        // html = applyXsl(xhtml, getXhtmlOfficexsl(context));
-        String pageBreakBeforeMatch = "<p style=\"page-break-before: always;\" />\n$1";
-        html = html.replaceAll("(<div[^>]+class=\"pdftoc\"[^>]*>)", pageBreakBeforeMatch);
-        html = html.replaceAll("(<div[^>]+id=\"xwikimaincontainer\"[^>]*>)", pageBreakBeforeMatch);
-
-        // OpenOffice does not support XHTML so we remove the XML marker and let it parse it as if it was HTML content
-        html = html.substring(xhtml.indexOf("?>") + 2);
-
-        // id attribute on body element makes openoffice converter to fail
-        html = html.replaceFirst("(<body[^>]+)id=\"body\"([^>]*>)", "$1$2");
-
-        OpenOfficeConverter documentConverter = ooManager.getConverter();
+        String html = applyXSLT(xhtml, getOfficeExportXSLT(context));
 
         String inputFileName = "export_input.html";
         String outputFileName = "export_output." + format.getExtension();
@@ -136,6 +122,7 @@ public class OfficeExporter extends PdfExportImpl
         inputStreams.put(inputFileName, new ByteArrayInputStream(html.getBytes()));
         addEmbeddedObjects(inputStreams, context);
 
+        OpenOfficeConverter documentConverter = ooManager.getConverter();
         try {
             Map<String, byte[]> ouput = documentConverter.convert(inputStreams, inputFileName, outputFileName);
 
@@ -167,5 +154,17 @@ public class OfficeExporter extends PdfExportImpl
                 LOG.warn(String.format("Failed to embed %s in the office export.", file.getName()), e);
             }
         }
+    }
+
+    /**
+     * Get the XSLT for preparing a (valid) XHTML to be converted to an office format.
+     * 
+     * @param context the current request context
+     * @return the content of the XSLT as a byte stream
+     * @see PdfExportImpl#getXslt(String, String, XWikiContext)
+     */
+    private InputStream getOfficeExportXSLT(XWikiContext context)
+    {
+        return getXslt("officeExportXSLT", "officeExport.xsl", context);
     }
 }

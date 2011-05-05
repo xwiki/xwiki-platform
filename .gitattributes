@@ -1,0 +1,8 @@
+* text=auto
+*.java text ident diff=java
+*.xml text ident diff=html
+*.vm text ident
+*.js text ident
+*.css text ident
+*.sh eol=lf ident
+*.bat eol=crlf ident

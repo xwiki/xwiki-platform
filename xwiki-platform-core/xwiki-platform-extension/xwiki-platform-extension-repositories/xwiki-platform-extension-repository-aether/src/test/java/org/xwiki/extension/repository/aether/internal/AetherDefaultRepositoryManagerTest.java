@@ -56,7 +56,7 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         this.repositoryUtil.setup();
 
         this.extensionId = new ExtensionId("groupid:artifactid", "version");
-        this.dependencyExtensionId = new ExtensionId("dependencygroupid:dependencyartifactid", "dependencyversion");
+        this.dependencyExtensionId = new ExtensionId("dgroupid:dartifactid", "dversion");
 
         // lookup
 

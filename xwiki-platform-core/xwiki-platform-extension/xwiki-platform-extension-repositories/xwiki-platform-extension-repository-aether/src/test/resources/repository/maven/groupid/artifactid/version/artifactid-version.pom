@@ -12,9 +12,9 @@
 	<url>http://website</url>
 	<dependencies>
 	  <dependency>
-	    <groupId>dependencygroupid</groupId>
-	    <artifactId>dependencyartifactid</artifactId>
-	    <version>dependencyversion</version>
+	    <groupId>dgroupid</groupId>
+	    <artifactId>dartifactid</artifactId>
+	    <version>dversion</version>
 	  </dependency>
 	</dependencies>
 </project>

@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * Test case for cleaning html tables in {@link OpenOfficeHTMLCleaner}.
  * 
- * @version $Id: TableOpenOfficeCleaningTest.java 22857 2009-08-23 18:32:09Z vmassol $
+ * @version $Id$
  * @since 1.8
  */
 public class TableOpenOfficeCleaningTest extends AbstractHTMLCleaningTest

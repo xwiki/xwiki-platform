@@ -15,6 +15,7 @@
 	    <groupId>dgroupid</groupId>
 	    <artifactId>dartifactid</artifactId>
 	    <version>dversion</version>
+	    <type>type</type>
 	  </dependency>
 	</dependencies>
 </project>

@@ -471,7 +471,7 @@ public class PdfExportImpl implements PdfExport
      * @return the converted document
      * @throws XWikiException if the transformation fails for any reason
      */
-    private String applyXSLT(String xml, InputStream xslt) throws XWikiException
+    protected String applyXSLT(String xml, InputStream xslt) throws XWikiException
     {
         StringWriter output = new StringWriter(xml.length());
 
@@ -626,7 +626,7 @@ public class PdfExportImpl implements PdfExport
      * @param context the current request context
      * @return the content of the XSLT as a byte stream
      */
-    private InputStream getXslt(String propertyName, String fallbackFile, XWikiContext context)
+    protected InputStream getXslt(String propertyName, String fallbackFile, XWikiContext context)
     {
         String xsl = getPDFTemplateProperty(propertyName, context);
         if (!StringUtils.isBlank(xsl)) {

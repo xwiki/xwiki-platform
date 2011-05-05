@@ -81,6 +81,11 @@
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.image.internal.IEImageConfigDOMWriter">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter" />
+    <when-property-is name="user.agent" value="ie8" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.image.internal.IE6ImageConfigDOMWriter">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter" />
     <when-property-is name="user.agent" value="ie6" />
   </replace-with>
 

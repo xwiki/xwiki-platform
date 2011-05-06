@@ -90,6 +90,7 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
     {
         getLogger().debug("Send JGroups remote event [" + remoteEvent + "]");
 
+        // Send the message to the whole group
         Message message = new Message(null, null, remoteEvent);
 
         // Send message to jgroups channels

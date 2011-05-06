@@ -47,6 +47,11 @@ public abstract class AbstractExtension implements Extension
 
     protected List<ExtensionDependency> dependencies;
 
+    public AbstractExtension()
+    {
+
+    }
+
     public AbstractExtension(ExtensionRepository repository, ExtensionId id, String type)
     {
         this.repository = repository;
@@ -63,7 +68,7 @@ public abstract class AbstractExtension implements Extension
         setAuthor(extension.getAuthor());
         setWebsite(extension.getWebSite());
 
-        List<ExtensionDependency> dependencies = extension.getDependencies();
+        List< ? extends ExtensionDependency> dependencies = extension.getDependencies();
         if (!dependencies.isEmpty()) {
             this.dependencies = new ArrayList<ExtensionDependency>(extension.getDependencies());
         }
@@ -145,10 +150,15 @@ public abstract class AbstractExtension implements Extension
         this.dependencies.add(dependency);
     }
 
-    public List<ExtensionDependency> getDependencies()
+    public List< ? extends ExtensionDependency> getDependencies()
     {
         return this.dependencies != null ? Collections.unmodifiableList(this.dependencies) : Collections
             .<ExtensionDependency> emptyList();
+    }
+
+    public void setDependencies(List< ? extends ExtensionDependency> dependencies)
+    {
+        this.dependencies = new ArrayList<ExtensionDependency>(dependencies);
     }
 
     public ExtensionRepository getRepository()

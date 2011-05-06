@@ -49,11 +49,9 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionCollectException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.CoreExtensionRepository;
-import org.xwiki.extension.repository.ExtensionCollector;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 
 import com.google.common.base.Predicates;
@@ -317,12 +315,5 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
     public CoreExtension getCoreExtension(String id)
     {
         return this.extensions.get(id);
-    }
-
-    public void collectExtensions(ExtensionCollector collector) throws ExtensionCollectException
-    {
-        for (CoreExtension coreExtension : this.extensions.values()) {
-            collector.addExtension(coreExtension);
-        }
     }
 }

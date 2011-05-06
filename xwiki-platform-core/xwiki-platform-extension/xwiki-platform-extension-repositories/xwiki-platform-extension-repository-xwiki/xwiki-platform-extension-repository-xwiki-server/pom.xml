@@ -49,10 +49,5 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.restlet</groupId>
-      <artifactId>org.restlet.ext.jaxrs</artifactId>
-      <version>1.1.10</version>
-    </dependency>
   </dependencies>
 </project>

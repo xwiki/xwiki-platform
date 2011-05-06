@@ -20,7 +20,6 @@
 package org.xwiki.extension.repository;
 
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionCollectException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 
@@ -31,8 +30,4 @@ public interface ExtensionRepository
     Extension resolve(ExtensionId extensionId) throws ResolveException;
 
     boolean exists(ExtensionId extensionId);
-
-    int countExtensions();
-
-    void collectExtensions(ExtensionCollector collector) throws ExtensionCollectException;
 }

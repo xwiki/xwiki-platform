@@ -48,7 +48,6 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionCollectException;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManagerConfiguration;
@@ -59,7 +58,6 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.internal.VersionManager;
 import org.xwiki.extension.repository.CoreExtensionRepository;
-import org.xwiki.extension.repository.ExtensionCollector;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 
@@ -398,13 +396,6 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
     public int countExtensions()
     {
         return this.extensions.size();
-    }
-
-    public void collectExtensions(ExtensionCollector collector) throws ExtensionCollectException
-    {
-        for (LocalExtension localExtension : this.extensions.values()) {
-            collector.addExtension(localExtension);
-        }
     }
 
     public LocalExtension installExtension(Extension extension, boolean dependency, String namespace)

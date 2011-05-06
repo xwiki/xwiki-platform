@@ -39,7 +39,7 @@ public interface Extension
 
     String getAuthor();
 
-    List<ExtensionDependency> getDependencies();
+    List< ? extends ExtensionDependency> getDependencies();
 
     void download(File file) throws ExtensionException;
 

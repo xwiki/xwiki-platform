@@ -108,7 +108,7 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
 
     // Searchable
 
-    public List<Extension> search(String query)
+    public List<Extension> search(String str)
     {
         // TODO Auto-generated method stub
         return null;

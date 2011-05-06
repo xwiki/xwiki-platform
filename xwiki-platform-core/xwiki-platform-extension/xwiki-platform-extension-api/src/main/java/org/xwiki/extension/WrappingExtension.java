@@ -71,7 +71,7 @@ public class WrappingExtension implements Extension
         return getExtension().getAuthor();
     }
 
-    public List<ExtensionDependency> getDependencies()
+    public List< ? extends ExtensionDependency> getDependencies()
     {
         return getExtension().getDependencies();
     }

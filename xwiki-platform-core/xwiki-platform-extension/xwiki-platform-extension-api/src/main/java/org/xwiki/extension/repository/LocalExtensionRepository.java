@@ -33,6 +33,8 @@ import org.xwiki.extension.UninstallException;
 @ComponentRole
 public interface LocalExtensionRepository extends ExtensionRepository
 {
+    int countExtensions();
+
     Collection<LocalExtension> getLocalExtensions();
 
     Collection<LocalExtension> getInstalledExtensions(String namespace);

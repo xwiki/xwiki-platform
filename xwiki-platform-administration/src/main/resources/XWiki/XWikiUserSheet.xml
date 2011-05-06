@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>XWikiUserSheet</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Main.XWikiUsers</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1106308018000</creationDate>
+<date>1106308018000</date>
+<contentUpdateDate>1106308018000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<attachment>
+<filename>noavatar.png</filename>
+<filesize>3076</filesize>
+<author>XWiki.Admin</author>
+<date>1263400909000</date>
+<version>1.1</version>
+<comment></comment>
+<content>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</content>
+</attachment>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.XWikiUserSheet</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>4a317e5c-a75e-4dec-aad0-1f80ffde5124</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>Object.extend(XWiki, {
+  userprofile : {
+
+    init : function() {
+      if ($('avatar')) {
+        Event.observe($('avatar'), 'mouseover', function() { XWiki.userprofile.displayChangePhoto('true') });
+        Event.observe($('avatar'), 'mouseout', function() { XWiki.userprofile.displayChangePhoto('false') });
+        XWiki.userprofile.adjustTabsContainerHeight();
+      }
+    },
+
+    /* 
+    ** This ugly hack is used as a workaround for IE6 box model (3px jog bug) which prevent from 
+    ** putting the  separating border between tabs and panes on the pane div. We put the border 
+    ** on the tabs container and adjust its size depending on the size of the right pane.
+    ** FIXME: find a better mechanism for tabbed UIs / drop this hack when stopping IE6 support.
+    */
+    adjustTabsContainerHeight: function() {
+      var currentPane;
+      $("vertical-panes").select("div.vertical-pane").each(function(pane){
+        if(!pane.hasClassName('hidden')) {
+          currentPane = pane;
+        }
+      });
+      if (currentPane.getHeight() &gt; $('vertical-tabs').getHeight()) {
+        $('vertical-tabs').setStyle({ height: currentPane.getHeight() + 'px' });
+      } else {
+        $('vertical-tabs').setStyle({ height: '' });
+      }
+    },
+
+    displayChangePhoto : function(display) {
+      var changePhoto = $('avatarUpload');
+      if (display == true) {
+        changePhoto.removeClassName('hidden');
+      } else {
+        changePhoto.addClassName('hidden');
+      }
+    },
+
+    switchTab : function(tab) {
+      $("vertical-panes").select("div.vertical-pane").each(function(pane){
+        pane.addClassName('hidden');
+      });
+      $('vertical-tabs').setStyle({ height: '' });
+      $(tab + 'Pane').removeClassName('hidden');
+      $("vertical-tabs").select("li.vertical-tab").each(function(tab){
+        tab.removeClassName('active');
+      });
+      $(tab + 'Tab').addClassName('active');
+      XWiki.userprofile.adjustTabsContainerHeight();
+    }
+  }
+});
+
+Event.observe(window, 'load', function() { XWiki.userprofile.init() });</code>
+</property>
+<property>
+<name>userprofile</name>
+</property>
+<property>
+<parse>0</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.SheetClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultEditMode>
+<name>defaultEditMode</name>
+<number>1</number>
+<prettyName>Default Edit Mode</prettyName>
+<size>15</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultEditMode>
+</class>
+<name>XWiki.XWikiUserSheet</name>
+<number>0</number>
+<className>XWiki.SheetClass</className>
+<guid>03ac24bd-55c2-4ce2-b80a-9b4ecf5f5282</guid>
+<property>
+<defaultEditMode></defaultEditMode>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.XWikiUserSheet</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>30c9f7e7-0b53-468b-a254-645d035d9416</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>#template("colorThemeInit.vm")
+#set($tabswidth = "130px")
+
+td.recentChangesLeft, .recentChangesMoreActions {
+  display:none;
+}
+
+td.recentChangesRight {
+  padding: 0 !important;
+}
+
+#profilePane .column h1 {
+  font-weight:bold;
+  font-size:115%;
+  margin:10px 0;
+}
+
+#profilePane .column h2 {
+  font-size: 110%;
+}
+
+div.userInfo, div.userRecentChanges, div.userPreferences, div.passwordManagement, div.watchlistManagement, div.watchlistRss, div.watchlistElements {
+  margin: 5px 10px 10px;
+  padding: 5px 10px 10px;
+}
+
+div.userInfo, div.userPreferences, div.watchlistManagement {
+  background-color: $theme.backgroundSecondaryColor;
+}
+
+.userInfo img {
+  max-width: 100%;
+}
+
+div.userInfo input[type="text"], div.userInfo input[type="password"], div.userInfo textarea, div.userInfo select, div.userPreferences select {
+  width: 100%;
+}
+
+div.editProfileCategory {
+  float:right;
+}
+
+div.editProfileCategory a {
+  display:block;
+  width: 16px;
+  height: 16px;
+  background: url($xwiki.getSkinFile('icons/silk/pencil.gif')) no-repeat;
+}
+
+/* Watchlist */
+
+#watchlistRssLink {
+  background: url($xwiki.getSkinFile('icons/xwiki/rss-medium.png')) no-repeat;
+  padding-left: 18px;
+  font-weight: bold;
+}
+
+span.wikiWatchlistType, span.spaceWatchlistType, span.pageWatchlistType {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+span.wikiWatchlistType {
+  background: url($xwiki.getSkinFile('icons/silk/world.gif')) no-repeat;
+}
+
+span.spaceWatchlistType {
+  background: url($xwiki.getSkinFile('icons/silk/folder.gif')) no-repeat;
+}
+
+span.pageWatchlistType {
+  background: url($xwiki.getSkinFile('icons/silk/page_white_text.gif')) no-repeat;
+}
+
+/* Tabs */
+
+div#vertical-panes {
+  margin-top: 10px;
+}
+
+span#avatarUpload {
+  display:block;
+  width:$tabswidth;
+  position:absolute;
+  font-size: 10px;
+  font-weight: bold;
+  background-color: white;
+}
+
+#vertical-tabs {
+  float:left;
+  width:$tabswidth;
+  border-right: solid 1px $theme.menuBackgroundColor;
+}
+
+#vertical-tabs ul {
+  margin:0;
+  margin-top:5px;
+  padding:0;
+  border-right:0;
+  border-bottom:0;
+  border-left:0;
+}
+
+#vertical-tabs ul li {
+  display: block;
+  list-style-type: none;
+  list-style-position: outside;
+  margin:0;
+  border: solid 1px $theme.pageContentBackgroundColor;
+  border-right: 0;
+}
+
+#vertical-tabs ul li img {
+  float:left;
+  margin-right:4px;
+  vertical-align:middle;
+}
+
+#vertical-tabs ul li span {
+  line-height:1.5em;
+}
+
+#vertical-tabs ul li.active {
+  border: solid 1px $theme.menuBackgroundColor;
+  border-right: 0px;
+}
+
+#vertical-tabs ul li a {
+  padding: 3px 0px 3px 10px;
+  text-decoration: none;
+  display:block;
+  color:$theme.menuBackgroundColor;
+}
+
+#vertical-tabs ul li.active a {
+  text-decoration: none;
+  position:relative;
+  left:1px;
+  background:$theme.pageContentBackgroundColor;
+  color: $theme.textColor;
+  padding-left: 9px;
+}
+
+.vertical-pane {
+  margin-left:$tabswidth;
+  padding: 10px;
+  padding-top: 0;
+}
+
+.vertical-pane .column {
+  overflow: hidden;
+}</code>
+</property>
+<property>
+<name>userprofile</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<content>{{velocity}}
+##
+## Extensions and vars
+##
+$xwiki.ssx.use("XWiki.XWikiUserSheet")##
+$xwiki.jsx.use("XWiki.XWikiUserSheet")##
+#set($obj = $doc.getObject("XWiki.XWikiUsers"))
+##
+## Categories
+##
+#set($categories = $util.arrayList)
+#set($discard = $categories.add(['profile', $msg.get('platform.core.profile.category.profile'), 'XWiki.XWikiUserProfileSheet', 'icons/silk/vcard.gif']))
+#set($isMyProfile = ($xcontext.user == $doc.fullName))
+#if($isMyProfile || $hasAdmin)
+  #set($discard = $categories.add(['preferences', $msg.get('platform.core.profile.category.preferences'), 'XWiki.XWikiUserPreferencesSheet', 'icons/silk/wrench.gif']))
+#end
+## TODO: add APIs to be able to display users watchlists to admins
+#if($isMyProfile &amp;&amp; $hasWatch)
+  #set($discard = $categories.add(['watchlist', $msg.get('platform.core.profile.category.watchlist'), 'XWiki.XWikiUserWatchListSheet', 'icons/silk/star.gif']))
+#end
+##
+## Avatar
+##
+#set($avatarURL = '')
+#if($obj.getProperty("avatar") &amp;&amp; $obj.getProperty("avatar").getValue() != '')
+  #foreach ($attach in $doc.attachmentList)
+    #if($attach.filename == $obj.getProperty("avatar").getValue())
+      #set($avatarURL = "$doc.getAttachmentURL($attach.filename, 'download', 'width=120')")
+    #end
+  #end
+#end
+#if("$!avatarURL" == '')
+  #set($avatarURL = $xwiki.getDocument("XWiki.XWikiUserSheet").getAttachmentURL('noavatar.png', 'download', 'width=120'))
+#end
+##
+## Current category
+##
+#set($currentCategory = "$!request.category")
+#if($currentCategory == "")
+  #set($currentCategory = $listtool.get($listtool.get($categories, 0), 0))
+#end
+##
+## Display
+##
+{{html clean="false"}}
+  &lt;div id="vertical-panes"&gt;
+    ##
+    ## Tabs
+    ##
+    &lt;div id="vertical-tabs"&gt;
+      &lt;div id="avatar"&gt;
+        &lt;span id="avatarUpload" class="hidden"&gt;$msg.get('platform.core.profile.changePhoto')&lt;/span&gt;
+        &lt;a href="$doc.getURL('edit', 'xpage=changemyavatar')" &gt;&lt;img class="photo" id="xwikiuseravatar" alt="$doc.display('first_name', 'view', $obj)" src="$avatarURL"/&gt;&lt;/a&gt;
+      &lt;/div&gt;
+      &lt;div&gt; 
+        &lt;ul&gt;
+          #foreach($tab in $categories)
+            #set($tabKey = $listtool.get($tab, 0))
+            #set($tabName = $listtool.get($tab, 1))
+            #set($tabIcon = $listtool.get($tab, 3))
+            &lt;li id="${tabKey}Tab" class="vertical-tab#if($tabKey == $currentCategory) active#end"&gt;&lt;a href="?category=${tabKey}"&gt;&lt;img src="$xwiki.getSkinFile($tabIcon)" alt="$tabName" /&gt;&lt;span&gt;$tabName&lt;/span&gt;&lt;/a&gt;&lt;script type="text/javascript"&gt;Event.observe($("${tabKey}Tab"), 'click', function(event) { XWiki.userprofile.switchTab("${tabKey}"); Event.stop(event); });&lt;/script&gt;&lt;/li&gt;
+          #end
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    ##
+    ## Panes
+    ##
+    #foreach($tab in $categories)
+      #set($tabKey = $listtool.get($tab, 0))
+      #set($tabInclude = $listtool.get($tab, 2))
+      &lt;div id="${tabKey}Pane" class="vertical-pane#if($tabKey != $currentCategory) hidden#end"&gt;
+{{/html}}
+
+{{include document="${tabInclude}" /}}
+
+{{html clean="false"}}
+      &lt;/div&gt;
+    #end
+    &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
+  &lt;/div&gt;
+{{/html}}
+{{/velocity}}</content>
+</xwikidoc>

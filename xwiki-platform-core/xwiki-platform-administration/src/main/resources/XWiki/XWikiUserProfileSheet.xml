@@ -153,7 +153,10 @@
 </object>
 <content>{{velocity}}
 #set($obj = $doc.getObject("XWiki.XWikiUsers"))
-#set($obfuscateEmail = true)
+## Allow $obfuscateEmail to be set in some other place.
+#if("$!obfuscateEmail" == '')
+  #set($obfuscateEmail = true)
+#end
 #if(!$obj)
 = $msg.get('xe.admin.users.sheet') =
 

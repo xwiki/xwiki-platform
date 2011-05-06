@@ -184,6 +184,7 @@
     <module>xwiki-csrf</module>
     <module>xwiki-extension</module>
     <module>xwiki-legacy</module>
+    <module>xwiki-platform-administration</module>
     <module>xwiki-platform-colibri</module>
     <module>xwiki-platform-tag</module>
     <module>xwiki-platform-web</module>

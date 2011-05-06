@@ -1,1 +1,2 @@
-org.xwiki.extension.repository.xwiki.internal.ExtensionRESTResource.java
+org.xwiki.extension.repository.xwiki.internal.ExtensionRESTResource
+org.xwiki.extension.repository.xwiki.internal.ExtensionFileRESTResource

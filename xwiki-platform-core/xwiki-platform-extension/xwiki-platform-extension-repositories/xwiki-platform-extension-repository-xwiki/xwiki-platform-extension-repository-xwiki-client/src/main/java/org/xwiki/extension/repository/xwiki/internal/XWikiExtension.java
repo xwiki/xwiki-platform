@@ -20,20 +20,20 @@
 package org.xwiki.extension.repository.xwiki.internal;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import org.apache.commons.io.FileUtils;
 import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.repository.ExtensionRepository;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(name = "Extension")
@@ -55,9 +55,25 @@ public class XWikiExtension extends AbstractExtension
         super(repository, id, type);
     }
 
+    @Override
+    public XWikiExtensionRepository getRepository()
+    {
+        return (XWikiExtensionRepository) super.getRepository();
+    }
+
     public void download(File file) throws ExtensionException
     {
+        XWikiExtensionRepository repository = getRepository();
 
+        try {
+            InputStream stream =
+                repository.getRESTResourceAsStream(repository.getExtensionFileUriBuider(), getExtensionId(),
+                    getExtensionVersion());
+
+            FileUtils.copyInputStreamToFile(stream, file);
+        } catch (IOException e) {
+            throw new ExtensionException("Failed to download extension [" + this + "]");
+        }
     }
 
     // Properties
@@ -118,21 +134,5 @@ public class XWikiExtension extends AbstractExtension
     public List<XWikiExtensionDependency> getDependencies()
     {
         return (List<XWikiExtensionDependency>) getDependencies();
-    }
-
-    // Ignored properties in REST transactions
-
-    @Override
-    @XmlTransient
-    public Map<String, Object> getProperties()
-    {
-        return super.getProperties();
-    }
-
-    @Override
-    @XmlTransient
-    public ExtensionRepository getRepository()
-    {
-        return super.getRepository();
     }
 }

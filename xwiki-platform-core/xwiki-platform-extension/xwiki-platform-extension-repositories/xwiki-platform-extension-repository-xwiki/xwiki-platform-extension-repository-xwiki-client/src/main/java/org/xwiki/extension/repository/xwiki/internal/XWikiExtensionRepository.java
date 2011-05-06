@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.repository.xwiki.internal;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
@@ -35,7 +37,6 @@ import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.Searchable;
 
 /**
- * 
  * @version $Id$
  */
 public class XWikiExtensionRepository extends AbstractExtensionRepository implements Searchable
@@ -43,6 +44,8 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
     private XWikiExtensionRepositoryFactory repositoryFactory;
 
     private final UriBuilder extensionUriBuider;
+
+    private final UriBuilder extensionFileUriBuider;
 
     public XWikiExtensionRepository(ExtensionRepositoryId repositoryId,
         XWikiExtensionRepositoryFactory repositoryFactory) throws Exception
@@ -53,17 +56,22 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
 
         // Uri builders
         this.extensionUriBuider = createUriBuilder("/extension/{extensionId}/{extensionVersion}");
+        this.extensionFileUriBuider = createUriBuilder("/extension/{extensionId}/{extensionVersion}/file");
     }
 
-    // ExtensionRepository
+    public UriBuilder getExtensionFileUriBuider()
+    {
+        return this.extensionFileUriBuider;
+    }
 
-    public Extension resolve(ExtensionId extensionId) throws ResolveException
+    public InputStream getRESTResourceAsStream(UriBuilder builder, Object... values) throws ResolveException,
+        IOException
     {
         String url;
         try {
-            url = this.extensionUriBuider.build(extensionId.getId(), extensionId.getVersion()).toString();
+            url = builder.build(values).toString();
         } catch (Exception e) {
-            throw new ResolveException("Failed to build REST URL for extension [" + extensionId + "]", e);
+            throw new ResolveException("Failed to build REST URL", e);
         }
 
         HttpClient httpClient = createClient();
@@ -73,16 +81,23 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         try {
             httpClient.executeMethod(getMethod);
         } catch (Exception e) {
-            throw new ResolveException("Failed to request extension [" + extensionId + "]", e);
+            throw new ResolveException("Failed to request", e);
         }
 
         if (getMethod.getStatusCode() != HttpStatus.SC_OK) {
-            throw new ResolveException("Invalid answer fo the server when requesting extension [" + extensionId + "]");
+            throw new ResolveException("Invalid answer fo the server when requesting");
         }
 
+        return getMethod.getResponseBodyAsStream();
+    }
+
+    // ExtensionRepository
+
+    public Extension resolve(ExtensionId extensionId) throws ResolveException
+    {
         try {
             return (XWikiExtension) this.repositoryFactory.getUnmarshaller().unmarshal(
-                getMethod.getResponseBodyAsStream());
+                getRESTResourceAsStream(this.extensionUriBuider, extensionId.getId(), extensionId.getVersion()));
         } catch (Exception e) {
             throw new ResolveException("Failed to create extension object for extension [" + extensionId + "]", e);
         }

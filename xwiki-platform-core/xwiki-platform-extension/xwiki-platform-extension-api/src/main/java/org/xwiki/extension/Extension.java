@@ -32,7 +32,7 @@ public interface Extension
     String getType();
 
     String getName();
-    
+
     String getDescription();
 
     String getWebSite();

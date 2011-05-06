@@ -28,7 +28,8 @@ import org.xwiki.component.annotation.ComponentRole;
  * into the request does not match the token stored on the server side, the request is redirected to a resubmission page
  * where a legitimate user has a chance to confirm his action.
  * 
- * @see http://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet
+ * @see <a href="http://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet">CSRF
+ *      Prevention Cheat Sheet</a>
  * @version $Id$
  * @since 2.5M2
  */

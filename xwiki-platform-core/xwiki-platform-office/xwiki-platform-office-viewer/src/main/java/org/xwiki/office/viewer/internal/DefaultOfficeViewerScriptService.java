@@ -106,7 +106,7 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
      */
     public Exception getCaughtException()
     {
-        return (Exception) execution.getContext().getProperty(OFFICE_VIEW_EXCEPTION);
+        return (Exception) this.execution.getContext().getProperty(OFFICE_VIEW_EXCEPTION);
     }
 
     /**
@@ -128,21 +128,21 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
     public String view(AttachmentReference attachmentReference, Map<String, String> parameters)
     {
         // Clear previous caught exception.
-        execution.getContext().removeProperty(OFFICE_VIEW_EXCEPTION);
+        this.execution.getContext().removeProperty(OFFICE_VIEW_EXCEPTION);
         try {
             DocumentReference documentReference = attachmentReference.getDocumentReference();
             // Check whether current user has view rights on the document containing the attachment.
-            if (!documentAccessBridge.isDocumentViewable(documentReference)) {
+            if (!this.documentAccessBridge.isDocumentViewable(documentReference)) {
                 throw new RuntimeException("Inadequate privileges.");
             }
 
             // Create the view and render the result.
-            Syntax fromSyntax = documentAccessBridge.getDocument(documentReference).getSyntax();
+            Syntax fromSyntax = this.documentAccessBridge.getDocument(documentReference).getSyntax();
             Syntax toSyntax = Syntax.XHTML_1_0;
-            return render(officeViewer.createView(attachmentReference, parameters), fromSyntax, toSyntax);
+            return render(this.officeViewer.createView(attachmentReference, parameters), fromSyntax, toSyntax);
         } catch (Exception e) {
             // Save caught exception.
-            execution.getContext().setProperty(OFFICE_VIEW_EXCEPTION, e);
+            this.execution.getContext().setProperty(OFFICE_VIEW_EXCEPTION, e);
             getLogger().error("Failed to view office document: " + attachmentReference, e);
             return null;
         }
@@ -155,7 +155,7 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
      */
     public boolean isMimeTypeSupported(String mimeType)
     {
-        OpenOfficeConverter converter = officeManager.getConverter();
+        OpenOfficeConverter converter = this.officeManager.getConverter();
         return converter != null && converter.isMediaTypeSupported(mimeType);
     }
 
@@ -173,10 +173,10 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
         // Perform the transformations. This is required for office presentations which use the gallery macro to display
         // the slide images.
         TransformationContext context = new TransformationContext(xdom, fromSyntax);
-        transformationManager.performTransformations(xdom, context);
+        this.transformationManager.performTransformations(xdom, context);
 
         WikiPrinter printer = new DefaultWikiPrinter();
-        BlockRenderer renderer = componentManager.lookup(BlockRenderer.class, toSyntax.toIdString());
+        BlockRenderer renderer = this.componentManager.lookup(BlockRenderer.class, toSyntax.toIdString());
         renderer.render(xdom, printer);
         return printer.toString();
     }

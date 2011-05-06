@@ -78,9 +78,10 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
      * @return the XWiki context
      * @deprecated avoid using this method; try using the document access bridge instead
      */
+    @Deprecated
     private XWikiContext getXWikiContext()
     {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 
     /**
@@ -91,8 +92,8 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
     public boolean isSyntaxSupported(String syntaxId)
     {
         try {
-            componentManager.lookup(Parser.class, syntaxId);
-            componentManager.lookup(PrintRendererFactory.class, syntaxId);
+            this.componentManager.lookup(Parser.class, syntaxId);
+            this.componentManager.lookup(PrintRendererFactory.class, syntaxId);
             return true;
         } catch (Exception e) {
             return false;
@@ -115,7 +116,7 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
             // templates using only Velocity for example).
             getXWikiContext().put(IS_IN_RENDERING_ENGINE, true);
 
-            return htmlConverter.parseAndRender(html, syntax);
+            return this.htmlConverter.parseAndRender(html, syntax);
         } catch (Exception e) {
             // Leave the previous HTML in case of an exception.
             return html;
@@ -145,7 +146,7 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
             // templates using only Velocity for example).
             getXWikiContext().put(IS_IN_RENDERING_ENGINE, true);
 
-            return htmlConverter.toHTML(source, syntaxId);
+            return this.htmlConverter.toHTML(source, syntaxId);
         } catch (Exception e) {
             // Return the source text in case of an exception.
             return source;
@@ -166,6 +167,6 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
      */
     public WysiwygEditorConfiguration getConfig()
     {
-        return editorConfiguration;
+        return this.editorConfiguration;
     }
 }

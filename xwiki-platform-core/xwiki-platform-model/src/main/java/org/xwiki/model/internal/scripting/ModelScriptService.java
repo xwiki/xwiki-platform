@@ -144,7 +144,8 @@ public class ModelScriptService implements ScriptService
     public DocumentReference resolveDocument(String stringRepresentation, String hint, Object... parameters)
     {
         try {
-            EntityReferenceResolver<String> resolver = componentManager.lookup(EntityReferenceResolver.class, hint);
+            EntityReferenceResolver<String> resolver =
+                this.componentManager.lookup(EntityReferenceResolver.class, hint);
             return new DocumentReference(resolver.resolve(stringRepresentation, EntityType.DOCUMENT, parameters));
         } catch (ComponentLookupException e) {
             return null;
@@ -177,7 +178,8 @@ public class ModelScriptService implements ScriptService
     public AttachmentReference resolveAttachment(String stringRepresentation, String hint, Object... parameters)
     {
         try {
-            EntityReferenceResolver<String> resolver = componentManager.lookup(EntityReferenceResolver.class, hint);
+            EntityReferenceResolver<String> resolver =
+                this.componentManager.lookup(EntityReferenceResolver.class, hint);
             return new AttachmentReference(resolver.resolve(stringRepresentation, EntityType.ATTACHMENT, parameters));
         } catch (ComponentLookupException e) {
             return null;

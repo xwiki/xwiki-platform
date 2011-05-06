@@ -31,7 +31,7 @@ import org.xwiki.script.service.ScriptService;
 
 /**
  * Provides Query Manager-specific Scripting APIs.
- *
+ * 
  * @version $Id$
  * @since 2.4M2
  */
@@ -49,7 +49,7 @@ public class QueryManagerScriptService implements ScriptService
 
     /**
      * Shortcut for writing a XWQL query.
-     *
+     * 
      * @param statement the XWQL statement for the query
      * @return the Query object, ready to be executed
      * @throws org.xwiki.query.QueryException if any errors
@@ -61,7 +61,7 @@ public class QueryManagerScriptService implements ScriptService
 
     /**
      * Shortcut for writing a HQL query.
-     *
+     * 
      * @param statement the HQL statement for the query
      * @return the Query object, ready to be executed
      * @throws org.xwiki.query.QueryException if any errors
@@ -73,7 +73,7 @@ public class QueryManagerScriptService implements ScriptService
 
     /**
      * Create a Query for the given statement and language.
-     *
+     * 
      * @param statement the query statement
      * @param language language of the query. Must be a supported language.
      * @return the Query object

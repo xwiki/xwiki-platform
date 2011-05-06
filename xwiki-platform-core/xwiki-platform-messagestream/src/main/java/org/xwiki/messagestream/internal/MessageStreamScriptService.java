@@ -19,8 +19,11 @@
  */
 package org.xwiki.messagestream.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.messagestream.MessageStream;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
@@ -30,11 +33,13 @@ import org.xwiki.script.service.ScriptService;
  * 
  * @version $Id$
  */
-@Component("messageStream")
+@Component
+@Named("messageStream")
+@Singleton
 public class MessageStreamScriptService implements ScriptService
 {
     /** The wrapped stream that is exposed in this service. */
-    @Requirement
+    @Inject
     private MessageStream stream;
 
     /**

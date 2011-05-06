@@ -19,8 +19,11 @@
  */
 package org.xwiki.csrf.internal.scripting;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.script.service.ScriptService;
@@ -31,11 +34,13 @@ import org.xwiki.script.service.ScriptService;
  * @version $Id$
  * @since 2.5M2
  */
-@Component(roles = ScriptService.class, hints = "csrf")
+@Component(roles = ScriptService.class)
+@Named("csrf")
+@Singleton
 public class CSRFTokenScriptService extends AbstractLogEnabled implements CSRFToken, ScriptService
 {
     /** Wrapped CSRF token component. */
-    @Requirement
+    @Inject
     private CSRFToken csrf;
 
     /**

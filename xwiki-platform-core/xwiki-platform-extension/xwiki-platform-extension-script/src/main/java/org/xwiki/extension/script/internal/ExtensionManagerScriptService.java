@@ -22,9 +22,12 @@ package org.xwiki.extension.script.internal;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
@@ -41,30 +44,32 @@ import org.xwiki.extension.task.TaskManager;
 import org.xwiki.extension.task.UninstallRequest;
 import org.xwiki.script.service.ScriptService;
 
-@Component("extension")
+@Component
+@Named("extension")
+@Singleton
 public class ExtensionManagerScriptService implements ScriptService
 {
     private static final String EXTENSIONERROR_KEY = "extensionerror";
 
-    @Requirement
+    @Inject
     private ExtensionManager extensionManager;
 
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
-    @Requirement
+    @Inject
     private VersionManager versionManager;
 
-    @Requirement
+    @Inject
     private LocalExtensionRepository localExtensionRepository;
 
-    @Requirement
+    @Inject
     private CoreExtensionRepository coreExtensionRepository;
 
-    @Requirement
+    @Inject
     private TaskManager taskManager;
 
-    @Requirement
+    @Inject
     private Execution execution;
 
     public Exception getLastError()

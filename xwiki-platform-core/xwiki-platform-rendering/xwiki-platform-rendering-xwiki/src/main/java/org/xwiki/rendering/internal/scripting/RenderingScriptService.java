@@ -22,8 +22,11 @@ package org.xwiki.rendering.internal.scripting;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.parser.Parser;
@@ -37,13 +40,15 @@ import org.xwiki.script.service.ScriptService;
  * @version $Id$
  * @since 2.3M1
  */
-@Component("rendering")
+@Component
+@Named("rendering")
+@Singleton
 public class RenderingScriptService implements ScriptService
 {
     /**
      * Used to lookup parsers and renderers to discover available syntaxes.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**

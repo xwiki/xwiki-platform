@@ -19,30 +19,33 @@
  */
 package org.xwiki.crypto.internal.scripting;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-
-import org.xwiki.crypto.x509.X509CryptoService;
 import org.xwiki.crypto.passwd.PasswordCryptoService;
-
+import org.xwiki.crypto.x509.X509CryptoService;
 import org.xwiki.script.service.ScriptService;
 
 /**
- * Script service allowing a user to sign text, determine the validity and signer of already signed text,
- * create keys, and register new certificates.
+ * Script service allowing a user to sign text, determine the validity and signer of already signed text, create keys,
+ * and register new certificates.
  * 
  * @version $Id$
  * @since 2.5M1
  */
-@Component(roles = { ScriptService.class }, hints = { "crypto" })
+@Component
+@Named("crypto")
+@Singleton
 public class CryptoScriptService implements ScriptService
 {
     /** The x509/CMS service. */
-    @Requirement
+    @Inject
     private X509CryptoService x509;
 
     /** The password encryption and password hashing/protection service. */
-    @Requirement
+    @Inject
     private PasswordCryptoService passwd;
 
     /** @return the x509/CMS service. */
@@ -57,4 +60,3 @@ public class CryptoScriptService implements ScriptService
         return this.passwd;
     }
 }
-

@@ -19,8 +19,11 @@
  */
 package org.xwiki.query.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -32,13 +35,16 @@ import org.xwiki.script.service.ScriptService;
  * @version $Id$
  * @since 2.4M2
  */
-@Component("query")
+@Component
+@Named("query")
+@Singleton
 public class QueryManagerScriptService implements ScriptService
 {
     /**
      * Secure query manager that performs checks on rights depending on the query being executed.
      */
-    @Requirement("secure")
+    @Inject
+    @Named("secure")
     private QueryManager secureQueryManager;
 
     /**

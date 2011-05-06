@@ -22,12 +22,15 @@ package org.xwiki.annotation.internal;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationService;
 import org.xwiki.annotation.AnnotationServiceException;
 import org.xwiki.annotation.rights.AnnotationRightService;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -42,31 +45,33 @@ import com.xpn.xwiki.XWikiException;
  * @version $Id$
  * @since 3.0-RC1
  */
-@Component("annotations")
+@Component
+@Named("annotations")
+@Singleton
 public class AnnotationScriptService implements ScriptService
 {
     /**
      * The annotation service to execute annotation functions.
      */
-    @Requirement
+    @Inject
     private AnnotationService annotationService;
 
     /**
      * The annotations rights service.
      */
-    @Requirement
+    @Inject
     private AnnotationRightService rightsService;
 
     /**
      * The execution to get the context.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
      * Entity reference serializer, to create references to the documents to which annotation targets refer.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> serializer;
 
     /**

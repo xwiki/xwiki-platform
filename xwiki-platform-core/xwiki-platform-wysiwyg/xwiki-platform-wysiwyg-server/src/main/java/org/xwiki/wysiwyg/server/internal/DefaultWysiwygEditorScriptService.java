@@ -19,8 +19,11 @@
  */
 package org.xwiki.wysiwyg.server.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
@@ -36,7 +39,9 @@ import com.xpn.xwiki.XWikiContext;
  * 
  * @version $Id$
  */
-@Component("wysiwyg")
+@Component
+@Named("wysiwyg")
+@Singleton
 public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptService
 {
     /**
@@ -50,23 +55,23 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
     /**
      * The component manager. We need it because we have to access components dynamically.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /** Execution context handler, needed for accessing the XWikiContext. */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
      * The component used to convert HTML to wiki syntax.
      */
-    @Requirement
+    @Inject
     private HTMLConverter htmlConverter;
 
     /**
      * The component used to access the WYSIWYG editor configuration properties.
      */
-    @Requirement
+    @Inject
     private WysiwygEditorConfiguration editorConfiguration;
 
     /**

@@ -22,9 +22,12 @@ package org.xwiki.office.viewer.internal;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
@@ -48,7 +51,9 @@ import org.xwiki.rendering.transformation.TransformationManager;
  * @since 2.5M2
  * @version $Id$
  */
-@Component("officeviewer")
+@Component
+@Named("officeviewer")
+@Singleton
 public class DefaultOfficeViewerScriptService extends AbstractLogEnabled implements OfficeViewerScriptService
 {
     /**
@@ -59,7 +64,7 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
     /**
      * The component used to view office documents.
      */
-    @Requirement
+    @Inject
     private OfficeViewer officeViewer;
 
     /**
@@ -67,31 +72,31 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
      * 
      * @see #isMimeTypeSupported(String)
      */
-    @Requirement
+    @Inject
     private OpenOfficeManager officeManager;
 
     /**
      * Used to lookup various {@link BlockRenderer} implementations based on the output syntax.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
      * Reference to the current execution context, used to save the exception caught during office document view.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
      * The component used to check access rights on the document holding the office attachment to be viewed.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * The component used to perform the XDOM transformations.
      */
-    @Requirement
+    @Inject
     private TransformationManager transformationManager;
 
     /**

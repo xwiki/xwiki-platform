@@ -23,7 +23,6 @@ import java.util.Date;
 
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
-import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
@@ -140,10 +139,7 @@ public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
         @Override
         public byte[] getArchive(XWikiContext context) throws XWikiException
         {
-            String sdata = getAttachment().toStringXML(true, false, context);
-            Object[] lines = ToString.stringToArray(sdata);
-            Archive archive = new Archive(lines, getAttachment().getFilename(), getAttachment().getVersion());
-            return archive.toByteArray();
+            return new byte[0];
         }
 
         /**

@@ -470,6 +470,11 @@ var XWiki = (function(XWiki){
       var div = this.resultContainer;
     }
 
+    // Ensure any previous list of results for this source gets removed
+    if (div.down('ul')) {
+      div.down('ul').remove();
+    }
+
     // create and populate list
     var list = new XWiki.widgets.XList([], {
        icon: this.options.icon,

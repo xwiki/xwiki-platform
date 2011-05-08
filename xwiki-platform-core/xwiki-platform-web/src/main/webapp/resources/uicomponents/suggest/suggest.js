@@ -104,6 +104,11 @@ var XWiki = (function(XWiki){
       this.seps = "";
     }
 
+    // Initialize a request number that will keep track of the latest request being fired.
+    // This will help to discard potential non-last requests callbacks ; this in order to have better performance
+    // (less unneccessary DOM manipulation, and less unneccessary highlighting computation).
+    this.latestRequest = 0;
+
   },
 
   /**
@@ -277,7 +282,7 @@ var XWiki = (function(XWiki){
       var ajx = new Ajax.Request(url, {
         method: method,
         requestHeaders: headers,
-        onSuccess: this.setSuggestions.bindAsEventListener(this, source),
+        onSuccess: this.setSuggestions.bindAsEventListener(this, source, requestId),
         onFailure: function (response) {
           new XWiki.widgets.Notification("Failed to retrieve suggestions : ')" + response.statusText, "error", {timeout: 5});
         }
@@ -289,9 +294,19 @@ var XWiki = (function(XWiki){
    * Set suggestions
    *
    * @param {Object} req
+   * @param {Object} source
+   * @param {Number} requestId the identifier of the request for which this callback is triggered.
    */
-  setSuggestions: function (req, source)
+  setSuggestions: function (req, source, requestId)
   {
+	
+	// If there has been one or several requests fired in the mean time (between the time the request for which this callback
+	// has been triggered and the time of the callback itself) ; we don't do anything and leave it to following callbacks to
+	// set potential suggestions
+	if (requestId < this.latestRequest) {
+		return;
+	}
+	
     this.aSuggestions = [];
 
     if (source.json) {

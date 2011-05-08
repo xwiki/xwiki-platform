@@ -375,7 +375,7 @@ var XWiki = (function(XWiki){
       this.container = div;
 
       if (this.options.insertBeforeSuggestions) {
-	    this.resultContainer.insert(this.options.insertBeforeSuggestions);
+        this.resultContainer.insert(this.options.insertBeforeSuggestions);
       }
 
       document.fire("xwiki:suggest:containerCreated", {
@@ -504,8 +504,8 @@ var XWiki = (function(XWiki){
       else {
         var displayNode = new Element("div").insert(new Element('div', {'class':'value'}).update(output))
                                             .insert(new Element('div', {'class':'info'}).update(
-	                                          "<span class='legend'>" + this.options.displayValueText + "</span>" + arr[i].info)
-	                                        );
+                                              "<span class='legend'>" + this.options.displayValueText + "</span>" + arr[i].info)
+                                            );
       }
       var valueNode = new Element('div')
             .insert(new Element('span', {'class':'suggestId'}).update(arr[i].id))

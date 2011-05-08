@@ -45,6 +45,8 @@ var XWiki = (function(XWiki){
     // The name of the JSON parameter or XML attribute holding the result auxiliary information.
     // "info" for the old suggest, "pageFullName" for the REST search.
     resultInfo : "info",
+    // The name of the JSON parameter or XML attribute holding the result icon.
+    resultIcon: "icon",
     // The id of the element that will hold the suggest element
     parentContainer : "body",
     // Should results fragments be highlighted when matching typed input
@@ -303,7 +305,8 @@ var XWiki = (function(XWiki){
         this.aSuggestions.push({
            'id': results[i][source.resultId || this.options.resultId],
            'value': results[i][source.resultValue || this.options.resultValue],
-           'info': results[i][source.resultInfo || this.options.resultInfo]
+           'info': results[i][source.resultInfo || this.options.resultInfo],
+           'icon' : results[i][source.resultIcon || this.options.resultIcon]
         });
       }
     } else {
@@ -319,7 +322,8 @@ var XWiki = (function(XWiki){
           this.aSuggestions.push({
             'id': results[i].getAttribute('id'),
             'value':results[i].childNodes[0].nodeValue,
-            'info':results[i].getAttribute('info')
+            'info':results[i].getAttribute('info'),
+            'icon':results[i].getAttribute('icon')
           });
         }
       }
@@ -512,6 +516,14 @@ var XWiki = (function(XWiki){
                                               "<span class='legend'>" + this.options.displayValueText + "</span>" + arr[i].info)
                                             );
       }
+
+      if (arr[i].icon) {
+        var iconImage = new Image();
+        iconImage.src = arr[i].icon;
+        $(iconImage).addClassName('icon');
+        displayNode.insert({top: iconImage});
+      }
+
       var valueNode = new Element('div')
             .insert(new Element('span', {'class':'suggestId'}).update(arr[i].id))
             .insert(new Element('span', {'class':'suggestValue'}).update(arr[i].value))

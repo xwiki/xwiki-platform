@@ -33,11 +33,6 @@
   <description>The API that is used to write plugins for the WYSIWYG editor.</description>
   <dependencies>
     <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-user</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-gwt-user</artifactId>
       <version>${project.version}</version>

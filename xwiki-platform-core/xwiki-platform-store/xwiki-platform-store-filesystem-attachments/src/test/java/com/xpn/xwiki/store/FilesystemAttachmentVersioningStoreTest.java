@@ -40,6 +40,7 @@ import com.xpn.xwiki.doc.ListAttachmentArchive;
 import com.xpn.xwiki.web.Utils;
 
 import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.store.locks.preemptive.internal.PreemptiveLockProvider;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -77,7 +78,9 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractMockingComp
         this.storageLocation = new File(tmpDir, "test-storage-location");
 
         this.fileTools =
-            new DefaultFilesystemStoreTools(new PathStringEntityReferenceSerializer(), storageLocation);
+            new DefaultFilesystemStoreTools(new PathStringEntityReferenceSerializer(),
+                                            storageLocation,
+                                            new PreemptiveLockProvider());
         final AttachmentListMetadataSerializer serializer =
             new AttachmentListMetadataSerializer(new AttachmentMetadataSerializer());
         this.versionStore = new FilesystemAttachmentVersioningStore(this.fileTools, serializer);

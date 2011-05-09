@@ -31,6 +31,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.repository.xwiki.model.jaxb.Extension;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ObjectFactory;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -62,7 +63,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
      * </p>
      */
     protected ObjectFactory objectFactory;
-    
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -70,7 +71,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         this.objectFactory = new ObjectFactory();
     }
-    
+
     protected Document getExtensionDocument(String extensionId) throws XWikiException, QueryException
     {
         String query = "from doc.object(XWiki.ExtensionClass) as extension where extension.id = :extensionId";
@@ -141,7 +142,14 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setName((String) getValue(extensionObject, "name"));
         extension.setWebsite((String) getValue(extensionObject, "website"));
 
-        // TODO: set dependencies
+        for (com.xpn.xwiki.api.Object dependencyObject : extensionDocument.getObjects("XWiki.ExtensionDependencyClass",
+            "extensionversion", version)) {
+            ExtensionDependency dependency = new ExtensionDependency();
+            dependency.setId((String) getValue(dependencyObject, "id"));
+            dependency.setVersion((String) getValue(dependencyObject, "version"));
+
+            extension.getDepedencies().add(dependency);
+        }
 
         return extension;
     }

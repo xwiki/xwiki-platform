@@ -29,10 +29,10 @@
     <artifactId>xwiki-platform-extension-repositories</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-extension-repository-xwiki-server</artifactId>
-  <name>XWiki Platform - Extension - Repository - XWiki server</name>
+  <artifactId>xwiki-platform-extension-repository-xwiki-server-api</artifactId>
+  <name>XWiki Platform - Extension - Repository - XWiki server api</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Extension - Repository - XWiki server</description>
+  <description>XWiki Platform - Extension - Repository - XWiki server api</description>
   <dependencies>   
     <dependency>
       <groupId>org.xwiki.platform</groupId>

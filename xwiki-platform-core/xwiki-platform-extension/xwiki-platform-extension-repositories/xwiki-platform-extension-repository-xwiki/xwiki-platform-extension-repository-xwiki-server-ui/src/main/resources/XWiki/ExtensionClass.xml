@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>ExtensionClass</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1304002820000</creationDate>
+<date>1304957526000</date>
+<contentUpdateDate>1304957526000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<class>
+<name>XWiki.ExtensionClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<author>
+<disabled>0</disabled>
+<name>author</name>
+<number>5</number>
+<prettyName>author</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</author>
+<description>
+<disabled>0</disabled>
+<name>description</name>
+<number>4</number>
+<prettyName>description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<id>
+<disabled>0</disabled>
+<name>id</name>
+<number>1</number>
+<prettyName>id</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</id>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>3</number>
+<prettyName>name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<type>
+<disabled>0</disabled>
+<name>type</name>
+<number>2</number>
+<prettyName>type</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</type>
+<website>
+<disabled>0</disabled>
+<name>website</name>
+<number>6</number>
+<prettyName>website</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</website>
+</class>
+<content>{{velocity output="false"}}
+#set($extension = $doc.getObject("XWiki.ExtensionClass"))
+{{/velocity}}
+
+{{velocity}}
+#if ($extension)
+  ; Id
+  : $extension.id
+  ; Type
+  : $extension.type
+
+  ; Name
+  : $extension.get('name')
+  ; Description
+  : $extension.description
+  ; Author
+  : $extension.author
+  ; Website
+  : $extension.website
+
+  #foreach($extensionVersion in $doc.getObjects('XWiki.ExtensionVersionClass'))
+    * $extensionVersion.version
+    #foreach($extensionDependency in $doc.getObjects('XWiki.ExtensionDependencyClass', 'extensionversion', $extensionVersion.version))
+      ** $extensionDependency.id $extensionDependency.version
+    #end
+  #end
+#else
+  {{warning}}No //XWiki.ExtensionClass// object found.{{/warning}} 
+#end
+{{/velocity}}</content></xwikidoc>

@@ -32,12 +32,6 @@
   <packaging>jar</packaging>
   <description>The client side of XWiki's WYSIWYG editor. This is a reusable rich text editor all written in GWT.</description>
   <dependencies>
-    <!-- GWT core dependencies -->
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-user</artifactId>
-      <scope>provided</scope>
-    </dependency>
     <!-- GWT libraries -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

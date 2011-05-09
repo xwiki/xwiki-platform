@@ -71,12 +71,10 @@
     <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
-      <version>2.2.2</version>
     </dependency>
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
-      <version>2.2.2</version>
     </dependency>
     <dependency>
       <groupId>net.java.dev.jaxb2-commons</groupId>

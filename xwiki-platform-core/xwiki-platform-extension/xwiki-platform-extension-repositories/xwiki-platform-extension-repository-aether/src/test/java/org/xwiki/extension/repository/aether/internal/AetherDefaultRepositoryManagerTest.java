@@ -90,7 +90,7 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
     {
         Extension artifact = this.repositoryManager.resolve(this.extensionId);
 
-        File file = new File("target/downloaded/" + this.extensionId.getId() + ".ext");
+        File file = new File("target/downloaded/" + this.extensionId.getId() + "." + artifact.getType());
 
         if (file.exists()) {
             file.delete();

@@ -91,7 +91,7 @@ public class DefaultExtensionRepositoryManager extends AbstractLogEnabled implem
                 return artifact;
             } catch (ResolveException e) {
                 getLogger().debug(
-                    "Could not find extension [" + extensionId + "] in repository [" + repository.getId() + "]");
+                    "Could not find extension [" + extensionId + "] in repository [" + repository.getId() + "]", e);
             }
         }
 

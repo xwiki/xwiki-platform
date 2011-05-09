@@ -20,7 +20,6 @@
 
 package org.xwiki.extension.repository.xwiki.internal;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.DefaultValue;
@@ -31,6 +30,7 @@ import javax.ws.rs.QueryParam;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.xwiki.model.jaxb.Extension;
+import org.xwiki.extension.repository.xwiki.model.jaxb.Extensions;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.Utils;
@@ -41,12 +41,12 @@ import com.xpn.xwiki.XWikiException;
  * @version $Id$
  * @since 3.1M2
  */
-@Component("org.xwiki.extension.repository.xwiki.internal.ExtensionSearchRESTResource")
-@Path("/extensionsearch/simple/{pattern}")
+@Component("org.xwiki.extension.repository.xwiki.internal.ExtensionSimpleSearchRESTResource")
+@Path("/extensions/search/simple/{pattern}")
 public class ExtensionSimpleSearchRESTResource extends AbstractExtensionRESTResource
 {
     @GET
-    public List<Extension> search(@PathParam("pattern") String pattern,
+    public Extensions search(@PathParam("pattern") String pattern,
         @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("number") @DefaultValue("-1") int number)
         throws XWikiException, QueryException
     {
@@ -56,7 +56,7 @@ public class ExtensionSimpleSearchRESTResource extends AbstractExtensionRESTReso
 
         Query query = this.queryManager.createQuery(queryStr, Query.XWQL);
 
-        query.bindValue("pattern", pattern);
+        query.bindValue("pattern", '%' + pattern + '%');
         query.setOffset(offset);
         if (number > 0) {
             query.setLimit(number);
@@ -64,9 +64,11 @@ public class ExtensionSimpleSearchRESTResource extends AbstractExtensionRESTReso
 
         List<String> documentNames = query.execute();
 
-        List<Extension> extensions = new ArrayList<Extension>(documentNames.size());
+        Extensions extensions = this.objectFactory.createExtensions();
+        List<Extension> extensionsList = extensions.getExtensions();
         for (String documentName : documentNames) {
-            extensions.add(createExtension(Utils.getXWikiApi(this.componentManager).getDocument(documentName), null));
+            extensionsList
+                .add(createExtension(Utils.getXWikiApi(this.componentManager).getDocument(documentName), null));
         }
 
         return extensions;

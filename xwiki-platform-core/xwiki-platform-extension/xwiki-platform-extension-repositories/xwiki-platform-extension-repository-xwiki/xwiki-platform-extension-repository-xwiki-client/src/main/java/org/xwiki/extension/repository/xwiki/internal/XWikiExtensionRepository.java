@@ -21,6 +21,7 @@ package org.xwiki.extension.repository.xwiki.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
@@ -28,6 +29,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.lang.StringUtils;
 import org.restlet.data.MediaType;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
@@ -50,7 +52,8 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
     public XWikiExtensionRepository(ExtensionRepositoryId repositoryId,
         XWikiExtensionRepositoryFactory repositoryFactory) throws Exception
     {
-        super(repositoryId);
+        super(repositoryId.getURI().getPath().endsWith("/") ? new ExtensionRepositoryId(repositoryId.getId(),
+            repositoryId.getType(), new URI(StringUtils.chop(repositoryId.getURI().toString()))) : repositoryId);
 
         this.repositoryFactory = repositoryFactory;
 
@@ -85,7 +88,8 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         }
 
         if (getMethod.getStatusCode() != HttpStatus.SC_OK) {
-            throw new ResolveException("Invalid answer fo the server when requesting");
+            throw new ResolveException("Invalid answer (" + getMethod.getStatusCode()
+                + ") fo the server when requesting");
         }
 
         return getMethod.getResponseBodyAsStream();
@@ -96,8 +100,12 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
         try {
-            return (XWikiExtension) this.repositoryFactory.getUnmarshaller().unmarshal(
-                getRESTResourceAsStream(this.extensionUriBuider, extensionId.getId(), extensionId.getVersion()));
+            return new XWikiExtension(
+                this,
+                (org.xwiki.extension.repository.xwiki.model.jaxb.Extension) this.repositoryFactory
+                    .getUnmarshaller()
+                    .unmarshal(
+                        getRESTResourceAsStream(this.extensionUriBuider, extensionId.getId(), extensionId.getVersion())));
         } catch (Exception e) {
             throw new ResolveException("Failed to create extension object for extension [" + extensionId + "]", e);
         }

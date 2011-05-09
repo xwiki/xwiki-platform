@@ -42,4 +42,14 @@
     	</sequence>
     </complexType>
     
+    <element name="extension" type="xwiki:Extension"></element>
+
+    <element name="extensions">
+    <complexType>
+      <sequence>
+        <element name="extension" type="xwiki:Extension"
+              minOccurs="0" maxOccurs="unbounded"></element>
+      </sequence>
+    </complexType>
+  </element>
 </schema>

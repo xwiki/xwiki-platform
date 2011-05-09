@@ -25,9 +25,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.repository.xwiki.model.jaxb.Extension;
 import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.XWikiException;
@@ -51,16 +53,20 @@ public class ExtensionFileRESTResource extends AbstractExtensionRESTResource
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        com.xpn.xwiki.api.Object extensionVersionObject =
-            getExtensionVersionObject(extensionDocument, extensionVersion);
+        Extension extension = createExtension(extensionDocument, extensionVersion);
 
         com.xpn.xwiki.api.Attachment xwikiAttachment =
-            extensionDocument.getAttachment(extensionId + "-" + extensionVersion + "."
-                + extensionVersionObject.getProperty("type").getValue());
+            extensionDocument.getAttachment(extensionId + "-" + extensionVersion + "." + extension.getType());
         if (xwikiAttachment == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        return Response.ok().type(xwikiAttachment.getMimeType()).entity(xwikiAttachment.getContent()).build();
+        ResponseBuilder response = Response.ok();
+
+        response.type(xwikiAttachment.getMimeType());
+        response.entity(xwikiAttachment.getContent());
+        response.header("Content-Disposition", "attachment; filename=\"" + xwikiAttachment.getFilename() + "\"");
+
+        return response.build();
     }
 }

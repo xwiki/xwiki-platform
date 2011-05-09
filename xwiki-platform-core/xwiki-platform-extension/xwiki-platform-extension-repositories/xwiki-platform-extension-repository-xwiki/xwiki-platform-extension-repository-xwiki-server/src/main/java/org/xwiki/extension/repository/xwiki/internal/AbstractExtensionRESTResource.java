@@ -27,8 +27,11 @@ import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.repository.xwiki.model.jaxb.Extension;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ObjectFactory;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.Utils;
@@ -45,7 +48,7 @@ import com.xpn.xwiki.api.Property;
  * @version $Id$
  * @since 3.1M2
  */
-public abstract class AbstractExtensionRESTResource extends XWikiResource
+public abstract class AbstractExtensionRESTResource extends XWikiResource implements Initializable
 {
     /**
      * The execution needed to get the annotation author from the context user.
@@ -53,6 +56,21 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource
     @Inject
     protected Execution execution;
 
+    /**
+     * <p>
+     * The object factory for model objects to be used when creating representations.
+     * </p>
+     */
+    protected ObjectFactory objectFactory;
+    
+    @Override
+    public void initialize() throws InitializationException
+    {
+        super.initialize();
+
+        this.objectFactory = new ObjectFactory();
+    }
+    
     protected Document getExtensionDocument(String extensionId) throws XWikiException, QueryException
     {
         String query = "from doc.object(XWiki.ExtensionClass) as extension where extension.id = :extensionId";
@@ -113,7 +131,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        Extension extension = new Extension();
+        Extension extension = this.objectFactory.createExtension();
         extension.setId((String) getValue(extensionObject, "id"));
         extension.setVersion((String) getValue(extensionVersionObject, "version"));
         extension.setType((String) getValue(extensionObject, "type"));

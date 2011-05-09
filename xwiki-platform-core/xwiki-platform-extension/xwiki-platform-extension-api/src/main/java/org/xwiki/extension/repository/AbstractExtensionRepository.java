@@ -6,7 +6,7 @@ public abstract class AbstractExtensionRepository implements ExtensionRepository
 
     public AbstractExtensionRepository(ExtensionRepositoryId id)
     {
-        this.id = id;
+        this.id = new ExtensionRepositoryId(id.getId(), id.getType(), id.getURI());
     }
 
     public ExtensionRepositoryId getId()

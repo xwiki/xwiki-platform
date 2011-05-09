@@ -81,7 +81,7 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
         try {
             loadExtensions();
         } catch (Exception e) {
-            getLogger().error("Failed to load core extensions", e);
+            getLogger().warn("Failed to load core extensions", e);
         }
     }
 
@@ -230,7 +230,7 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
                     }
                 }
             } catch (Exception e) {
-                getLogger().warn("Faile to guess extensions extra informations", e);
+                getLogger().warn("Failed to guess extra information about some extensions", e);
             }
         }
     }

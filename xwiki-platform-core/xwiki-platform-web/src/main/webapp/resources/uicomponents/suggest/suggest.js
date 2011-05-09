@@ -299,14 +299,14 @@ var XWiki = (function(XWiki){
    */
   setSuggestions: function (req, source, requestId)
   {
-	
-	// If there has been one or several requests fired in the mean time (between the time the request for which this callback
-	// has been triggered and the time of the callback itself) ; we don't do anything and leave it to following callbacks to
-	// set potential suggestions
-	if (requestId < this.latestRequest) {
-		return;
-	}
-	
+
+    // If there has been one or several requests fired in the mean time (between the time the request for which this callback
+    // has been triggered and the time of the callback itself) ; we don't do anything and leave it to following callbacks to
+    // set potential suggestions
+    if (requestId < this.latestRequest) {
+      return;
+    }
+
     this.aSuggestions = [];
 
     if (source.json) {
@@ -532,10 +532,9 @@ var XWiki = (function(XWiki){
                                             );
       }
 
+      // If the search result contains an icon information, we insert this icon in the result entry.
       if (arr[i].icon) {
-        var iconImage = new Image();
-        iconImage.src = arr[i].icon;
-        $(iconImage).addClassName('icon');
+        var iconImage = new Element("img", {'src' : arr[i].icon, 'class' : 'icon' });
         displayNode.insert({top: iconImage});
       }
 

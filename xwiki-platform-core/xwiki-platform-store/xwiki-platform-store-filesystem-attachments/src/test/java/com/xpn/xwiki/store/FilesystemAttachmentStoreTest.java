@@ -61,6 +61,7 @@ import org.jmock.lib.action.CustomAction;
 import org.jmock.api.Invocation;
 
 import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.store.locks.preemptive.internal.PreemptiveLockProvider;
 
 import org.apache.commons.io.IOUtils;
 
@@ -161,7 +162,9 @@ public class FilesystemAttachmentStoreTest extends AbstractMockingComponentTestC
         this.storageLocation = new File(tmpDir, "test-storage-location");
 
         this.fileTools =
-            new DefaultFilesystemStoreTools(new PathStringEntityReferenceSerializer(), storageLocation);
+            new DefaultFilesystemStoreTools(new PathStringEntityReferenceSerializer(),
+                                            storageLocation,
+                                            new PreemptiveLockProvider());
 
         this.attachStore = new FilesystemAttachmentStore(fileTools);
         this.storeFile =

@@ -29,27 +29,21 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-store</artifactId>
-  <name>XWiki Platform - Store - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>
-    XWiki data storage module. This module is intended to replace xwiki-core/src/main/com/xpn/xwiki/store in due time.
-  </description>
-  <modules>
-    <module>xwiki-platform-store-api</module>
-    <module>xwiki-platform-store-transaction</module>
-    <module>xwiki-platform-store-locks</module>
-    <module>xwiki-platform-store-serialization</module>
-    <module>xwiki-platform-store-filesystem</module>
-    <module>xwiki-platform-store-filesystem-attachments</module>
-  </modules>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
+  <artifactId>xwiki-platform-store-locks</artifactId>
+  <name>XWiki Platform - Store - Locks</name>
+  <version>3.1-SNAPSHOT</version>
+  <description>Locking mechanisms and supporting code for XWiki storage engine.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-junit4</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

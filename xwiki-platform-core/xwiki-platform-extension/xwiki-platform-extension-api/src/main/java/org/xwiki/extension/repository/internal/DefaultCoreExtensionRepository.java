@@ -78,18 +78,22 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
     {
         this.repositoryId = new ExtensionRepositoryId("core", "xwiki-core", null);
 
-        loadExtensions();
+        try {
+            loadExtensions();
+        } catch (Exception e) {
+            getLogger().error("Failed to load core extensions", e);
+        }
     }
 
     private void loadExtensions()
     {
-        Set<URL> basURLs = ClasspathHelper.getUrlsForPackagePrefix("META-INF.maven");
+        Set<URL> baseURLs = ClasspathHelper.getUrlsForPackagePrefix("META-INF.maven");
 
-        basURLs = filterURLs(basURLs);
+        baseURLs = filterURLs(baseURLs);
 
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.setScanners(new ResourcesScanner());
-        configurationBuilder.setUrls(basURLs);
+        configurationBuilder.setUrls(baseURLs);
         configurationBuilder.filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix("META-INF.maven")));
 
         Reflections reflections = new Reflections(configurationBuilder);
@@ -104,8 +108,6 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
         for (String descriptor : descriptors) {
             URL descriptorUrl = getClass().getClassLoader().getResource(descriptor);
 
-            // TODO: extract jar URL from descriptorUrl
-
             InputStream descriptorStream = getClass().getClassLoader().getResourceAsStream(descriptor);
             try {
                 MavenXpp3Reader reader = new MavenXpp3Reader();
@@ -115,7 +117,7 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
                 String version = mavenModel.getVersion();
                 String groupId = mavenModel.getGroupId();
 
-                // TODO: add support for parents using aether
+                // TODO: download parents and resolve pom.xml properties using aether
                 if (version == null || groupId == null) {
                     Parent parent = mavenModel.getParent();
 
@@ -140,8 +142,8 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
                 }
 
                 DefaultCoreExtension coreExtension =
-                    new DefaultCoreExtension(this, ClasspathHelper.getBaseUrl(descriptorUrl, basURLs), new ExtensionId(
-                        groupId + ":" + mavenModel.getArtifactId(), version),
+                    new DefaultCoreExtension(this, ClasspathHelper.getBaseUrl(descriptorUrl, baseURLs),
+                        new ExtensionId(groupId + ":" + mavenModel.getArtifactId(), version),
                         packagingToType(mavenModel.getPackaging()));
 
                 this.extensions.put(coreExtension.getId().getId(), coreExtension);
@@ -199,33 +201,36 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
             }
 
             // Try to resolve version no easy to find from the pom.xml
+            try {
+                for (Object[] coreArtefactId : coreArtefactIds) {
+                    Object[] artefact = artefacts.get(coreArtefactId[0]);
 
-            for (Object[] coreArtefactId : coreArtefactIds) {
-                Object[] artefact = artefacts.get(coreArtefactId[0]);
-
-                DefaultCoreExtension coreExtension = (DefaultCoreExtension) coreArtefactId[1];
-                if (artefact != null && coreExtension.getId().getVersion().charAt(0) == '$') {
-                    coreExtension.setId(new ExtensionId(coreExtension.getId().getId(), (String) artefact[0]));
-                    coreExtension.setGuessed(true);
-                }
-            }
-
-            // Add dependencies that does not provide proper pom.xml resource and can't be found in the classpath
-            for (Dependency dependency : dependencies) {
-                String dependencyId = dependency.getGroupId() + ":" + dependency.getArtifactId();
-
-                Object[] artefact = artefacts.get(dependency.getArtifactId());
-                if (artefact != null) {
-                    DefaultCoreExtension coreExtension = this.extensions.get(dependencyId);
-                    if (coreExtension == null) {
-                        coreExtension =
-                            new DefaultCoreExtension(this, (URL) artefact[1], new ExtensionId(dependencyId,
-                                (String) artefact[0]), packagingToType(dependency.getType()));
+                    DefaultCoreExtension coreExtension = (DefaultCoreExtension) coreArtefactId[1];
+                    if (artefact != null && coreExtension.getId().getVersion().charAt(0) == '$') {
+                        coreExtension.setId(new ExtensionId(coreExtension.getId().getId(), (String) artefact[0]));
                         coreExtension.setGuessed(true);
-
-                        this.extensions.put(dependencyId, coreExtension);
                     }
                 }
+
+                // Add dependencies that does not provide proper pom.xml resource and can't be found in the classpath
+                for (Dependency dependency : dependencies) {
+                    String dependencyId = dependency.getGroupId() + ":" + dependency.getArtifactId();
+
+                    Object[] artefact = artefacts.get(dependency.getArtifactId());
+                    if (artefact != null) {
+                        DefaultCoreExtension coreExtension = this.extensions.get(dependencyId);
+                        if (coreExtension == null) {
+                            coreExtension =
+                                new DefaultCoreExtension(this, (URL) artefact[1], new ExtensionId(dependencyId,
+                                    (String) artefact[0]), packagingToType(dependency.getType()));
+                            coreExtension.setGuessed(true);
+
+                            this.extensions.put(dependencyId, coreExtension);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                getLogger().warn("Faile to guess extensions extra informations", e);
             }
         }
     }

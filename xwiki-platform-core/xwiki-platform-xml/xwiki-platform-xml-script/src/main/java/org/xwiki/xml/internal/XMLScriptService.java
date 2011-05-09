@@ -32,8 +32,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
@@ -43,6 +41,7 @@ import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSParser;
 import org.w3c.dom.ls.LSSerializer;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.xml.XMLUtils;
 
@@ -53,11 +52,8 @@ import org.xwiki.xml.XMLUtils;
  * @since 2.7M1
  */
 @Component("xml")
-public class XMLScriptService implements ScriptService
+public class XMLScriptService extends AbstractLogEnabled implements ScriptService
 {
-    /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(XMLScriptService.class);
-
     /** Xerces configuration parameter for disabling fetching and checking XMLs against their DTD. */
     private static final String DISABLE_DTD_PARAM = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
 
@@ -72,7 +68,7 @@ public class XMLScriptService implements ScriptService
         try {
             this.lsImpl = (DOMImplementationLS) DOMImplementationRegistry.newInstance().getDOMImplementation("LS 3.0");
         } catch (Exception ex) {
-            LOG.warn("Cannot initialize the XML Script Service", ex);
+            getLogger().warn("Cannot initialize the XML Script Service", ex);
         }
     }
 
@@ -134,7 +130,7 @@ public class XMLScriptService implements ScriptService
         try {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         } catch (ParserConfigurationException ex) {
-            LOG.error("Cannot create DOM Documents", ex);
+            getLogger().error("Cannot create DOM Documents", ex);
             return null;
         }
     }
@@ -156,7 +152,7 @@ public class XMLScriptService implements ScriptService
             }
             return p.parse(source);
         } catch (Exception ex) {
-            LOG.warn("Cannot parse XML document: " + ex.getMessage());
+            getLogger().warn("Cannot parse XML document: " + ex.getMessage());
             return null;
         }
     }
@@ -249,7 +245,7 @@ public class XMLScriptService implements ScriptService
             serializer.write(node, output);
             return result.toString();
         } catch (Exception ex) {
-            LOG.warn("Failed to serialize node to XML String", ex);
+            getLogger().warn("Failed to serialize node to XML String", ex);
             return "";
         }
     }
@@ -270,7 +266,7 @@ public class XMLScriptService implements ScriptService
                 javax.xml.transform.TransformerFactory.newInstance().newTransformer(xslt).transform(xml, result);
                 return output.toString();
             } catch (Exception ex) {
-                LOG.warn("Failed to apply XSLT transformation: " + ex.getMessage());
+                getLogger().warn("Failed to apply XSLT transformation: " + ex.getMessage());
             }
         }
         return null;

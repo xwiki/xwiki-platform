@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Requirement;
 
 /**
@@ -38,7 +38,7 @@ import org.xwiki.component.annotation.Requirement;
 public abstract class AbstractFormulaRenderer implements FormulaRenderer
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(AbstractFormulaRenderer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractFormulaRenderer.class);
 
     /** A storage system for rendered images, for reuse in subsequent requests. */
     @Requirement
@@ -107,9 +107,9 @@ public abstract class AbstractFormulaRenderer implements FormulaRenderer
             hashAlgorithm.update(formula.getBytes());
             return new String(org.apache.commons.codec.binary.Hex.encodeHex(hashAlgorithm.digest()));
         } catch (NoSuchAlgorithmException ex) {
-            LOG.error("No MD5 hash algorithm implementation", ex);
+            LOGGER.error("No MD5 hash algorithm implementation", ex);
         } catch (NullPointerException ex) {
-            LOG.error("Error hashing image name", ex);
+            LOGGER.error("Error hashing image name", ex);
         }
         // Fallback to a simple hashcode
         final int prime = 37;

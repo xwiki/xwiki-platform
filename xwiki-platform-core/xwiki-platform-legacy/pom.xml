@@ -68,6 +68,12 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- For some tests we need to have the Servlet API JAR available -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

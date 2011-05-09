@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jboss.cache.config.CacheLoaderConfig;
 import org.jboss.cache.config.Configuration;
 import org.jboss.cache.config.EvictionConfig;
@@ -34,6 +32,8 @@ import org.jboss.cache.config.EvictionRegionConfig;
 import org.jboss.cache.config.CacheLoaderConfig.IndividualCacheLoaderConfig;
 import org.jboss.cache.config.parsing.XmlConfigurationParser;
 import org.jboss.cache.eviction.LRUAlgorithmConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
@@ -55,7 +55,7 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
     /**
      * the logging tool.
      */
-    private static final Log LOG = LogFactory.getLog(JBossCacheCacheConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JBossCacheCacheConfiguration.class);
 
     /**
      * The folder containing JBossCache properties files.
@@ -234,20 +234,20 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
             XmlConfigurationParser parser = new XmlConfigurationParser();
             config = parser.parseStream(is);
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Properties loaded: " + propertiesFilename);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Properties loaded: " + propertiesFilename);
             }
         } catch (Exception e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Failed to load configuration file " + propertiesId, e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Failed to load configuration file " + propertiesId, e);
             }
         } finally {
             if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Failed t close properties file", e);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Failed t close properties file", e);
                     }
                 }
             }

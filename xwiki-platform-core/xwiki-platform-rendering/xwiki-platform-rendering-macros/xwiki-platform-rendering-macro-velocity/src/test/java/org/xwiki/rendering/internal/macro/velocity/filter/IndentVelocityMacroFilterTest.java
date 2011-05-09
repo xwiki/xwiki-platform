@@ -22,25 +22,25 @@ package org.xwiki.rendering.internal.macro.velocity.filter;
 import junit.framework.Assert;
 
 import org.apache.velocity.VelocityContext;
-import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
+import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Validate the behavior of {@link HTMLVelocityMacroFilter}.
  * 
  * @version $Id$
  */
-public class IndentVelocityMacroFilterTest
+public class IndentVelocityMacroFilterTest extends AbstractComponentTestCase
 {
-    private IndentVelocityMacroFilter filter;
+    private VelocityMacroFilter filter;
 
     private VelocityContext context;
 
-    @Before
-    public void setUp() throws Exception
+    @Override
+    protected void registerComponents() throws Exception
     {
-        this.filter = new IndentVelocityMacroFilter();
-
+        this.filter = getComponentManager().lookup(VelocityMacroFilter.class, "indent");
         this.context = new VelocityContext();
     }
 

@@ -52,9 +52,10 @@
       <artifactId>xwiki-platform-cache-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- We only need the -default module (instead of just -api) for the Logging needs -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
+      <artifactId>xwiki-commons-component-default</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>

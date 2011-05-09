@@ -34,13 +34,10 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Cache - API</description>
   <dependencies>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-    </dependency>
+    <!-- We only need this dependency for the Logging API/Implementation part -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
+      <artifactId>xwiki-commons-component-default</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>

@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.annotation.io.internal;
 
 import java.util.ArrayList;
@@ -27,6 +26,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.event.AnnotationAddedEvent;
 import org.xwiki.annotation.event.AnnotationDeletedEvent;
@@ -38,7 +40,6 @@ import org.xwiki.annotation.reference.TypedStringEntityReferenceResolver;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
@@ -63,7 +64,7 @@ import com.xpn.xwiki.objects.BaseProperty;
  * @since 2.3M1
  */
 @Component
-public class DefaultIOService extends AbstractLogEnabled implements IOService
+public class DefaultIOService implements IOService
 {
     /**
      * The name of the field of the annotation object containing the reference of the content on which the annotation is
@@ -106,6 +107,12 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
      */
     @Requirement
     private ComponentManager componentManager;
+
+    /**
+     * The logger to use for logging.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * {@inheritDoc} <br />
@@ -165,7 +172,7 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
         } catch (XWikiException e) {
             throw new IOServiceException("An exception message has occurred while saving the annotation", e);
         } catch (ComponentLookupException exc) {
-            getLogger().warn("Could not get the observation manager to send notifications about the annotation add");
+            this.logger.warn("Could not get the observation manager to send notifications about the annotation add");
         }
     }
 
@@ -305,7 +312,7 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
         } catch (XWikiException e) {
             throw new IOServiceException("An exception has occurred while removing the annotation", e);
         } catch (ComponentLookupException exc) {
-            getLogger().warn("Could not get the observation manager to send notifications about the annotation delete");
+            this.logger.warn("Could not get the observation manager to send notifications about the annotation delete");
         }
     }
 
@@ -361,7 +368,7 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
         } catch (XWikiException e) {
             throw new IOServiceException("An exception has occurred while updating the annotation", e);
         } catch (ComponentLookupException exc) {
-            getLogger().warn("Could not get the observation manager to send notifications about the annotation update");
+            this.logger.warn("Could not get the observation manager to send notifications about the annotation update");
         }
     }
 
@@ -392,7 +399,7 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
                 try {
                     annotation.set(propName, ((BaseProperty) object.get(propName)).getValue());
                 } catch (XWikiException e) {
-                    getLogger().warn(
+                    this.logger.warn(
                         "Unable to get property " + propName + " from object " + object.getClassName() + "["
                             + object.getNumber() + "]. Will not be saved in the annotation.", e);
                 }

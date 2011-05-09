@@ -22,26 +22,25 @@ package org.xwiki.rendering.internal.macro.velocity.filter;
 import junit.framework.Assert;
 
 import org.apache.velocity.VelocityContext;
-import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
+import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Validate the behavior of {@link HTMLVelocityMacroFilter}.
  * 
  * @version $Id$
  */
-public class HTMLVelocityMacroFilterTest
+public class HTMLVelocityMacroFilterTest extends AbstractComponentTestCase
 {
-    private HTMLVelocityMacroFilter filter;
+    private VelocityMacroFilter filter;
 
     private VelocityContext context;
 
-    @Before
-    public void setUp() throws Exception
+    @Override
+    protected void registerComponents() throws Exception
     {
-        this.filter = new HTMLVelocityMacroFilter();
-        this.filter.initialize();
-
+        this.filter = getComponentManager().lookup(VelocityMacroFilter.class, "html");
         this.context = new VelocityContext();
     }
 

@@ -19,30 +19,13 @@
  */
 package org.xwiki.extension.repository.xwiki.internal;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-
 import org.xwiki.extension.AbstractExtensionDependency;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
 
-@XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlType(name = "ExtensionDependency")
-@XmlRootElement(name = "dependency")
 public class XWikiExtensionDependency extends AbstractExtensionDependency
 {
-    @XmlElement(required = true)
-    @Override
-    public String getId()
+    public XWikiExtensionDependency(ExtensionDependency dependency)
     {
-        return super.getId();
-    }
-    
-    @XmlElement(required = true)
-    @Override
-    public String getVersion()
-    {
-        return super.getVersion();
+        super(dependency.getId(), dependency.getVersion());
     }
 }

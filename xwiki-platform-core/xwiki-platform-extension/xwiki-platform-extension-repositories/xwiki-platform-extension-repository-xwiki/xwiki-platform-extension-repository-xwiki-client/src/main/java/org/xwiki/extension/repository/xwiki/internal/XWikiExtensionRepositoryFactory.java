@@ -47,7 +47,7 @@ public class XWikiExtensionRepositoryFactory extends AbstractLogEnabled implemen
     public void initialize() throws InitializationException
     {
         try {
-            JAXBContext context = JAXBContext.newInstance(XWikiExtension.class, XWikiExtensionDependency.class);
+            JAXBContext context = JAXBContext.newInstance("org.xwiki.extension.repository.xwiki.model.jaxb");
             this.marshaller = context.createMarshaller();
             this.unmarshaller = context.createUnmarshaller();
         } catch (Exception e) {

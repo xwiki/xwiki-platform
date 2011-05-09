@@ -37,7 +37,7 @@ import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.Searchable;
 
 /**
- * @version $Id$
+ * @version $Id: f601e321d7b978c33e9216eb8bf8f9a88dde416d $
  */
 public class XWikiExtensionRepository extends AbstractExtensionRepository implements Searchable
 {

@@ -21,13 +21,14 @@
 package org.xwiki.extension.repository.xwiki.internal;
 
 import java.util.List;
+import java.util.Vector;
 
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.context.Execution;
-import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.repository.xwiki.model.jaxb.Extension;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.Utils;
@@ -79,6 +80,16 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource
 
     protected com.xpn.xwiki.api.Object getExtensionVersionObject(Document extensionDocument, String version)
     {
+        if (version == null) {
+            Vector<com.xpn.xwiki.api.Object> objects = extensionDocument.getObjects("XWiki.ExtensionVersionClass");
+
+            if (objects.isEmpty()) {
+                return null;
+            } else {
+                return objects.lastElement();
+            }
+        }
+
         return extensionDocument.getObject("XWiki.ExtensionVersionClass", "version", version, false);
     }
 
@@ -88,7 +99,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource
         return getExtensionVersionObject(getExtensionDocument(extensionId), version);
     }
 
-    protected XWikiExtension createExtension(Document extensionDocument, String version)
+    protected Extension createExtension(Document extensionDocument, String version)
     {
         com.xpn.xwiki.api.Object extensionObject = getExtensionObject(extensionDocument);
 
@@ -102,15 +113,16 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        XWikiExtension extension =
-            new XWikiExtension(new ExtensionId((String) getValue(extensionObject, "id"), (String) getValue(
-                extensionVersionObject, "version")), (String) getValue(extensionObject, "type"));
+        Extension extension = new Extension();
+        extension.setId((String) getValue(extensionObject, "id"));
+        extension.setVersion((String) getValue(extensionVersionObject, "version"));
+        extension.setType((String) getValue(extensionObject, "type"));
 
         extension.setAuthor((String) getValue(extensionObject, "author"));
         extension.setDescription((String) getValue(extensionObject, "description"));
         extension.setName((String) getValue(extensionObject, "name"));
         extension.setWebsite((String) getValue(extensionObject, "website"));
-        
+
         // TODO: set dependencies
 
         return extension;

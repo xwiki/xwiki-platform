@@ -57,6 +57,7 @@
   </dependencies>
   <modules>
     <module>xwiki-platform-extension-repository-aether</module>
+    <module>xwiki-platform-extension-repository-xwiki</module>
   </modules>
 </project>
        

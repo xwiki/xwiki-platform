@@ -34,7 +34,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 
 /**
- * @version $Id$
+ * @version $Id: f5908c5f9695a5793212ca7616ade9e40cf1bffd $
  * @since 3.1M2
  */
 @Component("org.xwiki.extension.repository.xwiki.internal.ExtensionFileRESTResource")

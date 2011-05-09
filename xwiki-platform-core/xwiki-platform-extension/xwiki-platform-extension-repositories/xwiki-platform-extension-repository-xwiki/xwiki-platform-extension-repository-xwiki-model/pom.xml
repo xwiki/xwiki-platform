@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-extension-repositories</artifactId>
+    <version>3.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-extension-repository-xwiki-model</artifactId>
+  <name>XWiki Platform - Extension - Repository - XWiki model</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Extension - Repository - XWiki model</description>
+  <dependencies>   
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+        <version>0.6.3</version>
+        <configuration>
+          <extension>true</extension>
+          <args>
+            <arg>-Xfluent-api</arg>
+          </args>
+          <schemaDirectory>src/main/resources</schemaDirectory>
+          <generatePackage>org.xwiki.extension.repository.xwiki.model.jaxb</generatePackage>
+          <verbose>true</verbose>
+          <removeOldOutput>false</removeOldOutput>
+          <plugins>
+            <plugin>
+              <groupId>net.java.dev.jaxb2-commons</groupId>
+              <artifactId>jaxb-fluent-api</artifactId>
+              <version>2.1.8</version>
+            </plugin>
+          </plugins>
+        </configuration>
+        <!-- Make it work on JDK 1.6 and Maven 3.x. Otherwise we get: Failed to execute goal org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:0.6.3:generate (default) on project xwiki-rest: 
+          Execution default of goal org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:0.6.3:generate failed: DTD factory class org.apache.xerces.impl.dv.dtd.DTDDVFactoryImpl does not extend from DTDDVFactory. -->
+        <dependencies>
+          <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.9.1</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>maven2-repository.dev.java.net.2</id>
+      <name>Java.net Repository for Maven</name>
+      <url>http://download.java.net/maven/2/</url>
+    </pluginRepository>
+    <!-- TODO: remove maven1 repository as soon as dependencies are available on maven2 repositories -->
+    <pluginRepository>
+      <id>maven-repository.dev.java.net.1</id>
+      <name>Java.net Maven 1 Repository (legacy)</name>
+      <url>http://download.java.net/maven/1</url>
+      <layout>legacy</layout>
+    </pluginRepository>
+  </pluginRepositories>
+  <repositories>
+    <repository>
+      <id>maven-restlet</id>
+      <name>Public online Restlet repository</name>
+      <url>http://maven.restlet.org</url>
+    </repository>
+    <repository>
+      <id>maven2-repository.dev.java.net.2</id>
+      <name>Java.net Repository for Maven</name>
+      <url>http://download.java.net/maven/2</url>
+    </repository>
+  </repositories>
+</project>

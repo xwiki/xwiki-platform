@@ -20,16 +20,14 @@
 
 package org.xwiki.extension.repository.xwiki.internal;
 
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.repository.xwiki.model.jaxb.Extension;
 import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.XWikiException;
@@ -44,19 +42,7 @@ import com.xpn.xwiki.api.Document;
 public class ExtensionRESTResource extends AbstractExtensionRESTResource
 {
     @GET
-    public XWikiExtension getExtension(@PathParam("extensionId") String extensionId,
-        @PathParam("extensionVersion") String extensionVersion, @QueryParam("file") @DefaultValue("false") boolean file) throws XWikiException, QueryException
-    {
-        Document extensionDocument = getExtensionDocument(extensionId);
-
-        if (extensionDocument.isNew()) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
-
-        return createExtension(extensionDocument, extensionVersion);
-    }
-
-    public Response downloadExtension(@PathParam("extensionId") String extensionId,
+    public Extension getExtension(@PathParam("extensionId") String extensionId,
         @PathParam("extensionVersion") String extensionVersion) throws XWikiException, QueryException
     {
         Document extensionDocument = getExtensionDocument(extensionId);
@@ -65,16 +51,6 @@ public class ExtensionRESTResource extends AbstractExtensionRESTResource
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        com.xpn.xwiki.api.Object extensionVersionObject =
-            getExtensionVersionObject(extensionDocument, extensionVersion);
-
-        com.xpn.xwiki.api.Attachment xwikiAttachment =
-            extensionDocument.getAttachment(extensionId + "-" + extensionVersion + "."
-                + extensionVersionObject.getProperty("type").getValue());
-        if (xwikiAttachment == null) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
-
-        return Response.ok().type(xwikiAttachment.getMimeType()).entity(xwikiAttachment.getContent()).build();
+        return createExtension(extensionDocument, extensionVersion);
     }
 }

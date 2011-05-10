@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.InputStream;
 import java.io.IOException;
 
 import com.xpn.xwiki.XWikiContext;
@@ -142,9 +143,11 @@ public class DownloadAction extends XWikiAction
                                     final XWikiContext context)
         throws XWikiException
     {
+        InputStream stream = null;
         try {
             response.setContentLength(attachment.getContentSize(context));
-            IOUtils.copy(attachment.getContentInputStream(context), response.getOutputStream());
+            stream = attachment.getContentInputStream(context);
+            IOUtils.copy(stream, response.getOutputStream());
         } catch (XWikiException e) {
             Object[] args = {filename};
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
@@ -154,6 +157,10 @@ public class DownloadAction extends XWikiAction
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
                 "Exception while sending response", e);
+        } finally {
+            if (stream != null) {
+                IOUtils.closeQuietly(stream);
+            }
         }
     }
 }

@@ -28,13 +28,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.xwiki.store.locks.internal.RemovableLock;
+
 /**
  * A lock designed never to deadlock.
  *
  * @version $Id$
  * @since 3.1M2
  */
-public class PreemptiveLock implements Lock
+public class PreemptiveLock implements RemovableLock
 {
     /** Exception to throw when a function is called which has not been written. */
     private static final String NOT_IMPLEMENTED = "Function not implemented.";
@@ -165,6 +167,16 @@ public class PreemptiveLock implements Lock
         this.locksHeldByThread.get().remove(this);
 
         this.notify();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.store.locks.RemovableLock
+     */
+    public synchronized void removeThread(final Thread toRemove)
+    {
+        while (this.owners.remove(toRemove)) ;
     }
 
     /**

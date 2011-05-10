@@ -31,9 +31,12 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.xwiki.store.locks.LockProvider;
-import org.xwiki.component.annotation.Component;
 import javax.inject.Singleton;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.store.locks.internal.RemovableLock;
+import org.xwiki.store.locks.internal.UnlockOnFinalizeLock;
+import org.xwiki.store.locks.internal.DefaultReadWriteLock;
+import org.xwiki.store.locks.LockProvider;
 
 /**
  * A provider of preemptive locks.
@@ -49,8 +52,8 @@ import javax.inject.Singleton;
 public class PreemptiveLockProvider implements LockProvider
 {
     /** A map which holds locks by the object so that the same lock is used for any equivilent object. */
-    private final Map<Object, WeakReference<ReadWriteLock>> lockMap =
-        new WeakHashMap<Object, WeakReference<ReadWriteLock>>();
+    private final Map<Object, WeakReference<RemovableLock>> lockMap =
+        new WeakHashMap<Object, WeakReference<RemovableLock>>();
 
     /** Used by PreemptiveLock. */
     private final ThreadLocal<Set<PreemptiveLock>> locksHeldByThread =
@@ -78,13 +81,13 @@ public class PreemptiveLockProvider implements LockProvider
      */
     public synchronized ReadWriteLock getLock(final Object toLockOn)
     {
-        final WeakReference<ReadWriteLock> lock = this.lockMap.get(toLockOn);
-        ReadWriteLock strongLock = null;
+        final WeakReference<RemovableLock> lock = this.lockMap.get(toLockOn);
+        RemovableLock strongLock = null;
         if (lock != null) {
             strongLock = lock.get();
         }
         if (strongLock == null) {
-            strongLock = new PreemptiveReadWriteLock(this.locksHeldByThread, this.lockBlockingThread)
+            strongLock = new PreemptiveLock(this.locksHeldByThread, this.lockBlockingThread)
             {
                 /**
                  * A strong reference on the object to make sure that the
@@ -92,8 +95,10 @@ public class PreemptiveLockProvider implements LockProvider
                  */
                 private final Object lockMapReference = toLockOn;
             };
-            this.lockMap.put(toLockOn, new WeakReference<ReadWriteLock>(strongLock));
+            this.lockMap.put(toLockOn, new WeakReference<RemovableLock>(strongLock));
         }
-        return strongLock;
+        final Lock uofLock = new UnlockOnFinalizeLock(strongLock);
+        // Currently using the same lock for reading and writing, TODO: fix
+        return new DefaultReadWriteLock(uofLock, uofLock);
     }
 }

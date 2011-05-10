@@ -36,14 +36,6 @@ public class UnlockOnFinalizeLockTest
 {
     private int aliceState;
 
-    public void run1000() throws Exception
-    {
-        for (int i = 0; i < 1000; i++) {
-            aliceState = 0;
-            unlockOnFinalizeTest();
-        }
-    }
-
     /** Make sure the lock is dropped when the garbage collector does a run. */
     @Test
     public void unlockOnFinalizeTest() throws Exception

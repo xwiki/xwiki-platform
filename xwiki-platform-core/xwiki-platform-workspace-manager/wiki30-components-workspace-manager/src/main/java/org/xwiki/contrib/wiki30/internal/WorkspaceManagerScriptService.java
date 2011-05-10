@@ -65,19 +65,19 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
     /** @see org.xwiki.contrib.wiki30.WorkspaceManager#canCreateWorkspace(java.lang.String, java.lang.String) */
     public boolean canCreateWorkspace(String userName, String workspaceName)
     {
-        return workspaceManager.canCreateWorkspace(userName, workspaceName);
+        return workspaceManager.canCreateWorkspace(getPrefixedUserName(userName), workspaceName);
     }
 
     /** @see org.xwiki.contrib.wiki30.WorkspaceManager#canEditWorkspace(java.lang.String, java.lang.String) */
     public boolean canEditWorkspace(String userName, String workspaceName)
     {
-        return workspaceManager.canEditWorkspace(userName, workspaceName);
+        return workspaceManager.canEditWorkspace(getPrefixedUserName(userName), workspaceName);
     }
 
     /** @see org.xwiki.contrib.wiki30.WorkspaceManager#canDeleteWorkspace(java.lang.String, java.lang.String) */
     public boolean canDeleteWorkspace(String userName, String workspaceName)
     {
-        return workspaceManager.canDeleteWorkspace(userName, workspaceName);
+        return workspaceManager.canDeleteWorkspace(getPrefixedUserName(userName), workspaceName);
     }
 
     /**
@@ -92,6 +92,12 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
             if (!canCreateWorkspace(getXWikiContext().getUser(), workspaceName)) {
                 throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, String.format(
                     "Access denied to create the workspace '%s'", workspaceName));
+            }
+
+            /* Avoid "traps" by making sure the page from where this is executed has PR. */
+            if (!getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
+                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, String.format(
+                    "The page requires programming rights in order to create the workspace '%s'", workspaceName));
             }
 
             if (workspaceName == null || workspaceName.trim().equals("")) {
@@ -110,24 +116,29 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
     }
 
     /** @see org.xwiki.contrib.wiki30.WorkspaceManager#deleteWorkspace(java.lang.String) */
-    public int deleteWorkspace(String workspaceName)
+    public void deleteWorkspace(String workspaceName)
     {
-        int returncode = XWikiExceptionApi.ERROR_NOERROR;
-
         try {
-            if (!canDeleteWorkspace(getXWikiContext().getUser(), workspaceName)) {
-                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, String.format(
-                    "Access denied to delete the workspace '%s'", workspaceName));
+            /* Get prefixed current user. */
+            String currentUser = getPrefixedUserName(getXWikiContext().getUser());
+
+            /* Check rights. */
+            if (!canDeleteWorkspace(currentUser, workspaceName)) {
+                throw new WorkspaceManagerException(String.format(
+                    "Access denied for user '%s' to delete the workspace '%s'", currentUser, workspaceName));
             }
 
+            /* Avoid "traps" by making sure the page from where this is executed has PR. */
+            if (!getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
+                throw new WorkspaceManagerException(String.format(
+                    "The page requires programming rights in order to delete the workspace '%s'", workspaceName));
+            }
+
+            /* Delegate call. */
             workspaceManager.deleteWorkspace(workspaceName);
-        } catch (XWikiException e) {
+        } catch (Exception e) {
             error(String.format("Failed to delete workspace '%s'.", workspaceName), e);
-
-            returncode = e.getCode();
         }
-
-        return returncode;
     }
 
     /**
@@ -137,15 +148,41 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
     public void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument)
     {
         try {
-            if (!canEditWorkspace(getXWikiContext().getUser(), workspaceName)) {
-                error(new WorkspaceManagerException(String.format("Access denied to edit the workspace '%s'",
-                    workspaceName)));
+            String currentUser = getPrefixedUserName(getXWikiContext().getUser());
+
+            /* Check rights. */
+            if (!canEditWorkspace(currentUser, workspaceName)) {
+                error(new WorkspaceManagerException(String.format(
+                    "Access denied for user '%s' to edit the workspace '%s'", currentUser, workspaceName)));
             }
 
+            /* Avoid "traps" by making sure the page from where this is executed has PR. */
+            if (!getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
+                throw new WorkspaceManagerException(String.format(
+                    "The page requires programming rights in order to edit the workspace '%s'", workspaceName));
+            }
+
+            /* Delegate call. */
             workspaceManager.editWorkspace(workspaceName, modifiedWikiXObjectDocument);
         } catch (Exception e) {
             error(String.format("Failed to edit workspace '%s'.", workspaceName), e);
         }
+    }
+
+    /**
+     * @param userName a wiki name prefixed or un-prefixed user name.
+     * @return always the a wiki name prefixed user name.
+     */
+    private String getPrefixedUserName(String userName)
+    {
+        XWikiContext deprecatedContext = getXWikiContext();
+
+        String result = userName;
+        if (!result.startsWith(String.format("%s:", deprecatedContext.getMainXWiki()))) {
+            result = String.format("%s:%s", deprecatedContext.getMainXWiki(), result);
+        }
+
+        return result;
     }
 
     /** @return the deprecated xwiki context used to manipulate xwiki objects */

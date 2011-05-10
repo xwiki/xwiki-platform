@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -35,6 +36,7 @@ import org.xwiki.contrib.wiki30.WorkspaceManager;
 import org.xwiki.contrib.wiki30.WorkspaceManagerException;
 import org.xwiki.contrib.wiki30.WorkspaceManagerMessageTool;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -68,16 +70,20 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
 
     /** Format string for the wiki preferences page of a certain wiki (absolute reference). */
     private static final String WIKI_PREFERENCES_PREFIXED_FORMAT = "%s:" + WIKI_PREFERENCES_LOCAL;
-    
+
     /** Membership type property name. */
     private static final String WORKSPACE_MEMBERSHIP_TYPE_PROPERTY = "membershipType";
-    
+
     /** Membership type default value. */
     private static final String WORKSPACE_MEMBERSHIP_TYPE_DEFAULT = "open";
 
     /** Execution context. */
     @Requirement
     private Execution execution;
+
+    /** Observation manager needed to fire events. */
+    @Requirement
+    private ObservationManager observationManager;
 
     /** Internal wiki manager tookit required to overcome the rights checking of the API. */
     private WikiManager wikiManagerInternal;
@@ -133,11 +139,6 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
             return false;
         }
 
-        /* Avoid "traps" by making sure the page from where this is executed has PR. */
-        if (!deprecatedContext.getWiki().getRightService().hasProgrammingRights(deprecatedContext)) {
-            return false;
-        }
-
         /* User name input validation. */
         if (userName == null || userName.trim().length() == 0) {
             return false;
@@ -159,11 +160,6 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
     public boolean canEditWorkspace(String userName, String workspaceName)
     {
         XWikiContext deprecatedContext = getXWikiContext();
-
-        /* Avoid "traps" by making sure the page from where this is executed has PR. */
-        if (!deprecatedContext.getWiki().getRightService().hasProgrammingRights(deprecatedContext)) {
-            return false;
-        }
 
         try {
             XWikiServer wikiServer = getWikiManager().getWikiDocument(workspaceName);
@@ -196,11 +192,6 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
     public boolean canDeleteWorkspace(String userName, String workspaceName)
     {
         XWikiContext deprecatedContext = getXWikiContext();
-
-        /* Avoid "traps" by making sure the page from where this is executed has PR. */
-        if (!deprecatedContext.getWiki().getRightService().hasProgrammingRights(deprecatedContext)) {
-            return false;
-        }
 
         try {
             XWikiServer wikiServer = getWikiManager().getWikiDocument(workspaceName);
@@ -312,9 +303,36 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
      * 
      * @see org.xwiki.contrib.wiki30.WorkspaceManager#deleteWorkspace(java.lang.String)
      */
-    public void deleteWorkspace(String workspaceName) throws XWikiException
+    public void deleteWorkspace(String workspaceName) throws WorkspaceManagerException
     {
-        // TODO Auto-generated method stub
+        Workspace workspace = getWorkspace(workspaceName);
+        if (workspace == null) {
+            throw new WorkspaceManagerException(String.format("Workspace '%s' does not exist", workspaceName));
+        }
+
+        XWikiContext deprecatedContext = getXWikiContext();
+        XWiki xwiki = deprecatedContext.getWiki();
+
+        /*
+         * Copy/paste from Wiki.delete(boolean deleteDatabase) because it checks internally for admin rights and the
+         * current user, even if he is the owner of a wiki, might not have admin rights to the main wiki. If the method
+         * is called from the main wiki, an owner might not be allowed to delete his wiki. This way we fix it.
+         */
+        try {
+            xwiki.getStore().deleteWiki(workspaceName, deprecatedContext);
+            observationManager.notify(new WikiDeletedEvent(workspaceName), workspaceName, deprecatedContext);
+            xwiki.getVirtualWikiList().remove(workspaceName);
+        } catch (Exception e) {
+            throw new WorkspaceManagerException(
+                String.format("Failed to delete wiki '%s' from database", workspaceName), e);
+        }
+
+        try {
+            xwiki.deleteDocument(workspace.getWikiDescriptor().getDocument(), false, deprecatedContext);
+        } catch (Exception e) {
+            throw new WorkspaceManagerException(String.format("Failed to delete wiki descriptor for workspace '%s'",
+                workspace), e);
+        }
 
     }
 

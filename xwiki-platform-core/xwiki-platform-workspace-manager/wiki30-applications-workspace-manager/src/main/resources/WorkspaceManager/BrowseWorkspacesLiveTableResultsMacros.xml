@@ -5,7 +5,7 @@
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent>XWiki.WebHome</parent>
+<parent>WorkspaceManager.WebHome</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
@@ -13,7 +13,7 @@
 <creationDate>1293832800000</creationDate>
 <date>1303999851000</date>
 <contentUpdateDate>1303999851000</contentUpdateDate>
-<version>8.25</version>
+<version>1.1</version>
 <title>$msg.get("xe.livetable.resultsmacros")</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -206,6 +206,8 @@
   "offset": $mathtool.add($offset, 1),
   "reqNo": $util.parseInt($request.reqNo),
   "rows": [
+    #set ($WorkspaceManager = $services.workspaceManager)
+    #set ($currentUser = "${xcontext.mainWikiName}:${xcontext.user}")
     #foreach($item in $items)
      #set($viewable = $xwiki.hasAccessLevel('view', $context.user, "${context.database}:${item}"))
      #if($velocityCount &gt; 1) , #end
@@ -228,14 +230,13 @@
         #end
         #set($editUrl = $itemDoc.getURL($itemDoc.defaultEditMode))
         #set($copyUrl = $itemDoc.getURL('view', 'xpage=copy'))
-        #set($deleteUrl = $itemDoc.getURL('delete'))
+        #set ($deleteUrl = $xwiki.getURL('WorkspaceManager.DeleteWorkspaceCode', 'view', "workspaceId=${itemWikiName}&amp;workspaceName=${itemWikiDescriptor.wikiPrettyName}"))
         #set($renameUrl = $itemDoc.getURL('view', 'xpage=rename&amp;step=1'))
         #set($rightsUrl = $itemDoc.getURL('edit', 'editor=rights'))
         #set ($joinUrl = $xwiki.getURL('WorkspaceManager.JoinWorkspaceCode', 'view', "workspaceId=${itemWikiName}&amp;workspaceName=${itemWikiDescriptor.wikiPrettyName}"))
         #set ($leaveUrl = $xwiki.getURL('WorkspaceManager.LeaveWorkspaceCode', 'view', "workspaceId=${itemWikiName}&amp;workspaceName=${itemWikiDescriptor.wikiPrettyName}"))
-        #set ($itemGroupDocument = $services.workspaceManager.getWorkspace($itemWikiName).groupDocument)
+        #set ($itemGroupDocument = $WorkspaceManager.getWorkspace($itemWikiName).groupDocument)
         #set ($itemGroupsClass = "${itemWikiName}:XWiki.XWikiGroups")
-        #set ($currentUser = "${xcontext.mainWikiName}:${xcontext.user}")
         #set ($currentUserGroupObject = $itemGroupDocument.getObject($itemGroupsClass, 'member', $currentUser))
         #set ($itemHasJoin = ("$!currentUserGroupObject" == ''))
         #set ($itemHasLeave = !$itemHasJoin)
@@ -250,7 +251,7 @@
         #end
         "doc_hasadmin"  : $xwiki.hasAdminRights(),
         "doc_hasedit" : $xwiki.hasAccessLevel('edit', $context.user, $fullname),
-        "doc_hasdelete" : $xwiki.hasAccessLevel('delete', $context.user, $fullname),
+        "doc_hasdelete" : $WorkspaceManager.canDeleteWorkspace($currentUser, $itemWikiName),
         "doc_hasjoin" : $itemHasJoin,
         "doc_hasleave" : $itemHasLeave,
         "doc_edit_url" : "$escapetool.javascript($editUrl)",

@@ -70,16 +70,16 @@ public interface WorkspaceManager
 
     /**
      * @param workspaceName name of the workspace to delete.
-     * @throws XWikiException
+     * @throws WorkspaceManagerException if problems occur.
      * @see {@link WikiManager#deleteWiki(String, boolean, com.xpn.xwiki.XWikiContext)}
      */
-    void deleteWorkspace(String workspaceName) throws XWikiException;
+    void deleteWorkspace(String workspaceName) throws WorkspaceManagerException;
 
     /**
      * @param workspaceName name of the workspace to edit.
      * @param modifiedWikiXObjectDocument an in-memory modified wiki descriptor document. This method will take care of
      *            saving the changes.
-     * @throws WorkspaceManagerException
+     * @throws WorkspaceManagerException if problems occur.
      */
     void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument) throws WorkspaceManagerException;
 

@@ -1,7 +1,0 @@
-## Define variables containing the list of edit panels for the Toucan skin
-#set($editorPanelsWysiwyg = "Panels.DocumentInformation,Panels.EditTranslations,Panels.SyntaxHelp")
-#set($editorPanelsWiki = "Panels.DocumentInformation,Panels.EditTranslations,Panels.SyntaxHelp")
-#set($editorPanelsObjects = "")
-#set($editorPanelsClass = "")
-#set($editorPanelsRights = "")
-#set($editorPanelsHistory = "")

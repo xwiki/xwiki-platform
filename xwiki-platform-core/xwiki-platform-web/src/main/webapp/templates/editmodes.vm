@@ -1,22 +1,3 @@
-###
-### Edit mode tabs
-###
-###
-#set($param = "")
-#if($request.getParameter("section"))
-    #set($sectionNumbers = $request.getParameter("section"))
-    #set($param = "section=$!{escapetool.url($sectionNumbers)}")
-#end
-#if ($sectionNumber && $sectionNumber != 0)
-    #set($param = "section=$!{escapetool.url($sectionNumber)}")
-#end
-<h4 id="xwikieditorstitles">$msg.get("chooseeditor")</h4>
-<div class="floatcontainer">
-<ul class="xwikitabbar">
-<li id="xwikieditwysiwyg"#if($editor == 'wysiwyg') class="active"#end><a href="$doc.getURL('edit', "editor=wysiwyg&amp;$!param")" onclick="#if($doc.syntax.toIdString() == "xwiki/1.0")if (checkAdvancedContent('$msg.get('checkadvancedcontent')') == false) return false; #{end}var form = $(this).up('form'); if (!form) { form = $(this).up('.alleditcontent').down('form'); } form.action='$doc.getURL('edit', "editor=wysiwyg&amp;$!languageparams&amp;$!param")'; form.submit(); return false;">$msg.get('editVisual')</a></li>
-<li id="xwikieditwiki"#if($editor == 'wiki') class="active"#end><a href="$doc.getURL('edit', "editor=wiki&amp;$!param")" onclick="var form = $(this).up('form'); if (!form) { form = $(this).up('.alleditcontent').down('form'); } form.action='$doc.getURL('edit', "editor=wiki&amp;$!languageparams&amp;$!param")'; form.submit(); return false;">$msg.get('editWiki')</a></li>
-#if($isAdvancedUser)<li id="xwikieditobject"#if($editor == "object") class="active"#end><a href="$doc.getURL("edit", "editor=object&amp;$param")">$msg.get("editObject")</a></li> #end
-#if($isAdvancedUser)<li id="xwikieditclass"#if($editor == "class") class="active"#end><a href="$doc.getURL("edit", "editor=class&amp;$param")">$msg.get("editClass")</a></li> #end
-<li id="xwikieditrights"#if($editor == "rights") class="active"#end><a href="$doc.getURL("edit", "editor=rights&amp;$param")">$msg.get("editRights")</a></li>
-</ul>
-</div>
+## We need to have this template file even though it's empty.
+## The reason is because the Colibri skin doesn't use any tab to display
+## the different modes; it uses a menu instead.

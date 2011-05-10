@@ -19,17 +19,7 @@
  */
 package org.xwiki.store.locks;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
-import java.util.HashMap;
-import java.lang.ref.WeakReference;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 import org.xwiki.component.annotation.ComponentRole;
 
@@ -53,5 +43,5 @@ public interface LockProvider
      * @param toLockOn the object to get a lock for.
      * @return a lock for this object and any which are equal.
      */
-    public ReadWriteLock getLock(final Object toLockOn);
+    ReadWriteLock getLock(final Object toLockOn);
 }

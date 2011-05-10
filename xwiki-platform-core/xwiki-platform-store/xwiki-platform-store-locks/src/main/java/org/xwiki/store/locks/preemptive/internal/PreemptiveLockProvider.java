@@ -19,11 +19,8 @@
  */
 package org.xwiki.store.locks.preemptive.internal;
 
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Stack;
 import java.util.HashMap;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.locks.Lock;
@@ -33,8 +30,6 @@ import java.util.WeakHashMap;
 
 import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.store.locks.internal.RemovableLock;
-import org.xwiki.store.locks.internal.UnlockOnFinalizeLock;
 import org.xwiki.store.locks.internal.DefaultReadWriteLock;
 import org.xwiki.store.locks.LockProvider;
 
@@ -52,8 +47,8 @@ import org.xwiki.store.locks.LockProvider;
 public class PreemptiveLockProvider implements LockProvider
 {
     /** A map which holds locks by the object so that the same lock is used for any equivilent object. */
-    private final Map<Object, WeakReference<RemovableLock>> lockMap =
-        new WeakHashMap<Object, WeakReference<RemovableLock>>();
+    private final Map<Object, WeakReference<ReadWriteLock>> lockMap =
+        new WeakHashMap<Object, WeakReference<ReadWriteLock>>();
 
     /** Used by PreemptiveLock. */
     private final ThreadLocal<Set<PreemptiveLock>> locksHeldByThread =
@@ -81,13 +76,13 @@ public class PreemptiveLockProvider implements LockProvider
      */
     public synchronized ReadWriteLock getLock(final Object toLockOn)
     {
-        final WeakReference<RemovableLock> lock = this.lockMap.get(toLockOn);
-        RemovableLock strongLock = null;
+        final WeakReference<ReadWriteLock> lock = this.lockMap.get(toLockOn);
+        ReadWriteLock strongLock = null;
         if (lock != null) {
             strongLock = lock.get();
         }
         if (strongLock == null) {
-            strongLock = new PreemptiveLock(this.locksHeldByThread, this.lockBlockingThread)
+            final Lock preemptiveLock = new PreemptiveLock(this.locksHeldByThread, this.lockBlockingThread)
             {
                 /**
                  * A strong reference on the object to make sure that the
@@ -95,10 +90,11 @@ public class PreemptiveLockProvider implements LockProvider
                  */
                 private final Object lockMapReference = toLockOn;
             };
-            this.lockMap.put(toLockOn, new WeakReference<RemovableLock>(strongLock));
+            // Currently using the same lock for reading and writing, TODO: fix
+            strongLock = new DefaultReadWriteLock(preemptiveLock, preemptiveLock);
+            this.lockMap.put(toLockOn, new WeakReference<ReadWriteLock>(strongLock));
         }
-        final Lock uofLock = new UnlockOnFinalizeLock(strongLock);
-        // Currently using the same lock for reading and writing, TODO: fix
-        return new DefaultReadWriteLock(uofLock, uofLock);
+
+        return strongLock;
     }
 }

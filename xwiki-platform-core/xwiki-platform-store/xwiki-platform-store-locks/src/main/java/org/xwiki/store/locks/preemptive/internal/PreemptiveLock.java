@@ -21,14 +21,10 @@ package org.xwiki.store.locks.preemptive.internal;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.TimeUnit;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-
-import org.xwiki.store.locks.internal.RemovableLock;
 
 /**
  * A lock designed never to deadlock.
@@ -36,7 +32,7 @@ import org.xwiki.store.locks.internal.RemovableLock;
  * @version $Id$
  * @since 3.1M2
  */
-public class PreemptiveLock implements RemovableLock
+public class PreemptiveLock implements Lock
 {
     /** Exception to throw when a function is called which has not been written. */
     private static final String NOT_IMPLEMENTED = "Function not implemented.";
@@ -167,16 +163,6 @@ public class PreemptiveLock implements RemovableLock
         this.locksHeldByThread.get().remove(this);
 
         this.notify();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.store.locks.RemovableLock
-     */
-    public synchronized void removeThread(final Thread toRemove)
-    {
-        while (this.owners.remove(toRemove)) ;
     }
 
     /**

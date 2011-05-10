@@ -19,48 +19,66 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.IOException;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.util.Util;
-
-import java.io.IOException;
-
 import org.apache.commons.io.IOUtils;
 
+/**
+ * The action for downloading attachments from the server.
+ *
+ * @version $Id$
+ */
 public class DownloadAction extends XWikiAction
 {
-    /**
-     * The identifier of the download action.
-     */
+    /** The identifier of the download action. */
     public static final String ACTION_NAME = "download";
 
-    public String getFileName(String path, String action)
+    /** The URL part seperator. */
+    private static final String SEPERATOR = "/";
+
+    /**
+     * Get the filename of the attachment from the path and the action.
+     *
+     * @param path the request URI.
+     * @param action the action used to download the attachment.
+     * @return the filename of the attachment.
+     */
+    public String getFileName(final String path, final String action)
     {
-        path = path.substring(path.indexOf("/" + action));
+        final String subPath = path.substring(path.indexOf(SEPERATOR + action));
         int pos = 0;
         for (int i = 0; i < 3; i++) {
-            pos = path.indexOf("/", pos + 1);
+            pos = path.indexOf(SEPERATOR, pos + 1);
         }
-        if (path.indexOf("/", pos + 1) > 0) {
-            return path.substring(pos + 1, path.indexOf("/", pos + 1));
+        if (subPath.indexOf(SEPERATOR, pos + 1) > 0) {
+            return subPath.substring(pos + 1, path.indexOf(SEPERATOR, pos + 1));
         }
-        return path.substring(pos + 1);
+        return subPath.substring(pos + 1);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.web.XWikiAction#render(XWikiContext)
+     */
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         String path = request.getRequestURI();
-        String filename = Util.decodeURI(getFileName(path, "download"), context);
+        String filename = Util.decodeURI(getFileName(path, ACTION_NAME), context);
         XWikiAttachment attachment;
 
-        if (request.getParameter("id") != null) {
-            int id = Integer.parseInt(request.getParameter("id"));
+        final String idStr = request.getParameter("id");
+        if (idStr != null) {
+            int id = Integer.parseInt(idStr);
             attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
         } else {
             attachment = doc.getAttachment(filename);
@@ -83,8 +101,8 @@ public class DownloadAction extends XWikiAction
         long lastModifiedOnClient = request.getDateHeader("If-Modified-Since");
         long lastModifiedOnServer = attachment.getDate().getTime();
         if (lastModifiedOnClient != -1 && lastModifiedOnClient >= lastModifiedOnServer) {
-             response.setStatus(XWikiResponse.SC_NOT_MODIFIED);
-             return null;
+            response.setStatus(XWikiResponse.SC_NOT_MODIFIED);
+            return null;
         }
 
         String ofilename =
@@ -105,6 +123,25 @@ public class DownloadAction extends XWikiAction
         response.setDateHeader("Last-Modified", lastModifiedOnServer);
 
         // Sending the content of the attachment
+        sendContent(attachment, response, filename, context);
+        return null;
+    }
+
+    /**
+     * Send the attachment content in the response.
+     *
+     * @param attachment the attachment to get content from.
+     * @param response the response to write to.
+     * @param filename the filename to show in the message in case an exception needs to be thrown.
+     * @param context the XWikiContext just in case it is needed to load the attachment content.
+     * @throws XWikiException if someting goes wrong.
+     */
+    private static void sendContent(final XWikiAttachment attachment,
+                                    final XWikiResponse response,
+                                    final String filename,
+                                    final XWikiContext context)
+        throws XWikiException
+    {
         try {
             response.setContentLength(attachment.getContentSize(context));
             IOUtils.copy(attachment.getContentInputStream(context), response.getOutputStream());
@@ -118,6 +155,5 @@ public class DownloadAction extends XWikiAction
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
                 "Exception while sending response", e);
         }
-        return null;
     }
 }

@@ -4,13 +4,13 @@
 <web>Panels</web>
 <name>IncludedDocuments</name>
 <language></language>
-<defaultLanguage>en</defaultLanguage>
+<defaultLanguage></defaultLanguage>
 <translation>0</translation>
 <parent>Panels.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1153917315000</creationDate>
 <date>1166177444000</date>
 <contentUpdateDate>1169801141000</contentUpdateDate>

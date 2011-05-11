@@ -3,13 +3,13 @@
 <web>Panels</web>
 <name>PanelSheet</name>
 <language></language>
-<defaultLanguage>en</defaultLanguage>
+<defaultLanguage></defaultLanguage>
 <translation>0</translation>
 <parent>Panels.PanelClass</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1157353355000</creationDate>
 <date>1277305869000</date>
 <contentUpdateDate>1277305869000</contentUpdateDate>

@@ -1648,10 +1648,15 @@ function (row, i, table) {
  *   <dt>itemsPerPageParamName</dt>
  *   <dd>The name of the request parameter for the number of items displayed on a page.</dd>
  *   <dd>Default: perPage</dd>
+ *   <dt>noSx</dt>
+ *   <dd>Do not force to use the pagination Skin Extension</dd>
+ *   <dd>Default: false</dd> 
  * </dl>
  *#
 #macro(pagination $parameters)
+  #if(!$parameters.noSx)
   $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
+  #end
   #if("$!{parameters.url}" == '')
     #set($parameters.url = $doc.getURL('view'))
   #end

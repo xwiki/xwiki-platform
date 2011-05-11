@@ -160,7 +160,9 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
                     dependencies.add(dependency);
                 }
             } catch (Exception e) {
-                getLogger().error("Failed to parse descriptor [" + descriptorUrl + "]", e);
+                getLogger().warn(
+                    "Failed to parse descriptor [" + descriptorUrl
+                        + "], it will be ignored and not found in core extensions.", e);
             } finally {
                 try {
                     descriptorStream.close();

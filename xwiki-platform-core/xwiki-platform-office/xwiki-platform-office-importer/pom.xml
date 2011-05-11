@@ -81,7 +81,7 @@
           * a fix for http://jira.xwiki.org/jira/browse/XWIKI-5979
           * a fix for http://jira.xwiki.org/jira/browse/XWIKI-6583
       -->
-      <version>3.0-beta-3-xwiki-20110504</version>
+      <version>3.0-beta-3-xwiki-20110510</version>
     </dependency>
     <dependency>
       <!--

@@ -254,9 +254,12 @@ var XWiki = (function(XWiki){
 
       this.prepareContainer();
 
+      this.latestRequest++;
       var pointer = this;
+      var requestId = this.latestRequest;
       clearTimeout(this.ajID);
-      this.ajID = setTimeout( function() { pointer.doAjaxRequests() }, this.options.delay );
+      this.ajID = setTimeout( function() { pointer.doAjaxRequests(requestId) }, this.options.delay );
+
     }
     return false;
   },

@@ -1,8 +1,7 @@
-## Define variables containing the list of edit panels for the Albatross skin
-#set($editorPanelsWiki = "Panels.DocumentInformation,Panels.EditTranslations,Panels.SyntaxHelp")
+## Define variables containing the list of edit panels for the Toucan skin
 #set($editorPanelsWysiwyg = "Panels.DocumentInformation,Panels.EditTranslations,Panels.SyntaxHelp")
-#set($editorPanelsObjects = "Panels.ObjectEditorWelcome,Panels.AddObject")
-#set($editorPanelsClass = "Panels.AddClassProperty,Panels.ClassSwitcher")
-#set($editorPanelsRights = "Panels.RightsEditorWelcome,Panels.RightsTips")
-## No Panels for the history editor mode in Albatross
+#set($editorPanelsWiki = "Panels.DocumentInformation,Panels.EditTranslations,Panels.SyntaxHelp")
+#set($editorPanelsObjects = "")
+#set($editorPanelsClass = "")
+#set($editorPanelsRights = "")
 #set($editorPanelsHistory = "")

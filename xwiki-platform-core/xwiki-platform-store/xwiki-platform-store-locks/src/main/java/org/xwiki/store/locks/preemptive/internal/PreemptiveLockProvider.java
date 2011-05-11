@@ -19,11 +19,8 @@
  */
 package org.xwiki.store.locks.preemptive.internal;
 
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Stack;
 import java.util.HashMap;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.locks.Lock;
@@ -31,9 +28,10 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.xwiki.store.locks.LockProvider;
-import org.xwiki.component.annotation.Component;
 import javax.inject.Singleton;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.store.locks.internal.DefaultReadWriteLock;
+import org.xwiki.store.locks.LockProvider;
 
 /**
  * A provider of preemptive locks.
@@ -84,7 +82,7 @@ public class PreemptiveLockProvider implements LockProvider
             strongLock = lock.get();
         }
         if (strongLock == null) {
-            strongLock = new PreemptiveReadWriteLock(this.locksHeldByThread, this.lockBlockingThread)
+            final Lock preemptiveLock = new PreemptiveLock(this.locksHeldByThread, this.lockBlockingThread)
             {
                 /**
                  * A strong reference on the object to make sure that the
@@ -92,8 +90,11 @@ public class PreemptiveLockProvider implements LockProvider
                  */
                 private final Object lockMapReference = toLockOn;
             };
+            // Currently using the same lock for reading and writing, TODO: fix
+            strongLock = new DefaultReadWriteLock(preemptiveLock, preemptiveLock);
             this.lockMap.put(toLockOn, new WeakReference<ReadWriteLock>(strongLock));
         }
+
         return strongLock;
     }
 }

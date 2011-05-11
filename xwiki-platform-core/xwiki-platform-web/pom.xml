@@ -114,6 +114,11 @@
       <artifactId>xwiki-platform-extension-repository-aether</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-repository-xwiki-client</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Default macros dependencies, so that they are packed in the war
          Please try to keep them in alphabetical order -->    
    <dependency>

@@ -55,10 +55,10 @@ public class DownloadAction extends XWikiAction
         final String subPath = path.substring(path.indexOf(SEPERATOR + action));
         int pos = 0;
         for (int i = 0; i < 3; i++) {
-            pos = path.indexOf(SEPERATOR, pos + 1);
+            pos = subPath.indexOf(SEPERATOR, pos + 1);
         }
         if (subPath.indexOf(SEPERATOR, pos + 1) > 0) {
-            return subPath.substring(pos + 1, path.indexOf(SEPERATOR, pos + 1));
+            return subPath.substring(pos + 1, subPath.indexOf(SEPERATOR, pos + 1));
         }
         return subPath.substring(pos + 1);
     }

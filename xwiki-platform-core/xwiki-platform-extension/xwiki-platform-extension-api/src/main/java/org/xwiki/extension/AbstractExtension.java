@@ -22,6 +22,7 @@ package org.xwiki.extension;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public abstract class AbstractExtension implements Extension
 
     private String description;
 
-    private String author;
+    private List<String> authors = new ArrayList<String>();
 
     private String website;
 
@@ -65,7 +66,7 @@ public abstract class AbstractExtension implements Extension
         this(repository, extension.getId(), extension.getType());
 
         setDescription(extension.getDescription());
-        setAuthor(extension.getAuthor());
+        setAuthors(extension.getAuthors());
         setWebsite(extension.getWebSite());
 
         List< ? extends ExtensionDependency> dependencies = extension.getDependencies();
@@ -121,14 +122,19 @@ public abstract class AbstractExtension implements Extension
         this.description = description;
     }
 
-    public String getAuthor()
+    public List<String> getAuthors()
     {
-        return this.author;
+        return this.authors;
     }
 
-    public void setAuthor(String author)
+    public void setAuthors(List<String> authors)
     {
-        this.author = author;
+        this.authors = new ArrayList<String>(authors);
+    }
+
+    public void addAuthor(String author)
+    {
+        this.authors.add(author);
     }
 
     public String getWebSite()

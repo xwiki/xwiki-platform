@@ -3,6 +3,7 @@ package org.xwiki.extension.repository.internal;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -78,17 +79,23 @@ public class DefaultLocalExtensionSerializer
         if (descriptionNode != null) {
             localExtension.setDescription(descriptionNode.getTextContent());
         }
-        Node authorNode = getNode(extensionElement, "author");
-        if (authorNode != null) {
-            localExtension.setAuthor(authorNode.getTextContent());
-        }
         Node websiteNode = getNode(extensionElement, "website");
         if (websiteNode != null) {
             localExtension.setWebsite(websiteNode.getTextContent());
         }
 
-        // Dependencies
+        // Authors
+        NodeList authorsNodes = extensionElement.getElementsByTagName("authors");
+        if (authorsNodes.getLength() > 0) {
+            NodeList authors = authorsNodes.item(0).getChildNodes();
+            for (int i = 0; i < authors.getLength(); ++i) {
+                Node authorsNode = authors.item(i);
 
+                localExtension.addAuthor(authorsNode.getTextContent());
+            }
+        }
+
+        // Dependencies
         NodeList dependenciesNodes = extensionElement.getElementsByTagName("dependencies");
         if (dependenciesNodes.getLength() > 0) {
             NodeList dependenciesNodeList = dependenciesNodes.item(0).getChildNodes();
@@ -156,9 +163,9 @@ public class DefaultLocalExtensionSerializer
         addElement(document, extensionElement, "dependency", String.valueOf(extension.isDependency()));
         addElement(document, extensionElement, "installed", String.valueOf(extension.isInstalled()));
         addElement(document, extensionElement, "description", extension.getDescription());
-        addElement(document, extensionElement, "author", extension.getAuthor());
         addElement(document, extensionElement, "website", extension.getWebSite());
 
+        addAuthors(document, extensionElement, extension);
         addDependencies(document, extensionElement, extension);
         addNamespaces(document, extensionElement, extension);
 
@@ -197,12 +204,23 @@ public class DefaultLocalExtensionSerializer
 
     private void addNamespaces(Document document, Element parentElement, LocalExtension extension)
     {
-        if (extension.getNamespaces() != null) {
-            Element wikisElement = document.createElement("namespaces");
+        addCollection(document, parentElement, extension.getNamespaces(), "namespace", "namespaces");
+    }
+
+    private void addAuthors(Document document, Element parentElement, LocalExtension extension)
+    {
+        addCollection(document, parentElement, extension.getAuthors(), "author", "authors");
+    }
+
+    private void addCollection(Document document, Element parentElement, Collection<String> elements,
+        String elementName, String elementRoot)
+    {
+        if (elements != null && !elements.isEmpty()) {
+            Element wikisElement = document.createElement(elementRoot);
             parentElement.appendChild(wikisElement);
 
-            for (String namespace : extension.getNamespaces()) {
-                addElement(document, wikisElement, "namespace", namespace);
+            for (String element : elements) {
+                addElement(document, wikisElement, elementName, element);
             }
         }
     }

@@ -29,9 +29,9 @@
             <element name="type" type="string" maxOccurs="1" minOccurs="1"></element>
             <element name="name" type="string" maxOccurs="1" minOccurs="0"></element>
             <element name="description" type="string" maxOccurs="1" minOccurs="0"></element>
-            <element name="author" type="string" maxOccurs="1" minOccurs="0"></element>
     		<element name="website" type="string" maxOccurs="1" minOccurs="0"></element>
-    		<element name="depedencies" type="xwiki:ExtensionDependency" maxOccurs="unbounded" minOccurs="0"></element>
+            <element name="authors" type="string" maxOccurs="unbounded" minOccurs="0"></element>
+            <element name="depedencies" type="xwiki:ExtensionDependency" maxOccurs="unbounded" minOccurs="0"></element>
     	</sequence>
     </complexType>
     

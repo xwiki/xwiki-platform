@@ -52,7 +52,7 @@
 #end
 ##
 #if(!$creationsortedallwikilist)
-  #sortDocumentByCreationDate($allwikilist $creationsortedallwikilist false)
+  #set ($creationsortedallwikilist = $sorttool.sort($allwikilist, 'creationDate:desc'))
 #end
 ##
 #############################################################################

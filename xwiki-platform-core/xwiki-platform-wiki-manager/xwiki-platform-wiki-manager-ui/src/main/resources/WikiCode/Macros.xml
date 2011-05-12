@@ -23,26 +23,7 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>false</hidden>
-<content>#macro(sortDocumentByCreationDate $documentlist $sorteddocumentlist $asc)
-  #set($sorteddocumentlist = [])
-  ##
-  #foreach($docEntry in $documentlist)
-    ##
-    #set($index = -1)
-    #foreach($sortedDoc in $sorteddocumentlist)
-      #if($index == -1 &amp;&amp; (($asc &amp;&amp; ($sortedDoc.creationDate.after($docEntry.creationDate))) || (!$asc &amp;&amp; ($sortedDoc.creationDate.before($docEntry.creationDate)))))
-        #set($index = $velocityCount - 1)
-      #end
-    #end
-    #if($index == -1)
-      #set($added = $sorteddocumentlist.add($docEntry))
-    #else
-     #set($added = $sorteddocumentlist.add($index, $docEntry))
-    #end
-  #end
-#end
-
-#macro(displaymodification $pagename $pagelink $date $formatDate $user $star)
+<content>#macro(displaymodification $pagename $pagelink $date $formatDate $user $star)
   #if(!$formatDate)
     #set($formatDate = $msg.get("wikimanager.defaultdatetimeformat"))
   #end

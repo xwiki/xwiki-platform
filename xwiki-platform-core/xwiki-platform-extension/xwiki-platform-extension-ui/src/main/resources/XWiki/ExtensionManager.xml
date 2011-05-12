@@ -13,13 +13,13 @@
 <creationDate>1284039567000</creationDate>
 <date>1305186885000</date>
 <contentUpdateDate>1305186885000</contentUpdateDate>
-<version>3.11</version>
+<version>1.1</version>
 <title>Extension Manager</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>true</minorEdit>
+<minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden><attachment>
 <filename>icon.png</filename>

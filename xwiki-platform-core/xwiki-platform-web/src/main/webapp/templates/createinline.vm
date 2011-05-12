@@ -160,7 +160,8 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
               ## pass the template provider to the create action. Prepare the template provider reference
               #set($tpdocRef = $services.model.serialize($tpdoc.documentReference, 'local'))
               <input id="$inputId" type="radio" name="templateprovider" value="$escapetool.xml(${tpdocRef})"/>
-              $escapetool.xml($tpobj.display('name', 'view'))
+              ## use the template name as a translation key, to allow i18n
+              $escapetool.xml($msg.get($tpobj.getProperty('name').value))
             </label>
             #set($jsAllowedSpacesArray = '')## Reset previous value
             #set($allowedSpaces = $tpobj.getProperty('spaces').getValue())

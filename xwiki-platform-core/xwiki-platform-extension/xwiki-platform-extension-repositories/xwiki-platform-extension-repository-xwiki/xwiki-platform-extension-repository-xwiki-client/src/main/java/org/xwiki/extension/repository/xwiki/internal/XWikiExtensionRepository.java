@@ -22,6 +22,7 @@ package org.xwiki.extension.repository.xwiki.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
@@ -36,7 +37,9 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
+import org.xwiki.extension.repository.SearchException;
 import org.xwiki.extension.repository.Searchable;
+import org.xwiki.extension.repository.xwiki.model.jaxb.Extensions;
 
 /**
  * @version $Id$
@@ -49,6 +52,8 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
 
     private final UriBuilder extensionFileUriBuider;
 
+    private final UriBuilder simplesearchUriBuider;
+
     public XWikiExtensionRepository(ExtensionRepositoryId repositoryId,
         XWikiExtensionRepositoryFactory repositoryFactory) throws Exception
     {
@@ -60,6 +65,7 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         // Uri builders
         this.extensionUriBuider = createUriBuilder("/extension/{extensionId}/{extensionVersion}");
         this.extensionFileUriBuider = createUriBuilder("/extension/{extensionId}/{extensionVersion}/file");
+        this.simplesearchUriBuider = createUriBuilder("/extensions/search/simple/{pattern}");
     }
 
     public UriBuilder getExtensionFileUriBuider()
@@ -84,7 +90,7 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         try {
             httpClient.executeMethod(getMethod);
         } catch (Exception e) {
-            throw new ResolveException("Failed to request", e);
+            throw new ResolveException("Failed to request [" + getMethod.getURI() + "]", e);
         }
 
         if (getMethod.getStatusCode() != HttpStatus.SC_OK) {
@@ -131,9 +137,22 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
 
     // Searchable
 
-    public List<Extension> search(String str)
+    public List<Extension> search(String pattern, int offset, int nb) throws SearchException
     {
-        // TODO Auto-generated method stub
-        return null;
+        Extensions restExtensions;
+        try {
+            restExtensions =
+                (Extensions) this.repositoryFactory.getUnmarshaller().unmarshal(
+                    getRESTResourceAsStream(this.simplesearchUriBuider, pattern));
+        } catch (Exception e) {
+            throw new SearchException("Failed to search extensions based on pattern [" + pattern + "]", e);
+        }
+
+        List<Extension> extensions = new ArrayList<Extension>(restExtensions.getExtensions().size());
+        for (org.xwiki.extension.repository.xwiki.model.jaxb.Extension restExtension : restExtensions.getExtensions()) {
+            extensions.add(new XWikiExtension(this, restExtension));
+        }
+
+        return extensions;
     }
 }

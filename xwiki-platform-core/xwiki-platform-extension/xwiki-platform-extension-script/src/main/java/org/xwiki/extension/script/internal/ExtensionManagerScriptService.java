@@ -20,6 +20,7 @@
 package org.xwiki.extension.script.internal;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -36,6 +37,7 @@ import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.internal.VersionManager;
 import org.xwiki.extension.repository.CoreExtensionRepository;
+import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.task.InstallRequest;
 import org.xwiki.extension.task.Task;
@@ -65,6 +67,9 @@ public class ExtensionManagerScriptService implements ScriptService
 
     @Inject
     private CoreExtensionRepository coreExtensionRepository;
+
+    @Inject
+    private ExtensionRepositoryManager reporitoryManager;
 
     @Inject
     private TaskManager taskManager;
@@ -97,6 +102,11 @@ public class ExtensionManagerScriptService implements ScriptService
         }
 
         return extension;
+    }
+
+    public List<Extension> search(String pattern, int offset, int nb)
+    {
+        return this.reporitoryManager.search(pattern, offset, nb);
     }
 
     public Map<String, Collection<LocalExtension>> getBackwardDependencies(String id, String version)

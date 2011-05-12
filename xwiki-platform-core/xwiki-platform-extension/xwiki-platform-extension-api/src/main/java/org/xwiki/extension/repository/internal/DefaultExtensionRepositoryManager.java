@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.repository.internal;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -37,6 +39,8 @@ import org.xwiki.extension.repository.ExtensionRepositoryException;
 import org.xwiki.extension.repository.ExtensionRepositoryFactory;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
+import org.xwiki.extension.repository.SearchException;
+import org.xwiki.extension.repository.Searchable;
 
 @Component
 @Singleton
@@ -96,5 +100,44 @@ public class DefaultExtensionRepositoryManager extends AbstractLogEnabled implem
         }
 
         throw new ResolveException("Could not find extension [" + extensionId + "]");
+    }
+
+    public List<Extension> search(String pattern, int offset, int nb)
+    {
+        List<Extension> extensions = new ArrayList<Extension>(nb > 0 ? nb : 0);
+
+        // A local index would avoid things like this...
+        int currentOffset = 0;
+        for (ExtensionRepository repository : this.repositories.values()) {
+            int currentNb = nb - extensions.size();
+            if (nb > 0 && currentNb == 0) {
+                break;
+            }
+
+            if (repository instanceof Searchable) {
+                Searchable searchableRepository = (Searchable) repository;
+
+                List<Extension> foundExtensions;
+                try {
+                    foundExtensions = searchableRepository.search(pattern, 0, offset == 0 ? currentNb : -1);
+
+                    if (!foundExtensions.isEmpty()) {
+                        if (offset - currentOffset >= foundExtensions.size()) {
+                            currentOffset += foundExtensions.size();
+                        } else {
+                            int fromIndex = offset - currentOffset;
+                            int toIndex = fromIndex + currentNb;
+                            extensions.addAll(foundExtensions.subList(fromIndex,
+                                (toIndex <= 0 || toIndex > foundExtensions.size()) ? foundExtensions.size() : toIndex));
+                            currentOffset = offset;
+                        }
+                    }
+                } catch (SearchException e) {
+                    getLogger().warn("Failed to search in repository [" + this + "]", e);
+                }
+            }
+        }
+
+        return extensions;
     }
 }

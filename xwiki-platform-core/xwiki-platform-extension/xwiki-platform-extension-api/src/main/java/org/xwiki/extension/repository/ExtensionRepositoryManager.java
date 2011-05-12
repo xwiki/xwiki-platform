@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.repository;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
@@ -36,4 +38,6 @@ public interface ExtensionRepositoryManager
     ExtensionRepository getRepository(String repositoryId);
 
     Extension resolve(ExtensionId extensionId) throws ResolveException;
+
+    List<Extension> search(String pattern, int offset, int nb);
 }

@@ -6,5 +6,5 @@ import org.xwiki.extension.Extension;
 
 public interface Searchable
 {
-    List<Extension> search(String str);
+    List<Extension> search(String pattern, int offset, int nb) throws SearchException;
 }

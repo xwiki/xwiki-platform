@@ -225,9 +225,9 @@ public class CreateAction extends XWikiAction
         // This template can be passed a parent document reference in parameter (using the "parent" parameter).
         // If a parent parameter is passed, use it to set the parent when creating the new Page or Space.
         // If no parent parameter was passed, use the current document if we're creating a new page, keep it blank
-        // if we're creating a new space.
+        // if we're creating a new space. Also don't set current document as parent if it's a new doc
         String parent = request.getParameter("parent");
-        if (StringUtils.isEmpty(parent) && !isSpace) {
+        if (StringUtils.isEmpty(parent) && !isSpace && !doc.isNew()) {
             DocumentReference parentRef = doc.getDocumentReference();
             @SuppressWarnings("unchecked")
             EntityReferenceSerializer<String> localSerializer =
@@ -437,18 +437,26 @@ public class CreateAction extends XWikiAction
             XWiki xwiki = context.getWiki();
 
             DocumentReference templateReference = resolver.resolve(template);
-            DocumentReference parentReference = resolver.resolve(parent);
             newDocument.readFromTemplate(templateReference, context);
-            newDocument.setParentReference((EntityReference) parentReference);
-            newDocument.setTitle(title);
+            if (!StringUtils.isEmpty(parent)) {
+                DocumentReference parentReference = resolver.resolve(parent);
+                newDocument.setParentReference((EntityReference) parentReference);
+            }
+            if (title != null) {
+                newDocument.setTitle(title);
+            }
 
             xwiki.saveDocument(newDocument, context);
             editMode = newDocument.getDefaultEditMode(context);
         } else {
             // put all the data in the redirect params, to be passed to the edit mode
-            redirectParams =
-                "parent=" + Util.encodeURI(parent, context) + "&template=" + Util.encodeURI(template, context)
-                    + "&title=" + Util.encodeURI(title, context);
+            redirectParams = "template=" + Util.encodeURI(template, context);
+            if (parent != null) {
+                redirectParams += "&parent=" + Util.encodeURI(parent, context);
+            }
+            if (title != null) {
+                redirectParams += "&title=" + Util.encodeURI(title, context);
+            }
 
             // Get the edit mode of the document to create from the specified template
             editMode = getEditMode(template, resolver, context);

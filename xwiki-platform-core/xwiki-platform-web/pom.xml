@@ -590,9 +590,12 @@
           <!-- - Make sure we exclude JCL and LOGJ4 since we want all logging to go through SLF4J
                - Excluded to prevent conflict in the patched version of Rhino used by yuicompressor used for JSX.
                  See http://jira.xwiki.org/jira/browse/XWIKI-6151 for more details.
+
+               Note: We use ?????? because we need to exclude log4j-1.2.16 but keep log4j-over-slf4j-1.6.1.jar
+                     See http://jira.codehaus.org/browse/MWAR-81
            -->
           <packagingExcludes>
-            WEB-INF/lib/batik-js-*.jar,WEB-INF/lib/commons-logging-*.jar,WEB-INF/lib/log4j-*.jar
+            WEB-INF/lib/batik-js-*.jar,WEB-INF/lib/commons-logging-*.jar,WEB-INF/lib/log4j-??????.jar
           </packagingExcludes>
         </configuration>
       </plugin>

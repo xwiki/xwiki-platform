@@ -36,6 +36,9 @@ import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+
 /**
  * Rich text editor plug-in for inserting links, using a dialog to get link settings from the user. It installs a menu
  * bar extension, with entries for all its actions.
@@ -120,6 +123,15 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
 
         menuExtension = new LinkMenuExtension(this);
         getUIExtensionList().add(menuExtension);
+        // Hack: We can access the menus where each menu item was placed only after the main menu bar is initialized,
+        // which happens after all the plugins are loaded.
+        Scheduler.get().scheduleDeferred(new ScheduledCommand()
+        {
+            public void execute()
+            {
+                menuExtension.registerAttachHandlers();
+            }
+        });
 
         // Initialize the meta data extractor to handle link meta data.
         metaDataExtractor = new LinkMetaDataExtractor();
@@ -158,7 +170,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
         getTextArea().getCommandManager().removeCommandListener(linkFilter);
 
         // Destroy menu extension.
-        menuExtension.destroy();
+        menuExtension.clearFeatures();
         super.destroy();
     }
 

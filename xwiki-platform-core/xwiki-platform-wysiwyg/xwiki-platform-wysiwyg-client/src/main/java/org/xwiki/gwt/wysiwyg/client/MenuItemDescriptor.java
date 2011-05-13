@@ -17,32 +17,61 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.gwt.user.client.ui;
+package org.xwiki.gwt.wysiwyg.client;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
- * A collection of {@link MenuListener}s. It provides an easy way of notifying all the listeners when a menu event is
- * triggered.
+ * Describes a menu item.
  * 
  * @version $Id$
  */
-public class MenuListenerCollection extends ArrayList<MenuListener>
+public class MenuItemDescriptor
 {
     /**
-     * Field required by all {@link java.io.Serializable} classes.
+     * The feature exposed by this menu item.
      */
-    private static final long serialVersionUID = -1315507848121982574L;
+    private String feature;
 
     /**
-     * Notifies all the listeners in this collection.
-     * 
-     * @param menuItem the menu item which has been selected
+     * The sub-menu.
      */
-    public void fireMenuItemSelected(MenuItem menuItem)
+    private final List<MenuItemDescriptor> subMenu = new ArrayList<MenuItemDescriptor>();
+
+    /**
+     * Creates a new menu item that exposes the specified feature.
+     * 
+     * @param feature the feature name
+     */
+    public MenuItemDescriptor(String feature)
     {
-        for (MenuListener listener : this) {
-            listener.onMenuItemSelected(menuItem);
-        }
+        this.feature = feature;
+    }
+
+    /**
+     * @return the feature exposed by this menu item
+     */
+    public String getFeature()
+    {
+        return feature;
+    }
+
+    /**
+     * Sets the feature exposed by this menu item.
+     * 
+     * @param feature the feature name
+     */
+    public void setFeature(String feature)
+    {
+        this.feature = feature;
+    }
+
+    /**
+     * @return the sub-menu
+     */
+    public List<MenuItemDescriptor> getSubMenu()
+    {
+        return subMenu;
     }
 }

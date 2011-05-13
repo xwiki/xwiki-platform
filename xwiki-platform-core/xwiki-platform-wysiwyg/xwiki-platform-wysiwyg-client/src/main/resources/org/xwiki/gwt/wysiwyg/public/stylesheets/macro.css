@@ -11,7 +11,7 @@
   padding: 14px 0 6px 0;
 }
 
-.xMacroLabel, .xMacroParameterLabel {
+.xMacro .xMacroLabel, .xMacroParameter .xMacroParameterLabel {
   padding-top: 0;
 }
 

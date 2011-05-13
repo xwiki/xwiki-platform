@@ -29,6 +29,8 @@ import org.xwiki.gwt.wysiwyg.client.plugin.internal.CompositeUIExtension;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import org.xwiki.gwt.wysiwyg.client.plugin.separator.exec.InsertHRExecutable;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Image;
@@ -50,6 +52,11 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickHandler
      * Tool bar extension that includes the horizontal rule button.
      */
     private final FocusWidgetUIExtension toolBarFocusWidgets = new FocusWidgetUIExtension("toolbar");
+
+    /**
+     * The menu extension that provides the menu separators.
+     */
+    private final MenuBarSeparator menuExtension = new MenuBarSeparator();
 
     /**
      * Tool bar extension that includes {@link #toolBarFocusWidgets} and tool bar specific separators like the vertical
@@ -82,9 +89,18 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickHandler
             toolBarFocusWidgets.addFeature("hr", hr);
         }
 
-        if (toolBarExtension.getFeatures().length > 0) {
-            getUIExtensionList().add(toolBarExtension);
-        }
+        getUIExtensionList().add(menuExtension);
+        getUIExtensionList().add(toolBarExtension);
+
+        // Hack: We can access the menus where each menu item separator was placed only after the main menu bar is
+        // initialized, which happens after all the plugins are loaded.
+        Scheduler.get().scheduleDeferred(new ScheduledCommand()
+        {
+            public void execute()
+            {
+                menuExtension.registerAttachHandlers();
+            }
+        });
     }
 
     /**
@@ -100,6 +116,7 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickHandler
         }
 
         toolBarFocusWidgets.clearFeatures();
+        menuExtension.destroy();
 
         super.destroy();
     }

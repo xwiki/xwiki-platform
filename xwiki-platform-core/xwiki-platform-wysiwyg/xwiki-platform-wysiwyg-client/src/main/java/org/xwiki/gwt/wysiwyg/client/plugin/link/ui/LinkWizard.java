@@ -158,7 +158,7 @@ public class LinkWizard extends Wizard implements WizardStepProvider
         boolean selectionLimitedToCurrentPage = "currentpage".equals(config.getParameter("linkfiles"));
         AttachmentSelectorAggregatorWizardStep<LinkConfig> attachmentSelector =
             new AttachmentSelectorAggregatorWizardStep<LinkConfig>(selectionLimitedToCurrentPage, wikiService);
-        attachmentSelector.setStepTitle(Strings.INSTANCE.imageSelectImageTitle());
+        attachmentSelector.setStepTitle(Strings.INSTANCE.linkSelectAttachmentTitle());
         attachmentSelector.setCurrentPageSelector(new CurrentPageAttachmentSelectorWizardStep(wikiService));
         if (!selectionLimitedToCurrentPage) {
             attachmentSelector.setAllPagesSelector(new AttachmentExplorerWizardStep(wikiService));

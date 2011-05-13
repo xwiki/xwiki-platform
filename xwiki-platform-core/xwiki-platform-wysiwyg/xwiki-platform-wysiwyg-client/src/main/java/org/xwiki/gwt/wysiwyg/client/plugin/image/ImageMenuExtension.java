@@ -19,58 +19,40 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.image;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.xwiki.gwt.user.client.DeferredUpdater;
-import org.xwiki.gwt.user.client.Updatable;
-import org.xwiki.gwt.user.client.ui.MenuBar;
 import org.xwiki.gwt.user.client.ui.MenuItem;
-import org.xwiki.gwt.user.client.ui.MenuListener;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.wysiwyg.client.Images;
 import org.xwiki.gwt.wysiwyg.client.Strings;
-import org.xwiki.gwt.wysiwyg.client.plugin.internal.MenuItemUIExtension;
+import org.xwiki.gwt.wysiwyg.client.plugin.internal.MenuItemUIExtensionAdaptor;
 
-import com.google.gwt.user.client.ui.UIObject;
+import com.google.gwt.event.logical.shared.AttachEvent;
 
 /**
  * Provides user interface for manipulating images through the WYSIWYG top-level menu.
  * 
  * @version $Id$
  */
-public class ImageMenuExtension extends MenuItemUIExtension implements Updatable, MenuListener
+public class ImageMenuExtension extends MenuItemUIExtensionAdaptor
 {
     /**
-     * Schedules menu updates and executes only the most recent one. We use the minimum delay because we want the menu
-     * to be update as soon as possible.
+     * The menu item used to insert an image.
      */
-    private final DeferredUpdater updater = new DeferredUpdater(this, 1);
+    private MenuItem insert;
+
+    /**
+     * The menu item used to edit the selected image.
+     */
+    private MenuItem edit;
+
+    /**
+     * The menu item used to remove the selected image.
+     */
+    private MenuItem remove;
 
     /**
      * The link plug-in associated with this menu extension.
      */
     private final ImagePlugin plugin;
-
-    /**
-     * The list of menu options used to create links.
-     */
-    private List<UIObject> createImageMenus;
-
-    /**
-     * The list of menu options used to edit links or to remove them.
-     */
-    private List<UIObject> editImageMenus;
-
-    /**
-     * The submenu holding the various link options.
-     */
-    private MenuBar submenu;
-
-    /**
-     * The toplevel menu item corresponding to this menu extension.
-     */
-    private MenuItem menu;
 
     /**
      * Builds the menu extension using the passed plugin.
@@ -80,121 +62,57 @@ public class ImageMenuExtension extends MenuItemUIExtension implements Updatable
     public ImageMenuExtension(final ImagePlugin plugin)
     {
         super("menu");
+
         this.plugin = plugin;
 
-        MenuItem insertImage =
-            new MenuItem(Strings.INSTANCE.imageInsertImage(), new com.google.gwt.user.client.Command()
-            {
-                public void execute()
-                {
-                    plugin.onImage();
-                }
-            });
-
-        createImageMenus = new ArrayList<UIObject>();
-        createImageMenus.add(insertImage);
-
-        MenuItem editImage = new MenuItem(Strings.INSTANCE.imageEditImage(), new com.google.gwt.user.client.Command()
+        insert = createMenuItem(Strings.INSTANCE.imageInsertImage(), null, new com.google.gwt.user.client.Command()
         {
             public void execute()
             {
                 plugin.onImage();
             }
         });
-
-        MenuItem removeImage =
-            new MenuItem(Strings.INSTANCE.imageRemoveImage(), new com.google.gwt.user.client.Command()
+        edit = createMenuItem(Strings.INSTANCE.imageEditImage(), null, new com.google.gwt.user.client.Command()
+        {
+            public void execute()
             {
-                public void execute()
-                {
-                    plugin.onImageRemove();
-                }
-            });
+                plugin.onImage();
+            }
+        });
+        remove = createMenuItem(Strings.INSTANCE.imageRemoveImage(), null, new com.google.gwt.user.client.Command()
+        {
+            public void execute()
+            {
+                plugin.onImageRemove();
+            }
+        });
+        MenuItem imageMenu = createMenuItem(Strings.INSTANCE.image(), Images.INSTANCE.image());
 
-        editImageMenus = new ArrayList<UIObject>();
-        editImageMenus.add(editImage);
-        editImageMenus.add(removeImage);
-
-        submenu = new MenuBar(true);
-        submenu.setAnimationEnabled(false);
-        submenu.addAll(createImageMenus);
-
-        menu = new MenuItem(Strings.INSTANCE.image(), submenu);
-        menu.setIcon(Images.INSTANCE.image());
-        menu.addMenuListener(this);
-
-        addFeature(ImagePluginFactory.getInstance().getPluginName(), menu);
-    }
-
-    /**
-     * Cleans up this menu extension on destroy.
-     */
-    public void destroy()
-    {
-        createImageMenus.clear();
-        createImageMenus = null;
-
-        editImageMenus.clear();
-        editImageMenus = null;
-
-        submenu.clearItems();
-        submenu = null;
-
-        menu.getParentMenu().removeItem(menu);
-        menu.removeMenuListener(this);
-        menu = null;
-
-        this.clearFeatures();
+        addFeature(ImagePluginFactory.getInstance().getPluginName(), imageMenu);
+        addFeature("imageInsert", insert);
+        addFeature("imageEdit", edit);
+        addFeature("imageRemove", remove);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see MenuListener#onMenuItemSelected(MenuItem)
+     * @see MenuItemUIExtensionAdaptor#onAttach(AttachEvent)
      */
-    public void onMenuItemSelected(MenuItem menuItem)
+    protected void onAttach(AttachEvent event)
     {
-        // update the list of shown options
-        updater.deferUpdate();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Updatable#update()
-     */
-    public void update()
-    {
-        // test if the image command is executed
-        if (plugin.getTextArea().getCommandManager().isExecuted(Command.INSERT_IMAGE)) {
-            // activate the edit submenu
-            if (submenu.getItem(0) != editImageMenus.get(0)) {
-                submenu.clearItems();
-                submenu.addAll(editImageMenus);
-            }
-        } else {
-            // the create images list must be setup, and disabled if create image is not possible
-            if (submenu.getItem(0) != createImageMenus.get(0)) {
-                submenu.clearItems();
-                submenu.addAll(createImageMenus);
-            }
-            boolean canCreateImage = plugin.getTextArea().getCommandManager().isEnabled(Command.INSERT_IMAGE);
-            // set enabling state of the menu items in the submenu
-            for (UIObject m : createImageMenus) {
-                if (m instanceof MenuItem) {
-                    ((MenuItem) m).setEnabled(canCreateImage);
-                }
-            }
+        boolean editMode = plugin.getTextArea().getCommandManager().isExecuted(Command.INSERT_IMAGE);
+        if (insert.getParentMenu() == event.getSource()) {
+            insert.setEnabled(!editMode && plugin.getTextArea().getCommandManager().isEnabled(Command.INSERT_IMAGE));
+            insert.setVisible(!editMode);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Updatable#canUpdate()
-     */
-    public boolean canUpdate()
-    {
-        return plugin.getTextArea().isAttached() && plugin.getTextArea().isEnabled();
+        if (edit.getParentMenu() == event.getSource()) {
+            edit.setEnabled(editMode);
+            edit.setVisible(editMode);
+        }
+        if (remove.getParentMenu() == event.getSource()) {
+            remove.setEnabled(editMode);
+            remove.setVisible(editMode);
+        }
     }
 }

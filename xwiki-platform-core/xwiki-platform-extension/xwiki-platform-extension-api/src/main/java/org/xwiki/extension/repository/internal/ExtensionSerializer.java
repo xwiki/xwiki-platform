@@ -31,26 +31,36 @@ import org.xwiki.extension.LocalExtension;
  * 
  * @version $Id$
  */
-public class DefaultLocalExtensionSerializer
+public class ExtensionSerializer
 {
     private static final String ELEMENT_ID = "id";
+
     private static final String ELEMENT_VERSION = "version";
+
     private static final String ELEMENT_TYPE = "type";
+
     private static final String ELEMENT_DEPENDENCY = "dependency";
+
     private static final String ELEMENT_INSTALLED = "installed";
+
     private static final String ELEMENT_NAME = "name";
+
     private static final String ELEMENT_DESCRIPTION = "description";
+
     private static final String ELEMENT_WEBSITE = "website";
-  
+
     private static final String ELEMENT_AUTHORS = "authors";
+
     private static final String ELEMENT_AAUTHOR = "author";
-    
+
     private static final String ELEMENT_DEPENDENCIES = "dependencies";
+
     private static final String ELEMENT_DDEPENDENCY = "dependency";
-    
+
     private static final String ELEMENT_NAMESPACES = "namespaces";
+
     private static final String ELEMENT_NNAMESPACE = "namespace";
-    
+
     /**
      * Used to parse XML descriptor file.
      */

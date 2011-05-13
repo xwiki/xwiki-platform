@@ -19,14 +19,6 @@
  */
 package org.xwiki.extension.repository.internal;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,10 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -52,7 +41,6 @@ import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.InstallException;
-import org.xwiki.extension.InvalidExtensionException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
@@ -90,25 +78,14 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
     private VersionManager versionManager;
 
     /**
-     * Logging tool.
-     */
-    @Inject
-    private Logger logger;
-
-    /**
-     * Used to read/write in the repository storage itself.
-     */
-    private DefaultLocalExtensionSerializer extensionSerializer;
-
-    /**
      * The repository identifier.
      */
     private ExtensionRepositoryId repositoryId;
 
     /**
-     * Local repository folder.
+     * Used to manipulate filesystem repository storage.
      */
-    private File rootFolder;
+    private ExtensionStorage storage;
 
     /**
      * the local extensions.
@@ -137,45 +114,11 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
      */
     public void initialize() throws InitializationException
     {
-        this.rootFolder = this.configuration.getLocalRepository();
+        this.storage = new ExtensionStorage(this, this.configuration.getLocalRepository());
 
-        this.repositoryId = new ExtensionRepositoryId("local", "xwiki", this.rootFolder.toURI());
+        this.repositoryId = new ExtensionRepositoryId("local", "xwiki", this.storage.getRootFolder().toURI());
 
-        this.extensionSerializer = new DefaultLocalExtensionSerializer();
-
-        loadExtensions();
-    }
-
-    /**
-     * Load extension from repository storage.
-     */
-    private void loadExtensions()
-    {
-        // Load local extension from repository
-
-        if (this.rootFolder.exists()) {
-            FilenameFilter descriptorFilter = new FilenameFilter()
-            {
-                public boolean accept(File dir, String name)
-                {
-                    return name.endsWith(".xed");
-                }
-            };
-
-            for (File child : this.rootFolder.listFiles(descriptorFilter)) {
-                if (!child.isDirectory()) {
-                    try {
-                        LocalExtension localExtension = loadDescriptor(child);
-
-                        addLocalExtension(localExtension);
-                    } catch (Exception e) {
-                        this.logger.warn("Failed to load extension from file [" + child + "] in local repository", e);
-                    }
-                }
-            }
-        } else {
-            this.rootFolder.mkdirs();
-        }
+        this.storage.loadExtensions();
 
         // Validate local extension
 
@@ -251,8 +194,9 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
 
                 List<LocalExtension> dependencyVersions = this.extensionsById.get(dependency.getId());
                 if (dependencyVersions != null) {
-                    for (ListIterator<LocalExtension> it = dependencyVersions.listIterator(dependencyVersions.size()); it
-                        .hasPrevious();) {
+                    for (
+                        ListIterator<LocalExtension> it = dependencyVersions.listIterator(dependencyVersions.size());
+                        it.hasPrevious();) {
                         LocalExtension dependencyExtension = it.previous();
 
                         if (!validatedExtensions.contains(dependency.getId())) {
@@ -295,7 +239,7 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
         localExtension.setInstalled(false, namespace);
 
         try {
-            saveDescriptor(localExtension);
+            this.storage.saveDescriptor(localExtension);
         } catch (Exception e) {
             throw new UninstallException("Failed to modify extension descriptor", e);
         }
@@ -329,7 +273,7 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
      * 
      * @param localExtension the new local extension
      */
-    private void addLocalExtension(LocalExtension localExtension)
+    protected void addLocalExtension(LocalExtension localExtension)
     {
         // extensions
         this.extensions.put(localExtension.getId(), localExtension);
@@ -394,14 +338,6 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
 
             backwardDependencies.add(localExtension);
         }
-    }
-
-    /**
-     * @return the repository folder
-     */
-    public File getRootFolder()
-    {
-        return this.rootFolder;
     }
 
     // Repository
@@ -522,7 +458,7 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
 
         localExtension.setDependency(dependency);
 
-        localExtension.setFile(getExtensionFile(localExtension.getId(), localExtension.getType()));
+        localExtension.setFile(this.storage.getExtensionFile(localExtension.getId(), localExtension.getType()));
 
         return localExtension;
     }
@@ -553,10 +489,10 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
                 localExtension = createExtension(extension, dependency);
                 extension.download(localExtension.getFile());
                 addLocalExtension(localExtension, namespace);
-                saveDescriptor(localExtension);
+                this.storage.saveDescriptor(localExtension);
             } else if (!localExtension.isInstalled(namespace)) {
                 addLocalExtension(localExtension, namespace);
-                saveDescriptor(localExtension);
+                this.storage.saveDescriptor(localExtension);
             }
         } catch (Exception e) {
             // TODO: clean
@@ -579,101 +515,6 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
 
         if (existingExtension == localExtension) {
             uninstallLocalExtension((DefaultLocalExtension) localExtension, namespace);
-        }
-    }
-
-    /***
-     * Update the extension descriptor in the filesystem repository.
-     * 
-     * @param extension the local extension descriptor to save
-     * @throws ParserConfigurationException error when trying to save the descriptor
-     * @throws TransformerException error when trying to save the descriptor
-     * @throws IOException error when trying to save the descriptor
-     */
-    private void saveDescriptor(LocalExtension extension) throws ParserConfigurationException, TransformerException,
-        IOException
-    {
-        File file = getDescriptorFile(extension.getId());
-        FileOutputStream fos = new FileOutputStream(file);
-
-        try {
-            this.extensionSerializer.saveDescriptor(extension, fos);
-        } finally {
-            fos.close();
-        }
-    }
-
-    /**
-     * @param id the extension identifier
-     * @param type the extension type
-     * @return the file containing the extension
-     */
-    private File getExtensionFile(ExtensionId id, String type)
-    {
-        return new File(getRootFolder(), getFileName(id, type));
-    }
-
-    /**
-     * @param id the extension identifier
-     * @return the file containing the extension descriptor
-     */
-    private File getDescriptorFile(ExtensionId id)
-    {
-        return new File(getRootFolder(), getFileName(id, "xed"));
-    }
-
-    /**
-     * Get file path in the local extension repository.
-     * 
-     * @param id the extension id
-     * @param fileExtension the file extension
-     * @return the encoded file path
-     */
-    private String getFileName(ExtensionId id, String fileExtension)
-    {
-        String fileName = id.getId() + "-" + id.getVersion() + "." + fileExtension;
-        try {
-            return URLEncoder.encode(fileName, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // Should never happen
-
-            return fileName;
-        }
-    }
-
-    /**
-     * Local extension descriptor from a file.
-     * 
-     * @param descriptor the descriptor file
-     * @return the extension descriptor
-     * @throws InvalidExtensionException error when trying to load extension descriptor
-     */
-    private LocalExtension loadDescriptor(File descriptor) throws InvalidExtensionException
-    {
-        FileInputStream fis;
-        try {
-            fis = new FileInputStream(descriptor);
-        } catch (FileNotFoundException e) {
-            throw new InvalidExtensionException("Failed to open descriptor for reading", e);
-        }
-
-        try {
-            DefaultLocalExtension localExtension = this.extensionSerializer.loadDescriptor(this, fis);
-
-            localExtension.setFile(getExtensionFile(localExtension.getId(), localExtension.getType()));
-
-            if (!localExtension.getFile().exists()) {
-                throw new InvalidExtensionException("Failed to load local extension [" + descriptor + "]: ["
-                    + localExtension.getFile() + "] file does not exists");
-            }
-
-            return localExtension;
-        } finally {
-            try {
-                fis.close();
-            } catch (IOException e) {
-                // TODO: log something
-            }
         }
     }
 

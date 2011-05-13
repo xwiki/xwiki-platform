@@ -13,11 +13,11 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.internal.DefaultLocalExtension;
-import org.xwiki.extension.repository.internal.DefaultLocalExtensionSerializer;
+import org.xwiki.extension.repository.internal.ExtensionSerializer;
 
 public class ResourceExtensionRepository implements ExtensionRepository
 {
-    private DefaultLocalExtensionSerializer extensionSerializer;
+    private ExtensionSerializer extensionSerializer;
 
     private ExtensionRepositoryId repositoryId;
 
@@ -29,7 +29,7 @@ public class ResourceExtensionRepository implements ExtensionRepository
 
     public ResourceExtensionRepository(ClassLoader classLoader, String baseResource)
     {
-        this.extensionSerializer = new DefaultLocalExtensionSerializer();
+        this.extensionSerializer = new ExtensionSerializer();
 
         this.repositoryId = new ExtensionRepositoryId("resources", "resources", null);
 

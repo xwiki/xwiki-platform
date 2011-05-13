@@ -151,7 +151,7 @@ public class DefaultCoreExtensionScanner
 
                 DefaultCoreExtension coreExtension =
                     new DefaultCoreExtension(repository, ClasspathHelper.getBaseUrl(descriptorUrl, baseURLs),
-                        new ExtensionId(groupId + ":" + mavenModel.getArtifactId(), version),
+                        new ExtensionId(groupId + ':' + mavenModel.getArtifactId(), version),
                         packagingToType(mavenModel.getPackaging()));
 
                 extensions.put(coreExtension.getId().getId(), coreExtension);
@@ -223,7 +223,7 @@ public class DefaultCoreExtensionScanner
 
                 // Add dependencies that does not provide proper pom.xml resource and can't be found in the classpath
                 for (Dependency dependency : dependencies) {
-                    String dependencyId = dependency.getGroupId() + ":" + dependency.getArtifactId();
+                    String dependencyId = dependency.getGroupId() + ':' + dependency.getArtifactId();
 
                     Object[] artefact = artefacts.get(dependency.getArtifactId());
                     if (artefact != null) {

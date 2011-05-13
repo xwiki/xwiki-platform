@@ -33,6 +33,9 @@
   <name>XWiki Platform - Extension - Script</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Extension - Script</description>
+  <properties>
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

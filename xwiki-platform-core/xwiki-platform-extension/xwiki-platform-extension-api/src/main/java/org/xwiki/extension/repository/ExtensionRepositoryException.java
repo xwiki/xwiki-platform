@@ -21,6 +21,11 @@ package org.xwiki.extension.repository;
 
 import org.xwiki.extension.ExtensionException;
 
+/**
+ * Error when creating a new extension repository.
+ * 
+ * @version $Id$
+ */
 public class ExtensionRepositoryException extends ExtensionException
 {
     /**

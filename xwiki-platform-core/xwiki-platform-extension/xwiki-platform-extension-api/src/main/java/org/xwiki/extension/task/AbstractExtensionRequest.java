@@ -24,38 +24,65 @@ import java.util.List;
 
 import org.xwiki.extension.ExtensionId;
 
-public class AbstractExtensionRequest extends AbstractRequest
+/**
+ * Base class for extension manipulation related {@link Request} implementations.
+ * 
+ * @version $Id$
+ */
+public abstract class AbstractExtensionRequest extends AbstractRequest
 {
+    /**
+     * @see #getExtensions()
+     */
     private List<ExtensionId> extensions = new ArrayList<ExtensionId>();
 
+    /**
+     * @see #getNamespaces()
+     */
     private List<String> namespaces;
 
+    /**
+     * @return the extension on which to apply the task.
+     */
     public List<ExtensionId> getExtensions()
     {
         return this.extensions;
     }
 
+    /**
+     * @return the namespaces on which to apply the task.
+     */
     public List<String> getNamespaces()
     {
         return this.namespaces;
     }
 
+    /**
+     * @return indicate if the request is applied on specific namespace or all of them
+     */
     public boolean hasNamespaces()
     {
         return this.namespaces != null && !this.namespaces.isEmpty();
     }
 
-    public boolean addExtension(ExtensionId extensionId)
+    /**
+     * @param extensionId the extension identifier
+     */
+    public void addExtension(ExtensionId extensionId)
     {
-        return this.extensions.add(extensionId);
+        this.extensions.add(extensionId);
     }
 
-    public boolean addNamespace(String namespace)
+    /**
+     * @param namespace the namespace
+     * @return
+     */
+    public void addNamespace(String namespace)
     {
         if (this.namespaces == null) {
             this.namespaces = new ArrayList<String>();
         }
 
-        return this.namespaces.add(namespace);
+        this.namespaces.add(namespace);
     }
 }

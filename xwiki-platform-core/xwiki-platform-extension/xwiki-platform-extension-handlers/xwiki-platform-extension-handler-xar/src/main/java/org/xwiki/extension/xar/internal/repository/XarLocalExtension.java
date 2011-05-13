@@ -28,7 +28,7 @@ import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 
-public class XarLocalExtension extends WrappingLocalExtension
+public class XarLocalExtension extends WrappingLocalExtension<LocalExtension>
 {
     private XarLocalExtensionRepository repository;
 
@@ -51,9 +51,9 @@ public class XarLocalExtension extends WrappingLocalExtension
     {
         this.pages = packager.getEntries(getFile());
     }
-    
+
     // ExtensionRepository
-    
+
     @Override
     public ExtensionRepository getRepository()
     {

@@ -19,6 +19,11 @@
  */
 package org.xwiki.extension.task;
 
+/**
+ * A {@link Task} request.
+ * 
+ * @version $Id$
+ */
 public interface Request
 {
 

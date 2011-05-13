@@ -24,13 +24,40 @@ import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.UninstallException;
 
+/**
+ * Handle extension related tasks depending of the type (install, uninstall, etc...).
+ * 
+ * @version $Id$
+ */
 @ComponentRole
 public interface ExtensionHandler
 {
+    /**
+     * Install the provided local extension.
+     * 
+     * @param localExtension the extension to install
+     * @param namespace the namespace where to install the extension
+     * @throws InstallException error when trying to install the extension
+     */
     void install(LocalExtension localExtension, String namespace) throws InstallException;
 
+    /**
+     * Uninstall the provided local extension.
+     * 
+     * @param localExtension the extension to uninstall
+     * @param namespace the namespace from where to uninstall the extension
+     * @throws UninstallException error when trying to uninstall the extension
+     */
     void uninstall(LocalExtension localExtension, String namespace) throws UninstallException;
 
+    /**
+     * Upgrade the provided local extension.
+     * 
+     * @param previousLocalExtension the previous installed version of the extension
+     * @param newLocalExtension the extension to install
+     * @param namespace the namespace from where to uninstall the extension
+     * @throws InstallException error when trying to upgrade the extension
+     */
     void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace)
         throws InstallException;
 }

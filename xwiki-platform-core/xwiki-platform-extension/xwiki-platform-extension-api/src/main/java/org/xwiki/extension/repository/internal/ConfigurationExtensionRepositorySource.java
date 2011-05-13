@@ -29,13 +29,26 @@ import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositorySource;
 
+/**
+ * Extensions repositories identifier stored in the configuration.
+ * 
+ * @version $Id$
+ */
 @Component
 @Singleton
 public class ConfigurationExtensionRepositorySource implements ExtensionRepositorySource
 {
+    /**
+     * Used to get configuration properties containing repositories.
+     */
     @Inject
     private ExtensionManagerConfiguration configuration;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.repository.ExtensionRepositorySource#getExtensionRepositories()
+     */
     public List<ExtensionRepositoryId> getExtensionRepositories()
     {
         return configuration.getRepositories();

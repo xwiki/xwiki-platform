@@ -31,19 +31,45 @@ import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.ExtensionHandler;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
 
+/**
+ * Default implementation of {@link ExtensionHandlerManager}.
+ * 
+ * @version $Id$
+ */
 @Component
 @Singleton
 public class DefaultExtensionHandlerManager implements ExtensionHandlerManager
 {
+    /**
+     * Message used when falling to find a proper extension handler.
+     */
+    private static final String LOOKUPERROR = "Can't find any extension handler for the extension ";
+
+    /**
+     * Use to lookup {@link ExtensionHandler} implementations.
+     */
     @Inject
     private ComponentManager componentManager;
 
+    /**
+     * Get the handler corresponding to the provided extension.
+     * 
+     * @param localExtension the extension to handler
+     * @return the handler
+     * @throws ComponentLookupException failed to find a proper handler for the provided extension
+     */
     private ExtensionHandler getExtensionHandler(LocalExtension localExtension) throws ComponentLookupException
     {
         // Load extension
         return this.componentManager.lookup(ExtensionHandler.class, localExtension.getType().toString().toLowerCase());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.handler.ExtensionHandlerManager#install(org.xwiki.extension.LocalExtension,
+     *      java.lang.String)
+     */
     public void install(LocalExtension localExtension, String namespace) throws InstallException
     {
         ExtensionHandler extensionHandler;
@@ -51,8 +77,7 @@ public class DefaultExtensionHandlerManager implements ExtensionHandlerManager
             // Load extension
             extensionHandler = getExtensionHandler(localExtension);
         } catch (ComponentLookupException e) {
-            throw new InstallException("Can't find any extension handler for the extension type [" + localExtension
-                + "]", e);
+            throw new InstallException(LOOKUPERROR + '[' + localExtension + ']', e);
         }
 
         try {
@@ -64,6 +89,12 @@ public class DefaultExtensionHandlerManager implements ExtensionHandlerManager
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.handler.ExtensionHandlerManager#uninstall(org.xwiki.extension.LocalExtension,
+     *      java.lang.String)
+     */
     public void uninstall(LocalExtension localExtension, String namespace) throws UninstallException
     {
         try {
@@ -72,11 +103,16 @@ public class DefaultExtensionHandlerManager implements ExtensionHandlerManager
 
             extensionHandler.uninstall(localExtension, namespace);
         } catch (ComponentLookupException e) {
-            throw new UninstallException("Can't find any extension handler for the extension type [" + localExtension
-                + "]");
+            throw new UninstallException(LOOKUPERROR + '[' + localExtension + ']');
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.handler.ExtensionHandlerManager#upgrade(org.xwiki.extension.LocalExtension,
+     *      org.xwiki.extension.LocalExtension, java.lang.String)
+     */
     public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace)
         throws InstallException
     {
@@ -86,8 +122,7 @@ public class DefaultExtensionHandlerManager implements ExtensionHandlerManager
 
             extensionInstaller.upgrade(previousLocalExtension, newLocalExtension, namespace);
         } catch (ComponentLookupException e) {
-            throw new InstallException("Can't find any extension handler for the extension type [" + newLocalExtension
-                + "]");
+            throw new InstallException(LOOKUPERROR + '[' + newLocalExtension + ']');
         }
     }
 }

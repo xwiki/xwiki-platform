@@ -33,6 +33,9 @@
   <name>XWiki Platform - Extension - Handler - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Extension - Handler - Parent POM</description>
+  <properties>
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

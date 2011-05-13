@@ -21,6 +21,11 @@ package org.xwiki.extension.repository;
 
 import org.xwiki.extension.ExtensionException;
 
+/**
+ * Error when search for exetension in a repository.
+ * 
+ * @version $Id$
+ */
 public class SearchException extends ExtensionException
 {
     /**

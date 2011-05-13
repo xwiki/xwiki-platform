@@ -21,15 +21,29 @@ package org.xwiki.extension.event;
 
 import org.xwiki.extension.ExtensionId;
 
+/**
+ * Base class for all {@link ExtensionEvent}.
+ * 
+ * @version $Id$
+ */
 public abstract class AbstractExtensionEvent implements ExtensionEvent
 {
+    /**
+     * The event related extension identifier.
+     */
     private ExtensionId extensionId;
 
+    /**
+     * Default constructor.
+     */
     public AbstractExtensionEvent()
     {
 
     }
 
+    /**
+     * @param extensionId the event related extension identifier
+     */
     protected AbstractExtensionEvent(ExtensionId extensionId)
     {
         this.extensionId = extensionId;
@@ -37,6 +51,11 @@ public abstract class AbstractExtensionEvent implements ExtensionEvent
 
     // ExtensionEvent
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.event.ExtensionEvent#getExtensionId()
+     */
     public ExtensionId getExtensionId()
     {
         return this.extensionId;
@@ -44,12 +63,21 @@ public abstract class AbstractExtensionEvent implements ExtensionEvent
 
     // Event
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.event.Event#matches(java.lang.Object)
+     */
     public boolean matches(Object event)
     {
         return this.getClass() == event.getClass()
             && (this.extensionId == null || macthesExtensionId(((AbstractExtensionEvent) event).getExtensionId()));
     }
 
+    /**
+     * @param extensionId the event related extension identifier
+     * @return <code>true</code> if the passed event matches this event, <code>false</code> otherwise.
+     */
     private boolean macthesExtensionId(ExtensionId extensionId)
     {
         return this.extensionId.equals(extensionId)

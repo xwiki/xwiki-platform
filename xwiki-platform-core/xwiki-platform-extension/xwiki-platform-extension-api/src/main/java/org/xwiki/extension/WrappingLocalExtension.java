@@ -22,42 +22,71 @@ package org.xwiki.extension;
 import java.io.File;
 import java.util.Collection;
 
-public class WrappingLocalExtension extends WrappingExtension implements LocalExtension
+/**
+ * Wrap a local extension.
+ * 
+ * @param <T> the extension type
+ * @version $Id$
+ */
+public class WrappingLocalExtension<T extends LocalExtension> extends WrappingExtension<T> implements LocalExtension
 {
-    public WrappingLocalExtension(LocalExtension localExtension)
+    /**
+     * @param localExtension the wrapped local extension
+     */
+    public WrappingLocalExtension(T localExtension)
     {
         super(localExtension);
     }
 
-    public LocalExtension getLocalExtension()
-    {
-        return (LocalExtension) getExtension();
-    }
-
     // LocalExtension
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.LocalExtension#getFile()
+     */
     public File getFile()
     {
-        return getLocalExtension().getFile();
+        return getExtension().getFile();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.LocalExtension#isInstalled()
+     */
     public boolean isInstalled()
     {
-        return getLocalExtension().isInstalled();
+        return getExtension().isInstalled();
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.LocalExtension#isInstalled(java.lang.String)
+     */
     public boolean isInstalled(String namespace)
     {
-        return getLocalExtension().isInstalled(namespace);
+        return getExtension().isInstalled(namespace);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.LocalExtension#isDependency()
+     */
     public boolean isDependency()
     {
-        return getLocalExtension().isDependency();
+        return getExtension().isDependency();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.LocalExtension#getNamespaces()
+     */
     public Collection<String> getNamespaces()
     {
-        return getLocalExtension().getNamespaces();
+        return getExtension().getNamespaces();
     }
 }

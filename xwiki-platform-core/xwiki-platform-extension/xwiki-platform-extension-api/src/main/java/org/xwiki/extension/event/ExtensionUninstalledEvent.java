@@ -21,13 +21,26 @@ package org.xwiki.extension.event;
 
 import org.xwiki.extension.ExtensionId;
 
-public class ExtensionUninstalled extends AbstractExtensionEvent
+/**
+ * An event triggered when a extension has been uninstalled.
+ * 
+ * @version $Id$
+ */
+public class ExtensionUninstalledEvent extends AbstractExtensionEvent
 {
-    public ExtensionUninstalled()
+    /**
+     * Matches all extensions.
+     */
+    public ExtensionUninstalledEvent()
     {
     }
 
-    public ExtensionUninstalled(ExtensionId extensionId)
+    /**
+     * Matches only the specified extension id or/and version.
+     * 
+     * @param extensionId the extension identifier
+     */
+    public ExtensionUninstalledEvent(ExtensionId extensionId)
     {
         super(extensionId);
     }

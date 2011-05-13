@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.task.internal;
 
+import java.text.MessageFormat;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -32,8 +34,8 @@ import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
-import org.xwiki.extension.event.ExtensionInstalled;
-import org.xwiki.extension.event.ExtensionUpgraded;
+import org.xwiki.extension.event.ExtensionInstalledEvent;
+import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
 import org.xwiki.extension.internal.VersionManager;
 import org.xwiki.extension.repository.CoreExtensionRepository;
@@ -42,29 +44,60 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.task.InstallRequest;
 import org.xwiki.observation.ObservationManager;
 
+/**
+ * Extension installation related task.
+ * <p>
+ * This task is taking care of discovering automatically if the extension need to be upgraded instead of installed. It
+ * also generated related events.
+ * 
+ * @version $Id$
+ */
 @Component
 @Singleton
 @Named("install")
 public class InstallTask extends AbstractTask<InstallRequest>
 {
+    /**
+     * Used to resolve extensions to install.
+     */
     @Inject
     private ExtensionRepositoryManager repositoryManager;
 
+    /**
+     * Used to check if extension or its dependencies are already core extensions.
+     */
     @Inject
     private CoreExtensionRepository coreExtensionRepository;
 
+    /**
+     * Used to manipulate local extension repository.
+     */
     @Inject
     private LocalExtensionRepository localExtensionRepository;
 
+    /**
+     * Used to compare version of upgraded extensions.
+     */
     @Inject
     private VersionManager versionManager;
 
+    /**
+     * Used to install the extension itself depending of its type.
+     */
     @Inject
     private ExtensionHandlerManager extensionHandlerManager;
 
+    /**
+     * Used to send extensions installation and upgrade related events.
+     */
     @Inject
     private ObservationManager observationManager;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.task.internal.AbstractTask#start()
+     */
     @Override
     protected void start() throws Exception
     {
@@ -79,16 +112,33 @@ public class InstallTask extends AbstractTask<InstallRequest>
         }
     }
 
+    /**
+     * Install provided extension.
+     * 
+     * @param extensionId the identifier of the extension to install
+     * @param namespace the namespace where to install the extension
+     * @return the newly installed local extension
+     * @throws InstallException error when trying to install provided extension
+     */
     public LocalExtension installExtension(ExtensionId extensionId, String namespace) throws InstallException
     {
         return installExtension(extensionId, false, namespace);
     }
 
+    /**
+     * Install provided extension.
+     * 
+     * @param extensionId the identifier of the extension to install
+     * @param dependency indicate if the extension is installed as a dependency
+     * @param namespace the namespace where to install the extension
+     * @return the newly installed local extension
+     * @throws InstallException error when trying to install provided extension
+     */
     private LocalExtension installExtension(ExtensionId extensionId, boolean dependency, String namespace)
         throws InstallException
     {
         if (this.coreExtensionRepository.exists(extensionId.getId())) {
-            throw new InstallException("[" + extensionId.getId() + "]: core extension");
+            throw new InstallException(MessageFormat.format("[{0}]: core extension", extensionId.getId()));
         }
 
         LocalExtension previousExtension = null;
@@ -100,9 +150,10 @@ public class InstallTask extends AbstractTask<InstallRequest>
                 this.versionManager.compareVersions(extensionId.getVersion(), localExtension.getId().getVersion());
 
             if (diff == 0) {
-                throw new InstallException("[" + extensionId.getId() + "]: already installed");
+                throw new InstallException(MessageFormat.format("[{0}]: already installed", extensionId.getId()));
             } else if (diff < 0) {
-                throw new InstallException("[" + extensionId.getId() + "]: a more recent version is already installed");
+                throw new InstallException(MessageFormat.format("[{0}]: a more recent version is already installed",
+                    extensionId.getId()));
             } else {
                 // upgrade
                 previousExtension = localExtension;
@@ -113,6 +164,15 @@ public class InstallTask extends AbstractTask<InstallRequest>
     }
 
     // TODO: support version range
+
+    /**
+     * Install provided extension dependency.
+     * 
+     * @param extensionDependency the extension dependency to install
+     * @param namespace the namespace where to install the extension
+     * @return the newly installed local extension
+     * @throws InstallException error when trying to install provided extension
+     */
     private LocalExtension installExtensionDependency(ExtensionDependency extensionDependency, String namespace)
         throws InstallException
     {
@@ -141,6 +201,16 @@ public class InstallTask extends AbstractTask<InstallRequest>
             new ExtensionId(extensionDependency.getId(), extensionDependency.getVersion()), true, namespace);
     }
 
+    /**
+     * Install provided extension.
+     * 
+     * @param previousExtension the previous installed version of the extension to install
+     * @param extensionId the identifier of the extension to install
+     * @param dependency indicate if the extension is installed as a dependency
+     * @param namespace the namespace where to install the extension
+     * @return the newly installed local extension
+     * @throws InstallException error when trying to install provided extension
+     */
     private LocalExtension installExtension(LocalExtension previousExtension, ExtensionId extensionId,
         boolean dependency, String namespace) throws InstallException
     {
@@ -149,11 +219,7 @@ public class InstallTask extends AbstractTask<InstallRequest>
         try {
             remoteExtension = this.repositoryManager.resolve(extensionId);
         } catch (ResolveException e) {
-            throw new InstallException("Failed to resolve extension [" + extensionId + "]", e);
-        }
-
-        if (remoteExtension == null) {
-            throw new InstallException("Failed to resolve extension [" + extensionId + "]");
+            throw new InstallException(MessageFormat.format("Failed to resolve extension [{0}]", extensionId), e);
         }
 
         try {
@@ -163,6 +229,15 @@ public class InstallTask extends AbstractTask<InstallRequest>
         }
     }
 
+    /**
+     * @param previousExtension the previous installed version of the extension to install
+     * @param remoteExtension the new extension to install
+     * @param dependency indicate if the extension is installed as a dependency
+     * @param namespace the namespace where to install the extension
+     * @return the newly installed local extension
+     * @throws ComponentLookupException failed to find proper {@link org.xwiki.extension.handler.ExtensionHandler}
+     * @throws InstallException error when trying to install provided extension
+     */
     private LocalExtension installExtension(LocalExtension previousExtension, Extension remoteExtension,
         boolean dependency, String namespace) throws ComponentLookupException, InstallException
     {
@@ -185,12 +260,12 @@ public class InstallTask extends AbstractTask<InstallRequest>
                 // extension exists
             }
 
-            this.observationManager.notify(new ExtensionUpgraded(localExtension.getId()), localExtension,
+            this.observationManager.notify(new ExtensionUpgradedEvent(localExtension.getId()), localExtension,
                 previousExtension);
         } else {
             this.extensionHandlerManager.install(localExtension, namespace);
 
-            this.observationManager.notify(new ExtensionInstalled(localExtension.getId()), localExtension,
+            this.observationManager.notify(new ExtensionInstalledEvent(localExtension.getId()), localExtension,
                 previousExtension);
         }
 

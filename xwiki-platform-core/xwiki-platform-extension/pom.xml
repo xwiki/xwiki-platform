@@ -37,7 +37,6 @@
     <maven.version>3.0.3</maven.version>
   
     <!-- Extension Manager is still in experimental sate and change very often -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <modules>

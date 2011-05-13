@@ -26,18 +26,46 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InvalidExtensionException;
 import org.xwiki.extension.LocalExtension;
 
+/**
+ * Local repository storage serialization tool.
+ * 
+ * @version $Id$
+ */
 public class DefaultLocalExtensionSerializer
 {
-    private DefaultLocalExtensionRepository repository;
-
+    private static final String ELEMENT_ID = "id";
+    private static final String ELEMENT_VERSION = "version";
+    private static final String ELEMENT_TYPE = "type";
+    private static final String ELEMENT_DEPENDENCY = "dependency";
+    private static final String ELEMENT_INSTALLED = "installed";
+    private static final String ELEMENT_NAME = "name";
+    private static final String ELEMENT_DESCRIPTION = "description";
+    private static final String ELEMENT_WEBSITE = "website";
+  
+    private static final String ELEMENT_AUTHORS = "authors";
+    private static final String ELEMENT_AAUTHOR = "author";
+    
+    private static final String ELEMENT_DEPENDENCIES = "dependencies";
+    private static final String ELEMENT_DDEPENDENCY = "dependency";
+    
+    private static final String ELEMENT_NAMESPACES = "namespaces";
+    private static final String ELEMENT_NNAMESPACE = "namespace";
+    
+    /**
+     * Used to parse XML descriptor file.
+     */
     private DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
-    public DefaultLocalExtensionSerializer(DefaultLocalExtensionRepository repository)
-    {
-        this.repository = repository;
-    }
-
-    public DefaultLocalExtension loadDescriptor(InputStream descriptor) throws InvalidExtensionException
+    /**
+     * Load local extension descriptor.
+     * 
+     * @param repository the repository
+     * @param descriptor the descriptor content
+     * @return the parsed local extension descriptor
+     * @throws InvalidExtensionException error when trying to parse extension descriptor
+     */
+    public DefaultLocalExtension loadDescriptor(DefaultLocalExtensionRepository repository, InputStream descriptor)
+        throws InvalidExtensionException
     {
         DocumentBuilder documentBuilder;
         try {
@@ -57,9 +85,9 @@ public class DefaultLocalExtensionSerializer
 
         // Mandatory fields
 
-        Node idNode = extensionElement.getElementsByTagName("id").item(0);
-        Node versionNode = extensionElement.getElementsByTagName("version").item(0);
-        Node typeNode = extensionElement.getElementsByTagName("type").item(0);
+        Node idNode = extensionElement.getElementsByTagName(ELEMENT_ID).item(0);
+        Node versionNode = extensionElement.getElementsByTagName(ELEMENT_VERSION).item(0);
+        Node typeNode = extensionElement.getElementsByTagName(ELEMENT_TYPE).item(0);
 
         DefaultLocalExtension localExtension =
             new DefaultLocalExtension(repository,
@@ -67,25 +95,29 @@ public class DefaultLocalExtensionSerializer
 
         // Optional fields
 
-        Node dependencyNode = getNode(extensionElement, "dependency");
+        Node dependencyNode = getNode(extensionElement, ELEMENT_DEPENDENCY);
         if (dependencyNode != null) {
             localExtension.setDependency(Boolean.valueOf(dependencyNode.getTextContent()));
         }
-        Node enabledNode = getNode(extensionElement, "installed");
+        Node enabledNode = getNode(extensionElement, ELEMENT_INSTALLED);
         if (enabledNode != null) {
             localExtension.setInstalled(Boolean.valueOf(enabledNode.getTextContent()));
         }
-        Node descriptionNode = getNode(extensionElement, "description");
+        Node nameNode = getNode(extensionElement, ELEMENT_NAME);
+        if (nameNode != null) {
+            localExtension.setName(nameNode.getTextContent());
+        }
+        Node descriptionNode = getNode(extensionElement, ELEMENT_DESCRIPTION);
         if (descriptionNode != null) {
             localExtension.setDescription(descriptionNode.getTextContent());
         }
-        Node websiteNode = getNode(extensionElement, "website");
+        Node websiteNode = getNode(extensionElement, ELEMENT_WEBSITE);
         if (websiteNode != null) {
             localExtension.setWebsite(websiteNode.getTextContent());
         }
 
         // Authors
-        NodeList authorsNodes = extensionElement.getElementsByTagName("authors");
+        NodeList authorsNodes = extensionElement.getElementsByTagName(ELEMENT_AUTHORS);
         if (authorsNodes.getLength() > 0) {
             NodeList authors = authorsNodes.item(0).getChildNodes();
             for (int i = 0; i < authors.getLength(); ++i) {
@@ -96,15 +128,15 @@ public class DefaultLocalExtensionSerializer
         }
 
         // Dependencies
-        NodeList dependenciesNodes = extensionElement.getElementsByTagName("dependencies");
+        NodeList dependenciesNodes = extensionElement.getElementsByTagName(ELEMENT_DEPENDENCIES);
         if (dependenciesNodes.getLength() > 0) {
             NodeList dependenciesNodeList = dependenciesNodes.item(0).getChildNodes();
             for (int i = 0; i < dependenciesNodeList.getLength(); ++i) {
                 Node dependency = dependenciesNodeList.item(i);
 
-                if (dependency.getNodeName().equals("dependency")) {
-                    Node dependencyIdNode = getNode(dependency, "id");
-                    Node dependencyVersionNode = getNode(dependency, "version");
+                if (dependency.getNodeName().equals(ELEMENT_DDEPENDENCY)) {
+                    Node dependencyIdNode = getNode(dependency, ELEMENT_ID);
+                    Node dependencyVersionNode = getNode(dependency, ELEMENT_VERSION);
 
                     localExtension.addDependency(new LocalExtensionDependency(dependencyIdNode.getTextContent(),
                         dependencyVersionNode.getTextContent()));
@@ -113,7 +145,7 @@ public class DefaultLocalExtensionSerializer
         }
 
         // Namespaces
-        NodeList namespacesNodes = extensionElement.getElementsByTagName("namespaces");
+        NodeList namespacesNodes = extensionElement.getElementsByTagName(ELEMENT_NAMESPACES);
         if (namespacesNodes.getLength() > 0) {
             NodeList namespaces = namespacesNodes.item(0).getChildNodes();
             for (int i = 0; i < namespaces.getLength(); ++i) {
@@ -156,14 +188,15 @@ public class DefaultLocalExtensionSerializer
         Element extensionElement = document.createElement("extension");
         document.appendChild(extensionElement);
 
-        addElement(document, extensionElement, "id", extension.getId().getId());
-        addElement(document, extensionElement, "version", extension.getId().getVersion());
-        addElement(document, extensionElement, "type", extension.getType());
+        addElement(document, extensionElement, ELEMENT_ID, extension.getId().getId());
+        addElement(document, extensionElement, ELEMENT_VERSION, extension.getId().getVersion());
+        addElement(document, extensionElement, ELEMENT_TYPE, extension.getType());
 
-        addElement(document, extensionElement, "dependency", String.valueOf(extension.isDependency()));
-        addElement(document, extensionElement, "installed", String.valueOf(extension.isInstalled()));
-        addElement(document, extensionElement, "description", extension.getDescription());
-        addElement(document, extensionElement, "website", extension.getWebSite());
+        addElement(document, extensionElement, ELEMENT_DEPENDENCY, String.valueOf(extension.isDependency()));
+        addElement(document, extensionElement, ELEMENT_INSTALLED, String.valueOf(extension.isInstalled()));
+        addElement(document, extensionElement, ELEMENT_NAME, extension.getName());
+        addElement(document, extensionElement, ELEMENT_DESCRIPTION, extension.getDescription());
+        addElement(document, extensionElement, ELEMENT_WEBSITE, extension.getWebSite());
 
         addAuthors(document, extensionElement, extension);
         addDependencies(document, extensionElement, extension);
@@ -189,27 +222,27 @@ public class DefaultLocalExtensionSerializer
     private void addDependencies(Document document, Element parentElement, Extension extension)
     {
         if (extension.getDependencies() != null && !extension.getDependencies().isEmpty()) {
-            Element dependenciesElement = document.createElement("dependencies");
+            Element dependenciesElement = document.createElement(ELEMENT_DEPENDENCIES);
             parentElement.appendChild(dependenciesElement);
 
             for (ExtensionDependency dependency : extension.getDependencies()) {
-                Element dependencyElement = document.createElement("dependency");
+                Element dependencyElement = document.createElement(ELEMENT_DDEPENDENCY);
                 dependenciesElement.appendChild(dependencyElement);
 
-                addElement(document, dependencyElement, "id", dependency.getId());
-                addElement(document, dependencyElement, "version", dependency.getVersion());
+                addElement(document, dependencyElement, ELEMENT_ID, dependency.getId());
+                addElement(document, dependencyElement, ELEMENT_VERSION, dependency.getVersion());
             }
         }
     }
 
     private void addNamespaces(Document document, Element parentElement, LocalExtension extension)
     {
-        addCollection(document, parentElement, extension.getNamespaces(), "namespace", "namespaces");
+        addCollection(document, parentElement, extension.getNamespaces(), ELEMENT_NNAMESPACE, ELEMENT_NAMESPACES);
     }
 
     private void addAuthors(Document document, Element parentElement, LocalExtension extension)
     {
-        addCollection(document, parentElement, extension.getAuthors(), "author", "authors");
+        addCollection(document, parentElement, extension.getAuthors(), ELEMENT_AAUTHOR, ELEMENT_AUTHORS);
     }
 
     private void addCollection(Document document, Element parentElement, Collection<String> elements,

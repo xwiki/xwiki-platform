@@ -21,8 +21,20 @@ package org.xwiki.extension.repository;
 
 import org.xwiki.component.annotation.ComponentRole;
 
+/**
+ * Create {@link ExtensionRepository}s.
+ * 
+ * @version $Id$
+ */
 @ComponentRole
 public interface ExtensionRepositoryFactory
 {
+    /**
+     * Create a new {@link ExtensionRepository}.
+     * 
+     * @param repositoryId the repository identifier
+     * @return the {@link ExtensionRepository}
+     * @throws ExtensionRepositoryException failed to create a {@link ExtensionRepository} for the provided identifier
+     */
     ExtensionRepository createRepository(ExtensionRepositoryId repositoryId) throws ExtensionRepositoryException;
 }

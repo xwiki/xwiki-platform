@@ -191,10 +191,11 @@ public class ScryptMemoryHardKeyDerivationFunction extends AbstractMemoryHardKey
             this.allocateMemory(true);
             PBKDF2KeyDerivationFunction sha256Pbkdf2 = new PBKDF2KeyDerivationFunction(new SHA256Digest());
             int blockSizeInBytes = 128 * this.blockSize;
-            byte[] workingBufferB = new byte[blockSizeInBytes * this.processorExpense];
+            int bufferBLength = blockSizeInBytes * this.processorExpense;
 
             /* 1: (B_0 ... B_{p-1}) <-- PBKDF2(P, S, 1, p * MFLen) */
-            workingBufferB = sha256Pbkdf2.generateDerivedKey(password, this.salt, 1, workingBufferB.length);
+            byte[] workingBufferB =
+                sha256Pbkdf2.generateDerivedKey(password, this.salt, 1, bufferBLength);
 
             /* 2: for i = 0 to p - 1 do */
             // NOTE: This loop cycles processorExpense number of cycles.

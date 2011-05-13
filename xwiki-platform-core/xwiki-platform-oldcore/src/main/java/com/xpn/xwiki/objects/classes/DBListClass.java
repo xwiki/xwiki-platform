@@ -553,36 +553,19 @@ public class DBListClass extends ListClass
     @Override
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
-        if (isPicker() && getSql().compareTo("") != 0) {
-            BaseProperty prop = (BaseProperty) object.safeget(name);
-            String val = "";
-            if (prop != null) {
-                val = prop.toFormString();
+        List<String> selectlist;
+        String separator = getSeparator();
+        BaseProperty prop = (BaseProperty) object.safeget(name);
+        Map<String, ListItem> map = getMap(context);
+        if (prop instanceof ListProperty) {
+            selectlist = ((ListProperty) prop).getList();
+            List<String> newlist = new ArrayList<String>();
+            for (String entry : selectlist) {
+                newlist.add(getDisplayValue(entry, name, map, context));
             }
-            Map map = getMap(context);
-
-            String secondCol = returnCol(getSql(), false);
-            if (secondCol.compareTo("-") != 0) {
-                String res = getValue(val, getSql(), context);
-                buffer.append(getDisplayValue(res, name, map, context));
-            } else {
-                buffer.append(getDisplayValue(val, name, map, context));
-            }
+            buffer.append(StringUtils.join(newlist, separator));
         } else {
-            List<String> selectlist;
-            String separator = getSeparator();
-            BaseProperty prop = (BaseProperty) object.safeget(name);
-            Map<String, ListItem> map = getMap(context);
-            if (prop instanceof ListProperty) {
-                selectlist = ((ListProperty) prop).getList();
-                List<String> newlist = new ArrayList<String>();
-                for (String entry : selectlist) {
-                    newlist.add(getDisplayValue(entry, name, map, context));
-                }
-                buffer.append(StringUtils.join(newlist, separator));
-            } else {
-                buffer.append(getDisplayValue(prop.getValue(), name, map, context));
-            }
+            buffer.append(getDisplayValue(prop.getValue(), name, map, context));
         }
     }
 }

@@ -33,7 +33,7 @@ import org.xwiki.crypto.internal.Convert;
  * and the private key is written in the string below.
  *
  * @version $Id$
- * @since 2.5M1
+ * @since 3.1M2
  */
 public class FastKeySupplier
 {

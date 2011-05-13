@@ -208,8 +208,8 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
         }
         topLevel.addChildren(layoutedResult);
         // add the style attribute of the dashboard macro as a class to the toplevel container
-        topLevel.setParameter("class", MACRO_NAME
-            + (StringUtils.isEmpty(parameters.getStyle()) ? "" : " " + parameters.getStyle()));
+        topLevel.setParameter("class",
+            MACRO_NAME + (StringUtils.isEmpty(parameters.getStyle()) ? "" : " " + parameters.getStyle()));
 
         return Collections.<Block> singletonList(topLevel);
     }
@@ -230,9 +230,23 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
             jsfx.use("js/scriptaculous/effects.js");
             jsfx.use("js/scriptaculous/dragdrop.js");
             Map<String, Object> fxParamsNonDeferred = new HashMap<String, Object>();
-            fxParamsNonDeferred.putAll(fxParamsForceSkinAction);
             fxParamsNonDeferred.put("defer", false);
-            jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", fxParamsNonDeferred);
+            Map<String, Object> fxParamsNonDeferredForceSkinAction = new HashMap<String, Object>();
+            fxParamsNonDeferredForceSkinAction.putAll(fxParamsForceSkinAction);
+            fxParamsNonDeferredForceSkinAction.putAll(fxParamsNonDeferred);
+            // include the smart client as well since it injects stuff in the GWT and then onModuleLoad cannot be ran
+            // without. See XWIKI-6620 for details
+            jsfx.use("js/smartclient/initsc.js", fxParamsNonDeferredForceSkinAction);
+            jsfx.use("js/smartclient/modules/ISC_Core.js", fxParamsNonDeferred);
+            jsfx.use("js/smartclient/overwritesc.js", fxParamsNonDeferred);
+            jsfx.use("js/smartclient/modules/ISC_Foundation.js", fxParamsNonDeferred);
+            jsfx.use("js/smartclient/modules/ISC_Containers.js", fxParamsNonDeferred);
+            // this is the only file that seems to be not really needed. I am including it though since I'm including
+            // all others anyway and maybe there's a case I didn't see
+            jsfx.use("js/smartclient/modules/ISC_Grids.js", fxParamsNonDeferred);
+            jsfx.use("js/smartclient/modules/ISC_Forms.js", fxParamsNonDeferred);
+            jsfx.use("js/smartclient/modules/ISC_DataBinding.js", fxParamsNonDeferred);
+            jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", fxParamsNonDeferredForceSkinAction);
             jsfx.use("uicomponents/dashboard/dashboard.js", fxParamsForceSkinAction);
         }
     }

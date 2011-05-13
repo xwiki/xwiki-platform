@@ -82,13 +82,12 @@ public class ExtensionManagerScriptService implements ScriptService
     @Inject
     private Execution execution;
 
-    private <K, T extends Extension> Map<K, Collection<T>> wrapExtensions(
-        Map<K, Collection< ? extends Extension>> extensions)
+    private <K> Map<K, Collection<LocalExtension>> wrapExtensions(Map<K, Collection<LocalExtension>> extensions)
     {
-        Map<K, Collection<T>> wrappedExtensions = new LinkedHashMap<K, Collection<T>>();
+        Map<K, Collection<LocalExtension>> wrappedExtensions = new LinkedHashMap<K, Collection<LocalExtension>>();
 
-        for (Map.Entry<K, Collection< ? extends Extension>> entry : extensions.entrySet()) {
-            wrappedExtensions.put(entry.getKey(), this.<T> wrapExtensions(entry.getValue()));
+        for (Map.Entry<K, Collection<LocalExtension>> entry : extensions.entrySet()) {
+            wrappedExtensions.put(entry.getKey(), this.<LocalExtension> wrapExtensions(entry.getValue()));
         }
 
         return wrappedExtensions;
@@ -161,7 +160,9 @@ public class ExtensionManagerScriptService implements ScriptService
         Map<String, Collection<LocalExtension>> extensions;
 
         try {
-            extensions = this.<String, LocalExtension>wrapExtensions(this.localExtensionRepository.getBackwardDependencies(new ExtensionId(id, version)));
+            extensions =
+                this.<String> wrapExtensions(this.localExtensionRepository.getBackwardDependencies(new ExtensionId(id,
+                    version)));
         } catch (Exception e) {
             setError(e);
 

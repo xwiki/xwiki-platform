@@ -65,7 +65,8 @@ public class DefaultPasswordCryptoServiceConfiguration
     private final String keyDerivationFunctionClassForEncryption = "keyDerivationFunctionClassForEncryption";
 
     /** Default {@link org.xwiki.crypto.passwd.KeyDerivationFunction} class to use for encryption. */
-    private final Class<?> defaultKeyDerivationFunctionClassForEncryption = ScryptMemoryHardKeyDerivationFunction.class;
+    private final Class<?> defaultKeyDerivationFunctionClassForEncryption =
+        PBKDF2KeyDerivationFunction.class;
 
     /**
      * Key for {@link java.util.Properties} for the {@link org.xwiki.crypto.passwd.KeyDerivationFunction} 
@@ -93,7 +94,7 @@ public class DefaultPasswordCryptoServiceConfiguration
 
     /** Default {@link org.xwiki.crypto.passwd.KeyDerivationFunction} class to use for password verification. */
     private final Class<?> defaultKeyDerivationFunctionClassForPasswordVerification = 
-        ScryptMemoryHardKeyDerivationFunction.class;
+        PBKDF2KeyDerivationFunction.class;
 
     /**
      * Key for {@link java.util.Properties} for the {@link org.xwiki.crypto.passwd.KeyDerivationFunction} 

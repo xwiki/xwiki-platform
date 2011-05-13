@@ -286,29 +286,6 @@ public class ScryptMemoryHardKeyDerivationFunctionTest extends ScryptMemoryHardK
         Assert.assertEquals(this.salsa8OutputBase64, outStr);
     }
 
-    /**
-     * Prove that guessing the processor time when initializing is relatively accurate.
-     * It's important to run this test on various architectures.
-     * This test will fail if time taken is over 100% difference from time expected.
-     */
-    @Test
-    public void initializationProcessorTimeTest() throws Exception
-    {
-        this.checkInitializationProcessorTime(1024, 500);
-        this.checkInitializationProcessorTime(8192, 1000);
-        this.checkInitializationProcessorTime(16384, 3000);
-    }
-
-    public void checkInitializationProcessorTime(int targetMemory, int targetTime) throws Exception
-    {
-        this.init(targetMemory, targetTime, 64);
-        long time = System.currentTimeMillis();
-        this.deriveKey("password".getBytes());
-        int timeSpent = (int) (System.currentTimeMillis() - time);
-        Assert.assertTrue("password hashing took " + timeSpent + " and target time was " + targetTime,
-                          Math.abs(timeSpent - targetTime) < targetTime);
-    }
-
     /** Prove that the function will continue to produce the same hash for a given password after serialization. */
     @Test
     public void serializationTest() throws Exception

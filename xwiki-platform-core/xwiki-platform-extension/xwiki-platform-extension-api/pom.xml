@@ -117,7 +117,7 @@
           <excludes>
               **/DefaultCoreExtensionScanner.java,
               **/DefaultLocalExtensionRepository.java,
-              **/DefaultLocalExtensionSerializer.java
+              **/ExtensionSerializer.java
           </excludes>
         </configuration>
       </plugin>

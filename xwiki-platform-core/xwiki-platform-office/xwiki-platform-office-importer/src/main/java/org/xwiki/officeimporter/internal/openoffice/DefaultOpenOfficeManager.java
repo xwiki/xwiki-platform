@@ -22,14 +22,16 @@ package org.xwiki.officeimporter.internal.openoffice;
 import java.io.File;
 import java.io.InputStream;
 
+import javax.inject.Inject;
+
 import org.artofsolving.jodconverter.OfficeDocumentConverter;
 import org.artofsolving.jodconverter.document.JsonDocumentFormatRegistry;
 import org.artofsolving.jodconverter.office.DefaultOfficeManagerConfiguration;
 import org.artofsolving.jodconverter.office.ExternalOfficeManagerConfiguration;
 import org.artofsolving.jodconverter.office.OfficeManager;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.container.Container;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
@@ -43,7 +45,7 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
  * @since 1.8RC3
  */
 @Component
-public class DefaultOpenOfficeManager extends AbstractLogEnabled implements OpenOfficeManager
+public class DefaultOpenOfficeManager implements OpenOfficeManager
 {
     /**
      * The path to the file that can be used to configure the office document conversion.
@@ -61,6 +63,12 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
      */
     @Requirement
     private Container container;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Internal {@link OfficeManager} used to control / connect openoffice server.
@@ -124,12 +132,12 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
             try {
                 jodConverter = new OfficeDocumentConverter(jodOOManager, new JsonDocumentFormatRegistry(input));
             } catch (Exception e) {
-                getLogger().warn(
+                this.logger.warn(
                     String.format("Failed to parse %s . The default document format registry will be used instead.",
                         DOCUMENT_FORMATS_PATH), e);
             }
         } else {
-            getLogger().debug(
+            this.logger.debug(
                 String.format("%s is missing. The default document format registry will be used instead.",
                     DOCUMENT_FORMATS_PATH));
         }
@@ -139,7 +147,7 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
         }
 
         File workDir = container.getApplicationContext().getTemporaryDirectory();
-        this.converter = new DefaultOpenOfficeConverter(this.jodConverter, workDir, getLogger());
+        this.converter = new DefaultOpenOfficeConverter(this.jodConverter, workDir);
     }
 
     /**
@@ -166,7 +174,7 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
         try {
             this.jodOOManager.start();
             setState(ManagerState.CONNECTED);
-            getLogger().info("Open Office instance started.");
+            this.logger.info("Open Office instance started.");
         } catch (Exception e) {
             setState(ManagerState.ERROR);
             throw new OpenOfficeManagerException("Error while connecting / starting openoffice.", e);
@@ -186,7 +194,7 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
         try {
             this.jodOOManager.stop();
             setState(ManagerState.NOT_CONNECTED);
-            getLogger().info("Open Office instance stopped.");
+            this.logger.info("Open Office instance stopped.");
         } catch (Exception e) {
             if (connected) {
                 setState(ManagerState.ERROR);

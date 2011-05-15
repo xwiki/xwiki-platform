@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -52,6 +53,12 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
     private Container container;
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * {@inheritDoc}
      * 
      * @see Initializable#initialize()
@@ -65,10 +72,10 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
             xwikiPropertiesUrl = this.container.getApplicationContext().getResource(XWIKI_PROPERTIES_FILE);
             if (xwikiPropertiesUrl != null) {
                 setConfiguration(new PropertiesConfiguration(xwikiPropertiesUrl));
-            } else if (getLogger().isDebugEnabled()) {
+            } else if (this.logger.isDebugEnabled()) {
                 // We use a debug logging level here since we consider it's ok that there's no XWIKI_PROPERTIES_FILE
                 // available, in which case default values are used.
-                getLogger().debug("No configuration file [" + XWIKI_PROPERTIES_FILE + "] found. "
+                this.logger.debug("No configuration file [" + XWIKI_PROPERTIES_FILE + "] found. "
                     + "Using default configuration values.");
 
                 // Use a default Commons Configuration implementation since we couldn't use a Properties configuration.
@@ -77,7 +84,7 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
         } catch (Exception e) {
             // Note: if we cannot read the configuration file for any reasonwe log a warning but continue since XWiki
             // will use default values for all configurable elements.
-            getLogger().warn("Failed to load configuration file [" + XWIKI_PROPERTIES_FILE
+            this.logger.warn("Failed to load configuration file [" + XWIKI_PROPERTIES_FILE
                 + "]. Using default configuration values. " + " Internal error [" + e.getMessage() + "]");
 
             // Use a default Commons Configuration implementation since we couldn't use a Properties configuration.

@@ -19,10 +19,12 @@
  */
 package com.xpn.xwiki.internal;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.configuration.ConfigurationSource;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -37,7 +39,7 @@ import org.xwiki.rendering.syntax.SyntaxFactory;
  * @since 1.8RC2
  */
 @Component
-public class DefaultCoreConfiguration extends AbstractLogEnabled implements CoreConfiguration
+public class DefaultCoreConfiguration implements CoreConfiguration
 {
     /**
      * Prefix for configuration keys for the Core module.
@@ -64,6 +66,12 @@ public class DefaultCoreConfiguration extends AbstractLogEnabled implements Core
     private ConfigurationSource xwikiPropertiesConfiguration;
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * @see CoreConfiguration#getDefaultDocumentSyntax()
      * @since 2.3M1
      */
@@ -85,7 +93,7 @@ public class DefaultCoreConfiguration extends AbstractLogEnabled implements Core
         try {
             syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
         } catch (ParseException e) {
-            getLogger().warn("Invalid default document Syntax [" + syntaxId + "], defaulting to ["
+            this.logger.warn("Invalid default document Syntax [" + syntaxId + "], defaulting to ["
                 + Syntax.XWIKI_2_0.toIdString() + "] instead", e);
             syntax = Syntax.XWIKI_2_0;
         }

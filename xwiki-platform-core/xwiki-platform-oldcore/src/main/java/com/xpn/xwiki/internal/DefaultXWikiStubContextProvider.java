@@ -19,8 +19,10 @@
  */
 package com.xpn.xwiki.internal;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -38,8 +40,14 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
  * @since 2.0M3
  */
 @Component
-public class DefaultXWikiStubContextProvider extends AbstractLogEnabled implements XWikiStubContextProvider
+public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
 {
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
     /**
      * The initial stub XWikiContext.
      */
@@ -74,7 +82,7 @@ public class DefaultXWikiStubContextProvider extends AbstractLogEnabled implemen
         this.stubContext.flushClassCache();
         this.stubContext.flushArchiveCache();
 
-        getLogger().debug("Stub context initialized.");
+        this.logger.debug("Stub context initialized.");
     }
 
     /**

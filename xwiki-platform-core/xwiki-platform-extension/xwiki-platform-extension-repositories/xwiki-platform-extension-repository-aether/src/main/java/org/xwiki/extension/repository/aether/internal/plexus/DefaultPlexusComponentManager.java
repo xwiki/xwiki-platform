@@ -41,6 +41,12 @@ public class DefaultPlexusComponentManager implements PlexusComponentManager, In
     Logger logger;
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * In-process maven runtime.
      */
     private MutablePlexusContainer plexusContainer;

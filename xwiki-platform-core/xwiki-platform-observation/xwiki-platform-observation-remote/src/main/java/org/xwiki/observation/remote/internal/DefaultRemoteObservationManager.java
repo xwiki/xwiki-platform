@@ -22,8 +22,8 @@ package org.xwiki.observation.remote.internal;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
@@ -51,8 +51,7 @@ import org.xwiki.observation.remote.converter.EventConverterManager;
  */
 @Component
 @Singleton
-public class DefaultRemoteObservationManager extends AbstractLogEnabled implements RemoteObservationManager,
-    Initializable
+public class DefaultRemoteObservationManager implements RemoteObservationManager, Initializable
 {
     /**
      * Access {@link RemoteObservationManager} configuration.
@@ -97,6 +96,12 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
     private ComponentManager componentManager;
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * The network adapter to use to actually send and receive network messages.
      */
     private NetworkAdapter networkAdapter;
@@ -121,7 +126,7 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
             try {
                 startChannel(channelId);
             } catch (RemoteEventException e) {
-                getLogger().error("Failed to start channel [" + channelId + "]", e);
+                this.logger.error("Failed to start channel [" + channelId + "]", e);
             }
         }
     }
@@ -150,7 +155,7 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
             try {
                 this.networkAdapter.stopAllChannels();
             } catch (RemoteEventException e) {
-                getLogger().error("Failed to stop channels", e);
+                this.logger.error("Failed to stop channels", e);
             }
         }
     }
@@ -212,7 +217,7 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
             try {
                 this.executionContextManager.initialize(context);
             } catch (ExecutionContextException e) {
-                getLogger().error("failed to initialize execution context", e);
+                this.logger.error("failed to initialize execution context", e);
             }
 
             this.execution.setContext(context);

@@ -26,9 +26,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
@@ -54,7 +54,7 @@ import org.xwiki.rendering.transformation.TransformationManager;
 @Component
 @Named("officeviewer")
 @Singleton
-public class DefaultOfficeViewerScriptService extends AbstractLogEnabled implements OfficeViewerScriptService
+public class DefaultOfficeViewerScriptService implements OfficeViewerScriptService
 {
     /**
      * The key used to save on the execution context the exception caught during office document view.
@@ -100,6 +100,12 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
     private TransformationManager transformationManager;
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * {@inheritDoc}
      * 
      * @see OfficeViewerScriptService#getCaughtException()
@@ -143,7 +149,7 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
         } catch (Exception e) {
             // Save caught exception.
             this.execution.getContext().setProperty(OFFICE_VIEW_EXCEPTION, e);
-            getLogger().error("Failed to view office document: " + attachmentReference, e);
+            this.logger.error("Failed to view office document: " + attachmentReference, e);
             return null;
         }
     }

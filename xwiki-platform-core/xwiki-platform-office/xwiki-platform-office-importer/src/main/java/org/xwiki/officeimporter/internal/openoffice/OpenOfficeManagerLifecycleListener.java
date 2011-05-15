@@ -22,9 +22,11 @@ package org.xwiki.officeimporter.internal.openoffice;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
@@ -41,7 +43,7 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
  * @since 2.0M1
  */
 @Component("oomanager")
-public class OpenOfficeManagerLifecycleListener extends AbstractLogEnabled implements EventListener
+public class OpenOfficeManagerLifecycleListener implements EventListener
 {
     /**
      * The {@link OpenOfficeConfiguration} component.
@@ -54,6 +56,12 @@ public class OpenOfficeManagerLifecycleListener extends AbstractLogEnabled imple
      */
     @Requirement
     private OpenOfficeManager ooManager;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * {@inheritDoc}
@@ -95,7 +103,7 @@ public class OpenOfficeManagerLifecycleListener extends AbstractLogEnabled imple
             try {
                 this.ooManager.start();
             } catch (OpenOfficeManagerException ex) {
-                getLogger().error(ex.getMessage(), ex);
+                this.logger.error(ex.getMessage(), ex);
             }
         }
     }
@@ -110,7 +118,7 @@ public class OpenOfficeManagerLifecycleListener extends AbstractLogEnabled imple
         try {
             this.ooManager.stop();
         } catch (OpenOfficeManagerException ex) {
-            getLogger().error(ex.getMessage(), ex);
+            this.logger.error(ex.getMessage(), ex);
         }
     }        
 }

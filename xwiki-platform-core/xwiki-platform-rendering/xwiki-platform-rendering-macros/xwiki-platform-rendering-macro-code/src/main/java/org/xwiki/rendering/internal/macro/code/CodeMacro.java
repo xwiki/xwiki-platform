@@ -23,7 +23,10 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -73,6 +76,12 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
      */
     @Requirement
     private ComponentManager componentManager;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -130,16 +139,12 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
                 parser = this.componentManager.lookup(HighlightParser.class, parameters.getLanguage());
                 return parser.highlight(parameters.getLanguage(), new StringReader(content));
             } catch (ComponentLookupException e) {
-                if (getLogger().isDebugEnabled()) {
-                    getLogger().debug(
-                        "Can't find specific highlighting parser for language [" + parameters.getLanguage() + "]", e);
-                }
+                this.logger.debug(
+                    "Can't find specific highlighting parser for language [" + parameters.getLanguage() + "]", e);
             }
         }
 
-        if (getLogger().isDebugEnabled()) {
-            getLogger().debug("Trying the default highlighting parser");
-        }
+        this.logger.debug("Trying the default highlighting parser");
 
         parser = this.componentManager.lookup(HighlightParser.class, "default");
 

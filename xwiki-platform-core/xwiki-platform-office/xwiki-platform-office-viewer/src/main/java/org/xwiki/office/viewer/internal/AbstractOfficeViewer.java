@@ -25,14 +25,16 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.container.Container;
@@ -48,7 +50,7 @@ import org.xwiki.rendering.block.XDOM;
  * @since 2.5M2
  * @version $Id$
  */
-public abstract class AbstractOfficeViewer extends AbstractLogEnabled implements OfficeViewer, Initializable
+public abstract class AbstractOfficeViewer implements OfficeViewer, Initializable
 {
     /**
      * Default encoding used for encoding wiki, space, page and attachment names.
@@ -84,6 +86,12 @@ public abstract class AbstractOfficeViewer extends AbstractLogEnabled implements
      */
     @Requirement
     private CacheManager cacheManager;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Office document view cache.
@@ -244,7 +252,7 @@ public abstract class AbstractOfficeViewer extends AbstractLogEnabled implements
             return String.format("%s/%s/%s/%s", prefix, MODULE_NAME, encodedAttachmentName, encodedFileName);
         } catch (UnsupportedEncodingException e) {
             // This should never happen.
-            getLogger().error("Failed to encode URL using " + DEFAULT_ENCODING, e);
+            this.logger.error("Failed to encode URL using " + DEFAULT_ENCODING, e);
             return null;
         }
     }

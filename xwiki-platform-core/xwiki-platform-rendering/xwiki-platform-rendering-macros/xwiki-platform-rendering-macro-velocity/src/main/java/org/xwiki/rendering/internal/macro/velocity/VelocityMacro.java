@@ -21,8 +21,11 @@ package org.xwiki.rendering.internal.macro.velocity;
 
 import java.io.StringWriter;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -67,6 +70,12 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
      */
     @Requirement
     private VelocityMacroConfiguration configuration;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Default constructor.
@@ -149,7 +158,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
             try {
                 filter = getComponentManager().lookup(VelocityMacroFilter.class, filterName);
             } catch (ComponentLookupException e) {
-                getLogger().error("Can't find velocity maco cleaner", e);
+                this.logger.error("Can't find velocity maco cleaner", e);
             }
         }
 

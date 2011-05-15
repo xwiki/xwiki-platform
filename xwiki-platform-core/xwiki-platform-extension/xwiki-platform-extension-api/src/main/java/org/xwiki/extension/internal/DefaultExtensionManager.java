@@ -73,7 +73,7 @@ public class DefaultExtensionManager implements ExtensionManager, Initializable
     private LocalExtensionRepository localExtensionRepository;
 
     /**
-     * Logging tool.
+     * The logger to log.
      */
     @Inject
     private Logger logger;

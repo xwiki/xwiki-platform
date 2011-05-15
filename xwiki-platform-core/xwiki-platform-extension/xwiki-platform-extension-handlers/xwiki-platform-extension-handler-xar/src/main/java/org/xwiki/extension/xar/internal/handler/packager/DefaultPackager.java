@@ -76,6 +76,9 @@ public class DefaultPackager implements Packager, Initializable
     @Named("explicit/reference")
     private DocumentReferenceResolver<EntityReference> resolver;
 
+    /**
+     * The logger to log.
+     */
     @Inject
     private Logger logger;
 

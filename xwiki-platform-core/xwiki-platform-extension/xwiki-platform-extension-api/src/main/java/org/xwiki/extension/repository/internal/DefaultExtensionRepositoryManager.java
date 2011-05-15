@@ -59,7 +59,7 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
     private ComponentManager componentManager;
 
     /**
-     * Logging tool.
+     * The logger to log.
      */
     @Inject
     private Logger logger;

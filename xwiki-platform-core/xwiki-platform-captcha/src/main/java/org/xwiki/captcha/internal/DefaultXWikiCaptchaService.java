@@ -22,6 +22,9 @@ package org.xwiki.captcha.internal;
 import java.util.List;
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.captcha.CaptchaVerifier;
 import org.xwiki.captcha.CaptchaVerifierNotFoundException;
 import org.xwiki.captcha.XWikiCaptchaService;
@@ -29,7 +32,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 
 /**
  * Provides access to the classes implementing Captcha.
@@ -38,11 +40,17 @@ import org.xwiki.component.logging.AbstractLogEnabled;
  * @since 2.2M2
  */
 @Component
-public class DefaultXWikiCaptchaService extends AbstractLogEnabled implements XWikiCaptchaService
+public class DefaultXWikiCaptchaService implements XWikiCaptchaService
 {
     /** A Map of all captchas by their names. */
     @Requirement
     private ComponentManager componentManager;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * {@inheritDoc}
@@ -73,7 +81,7 @@ public class DefaultXWikiCaptchaService extends AbstractLogEnabled implements XW
         try {
             captchaNames.addAll(componentManager.lookupMap(CaptchaVerifier.class).keySet());
         } catch (ComponentLookupException e) {
-            getLogger().error("Couldn't get list of CaptchaVerifier names " + e.getMessage());
+            this.logger.error("Couldn't get list of CaptchaVerifier names " + e.getMessage());
         }
         return captchaNames;
     }

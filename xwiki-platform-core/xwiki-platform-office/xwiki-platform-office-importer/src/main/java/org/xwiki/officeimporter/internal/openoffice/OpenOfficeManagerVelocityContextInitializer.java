@@ -23,7 +23,6 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManagerVelocityBridge;
@@ -36,8 +35,7 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @since 1.8RC3
  */
 @Component("oomanager")
-public class OpenOfficeManagerVelocityContextInitializer extends AbstractLogEnabled implements
-    VelocityContextInitializer
+public class OpenOfficeManagerVelocityContextInitializer implements VelocityContextInitializer
 {
     /**
      * The key to use for openoffice server manager in the velocity context.
@@ -73,7 +71,7 @@ public class OpenOfficeManagerVelocityContextInitializer extends AbstractLogEnab
     public void initialize(VelocityContext context)
     {
         if (null == veloBridge) {
-            veloBridge = new OpenOfficeManagerVelocityBridge(ooManager, docBridge, execution, getLogger());
+            veloBridge = new OpenOfficeManagerVelocityBridge(ooManager, docBridge, execution);
         }
         context.put(VELOCITY_CONTEXT_KEY, veloBridge);
     }

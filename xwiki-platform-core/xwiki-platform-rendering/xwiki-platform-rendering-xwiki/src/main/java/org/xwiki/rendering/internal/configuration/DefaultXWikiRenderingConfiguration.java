@@ -25,9 +25,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
@@ -40,7 +42,7 @@ import org.xwiki.rendering.transformation.Transformation;
  * @since 2.5M2
  */
 @Component
-public class DefaultXWikiRenderingConfiguration extends AbstractLogEnabled implements XWikiRenderingConfiguration
+public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfiguration
 {
     /**
      * Prefix for configuration keys for the Rendering module.
@@ -64,6 +66,12 @@ public class DefaultXWikiRenderingConfiguration extends AbstractLogEnabled imple
      */
     @Requirement
     private ComponentManager componentManager;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * {@inheritDoc}
@@ -129,7 +137,7 @@ public class DefaultXWikiRenderingConfiguration extends AbstractLogEnabled imple
             try {
                 transformations.add(this.componentManager.lookup(Transformation.class, hint));
             } catch (ComponentLookupException e) {
-                getLogger().warn("Failed to locate transformation with hint [" + hint + "], ignoring it.");
+                this.logger.warn("Failed to locate transformation with hint [" + hint + "], ignoring it.");
             }
         }
         Collections.sort(transformations);

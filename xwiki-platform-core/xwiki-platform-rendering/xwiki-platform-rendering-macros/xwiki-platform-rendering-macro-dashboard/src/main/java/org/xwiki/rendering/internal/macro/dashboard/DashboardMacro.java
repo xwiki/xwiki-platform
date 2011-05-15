@@ -24,7 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -138,6 +141,12 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
     private GadgetSource gadgetSource;
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * Instantiates the dashboard macro, setting the name, description and parameters type.
      */
     public DashboardMacro()
@@ -161,7 +170,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
         } catch (Exception e) {
             String message = "Could not get the gadgets.";
             // log and throw further
-            getLogger().error(message, e);
+            this.logger.error(message, e);
             throw new MacroExecutionException(message, e);
         }
 
@@ -172,7 +181,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
         if (renderer == null) {
             String message = "Could not find dashboard renderer " + parameters.getLayout();
             // log and throw further
-            getLogger().error(message);
+            this.logger.error(message);
             throw new MacroExecutionException(message);
         }
 
@@ -180,7 +189,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
         if (gadgetRenderer == null) {
             String message = "Could not find gadgets renderer.";
             // log and throw further
-            getLogger().error(message);
+            this.logger.error(message);
             throw new MacroExecutionException(message);
         }
 
@@ -191,7 +200,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
         } catch (Exception e) {
             String message = "Could not render the gadgets for layout " + parameters.getLayout();
             // log and throw further
-            getLogger().error(message, e);
+            this.logger.error(message, e);
             throw new MacroExecutionException(message, e);
         }
 
@@ -260,7 +269,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
         try {
             return componentManager.lookup(DashboardRenderer.class, layout);
         } catch (ComponentLookupException e) {
-            getLogger().warn("Could not find the Dashboard renderer for layout \"" + layout + "\"");
+            this.logger.warn("Could not find the Dashboard renderer for layout \"" + layout + "\"");
             return null;
         }
     }
@@ -278,7 +287,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
         try {
             return componentManager.lookup(GadgetRenderer.class, hint);
         } catch (ComponentLookupException e) {
-            getLogger().warn("Could not find the Gadgets renderer for hint \"" + hint + "\".");
+            this.logger.warn("Could not find the Gadgets renderer for hint \"" + hint + "\".");
             return null;
         }
     }

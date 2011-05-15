@@ -19,10 +19,12 @@
  */
 package org.xwiki.annotation.internal;
 
+import javax.inject.Inject;
+
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.script.service.ScriptService;
@@ -35,7 +37,7 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @since 2.3M1
  */
 @Component("annotations")
-public class AnnotationVelocityContextInitializer extends AbstractLogEnabled implements VelocityContextInitializer
+public class AnnotationVelocityContextInitializer implements VelocityContextInitializer
 {
     /**
      * The key to add to the velocity context.
@@ -54,6 +56,12 @@ public class AnnotationVelocityContextInitializer extends AbstractLogEnabled imp
     private ComponentManager componentManager;
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.velocity.VelocityContextInitializer#initialize(org.apache.velocity.VelocityContext)
@@ -66,7 +74,7 @@ public class AnnotationVelocityContextInitializer extends AbstractLogEnabled imp
                 ANNOTATION_SCRIPT_SERVICE_HINT);
             context.put(VELOCITY_CONTEXT_KEY, annotationsScriptService);
         } catch (ComponentLookupException e) {
-            getLogger().warn(
+            this.logger.warn(
                 "Could not initialize the annotations velocity bridge, "
                     + "annotations service will not be accessible in velocity context.");
         }

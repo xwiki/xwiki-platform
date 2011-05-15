@@ -28,7 +28,8 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.artofsolving.jodconverter.OfficeDocumentConverter;
-import org.xwiki.component.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
 
@@ -41,6 +42,11 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
 public class DefaultOpenOfficeConverter implements OpenOfficeConverter
 {
     /**
+     * The logger to log.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultOpenOfficeConverter.class);
+
+    /**
      * Converter provided by jodconverter library.
      */
     private OfficeDocumentConverter converter;
@@ -51,22 +57,15 @@ public class DefaultOpenOfficeConverter implements OpenOfficeConverter
     private File workDir;
 
     /**
-     * Used for logging.
-     */
-    private Logger logger;
-
-    /**
      * Creates a new {@link DefaultOpenOfficeConverter} instance.
      * 
      * @param converter provided by jodconverter library.
      * @param workDir space for holding temporary file.
-     * @param logger logging support.
      */
-    public DefaultOpenOfficeConverter(OfficeDocumentConverter converter, File workDir, Logger logger)
+    public DefaultOpenOfficeConverter(OfficeDocumentConverter converter, File workDir)
     {
         this.converter = converter;
         this.workDir = workDir;
-        this.logger = logger;
     }
 
     /**
@@ -118,7 +117,7 @@ public class DefaultOpenOfficeConverter implements OpenOfficeConverter
             throw new OpenOfficeConverterException("Error while performing conversion.", ex);
         } finally {
             if (!storage.cleanUp()) {
-                logger.error("Could not cleanup temporary storage after conversion.");
+                LOGGER.error("Could not cleanup temporary storage after conversion.");
             }
         }
     }

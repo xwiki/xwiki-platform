@@ -69,9 +69,12 @@ public class XarLocalExtensionRepository implements LocalExtensionRepository, In
     @Inject
     private ObservationManager observation;
 
+    /**
+     * The logger to log.
+     */
     @Inject
     private Logger logger;
-    
+
     private ExtensionRepositoryId repositoryId;
 
     private Map<ExtensionId, XarLocalExtension> extensions = new ConcurrentHashMap<ExtensionId, XarLocalExtension>();

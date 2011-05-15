@@ -26,7 +26,6 @@ import org.jfree.util.Log;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -44,7 +43,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  */
 @Component("WikiMacroExecutionEventListener")
-public class WikiMacroExecutionEventListener extends AbstractLogEnabled implements EventListener
+public class WikiMacroExecutionEventListener implements EventListener
 {
     /**
      * The name of the listener.

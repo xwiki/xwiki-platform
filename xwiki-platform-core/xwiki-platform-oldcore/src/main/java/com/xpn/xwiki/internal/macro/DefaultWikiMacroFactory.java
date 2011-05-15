@@ -24,10 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
@@ -59,7 +61,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @since 2.0M2
  */
 @Component
-public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiMacroFactory, WikiMacroConstants
+public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConstants
 {
     /**
      * The {@link ComponentManager} component.
@@ -72,6 +74,12 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
      */
     @Requirement
     private Execution execution;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Utility method for accessing XWikiContext.
@@ -137,20 +145,20 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
         // Verify macro name.
         if (StringUtils.isEmpty(macroName)) {
             macroName = macroId;
-            getLogger().debug(
+            this.logger.debug(
                 String.format("Incomplete macro definition in [%s], macro name is empty", documentReference));
         }
 
         // Verify macro description.
         if (StringUtils.isEmpty(macroDescription)) {
-            getLogger().debug(
+            this.logger.debug(
                 String.format("Incomplete macro definition in [%s], macro description is empty", documentReference));
         }
 
         // Verify default macro category.
         if (StringUtils.isEmpty(macroDefaultCategory)) {
             macroDefaultCategory = null;
-            getLogger().debug(String.format("Incomplete macro definition in [%s], default macro category is empty",
+            this.logger.debug(String.format("Incomplete macro definition in [%s], default macro category is empty",
                 documentReference));
         }
 
@@ -162,7 +170,7 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
         // Verify macro content description.
         if (!macroContentType.equals(MACRO_CONTENT_EMPTY) && StringUtils.isEmpty(macroContentDescription)) {
             String errorMsg = "Incomplete macro definition in [%s], macro content description is empty";
-            getLogger().debug(String.format(errorMsg, documentReference));
+            this.logger.debug(String.format(errorMsg, documentReference));
             macroContentDescription = "Macro content";
         }
 
@@ -198,7 +206,7 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
                 // Verify parameter description.
                 if (StringUtils.isEmpty(parameterDescription)) {
                     String errorMessage = "Incomplete macro definition in [%s], macro parameter description is empty";
-                    getLogger().debug(String.format(errorMessage, documentReference));
+                    this.logger.debug(String.format(errorMessage, documentReference));
                 }
                 
                 // If field empty, assume no default value was provided.

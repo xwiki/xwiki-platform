@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.observation;
 
@@ -28,8 +27,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.component.logging.Logger;
-import org.xwiki.component.phase.LogEnabled;
+import org.slf4j.Logger;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.AllEvent;
 import org.xwiki.observation.event.Event;
@@ -200,8 +199,8 @@ public class ObservationManagerTest
         final EventListener listener = this.context.mock(EventListener.class);
         final Logger logger = this.context.mock(Logger.class);
 
-        ((LogEnabled) this.manager).enableLogging(logger);
-        
+        ReflectionUtils.setFieldValue(this.manager, "logger", logger);
+
         this.context.checking(new Expectations() {{
             allowing(listener).getName(); will(returnValue("mylistener"));
             allowing(listener).getEvents(); will(returnValue(Arrays.asList(AllEvent.ALLEVENT)));

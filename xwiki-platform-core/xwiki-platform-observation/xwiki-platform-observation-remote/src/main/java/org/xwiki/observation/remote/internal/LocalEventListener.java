@@ -26,8 +26,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.EventListener;
@@ -47,7 +47,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 @Component
 @Named("observation.remote")
 @Singleton
-public class LocalEventListener extends AbstractLogEnabled implements EventListener
+public class LocalEventListener implements EventListener
 {
     /**
      * The name of the listener.
@@ -65,6 +65,12 @@ public class LocalEventListener extends AbstractLogEnabled implements EventListe
      */
     @Inject
     private ComponentManager componentManager;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * We don't inject {@link RemoteObservationManager} automatically to load it only when necessary (when remote
@@ -112,7 +118,7 @@ public class LocalEventListener extends AbstractLogEnabled implements EventListe
             try {
                 this.remoteObservationManager = this.componentManager.lookup(RemoteObservationManager.class);
             } catch (ComponentLookupException e) {
-                getLogger().error("Failed to initialize the Remote Observation Manager", e);
+                this.logger.error("Failed to initialize the Remote Observation Manager", e);
             }
         }
 

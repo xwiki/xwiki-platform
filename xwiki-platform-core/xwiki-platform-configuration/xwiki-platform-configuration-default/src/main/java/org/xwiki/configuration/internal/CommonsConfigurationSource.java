@@ -19,11 +19,13 @@
  */
 package org.xwiki.configuration.internal;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.configuration.Configuration;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.properties.ConverterManager;
 
@@ -35,7 +37,7 @@ import org.xwiki.properties.ConverterManager;
  * @version $Id$
  * @since 1.6M1
  */
-public class CommonsConfigurationSource extends AbstractLogEnabled implements ConfigurationSource
+public class CommonsConfigurationSource implements ConfigurationSource
 {
     private Configuration configuration;
 

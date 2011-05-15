@@ -26,15 +26,16 @@ import java.security.SecureRandom;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.container.Container;
@@ -62,7 +63,7 @@ import org.xwiki.model.reference.DocumentReference;
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)
-public class DefaultCSRFToken extends AbstractLogEnabled implements CSRFToken, Initializable
+public class DefaultCSRFToken implements CSRFToken, Initializable
 {
     /** Length of the random string in bytes. */
     private static final int TOKEN_LENGTH = 16;
@@ -89,6 +90,12 @@ public class DefaultCSRFToken extends AbstractLogEnabled implements CSRFToken, I
     private CSRFTokenConfiguration configuration;
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * Initializes the storage and random number generator.
      * 
      * {@inheritDoc}
@@ -101,11 +108,11 @@ public class DefaultCSRFToken extends AbstractLogEnabled implements CSRFToken, I
         } catch (NoSuchAlgorithmException e) {
             // use the default implementation then
             this.random = new SecureRandom();
-            getLogger().warn("CSRFToken: Using default implementation of SecureRandom");
+            this.logger.warn("CSRFToken: Using default implementation of SecureRandom");
         }
         byte[] seed = this.random.generateSeed(TOKEN_LENGTH);
         this.random.setSeed(seed);
-        getLogger().debug("CSRFToken: Anti-CSRF secret token component has been initialized");
+        this.logger.debug("CSRFToken: Anti-CSRF secret token component has been initialized");
     }
 
     /**
@@ -152,7 +159,7 @@ public class DefaultCSRFToken extends AbstractLogEnabled implements CSRFToken, I
         }
         String storedToken = getToken();
         if (token == null || token.equals("") || !storedToken.equals(token)) {
-            getLogger().warn("CSRFToken: Secret token verification failed, token: \"" + token
+            this.logger.warn("CSRFToken: Secret token verification failed, token: \"" + token
                 + "\", stored token: \"" + storedToken + "\"");
             return false;
         }

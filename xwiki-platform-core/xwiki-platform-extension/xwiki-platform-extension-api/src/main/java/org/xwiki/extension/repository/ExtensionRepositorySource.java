@@ -23,8 +23,16 @@ import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
 
+/**
+ * A repository identifiers source (for example xwiki.properties).
+ * 
+ * @version $Id$
+ */
 @ComponentRole
 public interface ExtensionRepositorySource
 {
+    /**
+     * @return the extension repositories identifiers
+     */
     List<ExtensionRepositoryId> getExtensionRepositories();
 }

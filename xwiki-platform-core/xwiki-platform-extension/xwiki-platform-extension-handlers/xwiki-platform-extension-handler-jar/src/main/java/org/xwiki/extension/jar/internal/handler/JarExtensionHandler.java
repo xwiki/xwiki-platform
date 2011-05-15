@@ -30,6 +30,7 @@ import java.util.zip.ZipInputStream;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.descriptor.ComponentDescriptor;
@@ -44,13 +45,16 @@ import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
 @Component("jar")
 public class JarExtensionHandler extends AbstractExtensionHandler implements Initializable
 {
-    private ComponentAnnotationLoader jarLoader;
-
     @Inject
     private ComponentManager componentManager;
 
     @Inject
     private JarExtensionClassLoader jarExtensionClassLoader;
+
+    @Inject
+    private Logger logger;
+
+    private ComponentAnnotationLoader jarLoader;
 
     /**
      * {@inheritDoc}
@@ -95,7 +99,7 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
             List<String>[] components = getDeclaredComponents(jarFile);
 
             if (components[0] == null) {
-                getLogger().debug(jarFile + " does not contains any component");
+                this.logger.debug(jarFile + " does not contains any component");
                 return;
             }
 
@@ -135,7 +139,7 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
             List<String>[] components = getDeclaredComponents(jarFile);
 
             if (components[0] == null) {
-                getLogger().debug(jarFile + " does not contains any component");
+                this.logger.debug(jarFile + " does not contains any component");
                 return;
             }
 
@@ -147,7 +151,7 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
                             componentDescriptor.getRoleHint());
                     }
                 } catch (ClassNotFoundException e) {
-                    getLogger().error("Failed to load class [" + componentImplementation + "]", e);
+                    this.logger.error("Failed to load class [" + componentImplementation + "]", e);
                 }
             }
         } catch (Exception e) {

@@ -19,7 +19,12 @@
  */
 package org.xwiki.extension.task;
 
-public class AbstractRequest implements Request
+/**
+ * Base class for {@link Request} implementations.
+ * 
+ * @version $Id$
+ */
+public abstract class AbstractRequest implements Request
 {
-    
+
 }

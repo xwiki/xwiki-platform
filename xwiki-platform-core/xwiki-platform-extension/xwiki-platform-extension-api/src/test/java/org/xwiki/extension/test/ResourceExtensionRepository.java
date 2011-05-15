@@ -2,23 +2,22 @@ package org.xwiki.extension.test;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionCollectException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
-import org.xwiki.extension.repository.ExtensionCollector;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.internal.DefaultLocalExtension;
-import org.xwiki.extension.repository.internal.DefaultLocalExtensionSerializer;
+import org.xwiki.extension.repository.internal.ExtensionSerializer;
 
 public class ResourceExtensionRepository implements ExtensionRepository
 {
-    private DefaultLocalExtensionSerializer extensionSerializer;
+    private ExtensionSerializer extensionSerializer;
 
     private ExtensionRepositoryId repositoryId;
 
@@ -30,7 +29,7 @@ public class ResourceExtensionRepository implements ExtensionRepository
 
     public ResourceExtensionRepository(ClassLoader classLoader, String baseResource)
     {
-        this.extensionSerializer = new DefaultLocalExtensionSerializer(null);
+        this.extensionSerializer = new ExtensionSerializer();
 
         this.repositoryId = new ExtensionRepositoryId("resources", "resources", null);
 
@@ -38,14 +37,24 @@ public class ResourceExtensionRepository implements ExtensionRepository
         this.baseResource = baseResource;
     }
 
-    InputStream getResourceAsStream(String name) throws UnsupportedEncodingException
-    {
-        return this.classLoader.getResourceAsStream(this.baseResource + URLEncoder.encode(name, "UTF-8"));
-    }
-
     InputStream getResourceAsStream(ExtensionId extensionId, String type) throws UnsupportedEncodingException
     {
-        return getResourceAsStream(extensionId.getId() + '-' + extensionId.getVersion() + '.' + type);
+        return this.classLoader.getResourceAsStream(getEncodedPath(extensionId, type));
+    }
+
+    URL getResource(ExtensionId extensionId, String type) throws UnsupportedEncodingException
+    {
+        return this.classLoader.getResource(getEncodedPath(extensionId, type));
+    }
+
+    String getEncodedPath(ExtensionId extensionId, String type) throws UnsupportedEncodingException
+    {
+        return this.baseResource + URLEncoder.encode(getPathSuffix(extensionId, type), "UTF-8");
+    }
+
+    String getPathSuffix(ExtensionId extensionId, String type)
+    {
+        return extensionId.getId() + '-' + extensionId.getVersion() + '.' + type;
     }
 
     public ExtensionRepositoryId getId()
@@ -67,7 +76,7 @@ public class ResourceExtensionRepository implements ExtensionRepository
         }
 
         try {
-            DefaultLocalExtension localExtension = this.extensionSerializer.loadDescriptor(descriptor);
+            DefaultLocalExtension localExtension = this.extensionSerializer.loadDescriptor(null, descriptor);
 
             ResourceExtension resourceExtension = new ResourceExtension(this, localExtension);
 
@@ -81,18 +90,10 @@ public class ResourceExtensionRepository implements ExtensionRepository
 
     public boolean exists(ExtensionId extensionId)
     {
-        // TODO
-        return false;
-    }
-
-    public int countExtensions()
-    {
-        // TODO
-        return 0;
-    }
-
-    public void collectExtensions(ExtensionCollector collector) throws ExtensionCollectException
-    {
-        // TODO        
+        try {
+            return getResource(extensionId, "xed") != null;
+        } catch (UnsupportedEncodingException e) {
+            return false;
+        }
     }
 }

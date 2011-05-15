@@ -19,6 +19,11 @@
  */
 package org.xwiki.extension.task;
 
+/**
+ * Request used in {@link org.xwiki.extension.task.internal.InstallTask}.
+ * 
+ * @version $Id$
+ */
 public class InstallRequest extends AbstractExtensionRequest
 {
 

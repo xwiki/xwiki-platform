@@ -19,11 +19,22 @@
  */
 package org.xwiki.extension;
 
+/**
+ * An extension dependency.
+ * 
+ * @version $Id$
+ */
 public interface ExtensionDependency
 {
+    /**
+     * @return the id of the target extension
+     */
     String getId();
 
+    /**
+     * @return the version of the target extension
+     */
     String getVersion();
-    
+
     // TODO: add version range
 }

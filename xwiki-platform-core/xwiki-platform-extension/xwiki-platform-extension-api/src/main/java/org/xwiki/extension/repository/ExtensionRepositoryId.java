@@ -21,14 +21,33 @@ package org.xwiki.extension.repository;
 
 import java.net.URI;
 
+/**
+ * An extension repository identifier.
+ * 
+ * @version $Id$
+ */
 public class ExtensionRepositoryId
 {
+    /**
+     * @see #getId()
+     */
     private final String id;
 
+    /**
+     * @see #getType()
+     */
     private final String type;
 
+    /**
+     * @see #getURI()
+     */
     private final URI uri;
 
+    /**
+     * @param id the unique identifier
+     * @param type the repository type (maven, xwiki, etc.)
+     * @param uri the repository adress
+     */
     public ExtensionRepositoryId(String id, String type, URI uri)
     {
         this.id = id;
@@ -36,16 +55,25 @@ public class ExtensionRepositoryId
         this.uri = uri;
     }
 
+    /**
+     * @return the unique identifier
+     */
     public String getId()
     {
         return id;
     }
 
+    /**
+     * @return the repository type (maven, xwiki, etc.)
+     */
     public String getType()
     {
         return type;
     }
 
+    /**
+     * @return the repository adress
+     */
     public URI getURI()
     {
         return uri;

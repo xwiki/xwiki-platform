@@ -33,7 +33,7 @@ import org.xwiki.extension.repository.ExtensionRepository;
 public interface Extension
 {
     /**
-     * @return what makes the extension unique
+     * @return the id/version combination which makes the extension unique
      */
     ExtensionId getId();
 
@@ -43,7 +43,7 @@ public interface Extension
     String getType();
 
     /**
-     * @return the display name of the extensions
+     * @return the display name of the extension
      */
     String getName();
 
@@ -76,7 +76,7 @@ public interface Extension
     void download(File file) throws ExtensionException;
 
     /**
-     * @return the repository of th extension
+     * @return the repository of the extension
      */
     ExtensionRepository getRepository();
 
@@ -85,6 +85,8 @@ public interface Extension
      * <p>
      * Theses are generally provided by specific repositories. For example a maven repository will provide group and
      * artifacts ids.
+     * 
+     * @return the properties
      */
     Map<String, Object> getProperties();
 

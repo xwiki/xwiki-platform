@@ -22,7 +22,15 @@ package org.xwiki.extension.event;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.observation.event.Event;
 
+/**
+ * An extension related event.
+ * 
+ * @version $Id$
+ */
 public interface ExtensionEvent extends Event
 {
+    /**
+     * @return the event related extension identifier.
+     */
     ExtensionId getExtensionId();
 }

@@ -19,6 +19,11 @@
  */
 package org.xwiki.extension;
 
+/**
+ * Error when trying to uninstall an extension.
+ * 
+ * @version $Id$
+ */
 public class UninstallException extends ExtensionException
 {
     /**

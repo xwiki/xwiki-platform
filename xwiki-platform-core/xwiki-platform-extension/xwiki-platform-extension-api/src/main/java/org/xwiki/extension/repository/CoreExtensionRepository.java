@@ -24,12 +24,35 @@ import java.util.Collection;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.extension.CoreExtension;
 
+/**
+ * Virtual extension repository containing core extensions.
+ * 
+ * @version $Id$
+ */
 @ComponentRole
 public interface CoreExtensionRepository extends ExtensionRepository
 {
+    /**
+     * @return the number of core extensions
+     */
+    int countExtensions();
+
+    /**
+     * @return all the core extensions
+     */
     Collection<CoreExtension> getCoreExtensions();
 
+    /**
+     * @param id the extension identifier (version is not needed since there can be only one version of a core
+     *            extension)
+     * @return the core extension, null if none is found
+     */
     CoreExtension getCoreExtension(String id);
 
+    /**
+     * @param id the extension identifier (version is not needed since there can be only one version of a core
+     *            extension)
+     * @return true if the extension exists, false otherwise
+     */
     boolean exists(String id);
 }

@@ -39,6 +39,12 @@
     <wagon.providers.version>1.0-beta-7</wagon.providers.version>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
     <!-- Wagon -->
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>

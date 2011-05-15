@@ -34,10 +34,8 @@ import org.sonatype.aether.resolution.ArtifactDescriptorRequest;
 import org.sonatype.aether.resolution.ArtifactDescriptorResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionCollectException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
-import org.xwiki.extension.repository.ExtensionCollector;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
@@ -141,10 +139,5 @@ public class AetherExtensionRepository implements ExtensionRepository
     public RemoteRepository getRemoteRepository()
     {
         return remoteRepository;
-    }
-
-    public void collectExtensions(ExtensionCollector collector) throws ExtensionCollectException
-    {
-        // TODO
     }
 }

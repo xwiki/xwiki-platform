@@ -26,7 +26,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -37,8 +36,7 @@ import org.xwiki.extension.repository.ExtensionRepositoryId;
 @Component
 @Singleton
 @Named("xwiki")
-public class XWikiExtensionRepositoryFactory extends AbstractLogEnabled implements ExtensionRepositoryFactory,
-    Initializable
+public class XWikiExtensionRepositoryFactory implements ExtensionRepositoryFactory, Initializable
 {
     protected Marshaller marshaller;
 

@@ -19,23 +19,44 @@
  */
 package org.xwiki.extension;
 
+/**
+ * The combination of properties which makes an extension unique.
+ * 
+ * @version $Id$
+ */
 public class ExtensionId
 {
+    /**
+     * @see #getId()
+     */
     private final String id;
 
+    /**
+     * @see #getVersion()
+     */
     private final String version;
 
+    /**
+     * @param id the extension identifier
+     * @param version the extension version
+     */
     public ExtensionId(String id, String version)
     {
         this.id = id;
         this.version = version;
     }
 
+    /**
+     * @return the extension identifier
+     */
     public String getId()
     {
         return id;
     }
 
+    /**
+     * @return the extension version
+     */
     public String getVersion()
     {
         return version;

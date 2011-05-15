@@ -27,8 +27,19 @@ import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
 
+/**
+ * Default implementation of {@link CoreExtension}.
+ * 
+ * @version $Id$
+ */
 public class DefaultCoreExtension extends AbstractExtension implements CoreExtension
 {
+    /**
+     * @param repository the core extension repository
+     * @param url the core extension URL
+     * @param id the id/version combination which makes the extension unique
+     * @param type the type of the extension
+     */
     public DefaultCoreExtension(DefaultCoreExtensionRepository repository, URL url, ExtensionId id, String type)
     {
         super(repository, id, type);
@@ -38,11 +49,21 @@ public class DefaultCoreExtension extends AbstractExtension implements CoreExten
 
     // Extension
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#download(java.io.File)
+     */
     public void download(File file) throws ExtensionException
     {
         // TODO
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.AbstractExtension#setId(org.xwiki.extension.ExtensionId)
+     */
     public void setId(ExtensionId id)
     {
         super.setId(id);
@@ -50,16 +71,29 @@ public class DefaultCoreExtension extends AbstractExtension implements CoreExten
 
     // CoreExtension
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.CoreExtension#getURL()
+     */
     public URL getURL()
     {
         return getProperty(PKEY_URL, null);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.CoreExtension#isGuessed()
+     */
     public boolean isGuessed()
     {
         return getProperty(PKEY_GUESSED, false);
     }
 
+    /**
+     * @param guessed true if the extension is "guessed"
+     */
     public void setGuessed(boolean guessed)
     {
         putProperty(PKEY_GUESSED, guessed);
@@ -67,6 +101,11 @@ public class DefaultCoreExtension extends AbstractExtension implements CoreExten
 
     // Object
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.AbstractExtension#toString()
+     */
     @Override
     public String toString()
     {

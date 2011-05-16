@@ -19,12 +19,14 @@
  */
 package org.xwiki.annotation.internal.renderer;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.xwiki.annotation.content.ContentAlterer;
 import org.xwiki.annotation.renderer.GeneratorEmptyBlockChainingListener;
 import org.xwiki.annotation.renderer.LinkLabelGeneratorChainingListener;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -39,20 +41,23 @@ import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
  * @version $Id$
  * @since 2.3M1
  */
-@Component("normalizer-plain/1.0")
+@Component
+@Named("normalizer-plain/1.0")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class PlainTextNormalizingRenderer extends AbstractChainingPrintRenderer implements Initializable
 {
     /**
      * Space normalizer content alterer to clean the rendered texts.
      */
-    @Requirement("space-normalizer")
+    @Inject
+    @Named("space-normalizer")
     protected ContentAlterer textCleaner;
 
     /**
      * Plain text parser used to parse generated link labels.
      */
-    @Requirement("plain/1.0")
+    @Inject
+    @Named("plain/1.0")
     protected StreamParser plainTextParser;
 
     /**
@@ -60,7 +65,7 @@ public class PlainTextNormalizingRenderer extends AbstractChainingPrintRenderer 
      * TODO: it would be nice if we could somehow get the very same link generator that the XHTML default renderer is
      * using, since we need the two to be fully synchronized and generate the same content.
      */
-    @Requirement
+    @Inject
     private LinkLabelGenerator linkLabelGenerator;
 
     /**

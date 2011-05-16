@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.annotation.Annotation;
@@ -39,7 +41,6 @@ import org.xwiki.annotation.maintainer.AnnotationState;
 import org.xwiki.annotation.reference.TypedStringEntityReferenceResolver;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
@@ -64,6 +65,7 @@ import com.xpn.xwiki.objects.BaseProperty;
  * @since 2.3M1
  */
 @Component
+@Singleton
 public class DefaultIOService implements IOService
 {
     /**
@@ -75,37 +77,38 @@ public class DefaultIOService implements IOService
     /**
      * The execution used to get the deprecated XWikiContext.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
      * Entity reference handler to resolve the reference target.
      */
-    @Requirement
+    @Inject
     private TypedStringEntityReferenceResolver referenceResolver;
 
     /**
      * Default entity reference serializer to create document full names.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> serializer;
 
     /**
      * Local entity reference serializer, to create references which are robust to import / export.
      */
-    @Requirement("local")
+    @Inject
+    @Named("local")
     private EntityReferenceSerializer<String> localSerializer;
 
     /**
      * Document access bridge used to get the annotations configuration parameters.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge dab;
 
     /**
      * Component manager to get the observation manager and send notifications.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**

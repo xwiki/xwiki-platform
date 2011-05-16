@@ -23,12 +23,15 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.formula.FormulaRenderer;
@@ -53,7 +56,9 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 2.0M3
  */
-@Component("formula")
+@Component
+@Named("formula")
+@Singleton
 public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
 {
     /** Predefined error message: empty formula. */
@@ -72,15 +77,15 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
     private static final String CONTENT_DESCRIPTION = "The mathematical formula, in LaTeX syntax";
 
     /** Component manager, needed for retrieving the selected formula renderer. */
-    @Requirement
+    @Inject
     private ComponentManager manager;
 
     /** Defines from where to read the rendering configuration data. */
-    @Requirement
+    @Inject
     private FormulaMacroConfiguration configuration;
 
     /** Needed for computing the URL for accessing the rendered image. */
-    @Requirement
+    @Inject
     private DocumentAccessBridge dab;
 
     /**

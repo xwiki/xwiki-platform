@@ -25,11 +25,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
@@ -50,7 +51,9 @@ import org.xwiki.skinx.SkinExtension;
  * @version $Id$
  * @since 2.5M2
  */
-@Component(DashboardMacro.MACRO_NAME)
+@Component
+@Named(DashboardMacro.MACRO_NAME)
+@Singleton
 public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
 {
     /**
@@ -119,25 +122,27 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
     /**
      * CSS file skin extension, to include the dashboard css.
      */
-    @Requirement("ssfx")
+    @Inject
+    @Named("ssfx")
     private SkinExtension ssfx;
 
     /**
      * JS file skin extension, to include the dashboard.js.
      */
-    @Requirement("jsfx")
+    @Inject
+    @Named("jsfx")
     private SkinExtension jsfx;
 
     /**
      * The component manager, to resolve the dashboard renderer by layout hint.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
      * The gadget reader providing the list of {@link Gadget}s to render on this dashboard.
      */
-    @Requirement
+    @Inject
     private GadgetSource gadgetSource;
 
     /**
@@ -166,7 +171,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
         // get the gadgets from the objects
         List<Gadget> gadgets;
         try {
-            gadgets = gadgetSource.getGadgets(parameters.getSource(), context);
+            gadgets = this.gadgetSource.getGadgets(parameters.getSource(), context);
         } catch (Exception e) {
             String message = "Could not get the gadgets.";
             // log and throw further
@@ -174,7 +179,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
             throw new MacroExecutionException(message, e);
         }
 
-        boolean isInEditMode = gadgetSource.isEditing();
+        boolean isInEditMode = this.gadgetSource.isEditing();
 
         DashboardRenderer renderer =
             getDashboardRenderer(StringUtils.isEmpty(parameters.getLayout()) ? "columns" : parameters.getLayout());
@@ -213,7 +218,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
         // just under the toplevel, above the content, slip in the metadata, for the client code, only if we're in edit
         // mode
         if (isInEditMode) {
-            topLevel.addChildren(gadgetSource.getDashboardSourceMetadata(parameters.getSource(), context));
+            topLevel.addChildren(this.gadgetSource.getDashboardSourceMetadata(parameters.getSource(), context));
         }
         topLevel.addChildren(layoutedResult);
         // add the style attribute of the dashboard macro as a class to the toplevel container
@@ -232,12 +237,12 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
     {
         Map<String, Object> fxParamsForceSkinAction = new HashMap<String, Object>();
         fxParamsForceSkinAction.put("forceSkinAction", true);
-        ssfx.use("uicomponents/dashboard/dashboard.css", fxParamsForceSkinAction);
+        this.ssfx.use("uicomponents/dashboard/dashboard.css", fxParamsForceSkinAction);
         // include the js resources, for editing, in edit mode only
         if (editMode) {
             // include the effects.js and dragdrop.js that are needed by the dashboard js
-            jsfx.use("js/scriptaculous/effects.js");
-            jsfx.use("js/scriptaculous/dragdrop.js");
+            this.jsfx.use("js/scriptaculous/effects.js");
+            this.jsfx.use("js/scriptaculous/dragdrop.js");
             Map<String, Object> fxParamsNonDeferred = new HashMap<String, Object>();
             fxParamsNonDeferred.put("defer", false);
             Map<String, Object> fxParamsNonDeferredForceSkinAction = new HashMap<String, Object>();
@@ -245,18 +250,18 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
             fxParamsNonDeferredForceSkinAction.putAll(fxParamsNonDeferred);
             // include the smart client as well since it injects stuff in the GWT and then onModuleLoad cannot be ran
             // without. See XWIKI-6620 for details
-            jsfx.use("js/smartclient/initsc.js", fxParamsNonDeferredForceSkinAction);
-            jsfx.use("js/smartclient/modules/ISC_Core.js", fxParamsNonDeferred);
-            jsfx.use("js/smartclient/overwritesc.js", fxParamsNonDeferred);
-            jsfx.use("js/smartclient/modules/ISC_Foundation.js", fxParamsNonDeferred);
-            jsfx.use("js/smartclient/modules/ISC_Containers.js", fxParamsNonDeferred);
+            this.jsfx.use("js/smartclient/initsc.js", fxParamsNonDeferredForceSkinAction);
+            this.jsfx.use("js/smartclient/modules/ISC_Core.js", fxParamsNonDeferred);
+            this.jsfx.use("js/smartclient/overwritesc.js", fxParamsNonDeferred);
+            this.jsfx.use("js/smartclient/modules/ISC_Foundation.js", fxParamsNonDeferred);
+            this.jsfx.use("js/smartclient/modules/ISC_Containers.js", fxParamsNonDeferred);
             // this is the only file that seems to be not really needed. I am including it though since I'm including
             // all others anyway and maybe there's a case I didn't see
-            jsfx.use("js/smartclient/modules/ISC_Grids.js", fxParamsNonDeferred);
-            jsfx.use("js/smartclient/modules/ISC_Forms.js", fxParamsNonDeferred);
-            jsfx.use("js/smartclient/modules/ISC_DataBinding.js", fxParamsNonDeferred);
-            jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", fxParamsNonDeferredForceSkinAction);
-            jsfx.use("uicomponents/dashboard/dashboard.js", fxParamsForceSkinAction);
+            this.jsfx.use("js/smartclient/modules/ISC_Grids.js", fxParamsNonDeferred);
+            this.jsfx.use("js/smartclient/modules/ISC_Forms.js", fxParamsNonDeferred);
+            this.jsfx.use("js/smartclient/modules/ISC_DataBinding.js", fxParamsNonDeferred);
+            this.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", fxParamsNonDeferredForceSkinAction);
+            this.jsfx.use("uicomponents/dashboard/dashboard.js", fxParamsForceSkinAction);
         }
     }
 
@@ -267,7 +272,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
     protected DashboardRenderer getDashboardRenderer(String layout)
     {
         try {
-            return componentManager.lookup(DashboardRenderer.class, layout);
+            return this.componentManager.lookup(DashboardRenderer.class, layout);
         } catch (ComponentLookupException e) {
             this.logger.warn("Could not find the Dashboard renderer for layout \"" + layout + "\"");
             return null;
@@ -285,7 +290,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
             hint = "edit";
         }
         try {
-            return componentManager.lookup(GadgetRenderer.class, hint);
+            return this.componentManager.lookup(GadgetRenderer.class, hint);
         } catch (ComponentLookupException e) {
             this.logger.warn("Could not find the Gadgets renderer for hint \"" + hint + "\".");
             return null;

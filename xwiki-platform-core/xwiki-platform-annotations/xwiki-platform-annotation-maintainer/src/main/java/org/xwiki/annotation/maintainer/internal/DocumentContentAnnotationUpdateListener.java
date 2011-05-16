@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.annotation.maintainer.AnnotationMaintainer;
@@ -31,7 +33,6 @@ import org.xwiki.annotation.maintainer.MaintainerServiceException;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -45,19 +46,21 @@ import org.xwiki.observation.event.Event;
  * @version $Id$
  * @since 2.3M1
  */
-@Component("document-content-annotation-updater")
+@Component
+@Named("document-content-annotation-updater")
+@Singleton
 public class DocumentContentAnnotationUpdateListener implements EventListener
 {
     /**
      * Entity reference serializer, to serialize the modified document reference to send to the annotations service.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> serializer;
 
     /**
      * Annotations maintainer, to be invoked for the document content update.
      */
-    @Requirement
+    @Inject
     private AnnotationMaintainer maintainer;
 
     /**

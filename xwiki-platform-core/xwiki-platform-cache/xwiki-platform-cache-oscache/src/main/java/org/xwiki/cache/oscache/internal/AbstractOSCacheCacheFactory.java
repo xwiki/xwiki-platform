@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.container.Container;
 
 /**
@@ -39,7 +38,7 @@ public abstract class AbstractOSCacheCacheFactory implements CacheFactory
     /**
      * The container used to access configuration files.
      */
-    @Requirement
+    @Inject
     private Container container;
 
     /**

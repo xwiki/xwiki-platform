@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.ScriptContext;
@@ -33,7 +34,6 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
@@ -60,7 +60,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     /**
      * Used to get the current script context to give to script engine evaluation method.
      */
-    @Requirement
+    @Inject
     private ScriptContextManager scriptContextManager;
 
     /**
@@ -212,8 +212,8 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
                 result = ((XDOM) scriptResult).getChildren();
             } else if (scriptResult instanceof Block) {
                 result = Collections.singletonList((Block) scriptResult);
-            } else if (scriptResult instanceof List && !((List<?>) scriptResult).isEmpty()
-                && ((List<?>) scriptResult).get(0) instanceof Block) {
+            } else if (scriptResult instanceof List && !((List< ? >) scriptResult).isEmpty()
+                && ((List< ? >) scriptResult).get(0) instanceof Block) {
                 result = (List<Block>) scriptResult;
             } else {
                 // Run the wiki syntax parser on the script-rendered content

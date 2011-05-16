@@ -21,13 +21,16 @@ package org.xwiki.rendering.internal.macro.cache;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
@@ -43,11 +46,13 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Provides Caching for the content of the macro.
- *
+ * 
  * @version $Id$
  * @since 3.0M1
  */
-@Component("cache")
+@Component
+@Named("cache")
+@Singleton
 public class CacheMacro extends AbstractMacro<CacheMacroParameters> implements Initializable
 {
     /**
@@ -63,25 +68,26 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters> implements I
     /**
      * Used to create the macro content cache.
      */
-    @Requirement
+    @Inject
     private CacheManager cacheManager;
 
     /**
      * The parser used to parse the content (when not cached).
      */
-    @Requirement
+    @Inject
     private MacroContentParser contentParser;
 
     /**
      * Renders the optional id parameter as plain text to use the result as a cache key.
      */
-    @Requirement("plain/1.0")
+    @Inject
+    @Named("plain/1.0")
     private BlockRenderer plainTextBlockRenderer;
 
     /**
      * The cache containing all cache macro contents.
      */
-    private Cache contentCache;
+    private Cache<List<Block>> contentCache;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -94,6 +100,7 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters> implements I
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.component.phase.Initializable#initialize()
      */
     @Override
@@ -123,7 +130,7 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters> implements I
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
      */
     public boolean supportsInlineMode()
@@ -133,7 +140,7 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters> implements I
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
      */
     public List<Block> execute(CacheMacroParameters parameters, String content, MacroTransformationContext context)
@@ -153,10 +160,10 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters> implements I
             cacheKey = content;
         }
 
-        List<Block> result = (List<Block>) this.contentCache.get(cacheKey);
+        List<Block> result = this.contentCache.get(cacheKey);
         if (result == null) {
             // Run the parser for the syntax on the content
-            // We run  the current transformation on the cache macro content. We need to do this since we want to cache
+            // We run the current transformation on the cache macro content. We need to do this since we want to cache
             // the XDOM resulting from the execution of Macros because that's where lengthy processing happens.
             result = this.contentParser.parse(content, context, true, context.isInline());
             this.contentCache.set(cacheKey, result);

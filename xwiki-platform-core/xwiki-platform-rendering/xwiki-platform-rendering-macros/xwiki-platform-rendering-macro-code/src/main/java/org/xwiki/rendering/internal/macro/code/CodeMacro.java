@@ -24,11 +24,12 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
@@ -47,7 +48,9 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.7RC1
  */
-@Component("code")
+@Component
+@Named("code")
+@Singleton
 public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
 {
     /**
@@ -68,13 +71,14 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
     /**
      * Used to parse content when language="none".
      */
-    @Requirement("plain/1.0")
+    @Inject
+    @Named("plain/1.0")
     private Parser plainTextParser;
 
     /**
      * Used to lookup highlight parsers.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**

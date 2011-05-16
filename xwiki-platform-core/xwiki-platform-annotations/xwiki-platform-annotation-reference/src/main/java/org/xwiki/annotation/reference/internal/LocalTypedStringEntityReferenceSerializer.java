@@ -19,8 +19,11 @@
  */
 package org.xwiki.annotation.reference.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
@@ -29,13 +32,16 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * @version $Id$
  * @since 2.3M1
  */
-@Component("local")
+@Component
+@Named("local")
+@Singleton
 public class LocalTypedStringEntityReferenceSerializer extends AbstractTypedStringEntityReferenceSerializer
 {
     /**
      * Serializer used to serialize the reference without the type specification.
      */
-    @Requirement("local")
+    @Inject
+    @Named("local")
     private EntityReferenceSerializer<String> referenceSerializer;
 
     /**

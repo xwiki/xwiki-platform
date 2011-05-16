@@ -19,10 +19,12 @@
  */
 package org.xwiki.annotation.maintainer.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.annotation.maintainer.AbstractAnnotationMaintainer;
 import org.xwiki.annotation.maintainer.DiffService;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 
 /**
  * Default implementation of the annotation maintainer, using a default implementation of the diff service.
@@ -31,12 +33,13 @@ import org.xwiki.component.annotation.Requirement;
  * @since 2.3M1
  */
 @Component
+@Singleton
 public class DefaultAnnotationMaintainer extends AbstractAnnotationMaintainer
 {
     /**
      * Diff service to get the differences between content.
      */
-    @Requirement
+    @Inject
     private DiffService diffService;
 
     /**

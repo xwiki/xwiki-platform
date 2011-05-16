@@ -23,8 +23,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.internal.macro.MacroContentParser;
@@ -40,7 +43,9 @@ import org.xwiki.skinx.SkinExtension;
  * @version $Id$
  * @since 3.0M3
  */
-@Component("gallery")
+@Component
+@Named("gallery")
+@Singleton
 public class DefaultGalleryMacro extends AbstractMacro<Object>
 {
     /**
@@ -60,19 +65,21 @@ public class DefaultGalleryMacro extends AbstractMacro<Object>
     /**
      * The parser used to parse gallery content.
      */
-    @Requirement
+    @Inject
     private MacroContentParser contentParser;
 
     /**
      * The component used to import JavaScript file extensions.
      */
-    @Requirement("jsfx")
+    @Inject
+    @Named("jsfx")
     private SkinExtension jsfx;
 
     /**
      * The component used to import style-sheet file extensions.
      */
-    @Requirement("ssfx")
+    @Inject
+    @Named("ssfx")
     private SkinExtension ssfx;
 
     /**
@@ -94,12 +101,12 @@ public class DefaultGalleryMacro extends AbstractMacro<Object>
     {
         if (context != null) {
             Map<String, Object> skinExtensionParameters = Collections.singletonMap("forceSkinAction", (Object) true);
-            jsfx.use("uicomponents/widgets/gallery/gallery.js", skinExtensionParameters);
-            ssfx.use("uicomponents/widgets/gallery/gallery.css", skinExtensionParameters);
+            this.jsfx.use("uicomponents/widgets/gallery/gallery.js", skinExtensionParameters);
+            this.ssfx.use("uicomponents/widgets/gallery/gallery.css", skinExtensionParameters);
 
             Block galleryBlock = new GroupBlock(Collections.singletonMap("class", "gallery"));
             // Don't execute transformations explicitly. They'll be executed on the generated content later on.
-            galleryBlock.addChildren(contentParser.parse(content, context, false, false));
+            galleryBlock.addChildren(this.contentParser.parse(content, context, false, false));
             return Collections.singletonList(galleryBlock);
         } else {
             return Collections.emptyList();

@@ -19,9 +19,12 @@
  */
 package org.xwiki.annotation.internal.content;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.annotation.content.filter.Filter;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 
 /**
  * Content alterer that filters out all spaces.
@@ -29,13 +32,16 @@ import org.xwiki.component.annotation.Requirement;
  * @version $Id$
  * @since 2.3M1
  */
-@Component("whitespace")
+@Component
+@Named("whitespace")
+@Singleton
 public class WhiteSpaceContentAlterer extends AbstractFilterContentAlterer
 {
     /**
      * Whitespace filter used by this alterer.
      */
-    @Requirement("whitespace")
+    @Inject
+    @Named("whitespace")
     private Filter whiteSpaceFilter;
 
     /**

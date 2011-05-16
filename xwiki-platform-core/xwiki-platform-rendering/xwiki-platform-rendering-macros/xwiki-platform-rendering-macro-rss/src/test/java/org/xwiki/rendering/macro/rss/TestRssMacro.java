@@ -22,6 +22,9 @@ package org.xwiki.rendering.macro.rss;
 import java.net.URL;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.macro.rss.RssMacro;
@@ -34,7 +37,9 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.8RC1
  */
-@Component("testrss")
+@Component
+@Named("testrss")
+@Singleton
 public class TestRssMacro extends RssMacro
 {
     /**
@@ -42,6 +47,7 @@ public class TestRssMacro extends RssMacro
      * 
      * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
      */
+    @Override
     public List<Block> execute(RssMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -51,7 +57,7 @@ public class TestRssMacro extends RssMacro
             String localFile = feedParam.substring(feedParam.lastIndexOf("/"));
             URL feedURL = getClass().getResource(localFile);
             parameters.setFeed(feedURL.toString());
-        }        
-        return super.execute(parameters, content, context);        
+        }
+        return super.execute(parameters, content, context);
     }
 }

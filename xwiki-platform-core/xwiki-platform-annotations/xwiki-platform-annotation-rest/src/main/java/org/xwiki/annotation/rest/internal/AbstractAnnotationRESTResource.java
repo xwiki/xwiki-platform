@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.velocity.VelocityContext;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationService;
@@ -39,7 +41,6 @@ import org.xwiki.annotation.rest.model.jaxb.AnnotationResponse;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationStub;
 import org.xwiki.annotation.rest.model.jaxb.ObjectFactory;
 import org.xwiki.annotation.rights.AnnotationRightService;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.rest.XWikiResource;
@@ -68,19 +69,19 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     /**
      * The annotations service to be used by this REST interface.
      */
-    @Requirement
+    @Inject
     protected AnnotationService annotationService;
 
     /**
      * The annotations rights checking service, to check user rights to perform annotations actions.
      */
-    @Requirement
+    @Inject
     protected AnnotationRightService annotationRightService;
 
     /**
      * The execution needed to get the annotation author from the context user.
      */
-    @Requirement
+    @Inject
     protected Execution execution;
 
     /**

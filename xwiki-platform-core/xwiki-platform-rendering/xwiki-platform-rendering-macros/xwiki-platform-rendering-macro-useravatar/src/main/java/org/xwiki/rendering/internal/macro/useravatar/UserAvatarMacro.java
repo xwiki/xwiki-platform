@@ -23,11 +23,14 @@ package org.xwiki.rendering.internal.macro.useravatar;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -49,7 +52,9 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.8RC2
  */
-@Component("useravatar")
+@Component
+@Named("useravatar")
+@Singleton
 public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
 {
     /**
@@ -60,33 +65,36 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
     /**
      * Used to get the user avatar picture from his profile.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * Used to get the default avatar picture when the user doesn't exist.
      */
-    @Requirement
+    @Inject
     private SkinAccessBridge skinAccessBridge;
 
     /**
-     * Used to convert a user reference represented as a String (passed as a macro parameter by the user) to a
-     * Document Reference.
+     * Used to convert a user reference represented as a String (passed as a macro parameter by the user) to a Document
+     * Reference.
      */
-    @Requirement("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver; 
+    @Inject
+    @Named("current")
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
     /**
      * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
      * wiki).
      */
-    @Requirement("compactwiki")
+    @Inject
+    @Named("compactwiki")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
 
     /**
      * Used to find out the current Wiki name.
      */
-    @Requirement("current")
+    @Inject
+    @Named("current")
     private EntityReferenceValueProvider currentEntityReferenceValueProvider;
 
     /**
@@ -111,12 +119,12 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
 
         // Find the avatar attachment name or null if not defined or an error happened when locating it
         String fileName = null;
-        if (documentAccessBridge.exists(userReference)) {
-            Object avatarProperty = documentAccessBridge.getProperty(userReference,
+        if (this.documentAccessBridge.exists(userReference)) {
+            Object avatarProperty = this.documentAccessBridge.getProperty(userReference,
                 new DocumentReference(this.currentEntityReferenceValueProvider.getDefaultValue(EntityType.WIKI),
                     "XWiki", "XWikiUsers"), "avatar");
             if (avatarProperty != null) {
-                fileName = avatarProperty.toString(); 
+                fileName = avatarProperty.toString();
             }
         } else {
             throw new MacroExecutionException("User ["
@@ -126,7 +134,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
 
         ResourceReference imageReference;
         if (StringUtils.isBlank(fileName)) {
-            imageReference = new ResourceReference(skinAccessBridge.getSkinFile("noavatar.png"), ResourceType.URL);
+            imageReference = new ResourceReference(this.skinAccessBridge.getSkinFile("noavatar.png"), ResourceType.URL);
         } else {
             AttachmentReference attachmentReference = new AttachmentReference(fileName, userReference);
             imageReference = new ResourceReference(

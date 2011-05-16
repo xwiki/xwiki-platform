@@ -19,6 +19,9 @@
  */
 package org.xwiki.rendering.internal.macro.ruby;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.script.AbstractJSR223ScriptMacro;
@@ -30,7 +33,9 @@ import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
  * @version $Id$
  * @since 2.0M2
  */
-@Component("ruby")
+@Component
+@Named("ruby")
+@Singleton
 public class RubyMacro extends AbstractJSR223ScriptMacro<JSR223ScriptMacroParameters>
 {
     /**

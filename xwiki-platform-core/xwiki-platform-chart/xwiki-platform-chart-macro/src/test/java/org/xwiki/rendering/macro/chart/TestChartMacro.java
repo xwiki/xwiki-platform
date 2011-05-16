@@ -21,16 +21,21 @@ package org.xwiki.rendering.macro.chart;
 
 import java.io.File;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.internal.macro.chart.ChartMacro;
 
 /**
  * Extension of the {@link ChartMacro} for testing.
- *
+ * 
  * @version $Id$
  * @since 2.0M1
  */
-@Component("testchart")
+@Component
+@Named("testchart")
+@Singleton
 public class TestChartMacro extends ChartMacro
 {
     /**
@@ -40,5 +45,5 @@ public class TestChartMacro extends ChartMacro
     protected File getChartImageFile(ChartMacroParameters parameters)
     {
         return new File(System.getProperty("java.io.tmpdir") + "/chart.png");
-    }    
+    }
 }

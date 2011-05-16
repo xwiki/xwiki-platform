@@ -23,9 +23,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -43,25 +46,28 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 2.5M2
  */
-@Component("office")
+@Component
+@Named("office")
+@Singleton
 public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
 {
     /**
      * The component used to resolve the attachment string reference relative to the current document reference.
      */
-    @Requirement("explicit")
+    @Inject
+    @Named("explicit")
     private EntityReferenceResolver<String> explicitStringEntityReferenceResolver;
 
     /**
      * The component used to get the current document reference.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * The component used to view the office attachments.
      */
-    @Requirement
+    @Inject
     private OfficeViewer officeViewer;
 
     /**
@@ -83,14 +89,14 @@ public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
     public List<Block> execute(OfficeMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        DocumentReference currentDocumentReference = documentAccessBridge.getCurrentDocumentReference();
+        DocumentReference currentDocumentReference = this.documentAccessBridge.getCurrentDocumentReference();
         AttachmentReference attachmentReference =
             new AttachmentReference(explicitStringEntityReferenceResolver.resolve(parameters.getAttachment(),
                 EntityType.ATTACHMENT, currentDocumentReference));
         Map<String, String> viewParameters =
             Collections.singletonMap("filterStyles", String.valueOf(parameters.isFilterStyles()));
         try {
-            return officeViewer.createView(attachmentReference, viewParameters).getChildren();
+            return this.officeViewer.createView(attachmentReference, viewParameters).getChildren();
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to view office attachment.", e);
         }

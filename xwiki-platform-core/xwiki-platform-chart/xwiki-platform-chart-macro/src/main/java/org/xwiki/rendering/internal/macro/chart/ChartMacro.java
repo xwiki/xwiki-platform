@@ -25,11 +25,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.chart.ChartGenerator;
 import org.xwiki.chart.ChartGeneratorException;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
@@ -52,14 +55,16 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 2.0M1
  */
-@Component("chart")
+@Component
+@Named("chart")
+@Singleton
 public class ChartMacro extends AbstractMacro<ChartMacroParameters>
 {
     /**
      * The description of the macro.
      */
     private static final String DESCRIPTION = "Displays a graphical chart generated from miscellaneous data sources";
-    
+
     /**
      * The description of the macro content.
      */
@@ -68,25 +73,25 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
     /**
      * Used for building the actual chart.
      */
-    @Requirement
+    @Inject
     private ChartGenerator chartGenerator;
 
     /**
      * Used for getting web URLs from specific filenames.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * The component manager needed for instantiating the datasource factory.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
      * The web container of the current module.
      */
-    @Requirement
+    @Inject
     private Container container;
 
     /**
@@ -113,7 +118,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
         throws MacroExecutionException
     {
         String imageLocation =
-            documentAccessBridge.getURL(null, "charting", null, null) + "/" + generateChart(macroParams, content);
+            this.documentAccessBridge.getURL(null, "charting", null, null) + "/" + generateChart(macroParams, content);
         String title = macroParams.getTitle();
         ResourceReference reference = new ResourceReference(imageLocation, ResourceType.URL);
         ImageBlock imageBlock = new ImageBlock(new ResourceReference(imageLocation, ResourceType.URL), true);
@@ -147,9 +152,9 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
         String source = paramsMap.get("source");
         File chartFile;
         try {
-            ChartDataSource dataSource = componentManager.lookup(ChartDataSource.class, source);
+            ChartDataSource dataSource = this.componentManager.lookup(ChartDataSource.class, source);
             byte[] chart =
-                chartGenerator.generate(dataSource.buildModel(content, paramsMap), paramsMap);
+                this.chartGenerator.generate(dataSource.buildModel(content, paramsMap), paramsMap);
             chartFile = getChartImageFile(parameters);
             FileOutputStream fos = new FileOutputStream(chartFile);
             fos.write(chart);
@@ -172,7 +177,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
      */
     protected File getChartImageFile(ChartMacroParameters parameters)
     {
-        File chartsDir = new File(container.getApplicationContext().getTemporaryDirectory(), "charts");
+        File chartsDir = new File(this.container.getApplicationContext().getTemporaryDirectory(), "charts");
         return new File(chartsDir, Math.abs(parameters.hashCode()) + ".png");
     }
 }

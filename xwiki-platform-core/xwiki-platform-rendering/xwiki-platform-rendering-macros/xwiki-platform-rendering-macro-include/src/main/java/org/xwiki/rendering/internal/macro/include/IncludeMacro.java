@@ -24,10 +24,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
@@ -56,7 +59,9 @@ import org.xwiki.rendering.transformation.TransformationContext;
  * @version $Id$
  * @since 1.5M2
  */
-@Component("include")
+@Component
+@Named("include")
+@Singleton
 public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
 {
     /**
@@ -67,32 +72,33 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     /**
      * Used to get the current context that we clone if the users asks to execute the included page in its own context.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
      * Used in order to clone the execution context when the user asks to execute the included page in its own context.
      */
-    @Requirement
+    @Inject
     private ExecutionContextManager executionContextManager;
 
     /**
      * Used to access document content and check view access right.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * Used to transform the passed document reference macro parameter to a typed {@link DocumentReference} object.
      */
-    @Requirement("current")
+    @Inject
+    @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
     /**
      * Used to serialize resolved document links into a string again since the Rendering API only manipulates Strings
      * (done voluntarily to be independent of any wiki engine and not draw XWiki-specific dependencies).
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
     /**

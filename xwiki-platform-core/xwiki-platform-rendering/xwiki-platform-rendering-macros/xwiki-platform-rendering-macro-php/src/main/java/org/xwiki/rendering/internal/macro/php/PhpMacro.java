@@ -19,6 +19,9 @@
  */
 package org.xwiki.rendering.internal.macro.php;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.script.AbstractJSR223ScriptMacro;
@@ -30,7 +33,9 @@ import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
  * @version $Id$
  * @since 2.1M1
  */
-@Component("php")
+@Component
+@Named("php")
+@Singleton
 public class PhpMacro extends AbstractJSR223ScriptMacro<JSR223ScriptMacroParameters>
 {
     /** The description of the macro. */

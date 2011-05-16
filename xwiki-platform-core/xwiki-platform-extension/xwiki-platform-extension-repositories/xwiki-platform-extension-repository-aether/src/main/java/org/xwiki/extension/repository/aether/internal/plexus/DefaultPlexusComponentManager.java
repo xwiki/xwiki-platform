@@ -37,9 +37,6 @@ import org.xwiki.extension.repository.aether.internal.XWikiLoggerManager;
 @Component
 public class DefaultPlexusComponentManager implements PlexusComponentManager, Initializable
 {
-    @Inject
-    Logger logger;
-
     /**
      * The logger to log.
      */

@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * 
  * @version $Id$
  * @since 2.0.1
- * @deprecated use {@link org.xwiki.model.AttachmentNameSerializer} instead since 2.2M1
+ * @deprecated use {@link org.xwiki.model.reference.EntityReferenceSerializer} instead since 2.2M1
  */
 @ComponentRole
 @Deprecated

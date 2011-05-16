@@ -119,6 +119,7 @@ XWiki.actionButtons.EditActions = Class.create({
     if (!this.validateForm(event.element().form)) {
       event.stop();
     } else {
+      this.updateContentForShortcut();
       // Notify others
       this.notify(event, "preview");
     }
@@ -127,6 +128,7 @@ XWiki.actionButtons.EditActions = Class.create({
     if (!this.validateForm(event.element().form)) {
       event.stop();
     } else {
+      this.updateContentForShortcut();
       this.notify(event, "save", {"continue" : false});
     }
   },
@@ -134,6 +136,7 @@ XWiki.actionButtons.EditActions = Class.create({
     if (!this.validateForm(event.element().form)) {
       event.stop();
     } else {
+      this.updateContentForShortcut();
       this.notify(event, "save", {"continue" : true});
     }
   },
@@ -143,6 +146,14 @@ XWiki.actionButtons.EditActions = Class.create({
     if (event.stopped) {
       event.stop();
     }
+  },
+  updateContentForShortcut : function(){
+    if (typeof(Wysiwyg)=="undefined"){
+      return;
+    }
+    Wysiwyg.getInstance("content").getSourceText(function(response) {
+      $("content").value=response;
+    }, function(){return;});
   }
 });
 

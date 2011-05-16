@@ -19,10 +19,12 @@
  */
 package org.xwiki.officeimporter.internal;
 
+import javax.inject.Inject;
+
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.OfficeImporterVelocityBridge;
@@ -35,7 +37,7 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @since 1.8M1
  */
 @Component("officeimporter")
-public class OfficeImporterVelocityContextInitializer extends AbstractLogEnabled implements VelocityContextInitializer
+public class OfficeImporterVelocityContextInitializer implements VelocityContextInitializer
 {
     /**
      * The key to use for office importer in the velocity context.
@@ -49,16 +51,22 @@ public class OfficeImporterVelocityContextInitializer extends AbstractLogEnabled
     private ComponentManager componentManager;
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * {@inheritDoc}
      */
     public void initialize(VelocityContext context)
     {
         try {
-            OfficeImporterVelocityBridge bridge = new OfficeImporterVelocityBridge(componentManager, getLogger());
+            OfficeImporterVelocityBridge bridge = new OfficeImporterVelocityBridge(this.componentManager);
             context.put(VELOCITY_CONTEXT_KEY, bridge);
         } catch (OfficeImporterException ex) {
             String message = "Unrecoverable error, office importer will not be available for velocity scripts.";
-            getLogger().error(message, ex);
+            this.logger.error(message, ex);
         }        
     }
 }

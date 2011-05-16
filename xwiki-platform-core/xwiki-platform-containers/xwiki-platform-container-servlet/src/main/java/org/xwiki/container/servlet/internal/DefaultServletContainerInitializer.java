@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.container.servlet.internal;
 
@@ -24,13 +23,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 
+import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
@@ -52,7 +52,7 @@ import org.xwiki.url.XWikiURL;
 import org.xwiki.url.XWikiURLFactory;
 
 @Component
-public class DefaultServletContainerInitializer extends AbstractLogEnabled implements ServletContainerInitializer
+public class DefaultServletContainerInitializer implements ServletContainerInitializer
 {
      // Implementation note: It's important that we don't use @Requirement annotations here
      // for RequestInitializerManager and ExecutionContextManager since we can have
@@ -72,6 +72,12 @@ public class DefaultServletContainerInitializer extends AbstractLogEnabled imple
 
     @Requirement
     private ComponentManager componentManager;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     public void initializeApplicationContext(ServletContext servletContext)
     {
@@ -110,17 +116,13 @@ public class DefaultServletContainerInitializer extends AbstractLogEnabled imple
             // Happens if getURL() fails, shouldn't happen normally since the Servlet Container should always return
             // valid URLs when getRequestURL() is called.
             // TODO: However since we're still debugging this ignore errors FTM.
-            if (getLogger().isDebugEnabled()) {
-                getLogger().debug("Failed to get URL from HTTP Request", mue);
-            }
+            this.logger.debug("Failed to get URL from HTTP Request", mue);
         } catch (ComponentLookupException cle) {
             throw new ServletContainerException("Failed to locate URL Factory", cle);
         } catch (InvalidURLException iue) {
             // TODO: For the moment ignore any exception since we don't handle all types of URLs. This simply means
             // that the XWiki URL won't be in the Request (and thus not in the Execution Context either).
-            if (getLogger().isDebugEnabled()) {
-                getLogger().debug("Failed to extract XWiki URL", iue);
-            }
+            this.logger.debug("Failed to extract XWiki URL", iue);
         }
 
         // 5) Call the request initializers to populate the Request further.

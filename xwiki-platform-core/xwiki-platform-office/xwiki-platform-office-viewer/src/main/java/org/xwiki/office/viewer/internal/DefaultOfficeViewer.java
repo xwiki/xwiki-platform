@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReference;
@@ -65,6 +68,12 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
      */
     @Requirement
     private PresentationBuilder presentationBuilder;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * {@inheritDoc}
@@ -121,7 +130,7 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
                     temporaryFiles.add(tempFile);
                 } catch (Exception ex) {
                     String message = "Error while processing artifact image [%s].";
-                    getLogger().error(String.format(message, imageReference), ex);
+                    this.logger.error(String.format(message, imageReference), ex);
                 }
             }
         }

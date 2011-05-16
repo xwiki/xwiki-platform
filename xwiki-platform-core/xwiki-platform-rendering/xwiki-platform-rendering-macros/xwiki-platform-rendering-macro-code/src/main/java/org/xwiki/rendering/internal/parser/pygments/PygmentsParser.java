@@ -26,12 +26,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 import org.python.util.PythonInterpreter;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
@@ -142,6 +145,12 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     private PygmentsParserConfiguration configuration;
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.component.phase.Initializable#initialize()
@@ -225,9 +234,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
         PyObject lexer = getLexer(syntaxId);
         if (lexer == null || lexer == Py.None) {
             // No lexer found
-            if (getLogger().isDebugEnabled()) {
-                getLogger().debug("no lexer found");
-            }
+            this.logger.debug("no lexer found");
 
             return Collections.<Block> singletonList(new VerbatimBlock(code, true));
         }

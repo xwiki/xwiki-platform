@@ -24,8 +24,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.logging.Logger;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
@@ -51,6 +52,10 @@ import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
  */
 public class OfficeImporterVelocityBridge
 {
+    /**
+     * The logger to log.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(OfficeImporterVelocityBridge.class);
     /**
      * File extensions corresponding to slide presentations.
      */
@@ -107,21 +112,14 @@ public class OfficeImporterVelocityBridge
     private XDOMOfficeDocumentSplitter xdomSplitter;
 
     /**
-     * The {@link Logger} instance.
-     */
-    private Logger logger;
-
-    /**
      * Default constructor.
      * 
      * @param componentManager used to lookup for other necessary components.
-     * @param logger logger.
      * @throws OfficeImporterException if an error occurs while looking up for other required components.
      */
-    public OfficeImporterVelocityBridge(ComponentManager componentManager, Logger logger)
+    public OfficeImporterVelocityBridge(ComponentManager componentManager)
         throws OfficeImporterException
     {
-        this.logger = logger;
         try {
             this.execution = componentManager.lookup(Execution.class);
             this.docBridge = componentManager.lookup(DocumentAccessBridge.class);
@@ -160,7 +158,7 @@ public class OfficeImporterVelocityBridge
                 .resolve(referenceDocument), filterStyles);
         } catch (Exception ex) {
             setErrorMessage(ex.getMessage());
-            logger.error(ex.getMessage(), ex);
+            LOGGER.error(ex.getMessage(), ex);
         }
         return null;
     }
@@ -179,7 +177,7 @@ public class OfficeImporterVelocityBridge
             return xdomBuilder.build(xhtmlOfficeDocument);
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
-            logger.error(ex.getMessage(), ex);
+            LOGGER.error(ex.getMessage(), ex);
         }
         return null;
     }
@@ -211,7 +209,7 @@ public class OfficeImporterVelocityBridge
             }
         } catch (Exception ex) {
             setErrorMessage(ex.getMessage());
-            logger.error(ex.getMessage(), ex);
+            LOGGER.error(ex.getMessage(), ex);
         }
         return null;
     }
@@ -244,7 +242,7 @@ public class OfficeImporterVelocityBridge
                 currentMixedDocumentReferenceResolver.resolve(rootDocumentName));
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
-            logger.error(ex.getMessage(), ex);
+            LOGGER.error(ex.getMessage(), ex);
         }
         return null;
     }
@@ -312,12 +310,12 @@ public class OfficeImporterVelocityBridge
             return true;
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
-            logger.error(ex.getMessage(), ex);
+            LOGGER.error(ex.getMessage(), ex);
         } catch (Exception ex) {
             String message = "Error while saving document [%s].";
             message = String.format(message, target);
             setErrorMessage(message);
-            logger.error(message, ex);
+            LOGGER.error(message, ex);
         }
         return false;
     }
@@ -392,7 +390,7 @@ public class OfficeImporterVelocityBridge
                 docBridge.setAttachmentContent(attachmentReference, artifact.getValue());
             } catch (Exception ex) {
                 // Log the error and skip the artifact.
-                logger.error("Error while attaching artifact.", ex);
+                LOGGER.error("Error while attaching artifact.", ex);
             }
         }
     }

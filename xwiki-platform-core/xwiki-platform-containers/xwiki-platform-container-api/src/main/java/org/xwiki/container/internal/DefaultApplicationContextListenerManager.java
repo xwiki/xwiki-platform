@@ -16,15 +16,16 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.container.internal;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
@@ -38,14 +39,19 @@ import org.xwiki.container.ApplicationContextListenerManager;
  * @since 1.9M2
  */
 @Component
-public class DefaultApplicationContextListenerManager extends AbstractLogEnabled 
-    implements ApplicationContextListenerManager
+public class DefaultApplicationContextListenerManager implements ApplicationContextListenerManager
 {
     /**
      * The {@link ComponentManager} used to lookup for all {@link ApplicationContextListener} components.
      */
     @Requirement
     private ComponentManager componentManager;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * {@inheritDoc}
@@ -59,7 +65,7 @@ public class DefaultApplicationContextListenerManager extends AbstractLogEnabled
                 initializer.initializeApplicationContext(applicationContext);
             }
         } catch (ComponentLookupException ex) {
-            getLogger().error(ex.getMessage(), ex);
+            this.logger.error(ex.getMessage(), ex);
         }
     }
 
@@ -75,7 +81,7 @@ public class DefaultApplicationContextListenerManager extends AbstractLogEnabled
                 initializer.destroyApplicationContext(applicationContext);
             }
         } catch (ComponentLookupException ex) {
-            getLogger().error(ex.getMessage(), ex);
+            this.logger.error(ex.getMessage(), ex);
         }
     }       
 }

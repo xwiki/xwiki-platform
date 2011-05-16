@@ -22,7 +22,7 @@ package org.xwiki.configuration.internal;
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.component.logging.Logger;
+import org.slf4j.Logger;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
@@ -60,7 +60,7 @@ public class XWikiPropertiesConfigurationSourceTest extends AbstractComponentTes
 
         this.source = new XWikiPropertiesConfigurationSource();
         ReflectionUtils.setFieldValue(this.source, "container", container);
-        this.source.enableLogging(this.logger);
+        ReflectionUtils.setFieldValue(this.source, "logger", this.logger);
     }
 
     @Test

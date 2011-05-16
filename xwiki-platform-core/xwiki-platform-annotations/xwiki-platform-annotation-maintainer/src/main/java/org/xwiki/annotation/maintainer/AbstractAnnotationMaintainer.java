@@ -31,7 +31,6 @@ import org.xwiki.annotation.content.ContentAlterer;
 import org.xwiki.annotation.io.IOService;
 import org.xwiki.annotation.io.IOTargetService;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
@@ -48,7 +47,7 @@ import org.xwiki.rendering.transformation.TransformationManager;
  * @version $Id$
  * @since 2.3M1
  */
-public abstract class AbstractAnnotationMaintainer extends AbstractLogEnabled implements AnnotationMaintainer
+public abstract class AbstractAnnotationMaintainer implements AnnotationMaintainer
 {
     /**
      * Annotations storage service.

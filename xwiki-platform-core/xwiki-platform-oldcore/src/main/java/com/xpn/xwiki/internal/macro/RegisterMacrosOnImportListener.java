@@ -23,9 +23,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -43,7 +45,7 @@ import com.xpn.xwiki.internal.event.XARImportedEvent;
  * @version $Id$
  */
 @Component("register-macros-on-import")
-public class RegisterMacrosOnImportListener extends AbstractLogEnabled implements EventListener
+public class RegisterMacrosOnImportListener implements EventListener
 {
     /**
      * The macro initializer used to register the wiki macros.
@@ -56,6 +58,12 @@ public class RegisterMacrosOnImportListener extends AbstractLogEnabled implement
      */
     @Requirement
     private Execution execution;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * The events observed by this event listener.
@@ -105,7 +113,7 @@ public class RegisterMacrosOnImportListener extends AbstractLogEnabled implement
             String currentWiki = xcontext.getDatabase();
             macroInitializer.registerExistingWikiMacros(currentWiki);
         } catch (Exception e) {
-            getLogger().warn("Could not register existing macros on import", e);
+            this.logger.warn("Could not register existing macros on import", e);
         }
     }
 }

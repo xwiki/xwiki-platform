@@ -80,7 +80,7 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     private ConfigurationSource configurationSource;
 
     /**
-     * Logging tool.
+     * The logger to log.
      */
     @Inject
     private Logger logger;

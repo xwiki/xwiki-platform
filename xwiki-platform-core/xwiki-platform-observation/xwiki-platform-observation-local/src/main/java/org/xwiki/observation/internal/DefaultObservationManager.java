@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.observation.internal;
 
@@ -26,12 +25,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.event.ComponentDescriptorAddedEvent;
 import org.xwiki.component.event.ComponentDescriptorEvent;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.event.ComponentDescriptorRemovedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -52,7 +53,7 @@ import org.xwiki.observation.event.Event;
  * @version $Id$
  */
 @Component
-public class DefaultObservationManager extends AbstractLogEnabled implements ObservationManager, Initializable
+public class DefaultObservationManager implements ObservationManager, Initializable
 {
     /**
      * Registered listeners indexed on Event classes so that it's fast to find all the listeners registered for a given
@@ -74,6 +75,12 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      */
     @Requirement
     private ComponentManager componentManager;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Helper class to store the list of events of a given type associated with a given listener. We need this for
@@ -150,7 +157,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
 
         // If the passed event listener name is already registered, log a warning
         if (previousListener != null) {
-            getLogger().warn(
+            this.logger.warn(
                 "The [" + eventListener.getClass().getName() + "] listener has overwritten a previously "
                     + "registered listener [" + previousListener.getClass().getName()
                     + "] since they both are registered under the same id [" + eventListener.getName() + "]."
@@ -278,7 +285,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
                         listener.listener.onEvent(event, source, data);
                     } catch (Exception e) {
                         // protect from bad listeners
-                        getLogger().error("Fail to send event [" + event + "] to listener [" + listener.listener + "]",
+                        this.logger.error("Fail to send event [" + event + "] to listener [" + listener.listener + "]",
                             e);
                     }
 
@@ -331,7 +338,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
                 addListener(eventListener);
             }
         } catch (ComponentLookupException e) {
-            getLogger().error("Failed to lookup event listener corresponding to the component registration event", e);
+            this.logger.error("Failed to lookup event listener corresponding to the component registration event", e);
         }
     }
 

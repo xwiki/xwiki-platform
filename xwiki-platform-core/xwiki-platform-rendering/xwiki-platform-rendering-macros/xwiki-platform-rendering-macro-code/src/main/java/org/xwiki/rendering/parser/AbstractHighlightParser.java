@@ -21,7 +21,6 @@ package org.xwiki.rendering.parser;
 
 import java.io.Reader;
 
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.block.XDOM;
 
 /**
@@ -30,7 +29,7 @@ import org.xwiki.rendering.block.XDOM;
  * @version $Id$
  * @since 1.7RC1
  */
-public abstract class AbstractHighlightParser extends AbstractLogEnabled implements HighlightParser
+public abstract class AbstractHighlightParser implements HighlightParser
 {
     /**
      * The syntax identifier.

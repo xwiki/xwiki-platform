@@ -38,8 +38,8 @@ import org.jgroups.conf.ConfiguratorFactory;
 import org.jgroups.conf.ProtocolStackConfigurator;
 import org.jgroups.conf.XmlConfigurator;
 import org.jgroups.jmx.JmxConfigurator;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
@@ -57,7 +57,7 @@ import org.xwiki.observation.remote.jgroups.JGroupsReceiver;
 @Component
 @Named("jgroups")
 @Singleton
-public class JGroupsNetworkAdapter extends AbstractLogEnabled implements NetworkAdapter
+public class JGroupsNetworkAdapter implements NetworkAdapter
 {
     /**
      * Relative path where to find jgroups channels configurations.
@@ -77,6 +77,12 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
     private ComponentManager componentManager;
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * The network channels.
      */
     private Map<String, JChannel> channels = new ConcurrentHashMap<String, JChannel>();
@@ -88,7 +94,7 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
      */
     public void send(RemoteEventData remoteEvent)
     {
-        getLogger().debug("Send JGroups remote event [" + remoteEvent + "]");
+        this.logger.debug("Send JGroups remote event [" + remoteEvent + "]");
 
         // Send the message to the whole group
         Message message = new Message(null, null, remoteEvent);
@@ -98,7 +104,7 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
             try {
                 entry.getValue().send(message);
             } catch (Exception e) {
-                getLogger().error("Failed to send message [" + remoteEvent + "] to the channel [" + entry.getKey()
+                this.logger.error("Failed to send message [" + remoteEvent + "] to the channel [" + entry.getKey()
                     + "]", e);
             }
         }
@@ -130,10 +136,10 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             JmxConfigurator.registerChannel(channel, mbs, channel.getClusterName());
         } catch (Exception e) {
-            getLogger().warn("Failed to register channel [" + channelId + "] against the JMX Server", e);
+            this.logger.warn("Failed to register channel [" + channelId + "] against the JMX Server", e);
         }
 
-        getLogger().info(MessageFormat.format("Channel [{0}] started", channelId));
+        this.logger.info(MessageFormat.format("Channel [{0}] started", channelId));
     }
 
     /**
@@ -158,10 +164,10 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             JmxConfigurator.unregister(channel, mbs, channel.getClusterName());
         } catch (Exception e) {
-            getLogger().warn("Failed to unregister channel [" + channelId + "] from the JMX Server", e);
+            this.logger.warn("Failed to unregister channel [" + channelId + "] from the JMX Server", e);
         }
 
-        getLogger().info(MessageFormat.format("Channel [{0}] stopped", channelId));
+        this.logger.info(MessageFormat.format("Channel [{0}] stopped", channelId));
     }
 
     /**
@@ -218,7 +224,7 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
         if (is != null) {
             configurator = XmlConfigurator.getInstance(is);
         } else {
-            getLogger().warn(
+            this.logger.warn(
                 "Can't find a configuration for channel [" + channelId + "] at [" + path + "]. Using "
                     + JChannel.DEFAULT_PROTOCOL_STACK + " JGroups default configuration.");
 
@@ -241,6 +247,6 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
 
         this.channels.clear();
 
-        getLogger().info("All channels stopped");
+        this.logger.info("All channels stopped");
     }
 }

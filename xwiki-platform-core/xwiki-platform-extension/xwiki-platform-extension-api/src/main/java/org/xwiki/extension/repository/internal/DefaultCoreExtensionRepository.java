@@ -54,7 +54,7 @@ public class DefaultCoreExtensionRepository extends AbstractExtensionRepository 
     protected Map<String, DefaultCoreExtension> extensions;
 
     /**
-     * Logging tool.
+     * The logger to log.
      */
     @Inject
     private Logger logger;
@@ -142,7 +142,7 @@ public class DefaultCoreExtensionRepository extends AbstractExtensionRepository 
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.extension.repository.CoreExtensionRepository#getCoreExtensions()
      */
     public Collection<CoreExtension> getCoreExtensions()

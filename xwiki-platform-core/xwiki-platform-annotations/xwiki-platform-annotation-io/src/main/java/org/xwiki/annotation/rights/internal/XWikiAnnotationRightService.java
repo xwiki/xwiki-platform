@@ -19,13 +19,15 @@
  */
 package org.xwiki.annotation.rights.internal;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.io.IOService;
 import org.xwiki.annotation.reference.TypedStringEntityReferenceResolver;
 import org.xwiki.annotation.rights.AnnotationRightService;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
@@ -41,7 +43,7 @@ import com.xpn.xwiki.XWikiException;
  * @since 2.3M1
  */
 @Component
-public class XWikiAnnotationRightService extends AbstractLogEnabled implements AnnotationRightService
+public class XWikiAnnotationRightService implements AnnotationRightService
 {
     /**
      * The execution used to get the deprecated XWikiContext.
@@ -69,6 +71,12 @@ public class XWikiAnnotationRightService extends AbstractLogEnabled implements A
      */
     @Requirement
     private EntityReferenceSerializer<String> serializer;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * {@inheritDoc}
@@ -172,7 +180,7 @@ public class XWikiAnnotationRightService extends AbstractLogEnabled implements A
      */
     private void logException(Exception e, String target, String user)
     {
-        getLogger().warn("Couldn't get access rights for the target " + target + "for user " + user, e);
+        this.logger.warn("Couldn't get access rights for the target [" + target + "] for user [" + user + "]", e);
     }
 
     /**

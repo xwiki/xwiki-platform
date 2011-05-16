@@ -27,8 +27,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
@@ -39,7 +39,7 @@ import org.xwiki.observation.event.Event;
 @Component
 @Singleton
 @Named("JarHandlerApplicationStartedListener")
-public class JarHandlerApplicationStartedListener extends AbstractLogEnabled implements EventListener
+public class JarHandlerApplicationStartedListener implements EventListener
 {
     private static final List<Event> EVENTS = Collections.<Event> singletonList(new ApplicationStartedEvent());
 
@@ -48,6 +48,12 @@ public class JarHandlerApplicationStartedListener extends AbstractLogEnabled imp
 
     @Inject
     private ExtensionHandlerManager extensionHandlerManager;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     public List<Event> getEvents()
     {
@@ -75,7 +81,7 @@ public class JarHandlerApplicationStartedListener extends AbstractLogEnabled imp
                             this.extensionHandlerManager.install(localExtension, null);
                         }
                     } catch (Exception e) {
-                        getLogger().error("Failed to install local extension [" + localExtension + "]", e);
+                        this.logger.error("Failed to install local extension [" + localExtension + "]", e);
                     }
                 }
             }

@@ -16,19 +16,20 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.legacy.internal;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.EventListener;
@@ -45,7 +46,7 @@ import org.xwiki.observation.event.Event;
  * @version $Id$
  */
 @Component("legacyEventDispatcher")
-public class LegacyEventDispatcher extends AbstractLogEnabled implements EventListener
+public class LegacyEventDispatcher implements EventListener
 {
     /**
      * Component manager, used to get access to the observation manager that we cannot get injected because of a cyclic
@@ -53,6 +54,12 @@ public class LegacyEventDispatcher extends AbstractLogEnabled implements EventLi
      */
     @Requirement
     private ComponentManager componentManager;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Observation manager, used to notify legacy events.
@@ -112,7 +119,7 @@ public class LegacyEventDispatcher extends AbstractLogEnabled implements EventLi
         try {
             this.observationManager = this.componentManager.lookup(ObservationManager.class);
         } catch (ComponentLookupException e) {
-            this.getLogger().error("Failed to lookup observation manager", e);
+            this.logger.error("Failed to lookup observation manager", e);
         }
         return this.observationManager;
     }

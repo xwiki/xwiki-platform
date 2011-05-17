@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-web</artifactId>
-    <version>2.7-SNAPSHOT</version>
+    <version>2.7.2</version>
   </parent>
   <artifactId>xwiki-web-gwt-wysiwyg-client</artifactId>
   <name>XWiki Platform - Web - GWT - WYSIWYG Editor - Client Side</name>

@@ -47,7 +47,6 @@ import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Settings;
 import org.hibernate.connection.ConnectionProvider;
@@ -540,9 +539,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // We should only save the class if we are using the class table mode
             if (bclass != null) {
                 bclass.setDocumentReference(doc.getDocumentReference());
-                if ((bclass.getFieldList().size() > 0) && (useClassesTable(true, context))) {
-                    saveXWikiClass(bclass, context, false);
-                }
                 // Store this XWikiClass in the context so that we can use it in case of recursive
                 // usage of classes
                 context.addBaseClass(bclass);
@@ -722,10 +718,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 bclass.fromXML(cxml);
                 bclass.setDocumentReference(doc.getDocumentReference());
                 doc.setXClass(bclass);
-            } else if (useClassesTable(false, context)) {
-                bclass.setDocumentReference(doc.getDocumentReference());
-                bclass = loadXWikiClass(bclass, context, false);
-                doc.setXClass(bclass);
             }
 
             // Store this XWikiClass in the context so that we can use it in case of recursive usage
@@ -867,11 +859,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // deleting XWikiLinks
             if (context.getWiki().hasBacklinks(context)) {
                 deleteLinks(doc.getId(), context, true);
-            }
-
-            BaseClass bclass = doc.getXClass();
-            if ((bclass.getFieldList().size() > 0) && (useClassesTable(true, context))) {
-                deleteXWikiClass(bclass, context, false);
             }
 
             // Find the list of classes for which we have an object
@@ -1331,11 +1318,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         deleteXWikiCollection(baseObject, context, b);
     }
 
-    private void deleteXWikiClass(BaseClass baseClass, XWikiContext context, boolean b) throws XWikiException
-    {
-        deleteXWikiCollection(baseClass, context, b);
-    }
-
     private void loadXWikiProperty(PropertyInterface property, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
@@ -1443,195 +1425,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                                      XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
                                      "Exception while saving property {1} of object {0}", e, args);
-        }
-    }
-
-    private void saveXWikiClass(BaseClass bclass, XWikiContext context, boolean bTransaction) throws XWikiException
-    {
-        try {
-            if (bTransaction) {
-                checkHibernate(context);
-                bTransaction = beginTransaction(context);
-            }
-            Session session = getSession(context);
-
-            // Verify if the property already exists
-            Query query = session.createQuery("select obj.id from BaseClass as obj where obj.id = :id");
-            query.setInteger("id", bclass.getId());
-            if (query.uniqueResult() == null) {
-                session.save(bclass);
-            } else {
-                session.update(bclass);
-            }
-
-            // Remove all existing properties
-            if (bclass.getFieldsToRemove().size() > 0) {
-                for (int i = 0; i < bclass.getFieldsToRemove().size(); i++) {
-                    session.delete(bclass.getFieldsToRemove().get(i));
-                }
-                bclass.setFieldsToRemove(new ArrayList());
-            }
-
-            for (PropertyClass prop : (Collection<PropertyClass>) bclass.getFieldList()) {
-                String pname = prop.getName();
-                if (pname != null && !pname.trim().equals("")) {
-                    saveXWikiClassProperty(prop, context, false);
-                }
-            }
-
-            if (bTransaction) {
-                endTransaction(context, true);
-            }
-        } catch (Exception e) {
-            Object[] args = {bclass.getDocumentReference()};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_CLASS, "Exception while saving class {0}", e, args);
-        } finally {
-            try {
-                if (bTransaction) {
-                    endTransaction(context, false);
-                }
-            } catch (Exception e) {
-            }
-        }
-    }
-
-    private BaseClass loadXWikiClass(BaseClass bclass, XWikiContext context, boolean bTransaction)
-        throws XWikiException
-    {
-        try {
-            if (bTransaction) {
-                checkHibernate(context);
-                bTransaction = beginTransaction(false, context);
-            }
-            Session session = getSession(context);
-
-            try {
-                session.load(bclass, Integer.valueOf(bclass.getId()));
-
-                Query query =
-                    session
-                        .createQuery("select prop.name, prop.classType from PropertyClass as prop where prop.id.id = :id order by prop.number asc");
-                query.setInteger("id", bclass.getId());
-                for (Object[] result : (List<Object[]>) query.list()) {
-                    String name = (String) result[0];
-                    String classType = (String) result[1];
-                    PropertyClass property = (PropertyClass) Class.forName(classType).newInstance();
-                    property.setName(name);
-                    property.setObject(bclass);
-                    session.load(property, property);
-                    bclass.addField(name, property);
-                }
-            } catch (ObjectNotFoundException e) {
-            }
-
-            if (bTransaction) {
-                endTransaction(context, false, false);
-            }
-
-            if ((bclass != null) && (bclass.hasExternalCustomMapping())) {
-                setSessionFactory(injectCustomMappingsInSessionFactory(bclass, context));
-            }
-
-            return bclass;
-        } catch (Exception e) {
-            Object[] args = {bclass.getDocumentReference()};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_CLASS, "Exception while loading class {0}", e, args);
-        } finally {
-            try {
-                if (bTransaction) {
-                    endTransaction(context, false, false);
-                }
-            } catch (Exception e) {
-            }
-        }
-    }
-
-    private void saveXWikiClassProperty(PropertyClass property, XWikiContext context, boolean bTransaction)
-        throws XWikiException
-    {
-        try {
-            if (bTransaction) {
-                checkHibernate(context);
-                bTransaction = beginTransaction(context);
-            }
-            Session session = getSession(context);
-
-            // I'm using a local transaction
-            // There might be implications to this for a wider transaction
-            Transaction ltransaction = session.beginTransaction();
-
-            // Use to chose what to delete
-            boolean isSave = false;
-            try {
-                Query query =
-                    session
-                        .createQuery("select prop.name from PropertyClass as prop where prop.id.id = :id and prop.id.name= :name");
-                query.setInteger("id", property.getId());
-                query.setString("name", property.getName());
-                if (query.uniqueResult() == null) {
-                    isSave = true;
-                    session.save(property);
-                } else {
-                    isSave = false;
-                    session.update(property);
-                }
-
-                session.flush();
-                ltransaction.commit();
-            } catch (Exception e) {
-                // This seems to have failed..
-                // This is an attempt to cleanup a potential mess
-                // This code is only called if the tables are in an incoherent state
-                // (Example: data in xwikiproperties and no data in xwikiintegers or vice-versa)
-                // TODO: verify of the code works with longer transactions
-                PropertyClass prop2;
-                // Depending on save/update there is too much data either
-                // in the BaseProperty table or in the inheritated property table
-                // We need to delete this data
-                if (isSave) {
-                    prop2 = property;
-                } else {
-                    prop2 = new PropertyClass();
-                }
-
-                prop2.setName(property.getName());
-                prop2.setObject(property.getObject());
-                ltransaction.rollback();
-
-                // We need to run the delete in a separate session
-                // This is not a problem since this is cleaning up
-                Session session2 = getSessionFactory().openSession();
-                Transaction transaction2 = session2.beginTransaction();
-                session2.delete(prop2);
-                session2.flush();
-
-                // I don't understand why I can't run this in the general session
-                // This might make transactions fail
-                if (!isSave) {
-                    session2.save(property);
-                }
-                transaction2.commit();
-                session2.close();
-            }
-
-            if (bTransaction) {
-                endTransaction(context, true);
-            }
-
-        } catch (Exception e) {
-            Object[] args = {property.getObject().getName()};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_CLASS, "Exception while saving class {0}", e, args);
-
-        } finally {
-            try {
-                if (bTransaction) {
-                    endTransaction(context, false);
-                }
-            } catch (Exception e) {
-            }
         }
     }
 
@@ -2087,20 +1880,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             bTransaction = beginTransaction(false, context);
             Session session = getSession(context);
 
-            Query query =
-                session.createQuery("select doc.fullName from XWikiDocument as doc "
+            Query query = session.createQuery("select doc.fullName from XWikiDocument as doc "
                 + "where (doc.xWikiClassXML is not null and doc.xWikiClassXML like '<%')");
             List<String> list = new ArrayList<String>();
             list.addAll(query.list());
 
-            if (useClassesTable(false, context)) {
-                query = session.createQuery("select bclass.name from BaseClass as bclass");
-                for (String name : (List<String>) query.list()) {
-                    if (!list.contains(name)) {
-                        list.add(name);
-                    }
-                }
-            }
             if (bTransaction) {
                 endTransaction(context, false, false);
             }
@@ -2115,16 +1899,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             } catch (Exception e) {
             }
-        }
-    }
-
-    private boolean useClassesTable(boolean write, XWikiContext context)
-    {
-        String param = "xwiki.store.hibernate.useclasstables";
-        if (write) {
-            return ("1".equals(context.getWiki().Param(param + ".write", "0")));
-        } else {
-            return ("1".equals(context.getWiki().Param(param + ".read", "1")));
         }
     }
 
@@ -2833,12 +2607,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
 
         List<XWikiDocument> list;
-        if (useClassesTable(true, context)) {
-            list = searchDocuments(
-                ", BaseClass as bclass where bclass.name=doc.fullName and bclass.customMapping is not null", true,
-                false, false, 0, 0, context);
-        }
-        list = searchDocuments("", true, false, false, 0, 0, context);
+        list = searchDocuments(" where (doc.xWikiClassXML is not null and doc.xWikiClassXML like '<%')",
+            true, false, false, 0, 0, context);
         boolean result = false;
 
         for (XWikiDocument doc : list) {

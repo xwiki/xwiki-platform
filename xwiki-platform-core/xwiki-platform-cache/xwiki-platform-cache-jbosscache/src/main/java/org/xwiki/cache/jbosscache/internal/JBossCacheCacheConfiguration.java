@@ -78,12 +78,12 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
     private Configuration jbossConfiguration;
 
     /**
-     * The container used to access configuration files.
+     * The optional container used to access configuration files (can be null).
      */
     private Container container;
 
     /**
-     * @param container the container used to access configuration files.
+     * @param container the container used to access configuration files, can be null if there's no container
      * @param configuration the XWiki cache API configuration.
      * @param defaultPropsId the default configuration identifier used to load cache configuration file.
      */
@@ -218,10 +218,13 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
 
         InputStream is = null;
 
+        // Note: We look into the container only if it exists and if it has its application context specified since
+        // we want to allow usage of JBoss Cache even in environments where there's no container or no application
+        // context.
         try {
             if (file.exists()) {
                 is = new FileInputStream(file);
-            } else {
+            } else if (this.container != null && this.container.getApplicationContext() != null) {
                 is = this.container.getApplicationContext().getResourceAsStream(
                     "/WEB-INF/" + PROPS_PATH + propertiesFilename);
             }

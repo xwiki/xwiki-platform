@@ -222,33 +222,30 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
             if (file.exists()) {
                 is = new FileInputStream(file);
             } else {
-                is =
-                    this.container.getApplicationContext().getResourceAsStream(
-                        "/WEB-INF/" + PROPS_PATH + propertiesFilename);
+                is = this.container.getApplicationContext().getResourceAsStream(
+                    "/WEB-INF/" + PROPS_PATH + propertiesFilename);
             }
 
             if (is == null) {
-                throw new PropertiesLoadingCacheException("Can't find any configuration file for" + propertiesId);
-            }
+                LOGGER.debug("Can't find any configuration file for [" + propertiesId
+                    + "]. Default JBoss Cache configuration will be used");
+            } else {
+                XmlConfigurationParser parser = new XmlConfigurationParser();
+                config = parser.parseStream(is);
 
-            XmlConfigurationParser parser = new XmlConfigurationParser();
-            config = parser.parseStream(is);
-
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Properties loaded: " + propertiesFilename);
+                LOGGER.debug("Properties [{}] loaded", propertiesFilename);
             }
         } catch (Exception e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Failed to load configuration file " + propertiesId, e);
-            }
+            // TODO: Raise a runtime exception to stop the application since the configuration that the user has
+            // specified couldn't be loaded for some reason.
+            LOGGER.error("Failed to load configuration file [" + propertiesId + "]. Default JBoss Cache configuration "
+                + "will be used.", e);
         } finally {
             if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Failed t close properties file", e);
-                    }
+                    LOGGER.debug("Failed to close properties file", e);
                 }
             }
         }

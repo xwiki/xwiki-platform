@@ -49,11 +49,30 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <!-- Exclude LOG4J so that we use SLF4J's LOG4J JAR instead to have LOG4J logs go through SLF4J -->
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-default</artifactId>
       <version>${commons.version}</version>
+    </dependency>
+    <!-- Route LOG4J calls to SLF4J -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
+    </dependency>
+    <!-- Make sure we provide a default implementation of SLF4J when executing this plugin -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>0.9.28</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
   <build>

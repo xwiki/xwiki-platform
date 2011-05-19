@@ -16,6 +16,5 @@
                    max_bytes="400000"/>
     <VIEW_SYNC avg_send_interval="60000"/>
     <pbcast.GMS print_local_addr="true" join_timeout="3000"
-                shun="true"
                 view_bundling="true"/>
 </config>

@@ -50,7 +50,7 @@ public class XWikiExecutor
 
     public static final String DEFAULT_STOPPORT = System.getProperty("xwikiStopPort", "8079");
 
-    public static final String DEFAULT_RMIPORT = System.getProperty("rmiPort", "9000");
+    public static final String DEFAULT_RMIPORT = System.getProperty("rmiPort", "9010");
 
     private static final String DEFAULT_EXECUTION_DIRECTORY = System.getProperty("xwikiExecutionDirectory");
 

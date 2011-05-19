@@ -89,7 +89,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public DocumentModelBridge getDocument(String documentReference) throws Exception
     {
         XWikiContext xcontext = getContext();
-        return xcontext.getWiki().getDocument(documentReference, xcontext);
+        return xcontext.getWiki().getDocument(documentReference, xcontext).getTranslatedDocument(xcontext);
     }
 
     /**
@@ -100,7 +100,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public DocumentModelBridge getDocument(DocumentReference documentReference) throws Exception
     {
         XWikiContext xcontext = getContext();
-        return xcontext.getWiki().getDocument(documentReference, xcontext);
+        return xcontext.getWiki().getDocument(documentReference, xcontext).getTranslatedDocument(xcontext);
     }
 
     /**

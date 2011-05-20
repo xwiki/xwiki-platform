@@ -37,11 +37,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>net.java.dev.jaxb2-commons</groupId>
-      <artifactId>jaxb-fluent-api</artifactId>
-      <version>2.1.8</version>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-annotation-core</artifactId>
       <version>${project.version}</version>
@@ -61,7 +56,7 @@
       <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb2-plugin</artifactId>
-        <version>0.6.3</version>
+        <version>0.7.5</version>
         <configuration>
           <extension>true</extension>
           <args>
@@ -73,23 +68,12 @@
           <removeOldOutput>false</removeOldOutput>
           <plugins>
             <plugin>
-              <groupId>net.java.dev.jaxb2-commons</groupId>
-              <artifactId>jaxb-fluent-api</artifactId>
-              <version>2.1.8</version>
+              <groupId>org.jvnet.jaxb2_commons</groupId>
+              <artifactId>jaxb2-fluent-api</artifactId>
+              <version>3.0</version>
             </plugin>
           </plugins>
         </configuration>
-        <!-- Make it work on JDK 1.6 and Maven 3.x. Otherwise we get:
-             Failed to execute goal org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:0.6.3:generate (default) on project
-             xwiki-rest: Execution default of goal org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:0.6.3:generate failed:
-             DTD factory class org.apache.xerces.impl.dv.dtd.DTDDVFactoryImpl does not extend from DTDDVFactory. -->
-        <dependencies>
-          <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.9.1</version>
-          </dependency>
-        </dependencies>
         <executions>
           <execution>
             <goals>
@@ -116,20 +100,5 @@
       <name>Public online Restlet repository</name>
       <url>http://maven.restlet.org</url>
     </repository>
-    <repository>
-      <id>maven2-repository.dev.java.net.2</id>
-      <name>Java.net Repository for Maven</name>
-      <url>http://download.java.net/maven/2/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
   </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>maven2-repository.dev.java.net.2</id>
-      <name>Java.net Repository for Maven</name>
-      <url>http://download.java.net/maven/2/</url>
-    </pluginRepository>
-  </pluginRepositories>
 </project>

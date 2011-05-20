@@ -32,6 +32,7 @@
 <nameField></nameField>
 <validationScript></validationScript>
 <attachmentSelectionLimited>
+<customDisplay></customDisplay>
 <defaultValue>0</defaultValue>
 <disabled>0</disabled>
 <displayFormType>radio</displayFormType>
@@ -45,6 +46,7 @@
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </attachmentSelectionLimited>
 <colorPalette>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
 <editor>PureText</editor>
 <name>colorPalette</name>
@@ -59,6 +61,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </colorPalette>
 <colorsPerRow>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
 <name>colorsPerRow</name>
 <number>9</number>
@@ -71,6 +74,7 @@
 <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
 </colorsPerRow>
 <externalImages>
+<customDisplay></customDisplay>
 <defaultValue>1</defaultValue>
 <disabled>0</disabled>
 <displayFormType>radio</displayFormType>
@@ -84,6 +88,7 @@
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </externalImages>
 <fontNames>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
 <editor>PureText</editor>
 <name>fontNames</name>
@@ -98,6 +103,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </fontNames>
 <fontSizes>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
 <editor>PureText</editor>
 <name>fontSizes</name>
@@ -112,6 +118,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </fontSizes>
 <imageSelectionLimited>
+<customDisplay></customDisplay>
 <defaultValue>0</defaultValue>
 <disabled>0</disabled>
 <displayFormType>radio</displayFormType>
@@ -125,18 +132,22 @@
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </imageSelectionLimited>
 <menuBar>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
+<editor>PureText</editor>
 <name>menuBar</name>
 <number>3</number>
 <picker>0</picker>
 <prettyName>Menu Bar</prettyName>
-<size>30</size>
+<rows>5</rows>
+<size>40</size>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
 <validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </menuBar>
 <plugins>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
 <editor>PureText</editor>
 <name>plugins</name>
@@ -151,6 +162,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </plugins>
 <sourceEditorEnabled>
+<customDisplay></customDisplay>
 <defaultValue>1</defaultValue>
 <disabled>0</disabled>
 <displayFormType>radio</displayFormType>
@@ -164,6 +176,7 @@
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </sourceEditorEnabled>
 <styleNames>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
 <editor>PureText</editor>
 <name>styleNames</name>
@@ -178,6 +191,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </styleNames>
 <toolBar>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
 <editor>PureText</editor>
 <name>toolBar</name>

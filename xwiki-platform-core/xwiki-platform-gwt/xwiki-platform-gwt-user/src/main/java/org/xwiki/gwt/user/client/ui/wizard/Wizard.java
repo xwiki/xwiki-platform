@@ -41,9 +41,8 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
      * Asynchronous callback adapter to handle the callback fails by displaying the error inside the dialog.
      * 
      * @param <T> the return type of the callback
-     * @see AsyncCallback
      */
-    protected abstract class AbstractDefaultAsyncCallback<T> implements AsyncCallback<T>
+    protected abstract class AbstractAsyncCallbackAdaptor<T> implements AsyncCallback<T>
     {
         /**
          * {@inheritDoc}
@@ -52,6 +51,8 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
          */
         public void onFailure(Throwable caught)
         {
+            // Keeping the finishing flag set prevents us from going back when an error occurs.
+            finishing = false;
             dialog.showError(caught);
         }
     }
@@ -82,6 +83,13 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
     protected WizardStep currentStep;
 
     /**
+     * {@code true} if {@link NavigationDirection#FINISH} has been triggered and the queue of next wizard steps is not
+     * empty, {@code false} otherwise. The wizard goes through all the remaining steps and automatically submits them
+     * once this flag is set to {@code true}.
+     */
+    protected boolean finishing;
+
+    /**
      * Builds a wizard from the passed title and with the specified icon.
      * 
      * @param wizardTitle the title of this wizard
@@ -89,7 +97,6 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
      */
     public Wizard(String wizardTitle, Image wizardIcon)
     {
-        // initialize the dialog
         dialog = new WizardDialog(wizardTitle, wizardIcon);
         dialog.addNavigationListener(this);
         dialog.addCloseHandler(this);
@@ -119,7 +126,7 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
      */
     public void start(String startStep, Object data)
     {
-        // start over
+        finishing = false;
         navigationStack.clear();
 
         currentStep = provider.getStep(startStep);
@@ -142,19 +149,18 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
             dialog.center();
         }
         dialog.setLoading(true);
-        currentStep.init(data, new AsyncCallback<Object>()
+        currentStep.init(data, new AbstractAsyncCallbackAdaptor<Object>()
         {
             public void onSuccess(Object result)
             {
                 dialog.displayStep(currentStep, navigationStack.size() > 1);
-                if (currentStep instanceof SourcesNavigationEvents) {
+                if (finishing) {
+                    onDirection(NavigationDirection.FINISH);
+                } else if (currentStep.isAutoSubmit()) {
+                    onDirection(NavigationDirection.NEXT);
+                } else if (currentStep instanceof SourcesNavigationEvents) {
                     ((SourcesNavigationEvents) currentStep).addNavigationListener(Wizard.this);
                 }
-            }
-
-            public void onFailure(Throwable caught)
-            {
-                dialog.showError(caught);
             }
         });
     }
@@ -166,7 +172,6 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
     protected void unloadCurrentStep()
     {
         if (currentStep instanceof SourcesNavigationEvents) {
-            // remove this from the list of listened navigation sources
             ((SourcesNavigationEvents) currentStep).removeNavigationListener(this);
         }
     }
@@ -178,33 +183,27 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
      */
     public void onDirection(final NavigationDirection direction)
     {
+        dialog.setLoading(true);
         if (direction == NavigationDirection.CANCEL || direction == NavigationDirection.PREVIOUS) {
-            // call the step's onCancel and check the result
-            dialog.setLoading(true);
             currentStep.onCancel();
             if (direction == NavigationDirection.CANCEL) {
                 onCancel();
             } else {
                 onPrevious();
             }
-        }
-
-        if (direction == NavigationDirection.FINISH || direction == NavigationDirection.NEXT) {
-            // call the step's onSubmit and check the result
-            dialog.setLoading(true);
-            currentStep.onSubmit(new AbstractDefaultAsyncCallback<Boolean>()
+        } else if (direction == NavigationDirection.FINISH || direction == NavigationDirection.NEXT) {
+            currentStep.onSubmit(new AbstractAsyncCallbackAdaptor<Boolean>()
             {
-                public void onSuccess(Boolean result)
+                public void onSuccess(Boolean success)
                 {
-                    if (result) {
-                        // it's ok, take specific actions
+                    if (success) {
                         if (direction == NavigationDirection.FINISH) {
+                            finishing = true;
                             onFinish();
                         } else {
                             onNext();
                         }
                     } else {
-                        // nothing, keep it open
                         dialog.setLoading(false);
                     }
                 }
@@ -217,14 +216,11 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
      */
     protected void onCancel()
     {
-        // unload current step
         unloadCurrentStep();
         currentStep = null;
-        // hide UIs
         hideDialog();
-        // notify listeners of cancel
-        for (WizardListener wListener : wizardListeners) {
-            wListener.onCancel(this);
+        for (WizardListener listener : wizardListeners) {
+            listener.onCancel(this);
         }
     }
 
@@ -233,23 +229,25 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
      */
     protected void onPrevious()
     {
-        // get this step out of the stack
-        navigationStack.pop();
-        // if there are no more steps, cancel everything
-        if (navigationStack.isEmpty()) {
-            onCancel();
-            return;
-        }
-        // get the previous step
-        WizardStep previousStep = provider.getStep(navigationStack.peek());
-        if (previousStep == null) {
-            onCancel();
-            return;
-        }
-        // prepare previous step
-        Object result = currentStep.getResult();
-        unloadCurrentStep();
-        currentStep = previousStep;
+        // We have to jump over the previous wizard steps that are automatically submitted, without initializing nor
+        // canceling them.
+        Object result;
+        do {
+            // Get the current step out of the stack.
+            navigationStack.pop();
+            if (navigationStack.isEmpty()) {
+                onCancel();
+                return;
+            }
+            WizardStep previousStep = provider.getStep(navigationStack.peek());
+            if (previousStep == null) {
+                onCancel();
+                return;
+            }
+            result = currentStep.getResult();
+            unloadCurrentStep();
+            currentStep = previousStep;
+        } while (currentStep.isAutoSubmit());
         initAndDisplayCurrentStep(result);
     }
 
@@ -258,19 +256,21 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
      */
     protected void onNext()
     {
-        // get the step from the next action of this step
         String nextStepName = currentStep.getNextStep();
-        WizardStep nextStep = provider.getStep(nextStepName);
-        if (nextStep == null) {
-            onFinish();
-            return;
+        if (nextStepName != null) {
+            WizardStep nextStep = provider.getStep(nextStepName);
+            if (nextStep != null) {
+                Object result = currentStep.getResult();
+                unloadCurrentStep();
+                currentStep = nextStep;
+                navigationStack.push(nextStepName);
+                initAndDisplayCurrentStep(result);
+                return;
+            }
         }
-        // prepare next step
-        Object result = currentStep.getResult();
-        unloadCurrentStep();
-        currentStep = nextStep;
-        navigationStack.push(nextStepName);
-        initAndDisplayCurrentStep(result);
+
+        finishing = false;
+        onFinish();
     }
 
     /**
@@ -278,15 +278,17 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
      */
     protected void onFinish()
     {
-        // unload things from the dialog
-        unloadCurrentStep();
-        Object result = getResult();
-        currentStep = null;
-        // hide UIs
-        hideDialog();
-        // fire the listeners
-        for (WizardListener wListener : wizardListeners) {
-            wListener.onFinish(this, result);
+        if (finishing) {
+            // We automatically submit all the following steps when finishing.
+            onNext();
+        } else {
+            unloadCurrentStep();
+            Object result = getResult();
+            currentStep = null;
+            hideDialog();
+            for (WizardListener listener : wizardListeners) {
+                listener.onFinish(this, result);
+            }
         }
     }
 
@@ -327,17 +329,17 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
     {
         if (event.getTarget() == dialog) {
             if (!dialog.isCanceled()) {
-                // it's a programmatic close, nothing to do
+                // Closed by code, nothing to do.
                 return;
             } else {
-                // it's a user close, do a cancel
+                // Closed by user action, do a cancel.
                 onDirection(NavigationDirection.CANCEL);
             }
         }
     }
 
     /**
-     * Helper function to hide the dialog and mark that it's a programmatic close not a user close.
+     * Helper function to hide the dialog and mark that it was closed by code and not by user action.
      */
     public void hideDialog()
     {

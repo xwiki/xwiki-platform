@@ -25,14 +25,12 @@ import java.util.Map;
 
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 
-import com.google.gwt.user.client.ui.FlowPanel;
-
 /**
  * An abstract wizard step that is aware of the wizard navigation.
  * 
  * @version $Id$
  */
-public abstract class AbstractNavigationAwareWizardStep extends AbstractCompositeWizardStep
+public abstract class AbstractNavigationAwareWizardStep implements WizardStep
 {
     /**
      * The map used to associate a name to a navigation direction.
@@ -50,27 +48,9 @@ public abstract class AbstractNavigationAwareWizardStep extends AbstractComposit
     private EnumSet<NavigationDirection> validDirections = EnumSet.allOf(NavigationDirection.class);
 
     /**
-     * Creates a new navigation-aware wizard step.
-     */
-    public AbstractNavigationAwareWizardStep()
-    {
-        super();
-    }
-
-    /**
-     * Creates a new navigation-aware wizard step that uses the given panel to hold its widgets.
-     * 
-     * @param panel the panel where this wizard step will add its widgets
-     */
-    public AbstractNavigationAwareWizardStep(FlowPanel panel)
-    {
-        super(panel);
-    }
-
-    /**
      * {@inheritDoc}
      * 
-     * @see AbstractCompositeWizardStep#getDirectionName(NavigationDirection)
+     * @see WizardStep#getDirectionName(NavigationDirection)
      */
     public String getDirectionName(NavigationDirection direction)
     {
@@ -92,7 +72,7 @@ public abstract class AbstractNavigationAwareWizardStep extends AbstractComposit
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractCompositeWizardStep#getNextStep()
+     * @see WizardStep#getNextStep()
      */
     public String getNextStep()
     {
@@ -112,7 +92,7 @@ public abstract class AbstractNavigationAwareWizardStep extends AbstractComposit
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractCompositeWizardStep#getValidDirections()
+     * @see WizardStep#getValidDirections()
      */
     public EnumSet<NavigationDirection> getValidDirections()
     {

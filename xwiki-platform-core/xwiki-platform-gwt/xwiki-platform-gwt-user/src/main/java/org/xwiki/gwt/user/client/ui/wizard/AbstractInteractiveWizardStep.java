@@ -19,51 +19,83 @@
  */
 package org.xwiki.gwt.user.client.ui.wizard;
 
-
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
- * An abstract wizard step that is a widget composite.
+ * An abstract wizard step that requires user input in order to move forward.
  * 
  * @version $Id$
  */
-public abstract class AbstractCompositeWizardStep extends Composite implements WizardStep
+public abstract class AbstractInteractiveWizardStep extends AbstractNavigationAwareWizardStep
 {
+    /**
+     * The step title.
+     */
+    private String title;
+
+    /**
+     * The panel holding this step's widgets.
+     */
+    private final FlowPanel panel;
+
     /**
      * Creates a new composite wizard step.
      */
-    public AbstractCompositeWizardStep()
+    public AbstractInteractiveWizardStep()
     {
         this(new FlowPanel());
     }
 
     /**
-     * Creates a new composite wizard step that uses the given panel to hold its widgets.
+     * Creates a new interactive wizard step that uses the given panel to hold its widgets.
      * 
      * @param panel the panel where this wizard step will add its widgets
      */
-    public AbstractCompositeWizardStep(FlowPanel panel)
+    public AbstractInteractiveWizardStep(FlowPanel panel)
     {
-        initWidget(panel);
+        this.panel = panel;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * You can safely use this method to access the panel and add widget to it.
+     * 
+     * @see AbstractNavigationAwareWizardStep#display()
+     */
+    public FlowPanel display()
+    {
+        return panel;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see WizardStep#display()
+     * @see AbstractNavigationAwareWizardStep#isAutoSubmit()
      */
-    public Widget display()
+    public final boolean isAutoSubmit()
     {
-        return this;
+        // This step has a panel for a reason.
+        return false;
     }
 
     /**
-     * @return the panel that holds all the widgets of this wizard step
+     * {@inheritDoc}
+     * 
+     * @see AbstractNavigationAwareWizardStep#getStepTitle()
      */
-    protected FlowPanel getPanel()
+    public String getStepTitle()
     {
-        return (FlowPanel) getWidget();
+        return title;
+    }
+
+    /**
+     * Sets the step title.
+     * 
+     * @param title the new step title
+     */
+    public void setStepTitle(String title)
+    {
+        this.title = title;
     }
 }

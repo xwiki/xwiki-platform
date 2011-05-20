@@ -587,29 +587,49 @@ var XWiki = (function(XWiki){
     var n, elem;
 
     if (this.iHighlighted) {
-      if (key == 40) {
-        elem = this.iHighlighted.next() || ((this.iHighlighted.up('div.results') &&
-          this.iHighlighted.up('div.results').next()) ? this.iHighlighted.up('div.results').next().down('li') :
-          list.down('li'));
-      }
-      else if (key == 38) {
-        if (this.iHighlighted.previous()) {
-          elem = this.iHighlighted.previous();
+      // If there is already a highlighted element, we look for the next or previous highlightable item in the list
+      // of results, according to which key has been pressed.
+      if (key == Event.KEY_DOWN) {
+        elem = this.iHighlighted.next();
+        if (!elem && this.iHighlighted.up('div.results')) {
+          // if the next item could not be found and multi-source mode, find the next not empty source
+          var source = this.iHighlighted.up('div.results').next();
+          while (source && !elem) {
+            elem = source.down('li');
+            source = source.next();
+          }
         }
-        else {
-            if ((this.iHighlighted.up('div.results') && this.iHighlighted.up('div.results').previous())) {
-              elem = this.iHighlighted.up('div.results').previous().down('li:last-child');
-            }
-            else {
-              elem =  list.select('ul')[list.select('ul').length - 1].down('li:last-child');
-            }
+        if(!elem) {
+          elem = list.down('li');
+        }
+      }
+      else if (key == Event.KEY_UP) {
+        elem = this.iHighlighted.previous();
+        if (!elem && this.iHighlighted.up('div.results')) {
+          // if the previous item could not be found and multi-source mode, find the previous not empty source
+          var source = this.iHighlighted.up('div.results').previous();
+          while(source && !elem) {
+            elem = source.down('li:last-child');
+            source = source.previous();
+          }
+        }
+        if (!elem) {
+          elem =  list.select('ul')[list.select('ul').length - 1].down('li:last-child');
         }
       }
     }
     else {
-      if (key == 40)
-        elem = list.down('li');
-      else if (key == 38)
+      // No item is highlighted yet, so we just look for the first or last highlightable item,
+      // according to which key, up or down, has been pressed.
+      if (key == Event.KEY_DOWN) {
+        if (list.down('div.results')) {
+          elem = list.down('div.results').down('li')
+        }
+        else {
+          elem = list.down('li');
+        }
+      }
+      else if (key == Event.KEY_UP)
         if (list.select('li') > 0) {
           elem = list.select('li')[list.select('li').length - 1];
         }

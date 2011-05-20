@@ -22,49 +22,68 @@
 
 package com.xpn.xwiki.plugin.alexa;
 
-import com.amazon.api.alexa.*;
+import java.rmi.RemoteException;
+
+import javax.xml.rpc.ServiceException;
+
+import com.amazon.api.alexa.AWSAlexa;
+import com.amazon.api.alexa.AWSAlexaLocator;
+import com.amazon.api.alexa.AWSAlexaPortType;
+import com.amazon.api.alexa.UrlInfoRequest;
+import com.amazon.api.alexa.UrlInfoResult;
 import com.amazon.api.alexa.holders.OperationRequestHolder;
 import com.amazon.api.alexa.holders.UrlInfoResultHolder;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.plugin.PluginApi;
 
-import javax.xml.rpc.ServiceException;
-import java.rmi.RemoteException;
-
-public class AlexaPluginApi extends Api {
-    private AlexaPlugin plugin;
-
-    public AlexaPluginApi(AlexaPlugin plugin, XWikiContext context) {
-            super(context);
-            setPlugin(plugin);
-        }
-
-    public AlexaPlugin getPlugin() {
-        if (hasProgrammingRights()) {
-            return plugin;
-        }
-        return null;
+/**
+ * Plugin allowing to query Alexa services.
+ * 
+ * @version $Id$
+ * @deprecated the plugin technology is deprecated
+ */
+@Deprecated
+public class AlexaPluginApi extends PluginApi<AlexaPlugin>
+{
+    /**
+     * Default plugin API constructor.
+     * 
+     * @param plugin the wrapped plugin instance
+     * @param context the current request context
+     */
+    public AlexaPluginApi(AlexaPlugin plugin, XWikiContext context)
+    {
+        super(plugin, context);
     }
 
-    public void setPlugin(AlexaPlugin plugin) {
-        this.plugin = plugin;
+    /**
+     * Return the inner plugin object, if the user has the required programming rights.
+     * 
+     * @return The wrapped plugin object.
+     */
+    public AlexaPlugin getPlugin()
+    {
+        return getInternalPlugin();
     }
 
-    public UrlInfoRequest getUrlInfoRequest() {
+    public UrlInfoRequest getUrlInfoRequest()
+    {
         return new UrlInfoRequest();
     }
 
-    public OperationRequestHolder getOperationRequestHolder() {
+    public OperationRequestHolder getOperationRequestHolder()
+    {
         return new OperationRequestHolder();
     }
 
-    public UrlInfoResultHolder getUrlInfoResultHolder() {
+    public UrlInfoResultHolder getUrlInfoResultHolder()
+    {
         return new UrlInfoResultHolder();
     }
 
-    public UrlInfoResult getUrlInfo(String subscriptionId, String associateTag, String validate,
-                                    UrlInfoRequest shared, UrlInfoRequest[] request, OperationRequestHolder operationRequest) throws ServiceException, RemoteException {
-
+    public UrlInfoResult getUrlInfo(String subscriptionId, String associateTag, String validate, UrlInfoRequest shared,
+        UrlInfoRequest[] request, OperationRequestHolder operationRequest) throws ServiceException, RemoteException
+    {
         // Make a service
         AWSAlexa service = new AWSAlexaLocator();
 
@@ -72,13 +91,12 @@ public class AlexaPluginApi extends Api {
         AWSAlexaPortType alexa = service.getAWSAlexaPort();
 
         UrlInfoResultHolder urlInfoResult = new UrlInfoResultHolder();
-        alexa.urlInfo(subscriptionId, associateTag, validate, shared, request,
-                        operationRequest, urlInfoResult);
+        alexa.urlInfo(subscriptionId, associateTag, validate, shared, request, operationRequest, urlInfoResult);
         return urlInfoResult.value;
     }
 
-    public UrlInfoResult getUrlInfo(String subscriptionId, String url) throws ServiceException, RemoteException {
-
+    public UrlInfoResult getUrlInfo(String subscriptionId, String url) throws ServiceException, RemoteException
+    {
         // Make a service
         AWSAlexa service = new AWSAlexaLocator();
 
@@ -86,32 +104,17 @@ public class AlexaPluginApi extends Api {
         AWSAlexaPortType alexa = service.getAWSAlexaPort();
 
         UrlInfoResultHolder urlInfoResult = new UrlInfoResultHolder();
-        UrlInfoRequest request = new UrlInfoRequest(url,"TrafficData,ContactInfo,Categories,RelatedLinks","");
-        try { alexa.urlInfo(subscriptionId, "", "", request, null,
-                      getOperationRequestHolder(), urlInfoResult);
-        } catch (Exception e) {}
-        return urlInfoResult.value;
-    }
-
-    public UrlInfoResult getUrlInfo(String subscriptionId, String url, String responseGroup) throws ServiceException, RemoteException {
-
-        // Make a service
-        AWSAlexa service = new AWSAlexaLocator();
-
-        // Now use the service to get a stub to the Service Definition Interface (SDI)
-        AWSAlexaPortType alexa = service.getAWSAlexaPort();
-
-        UrlInfoResultHolder urlInfoResult = new UrlInfoResultHolder();
-        UrlInfoRequest request = new UrlInfoRequest(url,responseGroup,"");
+        UrlInfoRequest request = new UrlInfoRequest(url, "TrafficData,ContactInfo,Categories,RelatedLinks", "");
         try {
-            alexa.urlInfo(subscriptionId, "", "", request, null,
-                    getOperationRequestHolder(), urlInfoResult);
-        } catch (Exception e) {}
+            alexa.urlInfo(subscriptionId, "", "", request, null, getOperationRequestHolder(), urlInfoResult);
+        } catch (Exception e) {
+        }
         return urlInfoResult.value;
     }
 
-    public UrlInfoResult getUrlInfo(String subscriptionId, String url, String responseGroup, String countryCodes) throws ServiceException, RemoteException {
-
+    public UrlInfoResult getUrlInfo(String subscriptionId, String url, String responseGroup) throws ServiceException,
+        RemoteException
+    {
         // Make a service
         AWSAlexa service = new AWSAlexaLocator();
 
@@ -119,11 +122,29 @@ public class AlexaPluginApi extends Api {
         AWSAlexaPortType alexa = service.getAWSAlexaPort();
 
         UrlInfoResultHolder urlInfoResult = new UrlInfoResultHolder();
-        UrlInfoRequest request = new UrlInfoRequest(url,responseGroup,countryCodes);
+        UrlInfoRequest request = new UrlInfoRequest(url, responseGroup, "");
         try {
-            alexa.urlInfo(subscriptionId, "", "", request, null,
-                    getOperationRequestHolder(), urlInfoResult);
-        } catch (Exception e) {}
+            alexa.urlInfo(subscriptionId, "", "", request, null, getOperationRequestHolder(), urlInfoResult);
+        } catch (Exception e) {
+        }
+        return urlInfoResult.value;
+    }
+
+    public UrlInfoResult getUrlInfo(String subscriptionId, String url, String responseGroup, String countryCodes)
+        throws ServiceException, RemoteException
+    {
+        // Make a service
+        AWSAlexa service = new AWSAlexaLocator();
+
+        // Now use the service to get a stub to the Service Definition Interface (SDI)
+        AWSAlexaPortType alexa = service.getAWSAlexaPort();
+
+        UrlInfoResultHolder urlInfoResult = new UrlInfoResultHolder();
+        UrlInfoRequest request = new UrlInfoRequest(url, responseGroup, countryCodes);
+        try {
+            alexa.urlInfo(subscriptionId, "", "", request, null, getOperationRequestHolder(), urlInfoResult);
+        } catch (Exception e) {
+        }
         return urlInfoResult.value;
     }
 

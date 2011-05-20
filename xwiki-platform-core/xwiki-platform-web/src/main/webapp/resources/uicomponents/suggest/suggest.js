@@ -267,7 +267,7 @@ var XWiki = (function(XWiki){
   /**
    * Fire the AJAX Request(s) that will get suggestions
    */
-  doAjaxRequests: function ()
+  doAjaxRequests: function (requestId)
   {
     for (var i=0;i<this.sources.length;i++) {
       var source = this.sources[i];

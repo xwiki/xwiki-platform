@@ -59,7 +59,9 @@ var XWiki = (function(XWiki){
     // Display value prefix text
     displayValueText: "Value :",
     // How to align the suggestion list when its with is different than the input field width
-    align: "left"
+    align: "left",
+    // Hide the ajax loading spinner(s) while requests are transiting
+    hiddenLoading: false
   },
   sInput : "",
   nInputChars : 0,
@@ -420,13 +422,22 @@ var XWiki = (function(XWiki){
           if (this.resultContainer.down('.results' + source.id).down('ul')) {
             this.resultContainer.down('.results' + source.id).down('ul').remove();
           }
-          this.resultContainer.down('.results' + source.id).down('.sourceContent').addClassName('loading');
+          if (!this.options.hiddenLoading) {
+            this.resultContainer.down('.results' + source.id).down('.sourceContent').addClassName('loading');
+          }
+          else {
+            this.resultContainer.down('.results' + source.id).addClassName('hidden');
+          }
         }
         else {
           // The sub-container for this source has not been created yet
           // Really create the subcontainer for this source and inject it in the global container
           var sourceContainer = new Element('div', {'class' : 'results results' + source.id}),
               sourceHeader = new Element('div', {'class':'sourceName'});
+
+          if (this.options.hiddenLoading) {
+            sourceContainer.addClassName('hidden');
+          }
 
           if (typeof source.icon != 'undefined') {
             // If there is an icon for this source group, set it as background image
@@ -446,7 +457,8 @@ var XWiki = (function(XWiki){
           }
           sourceHeader.insert(source.name)
           sourceContainer.insert( sourceHeader );
-          sourceContainer.insert( new Element('div', {'class':'sourceContent loading'}));
+          var classes = "sourceContent " + (this.options.hiddenLoading ? "" : "loading");
+          sourceContainer.insert( new Element('div', {'class':classes}));
           this.resultContainer.insert(sourceContainer);
         }
       }
@@ -487,6 +499,7 @@ var XWiki = (function(XWiki){
     if (this.sources.length > 1) {
       var div = this.resultContainer.down(".results" + source.id);
       div.down('.sourceContent').removeClassName('loading');
+      this.resultContainer.down(".results" + source.id).removeClassName("hidden");
     }
     else {
       var div = this.resultContainer;

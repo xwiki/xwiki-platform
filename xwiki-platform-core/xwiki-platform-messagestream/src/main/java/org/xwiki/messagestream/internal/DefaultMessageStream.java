@@ -23,12 +23,15 @@ package org.xwiki.messagestream.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventFactory;
 import org.xwiki.eventstream.EventStream;
@@ -51,37 +54,39 @@ import org.xwiki.query.QueryManager;
  * @since 3.0M3
  */
 @Component
+@Singleton
 public class DefaultMessageStream implements MessageStream
 {
     /** Logging helper object. */
     private static final Logger LOG = LoggerFactory.getLogger(DefaultMessageStream.class);
 
     /** Needed for altering queries. */
-    @Requirement
+    @Inject
     private QueryManager qm;
 
     /** Needed for obtaining the current wiki name. */
-    @Requirement
+    @Inject
     private ModelContext context;
 
     /** Entity parser used for converting the current user name into a proper reference. */
-    @Requirement("current")
+    @Inject
+    @Named("current")
     private EntityReferenceResolver<String> currentResolver;
 
     /** Entity serializer, used for converting references to strings suitable for storing in the "stream" field. */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> serializer;
 
     /** The event stream used for storing the messages. */
-    @Requirement
+    @Inject
     private EventStream stream;
 
     /** The default factory for creating event objects. */
-    @Requirement
+    @Inject
     private EventFactory factory;
 
     /** Needed for retrieving the current user. */
-    @Requirement
+    @Inject
     private DocumentAccessBridge bridge;
 
     /**

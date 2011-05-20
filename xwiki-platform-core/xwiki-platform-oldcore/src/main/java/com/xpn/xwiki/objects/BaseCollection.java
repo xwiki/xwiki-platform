@@ -58,9 +58,9 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Base class for representing an element having a collection of properties. For example:
  * <ul>
- *   <li>an XClass definition (composed of XClass properties)</li>
- *   <li>an XObject definition (composed of XObject properties)</li>
- *   <li>an XWikiStats object (composed of stats properties)</li>
+ * <li>an XClass definition (composed of XClass properties)</li>
+ * <li>an XObject definition (composed of XObject properties)</li>
+ * <li>an XWikiStats object (composed of stats properties)</li>
  * </ul>
  * 
  * @version $Id$
@@ -72,15 +72,14 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     /**
      * The meaning of this reference fields depends on the element represented. Examples:
      * <ul>
-     *   <li>If this BaseCollection instance represents an XObject then refers to the document where the XObject's 
-     *       XClass is defined.</li>
-     *   <li>If this BaseCollection instance represents an XClass then it's not used.</li>
+     * <li>If this BaseCollection instance represents an XObject then refers to the document where the XObject's XClass
+     * is defined.</li>
+     * <li>If this BaseCollection instance represents an XClass then it's not used.</li>
      * </ul>
-     *
      * Note that we're saving the XClass reference as a relative reference instead of an absolute one. This is because
      * We want the ability (for example) to create an XObject relative to the current space or wiki so that a copy of
-     * that XObject would retain that relativity. This is for example useful when copying a Wiki into another Wiki
-     * so that the copied XObject have a XClassReference pointing in the new wiki.
+     * that XObject would retain that relativity. This is for example useful when copying a Wiki into another Wiki so
+     * that the copied XObject have a XClassReference pointing in the new wiki.
      */
     private EntityReference xClassReference;
 
@@ -100,9 +99,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     /**
      * The meaning of this reference fields depends on the element represented. Examples:
      * <ul>
-     *   <li>When the BaseCollection represents an XObject, this number is the position of this XObject in the document
-     *       where it's located. The first XObject of a given XClass type is at position 0, and other XObject of the
-     *       same XClass type are at position 1, etc.</li>
+     * <li>When the BaseCollection represents an XObject, this number is the position of this XObject in the document
+     * where it's located. The first XObject of a given XClass type is at position 0, and other XObject of the same
+     * XClass type are at position 1, etc.</li>
      * </ul>
      */
     protected int number;
@@ -111,20 +110,20 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
      * Used to resolve XClass references in the way they are stored externally (database, xml, etc), ie relative or
      * absolute.
      */
-    private EntityReferenceResolver<String> relativeEntityReferenceResolver =
-        Utils.getComponent(EntityReferenceResolver.class, "relative");
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
+        EntityReferenceResolver.class, "relative");
 
     /**
      * Used to convert a proper Class Reference to a string but without the wiki name.
      */
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class, "local");
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.class, "local");
 
     /**
      * Used to normalize references.
      */
-    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "current/reference");
+    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "current/reference");
 
     public int getId()
     {
@@ -169,8 +168,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         // Ensure we always return an absolute references since we always want well-constructed to be used from outside
         // this class.
         if (this.xClassReferenceCache == null && getRelativeXClassReference() != null) {
-            this.xClassReferenceCache = this.currentReferenceDocumentReferenceResolver
-                .resolve(getRelativeXClassReference(), getDocumentReference());
+            this.xClassReferenceCache =
+                this.currentReferenceDocumentReferenceResolver.resolve(getRelativeXClassReference(),
+                    getDocumentReference());
         }
 
         return this.xClassReferenceCache;
@@ -680,8 +680,8 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                         String newPropertyValue =
                             (newProperty.getValue() instanceof String) ? newProperty.toText() : pclass.displayView(
                                 propertyName, this, context);
-                        difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "added", propertyName,
-                            propertyType, "", newPropertyValue));
+                        difflist.add(new ObjectDiff(getClassName(), getNumber(), "", ObjectDiff.ACTION_PROPERTYADDED,
+                            propertyName, propertyType, "", newPropertyValue));
                     }
                 }
             } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
@@ -690,16 +690,16 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                     // Put the values as they would be displayed in the interface
                     String newPropertyValue =
                         (newProperty.getValue() instanceof String) ? newProperty.toText() : pclass.displayView(
-                        propertyName, this, context);
+                            propertyName, this, context);
                     String oldPropertyValue =
                         (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
-                        propertyName, oldCollection, context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "changed", propertyName, propertyType,
-                        oldPropertyValue, newPropertyValue));
+                            propertyName, oldCollection, context);
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
+                        propertyName, propertyType, oldPropertyValue, newPropertyValue));
                 } else {
                     // Cannot get property definition, so use the plain value
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "changed", propertyName, propertyType,
-                        oldProperty.toText(), newProperty.toText()));
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
+                        propertyName, propertyType, oldProperty.toText(), newProperty.toText()));
                 }
             }
         }
@@ -720,13 +720,13 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                         // Put the values as they would be displayed in the interface
                         String oldPropertyValue =
                             (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
-                            propertyName, oldCollection, context);
+                                propertyName, oldCollection, context);
                         difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "",
-                            "removed", propertyName, propertyType, oldPropertyValue, ""));
+                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, ""));
                     } else {
                         // Cannot get property definition, so use the plain value
                         difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "",
-                            "removed", propertyName, propertyType, oldProperty.toText(), ""));
+                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty.toText(), ""));
                     }
                 }
             }

@@ -148,7 +148,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             dependency.setId((String) getValue(dependencyObject, "id"));
             dependency.setVersion((String) getValue(dependencyObject, "version"));
 
-            extension.getDepedencies().add(dependency);
+            extension.getDependencies().add(dependency);
         }
 
         return extension;

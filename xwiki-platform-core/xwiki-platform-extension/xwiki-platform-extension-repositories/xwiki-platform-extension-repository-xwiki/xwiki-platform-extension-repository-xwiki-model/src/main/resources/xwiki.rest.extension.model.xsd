@@ -31,7 +31,7 @@
             <element name="description" type="string" maxOccurs="1" minOccurs="0"></element>
     		<element name="website" type="string" maxOccurs="1" minOccurs="0"></element>
             <element name="authors" type="string" maxOccurs="unbounded" minOccurs="0"></element>
-            <element name="depedencies" type="xwiki:ExtensionDependency" maxOccurs="unbounded" minOccurs="0"></element>
+            <element name="dependencies" type="xwiki:ExtensionDependency" maxOccurs="unbounded" minOccurs="0"></element>
     	</sequence>
     </complexType>
     

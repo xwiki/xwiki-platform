@@ -56,7 +56,7 @@ var XWiki = (function(XWiki){
     insertBeforeSuggestions: null,
     // Should value be displayed as a hint
     displayValue: false,
-    // Display value prefix text 
+    // Display value prefix text
     displayValueText: "Value :",
     // How to align the suggestion list when its with is different than the input field width
     align: "left"

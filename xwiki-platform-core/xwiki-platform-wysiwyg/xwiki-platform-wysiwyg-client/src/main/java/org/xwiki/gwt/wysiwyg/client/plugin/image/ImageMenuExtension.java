@@ -35,9 +35,14 @@ import com.google.gwt.event.logical.shared.AttachEvent;
 public class ImageMenuExtension extends MenuItemUIExtensionAdaptor
 {
     /**
-     * The menu item used to insert an image.
+     * The menu item used to insert an attached image.
      */
-    private MenuItem insert;
+    private MenuItem attachedImage;
+
+    /**
+     * The menu item used to insert an external image.
+     */
+    private MenuItem urlImage;
 
     /**
      * The menu item used to edit the selected image.
@@ -65,18 +70,29 @@ public class ImageMenuExtension extends MenuItemUIExtensionAdaptor
 
         this.plugin = plugin;
 
-        insert = createMenuItem(Strings.INSTANCE.imageInsertImage(), null, new com.google.gwt.user.client.Command()
-        {
-            public void execute()
+        attachedImage =
+            createMenuItem(Strings.INSTANCE.imageInsertAttachedImage(), null, new com.google.gwt.user.client.Command()
             {
-                plugin.onImage();
-            }
-        });
+                public void execute()
+                {
+                    plugin.onAttachedImage();
+                }
+            });
+        if (Boolean.valueOf(plugin.getConfig().getParameter("allowExternalImages", "true"))) {
+            urlImage =
+                createMenuItem(Strings.INSTANCE.imageInsertURLImage(), null, new com.google.gwt.user.client.Command()
+                {
+                    public void execute()
+                    {
+                        plugin.onURLImage();
+                    }
+                });
+        }
         edit = createMenuItem(Strings.INSTANCE.imageEditImage(), null, new com.google.gwt.user.client.Command()
         {
             public void execute()
             {
-                plugin.onImage();
+                plugin.onImageEdit();
             }
         });
         remove = createMenuItem(Strings.INSTANCE.imageRemoveImage(), null, new com.google.gwt.user.client.Command()
@@ -89,7 +105,10 @@ public class ImageMenuExtension extends MenuItemUIExtensionAdaptor
         MenuItem imageMenu = createMenuItem(Strings.INSTANCE.image(), Images.INSTANCE.image());
 
         addFeature(ImagePluginFactory.getInstance().getPluginName(), imageMenu);
-        addFeature("imageInsert", insert);
+        addFeature("imageInsertAttached", attachedImage);
+        if (urlImage != null) {
+            addFeature("imageInsertURL", urlImage);
+        }
         addFeature("imageEdit", edit);
         addFeature("imageRemove", remove);
     }
@@ -102,9 +121,14 @@ public class ImageMenuExtension extends MenuItemUIExtensionAdaptor
     protected void onAttach(AttachEvent event)
     {
         boolean editMode = plugin.getTextArea().getCommandManager().isExecuted(Command.INSERT_IMAGE);
-        if (insert.getParentMenu() == event.getSource()) {
-            insert.setEnabled(!editMode && plugin.getTextArea().getCommandManager().isEnabled(Command.INSERT_IMAGE));
-            insert.setVisible(!editMode);
+        if (attachedImage.getParentMenu() == event.getSource()) {
+            attachedImage.setEnabled(!editMode
+                && plugin.getTextArea().getCommandManager().isEnabled(Command.INSERT_IMAGE));
+            attachedImage.setVisible(!editMode);
+        }
+        if (urlImage != null && urlImage.getParentMenu() == event.getSource()) {
+            urlImage.setEnabled(!editMode && plugin.getTextArea().getCommandManager().isEnabled(Command.INSERT_IMAGE));
+            urlImage.setVisible(!editMode);
         }
         if (edit.getParentMenu() == event.getSource()) {
             edit.setEnabled(editMode);

@@ -37,6 +37,7 @@ public class EmailAddressLinkWizardStep extends AbstractExternalLinkWizardStep
     EmailAddressLinkWizardStep(WikiServiceAsync wikiService)
     {
         super(wikiService);
+        setStepTitle(Strings.INSTANCE.linkToEmail());
     }
 
     /**
@@ -76,13 +77,5 @@ public class EmailAddressLinkWizardStep extends AbstractExternalLinkWizardStep
     protected String getURLHelpLabel()
     {
         return Strings.INSTANCE.linkEmailHelpLabel();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getStepTitle()
-    {
-        return Strings.INSTANCE.linkToEmail();
     }
 }

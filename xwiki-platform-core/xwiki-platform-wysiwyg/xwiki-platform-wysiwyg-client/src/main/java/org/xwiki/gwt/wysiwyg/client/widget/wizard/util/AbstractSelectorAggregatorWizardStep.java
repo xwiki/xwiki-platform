@@ -36,7 +36,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TabPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Wizard step used to aggregate a set of selectors for a file attached (file attachment or image) to a page in the
@@ -75,11 +74,6 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     private final TabPanel tabPanel = new TabPanel();
 
     /**
-     * The main panel of this wizard step.
-     */
-    private final FlowPanel mainPanel = new FlowPanel();
-
-    /**
      * The navigation listeners for this selector step, to pass further potential navigation events launched by
      * aggregated steps.
      */
@@ -91,7 +85,7 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     public AbstractSelectorAggregatorWizardStep()
     {
         // instantiate the main panel
-        mainPanel.addStyleName("xSelectorAggregatorStep");
+        display().addStyleName("xSelectorAggregatorStep");
 
         tabPanel.addStyleName("xStepsTabs");
 
@@ -101,7 +95,7 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
         }
 
         tabPanel.addSelectionHandler(this);
-        mainPanel.add(tabPanel);
+        display().add(tabPanel);
     }
 
     /**
@@ -188,7 +182,6 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
      * @param step the step that just finished loading
      * @param stepPanel the container panel of the tab where this widget is to be displayed
      */
-    @SuppressWarnings("unchecked")
     private void onStepInitialized(WizardStep step, FlowPanel stepPanel)
     {
         // remove any existant error message
@@ -202,7 +195,7 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
         stepPanel.getWidget(0).setVisible(true);
         tabPanel.removeStyleName(STYLE_LOADING);
         if (step instanceof AbstractSelectorWizardStep) {
-            ((AbstractSelectorWizardStep) step).setActive();
+            ((AbstractSelectorWizardStep< ? >) step).setActive();
         }
     }
 
@@ -257,14 +250,6 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
             currentStepName = tabPanel.getTabBar().getTabHTML(selectedTab);
         }
         return currentStepName;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Widget display()
-    {
-        return mainPanel;
     }
 
     /**

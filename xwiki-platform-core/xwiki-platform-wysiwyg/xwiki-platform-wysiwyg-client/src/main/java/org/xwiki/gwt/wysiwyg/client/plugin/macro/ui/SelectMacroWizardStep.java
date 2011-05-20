@@ -37,9 +37,9 @@ import org.xwiki.gwt.user.client.ui.ListBox;
 import org.xwiki.gwt.user.client.ui.ListItem;
 import org.xwiki.gwt.user.client.ui.VerticalResizePanel;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
 import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
-import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroCall;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor;
@@ -341,20 +341,20 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
         super(config, macroService, new VerticalResizePanel());
 
         macroFilter = new MacroFilter();
-        getPanel().add(macroFilter);
+        display().add(macroFilter);
 
         validationMessage = new Label(Strings.INSTANCE.macroNoMacroSelected());
         validationMessage.setVisible(false);
         validationMessage.addStyleName("xErrorMsg");
-        getPanel().add(validationMessage);
+        display().add(validationMessage);
 
         macroList = new ListBox<MacroDescriptor>();
         macroList.addDoubleClickHandler(this);
         macroList.addKeyUpHandler(this);
-        getPanel().add(macroList);
+        display().add(macroList);
 
-        getPanel().addStyleName("xMacroSelector");
-        ((VerticalResizePanel) getPanel()).setExpandingWidget(macroList, false);
+        display().addStyleName("xMacroSelector");
+        ((VerticalResizePanel) display()).setExpandingWidget(macroList, false);
     }
 
     /**
@@ -634,7 +634,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
             } else {
                 macroList.removeStyleName(errorStyle);
             }
-            ((VerticalResizePanel) getPanel()).refreshHeights();
+            ((VerticalResizePanel) display()).refreshHeights();
         }
     }
 

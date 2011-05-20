@@ -204,13 +204,45 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
     {
         ImageConfig imageConfig;
         String imageJSON = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
+        String startStep = ImageWizardStep.ATTACHED_IMAGE_SELECTOR.toString();
         if (imageJSON != null) {
+            startStep = ImageWizardStep.IMAGE_REFERENCE_PARSER.toString();
             imageConfig = imageConfigJSONParser.parse(imageJSON);
         } else {
             imageConfig = new ImageConfig();
             imageConfig.setAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
         }
-        imageWizard.start(ImageWizardStep.IMAGE_SELECTOR.toString(), imageConfig);
+        imageWizard.start(startStep, imageConfig);
+    }
+
+    /**
+     * Start the edit image wizard.
+     */
+    public void onImageEdit()
+    {
+        String imageJSON = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
+        ImageConfig imageConfig = imageConfigJSONParser.parse(imageJSON);
+        imageWizard.start(ImageWizardStep.IMAGE_REFERENCE_PARSER.toString(), imageConfig);
+    }
+
+    /**
+     * Start the insert attached image wizard.
+     */
+    public void onAttachedImage()
+    {
+        ImageConfig imageConfig = new ImageConfig();
+        imageConfig.setAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
+        imageWizard.start(ImageWizardStep.ATTACHED_IMAGE_SELECTOR.toString(), imageConfig);
+    }
+
+    /**
+     * Start the insert external image wizard.
+     */
+    public void onURLImage()
+    {
+        ImageConfig imageConfig = new ImageConfig();
+        imageConfig.setAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
+        imageWizard.start(ImageWizardStep.URL_IMAGE_SELECTOR.toString(), imageConfig);
     }
 
     /**

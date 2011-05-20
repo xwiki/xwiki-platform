@@ -20,6 +20,7 @@
 package org.xwiki.gwt.wysiwyg.client.widget.wizard.util;
 
 import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.ui.wizard.AbstractAutoSubmitWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
 import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
@@ -28,25 +29,25 @@ import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
- * Abstract wizard step that aggregates multiple views for selecting an entity to link to.
+ * An auto-submit wizard step that parses the resource reference from the input data.
  * 
- * @param <C> the type of link configuration data associated with the link
+ * @param <T> the type of entity configuration
  * @version $Id$
  */
-public abstract class AbstractEntitySelectorAggregatorWizardStep<C extends EntityConfig> extends
-    AbstractSelectorAggregatorWizardStep<EntityLink<C>>
+public class ResourceReferenceParserWizardStep<T extends EntityConfig> extends
+    AbstractAutoSubmitWizardStep<EntityLink<T>>
 {
     /**
-     * The service used access the wiki.
+     * The service used to parse the resource reference.
      */
     private final WikiServiceAsync wikiService;
 
     /**
-     * Creates a new entity selector wizard step that uses the given service to access the wiki.
+     * Creates a new step that parses the resource reference from the input data.
      * 
-     * @param wikiService the service used to access the wiki
+     * @param wikiService the service used to parse the resource reference
      */
-    public AbstractEntitySelectorAggregatorWizardStep(WikiServiceAsync wikiService)
+    public ResourceReferenceParserWizardStep(WikiServiceAsync wikiService)
     {
         this.wikiService = wikiService;
     }
@@ -54,39 +55,29 @@ public abstract class AbstractEntitySelectorAggregatorWizardStep<C extends Entit
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractSelectorAggregatorWizardStep#init(Object, AsyncCallback)
+     * @see AbstractAutoSubmitWizardStep#onSubmit(AsyncCallback)
      */
-    @SuppressWarnings("unchecked")
     @Override
-    public void init(Object data, final AsyncCallback< ? > cb)
+    public void onSubmit(final AsyncCallback<Boolean> callback)
     {
-        final EntityLink<C> entityLink = (EntityLink<C>) data;
-        if (StringUtils.isEmpty(entityLink.getData().getReference())) {
-            entityLink.getDestination().setEntityReference(entityLink.getOrigin().clone());
-            super.init(entityLink, cb);
+        if (StringUtils.isEmpty(getData().getData().getReference())) {
+            getData().getDestination().setEntityReference(getData().getOrigin().clone());
+            callback.onSuccess(Boolean.TRUE);
         } else {
-            wikiService.parseLinkReference(entityLink.getData().getReference(), entityLink.getOrigin(),
+            wikiService.parseLinkReference(getData().getData().getReference(), getData().getOrigin(),
                 new AsyncCallback<ResourceReference>()
                 {
                     public void onFailure(Throwable caught)
                     {
-                        cb.onFailure(caught);
+                        callback.onFailure(caught);
                     }
 
                     public void onSuccess(ResourceReference result)
                     {
-                        entityLink.setDestination(result);
-                        AbstractEntitySelectorAggregatorWizardStep.super.init(entityLink, cb);
+                        getData().setDestination(result);
+                        callback.onSuccess(Boolean.TRUE);
                     }
                 });
         }
-    }
-
-    /**
-     * @return the service used to access the wiki
-     */
-    public WikiServiceAsync getWikiService()
-    {
-        return wikiService;
     }
 }

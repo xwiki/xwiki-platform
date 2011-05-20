@@ -21,19 +21,16 @@ package org.xwiki.gwt.wysiwyg.client.plugin.image.ui;
 
 import org.xwiki.gwt.user.client.FocusCommand;
 import org.xwiki.gwt.user.client.StringUtils;
-import org.xwiki.gwt.user.client.ui.wizard.AbstractNavigationAwareWizardStep;
+import org.xwiki.gwt.user.client.ui.wizard.AbstractInteractiveWizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
 import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
-import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
-import org.xwiki.gwt.wysiwyg.client.wiki.URIReference;
-import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType;
+import org.xwiki.gwt.wysiwyg.client.wiki.URIReference;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -51,8 +48,8 @@ import com.google.gwt.user.client.ui.TextBox;
  * 
  * @version $Id$
  */
-public class ExternalImageSelectorWizardStep extends AbstractNavigationAwareWizardStep implements
-    SourcesNavigationEvents, KeyUpHandler
+public class URLImageSelectorWizardStep extends AbstractInteractiveWizardStep implements SourcesNavigationEvents,
+    KeyUpHandler
 {
     /**
      * The style of the fields under error.
@@ -86,18 +83,11 @@ public class ExternalImageSelectorWizardStep extends AbstractNavigationAwareWiza
     private final Label sourceValidationError = new Label(Strings.INSTANCE.imageExternalLocationNotSpecifiedError());
 
     /**
-     * the service used to serialize external image references.
-     */
-    private final WikiServiceAsync wikiService;
-
-    /**
      * Creates a new wizard step that allows the user to select an external image by specifying its URL.
-     * 
-     * @param wikiService the service used to serialize external image references
      */
-    public ExternalImageSelectorWizardStep(WikiServiceAsync wikiService)
+    public URLImageSelectorWizardStep()
     {
-        this.wikiService = wikiService;
+        setStepTitle(Strings.INSTANCE.imageSelectImageTitle());
 
         InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
         mandatoryLabel.addStyleName("xMandatory");
@@ -106,27 +96,27 @@ public class ExternalImageSelectorWizardStep extends AbstractNavigationAwareWiza
         sourceLabel.setStyleName("xInfoLabel");
         sourceLabel.add(new InlineLabel(Strings.INSTANCE.imageExternalLocationLabel()));
         sourceLabel.add(mandatoryLabel);
-        getPanel().add(sourceLabel);
+        display().add(sourceLabel);
 
         Label sourceHelpLabel = new Label(Strings.INSTANCE.imageExternalLocationHelpLabel());
         sourceHelpLabel.setStyleName("xHelpLabel");
-        getPanel().add(sourceHelpLabel);
+        display().add(sourceHelpLabel);
 
         sourceValidationError.addStyleName("xErrorMsg");
         sourceValidationError.setVisible(false);
-        getPanel().add(sourceValidationError);
+        display().add(sourceValidationError);
 
         source.setTitle(Strings.INSTANCE.imageExternalLocationLabel());
         source.addKeyUpHandler(this);
-        getPanel().add(source);
+        display().add(source);
 
-        getPanel().addStyleName("xExternalImage");
+        display().addStyleName("xExternalImage");
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#getResult()
+     * @see AbstractInteractiveWizardStep#getResult()
      */
     public Object getResult()
     {
@@ -136,17 +126,7 @@ public class ExternalImageSelectorWizardStep extends AbstractNavigationAwareWiza
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#getStepTitle()
-     */
-    public String getStepTitle()
-    {
-        return Strings.INSTANCE.imageSelectImageTitle();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractNavigationAwareWizardStep#init(Object, AsyncCallback)
+     * @see AbstractInteractiveWizardStep#init(Object, AsyncCallback)
      */
     @SuppressWarnings("unchecked")
     public void init(Object data, AsyncCallback< ? > cb)
@@ -166,7 +146,7 @@ public class ExternalImageSelectorWizardStep extends AbstractNavigationAwareWiza
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#onCancel()
+     * @see AbstractInteractiveWizardStep#onCancel()
      */
     public void onCancel()
     {
@@ -177,12 +157,13 @@ public class ExternalImageSelectorWizardStep extends AbstractNavigationAwareWiza
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#onSubmit(AsyncCallback)
+     * @see AbstractInteractiveWizardStep#onSubmit(AsyncCallback)
      */
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         if (validate()) {
-            updateResult(async);
+            updateResult();
+            async.onSuccess(true);
         } else {
             async.onSuccess(false);
         }
@@ -207,33 +188,17 @@ public class ExternalImageSelectorWizardStep extends AbstractNavigationAwareWiza
 
     /**
      * Updates the result object returned by this wizard step and notifies the call-back object.
-     * 
-     * @param async the object to be notified after the result is updated
      */
-    private void updateResult(final AsyncCallback<Boolean> async)
+    private void updateResult()
     {
         String imageURL = source.getText().trim();
         if (!imageURL.contains(PROTOCOL_DELIMITER)) {
             imageURL = "http://" + imageURL;
         }
-        final ResourceReference imageReference = entityLink.getDestination().clone();
-        imageReference.setType(ResourceType.URL);
-        imageReference.setEntityReference(new URIReference(imageURL).getEntityReference());
-        wikiService.getEntityConfig(entityLink.getOrigin(), imageReference, new AsyncCallback<EntityConfig>()
-        {
-            public void onFailure(Throwable caught)
-            {
-                async.onFailure(caught);
-            }
-
-            public void onSuccess(EntityConfig result)
-            {
-                entityLink.setDestination(imageReference);
-                entityLink.getData().setReference(result.getReference());
-                entityLink.getData().setUrl(result.getUrl());
-                async.onSuccess(true);
-            }
-        });
+        entityLink.getDestination().setType(ResourceType.URL);
+        entityLink.getDestination().setEntityReference(new URIReference(imageURL).getEntityReference());
+        entityLink.getData().setReference(null);
+        entityLink.getData().setUrl(imageURL);
     }
 
     /**

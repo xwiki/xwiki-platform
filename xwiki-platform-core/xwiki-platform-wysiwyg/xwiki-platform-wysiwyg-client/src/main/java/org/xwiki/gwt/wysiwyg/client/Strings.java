@@ -276,6 +276,8 @@ public interface Strings extends Constants
 
     String linkNewPageError();
 
+    String linkSettingsLabel();
+
     String selectorSelectFromCurrentPage();
 
     String selectorSelectFromAllPages();
@@ -306,7 +308,9 @@ public interface Strings extends Constants
 
     String imageTooltip();
 
-    String imageInsertImage();
+    String imageInsertAttachedImage();
+
+    String imageInsertURLImage();
 
     String imageEditImage();
 
@@ -363,6 +367,8 @@ public interface Strings extends Constants
     String imageUploadHelpLabel();
 
     String imageNoImageSelectedError();
+
+    String imageChangeImageButton();
 
     String imageExternal();
 

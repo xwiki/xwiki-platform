@@ -183,7 +183,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
     {
         LinkConfig linkConfig = linkConfigFactory.createLinkConfig();
         linkConfig.setType(linkType);
-        dispatchLinkWizard(linkConfig);
+        getLinkWizard().start(LinkWizardStep.LINK_REFERENCE_PARSER.toString(), linkConfig);
     }
 
     /**
@@ -191,32 +191,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
      */
     public void onLinkEdit()
     {
-        dispatchLinkWizard(linkConfigFactory.createLinkConfig());
-    }
-
-    /**
-     * Instantiates and runs the correct wizard for the passed link.
-     * 
-     * @param linkConfig the link configuration object to be passed to the wizard
-     */
-    protected void dispatchLinkWizard(LinkConfig linkConfig)
-    {
-        switch (linkConfig.getType()) {
-            case WIKIPAGE:
-            case NEW_WIKIPAGE:
-                getLinkWizard().start(LinkWizardStep.WIKI_PAGE.toString(), linkConfig);
-                break;
-            case ATTACHMENT:
-                getLinkWizard().start(LinkWizardStep.ATTACHMENT.toString(), linkConfig);
-                break;
-            case EMAIL:
-                getLinkWizard().start(LinkWizardStep.EMAIL.toString(), linkConfig);
-                break;
-            case EXTERNAL:
-            default:
-                getLinkWizard().start(LinkWizardStep.WEB_PAGE.toString(), linkConfig);
-                break;
-        }
+        getLinkWizard().start(LinkWizardStep.LINK_REFERENCE_PARSER.toString(), linkConfigFactory.createLinkConfig());
     }
 
     /**
@@ -252,7 +227,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
     {
         // Return the focus to the rich text area.
         getTextArea().setFocus(true);
-        // Insert of update the link.
+        // Insert or update the link.
         String linkJSON = linkConfigJSONSerializer.serialize((LinkConfig) result);
         getTextArea().getCommandManager().execute(Command.CREATE_LINK, linkJSON);
     }

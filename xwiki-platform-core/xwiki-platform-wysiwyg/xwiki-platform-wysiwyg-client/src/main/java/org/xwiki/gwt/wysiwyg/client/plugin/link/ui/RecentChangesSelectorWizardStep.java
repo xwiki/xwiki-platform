@@ -42,7 +42,7 @@ public class RecentChangesSelectorWizardStep extends AbstractPageListSelectorWiz
     public RecentChangesSelectorWizardStep(WikiServiceAsync wikiService)
     {
         super(wikiService);
-        getMainPanel().addStyleName("xPagesRecent");
+        display().addStyleName("xPagesRecent");
     }
 
     /**

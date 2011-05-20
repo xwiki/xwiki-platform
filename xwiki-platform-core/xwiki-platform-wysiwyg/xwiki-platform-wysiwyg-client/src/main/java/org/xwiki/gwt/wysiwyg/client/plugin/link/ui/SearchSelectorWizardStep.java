@@ -76,7 +76,7 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
     {
         super(wikiService);
 
-        getMainPanel().addStyleName("xPagesSearch");
+        display().addStyleName("xPagesSearch");
         // create the search widget
         FlowPanel searchPanel = new FlowPanel();
         searchPanel.addStyleName("xSearchForm");
@@ -87,7 +87,7 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
         searchBox.addKeyPressHandler(this);
         searchPanel.add(searchBox);
         searchPanel.add(searchButton);
-        getMainPanel().insert(searchPanel, 0);
+        display().insert(searchPanel, 0);
     }
 
     /**
@@ -99,18 +99,18 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
     {
         // set the keyword from the search input
         keyword = searchBox.getText().trim();
-        getMainPanel().addStyleName(STYLE_LOADING);
+        display().addStyleName(STYLE_LOADING);
         // refresh the results list
         refreshList(new AsyncCallback<Object>()
         {
             public void onSuccess(Object result)
             {
-                getMainPanel().removeStyleName(STYLE_LOADING);
+                display().removeStyleName(STYLE_LOADING);
             }
 
             public void onFailure(Throwable caught)
             {
-                getMainPanel().removeStyleName(STYLE_LOADING);
+                display().removeStyleName(STYLE_LOADING);
                 Label error = new Label(Strings.INSTANCE.linkErrorLoadingData());
                 error.addStyleName(STYLE_ERROR);
                 ListItem<WikiPage> errorListItem = new ListItem<WikiPage>();

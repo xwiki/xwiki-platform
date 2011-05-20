@@ -41,11 +41,6 @@ public class LinkUploadWizardStep<C extends EntityConfig> extends AbstractFileUp
     private EntityLink<C> entityLink;
 
     /**
-     * The next wizard step.
-     */
-    private String nextStep;
-
-    /**
      * Creates a new upload wizard step that uses the given service to access the attachments.
      * 
      * @param wikiService the service used to access the attachments
@@ -85,24 +80,10 @@ public class LinkUploadWizardStep<C extends EntityConfig> extends AbstractFileUp
      * @see AbstractFileUploadWizardStep#onAttachmentUploaded(Attachment, AsyncCallback)
      */
     @Override
-    protected void onAttachmentUploaded(Attachment attachment, final AsyncCallback<Boolean> async)
+    protected void onAttachmentUploaded(Attachment attachment, final AsyncCallback<Boolean> callback)
     {
         entityLink.getDestination().setEntityReference(attachment.getReference().clone());
-        getWikiService().getEntityConfig(entityLink.getOrigin(), entityLink.getDestination(),
-            new AsyncCallback<EntityConfig>()
-            {
-                public void onFailure(Throwable caught)
-                {
-                    async.onFailure(caught);
-                }
-
-                public void onSuccess(EntityConfig result)
-                {
-                    entityLink.getData().setReference(result.getReference());
-                    entityLink.getData().setUrl(result.getUrl());
-                    async.onSuccess(true);
-                }
-            });
+        callback.onSuccess(true);
     }
 
     /**
@@ -113,25 +94,5 @@ public class LinkUploadWizardStep<C extends EntityConfig> extends AbstractFileUp
     public Object getResult()
     {
         return entityLink;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractFileUploadWizardStep#getNextStep()
-     */
-    public String getNextStep()
-    {
-        return nextStep;
-    }
-
-    /**
-     * Sets the next step.
-     * 
-     * @param nextStep the new next step
-     */
-    public void setNextStep(String nextStep)
-    {
-        this.nextStep = nextStep;
     }
 }

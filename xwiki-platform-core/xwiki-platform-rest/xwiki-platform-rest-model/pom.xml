@@ -32,12 +32,6 @@
   <artifactId>xwiki-platform-rest-model</artifactId>
   <name>XWiki Platform - REST - Model</name>
   <description>The (JAXB) model for XML resource representations served by the REST module.</description>
-  <dependencies>
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-    </dependency>
-  </dependencies>
   <build>
     <plugins>
       <plugin>

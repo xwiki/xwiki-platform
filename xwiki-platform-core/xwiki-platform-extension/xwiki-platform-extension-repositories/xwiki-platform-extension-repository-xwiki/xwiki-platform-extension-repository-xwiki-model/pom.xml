@@ -33,12 +33,6 @@
   <name>XWiki Platform - Extension - Repository - XWiki model</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Extension - Repository - XWiki model</description>
-  <dependencies>   
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-    </dependency>
-  </dependencies>
   <build>
     <plugins>
       <plugin>

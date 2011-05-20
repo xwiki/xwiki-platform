@@ -125,17 +125,6 @@
         <artifactId>smartgwt</artifactId>
         <version>${smartgwt.version}</version>
       </dependency>
-      <!-- REST -->
-      <dependency>
-        <groupId>javax.xml.bind</groupId>
-        <artifactId>jaxb-api</artifactId>
-        <version>2.2.2</version>
-      </dependency>
-      <dependency>
-        <groupId>com.sun.xml.bind</groupId>
-        <artifactId>jaxb-impl</artifactId>
-        <version>2.2.2</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

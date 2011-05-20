@@ -85,12 +85,12 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.MetaData;
@@ -5582,8 +5582,9 @@ public class XWikiDocument implements DocumentModelBridge
                     if (newObj == null) {
                         // The object was deleted.
                         dlist = new BaseObject().getDiff(originalObj, context);
-                        ObjectDiff deleteMarker = new ObjectDiff(originalObj.getClassName(), originalObj.getNumber(),
-                            originalObj.getGuid(), "object-removed", "", "", "", "");
+                        ObjectDiff deleteMarker =
+                            new ObjectDiff(originalObj.getClassName(), originalObj.getNumber(), originalObj.getGuid(),
+                                ObjectDiff.ACTION_OBJECTREMOVED, "", "", "", "");
                         dlist.add(0, deleteMarker);
                     } else {
                         // The object exists in both versions, but might have been changed.
@@ -5611,8 +5612,9 @@ public class XWikiDocument implements DocumentModelBridge
                         originalObj.setNumber(newObj.getNumber());
                         originalObj.setGuid(newObj.getGuid());
                         List<ObjectDiff> dlist = newObj.getDiff(originalObj, context);
-                        ObjectDiff addMarker = new ObjectDiff(newObj.getClassName(), newObj.getNumber(),
-                            newObj.getGuid(), "object-added", "", "", "", "");
+                        ObjectDiff addMarker =
+                            new ObjectDiff(newObj.getClassName(), newObj.getNumber(), newObj.getGuid(),
+                                ObjectDiff.ACTION_OBJECTADDED, "", "", "", "");
                         dlist.add(0, addMarker);
                         if (dlist.size() > 0) {
                             difflist.add(dlist);
@@ -6062,8 +6064,8 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Gets the default edit mode for this document. An edit mode (other than the default "edit") can be enforced by
      * creating an {@code XWiki.EditModeClass} object in the current document, with the appropriate value for the
-     * defaultEditMode property, or by adding this object in a sheet included by the document. This function also
-     * falls back on the old {@code SheetClass}, deprecated since 3.1M2, which can be attached to included documents to
+     * defaultEditMode property, or by adding this object in a sheet included by the document. This function also falls
+     * back on the old {@code SheetClass}, deprecated since 3.1M2, which can be attached to included documents to
      * specify that the current document should be edited inline.
      * 
      * @return the default edit mode for this document ("edit" or "inline" usually)

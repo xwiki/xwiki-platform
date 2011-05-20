@@ -22,6 +22,16 @@ package com.xpn.xwiki.objects;
 
 public class ObjectDiff
 {
+    public static final String ACTION_PROPERTYADDED = "added";
+
+    public static final String ACTION_PROPERTYCHANGED = "changed";
+
+    public static final String ACTION_PROPERTYREMOVED = "removed";
+
+    public static final String ACTION_OBJECTADDED = "object-added";
+
+    public static final String ACTION_OBJECTREMOVED = "object-removed";
+
     private String className;
 
     private int number;
@@ -29,7 +39,7 @@ public class ObjectDiff
     private String guid;
 
     private String propName;
-    
+
     private String propType;
 
     private Object prevValue;
@@ -44,7 +54,7 @@ public class ObjectDiff
         this(className, number, "", action, propName, "", prevValue, newValue);
     }
 
-    public ObjectDiff(String className, int number, String guid, String action, String propName, String propType, 
+    public ObjectDiff(String className, int number, String guid, String action, String propName, String propType,
         Object prevValue, Object newValue)
     {
         this.setClassName(className);
@@ -96,12 +106,12 @@ public class ObjectDiff
     {
         this.propName = propName;
     }
-    
+
     public String getPropType()
     {
         return this.propType;
     }
-    
+
     public void setPropType(String propType)
     {
         this.propType = propType;

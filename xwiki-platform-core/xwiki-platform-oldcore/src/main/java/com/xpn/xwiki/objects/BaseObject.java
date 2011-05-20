@@ -52,8 +52,8 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "currentmixed");
 
     /**
      * Used here to merge setName() and setWiki() calls into the DocumentReference.
@@ -62,9 +62,9 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         EntityReferenceResolver.class, "relative");
 
     /**
-     * Note: This method is overridden to add the deprecation warning so that code using it can see it's deprecated.
-     *
      * {@inheritDoc}
+     * <p>
+     * Note: This method is overridden to add the deprecation warning so that code using it can see it's deprecated.
      * 
      * @deprecated since 2.2M2 use {@link #getDocumentReference()}
      */
@@ -76,9 +76,9 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     }
 
     /**
-     * Note: BaseElement.setName() does not support setting reference anymore since 2.4M2.
-     * 
      * {@inheritDoc}
+     * <p>
+     * Note: BaseElement.setName() does not support setting reference anymore since 2.4M2.
      * 
      * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
@@ -196,9 +196,9 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     }
 
     /**
-     * Similar to {@link #clone()} but whereas a clone is an exact copy (with the same GUID), a duplicate keeps the
-     * same data but with a different identity.
-     *
+     * Similar to {@link #clone()} but whereas a clone is an exact copy (with the same GUID), a duplicate keeps the same
+     * data but with a different identity.
+     * 
      * @since 2.2.3
      */
     public BaseObject duplicate()
@@ -343,27 +343,29 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
                 // The property exist in the new object, but not in the old one
                 if ((newProperty != null) && (!newProperty.toText().equals(""))) {
                     String newPropertyValue =
-                        (newProperty.getValue() instanceof String || pclass == null) ? newProperty.toText() :
-                        pclass.displayView(propertyName, this, context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "added", propertyName,
-                        propertyType, "", newPropertyValue));
+                        (newProperty.getValue() instanceof String || pclass == null) ? newProperty.toText() : pclass
+                            .displayView(propertyName, this, context);
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(),
+                        ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue));
                 }
             } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
                 // The property exists in both objects and is different
                 if (pclass != null) {
                     // Put the values as they would be displayed in the interface
                     String newPropertyValue =
-                        (newProperty.getValue() instanceof String || pclass == null) ? newProperty.toText() :
-                        pclass.displayView(propertyName, this, context);
+                        (newProperty.getValue() instanceof String || pclass == null) ? newProperty.toText() : pclass
+                            .displayView(propertyName, this, context);
                     String oldPropertyValue =
-                        (oldProperty.getValue() instanceof String || pclass == null) ? oldProperty.toText() :
-                        pclass.displayView(propertyName, oldObject, context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "changed", propertyName,
-                        propertyType, oldPropertyValue, newPropertyValue));
+                        (oldProperty.getValue() instanceof String || pclass == null) ? oldProperty.toText() : pclass
+                            .displayView(propertyName, oldObject, context);
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(),
+                        ObjectDiff.ACTION_PROPERTYCHANGED, propertyName, propertyType, oldPropertyValue,
+                        newPropertyValue));
                 } else {
                     // Cannot get property definition, so use the plain value
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "changed", propertyName,
-                        propertyType, oldProperty.toText(), newProperty.toText()));
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(),
+                        ObjectDiff.ACTION_PROPERTYCHANGED, propertyName, propertyType, oldProperty.toText(),
+                        newProperty.toText()));
                 }
             }
         }
@@ -382,14 +384,16 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
                     if (pclass != null) {
                         // Put the values as they would be displayed in the interface
                         String oldPropertyValue =
-                            (oldProperty.getValue() instanceof String) ? oldProperty.toText() :
-                            pclass.displayView(propertyName, oldObject, context);
-                        difflist.add(new ObjectDiff(oldObject.getClassName(), oldObject.getNumber(),
-                            oldObject.getGuid(), "removed", propertyName, propertyType, oldPropertyValue, ""));
+                            (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
+                                propertyName, oldObject, context);
+                        difflist.add(new ObjectDiff(oldObject.getClassName(), oldObject.getNumber(), oldObject
+                            .getGuid(), ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType,
+                            oldPropertyValue, ""));
                     } else {
                         // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(oldObject.getClassName(), oldObject.getNumber(),
-                            oldObject.getGuid(), "removed", propertyName, propertyType, oldProperty.toText(), ""));
+                        difflist.add(new ObjectDiff(oldObject.getClassName(), oldObject.getNumber(), oldObject
+                            .getGuid(), ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty
+                            .toText(), ""));
                     }
                 }
             }

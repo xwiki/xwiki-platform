@@ -84,16 +84,16 @@ public class BaseClass extends BaseCollection implements ClassInterface
     private String nameField;
 
     @SuppressWarnings("unchecked")
-    private EntityReferenceSerializer<EntityReference> localReferenceEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class, "local/reference");
+    private EntityReferenceSerializer<EntityReference> localReferenceEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.class, "local/reference");
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "currentmixed");
 
     /**
      * Used here to merge setName() and setWiki() calls into the DocumentReference.
@@ -101,10 +101,9 @@ public class BaseClass extends BaseCollection implements ClassInterface
     private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.class, "relative");
 
-
     /**
      * {@inheritDoc}
-     * 
+     * <p>
      * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
      * 
      * @deprecated since 2.2M2 use {@link #getDocumentReference()}
@@ -117,11 +116,11 @@ public class BaseClass extends BaseCollection implements ClassInterface
     }
 
     /**
-     * Note: BaseElement#setName() does not support setting reference anymore since 2.4M2. This was broken and
-     * has been replaced by this overridden method. See XWIKI-5285
-     *
      * {@inheritDoc}
-     *
+     * <p>
+     * Note: BaseElement#setName() does not support setting reference anymore since 2.4M2. This was broken and has been
+     * replaced by this overridden method. See XWIKI-5285
+     * 
      * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
     @Deprecated
@@ -136,8 +135,8 @@ public class BaseClass extends BaseCollection implements ClassInterface
             if (reference != null) {
                 EntityReference relativeReference =
                     this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
-                reference.getLastSpaceReference()
-                    .setName(relativeReference.extractReference(EntityType.SPACE).getName());
+                reference.getLastSpaceReference().setName(
+                    relativeReference.extractReference(EntityType.SPACE).getName());
                 reference.setName(relativeReference.extractReference(EntityType.DOCUMENT).getName());
             } else {
                 reference = this.currentMixedDocumentReferenceResolver.resolve(name);
@@ -1055,7 +1054,8 @@ public class BaseClass extends BaseCollection implements ClassInterface
     }
 
     /**
-     * @deprecated since 2.2.3 use {@link #newCustomClassInstance(DocumentReference classReference, com.xpn.xwiki.XWikiContext)}
+     * @deprecated since 2.2.3 use {@link #newCustomClassInstance(DocumentReference classReference,
+     *             com.xpn.xwiki.XWikiContext)}
      */
     @Deprecated
     public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException
@@ -1280,11 +1280,11 @@ public class BaseClass extends BaseCollection implements ClassInterface
             String propertyType = StringUtils.substringAfterLast(newProperty.getClassType(), ".");
 
             if (oldProperty == null) {
-                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "added", propertyName, propertyType, "",
-                    ""));
+                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", ObjectDiff.ACTION_PROPERTYADDED,
+                    propertyName, propertyType, "", ""));
             } else if (!oldProperty.equals(newProperty)) {
-                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "changed", propertyName, propertyType, "",
-                    ""));
+                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
+                    propertyName, propertyType, "", ""));
             }
         }
 
@@ -1294,8 +1294,8 @@ public class BaseClass extends BaseCollection implements ClassInterface
             String propertyType = StringUtils.substringAfterLast(oldProperty.getClassType(), ".");
 
             if (newProperty == null) {
-                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "removed", propertyName, propertyType, "",
-                    ""));
+                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", ObjectDiff.ACTION_PROPERTYREMOVED,
+                    propertyName, propertyType, "", ""));
             }
         }
 

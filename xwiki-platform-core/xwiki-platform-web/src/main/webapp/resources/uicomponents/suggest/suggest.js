@@ -512,14 +512,29 @@ var XWiki = (function(XWiki){
     //
     for (var i=0;i<arr.length;i++)
     {
+
       // format output with the input enclosed in a EM element
       // (as HTML, not DOM)
       //
       if (source.highlight) {
         // If the source declares that results are matching, we highlight them in the value
-        var val = arr[i].value;
-        var st = val.toLowerCase().indexOf( this.sInput.toLowerCase() );
-        var output = val.substring(0,st) + "<em>" + val.substring(st, st+this.sInput.length) + "</em>" + val.substring(st+this.sInput.length);
+        var val = arr[i].value,
+            output = val,
+            fragments = this.sInput.split(' ').uniq().compact();
+
+        for(var j=0;j<fragments.length;j++) {
+          var index = output.toLowerCase().indexOf(fragments[j].toLowerCase());
+          var matches = {};
+          while (index >= 0) {
+            var match =  output.substring(index, index + fragments[j].length);
+            matches["" + j] =  match;
+            output = output.substring(0, index) + "<em>__PLACEHOLDER" + j + "__</em>" + output.substring(index + fragments[j].length);
+            index = output.toLowerCase().indexOf(fragments[j].toLowerCase());
+          }
+          Object.keys(matches).each(function(key){
+            output = output.replace("__PLACEHOLDER" + key + "__", matches[key]);
+          });
+        }
       }
       else {
         // Otherwise we just put row result value

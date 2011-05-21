@@ -3358,9 +3358,7 @@ document.observe('xwiki:dom:loaded', function() {
 ## Administration Sheet, used to display a common UI for some wiki features (presentation, users,
 ## groups, rights etc.) at global / space level and also for several applications.
 ##**************************************************************************************************
-#if ($xcontext.action == 'export')
-  ## Do nothing, this shouldn't be exported as PDF
-#elseif ($xcontext.action == 'view')
+#if($xcontext.action == 'view')
   $response.sendRedirect($xwiki.getURL($doc.getFullName(), 'admin', $request.getQueryString()))##
 #else
   $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')##

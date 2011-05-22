@@ -85,11 +85,13 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
@@ -5580,8 +5582,9 @@ public class XWikiDocument implements DocumentModelBridge
                     if (newObj == null) {
                         // The object was deleted.
                         dlist = new BaseObject().getDiff(originalObj, context);
-                        ObjectDiff deleteMarker = new ObjectDiff(originalObj.getClassName(), originalObj.getNumber(),
-                            originalObj.getGuid(), "object-removed", "", "", "", "");
+                        ObjectDiff deleteMarker =
+                            new ObjectDiff(originalObj.getClassName(), originalObj.getNumber(), originalObj.getGuid(),
+                                ObjectDiff.ACTION_OBJECTREMOVED, "", "", "", "");
                         dlist.add(0, deleteMarker);
                     } else {
                         // The object exists in both versions, but might have been changed.
@@ -5609,8 +5612,9 @@ public class XWikiDocument implements DocumentModelBridge
                         originalObj.setNumber(newObj.getNumber());
                         originalObj.setGuid(newObj.getGuid());
                         List<ObjectDiff> dlist = newObj.getDiff(originalObj, context);
-                        ObjectDiff addMarker = new ObjectDiff(newObj.getClassName(), newObj.getNumber(),
-                            newObj.getGuid(), "object-added", "", "", "", "");
+                        ObjectDiff addMarker =
+                            new ObjectDiff(newObj.getClassName(), newObj.getNumber(), newObj.getGuid(),
+                                ObjectDiff.ACTION_OBJECTADDED, "", "", "", "");
                         dlist.add(0, addMarker);
                         if (dlist.size() > 0) {
                             difflist.add(dlist);
@@ -6058,11 +6062,32 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @return "inline" if the document should be edited in inline mode by default or "edit" otherwise.
+     * Gets the default edit mode for this document. An edit mode (other than the default "edit") can be enforced by
+     * creating an {@code XWiki.EditModeClass} object in the current document, with the appropriate value for the
+     * defaultEditMode property, or by adding this object in a sheet included by the document. This function also falls
+     * back on the old {@code SheetClass}, deprecated since 3.1M2, which can be attached to included documents to
+     * specify that the current document should be edited inline.
+     * 
+     * @return the default edit mode for this document ("edit" or "inline" usually)
+     * @param context the context of the request for this document
      * @throws XWikiException if an error happens when computing the edit mode
      */
     public String getDefaultEditMode(XWikiContext context) throws XWikiException
     {
+        String editModeProperty = "defaultEditMode";
+        DocumentReference editModeClass =
+            currentReferenceDocumentReferenceResolver.resolve(XWikiConstant.EDIT_MODE_CLASS);
+        // check if the current document has any edit mode class object attached to it, and read the edit mode from it
+        BaseObject editModeObject = this.getXObject(editModeClass);
+        if (editModeObject != null) {
+            String defaultEditMode = editModeObject.getStringValue(editModeProperty);
+            if (StringUtils.isEmpty(defaultEditMode)) {
+                return "edit";
+            } else {
+                return defaultEditMode;
+            }
+        }
+        // otherwise look for included documents
         com.xpn.xwiki.XWiki xwiki = context.getWiki();
         if (is10Syntax()) {
             if (getContent().indexOf("includeForm(") != -1) {
@@ -6070,29 +6095,35 @@ public class XWikiDocument implements DocumentModelBridge
             }
         } else {
             // Algorithm: look in all include macro and for all document included check if one of them
-            // has an SheetClass object attached to it. If so then the edit mode is inline.
+            // has an EditModeClass object attached to it, or a SheetClass object (deprecated since 3.1M2) attached to
+            // it. If so then the edit mode is inline.
 
             // Find all include macros and extract the document names
-            for (MacroBlock macroBlock : getXDOM().getChildrenByType(MacroBlock.class, false)) {
-                // TODO: Is there a good way not to hardcode the macro name? The macro itself shouldn't know
-                // its own name since it's a deployment time concern.
-                if ("include".equals(macroBlock.getId())) {
-                    String documentName = macroBlock.getParameter("document");
-                    if (documentName != null) {
-                        // Resolve the document name into a valid Reference
-                        DocumentReference documentReference =
-                            this.currentMixedDocumentReferenceResolver.resolve(documentName);
-                        XWikiDocument includedDocument = xwiki.getDocument(documentReference, context);
-                        if (!includedDocument.isNew()) {
-                            BaseObject sheetClassObject = includedDocument.getObject(XWikiConstant.SHEET_CLASS);
-                            if (sheetClassObject != null) {
-                                // Use the user-defined default edit mode if set.
-                                String defaultEditMode = sheetClassObject.getStringValue("defaultEditMode");
-                                if (StringUtils.isBlank(defaultEditMode)) {
-                                    return "inline";
-                                } else {
-                                    return defaultEditMode;
-                                }
+            // TODO: Is there a good way not to hardcode the macro name? The macro itself shouldn't know
+            // its own name since it's a deployment time concern.
+            for (Block macroBlock : getXDOM().getBlocks(new MacroBlockMatcher("include"), Axes.CHILD)) {
+                String documentName = macroBlock.getParameter("document");
+                if (documentName != null) {
+                    // Resolve the document name into a valid Reference
+                    DocumentReference documentReference =
+                        this.currentMixedDocumentReferenceResolver.resolve(documentName);
+                    XWikiDocument includedDocument = xwiki.getDocument(documentReference, context);
+                    if (!includedDocument.isNew()) {
+                        // get the edit mode object, first the new class and then the deprecated class if new class
+                        // is not found
+                        editModeObject = includedDocument.getXObject(editModeClass);
+                        if (editModeObject == null) {
+                            editModeObject = includedDocument.getObject(XWikiConstant.SHEET_CLASS);
+                        }
+                        if (editModeObject != null) {
+                            // Use the user-defined default edit mode if set.
+                            String defaultEditMode = editModeObject.getStringValue(editModeProperty);
+                            if (StringUtils.isBlank(defaultEditMode)) {
+                                // TODO: maybe here the real value should be returned if the object is edit mode class,
+                                // and inline only if the object is sheetclass
+                                return "inline";
+                            } else {
+                                return defaultEditMode;
                             }
                         }
                     }

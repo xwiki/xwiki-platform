@@ -31,7 +31,6 @@ import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
@@ -49,7 +48,7 @@ import org.xwiki.xml.html.HTMLCleanerConfiguration;
  * @since 2.1M1
  */
 @Component
-public class DefaultXHTMLOfficeDocumentBuilder extends AbstractLogEnabled implements XHTMLOfficeDocumentBuilder
+public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBuilder
 {
     /**
      * Used to serialize the reference document name.

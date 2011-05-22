@@ -22,80 +22,97 @@
 
 package com.xpn.xwiki.plugin.adwords;
 
-import com.google.api.adwords.v2.*;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Api;
-import org.apache.axis.client.Stub;
-
-import javax.xml.rpc.ServiceException;
 import java.rmi.RemoteException;
 import java.util.Calendar;
 import java.util.Date;
 
-public class AdWordsPluginApi extends Api {
-    private AdWordsPlugin plugin;
+import javax.xml.rpc.ServiceException;
 
+import org.apache.axis.client.Stub;
+
+import com.google.api.adwords.v2.Campaign;
+import com.google.api.adwords.v2.CampaignService;
+import com.google.api.adwords.v2.CampaignServiceService;
+import com.google.api.adwords.v2.CampaignServiceServiceLocator;
+import com.google.api.adwords.v2.KeywordEstimate;
+import com.google.api.adwords.v2.KeywordRequest;
+import com.google.api.adwords.v2.StatsRecord;
+import com.google.api.adwords.v2.TrafficEstimatorInterface;
+import com.google.api.adwords.v2.TrafficEstimatorService;
+import com.google.api.adwords.v2.TrafficEstimatorServiceLocator;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.plugin.PluginApi;
+
+/**
+ * @version $Id$
+ * @deprecated the plugin technology is deprecated
+ */
+@Deprecated
+public class AdWordsPluginApi extends PluginApi<AdWordsPlugin>
+{
     /** The namespace used for API headers. **/
-    private static final String apiNS="https://adwords.google.com/api/adwords/v2";
+    private static final String apiNS = "https://adwords.google.com/api/adwords/v2";
 
-    public AdWordsPluginApi(AdWordsPlugin plugin, XWikiContext context) {
-            super(context);
-            setPlugin(plugin);
-        }
-
-    public AdWordsPlugin getPlugin() {
-        if (hasProgrammingRights()) {
-            return plugin;
-        }
-        return null;
+    /**
+     * Default plugin API constructor.
+     * 
+     * @param plugin the wrapped plugin instance
+     * @param context the current request context
+     */
+    public AdWordsPluginApi(AdWordsPlugin plugin, XWikiContext context)
+    {
+        super(plugin, context);
     }
 
-    public void setPlugin(AdWordsPlugin plugin) {
-        this.plugin = plugin;
+    /**
+     * Return the inner plugin object, if the user has the required programming rights.
+     * 
+     * @return The wrapped plugin object.
+     */
+    public AdWordsPlugin getPlugin()
+    {
+        return getInternalPlugin();
     }
 
-    public KeywordRequest newKeywordRequest() {
+    public KeywordRequest newKeywordRequest()
+    {
         return new KeywordRequest();
     }
 
-    private void addSecurity(Stub stub, String email, String password, String token) {
-        // Set the authentication request headers
-        stub.setHeader(apiNS, "email", email);
-        stub.setHeader(apiNS, "password", password);
-        stub.setHeader(apiNS, "useragent", "XWiki AdWords Plugin version 1.0");
-        stub.setHeader(apiNS, "token", token);
-    }
-
-
-    public KeywordEstimate[] getTrafficEstimate(String token, String email, String password, KeywordRequest[] kr) throws ServiceException, RemoteException {
+    public KeywordEstimate[] getTrafficEstimate(String token, String email, String password, KeywordRequest[] kr)
+        throws ServiceException, RemoteException
+    {
         // Make a service
         TrafficEstimatorService service = new TrafficEstimatorServiceLocator();
         // Now use the service to get a stub to the Service Definition Interface (SDI)
         TrafficEstimatorInterface traffic = service.getTrafficEstimatorService();
 
-        addSecurity((Stub)traffic, email, password, token);
+        addSecurity((Stub) traffic, email, password, token);
 
         return traffic.estimateKeywordList(kr);
     }
 
-
-    public Campaign[] getCampaignList(String token, String email, String password, int [] ids) throws ServiceException, RemoteException {
+    public Campaign[] getCampaignList(String token, String email, String password, int[] ids) throws ServiceException,
+        RemoteException
+    {
         // Make a service
         CampaignServiceService service = new CampaignServiceServiceLocator();
         // Now use the service to get a stub to the Service Definition Interface (SDI)
         CampaignService campaign = service.getCampaignService();
 
-        addSecurity((Stub)campaign, email, password, token);
+        addSecurity((Stub) campaign, email, password, token);
         return campaign.getCampaignList(ids);
     }
 
-    public StatsRecord[] getCampaignList(String token, String email, String password, int [] ids, Date startDate, Date endDate) throws ServiceException, RemoteException {
+    public StatsRecord[] getCampaignList(String token, String email, String password, int[] ids, Date startDate,
+        Date endDate) throws ServiceException, RemoteException
+    {
         // Make a service
         CampaignServiceService service = new CampaignServiceServiceLocator();
         // Now use the service to get a stub to the Service Definition Interface (SDI)
         CampaignService campaign = service.getCampaignService();
 
-        addSecurity((Stub)campaign, email, password, token);
+        addSecurity((Stub) campaign, email, password, token);
 
         Calendar startcal = Calendar.getInstance();
         Calendar endcal = Calendar.getInstance();
@@ -104,5 +121,12 @@ public class AdWordsPluginApi extends Api {
         return campaign.getCampaignStats(ids, startcal, endcal);
     }
 
-
+    private void addSecurity(Stub stub, String email, String password, String token)
+    {
+        // Set the authentication request headers
+        stub.setHeader(apiNS, "email", email);
+        stub.setHeader(apiNS, "password", password);
+        stub.setHeader(apiNS, "useragent", "XWiki AdWords Plugin version 1.0");
+        stub.setHeader(apiNS, "token", token);
+    }
 }

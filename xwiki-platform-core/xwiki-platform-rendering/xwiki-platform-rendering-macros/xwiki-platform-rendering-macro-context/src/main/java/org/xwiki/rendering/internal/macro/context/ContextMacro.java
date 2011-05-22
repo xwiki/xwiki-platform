@@ -24,9 +24,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.Block;
@@ -41,11 +44,13 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Execute the macro's content in the context of another document's reference.
- *
+ * 
  * @version $Id$
  * @since 3.0M1
  */
-@Component("context")
+@Component
+@Named("context")
+@Singleton
 public class ContextMacro extends AbstractMacro<ContextMacroParameters>
 {
     /**
@@ -61,19 +66,20 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
     /**
      * Used to set the current document in the context (old way) and check rights.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * The parser used to parse macro content.
      */
-    @Requirement
+    @Inject
     private MacroContentParser contentParser;
 
     /**
      * Used to transform document links into absolute references.
      */
-    @Requirement("current")
+    @Inject
+    @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
     /**
@@ -91,7 +97,7 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
      */
     public boolean supportsInlineMode()
@@ -101,7 +107,7 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
      */
     public List<Block> execute(ContextMacroParameters parameters, String content, MacroTransformationContext context)
@@ -136,7 +142,7 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
                 this.documentAccessBridge.popDocumentFromContext(backupObjects);
             }
         } catch (Exception e) {
-            if (e instanceof  MacroExecutionException) {
+            if (e instanceof MacroExecutionException) {
                 throw (MacroExecutionException) e;
             } else {
                 throw new MacroExecutionException("Failed to render page in the context of [" + docReference + "]", e);

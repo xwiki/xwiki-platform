@@ -25,9 +25,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.jboss.cache.notifications.annotation.CacheListener;
 import org.jboss.cache.notifications.annotation.NodeEvicted;
 import org.jboss.cache.notifications.annotation.NodeModified;
@@ -39,6 +36,8 @@ import org.jboss.cache.Cache;
 import org.jboss.cache.CacheFactory;
 import org.jboss.cache.DefaultCacheFactory;
 import org.jboss.cache.Fqn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.cache.jbosscache.internal.event.JBossCacheCacheEntryEvent;
 import org.xwiki.cache.util.AbstractCache;
@@ -60,7 +59,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     /**
      * The logging tool.
      */
-    private static final Log LOG = LogFactory.getLog(JBossCacheCache.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JBossCacheCache.class);
 
     /**
      * The name of the key when data is store in the node.
@@ -196,11 +195,11 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     {
         if (!event.getFqn().isChildOf(ROOT_FQN)) {
             if (!event.getFqn().equals(ROOT_FQN)) {
-                LOG.warn(MessageFormat.format(
+                LOGGER.warn(MessageFormat.format(
                     "The [{0}] node has been evicted but it should not even have been part of the cache",
                     event.getFqn()));
             } else {
-                LOG.debug("The entire cache has been evicted");
+                LOGGER.debug("The entire cache has been evicted");
             }
 
             return;
@@ -221,11 +220,11 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     {
         if (!event.getFqn().isChildOf(ROOT_FQN)) {
             if (!event.getFqn().equals(ROOT_FQN)) {
-                LOG.warn(MessageFormat.format(
+                LOGGER.warn(MessageFormat.format(
                     "The [{0}] node has been removed but it should not even have been part of the cache",
                     event.getFqn()));
             } else {
-                LOG.debug("The entire cache has been removed");
+                LOGGER.debug("The entire cache has been removed");
             }
 
             return;
@@ -251,8 +250,8 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     public void nodeModified(NodeModifiedEvent event)
     {
         if (!event.getFqn().isChildOf(ROOT_FQN)) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info(MessageFormat.format("The node {0} should not has been modified", event.getFqn()));
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info(MessageFormat.format("The node {0} should not has been modified", event.getFqn()));
             }
 
             return;

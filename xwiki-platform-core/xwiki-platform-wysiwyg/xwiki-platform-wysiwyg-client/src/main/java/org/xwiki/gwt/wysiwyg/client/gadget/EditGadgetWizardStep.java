@@ -83,7 +83,7 @@ public class EditGadgetWizardStep extends EditMacroWizardStep
         super.init(gadgetInstance.getMacroCall(), cb);
 
         // insert the title on the first position in the content panel
-        getPanel().insert(getTitlePanel(gadgetInstance.getTitle()), 0);
+        display().insert(getTitlePanel(gadgetInstance.getTitle()), 0);
         // and focus the title input
         // FIXME: this doesn't work, need to hook on the insert of all the parameter editors in the param displayers
         titleInput.setFocus(true);

@@ -61,7 +61,13 @@ public class XWikiExecutorSuite extends ClasspathSuite
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    public static @interface Initialized
+    public static @interface PreStart
+    {
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public static @interface PostStart
     {
     }
 
@@ -100,18 +106,18 @@ public class XWikiExecutorSuite extends ClasspathSuite
             this.executors.add(new XWikiExecutor(i));
         }
 
-        // Callback to setup executors in the suite class.
+        // Callback to setup executors in the suite class before containers are started
         try {
             for (Method method : getTestClass().getJavaClass().getMethods()) {
-                Initialized initializedAnnotation = method.getAnnotation(Initialized.class);
-                if (initializedAnnotation != null) {
+                PreStart preStartAnnotation = method.getAnnotation(PreStart.class);
+                if (preStartAnnotation != null) {
                     // Call it!
                     Object instance = getTestClass().getJavaClass().newInstance();
                     method.invoke(instance, this.executors);
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize XWiki Executors", e);
+            throw new RuntimeException("Failed to initialize XWiki Executors befpre start", e);
         }
 
         try {
@@ -120,6 +126,20 @@ public class XWikiExecutorSuite extends ClasspathSuite
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to start XWiki", e);
+        }
+
+        // Callback to setup executors in the suite class after containers have been started
+        try {
+            for (Method method : getTestClass().getJavaClass().getMethods()) {
+                PostStart postStartAnnotation = method.getAnnotation(PostStart.class);
+                if (postStartAnnotation != null) {
+                    // Call it!
+                    Object instance = getTestClass().getJavaClass().newInstance();
+                    method.invoke(instance, this.executors);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize XWiki Executors after start", e);
         }
 
         try {

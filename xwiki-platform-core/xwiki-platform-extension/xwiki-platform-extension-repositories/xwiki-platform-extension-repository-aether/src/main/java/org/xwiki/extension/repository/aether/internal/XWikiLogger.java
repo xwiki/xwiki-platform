@@ -19,7 +19,7 @@
  */
 package org.xwiki.extension.repository.aether.internal;
 
-import org.xwiki.component.logging.Logger;
+import org.slf4j.Logger;
 
 class XWikiLogger implements org.codehaus.plexus.logging.Logger
 {

@@ -21,8 +21,8 @@ package org.xwiki.cache.util;
 
 import javax.swing.event.EventListenerList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -38,9 +38,9 @@ import org.xwiki.cache.event.CacheEntryListener;
 public abstract class AbstractCache<T> implements Cache<T>
 {
     /**
-     * The logging tool.
+     * The logger to use to log.
      */
-    private static final Log LOG = LogFactory.getLog(AbstractCache.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCache.class);
 
     /**
      * The configuration used to create the cache.
@@ -136,8 +136,8 @@ public abstract class AbstractCache<T> implements Cache<T>
             try {
                 ((DisposableCacheValue) value).dispose();
             } catch (Throwable e) {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("Error when trying to dispose a cache object of cache ["
+                if (LOGGER.isWarnEnabled()) {
+                    LOGGER.warn("Error when trying to dispose a cache object of cache ["
                         + configuration.getConfigurationId() + "]", e);
                 }
             }

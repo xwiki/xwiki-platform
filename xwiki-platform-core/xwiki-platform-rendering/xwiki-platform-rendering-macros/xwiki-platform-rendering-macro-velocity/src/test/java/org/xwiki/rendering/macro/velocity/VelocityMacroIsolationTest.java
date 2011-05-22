@@ -19,7 +19,10 @@
  */
 package org.xwiki.rendering.macro.velocity;
 
+import java.util.Collections;
+
 import org.junit.Test;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -61,6 +64,7 @@ public class VelocityMacroIsolationTest extends AbstractComponentTestCase
         VelocityMacroParameters params = new VelocityMacroParameters();
         MacroTransformationContext context = new MacroTransformationContext();
         context.setSyntax(Syntax.XWIKI_2_0);
+        context.setCurrentMacroBlock(new MacroBlock("velocity", Collections.<String, String>emptyMap(), false));
 
         // Execute the velocity macro in the context of a first page
         context.setId("page1");

@@ -23,13 +23,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
 import org.xwiki.annotation.maintainer.AnnotationMaintainer;
 import org.xwiki.annotation.maintainer.MaintainerServiceException;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -43,20 +46,28 @@ import org.xwiki.observation.event.Event;
  * @version $Id$
  * @since 2.3M1
  */
-@Component("document-content-annotation-updater")
-public class DocumentContentAnnotationUpdateListener extends AbstractLogEnabled implements EventListener
+@Component
+@Named("document-content-annotation-updater")
+@Singleton
+public class DocumentContentAnnotationUpdateListener implements EventListener
 {
     /**
      * Entity reference serializer, to serialize the modified document reference to send to the annotations service.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> serializer;
 
     /**
      * Annotations maintainer, to be invoked for the document content update.
      */
-    @Requirement
+    @Inject
     private AnnotationMaintainer maintainer;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Marks that there is currently an annotations update in progress so all the saves should not trigger a new update.
@@ -117,7 +128,7 @@ public class DocumentContentAnnotationUpdateListener extends AbstractLogEnabled 
             try {
                 maintainer.updateAnnotations(serializer.serialize(docReference), previousContent, content);
             } catch (MaintainerServiceException e) {
-                getLogger().warn(e.getMessage(), e);
+                this.logger.warn(e.getMessage(), e);
                 // nothing else, just go further
             }
             isUpdating = false;

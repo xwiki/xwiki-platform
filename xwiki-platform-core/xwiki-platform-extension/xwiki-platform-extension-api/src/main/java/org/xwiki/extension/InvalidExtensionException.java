@@ -19,6 +19,11 @@
  */
 package org.xwiki.extension;
 
+/**
+ * Error when loading an extension descriptor.
+ * 
+ * @version $Id$
+ */
 public class InvalidExtensionException extends ExtensionException
 {
     /**

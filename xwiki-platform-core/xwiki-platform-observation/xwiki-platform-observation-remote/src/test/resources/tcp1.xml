@@ -94,10 +94,8 @@
       join_timeout: the maximum number of milliseconds to wait for a new node JOIN request to succeed. Retry afterwards.
       join_retry_timeout: the maximum number of milliseconds to wait after a failed JOIN to re-submit it.
       print_local_addr: whether to dump the node's own address to the output when started.
-      shun: whether a node should shun itself if it receives a cluster view that it is not a member node.
       disable_initial_coord: whether to prevent this node as the cluster coordinator.
     -->
     <pbcast.GMS print_local_addr="true" join_timeout="3000"
-                shun="true"
                 view_bundling="true"/>
 </config>

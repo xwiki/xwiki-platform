@@ -21,9 +21,11 @@ package org.xwiki.crypto.passwd.internal;
 
 import java.util.Properties;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.configuration.ConfigurationSource;
 
 import org.xwiki.crypto.passwd.PasswordCryptoServiceConfiguration;
@@ -37,10 +39,14 @@ import org.xwiki.crypto.passwd.PasswordCiphertext;
  * @version $Id$
  */
 @Component
-public class DefaultPasswordCryptoServiceConfiguration
-    extends AbstractLogEnabled
-    implements PasswordCryptoServiceConfiguration
+public class DefaultPasswordCryptoServiceConfiguration implements PasswordCryptoServiceConfiguration
 {
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
     /**
      * Default {@link java.util.Properties} for the {@link org.xwiki.crypto.passwd.KeyDerivationFunction}s.
      */
@@ -65,7 +71,8 @@ public class DefaultPasswordCryptoServiceConfiguration
     private final String keyDerivationFunctionClassForEncryption = "keyDerivationFunctionClassForEncryption";
 
     /** Default {@link org.xwiki.crypto.passwd.KeyDerivationFunction} class to use for encryption. */
-    private final Class<?> defaultKeyDerivationFunctionClassForEncryption = ScryptMemoryHardKeyDerivationFunction.class;
+    private final Class<?> defaultKeyDerivationFunctionClassForEncryption =
+        PBKDF2KeyDerivationFunction.class;
 
     /**
      * Key for {@link java.util.Properties} for the {@link org.xwiki.crypto.passwd.KeyDerivationFunction} 
@@ -93,7 +100,7 @@ public class DefaultPasswordCryptoServiceConfiguration
 
     /** Default {@link org.xwiki.crypto.passwd.KeyDerivationFunction} class to use for password verification. */
     private final Class<?> defaultKeyDerivationFunctionClassForPasswordVerification = 
-        ScryptMemoryHardKeyDerivationFunction.class;
+        PBKDF2KeyDerivationFunction.class;
 
     /**
      * Key for {@link java.util.Properties} for the {@link org.xwiki.crypto.passwd.KeyDerivationFunction} 
@@ -204,7 +211,7 @@ public class DefaultPasswordCryptoServiceConfiguration
                 return Class.forName(value).asSubclass(mustExtend);
             }
         } catch (Exception e) {
-            this.getLogger().info("Unable to read configuration for [" + configurationKey + "] using default.");
+            this.logger.info("Unable to read configuration for [" + configurationKey + "] using default.");
         }
         return defaultOut.asSubclass(mustExtend);
     }

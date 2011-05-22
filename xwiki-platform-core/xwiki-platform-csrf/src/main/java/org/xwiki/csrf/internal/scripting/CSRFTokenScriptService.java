@@ -24,7 +24,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.script.service.ScriptService;
 
@@ -37,7 +36,7 @@ import org.xwiki.script.service.ScriptService;
 @Component(roles = ScriptService.class)
 @Named("csrf")
 @Singleton
-public class CSRFTokenScriptService extends AbstractLogEnabled implements CSRFToken, ScriptService
+public class CSRFTokenScriptService implements CSRFToken, ScriptService
 {
     /** Wrapped CSRF token component. */
     @Inject

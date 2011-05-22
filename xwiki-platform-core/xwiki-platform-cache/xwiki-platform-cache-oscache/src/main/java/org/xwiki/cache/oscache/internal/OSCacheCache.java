@@ -19,8 +19,8 @@
  */
 package org.xwiki.cache.oscache.internal;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.cache.oscache.internal.event.OSCacheCacheEntryEvent;
 import org.xwiki.cache.util.AbstractCache;
 
@@ -43,7 +43,7 @@ public class OSCacheCache<T> extends AbstractCache<T> implements CacheEntryEvent
     /**
      * Logging tool.
      */
-    private static final Log LOG = LogFactory.getLog(OSCacheCache.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OSCacheCache.class);
 
     /**
      * The OSCache cache configuration.
@@ -136,8 +136,8 @@ public class OSCacheCache<T> extends AbstractCache<T> implements CacheEntryEvent
         } catch (NeedsRefreshException e) {
             this.cacheAdmin.cancelUpdate(cacheKey);
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Failed to get the value from the cache", e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Failed to get the value from the cache", e);
             }
         }
 

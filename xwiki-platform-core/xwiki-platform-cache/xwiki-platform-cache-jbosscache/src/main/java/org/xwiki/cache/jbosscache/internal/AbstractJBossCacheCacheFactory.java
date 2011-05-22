@@ -19,11 +19,12 @@
  */
 package org.xwiki.cache.jbosscache.internal;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.container.Container;
 
 /**
@@ -32,14 +33,20 @@ import org.xwiki.container.Container;
  * @version $Id$
  * @since 1.9M2
  */
-public abstract class AbstractJBossCacheCacheFactory extends AbstractLogEnabled implements CacheFactory
+public abstract class AbstractJBossCacheCacheFactory implements CacheFactory
 {
     /**
      * The container used to access configuration files.
      */
-    @Requirement
+    @Inject
     private Container container;
-    
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
     /**
      * @return the default configuration identifier used to load cache configuration file
      */
@@ -52,16 +59,12 @@ public abstract class AbstractJBossCacheCacheFactory extends AbstractLogEnabled 
      */
     public <T> org.xwiki.cache.Cache<T> newCache(CacheConfiguration configuration) throws CacheException
     {
-        if (getLogger().isDebugEnabled()) {
-            getLogger().debug("Start JBoss Cache initialisation");
-        }
+        this.logger.debug("Start JBoss Cache initialisation");
 
         JBossCacheCache<T> cache = new JBossCacheCache<T>();
         cache.initialize(new JBossCacheCacheConfiguration(this.container, configuration, getDefaultPropsId()));
 
-        if (getLogger().isDebugEnabled()) {
-            getLogger().debug("End JBoss Cache initialisation");
-        }
+        this.logger.debug("End JBoss Cache initialisation");
 
         return cache;
     }

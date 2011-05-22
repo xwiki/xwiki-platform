@@ -23,10 +23,13 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -39,19 +42,21 @@ import org.xwiki.rendering.parser.Parser;
  * @version $Id$
  * @since 2.0M1
  */
-@Component("inline")
+@Component
+@Named("inline")
+@Singleton
 public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSource
 {
     /**
      * {@link ComponentManager} used to dynamically lookup for various {@link Parser} implementations.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
      * {@link DocumentAccessBridge} component.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge docBridge;
 
     /**

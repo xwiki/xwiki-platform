@@ -54,10 +54,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-    </dependency>
-    <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
     </dependency>
@@ -77,8 +73,6 @@
             </goals>
             <configuration>
               <aspectDirectory>src/main/aspect/compatibility</aspectDirectory>
-              <source>1.5</source>
-              <target>1.5</target>
             </configuration>
           </execution>
         </executions>

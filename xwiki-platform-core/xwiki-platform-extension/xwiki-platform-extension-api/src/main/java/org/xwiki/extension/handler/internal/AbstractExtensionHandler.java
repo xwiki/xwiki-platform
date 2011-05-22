@@ -19,14 +19,33 @@
  */
 package org.xwiki.extension.handler.internal;
 
-import org.xwiki.component.logging.AbstractLogEnabled;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.ExtensionHandler;
 
-public abstract class AbstractExtensionHandler extends AbstractLogEnabled implements ExtensionHandler
+/**
+ * Base class for {@link ExtensionHandler} implementations.
+ * 
+ * @version $Id$
+ */
+public abstract class AbstractExtensionHandler implements ExtensionHandler
 {
+    /**
+     * The logger to log.
+     */
+    @Inject
+    protected Logger logger;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.handler.ExtensionHandler#upgrade(org.xwiki.extension.LocalExtension,
+     *      org.xwiki.extension.LocalExtension, java.lang.String)
+     */
     public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace)
         throws InstallException
     {

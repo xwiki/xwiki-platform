@@ -41,14 +41,21 @@ public abstract class AbstractPageListSelectorWizardStep extends
     AbstractEntityListSelectorWizardStep<LinkConfig, WikiPage>
 {
     /**
+     * The service used to fetch the list of pages.
+     */
+    private final WikiServiceAsync wikiService;
+
+    /**
      * Creates a new selector.
      * 
      * @param wikiService the service used to access the wiki
      */
     public AbstractPageListSelectorWizardStep(WikiServiceAsync wikiService)
     {
-        super(wikiService);
-        getMainPanel().addStyleName("xPagesSelector");
+        this.wikiService = wikiService;
+
+        setStepTitle(Strings.INSTANCE.linkSelectWikipageTitle());
+        display().addStyleName("xPagesSelector");
     }
 
     /**
@@ -129,14 +136,14 @@ public abstract class AbstractPageListSelectorWizardStep extends
         if (getSelectedItem() != null && getSelectedItem().getData() == null) {
             return LinkWizardStep.WIKI_PAGE_CREATOR.toString();
         }
-        return LinkWizardStep.WIKI_PAGE_CONFIG.toString();
+        return LinkWizardStep.LINK_CONFIG.toString();
     }
 
     /**
-     * {@inheritDoc}
+     * @return the service used to fetch the lists of pages
      */
-    public String getStepTitle()
+    protected WikiServiceAsync getWikiService()
     {
-        return Strings.INSTANCE.linkSelectWikipageTitle();
+        return wikiService;
     }
 }

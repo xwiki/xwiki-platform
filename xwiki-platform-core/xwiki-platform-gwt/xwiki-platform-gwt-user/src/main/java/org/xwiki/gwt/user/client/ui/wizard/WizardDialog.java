@@ -34,6 +34,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Wizard dialog class, used to display the current wizard step.
@@ -75,18 +76,22 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
      */
     public void displayStep(WizardStep step, boolean hasPrevious)
     {
-        // first make sure the dialog exits the loading state
         setLoading(false);
+
         getBody().clear();
-        getBody().add(step.display());
+        Widget stepDisplay = step.display();
+        if (stepDisplay != null) {
+            getBody().add(stepDisplay);
+        }
+
         getHeader().clear();
-        // display the step name in the title panel
         String stepTitle = step.getStepTitle();
         if (stepTitle != null) {
             Label titleLabel = new Label(stepTitle);
             titleLabel.addStyleName("title");
             getHeader().add(titleLabel);
         }
+
         getFooter().clear();
         fillButtonsContainers(step, hasPrevious);
     }
@@ -103,8 +108,8 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
         if (getBody().getWidgetCount() > 0) {
             // use the visibility attribute instead of the setVisible method to have the layout of the dialog on errors
             // display correctly recomputed, having elements sizes even is the container is not visible
-            getBody().getWidget(0).getElement().getStyle().setVisibility(
-                !loading ? Visibility.VISIBLE : Visibility.HIDDEN);
+            getBody().getWidget(0).getElement().getStyle()
+                .setVisibility(!loading ? Visibility.VISIBLE : Visibility.HIDDEN);
         }
         // toggle buttons state
         for (Button b : buttons) {
@@ -121,6 +126,8 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
      */
     public void showError(Throwable caught)
     {
+        // Show only the error message.
+        getBody().clear();
         super.showError(caught);
     }
 

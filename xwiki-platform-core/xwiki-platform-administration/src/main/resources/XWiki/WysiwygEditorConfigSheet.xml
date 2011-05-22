@@ -843,11 +843,6 @@ return XWiki;
     tip: '$escapetool.javascript($msg.get('wysiwyg.admin.plugins.add.hint'))'
   },
   {
-    field: 'XWiki.WysiwygEditorConfigClass_0_menuBar',
-    values: 'link image table macro import',
-    tip: '$escapetool.javascript($msg.get('wysiwyg.admin.menuBar.add.hint'))'
-  },
-  {
     field: 'XWiki.WysiwygEditorConfigClass_0_toolBar',
     duplicatesAllowed: true,
     values: '| / bold italic underline strikethrough teletype subscript superscript justifyleft justifycenter justifyright justifyfull unorderedlist orderedlist outdent indent undo redo format fontname fontsize forecolor backcolor hr removeformat symbol paste macro:',
@@ -863,6 +858,14 @@ return XWiki;
     Event.observe(document, 'xwiki:actions:save', function() {
       field.value = list.getValue();
     });
+  });
+
+  // Initialize the menu editor.
+  var menuField = $('XWiki.WysiwygEditorConfigClass_0_menuBar');
+  var menuEditor = new XWiki.MenuEditor(menuField.value);
+  menuEditor.attachTo(menuField.up('.noScript').parentNode);
+  Event.observe(document, 'xwiki:actions:save', function() {
+    menuField.value = menuEditor.getValue();
   });
 
   // Initialize the color palette editor.
@@ -913,6 +916,146 @@ Event.observe(document, 'xwiki:dom:loaded', function() {
 </property>
 <property>
 <name>Setup</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.WysiwygEditorConfigSheet</name>
+<number>4</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>1f0cb4a9-e6cb-4d23-9ccc-fbca826b92b7</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>#set($super = '$super')
+var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+XWiki.MenuEditor = Class.create(XWiki.SpaceSeparatedList, {
+  _defaultMenu : {
+    link : {
+      feature: "link",
+      subMenu: ["linkEdit", "linkRemove", "linkWikiPage", "linkAttachment", "|", "linkWebPage", "linkEmail", "|", "alfrescoLink"]
+    },
+    image : {
+      feature: "image",
+      subMenu: ["imageInsertAttached", "imageInsertURL", "imageEdit", "alfrescoImage", "imageRemove"]
+    },
+    table : {
+      feature: "table",
+      subMenu: ["inserttable", "insertcolbefore", "insertcolafter", "deletecol", "|", "insertrowbefore", "insertrowafter", "deleterow", "|", "deletetable"]
+    },
+    macro : {
+      feature: "macro",
+      subMenu: ["macroInsert", "macroEdit", "|", "macroRefresh", "|", "macroCollapse", "macroExpand"]
+    },
+    import : {
+      feature: "import",
+      subMenu: ["importOffice"]
+    }
+  },
+  initialize : function($super, values, possibleValues) {
+    var availableTopMenuItems = 'link image table macro import';
+    var inputTip = '$escapetool.javascript($msg.get('wysiwyg.admin.menuBar.add.hint'))';
+    $super(this._extractValues(values), false, availableTopMenuItems, inputTip);
+  },
+  getValue : function() {
+    var menu = [];
+    this.getValues().each(function(value) {
+      menu.push(this._defaultMenu[value]);
+    }.bind(this));
+    return Object.toJSON(menu);
+  },
+  _extractValues : function(menuJSON) {
+    var topMenuItems = [];
+    menuJSON.evalJSON().each(function(menuItem) {
+      topMenuItems.push(menuItem.feature);
+    });
+    return topMenuItems.join(' ');
+  }
+});
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));</code>
+</property>
+<property>
+<name>MenuEditor</name>
 </property>
 <property>
 <parse>1</parse>

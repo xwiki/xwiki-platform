@@ -49,10 +49,6 @@
       <artifactId>xwiki-commons-xml</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-    </dependency>
 
     <!-- Testing dependencies -->
     <dependency>

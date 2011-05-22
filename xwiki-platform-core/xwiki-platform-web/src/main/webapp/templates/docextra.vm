@@ -1,8 +1,6 @@
 ##
 ## Document footer: tags, creation date, modification date
 ##
-## There is no need for document extras to have permissions.
-$xcontext.dropPermissions()
 ##
 <div id="xdocFooter">
   #template("documentTags.vm")
@@ -13,9 +11,9 @@ $xcontext.dropPermissions()
         $msg.get('core.footer.translationCreation', [$tdoc.realLanguage, $xwiki.getUserName($tdoc.creator), $xwiki.formatDate($tdoc.creationDate)])<br/>
       #end
     </div>
-    <div class="xdocLastModification"> ## Last modification
-      $msg.get('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
-    </div>
+##    <div class="xdocLastModification"> ## Last modification
+##      $msg.get('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+##    </div>
   </div>
 </div>
 ##
@@ -49,6 +47,8 @@ $xcontext.dropPermissions()
     #set ($discard = $docextras.add(['Attachments', 'attachments', $msg.get('docextra.attachments'), $doc.getAttachmentList().size(), 'attachmentsinline.vm', $msg.get('core.shortcuts.view.attachments')]))
   #end
   #if ($showhistory)
+    ## Pagination style
+    $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
     #set ($discard = $docextras.add(['History', 'history', $msg.get('docextra.history'), -1, 'historyinline.vm', $msg.get('core.shortcuts.view.history')]))
   #end
   #if ($showinformation)
@@ -94,6 +94,7 @@ $xcontext.dropPermissions()
       var hashviewer = self.document.location.hash.substring(1);
       #foreach($docextra in $docextras)
         #set ($extraAnchor = $listtool.get($docextra, 0))
+        #set ($extraName = $listtool.get($docextra, 1))
         #set ($extraTemplate = $listtool.get($docextra, 4))
         #set ($extraShortcut = $listtool.get($docextra, 5))
         ##
@@ -118,6 +119,13 @@ $xcontext.dropPermissions()
         if ($("tmShow${extraAnchor}") != null) {
           $("tmShow${extraAnchor}").href="#${extraAnchor}";
           Event.observe($("tmShow${extraAnchor}"), "click", function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, false);
+        }
+        ##
+        ## Replace shortcut link (if any)
+        ##
+        if ($("${extraName}shortcut") != null) {
+          $("${extraName}shortcut").down('a').href="#${extraName}";
+          Event.observe($("${extraName}shortcut"), "click", function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, false);
         }
         ##
         ## Override keyboard shortcut (if any)

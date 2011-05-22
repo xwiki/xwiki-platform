@@ -114,6 +114,11 @@
       <artifactId>xwiki-platform-extension-repository-aether</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-repository-xwiki-client</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Default macros dependencies, so that they are packed in the war
          Please try to keep them in alphabetical order -->    
    <dependency>
@@ -312,14 +317,24 @@
       <version>${project.version}</version>
       <type>zip</type>
     </dependency>
-    <!-- needed for slf4j clients such as QueryPlugin and JCRStore 
-         It is deployment time logging configuration, so it is here instead of xwiki-core. -->
+    <!-- Decide which logging implementation of SLF4J to use -->
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>0.9.28</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- needed for JSR 303 (Bean Validation) clients such as xwiki-core properties. 
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Needed for JSR 303 (Bean Validation) clients such as xwiki-core properties.
          It is just one JSR 303 implements among others so it's distribution decision to choose this one.
          Note that hibernate-validator depends on Java 6 since 4.1 branch.
     -->
@@ -572,9 +587,16 @@
               <filtering>false</filtering>
             </resource>
           </webResources>
-          <!-- Excluded to prevent conflict in the patched version of Rhino used by yuicompressor used for JSX.
-               See http://jira.xwiki.org/jira/browse/XWIKI-6151 for more details. -->
-          <packagingExcludes>WEB-INF/lib/batik-js-*.jar</packagingExcludes>
+          <!-- - Make sure we exclude JCL and LOGJ4 since we want all logging to go through SLF4J
+               - Excluded to prevent conflict in the patched version of Rhino used by yuicompressor used for JSX.
+                 See http://jira.xwiki.org/jira/browse/XWIKI-6151 for more details.
+
+               Note: We use ?????? because we need to exclude log4j-1.2.16 but keep log4j-over-slf4j-1.6.1.jar
+                     See http://jira.codehaus.org/browse/MWAR-81
+           -->
+          <packagingExcludes>
+            WEB-INF/lib/batik-js-*.jar,WEB-INF/lib/commons-logging-*.jar,WEB-INF/lib/log4j-??????.jar
+          </packagingExcludes>
         </configuration>
       </plugin>
       <!-- Ensure that some modules are not added as dependencies.  -->

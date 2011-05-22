@@ -19,22 +19,26 @@
  */
 package org.xwiki.bridge.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.AttachmentName;
 import org.xwiki.bridge.AttachmentNameFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameFactory;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 
 /**
  * Implementation that supports the format defined in {@link #createAttachmentName(String)}. 
  *  
  * @version $Id$
  * @since 2.0RC1
- * @deprecated use {@link org.xwiki.model.internal.DefaultAttachmentNameFactory} instead since 2.2M1
+ * @deprecated use {@link org.xwiki.model.reference.AttachmentReferenceResolver} instead since 2.2M1
  */
 @Component
+@Singleton
 @Deprecated
 public class DefaultAttachmentNameFactory implements AttachmentNameFactory
 {
@@ -46,19 +50,20 @@ public class DefaultAttachmentNameFactory implements AttachmentNameFactory
     /**
      * Factory that uses the current document name (if set) to create a document name from a raw reference.
      */
-    @Requirement("current")
+    @Inject
+    @Named("current")
     private DocumentNameFactory currentDocumentNameFactory;
 
     /**
      * Factory that uses a default page name if no page is specified in the pased raw reference.
      */
-    @Requirement
+    @Inject
     private DocumentNameFactory defaultDocumentNameFactory;
 
     /**
      * Used to get the current document name.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
     
     /**

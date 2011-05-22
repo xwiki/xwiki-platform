@@ -32,19 +32,12 @@
   <artifactId>xwiki-platform-rest-model</artifactId>
   <name>XWiki Platform - REST - Model</name>
   <description>The (JAXB) model for XML resource representations served by the REST module.</description>
-  <dependencies>
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-      <version>2.2.2</version>
-    </dependency>
-  </dependencies>
   <build>
     <plugins>
       <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb2-plugin</artifactId>
-        <version>0.6.3</version>
+        <version>0.7.5</version>
         <configuration>
           <extension>true</extension>
           <args>
@@ -56,21 +49,12 @@
           <removeOldOutput>false</removeOldOutput>
           <plugins>
             <plugin>
-              <groupId>net.java.dev.jaxb2-commons</groupId>
-              <artifactId>jaxb-fluent-api</artifactId>
-              <version>2.1.8</version>
+              <groupId>org.jvnet.jaxb2_commons</groupId>
+              <artifactId>jaxb2-fluent-api</artifactId>
+              <version>3.0</version>
             </plugin>
           </plugins>
         </configuration>
-        <!-- Make it work on JDK 1.6 and Maven 3.x. Otherwise we get: Failed to execute goal org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:0.6.3:generate (default) on project xwiki-rest: 
-          Execution default of goal org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:0.6.3:generate failed: DTD factory class org.apache.xerces.impl.dv.dtd.DTDDVFactoryImpl does not extend from DTDDVFactory. -->
-        <dependencies>
-          <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.9.1</version>
-          </dependency>
-        </dependencies>
         <executions>
           <execution>
             <goals>
@@ -81,30 +65,4 @@
       </plugin>
     </plugins>
   </build>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>maven2-repository.dev.java.net.2</id>
-      <name>Java.net Repository for Maven</name>
-      <url>http://download.java.net/maven/2/</url>
-    </pluginRepository>
-    <!-- TODO: remove maven1 repository as soon as dependencies are available on maven2 repositories -->
-    <pluginRepository>
-      <id>maven-repository.dev.java.net.1</id>
-      <name>Java.net Maven 1 Repository (legacy)</name>
-      <url>http://download.java.net/maven/1</url>
-      <layout>legacy</layout>
-    </pluginRepository>
-  </pluginRepositories>
-  <repositories>
-    <repository>
-      <id>maven-restlet</id>
-      <name>Public online Restlet repository</name>
-      <url>http://maven.restlet.org</url>
-    </repository>
-    <repository>
-      <id>maven2-repository.dev.java.net.2</id>
-      <name>Java.net Repository for Maven</name>
-      <url>http://download.java.net/maven/2</url>
-    </repository>
-  </repositories>
 </project>

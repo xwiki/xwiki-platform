@@ -1,0 +1,72 @@
+###
+### Global header
+###
+### The uppermost area of each page
+### Contains the company logo, links to global actions and the search facility
+###
+#if($isInServletMode) ## Visible only in a page
+<div id="headerglobal" class="layoutsection">
+#if($xcontext.action == "view")
+<div class="minwidthb"></div>
+#else
+<div class="minwidthd"></div>
+#end
+  <div id="company">
+  <div id="companylogo">
+    <a href="$!xwiki.getURL("Main.WebHome", "view")" title="Home" rel="home">
+#set($logoname = $xwiki.getSkinPreference("logo", "logo.png"))
+#set($logo = $!prefdoc.getAttachment($logoname))
+#if(!$logo)
+  #set($logourl = $xwiki.getSkinFile($logoname))
+#else
+  #set($logourl = $prefdoc.getAttachmentURL($logo.filename, "download"))
+#end
+    <img src="$!logourl" alt="Wiki Logo"/>
+    </a>
+  </div> ## companylogo
+  </div> ## company
+  <div id="globaldoctitle">
+    <h1>$!headertitle</h1>
+  </div>
+  <div id="globallinks">
+    <div id="globalmenu">
+#if (!$isGuest)
+#if ($xcontext.user == 'XWiki.superadmin')
+      $!msg.get("superadmin") #sep()
+#else
+      <a class="glink" href="$!xwiki.getURL($xcontext.user, "view")" id="headeruser">$!xwiki.getUserName($xcontext.user, false)</a> #sep()
+#end
+#end
+#if(!$xcontext.action.startsWith("login"))
+  #if($isGuest)
+    #set($loginurl = $xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.getRequestURL())"))
+      <a class="glink" href="$!loginurl" id="headerlogin">$!msg.get('login')</a>#sep()
+  #else
+    #set($logouturl = $xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.getRequestURL())"))
+      <a class="glink" href="$!logouturl" id="headerlogout">$!msg.get('logout')</a>#sep()
+  #end
+#end
+#if($isGuest && $xwiki.hasAccessLevel("register", "XWiki.XWikiPreferences"))
+#set($regurl = $xwiki.getURL("XWiki.Register", "register"))
+      <a class="glink" href="$!regurl" id="headerregister">$!msg.get("core.register")</a>#sep()
+#end
+#if($xwiki.isMultiLingual())
+  <span class="glink" id="headerlanguages">
+  #set($defaultLanguage = "$!{doc.getDefaultLanguage()}")
+  #if($defaultLanguage == '')
+    #set($defaultLanguage = "$!{doc.getLanguage()}")
+  #end
+  #if($defaultLanguage == '')
+    #set($defaultLanguage = "default")
+  #end
+  <a href="$!doc.getURL("view", "language=$defaultLanguage")" class="language-default#if($tdoc.realLanguage == $defaultLanguage || ($defaultLanguage == 'default' && $tdoc.realLanguage == '')) language-current#end">$defaultLanguage</a>
+  #foreach($lang in $doc.translationList)
+    / <a href="$!doc.getURL("view", "language=$lang")" class="language-translation#if($tdoc.realLanguage == $lang) language-current#end">$!lang</a>
+  #end
+  </span>
+#end
+    </div> ## globalmenu
+  </div> ## globallinks
+</div> ## headerglobal
+#end
+### TODO: Format the header for pdf output

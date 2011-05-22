@@ -86,6 +86,14 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- LockProvider for locking attachments -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-locks</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+
    <!-- Testing Dependencies -->
 
     <dependency>
@@ -99,6 +107,13 @@
     <dependency>
       <groupId>org.jmock</groupId>
       <artifactId>jmock-legacy</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- For some tests we need to have the Servlet API JAR available -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

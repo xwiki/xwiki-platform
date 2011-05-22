@@ -16,17 +16,13 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki;
 
-
-// import com.xpn.xwiki.store.XWikiBatcher;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.hibernate.JDBCException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import java.io.PrintStream;
@@ -34,9 +30,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.MessageFormat;
 
-public class XWikiException extends Exception {
-
-    private static final Log log = LogFactory.getLog(XWikiException.class);
+public class XWikiException extends Exception
+{
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiException.class);
 
     private int module;
     private int code;
@@ -196,6 +192,7 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE = 11013;
     public static final int ERROR_XWIKI_APP_JAVA_HEAP_SPACE = 11014;
     public static final int ERROR_XWIKI_APP_EXPORT = 11015;
+    public static final int ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE = 11016; 
 
     public static final int ERROR_XWIKI_EXPORT_XSL_FILE_NOT_FOUND = 12001;
     public static final int ERROR_XWIKI_EXPORT_PDF_FOP_FAILED = 12002;
@@ -250,8 +247,9 @@ public class XWikiException extends Exception {
         setException(e);
         setArgs(args);
         setMessage(message);
-        if (log.isTraceEnabled())
-            log.trace(getMessage(), e);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(getMessage(), e);
+        }
     }
 
     public XWikiException(int module, int code, String message, Throwable e) {
@@ -344,16 +342,6 @@ public class XWikiException extends Exception {
         buffer.append("\n");
         buffer.append(getStackTraceAsString());
         buffer.append("\n");
-        /*
-        List list = XWikiBatcher.getSQLStats().getRecentSqlList();
-        if (list.size() > 0) {
-            buffer.append("Recent SQL:\n");
-            for (int i = 0; i < list.size(); i++) {
-                buffer.append(list.get(i));
-                buffer.append("\n");
-            }
-        }
-        */
         return buffer.toString();
     }
 

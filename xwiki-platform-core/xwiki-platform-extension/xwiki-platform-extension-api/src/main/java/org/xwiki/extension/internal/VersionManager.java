@@ -21,8 +21,33 @@ package org.xwiki.extension.internal;
 
 import org.xwiki.component.annotation.ComponentRole;
 
+/**
+ * Helper to do versions related operations.
+ * 
+ * @version $Id$
+ */
 @ComponentRole
 public interface VersionManager
 {
+    /**
+     * Compare to version.
+     * <p>
+     * Anything is supported (i.e. will return a result) but version members separators used are dot (.) and dash (-).
+     * When one of the compared version member is not a number {@link String#compareTo(String)} is used.
+     * <p>
+     * Here are some examples:
+     * <ul>
+     * <li>1.1 is greater then 1.0</li>
+     * <li>1.10 is greater then 1.2</li>
+     * <li>1.10-sometext is greater then 1.2</li>
+     * <li>1.1-sometext is greater then 1.1</li>
+     * <li>1.sometext is greater then 1.10</li>
+     * </ul>
+     * 
+     * @param version1 the first version
+     * @param version2 the second version
+     * @return a negative integer, zero, or a positive integer as first version is less than, equal to, or greater than
+     *         the second version.
+     */
     int compareVersions(String version1, String version2);
 }

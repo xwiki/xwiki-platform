@@ -24,12 +24,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -56,7 +58,7 @@ import com.xpn.xwiki.user.api.XWikiUser;
  * @since 2.0M2
  */
 @Component
-public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements WikiMacroInitializer, WikiMacroConstants
+public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMacroConstants
 {
     /** Logging helper object. */
     private static final Log LOG = LogFactory.getLog(DefaultWikiMacroInitializer.class);
@@ -78,6 +80,12 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
      */
     @Requirement
     private Execution execution;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Utility method for accessing XWikiContext.
@@ -232,10 +240,10 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         } catch (InsufficientPrivilegesException ex) {
             // Just log the exception and skip to the next.
             // We only log at the debug level here as this is not really an error
-            getLogger().debug(ex.getMessage(), ex);
+            this.logger.debug(ex.getMessage(), ex);
         } catch (WikiMacroException ex) {
             // Just log the exception and skip to the next.
-            getLogger().error(ex.getMessage(), ex);
+            this.logger.error(ex.getMessage(), ex);
         } finally {
             xcontext.setUserReference(originalAuthor);
         }

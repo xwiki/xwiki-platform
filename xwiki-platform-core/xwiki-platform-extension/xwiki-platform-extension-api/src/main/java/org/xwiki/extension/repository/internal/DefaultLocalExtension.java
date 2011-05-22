@@ -36,79 +36,47 @@ import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
 
+/**
+ * Default implementation of {@link LocalExtension}.
+ * 
+ * @version $Id$
+ */
 public class DefaultLocalExtension extends AbstractExtension implements LocalExtension
 {
+    /**
+     * The namespace in which extension is installed.
+     */
     private Set<String> namespaces;
 
+    /**
+     * @param repository the repository where this extension comes from
+     * @param id the extension identifier
+     * @param type the extension type
+     */
     public DefaultLocalExtension(DefaultLocalExtensionRepository repository, ExtensionId id, String type)
     {
         super(repository, id, type);
 
     }
 
+    /**
+     * Create new extension descriptor by copying provided one.
+     * 
+     * @param repository the repository where this extension comes from
+     * @param extension the extension to copy
+     */
     public DefaultLocalExtension(DefaultLocalExtensionRepository repository, Extension extension)
     {
         super(repository, extension);
     }
 
-    public void setFile(File file)
-    {
-        putProperty(PKEY_FILE, file);
-    }
-
-    public void setInstalled(boolean installed)
-    {
-        putProperty(PKEY_INSTALLED, installed);
-    }
-
-    public void setInstalled(boolean installed, String namespace)
-    {
-        if (namespace == null) {
-            setInstalled(installed);
-            setNamespaces(null);
-        } else {
-            if (installed) {
-                setInstalled(true);
-                addNamespace(namespace);
-            } else {
-                if (this.namespaces != null) {
-                    this.namespaces.remove(namespace);
-
-                    if (this.namespaces.isEmpty()) {
-                        setInstalled(false);
-                        this.namespaces = null;
-                    }
-                }
-            }
-        }
-    }
-
-    public void setDependency(boolean dependency)
-    {
-        putProperty(PKEY_DEPENDENCY, dependency);
-    }
-
-    public Collection<String> getNamespaces()
-    {
-        return namespaces;
-    }
-
-    public void setNamespaces(Collection<String> namespaces)
-    {
-        this.namespaces = namespaces != null ? new HashSet<String>(namespaces) : null;
-    }
-
-    public void addNamespace(String namespace)
-    {
-        if (this.namespaces == null) {
-            this.namespaces = new HashSet<String>();
-        }
-
-        this.namespaces.add(namespace);
-    }
-
     // Extension
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#download(java.io.File)
+     */
     public void download(File file) throws ExtensionException
     {
         InputStream sourceStream = null;
@@ -148,23 +116,130 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
 
     // LocalExtension
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.LocalExtension#getNamespaces()
+     */
+    public Collection<String> getNamespaces()
+    {
+        return namespaces;
+    }
+
+    /**
+     * @param namespaces the namespaces in which this extension is enabled. Null means root namespace (i.e all
+     *            namespaces).
+     * @see #getNamespaces()
+     */
+    public void setNamespaces(Collection<String> namespaces)
+    {
+        this.namespaces = namespaces != null ? new HashSet<String>(namespaces) : null;
+    }
+
+    /**
+     * @param namespace the namespace
+     * @see #getNamespaces()
+     */
+    public void addNamespace(String namespace)
+    {
+        if (this.namespaces == null) {
+            this.namespaces = new HashSet<String>();
+        }
+
+        this.namespaces.add(namespace);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.LocalExtension#getFile()
+     */
     public File getFile()
     {
         return getProperty(PKEY_FILE, null);
     }
 
+    /**
+     * @param file the extension file in the filesystem
+     * @see #getFile()
+     */
+    public void setFile(File file)
+    {
+        putProperty(PKEY_FILE, file);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.LocalExtension#isInstalled()
+     */
     public boolean isInstalled()
     {
         return getProperty(PKEY_INSTALLED, false);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.LocalExtension#isInstalled(java.lang.String)
+     */
     public boolean isInstalled(String namespace)
     {
         return isInstalled() && (this.namespaces == null || this.namespaces.contains(namespace));
     }
 
+    /**
+     * @param installed indicate if the extension is installed
+     * @see #isInstalled()
+     */
+    public void setInstalled(boolean installed)
+    {
+        putProperty(PKEY_INSTALLED, installed);
+    }
+
+    /**
+     * @param installed indicate if the extension is installed
+     * @param namespace the namespace to look at, if null it means the extension is installed for all the namespaces
+     * @see #isInstalled(String)
+     */
+    public void setInstalled(boolean installed, String namespace)
+    {
+        if (namespace == null) {
+            setInstalled(installed);
+            setNamespaces(null);
+        } else {
+            if (installed) {
+                setInstalled(true);
+                addNamespace(namespace);
+            } else {
+                if (this.namespaces != null) {
+                    this.namespaces.remove(namespace);
+
+                    if (this.namespaces.isEmpty()) {
+                        setInstalled(false);
+                        this.namespaces = null;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.LocalExtension#isDependency()
+     */
     public boolean isDependency()
     {
         return getProperty(PKEY_DEPENDENCY, false);
+    }
+
+    /**
+     * @param dependency indicate if the extension as been installed as a dependency of another one.
+     * @see #isDependency()
+     */
+    public void setDependency(boolean dependency)
+    {
+        putProperty(PKEY_DEPENDENCY, dependency);
     }
 }

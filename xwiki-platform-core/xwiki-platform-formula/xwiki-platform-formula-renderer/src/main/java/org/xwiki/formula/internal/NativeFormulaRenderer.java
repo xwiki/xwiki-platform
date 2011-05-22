@@ -30,8 +30,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
@@ -60,7 +60,7 @@ import org.xwiki.formula.ImageData;
 public class NativeFormulaRenderer extends AbstractFormulaRenderer implements Initializable
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(NativeFormulaRenderer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NativeFormulaRenderer.class);
 
     /** Application container, needed for retrieving the work directory where temporary files can be created. */
     @Requirement
@@ -148,7 +148,7 @@ public class NativeFormulaRenderer extends AbstractFormulaRenderer implements In
         }
 
         if (process.exitValue() != 0) {
-            LOG.debug("Error generating image: " + IOUtils.toString(process.getErrorStream()));
+            LOGGER.debug("Error generating image: " + IOUtils.toString(process.getErrorStream()));
         }
 
         return process.exitValue() == 0;

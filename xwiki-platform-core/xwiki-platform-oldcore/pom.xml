@@ -167,10 +167,6 @@
     <!-- Apache Commons -->
     <!-- The versions for these are defined in the parent pom -->
     <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-    </dependency>
-    <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
     </dependency>
@@ -212,12 +208,6 @@
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-core</artifactId>
       <version>0.9</version>
-    </dependency>
-
-    <!-- Logging -->
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
     </dependency>
 
     <!-- XML processing -->
@@ -770,8 +760,6 @@
             </goals>
             <configuration>
               <aspectDirectory>src/main/aspect/compatibility</aspectDirectory>
-              <source>1.5</source>
-              <target>1.5</target>
             </configuration>
           </execution>
         </executions>
@@ -1179,7 +1167,6 @@
               **/web/DeleteAction.java,
               **/web/DeleteAttachmentAction.java,
               **/web/DotAction.java,
-              **/web/DownloadAction.java,
               **/web/DownloadRevAction.java,
               **/web/EditAction.java,
               **/web/EditBean.java,

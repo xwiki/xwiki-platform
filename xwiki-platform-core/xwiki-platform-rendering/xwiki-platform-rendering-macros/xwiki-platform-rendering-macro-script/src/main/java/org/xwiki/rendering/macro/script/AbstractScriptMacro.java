@@ -23,8 +23,10 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.ObservationManager;
@@ -67,39 +69,40 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      * 
      * @deprecated since 2.5M1 (not used any more)
      */
-    @Requirement
+    @Inject
     @Deprecated
     protected org.xwiki.bridge.DocumentAccessBridge documentAccessBridge;
 
     /**
      * Used by subclasses.
      */
-    @Requirement
+    @Inject
     protected Execution execution;
 
     /**
      * Used to get the current syntax parser.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
      * Used to parse the result of the script execution into a XDOM object when the macro is configured by the user to
      * not interpret wiki syntax.
      */
-    @Requirement("plain/1.0")
+    @Inject
+    @Named("plain/1.0")
     private Parser plainTextParser;
 
     /**
      * The parser used to parse box content and box title parameter.
      */
-    @Requirement
+    @Inject
     private MacroContentParser contentParser;
 
     /**
      * Observation manager used to sent evaluation events.
      */
-    @Requirement
+    @Inject
     private ObservationManager observation;
 
     /**
@@ -190,7 +193,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
             try {
                 // send evaluation starts event
                 ScriptEvaluatingEvent event = new ScriptEvaluatingEvent(getDescriptor().getId().getId());
-                observation.notify(event, context, parameters);
+                this.observation.notify(event, context, parameters);
                 if (event.isCanceled()) {
                     throw new MacroExecutionException(event.getReason());
                 }
@@ -203,7 +206,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
                 }
             } finally {
                 // send evaluation finished event
-                observation.notify(new ScriptEvaluatedEvent(getDescriptor().getId().getId()), context, parameters);
+                this.observation.notify(new ScriptEvaluatedEvent(getDescriptor().getId().getId()), context, parameters);
             }
         }
 

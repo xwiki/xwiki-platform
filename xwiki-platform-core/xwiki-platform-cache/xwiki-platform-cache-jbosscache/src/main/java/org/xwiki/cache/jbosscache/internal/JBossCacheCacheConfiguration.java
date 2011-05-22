@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jboss.cache.config.CacheLoaderConfig;
 import org.jboss.cache.config.Configuration;
 import org.jboss.cache.config.EvictionConfig;
@@ -34,6 +32,8 @@ import org.jboss.cache.config.EvictionRegionConfig;
 import org.jboss.cache.config.CacheLoaderConfig.IndividualCacheLoaderConfig;
 import org.jboss.cache.config.parsing.XmlConfigurationParser;
 import org.jboss.cache.eviction.LRUAlgorithmConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
@@ -55,7 +55,7 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
     /**
      * the logging tool.
      */
-    private static final Log LOG = LogFactory.getLog(JBossCacheCacheConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JBossCacheCacheConfiguration.class);
 
     /**
      * The folder containing JBossCache properties files.
@@ -78,12 +78,12 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
     private Configuration jbossConfiguration;
 
     /**
-     * The container used to access configuration files.
+     * The optional container used to access configuration files (can be null).
      */
     private Container container;
 
     /**
-     * @param container the container used to access configuration files.
+     * @param container the container used to access configuration files, can be null if there's no container
      * @param configuration the XWiki cache API configuration.
      * @param defaultPropsId the default configuration identifier used to load cache configuration file.
      */
@@ -218,37 +218,37 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
 
         InputStream is = null;
 
+        // Note: We look into the container only if it exists and if it has its application context specified since
+        // we want to allow usage of JBoss Cache even in environments where there's no container or no application
+        // context.
         try {
             if (file.exists()) {
                 is = new FileInputStream(file);
-            } else {
-                is =
-                    this.container.getApplicationContext().getResourceAsStream(
-                        "/WEB-INF/" + PROPS_PATH + propertiesFilename);
+            } else if (this.container != null && this.container.getApplicationContext() != null) {
+                is = this.container.getApplicationContext().getResourceAsStream(
+                    "/WEB-INF/" + PROPS_PATH + propertiesFilename);
             }
 
             if (is == null) {
-                throw new PropertiesLoadingCacheException("Can't find any configuration file for" + propertiesId);
-            }
+                LOGGER.debug("Can't find any configuration file for [" + propertiesId
+                    + "]. Default JBoss Cache configuration will be used");
+            } else {
+                XmlConfigurationParser parser = new XmlConfigurationParser();
+                config = parser.parseStream(is);
 
-            XmlConfigurationParser parser = new XmlConfigurationParser();
-            config = parser.parseStream(is);
-
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Properties loaded: " + propertiesFilename);
+                LOGGER.debug("Properties [{}] loaded", propertiesFilename);
             }
         } catch (Exception e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Failed to load configuration file " + propertiesId, e);
-            }
+            // TODO: Raise a runtime exception to stop the application since the configuration that the user has
+            // specified couldn't be loaded for some reason.
+            LOGGER.error("Failed to load configuration file [" + propertiesId + "]. Default JBoss Cache configuration "
+                + "will be used.", e);
         } finally {
             if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Failed t close properties file", e);
-                    }
+                    LOGGER.debug("Failed to close properties file", e);
                 }
             }
         }

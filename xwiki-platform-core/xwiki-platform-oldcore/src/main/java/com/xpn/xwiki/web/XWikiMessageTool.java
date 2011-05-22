@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
@@ -36,7 +35,8 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -69,7 +69,7 @@ public class XWikiMessageTool
     /**
      * Log4J logger object to log messages in this class.
      */
-    private static final Logger LOG = Logger.getLogger(XWikiMessageTool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiMessageTool.class);
 
     /**
      * Property name used to defined internationalization document bundles in either XWikiProperties ("documentBundles")
@@ -212,7 +212,7 @@ public class XWikiMessageTool
                     } else {
                         // The document listed as a document bundle doesn't exist. Do nothing
                         // and log.
-                        LOG.warn("The document [" + docBundle.getFullName() + "] is listed "
+                        LOGGER.warn("The document [" + docBundle.getFullName() + "] is listed "
                             + "as an internationalization document bundle but it does not " + "exist.");
                     }
                 }
@@ -244,7 +244,7 @@ public class XWikiMessageTool
                 // Error while loading the document.
                 // TODO: A runtime exception should be thrown that will bubble up till the
                 // topmost level. For now simply log the error
-                LOG.error(String.format(LOAD_ERROR_MSG_FMT, documentName), e);
+                LOGGER.error(String.format(LOAD_ERROR_MSG_FMT, documentName), e);
                 docBundle = null;
             }
         }
@@ -282,7 +282,7 @@ public class XWikiMessageTool
                 // Error while loading the document.
                 // TODO: A runtime exception should be thrown that will bubble up till the
                 // topmost level. For now simply log the error
-                LOG.error(String.format(LOAD_ERROR_MSG_FMT, documentName), e);
+                LOGGER.error(String.format(LOAD_ERROR_MSG_FMT, documentName), e);
             }
         }
 
@@ -301,7 +301,7 @@ public class XWikiMessageTool
         try {
             docContent = content.getBytes(BYTE_ENCODING);
         } catch (UnsupportedEncodingException ex) {
-            LOG.error("Error splitting the document into bytes", ex);
+            LOGGER.error("Error splitting the document into bytes", ex);
             docContent = content.getBytes();
         }
         InputStream is = new ByteArrayInputStream(docContent);
@@ -345,7 +345,7 @@ public class XWikiMessageTool
                         try {
                             returnValue = new String(returnValue.getBytes("ISO-8859-1"), BYTE_ENCODING);
                         } catch (UnsupportedEncodingException ex) {
-                            LOG.error("Error recombining the value from bytes", ex);
+                            LOGGER.error("Error recombining the value from bytes", ex);
                         }
                         break;
                     }

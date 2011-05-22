@@ -29,9 +29,9 @@ import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractEntityListSelecto
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
 import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -60,6 +60,11 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
     private final boolean useLinkDestination;
 
     /**
+     * The service used to fetch the list of images attached to the current page.
+     */
+    private final WikiServiceAsync wikiService;
+
+    /**
      * Creates a new image selector that displays the images attached to the link destination page.
      * 
      * @param wikiService the service used to retrieve the list of image attachments
@@ -68,11 +73,11 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
      */
     public CurrentPageImageSelectorWizardStep(WikiServiceAsync wikiService, boolean useLinkDestination)
     {
-        super(wikiService);
-
+        this.wikiService = wikiService;
         this.useLinkDestination = useLinkDestination;
+        setStepTitle(Strings.INSTANCE.imageSelectImageTitle());
 
-        getMainPanel().addStyleName("xImagesSelector");
+        display().addStyleName("xImagesSelector");
 
         clearFloatsListItem = new ListItem<Attachment>();
         clearFloatsListItem.setStyleName("clearfloats");
@@ -106,17 +111,18 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
     {
         EntityReference currentPage =
             useLinkDestination ? getData().getDestination().getEntityReference() : getData().getOrigin();
-        getWikiService().getImageAttachments(new WikiPageReference(currentPage), callback);
+        wikiService.getImageAttachments(new WikiPageReference(currentPage), callback);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void fillList(List<Attachment> attachments, Attachment selectedAttachment)
+    protected ListItem<Attachment> fillList(List<Attachment> attachments, Attachment selectedAttachment)
     {
-        super.fillList(attachments, selectedAttachment);
+        ListItem<Attachment> selectedItem = super.fillList(attachments, selectedAttachment);
         getList().addItem(clearFloatsListItem);
+        return selectedItem;
     }
 
     /**
@@ -128,14 +134,6 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
             return ImageWizardStep.IMAGE_UPLOAD.toString();
         }
         return ImageWizardStep.IMAGE_CONFIG.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getStepTitle()
-    {
-        return Strings.INSTANCE.imageSelectImageTitle();
     }
 
     /**
@@ -191,24 +189,8 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
     @Override
     protected void saveSelectedValue(final AsyncCallback<Boolean> async)
     {
-        // Backup the current resource type.
-        final ResourceType previousResourceType = getData().getDestination().getType();
         // Make sure the resource type is ATTACHMENT since this wizard step selects an attachment.
         getData().getDestination().setType(ResourceType.ATTACHMENT);
-        super.saveSelectedValue(new AsyncCallback<Boolean>()
-        {
-
-            public void onFailure(Throwable caught)
-            {
-                // Restore previous resource type.
-                getData().getDestination().setType(previousResourceType);
-                async.onFailure(caught);
-            }
-
-            public void onSuccess(Boolean result)
-            {
-                async.onSuccess(result);
-            }
-        });
+        super.saveSelectedValue(async);
     }
 }

@@ -860,6 +860,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         getSkinClass(context);
         getGlobalRightsClass(context);
         getSheetClass(context);
+        getEditModeClass(context);
 
         try {
             WikiMacroInitializer wikiMacroInitializer = Utils.getComponentManager().lookup(WikiMacroInitializer.class);
@@ -3002,6 +3003,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
      * @param context the XWiki Context
      * @return the SheetClass Base Class object containing the properties
      * @throws XWikiException if an error happens during the save to the database
+     * @deprecated since 3.1M2 edit mode class should be used for this purpose, not the sheet class
+     * @see #getEditModeClass(XWikiContext)
      */
     public BaseClass getSheetClass(XWikiContext context) throws XWikiException
     {
@@ -3022,6 +3025,47 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         if (doc.isNew()) {
             needsUpdate |= setClassDocumentFields(doc, "XWiki Sheet Class");
             doc.setContent(doc.getContent() + "\n\nClass that should be used to recognize sheet pages.");
+        }
+
+        if (needsUpdate) {
+            saveDocument(doc, context);
+        }
+        return bclass;
+    }
+
+    /**
+     * Verify if the {@code XWiki.EditModeClass} page exists and that it contains all the required configuration
+     * properties to make the edit mode feature work properly. If some properties are missing they are created and saved
+     * in the database. EditModeClass is used to specify the default edit mode of a page. It can also be used to mark a
+     * page as a sheet. When a page is marked as a sheet and that page is included in another page using the include
+     * macro then editing it triggers automatic inline edition (for XWiki Syntax 2.0 only - for XWiki Syntax 1.0
+     * automatic inline edition is triggered using #includeForm). It replaces and enhances the SheetClass mechanism (see
+     * {@link #getSheetClass(XWikiContext)}).
+     * 
+     * @param context the XWiki Context
+     * @return the EditModeClass Base Class object containing the properties
+     * @throws XWikiException if an error happens during the save to the database
+     * @since 3.1M2
+     */
+    public BaseClass getEditModeClass(XWikiContext context) throws XWikiException
+    {
+        DocumentReference classReference =
+            new DocumentReference(context.getDatabase(), XWikiConstant.EDIT_MODE_CLASS.getParent().getName(),
+                XWikiConstant.EDIT_MODE_CLASS.getName());
+        XWikiDocument doc = getDocument(classReference, context);
+
+        boolean needsUpdate = doc.isNew();
+
+        BaseClass bclass = doc.getXClass();
+        if (context.get("initdone") != null) {
+            return bclass;
+        }
+
+        needsUpdate |= bclass.addTextField("defaultEditMode", "Default Edit Mode", 15);
+
+        if (doc.isNew()) {
+            needsUpdate |= setClassDocumentFields(doc, "XWiki Edit Mode Class");
+            doc.setContent(doc.getContent() + "\n\nClass that should be used to specify the edit mode of a page.");
         }
 
         if (needsUpdate) {
@@ -7315,9 +7359,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             for (List<ObjectDiff> objectChanges : doc.getObjectDiff(originalDoc, doc, context)) {
                 for (ObjectDiff diff : objectChanges) {
                     if (StringUtils.equals(diff.getClassName(), "XWiki.XWikiComments")) {
-                        if (StringUtils.equals(diff.getAction(), "object-removed")) {
+                        if (StringUtils.equals(diff.getAction(), ObjectDiff.ACTION_OBJECTREMOVED)) {
                             om.notify(new CommentDeletedEvent(reference, diff.getNumber() + ""), source, data);
-                        } else if (StringUtils.equals(diff.getAction(), "object-added")) {
+                        } else if (StringUtils.equals(diff.getAction(), ObjectDiff.ACTION_OBJECTADDED)) {
                             om.notify(new CommentAddedEvent(reference, diff.getNumber() + ""), source, data);
                         } else {
                             om.notify(new CommentUpdatedEvent(reference, diff.getNumber() + ""), source, data);

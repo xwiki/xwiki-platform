@@ -59,7 +59,7 @@ public class DefaultGadgetRenderer implements GadgetRenderer
     public List<Block> decorateGadget(Gadget gadget)
     {
         // prepare the title of the gadget, in a heading 2
-        HeaderBlock titleBlock = new HeaderBlock(gadget.getTitle(), HeaderLevel.LEVEL2);
+        HeaderBlock titleBlock = new HeaderBlock(gadget.getTitle(), HeaderLevel.LEVEL1);
         titleBlock.setParameter(CLASS, "gadget-title");
 
         // And then the content wrapped in a group block with class, to style it

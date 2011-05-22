@@ -24,8 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
@@ -55,7 +56,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
     /**
      * The component manager used to dynamically fetch components (syntax parsers, in this case).
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
@@ -63,7 +64,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
      * 
      * @param name the name of the macro
      * @param description the description of the macro
-     * @param contentDescriptor the descriptor of the content of this macro 
+     * @param contentDescriptor the descriptor of the content of this macro
      * @param parametersBeanClass the type of parameters of this macro
      */
     protected AbstractContainerMacro(String name, String description, ContentDescriptor contentDescriptor,
@@ -138,7 +139,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
      */
     protected ComponentManager getComponentManager()
     {
-        return componentManager;
+        return this.componentManager;
     }
 
     /**

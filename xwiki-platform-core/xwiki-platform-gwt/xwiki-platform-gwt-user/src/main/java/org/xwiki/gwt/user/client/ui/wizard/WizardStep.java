@@ -34,19 +34,19 @@ import com.google.gwt.user.client.ui.Widget;
 public interface WizardStep
 {
     /**
-     * Initializes the current wizard step, according to the passed data. The state of the current wizard step should be
-     * entirely computed from the passed input data. This function will be called always on showing the dialog for this
-     * wizard step (both when shown as next and when shown as previous), with the data obtained from the
-     * {@link #getResult()} function of the previous step. The {@code cb} parameter should handle the asynchronous
-     * initialization of this wizard step, and should return normally through {@code onSuccess()} and error through
-     * {@code onFailure()}.
+     * Initializes the current wizard step, according to the passed data. This method is called before the wizard step
+     * is displayed, on both navigation directions. The input data is either the data the wizard was started with or the
+     * data returned by the {@link #getResult()} method of the previous step. The {@code callback} parameter should
+     * handle the asynchronous initialization of this wizard step.
      * 
-     * @param data an object to pass to the wizard step, which can contain configuration data, etc.
-     * @param cb callback to handle asynchronous loading of this wizard step
+     * @param data an object to pass to the wizard step, which can contain configuration data
+     * @param callback the object to be notified when the wizard step has finished initializing
      */
-    void init(Object data, AsyncCallback< ? > cb);
+    void init(Object data, AsyncCallback< ? > callback);
 
     /**
+     * This method is called right after the wizard step has been successfully initialized.
+     * 
      * @return the UI representation of this wizard step
      */
     Widget display();
@@ -58,8 +58,8 @@ public interface WizardStep
 
     /**
      * @return the result of the current step, in its current state. The result of the current wizard step will be used
-     *         as the input for the next dialog in the chain, either the next (as returned by {@link #getNextStep()}) or
-     *         the previous in the navigation stack.
+     *         as the input for the next step in the wizard chain, either the next (as returned by
+     *         {@link #getNextStep()}) or the previous in the navigation stack.
      */
     Object getResult();
 
@@ -68,10 +68,17 @@ public interface WizardStep
      * result of the dialog as well as the next step name. The asynchronous callback result (true or false) will be used
      * to determine if the submit should continue or it should be prevented.
      * 
-     * @param async asynchronous callback to handle asynchronous nature of this function (in case of validation on the
-     *            server side, for example).
+     * @param callback the object to be notified when the submit is done; pass {@code true} to notify that the submit
+     *            was successful and the wizard can move to the next step; pass {@code false} if the user needs to
+     *            adjust the submitted data
      */
-    void onSubmit(AsyncCallback<Boolean> async);
+    void onSubmit(AsyncCallback<Boolean> callback);
+
+    /**
+     * @return {@code true} if this step should be submitted automatically, {@code false} otherwise; the
+     *         {@link #display()} method should return {@code null} if the step is submitted automatically
+     */
+    boolean isAutoSubmit();
 
     /**
      * Called before canceling the current wizard step. Here is the point to do all adjustments before the previous
@@ -79,20 +86,20 @@ public interface WizardStep
      */
     void onCancel();
 
-    // Note: the following functions could be as well moved to a NavigatingWizardStep interface, so that we don't hold
-    // navigation responsibilities in the wizard step itself, but for the moment it would be a bit overengineered.
+    // Note: the following methods could be as well moved to a NavigatingWizardStep interface, so that we don't hold
+    // navigation responsibilities in the wizard step itself, but for the moment it would be a bit over-engineered.
 
     /**
      * Returns the key of the next step in the wizard. Note that this function is called after
      * {@link #onSubmit(AsyncCallback)} has returned successfully, so the computing of the next step can be done safely
      * at {@link #onSubmit(AsyncCallback)} time.
      * 
-     * @return the key of the next step in the wizard.
+     * @return the key of the next step in the wizard
      */
     String getNextStep();
 
     /**
-     * @return the set of valid directions from this step.
+     * @return the set of valid directions from this step
      */
     EnumSet<NavigationDirection> getValidDirections();
 

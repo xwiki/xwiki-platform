@@ -24,14 +24,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.content.AlteredContent;
 import org.xwiki.annotation.content.ContentAlterer;
 import org.xwiki.annotation.io.IOService;
 import org.xwiki.annotation.io.IOTargetService;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
@@ -48,31 +49,32 @@ import org.xwiki.rendering.transformation.TransformationManager;
  * @version $Id$
  * @since 2.3M1
  */
-public abstract class AbstractAnnotationMaintainer extends AbstractLogEnabled implements AnnotationMaintainer
+public abstract class AbstractAnnotationMaintainer implements AnnotationMaintainer
 {
     /**
      * Annotations storage service.
      */
-    @Requirement
+    @Inject
     protected IOService ioService;
 
     /**
      * Content storage and manipulation service.
      */
-    @Requirement
+    @Inject
     protected IOTargetService ioContentService;
 
     /**
      * Space stripper content alterer, to be able to map annotations on the content in the same way the rendering
      * mapping does it.
      */
-    @Requirement("whitespace")
+    @Inject
+    @Named("whitespace")
     protected ContentAlterer spaceStripperContentAlterer;
 
     /**
      * The component manager, used to grab the plain text renderer.
      */
-    @Requirement
+    @Inject
     protected ComponentManager componentManager;
 
     /**

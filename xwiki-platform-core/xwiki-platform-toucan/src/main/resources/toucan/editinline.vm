@@ -1,0 +1,51 @@
+## Insert JS and CSS needed for the fullscreen edit feature
+$xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', {'forceSkinAction': true, 'language': ${xcontext.language}})##
+$xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
+#set($formname = "inline")
+#set($saveaction = "save")
+#set($previewenabled = true)
+<div class="main layoutsubsection">
+##
+##
+## Can the document be edited?
+## If not, display an information and a forcing link:
+##
+#set($force = $!request.get("force"))
+#if (($doc.getLocked()==true)&&(!$force))
+  <div class="layoutsection">
+  $response.setStatus(423)
+  #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")
+  #set($forceEditURL = $doc.getURL($xcontext.action, ${newquerystring}))
+  #xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getUserName($doc.getLockingUser())")
+    <a href="$forceEditURL">$msg.get('forcelock')</a>
+  #xwikimessageboxend()
+  </div>
+#else
+##
+## Can edit. Display the form
+##
+<form id="inline" method="post" action="$doc.getURL("preview")">
+<div>
+<div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL("inline")"/></div>
+## CSRF prevention
+<input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+## This input is used by the full screen widget: it stores the selector of the maximized element, so that the full screen can be restored when coming back from preview.
+<input type="hidden" name="x-maximized" value="$!{escapetool.xml(${request.get('x-maximized')})}" />
+<input type="hidden" name="xredirect" value="$!{escapetool.xml($request.get('xredirect'))}" />
+<input type="hidden" name="xnotification" value="$!{escapetool.xml($request.get('xnotification'))}" />
+<input type="hidden" name="template" value="$!{escapetool.xml($request.template)}" />
+<input type="hidden" name="language" value="$!{escapetool.xml($doc.language)}" />
+#if("$!request.parent" != '')
+  <input type="hidden" name="parent" value="$!{escapetool.xml($request.parent)}" />
+#end
+#if("$!request.title" != '')
+  <input type="hidden" name="title" value="$!{escapetool.xml($request.title)}" />
+#end
+$cdoc.getRenderedContent()
+#set($editactions = "bottom")
+<div class="bottombuttons">#template("editactions.vm")</div>
+</div> ## form
+</form>
+#template("textarea_wysiwyg.vm")
+#end ## can edit
+</div> ## main

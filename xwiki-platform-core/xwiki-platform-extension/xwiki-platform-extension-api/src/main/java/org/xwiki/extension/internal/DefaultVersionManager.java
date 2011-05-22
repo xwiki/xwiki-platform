@@ -19,20 +19,35 @@
  */
 package org.xwiki.extension.internal;
 
-import org.apache.commons.lang.StringUtils;
+import java.util.regex.Pattern;
 
+/**
+ * Default implementation of {@link VersionManager}.
+ * 
+ * @version $Id$
+ */
 public class DefaultVersionManager implements VersionManager
 {
+    /**
+     * The separator used to cut in peaces the versions strings.
+     */
+    private static final Pattern SEPARATORS = Pattern.compile("[\\.-]");
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.internal.VersionManager#compareVersions(java.lang.String, java.lang.String)
+     */
     public int compareVersions(String version1, String version2)
     {
-        String[] elements1 = StringUtils.split(version1, '.');
-        String[] elements2 = StringUtils.split(version2, '.');
+        String[] elements1 = SEPARATORS.split(version1);
+        String[] elements2 = SEPARATORS.split(version2);
 
         for (int i = 0; i < elements1.length; ++i) {
             int result;
             if (elements2.length == i) {
                 result = 1;
-            } else  {
+            } else {
                 result = compareElement(elements1[i], elements2[i]);
             }
 
@@ -40,10 +55,16 @@ public class DefaultVersionManager implements VersionManager
                 return result;
             }
         }
-        
+
         return elements2.length > elements1.length ? -1 : 0;
     }
 
+    /**
+     * @param element1 the first element
+     * @param element2 the second element
+     * @return a negative integer, zero, or a positive integer as first version element is less than, equal to, or
+     *         greater than the second version element.
+     */
     private int compareElement(String element1, String element2)
     {
         Integer value1 = convertElement(element1);
@@ -56,6 +77,10 @@ public class DefaultVersionManager implements VersionManager
         }
     }
 
+    /**
+     * @param element the version element to convert in integer
+     * @return the integer version of the provided string, null if invalid
+     */
     private Integer convertElement(String element)
     {
         try {

@@ -21,6 +21,11 @@ package org.xwiki.extension.task;
 
 import org.xwiki.extension.ExtensionException;
 
+/**
+ * Error when trying to run a task.
+ * 
+ * @version $Id$
+ */
 public class TaskException extends ExtensionException
 {
     /**

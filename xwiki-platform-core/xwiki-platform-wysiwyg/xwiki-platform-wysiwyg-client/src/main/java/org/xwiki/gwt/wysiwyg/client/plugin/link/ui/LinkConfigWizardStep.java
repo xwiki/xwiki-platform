@@ -19,22 +19,20 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.link.ui;
 
-import java.util.EnumSet;
-
 import org.xwiki.gwt.user.client.FocusCommand;
 import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.ui.wizard.AbstractInteractiveWizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
 import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
-import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
-import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
 import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
-import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -47,7 +45,6 @@ import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Default implementation for the link configuration parameters, such as link labels, link tooltip, or opening the link
@@ -55,7 +52,8 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @version $Id$
  */
-public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents, KeyPressHandler
+public class LinkConfigWizardStep extends AbstractInteractiveWizardStep implements SourcesNavigationEvents,
+    KeyPressHandler
 {
     /**
      * The default style of the link configuration dialog.
@@ -115,11 +113,6 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     private CheckBox newWindowCheckBox;
 
     /**
-     * The panel holding the input for the label of the built link.
-     */
-    private final Panel mainPanel = new FlowPanel();
-
-    /**
      * The service used to parse the image reference when the link label is an image.
      */
     private final WikiServiceAsync wikiService;
@@ -132,8 +125,9 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     public LinkConfigWizardStep(WikiServiceAsync wikiService)
     {
         this.wikiService = wikiService;
+        setStepTitle(Strings.INSTANCE.linkConfigTitle());
 
-        mainPanel.addStyleName(DEFAULT_STYLE_NAME);
+        display().addStyleName(DEFAULT_STYLE_NAME);
         setUpLabelField();
         Label tooltipLabel = new Label(Strings.INSTANCE.linkTooltipLabel());
         tooltipLabel.setStyleName(INFO_LABEL_STYLE);
@@ -142,16 +136,16 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
         // on enter in the textbox, submit the form
         tooltipTextBox.addKeyPressHandler(this);
         tooltipTextBox.setTitle(getTooltipTextBoxTooltip());
-        mainPanel.add(tooltipLabel);
-        mainPanel.add(helpTooltipLabel);
-        mainPanel.add(tooltipTextBox);
+        display().add(tooltipLabel);
+        display().add(helpTooltipLabel);
+        display().add(tooltipTextBox);
         newWindowCheckBox = new CheckBox(Strings.INSTANCE.linkOpenInNewWindowLabel());
         // just add the style, because we need to be able to still detect this is a checkbox
         newWindowCheckBox.addStyleName(INFO_LABEL_STYLE);
         Label helpNewWindowLabel = new Label(Strings.INSTANCE.linkOpenInNewWindowHelpLabel());
         helpNewWindowLabel.setStyleName(HELP_LABEL_STYLE);
-        mainPanel.add(newWindowCheckBox);
-        mainPanel.add(helpNewWindowLabel);
+        display().add(newWindowCheckBox);
+        display().add(helpNewWindowLabel);
     }
 
     /**
@@ -173,10 +167,10 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
         // on enter in the textbox, submit the form
         labelTextBox.addKeyPressHandler(this);
         labelTextBox.setTitle(getLabelTextBoxTooltip());
-        mainPanel.add(labelLabel);
-        mainPanel.add(helpLabelLabel);
-        mainPanel.add(labelErrorLabel);
-        mainPanel.add(labelTextBox);
+        display().add(labelLabel);
+        display().add(helpLabelLabel);
+        display().add(labelErrorLabel);
+        display().add(labelTextBox);
     }
 
     /**
@@ -237,22 +231,6 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     protected void setFocus()
     {
         Scheduler.get().scheduleDeferred(new FocusCommand(labelTextBox.isEnabled() ? labelTextBox : tooltipTextBox));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Widget display()
-    {
-        return mainPanel;
-    }
-
-    /**
-     * @return the mainPanel, to be used by subclasses to display the form defined by this wizard step.
-     */
-    public Panel getMainPanel()
-    {
-        return mainPanel;
     }
 
     /**
@@ -360,45 +338,6 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public String getNextStep()
-    {
-        // this is the last step in the wizard.
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getStepTitle()
-    {
-        return Strings.INSTANCE.linkConfigTitle();
-    }
-
-    /**
-     * {@inheritDoc}. Configure this as the last wizard step, by default, allowing to finish, cancel or go to previous
-     * step if the navigation stack is not empty at this point.
-     */
-    public EnumSet<NavigationDirection> getValidDirections()
-    {
-        return EnumSet.of(NavigationDirection.FINISH, NavigationDirection.CANCEL, NavigationDirection.PREVIOUS);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDirectionName(NavigationDirection direction)
-    {
-        switch (direction) {
-            case FINISH:
-                return Strings.INSTANCE.linkCreateLinkButton();
-            default:
-                return null;
-        }
-    }
-
-    /**
      * @return the default navigation direction, to be fired automatically when enter is hit in an input in the form of
      *         this configuration wizard step. To be overridden by subclasses to provide the specific direction to be
      *         followed.
@@ -467,7 +406,7 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     }
 
     /**
-     * @return the data configured by this {@link WizardStep}
+     * @return the data configured by this wizard step
      */
     protected EntityLink<LinkConfig> getData()
     {

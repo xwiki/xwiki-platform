@@ -32,37 +32,79 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 
+/**
+ * Default implementation of {@link ExtensionManagerConfiguration}.
+ * 
+ * @version $Id$
+ */
 @Component
 @Singleton
-public class DefaultExtensionManagerConfiguration extends AbstractLogEnabled implements ExtensionManagerConfiguration
+public class DefaultExtensionManagerConfiguration implements ExtensionManagerConfiguration
 {
+    /**
+     * The current user home path.
+     */
     private static final String USERHOME = System.getProperty("user.home");
 
+    /**
+     * The xwiki home path.
+     */
     private static final File XWIKIHOME = new File(USERHOME, ".xwiki");
 
+    /**
+     * The extension manage home path.
+     */
     private static final File EXTENSIONSHOME = new File(XWIKIHOME, "extensions");
 
+    /**
+     * Used to parse repositories entries from the configuration.
+     */
     private static final Pattern REPOSITORYIDPATTERN = Pattern.compile("([^:]+):([^:]+):(.+)");
+    
+    /**
+     * The type identifier for a maven repository.
+     */
+    private static final String TYPE_MAVEN = "maven";
 
+    /**
+     * Used to manipulate xwiki.properties files.
+     */
     @Inject
     @Named("xwikiproperties")
     private ConfigurationSource configurationSource;
 
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
     // Cache
 
+    /**
+     * @see DefaultExtensionManagerConfiguration#getLocalRepository()
+     */
     private File localRepository;
 
+    /**
+     * @return extension manage home folder
+     */
     public File getHome()
     {
         return EXTENSIONSHOME;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.ExtensionManagerConfiguration#getLocalRepository()
+     */
     public File getLocalRepository()
     {
         if (this.localRepository == null) {
@@ -78,6 +120,11 @@ public class DefaultExtensionManagerConfiguration extends AbstractLogEnabled imp
         return this.localRepository;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.ExtensionManagerConfiguration#getRepositories()
+     */
     public List<ExtensionRepositoryId> getRepositories()
     {
         List<ExtensionRepositoryId> repositories = new ArrayList<ExtensionRepositoryId>();
@@ -91,15 +138,15 @@ public class DefaultExtensionManagerConfiguration extends AbstractLogEnabled imp
                     ExtensionRepositoryId extensionRepositoryId = parseRepository(repositoryString);
                     repositories.add(extensionRepositoryId);
                 } catch (Exception e) {
-                    getLogger().warn("Faild to parse repository [" + repositoryString + "] from configuration", e);
+                    this.logger.warn("Faild to parse repository [" + repositoryString + "] from configuration", e);
                 }
             }
         } else {
             try {
-                repositories.add(new ExtensionRepositoryId("xwiki-releases", "maven", new URI(
+                repositories.add(new ExtensionRepositoryId("maven-xwiki-releases", TYPE_MAVEN, new URI(
                     "http://maven.xwiki.org/releases/")));
-                repositories.add(new ExtensionRepositoryId("central", "maven",
-                    new URI("http://repo1.maven.org/maven2/")));
+                repositories.add(new ExtensionRepositoryId("maven-central", TYPE_MAVEN, new URI(
+                    "http://repo1.maven.org/maven2/")));
             } catch (Exception e) {
                 // Should never happen
             }
@@ -108,6 +155,13 @@ public class DefaultExtensionManagerConfiguration extends AbstractLogEnabled imp
         return repositories;
     }
 
+    /**
+     * Create a {@link ExtensionRepositoryId} from a string entry.
+     * 
+     * @param repositoryString the repository configuration entry
+     * @return the {@link ExtensionRepositoryId}
+     * @throws URISyntaxException Failed to create an {@link URI} object from the configuration entry
+     */
     private ExtensionRepositoryId parseRepository(String repositoryString) throws URISyntaxException
     {
         Matcher matcher = REPOSITORYIDPATTERN.matcher(repositoryString);

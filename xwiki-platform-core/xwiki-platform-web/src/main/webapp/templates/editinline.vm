@@ -5,6 +5,21 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 #set($saveaction = "save")
 #set($previewenabled = true)
 <div class="main layoutsubsection">
+  <div id="contentmenu" class="actionmenu">
+    #template("editmenu.vm")
+  </div>
+<div id="mainContentArea">
+#template("hierarchy.vm")
+#template('editmeta.vm')
+## ----------------------------------------------------------------------------
+## Compute title to display and modify rendered content accordingly.
+## ----------------------------------------------------------------------------
+#set ($renderedContent = $cdoc.getRenderedContent())
+#template("titlevars.vm")
+## ----------------------------
+## Display the title
+## ----------------------------
+<div id="document-title"><h1>$titleToDisplay</h1></div>
 ##
 ##
 ## Can the document be edited?
@@ -36,16 +51,20 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 <input type="hidden" name="template" value="$!{escapetool.xml($request.template)}" />
 <input type="hidden" name="language" value="$!{escapetool.xml($doc.language)}" />
 #if("$!request.parent" != '')
-  <input type="hidden" name="parent" value="$!{escapetool.xml($request.parent)}" />
+  <input type="hidden" name="parent" value="$escapetool.xml($!request.parent)" />
 #end
 #if("$!request.title" != '')
-  <input type="hidden" name="title" value="$!{escapetool.xml($request.title)}" />
+  <input type="hidden" name="title" value="$escapetool.xml($!request.title)" />
 #end
-$cdoc.getRenderedContent()
+## ----------------------------
+## Display the rendered content
+## ----------------------------
+$renderedContent
 #set($editactions = "bottom")
 <div class="bottombuttons">#template("editactions.vm")</div>
 </div> ## form
 </form>
 #template("textarea_wysiwyg.vm")
 #end ## can edit
+</div> ## mainContentArea
 </div> ## main

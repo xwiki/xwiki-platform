@@ -37,6 +37,7 @@ public class WebPageLinkWizardStep extends AbstractExternalLinkWizardStep
     public WebPageLinkWizardStep(WikiServiceAsync wikiService)
     {
         super(wikiService);
+        setStepTitle(Strings.INSTANCE.linkToWebPage());
     }
 
     /**
@@ -92,13 +93,5 @@ public class WebPageLinkWizardStep extends AbstractExternalLinkWizardStep
         }
 
         return webPageAddress;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getStepTitle()
-    {
-        return Strings.INSTANCE.linkToWebPage();
     }
 }

@@ -38,12 +38,12 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.io.input.CloseShieldInputStream;
+import org.slf4j.Logger;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -64,7 +64,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
 @Singleton
-public class DefaultPackager extends AbstractLogEnabled implements Packager, Initializable
+public class DefaultPackager implements Packager, Initializable
 {
     @Inject
     private ComponentManager componentManager;
@@ -75,6 +75,12 @@ public class DefaultPackager extends AbstractLogEnabled implements Packager, Ini
     @Inject
     @Named("explicit/reference")
     private DocumentReferenceResolver<EntityReference> resolver;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     private SAXParserFactory parserFactory;
 
@@ -126,7 +132,7 @@ public class DefaultPackager extends AbstractLogEnabled implements Packager, Ini
                     } catch (NotADocumentException e) {
                         // Impossible to know that before parsing
                     } catch (Exception e) {
-                        getLogger().error("Failed to parse document [" + entry.getName() + "]", e);
+                        this.logger.error("Failed to parse document [" + entry.getName() + "]", e);
                     }
                 }
             }
@@ -204,7 +210,7 @@ public class DefaultPackager extends AbstractLogEnabled implements Packager, Ini
                     }
                 }
             } catch (XWikiException e) {
-                getLogger().error("Failed to delete document [" + documentReference + "]", e);
+                this.logger.error("Failed to delete document [" + documentReference + "]", e);
             }
         }
     }
@@ -235,7 +241,7 @@ public class DefaultPackager extends AbstractLogEnabled implements Packager, Ini
                     } catch (NotADocumentException e) {
                         // Impossible to know that before parsing
                     } catch (Exception e) {
-                        getLogger().error("Failed to parse document [" + entry.getName() + "]", e);
+                        this.logger.error("Failed to parse document [" + entry.getName() + "]", e);
                     }
                 }
             }

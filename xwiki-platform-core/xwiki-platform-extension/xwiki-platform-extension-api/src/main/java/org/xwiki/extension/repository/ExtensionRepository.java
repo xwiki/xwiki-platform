@@ -20,19 +20,34 @@
 package org.xwiki.extension.repository;
 
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionCollectException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 
+/**
+ * A repository containing extensions.
+ * 
+ * @version $Id$
+ */
 public interface ExtensionRepository
 {
+    /**
+     * @return the repository identifier.
+     */
     ExtensionRepositoryId getId();
 
+    /**
+     * Return extension descriptor from the repository. If the extension can't be found a {@link ResolveException} is
+     * thrown.
+     * 
+     * @param extensionId the extension identifier
+     * @return the found extension descriptor
+     * @throws ResolveException failed to find extension in the repository
+     */
     Extension resolve(ExtensionId extensionId) throws ResolveException;
 
+    /**
+     * @param extensionId the extension identifier
+     * @return true if the extension exists in the repository
+     */
     boolean exists(ExtensionId extensionId);
-
-    int countExtensions();
-
-    void collectExtensions(ExtensionCollector collector) throws ExtensionCollectException;
 }

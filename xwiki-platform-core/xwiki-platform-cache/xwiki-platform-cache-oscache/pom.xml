@@ -34,6 +34,12 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Cache - OSCache</description>
   <dependencies>
+    <!-- We only need this dependency for the Logging API/Implementation part -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-default</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-cache-api</artifactId>
@@ -56,10 +62,6 @@
           <artifactId>jms</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
     </dependency>
     <!--  Test Dependencies -->
     <dependency>

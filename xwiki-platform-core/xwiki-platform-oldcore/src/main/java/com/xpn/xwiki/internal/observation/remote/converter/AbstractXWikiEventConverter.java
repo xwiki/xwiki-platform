@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.internal.observation.remote.converter;
 
@@ -24,6 +23,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -68,6 +70,12 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
      */
     @Requirement
     private XWikiStubContextProvider stubContextProvider;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * @param context the XWiki context to serialize
@@ -116,7 +124,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
             xcontext.setDatabase((String) remoteDataMap.get(CONTEXT_WIKI));
             xcontext.setUser((String) remoteDataMap.get(CONTEXT_USER));
         } else {
-            getLogger().warn(
+            this.logger.warn(
                 "Can't get a proper XWikiContext."
                     + " It generally mean that the wiki has never been fully initialized,"
                     + " i.e. has never been accesses at least once");

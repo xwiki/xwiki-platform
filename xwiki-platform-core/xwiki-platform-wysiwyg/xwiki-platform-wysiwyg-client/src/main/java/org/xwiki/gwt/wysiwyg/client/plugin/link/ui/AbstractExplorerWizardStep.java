@@ -22,23 +22,20 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link.ui;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.VerticalResizePanel;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
 import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
-import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
 import org.xwiki.gwt.wysiwyg.client.widget.explorer.XWikiExplorer;
 import org.xwiki.gwt.wysiwyg.client.widget.explorer.ds.WikiDataSource;
 import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
+import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
-import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
 import com.smartgwt.client.widgets.events.KeyPressEvent;
 import com.smartgwt.client.widgets.events.KeyPressHandler;
 import com.smartgwt.client.widgets.grid.events.RecordDoubleClickEvent;
@@ -63,11 +60,6 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     private final XWikiExplorer explorer = new XWikiExplorer();
 
     /**
-     * The panel to hold the xwiki explorer.
-     */
-    private final VerticalResizePanel mainPanel = new VerticalResizePanel();
-
-    /**
      * The label to display the error on submission of the wizard step form.
      */
     private final Label errorLabel = new Label();
@@ -84,44 +76,31 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     private final NavigationListenerCollection listeners = new NavigationListenerCollection();
 
     /**
-     * The service used to parse and serialize entity references.
-     */
-    private final WikiServiceAsync wikiService;
-
-    /**
-     * The step title.
-     */
-    private String stepTitle;
-
-    /**
      * Builds a {@link AbstractExplorerWizardStep} from the passed settings.
      * 
-     * @param wikiService the service to be used to parse and serialize entity references
      * @param addPage specifies whether the wiki explorer should show the option to add a page
      * @param showAttachments specifies whether the wiki explorer should show the attached files for pages
      * @param addAttachments specifies whether the wiki explorer should show the option to add an attachment
      */
-    public AbstractExplorerWizardStep(WikiServiceAsync wikiService, boolean addPage, boolean showAttachments,
-        boolean addAttachments)
+    public AbstractExplorerWizardStep(boolean addPage, boolean showAttachments, boolean addAttachments)
     {
-        this(wikiService, addPage, showAttachments, addAttachments, 455, 305);
+        this(addPage, showAttachments, addAttachments, 455, 305);
     }
 
     /**
      * Builds a {@link AbstractExplorerWizardStep} from the passed settings, with parameters for size. <br />
      * FIXME: remove the size parameters when the explorer will be correctly sizable from CSS.
      * 
-     * @param wikiService the service to be used to parse and serialize entity references
      * @param addPage specifies whether the wiki explorer should show the option to add a page
      * @param showAttachments specifies whether the wiki explorer should show the attached files for pages
      * @param addAttachments specifies whether the wiki explorer should show the option to add an attachment
      * @param width explorer width in pixels
      * @param height explorer height in pixels
      */
-    protected AbstractExplorerWizardStep(WikiServiceAsync wikiService, boolean addPage, boolean showAttachments,
-        boolean addAttachments, int width, int height)
+    protected AbstractExplorerWizardStep(boolean addPage, boolean showAttachments, boolean addAttachments, int width,
+        int height)
     {
-        this.wikiService = wikiService;
+        super(new VerticalResizePanel());
 
         explorer.setDisplayLinks(false);
         // display the new page option
@@ -148,18 +127,18 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         explorer.addKeyPressHandler(this);
 
         helpLabel.addStyleName("xHelpLabel");
-        mainPanel.add(helpLabel);
+        display().add(helpLabel);
 
         errorLabel.setVisible(false);
         errorLabel.addStyleName("xErrorMsg");
-        mainPanel.add(errorLabel);
+        display().add(errorLabel);
 
-        mainPanel.addStyleName("xExplorerPanel");
+        display().addStyleName("xExplorerPanel");
         // we need to add the explorer in a wrapper, since the explorer creates its own wrapper around and adds the
         // input to that wrapper. We use this panel to have a reference to the _whole_ generated UI, since the explorer
         // reference would point only to the grid inside.
-        mainPanel.add(explorer);
-        mainPanel.setExpandingWidget(explorer, true);
+        display().add(explorer);
+        display().setExpandingWidget(explorer, true);
     }
 
     /**
@@ -189,9 +168,9 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     /**
      * {@inheritDoc}
      */
-    public Widget display()
+    public VerticalResizePanel display()
     {
-        return mainPanel;
+        return (VerticalResizePanel) super.display();
     }
 
     /**
@@ -220,24 +199,17 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     @Override
     protected void initializeSelection(AsyncCallback< ? > initCallback)
     {
-        String reference = getData().getData().getReference();
-        if (!StringUtils.isEmpty(reference)) {
-            // Edit link (link reference is not empty).
-            getExplorer().selectEntity(getData().getDestination().getEntityReference(), null);
-        } else if (StringUtils.isEmpty(getExplorer().getValue())) {
-            // New link (no entity has been previously selected).
-            getExplorer().selectEntity(getData().getOrigin(), getGroupAnchor(getData().getDestination().getType()));
-        } // Else, preserve the current selection.
-        super.initializeSelection(initCallback);
-    }
+        EntityReference targetEntityReference = getData().getDestination().getEntityReference();
+        // If we don't have something selected or something was explicitly selected.
+        if (StringUtils.isEmpty(getExplorer().getValue()) || !getData().getOrigin().equals(targetEntityReference)) {
+            boolean isAttachment = getData().getDestination().getType() == ResourceType.ATTACHMENT;
+            String fileName = new AttachmentReference(targetEntityReference).getFileName();
+            String anchor = isAttachment && StringUtils.isEmpty(fileName) ? "Attachments" : null;
 
-    /**
-     * @param resourceType a resource type
-     * @return the anchor that groups the resources with the specified type under their parent entity
-     */
-    private String getGroupAnchor(ResourceType resourceType)
-    {
-        return resourceType == ResourceType.ATTACHMENT ? "Attachments" : null;
+            getExplorer().selectEntity(targetEntityReference, anchor);
+        }
+        // Else, keep the previous selection.
+        super.initializeSelection(initCallback);
     }
 
     /**
@@ -253,7 +225,7 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         if (!explorer.getElement().getClassName().contains(FIELD_ERROR_STYLE)) {
             explorer.getElement().setClassName(explorer.getElement().getClassName() + " " + FIELD_ERROR_STYLE);
         }
-        mainPanel.refreshHeights();
+        display().refreshHeights();
     }
 
     /**
@@ -266,7 +238,7 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         String boundary = "\\b";
         explorer.getElement().setClassName(
             explorer.getElement().getClassName().replaceAll(boundary + FIELD_ERROR_STYLE + boundary, ""));
-        mainPanel.refreshHeights();
+        display().refreshHeights();
     }
 
     /**
@@ -308,35 +280,13 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
      * Updates the link configuration object based on the selected entity.
      * 
      * @param selectedEntityReference a reference to the selected entity
-     * @param callback the object to be notified after the link configuration object has been updated
      */
-    protected void updateLinkConfig(EntityReference selectedEntityReference, final AsyncCallback<Boolean> callback)
+    protected void updateLinkConfig(EntityReference selectedEntityReference)
     {
-        final ResourceReference destination = getData().getDestination().clone();
-        destination.setEntityReference(selectedEntityReference.clone());
-        wikiService.getEntityConfig(getData().getOrigin(), destination, new AsyncCallback<EntityConfig>()
-        {
-            public void onFailure(Throwable caught)
-            {
-                callback.onFailure(caught);
-            }
-
-            public void onSuccess(EntityConfig result)
-            {
-                getData().setDestination(destination);
-                getData().getData().setReference(result.getReference());
-                getData().getData().setUrl(result.getUrl());
-                callback.onSuccess(true);
-            }
-        });
-    }
-
-    /**
-     * @return the service used to parse and serialize entity references
-     */
-    protected WikiServiceAsync getWikiService()
-    {
-        return wikiService;
+        getData().getDestination().setEntityReference(selectedEntityReference.clone());
+        // Reset the link configuration.
+        getData().getData().setReference(null);
+        getData().getData().setUrl(null);
     }
 
     /**
@@ -347,25 +297,5 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     public void onCancel()
     {
         // Do nothing.
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectorWizardStep#getStepTitle()
-     */
-    public String getStepTitle()
-    {
-        return stepTitle;
-    }
-
-    /**
-     * Sets the step title.
-     * 
-     * @param stepTitle the new step title
-     */
-    public void setStepTitle(String stepTitle)
-    {
-        this.stepTitle = stepTitle;
     }
 }

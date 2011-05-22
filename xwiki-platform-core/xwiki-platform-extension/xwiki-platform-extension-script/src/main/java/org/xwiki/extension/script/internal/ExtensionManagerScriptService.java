@@ -19,7 +19,10 @@
  */
 package org.xwiki.extension.script.internal;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -34,8 +37,12 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.WrappingCoreExtension;
+import org.xwiki.extension.WrappingExtension;
+import org.xwiki.extension.WrappingLocalExtension;
 import org.xwiki.extension.internal.VersionManager;
 import org.xwiki.extension.repository.CoreExtensionRepository;
+import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.task.InstallRequest;
 import org.xwiki.extension.task.Task;
@@ -67,10 +74,52 @@ public class ExtensionManagerScriptService implements ScriptService
     private CoreExtensionRepository coreExtensionRepository;
 
     @Inject
+    private ExtensionRepositoryManager reporitoryManager;
+
+    @Inject
     private TaskManager taskManager;
 
     @Inject
     private Execution execution;
+
+    private <K> Map<K, Collection<LocalExtension>> wrapExtensions(Map<K, Collection<LocalExtension>> extensions)
+    {
+        Map<K, Collection<LocalExtension>> wrappedExtensions = new LinkedHashMap<K, Collection<LocalExtension>>();
+
+        for (Map.Entry<K, Collection<LocalExtension>> entry : extensions.entrySet()) {
+            wrappedExtensions.put(entry.getKey(), this.<LocalExtension> wrapExtensions(entry.getValue()));
+        }
+
+        return wrappedExtensions;
+    }
+
+    private <T extends Extension> Collection<T> wrapExtensions(Collection< ? extends Extension> extensions)
+    {
+        List<T> wrappedExtensions = new ArrayList<T>(extensions.size());
+
+        for (Extension extension : extensions) {
+            wrappedExtensions.add(this.<T> wrapExtension(extension));
+        }
+
+        return wrappedExtensions;
+    }
+
+    private <T extends Extension> T wrapExtension(Extension extension)
+    {
+        T wrappedExtension;
+
+        if (extension instanceof CoreExtension) {
+            wrappedExtension = (T) new WrappingCoreExtension<CoreExtension>((CoreExtension) extension);
+        } else if (extension instanceof LocalExtension) {
+            wrappedExtension = (T) new WrappingLocalExtension<LocalExtension>((LocalExtension) extension);
+        } else if (extension != null) {
+            wrappedExtension = (T) new WrappingExtension<Extension>(extension);
+        } else {
+            wrappedExtension = null;
+        }
+
+        return wrappedExtension;
+    }
 
     public Exception getLastError()
     {
@@ -89,7 +138,7 @@ public class ExtensionManagerScriptService implements ScriptService
         Extension extension;
 
         try {
-            extension = this.extensionManager.resolveExtension(new ExtensionId(id, version), namespace);
+            extension = wrapExtension(this.extensionManager.resolveExtension(new ExtensionId(id, version), namespace));
         } catch (Exception e) {
             setError(e);
 
@@ -99,6 +148,11 @@ public class ExtensionManagerScriptService implements ScriptService
         return extension;
     }
 
+    public Collection<Extension> search(String pattern, int offset, int nb)
+    {
+        return wrapExtensions(this.reporitoryManager.search(pattern, offset, nb));
+    }
+
     public Map<String, Collection<LocalExtension>> getBackwardDependencies(String id, String version)
     {
         setError(null);
@@ -106,7 +160,9 @@ public class ExtensionManagerScriptService implements ScriptService
         Map<String, Collection<LocalExtension>> extensions;
 
         try {
-            extensions = this.localExtensionRepository.getBackwardDependencies(new ExtensionId(id, version));
+            extensions =
+                this.<String> wrapExtensions(this.localExtensionRepository.getBackwardDependencies(new ExtensionId(id,
+                    version)));
         } catch (Exception e) {
             setError(e);
 
@@ -118,27 +174,27 @@ public class ExtensionManagerScriptService implements ScriptService
 
     public LocalExtension getInstalledExtension(String id, String namespace)
     {
-        return this.localExtensionRepository.getInstalledExtension(id, namespace);
+        return wrapExtension(this.localExtensionRepository.getInstalledExtension(id, namespace));
     }
 
     public Collection<LocalExtension> getInstalledExtensions(String namespace)
     {
-        return this.localExtensionRepository.getInstalledExtensions(namespace);
+        return wrapExtensions(this.localExtensionRepository.getInstalledExtensions(namespace));
     }
 
     public Collection<LocalExtension> getInstalledExtensions()
     {
-        return this.localExtensionRepository.getInstalledExtensions();
+        return wrapExtensions(this.localExtensionRepository.getInstalledExtensions());
     }
 
     public Collection<CoreExtension> getCoreExtensions()
     {
-        return this.coreExtensionRepository.getCoreExtensions();
+        return wrapExtensions(this.coreExtensionRepository.getCoreExtensions());
     }
 
     public CoreExtension getCoreExtension(String id)
     {
-        return this.coreExtensionRepository.getCoreExtension(id);
+        return wrapExtension(this.coreExtensionRepository.getCoreExtension(id));
     }
 
     public VersionManager getVersionManager()

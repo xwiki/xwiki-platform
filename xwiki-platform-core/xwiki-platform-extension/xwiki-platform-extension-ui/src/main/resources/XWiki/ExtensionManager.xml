@@ -11,15 +11,15 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1284039567000</creationDate>
-<date>1300723874000</date>
-<contentUpdateDate>1300723874000</contentUpdateDate>
+<date>1305186885000</date>
+<contentUpdateDate>1305186885000</contentUpdateDate>
 <version>1.1</version>
 <title>Extension Manager</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>true</minorEdit>
+<minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden><attachment>
 <filename>icon.png</filename>
@@ -354,6 +354,34 @@ This application is experimental, use it at your own risk.
 #set($versionManager = $extensionManager.versionManager)
 #if ($request.extensionwiki &amp;&amp; $request.extensionwiki.trim() != '')
   #set($extensionwiki = $request.extensionwiki)
+#end
+{{/velocity}}
+
+{{velocity}}
+{{html}}
+&lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform half"&gt;
+   &lt;dl&gt;
+     &lt;dt&gt;
+       &lt;label for="extensionsearchpattern"&gt;Search pattern &lt;span class="xRequired"&gt;(Required)&lt;/span&gt;&lt;/label&gt;
+       &lt;span class="xHint"&gt;The string to search in repositories&lt;/span&gt;
+     &lt;/dt&gt;
+     &lt;dd&gt;
+       &lt;input id="extensionsearchpattern" name="extensionsearchpattern" type="text" class="" #if($request.extensionsearchpattern)value="${escapetool.xml($request.extensionsearchpattern)}"#end /&gt;
+     &lt;/dd&gt;
+   &lt;/dl&gt;
+  &lt;p&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Search" name="actionsearch" class="button"/&gt;&lt;/span&gt;
+  &lt;/p&gt;
+&lt;/form&gt;
+{{/html}}
+{{/velocity}}
+
+{{velocity}}
+#if ($request.actionsearch)
+  #set($extensions = $extensionManager.search($request.extensionsearchpattern, 0, -1))
+  #foreach($extension in $extensions)
+    * [[$extension.id&gt;&gt;?actionsearch&amp;extensionid=${escapetool.url($extension.id.id)}&amp;extensionversion=${escapetool.url($extension.id.version)}&amp;extensionsearchpattern=${escapetool.url($request.extensionsearchpattern)}]]
+  #end
 #end
 {{/velocity}}
 

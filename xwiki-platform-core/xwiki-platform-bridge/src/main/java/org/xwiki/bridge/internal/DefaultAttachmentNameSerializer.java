@@ -19,11 +19,13 @@
  */
 package org.xwiki.bridge.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.AttachmentName;
 import org.xwiki.bridge.AttachmentNameSerializer;
 import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 
 /**
  * Generate a fully qualified attachment reference string (ie of the form {@code wiki:space.page@filename}
@@ -31,16 +33,17 @@ import org.xwiki.component.annotation.Requirement;
  * 
  * @version $Id$
  * @since 2.0.1
- * @deprecated use {@link org.xwiki.model.internal.DefaultAttachmentNameSerializer} instead since 2.2M1
+ * @deprecated use {@link org.xwiki.model.reference.EntityReferenceSerializer} instead since 2.2M1
  */
 @Component
+@Singleton
 @Deprecated
 public class DefaultAttachmentNameSerializer implements AttachmentNameSerializer
 {
     /**
      * Serializer to transform a DocumentReference Object into a string.
      */
-    @Requirement
+    @Inject
     private DocumentNameSerializer documentNameSerializer;
     
     /**

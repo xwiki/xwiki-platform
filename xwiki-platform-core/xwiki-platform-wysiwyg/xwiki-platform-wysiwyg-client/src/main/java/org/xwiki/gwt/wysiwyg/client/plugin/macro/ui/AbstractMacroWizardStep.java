@@ -20,7 +20,7 @@
 package org.xwiki.gwt.wysiwyg.client.plugin.macro.ui;
 
 import org.xwiki.gwt.user.client.Config;
-import org.xwiki.gwt.user.client.ui.wizard.AbstractNavigationAwareWizardStep;
+import org.xwiki.gwt.user.client.ui.wizard.AbstractInteractiveWizardStep;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroServiceAsync;
 
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -30,7 +30,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
  * 
  * @version $Id$
  */
-public abstract class AbstractMacroWizardStep extends AbstractNavigationAwareWizardStep
+public abstract class AbstractMacroWizardStep extends AbstractInteractiveWizardStep
 {
     /**
      * The object used to configure the wizard step.

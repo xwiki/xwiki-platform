@@ -27,7 +27,6 @@ import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.MDC;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -99,7 +98,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     /**
      * Soft threshold after which no more documents will be added to the indexing queue. When the queue size gets larger
-     * than this value, the index rebuilding thread will sleep chuks of {@link IndexRebuilder#retryInterval}
+     * than this value, the index rebuilding thread will sleep chunks of {@code IndexRebuilder#retryInterval}
      * milliseconds until the queue size will get back bellow this threshold. This does not affect normal indexing
      * through wiki updates.
      */
@@ -151,15 +150,8 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
      */
     protected void runInternal()
     {
-        MDC.put("url", "Lucene index updating thread");
-
         getContext().setDatabase(getContext().getMainXWiki());
-
-        try {
-            runMainLoop();
-        } finally {
-            MDC.remove("url");
-        }
+        runMainLoop();
     }
 
     /**

@@ -36,6 +36,9 @@ import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+
 /**
  * Rich text editor plug-in for inserting links, using a dialog to get link settings from the user. It installs a menu
  * bar extension, with entries for all its actions.
@@ -120,6 +123,15 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
 
         menuExtension = new LinkMenuExtension(this);
         getUIExtensionList().add(menuExtension);
+        // Hack: We can access the menus where each menu item was placed only after the main menu bar is initialized,
+        // which happens after all the plugins are loaded.
+        Scheduler.get().scheduleDeferred(new ScheduledCommand()
+        {
+            public void execute()
+            {
+                menuExtension.registerAttachHandlers();
+            }
+        });
 
         // Initialize the meta data extractor to handle link meta data.
         metaDataExtractor = new LinkMetaDataExtractor();
@@ -158,7 +170,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
         getTextArea().getCommandManager().removeCommandListener(linkFilter);
 
         // Destroy menu extension.
-        menuExtension.destroy();
+        menuExtension.clearFeatures();
         super.destroy();
     }
 
@@ -171,7 +183,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
     {
         LinkConfig linkConfig = linkConfigFactory.createLinkConfig();
         linkConfig.setType(linkType);
-        dispatchLinkWizard(linkConfig);
+        getLinkWizard().start(LinkWizardStep.LINK_REFERENCE_PARSER.toString(), linkConfig);
     }
 
     /**
@@ -179,32 +191,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
      */
     public void onLinkEdit()
     {
-        dispatchLinkWizard(linkConfigFactory.createLinkConfig());
-    }
-
-    /**
-     * Instantiates and runs the correct wizard for the passed link.
-     * 
-     * @param linkConfig the link configuration object to be passed to the wizard
-     */
-    protected void dispatchLinkWizard(LinkConfig linkConfig)
-    {
-        switch (linkConfig.getType()) {
-            case WIKIPAGE:
-            case NEW_WIKIPAGE:
-                getLinkWizard().start(LinkWizardStep.WIKI_PAGE.toString(), linkConfig);
-                break;
-            case ATTACHMENT:
-                getLinkWizard().start(LinkWizardStep.ATTACHMENT.toString(), linkConfig);
-                break;
-            case EMAIL:
-                getLinkWizard().start(LinkWizardStep.EMAIL.toString(), linkConfig);
-                break;
-            case EXTERNAL:
-            default:
-                getLinkWizard().start(LinkWizardStep.WEB_PAGE.toString(), linkConfig);
-                break;
-        }
+        getLinkWizard().start(LinkWizardStep.LINK_REFERENCE_PARSER.toString(), linkConfigFactory.createLinkConfig());
     }
 
     /**
@@ -240,7 +227,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
     {
         // Return the focus to the rich text area.
         getTextArea().setFocus(true);
-        // Insert of update the link.
+        // Insert or update the link.
         String linkJSON = linkConfigJSONSerializer.serialize((LinkConfig) result);
         getTextArea().getCommandManager().execute(Command.CREATE_LINK, linkJSON);
     }

@@ -29,12 +29,12 @@ import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.ExecTask;
 import org.apache.tools.ant.types.Commandline;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Start and stop a xwiki instance.
@@ -44,11 +44,13 @@ import org.apache.tools.ant.types.Commandline;
  */
 public class XWikiExecutor
 {
-    protected static final Log LOG = LogFactory.getLog(XWikiExecutor.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiExecutor.class);
 
     public static final String DEFAULT_PORT = System.getProperty("xwikiPort", "8080");
 
     public static final String DEFAULT_STOPPORT = System.getProperty("xwikiStopPort", "8079");
+
+    public static final String DEFAULT_RMIPORT = System.getProperty("rmiPort", "9010");
 
     private static final String DEFAULT_EXECUTION_DIRECTORY = System.getProperty("xwikiExecutionDirectory");
 
@@ -64,8 +66,6 @@ public class XWikiExecutor
 
     private static final String XWIKIPROPERTIES_PATH = WEBINF_PATH + "/xwiki.properties";
 
-    private static final String LOG4PROPERTIES_PATH = WEBINF_PATH + "/classes/log4j.properties";
-
     private static final int TIMEOUT_SECONDS = 120;
 
     private Project project;
@@ -73,6 +73,8 @@ public class XWikiExecutor
     private int port;
 
     private int stopPort;
+
+    private int rmiPort;
 
     private String executionDirectory;
 
@@ -100,6 +102,9 @@ public class XWikiExecutor
         String stopPortString = System.getProperty("xwikiStopPort" + index);
         this.stopPort =
             stopPortString != null ? Integer.valueOf(stopPortString) : (Integer.valueOf(DEFAULT_STOPPORT) - index);
+        String rmiPortString = System.getProperty("rmiPort" + index);
+        this.rmiPort =
+            rmiPortString != null ? Integer.valueOf(rmiPortString) : (Integer.valueOf(DEFAULT_RMIPORT) + index);
 
         // resolve execution directory
         this.executionDirectory = System.getProperty("xwikiExecutionDirectory" + index);
@@ -119,6 +124,11 @@ public class XWikiExecutor
     public int getStopPort()
     {
         return this.stopPort;
+    }
+
+    public int getRMIPort()
+    {
+        return this.rmiPort;
     }
 
     public String getExecutionDirectory()
@@ -168,6 +178,7 @@ public class XWikiExecutor
             String startCommand = START_COMMAND;
             startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(getPort()));
             startCommand = startCommand.replaceFirst(DEFAULT_STOPPORT, String.valueOf(getStopPort()));
+            startCommand = startCommand.replaceFirst(DEFAULT_RMIPORT, String.valueOf(getRMIPort()));
 
             Commandline commandLine = new Commandline(startCommand);
             execTask.setCommand(commandLine);
@@ -284,11 +295,6 @@ public class XWikiExecutor
         return getExecutionDirectory() + XWIKIPROPERTIES_PATH;
     }
 
-    public String getLog4JPropertiesPath()
-    {
-        return getExecutionDirectory() + LOG4PROPERTIES_PATH;
-    }
-
     public Properties loadXWikiCfg() throws Exception
     {
         return getProperties(getXWikiCfgPath());
@@ -297,11 +303,6 @@ public class XWikiExecutor
     public Properties loadXWikiProperties() throws Exception
     {
         return getProperties(getXWikiPropertiesPath());
-    }
-
-    public Properties loadLog4JProperties() throws Exception
-    {
-        return getProperties(getLog4JPropertiesPath());
     }
 
     private Properties getProperties(String path) throws Exception
@@ -318,7 +319,7 @@ public class XWikiExecutor
                 fis.close();
             }
         } catch (FileNotFoundException e) {
-            LOG.debug("Failed to load properties [" + path + "]", e);
+            LOGGER.debug("Failed to load properties [" + path + "]", e);
         }
 
         return properties;
@@ -332,11 +333,6 @@ public class XWikiExecutor
     public void saveXWikiProperties(Properties properties) throws Exception
     {
         saveProperties(getXWikiPropertiesPath(), properties);
-    }
-
-    public void saveLog4JProperties(Properties properties) throws Exception
-    {
-        saveProperties(getLog4JPropertiesPath(), properties);
     }
 
     private void saveProperties(String path, Properties properties) throws Exception

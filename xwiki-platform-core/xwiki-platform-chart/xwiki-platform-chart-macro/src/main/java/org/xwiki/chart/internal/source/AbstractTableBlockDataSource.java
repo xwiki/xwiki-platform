@@ -22,9 +22,11 @@ package org.xwiki.chart.internal.source;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.xwiki.chart.model.ChartModel;
 import org.xwiki.chart.model.DefaultChartModel;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.TableCellBlock;
 import org.xwiki.rendering.block.TableRowBlock;
@@ -77,7 +79,8 @@ public abstract class AbstractTableBlockDataSource implements ChartDataSource
     /**
      * Used to convert cell blocks in plain text so that it can be converted to numbers.
      */
-    @Requirement("plain/1.0")
+    @Inject
+    @Named("plain/1.0")
     private BlockRenderer plainTextBlockRenderer;
 
     /**

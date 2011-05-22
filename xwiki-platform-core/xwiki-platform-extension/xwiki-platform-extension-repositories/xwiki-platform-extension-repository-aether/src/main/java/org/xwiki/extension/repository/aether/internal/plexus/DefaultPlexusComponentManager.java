@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.repository.aether.internal.plexus;
 
+import javax.inject.Inject;
+
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -26,15 +28,21 @@ import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.repository.aether.internal.XWikiLoggerManager;
 
 @Component
-public class DefaultPlexusComponentManager extends AbstractLogEnabled implements PlexusComponentManager, Initializable
+public class DefaultPlexusComponentManager implements PlexusComponentManager, Initializable
 {
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
     /**
      * In-process maven runtime.
      */
@@ -57,7 +65,7 @@ public class DefaultPlexusComponentManager extends AbstractLogEnabled implements
                 new ClassWorld(mavenCoreRealmId, ClassWorld.class.getClassLoader())).setName("mavenCore");
 
         this.plexusContainer = new DefaultPlexusContainer(mavenCoreCC);
-        this.plexusContainer.setLoggerManager(new XWikiLoggerManager(getLogger()));
+        this.plexusContainer.setLoggerManager(new XWikiLoggerManager(this.logger));
     }
 
     public PlexusContainer getPlexus()

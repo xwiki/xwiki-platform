@@ -25,34 +25,72 @@ import java.util.List;
 import org.xwiki.extension.task.Request;
 import org.xwiki.extension.task.Task;
 
+/**
+ * Base class for {@link Task} implementations.
+ * 
+ * @param <R> the request type associated to the task
+ * @version $Id$
+ */
 public abstract class AbstractTask<R extends Request> implements Task
 {
+    /**
+     * @see #getStatus()
+     */
     private Status status = Status.NONE;
 
+    /**
+     * @see #getRequest()
+     */
     private R request;
 
+    /**
+     * @see #getExceptions()
+     */
     private List<Exception> exceptions;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.task.Task#getStatus()
+     */
     public Status getStatus()
     {
         return this.status;
     }
 
+    /**
+     * @param status the status of the task
+     */
     public void setStatus(Status status)
     {
         this.status = status;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.task.Task#getRequest()
+     */
     public R getRequest()
     {
         return this.request;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.task.Task#getExceptions()
+     */
     public List<Exception> getExceptions()
     {
         return this.exceptions;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.task.Task#start(org.xwiki.extension.task.Request)
+     */
     public void start(Request request)
     {
         this.request = (R) request;
@@ -63,9 +101,14 @@ public abstract class AbstractTask<R extends Request> implements Task
             this.exceptions = new ArrayList<Exception>(1);
             this.exceptions.add(e);
         }
-        
+
         setStatus(Status.FINISHED);
     }
 
+    /**
+     * Should be implemented by {@link Task} implementations.
+     * 
+     * @throws Exception errors during task execution
+     */
     protected abstract void start() throws Exception;
 }

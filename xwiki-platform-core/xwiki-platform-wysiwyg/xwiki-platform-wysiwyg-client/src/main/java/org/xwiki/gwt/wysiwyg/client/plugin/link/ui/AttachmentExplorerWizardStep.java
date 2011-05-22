@@ -23,7 +23,6 @@ import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
-import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -36,15 +35,13 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
 {
     /**
      * Creates a new attachment selection wizard step that allows the user to select an attachment from a tree.
-     * 
-     * @param wikiService the service to be used for getting information about the selected attachments
      */
-    public AttachmentExplorerWizardStep(WikiServiceAsync wikiService)
+    public AttachmentExplorerWizardStep()
     {
         // Reduce the size to fit the toggling bar of the attachment selector step which aggregates this step.
         // FIXME: This wizard step should be usable w/o the aggregating step. Also having size information added in more
         // than one single place is bad.
-        super(wikiService, false, true, true, 455, 280);
+        super(false, true, true, 455, 280);
 
         setStepTitle(Strings.INSTANCE.linkSelectAttachmentTitle());
         setHelpLabelText(Strings.INSTANCE.linkSelectAttachmentHelpLabel());
@@ -56,7 +53,7 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
     public String getNextStep()
     {
         return getExplorer().isNewAttachment() ? LinkWizardStep.ATTACHMENT_UPLOAD.toString()
-            : LinkWizardStep.WIKI_PAGE_CONFIG.toString();
+            : LinkWizardStep.LINK_CONFIG.toString();
     }
 
     /**
@@ -83,7 +80,8 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
         } else if (getData().getDestination().getEntityReference().equals(attachmentReference.getEntityReference())) {
             async.onSuccess(true);
         } else {
-            updateLinkConfig(attachmentReference.getEntityReference(), async);
+            updateLinkConfig(attachmentReference.getEntityReference());
+            async.onSuccess(true);
         }
     }
 }

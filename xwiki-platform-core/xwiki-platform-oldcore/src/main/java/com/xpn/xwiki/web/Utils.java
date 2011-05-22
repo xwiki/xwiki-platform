@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
@@ -40,7 +39,6 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.MDC;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -340,10 +338,6 @@ public class Utils
         String dbname = "xwiki";
         URL url = XWiki.getRequestURL(request);
         context.setURL(url);
-
-        // Push the URL into the Log4j MDC context so that we can display it in the generated logs using the
-        // %X{url} syntax.
-        MDC.put("url", url);
 
         context.setEngineContext(engine_context);
         context.setRequest(request);

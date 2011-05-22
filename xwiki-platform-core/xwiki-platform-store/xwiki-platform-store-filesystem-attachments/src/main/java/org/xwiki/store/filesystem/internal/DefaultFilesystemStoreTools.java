@@ -21,18 +21,10 @@ package org.xwiki.store.filesystem.internal;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
 import java.util.HashMap;
 import java.io.File;
-import java.lang.ref.WeakReference;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.TimeUnit;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -43,6 +35,9 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
+
+import javax.inject.Inject;
+import org.xwiki.store.locks.LockProvider;
 
 /**
  * Default tools for getting files to store data in the filesystem.
@@ -100,32 +95,28 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     @Requirement
     private Execution exec;
 
+    /** A means of acquiring locks for attachments. */
+    @Inject
+    private LockProvider lockProvider;
+
     /** This is the directory where all of the attachments will stored. */
     private File storageDir;
-
-    /** A map which holds locks by the file path so that the same lock is used for the same file. */
-    private final Map<String, WeakReference<ReadWriteLock>> fileLockMap =
-        new WeakHashMap<String, WeakReference<ReadWriteLock>>();
-
-    /** Used by DeadlockBreakingLock. */
-    private final Map<Thread, Set<DeadlockBreakingLock>> locksHeldByThread =
-        new HashMap<Thread, Set<DeadlockBreakingLock>>();
-
-    /** Used by DeadlockBreakingLock. */
-    private final Map<Thread, DeadlockBreakingLock> lockBlockingThread =
-        new HashMap<Thread, DeadlockBreakingLock>();
 
     /**
      * Testing Constructor.
      *
      * @param pathSerializer an EntityReferenceSerializer for generating file paths.
      * @param storageDir the directory to store the content in.
+     * @param lockProvider a means of getting locks for making sure
+     *                     only one thread accesses an attachment at a time.
      */
     public DefaultFilesystemStoreTools(final EntityReferenceSerializer<String> pathSerializer,
-                                       final File storageDir)
+                                       final File storageDir,
+                                       final LockProvider lockProvider)
     {
         this.pathSerializer = pathSerializer;
         this.storageDir = storageDir;
+        this.lockProvider = lockProvider;
     }
 
     /** Constructor for component manager. */
@@ -370,325 +361,8 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
      *
      * @see FilesystemStoreTools#getLockForFile(File)
      */
-    public synchronized ReadWriteLock getLockForFile(final File toLock)
+    public ReadWriteLock getLockForFile(final File toLock)
     {
-        final String path = toLock.getAbsolutePath();
-        WeakReference<ReadWriteLock> lock = this.fileLockMap.get(path);
-        ReadWriteLock strongLock = null;
-        if (lock != null) {
-            strongLock = lock.get();
-        }
-        if (strongLock == null) {
-            strongLock = new DeadlockBreakingReadWriteLock(this.locksHeldByThread, this.lockBlockingThread)
-            {
-                /**
-                 * A strong reference on the string to make sure that the
-                 * mere existence of the lock will keep it in the map.
-                 */
-                private final String lockMapReference = path;
-            };
-            this.fileLockMap.put(path, new WeakReference<ReadWriteLock>(strongLock));
-        }
-        return strongLock;
-    }
-
-
-    /**
-     * This ReadWriteLock implementation is currently naive and uses only one lock for both.
-     */
-    private static class DeadlockBreakingReadWriteLock implements ReadWriteLock
-    {
-        /** The only lock in this readWriteLock. */
-        private final Lock onlyLock;
-
-        /**
-         * The Constructor.
-         *
-         * @param locksHeldByThread a map which is used internally to detect and break deadlock
-         *        conditions, the same map must be passed to all new locks if there is a possibility of
-         *        them deadlocking and the map must not be interfered with externally.
-         * @param lockBlockingThread another map used internally to detect and break deadlock.
-         *        the same map must be passed to all new locks if there is a possibility of
-         *        them deadlocking and the map must not be interfered with externally.
-         */
-        public DeadlockBreakingReadWriteLock(final Map<Thread, Set<DeadlockBreakingLock>> locksHeldByThread,
-                                             final Map<Thread, DeadlockBreakingLock> lockBlockingThread)
-        {
-            this.onlyLock = new DeadlockBreakingLock(locksHeldByThread, lockBlockingThread);
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @see java.util.concurrent.locks.ReadWriteLock#readLock()
-         */
-        public Lock readLock()
-        {
-            return this.onlyLock;
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @see java.util.concurrent.locks.ReadWriteLock#writeLock()
-         */
-        public Lock writeLock()
-        {
-            return this.onlyLock;
-        }
-    }
-
-    /**
-     * Every deadlock situation can be boiled down to Alice and Bob grabbing X and Y respectively
-     * then reaching for the other. There may be N threads in between but if Alice blocks out Charley
-     * who blocks Dave how blocks Elanor who blocks Bob who blocks Alice, the underlying situation
-     * is the same; Alice and Bob are blocking each other.
-     * If Bob is waiting for a lock held by Alice then there is no reason why Alice cannot proceed without
-     * the lock Bob holds because we can be assured that Bob will not move until Alice has released the
-     * lock which he is waiting on.
-     *
-     * DeadlockBreakingLock walks around the ring of blocked lockholders to determine if there is a
-     * deadlock situation and if there is, it does 2 things:
-     * 1. It lies to Alice, telling her she has acquired lock X which in fact belongs to Bob.
-     * 2. It alters lock Y (the one which is blocking Bob out) by making Bob unable to acquire it unless he
-     *    none of the locks which he owns have been forced.
-     *
-     * Multiple deadlock situations:
-     * If Alice acquires X, Bob acquires Y, Alice reaches for Y and Bob reaches for X. The algorithm will
-     * happily give Alice a pass to fake acquire Y and then it will make sure that X is not available to
-     * Bob until Y is released. Now imagine Charley has acquired Z which Alice now needs and
-     * as Alice begins waiting on Z, Charley reaches for Y. If he reaches for X then it is a simple
-     * situation of 2 separate deadlocks but when he reaches for Y, a single lock is forced to break 2
-     * deadlock situations. We could always prefer Alice because she has already forced the lock once but
-     * suppose Charley had to force Z when he acquired it. One way or another, a lock is going to have to
-     * be forced multiple times. To add to the confusion, Charley may also want X. It is okay for him to
-     * take X but when he releases it, Bob may not acquire it but Alice may acquire Z.
-     *
-     * This operation can be expressed graphically:
-     * A running Thread is represented by <code>----</code>
-     * A blocked thread is represented by whitespace,
-     * A successful lock is represented by a capital letter.
-     * An attempted lock which blocks the thread is represented by a lowercase letter.
-     * An unlock operation is represented by a capital letter in parentheses.
-     * <code>
-     * Alice ----X--Y--z                Z----(Y)-(X)----(Z)---
-     *
-     * Bob ------Y--x                             X-----(X)---
-     *
-     * Charley --Z-----Y---X---(Z)-(Y)-(X)--------------------
-     *
-     * Event:    1  2  3   4    5   6   7     8   9      10
-     * </code>
-     *
-     * This implementation currently uses a naive method of simply checking that a thread has not had any
-     * of it's locks forced and then puts threads into a wait cycle when trying to acquire a lock and
-     * notifies all waiters on unlock and lets them decide who is qualified to take over the lock.
-     */
-    private static class DeadlockBreakingLock implements Lock
-    {
-        /** Exception to throw when a function is called which has not been written. */
-        private static final String NOT_IMPLEMENTED = "Function not implemented.";
-
-        /**
-         * A set of all locks held by each lock-holding thread.
-         * Used so that we can make sure a thread owns all of the locks which it acquired, otherwise
-         * it may not acquire any more, specifically the one which it is blocked on.
-         */
-        private final Map<Thread, Set<DeadlockBreakingLock>> locksHeldByThread;
-
-        /**
-         * Find out which lock a given thread is waiting on.
-         * This is needed in order to find the loop causing deadlock using an algorithm like:
-         * What are you waiting for, who owns that, what is he waiting for...
-         */
-        private final Map<Thread, DeadlockBreakingLock> lockBlockingThread;
-
-        /**
-         * The owner of this lock, if the owner calls multiple times then it is added again.
-         * If another thread ceases the lock then it is added.
-         */
-        private Stack<Thread> owners = new Stack<Thread>();
-
-        /**
-         * The Constructor.
-         *
-         * @param locksHeldByThread a map which is used internally to detect and break deadlock
-         *        conditions, the same map must be passed to all new locks if there is a possibility of
-         *        them deadlocking and the map must not be interfered with externally.
-         * @param lockBlockingThread another map used internally to detect and break deadlock.
-         *        the same map must be passed to all new locks if there is a possibility of
-         *        them deadlocking and the map must not be interfered with externally.
-         */
-        public DeadlockBreakingLock(final Map<Thread, Set<DeadlockBreakingLock>> locksHeldByThread,
-                                    final Map<Thread, DeadlockBreakingLock> lockBlockingThread)
-        {
-            this.locksHeldByThread = locksHeldByThread;
-            this.lockBlockingThread = lockBlockingThread;
-        }
-
-        /**
-         * Make sure a given thread still has control of all the locks it locked.
-         *
-         * @param owner the thread to test.
-         * @return true if all of the locks which owner has acquired are still in it's possession.
-         */
-        private synchronized boolean ownsAllLocks(final Thread owner)
-        {
-            for (DeadlockBreakingLock lock : locksHeldByThread.get(owner)) {
-                if (lock.owners.peek() != owner) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @see java.util.concurrent.locks.Lock#lock()
-         */
-        public synchronized void lock()
-        {
-            final Thread currentThread = Thread.currentThread();
-
-            if (this.locksHeldByThread.get(currentThread) == null) {
-                this.locksHeldByThread.put(currentThread, new HashSet<DeadlockBreakingLock>());
-            }
-            this.lockBlockingThread.put(currentThread, this);
-
-            for (;;)
-            {
-                // We must insure that the thread which owns this lock does not force the lock which it is
-                // waiting on while at the same time this thread forces this lock.
-                // Specifically, we want to make sure that this.ownsAllLocks(currentThread) remains
-                // the same throughout.
-                //
-                // For now, sync on a global object.
-                // TODO We only need to sync on this "ring" of blocked threads, can that be done?
-                synchronized (this.locksHeldByThread)
-                {
-                    // If the current thread does not own all of it's locks then by no means should it be
-                    // forcing this lock, it should not be able to acquire it at all.
-                    if (this.ownsAllLocks(currentThread))
-                    {
-                        // If 1. the lock is unlocked, 2. reentrance, or 3. it's deadlocked.
-                        if (this.owners.empty()
-                            || this.owners.peek() == currentThread
-                            || this.isDeadlocked(null))
-                        {
-                            this.owners.push(currentThread);
-                            this.locksHeldByThread.get(currentThread).add(this);
-                            this.lockBlockingThread.remove(currentThread);
-                            return;
-                        }
-                    }
-                }
-
-                try {
-                    this.wait(100);
-                } catch (InterruptedException e) {
-                    this.lockBlockingThread.remove(currentThread);
-                    throw new RuntimeException("The thread was interrupted while waiting on the lock.");
-                }
-            }
-        }
-
-        /**
-         * Method to detect a deadlock situation in linear time.
-         *
-         * @param toCheckForLoop unless recursing, this should be null.
-         * @return true if the current lock is known to be deadlocked.
-         */
-        private boolean isDeadlocked(final DeadlockBreakingLock toCheckForLoop)
-        {
-            // We have looped around, it's deadlocked, make a list and start adding locks.
-            if (toCheckForLoop == this) {
-                return true;
-            }
-
-            if (!this.owners.empty()) {
-                // Get the lock that's holding up the thread that's holding this lock.
-                // We only care about the last owner in the stack because if any others are deadlocked,
-                // the last owner will finish and they will be exposed.
-                final DeadlockBreakingLock blocker = this.lockBlockingThread.get(this.owners.peek());
-
-                // If the lock blocking the thread which holds this lock exists (ie the thread is blocked)
-                if (blocker != null) {
-                    // Start case. We cannot call getLockLoop(this) otherwise it will always report false
-                    // positive so we must call getLockLoop(null) to begin.
-                    final DeadlockBreakingLock testCase = (toCheckForLoop == null) ? this : toCheckForLoop;
-
-                    // recurse on the lock which is blocking the thread which holds this lock and if that
-                    // lock is (transitively) blocked by this one then we have a loop.
-                    return blocker.isDeadlocked(testCase);
-                }
-            }
-            return false;
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @see java.util.concurrent.locks.Lock#unlock()
-         */
-        public synchronized void unlock()
-        {
-            final Thread currentThread = Thread.currentThread();
-            if (!this.owners.contains(currentThread)) {
-                throw new IllegalMonitorStateException("Cannot unlock this lock as this "
-                                                       + "thread does not own it.");
-            }
-
-            synchronized (this.locksHeldByThread.get(currentThread))
-            {
-                this.owners.remove(this.owners.lastIndexOf(currentThread));
-                this.locksHeldByThread.get(currentThread).remove(this);
-            }
-            this.notify();
-        }
-
-        /**
-         * {@inheritDoc}
-         * Not implemented.
-         *
-         * @see java.util.concurrent.locks.Lock#lockInterruptibly()
-         */
-        public void lockInterruptibly()
-        {
-            throw new RuntimeException(NOT_IMPLEMENTED);
-        }
-
-        /**
-         * {@inheritDoc}
-         * Not implemented.
-         *
-         * @see java.util.concurrent.locks.Lock#newCondition()
-         */
-        public Condition newCondition()
-        {
-            throw new RuntimeException(NOT_IMPLEMENTED);
-        }
-
-        /**
-         * {@inheritDoc}
-         * Not implemented.
-         *
-         * @see java.util.concurrent.locks.Lock#tryLock()
-         */
-        public boolean tryLock()
-        {
-            throw new RuntimeException(NOT_IMPLEMENTED);
-        }
-
-        /**
-         * {@inheritDoc}
-         * Not implemented.
-         *
-         * @see java.util.concurrent.locks.Lock#tryLock(long, TimeUnit)
-         */
-        public boolean tryLock(final long time, final TimeUnit unit)
-        {
-            throw new RuntimeException(NOT_IMPLEMENTED);
-        }
+        return this.lockProvider.getLock(toLock);
     }
 }

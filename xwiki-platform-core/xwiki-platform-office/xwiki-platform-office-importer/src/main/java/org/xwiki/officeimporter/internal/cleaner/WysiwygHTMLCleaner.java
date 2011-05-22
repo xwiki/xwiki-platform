@@ -27,7 +27,6 @@ import java.util.List;
 import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.filter.HTMLFilter;
@@ -39,7 +38,7 @@ import org.xwiki.xml.html.filter.HTMLFilter;
  * @since 1.8M1
  */
 @Component("wysiwyg")
-public class WysiwygHTMLCleaner extends AbstractLogEnabled implements HTMLCleaner
+public class WysiwygHTMLCleaner implements HTMLCleaner
 {
     /**
      * Default html cleaner component used internally. 

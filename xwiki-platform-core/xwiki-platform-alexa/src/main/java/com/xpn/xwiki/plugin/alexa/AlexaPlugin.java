@@ -26,30 +26,48 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
-public class AlexaPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
-        private static Log mLogger =
-                LogFactory.getFactory().getInstance(com.xpn.xwiki.plugin.alexa.AlexaPlugin.class);
+/**
+ * Plugin allowing to query Alexa services.
+ * 
+ * @version $Id$
+ * @deprecated the plugin technology is deprecated
+ */
+@Deprecated
+public class AlexaPlugin extends XWikiDefaultPlugin
+{
+    /**
+     * The mandatory plugin constructor, this is the method called (through reflection) by the plugin manager.
+     * 
+     * @param name the plugin name
+     * @param className the name of this class, ignored
+     * @param context the current request context
+     */
+    public AlexaPlugin(String name, String className, XWikiContext context)
+    {
+        super(name, className, context);
+        init(context);
+    }
 
-        public AlexaPlugin(String name, String className, XWikiContext context) {
-            super(name, className, context);
-            init(context);
-        }
-
-    public String getName() {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiPluginInterface#getName()
+     */
+    @Override
+    public String getName()
+    {
         return "alexa";
     }
 
-    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiPluginInterface#getPluginApi(XWikiPluginInterface, XWikiContext)
+     */
+    @Override
+    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
+    {
         return new AlexaPluginApi((AlexaPlugin) plugin, context);
-    }
-
-    public void flushCache() {
-    }
-
-    public void init(XWikiContext context) {
-        super.init(context);
     }
 }

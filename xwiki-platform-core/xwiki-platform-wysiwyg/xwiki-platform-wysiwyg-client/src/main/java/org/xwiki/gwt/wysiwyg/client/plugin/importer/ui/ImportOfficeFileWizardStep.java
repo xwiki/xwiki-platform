@@ -34,10 +34,7 @@ import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Wizard step responsible for importing the content of an office document into the wysiwyg editor.
@@ -47,11 +44,6 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
 {
-    /**
-     * Wysiwyg configuration object.
-     */
-    private Config config;
-
     /**
      * Result of the import operation.
      */
@@ -63,19 +55,14 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
     private CheckBox filterStylesCheckBox;
 
     /**
-     * Flag indicating whether an active openoffice server is available or not.
-     */
-    private boolean isOpenOfficeServerConnected;
-
-    /**
-     * Panel to be used as the UI of this wizard step in case we cannot locate an active openoffice server.
-     */
-    private Panel errorMessagePanel;
-
-    /**
      * The component used to import office documents.
      */
     private final ImportServiceAsync importService;
+
+    /**
+     * The page where the office document or text will be imported.
+     */
+    private final WikiPageReference targetPageReference;
 
     /**
      * Instantiates the office document import wizard step.
@@ -88,30 +75,35 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
     {
         super(wikiService);
 
-        this.config = config;
         this.importService = importService;
 
-        setFileHelpLabel(Strings.INSTANCE.importOfficeFileHelpLabel());
+        // Read WYSIWYG configuration for OpenOffice server availability.
+        boolean isOpenOfficeServerConnected =
+            Boolean.valueOf(config.getParameter("openofficeServerConnected", "false"));
 
-        // Add filter styles check box.
-        this.filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importOfficeContentFilterStylesCheckBoxLabel());
-        // The filter styles check box should be checked by default.
-        this.filterStylesCheckBox.setValue(true);
-        getMainPanel().add(filterStylesCheckBox);
+        setStepTitle(Strings.INSTANCE.importOfficeFileWizardStepTitle());
+        setDirectionName(NavigationDirection.FINISH, Strings.INSTANCE.importWizardImportButtonCaption());
+        setValidDirections(isOpenOfficeServerConnected ? EnumSet.of(NavigationDirection.CANCEL,
+            NavigationDirection.FINISH) : EnumSet.of(NavigationDirection.CANCEL));
 
-        // Read wysiwyg configuration for openoffice server availability.
-        isOpenOfficeServerConnected = config.getParameter("openofficeServerConnected", "false").equals("true");
-    }
+        targetPageReference = new WikiPageReference();
+        targetPageReference.setWikiName(config.getParameter("wiki", "xwiki"));
+        targetPageReference.setSpaceName(config.getParameter("space", "Main"));
+        targetPageReference.setPageName(config.getParameter("page", "WebHome"));
 
-    /**
-     * {@inheritDoc}
-     */
-    public Widget display()
-    {
         if (isOpenOfficeServerConnected) {
-            return super.display();
+            setFileHelpLabel(Strings.INSTANCE.importOfficeFileHelpLabel());
+            // Add filter styles check box.
+            this.filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importOfficeContentFilterStylesCheckBoxLabel());
+            // The filter styles check box should be checked by default.
+            this.filterStylesCheckBox.setValue(true);
+            display().add(filterStylesCheckBox);
         } else {
-            return getErrorMessagePanel();
+            Label errorMessageLabel = new Label(Strings.INSTANCE.importOfficeFileFeatureNotAvailable());
+            errorMessageLabel.addStyleName("xErrorMsg");
+            // Display only the error message.
+            display().clear();
+            display().add(errorMessageLabel);
         }
     }
 
@@ -124,16 +116,13 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
         {
             public void onSuccess(String result)
             {
-                setResult(result);
-
+                ImportOfficeFileWizardStep.this.result = result;
                 // Resume the wizard step submit operation.
                 async.onSuccess(true);
             }
 
             public void onFailure(Throwable thrown)
             {
-                setResult(null);
-
                 // Display the error and avoid submit operation from continuing.
                 displayError(thrown.getMessage());
                 async.onSuccess(false);
@@ -147,55 +136,6 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
     public Object getResult()
     {
         return this.result;
-    }
-
-    /**
-     * Sets the result of this wizard step.
-     * 
-     * @param result the result.
-     */
-    private void setResult(Object result)
-    {
-        this.result = result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getNextStep()
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDirectionName(NavigationDirection direction)
-    {
-        if (direction == NavigationDirection.FINISH) {
-            return Strings.INSTANCE.importWizardImportButtonCaption();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getStepTitle()
-    {
-        return Strings.INSTANCE.importOfficeFileWizardStepTitle();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public EnumSet<NavigationDirection> getValidDirections()
-    {
-        if (isOpenOfficeServerConnected) {
-            return EnumSet.of(NavigationDirection.CANCEL, NavigationDirection.FINISH);
-        } else {
-            return EnumSet.of(NavigationDirection.CANCEL);
-        }
     }
 
     /**
@@ -218,22 +158,6 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
     }
 
     /**
-     * Returns a UI widget with an error message explaining the unavailability of this import feature.
-     * 
-     * @return a UI panel with the given error message placed on it.
-     */
-    private Panel getErrorMessagePanel()
-    {
-        if (null == errorMessagePanel) {
-            errorMessagePanel = new FlowPanel();
-            Label errorMessageLabel = new Label(Strings.INSTANCE.importOfficeFileFeatureNotAvailable());
-            errorMessageLabel.addStyleName("xErrorMsg");
-            errorMessagePanel.add(errorMessageLabel);
-        }
-        return errorMessagePanel;
-    }
-
-    /**
      * {@inheritDoc}
      * 
      * @see AbstractFileUploadWizardStep#getTargetPageReference()
@@ -241,10 +165,6 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
     @Override
     protected WikiPageReference getTargetPageReference()
     {
-        WikiPageReference targetPageReference = new WikiPageReference();
-        targetPageReference.setWikiName(config.getParameter("wiki", "xwiki"));
-        targetPageReference.setSpaceName(config.getParameter("space", "Main"));
-        targetPageReference.setPageName(config.getParameter("page", "WebHome"));
         return targetPageReference;
     }
 }

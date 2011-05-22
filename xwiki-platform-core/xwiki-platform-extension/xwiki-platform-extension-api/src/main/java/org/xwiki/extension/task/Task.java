@@ -25,23 +25,58 @@ import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 
+/**
+ * @version $Id$
+ */
 @ComponentRole
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public interface Task
 {
+    /**
+     * Taks status.
+     * 
+     * @version $Id$
+     */
     enum Status
     {
+        /**
+         * Default status, generally mean that the task has not been started yet.
+         */
         NONE,
+
+        /**
+         * The task has been paused.
+         */
         PAUSED,
+
+        /**
+         * The task is running.
+         */
         RUNNING,
+
+        /**
+         * The task is done.
+         */
         FINISHED
     }
 
+    /**
+     * @return the status of the task
+     */
     Status getStatus();
 
+    /**
+     * @return the exceptions raised during the task execution, null of all went well
+     */
     List<Exception> getExceptions();
 
+    /**
+     * @return the task request
+     */
     Request getRequest();
 
+    /**
+     * @param request start the task with provided request
+     */
     void start(Request request);
 }

@@ -25,72 +25,142 @@ import java.util.Map;
 
 import org.xwiki.extension.repository.ExtensionRepository;
 
-public class WrappingExtension implements Extension
+/**
+ * Wrap an extension.
+ * 
+ * @param <T> the extension type
+ * @version $Id$
+ */
+public class WrappingExtension<T extends Extension> implements Extension
 {
-    private Extension extension;
+    /**
+     * @see #getExtension()
+     */
+    private T extension;
 
-    public WrappingExtension(Extension extension)
+    /**
+     * @param extension the wrapped extension
+     */
+    public WrappingExtension(T extension)
     {
         this.extension = extension;
     }
 
-    public Extension getExtension()
+    /**
+     * @return the wrapped extension
+     */
+    public T getExtension()
     {
         return this.extension;
     }
 
     // Extension
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#getId()
+     */
     public ExtensionId getId()
     {
         return getExtension().getId();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#getType()
+     */
     public String getType()
     {
         return getExtension().getType();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#getName()
+     */
     public String getName()
     {
         return getExtension().getName();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#getDescription()
+     */
     public String getDescription()
     {
         return getExtension().getDescription();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#getWebSite()
+     */
     public String getWebSite()
     {
         return getExtension().getWebSite();
     }
 
-    public String getAuthor()
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#getAuthors()
+     */
+    public List<String> getAuthors()
     {
-        return getExtension().getAuthor();
+        return getExtension().getAuthors();
     }
 
-    public List<ExtensionDependency> getDependencies()
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#getDependencies()
+     */
+    public List< ? extends ExtensionDependency> getDependencies()
     {
         return getExtension().getDependencies();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#download(java.io.File)
+     */
     public void download(File file) throws ExtensionException
     {
         getExtension().download(file);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#getRepository()
+     */
     public ExtensionRepository getRepository()
     {
         return getExtension().getRepository();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#getProperties()
+     */
     public Map<String, Object> getProperties()
     {
         return getExtension().getProperties();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#getProperty(java.lang.String)
+     */
     public Object getProperty(String key)
     {
         return getExtension().getProperty(key);

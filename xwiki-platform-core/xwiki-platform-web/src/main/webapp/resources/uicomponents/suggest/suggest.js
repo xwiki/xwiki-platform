@@ -45,6 +45,8 @@ var XWiki = (function(XWiki){
     // The name of the JSON parameter or XML attribute holding the result auxiliary information.
     // "info" for the old suggest, "pageFullName" for the REST search.
     resultInfo : "info",
+    // The name of the JSON parameter or XML attribute holding the result icon.
+    resultIcon: "icon",
     // The id of the element that will hold the suggest element
     parentContainer : "body",
     // Should results fragments be highlighted when matching typed input
@@ -101,6 +103,11 @@ var XWiki = (function(XWiki){
     } else {
       this.seps = "";
     }
+
+    // Initialize a request number that will keep track of the latest request being fired.
+    // This will help to discard potential non-last requests callbacks ; this in order to have better performance
+    // (less unneccessary DOM manipulation, and less unneccessary highlighting computation).
+    this.latestRequest = 0;
 
   },
 
@@ -247,9 +254,12 @@ var XWiki = (function(XWiki){
 
       this.prepareContainer();
 
+      this.latestRequest++;
       var pointer = this;
+      var requestId = this.latestRequest;
       clearTimeout(this.ajID);
-      this.ajID = setTimeout( function() { pointer.doAjaxRequests() }, this.options.delay );
+      this.ajID = setTimeout( function() { pointer.doAjaxRequests(requestId) }, this.options.delay );
+
     }
     return false;
   },
@@ -257,7 +267,7 @@ var XWiki = (function(XWiki){
   /**
    * Fire the AJAX Request(s) that will get suggestions
    */
-  doAjaxRequests: function ()
+  doAjaxRequests: function (requestId)
   {
     for (var i=0;i<this.sources.length;i++) {
       var source = this.sources[i];
@@ -275,7 +285,7 @@ var XWiki = (function(XWiki){
       var ajx = new Ajax.Request(url, {
         method: method,
         requestHeaders: headers,
-        onSuccess: this.setSuggestions.bindAsEventListener(this, source),
+        onSuccess: this.setSuggestions.bindAsEventListener(this, source, requestId),
         onFailure: function (response) {
           new XWiki.widgets.Notification("Failed to retrieve suggestions : ')" + response.statusText, "error", {timeout: 5});
         }
@@ -287,9 +297,19 @@ var XWiki = (function(XWiki){
    * Set suggestions
    *
    * @param {Object} req
+   * @param {Object} source
+   * @param {Number} requestId the identifier of the request for which this callback is triggered.
    */
-  setSuggestions: function (req, source)
+  setSuggestions: function (req, source, requestId)
   {
+
+    // If there has been one or several requests fired in the mean time (between the time the request for which this callback
+    // has been triggered and the time of the callback itself) ; we don't do anything and leave it to following callbacks to
+    // set potential suggestions
+    if (requestId < this.latestRequest) {
+      return;
+    }
+
     this.aSuggestions = [];
 
     if (source.json) {
@@ -303,7 +323,8 @@ var XWiki = (function(XWiki){
         this.aSuggestions.push({
            'id': results[i][source.resultId || this.options.resultId],
            'value': results[i][source.resultValue || this.options.resultValue],
-           'info': results[i][source.resultInfo || this.options.resultInfo]
+           'info': results[i][source.resultInfo || this.options.resultInfo],
+           'icon' : results[i][source.resultIcon || this.options.resultIcon]
         });
       }
     } else {
@@ -319,7 +340,8 @@ var XWiki = (function(XWiki){
           this.aSuggestions.push({
             'id': results[i].getAttribute('id'),
             'value':results[i].childNodes[0].nodeValue,
-            'info':results[i].getAttribute('info')
+            'info':results[i].getAttribute('info'),
+            'icon':results[i].getAttribute('icon')
           });
         }
       }
@@ -470,6 +492,11 @@ var XWiki = (function(XWiki){
       var div = this.resultContainer;
     }
 
+    // Ensure any previous list of results for this source gets removed
+    if (div.down('ul')) {
+      div.down('ul').remove();
+    }
+
     // create and populate list
     var list = new XWiki.widgets.XList([], {
        icon: this.options.icon,
@@ -507,6 +534,13 @@ var XWiki = (function(XWiki){
                                               "<span class='legend'>" + this.options.displayValueText + "</span>" + arr[i].info)
                                             );
       }
+
+      // If the search result contains an icon information, we insert this icon in the result entry.
+      if (arr[i].icon) {
+        var iconImage = new Element("img", {'src' : arr[i].icon, 'class' : 'icon' });
+        displayNode.insert({top: iconImage});
+      }
+
       var valueNode = new Element('div')
             .insert(new Element('span', {'class':'suggestId'}).update(arr[i].id))
             .insert(new Element('span', {'class':'suggestValue'}).update(arr[i].value))

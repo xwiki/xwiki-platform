@@ -28,7 +28,8 @@ import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.converter.AbstractEventConverter;
 
 /**
- * Default implementation of {@link LocalEventConverter}. Support any serializable event.
+ * Default implementation of {@link org.xwiki.observation.remote.converter.LocalEventConverter}.
+ * Support any serializable event.
  * 
  * @version $Id$
  * @since 2.0M3

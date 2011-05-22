@@ -32,21 +32,19 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionCollectException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
-import org.xwiki.extension.event.ExtensionInstalled;
-import org.xwiki.extension.event.ExtensionUninstalled;
-import org.xwiki.extension.event.ExtensionUpgraded;
-import org.xwiki.extension.repository.ExtensionCollector;
+import org.xwiki.extension.event.ExtensionInstalledEvent;
+import org.xwiki.extension.event.ExtensionUninstalledEvent;
+import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
@@ -57,10 +55,10 @@ import org.xwiki.observation.event.Event;
 @Component
 @Singleton
 @Named("xar")
-public class XarLocalExtensionRepository extends AbstractLogEnabled implements LocalExtensionRepository, Initializable
+public class XarLocalExtensionRepository implements LocalExtensionRepository, Initializable
 {
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new ExtensionInstalled(),
-        new ExtensionUninstalled(), new ExtensionUpgraded());
+    private static final List<Event> EVENTS = Arrays.<Event> asList(new ExtensionInstalledEvent(),
+        new ExtensionUninstalledEvent(), new ExtensionUpgradedEvent());
 
     @Inject
     private LocalExtensionRepository localRepository;
@@ -70,6 +68,12 @@ public class XarLocalExtensionRepository extends AbstractLogEnabled implements L
 
     @Inject
     private ObservationManager observation;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     private ExtensionRepositoryId repositoryId;
 
@@ -118,7 +122,7 @@ public class XarLocalExtensionRepository extends AbstractLogEnabled implements L
                 try {
                     addXarExtension(extension);
                 } catch (IOException e) {
-                    getLogger().error("Failed to parse extension [" + extension + "]", e);
+                    this.logger.error("Failed to parse extension [" + extension + "]", e);
                 }
             }
         }
@@ -143,7 +147,7 @@ public class XarLocalExtensionRepository extends AbstractLogEnabled implements L
                 try {
                     addXarExtension(localExtension);
                 } catch (IOException e) {
-                    getLogger().error("Failed to parse extension [" + localExtension + "]", e);
+                    this.logger.error("Failed to parse extension [" + localExtension + "]", e);
                 }
             }
         }
@@ -180,11 +184,6 @@ public class XarLocalExtensionRepository extends AbstractLogEnabled implements L
     public Collection< ? extends Extension> getExtensions(int nb, int offset)
     {
         return new ArrayList<LocalExtension>(this.extensions.values()).subList(offset, offset + nb);
-    }
-
-    public void collectExtensions(ExtensionCollector collector) throws ExtensionCollectException
-    {
-        
     }
     
     public Collection<LocalExtension> getLocalExtensions()

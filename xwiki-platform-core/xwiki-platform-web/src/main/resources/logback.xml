@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<configuration>
+
+  <!-- Register SLF4J against the JMX MBean Server automatically -->
+   <jmxConfigurator objectName="logback:type=xwiki"/>
+
+  <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- Direct log messages to stdout -->
+    <Target>System.out</Target>
+    <encoder>
+      <pattern>%d [%t] %-5p %-30.30c{2} - %m %n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="org.xwiki" level="info"/>
+  <logger name="com.xpn.xwiki" level="warn"/>
+  <logger name="com.xpn.xwiki.store.migration" level="info"/>
+  <logger name="com.xpn.xwiki.render.XWikiRadeoxRenderEngine" level="warn"/>
+
+  <!-- Hibernate logging options -->
+  <logger name="org.hibernate" level="warn"/>
+  <logger name="org.hibernate.type" level="warn"/>
+  <logger name="org.hibernate.ps.PreparedStatementCache" level="warn"/>
+  <logger name="org.hibernate.SQL" level="warn"/>
+
+  <!-- Deactivate Struts warnings -->
+  <logger name="org.apache.struts.util.RequestUtils" level="error"/>
+
+  <!-- Deactive PDF Export CSS Applier warnings -->
+  <logger name="org.apache.fop.layoutmgr.inline.ContentLayoutManager" level="error"/>
+  <logger name="info.informatica.doc.style.css.dom" level="error"/>
+
+  <!-- Deactivate JGroups warnings -->
+  <logger name="org.jgroups" level="error"/>
+
+  <!-- By default everything that is of severity WARN, ERROR or FATAL is logged to the console.
+       Since the console output is captured and redirected by the servlet container in most cases,
+       the logs will end up the container's logs, for example in catalina.out in Tomcat.
+  -->
+  <root level="warn">
+    <appender-ref ref="stdout"/>
+  </root>
+</configuration>

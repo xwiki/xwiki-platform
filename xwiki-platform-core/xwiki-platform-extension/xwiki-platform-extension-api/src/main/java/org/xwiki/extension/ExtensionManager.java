@@ -21,8 +21,30 @@ package org.xwiki.extension;
 
 import org.xwiki.component.annotation.ComponentRole;
 
+/**
+ * Main entry point for some extensions management tasks.
+ * 
+ * @version $Id$
+ */
 @ComponentRole
 public interface ExtensionManager
 {
+    /**
+     * Search the provided extension among all repositories including core and local repositories and for the provided
+     * namespace. Null namespace mean installed in the whole farm.
+     * <p>
+     * The search is done in the following order:
+     * <ul>
+     * <li>Is it a core extension ?</li>
+     * <li>Is it a local extension installed in the provided namespace ?</li>
+     * <li>Is it a remote extension in one of the configured remote repositories ?</li>
+     * </ul>
+     * The first one found is returned.
+     * 
+     * @param extensionId the extension identifier
+     * @param namespace the namespace where to resolve the extension
+     * @return the resolved extension
+     * @throws ResolveException error when trying to resolve extension
+     */
     Extension resolveExtension(ExtensionId extensionId, String namespace) throws ResolveException;
 }

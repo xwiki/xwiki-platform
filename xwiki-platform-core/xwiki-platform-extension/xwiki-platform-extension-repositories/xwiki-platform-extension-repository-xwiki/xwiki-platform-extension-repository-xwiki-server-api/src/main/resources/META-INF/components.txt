@@ -1,0 +1,3 @@
+org.xwiki.extension.repository.xwiki.internal.ExtensionRESTResource
+org.xwiki.extension.repository.xwiki.internal.ExtensionFileRESTResource
+org.xwiki.extension.repository.xwiki.internal.ExtensionSimpleSearchRESTResource

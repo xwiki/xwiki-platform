@@ -78,6 +78,7 @@ public class XWikiRCSArchive extends Archive
                 node.setDate(nodeInfo.getDate());
                 node.setLog(nodeInfo.getComment());
                 XWikiRCSNodeContent content = nodeInfo.getContent(context);
+                // Ensure we never set the text to NULL since this can cause errors on some DB such as Oracle.
                 node.setText(StringUtils.defaultString(content.getPatch().getContent()));
                 node.setDiff(nodeInfo.isDiff());
                 this.nodes.put(node.getVersion(), node);

@@ -25,12 +25,22 @@ import java.util.List;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 
+/**
+ * Provide some general extension manager configuration.
+ * 
+ * @version $Id$
+ */
 @ComponentRole
 public interface ExtensionManagerConfiguration
 {
-    File getHome();
-    
+    /**
+     * @return the folder containing the local extensions
+     * @see org.xwiki.extension.repository.LocalExtensionRepository
+     */
     File getLocalRepository();
-    
+
+    /**
+     * @return the configured repositories
+     */
     List<ExtensionRepositoryId> getRepositories();
 }

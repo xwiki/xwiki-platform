@@ -17,11 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.annotation.rest.internal;
 
 import java.util.logging.Level;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -36,7 +38,6 @@ import org.xwiki.annotation.rest.model.jaxb.AnnotationRequest;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationResponse;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationUpdateRequest;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
@@ -48,14 +49,16 @@ import com.xpn.xwiki.XWikiException;
  * @version $Id$
  * @since 2.3M1
  */
-@Component("org.xwiki.annotation.rest.internal.SingleAnnotationRESTResource")
+@Component
+@Named("org.xwiki.annotation.rest.internal.SingleAnnotationRESTResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/annotation/{id}")
+@Singleton
 public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
 {
     /**
      * Entity reference serializer used to get reference to the document to perform annotation operation on.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> referenceSerializer;
 
     /**

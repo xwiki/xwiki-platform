@@ -25,8 +25,8 @@ import javax.inject.Singleton;
 import org.jgroups.Address;
 import org.jgroups.Message;
 import org.jgroups.View;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.remote.RemoteEventData;
@@ -42,7 +42,7 @@ import org.xwiki.observation.remote.jgroups.JGroupsReceiver;
  */
 @Component
 @Singleton
-public class DefaultJGroupsReceiver extends AbstractLogEnabled implements JGroupsReceiver
+public class DefaultJGroupsReceiver implements JGroupsReceiver
 {
     /**
      * Used to send events for conversion.
@@ -56,9 +56,10 @@ public class DefaultJGroupsReceiver extends AbstractLogEnabled implements JGroup
     private ComponentManager componentManager;
 
     /**
-     * The address of the member.
+     * The logger to log.
      */
-    private Address address;
+    @Inject
+    private Logger logger;
 
     /**
      * @return the RemoteObservationManager
@@ -69,7 +70,7 @@ public class DefaultJGroupsReceiver extends AbstractLogEnabled implements JGroup
             try {
                 this.remoteObservationManager = componentManager.lookup(RemoteObservationManager.class);
             } catch (ComponentLookupException e) {
-                getLogger().error("Failed to lookup the Remote Observation Manager.", e);
+                this.logger.error("Failed to lookup the Remote Observation Manager.", e);
             }
         }
 
@@ -93,13 +94,11 @@ public class DefaultJGroupsReceiver extends AbstractLogEnabled implements JGroup
      */
     public void receive(Message msg)
     {
-        if (this.address == null || !this.address.equals(msg.getSrc())) {
-            RemoteEventData remoteEvent = (RemoteEventData) msg.getObject();
+        RemoteEventData remoteEvent = (RemoteEventData) msg.getObject();
 
-            getLogger().debug("Received JGroups remote event [" + remoteEvent + "]");
+        this.logger.debug("Received JGroups remote event [" + remoteEvent + "]");
 
-            getRemoteObservationManager().notify(remoteEvent);
-        }
+        getRemoteObservationManager().notify(remoteEvent);
     }
 
     /**

@@ -61,9 +61,37 @@ isc.ClassFactory.defineClass("XWEResultTree", isc.ResultTree);
 isc.XWEResultTree.addClassProperties({
     constants : {
         addNodeSuffix : "..new",
+        pageHint : "$msg.get('xwikiexplorer.page.hint')",
         attachmentsTitle : "$msg.get('xwikiexplorer.attachments.title')",
+        attachmentsHint : "$msg.get('xwikiexplorer.attachments.hint')",
+        attachmentHint : "$msg.get('xwikiexplorer.attachment.hint')",
         addPageTitle : "$msg.get('xwikiexplorer.addpage.title')",
-        addAttachmentTitle : "$msg.get('xwikiexplorer.addattachment.title')"
+        addPageHint : "$msg.get('xwikiexplorer.addpage.hint')",
+        addAttachmentTitle : "$msg.get('xwikiexplorer.addattachment.title')",
+        addAttachmentHint : "$msg.get('xwikiexplorer.addattachment.hint')",
+    }
+});
+
+isc.XWEResultTree.addClassMethods({
+    /**
+     * Joins the given arguments using the path separator.
+     */
+    formatPath : function() {
+        return Array.slice(arguments).join(' \u00BB ');
+    },
+
+    /**
+     * Generates a string that can be used as the label of a tree node.
+     */
+    formatTitle : function(title, hint, url) {
+        title = (title || '').escapeHTML();
+        // The tool tip is very useful when writing functional tests. It is difficult to locate tree nodes without the hint.
+        hint = (hint || '').escapeHTML();
+        if (url) {
+            return '<a href="' + url + '" title="' + hint + '">' + title + '</a>';
+        } else {
+            return '<span title="' + hint + '">' + title + '</span>';
+        }
     }
 });
 
@@ -171,18 +199,23 @@ isc.XWEResultTree.addMethods({
         var children = this.getChildren(parentNode);
         for (var i = 0; i < children.length; i++) {
             var currentDS = this.getNodeDataSource(children[i]);
-            var title = children[i].name;
+            // Display the title for entities that have a title (e.g. wiki pages).
+            var title = children[i].title || children[i].name;
+            var hint = currentDS.getHint(children[i]);
             var enabled = true;
 
             // Transform title to a link if showLinks is activated.
             if (this.displayLinks == true && children[i].xwikiRelativeUrl != null) {
-                title = "<a href='" + children[i].xwikiRelativeUrl + "'>" + title + "</a>";
+                title = isc.XWEResultTree.formatTitle(title, hint, children[i].xwikiRelativeUrl);
+            } else {
+                title = isc.XWEResultTree.formatTitle(title, hint);
             }
 
             // Overwrite node properties.
             isc.addProperties(children[i], {
                 // Overwrite children icon with the one defined in the XWiki DataSource.
                 icon: currentDS.icon,
+                plainTitle: children[i].title,
                 title: title,
                 isNewPage: false,
                 isNewAttachment: false
@@ -284,11 +317,13 @@ isc.XWEResultTree.addMethods({
     },
 
     addAddPageNode : function(node) {
+        var hint = isc.XWEResultTree.constants.addPageHint + ' '
+            + isc.XWEResultTree.formatPath(node.resource.wiki, node.resource.space);
         var newNode = {
             id: node.id + isc.XWEResultTree.constants.addNodeSuffix,
             wiki: node.wiki,
             space: node.space,
-            title: isc.XWEResultTree.constants.addPageTitle,
+            title: isc.XWEResultTree.formatTitle(isc.XWEResultTree.constants.addPageTitle, hint),
             parentId: node.id,
             icon: "$xwiki.getSkinFile('icons/silk/bullet_add.gif')",
             resource: node.resource,
@@ -314,12 +349,13 @@ isc.XWEResultTree.addMethods({
     },
 
     addAddAttachmentsNode : function(node) {
-
+        var hint = isc.XWEResultTree.constants.addAttachmentHint + ' '
+            + isc.XWEResultTree.formatPath(node.resource.wiki, node.resource.space, node.resource.name);
         var newNode = {
             id: node.id + isc.XWEResultTree.constants.addNodeSuffix,
             wiki: node.wiki,
             space: node.space,
-            title: isc.XWEResultTree.constants.addAttachmentTitle,
+            title: isc.XWEResultTree.formatTitle(isc.XWEResultTree.constants.addAttachmentTitle, hint),
             parentId: node.id,
             icon: "$xwiki.getSkinFile('icons/silk/bullet_add.gif')",
             resource: node.resource,
@@ -370,10 +406,14 @@ isc.XWEResultTree.addMethods({
         if (hasAttachments == true) {
 
             // Create attachments container node title.
-            var title = isc.XWEResultTree.constants.attachmentsTitle + " (" + node.name + ")";
+            var hint = isc.XWEResultTree.constants.attachmentsHint + ' '
+                + isc.XWEResultTree.formatPath(node.resource.wiki, node.resource.space, node.resource.name);
+            var plainTitle = isc.XWEResultTree.constants.attachmentsTitle + ' (' + node.plainTitle + ')';
             if (this.displayLinks == true) {
-                title = "<a href='" + node.xwikiRelativeUrl + XWiki.constants.anchorSeparator
-                        + XWiki.constants.docextraAttachmentsAnchor + "'>" + title + "</a>"
+                var title = isc.XWEResultTree.formatTitle(plainTitle, hint, node.xwikiRelativeUrl
+                    + XWiki.constants.anchorSeparator + XWiki.constants.docextraAttachmentsAnchor);
+            } else {
+                var title = isc.XWEResultTree.formatTitle(plainTitle, hint);
             }
 
             // Create the node itself.
@@ -475,6 +515,14 @@ isc.XWEDataSource.addMethods({
             dsRequest.originalData.r = "" + Math.floor(Math.random() * 1000000);
         }
         return dsRequest.data;
+    },
+
+    /**
+     * @return the hint for the specified item obtained from this data source
+     */
+    getHint : function(item) {
+        // No hint by default. Should be overwritten by specific data sources.
+        return '';
     }
 });
 
@@ -510,6 +558,13 @@ isc.XWEWikiDataSource.addMethods({
     init : function() {
         this.dataURL = XWiki.constants.rest.baseRestURI + "wikis/" + this.wiki + "/spaces";
         this.Super("init", arguments);
+    },
+
+    /**
+     * @return the hint for the specified item obtained from this data source
+     */
+    getHint : function(item) {
+        return isc.XWEResultTree.constants.pageHint + ' ' + isc.XWEResultTree.formatPath(item.resource.wiki, item.name);
     }
 });
 
@@ -563,6 +618,13 @@ isc.XWESpaceDataSource.addMethods({
             return this.Super("transformRequest", arguments);
         };
         this.Super("init", arguments);
+    },
+
+    /**
+     * @return the hint for the specified item obtained from this data source
+     */
+    getHint : function(item) {
+        return isc.XWEResultTree.constants.pageHint + ' ' + isc.XWEResultTree.formatPath(item.wiki, item.space, item.name);
     }
 });
 
@@ -643,6 +705,14 @@ isc.XWEAttachmentsDataSource.addMethods({
                 + this.space + "/pages/"
                 + this.page + "/attachments";
         this.Super("init", arguments);
+    },
+
+    /**
+     * @return the hint for the specified item obtained from this data source
+     */
+    getHint : function(item) {
+        return isc.XWEResultTree.constants.attachmentHint + ' ' + isc.XWEResultTree.formatPath(item.resource.wiki,
+            item.resource.space, item.resource.name);
     }
 });
 

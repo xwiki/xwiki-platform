@@ -21,12 +21,48 @@ package org.xwiki.extension.task;
 
 import org.xwiki.component.annotation.ComponentRole;
 
+/**
+ * Proxy used to simplify execution of tasks.
+ * 
+ * @version $Id$
+ */
 @ComponentRole
 public interface TaskManager
 {
+    /**
+     * @return the task currently running or the lastest task
+     */
     Task getCurrentTask();
 
+    /**
+     * Start an extension installation task.
+     * <p>
+     * It's the same as calling {@link #executeTask(String, Request)} with identifier "install".
+     * 
+     * @param request the request
+     * @return the created install task
+     * @throws TaskException error when trying to run install task
+     */
     Task install(InstallRequest request) throws TaskException;
 
+    /**
+     * Start an extension uninstall task.
+     * <p>
+     * It's the same as calling {@link #executeTask(String, Request)} with identifier "uninstall".
+     * 
+     * @param request the request
+     * @return the created uninstall task
+     * @throws TaskException error when trying to run uninstall task
+     */
     Task uninstall(UninstallRequest request) throws TaskException;
+
+    /**
+     * Start a new task with teh provided identifier.
+     * 
+     * @param taskId the role hint of the task component
+     * @param request the request
+     * @return the created task
+     * @throws TaskException error when trying to run the task
+     */
+    Task executeTask(String taskId, Request request) throws TaskException;
 }

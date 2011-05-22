@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.MDC;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -171,7 +170,6 @@ public class IndexRebuilder extends AbstractXWikiRunnable
     @Override
     protected void runInternal()
     {
-        MDC.put("url", "Lucene index rebuilder thread");
         LOG.debug("Starting lucene index rebuild");
         XWikiContext context = null;
         try {
@@ -216,7 +214,6 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             if (context != null) {
                 context.getWiki().getStore().cleanUp(context);
             }
-            MDC.remove("url");
         }
 
         LOG.debug("Lucene index rebuild done");

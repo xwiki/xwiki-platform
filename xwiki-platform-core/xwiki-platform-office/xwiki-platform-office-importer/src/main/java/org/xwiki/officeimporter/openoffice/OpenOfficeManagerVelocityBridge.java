@@ -19,8 +19,9 @@
  */
 package org.xwiki.officeimporter.openoffice;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.logging.Logger;
 import org.xwiki.context.Execution;
 
 /**
@@ -35,6 +36,11 @@ public class OpenOfficeManagerVelocityBridge
      * The key used to place any error messages while trying to control the oo server instance.
      */
     public static final String OFFICE_MANAGER_ERROR = "OFFICE_MANAGER_ERROR";
+
+    /**
+     * The logger to log.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficeManagerVelocityBridge.class);
 
     /**
      * Error message used to indicate that openoffice server administration is restricted for main xwiki.
@@ -62,25 +68,18 @@ public class OpenOfficeManagerVelocityBridge
     private DocumentAccessBridge docBridge;
 
     /**
-     * The logger instance passed by the velocity context initializer.
-     */
-    private Logger logger;
-
-    /**
      * Creates a new {@link OpenOfficeManagerVelocityBridge} with the provided {@link OpenOfficeManager} component.
      * 
      * @param oomanager openoffice manager component.
      * @param docBridge document access bridge component.
      * @param execution current execution.
-     * @param logger logger.
      */
     public OpenOfficeManagerVelocityBridge(OpenOfficeManager oomanager, DocumentAccessBridge docBridge,
-        Execution execution, Logger logger)
+        Execution execution)
     {
         this.ooManager = oomanager;
         this.docBridge = docBridge;
         this.execution = execution;
-        this.logger = logger;
     }
 
     /**
@@ -99,7 +98,7 @@ public class OpenOfficeManagerVelocityBridge
                 ooManager.start();
                 return true;
             } catch (OpenOfficeManagerException ex) {
-                logger.error(ex.getMessage(), ex);
+                LOGGER.error(ex.getMessage(), ex);
                 setErrorMessage(ex.getMessage());
             }
         }
@@ -122,7 +121,7 @@ public class OpenOfficeManagerVelocityBridge
                 ooManager.stop();
                 return true;
             } catch (OpenOfficeManagerException ex) {
-                logger.error(ex.getMessage(), ex);
+                LOGGER.error(ex.getMessage(), ex);
                 setErrorMessage(ex.getMessage());
             }
         }

@@ -24,8 +24,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
@@ -40,23 +40,43 @@ import org.xwiki.extension.repository.ExtensionRepositorySource;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 
 /**
- * TODO: cut installation process in steps (create and validate an install plan, install, etc.)
+ * Default implementation of {@link ExtensionManager}.
+ * 
+ * @version $Id$
  */
 @Component
 @Singleton
-public class DefaultExtensionManager extends AbstractLogEnabled implements ExtensionManager, Initializable
+public class DefaultExtensionManager implements ExtensionManager, Initializable
 {
+    /**
+     * Used to manipulate remote repositories.
+     */
     @Inject
     private ExtensionRepositoryManager repositoryManager;
 
+    /**
+     * Used to initialize {@link #repositoryManager}.
+     */
     @Inject
     private List<ExtensionRepositorySource> repositoriesSources;
 
+    /**
+     * Used to manipulate core extensions.
+     */
     @Inject
     private CoreExtensionRepository coreExtensionRepository;
 
+    /**
+     * Used to manipulate local extensions.
+     */
     @Inject
     private LocalExtensionRepository localExtensionRepository;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * {@inheritDoc}
@@ -71,12 +91,17 @@ public class DefaultExtensionManager extends AbstractLogEnabled implements Exten
                 try {
                     this.repositoryManager.addRepository(repositoryId);
                 } catch (ExtensionRepositoryException e) {
-                    getLogger().error("Failed to add repository [" + repositoryId + "]", e);
+                    this.logger.error("Failed to add repository [" + repositoryId + "]", e);
                 }
             }
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.ExtensionManager#resolveExtension(org.xwiki.extension.ExtensionId, java.lang.String)
+     */
     public Extension resolveExtension(ExtensionId extensionId, String namespace) throws ResolveException
     {
         Extension extension = null;

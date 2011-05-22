@@ -109,6 +109,18 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+              **/DefaultCoreExtensionScanner.java,
+              **/DefaultLocalExtensionRepository.java,
+              **/ExtensionSerializer.java
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 

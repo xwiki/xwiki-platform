@@ -25,8 +25,8 @@ import java.io.OutputStream;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.formula.AbstractFormulaRenderer;
 import org.xwiki.formula.FormulaRenderer;
@@ -53,7 +53,7 @@ import uk.ac.ed.ph.snuggletex.jeuclid.SimpleMathMLImageSavingCallback;
 public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(SnuggleTexFormulaRenderer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SnuggleTexFormulaRenderer.class);
 
     /** The SnuggleTeX engine responsible for rendering the formulae. */
     private SnuggleEngine engine = new SnuggleEngine();
@@ -138,7 +138,7 @@ public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
             Throwable exception)
         {
             // Shouldn't really happen
-            LOG.error("Can't save image", exception);
+            LOGGER.error("Can't save image", exception);
         }
     }
 }

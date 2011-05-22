@@ -26,30 +26,34 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
-public class AdWordsPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
-        private static Log mLogger =
-                LogFactory.getFactory().getInstance(AdWordsPlugin.class);
+/**
+ * @version $Id$
+ * @deprecated the plugin technology is deprecated
+ */
+@Deprecated
+public class AdWordsPlugin extends XWikiDefaultPlugin
+{
+    public AdWordsPlugin(String name, String className, XWikiContext context)
+    {
+        super(name, className, context);
+        init(context);
+    }
 
-        public AdWordsPlugin(String name, String className, XWikiContext context) {
-            super(name, className, context);
-            init(context);
-        }
-
-    public String getName() {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiPluginInterface#getName()
+     */
+    @Override
+    public String getName()
+    {
         return "adwords";
     }
 
-    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
+    @Override
+    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
+    {
         return new AdWordsPluginApi((AdWordsPlugin) plugin, context);
-    }
-
-    public void flushCache() {
-    }
-
-    public void init(XWikiContext context) {
-        super.init(context);
     }
 }

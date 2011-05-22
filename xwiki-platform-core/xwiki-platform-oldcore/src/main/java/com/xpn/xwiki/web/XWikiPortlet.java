@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
@@ -37,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.MDC;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.container.ApplicationContextListenerManager;
@@ -102,22 +100,18 @@ public class XWikiPortlet extends GenericPortlet
 
     protected void cleanUp(XWikiContext context)
     {
-        try {
-            FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
-            if (fileupload != null) {
-                fileupload.cleanFileList(context);
-            }
+        FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
+        if (fileupload != null) {
+            fileupload.cleanFileList(context);
+        }
 
-            XWiki xwiki = (context != null) ? context.getWiki() : null;
-            // Make sure we cleanup database connections
-            // There could be cases where we have some
-            if ((context != null) && (xwiki != null)) {
-                if (xwiki.getStore() != null) {
-                    xwiki.getStore().cleanUp(context);
-                }
+        XWiki xwiki = (context != null) ? context.getWiki() : null;
+        // Make sure we cleanup database connections
+        // There could be cases where we have some
+        if ((context != null) && (xwiki != null)) {
+            if (xwiki.getStore() != null) {
+                xwiki.getStore().cleanUp(context);
             }
-        } finally {
-            MDC.remove("url");
         }
     }
 

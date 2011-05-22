@@ -25,9 +25,6 @@ import junit.framework.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * JUnit TestSetup extension that starts/stops XWiki using a script passed using System Properties. These properties are
  * meant to be passed by the underlying build system. This class is meant to wrap a JUnit TestSuite. For example:
@@ -50,8 +47,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class XWikiTestSetup extends TestSetup
 {
-    protected static final Log LOG = LogFactory.getLog(XWikiTestSetup.class);
-
     private List<XWikiExecutor> executors = new ArrayList<XWikiExecutor>();
 
     public XWikiTestSetup(Test test)

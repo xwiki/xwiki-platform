@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  *
+  * See the NOTICE file distributed with this work for additional
+  * information regarding copyright ownership.
+  *
+  * This is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU Lesser General Public License as
+  * published by the Free Software Foundation; either version 2.1 of
+  * the License, or (at your option) any later version.
+  *
+  * This software is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+  * License along with this software; if not, write to the Free
+  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  *
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.org"
+  xmlns:xwiki="http://www.xwiki.org" elementFormDefault="qualified">
+    <complexType name="Extension">
+    	<sequence>
+    		<element name="id" type="string" maxOccurs="1" minOccurs="1"></element>
+    		<element name="version" type="string" maxOccurs="1" minOccurs="1"></element>
+            <element name="type" type="string" maxOccurs="1" minOccurs="1"></element>
+            <element name="name" type="string" maxOccurs="1" minOccurs="0"></element>
+            <element name="description" type="string" maxOccurs="1" minOccurs="0"></element>
+    		<element name="website" type="string" maxOccurs="1" minOccurs="0"></element>
+            <element name="authors" type="string" maxOccurs="unbounded" minOccurs="0"></element>
+            <element name="dependencies" type="xwiki:ExtensionDependency" maxOccurs="unbounded" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="ExtensionDependency">
+    	<sequence>
+    		<element name="id" type="string" maxOccurs="1" minOccurs="1"></element>
+    		<element name="version" type="string" maxOccurs="1" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+    
+    <element name="extension" type="xwiki:Extension"></element>
+
+    <element name="extensions">
+    <complexType>
+      <sequence>
+        <element name="extension" type="xwiki:Extension"
+              minOccurs="0" maxOccurs="unbounded"></element>
+      </sequence>
+    </complexType>
+  </element>
+</schema>

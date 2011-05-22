@@ -17,8 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.annotation.io.internal;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.xwiki.annotation.io.IOServiceException;
 import org.xwiki.annotation.io.IOTargetService;
@@ -26,7 +28,6 @@ import org.xwiki.annotation.reference.IndexedObjectReference;
 import org.xwiki.annotation.reference.TypedStringEntityReferenceResolver;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -42,24 +43,25 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * @since 2.3M1
  */
 @Component
+@Singleton
 public class DefaultIOTargetService implements IOTargetService
 {
     /**
      * Document access bridge to manipulate xwiki documents.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge dab;
 
     /**
      * Entity reference handler to resolve the reference.
      */
-    @Requirement
+    @Inject
     private TypedStringEntityReferenceResolver referenceResolver;
 
     /**
      * Default entity reference serializer.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> serializer;
 
     /**

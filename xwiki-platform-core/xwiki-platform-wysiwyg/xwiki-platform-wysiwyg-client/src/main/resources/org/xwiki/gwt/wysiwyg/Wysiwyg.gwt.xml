@@ -58,6 +58,7 @@
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
+      <when-property-is name="user.agent" value="ie9" />
     </any>
   </replace-with>
 
@@ -71,6 +72,7 @@
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
+      <when-property-is name="user.agent" value="ie9" />
     </any>
   </replace-with>
 
@@ -81,7 +83,10 @@
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.image.internal.IEImageConfigDOMWriter">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter" />
-    <when-property-is name="user.agent" value="ie8" />
+    <any>
+      <when-property-is name="user.agent" value="ie8" />
+      <when-property-is name="user.agent" value="ie9" />
+    </any>
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.image.internal.IE6ImageConfigDOMWriter">
@@ -99,6 +104,7 @@
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
+      <when-property-is name="user.agent" value="ie9" />
     </any>
   </replace-with>
 
@@ -112,6 +118,7 @@
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
+      <when-property-is name="user.agent" value="ie9" />
     </any>
   </replace-with>
 

@@ -20,6 +20,9 @@
  */
 package org.xwiki.cache.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
@@ -27,7 +30,6 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.CacheManagerConfiguration;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 
@@ -39,18 +41,19 @@ import org.xwiki.component.manager.ComponentManager;
  * @since 1.7M1
  */
 @Component
+@Singleton
 public class DefaultCacheManager implements CacheManager
 {
     /**
      * The component manager to use to find cache components.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
      * The configuration component for {@link CacheManager}.
      */
-    @Requirement
+    @Inject
     private CacheManagerConfiguration configuration;
 
     /**

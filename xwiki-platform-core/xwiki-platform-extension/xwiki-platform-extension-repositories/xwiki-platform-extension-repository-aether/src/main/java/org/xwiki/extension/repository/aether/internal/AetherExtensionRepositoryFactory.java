@@ -29,7 +29,6 @@ import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.util.DefaultRepositorySystemSession;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -42,7 +41,7 @@ import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentMana
 @Component
 @Singleton
 @Named("maven")
-public class AetherExtensionRepositoryFactory extends AbstractLogEnabled implements ExtensionRepositoryFactory,
+public class AetherExtensionRepositoryFactory implements ExtensionRepositoryFactory,
     Initializable
 {
     @Inject

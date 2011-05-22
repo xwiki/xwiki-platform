@@ -22,12 +22,11 @@ package org.xwiki.gwt.wysiwyg.client.widget.wizard.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
-import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 /**
  * Generic wizard step that allows the user to select an attachment to link to by aggregating a current page selector
@@ -37,17 +36,12 @@ import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
  * @version $Id$
  */
 public class AttachmentSelectorAggregatorWizardStep<T extends EntityConfig> extends
-    AbstractEntitySelectorAggregatorWizardStep<T>
+    AbstractSelectorAggregatorWizardStep<EntityLink<T>>
 {
     /**
      * Flag indicating if the selection is limited to the current page or not.
      */
     private final boolean selectionLimitedToCurrentPage;
-
-    /**
-     * This wizard step's title.
-     */
-    private String stepTitle;
 
     /**
      * The wizard step used to select attachments only from the current page.
@@ -64,11 +58,9 @@ public class AttachmentSelectorAggregatorWizardStep<T extends EntityConfig> exte
      * 
      * @param selectionLimitedToCurrentPage {@code true} to limit the selection to the current page, {@code false}
      *            otherwise
-     * @param wikiService the service to be used to access the attachments
      */
-    public AttachmentSelectorAggregatorWizardStep(boolean selectionLimitedToCurrentPage, WikiServiceAsync wikiService)
+    public AttachmentSelectorAggregatorWizardStep(boolean selectionLimitedToCurrentPage)
     {
-        super(wikiService);
         this.selectionLimitedToCurrentPage = selectionLimitedToCurrentPage;
     }
 
@@ -80,10 +72,8 @@ public class AttachmentSelectorAggregatorWizardStep<T extends EntityConfig> exte
     {
         WikiPageReference originPage = new WikiPageReference(getData().getOrigin());
         WikiPageReference destinationPage = new WikiPageReference(getData().getDestination().getEntityReference());
-        if (selectionLimitedToCurrentPage || StringUtils.isEmpty(getData().getData().getReference())
-            || originPage.equals(destinationPage)) {
-            // Selection limited to current page, or no reference specified or the targeted attachment is attached to
-            // the origin page.
+        if (selectionLimitedToCurrentPage || originPage.equals(destinationPage)) {
+            // Selection limited to current page or the targeted attachment is attached to the origin page.
             return Strings.INSTANCE.selectorSelectFromCurrentPage();
         } else {
             return Strings.INSTANCE.selectorSelectFromAllPages();
@@ -93,7 +83,7 @@ public class AttachmentSelectorAggregatorWizardStep<T extends EntityConfig> exte
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractEntitySelectorAggregatorWizardStep#getStepInstance(String)
+     * @see AbstractSelectorAggregatorWizardStep#getStepInstance(String)
      */
     @Override
     protected WizardStep getStepInstance(String name)
@@ -129,7 +119,7 @@ public class AttachmentSelectorAggregatorWizardStep<T extends EntityConfig> exte
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractEntitySelectorAggregatorWizardStep#getStepNames()
+     * @see AbstractSelectorAggregatorWizardStep#getStepNames()
      */
     @Override
     protected List<String> getStepNames()
@@ -140,25 +130,5 @@ public class AttachmentSelectorAggregatorWizardStep<T extends EntityConfig> exte
             stepNames.add(Strings.INSTANCE.selectorSelectFromAllPages());
         }
         return stepNames;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractEntitySelectorAggregatorWizardStep#getStepTitle()
-     */
-    public String getStepTitle()
-    {
-        return stepTitle;
-    }
-
-    /**
-     * Sets the step title.
-     * 
-     * @param stepTitle the new step title
-     */
-    public void setStepTitle(String stepTitle)
-    {
-        this.stepTitle = stepTitle;
     }
 }

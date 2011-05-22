@@ -5,6 +5,9 @@
 $response.setStatus(404)
 #template("startpage.vm")
 <div class="main layoutsubsection">
+<div id="contentmenu" class="actionmenu">
+  #template("contentmenu.vm")
+</div>
 <div id="mainContentArea">
 #if($xwiki.exists("XWiki.DocumentDoesNotExist"))
     $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)

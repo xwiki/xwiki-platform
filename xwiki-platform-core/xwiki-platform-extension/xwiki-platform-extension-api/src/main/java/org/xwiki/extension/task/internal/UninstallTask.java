@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.task.internal;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Map;
 
@@ -31,26 +32,47 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
-import org.xwiki.extension.event.ExtensionUninstalled;
+import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.task.UninstallRequest;
 import org.xwiki.observation.ObservationManager;
 
+/**
+ * Extension uninstallation related task.
+ * <p>
+ * This task generates related events.
+ * 
+ * @version $Id$
+ */
 @Component
 @Singleton
 @Named("uninstall")
 public class UninstallTask extends AbstractTask<UninstallRequest>
 {
+    /**
+     * Used to manipulate local repository.
+     */
     @Inject
     private LocalExtensionRepository localExtensionRepository;
 
+    /**
+     * Used to uninstall extensions.
+     */
     @Inject
     private ExtensionHandlerManager extensionHandlerManager;
 
+    /**
+     * Used to generated {@link ExtensionUninstalledEvent} event.
+     */
     @Inject
     private ObservationManager observationManager;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.task.internal.AbstractTask#start()
+     */
     @Override
     protected void start() throws Exception
     {
@@ -75,19 +97,29 @@ public class UninstallTask extends AbstractTask<UninstallRequest>
         }
     }
 
-    public void uninstallExtension(String name, Collection<String> namespaces) throws UninstallException
+    /**
+     * @param extensionId the identifier of the extension to uninstall
+     * @param namespaces the namespaces from where to uninstall the extension
+     * @throws UninstallException error when trying to uninstall provided extensions
+     */
+    public void uninstallExtension(String extensionId, Collection<String> namespaces) throws UninstallException
     {
         for (String namespace : namespaces) {
-            uninstallExtension(name, namespace);
+            uninstallExtension(extensionId, namespace);
         }
     }
 
-    public void uninstallExtension(String name, String namespace) throws UninstallException
+    /**
+     * @param extensionId the identifier of the extension to uninstall
+     * @param namespace the namespace from where to uninstall the extension
+     * @throws UninstallException error when trying to uninstall provided extension
+     */
+    public void uninstallExtension(String extensionId, String namespace) throws UninstallException
     {
-        LocalExtension localExtension = this.localExtensionRepository.getInstalledExtension(name, namespace);
+        LocalExtension localExtension = this.localExtensionRepository.getInstalledExtension(extensionId, namespace);
 
         if (localExtension == null) {
-            throw new UninstallException("[" + name + "]: extension is not installed");
+            throw new UninstallException(MessageFormat.format("[{0}]: extension is not installed", extensionId));
         }
 
         try {
@@ -97,6 +129,11 @@ public class UninstallTask extends AbstractTask<UninstallRequest>
         }
     }
 
+    /**
+     * @param localExtension the extension to uninstall
+     * @param namespaces the namespaces from where to uninstall the extension
+     * @throws UninstallException error when trying to uninstall provided extension
+     */
     public void uninstallExtension(LocalExtension localExtension, Collection<String> namespaces)
         throws UninstallException
     {
@@ -105,11 +142,16 @@ public class UninstallTask extends AbstractTask<UninstallRequest>
         }
     }
 
+    /**
+     * @param localExtension the extension to uninstall
+     * @param namespace the namespace from where to uninstall the extension
+     * @throws UninstallException error when trying to uninstall provided extension
+     */
     public void uninstallExtension(LocalExtension localExtension, String namespace) throws UninstallException
     {
-        if (namespace != null && localExtension.getNamespaces() != null
-            && !localExtension.getNamespaces().contains(namespace)) {
-            throw new UninstallException("[" + namespace + "]: extension is not installed on wiki [" + namespace + "]");
+        if (namespace != null && !localExtension.isInstalled(namespace)) {
+            throw new UninstallException(MessageFormat.format("[{0}]: extension is not installed on wiki [{1}]",
+                localExtension, namespace));
         }
 
         // Uninstall backward dependencies
@@ -142,6 +184,6 @@ public class UninstallTask extends AbstractTask<UninstallRequest>
             this.localExtensionRepository.uninstallExtension(localExtension, namespace);
         }
 
-        this.observationManager.notify(new ExtensionUninstalled(localExtension.getId()), localExtension, null);
+        this.observationManager.notify(new ExtensionUninstalledEvent(localExtension.getId()), localExtension, null);
     }
 }

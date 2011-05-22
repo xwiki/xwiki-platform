@@ -19,9 +19,12 @@
  */
 package org.xwiki.cache.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.cache.CacheManagerConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 
 /**
@@ -30,6 +33,7 @@ import org.xwiki.configuration.ConfigurationSource;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultCacheManagerConfiguration implements CacheManagerConfiguration
 {
     /**
@@ -54,7 +58,8 @@ public class DefaultCacheManagerConfiguration implements CacheManagerConfigurati
      * would cause some cyclic dependency since the configuration source would look for config data
      * in wiki pages thus calling the cache store which in turn would call this class again.
      */
-    @Requirement("xwikiproperties")
+    @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource configuration;
 
     /**

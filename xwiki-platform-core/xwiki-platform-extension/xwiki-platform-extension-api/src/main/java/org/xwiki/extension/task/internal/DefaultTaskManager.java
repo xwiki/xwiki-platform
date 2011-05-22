@@ -33,31 +33,62 @@ import org.xwiki.extension.task.TaskException;
 import org.xwiki.extension.task.TaskManager;
 import org.xwiki.extension.task.UninstallRequest;
 
+/**
+ * Default implementation of {@link TaskManager}.
+ * 
+ * @version $Id$
+ */
 @Component
 @Singleton
 public class DefaultTaskManager implements TaskManager
 {
+    /**
+     * Used to lookup {@link Task} implementations.
+     */
     @Inject
     private ComponentManager componentManager;
 
+    /**
+     * @see #getCurrentTask()
+     */
     private Task currentTask;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.task.TaskManager#getCurrentTask()
+     */
     public Task getCurrentTask()
     {
         return this.currentTask;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.task.TaskManager#install(org.xwiki.extension.task.InstallRequest)
+     */
     public Task install(InstallRequest request) throws TaskException
     {
         return executeTask("install", request);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.task.TaskManager#uninstall(org.xwiki.extension.task.UninstallRequest)
+     */
     public Task uninstall(UninstallRequest request) throws TaskException
     {
         return executeTask("uninstall", request);
     }
 
-    private synchronized Task executeTask(String taskId, Request request) throws TaskException
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.task.TaskManager#executeTask(java.lang.String, org.xwiki.extension.task.Request)
+     */
+    public synchronized Task executeTask(String taskId, Request request) throws TaskException
     {
         if (this.currentTask != null && this.currentTask.getStatus() != Status.FINISHED) {
             throw new TaskException("A task is already running");

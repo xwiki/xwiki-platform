@@ -21,22 +21,48 @@ package org.xwiki.extension.repository.internal;
 
 import org.xwiki.extension.ExtensionDependency;
 
+/**
+ * Default implementation of {@link ExtensionDependency}.
+ * 
+ * @version $Id$
+ */
 public class LocalExtensionDependency implements ExtensionDependency
 {
+    /**
+     * @see #getId()
+     */
     private String id;
+
+    /**
+     * @see #getVersion()
+     */
     private String version;
 
+    /**
+     * @param id the target extension identifier
+     * @param version the target extension version
+     */
     public LocalExtensionDependency(String id, String version)
     {
         this.id = id;
         this.version = version;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.ExtensionDependency#getId()
+     */
     public String getId()
     {
         return this.id;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.ExtensionDependency#getVersion()
+     */
     public String getVersion()
     {
         return this.version;

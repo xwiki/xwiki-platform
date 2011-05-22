@@ -19,32 +19,21 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.importer;
 
-import org.xwiki.gwt.user.client.ui.MenuBar;
 import org.xwiki.gwt.user.client.ui.MenuItem;
 import org.xwiki.gwt.wysiwyg.client.Images;
 import org.xwiki.gwt.wysiwyg.client.Strings;
-import org.xwiki.gwt.wysiwyg.client.plugin.internal.MenuItemUIExtension;
+import org.xwiki.gwt.wysiwyg.client.plugin.internal.MenuItemUIExtensionAdaptor;
 
 import com.google.gwt.user.client.Command;
 
 /**
- * Provides access to various content importers through the top-level wysiwyg menu.
+ * Provides access to various content importers through the top-level menu.
  * 
  * @version $Id$
  * @since 2.0.1
  */
-public class ImportMenuExtension extends MenuItemUIExtension
+public class ImportMenuExtension extends MenuItemUIExtensionAdaptor
 {
-    /**
-     * The top level menu entry.
-     */
-    private MenuItem importMenuEntry;
-
-    /**
-     * The sub-menu that gets expanded once clicked on importMenuEntry.
-     */
-    private MenuBar importMenu;
-
     /**
      * Creates a new import menu extension.
      * 
@@ -54,38 +43,19 @@ public class ImportMenuExtension extends MenuItemUIExtension
     {
         super("menu");
 
-        // Office File Import.
-        MenuItem importOfficeFileMenuItem =
-            new MenuItem(Strings.INSTANCE.importOfficeFileMenuItemCaption(), new Command()
-            {
-                public void execute()
+        MenuItem importOfficeFile =
+            createMenuItem(Strings.INSTANCE.importOfficeFileMenuItemCaption(),
+                Images.INSTANCE.importOfficeFileMenuEntryIcon(), new Command()
                 {
-                    importPlugin.onImportOfficeFile();
-                }
-            });
-        importOfficeFileMenuItem.setIcon(Images.INSTANCE.importOfficeFileMenuEntryIcon());
+                    public void execute()
+                    {
+                        importPlugin.onImportOfficeFile();
+                    }
+                });
+        MenuItem importMenu =
+            createMenuItem(Strings.INSTANCE.importMenuEntryCaption(), Images.INSTANCE.importMenuEntryIcon());
 
-        importMenu = new MenuBar(true);
-        importMenu.setAnimationEnabled(false);
-        importMenu.addItem(importOfficeFileMenuItem);
-
-        importMenuEntry = new MenuItem(Strings.INSTANCE.importMenuEntryCaption(), importMenu);
-        importMenuEntry.setIcon(Images.INSTANCE.importMenuEntryIcon());
-
-        addFeature(ImportPluginFactory.getInstance().getPluginName(), importMenuEntry);
-    }
-
-    /**
-     * Cleans up this menu extension on destroy.
-     */
-    public void destroy()
-    {
-        importMenu.clearItems();
-        importMenu = null;
-
-        importMenuEntry.getParentMenu().removeItem(importMenuEntry);
-        importMenuEntry = null;
-
-        this.clearFeatures();
+        addFeature(ImportPluginFactory.getInstance().getPluginName(), importMenu);
+        addFeature("importOffice", importOfficeFile);
     }
 }

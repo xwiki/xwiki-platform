@@ -19,6 +19,11 @@
  */
 package org.xwiki.extension;
 
+/**
+ * Error when installing an extension.
+ * 
+ * @version $Id$
+ */
 public class InstallException extends ExtensionException
 {
     /**

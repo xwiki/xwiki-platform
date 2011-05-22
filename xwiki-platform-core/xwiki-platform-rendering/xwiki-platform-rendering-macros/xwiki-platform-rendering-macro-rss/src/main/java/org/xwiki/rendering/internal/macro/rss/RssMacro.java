@@ -24,10 +24,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.ImageBlock;
@@ -55,7 +58,9 @@ import com.sun.syndication.feed.synd.SyndFeed;
  * @version $Id$
  * @since 1.8RC1
  */
-@Component("rss")
+@Component
+@Named("rss")
+@Singleton
 public class RssMacro extends AbstractMacro<RssMacroParameters>
 {
 
@@ -73,23 +78,25 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
      * The relative skin path of the feed icon to be displayed in the channel title.
      */
     private static final String FEED_ICON_RESOURCE_PATH = "icons/silk/feed.gif";
-    
+
     /**
      * The Box macro is used to draw boxes around RSS feed items and for the main around the RSS feed list.
      */
-    @Requirement("box")
+    @Inject
+    @Named("box")
     protected Macro<BoxMacroParameters> boxMacro;
 
     /**
      * Used to get the RSS icon.
      */
-    @Requirement
+    @Inject
     private SkinAccessBridge skinAccessBridge;
 
     /**
      * Needed to parse the ordinary text.
      */
-    @Requirement("plain/1.0")
+    @Inject
+    @Named("plain/1.0")
     private Parser plainTextParser;
 
     /**
@@ -140,7 +147,8 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             boxParameters.setImage(new ResourceReference(feed.getImage().getUrl(), ResourceType.URL));
         }
 
-        List<Block> result = boxMacro.execute(boxParameters, content == null ? StringUtils.EMPTY : content, context);
+        List<Block> result =
+            this.boxMacro.execute(boxParameters, content == null ? StringUtils.EMPTY : content, context);
         generaterEntries(result.get(0), feed, parameters, context);
 
         return result;
@@ -167,7 +175,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             Block titleTextLinkBlock = new LinkBlock(parsePlainText(feed.getTitle()), titleResourceReference, true);
 
             // Rss icon.
-            String imagePath = skinAccessBridge.getSkinFile(FEED_ICON_RESOURCE_PATH);
+            String imagePath = this.skinAccessBridge.getSkinFile(FEED_ICON_RESOURCE_PATH);
             ImageBlock imageBlock = new ImageBlock(new ResourceReference(imagePath, ResourceType.URL), false);
 
             // Title rss icon link.

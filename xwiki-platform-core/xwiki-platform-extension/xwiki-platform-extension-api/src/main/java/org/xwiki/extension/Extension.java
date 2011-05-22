@@ -25,30 +25,74 @@ import java.util.Map;
 
 import org.xwiki.extension.repository.ExtensionRepository;
 
+/**
+ * Represent an extension.
+ * 
+ * @version $Id$
+ */
 public interface Extension
 {
+    /**
+     * @return the id/version combination which makes the extension unique
+     */
     ExtensionId getId();
 
+    /**
+     * @return the type of the extension
+     */
     String getType();
 
+    /**
+     * @return the display name of the extension
+     */
     String getName();
-    
+
+    /**
+     * @return a description of the extension
+     */
     String getDescription();
 
+    /**
+     * @return an URL for the extension website
+     */
     String getWebSite();
 
-    String getAuthor();
+    /**
+     * @return the extension authors
+     */
+    List<String> getAuthors();
 
-    List<ExtensionDependency> getDependencies();
+    /**
+     * @return the dependencies of the extension
+     */
+    List< ? extends ExtensionDependency> getDependencies();
 
+    /**
+     * Download the extension in the provided file.
+     * 
+     * @param file the file where to save the extension
+     * @throws ExtensionException error when downloading the extension
+     */
     void download(File file) throws ExtensionException;
 
+    /**
+     * @return the repository of the extension
+     */
     ExtensionRepository getRepository();
 
     /**
-     * Extends {@link Extension} standard properties (used to be stored in local extension descriptor, index etc...)
+     * Extends {@link Extension} standard properties.
+     * <p>
+     * Theses are generally provided by specific repositories. For example a maven repository will provide group and
+     * artifacts ids.
+     * 
+     * @return the properties
      */
     Map<String, Object> getProperties();
 
+    /**
+     * @param key the property key
+     * @return the property value
+     */
     Object getProperty(String key);
 }

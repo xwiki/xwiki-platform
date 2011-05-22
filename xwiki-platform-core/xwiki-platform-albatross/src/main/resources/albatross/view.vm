@@ -1,0 +1,39 @@
+###
+### Main "view" template
+###
+### General wrapper for view actions
+###
+#if ($request.getParameter("raw").equals("1"))
+  #template("code.vm")
+#else
+  #template("startpage.vm")
+  ## ----------------------------------------------------------------------------------
+  ## Use the "viewer" variable to decide which view template to call. If no
+  ## "viewer" variable is specified, then checks if a "viewer" request parmaeter has
+  ## been specified and use it if found. If it doesn't exist then default to the
+  ## contentview.vm template, used to display the standard view of a document.
+  ## ----------------------------------------------------------------------------------
+  #if("$!viewer" == '')
+    #set($viewer = $request.getParameter('viewer'))
+  #end
+  #if("$!viewer" == '')
+    #set($viewer = 'content')
+  #end
+  #if($viewer == 'content')
+    <div class="minwidthb"></div>
+    <div class="main layoutsubsection">
+    #template("contentview.vm")
+    <div class="clearfloats"></div>
+    #if($displayDocExtra)
+      #template("docextra.vm")
+      <div class="clearfloats"></div>
+    #end
+    </div>## main
+  #else
+    <div class="main layoutsubsection">
+    #template("${viewer}.vm")
+    <div class="clearfloats"></div>
+    </div>## main
+  #end
+  #template("endpage.vm")
+#end

@@ -52,6 +52,13 @@
       <groupId>org.jboss.cache</groupId>
       <artifactId>jbosscache-core</artifactId>
       <version>3.2.5.GA</version>
+      <exclusions>
+        <!-- We don't use it in the context of the cache, plus it causes conflicts with the version used by remote observation module -->
+        <exclusion>
+          <groupId>jgroups</groupId>
+          <artifactId>jgroups</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- Test Dependencies -->
     <dependency>

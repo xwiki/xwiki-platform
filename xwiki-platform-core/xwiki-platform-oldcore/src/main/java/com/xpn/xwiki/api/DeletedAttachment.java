@@ -22,8 +22,8 @@ package com.xpn.xwiki.api;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
@@ -45,7 +45,7 @@ import com.xpn.xwiki.util.Programming;
 public class DeletedAttachment extends Api
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(DeletedAttachment.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeletedAttachment.class);
 
     /** The internal object wrapped by this API. */
     private final com.xpn.xwiki.doc.DeletedAttachment deletedAttachment;
@@ -126,7 +126,7 @@ public class DeletedAttachment extends Api
             Document doc = this.context.getWiki().getDocument(getDocName(), this.context).newDocument(this.context);
             return new Attachment(doc, this.deletedAttachment.restoreAttachment(null, this.context), this.context);
         } catch (XWikiException ex) {
-            LOG.warn("Failed to parse deleted attachment: " + ex.getMessage(), ex);
+            LOGGER.warn("Failed to parse deleted attachment: " + ex.getMessage(), ex);
             return null;
         }
     }
@@ -190,7 +190,7 @@ public class DeletedAttachment extends Api
             return cal.before(Calendar.getInstance());
         } catch (Exception ex) {
             // Public APIs should not throw exceptions
-            LOG.warn("Exception while checking if entry [" + getId() + "] can be removed from the recycle bin", ex);
+            LOGGER.warn("Exception while checking if entry [" + getId() + "] can be removed from the recycle bin", ex);
             return false;
         }
     }
@@ -208,7 +208,7 @@ public class DeletedAttachment extends Api
             try {
                 this.context.getWiki().getAttachmentRecycleBinStore().deleteFromRecycleBin(getId(), this.context, true);
             } catch (Exception ex) {
-                LOG.warn("Failed to purge deleted attachment", ex);
+                LOGGER.warn("Failed to purge deleted attachment", ex);
             }
         } else {
             java.lang.Object[] args = {this.getFilename(), this.getDocName()};

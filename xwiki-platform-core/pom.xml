@@ -102,6 +102,12 @@
         <artifactId>jcommon</artifactId>
         <version>1.0.15</version>
       </dependency>
+      <!-- Used on remote objervatoin and also by JBossCache (even if it does not really use it) -->
+      <dependency>
+        <groupId>org.jgroups</groupId>
+        <artifactId>jgroups</artifactId>
+        <version>2.12.1.Final</version>
+      </dependency>
       <!-- Standard dependencies used in GWT modules -->
       <dependency>
         <groupId>com.google.gwt</groupId>

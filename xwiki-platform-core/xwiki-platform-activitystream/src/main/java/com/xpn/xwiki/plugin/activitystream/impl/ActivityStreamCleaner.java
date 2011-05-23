@@ -20,8 +20,8 @@
 package com.xpn.xwiki.plugin.activitystream.impl;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
@@ -42,7 +42,7 @@ public final class ActivityStreamCleaner
     /**
      * Logger.
      */
-    private static final Log LOG = LogFactory.getLog(ActivityStreamCleaner.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActivityStreamCleaner.class);
     
     /**
      * Document holding the cleaner Job.
@@ -200,7 +200,7 @@ public final class ActivityStreamCleaner
                 ((SchedulerPlugin) context.getWiki().getPlugin("scheduler", context)).scheduleJob(job, context);
             }
         } catch (Exception e) {
-            LOG.error("Cannot initialize ActivityStreamCleanerJob", e);
+            LOGGER.error("Cannot initialize ActivityStreamCleanerJob", e);
         }
     }
     

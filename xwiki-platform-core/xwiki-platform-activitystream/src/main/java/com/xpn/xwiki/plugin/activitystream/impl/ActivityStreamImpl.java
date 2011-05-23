@@ -27,10 +27,10 @@ import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.annotation.event.AnnotationAddedEvent;
 import org.xwiki.annotation.event.AnnotationDeletedEvent;
 import org.xwiki.annotation.event.AnnotationUpdatedEvent;
@@ -75,7 +75,7 @@ import com.xpn.xwiki.web.Utils;
 public class ActivityStreamImpl implements ActivityStream, EventListener
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(ActivityStreamImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActivityStreamImpl.class);
 
     /**
      * Key used to store the request ID in the context.
@@ -953,7 +953,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             try {
                 addDocumentActivityEvent(streamName, currentDoc, eventType, msgPrefix + eventType, params, context);
             } catch (ActivityStreamException e) {
-                LOG.error("Exception while trying to add a document activity event, updated document: [" + wiki + ":"
+                LOGGER.error("Exception while trying to add a document activity event, updated document: [" + wiki + ":"
                     + currentDoc.getFullName() + "]");
             }
         }

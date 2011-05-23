@@ -680,7 +680,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                         String newPropertyValue =
                             (newProperty.getValue() instanceof String) ? newProperty.toText() : pclass.displayView(
                                 propertyName, this, context);
-                        difflist.add(new ObjectDiff(getClassName(), getNumber(), "", ObjectDiff.ACTION_PROPERTYADDED,
+                        difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYADDED,
                             propertyName, propertyType, "", newPropertyValue));
                     }
                 }
@@ -694,11 +694,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                     String oldPropertyValue =
                         (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
                             propertyName, oldCollection, context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
+                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
                         propertyName, propertyType, oldPropertyValue, newPropertyValue));
                 } else {
                     // Cannot get property definition, so use the plain value
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
+                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
                         propertyName, propertyType, oldProperty.toText(), newProperty.toText()));
                 }
             }
@@ -721,11 +721,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                         String oldPropertyValue =
                             (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
                                 propertyName, oldCollection, context);
-                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "",
+                        difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
                             ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, ""));
                     } else {
                         // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "",
+                        difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
                             ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty.toText(), ""));
                     }
                 }

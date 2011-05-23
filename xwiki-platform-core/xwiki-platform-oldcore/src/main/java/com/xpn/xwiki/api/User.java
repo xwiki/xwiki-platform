@@ -16,14 +16,13 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.api;
 
 import java.text.MessageFormat;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -42,7 +41,7 @@ import com.xpn.xwiki.util.Programming;
 public class User extends Api
 {
     /** Logging helper object. */
-    protected static final Log LOG = LogFactory.getLog(User.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(User.class);
 
     /** The wrapped XWikiUser object. */
     private XWikiUser user;
@@ -86,12 +85,12 @@ public class User extends Api
         boolean result = false;
         try {
             if (this.user == null) {
-                LOG.warn("Invalid null user");
+                LOGGER.warn("Invalid null user");
             } else {
                 result = this.user.isUserInGroup(groupName, getXWikiContext());
             }
         } catch (Exception ex) {
-            LOG.warn(new MessageFormat("Unhandled exception while checking if user {0}"
+            LOGGER.warn(new MessageFormat("Unhandled exception while checking if user {0}"
                 + " belongs to group {1}").format(new java.lang.Object[] {user, groupName}), ex);
         }
         return result;

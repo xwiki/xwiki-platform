@@ -53,11 +53,11 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
@@ -84,7 +84,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 public class MailSenderPlugin extends XWikiDefaultPlugin
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(MailSenderPlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailSenderPlugin.class);
 
     /**
      * Since Java uses full Unicode Strings and email clients manage it we force email encoding to UTF-8. XWiki encoding
@@ -313,7 +313,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         InternetAddress[] bcc = toInternetAddresses(recipients);
 
         if ((to == null) && (cc == null) && (bcc == null)) {
-            LOG.info("No recipient -> skipping this email");
+            LOGGER.info("No recipient -> skipping this email");
             return null;
         }
 
@@ -527,7 +527,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 line = input.readLine();
             } else {
                 if (headersFound) {
-                    LOG.warn("Mail body does not contain an empty line between the headers and the body.");
+                    LOGGER.warn("Mail body does not contain an empty line between the headers and the body.");
                 }
             }
 
@@ -545,7 +545,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             toMail.setTextPart(result.toString());
         } catch (IOException ioe) {
             // Can't really happen here
-            LOG.error("Unexpected IO exception while preparing a mail", ioe);
+            LOGGER.error("Unexpected IO exception while preparing a mail", ioe);
         }
     }
 
@@ -697,7 +697,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 count++;
 
                 Mail mail = emailIt.next();
-                LOG.info("Sending email: " + mail.toString());
+                LOGGER.info("Sending email: " + mail.toString());
 
                 if ((transport == null) || (session == null)) {
                     // initialize JavaMail Session and Transport
@@ -728,15 +728,15 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                                 transport.close();
                             }
                         } catch (MessagingException ex) {
-                            LOG.error("MessagingException has occured.", ex);
+                            LOGGER.error("MessagingException has occured.", ex);
                         }
                         transport = null;
                         session = null;
                     }
                 } catch (SendFailedException ex) {
                     sendFailedCount++;
-                    LOG.error("SendFailedException has occured.", ex);
-                    LOG.error("Detailed email information" + mail.toString());
+                    LOGGER.error("SendFailedException has occured.", ex);
+                    LOGGER.error("Detailed email information" + mail.toString());
                     if (emailCount == 1) {
                         throw ex;
                     }
@@ -744,15 +744,15 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                         throw ex;
                     }
                 } catch (MessagingException mex) {
-                    LOG.error("MessagingException has occured.", mex);
-                    LOG.error("Detailed email information" + mail.toString());
+                    LOGGER.error("MessagingException has occured.", mex);
+                    LOGGER.error("Detailed email information" + mail.toString());
                     if (emailCount == 1) {
                         throw mex;
                     }
                 } catch (XWikiException e) {
-                    LOG.error("XWikiException has occured.", e);
+                    LOGGER.error("XWikiException has occured.", e);
                 } catch (IOException e) {
-                    LOG.error("IOException has occured.", e);
+                    LOGGER.error("IOException has occured.", e);
                 }
             }
         } finally {
@@ -761,10 +761,10 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                     transport.close();
                 }
             } catch (MessagingException ex) {
-                LOG.error("MessagingException has occured.", ex);
+                LOGGER.error("MessagingException has occured.", ex);
             }
 
-            LOG.info("sendEmails: Email count = " + emailCount + " sent count = " + count);
+            LOGGER.info("sendEmails: Email count = " + emailCount + " sent count = " + count);
         }
         return true;
     }
@@ -799,7 +799,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 obj = doc.getObject(EMAIL_XWIKI_CLASS_NAME, "language", "en");
             }
             if (obj == null) {
-                LOG.error("No mail object found in the document " + templateDocFullName);
+                LOGGER.error("No mail object found in the document " + templateDocFullName);
                 return ERROR_TEMPLATE_EMAIL_OBJECT_NOT_FOUND;
             }
             String subjectContent = obj.getStringValue("subject");
@@ -827,7 +827,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 sendMail(mail, context);
                 return 0;
             } catch (Exception e) {
-                LOG.error("sendEmailFromTemplate: " + templateDocFullName + " vcontext: " + updatedVelocityContext, e);
+                LOGGER.error("sendEmailFromTemplate: " + templateDocFullName + " vcontext: " + updatedVelocityContext, e);
                 return ERROR;
             }
         } finally {

@@ -17,15 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.applicationmanager;
 
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -47,7 +46,7 @@ public final class ApplicationManager
     /**
      * The logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(ApplicationManager.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(ApplicationManager.class);
 
     /**
      * Wiki preferences document and class full name.
@@ -152,16 +151,16 @@ public final class ApplicationManager
         if (!docToSave.isNew() && appClass.isInstance(docToSave)) {
             // If we are not allowed to continue if server page already exists
             if (failOnExist) {
-                if (LOG.isErrorEnabled()) {
-                    LOG.error(getMessageTool(context).get(ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error(getMessageTool(context).get(ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
                         userAppSuperDoc.getAppName()));
                 }
 
                 throw new ApplicationManagerException(ApplicationManagerException.ERROR_AM_APPDOCALREADYEXISTS,
                     getMessageTool(context).get(ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
                         userAppSuperDoc.getAppName()));
-            } else if (LOG.isWarnEnabled()) {
-                LOG.warn(getMessageTool(context).get(ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
+            } else if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn(getMessageTool(context).get(ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
                     userAppSuperDoc.getAppName()));
             }
 

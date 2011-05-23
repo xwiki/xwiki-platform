@@ -30,8 +30,8 @@ import java.util.List;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.PatchFailedException;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.InvalidFileFormatException;
@@ -57,7 +57,7 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
 public class XWikiRCSArchive extends Archive
 {
     /** logger. */
-    private static final Log LOG = LogFactory.getLog(XWikiRCSArchive.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRCSArchive.class);
 
     /**
      * Used to serialize {@link XWikiDocumentArchive}.
@@ -210,7 +210,7 @@ public class XWikiRCSArchive extends Archive
         {
             boolean isdiff = !sfullVersion.equals(getState());
             if (getTextString() != null && isdiff != !getTextString().startsWith("<")) {
-                LOG.warn("isDiff: Archive is inconsistent. Text and diff field are contradicting. version="
+                LOGGER.warn("isDiff: Archive is inconsistent. Text and diff field are contradicting. version="
                     + getVersion());
                 isdiff = !isdiff;
             }
@@ -221,7 +221,7 @@ public class XWikiRCSArchive extends Archive
         public void setDiff(boolean isdiff)
         {
             if (getTextString() != null && isdiff != !getTextString().startsWith("<")) {
-                LOG.warn("setDiff: Archive is inconsistent. Text and diff field are contradicting. version="
+                LOGGER.warn("setDiff: Archive is inconsistent. Text and diff field are contradicting. version="
                     + getVersion());
                 isdiff = !isdiff;
             }
@@ -306,7 +306,7 @@ public class XWikiRCSArchive extends Archive
                     //    See http://jira.xwiki.org/jira/browse/XWIKI-1855
                     // 3) Cannot get the revision as a string from a node version. Not sure why this
                     //    is happening though... See http://jira.xwiki.org/jira/browse/XWIKI-2076
-                    LOG.warn("Error in revision [" + node.getVersion().toString() + "]: [" + e.getMessage()
+                    LOGGER.warn("Error in revision [" + node.getVersion().toString() + "]: [" + e.getMessage()
                         + "]. Ignoring non-fatal error, the Author, Comment and Date are not set.");
                 }
             }

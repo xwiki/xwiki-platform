@@ -135,4 +135,11 @@
       </plugin>
     </plugins>
   </build>
+  <repositories>
+   <!-- Needed for Smat GWT -->
+    <repository>
+      <id>smartgwt-maven</id>
+      <url>http://www.smartclient.com/maven2</url>
+    </repository>
+  </repositories>
 </project>

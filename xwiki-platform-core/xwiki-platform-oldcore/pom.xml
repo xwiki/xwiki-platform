@@ -453,12 +453,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- iCal processing -->
-    <dependency>
-      <groupId>ical4j</groupId>
-      <artifactId>ical4j</artifactId>
-      <version>0.9.20</version>
-    </dependency>
     <!-- Mail sender -->
     <dependency>
       <groupId>javax.mail</groupId>

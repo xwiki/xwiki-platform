@@ -28,8 +28,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -67,9 +66,6 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
     /** Predefined error message: invalid formula. */
     public static final String WRONG_CONTENT_ERROR = "The formula text is not valid, please correct it.";
 
-    /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(FormulaMacro.class);
-
     /** The description of the macro. */
     private static final String DESCRIPTION = "Displays a mathematical formula.";
 
@@ -87,6 +83,12 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
     /** Needed for computing the URL for accessing the rendered image. */
     @Inject
     private DocumentAccessBridge dab;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -116,11 +118,11 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
         try {
             result = render(content, context.isInline(), size, type, rendererHint);
         } catch (ComponentLookupException ex) {
-            LOG.error("Invalid renderer: [" + rendererHint + "]. Falling back to the safe renderer.", ex);
+            this.logger.error("Invalid renderer: [" + rendererHint + "]. Falling back to the safe renderer.", ex);
             try {
                 result = render(content, context.isInline(), size, type, this.configuration.getSafeRenderer());
             } catch (ComponentLookupException ex2) {
-                LOG.error("Safe renderer not found. No image generated. Returning plain text.", ex);
+                this.logger.error("Safe renderer not found. No image generated. Returning plain text.", ex);
             } catch (IllegalArgumentException ex2) {
                 throw new MacroExecutionException(WRONG_CONTENT_ERROR);
             }

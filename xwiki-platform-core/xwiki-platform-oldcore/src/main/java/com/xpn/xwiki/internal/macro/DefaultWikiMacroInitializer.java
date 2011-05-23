@@ -27,8 +27,6 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -49,7 +47,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
  * A {@link DefaultWikiMacroInitializer} providing wiki macros.
@@ -60,9 +57,6 @@ import com.xpn.xwiki.user.api.XWikiUser;
 @Component
 public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMacroConstants
 {
-    /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(DefaultWikiMacroInitializer.class);
-
     /**
      * The {@link org.xwiki.rendering.macro.wikibridge.WikiMacroFactory} component.
      */
@@ -169,7 +163,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
     private void registerMacrosForWiki(String wikiName, XWikiContext xcontext)
     {
         try {
-            LOG.debug("Registering wiki macros for wiki " + wikiName);
+            this.logger.debug("Registering wiki macros for wiki " + wikiName);
             // Set the context to be in that wiki so that both the search for XWikiMacro class objects and the
             // registration of macros registered for the current wiki will work.
             // TODO: In the future when we have APIs for it, move the code to set the current wiki and the current user
@@ -187,7 +181,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
                 registerMacro(wikiMacroDocumentReference, (String) wikiMacroDocumentData[2], xcontext);
             }
         } catch (Exception ex) {
-            LOG.warn("Failed to register macros for wiki [" + wikiName + "]: " + ex.getMessage());
+            this.logger.warn("Failed to register macros for wiki [" + wikiName + "]: " + ex.getMessage());
         }
     }
 
@@ -225,7 +219,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
     private void registerMacro(DocumentReference wikiMacroDocumentReference, String wikiMacroDocumentAuthor,
         XWikiContext xcontext)
     {
-        LOG.debug("Found macro: " + wikiMacroDocumentReference);
+        this.logger.debug("Found macro: " + wikiMacroDocumentReference);
 
         DocumentReference originalAuthor = xcontext.getUserReference();
         try {
@@ -236,7 +230,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
             // the correct user will be found in the Execution Context.
             xcontext.setUser(wikiMacroDocumentAuthor);
             this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, macro);
-            LOG.debug("Registered macro " + wikiMacroDocumentReference);
+            this.logger.debug("Registered macro " + wikiMacroDocumentReference);
         } catch (InsufficientPrivilegesException ex) {
             // Just log the exception and skip to the next.
             // We only log at the debug level here as this is not really an error

@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.api;
 
@@ -32,8 +31,8 @@ import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
@@ -84,7 +83,7 @@ import com.xpn.xwiki.web.Utils;
 public class Document extends Api
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(Document.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Document.class);
 
     /**
      * The XWikiDocument object wrapped by this API.
@@ -332,12 +331,12 @@ public class Document extends Api
             return this.doc.getRenderedTitle(
                 Utils.getComponent(SyntaxFactory.class).createSyntaxFromIdString(syntaxId), getXWikiContext());
         } catch (ParseException e) {
-            LOG.error("Failed to parse provided syntax identifier [" + syntaxId + "]", e);
+            LOGGER.error("Failed to parse provided syntax identifier [" + syntaxId + "]", e);
 
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to parse syntax identifier [" + syntaxId + "]", e);
         } catch (Exception e) {
-            LOG.error("Failed to render document [" + getPrefixedFullName() + "] title content", e);
+            LOGGER.error("Failed to render document [" + getPrefixedFullName() + "] title content", e);
 
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to render document [" + getPrefixedFullName() + "] content title", e);
@@ -2487,7 +2486,7 @@ public class Document extends Api
         try {
             getDoc().convertSyntax(targetSyntaxId, this.context);
         } catch (Exception ex) {
-            LOG.error("Failed to convert document [" + getPrefixedFullName() + "] to syntax [" + targetSyntaxId + "]",
+            LOGGER.error("Failed to convert document [" + getPrefixedFullName() + "] to syntax [" + targetSyntaxId + "]",
                 ex);
 
             return false;

@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.doc;
 
 import java.io.ByteArrayOutputStream;
@@ -31,8 +29,6 @@ import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -40,6 +36,8 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 
@@ -50,7 +48,7 @@ import com.xpn.xwiki.internal.xml.XMLWriter;
 
 public class XWikiAttachment implements Cloneable
 {
-    private static final Log LOG = LogFactory.getLog(XWikiAttachment.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAttachment.class);
 
     private XWikiDocument doc;
 
@@ -123,7 +121,7 @@ public class XWikiAttachment implements Cloneable
             attachment = getClass().newInstance();
         } catch (Exception e) {
             // This should not happen
-            LOG.error("exception while attach.clone", e);
+            LOGGER.error("exception while attach.clone", e);
         }
 
         attachment.setAuthor(getAuthor());
@@ -592,7 +590,7 @@ public class XWikiAttachment implements Cloneable
         try {
             return getAttachment_archive().getVersions();
         } catch (Exception ex) {
-            LOG.warn(String.format("Cannot retrieve versions of attachment [%s@%s]: %s", getFilename(), getDoc()
+            LOGGER.warn(String.format("Cannot retrieve versions of attachment [%s@%s]: %s", getFilename(), getDoc()
                 .getFullName(), ex.getMessage()));
 
             return new Version[] {new Version(this.getVersion())};
@@ -673,7 +671,7 @@ public class XWikiAttachment implements Cloneable
             try {
                 context.getWiki().getAttachmentStore().loadAttachmentContent(this, context, true);
             } catch (Exception ex) {
-                LOG.warn(String.format("Failed to load content for attachment [%s@%s]. "
+                LOGGER.warn(String.format("Failed to load content for attachment [%s@%s]. "
                     + "This attachment is broken, please consider re-uploading it. " + "Internal error: %s",
                     getFilename(), (this.doc != null) ? this.doc.getFullName() : "<unknown>", ex.getMessage()));
             }
@@ -687,7 +685,7 @@ public class XWikiAttachment implements Cloneable
                 this.attachment_archive =
                     context.getWiki().getAttachmentVersioningStore().loadArchive(this, context, true);
             } catch (Exception ex) {
-                LOG.warn(String.format("Failed to load archive for attachment [%s@%s]. "
+                LOGGER.warn(String.format("Failed to load archive for attachment [%s@%s]. "
                     + "This attachment is broken, please consider re-uploading it. " + "Internal error: %s",
                     getFilename(), (this.doc != null) ? this.doc.getFullName() : "<unknown>", ex.getMessage()));
             }

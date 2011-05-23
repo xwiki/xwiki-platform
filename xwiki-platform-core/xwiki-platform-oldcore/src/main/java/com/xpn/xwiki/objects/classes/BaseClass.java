@@ -1280,10 +1280,10 @@ public class BaseClass extends BaseCollection implements ClassInterface
             String propertyType = StringUtils.substringAfterLast(newProperty.getClassType(), ".");
 
             if (oldProperty == null) {
-                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", ObjectDiff.ACTION_PROPERTYADDED,
+                difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYADDED,
                     propertyName, propertyType, "", ""));
             } else if (!oldProperty.equals(newProperty)) {
-                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
+                difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
                     propertyName, propertyType, "", ""));
             }
         }
@@ -1294,7 +1294,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
             String propertyType = StringUtils.substringAfterLast(oldProperty.getClassType(), ".");
 
             if (newProperty == null) {
-                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", ObjectDiff.ACTION_PROPERTYREMOVED,
+                difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYREMOVED,
                     propertyName, propertyType, "", ""));
             }
         }

@@ -17,13 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.applicationmanager;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
 import com.xpn.xwiki.plugin.PluginApi;
@@ -32,9 +34,6 @@ import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplicationClass;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Plugin for managing applications: installation, export, creation. The plugin uses the concept of an Application
@@ -58,7 +57,7 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
     /**
      * The logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(ApplicationManagerPluginApi.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(ApplicationManagerPluginApi.class);
 
     /**
      * The default ApplicationManager managed exception.
@@ -126,7 +125,7 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
      */
     public void logError(String errorMessage, XWikiException e)
     {
-        LOG.error(errorMessage, e);
+        LOGGER.error(errorMessage, e);
 
         context.put(CONTEXT_LASTERRORCODE, Integer.valueOf(e.getCode()));
         context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));

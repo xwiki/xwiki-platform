@@ -16,10 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author jeremi
- * @author ldubost
- *
  */
 package com.xpn.xwiki.gwt.api.server;
 
@@ -45,8 +41,9 @@ import com.xpn.xwiki.web.XWikiServletContext;
 import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiServletResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
@@ -64,7 +61,7 @@ import java.io.UnsupportedEncodingException;
 
 public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiService
 {
-    private static final Log LOG = LogFactory.getLog(XWiki.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
 
     /**
      * We override the default processCall method in order to provide XWiki initialization before 
@@ -173,8 +170,8 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
 
     protected XWikiGWTException getXWikiGWTException(Exception e) {
         // let's make sure we are informed
-        if (LOG.isErrorEnabled()) {
-            LOG.error("Unhandled exception on the server", e);
+        if (LOGGER.isErrorEnabled()) {
+            LOGGER.error("Unhandled exception on the server", e);
         }
 
         if (e instanceof XWikiGWTException){
@@ -1079,7 +1076,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
     }
 
     public void logJSError(Map infos){
-        LOG.warn("[GWT-JS] useragent:" + infos.get("useragent") + "\n"
+        LOGGER.warn("[GWT-JS] useragent:" + infos.get("useragent") + "\n"
                 + "module:" + infos.get("module") + "\n");
                // + "stacktrace" + infos.get("stacktrace"));
     }

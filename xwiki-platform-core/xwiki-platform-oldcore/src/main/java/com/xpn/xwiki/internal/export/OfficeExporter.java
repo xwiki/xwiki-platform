@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.internal.export;
 
@@ -28,11 +27,11 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.artofsolving.jodconverter.document.DefaultDocumentFormatRegistry;
 import org.artofsolving.jodconverter.document.DocumentFormat;
 import org.artofsolving.jodconverter.document.DocumentFormatRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager.ManagerState;
@@ -54,7 +53,7 @@ import com.xpn.xwiki.web.Utils;
 public class OfficeExporter extends PdfExportImpl
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(OfficeExporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OfficeExporter.class);
 
     /**
      * The component used to access the office document converter.
@@ -151,7 +150,7 @@ public class OfficeExporter extends PdfExportImpl
                 // Embedded files are placed in the same folder as the HTML input file during office conversion.
                 inputStreams.put(file.getName(), new FileInputStream(file));
             } catch (Exception e) {
-                LOG.warn(String.format("Failed to embed %s in the office export.", file.getName()), e);
+                LOGGER.warn(String.format("Failed to embed %s in the office export.", file.getName()), e);
             }
         }
     }

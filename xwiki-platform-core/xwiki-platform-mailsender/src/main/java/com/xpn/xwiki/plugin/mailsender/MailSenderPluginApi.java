@@ -21,9 +21,9 @@ package com.xpn.xwiki.plugin.mailsender;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
@@ -41,7 +41,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
     /**
      * Log object to log messages in this class.
      */
-    private static final Log LOG = LogFactory.getLog(MailSenderPluginApi.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailSenderPluginApi.class);
 
     /**
      * API constructor.
@@ -140,7 +140,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
             if (e.getMessage() != null) {
                 this.context.put("error", e.getMessage());
             }
-            LOG.error("sendMessageFromTemplate", e);
+            LOGGER.error("sendMessageFromTemplate", e);
             return -1;
         }
     }
@@ -170,7 +170,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
             if (e.getMessage() != null) {
                 this.context.put("error", e.getMessage());
             }
-            LOG.error("Failed to send email [" + mail.toString() + "]", e);
+            LOGGER.error("Failed to send email [" + mail.toString() + "]", e);
             result = -1;
         }
 
@@ -202,7 +202,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
             if (e.getMessage() != null) {
                 this.context.put("error", e.getMessage());
             }
-            LOG.error("Failed to send email [" + mail.toString() + "] using mail configuration ["
+            LOGGER.error("Failed to send email [" + mail.toString() + "] using mail configuration ["
                 + mailConfiguration.toString() + "]", e);
             result = -1;
         }

@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.export.html;
 
 import java.io.File;
@@ -11,9 +30,9 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
@@ -39,7 +58,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public class HtmlPackager
 {
-    private static final Log LOG = LogFactory.getLog(HtmlPackager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HtmlPackager.class);
 
     /**
      * A point.
@@ -361,8 +380,8 @@ public class HtmlPackager
     private static void addDirToZip(File directory, ZipOutputStream out, String basePath,
         Collection<String> exportedSkinFiles) throws IOException
     {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Adding dir [" + directory.getPath() + "] to the Zip file being generated.");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Adding dir [" + directory.getPath() + "] to the Zip file being generated.");
         }
 
         if (!directory.isDirectory()) {

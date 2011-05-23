@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.user.impl.LDAP;
 
 import com.novell.ldap.*;
@@ -29,9 +27,9 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.securityfilter.realm.SimplePrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.rendering.syntax.Syntax;
 
 import java.io.UnsupportedEncodingException;
@@ -47,7 +45,7 @@ import java.util.Iterator;
 @Deprecated
 public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
 {
-    private static final Log log = LogFactory.getLog(LDAPAuthServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LDAPAuthServiceImpl.class);
 
     public Principal authenticate(String ldapusername, String password, XWikiContext context) throws XWikiException {
         Principal principal = null;
@@ -88,13 +86,13 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
                HashMap attributes = new HashMap();
                if (checkUserPassword(ldapusername, password, attributes, context))
                {
-                   if (log.isDebugEnabled())
-                        log.debug("User authenticated successfully");
+                   if (LOGGER.isDebugEnabled())
+                        LOGGER.debug("User authenticated successfully");
                    principal = GetUserPrincipal(susername, context);
                    if (principal == null && attributes.size() > 0)
                    {
-                       if (log.isDebugEnabled())
-                            log.debug("Ready to create user from LDAP");
+                       if (LOGGER.isDebugEnabled())
+                            LOGGER.debug("Ready to create user from LDAP");
 
                 	   // In case of Virtual Wikis, users should be added in the main wiki
                 	   	// if ldap is not configured for the virtual wiki
@@ -108,7 +106,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
 								}
 								try {
 									CreateUserFromLDAP(attributes,	context);
-                                    log.debug("Looking for user again " + susername);
+                                    LOGGER.debug("Looking for user again " + susername);
 									principal = GetUserPrincipal(susername, context);
 								} catch (Exception e) {
 								}
@@ -117,14 +115,14 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
 							}
 						} else {
 							CreateUserFromLDAP(attributes, context);
-                            log.debug("Looking for user again " + susername);
+                            LOGGER.debug("Looking for user again " + susername);
 							principal = GetUserPrincipal(susername, context);
 						}
 						context.getWiki().flushCache(context);
                    }
                    if (principal ==null) {
-                       if (log.isDebugEnabled())
-                          log.debug("Accept user even without account");
+                       if (LOGGER.isDebugEnabled())
+                          LOGGER.debug("Accept user even without account");
                        principal = new SimplePrincipal("XWiki." + susername);
                    }
                }
@@ -135,8 +133,8 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
     private void CreateUserFromLDAP(HashMap attributes, XWikiContext context) throws XWikiException {
         String ldapFieldMapping = getParam("ldap_fields_mapping",context);
-        if (log.isDebugEnabled())
-             log.debug("Ready to create user from LDAP with field " + ldapFieldMapping);
+        if (LOGGER.isDebugEnabled())
+             LOGGER.debug("Ready to create user from LDAP with field " + ldapFieldMapping);
         if (ldapFieldMapping != null && ldapFieldMapping.length() > 0)
         {
             String[] fields = ldapFieldMapping.split(",");
@@ -150,8 +148,8 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
                 if (2 == field.length)
                 {
                    String fieldName = field[0];
-                   if (log.isDebugEnabled())
-                         log.debug("Create user from LDAP looking at field " + fieldName);
+                   if (LOGGER.isDebugEnabled())
+                         LOGGER.debug("Create user from LDAP looking at field " + fieldName);
                    if (attributes.containsKey(field[1]))
                    {
                        String fieldValue;
@@ -164,7 +162,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
                        }
                        else
                        {
-                           log.debug("Create user from LDAP setting field " + fieldName);
+                           LOGGER.debug("Create user from LDAP setting field " + fieldName);
                            bobj.setStringValue(fieldName, fieldValue);
                        }
                    }
@@ -195,12 +193,12 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         // First we check in the local database
         try {
-            if (log.isDebugEnabled())
-                 log.debug("Finding user " + susername);
+            if (LOGGER.isDebugEnabled())
+                 LOGGER.debug("Finding user " + susername);
             String user = findUser(susername, context);
             if (user != null) {
-                if (log.isDebugEnabled())
-                     log.debug("Found user " + susername);
+                if (LOGGER.isDebugEnabled())
+                     LOGGER.debug("Found user " + susername);
                 principal = new SimplePrincipal(user);
             }
         } catch (Exception e) {
@@ -280,8 +278,8 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
         String foundDN = null;
 
         try {
-            if (log.isDebugEnabled())
-                log.debug("LDAP Password check for user " + username);
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("LDAP Password check for user " + username);
 
             int ldapPort = getLDAPPort(context);
             int ldapVersion = LDAPConnection.LDAP_V3;
@@ -290,8 +288,8 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
             String bindPasswordFormat = getParam("ldap_bind_pass", context);
 
             int checkLevel = GetCheckLevel(context);
-            if (log.isDebugEnabled())
-                 log.debug("LDAP Check level is " + checkLevel);
+            if (LOGGER.isDebugEnabled())
+                 LOGGER.debug("LDAP Check level is " + checkLevel);
 
             Object[] arguments = {
                     username,
@@ -305,19 +303,19 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
             lc.connect(ldapHost, ldapPort);
 
-            if (log.isDebugEnabled())
-                log.debug("LDAP Connect successfull to host " + ldapHost + " and port " + ldapPort);
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("LDAP Connect successfull to host " + ldapHost + " and port " + ldapPort);
 
             // authenticate to the server
             result = Bind(bindDN, bindPassword, lc, ldapVersion);
 
-            if (log.isDebugEnabled())
-                 log.debug("LDAP Bind returned with result " + result);
+            if (LOGGER.isDebugEnabled())
+                 LOGGER.debug("LDAP Bind returned with result " + result);
 
             if (result && (checkLevel > 0))
             {
-                if (log.isDebugEnabled())
-                    log.debug("LDAP searching user");
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug("LDAP searching user");
 
                 LDAPSearchResults searchResults =
                         lc.search(baseDN,
@@ -328,26 +326,26 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
                                 false);        // return attrs and values
 
                 if (searchResults.hasMore()) {
-                    if (log.isDebugEnabled())
-                        log.debug("LDAP searching found user");
+                    if (LOGGER.isDebugEnabled())
+                        LOGGER.debug("LDAP searching found user");
 
                     LDAPEntry nextEntry = searchResults.next();
                     foundDN = nextEntry.getDN();
 
-                    if (log.isDebugEnabled())
-                        log.debug("LDAP searching found DN: " + foundDN);
+                    if (LOGGER.isDebugEnabled())
+                        LOGGER.debug("LDAP searching found DN: " + foundDN);
 
                     if (checkLevel > 1) {
-                        if (log.isDebugEnabled())
-                            log.debug("LDAP comparing password");
+                        if (LOGGER.isDebugEnabled())
+                            LOGGER.debug("LDAP comparing password");
 
                         LDAPAttribute attr = new LDAPAttribute(
                                 "userPassword", password);
                         result = lc.compare(foundDN, attr);
                     }
                     if (result) {
-                        if (log.isDebugEnabled())
-                            log.debug("LDAP adding user attributes");
+                        if (LOGGER.isDebugEnabled())
+                            LOGGER.debug("LDAP adding user attributes");
 
                         LDAPAttributeSet attributeSet = nextEntry.getAttributeSet();
                         Iterator allAttributes = attributeSet.iterator();
@@ -361,8 +359,8 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
                             if (allValues != null) {
                                 while (allValues.hasMoreElements()) {
-                                    if (log.isDebugEnabled())
-                                        log.debug("LDAP adding user attribute " + attributeName);
+                                    if (LOGGER.isDebugEnabled())
+                                        LOGGER.debug("LDAP adding user attribute " + attributeName);
 
                                     String Value = (String) allValues.nextElement();
                                     attributes.put(attributeName, Value);
@@ -372,22 +370,22 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
                         attributes.put("dn", foundDN);
                     }
                 } else {
-                    if (log.isDebugEnabled())
-                        log.debug("LDAP search user failed");
+                    if (LOGGER.isDebugEnabled())
+                        LOGGER.debug("LDAP search user failed");
                     notinLDAP = true;
                 }
             }
 
-            if (log.isInfoEnabled()) {
+            if (LOGGER.isInfoEnabled()) {
                 if (result)
-                 log.info("LDAP Password check for user " + username + " successfull");
+                 LOGGER.info("LDAP Password check for user " + username + " successfull");
                 else
-                 log.info("LDAP Password check for user " + username + " failed");
+                 LOGGER.info("LDAP Password check for user " + username + " failed");
             }
         }
         catch (LDAPException e) {
-            if (log.isInfoEnabled())
-                log.info("LDAP Password check for user " + username + " failed with exception " + e.getMessage());
+            if (LOGGER.isInfoEnabled())
+                LOGGER.info("LDAP Password check for user " + username + " failed with exception " + e.getMessage());
 
             if (e.getResultCode() == LDAPException.NO_SUCH_OBJECT) {
                 notinLDAP = true;
@@ -398,12 +396,12 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
         }
         catch (Throwable e) {
             notinLDAP = true;
-            if (log.isErrorEnabled())
-                log.error("LDAP Password check for user " + username + " failed with exception " + e.getMessage());
+            if (LOGGER.isErrorEnabled())
+                LOGGER.error("LDAP Password check for user " + username + " failed with exception " + e.getMessage());
         }
         finally {
-            if (log.isDebugEnabled())
-                log.debug("LDAP check in finally block");
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("LDAP check in finally block");
 
             try {
                 lc.disconnect();
@@ -413,8 +411,8 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
         }
 
         if (notinLDAP) {
-            if (log.isDebugEnabled())
-                log.debug("LDAP Password check reverting to XWiki");
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("LDAP Password check reverting to XWiki");
 
             // Use XWiki password if user not in LDAP
             result = checkPassword(findUser(username, context), password, context);
@@ -478,11 +476,11 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
             // authenticate to the server
             result = Bind(DN, password, lc, ldapVersion);
 
-            if (log.isDebugEnabled()) {
+            if (LOGGER.isDebugEnabled()) {
                 if (result)
-                    log.debug("(debug) Password check for user " + DN + " successfull");
+                    LOGGER.debug("(debug) Password check for user " + DN + " successfull");
                 else
-                    log.debug("(debug) Password check for user " + DN + " failed");
+                    LOGGER.debug("(debug) Password check for user " + DN + " failed");
             }
         }
         catch (LDAPException e) {
@@ -513,24 +511,24 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
     private boolean Bind(String bindDN, String bindPassword, LDAPConnection lc, int ldapVersion) throws UnsupportedEncodingException {
         boolean bound = false;
-        if (log.isDebugEnabled())
-             log.debug("LDAP Bind starting");
+        if (LOGGER.isDebugEnabled())
+             LOGGER.debug("LDAP Bind starting");
 
         if (bindDN != null && bindDN.length() > 0 && bindPassword != null) {
             try {
                 lc.bind(ldapVersion, bindDN, bindPassword.getBytes("UTF8"));
                 bound = true;
 
-                if (log.isDebugEnabled())
-                    log.debug("LDAP Bind successfull");
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug("LDAP Bind successfull");
             }
             catch (LDAPException e) {
-                if (log.isErrorEnabled())
-                    log.error("LDAP Bind failed with Exception " + e.getMessage());
+                if (LOGGER.isErrorEnabled())
+                    LOGGER.error("LDAP Bind failed with Exception " + e.getMessage());
             }
         } else {
-            if (log.isDebugEnabled())
-                log.debug("LDAP Bind does not have binding info");
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("LDAP Bind does not have binding info");
         }
         return bound;
     }
@@ -543,8 +541,8 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
         HashMap attributes = new HashMap();
 
         try {
-            if (log.isDebugEnabled())
-                 log.debug("LDAP Password check for user " + authusername);
+            if (LOGGER.isDebugEnabled())
+                 LOGGER.debug("LDAP Password check for user " + authusername);
 
             int ldapPort = getLDAPPort(context);
             int ldapVersion = LDAPConnection.LDAP_V3;
@@ -562,14 +560,14 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
             lc.connect( ldapHost, ldapPort );
 
-            if (log.isDebugEnabled())
-                 log.debug("LDAP Connect successfull to host " + ldapHost + " and port " + ldapPort );
+            if (LOGGER.isDebugEnabled())
+                 LOGGER.debug("LDAP Connect successfull to host " + ldapHost + " and port " + ldapPort );
 
             // authenticate to the server
             result = Bind(bindDN, bindPassword, lc, ldapVersion);
 
-            if (log.isDebugEnabled())
-                 log.debug("LDAP Bind returned with result " + result);
+            if (LOGGER.isDebugEnabled())
+                 LOGGER.debug("LDAP Bind returned with result " + result);
 
             if (result) {
                 LDAPSearchResults searchResults =
@@ -582,19 +580,19 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
                 if (searchResults.hasMore())
                 {
-                    if (log.isDebugEnabled())
-                         log.debug("LDAP searching found user");
+                    if (LOGGER.isDebugEnabled())
+                         LOGGER.debug("LDAP searching found user");
 
                     LDAPEntry nextEntry = searchResults.next();
                     foundDN = nextEntry.getDN();
 
-                    if (log.isDebugEnabled())
-                         log.debug("LDAP searching found DN: " + foundDN);
+                    if (LOGGER.isDebugEnabled())
+                         LOGGER.debug("LDAP searching found DN: " + foundDN);
 
                     if (result)
                     {
-                        if (log.isDebugEnabled())
-                             log.debug("LDAP adding user attributes");
+                        if (LOGGER.isDebugEnabled())
+                             LOGGER.debug("LDAP adding user attributes");
 
                         LDAPAttributeSet attributeSet = nextEntry.getAttributeSet();
                         Iterator allAttributes = attributeSet.iterator();
@@ -608,8 +606,8 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
                             if( allValues != null) {
                                 while(allValues.hasMoreElements()) {
-                                    if (log.isDebugEnabled())
-                                         log.debug("LDAP adding user attribute " + attributeName);
+                                    if (LOGGER.isDebugEnabled())
+                                         LOGGER.debug("LDAP adding user attribute " + attributeName);
 
                                     String Value = (String) allValues.nextElement();
                                     attributes.put(attributeName, Value);
@@ -620,30 +618,30 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
                         CreateUserFromLDAP(attributes, context);
                     }
                 else {
-                    if (log.isDebugEnabled())
-                       log.debug("LDAP search user failed");
+                    if (LOGGER.isDebugEnabled())
+                       LOGGER.debug("LDAP search user failed");
                 }
               }
             }
-            if (log.isInfoEnabled()) {
+            if (LOGGER.isInfoEnabled()) {
                 if (result)
-                 log.info("LDAP create user for user " + username + " successfull");
+                 LOGGER.info("LDAP create user for user " + username + " successfull");
                 else
-                 log.info("LDAP create user for user " + username + " failed");
+                 LOGGER.info("LDAP create user for user " + username + " failed");
           }
         }
         catch( LDAPException e ) {
-            if (log.isInfoEnabled())
-                log.info("LDAP create user for user " + username + " failed with exception " + e.getMessage());
+            if (LOGGER.isInfoEnabled())
+                LOGGER.info("LDAP create user for user " + username + " failed with exception " + e.getMessage());
         }
         catch (Throwable e) {
-            if (log.isErrorEnabled())
-                 log.error("LDAP create user for user " + username + " failed with exception " + e.getMessage());
+            if (LOGGER.isErrorEnabled())
+                 LOGGER.error("LDAP create user for user " + username + " failed with exception " + e.getMessage());
         }
         finally
         {
-            if (log.isDebugEnabled())
-                 log.debug("LDAP create user in finally block");
+            if (LOGGER.isDebugEnabled())
+                 LOGGER.debug("LDAP create user in finally block");
 
             try {
                 lc.disconnect();

@@ -56,8 +56,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -66,6 +64,8 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.Diff;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.Revision;
@@ -155,7 +155,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class XWikiDocument implements DocumentModelBridge
 {
-    private static final Log LOG = LogFactory.getLog(XWikiDocument.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);
 
     /**
      * Regex Pattern to recognize if there's HTML code in a XWiki page.
@@ -810,13 +810,13 @@ public class XWikiDocument implements DocumentModelBridge
                 try {
                     Utils.getComponent(VelocityManager.class).getVelocityEngine()
                         .startedUsingMacroNamespace(documentName);
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Started using velocity macro namespace [" + documentName + "]");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Started using velocity macro namespace [" + documentName + "]");
                     }
                 } catch (XWikiVelocityException e) {
                     // Failed to get the Velocity Engine and this to clear Velocity Macro cache. Log this as a warning
                     // but continue since it's not absolutely critical.
-                    LOG.warn("Failed to notify Velocity Macro cache for the [" + documentName
+                    LOGGER.warn("Failed to notify Velocity Macro cache for the [" + documentName
                         + "] namespace. Reason = [" + e.getMessage() + "]");
                 }
             }
@@ -859,14 +859,14 @@ public class XWikiDocument implements DocumentModelBridge
                     try {
                         Utils.getComponent(VelocityManager.class).getVelocityEngine()
                             .stoppedUsingMacroNamespace(documentName);
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Stopped using velocity macro namespace [" + documentName + "]");
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Stopped using velocity macro namespace [" + documentName + "]");
                         }
                     } catch (XWikiVelocityException e) {
                         // Failed to get the Velocity Engine and this to clear Velocity Macro cache. Log this as a
                         // warning
                         // but continue since it's not absolutely critical.
-                        LOG.warn("Failed to notify Velocity Macro cache for the [" + documentName
+                        LOGGER.warn("Failed to notify Velocity Macro cache for the [" + documentName
                             + "] namespace. Reason = [" + e.getMessage() + "]");
                     }
                 }
@@ -918,14 +918,14 @@ public class XWikiDocument implements DocumentModelBridge
                     try {
                         Utils.getComponent(VelocityManager.class).getVelocityEngine()
                             .startedUsingMacroNamespace(documentName);
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Started using velocity macro namespace [" + documentName + "]");
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Started using velocity macro namespace [" + documentName + "]");
                         }
                     } catch (XWikiVelocityException e) {
                         // Failed to get the Velocity Engine and this to clear Velocity Macro cache. Log this as a
                         // warning
                         // but continue since it's not absolutely critical.
-                        LOG.warn("Failed to notify Velocity Macro cache for the [" + documentName
+                        LOGGER.warn("Failed to notify Velocity Macro cache for the [" + documentName
                             + "] namespace. Reason = [" + e.getMessage() + "]");
                     }
                 }
@@ -952,7 +952,7 @@ public class XWikiDocument implements DocumentModelBridge
             } catch (Exception e) {
                 // Failed to render for some reason. This method should normally throw an exception but this
                 // requires changing the signature of calling methods too.
-                LOG.warn(e);
+                LOGGER.warn("Failed to render content [" + text + "]", e);
                 result = "";
             } finally {
                 restoreContext(backup, context);
@@ -975,14 +975,14 @@ public class XWikiDocument implements DocumentModelBridge
                     try {
                         Utils.getComponent(VelocityManager.class).getVelocityEngine()
                             .stoppedUsingMacroNamespace(documentName);
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Stopped using velocity macro namespace [" + documentName + "]");
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Stopped using velocity macro namespace [" + documentName + "]");
                         }
                     } catch (XWikiVelocityException e) {
                         // Failed to get the Velocity Engine and this to clear Velocity Macro cache. Log this as a
                         // warning
                         // but continue since it's not absolutely critical.
-                        LOG.warn("Failed to notify Velocity Macro cache for the [" + documentName
+                        LOGGER.warn("Failed to notify Velocity Macro cache for the [" + documentName
                             + "] namespace. Reason = [" + e.getMessage() + "]");
                     }
                 }
@@ -1304,7 +1304,7 @@ public class XWikiDocument implements DocumentModelBridge
                 }
             }
         } catch (Exception e) {
-            LOG.warn("Failed to interpret title of document ["
+            LOGGER.warn("Failed to interpret title of document ["
                 + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
         }
 
@@ -1312,7 +1312,7 @@ public class XWikiDocument implements DocumentModelBridge
             // 2) If not, then try to extract the title from the first document section title
             title = getRenderedContentTitle(outputSyntax, context);
         } catch (Exception e) {
-            LOG.warn("Failed to extract title from content of document ["
+            LOGGER.warn("Failed to extract title from content of document ["
                 + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
         }
 
@@ -1814,7 +1814,7 @@ public class XWikiDocument implements DocumentModelBridge
             try {
                 return newDocument(Class.forName(customClassName), context);
             } catch (ClassNotFoundException e) {
-                LOG.error("Failed to get java Class object from class name", e);
+                LOGGER.error("Failed to get java Class object from class name", e);
             }
         }
 
@@ -1839,7 +1839,7 @@ public class XWikiDocument implements DocumentModelBridge
 
                 return (com.xpn.xwiki.api.Document) customClass.getConstructor(classes).newInstance(args);
             } catch (Exception e) {
-                LOG.error("Failed to create a custom Document object", e);
+                LOGGER.error("Failed to create a custom Document object", e);
             }
         }
 
@@ -1901,7 +1901,7 @@ public class XWikiDocument implements DocumentModelBridge
             // may be null (tests)
             // To maintain the behavior of this method we can't throw an exception.
             // Formerly, null was returned if there was no SoftReference.
-            LOG.warn("Could not get document archive", e);
+            LOGGER.warn("Could not get document archive", e);
             return null;
         }
     }
@@ -2767,7 +2767,7 @@ public class XWikiDocument implements DocumentModelBridge
 
             result = display(fieldname, object, context);
         } catch (Exception e) {
-            LOG.error("Failed to display field [" + fieldname + "] of document ["
+            LOGGER.error("Failed to display field [" + fieldname + "] of document ["
                 + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
         }
 
@@ -2978,7 +2978,7 @@ public class XWikiDocument implements DocumentModelBridge
         } catch (Exception ex) {
             // TODO: It would better to check if the field exists rather than catching an exception
             // raised by a NPE as this is currently the case here...
-            LOG.warn("Failed to display field [" + fieldname + "] in [" + type + "] mode for Object of Class ["
+            LOGGER.warn("Failed to display field [" + fieldname + "] in [" + type + "] mode for Object of Class ["
                 + this.defaultEntityReferenceSerializer.serialize(obj.getDocumentReference()) + "]", ex);
             return "";
         } finally {
@@ -3252,7 +3252,7 @@ public class XWikiDocument implements DocumentModelBridge
 
             return ListClass.getListFromString(possibleValues);
         } catch (XWikiException e) {
-            LOG.error("Failed to get tag class", e);
+            LOGGER.error("Failed to get tag class", e);
 
             list = Collections.emptyList();
         }
@@ -3503,7 +3503,7 @@ public class XWikiDocument implements DocumentModelBridge
             doc.originalDocument = this.originalDocument;
         } catch (Exception e) {
             // This should not happen
-            LOG.error("Exception while cloning document", e);
+            LOGGER.error("Exception while cloning document", e);
         }
         return doc;
     }
@@ -3721,7 +3721,7 @@ public class XWikiDocument implements DocumentModelBridge
             wr.write(doc);
             return os.toString(encoding);
         } catch (IOException e) {
-            LOG.error("Exception while doc.toXML", e);
+            LOGGER.error("Exception while doc.toXML", e);
             return "";
         }
     }
@@ -4075,7 +4075,7 @@ public class XWikiDocument implements DocumentModelBridge
                 el.addText(getDocumentArchive(context).getArchive(context));
                 wr.write(el);
             } catch (XWikiException e) {
-                LOG.error("Document [" + this.defaultEntityReferenceSerializer.serialize(getDocumentReference())
+                LOGGER.error("Document [" + this.defaultEntityReferenceSerializer.serialize(getDocumentReference())
                     + "] has malformed history");
             }
         }
@@ -4598,7 +4598,7 @@ public class XWikiDocument implements DocumentModelBridge
             return pageNames;
         } catch (Exception e) {
             // This should never happen
-            LOG.error("Failed to get linked documents", e);
+            LOGGER.error("Failed to get linked documents", e);
 
             return null;
         }
@@ -4873,7 +4873,7 @@ public class XWikiDocument implements DocumentModelBridge
 
             return list;
         } catch (Exception e) {
-            LOG.error("Failed to extract include target from provided content [" + content + "]", e);
+            LOGGER.error("Failed to extract include target from provided content [" + content + "]", e);
 
             return null;
         }
@@ -5436,7 +5436,7 @@ public class XWikiDocument implements DocumentModelBridge
             return getDeltas(Diff.diff(ToString.stringToArray(prevDoc.getContent()),
                 ToString.stringToArray(getContent())));
         } catch (Exception ex) {
-            LOG.debug("Exception getting differences from previous version: " + ex.getMessage());
+            LOGGER.debug("Exception getting differences from previous version: " + ex.getMessage());
         }
 
         return new ArrayList<Delta>();
@@ -6262,7 +6262,7 @@ public class XWikiDocument implements DocumentModelBridge
                 syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
             } catch (ParseException e) {
                 syntax = getDefaultDocumentSyntax();
-                LOG.warn("Failed to set syntax [" + syntaxId + "] for ["
+                LOGGER.warn("Failed to set syntax [" + syntaxId + "] for ["
                     + this.defaultEntityReferenceSerializer.serialize(getDocumentReference())
                     + "], setting syntax [" + syntax.toIdString() + "] instead.", e);
             }
@@ -7077,7 +7077,7 @@ public class XWikiDocument implements DocumentModelBridge
         try {
             md5 = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException ex) {
-            LOG.error("Cannot create MD5 object", ex);
+            LOGGER.error("Cannot create MD5 object", ex);
             return hashCode() + "";
         }
 
@@ -7097,7 +7097,7 @@ public class XWikiDocument implements DocumentModelBridge
 
             return sb.toString();
         } catch (Exception ex) {
-            LOG.error("Exception while computing document hash", ex);
+            LOGGER.error("Exception while computing document hash", ex);
         }
 
         return hashCode() + "";
@@ -7386,7 +7386,7 @@ public class XWikiDocument implements DocumentModelBridge
                 gcontext.put("tdoc", tdoc);
             }
         } catch (XWikiException ex) {
-            LOG.warn("Unhandled exception setting context", ex);
+            LOGGER.warn("Unhandled exception setting context", ex);
         }
     }
 
@@ -7501,7 +7501,7 @@ public class XWikiDocument implements DocumentModelBridge
             try {
                 this.xdom = parseContent(getContent());
             } catch (XWikiException e) {
-                LOG.error("Failed to parse document content to XDOM", e);
+                LOGGER.error("Failed to parse document content to XDOM", e);
             }
         }
 
@@ -7699,7 +7699,7 @@ public class XWikiDocument implements DocumentModelBridge
         try {
             Utils.getComponent(Parser.class, syntax.toIdString());
         } catch (Exception e) {
-            LOG.warn("Failed to find parser for the default syntax [" + syntax.toIdString()
+            LOGGER.warn("Failed to find parser for the default syntax [" + syntax.toIdString()
                 + "]. Defaulting to xwiki/2.0 syntax.");
             syntax = Syntax.XWIKI_2_0;
         }

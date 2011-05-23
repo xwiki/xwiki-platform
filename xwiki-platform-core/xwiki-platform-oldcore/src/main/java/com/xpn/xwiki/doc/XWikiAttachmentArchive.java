@@ -16,16 +16,14 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.doc;
 
 import java.io.ByteArrayInputStream;
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.rcs.impl.Node;
@@ -46,7 +44,7 @@ public class XWikiAttachmentArchive implements Cloneable
         "Exception while manipulating the archive for attachment {0}";
 
     /** The log, used to log if there is an error while cloning the archive. */
-    private static final Log LOG = LogFactory.getLog(XWikiAttachmentArchive.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAttachmentArchive.class);
 
     /** The attachment which this is an archive of. */
     private XWikiAttachment attachment;
@@ -85,7 +83,7 @@ public class XWikiAttachmentArchive implements Cloneable
             attachmentarchive = getClass().newInstance();
         } catch (Exception e) {
             // This should not happen
-            LOG.error("Error while attachmentArchive.clone()", e);
+            LOGGER.error("Error while attachmentArchive.clone()", e);
         }
 
         attachmentarchive.setAttachment(getAttachment());

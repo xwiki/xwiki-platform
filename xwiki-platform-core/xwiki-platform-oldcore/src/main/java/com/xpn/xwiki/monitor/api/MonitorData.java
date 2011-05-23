@@ -16,19 +16,17 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.monitor.api;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.net.URL;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class MonitorData {
-    private static final Log log = LogFactory.getLog(MonitorData.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MonitorData.class);
 
     private URL url;
     private String wikiPage;
@@ -116,8 +114,8 @@ public class MonitorData {
         MonitorTimer timer;
         timer = (MonitorTimer)timers.get(timername);
         if (timer!=null) {
-          if (log.isDebugEnabled()) {
-              log.debug("MONITOR: error recursive timers for " + timername);
+          if (LOGGER.isDebugEnabled()) {
+              LOGGER.debug("MONITOR: error recursive timers for " + timername);
           }
         } else {
           timer = new MonitorTimer(timername, details);
@@ -134,8 +132,8 @@ public class MonitorData {
         MonitorTimer timer;
         timer = (MonitorTimer)timers.get(timername);
         if (timer==null) {
-          if (log.isDebugEnabled()) {
-              log.debug("MONITOR: could not find timer for " + timername);
+          if (LOGGER.isDebugEnabled()) {
+              LOGGER.debug("MONITOR: could not find timer for " + timername);
           }
         } else {
             timer.setDetails(details);
@@ -149,8 +147,8 @@ public class MonitorData {
         MonitorTimer timer;
         timer = (MonitorTimer)timers.get(timername);
         if (timer==null) {
-          if (log.isDebugEnabled()) {
-              log.debug("MONITOR: could not find timer for " + timername);
+          if (LOGGER.isDebugEnabled()) {
+              LOGGER.debug("MONITOR: could not find timer for " + timername);
           }
         } else {
           timer.setEndDate();
@@ -163,8 +161,8 @@ public class MonitorData {
               timerSummaries.put(timername, tsummary);
           }
           tsummary.addTimer(timer.getDuration());
-            if (log.isDebugEnabled()) {
-                   log.debug("MONITOR " + wikiPage + " " + action + " " + timer.getName() + ": " + timer.getDuration() + "ms " + timer.getDetails());
+            if (LOGGER.isDebugEnabled()) {
+                   LOGGER.debug("MONITOR " + wikiPage + " " + action + " " + timer.getName() + ": " + timer.getDuration() + "ms " + timer.getDetails());
             }
         }
     }
@@ -178,12 +176,12 @@ public class MonitorData {
     }
 
     public void log() {
-        if (log.isDebugEnabled()) {
-            log.debug("MONITOR " + wikiPage + ": " + getDuration() + "ms");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("MONITOR " + wikiPage + ": " + getDuration() + "ms");
             Iterator it = timerSummaries.values().iterator();
             while (it.hasNext()) {
                 MonitorTimerSummary tsummary = (MonitorTimerSummary) it.next();
-                log.debug("MONITOR " + wikiPage + " " + action + " " + tsummary.getName() + ": " + tsummary.getDuration() + "ms " + tsummary.getNbCalls());
+                LOGGER.debug("MONITOR " + wikiPage + " " + action + " " + tsummary.getName() + ": " + tsummary.getDuration() + "ms " + tsummary.getNbCalls());
             }
         }
     }

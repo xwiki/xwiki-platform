@@ -17,14 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.applicationmanager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.observation.EventListener;
@@ -58,7 +57,7 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin implements Even
     /**
      * The logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(ApplicationManagerPlugin.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(ApplicationManagerPlugin.class);
 
     /**
      * The events matchers.
@@ -121,7 +120,7 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin implements Even
             context.setDatabase(context.getMainXWiki());
             this.applicationManager.updateAllApplicationTranslation(context);
         } catch (XWikiException e) {
-            LOG.error(ApplicationManagerMessageTool.getDefault(context).get(
+            LOGGER.error(ApplicationManagerMessageTool.getDefault(context).get(
                 ApplicationManagerMessageTool.LOG_REFRESHALLTRANSLATIONS), e);
         } finally {
             context.setDatabase(database);
@@ -144,7 +143,7 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin implements Even
                 this.applicationManager.updateApplicationsTranslation(document, context);
             }
         } catch (XWikiException e) {
-            LOG.error(ApplicationManagerMessageTool.getDefault(context).get(
+            LOGGER.error(ApplicationManagerMessageTool.getDefault(context).get(
                 ApplicationManagerMessageTool.LOG_AUTOUPDATETRANSLATIONS, document.getFullName()), e);
         }
     }

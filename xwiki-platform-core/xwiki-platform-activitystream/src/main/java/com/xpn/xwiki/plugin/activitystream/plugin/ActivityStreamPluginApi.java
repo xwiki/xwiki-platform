@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -43,7 +43,7 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
 public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(ActivityStreamPlugin.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ActivityStreamPlugin.class);
 
     /**
      * Constructor.

@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.api;
 
 import java.io.IOException;
@@ -28,8 +27,8 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -55,7 +54,7 @@ import com.xpn.xwiki.web.XWikiEngineContext;
 public class XWiki extends Api
 {
     /** Logging helper object. */
-    protected static final Log LOG = LogFactory.getLog(XWiki.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
 
     /** The internal object wrapped by this API. */
     private com.xpn.xwiki.XWiki xwiki;
@@ -185,7 +184,7 @@ public class XWiki extends Api
             Document newdoc = doc.newDocument(getXWikiContext());
             return newdoc;
         } catch (Exception ex) {
-            LOG.warn("Failed to access document " + reference + ": " + ex.getMessage());
+            LOGGER.warn("Failed to access document " + reference + ": " + ex.getMessage());
             return new Document(new XWikiDocument(reference), getXWikiContext());
         }
     }
@@ -298,7 +297,7 @@ public class XWiki extends Api
             }
             return result;
         } catch (Exception ex) {
-            LOG.warn("Failed to retrieve deleted attachments", ex);
+            LOGGER.warn("Failed to retrieve deleted attachments", ex);
         }
         return Collections.emptyList();
     }
@@ -329,7 +328,7 @@ public class XWiki extends Api
             }
             return result;
         } catch (Exception ex) {
-            LOG.warn("Failed to retrieve deleted attachments", ex);
+            LOGGER.warn("Failed to retrieve deleted attachments", ex);
         }
         return Collections.emptyList();
     }
@@ -348,7 +347,7 @@ public class XWiki extends Api
                 return new DeletedAttachment(attachment, this.context);
             }
         } catch (Exception ex) {
-            LOG.warn("Failed to retrieve deleted attachment", ex);
+            LOGGER.warn("Failed to retrieve deleted attachment", ex);
         }
         return null;
     }
@@ -439,7 +438,7 @@ public class XWiki extends Api
             return revdoc.newDocument(getXWikiContext());
         } catch (Exception e) {
             // Can't read versioned document
-            LOG.error("Failed to read versioned document", e);
+            LOGGER.error("Failed to read versioned document", e);
 
             return null;
         }
@@ -1281,7 +1280,7 @@ public class XWiki extends Api
 
             return -1;
         } catch (Exception e) {
-            LOG.error("Failed to create user", e);
+            LOGGER.error("Failed to create user", e);
 
             return -2;
         }
@@ -2163,7 +2162,7 @@ public class XWiki extends Api
         try {
             return this.xwiki.getURLContent(surl, username, password, this.context);
         } catch (Exception e) {
-            LOG.warn("Failed to retrieve content from [" + surl + "]", e);
+            LOGGER.warn("Failed to retrieve content from [" + surl + "]", e);
             return "";
         }
     }
@@ -2180,7 +2179,7 @@ public class XWiki extends Api
         try {
             return this.xwiki.getURLContent(surl, this.context);
         } catch (Exception e) {
-            LOG.warn("Failed to retrieve content from [" + surl + "]", e);
+            LOGGER.warn("Failed to retrieve content from [" + surl + "]", e);
             return "";
         }
     }

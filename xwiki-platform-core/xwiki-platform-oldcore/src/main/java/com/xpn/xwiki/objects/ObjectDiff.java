@@ -20,6 +20,12 @@
  */
 package com.xpn.xwiki.objects;
 
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+
+import com.xpn.xwiki.web.Utils;
+
 public class ObjectDiff
 {
     public static final String ACTION_PROPERTYADDED = "added";
@@ -32,7 +38,13 @@ public class ObjectDiff
 
     public static final String ACTION_OBJECTREMOVED = "object-removed";
 
-    private String className;
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "current");
+
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.class, "local");
+
+    private DocumentReference xClassReference;
 
     private int number;
 
@@ -54,6 +66,7 @@ public class ObjectDiff
         this(className, number, "", action, propName, "", prevValue, newValue);
     }
 
+    @Deprecated
     public ObjectDiff(String className, int number, String guid, String action, String propName, String propType,
         Object prevValue, Object newValue)
     {
@@ -67,14 +80,41 @@ public class ObjectDiff
         this.setNewValue(newValue);
     }
 
+    public ObjectDiff(DocumentReference xClassReference, int number, String guid, String action, String propName,
+        String propType, Object prevValue, Object newValue)
+    {
+        this.setXClassReference(xClassReference);
+        this.setNumber(number);
+        this.setGuid(guid);
+        this.setAction(action);
+        this.setPropName(propName);
+        this.setPropType(propType);
+        this.setPrevValue(prevValue);
+        this.setNewValue(newValue);
+    }
+
     public String getClassName()
     {
-        return this.className;
+        DocumentReference xClassReference = getXClassReference();
+
+        return xClassReference != null ? this.localEntityReferenceSerializer.serialize(getXClassReference()) : null;
     }
 
     public void setClassName(String className)
     {
-        this.className = className;
+        DocumentReference xClassReference =
+            className != null ? this.currentDocumentReferenceResolver.resolve(className) : null;
+        setXClassReference(xClassReference);
+    }
+
+    public DocumentReference getXClassReference()
+    {
+        return this.xClassReference;
+    }
+
+    public void setXClassReference(DocumentReference xClassReference)
+    {
+        this.xClassReference = xClassReference;
     }
 
     public int getNumber()
@@ -150,7 +190,8 @@ public class ObjectDiff
     @Override
     public String toString()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
+
         buffer.append(getClassName());
         buffer.append(".");
         buffer.append(getPropName());
@@ -158,6 +199,7 @@ public class ObjectDiff
         buffer.append(getPrevValue().toString());
         buffer.append(" &gt; ");
         buffer.append(getNewValue().toString());
+
         return buffer.toString();
     }
 }

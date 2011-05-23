@@ -345,7 +345,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
                     String newPropertyValue =
                         (newProperty.getValue() instanceof String || pclass == null) ? newProperty.toText() : pclass
                             .displayView(propertyName, this, context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(),
+                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), getGuid(),
                         ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue));
                 }
             } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
@@ -358,12 +358,12 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
                     String oldPropertyValue =
                         (oldProperty.getValue() instanceof String || pclass == null) ? oldProperty.toText() : pclass
                             .displayView(propertyName, oldObject, context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(),
+                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), getGuid(),
                         ObjectDiff.ACTION_PROPERTYCHANGED, propertyName, propertyType, oldPropertyValue,
                         newPropertyValue));
                 } else {
                     // Cannot get property definition, so use the plain value
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(),
+                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), getGuid(),
                         ObjectDiff.ACTION_PROPERTYCHANGED, propertyName, propertyType, oldProperty.toText(),
                         newProperty.toText()));
                 }
@@ -386,12 +386,12 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
                         String oldPropertyValue =
                             (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
                                 propertyName, oldObject, context);
-                        difflist.add(new ObjectDiff(oldObject.getClassName(), oldObject.getNumber(), oldObject
+                        difflist.add(new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject
                             .getGuid(), ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType,
                             oldPropertyValue, ""));
                     } else {
                         // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(oldObject.getClassName(), oldObject.getNumber(), oldObject
+                        difflist.add(new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject
                             .getGuid(), ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty
                             .toText(), ""));
                     }

@@ -5583,7 +5583,7 @@ public class XWikiDocument implements DocumentModelBridge
                         // The object was deleted.
                         dlist = new BaseObject().getDiff(originalObj, context);
                         ObjectDiff deleteMarker =
-                            new ObjectDiff(originalObj.getClassName(), originalObj.getNumber(), originalObj.getGuid(),
+                            new ObjectDiff(originalObj.getXClassReference(), originalObj.getNumber(), originalObj.getGuid(),
                                 ObjectDiff.ACTION_OBJECTREMOVED, "", "", "", "");
                         dlist.add(0, deleteMarker);
                     } else {
@@ -5613,7 +5613,7 @@ public class XWikiDocument implements DocumentModelBridge
                         originalObj.setGuid(newObj.getGuid());
                         List<ObjectDiff> dlist = newObj.getDiff(originalObj, context);
                         ObjectDiff addMarker =
-                            new ObjectDiff(newObj.getClassName(), newObj.getNumber(), newObj.getGuid(),
+                            new ObjectDiff(newObj.getXClassReference(), newObj.getNumber(), newObj.getGuid(),
                                 ObjectDiff.ACTION_OBJECTADDED, "", "", "", "");
                         dlist.add(0, addMarker);
                         if (dlist.size() > 0) {

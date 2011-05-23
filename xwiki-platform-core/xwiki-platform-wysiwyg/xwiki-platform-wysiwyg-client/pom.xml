@@ -136,7 +136,7 @@
     </plugins>
   </build>
   <repositories>
-   <!-- Needed for Smat GWT -->
+   <!-- Needed for Smart GWT -->
     <repository>
       <id>smartgwt-maven</id>
       <url>http://www.smartclient.com/maven2</url>

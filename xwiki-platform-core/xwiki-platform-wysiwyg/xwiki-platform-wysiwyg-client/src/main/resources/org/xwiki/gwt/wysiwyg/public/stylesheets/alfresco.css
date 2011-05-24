@@ -1,0 +1,47 @@
+.xAlfrescoSelector {
+  height: 340px;
+  margin-top: 5px;
+  overflow: auto;
+  width: 459px;
+}
+
+.xAlfrescoSelector .xListBox {
+  overflow: auto;
+}
+
+.xAlfrescoSelector .xListItem .gwt-Label {
+  background-image: url("../images/folder.gif");
+  background-position: left center;
+  background-repeat: no-repeat;
+  padding: 5px 5px 5px 20px;
+}
+
+.xAlfrescoSelector .xListItem .mediaType {
+  background-image: url("../images/page_white_text.gif");
+}
+
+.xAlfrescoSelector .xListItem.preview {
+  display: inline-block;
+  max-height: 105px;
+  padding: 5px;
+  max-width: 145px;
+}
+
+.xAlfrescoSelector .xListItem.preview img {
+  max-height: 95px;
+  max-width: 135px;
+}
+
+.xAlfrescoSelector .xPath {
+  margin-bottom: 5px;
+}
+
+.xAlfrescoSelector .xPath-label {
+  display: inline;
+  font-weight: bolder;
+  margin-right: 3px;
+}
+
+.xAlfrescoSelector .xPath-value {
+  display: inline;
+}

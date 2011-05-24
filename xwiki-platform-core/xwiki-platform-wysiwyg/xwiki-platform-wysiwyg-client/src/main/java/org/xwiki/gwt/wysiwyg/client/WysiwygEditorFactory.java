@@ -21,6 +21,7 @@ package org.xwiki.gwt.wysiwyg.client;
 
 import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.wysiwyg.client.plugin.PluginFactoryManager;
+import org.xwiki.gwt.wysiwyg.client.plugin.alfresco.AlfrescoPluginFactory;
 import org.xwiki.gwt.wysiwyg.client.plugin.color.ColorPluginFactory;
 import org.xwiki.gwt.wysiwyg.client.plugin.embed.EmbedPluginFactory;
 import org.xwiki.gwt.wysiwyg.client.plugin.font.FontPluginFactory;
@@ -107,6 +108,7 @@ public final class WysiwygEditorFactory
         pfm.addPluginFactory(MacroPluginFactory.getInstance());
         pfm.addPluginFactory(EmbedPluginFactory.getInstance());
         pfm.addPluginFactory(StylePluginFactory.getInstance());
+        pfm.addPluginFactory(AlfrescoPluginFactory.getInstance());
         // add additional PluginFactory for other plug-ins
     }
 

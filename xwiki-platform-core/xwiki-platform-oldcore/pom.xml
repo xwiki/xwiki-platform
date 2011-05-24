@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-milestone-2</version>
+    <version>3.1-milestone-3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -489,22 +489,22 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-configuration-default</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-observation-local</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-observation-remote</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-velocity-webapp</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -519,17 +519,17 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-container-portlet</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-xmlrpc-model</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
@@ -539,45 +539,45 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-xwiki</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-chart-renderer</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-url-default</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-url-container</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <!-- Used by com.xpn.xwiki.web.CommentAction -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-captcha</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <!-- Core does not depend on this to run so it shouldn't be pulled in unless it is a dependency somewhere else. -->
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-wikimacro-api</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-context</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
@@ -596,24 +596,24 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-formula-renderer</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-cache-api</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-cache-jbosscache</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-cache-oscache</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
@@ -625,30 +625,30 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-query-manager</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-office-importer</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-component-multi</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <!-- Only required at runtime (ie in the distribution) -->
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-query-xwql</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-csrf</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
 
     <!-- Used to mock XWiki class -->
@@ -661,7 +661,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
@@ -669,14 +669,14 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     

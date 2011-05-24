@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-milestone-2</version>
+    <version>3.1-milestone-3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-crypto</artifactId>
   <name>XWiki Platform - Cryptographic Services</name>
@@ -59,13 +59,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <!-- Used exclusively by UserDocumentUtils -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <!--Tests -->
     <dependency>

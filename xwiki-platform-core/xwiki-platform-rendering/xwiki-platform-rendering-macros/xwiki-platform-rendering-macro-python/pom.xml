@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>  
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>3.1-milestone-2</version>
+    <version>3.1-milestone-3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-python</artifactId>
   <name>XWiki Platform - Rendering - Macro - Python</name>
@@ -36,7 +36,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.python</groupId>
@@ -47,14 +47,14 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-observation-local</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

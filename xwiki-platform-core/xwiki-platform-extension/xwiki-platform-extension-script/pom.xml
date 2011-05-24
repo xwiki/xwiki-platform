@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension</artifactId>
-    <version>3.1-milestone-2</version>
+    <version>3.1-milestone-3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-script</artifactId>
   <name>XWiki Platform - Extension - Script</name>
@@ -40,14 +40,14 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-api</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
   
     <!-- Scripting -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
-      <version>3.1-milestone-2</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
 
     <!-- Test dependencies -->

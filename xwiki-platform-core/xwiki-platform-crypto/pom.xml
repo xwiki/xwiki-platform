@@ -59,13 +59,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-2</version>
     </dependency>
     <!-- Used exclusively by UserDocumentUtils -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-2</version>
     </dependency>
     <!--Tests -->
     <dependency>

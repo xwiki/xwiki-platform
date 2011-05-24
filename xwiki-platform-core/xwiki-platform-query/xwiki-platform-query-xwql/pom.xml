@@ -36,17 +36,17 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-query-jpql-parser</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-2</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-query-manager</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-2</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-2</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

@@ -35,12 +35,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-cache-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-2</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-container-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-2</version>
     </dependency>
     <!-- We only need this dependency for the Logging API/Implementation part -->
     <dependency>
@@ -71,7 +71,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-cache-tests</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

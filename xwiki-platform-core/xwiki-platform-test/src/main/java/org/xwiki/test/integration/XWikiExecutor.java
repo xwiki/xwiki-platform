@@ -142,6 +142,8 @@ public class XWikiExecutor
 
     public void start() throws Exception
     {
+        System.out.println("Starting XWiki server start");
+
         // First, verify if XWiki is started. If it is then don't start it again.
         this.wasStarted = !isXWikiStarted(getURL(), 15).timedOut;
         if (!this.wasStarted) {
@@ -278,6 +280,7 @@ public class XWikiExecutor
         if (!this.wasStarted) {
             createStopTask().execute();
         }
+        System.out.println("XWiki server stopped");
     }
 
     public String getWebInfDirectory()

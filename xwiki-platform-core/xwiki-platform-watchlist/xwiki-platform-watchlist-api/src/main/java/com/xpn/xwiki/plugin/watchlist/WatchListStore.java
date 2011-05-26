@@ -393,6 +393,9 @@ public class WatchListStore implements EventListener
     {
         BaseObject watchListObject = this.getWatchListObject(user, context);
         String watchedItems = watchListObject.getLargeStringValue(getWatchListClassPropertyForType(type)).trim();
+        if (StringUtils.isBlank(watchedItems)) {
+            return Collections.emptyList();
+        }
         List<String> elements = new ArrayList<String>();
         elements.addAll(Arrays.asList(watchedItems.split(WATCHLIST_ELEMENT_SEP)));
         return elements;

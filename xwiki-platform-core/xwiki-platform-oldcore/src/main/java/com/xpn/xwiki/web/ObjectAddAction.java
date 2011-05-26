@@ -20,8 +20,12 @@
  */
 package com.xpn.xwiki.web;
 
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.Map;
+
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -35,7 +39,6 @@ public class ObjectAddAction extends XWikiAction
 {
     private static final String[] EMPTY_PROPERTY = new String[] {""};
 
-    @SuppressWarnings("unchecked")
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -46,20 +49,23 @@ public class ObjectAddAction extends XWikiAction
 
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
-        String username = context.getUser();
+        DocumentReference username = context.getUserReference();
         XWikiDocument doc = context.getDoc();
         ObjectAddForm oform = (ObjectAddForm) context.getForm();
 
         String className = oform.getClassName();
-        BaseObject object = doc.newObject(className, context);
+        @SuppressWarnings("unchecked")
+        EntityReferenceResolver<String> resolver = Utils.getComponent(EntityReferenceResolver.class, "current");
+        DocumentReference classReference = new DocumentReference(resolver.resolve(className, EntityType.DOCUMENT));
+        BaseObject object = doc.newXObject(classReference, context);
 
         // We need to have a string in the map for each field for the object to be correctly created.
         // Otherwise, queries using the missing properties will fail to return this object.
-        BaseClass baseclass = object.getxWikiClass(context);
+        BaseClass baseclass = object.getXClass(context);
         Map<String, String[]> objmap = oform.getObject(className);
-        Iterator<PropertyClass> itfields = baseclass.getFieldList().iterator();
-        while (itfields.hasNext()) {
-            PropertyClass property = itfields.next();
+        @SuppressWarnings("unchecked")
+        Collection<PropertyClass> fields = baseclass.getFieldList();
+        for (PropertyClass property : fields) {
             String name = property.getName();
             if (objmap.get(name) == null) {
                 objmap.put(name, EMPTY_PROPERTY);
@@ -69,9 +75,9 @@ public class ObjectAddAction extends XWikiAction
         // Load the object properties that are defined in the request.
         baseclass.fromMap(objmap, object);
 
-        doc.setAuthor(username);
+        doc.setAuthorReference(username);
         if (doc.isNew()) {
-            doc.setCreator(username);
+            doc.setCreatorReference(username);
         }
         xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addObject"), true, context);
 

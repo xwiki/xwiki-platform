@@ -227,3 +227,22 @@ document.observe('dom:loaded', function() {
     new XWiki.actionButtons.AjaxSaveAndContinue();
   }
 });
+function updateForShortcut() { 
+  if (typeof(Wysiwyg) == 'undefined') {
+    return;
+  }
+  var editors = Wysiwyg.getInstances();
+  for(var hookId in editors) {
+    var editor = editors[hookId];
+    var plainTextArea = editor.getPlainTextArea();
+    if(plainTextArea && !plainTextArea.disabled) {
+      $(hookId).value = plainTextArea.value;
+    } else {
+      $(hookId).value = editor.getRichTextArea().contentWindow.document.body.innerHTML;
+    }
+  }
+}
+document.observe("xwiki:actions:save", updateForShortcut);
+document.observe("xwiki:actions:preview", updateForShortcut);
+
+

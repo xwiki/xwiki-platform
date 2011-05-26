@@ -391,7 +391,7 @@ public class WatchListStore implements EventListener
      */
     public List<String> getWatchedElements(String user, ElementType type, XWikiContext context) throws XWikiException
     {
-        BaseObject watchListObject = this.getWatchListObject(user, context);
+        BaseObject watchListObject = getWatchListObject(user, context);
         String watchedItems = watchListObject.getLargeStringValue(getWatchListClassPropertyForType(type)).trim();
         List<String> elements = new ArrayList<String>();
         elements.addAll(Arrays.asList(watchedItems.split(WATCHLIST_ELEMENT_SEP)));
@@ -453,14 +453,14 @@ public class WatchListStore implements EventListener
             elementToWatch = context.getDatabase() + WIKI_SPACE_SEP + newWatchedElement;
         }
 
-        if (this.isWatched(elementToWatch, user, type, context)) {
+        if (isWatched(elementToWatch, user, type, context)) {
             return false;
         }
 
         List<String> watchedElements = getWatchedElements(user, type, context);
         watchedElements.add(elementToWatch);
 
-        this.setWatchListElementsProperty(user, type, watchedElements, context);
+        setWatchListElementsProperty(user, type, watchedElements, context);
         return true;
     }
 
@@ -518,15 +518,21 @@ public class WatchListStore implements EventListener
      * @param user XWiki User
      * @param context Context of the request
      * @return the WatchList XWiki BaseObject
-     * @throws XWikiException if BaseObject creation fails
+     * @throws XWikiException if BaseObject creation fails or if user does not exists
      */
     public BaseObject getWatchListObject(String user, XWikiContext context) throws XWikiException
     {
         XWikiDocument userDocument = context.getWiki().getDocument(user, context);
+        if (userDocument.isNew() || userDocument.getObject("XWiki.XWikiUsers") == null) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "User ["
+                + user + "] does not exists");
+        }
+
         BaseObject obj = userDocument.getObject(WATCHLIST_CLASS);
         if (obj == null) {
-            obj = this.createWatchListObject(user, context);
+            obj = createWatchListObject(user, context);
         }
+
         return obj;
     }
 
@@ -761,9 +767,11 @@ public class WatchListStore implements EventListener
 
             if (register) {
                 try {
-                    addWatchedElement(user, currentDoc.getPrefixedFullName(), ElementType.DOCUMENT, context);
+                    if (context.getWiki().exists(user, context)) {
+                        addWatchedElement(user, currentDoc.getPrefixedFullName(), ElementType.DOCUMENT, context);
+                    }
                 } catch (XWikiException e) {
-                    LOG.error("Failed to watch document [" + currentDoc.getPrefixedFullName() + "] for user [" + user
+                    LOG.warn("Failed to watch document [" + currentDoc.getPrefixedFullName() + "] for user [" + user
                         + "]", e);
                 }
             }

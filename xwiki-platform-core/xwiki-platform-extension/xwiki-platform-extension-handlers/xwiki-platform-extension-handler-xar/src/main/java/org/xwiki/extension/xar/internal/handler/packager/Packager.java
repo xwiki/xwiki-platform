@@ -36,7 +36,7 @@ import com.xpn.xwiki.XWikiException;
 @ComponentRole
 public interface Packager
 {
-    void importXAR(File xarFile, String wiki) throws IOException, XWikiException;
+    void importXAR(XarFile previousXarFile, File xarFile, String wiki) throws IOException, XWikiException;
 
     void unimportXAR(File xarFile, String wiki) throws IOException, XWikiException;
 

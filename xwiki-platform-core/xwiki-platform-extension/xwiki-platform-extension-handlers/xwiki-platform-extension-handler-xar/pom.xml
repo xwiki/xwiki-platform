@@ -48,7 +48,7 @@
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
     </dependency>
-    
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

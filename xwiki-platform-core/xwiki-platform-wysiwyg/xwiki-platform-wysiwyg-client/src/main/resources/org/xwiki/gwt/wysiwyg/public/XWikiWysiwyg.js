@@ -212,6 +212,13 @@ var Wysiwyg =
      */
     getInstance: function(hookId) {
         return this.instances[hookId];
+    },
+
+   /**
+     * @return all the WYSIWYG editor instances
+     */
+    getInstances: function() {
+        return this.instances;
     }
 };
 

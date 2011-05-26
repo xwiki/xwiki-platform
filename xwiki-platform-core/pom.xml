@@ -375,10 +375,4 @@
       </build>
     </profile>
   </profiles>
-  <repositories>
-    <repository>
-      <id>smartgwt-maven</id>
-      <url>http://www.smartclient.com/maven2</url>
-    </repository>
-  </repositories>
 </project>

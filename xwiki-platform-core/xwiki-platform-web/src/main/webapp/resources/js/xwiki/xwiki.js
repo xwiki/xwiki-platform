@@ -353,8 +353,8 @@ Object.extend(XWiki, {
    * Insert a link for editing sections.
    */
   insertSectionEditLinks: function() {
-      // Insert links only in view mode and for xwiki/2.0 documents.
-      if (XWiki.docsyntax == "xwiki/2.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
+      // Insert links only in view mode and for documents not in xwiki/1.0 syntax
+      if (XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
 
           // Section count starts at one, not zero.
           var sectioncount = 1;
@@ -395,8 +395,8 @@ Object.extend(XWiki, {
    * Display a modal box allowing to create the new document from a template when clicking on broken links.
    */
   insertCreatePageFromTemplateModalBoxes: function() {
-      // Insert links only in view mode and for xwiki/2.0 documents.
-      if (XWiki.docsyntax == "xwiki/2.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
+      // Insert links only in view mode and for documents not in xwiki/1.0 syntax
+      if (XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
           XWiki.widgets.CreatePagePopup = Class.create(XWiki.widgets.ModalPopup, {
               initialize : function($super, interactionParameters) {
                   var content =  new Element('div', {'class': 'modal-popup'});

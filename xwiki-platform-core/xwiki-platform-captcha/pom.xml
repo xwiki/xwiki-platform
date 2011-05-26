@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1-milestone-3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-captcha</artifactId>
   <name>XWiki Platform - Captcha</name>
@@ -44,7 +44,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-action</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <!-- CaptchaVelocityContextInitializer needs ConfigurationSource to tell whether captchas should be enabled -->
     <dependency>

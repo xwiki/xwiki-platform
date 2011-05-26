@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-url</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1-milestone-3-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform-url-default</artifactId>
@@ -38,7 +38,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-url-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

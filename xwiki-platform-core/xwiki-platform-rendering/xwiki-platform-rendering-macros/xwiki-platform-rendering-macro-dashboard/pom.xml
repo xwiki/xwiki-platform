@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1-milestone-3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-dashboard</artifactId>
   <name>XWiki Platform - Rendering - Macro - Dashboard</name>
@@ -36,22 +36,22 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-container</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-skin-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <build>

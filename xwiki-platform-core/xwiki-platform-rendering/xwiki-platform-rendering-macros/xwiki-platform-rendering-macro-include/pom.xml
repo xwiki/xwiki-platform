@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1-milestone-3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-include</artifactId>
   <name>XWiki Platform - Rendering - Macro - Include</name>
@@ -41,17 +41,17 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-context</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
 
     <!-- Testing dependencies -->
@@ -64,27 +64,27 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-observation-local</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-cache</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1-milestone-3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-cache-oscache</artifactId>
   <name>XWiki Platform - Cache - OSCache</name>
@@ -43,12 +43,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-cache-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-container-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <!-- TODO : This need to be upgraded to 2.4.1 as soon as it will be in the maven repository -->
     <dependency>
@@ -67,7 +67,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-cache-tests</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

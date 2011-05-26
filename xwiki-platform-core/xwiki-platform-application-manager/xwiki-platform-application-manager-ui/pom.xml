@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-application-manager</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1-milestone-3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-application-manager-ui</artifactId>
   <name>XWiki Platform - Application Manager - UI</name>
@@ -41,7 +41,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-application-manager-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
@@ -72,7 +72,7 @@
               <parameters>
                 <parameter>
                   <name>appversion</name>
-                  <value>${project.version}</value>
+                  <value>3.1-milestone-2</value>
                 </parameter>
               </parameters>
             </transformationSet>

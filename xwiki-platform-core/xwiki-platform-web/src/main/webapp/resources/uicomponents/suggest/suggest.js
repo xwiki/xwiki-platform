@@ -56,10 +56,12 @@ var XWiki = (function(XWiki){
     insertBeforeSuggestions: null,
     // Should value be displayed as a hint
     displayValue: false,
-    // Display value prefix text 
+    // Display value prefix text
     displayValueText: "Value :",
     // How to align the suggestion list when its with is different than the input field width
-    align: "left"
+    align: "left",
+    // Hide the ajax loading spinner(s) while requests are transiting
+    hiddenLoading: false
   },
   sInput : "",
   nInputChars : 0,
@@ -420,13 +422,22 @@ var XWiki = (function(XWiki){
           if (this.resultContainer.down('.results' + source.id).down('ul')) {
             this.resultContainer.down('.results' + source.id).down('ul').remove();
           }
-          this.resultContainer.down('.results' + source.id).down('.sourceContent').addClassName('loading');
+          if (!this.options.hiddenLoading) {
+            this.resultContainer.down('.results' + source.id).down('.sourceContent').addClassName('loading');
+          }
+          else {
+            this.resultContainer.down('.results' + source.id).addClassName('hidden');
+          }
         }
         else {
           // The sub-container for this source has not been created yet
           // Really create the subcontainer for this source and inject it in the global container
           var sourceContainer = new Element('div', {'class' : 'results results' + source.id}),
               sourceHeader = new Element('div', {'class':'sourceName'});
+
+          if (this.options.hiddenLoading) {
+            sourceContainer.addClassName('hidden');
+          }
 
           if (typeof source.icon != 'undefined') {
             // If there is an icon for this source group, set it as background image
@@ -446,7 +457,8 @@ var XWiki = (function(XWiki){
           }
           sourceHeader.insert(source.name)
           sourceContainer.insert( sourceHeader );
-          sourceContainer.insert( new Element('div', {'class':'sourceContent loading'}));
+          var classes = "sourceContent " + (this.options.hiddenLoading ? "" : "loading");
+          sourceContainer.insert( new Element('div', {'class':classes}));
           this.resultContainer.insert(sourceContainer);
         }
       }
@@ -487,6 +499,7 @@ var XWiki = (function(XWiki){
     if (this.sources.length > 1) {
       var div = this.resultContainer.down(".results" + source.id);
       div.down('.sourceContent').removeClassName('loading');
+      this.resultContainer.down(".results" + source.id).removeClassName("hidden");
     }
     else {
       var div = this.resultContainer;
@@ -512,14 +525,29 @@ var XWiki = (function(XWiki){
     //
     for (var i=0;i<arr.length;i++)
     {
+
       // format output with the input enclosed in a EM element
       // (as HTML, not DOM)
       //
       if (source.highlight) {
         // If the source declares that results are matching, we highlight them in the value
-        var val = arr[i].value;
-        var st = val.toLowerCase().indexOf( this.sInput.toLowerCase() );
-        var output = val.substring(0,st) + "<em>" + val.substring(st, st+this.sInput.length) + "</em>" + val.substring(st+this.sInput.length);
+        var val = arr[i].value,
+            output = val,
+            fragments = this.sInput.split(' ').uniq().compact();
+
+        for(var j=0;j<fragments.length;j++) {
+          var index = output.toLowerCase().indexOf(fragments[j].toLowerCase());
+          var matches = {};
+          while (index >= 0) {
+            var match =  output.substring(index, index + fragments[j].length);
+            matches["" + j] =  match;
+            output = output.substring(0, index) + "<em>__PLACEHOLDER" + j + "__</em>" + output.substring(index + fragments[j].length);
+            index = output.toLowerCase().indexOf(fragments[j].toLowerCase());
+          }
+          Object.keys(matches).each(function(key){
+            output = output.replace("__PLACEHOLDER" + key + "__", matches[key]);
+          });
+        }
       }
       else {
         // Otherwise we just put row result value
@@ -587,29 +615,49 @@ var XWiki = (function(XWiki){
     var n, elem;
 
     if (this.iHighlighted) {
-      if (key == 40) {
-        elem = this.iHighlighted.next() || ((this.iHighlighted.up('div.results') &&
-          this.iHighlighted.up('div.results').next()) ? this.iHighlighted.up('div.results').next().down('li') :
-          list.down('li'));
-      }
-      else if (key == 38) {
-        if (this.iHighlighted.previous()) {
-          elem = this.iHighlighted.previous();
+      // If there is already a highlighted element, we look for the next or previous highlightable item in the list
+      // of results, according to which key has been pressed.
+      if (key == Event.KEY_DOWN) {
+        elem = this.iHighlighted.next();
+        if (!elem && this.iHighlighted.up('div.results')) {
+          // if the next item could not be found and multi-source mode, find the next not empty source
+          var source = this.iHighlighted.up('div.results').next();
+          while (source && !elem) {
+            elem = source.down('li');
+            source = source.next();
+          }
         }
-        else {
-            if ((this.iHighlighted.up('div.results') && this.iHighlighted.up('div.results').previous())) {
-              elem = this.iHighlighted.up('div.results').previous().down('li:last-child');
-            }
-            else {
-              elem =  list.select('ul')[list.select('ul').length - 1].down('li:last-child');
-            }
+        if(!elem) {
+          elem = list.down('li');
+        }
+      }
+      else if (key == Event.KEY_UP) {
+        elem = this.iHighlighted.previous();
+        if (!elem && this.iHighlighted.up('div.results')) {
+          // if the previous item could not be found and multi-source mode, find the previous not empty source
+          var source = this.iHighlighted.up('div.results').previous();
+          while(source && !elem) {
+            elem = source.down('li:last-child');
+            source = source.previous();
+          }
+        }
+        if (!elem) {
+          elem =  list.select('ul')[list.select('ul').length - 1].down('li:last-child');
         }
       }
     }
     else {
-      if (key == 40)
-        elem = list.down('li');
-      else if (key == 38)
+      // No item is highlighted yet, so we just look for the first or last highlightable item,
+      // according to which key, up or down, has been pressed.
+      if (key == Event.KEY_DOWN) {
+        if (list.down('div.results')) {
+          elem = list.down('div.results').down('li')
+        }
+        else {
+          elem = list.down('li');
+        }
+      }
+      else if (key == Event.KEY_UP)
         if (list.select('li') > 0) {
           elem = list.select('li')[list.select('li').length - 1];
         }

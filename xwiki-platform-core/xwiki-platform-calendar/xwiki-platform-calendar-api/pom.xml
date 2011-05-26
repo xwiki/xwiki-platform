@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-calendar</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1-milestone-3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-calendar-api</artifactId>
   <name>XWiki Platform - Calendar - API</name>
@@ -36,11 +36,17 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-milestone-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
+    </dependency>
+    <!-- iCal processing -->
+    <dependency>
+      <groupId>ical4j</groupId>
+      <artifactId>ical4j</artifactId>
+      <version>0.9.20</version>
     </dependency>
   </dependencies>
 </project>

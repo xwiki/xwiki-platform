@@ -268,7 +268,6 @@
       ## CSRF prevention
       <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
       <input type="hidden" name="xcontinue" value="$doc.getURL($xcontext.action, $q)"/>
-      <input type="hidden" name="xredirect" value="$doc.getURL($xcontext.action, $q)"/>
       ## A submit button that captures "enter" on the form, placed before the "objectadd" submit button,
       ## to prevent from accidentally adding objects when pressing enter.
       #editActionButton('preview', 'preview')

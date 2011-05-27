@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -41,6 +41,9 @@ public class ObjectAddAction extends XWikiAction
 {
     private static final String[] EMPTY_PROPERTY = new String[] {""};
 
+    @SuppressWarnings("unchecked")
+    private DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.class, "current");
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -51,14 +54,12 @@ public class ObjectAddAction extends XWikiAction
 
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
-        DocumentReference username = context.getUserReference();
+        DocumentReference userReference = context.getUserReference();
         XWikiDocument doc = context.getDoc();
         ObjectAddForm oform = (ObjectAddForm) context.getForm();
 
         String className = oform.getClassName();
-        @SuppressWarnings("unchecked")
-        EntityReferenceResolver<String> resolver = Utils.getComponent(EntityReferenceResolver.class, "current");
-        DocumentReference classReference = new DocumentReference(resolver.resolve(className, EntityType.DOCUMENT));
+        DocumentReference classReference = this.resolver.resolve(className, EntityType.DOCUMENT);
         BaseObject object = doc.newXObject(classReference, context);
 
         // We need to have a string in the map for each field for the object to be correctly created.
@@ -77,9 +78,9 @@ public class ObjectAddAction extends XWikiAction
         // Load the object properties that are defined in the request.
         baseclass.fromMap(objmap, object);
 
-        doc.setAuthorReference(username);
+        doc.setAuthorReference(userReference);
         if (doc.isNew()) {
-            doc.setCreatorReference(username);
+            doc.setCreatorReference(userReference);
         }
         xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addObject"), true, context);
 

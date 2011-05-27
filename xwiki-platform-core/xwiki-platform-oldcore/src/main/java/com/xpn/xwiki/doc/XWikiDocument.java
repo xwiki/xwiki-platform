@@ -1231,7 +1231,7 @@ public class XWikiDocument implements DocumentModelBridge
                 title = getRenderedContentTitle10(context);
             } else {
                 List<HeaderBlock> blocks = getXDOM().getChildrenByType(HeaderBlock.class, true);
-                if (blocks.size() > 0) {
+                if (!blocks.isEmpty()) {
                     HeaderBlock header = blocks.get(0);
                     // Check the header depth after which we should return null if no header was found.
                     int titleHeaderDepth = (int) context.getWiki().ParamAsLong("xwiki.title.headerdepth", 2);
@@ -1333,7 +1333,7 @@ public class XWikiDocument implements DocumentModelBridge
                 title = extractTitle10();
             } else {
                 List<HeaderBlock> blocks = getXDOM().getChildrenByType(HeaderBlock.class, true);
-                if (blocks.size() > 0) {
+                if (!blocks.isEmpty()) {
                     HeaderBlock header = blocks.get(0);
                     if (header.getLevel().compareTo(HeaderLevel.LEVEL2) <= 0) {
                         XDOM headerXDOM = new XDOM(Collections.<Block> singletonList(header));
@@ -4028,7 +4028,7 @@ public class XWikiDocument implements DocumentModelBridge
         if (bWithObjects) {
             // Add Class
             BaseClass bclass = getXClass();
-            if (bclass.getFieldList().size() > 0) {
+            if (!bclass.getFieldList().isEmpty()) {
                 // If the class has fields, add class definition and field information to XML
                 wr.write(bclass.toXML(null));
             }
@@ -5567,7 +5567,7 @@ public class XWikiDocument implements DocumentModelBridge
     public List<List<ObjectDiff>> getObjectDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
         throws XWikiException
     {
-        ArrayList<List<ObjectDiff>> difflist = new ArrayList<List<ObjectDiff>>();
+        List<List<ObjectDiff>> difflist = new ArrayList<List<ObjectDiff>>();
 
         // Since objects could have been deleted or added, we iterate on both the old and the new
         // object collections.
@@ -5590,7 +5590,7 @@ public class XWikiDocument implements DocumentModelBridge
                         // The object exists in both versions, but might have been changed.
                         dlist = newObj.getDiff(originalObj, context);
                     }
-                    if (dlist.size() > 0) {
+                    if (!dlist.isEmpty()) {
                         difflist.add(dlist);
                     }
                 }
@@ -5616,7 +5616,7 @@ public class XWikiDocument implements DocumentModelBridge
                             new ObjectDiff(newObj.getXClassReference(), newObj.getNumber(), newObj.getGuid(),
                                 ObjectDiff.ACTION_OBJECTADDED, "", "", "", "");
                         dlist.add(0, addMarker);
-                        if (dlist.size() > 0) {
+                        if (!dlist.isEmpty()) {
                             difflist.add(dlist);
                         }
                     }
@@ -5630,7 +5630,7 @@ public class XWikiDocument implements DocumentModelBridge
     public List<List<ObjectDiff>> getClassDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
         throws XWikiException
     {
-        ArrayList<List<ObjectDiff>> difflist = new ArrayList<List<ObjectDiff>>();
+        List<List<ObjectDiff>> difflist = new ArrayList<List<ObjectDiff>>();
         BaseClass oldClass = fromDoc.getXClass();
         BaseClass newClass = toDoc.getXClass();
 
@@ -5639,7 +5639,7 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         List<ObjectDiff> dlist = newClass.getDiff(oldClass, context);
-        if (dlist.size() > 0) {
+        if (!dlist.isEmpty()) {
             difflist.add(dlist);
         }
 

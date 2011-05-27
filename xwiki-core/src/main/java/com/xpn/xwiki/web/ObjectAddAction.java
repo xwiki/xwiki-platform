@@ -23,6 +23,8 @@ package com.xpn.xwiki.web;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -75,8 +77,14 @@ public class ObjectAddAction extends XWikiAction
         }
         xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addObject"), true, context);
 
+        // If this is an ajax request, no need to redirect.
+        if (Utils.isAjaxRequest(context)) {
+            context.getResponse().setStatus(HttpServletResponse.SC_NO_CONTENT);
+            return false;
+        }
+
         // forward to edit
-        String redirect = Utils.getRedirect("edit", context);
+        String redirect = Utils.getRedirect("edit", "editor=object", "xcontinue", "xredirect");
         sendRedirect(response, redirect);
         return false;
     }

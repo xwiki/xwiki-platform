@@ -15,6 +15,9 @@ var XWiki = (function (XWiki) {
       this.sources = sources;
         
       this.searchInput = $(searchInput);
+      if (!this.searchInput) {
+        return;
+      }
 
       this.searchInput.observe("keyup", this.onKeyUp.bindAsEventListener(this));
 

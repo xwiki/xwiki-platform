@@ -21,6 +21,7 @@ package org.xwiki.extension.xar.internal.handler.packager;
 
 import java.util.zip.ZipEntry;
 
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
 public class XarEntry
@@ -30,6 +31,23 @@ public class XarEntry
     private String language;
 
     private ZipEntry zipEntry;
+
+    public XarEntry()
+    {
+    }
+
+    public XarEntry(String space, String page, String language)
+    {
+        this.documentReference =
+            new EntityReference(page, EntityType.DOCUMENT, new EntityReference(space, EntityType.SPACE));
+        this.language = language;
+    }
+
+    public XarEntry(EntityReference documentReference, String language)
+    {
+        this.documentReference = documentReference;
+        this.language = language;
+    }
 
     public EntityReference getDocumentReference()
     {

@@ -126,7 +126,8 @@ public class DefaultPackager implements Packager, Initializable
                 if (!entry.isDirectory()) {
                     try {
                         DocumentImporterHandler documentHandler =
-                            new DocumentImporterHandler(this.componentManager, wiki);
+                            new DocumentImporterHandler(this, this.componentManager, wiki);
+                        documentHandler.setPreviousXarFile(previousXarFile);
 
                         parseDocument(zis, documentHandler);
                     } catch (NotADocumentException e) {
@@ -252,7 +253,7 @@ public class DefaultPackager implements Packager, Initializable
         return documents != null ? documents : Collections.<XarEntry> emptyList();
     }
 
-    private void parseDocument(InputStream in, ContentHandler documentHandler) throws ParserConfigurationException,
+    public void parseDocument(InputStream in, ContentHandler documentHandler) throws ParserConfigurationException,
         SAXException, IOException, NotADocumentException
     {
         SAXParser saxParser = this.parserFactory.newSAXParser();

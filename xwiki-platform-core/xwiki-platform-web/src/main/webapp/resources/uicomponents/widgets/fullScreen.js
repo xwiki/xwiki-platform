@@ -57,7 +57,7 @@ XWiki.widgets.FullScreen = Class.create({
       this.addBehavior(item);
     }.bind(this));
     // WYSIWYGR sends events when a new editor is created.
-    this.addWysiwyg20Listener();
+    this.addWysiwygListeners();
     // When comming back from preview, check if the user was in full screen before hitting preview, and if so restore
     // that full screen
     this.maximizedReference = $(document.body).down("input[name='x-maximized']");
@@ -87,21 +87,30 @@ XWiki.widgets.FullScreen = Class.create({
       this.addElementButton(item);
     }
   },
-  addWysiwyg20Listener : function () {
+  addWysiwygListeners : function () {
     document.observe('xwiki:wysiwyg:created', this.wysiwyg20Created.bindAsEventListener(this));
+    document.observe('xwiki:tinymce:created', this.wysiwyg10Created.bindAsEventListener(this));
+  },
+  wysiwyg10Created : function(event) {
+    var item = $(event.memo.instance);
+    this.removeTextareaLink(item);
+    this.addBehavior(item);
   },
   wysiwyg20Created : function(event) {
     var item = $(event.memo.instance.getRichTextArea()).up(".xRichTextEditor");
+    this.removeTextareaLink(item);
     this.addBehavior(item);
-    // Remove the old maximize link inserted for the plain textarea before the WYSIWYG was loaded
+  },
+  /* Remove the old maximize link inserted for the plain textarea before the WYSIWYG was loaded. */
+  removeTextareaLink : function(item) {
     while (true) {
-      item = item.up();
       if (!item) {
         return;
       } else if (item.previous(".fullScreenEditLinkContainer")) {
         item.previous(".fullScreenEditLinkContainer").remove();
         return;
       }
+      item = item.up();
     }
   },
   // Some simple functions that help deciding what kind of editor is the target element

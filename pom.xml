@@ -34,7 +34,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>3.1-SNAPSHOT</version>
+  <version>3.2-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->

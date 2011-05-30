@@ -51,9 +51,9 @@ public class DefaultStringEntityReferenceSerializerTest
 
     private static final String DEFAULT_OBJECT_PROPERTY = "defproperty";
 
-    private EntityReferenceSerializer serializer;
+    private EntityReferenceSerializer<String> serializer;
 
-    private EntityReferenceResolver resolver;
+    private EntityReferenceResolver<String> resolver;
 
     private Mockery mockery = new Mockery();
 
@@ -66,23 +66,20 @@ public class DefaultStringEntityReferenceSerializerTest
         final EntityReferenceValueProvider mockValueProvider = this.mockery.mock(EntityReferenceValueProvider.class);
         ReflectionUtils.setFieldValue(this.resolver, "provider", mockValueProvider);
 
-        this.mockery.checking(new Expectations()
-        {
-            {
+        this.mockery.checking(new Expectations() {{
                 allowing(mockValueProvider).getDefaultValue(EntityType.WIKI);
-                will(returnValue(DEFAULT_WIKI));
+                    will(returnValue(DEFAULT_WIKI));
                 allowing(mockValueProvider).getDefaultValue(EntityType.SPACE);
-                will(returnValue(DEFAULT_SPACE));
+                    will(returnValue(DEFAULT_SPACE));
                 allowing(mockValueProvider).getDefaultValue(EntityType.DOCUMENT);
-                will(returnValue(DEFAULT_PAGE));
+                    will(returnValue(DEFAULT_PAGE));
                 allowing(mockValueProvider).getDefaultValue(EntityType.ATTACHMENT);
-                will(returnValue(DEFAULT_ATTACHMENT));
+                    will(returnValue(DEFAULT_ATTACHMENT));
                 allowing(mockValueProvider).getDefaultValue(EntityType.OBJECT);
-                will(returnValue(DEFAULT_OBJECT));
+                    will(returnValue(DEFAULT_OBJECT));
                 allowing(mockValueProvider).getDefaultValue(EntityType.OBJECT_PROPERTY);
-                will(returnValue(DEFAULT_OBJECT_PROPERTY));
-            }
-        });
+                    will(returnValue(DEFAULT_OBJECT_PROPERTY));
+            }});
     }
 
     @Test
@@ -125,6 +122,13 @@ public class DefaultStringEntityReferenceSerializerTest
 
         reference = resolver.resolve("\\.:@\\.", EntityType.DOCUMENT);
         Assert.assertEquals("defwiki:defspace.\\.:@\\.", serializer.serialize(reference));
+
+        reference = resolver.resolve("\\\\:\\\\.\\\\", EntityType.DOCUMENT);
+        Assert.assertEquals("\\\\:\\\\.\\\\", serializer.serialize(reference));
+
+        // The escaping here is useless
+        reference = resolver.resolve("\\wiki:\\space.\\page", EntityType.DOCUMENT);
+        Assert.assertEquals("wiki:space.page", serializer.serialize(reference));
     }
 
     @Test
@@ -168,7 +172,7 @@ public class DefaultStringEntityReferenceSerializerTest
      * Tests resolving and re-serializing an object reference.
      */
     @Test
-    public void testResolveAndSerializeObjectReference()
+    public void testSerializeObjectReference()
     {
         EntityReference reference = resolver.resolve("wiki:space.page^Object", EntityType.OBJECT);
         Assert.assertEquals("wiki:space.page^Object", serializer.serialize(reference));
@@ -196,7 +200,7 @@ public class DefaultStringEntityReferenceSerializerTest
      * Tests resolving and re-serializing an object reference.
      */
     @Test
-    public void testResolveAndSerializePropertyReference()
+    public void testSerializePropertyReference()
     {
         EntityReference reference = resolver.resolve("wiki:space.page^xwiki.class[0].prop", EntityType.OBJECT_PROPERTY);
         Assert.assertEquals("wiki:space.page^xwiki.class[0].prop", serializer.serialize(reference));

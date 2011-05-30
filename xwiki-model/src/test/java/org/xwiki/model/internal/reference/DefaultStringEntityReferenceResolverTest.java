@@ -33,7 +33,7 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 /**
  * Unit tests for {@link DefaultStringEntityReferenceResolver}.
  * 
- * @version $Id$
+ * @version $Id: 65fc3dcc4ff2b6461bcef9b23d562829205eac65 $
  * @since 2.2M1
  */
 public class DefaultStringEntityReferenceResolverTest
@@ -50,7 +50,7 @@ public class DefaultStringEntityReferenceResolverTest
 
     private static final String DEFAULT_OBJECT_PROPERTY = "defproperty";
 
-    private EntityReferenceResolver resolver;
+    private EntityReferenceResolver<String> resolver;
 
     private Mockery mockery = new Mockery();
 
@@ -140,6 +140,17 @@ public class DefaultStringEntityReferenceResolverTest
         reference = resolver.resolve("some\\.space.page", EntityType.DOCUMENT);
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("some.space", reference.extractReference(EntityType.SPACE).getName());
+        Assert.assertEquals("page", reference.getName());
+
+        // Escaping characters are escaped
+        reference = resolver.resolve("\\\\:\\\\.\\\\", EntityType.DOCUMENT);
+        Assert.assertEquals("\\", reference.extractReference(EntityType.WIKI).getName());
+        Assert.assertEquals("\\", reference.extractReference(EntityType.SPACE).getName());
+        Assert.assertEquals("\\", reference.getName());
+
+        reference = resolver.resolve("\\wiki:\\space.\\page", EntityType.DOCUMENT);
+        Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
+        Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.getName());
     }
 

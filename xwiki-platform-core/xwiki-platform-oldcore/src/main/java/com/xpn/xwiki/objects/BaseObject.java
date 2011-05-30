@@ -60,7 +60,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
      */
     private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.class, "relative");
-
+    
     /**
      * {@inheritDoc}
      * <p>

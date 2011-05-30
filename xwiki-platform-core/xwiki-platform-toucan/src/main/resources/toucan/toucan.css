@@ -142,21 +142,21 @@ a img {
 }
 
 .avatar_30 {
-  max-widht: 30px;
+  max-width: 30px;
   max-height: 30px;
 }
 * html .avatar_30 {
   width: 30px;
 }
 .avatar_50 {
-  max-widht: 50px;
+  max-width: 50px;
   max-height: 50px;
 }
 * html .avatar_50 {
   width: 50px;
 }
 .avatar_120 {
-  max-widht: 120px;
+  max-width: 120px;
   max-height: 120px;
 }
 * html .avatar_120 {
@@ -578,8 +578,8 @@ ol.ALPHA {
 }
 
 ol.greek { list-style-type: lower-greek; }
-ol.GREEK { list-style-type: upper-greek; }
 /* Disabled until they become valid CSS (in 3.0)
+ol.GREEK { list-style-type: upper-greek; }
 ol.hiragana { list-style-type: hiragana; }
 ol.HIRAGANA { list-style-type: hiragana-iroha; }
 ol.katakana { list-style-type: katakana; }
@@ -1067,10 +1067,6 @@ body#body.exportbody #footerglobal,
     margin: 0 220px;
     padding: 0 25px 25px 25px;
     background-color: #fff;
-}
-
-div#panelwizardcontainer {
-    padding: -30px -250px;
 }
 
 body.hideleft #contentcolumn .main {

@@ -19,8 +19,11 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -36,10 +39,13 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * @version $Id$
  * @since 2.2M1
  */
-@Component("current/reference")
+@Component
+@Named("current/reference")
+@Singleton
 public class CurrentReferenceDocumentReferenceResolver implements DocumentReferenceResolver<EntityReference>
 {
-    @Requirement("current/reference")
+    @Inject
+    @Named("current/reference")
     private EntityReferenceResolver<EntityReference> entityReferenceResolver;
 
     /**

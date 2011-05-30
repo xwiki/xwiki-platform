@@ -25,6 +25,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Result;
@@ -52,7 +54,9 @@ import org.xwiki.xml.XMLUtils;
  * @version $Id$
  * @since 2.7M1
  */
-@Component("xml")
+@Component
+@Named("xml")
+@Singleton
 public class XMLScriptService implements ScriptService
 {
     /** Xerces configuration parameter for disabling fetching and checking XMLs against their DTD. */

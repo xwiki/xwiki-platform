@@ -238,7 +238,7 @@ function updateForShortcut() {
     if(plainTextArea && !plainTextArea.disabled) {
       $(hookId).value = plainTextArea.value;
     } else {
-      $(hookId).value = editor.getRichTextArea().contentWindow.document.body.innerHTML;
+      editor.getCommandManager().execute('submit');
     }
   }
 }

@@ -1025,7 +1025,7 @@ XWiki.MenuEditor = Class.create(XWiki.SpaceSeparatedList, {
       feature: "macro",
       subMenu: ["macroInsert", "macroEdit", "|", "macroRefresh", "|", "macroCollapse", "macroExpand"]
     },
-    import : {
+    "import" : {
       feature: "import",
       subMenu: ["importOffice"]
     }

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-archetypes</artifactId>
   <name>XWiki Platform - Tools - Archetypes - Parent POM</name>

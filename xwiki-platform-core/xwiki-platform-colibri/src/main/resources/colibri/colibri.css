@@ -1274,6 +1274,13 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .xform h2 {
   margin: 2em 0 0;
 }
+/* Legend elements have an intrinsic 8px left padding; compensate that by a negative left margin */
+* html .xform legend {
+  margin-left: -8px;
+}
+*+html .xform legend {
+  margin-left: -8px;
+}
 .xform fieldset h2 {
   margin: 0;
 }

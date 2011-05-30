@@ -42,6 +42,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
@@ -236,11 +237,38 @@ public class Utils
      */
     public static String getRedirect(String action, String queryString, XWikiContext context)
     {
-        String redirect = context.getRequest().getParameter("xredirect");
-        if (StringUtils.isBlank(redirect)) {
+        return getRedirect(action, queryString, "xredirect");
+    }
+
+    /**
+     * Retrieve the URL to which the client should be redirected after the successful completion of the requested
+     * action. If any of the specified {@code redirectParameters} (in order) is present in the query string, it is
+     * returned as the redirect destination. If none of the parameters is set, compose an URL back to the current
+     * document using the specified action and query string, and return it.
+     * 
+     * @param action the XWiki action to use for composing the default redirect URL ({@code view}, {@code edit}, etc)
+     * @param queryString the query parameters to append to the fallback URL
+     * @param redirectParameters list of request parameters to look for as the redirect destination; each of the
+     *        parameters is tried in the order they are passed, and the first one set to a non-empty value is returned,
+     *        if any
+     * @return the destination URL, as specified in one of the {@code redirectParameters}, or computed using the current
+     *         document and the specified action and query string
+     */
+    public static String getRedirect(String action, String queryString, String... redirectParameters)
+    {
+        XWikiContext context =
+            (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext");
+        XWikiRequest request = context.getRequest();
+        String redirect = null;
+        for (String p : redirectParameters) {
+            redirect = request.getParameter(p);
+            if (StringUtils.isNotEmpty(redirect)) {
+                break;
+            }
+        }
+        if (StringUtils.isEmpty(redirect)) {
             redirect = context.getDoc().getURL(action, queryString, true, context);
         }
-
         return redirect;
     }
 

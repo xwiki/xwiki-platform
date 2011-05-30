@@ -26,12 +26,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <artifactId>xwiki-platform-store</artifactId>
+    <version>3.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-store-locks</artifactId>
   <name>XWiki Platform - Store - Locks</name>
-  <version>3.1-SNAPSHOT</version>
+  <version>3.2-SNAPSHOT</version>
   <description>Locking mechanisms and supporting code for XWiki storage engine.</description>
   <dependencies>
     <dependency>

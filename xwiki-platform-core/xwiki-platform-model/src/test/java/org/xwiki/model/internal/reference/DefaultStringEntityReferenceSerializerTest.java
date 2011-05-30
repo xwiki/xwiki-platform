@@ -126,7 +126,7 @@ public class DefaultStringEntityReferenceSerializerTest
         reference = resolver.resolve("\\\\:\\\\.\\\\", EntityType.DOCUMENT);
         Assert.assertEquals("\\\\:\\\\.\\\\", serializer.serialize(reference));
 
-        // The escaping here is useless
+        // The escaping here is not necessary but we want to test that it works
         reference = resolver.resolve("\\wiki:\\space.\\page", EntityType.DOCUMENT);
         Assert.assertEquals("wiki:space.page", serializer.serialize(reference));
     }

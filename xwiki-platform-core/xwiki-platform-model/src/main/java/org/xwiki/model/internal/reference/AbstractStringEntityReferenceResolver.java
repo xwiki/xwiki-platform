@@ -164,7 +164,7 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
             }
 
             if (currentChar == separator) {
-                int numberOfBackslashes = numberOfChars('\\', representation, nextIndex);
+                int numberOfBackslashes = getNumberOfCharsBefore('\\', representation, nextIndex);
 
                 if (numberOfBackslashes % 2 == 0) {
                     // Found a valid separator (not escaped), separate content on its left from content on its right
@@ -197,7 +197,12 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
         return name;
     }
 
-    private int numberOfChars(char c, StringBuilder representation, int currentPosition)
+    /**
+     * Search how many time the provided character is found consecutively started to the provided index and before.
+     * 
+     * @return the number of character in the found group
+     */
+    private int getNumberOfCharsBefore(char c, StringBuilder representation, int currentPosition)
     {
         int position = currentPosition;
 

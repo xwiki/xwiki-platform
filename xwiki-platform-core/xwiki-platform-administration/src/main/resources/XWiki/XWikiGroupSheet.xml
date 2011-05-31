@@ -170,7 +170,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
             return new XWiki.widgets.Suggest(input, { script: suggesturl, varname:'input', icon:icon });
           },
           addNewMember: function(uorg, input) {
-            if (input) {
+            if (input &amp;&amp; input.value.strip() != '') {
               var url = "${doc.getURL()}?xpage=adduorg&amp;uorg=" + encodeURIComponent(uorg) + "&amp;name=" + encodeURIComponent(input.value) + "&amp;form_token=$!{escapetool.url($services.csrf.getToken())}";
               new Ajax.Request(url, {
                 method: 'get',

@@ -50,8 +50,10 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
  * {@link FileItem}s.
  * 
  * @version $Id$
+ * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
-public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
+@Deprecated
+public class FileUploadPlugin extends XWikiDefaultPlugin
 {
     /**
      * The name of the plugin; the key that can be used to retrieve this plugin from the context.
@@ -264,6 +266,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
         // context.put("fileupload", fileupload);
 
         try {
+            @SuppressWarnings("unchecked")
             List<FileItem> list = fileupload.parseRequest(reqContext);
             if (list.size() > 0) {
                 LOG.info("Loaded " + list.size() + " uploaded files");

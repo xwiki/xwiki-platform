@@ -22,17 +22,12 @@ package org.xwiki.xml.internal;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.io.StringWriter;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.Logger;
@@ -41,9 +36,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSInput;
-import org.w3c.dom.ls.LSOutput;
-import org.w3c.dom.ls.LSParser;
-import org.w3c.dom.ls.LSSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.xml.XMLUtils;
@@ -59,9 +51,6 @@ import org.xwiki.xml.XMLUtils;
 @Singleton
 public class XMLScriptService implements ScriptService
 {
-    /** Xerces configuration parameter for disabling fetching and checking XMLs against their DTD. */
-    private static final String DISABLE_DTD_PARAM = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-
     /**
      * The logger to log.
      */
@@ -138,12 +127,7 @@ public class XMLScriptService implements ScriptService
      */
     public Document createDOMDocument()
     {
-        try {
-            return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-        } catch (ParserConfigurationException ex) {
-            this.logger.error("Cannot create DOM Documents", ex);
-            return null;
-        }
+        return XMLUtils.createDOMDocument();
     }
 
     /**
@@ -154,18 +138,7 @@ public class XMLScriptService implements ScriptService
      */
     public Document parse(LSInput source)
     {
-        try {
-            LSParser p = this.lsImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null);
-            // Disable validation, since this takes a lot of time and causes unneeded network traffic
-            p.getDomConfig().setParameter("validate", false);
-            if (p.getDomConfig().canSetParameter(DISABLE_DTD_PARAM, false)) {
-                p.getDomConfig().setParameter(DISABLE_DTD_PARAM, false);
-            }
-            return p.parse(source);
-        } catch (Exception ex) {
-            this.logger.warn("Cannot parse XML document: " + ex.getMessage());
-            return null;
-        }
+        return XMLUtils.parse(source);
     }
 
     /**
@@ -224,7 +197,7 @@ public class XMLScriptService implements ScriptService
      */
     public String serialize(Node node)
     {
-        return serialize(node, true);
+        return XMLUtils.serialize(node);
     }
 
     /**
@@ -236,29 +209,7 @@ public class XMLScriptService implements ScriptService
      */
     public String serialize(Node node, boolean withXmlDeclaration)
     {
-        if (node == null) {
-            return "";
-        }
-        try {
-            LSOutput output = this.lsImpl.createLSOutput();
-            StringWriter result = new StringWriter();
-            output.setCharacterStream(result);
-            LSSerializer serializer = this.lsImpl.createLSSerializer();
-            serializer.getDomConfig().setParameter("xml-declaration", withXmlDeclaration);
-            serializer.setNewLine("\n");
-            String encoding = "UTF-8";
-            if (node instanceof Document) {
-                encoding = ((Document) node).getXmlEncoding();
-            } else if (node.getOwnerDocument() != null) {
-                encoding = node.getOwnerDocument().getXmlEncoding();
-            }
-            output.setEncoding(encoding);
-            serializer.write(node, output);
-            return result.toString();
-        } catch (Exception ex) {
-            this.logger.warn("Failed to serialize node to XML String", ex);
-            return "";
-        }
+        return XMLUtils.serialize(node, withXmlDeclaration);
     }
 
     /**
@@ -270,17 +221,7 @@ public class XMLScriptService implements ScriptService
      */
     public String transform(Source xml, Source xslt)
     {
-        if (xml != null && xslt != null) {
-            try {
-                StringWriter output = new StringWriter();
-                Result result = new StreamResult(output);
-                javax.xml.transform.TransformerFactory.newInstance().newTransformer(xslt).transform(xml, result);
-                return output.toString();
-            } catch (Exception ex) {
-                this.logger.warn("Failed to apply XSLT transformation: " + ex.getMessage());
-            }
-        }
-        return null;
+        return XMLUtils.transform(xml, xslt);
     }
 
     /**

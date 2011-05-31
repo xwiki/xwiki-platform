@@ -20,8 +20,8 @@
  */
 package com.xpn.xwiki.plugin.image;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
@@ -34,11 +34,13 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * @version $Id$
+ * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
+@Deprecated
 public class ImagePluginAPI extends PluginApi<ImagePlugin>
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(ImagePluginAPI.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ImagePluginAPI.class);
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -102,7 +104,7 @@ public class ImagePluginAPI extends PluginApi<ImagePlugin>
      */
     private XWikiAttachment getAttachment(String pageName, String attachmentName) throws XWikiException
     {
-        DocumentReference documentReference = currentMixedDocumentReferenceResolver.resolve(pageName);
+        DocumentReference documentReference = this.currentMixedDocumentReferenceResolver.resolve(pageName);
         XWikiDocument document = getXWikiContext().getWiki().getDocument(documentReference, getXWikiContext());
         return document.getAttachment(attachmentName);
     }

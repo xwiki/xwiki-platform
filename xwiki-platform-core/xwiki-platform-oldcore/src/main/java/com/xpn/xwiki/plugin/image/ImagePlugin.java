@@ -126,7 +126,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
         initCache(context);
 
         String defaultQualityParam = context.getWiki().Param("xwiki.plugin.image.defaultQuality");
-        if (!StringUtils.isBlank(defaultQualityParam) && StringUtils.isNumeric(defaultQualityParam.trim())) {
+        if (!StringUtils.isBlank(defaultQualityParam)) {
             try {
                 this.defaultQuality = Math.max(0, Math.min(1, Float.parseFloat(defaultQualityParam.trim())));
             } catch (NumberFormatException e) {

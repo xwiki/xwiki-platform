@@ -210,7 +210,7 @@ XWiki.Selection = Class.create({
       rangeTextNodes.each(function(text) {
         // clone a highlightWrapper from the template
         var highlightWrapper = highlightWrapperTemplate.clone();
-        highlightWrapper.update(text.textContent);
+        highlightWrapper.update(text.textContent.escapeHTML());
         text.parentNode.replaceChild(highlightWrapper, text);
         this.highlightWrappers.push(highlightWrapper);
       }.bind(this));

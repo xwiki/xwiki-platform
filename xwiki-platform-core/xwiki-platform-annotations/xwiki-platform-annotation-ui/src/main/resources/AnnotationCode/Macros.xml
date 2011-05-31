@@ -203,12 +203,12 @@
       #if ($ann.state == 'ALTERED')
         &lt;div class="annotationOriginalSelection"&gt;$msg.get("annotations.altered.text")&lt;/div&gt;
       #end
-    &lt;blockquote class="annotatedText"&gt;$ann.selection&lt;/blockquote&gt;
+    &lt;blockquote class="annotatedText"&gt;$!escapetool.xml($ann.selection)&lt;/blockquote&gt;
   #end
   ## in view mode and list mode, also display the original selection of this annotation
   #if (($mode == 'view' || $mode == 'list') &amp;&amp; $ann.state == 'UPDATED')
     &lt;div class="annotationOriginalSelection"&gt;$msg.get("annotations.updated.text")&lt;/div&gt;
-    &lt;blockquote class="annotatedText originalAnnotatedText"&gt;$ann.originalSelection&lt;/blockquote&gt;
+    &lt;blockquote class="annotatedText originalAnnotatedText"&gt;$!escapetool.xml($ann.originalSelection)&lt;/blockquote&gt;
   #end
   ## Fake object that allows to use the API to generate the display
   #set($fakeObj = $doc.newObject($annotationClassDocName))

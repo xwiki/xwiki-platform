@@ -1771,7 +1771,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // necessary to blank links from doc
             context.remove("links");
 
-            if (doc.getSyntax() == Syntax.XWIKI_1_0) {
+            if (doc.getSyntax().equals(Syntax.XWIKI_1_0)) {
                 saveLinks10(doc, context, session);
             } else {
                 // When not in 1.0 content get WikiLinks directly from XDOM

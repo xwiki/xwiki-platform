@@ -18,38 +18,35 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package com.xpn.xwiki.objects;
+package com.xpn.xwiki.internal.event;
 
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
-public interface ElementInterface
+/**
+ * Base class for all object {@link org.xwiki.observation.event.Event events}.
+ * 
+ * @version $Id$
+ * @since xxx
+ */
+public class AbstractXObjectEvent extends AbstractEntityEvent implements XObjectEvent
 {
     /**
-     * @return the reference of the element
-     * @since xxx
+     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
+     * changes.
      */
-    EntityReference getReference();
-
-    String toString();
+    private static final long serialVersionUID = 1L;
 
     /**
-     * @return the reference to the document in which this element is defined (for elements where this make sense, for
-     *         example for an XClass or a XObject).
-     * @since 2.2M2
+     * Constructor initializing the event filter with an
+     * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
+     * other attachment event (add, update, delete).
      */
-    DocumentReference getDocumentReference();
+    public AbstractXObjectEvent()
+    {
+    }
 
-    /**
-     * @return the free form name (for elements which don't point to a reference, for example for instances of
-     *         {@link BaseProperty}).
-     */
-    String getName();
-
-    /**
-     * @since 2.2M2
-     */
-    void setDocumentReference(DocumentReference reference);
-
-    void setName(String name);
+    public AbstractXObjectEvent(EntityReference reference)
+    {
+        super(reference);
+    }
 }

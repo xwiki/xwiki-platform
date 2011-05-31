@@ -16,40 +16,25 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-package com.xpn.xwiki.objects;
+package com.xpn.xwiki.internal.event;
 
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
 
-public interface ElementInterface
+/**
+ * An event triggered when an object property is modified.
+ * 
+ * @version $Id$
+ * @since xxx
+ */
+public class XObjectPropertyUpdatedEvent extends AbstractXObjectPropertyEvent
 {
-    /**
-     * @return the reference of the element
-     * @since xxx
-     */
-    EntityReference getReference();
+    public XObjectPropertyUpdatedEvent()
+    {
+    }
 
-    String toString();
-
-    /**
-     * @return the reference to the document in which this element is defined (for elements where this make sense, for
-     *         example for an XClass or a XObject).
-     * @since 2.2M2
-     */
-    DocumentReference getDocumentReference();
-
-    /**
-     * @return the free form name (for elements which don't point to a reference, for example for instances of
-     *         {@link BaseProperty}).
-     */
-    String getName();
-
-    /**
-     * @since 2.2M2
-     */
-    void setDocumentReference(DocumentReference reference);
-
-    void setName(String name);
+    public XObjectPropertyUpdatedEvent(ObjectPropertyReference reference)
+    {
+        super(reference);
+    }
 }

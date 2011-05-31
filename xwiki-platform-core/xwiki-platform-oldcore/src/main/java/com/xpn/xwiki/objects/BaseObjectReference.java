@@ -30,9 +30,21 @@ import com.xpn.xwiki.web.Utils;
  */
 public class BaseObjectReference extends ObjectReference
 {
+    /**
+     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
+     * changes.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Used to parse object reference name to class reference.
+     */
     private static final DocumentReferenceResolver<String> RESOLVER = Utils
         .getComponent(DocumentReferenceResolver.class);
 
+    /**
+     * Used to serialize class reference to object reference name.
+     */
     private static final EntityReferenceSerializer<String> SERIALIZER = Utils
         .getComponent(EntityReferenceSerializer.class);
 
@@ -74,6 +86,13 @@ public class BaseObjectReference extends ObjectReference
         super(toName(classReference, objectNumber), parent);
     }
 
+    /**
+     * Convert provided class reference and object number into object reference name.
+     * 
+     * @param classReference the class reference
+     * @param objectNumber the object number
+     * @return the object reference name
+     */
     private static String toName(DocumentReference classReference, Integer objectNumber)
     {
         String name = SERIALIZER.serialize(classReference);
@@ -99,8 +118,7 @@ public class BaseObjectReference extends ObjectReference
     }
 
     /**
-     * @return the reference of the class of this object, as it was set by caller. I.e. no resolving is done from the
-     *         value set in the name of the object.
+     * @return the reference of the class of this object.
      */
     public DocumentReference getXClassReference()
     {
@@ -115,7 +133,7 @@ public class BaseObjectReference extends ObjectReference
      */
     public Integer getObjectNumber()
     {
-        return objectNumber;
+        return this.objectNumber;
     }
 
     /**

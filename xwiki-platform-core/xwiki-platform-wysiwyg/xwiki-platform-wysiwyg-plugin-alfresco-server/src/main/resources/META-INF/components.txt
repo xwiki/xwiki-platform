@@ -1,0 +1,3 @@
+org.xwiki.wysiwyg.plugin.alfresco.server.DefaultAlfrescoService
+org.xwiki.wysiwyg.plugin.alfresco.server.DefaultAlfrescoConfiguration
+org.xwiki.wysiwyg.plugin.alfresco.server.DefaultAlfrescoResponseParser

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.gwt.wysiwyg.client.plugin.alfresco.AlfrescoEntity;
 import org.xwiki.gwt.wysiwyg.client.plugin.alfresco.AlfrescoService;
@@ -41,6 +42,7 @@ import org.xwiki.wysiwyg.server.wiki.EntityReferenceConverter;
  * 
  * @version $Id$
  */
+@Component("xwiki")
 public class XWikiAlfrescoService implements AlfrescoService
 {
     /**

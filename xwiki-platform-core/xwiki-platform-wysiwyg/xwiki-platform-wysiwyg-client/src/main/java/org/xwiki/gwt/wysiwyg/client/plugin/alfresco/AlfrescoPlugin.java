@@ -221,8 +221,8 @@ public class AlfrescoPlugin extends AbstractPlugin implements WizardListener
         if (wizard == null) {
             Image alfrescoIcon = new Image(AlfrescoImages.INSTANCE.alfrescoIcon());
             wizard = new Wizard(AlfrescoConstants.INSTANCE.wizardTitle(), alfrescoIcon);
-            wizard.setProvider(new AlfrescoWizardStepProvider(wikiService, (AlfrescoServiceAsync) GWT
-                .create(AlfrescoService.class)));
+            AlfrescoServiceAsync alfrescoService = GWT.create(AlfrescoService.class);
+            wizard.setProvider(new AlfrescoWizardStepProvider(wikiService, alfrescoService));
             wizard.addWizardListener(this);
         }
         return wizard;

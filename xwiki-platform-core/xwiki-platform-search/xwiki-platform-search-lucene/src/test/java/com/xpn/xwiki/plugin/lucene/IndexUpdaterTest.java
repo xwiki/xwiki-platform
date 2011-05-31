@@ -136,7 +136,6 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
                 + " Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
 
         this.mockXWikiStoreInterface = mock(XWikiStoreInterface.class);
-        this.mockXWikiStoreInterface.stubs().method("searchDocumentReferences").will(returnValue(Collections.EMPTY_LIST));
         this.mockXWikiStoreInterface.stubs().method("cleanUp");
 
         this.mockXWiki = mock(XWiki.class);
@@ -154,6 +153,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("checkAccess").will(returnValue(true));
         this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
         this.mockXWiki.stubs().method("getStore").will(returnValue(this.mockXWikiStoreInterface.proxy()));
+        this.mockXWiki.stubs().method("search").will(returnValue(Collections.EMPTY_LIST));
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
         getContext().setDatabase("wiki");

@@ -32,7 +32,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * example both the Current Entity Reference Resolver and the Default Entity Reference Resolver to share the code from
  * this class.
  * 
- * @version $Id$
+ * @version $Id: a83a7ad175a8e743f2a2fd4c2acb417bbaad72b8 $
  * @since 2.2M1
  */
 public abstract class AbstractStringEntityReferenceResolver implements EntityReferenceResolver<String>
@@ -45,6 +45,7 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
             put(EntityType.SPACE, new char[] {':'});
             put(EntityType.OBJECT, new char[] {'^', '.', ':'});
             put(EntityType.OBJECT_PROPERTY, new char[] {'.', '^', '.', ':'});
+            put(EntityType.CLASS_PROPERTY, new char[] {'^', '.', ':'});
         }
     };
 
@@ -59,6 +60,8 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
             EntityType.WIKI});
             put(EntityType.OBJECT_PROPERTY, new EntityType[] {EntityType.OBJECT_PROPERTY, EntityType.OBJECT,
             EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI});
+            put(EntityType.CLASS_PROPERTY, new EntityType[] {EntityType.CLASS_PROPERTY, EntityType.DOCUMENT,
+            EntityType.SPACE, EntityType.WIKI});
         }
     };
 

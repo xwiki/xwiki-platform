@@ -31,6 +31,9 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 
 import com.xpn.xwiki.web.Utils;
 
@@ -39,11 +42,30 @@ import com.xpn.xwiki.web.Utils;
  */
 // TODO: shouldn't this be abstract? toFormString and toText
 // will never work unless getValue is overriden
-public class BaseProperty extends BaseElement implements PropertyInterface, Serializable, Cloneable
+public class BaseProperty<R extends EntityReference> extends BaseElement<R> implements PropertyInterface, Serializable,
+    Cloneable
 {
     private BaseCollection object;
 
     private int id;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseElement#createReference()
+     */
+    @Override
+    protected R createReference()
+    {
+        R reference;
+        if (this.object.getReference() instanceof ObjectReference) {
+            reference = (R) new ObjectPropertyReference(getName(), (ObjectReference) this.object.getReference());
+        } else {
+            reference = super.createReference();
+        }
+
+        return reference;
+    }
 
     /**
      * {@inheritDoc}
@@ -144,8 +166,10 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
     @Override
     public Object clone()
     {
-        BaseProperty property = (BaseProperty) super.clone();
+        BaseProperty<R> property = (BaseProperty<R>) super.clone();
+
         property.setObject(getObject());
+
         return property;
     }
 

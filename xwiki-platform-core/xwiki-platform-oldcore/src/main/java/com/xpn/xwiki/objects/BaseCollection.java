@@ -65,7 +65,7 @@ import com.xpn.xwiki.web.Utils;
  * 
  * @version $Id$
  */
-public abstract class BaseCollection extends BaseElement implements ObjectInterface, Cloneable
+public abstract class BaseCollection<R extends EntityReference> extends BaseElement<R> implements ObjectInterface, Cloneable
 {
     protected static final Log LOG = LogFactory.getLog(BaseCollection.class);
 

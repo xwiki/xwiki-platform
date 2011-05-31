@@ -16,40 +16,47 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-package com.xpn.xwiki.objects;
+package com.xpn.xwiki.internal.event;
 
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
-public interface ElementInterface
+/**
+ * Base class for all entity {@link org.xwiki.observation.event.Event events}.
+ * 
+ * @version $Id$
+ * @since xxx
+ */
+public class AbstractEntityEvent implements EntityEvent
 {
-    /**
-     * @return the reference of the element
-     * @since xxx
-     */
-    EntityReference getReference();
+    private EntityReference reference;
 
-    String toString();
+    public AbstractEntityEvent()
+    {
+    }
 
-    /**
-     * @return the reference to the document in which this element is defined (for elements where this make sense, for
-     *         example for an XClass or a XObject).
-     * @since 2.2M2
-     */
-    DocumentReference getDocumentReference();
+    public AbstractEntityEvent(EntityReference reference)
+    {
+        this.reference = reference;
+    }
 
-    /**
-     * @return the free form name (for elements which don't point to a reference, for example for instances of
-     *         {@link BaseProperty}).
-     */
-    String getName();
+    public EntityReference getReference()
+    {
+        return this.reference;
+    }
 
-    /**
-     * @since 2.2M2
-     */
-    void setDocumentReference(DocumentReference reference);
+    @Override
+    public boolean matches(Object otherEvent)
+    {
+        if (otherEvent == this) {
+            return true;
+        }
 
-    void setName(String name);
+        return otherEvent instanceof EntityEvent && matchesReference(((EntityEvent) otherEvent).getReference());
+    }
+
+    protected boolean matchesReference(EntityReference otherReference)
+    {
+        return getReference() == null || getReference().equals(otherReference);
+    }
 }

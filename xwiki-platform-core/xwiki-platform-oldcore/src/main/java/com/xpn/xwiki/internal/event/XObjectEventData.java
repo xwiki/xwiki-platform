@@ -16,40 +16,37 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-package com.xpn.xwiki.objects;
+package com.xpn.xwiki.internal.event;
 
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
-public interface ElementInterface
+/**
+ * Data related to {@link XObjectEvent}.
+ * 
+ * @version $Id$
+ * @since xxx
+ */
+public class XObjectEventData
 {
-    /**
-     * @return the reference of the element
-     * @since xxx
-     */
-    EntityReference getReference();
+    private XWikiDocument document;
 
-    String toString();
+    private BaseObject object;
 
-    /**
-     * @return the reference to the document in which this element is defined (for elements where this make sense, for
-     *         example for an XClass or a XObject).
-     * @since 2.2M2
-     */
-    DocumentReference getDocumentReference();
+    public XObjectEventData(XWikiDocument document, BaseObject object)
+    {
+        this.document = document;
+        this.object = object;
+    }
 
-    /**
-     * @return the free form name (for elements which don't point to a reference, for example for instances of
-     *         {@link BaseProperty}).
-     */
-    String getName();
+    public XWikiDocument getDocument()
+    {
+        return document;
+    }
 
-    /**
-     * @since 2.2M2
-     */
-    void setDocumentReference(DocumentReference reference);
-
-    void setName(String name);
+    public BaseObject getObject()
+    {
+        return object;
+    }
 }

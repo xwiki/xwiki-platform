@@ -58,5 +58,11 @@ public enum EntityType
     /**
      * Represents an Object Property Entity.
      */
-    OBJECT_PROPERTY
+    OBJECT_PROPERTY,
+
+    /**
+     * Represents a class property entity.
+     * @since xxx
+     */
+    CLASS_PROPERTY
 }

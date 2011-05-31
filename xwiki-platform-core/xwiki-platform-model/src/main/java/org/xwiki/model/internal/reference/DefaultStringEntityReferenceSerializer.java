@@ -32,7 +32,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * Generate a string representation of an entity reference (eg "wiki:space.page" for a document reference in the "wiki"
  * Wiki, the "space" Space and the "page" Page).
  * 
- * @version $Id$
+ * @version $Id: e987f967efe838bd2aa97e52bf181faa2b8f15f4 $
  * @since 2.2M1
  */
 @Component
@@ -49,6 +49,7 @@ public class DefaultStringEntityReferenceSerializer implements EntityReferenceSe
             put(EntityType.SPACE, new String[] {":", ".", "\\"});
             put(EntityType.OBJECT, new String[] {"^", "\\"});
             put(EntityType.OBJECT_PROPERTY, new String[] {".", "\\"});
+            put(EntityType.CLASS_PROPERTY, new String[] {"^", "\\"});
         }
     };
 
@@ -63,6 +64,7 @@ public class DefaultStringEntityReferenceSerializer implements EntityReferenceSe
             put(EntityType.SPACE, new String[] {"\\:", "\\.", "\\\\"});
             put(EntityType.OBJECT, new String[] {"\\^", "\\\\"});
             put(EntityType.OBJECT_PROPERTY, new String[] {"\\.", "\\\\"});
+            put(EntityType.CLASS_PROPERTY, new String[] {"\\^", "\\\\"});
         }
     };
 

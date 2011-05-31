@@ -60,6 +60,7 @@ public class DefaultModelConfiguration implements ModelConfiguration
         put(EntityType.ATTACHMENT, "filename");
         put(EntityType.OBJECT, "object");
         put(EntityType.OBJECT_PROPERTY, "property");
+        put(EntityType.CLASS_PROPERTY, "property");
     }};
 
     /**

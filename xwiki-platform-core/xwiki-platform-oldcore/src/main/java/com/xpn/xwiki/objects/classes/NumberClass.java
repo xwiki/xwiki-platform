@@ -24,9 +24,9 @@ package com.xpn.xwiki.objects.classes;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ecs.xhtml.input;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -43,7 +43,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 public class NumberClass extends PropertyClass
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(NumberClass.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NumberClass.class);
 
     public NumberClass(PropertyMetaClass wclass)
     {

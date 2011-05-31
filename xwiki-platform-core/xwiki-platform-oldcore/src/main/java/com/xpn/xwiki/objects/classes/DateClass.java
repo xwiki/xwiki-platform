@@ -28,10 +28,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ecs.xhtml.input;
 import org.dom4j.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -44,7 +44,8 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 
 public class DateClass extends PropertyClass
 {
-    private static final Log LOG = LogFactory.getLog(DateClass.class);
+    /** Logging helper object. */
+    private static final Logger LOG = LoggerFactory.getLogger(DateClass.class);
 
     public DateClass(PropertyMetaClass wclass)
     {

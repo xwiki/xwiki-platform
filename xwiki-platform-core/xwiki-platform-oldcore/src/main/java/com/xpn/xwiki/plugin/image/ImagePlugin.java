@@ -29,8 +29,8 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -46,13 +46,15 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * @version $Id$
+ * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
+@Deprecated
 public class ImagePlugin extends XWikiDefaultPlugin
 {
     /**
      * Logging helper object.
      */
-    private static final Log LOG = LogFactory.getLog(ImagePlugin.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ImagePlugin.class);
 
     /**
      * The name used for retrieving this plugin from the context.
@@ -128,8 +130,8 @@ public class ImagePlugin extends XWikiDefaultPlugin
             try {
                 this.defaultQuality = Math.max(0, Math.min(1, Float.parseFloat(defaultQualityParam.trim())));
             } catch (NumberFormatException e) {
-                LOG.warn(String.format("Failed to parse xwiki.plugin.image.defaultQuality configuration parameter. "
-                    + "Using %s as the default image quality.", this.defaultQuality), e);
+                LOG.warn("Failed to parse xwiki.plugin.image.defaultQuality configuration parameter. "
+                    + "Using {} as the default image quality.", this.defaultQuality);
             }
         }
     }

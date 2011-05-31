@@ -698,7 +698,7 @@ XWiki.Annotation = Class.create({
           // store the displayed annotations checkbox
           this.displayAnnotationsCheckbox = $('annotationsdisplay');
           // show this checkbox as checked if the annotations are displayed by default and were loaded successfully
-          if (this.displayedByDefault &amp;&amp; this.fetchedAnnotations) {
+          if (this.displayedByDefault || this.fetchedAnnotations) {
             this.displayAnnotationsCheckbox.checked = true;
           }
           this.attachSettingsListeners();
@@ -1477,7 +1477,10 @@ XWiki.Annotation = Class.create({
         if (this.checkResponseCodeAndFail(response)) {
           return;
         }
-        this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : this.displayedByDefault);
+        if (this.displayAnnotationsCheckbox) {
+          this.displayAnnotationsCheckbox.checked = true;
+        }
+        this.loadAnnotatedContent(response.responseJSON.annotatedContent, true);
         this.fetchedAnnotations = true;
         form._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.success')", "done");
         // and hide the create bubble, skipping selection highlight clear

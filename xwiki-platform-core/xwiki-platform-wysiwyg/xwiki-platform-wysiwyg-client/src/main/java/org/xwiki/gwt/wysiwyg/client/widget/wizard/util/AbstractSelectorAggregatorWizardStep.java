@@ -84,18 +84,10 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
      */
     public AbstractSelectorAggregatorWizardStep()
     {
-        // instantiate the main panel
-        display().addStyleName("xSelectorAggregatorStep");
-
         tabPanel.addStyleName("xStepsTabs");
-
-        // add an empty flow panel for each step to show in the tabs panel
-        for (String stepName : getStepNames()) {
-            tabPanel.add(new FlowPanel(), stepName);
-        }
-
         tabPanel.addSelectionHandler(this);
         display().add(tabPanel);
+        display().addStyleName("xSelectorAggregatorStep");
     }
 
     /**
@@ -281,7 +273,15 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
      */
     public void init(Object data, final AsyncCallback< ? > cb)
     {
-        // reset initialization of aggregated steps
+        // Maybe initialize the tab bar.
+        if (tabPanel.getTabBar().getTabCount() == 0) {
+            // Fill the tab bar with the names of the aggregated wizard steps.
+            for (String stepName : getStepNames()) {
+                tabPanel.add(new FlowPanel(), stepName);
+            }
+        }
+
+        // Aggregated wizard steps have to be reinitialized.
         for (WizardStep step : initialized.keySet()) {
             initialized.put(step, false);
         }
@@ -290,7 +290,6 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
         {
             public void onSuccess(Object result)
             {
-                // dispatch the initialization
                 dispatchInit(cb);
             }
 

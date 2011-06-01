@@ -1325,32 +1325,30 @@ XWiki.Annotation = Class.create({
     }
   },
 
-  registerAddAnnotationShortcut : function() {
-    var method = this.onAddAnnotationShortcut;
-    for (var i = 0; i &lt; this.addAnnotationShortcuts.size(); ++i) {
-      if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
-        shortcut.add(this.addAnnotationShortcuts[i], method.bindAsEventListener(this), {type: 'keyup'});
-      } else {
-        shortcut.add(this.addAnnotationShortcuts[i], method.bindAsEventListener(this), {type: 'keypress'});
-      }
+  registerShortcuts : function(annotationShorcuts, method) {
+    var eventType = 'keypress';
+    if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
+      eventType = 'keyup';
+    }
+    for (var i = 0; i &lt; annotationShorcuts.size(); ++i) {
+      shortcut.add(annotationShorcuts[i], method.bindAsEventListener(this), {type: eventType});
+    }
+  },
+  unregisterShortcuts : function(annotationShorcuts) {
+    for (var i = 0; i &lt; annotationShorcuts.size(); ++i) {
+      shortcut.remove(annotationShorcuts[i]);
     }
   },
 
+  registerAddAnnotationShortcut : function() {
+    this.registerShortcuts(this.addAnnotationShortcuts, this.onAddAnnotationShortcut);
+  },
   unregisterAddAnnotationShortcut : function() {
-    for (var i = 0; i &lt; this.addAnnotationShortcuts.size(); ++i) {
-      shortcut.remove(this.addAnnotationShortcuts[i]);
-    }
+    this.unregisterShortcuts(this.addAnnotationShortcuts);
   },
 
   registerCloseDialogShortcut : function() {
-    var method = this.closeOpenBubble;
-    for (var i = 0; i &lt; this.closeDialogShortcuts.size(); ++i) {
-      if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
-        shortcut.add(this.closeDialogShortcuts[i], method.bindAsEventListener(this), {type: 'keyup'});
-      } else {
-        shortcut.add(this.closeDialogShortcuts[i], method.bindAsEventListener(this), {type: 'keypress'});
-      }
-    }
+    this.registerShortcuts(this.closeDialogShortcuts, this.closeOpenBubble);
   },
 
   /**

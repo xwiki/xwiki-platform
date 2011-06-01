@@ -97,8 +97,8 @@ public class WatchListJob extends AbstractJob implements Job
         this.plugin = (WatchListPlugin) this.context.getWiki().getPlugin(WatchListPlugin.ID, this.context);
         this.schedulerJobObject = (BaseObject) data.get("xjob");
         this.watchListJobObject =
-            this.context.getWiki().getDocument(this.schedulerJobObject.getName(), this.context).getObject(
-                WatchListJobManager.WATCHLIST_JOB_CLASS);
+            this.context.getWiki().getDocument(this.schedulerJobObject.getName(), this.context)
+                .getObject(WatchListJobManager.WATCHLIST_JOB_CLASS);
         initializeComponents(this.context);
     }
 
@@ -115,8 +115,7 @@ public class WatchListJob extends AbstractJob implements Job
         // In the new component architecture we use ThreadLocal to transport the request,
         // response and session to components which require them.
         // In the future this Servlet will be replaced by the XWikiPlexusServlet Servlet.
-        ServletContainerInitializer containerInitializer =
-            Utils.getComponent(ServletContainerInitializer.class);
+        ServletContainerInitializer containerInitializer = Utils.getComponent(ServletContainerInitializer.class);
 
         try {
             containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(), context);
@@ -253,28 +252,31 @@ public class WatchListJob extends AbstractJob implements Job
             }
 
             for (String subscriber : subscribers) {
-                List<String> wikis =
-                    this.plugin.getStore().getWatchedElements(subscriber, ElementType.WIKI, this.context);
-                List<String> spaces =
-                    this.plugin.getStore().getWatchedElements(subscriber, ElementType.SPACE, this.context);
-                List<String> documents =
-                    this.plugin.getStore().getWatchedElements(subscriber, ElementType.DOCUMENT, this.context);
-                List<String> users =
-                    this.plugin.getStore().getWatchedElements(subscriber, ElementType.USER, this.context);
-                List<WatchListEvent> matchingEvents =
-                    eventMatcher.getMatchingEvents(wikis, spaces, documents, users, subscriber, this.context);
-                String userWiki = StringUtils.substringBefore(subscriber, WatchListStore.WIKI_SPACE_SEP);
+                try {
+                    List<String> wikis =
+                        this.plugin.getStore().getWatchedElements(subscriber, ElementType.WIKI, this.context);
+                    List<String> spaces =
+                        this.plugin.getStore().getWatchedElements(subscriber, ElementType.SPACE, this.context);
+                    List<String> documents =
+                        this.plugin.getStore().getWatchedElements(subscriber, ElementType.DOCUMENT, this.context);
+                    List<String> users =
+                        this.plugin.getStore().getWatchedElements(subscriber, ElementType.USER, this.context);
+                    List<WatchListEvent> matchingEvents =
+                        eventMatcher.getMatchingEvents(wikis, spaces, documents, users, subscriber, this.context);
+                    String userWiki = StringUtils.substringBefore(subscriber, WatchListStore.WIKI_SPACE_SEP);
 
-                // If events have occurred on at least one element watched by the user, send the email
-                if (matchingEvents.size() > 0) {
-                    this.plugin.getNotifier().sendEmailNotification(subscriber, matchingEvents,
-                        getEmailTemplate(userWiki), previousFireTime, this.context);
+                    // If events have occurred on at least one element watched by the user, send the email
+                    if (matchingEvents.size() > 0) {
+                        this.plugin.getNotifier().sendEmailNotification(subscriber, matchingEvents,
+                            getEmailTemplate(userWiki), previousFireTime, this.context);
+                    }
+                } catch (Exception e) {
+                    LOG.error("Failed to send watchlist notification to user [" + subscriber + "]", e);
                 }
             }
         } catch (Exception e) {
             // We're in a job, we don't throw exceptions
             LOG.error("Exception while running job", e);
-            e.printStackTrace();
         } finally {
             this.context.getWiki().getStore().cleanUp(this.context);
             cleanupComponents();

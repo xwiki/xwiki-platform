@@ -581,6 +581,8 @@ XWiki.Annotation = Class.create({
   annTabname : 'Annotations',
   // whether current displayed doc is the rendered annotated document
   fetchedAnnotations : false,
+  // whether the annotations are being displayed; synchronizes with displayAnnotationsCheckbox if that element exists
+  displayingAnnotations : false,
   // the display annotations check box in the settings panel
   displayAnnotationsCheckbox : false,
   // flag specifying if the annotations are displayed by default or not
@@ -589,6 +591,8 @@ XWiki.Annotation = Class.create({
   displayHighlight : true,
   // add annotation shortcuts
   addAnnotationShortcuts : ['Ctrl+M', 'Meta+M', 'Ctrl+I', 'Meta+I'],
+  // show annotations shortcuts
+  toggleAnnotationsShortcuts : ['Alt+A'],
   // shortcuts for closing the open dialog, be it create, edit or display
   closeDialogShortcuts : ['Esc'],
   // the selection service used to detect and handle selection related functions on the document
@@ -621,6 +625,8 @@ XWiki.Annotation = Class.create({
     document.observe('xwiki:docextra:loaded', this.addValidateListenersInTab.bindAsEventListener(this));
     // register the key shortcuts for adding an annotation
     this.registerAddAnnotationShortcut();
+    // register the key shortcuts for toggling annotation visibility
+    this.registerToggleAnnotationsShortcut();
     // register the close dialog shortcut
     this.registerCloseDialogShortcut();
 
@@ -669,6 +675,13 @@ XWiki.Annotation = Class.create({
       annLink.observe('click', this.toggleSettingsPanel.bind(this));
     }
   },
+
+  setAnnotationVisibility : function (visibility) {
+    this.displayingAnnotations = visibility;
+    if (this.displayAnnotationsCheckbox) {
+      this.displayAnnotationsCheckbox.checked = visibility;
+    }
+  },
   
   toggleSettingsPanel : function(event) {
     var menu = event.element();
@@ -698,7 +711,7 @@ XWiki.Annotation = Class.create({
           // store the displayed annotations checkbox
           this.displayAnnotationsCheckbox = $('annotationsdisplay');
           // show this checkbox as checked if the annotations are displayed by default and were loaded successfully
-          if (this.displayedByDefault || this.fetchedAnnotations) {
+          if (this.displayedByDefault || this.displayingAnnotations) {
             this.displayAnnotationsCheckbox.checked = true;
           }
           this.attachSettingsListeners();
@@ -754,6 +767,7 @@ XWiki.Annotation = Class.create({
     }
     //and toggle all annotation markers
     this.annotatedElement.select('.annotation-marker').invoke(visible ? 'removeClassName' : 'addClassName', 'hidden');
+    this.displayingAnnotations = visible;
     if (!visible) {
       // also close all open bubbles
       this.bubbles.each(function(bubble){
@@ -1349,6 +1363,19 @@ XWiki.Annotation = Class.create({
 
   registerCloseDialogShortcut : function() {
     this.registerShortcuts(this.closeDialogShortcuts, this.closeOpenBubble);
+  },
+
+  registerToggleAnnotationsShortcut : function() {
+    this.registerShortcuts(this.toggleAnnotationsShortcuts, this.onToggleAnnotationsShortcut);
+  },
+
+  onToggleAnnotationsShortcut : function() {
+    if (this.fetchedAnnotations) {
+      this.setAnnotationVisibility(!this.displayingAnnotations); 
+      this.toggleAnnotations(this.displayingAnnotations);
+    } else {
+      this.fetchAnnotations(true);
+    }
   },
 
   /**

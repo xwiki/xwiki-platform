@@ -22,6 +22,8 @@ package com.xpn.xwiki.plugin.fileupload;
 
 import java.util.List;
 
+import org.apache.commons.fileupload.FileItem;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.PluginApi;

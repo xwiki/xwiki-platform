@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>XWiki</web>
-<name>DefaultSkin</name>
+<name>XWikiSkinsTemplate</name>
 <language></language>
 <defaultLanguage></defaultLanguage>
 <translation>0</translation>
-<parent>XWiki.XWikiPreferences</parent>
+<parent>XWiki.XWikiSkins</parent>
 <creator>xwiki:XWiki.Admin</creator>
 <author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1167576476000</creationDate>
-<date>1167576476000</date>
-<contentUpdateDate>1167576476000</contentUpdateDate>
+<creationDate>1306878414000</creationDate>
+<date>1306880259000</date>
+<contentUpdateDate>1306880259000</contentUpdateDate>
 <version>1.1</version>
-<title>$msg.get("xe.admin.skin")</title>
+<title>XWikiSkins Template</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -162,12 +162,12 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </viewheader.vm>
 </class>
-<name>XWiki.DefaultSkin</name>
+<name>XWiki.XWikiSkinsTemplate</name>
 <number>0</number>
 <className>XWiki.XWikiSkins</className>
-<guid>c52655e2-0fae-4b2c-8508-378d1c1fb4ac</guid>
+<guid>4caf3995-860b-4784-9e5e-fc3534fc1379</guid>
 <property>
-<baseskin>colibri</baseskin>
+<baseskin></baseskin>
 </property>
 <property>
 <edit.vm></edit.vm>
@@ -179,10 +179,10 @@
 <header.vm></header.vm>
 </property>
 <property>
-<logo>logo.png</logo>
+<logo></logo>
 </property>
 <property>
-<name>Default XWiki Skin</name>
+<name></name>
 </property>
 <property>
 <style.css></style.css>

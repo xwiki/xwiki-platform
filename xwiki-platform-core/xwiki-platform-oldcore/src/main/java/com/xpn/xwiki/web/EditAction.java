@@ -56,15 +56,6 @@ public class EditAction extends XWikiAction
         context.put("doc", doc);
         vcontext.put("doc", doc.newDocument(context));
 
-        // Check for edit section
-        String sectionContent = "";
-        int sectionNumber = 0;
-        if (request.getParameter("section") != null && xwiki.hasSectionEdit(context)) {
-            sectionNumber = NumberUtils.toInt(request.getParameter("section"));
-            sectionContent = doc.getContentOfSection(sectionNumber);
-        }
-        vcontext.put("sectionNumber", new Integer(sectionNumber));
-
         synchronized (doc) {
             XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
             EditForm peform = (EditForm) form;
@@ -134,6 +125,15 @@ public class EditAction extends XWikiAction
                     vcontext.put("tdoc", tdoc.newDocument(context));
                 }
             }
+
+            // Check for edit section
+            String sectionContent = "";
+            int sectionNumber = 0;
+            if (request.getParameter("section") != null && xwiki.hasSectionEdit(context)) {
+                sectionNumber = NumberUtils.toInt(request.getParameter("section"));
+                sectionContent = tdoc.getContentOfSection(sectionNumber);
+            }
+            vcontext.put("sectionNumber", new Integer(sectionNumber));
 
             XWikiDocument tdoc2 = tdoc.clone();
             if (content != null) {

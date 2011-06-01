@@ -189,7 +189,7 @@ public class SelectionPreserver
     /**
      * Removes the markers from the document and clears the list of saved range place holders.
      */
-    public void clearPlaceHolders()
+    public void clearSelection()
     {
         for (int i = 0; i < placeHolders.size(); i++) {
             RangePlaceHolder placeHolder = placeHolders.get(i);
@@ -206,7 +206,7 @@ public class SelectionPreserver
      */
     public void saveSelection()
     {
-        clearPlaceHolders();
+        clearSelection();
         Selection selection = rta.getDocument().getSelection();
         for (int i = 0; i < selection.getRangeCount(); i++) {
             placeHolders.add(new RangePlaceHolder(selection.getRangeAt(i)));
@@ -214,6 +214,14 @@ public class SelectionPreserver
         // We need to restore the selection because it might have been affected by the range boundary markers we have
         // inserted. Of course, we don't reset the state of the preserver.
         restoreSelection(false);
+    }
+
+    /**
+     * @return {@code true} if there is a saved selection, {@code false} otherwise
+     */
+    public boolean hasSelection()
+    {
+        return !placeHolders.isEmpty();
     }
 
     /**
@@ -227,9 +235,10 @@ public class SelectionPreserver
     }
 
     /**
-     * Restores the saved selection on the underlying rich text area. You can specify if the selection preserver should
-     * reset its state. When you're calling this method multiple times for the same selection it's more convenient to
-     * keep the state between the calls rather than call {@link #saveSelection()} before.
+     * If there is a saved selection restores it, otherwise restores the default selection on the underlying rich text
+     * area. You can specify if the selection preserver should reset its state. When you're calling this method multiple
+     * times for the same selection it's more convenient to keep the state between the calls rather than call
+     * {@link #saveSelection()} before.
      * 
      * @param reset true if you want to reset the state of the selection preserver, false otherwise.
      * @see #saveSelection()
@@ -237,8 +246,40 @@ public class SelectionPreserver
     public void restoreSelection(boolean reset)
     {
         if (placeHolders.isEmpty()) {
-            return;
+            restoreDefaultSelection();
+        } else {
+            restoreSavedSelection(reset);
         }
+    }
+
+    /**
+     * Restores the default selection: places the caret at the beginning of the document.
+     */
+    private void restoreDefaultSelection()
+    {
+        Range range = rta.getDocument().createRange();
+        Node firstLeaf = DOMUtils.getInstance().getFirstLeaf(rta.getDocument().getBody());
+        if (firstLeaf.getNodeType() == Node.ELEMENT_NODE && Element.as(firstLeaf).canHaveChildren()) {
+            range.selectNodeContents(firstLeaf);
+        } else {
+            range.setStartBefore(firstLeaf);
+            range.collapse(true);
+        }
+        Selection selection = rta.getDocument().getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    /**
+     * Restores the saved selection on the underlying rich text area. You can specify if the selection preserver should
+     * reset its state. When you're calling this method multiple times for the same selection it's more convenient to
+     * keep the state between the calls rather than call {@link #saveSelection()} before.
+     * 
+     * @param reset true if you want to reset the state of the selection preserver, false otherwise.
+     * @see #saveSelection()
+     */
+    private void restoreSavedSelection(boolean reset)
+    {
         Selection selection = rta.getDocument().getSelection();
         selection.removeAllRanges();
         int delta = reset ? 0 : 1;

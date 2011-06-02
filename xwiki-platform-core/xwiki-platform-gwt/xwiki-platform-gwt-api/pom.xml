@@ -37,6 +37,12 @@
       <artifactId>gwt-servlet</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+      <!-- Overwrite the scope from the parent POM to prevent gwt-user jar from being included in the distribution war. -->
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>

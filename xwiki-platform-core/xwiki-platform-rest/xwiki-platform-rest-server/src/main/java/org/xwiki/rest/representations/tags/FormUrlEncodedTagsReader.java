@@ -34,8 +34,9 @@ import javax.ws.rs.ext.Provider;
 
 import org.restlet.Context;
 import org.restlet.data.Form;
-import org.restlet.resource.InputRepresentation;
-import org.restlet.resource.Representation;
+import org.restlet.representation.InputRepresentation;
+import org.restlet.representation.Representation;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Constants;
 import org.xwiki.rest.XWikiRestComponent;

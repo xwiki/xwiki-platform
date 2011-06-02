@@ -68,7 +68,7 @@ isc.XWEResultTree.addClassProperties({
         addPageTitle : "$msg.get('xwikiexplorer.addpage.title')",
         addPageHint : "$msg.get('xwikiexplorer.addpage.hint')",
         addAttachmentTitle : "$msg.get('xwikiexplorer.addattachment.title')",
-        addAttachmentHint : "$msg.get('xwikiexplorer.addattachment.hint')",
+        addAttachmentHint : "$msg.get('xwikiexplorer.addattachment.hint')"
     }
 });
 
@@ -77,7 +77,7 @@ isc.XWEResultTree.addClassMethods({
      * Joins the given arguments using the path separator.
      */
     formatPath : function() {
-        return Array.slice(arguments).join(' \u00BB ');
+        return Array.prototype.slice.call(arguments, 0).join(' \u00BB ');
     },
 
     /**

@@ -34,7 +34,7 @@
   <name>XWiki Platform - REST - Server</name>
   <description>Service for accessing XWiki through a RESTful API</description>
   <properties>
-    <restlet.version>2.0.7</restlet.version>
+    <restlet.version>2.0.5</restlet.version>
   </properties>
   <dependencies>
     <dependency>

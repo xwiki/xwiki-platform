@@ -25,6 +25,7 @@ import org.restlet.ext.jaxrs.JaxRsApplication;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
 
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rest.resources.BrowserAuthenticationResource;
 
 /**
@@ -51,6 +52,8 @@ public class XWikiRestletJaxRsApplication extends JaxRsApplication
         XWikiSetupCleanupFilter setupCleanupFilter = new XWikiSetupCleanupFilter();
 
         XWikiAuthentication xwikiAuthentication = new XWikiAuthentication(getContext());
+        ComponentManager componentManager = (ComponentManager) getContext().getAttributes().get(Constants.XWIKI_COMPONENT_MANAGER);
+        xwikiAuthentication.setVerifier(new XWikiSecretVerifier(getContext(), componentManager));
 
         /* Create a router for adding resources */
         Router router = new Router();

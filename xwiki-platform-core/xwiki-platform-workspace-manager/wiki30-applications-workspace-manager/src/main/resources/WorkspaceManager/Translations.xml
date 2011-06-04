@@ -11,15 +11,15 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1293832800000</creationDate>
-<date>1303997504000</date>
-<contentUpdateDate>1303997504000</contentUpdateDate>
+<date>1307189790000</date>
+<contentUpdateDate>1307189790000</contentUpdateDate>
 <version>1.1</version>
 <title>Translations</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>true</minorEdit>
+<minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content># Workspace Manager translation page
@@ -34,8 +34,7 @@ workspacemanager.members=MEMBERS
 workspacemanager.title.createwiki.wikiname=Workspace identifier
 workspacemanager.title.createwiki.desc=Workspace description
 workspacemanager.title.createwiki.members=Initial workspace members
-workspacemanager.title.join=Join Workspace "{0}"
-workspacemanager.title.join.empty=Join Workspace
+workspacemanager.title.join=Join Workspace
 workspacemanager.title.leave=Leave Workspace "{0}"
 workspacemanager.title.leave.empty=Leave Workspace
 workspacemanager.title.delete=Delete Workspace "{0}"
@@ -48,6 +47,9 @@ workspacemanager.browse.owner=Owner
 workspacemanager.browse.membershipType=Membership Type
 workspacemanager.browse._actions=Actions
 workspacemanager.browse._actions.join=Join
+workspacemanager.browse._actions.requestJoin=Request Join
+workspacemanager.browse._actions.viewInvitation=View Invitation
+workspacemanager.browse._actions.cancelJoinRequest=Cancel Request
 workspacemanager.browse._actions.leave=Leave
 workspacemanager.browse._actions.delete=Delete
 

@@ -55,7 +55,7 @@
     #set ($workspaceUrl = $workspace.wikiDescriptor.homePageUrl)
     ##
     #if (!$WorkspaceManager.canDeleteWorkspace($currentUser, $workspaceId))
-      {{error}}User #if($xcontext.user != 'XWiki.XWikiGuest')[[$currentUser]]#{else}$xcontext.user#end is not allowed to delete the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/error}}
+      {{error}}The user #if($xcontext.user != 'XWiki.XWikiGuest')[[$currentUser]]#{else}$xcontext.user#end is not allowed to delete the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/error}}
     #else
       #if ("$!confirm" != 1)
         #set ($browseDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'WebHome'))
@@ -73,7 +73,7 @@
           #printException($xcontext.lastexception)
         #else
           ## FIXME: replace with a success macro when it will be available.
-          {{box image="icon:tick"}}User [[$currentUser]] successfully deleted workspace ${workspaceName}.{{/box}}
+          {{box image="icon:tick"}}The user [[$currentUser]] successfully deleted the workspace ${workspaceName}.{{/box}}
         #end
       #end
     #end

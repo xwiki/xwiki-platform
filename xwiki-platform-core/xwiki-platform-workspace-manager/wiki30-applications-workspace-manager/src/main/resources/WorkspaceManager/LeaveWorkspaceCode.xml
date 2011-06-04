@@ -54,7 +54,9 @@
     ##
     #set ($existingMemberObject = $workspaceGroupDocumentRestricted.getXObject($groupsClassReference, 'member', $currentUser))
     #if ("$!existingMemberObject" == '')
-      {{error}}User [[$currentUser]] is not a member of the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/error}}
+      {{error}}The user [[$currentUser]] is not a member of the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/error}}
+    #elseif ($workspace.wikiDescriptor.owner == $currentUser)
+      {{error}}The user [[$currentUser]] is the owner of the workspace [[$workspaceName&gt;&gt;$workspaceUrl]]. The owner of a workspace may not leave it unless the workspace is deleted or the owner is changed.{{/error}}
     #else
       #if ("$!confirm" != 1)
         #set ($browseDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'WebHome'))
@@ -70,7 +72,7 @@
         #set ($temp = $workspaceGroupDocumentRestricted.removeXObject($existingMemberObject))
         #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, "User $currentUser left workspace.", true, $xcontext.context))
         ## FIXME: replace with a success macro when it will be available.
-        {{box image="icon:tick"}}User [[$currentUser]] successfully left workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/box}}
+        {{box image="icon:tick"}}The user [[$currentUser]] successfully left workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/box}}
       #end
     #end
   #end

@@ -11,15 +11,15 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1293832800000</creationDate>
-<date>1303999994000</date>
-<contentUpdateDate>1303999994000</contentUpdateDate>
+<date>1307113397000</date>
+<contentUpdateDate>1307113397000</contentUpdateDate>
 <version>1.1</version>
 <title>$msg.get("workspacemanager.browse")</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>true</minorEdit>
+<minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
@@ -108,6 +108,18 @@
 
 .actionleave {
   background-image: url($xwiki.getSkinFile("icons/silk/user_delete.gif"));
+}
+
+.actionrequestJoin {
+  background-image: url($xwiki.getSkinFile("icons/silk/bell.gif"));
+}
+
+.actioncancelJoinRequest {
+  background-image: url($xwiki.getSkinFile("icons/silk/bell_delete.gif"));
+}
+
+.actionviewInvitation {
+  background-image: url($xwiki.getSkinFile("icons/silk/script.gif"));
 }</code>
 </property>
 <property>
@@ -136,7 +148,7 @@
 })
 #if(!$isGuest)
   #set($discard = $columns.add('_actions'))
-  #set($discard = $columnsProperties.put('_actions', { 'actions' : ['join', 'leave', 'delete'] }))
+  #set($discard = $columnsProperties.put('_actions', { 'actions' : ['join', 'requestJoin', 'cancelJoinRequest', 'viewInvitation', 'leave', 'delete'] }))
 #end
 [[Create a new Workspace&gt;&gt;CreateNewWorkspace]]
 #livetable('workspaces', $columns, $columnsProperties, $options)

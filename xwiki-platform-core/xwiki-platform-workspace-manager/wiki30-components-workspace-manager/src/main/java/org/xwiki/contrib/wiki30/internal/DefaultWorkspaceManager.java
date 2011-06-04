@@ -241,9 +241,10 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
             LocalWikiManager.createNewWikiFromTemplate(newWikiXObjectDocument, "workspacetemplate", true, comment,
                 deprecatedContext);
 
-        /* Use the XWiki.XWikiAllGroup of the new wiki and add the owner as a member. */
-        String workspaceGroupName = "XWikiAllGroup";
-        DocumentReference workspaceGroupReference = new DocumentReference(workspaceName, "XWiki", workspaceGroupName);
+        /*
+         * Use the XWiki.XWikiAllGroup of the new wiki and add the owner as a member and the XWiki.XWikiAdminGroup of
+         * the new wiki and explicitly add the owner as an admin.
+         */        
         String workspaceOwner = newWikiXObjectDocument.getOwner();
 
         String currentWikiName = deprecatedContext.getDatabase();
@@ -252,15 +253,26 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
 
             XWiki wiki = deprecatedContext.getWiki();
 
+            /* Add user as workspace member. */
+            String workspaceGroupName = "XWikiAllGroup";
+            DocumentReference workspaceGroupReference = new DocumentReference(workspaceName, "XWiki", workspaceGroupName);
             XWikiDocument workspaceGroupDocument = wiki.getDocument(workspaceGroupReference, deprecatedContext);
 
             DocumentReference groupClassReference = wiki.getGroupClass(deprecatedContext).getDocumentReference();
-            int workspaceGroupObjectNr = workspaceGroupDocument.createXObject(groupClassReference, deprecatedContext);
-            BaseObject workspaceGroupObject =
-                workspaceGroupDocument.getXObject(groupClassReference, workspaceGroupObjectNr);
+            BaseObject workspaceGroupObject = workspaceGroupDocument.newXObject(groupClassReference, deprecatedContext);
             workspaceGroupObject.setStringValue("member", workspaceOwner);
-
+            
             wiki.saveDocument(workspaceGroupDocument, comment, deprecatedContext);
+            
+            /* Add user as workspace admin. */
+            String workspaceAdminGroupName = "XWikiAdminGroup";
+            DocumentReference workspaceAdminGroupReference = new DocumentReference(workspaceName, "XWiki", workspaceAdminGroupName);
+            XWikiDocument workspaceAdminGroupDocument = wiki.getDocument(workspaceAdminGroupReference, deprecatedContext);
+
+            BaseObject workspaceAdminGroupObject = workspaceAdminGroupDocument.newXObject(groupClassReference, deprecatedContext);
+            workspaceAdminGroupObject.setStringValue("member", workspaceOwner);
+
+            wiki.saveDocument(workspaceAdminGroupDocument, comment, deprecatedContext);
 
             // FIXME: See if we need to update the group service cache.
             // try {
@@ -286,7 +298,8 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
         if (workspaceObject == null) {
             workspaceObject = wikiDocument.newXObject(workspaceClassReference, deprecatedContext);
         }
-        /* Make sure the required values are set. */
+        
+        /* Make sure the required workspace attributes are set. */
         if (workspaceObject.getStringValue(WORKSPACE_MEMBERSHIP_TYPE_PROPERTY) == null) {
             workspaceObject.setStringValue(WORKSPACE_MEMBERSHIP_TYPE_PROPERTY, WORKSPACE_MEMBERSHIP_TYPE_DEFAULT);
         }

@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
-<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD//EN"
-  "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<!DOCTYPE hibernate-configuration PUBLIC
+  "-//Hibernate/Hibernate Configuration DTD//EN"
+  "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 ## Template for hibernate configuration. processing by maven using profiles.
 ## Replace original src/main/webapp/WEB-INF/hibernate.cfg.xml
 <hibernate-configuration>

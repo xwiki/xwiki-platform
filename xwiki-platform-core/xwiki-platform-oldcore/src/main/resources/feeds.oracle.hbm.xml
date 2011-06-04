@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC
   "-//Hibernate/Hibernate Mapping DTD//EN"
-  "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class entity-name="XWiki.AggregatorURLClass" table="feeds_aggregatorurl">
         <id name="id" type="integer" unsaved-value="any">
@@ -47,15 +47,9 @@
         <property name="feedname" type="text" column="fee_feedname" length="2000" />
         <property name="url" type="text" column="fee_url" length="2000" />
         <property name="category" type="text" column="fee_category" length="2000" />
-        <property name="content" type="text" length="30000">
-            <column name="fee_content" sql-type="clob" />
-        </property>
-        <property name="fullContent" type="text" length="30000">
-            <column name="fee_fullcontent" sql-type="clob" />
-        </property>
-        <property name="xml" type="text" length="30000">
-            <column name="fee_xml" sql-type="clob" />
-        </property>
+        <property name="content" type="materialized_clob" column="fee_content" length="30000" />
+        <property name="fullContent" type="materialized_clob" column="fee_fullcontent" length="30000" />
+        <property name="xml" type="materialized_clob" column="fee_xml" length="30000" />
         <property name="date" type="timestamp" column="fee_date" />
         <property name="flag" type="integer">
             <column name="fee_flag" default="0" />

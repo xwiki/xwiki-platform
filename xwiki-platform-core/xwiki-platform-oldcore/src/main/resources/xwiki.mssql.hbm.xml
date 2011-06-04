@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC
   "-//Hibernate/Hibernate Mapping DTD//EN"
-  "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="true">
 
     <!--
@@ -33,11 +33,11 @@
         <!-- This property is deprecated and should not be used anymore. Use .space instead. -->
         <property name="web" type="string" update="false" insert="false" column="XWD_WEB" length="255" not-null="true" />
         <property name="space" type="string" column="XWD_WEB" length="255" not-null="true" />
-        <property name="content" type="text" column="XWD_CONTENT" length="200000" not-null="true" />
+        <property name="content" type="materialized_clob" column="XWD_CONTENT" length="200000" not-null="true" />
         <property name="version" type="string" column="XWD_VERSION" length="255" not-null="true" />
         <property name="customClass" type="string" column="XWD_CUSTOM_CLASS" length="255" not-null="true" />
         <property name="parent" type="string" column="XWD_PARENT" length="511" not-null="true" />
-        <property name="xWikiClassXML" type="text" column="XWD_CLASS_XML" length="40000" not-null="false" />
+        <property name="xWikiClassXML" type="materialized_clob" column="XWD_CLASS_XML" length="60000" not-null="false" />
         <property name="elements" type="integer" not-null="true" column="XWD_ELEMENTS" />
         <property name="defaultTemplate" type="string" column="XWD_DEFAULT_TEMPLATE" not-null="true" />
         <property name="validationScript" type="string" column="XWD_VALIDATION_SCRIPT" not-null="true" />
@@ -54,7 +54,7 @@
             <key-property name="version2" column="XWR_VERSION2" type="integer" />
         </composite-id>
         <property name="date" type="timestamp" column="XWR_DATE" not-null="true" />
-        <property name="comment" type="text" column="XWR_COMMENT" not-null="true" />
+        <property name="comment" type="string" column="XWR_COMMENT" not-null="true" />
         <property name="author" type="string" column="XWR_AUTHOR" not-null="true" />
         <property name="diff" type="boolean" column="XWR_ISDIFF" not-null="false" update="false" insert="false" />
     </class>
@@ -67,7 +67,7 @@
         </composite-id>
         <component name="patch">
             <property name="diff" type="boolean" column="XWR_ISDIFF" not-null="false" />
-            <property name="content" type="text" column="XWR_PATCH" not-null="false" length="1000000000" />
+            <property name="content" type="materialized_clob" column="XWR_PATCH" not-null="false" length="1000000000" />
         </component>
     </class>
 
@@ -80,8 +80,8 @@
             <property name="language" column="XDD_LANGUAGE" type="string" length="5" />
             <property name="date" type="timestamp" column="XDD_DATE" />
         </natural-id>
-        <property name="deleter" type="string" column="XDD_DELETER" index="deleter" />
-        <property name="xml" type="text" column="XDD_XML" not-null="true" length="1000000000" />
+        <property name="deleter" type="string" column="XDD_DELETER" index="XDD_DELETER" />
+        <property name="xml" type="materialized_clob" column="XDD_XML" not-null="true" length="1000000000" />
     </class>
 
     <class name="com.xpn.xwiki.doc.DeletedAttachment" table="xwikiattrecyclebin" mutable="false">
@@ -95,10 +95,8 @@
             <property name="date" type="timestamp" column="XDA_DATE" />
         </natural-id>
         <property name="docName" column="XDA_DOC_NAME" type="string" length="255" />
-        <property name="deleter" type="string" column="XDA_DELETER" index="deleter" />
-        <property name="xml" type="text" >
-            <column name="XDA_XML" sql-type="varchar(max)" not-null="true" />
-        </property>
+        <property name="deleter" type="string" column="XDA_DELETER" index="XDA_DELETER" />
+        <property name="xml" type="materialized_clob" column="XDA_XML" not-null="true" length="1000000000" />
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiLock" table="xwikilock">
@@ -137,7 +135,7 @@
             <column name="XWA_ID" not-null="true" />
             <generator class="assigned" />
         </id>
-        <property name="content" type="binary" column="XWA_CONTENT" length="1000000000" not-null="true" />
+        <property name="content" type="materialized_blob" column="XWA_CONTENT" length="1000000000" not-null="true" />
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiAttachmentArchive" table="xwikiattachment_archive">
@@ -145,7 +143,7 @@
             <column name="XWA_ID" not-null="true" />
             <generator class="assigned" />
         </id>
-        <property name="archive" type="binary" column="XWA_ARCHIVE" length="1000000000" />
+        <property name="archive" type="materialized_blob" column="XWA_ARCHIVE" length="1000000000" />
     </class>
 
     <class name="com.xpn.xwiki.objects.BaseProperty" table="xwikiproperties">
@@ -325,15 +323,15 @@
         <property name="webcopyright" type="string" column="XWP_WEBCOPYRIGHT" length="255" />
         <property name="title" type="string" column="XWP_TITLE" length="255" />
         <property name="version" type="string" column="XWP_VERSION" length="255" />
-        <property name="meta" type="text" column="XWP_META" length="60000" />
+        <property name="meta" type="text" column="XWP_META" length="30000" />
         <property name="use_email_verification" type="integer" column="XWP_USE_EMAIL_VERIFICATION" />
         <property name="smtp_server" type="string" column="XWP_SMTP_SERVER" length="255" />
         <property name="admin_email" type="string" column="XWP_ADMIN_EMAIL" length="255" />
-        <property name="validation_email_content" type="text" column="XWP_VALIDATION_EMAIL_CONTENT" length="60000" />
-        <property name="confirmation_email_content" type="text" column="XWP_CONFIRMATION_EMAIL_CONTENT" length="60000" />
-        <property name="invitation_email_content" type="text" column="XWP_INVITATION_EMAIL_CONTENT" length="60000" />
-        <property name="leftPanels" type="string" column="XWP_LEFT_PANELS" length="2000" />
-        <property name="rightPanels" type="string" column="XWP_RIGHT_PANELS" length="2000" />
+        <property name="validation_email_content" type="text" column="XWP_VALIDATION_EMAIL_CONTENT" length="30000" />
+        <property name="confirmation_email_content" type="text" column="XWP_CONFIRMATION_EMAIL_CONTENT" length="30000" />
+        <property name="invitation_email_content" type="text" column="XWP_INVITATION_EMAIL_CONTENT" length="30000" />
+        <property name="leftPanels" type="text" column="XWP_LEFT_PANELS" length="2000" />
+        <property name="rightPanels" type="text" column="XWP_RIGHT_PANELS" length="2000" />
         <property name="showLeftPanels" type="integer" column="XWP_SHOW_LEFT_PANELS" />
         <property name="showRightPanels" type="integer" column="XWP_SHOW_RIGHT_PANELS" />
         <property name="languages" type="string" column="XWP_LANGUAGES" length="255" />
@@ -343,7 +341,7 @@
         <property name="edit_registered" type="string" column="XWP_EDIT_REGISTERED" length="255" />
         <property name="comment_anonymous" type="string" column="XWP_COMMENT_ANONYMOUS" length="255" />
         <property name="comment_registered" type="string" column="XWP_COMMENT_REGISTERED" length="255" />
-        <property name="documentBundles" type="string" column="XWP_DOCUMENT_BUNDLES" length="255" />
+        <property name="documentBundles" type="text" column="XWP_DOCUMENT_BUNDLES" length="2000" />
     </class>
 
     <!-- XWikiComments custom mapping -->

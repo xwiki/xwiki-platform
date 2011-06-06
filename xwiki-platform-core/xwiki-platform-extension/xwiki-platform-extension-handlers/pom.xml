@@ -40,14 +40,14 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
 
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>

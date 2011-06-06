@@ -36,12 +36,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-store-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-store-transaction</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
     <!-- IOUtils is used by FileSaveTransactionRunnable -->
     <dependency>

@@ -43,13 +43,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wysiwyg-client</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wysiwyg-server</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
   </dependencies>
   <build>
@@ -96,7 +96,7 @@
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
                   <artifactId>xwiki-platform-wysiwyg-client</artifactId>
-                  <version>${project.version}</version>
+                  <version>3.1-rc-1</version>
                   <classifier>shared</classifier>
                   <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
                 </artifactItem>

@@ -36,13 +36,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-application-manager-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
       <scope>provided</scope>
     </dependency>
 
@@ -56,7 +56,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>

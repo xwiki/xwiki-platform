@@ -55,7 +55,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-container-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -65,12 +65,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-refactoring</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
     <dependency>
       <groupId>org.artofsolving.jodconverter</groupId>
@@ -98,7 +98,7 @@
       <!-- Gallery macro is used to display imported office presentations. -->
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

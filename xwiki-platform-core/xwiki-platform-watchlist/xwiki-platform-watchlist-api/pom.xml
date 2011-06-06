@@ -44,22 +44,22 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-scheduler-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mailsender</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-activitystream</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
   </dependencies>
   <build>

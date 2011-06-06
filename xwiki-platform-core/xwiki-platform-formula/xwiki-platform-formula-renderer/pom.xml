@@ -50,7 +50,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-cache-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
     <!-- We only need the -default module (instead of just -api) for the Logging needs -->
     <dependency>
@@ -61,7 +61,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-container-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
 
     <!-- SnuggleTeX is a LaTeX to XHTML+MathML converter, which can be combined with JEuclid to transform equations into images -->

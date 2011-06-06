@@ -36,7 +36,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -51,7 +51,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
 
     <!-- Test dependencies -->
@@ -59,25 +59,25 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-component-multi</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
@@ -90,7 +90,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-observation-local</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
       <scope>test</scope>
     </dependency>
     <dependency>

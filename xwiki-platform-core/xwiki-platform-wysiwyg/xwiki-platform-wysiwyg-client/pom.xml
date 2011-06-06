@@ -36,12 +36,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-gwt-user</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wysiwyg-plugin-api</artifactId>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
     </dependency>
     <dependency>
       <!-- SmartGWT is used only for its tree widget. -->
@@ -63,14 +63,14 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-gwt-user</artifactId>
       <type>test-jar</type>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wysiwyg-plugin-api</artifactId>
       <type>test-jar</type>
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

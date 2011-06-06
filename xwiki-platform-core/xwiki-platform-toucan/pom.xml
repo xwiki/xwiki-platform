@@ -46,7 +46,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-albatross</artifactId>
       <!-- Lock albatross version because it isn't developed anymore. -->
-      <version>${project.version}</version>
+      <version>3.1-rc-1</version>
       <scope>runtime</scope>
       <type>zip</type>
     </dependency>

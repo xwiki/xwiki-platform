@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-wikimacro</artifactId>
-    <version>3.1-rc-1</version>
+    <version>3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-wikimacro-api</artifactId>
   <name>XWiki Platform - Rendering - Wiki Macro Bridge - API</name>
@@ -36,7 +36,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
-      <version>3.1-rc-1</version>
+      <version>3.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -51,7 +51,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
-      <version>3.1-rc-1</version>
+      <version>3.1-SNAPSHOT</version>
     </dependency>
 
     <!-- Test dependencies -->
@@ -59,25 +59,25 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-component-multi</artifactId>
-      <version>3.1-rc-1</version>
+      <version>3.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>3.1-rc-1</version>
+      <version>3.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
-      <version>3.1-rc-1</version>
+      <version>3.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
-      <version>3.1-rc-1</version>
+      <version>3.1-SNAPSHOT</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
@@ -90,7 +90,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-observation-local</artifactId>
-      <version>3.1-rc-1</version>
+      <version>3.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>

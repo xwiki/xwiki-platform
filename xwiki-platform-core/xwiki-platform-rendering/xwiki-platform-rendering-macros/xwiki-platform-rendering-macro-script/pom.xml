@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>3.1-rc-1</version>
+    <version>3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-script</artifactId>
   <name>XWiki Platform - Rendering - Macro - Script</name>
@@ -41,23 +41,23 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
-      <version>3.1-rc-1</version>
+      <version>3.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-classloader-api</artifactId>
-      <version>3.1-rc-1</version>
+      <version>3.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-classloader-protocol-jar</artifactId>
-      <version>3.1-rc-1</version>
+      <version>3.1-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-classloader-protocol-attachmentjar</artifactId>
-      <version>3.1-rc-1</version>
+      <version>3.1-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -76,7 +76,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-observation-local</artifactId>
-      <version>3.1-rc-1</version>
+      <version>3.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>

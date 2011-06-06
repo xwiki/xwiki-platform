@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>3.1-rc-1</version>
+    <version>3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
   <name>XWiki Platform - Rendering - Macro - Gallery</name>
@@ -36,7 +36,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-skin-api</artifactId>
-      <version>3.1-rc-1</version>
+      <version>3.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>

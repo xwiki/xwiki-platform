@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>3.1-rc-1</version>
+    <version>3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
@@ -48,7 +48,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>3.1-rc-1</version>
+      <version>3.1-SNAPSHOT</version>
       <exclusions>
         <!-- Exclude LOG4J so that we use SLF4J's LOG4J JAR instead to have LOG4J logs go through SLF4J -->
         <exclusion>

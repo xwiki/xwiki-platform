@@ -39,7 +39,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-foxwiki-core</artifactId>
-      <version>3.1-rc-1</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -72,7 +72,7 @@
             <phase>package</phase>
             <configuration>
               <tasks>
-                <move file="${project.build.directory}/${project.artifactId}-3.1-rc-1.zip" tofile="${project.build.directory}/${project.artifactId}-3.1-rc-1.xpi"/>
+                <move file="${project.build.directory}/${project.artifactId}-${project.version}.zip" tofile="${project.build.directory}/${project.artifactId}-${project.version}.xpi"/>
               </tasks>
             </configuration>
             <goals>
@@ -94,7 +94,7 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>${project.build.directory}/${project.artifactId}-3.1-rc-1.xpi</file>
+                  <file>${project.build.directory}/${project.artifactId}-${project.version}.xpi</file>
                   <type>xpi</type>
                 </artifact>
               </artifacts>

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>3.1-RC1</version>
+    <version>3.1-SNAPSHOT</version>
     <relativePath>../xwiki-commons/xwiki-commons-pom</relativePath>
   </parent>
   <groupId>org.xwiki.platform</groupId>
@@ -38,8 +38,8 @@
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
-    <rendering.version>3.1-rc-1</rendering.version>
-    <commons.version>3.1-rc-1</commons.version>
+    <rendering.version>${project.version}</rendering.version>
+    <commons.version>${project.version}</commons.version>
     <!-- The previous stable version of this project, used to catch API breakages. -->
     <clirr.previous.version>3.0</clirr.previous.version>
   </properties>

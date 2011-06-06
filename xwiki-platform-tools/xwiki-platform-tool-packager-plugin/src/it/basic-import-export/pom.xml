@@ -47,7 +47,7 @@
             </goals>
             <configuration>
               <resourceBundles>
-                <resourceBundle>org.xwiki.platform:xwiki-platform-tool-configuration-resources:3.1-rc-1</resourceBundle>
+                <resourceBundle>org.xwiki.platform:xwiki-platform-tool-configuration-resources:${project.version}</resourceBundle>
               </resourceBundles>
               <properties>
                 <xwikiDbConnectionUrl>jdbc:hsqldb:mem:.</xwikiDbConnectionUrl>
@@ -65,7 +65,7 @@
       <plugin>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-        <version>3.1-rc-1</version>
+        <version>${project.version}</version>
         <configuration>
           <hibernateConfig>${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml</hibernateConfig>
         </configuration>

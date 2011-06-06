@@ -41,7 +41,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-application-manager-api</artifactId>
-      <version>3.1-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
@@ -72,7 +72,7 @@
               <parameters>
                 <parameter>
                   <name>appversion</name>
-                  <value>3.1-rc-1</value>
+                  <value>${project.version}</value>
                 </parameter>
               </parameters>
             </transformationSet>

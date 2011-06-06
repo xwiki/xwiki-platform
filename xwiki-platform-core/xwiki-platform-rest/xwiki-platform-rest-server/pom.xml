@@ -34,6 +34,9 @@
   <name>XWiki Platform - REST - Server</name>
   <description>Service for accessing XWiki through a RESTful API</description>
   <properties>
+    <!-- We don't use Restlet 2.0.7 which is released, because it has a regression that would affect XWiki Rest sub-system.
+         See http://restlet-discuss.1400322.n2.nabble.com/Updated-from-Restlet-2-0-6-to-2-0-7-now-getting-exception-in-JAXB-serialisation-td6359255.html for more details.
+         (Restlet developers advise to use 2.0.5 until 2.0.8 is released) -->
     <restlet.version>2.0.5</restlet.version>
   </properties>
   <dependencies>

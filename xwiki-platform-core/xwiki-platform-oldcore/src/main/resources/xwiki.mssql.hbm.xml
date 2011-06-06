@@ -4,6 +4,13 @@
   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="true">
 
+    <!-- This file is a copy of xwiki.hbm.xml with the following modification:
+         - For medium strings (i.e. when size > 255) the property type was changed to text,
+           as otherwise Hibernate uses VARCHAR, which are limited to 255 chars
+         - For large strings (i.e. when size > 32K) the property type was changed to materialized_clob,
+           as otherwise Hibernate uses VARCHAR, which are limited to 32K
+    -->
+
     <!--
      All new table names should be all lower case versions of the name of the class which they represent
      for example:

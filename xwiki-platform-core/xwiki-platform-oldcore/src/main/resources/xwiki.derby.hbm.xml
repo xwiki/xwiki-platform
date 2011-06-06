@@ -5,11 +5,8 @@
 <hibernate-mapping auto-import="true">
 
     <!-- This file is a copy of xwiki.hbm.xml with the following modifications:
-         - For binary types we have added a sql-type="BLOB" as otherwise Hibernate maps binary
-           to VARCHAR and VARCHAR in Derby is limited to 32K.
-           See http://opensource.atlassian.com/projects/hibernate/browse/HHH-2651
-         - For large strings (i.e. when size > 32K) we have added a sql-type="CLOB" as otherwise
-           Hibernate uses VARCHAR, which are limited to 32K
+         - For large strings (i.e. when size > 32K) the property type was changed to materialized_clob,
+           as otherwise Hibernate uses VARCHAR, which are limited to 32K
     -->
 
     <!--

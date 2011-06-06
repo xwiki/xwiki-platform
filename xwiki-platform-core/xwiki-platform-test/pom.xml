@@ -37,7 +37,7 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-default</artifactId>
-      <version>${project.version}</version>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

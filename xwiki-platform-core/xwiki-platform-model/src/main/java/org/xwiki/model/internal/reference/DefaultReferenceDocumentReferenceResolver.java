@@ -37,7 +37,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * Reference are missing in the string representation. Default values are retrieved from the
  * {@link org.xwiki.model.ModelConfiguration} class.
  *
- * @version $Id: 3cc537f2572de0a080324b6997ee7b891b72b926 $
+ * @version $Id$
  * @since 2.2M1
  */
 @Component

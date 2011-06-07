@@ -34,7 +34,7 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 /**
  * Unit tests for {@link DefaultStringEntityReferenceSerializer}.
  * 
- * @version $Id: 0ac6d9379ddc6e81a1ef52bccecbe61930efd548 $
+ * @version $Id$
  * @since 2.2M1
  */
 public class DefaultStringEntityReferenceSerializerTest

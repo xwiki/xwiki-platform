@@ -32,7 +32,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * example both the Current Entity Reference Resolver and the Default Entity Reference Resolver to share the code from
  * this class.
  * 
- * @version $Id: a83a7ad175a8e743f2a2fd4c2acb417bbaad72b8 $
+ * @version $Id$
  * @since 2.2M1
  */
 public abstract class AbstractStringEntityReferenceResolver implements EntityReferenceResolver<String>

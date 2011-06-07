@@ -34,7 +34,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * fixed default values when parts of the Reference are missing in the string representation. Default values are
  * retrieved from the {@link org.xwiki.model.ModelConfiguration} class.
  * 
- * @version $Id: b204f393b72d1a2635e95398d960eca528d4dbca $
+ * @version $Id$
  * @since 2.2M1
  */
 @Component

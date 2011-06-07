@@ -34,7 +34,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * component to resolve {@link DocumentReference} objects from their string representation. The behavior is the one
  * defined in {@link com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver}.
  *
- * @version $Id: 7455c93d4d27e14035efce455c4e4368f8a1a9f5 $
+ * @version $Id$
  * @since 2.2M1
  */
 @Component

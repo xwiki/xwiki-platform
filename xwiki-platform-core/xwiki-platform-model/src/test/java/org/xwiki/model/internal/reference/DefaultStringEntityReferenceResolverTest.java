@@ -33,7 +33,7 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 /**
  * Unit tests for {@link DefaultStringEntityReferenceResolver}.
  * 
- * @version $Id: 65fc3dcc4ff2b6461bcef9b23d562829205eac65 $
+ * @version $Id$
  * @since 2.2M1
  */
 public class DefaultStringEntityReferenceResolverTest

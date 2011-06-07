@@ -7356,20 +7356,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         String reference = this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference());
 
         try {
-            for (List<ObjectDiff> objectChanges : doc.getObjectDiff(originalDoc, doc, context)) {
-                for (ObjectDiff diff : objectChanges) {
-                    if (StringUtils.equals(diff.getClassName(), "XWiki.XWikiComments")) {
-                        if (StringUtils.equals(diff.getAction(), ObjectDiff.ACTION_OBJECTREMOVED)) {
-                            om.notify(new CommentDeletedEvent(reference, diff.getNumber() + ""), source, data);
-                        } else if (StringUtils.equals(diff.getAction(), ObjectDiff.ACTION_OBJECTADDED)) {
-                            om.notify(new CommentAddedEvent(reference, diff.getNumber() + ""), source, data);
-                        } else {
-                            om.notify(new CommentUpdatedEvent(reference, diff.getNumber() + ""), source, data);
-                        }
-                    }
-                    break;
-                }
-            }
             for (AttachmentDiff diff : doc.getAttachmentDiff(originalDoc, doc, context)) {
                 if (StringUtils.isEmpty(diff.getOrigVersion())) {
                     om.notify(new AttachmentAddedEvent(reference, diff.getFileName()), source, data);

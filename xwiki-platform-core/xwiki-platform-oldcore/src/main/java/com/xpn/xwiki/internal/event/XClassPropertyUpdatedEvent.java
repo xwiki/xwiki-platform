@@ -16,37 +16,32 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
  */
 package com.xpn.xwiki.internal.event;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
+import org.xwiki.model.reference.EntityReference;
 
 /**
- * Data related to {@link XObjectEvent}.
+ * An event triggered when an class property is modified.
  * 
  * @version $Id$
  * @since 3.2M1
  */
-public class XObjectEventData
+public class XClassPropertyUpdatedEvent extends AbstractXClassPropertyEvent
 {
-    private XWikiDocument document;
-
-    private BaseObject object;
-
-    public XObjectEventData(XWikiDocument document, BaseObject object)
+    /**
+     * Default constructor. Matches any {@link XClassPropertyUpdatedEvent}.
+     */
+    public XClassPropertyUpdatedEvent()
     {
-        this.document = document;
-        this.object = object;
     }
 
-    public XWikiDocument getDocument()
+    /**
+     * @param reference the class property reference
+     */
+    public XClassPropertyUpdatedEvent(EntityReference reference)
     {
-        return document;
-    }
-
-    public BaseObject getObject()
-    {
-        return object;
+        super(reference);
     }
 }

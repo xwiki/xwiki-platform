@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.internal.event;
 
-import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * An event triggered when an object property is modified.
@@ -29,11 +29,17 @@ import org.xwiki.model.reference.ObjectPropertyReference;
  */
 public class XObjectPropertyUpdatedEvent extends AbstractXObjectPropertyEvent
 {
+    /**
+     * Default constructor. Matches any {@link XObjectPropertyUpdatedEvent}.
+     */
     public XObjectPropertyUpdatedEvent()
     {
     }
 
-    public XObjectPropertyUpdatedEvent(ObjectPropertyReference reference)
+    /**
+     * @param reference the object property reference
+     */
+    public XObjectPropertyUpdatedEvent(EntityReference reference)
     {
         super(reference);
     }

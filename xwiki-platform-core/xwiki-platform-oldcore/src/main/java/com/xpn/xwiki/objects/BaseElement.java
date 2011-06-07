@@ -77,7 +77,11 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     }
 
     /**
+<<<<<<< HEAD
      * @since 3.2M1
+=======
+     @since 3.2M1.2M1
+>>>>>>> XWIKI-6661: Add API to get ElementInterface references
      */
     protected R createReference()
     {

@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.internal.event;
 
-import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * An event triggered when an object is deleted.
@@ -29,11 +29,17 @@ import org.xwiki.model.reference.ObjectReference;
  */
 public class XObjectDeletedEvent extends AbstractXObjectEvent
 {
+    /**
+     * Default constructor. Matches any {@link XObjectDeletedEvent}.
+     */
     public XObjectDeletedEvent()
     {
     }
 
-    public XObjectDeletedEvent(ObjectReference reference)
+    /**
+     * @param reference the object reference
+     */
+    public XObjectDeletedEvent(EntityReference reference)
     {
         super(reference);
     }

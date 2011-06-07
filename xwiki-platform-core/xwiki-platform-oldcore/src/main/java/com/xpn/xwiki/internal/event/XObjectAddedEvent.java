@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.internal.event;
 
-import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * An event triggered when an object is added.
@@ -29,11 +29,17 @@ import org.xwiki.model.reference.ObjectReference;
  */
 public class XObjectAddedEvent extends AbstractXObjectEvent
 {
+    /**
+     * Default constructor. Matches any {@link XObjectAddedEvent}.
+     */
     public XObjectAddedEvent()
     {
     }
 
-    public XObjectAddedEvent(ObjectReference reference)
+    /**
+     * @param reference the object reference
+     */
+    public XObjectAddedEvent(EntityReference reference)
     {
         super(reference);
     }

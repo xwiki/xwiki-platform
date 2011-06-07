@@ -28,7 +28,7 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 3.2M1
  */
-public class AbstractXObjectEvent extends AbstractEntityEvent implements XObjectEvent
+public abstract class AbstractXObjectEvent extends AbstractEntityEvent implements XObjectEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -45,6 +45,9 @@ public class AbstractXObjectEvent extends AbstractEntityEvent implements XObject
     {
     }
 
+    /**
+     * @param reference the reference of the object
+     */
     public AbstractXObjectEvent(EntityReference reference)
     {
         super(reference);

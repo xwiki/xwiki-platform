@@ -20,7 +20,7 @@
  */
 package com.xpn.xwiki.internal.event;
 
-import org.xwiki.model.reference.ClassPropertyReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Base class for all class property {@link org.xwiki.observation.event.Event events}.
@@ -28,7 +28,7 @@ import org.xwiki.model.reference.ClassPropertyReference;
  * @version $Id$
  * @since 3.2M1
  */
-public class AbstractXClassPropertyEvent extends AbstractEntityEvent implements XClassPropertyEvent
+public abstract class AbstractXClassPropertyEvent extends AbstractEntityEvent implements XClassPropertyEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -36,11 +36,17 @@ public class AbstractXClassPropertyEvent extends AbstractEntityEvent implements 
      */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor. Matches any {@link XClassPropertyEvent}.
+     */
     public AbstractXClassPropertyEvent()
     {
     }
 
-    public AbstractXClassPropertyEvent(ClassPropertyReference reference)
+    /**
+     * @param reference the reference of the class property
+     */
+    public AbstractXClassPropertyEvent(EntityReference reference)
     {
         super(reference);
     }

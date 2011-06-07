@@ -25,7 +25,7 @@ import org.xwiki.model.EntityType;
  * References a property in a class in a document (the description of the property).
  * 
  * @version $Id$
- * @since 3.2M1M1
+ * @since 3.2M1
  */
 public class ClassPropertyReference extends EntityReference
 {
@@ -95,6 +95,6 @@ public class ClassPropertyReference extends EntityReference
                 + "reference");
         }
 
-        super.setParent(new ObjectReference(parent));
+        super.setParent(new DocumentReference(parent));
     }
 }

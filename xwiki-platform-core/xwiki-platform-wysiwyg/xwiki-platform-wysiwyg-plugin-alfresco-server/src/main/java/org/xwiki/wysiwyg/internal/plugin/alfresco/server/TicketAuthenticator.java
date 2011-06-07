@@ -28,6 +28,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
@@ -110,8 +111,8 @@ public class TicketAuthenticator implements Authenticator
         parameters.add(new BasicNameValuePair(AUTH_TICKET_PARAM, ticket));
         String query = URLEncodedUtils.format(parameters, QUERY_STRING_ENCODING);
         try {
-            request.setURI(new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(),
-                query, uri.getFragment()));
+            request.setURI(URIUtils.createURI(uri.getScheme(), uri.getHost(), uri.getPort(), uri.getRawPath(), query,
+                uri.getRawFragment()));
         } catch (URISyntaxException e) {
             // This shouldn't happen.
         }

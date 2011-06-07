@@ -20,6 +20,7 @@
 package org.xwiki.wysiwyg.internal.plugin.alfresco.server;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.http.Header;
@@ -35,7 +36,7 @@ import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.wysiwyg.plugin.alfresco.server.Authenticator;
 
 /**
- * An {@link Authenticator} implementation based on SiteMinder cookies.
+ * An {@link Authenticator} implementation based on SiteMinder's {@code SMSESSION} cookie.
  * 
  * @version $Id$
  */
@@ -43,7 +44,12 @@ import org.xwiki.wysiwyg.plugin.alfresco.server.Authenticator;
 public class SiteMinderAuthenticator implements Authenticator
 {
     /**
-     * The component used to access the current HTTP request, from where we copy the SiteMinder cookies.
+     * The list of SiteMinder cookies that are copied from the current HTTP servlet request.
+     */
+    private static final List<String> SITE_MINDER_COOKIES = Arrays.asList("SMSESSION");
+
+    /**
+     * The component used to access the current HTTP request, from where we copy the SMSESSION cookie.
      */
     @Requirement
     private Container container;
@@ -55,29 +61,38 @@ public class SiteMinderAuthenticator implements Authenticator
      */
     public void authenticate(HttpRequestBase request)
     {
+        List<Cookie> cookies = getSiteMinderCookies();
+        if (cookies.isEmpty()) {
+            throw new RuntimeException("Failed to authenticate request: SiteMinder cookies are missing.");
+        }
+        for (Header header : new BrowserCompatSpec().formatCookies(cookies)) {
+            request.addHeader(header);
+        }
+    }
+
+    /**
+     * @return the list of SiteMinder cookies that have to be added to the HTTP request in order to authenticate it.
+     */
+    private List<Cookie> getSiteMinderCookies()
+    {
         javax.servlet.http.Cookie[] receivedCookies =
             ((ServletRequest) container.getRequest()).getHttpServletRequest().getCookies();
         List<Cookie> cookies = new ArrayList<Cookie>();
-        // Copy cookies.
+        // Look for the SMSESSION cookie.
         for (int i = 0; i < receivedCookies.length; i++) {
             javax.servlet.http.Cookie receivedCookie = receivedCookies[i];
-            // Skip JSESSIONID because it is used to authenticate the received servlet request.
-            if ("JSESSIONID".equals(receivedCookie.getName())) {
-                continue;
+            if (SITE_MINDER_COOKIES.contains(receivedCookie.getName())) {
+                BasicClientCookie cookie = new BasicClientCookie(receivedCookie.getName(), receivedCookie.getValue());
+                cookie.setVersion(receivedCookie.getVersion());
+                cookie.setDomain(receivedCookie.getDomain());
+                cookie.setPath(receivedCookie.getPath());
+                cookie.setSecure(receivedCookie.getSecure());
+                // Set attributes EXACTLY as sent by the browser.
+                cookie.setAttribute(ClientCookie.VERSION_ATTR, String.valueOf(receivedCookie.getVersion()));
+                cookie.setAttribute(ClientCookie.DOMAIN_ATTR, receivedCookie.getDomain());
+                cookies.add(cookie);
             }
-            BasicClientCookie cookie = new BasicClientCookie(receivedCookie.getName(), receivedCookie.getValue());
-            cookie.setVersion(receivedCookie.getVersion());
-            cookie.setDomain(receivedCookie.getDomain());
-            cookie.setPath(receivedCookie.getPath());
-            cookie.setSecure(receivedCookie.getSecure());
-            // Set attributes EXACTLY as sent by the browser.
-            cookie.setAttribute(ClientCookie.VERSION_ATTR, String.valueOf(receivedCookie.getVersion()));
-            cookie.setAttribute(ClientCookie.DOMAIN_ATTR, receivedCookie.getDomain());
-            cookies.add(cookie);
         }
-        BrowserCompatSpec cookieSpec = new BrowserCompatSpec();
-        for (Header header : cookieSpec.formatCookies(cookies)) {
-            request.addHeader(header);
-        }
+        return cookies;
     }
 }

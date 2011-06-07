@@ -135,8 +135,10 @@ public class DefaultAlfrescoResponseParser implements AlfrescoResponseParser
         if (entity.getMediaType() != null) {
             if (entity.getMediaType().startsWith("image/")) {
                 // Image URL.
-                entity.setUrl(configuration.getServerURL() + "/alfresco/service/api/node/" + nodePath + "/content");
-                entity.setPreviewURL(entity.getUrl() + "/thumbnails/doclib");
+                entity.setUrl(configuration.getServerURL() + "/alfresco/d/d/" + nodePath + '/' + entity.getName());
+                // FIXME: The thumbnail service requires separate authentication.
+                entity.setPreviewURL(configuration.getServerURL() + "/alfresco/service/api/node/" + nodePath
+                    + "/content/thumbnails/doclib");
             } else {
                 // Document URL.
                 entity.setUrl(configuration.getServerURL() + "/alfresco/n/showDocDetails/" + nodePath);

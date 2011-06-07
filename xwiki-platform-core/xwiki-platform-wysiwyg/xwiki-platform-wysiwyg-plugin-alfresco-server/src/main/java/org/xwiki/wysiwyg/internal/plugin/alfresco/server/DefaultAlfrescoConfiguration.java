@@ -17,11 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wysiwyg.plugin.alfresco.server;
+package org.xwiki.wysiwyg.internal.plugin.alfresco.server;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.wysiwyg.plugin.alfresco.server.AlfrescoConfiguration;
 
 /**
  * Default implementation of {@link AlfrescoConfiguration}.
@@ -76,5 +77,11 @@ public class DefaultAlfrescoConfiguration implements AlfrescoConfiguration
     {
         return configurationSource.getProperty("alfresco.defaultNodeRef",
             "workspace://SpacesStore/e47e3e7d-c345-4558-97f7-1e846453dd4b");
+    }
+
+    @Override
+    public String getAuthenticatorHint()
+    {
+        return configurationSource.getProperty("alfresco.authenticatorHint", "siteMinder");
     }
 }

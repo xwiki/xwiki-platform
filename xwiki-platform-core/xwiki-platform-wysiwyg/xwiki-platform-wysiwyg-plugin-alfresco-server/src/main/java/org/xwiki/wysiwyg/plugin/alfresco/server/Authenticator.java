@@ -19,21 +19,21 @@
  */
 package org.xwiki.wysiwyg.plugin.alfresco.server;
 
+import org.apache.http.client.methods.HttpRequestBase;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Parses Alfresco repository node references.
+ * Component used to authenticate to an Alfresco server.
  * 
  * @version $Id$
  */
 @ComponentRole
-public interface NodeReferenceParser
+public interface Authenticator
 {
     /**
-     * Parses the given serialized node reference.
+     * Add authentication information to the given request.
      * 
-     * @param serializedReference the serialized node reference to be parsed
-     * @return the corresponding node reference
+     * @param request the request to be authenticated
      */
-    NodeReference parse(String serializedReference);
+    void authenticate(HttpRequestBase request);
 }

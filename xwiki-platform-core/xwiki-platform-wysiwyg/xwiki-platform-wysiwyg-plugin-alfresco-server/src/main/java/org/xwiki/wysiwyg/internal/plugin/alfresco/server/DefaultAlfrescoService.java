@@ -17,26 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wysiwyg.plugin.alfresco.server;
+package org.xwiki.wysiwyg.internal.plugin.alfresco.server;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 
-import javax.servlet.http.HttpSession;
-
-import org.json.JSONObject;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.container.Container;
-import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.gwt.wysiwyg.client.plugin.alfresco.AlfrescoEntity;
 import org.xwiki.gwt.wysiwyg.client.plugin.alfresco.AlfrescoService;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.URIReference;
+import org.xwiki.wysiwyg.plugin.alfresco.server.AlfrescoConfiguration;
+import org.xwiki.wysiwyg.plugin.alfresco.server.AlfrescoResponseParser;
+import org.xwiki.wysiwyg.plugin.alfresco.server.NodeReference;
+import org.xwiki.wysiwyg.plugin.alfresco.server.NodeReferenceParser;
+import org.xwiki.wysiwyg.plugin.alfresco.server.SimpleHttpClient;
 import org.xwiki.wysiwyg.plugin.alfresco.server.SimpleHttpClient.ResponseHandler;
 
 /**
@@ -47,17 +47,6 @@ import org.xwiki.wysiwyg.plugin.alfresco.server.SimpleHttpClient.ResponseHandler
 @Component
 public class DefaultAlfrescoService implements AlfrescoService
 {
-    /**
-     * The authentication query string parameter.
-     */
-    private static final String AUTH_TICKET_PARAM = "alf_ticket";
-
-    /**
-     * The session attribute used to cache the authentication ticket.
-     */
-    private static final String AUTH_TICKET_SESSION_ATTRIBUTE = AlfrescoService.class.getPackage().getName()
-        + ".ticket";
-
     /**
      * The request parameter used to filter the list of CMIS properties retrieved.
      */
@@ -75,31 +64,28 @@ public class DefaultAlfrescoService implements AlfrescoService
     private AlfrescoConfiguration configuration;
 
     /**
-     * The component used to access the HTTP session in order to cache the authentication ticket.
-     */
-    @Requirement
-    private Container container;
-
-    /**
      * The object used to parse the responses received for Alfresco REST requests.
      */
     @Requirement
     private AlfrescoResponseParser responseParser;
 
     /**
-     * The object used to extract the node reference out of an Alfresco URL.
+     * The HTTP client used to make REST requests to Alfresco.
      */
-    private final NodeReferenceURLParser nodeReferenceURLParser = new NodeReferenceURLParser();
+    @Requirement
+    private SimpleHttpClient httpClient;
 
     /**
      * The object used to parse node references.
      */
-    private final NodeReferenceParser nodeReferenceParser = new NodeReferenceParser();
+    @Requirement
+    private NodeReferenceParser nodeReferenceParser;
 
     /**
-     * The HTTP client used to make REST requests to Alfresco.
+     * The object used to extract the node reference out of an Alfresco URL.
      */
-    private final SimpleHttpClient httpClient = new SimpleHttpClient("XWiki's WYSIWYG Content Editor");
+    @Requirement("url")
+    private NodeReferenceParser urlNodeReferenceParser;
 
     /**
      * {@inheritDoc}
@@ -108,15 +94,12 @@ public class DefaultAlfrescoService implements AlfrescoService
      */
     public List<AlfrescoEntity> getChildren(final EntityReference parentReference)
     {
-        String ticket = authenticate();
-
         String parentPath = createNodeReference(parentReference).asPath();
         String childrenURL = configuration.getServerURL() + NODE_API_URL_PATH_PREFIX + parentPath + "/children";
 
-        List<Entry<String, String>> parameters = new ArrayList<Entry<String, String>>();
-        parameters.add(new SimpleEntry<String, String>(AUTH_TICKET_PARAM, ticket));
-        parameters.add(new SimpleEntry<String, String>(FILTER_PARAM,
-            "cmis:name,cmis:path,cmis:objectId,cmis:contentStreamMimeType"));
+        List<Entry<String, String>> parameters =
+            Collections.<Entry<String, String>> singletonList(new SimpleEntry<String, String>(FILTER_PARAM,
+                "cmis:name,cmis:path,cmis:objectId,cmis:contentStreamMimeType"));
         try {
             return httpClient.doGet(childrenURL, parameters, new ResponseHandler<List<AlfrescoEntity>>()
             {
@@ -137,14 +120,12 @@ public class DefaultAlfrescoService implements AlfrescoService
      */
     public AlfrescoEntity getParent(final EntityReference childReference)
     {
-        String ticket = authenticate();
-
         String childPath = createNodeReference(childReference).asPath();
         String parentURL = configuration.getServerURL() + NODE_API_URL_PATH_PREFIX + childPath + "/parent";
 
-        List<Entry<String, String>> parameters = new ArrayList<Entry<String, String>>();
-        parameters.add(new SimpleEntry<String, String>(AUTH_TICKET_PARAM, ticket));
-        parameters.add(new SimpleEntry<String, String>(FILTER_PARAM, "cmis:name,cmis:path,cmis:objectId"));
+        List<Entry<String, String>> parameters =
+            Collections.<Entry<String, String>> singletonList(new SimpleEntry<String, String>(FILTER_PARAM,
+                "cmis:name,cmis:path,cmis:objectId"));
         try {
             return httpClient.doGet(parentURL, parameters, new ResponseHandler<AlfrescoEntity>()
             {
@@ -167,45 +148,6 @@ public class DefaultAlfrescoService implements AlfrescoService
     }
 
     /**
-     * Authenticate in order to be able to retrieve information from Alfresco.
-     * 
-     * @return the authentication ticket
-     */
-    private String authenticate()
-    {
-        HttpSession session = ((ServletRequest) container.getRequest()).getHttpServletRequest().getSession();
-        String ticket = (String) session.getAttribute(AUTH_TICKET_SESSION_ATTRIBUTE);
-        if (ticket == null) {
-            ticket = getAuthenticationTicket();
-            session.setAttribute(AUTH_TICKET_SESSION_ATTRIBUTE, ticket);
-        }
-        return ticket;
-    }
-
-    /**
-     * @return the authentication ticket
-     */
-    private String getAuthenticationTicket()
-    {
-        try {
-            String loginURL = configuration.getServerURL() + "/alfresco/service/api/login";
-            JSONObject content = new JSONObject();
-            content.put("username", configuration.getUserName());
-            content.put("password", configuration.getPassword());
-            return httpClient.doPost(loginURL, content.toString(), "application/json; charset=UTF-8",
-                new ResponseHandler<String>()
-                {
-                    public String read(InputStream content)
-                    {
-                        return responseParser.parseAuthTicket(content);
-                    }
-                });
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to request the authentication ticket.", e);
-        }
-    }
-
-    /**
      * Creates a node reference from the given entity reference.
      * 
      * @param entityReference an entity reference
@@ -214,7 +156,7 @@ public class DefaultAlfrescoService implements AlfrescoService
     private NodeReference createNodeReference(EntityReference entityReference)
     {
         String entityURL = new URIReference(entityReference).getURI();
-        return entityURL != null ? nodeReferenceURLParser.parse(entityURL) : nodeReferenceParser.parse(configuration
+        return entityURL != null ? urlNodeReferenceParser.parse(entityURL) : nodeReferenceParser.parse(configuration
             .getDefaultNodeReference());
     }
 }

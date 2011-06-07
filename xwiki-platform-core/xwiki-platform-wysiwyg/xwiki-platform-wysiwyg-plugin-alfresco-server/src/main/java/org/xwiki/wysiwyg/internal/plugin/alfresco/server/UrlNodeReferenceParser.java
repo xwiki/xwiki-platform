@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wysiwyg.plugin.alfresco.server;
+package org.xwiki.wysiwyg.internal.plugin.alfresco.server;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,13 +26,19 @@ import java.util.regex.Pattern;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.wysiwyg.plugin.alfresco.server.NodeReference;
+import org.xwiki.wysiwyg.plugin.alfresco.server.NodeReferenceParser;
+import org.xwiki.wysiwyg.plugin.alfresco.server.StoreReference;
 
 /**
  * Extracts the node reference from an Alfresco URL.
  * 
  * @version $Id$
  */
-public class NodeReferenceURLParser
+@Component("url")
+public class UrlNodeReferenceParser implements NodeReferenceParser
 {
     /**
      * The regular expression used to extract the node reference from the URL path.
@@ -43,13 +49,13 @@ public class NodeReferenceURLParser
     /**
      * The object used to parse node references.
      */
-    private NodeReferenceParser nodeReferenceParser = new NodeReferenceParser();
+    @Requirement
+    private NodeReferenceParser nodeReferenceParser;
 
     /**
-     * Parses the given Alfresco URL and extracts the node reference.
+     * {@inheritDoc}
      * 
-     * @param url the Alfresco URL to be parsed
-     * @return the node reference specified in the given URL, {@code null} if the node reference is not specified
+     * @see NodeReferenceParser#parse(String)
      */
     public NodeReference parse(String url)
     {

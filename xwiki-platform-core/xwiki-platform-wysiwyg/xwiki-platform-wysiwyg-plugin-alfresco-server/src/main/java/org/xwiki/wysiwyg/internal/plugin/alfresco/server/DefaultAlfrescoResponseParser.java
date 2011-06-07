@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wysiwyg.plugin.alfresco.server;
+package org.xwiki.wysiwyg.internal.plugin.alfresco.server;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,6 +38,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.gwt.wysiwyg.client.plugin.alfresco.AlfrescoEntity;
 import org.xwiki.gwt.wysiwyg.client.wiki.URIReference;
+import org.xwiki.wysiwyg.plugin.alfresco.server.AlfrescoConfiguration;
+import org.xwiki.wysiwyg.plugin.alfresco.server.AlfrescoResponseParser;
+import org.xwiki.wysiwyg.plugin.alfresco.server.NodeReferenceParser;
 import org.xwiki.xml.EntityResolver;
 
 /**
@@ -61,7 +64,8 @@ public class DefaultAlfrescoResponseParser implements AlfrescoResponseParser
     /**
      * The object used to parse node references.
      */
-    private final NodeReferenceParser nodeReferenceParser = new NodeReferenceParser();
+    @Requirement
+    private NodeReferenceParser nodeReferenceParser;
 
     /**
      * The component used to get the Alfresco server URL.
@@ -127,16 +131,19 @@ public class DefaultAlfrescoResponseParser implements AlfrescoResponseParser
             }
             property = property.getNextSibling();
         }
+        String nodePath = nodeReferenceParser.parse(nodeRef).asPath();
         if (entity.getMediaType() != null) {
             if (entity.getMediaType().startsWith("image/")) {
-                entity.setUrl(configuration.getServerURL() + "/share/proxy/alfresco/api/node/"
-                    + nodeReferenceParser.parse(nodeRef).asPath() + "/content");
+                // Image URL.
+                entity.setUrl(configuration.getServerURL() + "/alfresco/service/api/node/" + nodePath + "/content");
                 entity.setPreviewURL(entity.getUrl() + "/thumbnails/doclib");
             } else {
-                entity.setUrl(configuration.getServerURL() + "/share/page/document-details?nodeRef=" + nodeRef);
+                // Document URL.
+                entity.setUrl(configuration.getServerURL() + "/alfresco/n/showDocDetails/" + nodePath);
             }
         } else {
-            entity.setUrl(configuration.getServerURL() + "/share/page/folder-details?nodeRef=" + nodeRef);
+            // Space URL.
+            entity.setUrl(configuration.getServerURL() + "/alfresco/n/showSpaceDetails/" + nodePath);
         }
         entity.setReference(new URIReference(entity.getUrl()).getEntityReference());
         return entity;

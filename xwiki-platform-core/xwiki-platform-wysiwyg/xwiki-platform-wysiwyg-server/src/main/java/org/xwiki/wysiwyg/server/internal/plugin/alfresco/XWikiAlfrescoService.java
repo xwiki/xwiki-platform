@@ -42,7 +42,7 @@ import org.xwiki.wysiwyg.server.wiki.EntityReferenceConverter;
  * 
  * @version $Id$
  */
-@Component("xwiki")
+@Component()
 public class XWikiAlfrescoService implements AlfrescoService
 {
     /**

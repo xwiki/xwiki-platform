@@ -48,4 +48,9 @@ public interface AlfrescoConfiguration
      * @return a reference to the Alfresco node that is displayed by default
      */
     String getDefaultNodeReference();
+
+    /**
+     * @return the authenticator hint; this parameter controls which authentication method is used
+     */
+    String getAuthenticatorHint();
 }

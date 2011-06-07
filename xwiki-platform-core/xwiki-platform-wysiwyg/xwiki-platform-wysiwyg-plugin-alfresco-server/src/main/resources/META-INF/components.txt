@@ -1,3 +1,10 @@
-org.xwiki.wysiwyg.plugin.alfresco.server.DefaultAlfrescoService
-org.xwiki.wysiwyg.plugin.alfresco.server.DefaultAlfrescoConfiguration
-org.xwiki.wysiwyg.plugin.alfresco.server.DefaultAlfrescoResponseParser
+org.xwiki.wysiwyg.internal.plugin.alfresco.server.AuthSimpleHttpClient
+org.xwiki.wysiwyg.internal.plugin.alfresco.server.BasicAuthenticator
+org.xwiki.wysiwyg.internal.plugin.alfresco.server.DefaultAlfrescoConfiguration
+org.xwiki.wysiwyg.internal.plugin.alfresco.server.DefaultAlfrescoResponseParser
+org.xwiki.wysiwyg.internal.plugin.alfresco.server.DefaultAlfrescoService
+org.xwiki.wysiwyg.internal.plugin.alfresco.server.DefaultNodeReferenceParser
+org.xwiki.wysiwyg.internal.plugin.alfresco.server.NoAuthSimpleHttpClient
+org.xwiki.wysiwyg.internal.plugin.alfresco.server.SiteMinderAuthenticator
+org.xwiki.wysiwyg.internal.plugin.alfresco.server.TicketAuthenticator
+org.xwiki.wysiwyg.internal.plugin.alfresco.server.UrlNodeReferenceParser

@@ -62,7 +62,7 @@ public enum EntityType
 
     /**
      * Represents a class property entity.
-     * @since xxx
+     * @since 3.2M1M1
      */
     CLASS_PROPERTY
 }

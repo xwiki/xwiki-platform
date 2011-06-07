@@ -36,7 +36,7 @@ import org.xwiki.model.EntityType;
  * {@link #equals(Object)} method behave as usual and then call following member {@link #equals(Object)} etc.
  * 
  * @version $Id$
- * @since xxx
+ * @since 3.2M1M1
  */
 public class RegexEntityReference extends EntityReference
 {

@@ -25,7 +25,7 @@ import org.xwiki.model.reference.ObjectPropertyReference;
  * An event triggered when an object property is deleted.
  * 
  * @version $Id$
- * @since xxx
+ * @since 3.2M1
  */
 public class XObjectPropertyDeletedEvent extends AbstractXObjectPropertyEvent
 {

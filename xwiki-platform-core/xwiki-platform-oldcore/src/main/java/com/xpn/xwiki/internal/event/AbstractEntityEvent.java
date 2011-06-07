@@ -25,7 +25,7 @@ import org.xwiki.model.reference.EntityReference;
  * Base class for all entity {@link org.xwiki.observation.event.Event events}.
  * 
  * @version $Id$
- * @since xxx
+ * @since 3.2M1
  */
 public class AbstractEntityEvent implements EntityEvent
 {

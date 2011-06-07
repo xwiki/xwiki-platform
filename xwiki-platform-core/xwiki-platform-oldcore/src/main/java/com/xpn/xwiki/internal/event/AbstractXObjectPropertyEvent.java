@@ -26,7 +26,7 @@ import org.xwiki.model.reference.EntityReference;
  * Base class for all object property {@link org.xwiki.observation.event.Event events}.
  * 
  * @version $Id$
- * @since xxx
+ * @since 3.2M1
  */
 public class AbstractXObjectPropertyEvent extends AbstractXObjectEvent implements XObjectPropertyEvent
 {

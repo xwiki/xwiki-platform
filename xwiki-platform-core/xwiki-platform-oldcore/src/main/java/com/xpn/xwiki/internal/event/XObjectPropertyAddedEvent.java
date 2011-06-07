@@ -25,7 +25,7 @@ import org.xwiki.model.reference.ObjectPropertyReference;
  * An event triggered when an object property is added.
  * 
  * @version $Id$
- * @since xxx
+ * @since 3.2M1
  */
 public class XObjectPropertyAddedEvent extends AbstractXObjectPropertyEvent
 {

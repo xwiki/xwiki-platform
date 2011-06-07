@@ -23,7 +23,7 @@ package com.xpn.xwiki.internal.event;
  * An event triggered when a class property is added.
  * 
  * @version $Id$
- * @since xxx
+ * @since 3.2M1
  */
 public interface XClassPropertyEvent extends EntityEvent
 {

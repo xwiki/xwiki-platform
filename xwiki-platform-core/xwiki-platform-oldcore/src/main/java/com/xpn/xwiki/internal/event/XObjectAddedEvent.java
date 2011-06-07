@@ -25,7 +25,7 @@ import org.xwiki.model.reference.ObjectReference;
  * An event triggered when an object is added.
  * 
  * @version $Id$
- * @since xxx
+ * @since 3.2M1
  */
 public class XObjectAddedEvent extends AbstractXObjectEvent
 {

@@ -23,7 +23,7 @@ package com.xpn.xwiki.internal.event;
  * Event related to XWiki object property.
  * 
  * @version $Id$
- * @since xxx
+ * @since 3.2M1
  */
 public interface XObjectPropertyEvent extends XObjectEvent
 {

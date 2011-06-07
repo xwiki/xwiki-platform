@@ -29,7 +29,7 @@ import com.xpn.xwiki.objects.BaseProperty;
  * Informations sent with {@link XObjectPropertyEvent}.
  * 
  * @version $Id$
- * @since xxx
+ * @since 3.2M1
  */
 public class XObjectPropertyEventData extends XObjectEventData
 {

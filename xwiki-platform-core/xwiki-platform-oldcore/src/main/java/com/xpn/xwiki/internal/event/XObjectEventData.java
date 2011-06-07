@@ -26,7 +26,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Data related to {@link XObjectEvent}.
  * 
  * @version $Id$
- * @since xxx
+ * @since 3.2M1
  */
 public class XObjectEventData
 {

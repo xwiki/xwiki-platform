@@ -47,7 +47,7 @@ import com.xpn.xwiki.web.Utils;
  * Produce {@link XObjectEvent} based on document events.
  * 
  * @version $Id$
- * @since xxx
+ * @since 3.2M1
  */
 @Component
 @Named("XObjectModificationsListener")

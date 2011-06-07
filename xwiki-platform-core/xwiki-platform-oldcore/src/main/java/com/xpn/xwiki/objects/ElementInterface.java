@@ -27,8 +27,7 @@ public interface ElementInterface
 {
     /**
      * @return the reference of the element
-     * @since xxx
-     */
+     * @since 3.2M1    */
     EntityReference getReference();
 
     String toString();

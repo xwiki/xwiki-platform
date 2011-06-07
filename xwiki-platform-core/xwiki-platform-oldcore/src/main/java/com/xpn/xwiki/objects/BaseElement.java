@@ -38,8 +38,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     /**
      * Full reference of this element.
      * 
-     * @since xxx
-     */
+     * @since 3.2M1    */
     protected R referenceCache;
 
     /**
@@ -77,7 +76,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     }
 
     /**
-     * @since xxx
+     @since 3.2M1.2M1
      */
     protected R createReference()
     {

@@ -16,35 +16,31 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
  */
 package com.xpn.xwiki.internal.event;
 
-import org.xwiki.model.reference.ObjectPropertyReference;
-
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
+import org.xwiki.model.reference.EntityReference;
 
 /**
- * Informations sent with {@link XObjectPropertyEvent}.
+ * An event triggered when an class property is deleted.
  * 
  * @version $Id$
- * @since xxx
  */
-public class XObjectPropertyEventData extends XObjectEventData
+public class XClassPropertyDeletedEvent extends AbstractXClassPropertyEvent
 {
-    private BaseProperty<ObjectPropertyReference> property;
-
-    public XObjectPropertyEventData(XWikiDocument document, BaseObject object,
-        BaseProperty<ObjectPropertyReference> property)
+    /**
+     * Default constructor. Matches any {@link XClassPropertyDeletedEvent}.
+     */
+    public XClassPropertyDeletedEvent()
     {
-        super(document, object);
-
-        this.property = property;
     }
 
-    public BaseProperty<ObjectPropertyReference> getProperty()
+    /**
+     * @param reference the class property reference
+     */
+    public XClassPropertyDeletedEvent(EntityReference reference)
     {
-        return this.property;
+        super(reference);
     }
 }

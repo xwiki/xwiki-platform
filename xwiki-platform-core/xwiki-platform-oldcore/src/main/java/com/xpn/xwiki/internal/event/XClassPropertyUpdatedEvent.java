@@ -16,30 +16,30 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
  */
 package com.xpn.xwiki.internal.event;
 
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * An event triggered when an object property is deleted.
+ * An event triggered when an class property is modified.
  * 
  * @version $Id$
- * @since 3.2M1
  */
-public class XObjectPropertyDeletedEvent extends AbstractXObjectPropertyEvent
+public class XClassPropertyUpdatedEvent extends AbstractXClassPropertyEvent
 {
     /**
-     * Default constructor. Matches any {@link XObjectPropertyDeletedEvent}.
+     * Default constructor. Matches any {@link XClassPropertyUpdatedEvent}.
      */
-    public XObjectPropertyDeletedEvent()
+    public XClassPropertyUpdatedEvent()
     {
     }
 
     /**
-     * @param reference the object property reference
+     * @param reference the class property reference
      */
-    public XObjectPropertyDeletedEvent(EntityReference reference)
+    public XClassPropertyUpdatedEvent(EntityReference reference)
     {
         super(reference);
     }

@@ -30,7 +30,6 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -39,23 +38,29 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ObjectDiff;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.web.Utils;
 
 /**
  * Produce {@link XObjectEvent} based on document events.
  * 
  * @version $Id$
- * @since xxx
+ * @since 3.2M1
  */
 @Component
-@Named("XObjectModificationsListener")
+@Named("XObjectEventGeneratorListener")
 public class XObjectEventGeneratorListener implements EventListener
 {
+    /**
+     * The events to match.
+     */
     private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentDeletedEvent(),
         new DocumentCreatedEvent(), new DocumentUpdatedEvent());
 
+    /**
+     * The logger to log.
+     */
     @Inject
     private Logger logger;
 
@@ -66,7 +71,7 @@ public class XObjectEventGeneratorListener implements EventListener
      */
     public String getName()
     {
-        return "XObjectModificationsListener";
+        return "XObjectEventGeneratorListener";
     }
 
     /**
@@ -91,6 +96,58 @@ public class XObjectEventGeneratorListener implements EventListener
         XWikiDocument originalDoc = doc.getOriginalDocument();
         XWikiContext context = (XWikiContext) data;
 
+        if (event instanceof DocumentUpdatedEvent) {
+            onDocumentUpdatedEvent(originalDoc, doc, context);
+        } else if (event instanceof DocumentDeletedEvent) {
+            onDocumentDeletedEvent(originalDoc, doc, context);
+        } else if (event instanceof DocumentCreatedEvent) {
+            onDocumentCreatedEvent(originalDoc, doc, context);
+        }
+    }
+
+    /**
+     * @param originalDoc the previous version of the document
+     * @param doc the new version of the document
+     * @param context the XWiki context
+     */
+    private void onDocumentCreatedEvent(XWikiDocument originalDoc, XWikiDocument doc, XWikiContext context)
+    {
+        ObservationManager observation = Utils.getComponent(ObservationManager.class);
+
+        for (List<BaseObject> xobjects : doc.getXObjects().values()) {
+            for (BaseObject xobject : xobjects) {
+                if (xobject != null) {
+                    observation.notify(new XObjectAddedEvent(xobject.getReference()), doc, context);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param originalDoc the previous version of the document
+     * @param doc the new version of the document
+     * @param context the XWiki context
+     */
+    private void onDocumentDeletedEvent(XWikiDocument originalDoc, XWikiDocument doc, XWikiContext context)
+    {
+        ObservationManager observation = Utils.getComponent(ObservationManager.class);
+
+        for (List<BaseObject> xobjects : originalDoc.getXObjects().values()) {
+            for (BaseObject xobject : xobjects) {
+                if (xobject != null) {
+                    observation.notify(new XObjectDeletedEvent(xobject.getReference()), doc, context);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param originalDoc the previous version of the document
+     * @param doc the new version of the document
+     * @param context the XWiki context
+     */
+    private void onDocumentUpdatedEvent(XWikiDocument originalDoc, XWikiDocument doc, XWikiContext context)
+    {
         ObservationManager observation = Utils.getComponent(ObservationManager.class);
 
         try {
@@ -100,22 +157,17 @@ public class XObjectEventGeneratorListener implements EventListener
                     BaseObject xobject = doc.getXObject(diff.getXClassReference(), diff.getNumber());
                     BaseObject xobjectOriginal = originalDoc.getXObject(diff.getXClassReference(), diff.getNumber());
                     if (ObjectDiff.ACTION_OBJECTREMOVED.equals(diff.getAction())) {
-                        observation.notify(
-                            new XObjectDeletedEvent(xobjectOriginal.getReference()),
-                            new XObjectEventData(doc, originalDoc.getXObject(diff.getXClassReference(),
-                                diff.getNumber())), context);
+                        observation.notify(new XObjectDeletedEvent(xobjectOriginal.getReference()), doc, context);
                     } else {
                         if (ObjectDiff.ACTION_OBJECTADDED.equals(diff.getAction())) {
-                            observation.notify(new XObjectAddedEvent(xobject.getReference()), new XObjectEventData(doc,
-                                xobject), context);
+                            observation.notify(new XObjectAddedEvent(xobject.getReference()), doc, context);
                         } else {
                             if (!modified) {
-                                observation.notify(new XObjectUpdatedEvent(xobject.getReference()),
-                                    new XObjectEventData(doc, xobject), context);
+                                observation.notify(new XObjectUpdatedEvent(xobject.getReference()), doc, context);
                                 modified = true;
                             }
 
-                            onObjectPropertyModified(observation, originalDoc, diff, context);
+                            onObjectPropertyModified(observation, doc, diff, context);
                         }
                     }
                 }
@@ -125,25 +177,28 @@ public class XObjectEventGeneratorListener implements EventListener
         }
     }
 
+    /**
+     * Generate object property related events.
+     * 
+     * @param observation the object manager
+     * @param doc the new version of the document
+     * @param diff the diff entry
+     * @param context the XWiki context
+     */
     private void onObjectPropertyModified(ObservationManager observation, XWikiDocument doc, ObjectDiff diff,
         XWikiContext context)
     {
         if (ObjectDiff.ACTION_PROPERTYREMOVED.equals(diff.getAction())) {
             BaseObject object = doc.getOriginalDocument().getXObject(diff.getXClassReference(), diff.getNumber());
-            BaseProperty<ObjectPropertyReference> property =
-                (BaseProperty<ObjectPropertyReference>) object.getField(diff.getPropName());
-            observation.notify(new XObjectPropertyDeletedEvent(property.getReference()), new XObjectPropertyEventData(
-                doc, object, property), context);
+            PropertyInterface property = object.getField(diff.getPropName());
+            observation.notify(new XObjectPropertyDeletedEvent(property.getReference()), doc, context);
         } else {
             BaseObject object = doc.getXObject(diff.getXClassReference(), diff.getNumber());
-            BaseProperty<ObjectPropertyReference> property =
-                (BaseProperty<ObjectPropertyReference>) object.getField(diff.getPropName());
+            PropertyInterface property = object.getField(diff.getPropName());
             if (ObjectDiff.ACTION_PROPERTYADDED.equals(diff.getAction())) {
-                observation.notify(new XObjectPropertyAddedEvent(property.getReference()),
-                    new XObjectPropertyEventData(doc, object, property), context);
+                observation.notify(new XObjectPropertyAddedEvent(property.getReference()), doc, context);
             } else if (ObjectDiff.ACTION_PROPERTYCHANGED.equals(diff.getAction())) {
-                observation.notify(new XObjectPropertyUpdatedEvent(property.getReference()),
-                    new XObjectPropertyEventData(doc, object, property), context);
+                observation.notify(new XObjectPropertyUpdatedEvent(property.getReference()), doc, context);
             }
         }
     }

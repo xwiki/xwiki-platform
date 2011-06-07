@@ -48,6 +48,9 @@ public class BaseObjectReference extends ObjectReference
     private static final EntityReferenceSerializer<String> SERIALIZER = Utils
         .getComponent(EntityReferenceSerializer.class);
 
+    /**
+     * Used to match number part of the object reference name.
+     */
     private static final Pattern NUMBERPATTERN = Pattern.compile("(\\\\*)\\[(\\d*)\\]$");
 
     /**
@@ -75,7 +78,7 @@ public class BaseObjectReference extends ObjectReference
      * Builds an indexed object reference for the object of class {@code className} with index {@code objectNumber} in
      * the document referenced by {@code parent}.
      * 
-     * @param className the name of the class of the object
+     * @param classReference the name of the class of the object
      * @param objectNumber the number of the object in the document, or {@code null} if the default object should be
      *            referenced
      * @param parent reference to the parent document where the object is

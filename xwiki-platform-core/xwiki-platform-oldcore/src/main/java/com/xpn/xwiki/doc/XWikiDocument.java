@@ -83,6 +83,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
@@ -129,6 +130,7 @@ import com.xpn.xwiki.internal.xml.DOMXMLWriter;
 import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
@@ -2280,6 +2282,25 @@ public class XWikiDocument implements DocumentModelBridge
             }
         }
         return result;
+    }
+
+    /**
+     * Get an object of this document based on its reference.
+     * 
+     * @param objectReference the reference of the object
+     * @return the XWiki object
+     * @since 3.2M1
+     */
+    public BaseObject getXObject(ObjectReference objectReference)
+    {
+        BaseObjectReference baseObjectReference;
+        if (objectReference instanceof BaseObjectReference) {
+            baseObjectReference = (BaseObjectReference)objectReference;
+        } else {
+            baseObjectReference = new BaseObjectReference(objectReference);
+        }
+
+        return getXObject(baseObjectReference.getXClassReference(), baseObjectReference.getObjectNumber());
     }
 
     /**

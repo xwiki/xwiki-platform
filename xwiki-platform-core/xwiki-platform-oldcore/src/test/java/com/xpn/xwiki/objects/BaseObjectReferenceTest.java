@@ -9,6 +9,11 @@ import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
+/**
+ * Validate {@link BaseObjectReference}.
+ * 
+ * @version $Id$
+ */
 public class BaseObjectReferenceTest extends AbstractBridgedComponentTestCase
 {
     private DocumentReference document;
@@ -41,11 +46,11 @@ public class BaseObjectReferenceTest extends AbstractBridgedComponentTestCase
             new BaseObjectReference(new DocumentReference("wiki", "space", "class[42]"), null, this.document);
 
         Assert.assertEquals("wiki:space.class\\[42]", reference.getName());
-        
+
         reference =
             new BaseObjectReference(new DocumentReference("wiki", "space", "class\\\\[42]"), null, this.document);
 
-        Assert.assertEquals("wiki:space.class\\\\\\\\[42]", reference.getName());
+        Assert.assertEquals("wiki:space.class\\\\\\\\\\[42]", reference.getName());
     }
 
     @Test
@@ -56,9 +61,8 @@ public class BaseObjectReferenceTest extends AbstractBridgedComponentTestCase
 
         Assert.assertEquals(new DocumentReference("wiki", "space", "class"), reference.getXClassReference());
         Assert.assertEquals((int) 42, (int) reference.getObjectNumber());
-        
-        reference =
-            new BaseObjectReference(new EntityReference("wiki:space.class", EntityType.OBJECT, this.document));
+
+        reference = new BaseObjectReference(new EntityReference("wiki:space.class", EntityType.OBJECT, this.document));
 
         Assert.assertEquals(new DocumentReference("wiki", "space", "class"), reference.getXClassReference());
         Assert.assertNull(reference.getObjectNumber());
@@ -72,19 +76,19 @@ public class BaseObjectReferenceTest extends AbstractBridgedComponentTestCase
 
         Assert.assertEquals(new DocumentReference("wiki", "space", "class[42]"), reference.getXClassReference());
         Assert.assertNull(reference.getObjectNumber());
-        
+
         reference =
             new BaseObjectReference(new EntityReference("wiki:space.class\\\\[42]", EntityType.OBJECT, this.document));
 
         Assert.assertEquals(new DocumentReference("wiki", "space", "class\\"), reference.getXClassReference());
         Assert.assertEquals((int) 42, (int) reference.getObjectNumber());
-        
+
         reference =
             new BaseObjectReference(new EntityReference("wiki:space.class\\\\\\[42]", EntityType.OBJECT, this.document));
 
         Assert.assertEquals(new DocumentReference("wiki", "space", "class\\[42]"), reference.getXClassReference());
         Assert.assertNull(reference.getObjectNumber());
-        
+
         reference =
             new BaseObjectReference(new EntityReference("wiki:space.class[word]", EntityType.OBJECT, this.document));
 

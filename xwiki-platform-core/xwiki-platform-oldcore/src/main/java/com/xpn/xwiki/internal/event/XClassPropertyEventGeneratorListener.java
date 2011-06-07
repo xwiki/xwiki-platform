@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.event;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -30,7 +31,6 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -38,24 +38,30 @@ import org.xwiki.observation.event.Event;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ObjectDiff;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Produce {@link XClassPropertyEvent} based on document events.
+ * Produce {@link XClassPropertyEvent property events} based on document events.
  * 
  * @version $Id$
- * @since xxx
+ * @since 3.2M1
  */
 @Component
-@Named("XObjectModificationsListener")
+@Named("XClassPropertyEventGeneratorListener")
 public class XClassPropertyEventGeneratorListener implements EventListener
 {
+    /**
+     * The events to match.
+     */
     private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentDeletedEvent(),
         new DocumentCreatedEvent(), new DocumentUpdatedEvent());
 
+    /**
+     * The logger to log.
+     */
     @Inject
     private Logger logger;
 
@@ -66,7 +72,7 @@ public class XClassPropertyEventGeneratorListener implements EventListener
      */
     public String getName()
     {
-        return "XObjectModificationsListener";
+        return "XClassPropertyEventGeneratorListener";
     }
 
     /**
@@ -91,60 +97,73 @@ public class XClassPropertyEventGeneratorListener implements EventListener
         XWikiDocument originalDoc = doc.getOriginalDocument();
         XWikiContext context = (XWikiContext) data;
 
+        if (event instanceof DocumentUpdatedEvent) {
+            onDocumentUpdatedEvent(originalDoc, doc, context);
+        } else if (event instanceof DocumentDeletedEvent) {
+            onDocumentDeletedEvent(originalDoc, doc, context);
+        } else if (event instanceof DocumentCreatedEvent) {
+            onDocumentCreatedEvent(originalDoc, doc, context);
+        }
+    }
+
+    /**
+     * @param originalDoc the previous version of the document
+     * @param doc the new version of the document
+     * @param context the XWiki context
+     */
+    private void onDocumentCreatedEvent(XWikiDocument originalDoc, XWikiDocument doc, XWikiContext context)
+    {
+        ObservationManager observation = Utils.getComponent(ObservationManager.class);
+
+        for (PropertyInterface property : (Collection<PropertyInterface>) doc.getXClass().getFieldList()) {
+            observation.notify(new XClassPropertyAddedEvent(property.getReference()), doc, context);
+        }
+    }
+
+    /**
+     * @param originalDoc the previous version of the document
+     * @param doc the new version of the document
+     * @param context the XWiki context
+     */
+    private void onDocumentDeletedEvent(XWikiDocument originalDoc, XWikiDocument doc, XWikiContext context)
+    {
+        ObservationManager observation = Utils.getComponent(ObservationManager.class);
+
+        for (PropertyInterface property : (Collection<PropertyInterface>) originalDoc.getXClass().getFieldList()) {
+            observation.notify(new XClassPropertyDeletedEvent(property.getReference()), doc, context);
+        }
+    }
+
+    /**
+     * @param originalDoc the previous version of the document
+     * @param doc the new version of the document
+     * @param context the XWiki context
+     */
+    private void onDocumentUpdatedEvent(XWikiDocument originalDoc, XWikiDocument doc, XWikiContext context)
+    {
         ObservationManager observation = Utils.getComponent(ObservationManager.class);
 
         try {
-            for (List<ObjectDiff> objectChanges : doc.getObjectDiff(originalDoc, doc, context)) {
-                boolean modified = false;
-                for (ObjectDiff diff : objectChanges) {
-                    BaseObject xobject = doc.getXObject(diff.getXClassReference(), diff.getNumber());
-                    BaseObject xobjectOriginal = originalDoc.getXObject(diff.getXClassReference(), diff.getNumber());
-                    if (ObjectDiff.ACTION_OBJECTREMOVED.equals(diff.getAction())) {
-                        observation.notify(
-                            new XObjectDeletedEvent(xobjectOriginal.getReference()),
-                            new XObjectEventData(doc, originalDoc.getXObject(diff.getXClassReference(),
-                                diff.getNumber())), context);
-                    } else {
-                        if (ObjectDiff.ACTION_OBJECTADDED.equals(diff.getAction())) {
-                            observation.notify(new XObjectAddedEvent(xobject.getReference()), new XObjectEventData(doc,
-                                xobject), context);
-                        } else {
-                            if (!modified) {
-                                observation.notify(new XObjectUpdatedEvent(xobject.getReference()),
-                                    new XObjectEventData(doc, xobject), context);
-                                modified = true;
-                            }
+            BaseClass baseClass = doc.getXClass();
+            BaseClass baseClassOriginal = originalDoc.getXClass();
 
-                            onObjectPropertyModified(observation, originalDoc, diff, context);
-                        }
+            for (List<ObjectDiff> objectChanges : doc.getClassDiff(originalDoc, doc, context)) {
+                for (ObjectDiff diff : objectChanges) {
+                    PropertyInterface property = baseClass.getField(diff.getPropName());
+                    PropertyInterface propertyOriginal = baseClassOriginal.getField(diff.getPropName());
+
+                    if (ObjectDiff.ACTION_PROPERTYREMOVED.equals(diff.getAction())) {
+                        observation.notify(new XClassPropertyDeletedEvent(propertyOriginal.getReference()), doc,
+                            context);
+                    } else if (ObjectDiff.ACTION_PROPERTYADDED.equals(diff.getAction())) {
+                        observation.notify(new XClassPropertyAddedEvent(property.getReference()), doc, context);
+                    } else if (ObjectDiff.ACTION_PROPERTYCHANGED.equals(diff.getAction())) {
+                        observation.notify(new XClassPropertyUpdatedEvent(property.getReference()), doc, context);
                     }
                 }
             }
         } catch (XWikiException e) {
             this.logger.error("Failed to diff documents [" + originalDoc + "] and [" + doc + "]");
-        }
-    }
-
-    private void onObjectPropertyModified(ObservationManager observation, XWikiDocument doc, ObjectDiff diff,
-        XWikiContext context)
-    {
-        if (ObjectDiff.ACTION_PROPERTYREMOVED.equals(diff.getAction())) {
-            BaseObject object = doc.getOriginalDocument().getXObject(diff.getXClassReference(), diff.getNumber());
-            BaseProperty<ObjectPropertyReference> property =
-                (BaseProperty<ObjectPropertyReference>) object.getField(diff.getPropName());
-            observation.notify(new XObjectPropertyDeletedEvent(property.getReference()), new XObjectPropertyEventData(
-                doc, object, property), context);
-        } else {
-            BaseObject object = doc.getXObject(diff.getXClassReference(), diff.getNumber());
-            BaseProperty<ObjectPropertyReference> property =
-                (BaseProperty<ObjectPropertyReference>) object.getField(diff.getPropName());
-            if (ObjectDiff.ACTION_PROPERTYADDED.equals(diff.getAction())) {
-                observation.notify(new XObjectPropertyAddedEvent(property.getReference()),
-                    new XObjectPropertyEventData(doc, object, property), context);
-            } else if (ObjectDiff.ACTION_PROPERTYCHANGED.equals(diff.getAction())) {
-                observation.notify(new XObjectPropertyUpdatedEvent(property.getReference()),
-                    new XObjectPropertyEventData(doc, object, property), context);
-            }
         }
     }
 }

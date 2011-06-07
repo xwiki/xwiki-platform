@@ -26,7 +26,7 @@ import org.xwiki.observation.event.Event;
  * Represent an event related to a provided entity.
  * 
  * @version $Id$
- * @since xxx
+ * @since 3.2M1
  */
 public interface EntityEvent extends Event
 {

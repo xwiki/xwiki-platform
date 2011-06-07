@@ -11,9 +11,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1303158348000</creationDate>
-<date>1304263523000</date>
-<contentUpdateDate>1304263523000</contentUpdateDate>
-<version>3.1</version>
+<date>1307445978000</date>
+<contentUpdateDate>1307445978000</contentUpdateDate>
+<version>1.1</version>
 <title>TemplateTranslations</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -29,6 +29,10 @@ core.menu.type.wiki=Workspace
 core.menu.watchlist.add.wiki=Watch Workspace
 core.menu.watchlist.remove.wiki=Unwatch Workspace
 core.menu.admin.wiki=Administer Workspace
+
+# Other menu entries
+workspacemanager.menu.workspace.mainWiki=Main Wiki
+workspacemanager.menu.workspace.index=Workspace Directory
 
 # WORKSPACE INFORMATION PANEL
 workspacemanager.panel.title=Workspace information

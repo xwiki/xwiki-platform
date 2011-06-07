@@ -623,7 +623,7 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
             #set($tabKey = $listtool.get($tab, 0))
             #set($tabName = $listtool.get($tab, 1))
             #set($tabIcon = $listtool.get($tab, 3))
-            &lt;li id="${tabKey}Tab" class="vertical-tab#if($tabKey == $currentCategory) active#end"&gt;&lt;a href="?category=${tabKey}"&gt;&lt;img src="$xwiki.getSkinFile($tabIcon)" alt="$tabName" /&gt;&lt;span&gt;$tabName&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+            &lt;li id="${tabKey}Tab" class="vertical-tab#if($tabKey == $currentCategory) active#end"&gt;&lt;a href="$doc.getURL('view', "category=${tabKey}")"&gt;&lt;img src="$xwiki.getSkinFile($tabIcon)" alt="$tabName" /&gt;&lt;span&gt;$tabName&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
           #end
         &lt;/ul&gt;
       &lt;/div&gt;

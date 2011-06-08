@@ -55,6 +55,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Document;
@@ -124,6 +125,8 @@ import com.xpn.xwiki.content.parsers.DocumentParser;
 import com.xpn.xwiki.content.parsers.RenamePageReplaceLinkHandler;
 import com.xpn.xwiki.content.parsers.ReplacementResultCollection;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
+import com.xpn.xwiki.doc.merge.CollisionException;
+import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.internal.xml.DOMXMLWriter;
@@ -135,6 +138,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.ObjectDiff;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -162,8 +166,9 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Regex Pattern to recognize if there's HTML code in a XWiki page.
      */
-    private static final Pattern HTML_TAG_PATTERN = Pattern.compile(
-        "</?+(html|img|a|i|br?|embed|script|form|input|textarea|object|font|li|[dou]l|table|center|hr|p) ?([^>]*+)>");
+    private static final Pattern HTML_TAG_PATTERN =
+        Pattern
+            .compile("</?+(html|img|a|i|br?|embed|script|form|input|textarea|object|font|li|[dou]l|table|center|hr|p) ?([^>]*+)>");
 
     /** Regex for finding the first level 1 or 2 heading in the document title, to be used as the document title. */
     private static final Pattern HEADING_PATTERN_10 = Pattern.compile("^\\s*+1(?:\\.1)?\\s++(.++)$", Pattern.MULTILINE);
@@ -551,8 +556,9 @@ public class XWikiDocument implements DocumentModelBridge
         if ((this.language == null) || this.language.trim().equals("")) {
             this.id = this.localEntityReferenceSerializer.serialize(getDocumentReference()).hashCode();
         } else {
-            this.id = (this.localEntityReferenceSerializer.serialize(getDocumentReference()) + ":" + this.language)
-                .hashCode();
+            this.id =
+                (this.localEntityReferenceSerializer.serialize(getDocumentReference()) + ":" + this.language)
+                    .hashCode();
         }
 
         return this.id;
@@ -671,8 +677,9 @@ public class XWikiDocument implements DocumentModelBridge
         // Ensure we always return absolute document references for the parent since we always want well-constructed
         // references and since we store the parent reference as relative internally.
         if (this.parentReferenceCache == null && getRelativeParentReference() != null) {
-            this.parentReferenceCache = this.explicitReferenceDocumentReferenceResolver.resolve(
-                getRelativeParentReference(), getDocumentReference());
+            this.parentReferenceCache =
+                this.explicitReferenceDocumentReferenceResolver.resolve(getRelativeParentReference(),
+                    getDocumentReference());
         }
 
         return this.parentReferenceCache;
@@ -801,8 +808,9 @@ public class XWikiDocument implements DocumentModelBridge
 
         String renderedContent = this.renderingCache.getRenderedContent(getDocumentReference(), content, context);
 
-        String documentName = this.defaultEntityReferenceSerializer.serialize(
-            isolateVelocityMacros ? getDocumentReference() : context.getDoc().getDocumentReference());
+        String documentName =
+            this.defaultEntityReferenceSerializer.serialize(isolateVelocityMacros ? getDocumentReference() : context
+                .getDoc().getDocumentReference());
 
         if (renderedContent == null) {
             Object isInRenderingEngine = context.get("isInRenderingEngine");
@@ -946,8 +954,9 @@ public class XWikiDocument implements DocumentModelBridge
                     TransformationContext txContext = new TransformationContext();
                     txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(sourceSyntaxId));
                     txContext.setId(documentName);
-                    result = performSyntaxConversion(text, documentName,
-                        syntaxFactory.createSyntaxFromIdString(targetSyntaxId), txContext);
+                    result =
+                        performSyntaxConversion(text, documentName,
+                            syntaxFactory.createSyntaxFromIdString(targetSyntaxId), txContext);
                 }
 
                 this.renderingCache.setRenderedContent(getDocumentReference(), text, result, context);
@@ -1306,16 +1315,18 @@ public class XWikiDocument implements DocumentModelBridge
                 }
             }
         } catch (Exception e) {
-            LOGGER.warn("Failed to interpret title of document ["
-                + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
+            LOGGER.warn(
+                "Failed to interpret title of document ["
+                    + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
         }
 
         try {
             // 2) If not, then try to extract the title from the first document section title
             title = getRenderedContentTitle(outputSyntax, context);
         } catch (Exception e) {
-            LOGGER.warn("Failed to extract title from content of document ["
-                + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
+            LOGGER.warn(
+                "Failed to extract title from content of document ["
+                    + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
         }
 
         // 3) No title has been found, return the page name as the title
@@ -1441,8 +1452,9 @@ public class XWikiDocument implements DocumentModelBridge
         // Note: Consider "" or null as the same, i.e. the author not being set
         DocumentReference authorReference = null;
         if (author != null && author.length() > 0) {
-            authorReference = this.explicitReferenceDocumentReferenceResolver.resolve(
-                this.xClassEntityReferenceResolver.resolve(author, EntityType.DOCUMENT), getDocumentReference());
+            authorReference =
+                this.explicitReferenceDocumentReferenceResolver.resolve(
+                    this.xClassEntityReferenceResolver.resolve(author, EntityType.DOCUMENT), getDocumentReference());
         }
 
         if ((getAuthorReference() == null && authorReference != null)
@@ -1500,8 +1512,10 @@ public class XWikiDocument implements DocumentModelBridge
         // Note: Consider "" or null as the same, i.e. the content author not being set
         DocumentReference contentAuthorReference = null;
         if (contentAuthor != null && contentAuthor.length() > 0) {
-            contentAuthorReference = this.explicitReferenceDocumentReferenceResolver.resolve(
-                this.xClassEntityReferenceResolver.resolve(contentAuthor, EntityType.DOCUMENT), getDocumentReference());
+            contentAuthorReference =
+                this.explicitReferenceDocumentReferenceResolver.resolve(
+                    this.xClassEntityReferenceResolver.resolve(contentAuthor, EntityType.DOCUMENT),
+                    getDocumentReference());
         }
 
         if ((getContentAuthorReference() == null && contentAuthorReference != null)
@@ -1558,8 +1572,9 @@ public class XWikiDocument implements DocumentModelBridge
         // Note: Consider "" or null as the same, i.e. the creator not being set
         DocumentReference creatorReference = null;
         if (creator != null && creator.length() > 0) {
-            creatorReference = this.explicitReferenceDocumentReferenceResolver.resolve(
-                this.xClassEntityReferenceResolver.resolve(creator, EntityType.DOCUMENT), getDocumentReference());
+            creatorReference =
+                this.explicitReferenceDocumentReferenceResolver.resolve(
+                    this.xClassEntityReferenceResolver.resolve(creator, EntityType.DOCUMENT), getDocumentReference());
         }
 
         if ((getCreatorReference() == null && creatorReference != null)
@@ -1701,36 +1716,41 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String getAttachmentURL(String filename, String action, XWikiContext context)
     {
-        URL url = context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action, null,
-            getDatabase(), context);
+        URL url =
+            context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action, null, getDatabase(),
+                context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getExternalAttachmentURL(String filename, String action, XWikiContext context)
     {
-        URL url = context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action, null,
-            getDatabase(), context);
+        URL url =
+            context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action, null, getDatabase(),
+                context);
         return url.toString();
     }
 
     public String getAttachmentURL(String filename, String action, String querystring, XWikiContext context)
     {
-        URL url = context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action, querystring,
-            getDatabase(), context);
+        URL url =
+            context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action, querystring,
+                getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getAttachmentRevisionURL(String filename, String revision, XWikiContext context)
     {
-        URL url = context.getURLFactory().createAttachmentRevisionURL(filename, getSpace(), getName(), revision, null,
-            getDatabase(), context);
+        URL url =
+            context.getURLFactory().createAttachmentRevisionURL(filename, getSpace(), getName(), revision, null,
+                getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getAttachmentRevisionURL(String filename, String revision, String querystring, XWikiContext context)
     {
-        URL url = context.getURLFactory().createAttachmentRevisionURL(filename, getSpace(), getName(), revision,
-            querystring, getDatabase(), context);
+        URL url =
+            context.getURLFactory().createAttachmentRevisionURL(filename, getSpace(), getName(), revision, querystring,
+                getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -1761,37 +1781,41 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String getURL(String action, String querystring, XWikiContext context)
     {
-        URL url = context.getURLFactory().createURL(getSpace(), getName(), action, querystring, null, getDatabase(),
-            context);
+        URL url =
+            context.getURLFactory().createURL(getSpace(), getName(), action, querystring, null, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getURL(String action, String querystring, String anchor, XWikiContext context)
     {
-        URL url = context.getURLFactory().createURL(getSpace(), getName(), action, querystring, anchor, getDatabase(),
-            context);
+        URL url =
+            context.getURLFactory().createURL(getSpace(), getName(), action, querystring, anchor, getDatabase(),
+                context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getExternalURL(String action, XWikiContext context)
     {
-        URL url = context.getURLFactory().createExternalURL(getSpace(), getName(), action, null, null, getDatabase(),
-            context);
+        URL url =
+            context.getURLFactory()
+                .createExternalURL(getSpace(), getName(), action, null, null, getDatabase(), context);
         return url.toString();
     }
 
     public String getExternalURL(String action, String querystring, XWikiContext context)
     {
-        URL url = context.getURLFactory().createExternalURL(getSpace(), getName(), action, querystring, null,
-            getDatabase(), context);
+        URL url =
+            context.getURLFactory().createExternalURL(getSpace(), getName(), action, querystring, null, getDatabase(),
+                context);
         return url.toString();
     }
 
     public String getParentURL(XWikiContext context) throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument(getParentReference());
-        URL url = context.getURLFactory().createURL(doc.getSpace(), doc.getName(), "view", null, null, getDatabase(),
-            context);
+        URL url =
+            context.getURLFactory()
+                .createURL(doc.getSpace(), doc.getName(), "view", null, null, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -2295,7 +2319,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         BaseObjectReference baseObjectReference;
         if (objectReference instanceof BaseObjectReference) {
-            baseObjectReference = (BaseObjectReference)objectReference;
+            baseObjectReference = (BaseObjectReference) objectReference;
         } else {
             baseObjectReference = new BaseObjectReference(objectReference);
         }
@@ -2760,8 +2784,9 @@ public class XWikiDocument implements DocumentModelBridge
             PropertyClass pclass = (PropertyClass) obj.getXClass(context).get(fieldname);
             String tooltip = pclass.getTooltip(context);
             if ((tooltip != null) && (!tooltip.trim().equals(""))) {
-                String img = "<img src=\"" + context.getWiki().getSkinFile("info.gif", context)
-                    + "\" class=\"tooltip_image\" align=\"middle\" />";
+                String img =
+                    "<img src=\"" + context.getWiki().getSkinFile("info.gif", context)
+                        + "\" class=\"tooltip_image\" align=\"middle\" />";
                 result = context.getWiki().addTooltip(img, tooltip, context);
             }
         } catch (Exception e) {
@@ -2917,9 +2942,9 @@ public class XWikiDocument implements DocumentModelBridge
             type = type.toLowerCase();
             StringBuffer result = new StringBuffer();
             PropertyClass pclass = (PropertyClass) obj.getXClass(context).get(fieldname);
-            String prefix = pref +
-                this.localEntityReferenceSerializer.serialize(obj.getXClass(context).getDocumentReference()) + "_"
-                + obj.getNumber() + "_";
+            String prefix =
+                pref + this.localEntityReferenceSerializer.serialize(obj.getXClass(context).getDocumentReference())
+                    + "_" + obj.getNumber() + "_";
 
             if (pclass == null) {
                 return "";
@@ -2972,8 +2997,8 @@ public class XWikiDocument implements DocumentModelBridge
                 if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
                     result.append("{pre}");
                 }
-                prefix = this.localEntityReferenceSerializer.serialize(obj.getXClass(context).getDocumentReference())
-                    + "_";
+                prefix =
+                    this.localEntityReferenceSerializer.serialize(obj.getXClass(context).getDocumentReference()) + "_";
                 pclass.displaySearch(result, fieldname, prefix, (XWikiCriteria) context.get("query"), context);
                 if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
                     result.append("{/pre}");
@@ -3309,9 +3334,10 @@ public class XWikiDocument implements DocumentModelBridge
                 BaseObject oldobject = oldObjects.get(i);
                 if (oldobject != null) {
                     BaseClass baseclass = oldobject.getXClass(context);
-                    BaseObject newobject = (BaseObject) baseclass.fromMap(eform.getObject(
-                        this.localEntityReferenceSerializer.serialize(baseclass.getDocumentReference()) + "_" + i),
-                        oldobject);
+                    BaseObject newobject =
+                        (BaseObject) baseclass.fromMap(
+                            eform.getObject(this.localEntityReferenceSerializer.serialize(baseclass
+                                .getDocumentReference()) + "_" + i), oldobject);
                     newobject.setNumber(oldobject.getNumber());
                     newobject.setGuid(oldobject.getGuid());
                     newobject.setDocumentReference(getDocumentReference());
@@ -4732,9 +4758,10 @@ public class XWikiDocument implements DocumentModelBridge
         // the current wiki.
         // - the parent document reference saved in the database matches the page name part of this document's
         // reference (eg "page") and the parent document's space is the same as this document's space.
-        List<String> params = Arrays.asList(this.defaultEntityReferenceSerializer.serialize(getDocumentReference()),
-            this.localEntityReferenceSerializer.serialize(getDocumentReference()),
-            getDocumentReference().getName(), getDocumentReference().getLastSpaceReference().getName());
+        List<String> params =
+            Arrays.asList(this.defaultEntityReferenceSerializer.serialize(getDocumentReference()),
+                this.localEntityReferenceSerializer.serialize(getDocumentReference()),
+                getDocumentReference().getName(), getDocumentReference().getLastSpaceReference().getName());
 
         String whereStatement = "doc.parent=? or doc.parent=? or (doc.parent=? and doc.space=?)";
         return context.getWiki().getStore().searchDocumentReferences(whereStatement, nb, start, params, context);
@@ -5604,8 +5631,8 @@ public class XWikiDocument implements DocumentModelBridge
                         // The object was deleted.
                         dlist = new BaseObject().getDiff(originalObj, context);
                         ObjectDiff deleteMarker =
-                            new ObjectDiff(originalObj.getXClassReference(), originalObj.getNumber(), originalObj.getGuid(),
-                                ObjectDiff.ACTION_OBJECTREMOVED, "", "", "", "");
+                            new ObjectDiff(originalObj.getXClassReference(), originalObj.getNumber(),
+                                originalObj.getGuid(), ObjectDiff.ACTION_OBJECTREMOVED, "", "", "", "");
                         dlist.add(0, deleteMarker);
                     } else {
                         // The object exists in both versions, but might have been changed.
@@ -5801,8 +5828,9 @@ public class XWikiDocument implements DocumentModelBridge
             for (DocumentReference childDocumentReference : childDocumentReferences) {
                 XWikiDocument childDocument = xwiki.getDocument(childDocumentReference, context);
                 childDocument.setParentReference(newDocumentReference);
-                String saveMessage = context.getMessageTool().get("core.comment.renameParent",
-                    Arrays.asList(this.compactEntityReferenceSerializer.serialize(newDocumentReference)));
+                String saveMessage =
+                    context.getMessageTool().get("core.comment.renameParent",
+                        Arrays.asList(this.compactEntityReferenceSerializer.serialize(newDocumentReference)));
                 xwiki.saveDocument(childDocument, saveMessage, true, context);
             }
         }
@@ -5829,8 +5857,9 @@ public class XWikiDocument implements DocumentModelBridge
                 // to the same document. For example [Page], [Page?param=1], [currentwiki:Page],
                 // [CurrentSpace.Page] all point to the same document. Thus we have to parse the links
                 // to recognize them and do the replace.
-                ReplacementResultCollection result = documentParser.parseLinksAndReplace(backlinkDocument.getContent(),
-                    oldLink, newLink, linkHandler, getDocumentReference().getLastSpaceReference().getName());
+                ReplacementResultCollection result =
+                    documentParser.parseLinksAndReplace(backlinkDocument.getContent(), oldLink, newLink, linkHandler,
+                        getDocumentReference().getLastSpaceReference().getName());
 
                 backlinkDocument.setContent((String) result.getModifiedContent());
             } else if (Utils.getComponentManager().hasComponent(BlockRenderer.class,
@@ -5838,8 +5867,9 @@ public class XWikiDocument implements DocumentModelBridge
                 backlinkDocument.refactorDocumentLinks(getDocumentReference(), newDocumentReference, context);
             }
 
-            String saveMessage = context.getMessageTool().get("core.comment.renameLink",
-                Arrays.asList(this.compactEntityReferenceSerializer.serialize(newDocumentReference)));
+            String saveMessage =
+                context.getMessageTool().get("core.comment.renameLink",
+                    Arrays.asList(this.compactEntityReferenceSerializer.serialize(newDocumentReference)));
             xwiki.saveDocument(backlinkDocument, saveMessage, true, context);
         }
 
@@ -5856,11 +5886,13 @@ public class XWikiDocument implements DocumentModelBridge
             for (LinkBlock linkBlock : linkBlockList) {
                 ResourceReference linkReference = linkBlock.getReference();
                 if (linkReference.getType().equals(ResourceType.DOCUMENT)) {
-                    DocumentReference currentLinkReference = this.explicitDocumentReferenceResolver.resolve(
-                        linkReference.getReference(), getDocumentReference());
+                    DocumentReference currentLinkReference =
+                        this.explicitDocumentReferenceResolver.resolve(linkReference.getReference(),
+                            getDocumentReference());
 
-                    DocumentReference newLinkReference = this.explicitDocumentReferenceResolver.resolve(
-                        linkReference.getReference(), newDocument.getDocumentReference());
+                    DocumentReference newLinkReference =
+                        this.explicitDocumentReferenceResolver.resolve(linkReference.getReference(),
+                            newDocument.getDocumentReference());
 
                     if (!newLinkReference.equals(currentLinkReference)) {
                         modified = true;
@@ -5936,8 +5968,9 @@ public class XWikiDocument implements DocumentModelBridge
         for (LinkBlock linkBlock : linkBlockList) {
             ResourceReference linkReference = linkBlock.getReference();
             if (linkReference.getType().equals(ResourceType.DOCUMENT)) {
-                DocumentReference documentReference = this.explicitDocumentReferenceResolver.resolve(
-                    linkReference.getReference(), getDocumentReference());
+                DocumentReference documentReference =
+                    this.explicitDocumentReferenceResolver
+                        .resolve(linkReference.getReference(), getDocumentReference());
 
                 if (documentReference.equals(oldDocumentReference)) {
                     linkReference.setReference(this.compactEntityReferenceSerializer.serialize(newDocumentReference,
@@ -6283,9 +6316,10 @@ public class XWikiDocument implements DocumentModelBridge
                 syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
             } catch (ParseException e) {
                 syntax = getDefaultDocumentSyntax();
-                LOGGER.warn("Failed to set syntax [" + syntaxId + "] for ["
-                    + this.defaultEntityReferenceSerializer.serialize(getDocumentReference())
-                    + "], setting syntax [" + syntax.toIdString() + "] instead.", e);
+                LOGGER.warn(
+                    "Failed to set syntax [" + syntaxId + "] for ["
+                        + this.defaultEntityReferenceSerializer.serialize(getDocumentReference())
+                        + "], setting syntax [" + syntax.toIdString() + "] instead.", e);
             }
         }
 
@@ -6363,8 +6397,9 @@ public class XWikiDocument implements DocumentModelBridge
         form.setRequest((HttpServletRequest) context.getRequest());
         form.readRequest();
 
-        EntityReference classReference = this.xClassEntityReferenceResolver.resolve(form.getClassName(),
-            EntityType.DOCUMENT, getDocumentReference());
+        EntityReference classReference =
+            this.xClassEntityReferenceResolver
+                .resolve(form.getClassName(), EntityType.DOCUMENT, getDocumentReference());
         BaseObject object = newXObject(classReference, context);
         BaseClass baseclass = object.getXClass(context);
         baseclass.fromMap(
@@ -6837,8 +6872,9 @@ public class XWikiDocument implements DocumentModelBridge
                 // Need to do the same thing than 1.0 content here
                 String documentSectionLevel = StringUtils.repeat("1.", header.getLevel().getAsInt() - 1) + "1";
 
-                DocumentSection docSection = new DocumentSection(sectionNumber++, documentSectionIndex,
-                    documentSectionLevel, renderXDOM(new XDOM(header.getChildren()), getSyntax()));
+                DocumentSection docSection =
+                    new DocumentSection(sectionNumber++, documentSectionIndex, documentSectionLevel, renderXDOM(
+                        new XDOM(header.getChildren()), getSyntax()));
                 splitSections.add(docSection);
             }
 
@@ -7756,8 +7792,9 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public DocumentReference resolveClassReference(String documentName)
     {
-        DocumentReference defaultReference = new DocumentReference(getDocumentReference().getWikiReference().getName(),
-            XWiki.SYSTEM_SPACE, getDocumentReference().getName());
+        DocumentReference defaultReference =
+            new DocumentReference(getDocumentReference().getWikiReference().getName(), XWiki.SYSTEM_SPACE,
+                getDocumentReference().getName());
         return this.explicitDocumentReferenceResolver.resolve(documentName, defaultReference);
     }
 
@@ -7766,8 +7803,9 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private DocumentReference resolveClassReference(EntityReference reference)
     {
-        DocumentReference defaultReference = new DocumentReference(getDocumentReference().getWikiReference().getName(),
-            XWiki.SYSTEM_SPACE, getDocumentReference().getName());
+        DocumentReference defaultReference =
+            new DocumentReference(getDocumentReference().getWikiReference().getName(), XWiki.SYSTEM_SPACE,
+                getDocumentReference().getName());
         return this.explicitReferenceDocumentReferenceResolver.resolve(reference, defaultReference);
     }
 
@@ -7794,5 +7832,267 @@ public class XWikiDocument implements DocumentModelBridge
         bobject.setDocumentReference(getDocumentReference());
         setContentDirty(true);
         return bobject;
+    }
+
+    /**
+     * Apply a 3 ways merge on the current document based on provide previous and new version of the document.
+     * <p>
+     * All 3 documents are supposed to have the same document reference and language already since that's what makes
+     * them uniques.
+     * <p>
+     * Important note: this method does not take care of attachments contents related operations and only remove
+     * attachments which need to be removed from the list. For memory handling reasons all attachments contents related
+     * operations should be done elsewhere.
+     * 
+     * @param previousDocument the previous version of the document
+     * @param newDocument the next version of the document
+     * @param context the XWiki context
+     * @return a repport of what happen during the merge (errors, etc.)
+     */
+    public MergeResult merge(XWikiDocument previousDocument, XWikiDocument newDocument, XWikiContext context)
+    {
+        MergeResult mergeResult = new MergeResult();
+
+        // Title
+        setTitle(mergeString(previousDocument.getTitle(), newDocument.getTitle(), getTitle(), mergeResult));
+
+        // Content
+        setContent(mergeString(previousDocument.getContent(), newDocument.getContent(), getContent(), mergeResult));
+
+        // Parent
+        if (!ObjectUtils.equals(previousDocument.getAuthorReference(), newDocument.getAuthorReference())) {
+            if (ObjectUtils.equals(previousDocument.getAuthorReference(), getAuthorReference())) {
+                setParentReference(newDocument.getRelativeParentReference());
+
+                mergeResult.setModified(true);
+            }
+        }
+
+        // Author
+        if (!ObjectUtils.equals(previousDocument.getAuthorReference(), newDocument.getAuthorReference())
+            && ObjectUtils.equals(previousDocument.getAuthorReference(), getAuthorReference())) {
+            setAuthorReference(newDocument.getAuthorReference());
+
+            mergeResult.setModified(true);
+        }
+
+        // Objects
+        try {
+            List<List<ObjectDiff>> objectsDiff = previousDocument.getObjectDiff(previousDocument, newDocument, context);
+            if (!objectsDiff.isEmpty()) {
+                // Apply diff on result
+                for (List<ObjectDiff> objectClassDiff : objectsDiff) {
+                    for (ObjectDiff diff : objectClassDiff) {
+                        BaseObject objectResult = getXObject(diff.getXClassReference(), diff.getNumber());
+                        BaseObject previousObject =
+                            previousDocument.getXObject(diff.getXClassReference(), diff.getNumber());
+                        BaseObject newObject = newDocument.getXObject(diff.getXClassReference(), diff.getNumber());
+                        PropertyInterface propertyResult =
+                            objectResult != null ? objectResult.getField(diff.getPropName()) : null;
+                        PropertyInterface previousProperty =
+                            previousObject != null ? objectResult.getField(diff.getPropName()) : null;
+                        PropertyInterface newProperty =
+                            newObject != null ? objectResult.getField(diff.getPropName()) : null;
+
+                        if (diff.getAction() == ObjectDiff.ACTION_OBJECTADDED) {
+                            if (objectResult == null) {
+                                setXObject(newObject.getNumber(), newObject);
+                                mergeResult.setModified(true);
+                            } else {
+                                // XXX: collision between DB and new: object to add but already exists in the DB
+                                mergeResult.getErrors().add(
+                                    new CollisionException("Collision found on object [" + objectResult.getReference()
+                                        + "]"));
+                            }
+                        } else if (diff.getAction() == ObjectDiff.ACTION_OBJECTREMOVED) {
+                            if (objectResult != null) {
+                                if (objectResult.equals(previousObject)) {
+                                    removeXObject(objectResult);
+                                    mergeResult.setModified(true);
+                                } else {
+                                    // XXX: collision between DB and new: object to remove but not the same as previous
+                                    // version
+                                    mergeResult.getErrors().add(
+                                        new CollisionException("Collision found on object ["
+                                            + objectResult.getReference() + "]"));
+                                }
+                            } else {
+                                // Already removed from DB, lets assume the user is prescient
+                                mergeResult.getWarnings().add(
+                                    new CollisionException("Object [" + previousObject.getReference()
+                                        + "] already removed"));
+                            }
+                        } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
+                            if (propertyResult == null) {
+                                objectResult.addField(diff.getPropName(), newProperty);
+                                mergeResult.setModified(true);
+                            } else {
+                                // XXX: collision between DB and new: property to add but already exists in the DB
+                                mergeResult.getErrors().add(
+                                    new CollisionException("Collision found on object property ["
+                                        + propertyResult.getReference() + "]"));
+                            }
+                        } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
+                            if (propertyResult != null) {
+                                if (propertyResult.equals(previousProperty)) {
+                                    objectResult.removeField(diff.getPropName());
+                                    mergeResult.setModified(true);
+                                } else {
+                                    // XXX: collision between DB and new: supposed to be removed but the DB version is
+                                    // not the same as the previous version
+                                    mergeResult.getErrors().add(
+                                        new CollisionException("Collision found on object property ["
+                                            + propertyResult.getReference() + "]"));
+                                }
+                            } else {
+                                // Already removed from DB, lets assume the user is prescient
+                                mergeResult.getWarnings().add(
+                                    new CollisionException("Object property [" + previousProperty.getReference()
+                                        + "] already removed"));
+                            }
+                        } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
+                            if (propertyResult != null) {
+                                if (propertyResult.equals(previousProperty)) {
+                                    objectResult.addField(diff.getPropName(), newProperty);
+                                    mergeResult.setModified(true);
+                                } else {
+                                    // TODO: try to apply a 3 ways merge on the property
+                                }
+                            } else {
+                                // XXX: collision between DB and new: property to modify but does not exists in DB
+                                // Lets assume it's a mistake to fix
+                                mergeResult.getWarnings().add(
+                                    new CollisionException("Object [" + newProperty.getReference()
+                                        + "] does not exists"));
+
+                                objectResult.addField(diff.getPropName(), newProperty);
+                                mergeResult.setModified(true);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (XWikiException e) {
+            mergeResult.getErrors().add(e);
+        }
+
+        // Class
+        try {
+            List<List<ObjectDiff>> classDiff = previousDocument.getClassDiff(previousDocument, newDocument, context);
+            if (!classDiff.isEmpty()) {
+                // Apply diff on result
+                BaseClass classResult = getXClass();
+                BaseClass previousClass = previousDocument.getXClass();
+                BaseClass newClass = newDocument.getXClass();
+                for (ObjectDiff diff : classDiff.get(0)) {
+                    PropertyInterface propertyResult = classResult.getField(diff.getPropName());
+                    PropertyInterface previousProperty = previousClass.getField(diff.getPropName());
+                    PropertyInterface newProperty = newClass.getField(diff.getPropName());
+
+                    if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
+                        if (propertyResult == null) {
+                            // Add if none has been added by user already
+                            classResult.addField(diff.getPropName(), newClass.getField(diff.getPropName()));
+                            mergeResult.setModified(true);
+                        } else if (!propertyResult.equals(newProperty)) {
+                            // XXX: collision between DB and new: property to add but already exists in the DB
+                            mergeResult.getErrors().add(
+                                new CollisionException("Collision found on class property ["
+                                    + newProperty.getReference() + "]"));
+                        }
+                    } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
+                        if (propertyResult != null) {
+                            if (propertyResult.equals(previousProperty)) {
+                                // Delete if it's the same as previous one
+                                classResult.removeField(diff.getPropName());
+                                mergeResult.setModified(true);
+                            } else {
+                                // XXX: collision between DB and new: property to remove but not the same as previous
+                                // version
+                                mergeResult.getErrors().add(
+                                    new CollisionException("Collision found on class property ["
+                                        + previousProperty.getReference() + "]"));
+                            }
+                        } else {
+                            // Already removed from DB, lets assume the user is prescient
+                            mergeResult.getWarnings().add(
+                                new CollisionException("Object property [" + previousProperty.getReference()
+                                    + "] already removed"));
+                        }
+                    } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
+                        if (propertyResult != null) {
+                            if (propertyResult.equals(previousProperty)) {
+                                // Let some automatic migration take care of that modification between DB and new
+                                classResult.addField(diff.getPropName(), newClass.getField(diff.getPropName()));
+                                mergeResult.setModified(true);
+                            } else if (!propertyResult.equals(newProperty)) {
+                                // XXX: collision between DB and new: supposed to be modified but it's already
+                                // modified in the DB so who wins ?
+                                mergeResult.getErrors().add(
+                                    new CollisionException("Collision found on class property ["
+                                        + newProperty.getReference() + "]"));
+                            }
+                        } else {
+                            // XXX: collision between DB and new: property to modify but does not exists in DB
+                            // Lets assume it's a mistake to fix
+                            mergeResult.getWarnings().add(
+                                new CollisionException("Collision found on class property ["
+                                    + newProperty.getReference() + "]"));
+
+                            classResult.addField(diff.getPropName(), newClass.getField(diff.getPropName()));
+                            mergeResult.setModified(true);
+                        }
+                    }
+                }
+            }
+        } catch (XWikiException e) {
+            mergeResult.getErrors().add(e);
+        }
+
+        // Attachments
+        try {
+            List<AttachmentDiff> attachmentsDiff =
+                previousDocument.getAttachmentDiff(previousDocument, newDocument, context);
+            if (!attachmentsDiff.isEmpty()) {
+                // Apply deleted attachment diff on result (new attachment has already been saved)
+                for (AttachmentDiff diff : attachmentsDiff) {
+                    if (diff.getNewVersion() == null) {
+                        try {
+                            XWikiAttachment attachmentResult = getAttachment(diff.getFileName());
+
+                            deleteAttachment(attachmentResult, context);
+
+                            mergeResult.setModified(true);
+                        } catch (XWikiException e) {
+                            mergeResult.getErrors().add(e);
+                        }
+                    } else {
+                        // TODO
+                    }
+                }
+            }
+        } catch (XWikiException e) {
+            mergeResult.getErrors().add(e);
+        }
+
+        return mergeResult;
+    }
+
+    private String mergeString(String previousStr, String newStr, String currentStr, MergeResult mergeResult)
+    {
+        String result = currentStr;
+
+        try {
+            Revision revision = Diff.diff(ToString.stringToArray(previousStr), ToString.stringToArray(newStr));
+            if (revision.size() > 0) {
+                result = ToString.arrayToString(revision.patch(ToString.stringToArray(currentStr)));
+
+                mergeResult.setModified(true);
+            }
+        } catch (Exception e) {
+            mergeResult.getErrors().add(e);
+        }
+
+        return result;
     }
 }

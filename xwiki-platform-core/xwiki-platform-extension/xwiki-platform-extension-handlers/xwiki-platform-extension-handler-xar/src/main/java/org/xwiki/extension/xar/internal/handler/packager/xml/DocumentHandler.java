@@ -37,8 +37,6 @@ public class DocumentHandler extends AbstractHandler
      */
     public SAXContentHandler domBuilder = new SAXContentHandler();
 
-    private boolean attchmentContent = true;
-
     public DocumentHandler(ComponentManager componentManager, String wiki)
     {
         super(componentManager);
@@ -52,11 +50,6 @@ public class DocumentHandler extends AbstractHandler
         this.skippedElements.add("version");
         this.skippedElements.add("minorEdit");
         this.skippedElements.add("comment");
-    }
-
-    public void setAttchmentContent(boolean attchmentContent)
-    {
-        this.attchmentContent = attchmentContent;
     }
 
     public XWikiDocument getDocument()

@@ -30,10 +30,6 @@ core.menu.watchlist.add.wiki=Watch Workspace
 core.menu.watchlist.remove.wiki=Unwatch Workspace
 core.menu.admin.wiki=Administer Workspace
 
-# Other menu entries
-workspacemanager.menu.workspace.mainWiki=Main Wiki
-workspacemanager.menu.workspace.index=Workspace Directory
-
 # WORKSPACE INFORMATION PANEL
 workspacemanager.panel.title=Workspace information
 

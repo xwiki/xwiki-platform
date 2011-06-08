@@ -63,7 +63,14 @@ public class ExpandedMacroBlock extends MacroBlock
     {
         // Keep the macro content synchronized with the child blocks.
         WikiPrinter printer = new DefaultWikiPrinter();
-        contentRenderer.render(getChildren(), printer);
+        XDOM xdom;
+        // We need the begin/endDocument events so we wrap the child blocks in a XDOM block.
+        if (getChildren().size() == 1 && getChildren().get(0) instanceof XDOM) {
+            xdom = (XDOM) getChildren().get(0);
+        } else {
+            xdom = new XDOM(getChildren());
+        }
+        contentRenderer.render(xdom, printer);
         return printer.toString();
     }
 }

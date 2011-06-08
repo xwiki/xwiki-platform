@@ -21,9 +21,7 @@
 
 package com.xpn.xwiki.objects;
 
-public class LargeStringProperty extends BaseStringProperty {
-
-    public LargeStringProperty() {
-      super();
-    }   
+public class LargeStringProperty extends BaseStringProperty
+{
+    
 }

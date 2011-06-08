@@ -24,17 +24,25 @@ package com.xpn.xwiki.objects;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.util.Date;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.suigeneris.jrcs.diff.Diff;
+import org.suigeneris.jrcs.diff.Revision;
+import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.merge.CollisionException;
+import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -245,5 +253,66 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     public Object getCustomMappingValue()
     {
         return getValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.ElementInterface#merge(com.xpn.xwiki.objects.ElementInterface,
+     *      com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.XWikiContext, com.xpn.xwiki.doc.merge.MergeResult)
+     */
+    @Override
+    public void merge(ElementInterface previousElement, ElementInterface newElement, XWikiContext context,
+        MergeResult mergeResult)
+    {
+        super.merge(previousElement, newElement, context, mergeResult);
+
+        // Value
+        Object previousValue = ((BaseProperty<R>) previousElement).getValue();
+        Object newValue = ((BaseProperty<R>) newElement).getValue();
+        if (previousValue == null) {
+            if (newValue != null) {
+                if (getValue() == null) {
+                    setValue(newValue);
+                } else {
+                    // XXX: collision between current and new
+                    mergeResult.error(new CollisionException("Collision found on property [" + getName()
+                        + "] between from value [" + getValue() + "] and to [" + newValue + "]"));
+                }
+            }
+        } else if (newValue == null) {
+            if (ObjectUtils.equals(previousValue, getValue())) {
+                setValue(null);
+            } else {
+                // XXX: collision between current and new
+                mergeResult.error(new CollisionException("Collision found on property [" + getName()
+                    + "] between from value [" + getValue() + "] and to [" + newValue + "]"));
+            }
+        } else {
+            if (ObjectUtils.equals(previousValue, getValue())) {
+                setValue(newValue);
+            } else if (previousValue.getClass() != newValue.getClass()) {
+                // XXX: collision between current and new
+                mergeResult.error(new CollisionException("Collision found on property [" + getName()
+                    + "] between from value [" + getValue() + "] and to [" + newValue + "]"));
+            } else if (ObjectUtils.equals(previousValue, getValue())) {
+                mergeValue(previousValue, newValue, mergeResult);
+            }
+        }
+    }
+
+    /**
+     * Try to apply 3 ways merge on property value.
+     * 
+     * @param previousValue the previous version of the value
+     * @param newValue the new version of the value
+     * @param mergeResult merge report
+     * @since 3.2M1
+     */
+    protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
+    {
+        // XXX: collision between current and new: don't know how to apply 3 way merge on unknown type
+        mergeResult.error(new CollisionException("Collision found on property [" + getName() + "] between from value ["
+            + getValue() + "] and to [" + newValue + "]"));
     }
 }

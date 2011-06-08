@@ -22,10 +22,8 @@ package com.xpn.xwiki.internal.event;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -35,7 +33,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.ObjectDiff;
@@ -57,12 +54,6 @@ public class XObjectEventGeneratorListener implements EventListener
      */
     private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentDeletedEvent(),
         new DocumentCreatedEvent(), new DocumentUpdatedEvent());
-
-    /**
-     * The logger to log.
-     */
-    @Inject
-    private Logger logger;
 
     /**
      * {@inheritDoc}
@@ -150,30 +141,26 @@ public class XObjectEventGeneratorListener implements EventListener
     {
         ObservationManager observation = Utils.getComponent(ObservationManager.class);
 
-        try {
-            for (List<ObjectDiff> objectChanges : doc.getObjectDiff(originalDoc, doc, context)) {
-                boolean modified = false;
-                for (ObjectDiff diff : objectChanges) {
-                    BaseObject xobject = doc.getXObject(diff.getXClassReference(), diff.getNumber());
-                    BaseObject xobjectOriginal = originalDoc.getXObject(diff.getXClassReference(), diff.getNumber());
-                    if (ObjectDiff.ACTION_OBJECTREMOVED.equals(diff.getAction())) {
-                        observation.notify(new XObjectDeletedEvent(xobjectOriginal.getReference()), doc, context);
+        for (List<ObjectDiff> objectChanges : doc.getObjectDiff(originalDoc, doc, context)) {
+            boolean modified = false;
+            for (ObjectDiff diff : objectChanges) {
+                BaseObject xobject = doc.getXObject(diff.getXClassReference(), diff.getNumber());
+                BaseObject xobjectOriginal = originalDoc.getXObject(diff.getXClassReference(), diff.getNumber());
+                if (ObjectDiff.ACTION_OBJECTREMOVED.equals(diff.getAction())) {
+                    observation.notify(new XObjectDeletedEvent(xobjectOriginal.getReference()), doc, context);
+                } else {
+                    if (ObjectDiff.ACTION_OBJECTADDED.equals(diff.getAction())) {
+                        observation.notify(new XObjectAddedEvent(xobject.getReference()), doc, context);
                     } else {
-                        if (ObjectDiff.ACTION_OBJECTADDED.equals(diff.getAction())) {
-                            observation.notify(new XObjectAddedEvent(xobject.getReference()), doc, context);
-                        } else {
-                            if (!modified) {
-                                observation.notify(new XObjectUpdatedEvent(xobject.getReference()), doc, context);
-                                modified = true;
-                            }
-
-                            onObjectPropertyModified(observation, doc, diff, context);
+                        if (!modified) {
+                            observation.notify(new XObjectUpdatedEvent(xobject.getReference()), doc, context);
+                            modified = true;
                         }
+
+                        onObjectPropertyModified(observation, doc, diff, context);
                     }
                 }
             }
-        } catch (XWikiException e) {
-            this.logger.error("Failed to diff documents [" + originalDoc + "] and [" + doc + "]");
         }
     }
 

@@ -63,7 +63,7 @@ public class MergeResult
     /**
      * Error raised during the merge.
      * <p>
-     * Generallt collision for which we don't know what do to at all.
+     * Generally collision for which we don't know what do to at all.
      * 
      * @return the merge errors
      */
@@ -75,13 +75,23 @@ public class MergeResult
     /**
      * Warning raised during the merge.
      * <p>
-     * The difference with error is that in that case a decision which should be good for most of the case has been made
-     * or at least safe enough.
+     * The difference with error is that in that case a decision which should be good (or at least safe enough) for most
+     * of the case has been made.
      * 
      * @return the merge warning
      */
     public List<Exception> getWarnings()
     {
         return this.warnings;
+    }
+
+    public void error(Exception e)
+    {
+        getErrors().add(e);
+    }
+
+    public void warn(Exception e)
+    {
+        getWarnings().add(e);
     }
 }

@@ -23,11 +23,15 @@ package com.xpn.xwiki.objects;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.merge.MergeResult;
+
 public interface ElementInterface
 {
     /**
      * @return the reference of the element
-     * @since 3.2M1    */
+     * @since 3.2M1
+     */
     EntityReference getReference();
 
     String toString();
@@ -51,4 +55,18 @@ public interface ElementInterface
     void setDocumentReference(DocumentReference reference);
 
     void setName(String name);
+
+    /**
+     * Apply a 3 ways merge on the current element based on provided previous and new version of the element.
+     * <p>
+     * All 3 elements are supposed to have the same class and reference.
+     * 
+     * @param previousElement the previous version of the element
+     * @param newElement the next version of the element
+     * @param context the XWiki context
+     * @param the merge report
+     * @since 3.2M1
+     */
+    void merge(ElementInterface previousElement, ElementInterface newElement, XWikiContext context,
+        MergeResult mergeResult);
 }

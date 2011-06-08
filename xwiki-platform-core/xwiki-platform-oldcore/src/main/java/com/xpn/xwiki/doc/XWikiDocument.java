@@ -5610,10 +5610,8 @@ public class XWikiDocument implements DocumentModelBridge
      *         inner lists contain {@link ObjectDiff} elements, one object for each changed property of the object.
      *         Additionally, if the object was added or removed, then the first entry in the list will be an
      *         "object-added" or "object-removed" marker.
-     * @throws XWikiException If there's an error computing the differences.
      */
     public List<List<ObjectDiff>> getObjectDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
-        throws XWikiException
     {
         List<List<ObjectDiff>> difflist = new ArrayList<List<ObjectDiff>>();
 
@@ -5676,7 +5674,6 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     public List<List<ObjectDiff>> getClassDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
-        throws XWikiException
     {
         List<List<ObjectDiff>> difflist = new ArrayList<List<ObjectDiff>>();
         BaseClass oldClass = fromDoc.getXClass();
@@ -5702,7 +5699,6 @@ public class XWikiDocument implements DocumentModelBridge
      * @throws XWikiException
      */
     public List<AttachmentDiff> getAttachmentDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
-        throws XWikiException
     {
         List<AttachmentDiff> difflist = new ArrayList<AttachmentDiff>();
         for (XWikiAttachment origAttach : fromDoc.getAttachmentList()) {
@@ -7835,7 +7831,7 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * Apply a 3 ways merge on the current document based on provide previous and new version of the document.
+     * Apply a 3 ways merge on the current document based on provided previous and new version of the document.
      * <p>
      * All 3 documents are supposed to have the same document reference and language already since that's what makes
      * them uniques.
@@ -7848,6 +7844,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @param newDocument the next version of the document
      * @param context the XWiki context
      * @return a repport of what happen during the merge (errors, etc.)
+     * @since 3.2M1
      */
     public MergeResult merge(XWikiDocument previousDocument, XWikiDocument newDocument, XWikiContext context)
     {
@@ -7877,141 +7874,72 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         // Objects
-        try {
-            List<List<ObjectDiff>> objectsDiff = previousDocument.getObjectDiff(previousDocument, newDocument, context);
-            if (!objectsDiff.isEmpty()) {
-                // Apply diff on result
-                for (List<ObjectDiff> objectClassDiff : objectsDiff) {
-                    for (ObjectDiff diff : objectClassDiff) {
-                        BaseObject objectResult = getXObject(diff.getXClassReference(), diff.getNumber());
-                        BaseObject previousObject =
-                            previousDocument.getXObject(diff.getXClassReference(), diff.getNumber());
-                        BaseObject newObject = newDocument.getXObject(diff.getXClassReference(), diff.getNumber());
-                        PropertyInterface propertyResult =
-                            objectResult != null ? objectResult.getField(diff.getPropName()) : null;
-                        PropertyInterface previousProperty =
-                            previousObject != null ? objectResult.getField(diff.getPropName()) : null;
-                        PropertyInterface newProperty =
-                            newObject != null ? objectResult.getField(diff.getPropName()) : null;
+        List<List<ObjectDiff>> objectsDiff = previousDocument.getObjectDiff(previousDocument, newDocument, context);
+        if (!objectsDiff.isEmpty()) {
+            // Apply diff on result
+            for (List<ObjectDiff> objectClassDiff : objectsDiff) {
+                for (ObjectDiff diff : objectClassDiff) {
+                    BaseObject objectResult = getXObject(diff.getXClassReference(), diff.getNumber());
+                    BaseObject previousObject =
+                        previousDocument.getXObject(diff.getXClassReference(), diff.getNumber());
+                    BaseObject newObject = newDocument.getXObject(diff.getXClassReference(), diff.getNumber());
+                    PropertyInterface propertyResult =
+                        objectResult != null ? objectResult.getField(diff.getPropName()) : null;
+                    PropertyInterface previousProperty =
+                        previousObject != null ? objectResult.getField(diff.getPropName()) : null;
+                    PropertyInterface newProperty =
+                        newObject != null ? objectResult.getField(diff.getPropName()) : null;
 
-                        if (diff.getAction() == ObjectDiff.ACTION_OBJECTADDED) {
-                            if (objectResult == null) {
-                                setXObject(newObject.getNumber(), newObject);
+                    if (diff.getAction() == ObjectDiff.ACTION_OBJECTADDED) {
+                        if (objectResult == null) {
+                            setXObject(newObject.getNumber(), newObject);
+                            mergeResult.setModified(true);
+                        } else {
+                            // XXX: collision between DB and new: object to add but already exists in the DB
+                            mergeResult.getErrors().add(
+                                new CollisionException("Collision found on object [" + objectResult.getReference()
+                                    + "]"));
+                        }
+                    } else if (diff.getAction() == ObjectDiff.ACTION_OBJECTREMOVED) {
+                        if (objectResult != null) {
+                            if (objectResult.equals(previousObject)) {
+                                removeXObject(objectResult);
                                 mergeResult.setModified(true);
                             } else {
-                                // XXX: collision between DB and new: object to add but already exists in the DB
+                                // XXX: collision between DB and new: object to remove but not the same as previous
+                                // version
                                 mergeResult.getErrors().add(
                                     new CollisionException("Collision found on object [" + objectResult.getReference()
                                         + "]"));
                             }
-                        } else if (diff.getAction() == ObjectDiff.ACTION_OBJECTREMOVED) {
-                            if (objectResult != null) {
-                                if (objectResult.equals(previousObject)) {
-                                    removeXObject(objectResult);
-                                    mergeResult.setModified(true);
-                                } else {
-                                    // XXX: collision between DB and new: object to remove but not the same as previous
-                                    // version
-                                    mergeResult.getErrors().add(
-                                        new CollisionException("Collision found on object ["
-                                            + objectResult.getReference() + "]"));
-                                }
-                            } else {
-                                // Already removed from DB, lets assume the user is prescient
-                                mergeResult.getWarnings().add(
+                        } else {
+                            // Already removed from DB, lets assume the user is prescient
+                            mergeResult.getWarnings()
+                                .add(
                                     new CollisionException("Object [" + previousObject.getReference()
                                         + "] already removed"));
-                            }
-                        } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
-                            if (propertyResult == null) {
-                                objectResult.addField(diff.getPropName(), newProperty);
-                                mergeResult.setModified(true);
-                            } else {
-                                // XXX: collision between DB and new: property to add but already exists in the DB
-                                mergeResult.getErrors().add(
-                                    new CollisionException("Collision found on object property ["
-                                        + propertyResult.getReference() + "]"));
-                            }
-                        } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
-                            if (propertyResult != null) {
-                                if (propertyResult.equals(previousProperty)) {
-                                    objectResult.removeField(diff.getPropName());
-                                    mergeResult.setModified(true);
-                                } else {
-                                    // XXX: collision between DB and new: supposed to be removed but the DB version is
-                                    // not the same as the previous version
-                                    mergeResult.getErrors().add(
-                                        new CollisionException("Collision found on object property ["
-                                            + propertyResult.getReference() + "]"));
-                                }
-                            } else {
-                                // Already removed from DB, lets assume the user is prescient
-                                mergeResult.getWarnings().add(
-                                    new CollisionException("Object property [" + previousProperty.getReference()
-                                        + "] already removed"));
-                            }
-                        } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
-                            if (propertyResult != null) {
-                                if (propertyResult.equals(previousProperty)) {
-                                    objectResult.addField(diff.getPropName(), newProperty);
-                                    mergeResult.setModified(true);
-                                } else {
-                                    // TODO: try to apply a 3 ways merge on the property
-                                }
-                            } else {
-                                // XXX: collision between DB and new: property to modify but does not exists in DB
-                                // Lets assume it's a mistake to fix
-                                mergeResult.getWarnings().add(
-                                    new CollisionException("Object [" + newProperty.getReference()
-                                        + "] does not exists"));
-
-                                objectResult.addField(diff.getPropName(), newProperty);
-                                mergeResult.setModified(true);
-                            }
                         }
-                    }
-                }
-            }
-        } catch (XWikiException e) {
-            mergeResult.getErrors().add(e);
-        }
-
-        // Class
-        try {
-            List<List<ObjectDiff>> classDiff = previousDocument.getClassDiff(previousDocument, newDocument, context);
-            if (!classDiff.isEmpty()) {
-                // Apply diff on result
-                BaseClass classResult = getXClass();
-                BaseClass previousClass = previousDocument.getXClass();
-                BaseClass newClass = newDocument.getXClass();
-                for (ObjectDiff diff : classDiff.get(0)) {
-                    PropertyInterface propertyResult = classResult.getField(diff.getPropName());
-                    PropertyInterface previousProperty = previousClass.getField(diff.getPropName());
-                    PropertyInterface newProperty = newClass.getField(diff.getPropName());
-
-                    if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
+                    } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
                         if (propertyResult == null) {
-                            // Add if none has been added by user already
-                            classResult.addField(diff.getPropName(), newClass.getField(diff.getPropName()));
+                            objectResult.addField(diff.getPropName(), newProperty);
                             mergeResult.setModified(true);
-                        } else if (!propertyResult.equals(newProperty)) {
+                        } else {
                             // XXX: collision between DB and new: property to add but already exists in the DB
                             mergeResult.getErrors().add(
-                                new CollisionException("Collision found on class property ["
-                                    + newProperty.getReference() + "]"));
+                                new CollisionException("Collision found on object property ["
+                                    + propertyResult.getReference() + "]"));
                         }
                     } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
                         if (propertyResult != null) {
                             if (propertyResult.equals(previousProperty)) {
-                                // Delete if it's the same as previous one
-                                classResult.removeField(diff.getPropName());
+                                objectResult.removeField(diff.getPropName());
                                 mergeResult.setModified(true);
                             } else {
-                                // XXX: collision between DB and new: property to remove but not the same as previous
-                                // version
+                                // XXX: collision between DB and new: supposed to be removed but the DB version is
+                                // not the same as the previous version
                                 mergeResult.getErrors().add(
-                                    new CollisionException("Collision found on class property ["
-                                        + previousProperty.getReference() + "]"));
+                                    new CollisionException("Collision found on object property ["
+                                        + propertyResult.getReference() + "]"));
                             }
                         } else {
                             // Already removed from DB, lets assume the user is prescient
@@ -8022,57 +7950,49 @@ public class XWikiDocument implements DocumentModelBridge
                     } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
                         if (propertyResult != null) {
                             if (propertyResult.equals(previousProperty)) {
-                                // Let some automatic migration take care of that modification between DB and new
-                                classResult.addField(diff.getPropName(), newClass.getField(diff.getPropName()));
+                                objectResult.addField(diff.getPropName(), newProperty);
                                 mergeResult.setModified(true);
-                            } else if (!propertyResult.equals(newProperty)) {
-                                // XXX: collision between DB and new: supposed to be modified but it's already
-                                // modified in the DB so who wins ?
-                                mergeResult.getErrors().add(
-                                    new CollisionException("Collision found on class property ["
-                                        + newProperty.getReference() + "]"));
+                            } else {
+                                // TODO: try to apply a 3 ways merge on the property
                             }
                         } else {
                             // XXX: collision between DB and new: property to modify but does not exists in DB
                             // Lets assume it's a mistake to fix
                             mergeResult.getWarnings().add(
-                                new CollisionException("Collision found on class property ["
-                                    + newProperty.getReference() + "]"));
+                                new CollisionException("Object [" + newProperty.getReference() + "] does not exists"));
 
-                            classResult.addField(diff.getPropName(), newClass.getField(diff.getPropName()));
+                            objectResult.addField(diff.getPropName(), newProperty);
                             mergeResult.setModified(true);
                         }
                     }
                 }
             }
-        } catch (XWikiException e) {
-            mergeResult.getErrors().add(e);
         }
 
+        // Class
+        BaseClass classResult = getXClass();
+        BaseClass previousClass = previousDocument.getXClass();
+        BaseClass newClass = newDocument.getXClass();
+        classResult.merge(previousClass, newClass, context, mergeResult);
+
         // Attachments
-        try {
-            List<AttachmentDiff> attachmentsDiff =
-                previousDocument.getAttachmentDiff(previousDocument, newDocument, context);
-            if (!attachmentsDiff.isEmpty()) {
-                // Apply deleted attachment diff on result (new attachment has already been saved)
-                for (AttachmentDiff diff : attachmentsDiff) {
-                    if (diff.getNewVersion() == null) {
-                        try {
-                            XWikiAttachment attachmentResult = getAttachment(diff.getFileName());
+        List<AttachmentDiff> attachmentsDiff =
+            previousDocument.getAttachmentDiff(previousDocument, newDocument, context);
+        if (!attachmentsDiff.isEmpty()) {
+            // Apply deleted attachment diff on result (new attachment has already been saved)
+            for (AttachmentDiff diff : attachmentsDiff) {
+                if (diff.getNewVersion() == null) {
+                    try {
+                        XWikiAttachment attachmentResult = getAttachment(diff.getFileName());
 
-                            deleteAttachment(attachmentResult, context);
+                        deleteAttachment(attachmentResult, context);
 
-                            mergeResult.setModified(true);
-                        } catch (XWikiException e) {
-                            mergeResult.getErrors().add(e);
-                        }
-                    } else {
-                        // TODO
+                        mergeResult.setModified(true);
+                    } catch (XWikiException e) {
+                        mergeResult.getErrors().add(e);
                     }
                 }
             }
-        } catch (XWikiException e) {
-            mergeResult.getErrors().add(e);
         }
 
         return mergeResult;

@@ -129,9 +129,6 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
 import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
 import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
-import com.xpn.xwiki.internal.event.CommentAddedEvent;
-import com.xpn.xwiki.internal.event.CommentDeletedEvent;
-import com.xpn.xwiki.internal.event.CommentUpdatedEvent;
 import com.xpn.xwiki.notify.DocObjectChangedRule;
 import com.xpn.xwiki.notify.PropertyChangedRule;
 import com.xpn.xwiki.notify.XWikiActionRule;
@@ -140,7 +137,6 @@ import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.notify.XWikiPageNotification;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
@@ -7346,6 +7342,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         return "1".equals(Param("xwiki.title.compatibility", "0"));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
+     *      java.lang.Object)
+     */
     public void onEvent(Event event, Object source, Object data)
     {
         XWikiDocument doc = (XWikiDocument) source;
@@ -7355,18 +7357,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         ObservationManager om = Utils.getComponent(ObservationManager.class);
         String reference = this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference());
 
-        try {
-            for (AttachmentDiff diff : doc.getAttachmentDiff(originalDoc, doc, context)) {
-                if (StringUtils.isEmpty(diff.getOrigVersion())) {
-                    om.notify(new AttachmentAddedEvent(reference, diff.getFileName()), source, data);
-                } else if (StringUtils.isEmpty(diff.getNewVersion())) {
-                    om.notify(new AttachmentDeletedEvent(reference, diff.getFileName()), source, data);
-                } else {
-                    om.notify(new AttachmentUpdatedEvent(reference, diff.getFileName()), source, data);
-                }
+        for (AttachmentDiff diff : doc.getAttachmentDiff(originalDoc, doc, context)) {
+            if (StringUtils.isEmpty(diff.getOrigVersion())) {
+                om.notify(new AttachmentAddedEvent(reference, diff.getFileName()), source, data);
+            } else if (StringUtils.isEmpty(diff.getNewVersion())) {
+                om.notify(new AttachmentDeletedEvent(reference, diff.getFileName()), source, data);
+            } else {
+                om.notify(new AttachmentUpdatedEvent(reference, diff.getFileName()), source, data);
             }
-        } catch (XWikiException ex) {
-            LOGGER.warn("Failed to refine events: " + ex.getMessage());
         }
     }
 

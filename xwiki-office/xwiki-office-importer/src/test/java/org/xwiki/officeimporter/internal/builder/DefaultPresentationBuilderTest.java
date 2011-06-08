@@ -42,7 +42,6 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ExpandedMacroBlock;
-import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -194,7 +193,7 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
     {
         final DocumentReference reference = new DocumentReference("wiki", "Space", "Page");
         final DocumentModelBridge mockDocumentModelBridge = getMockery().mock(DocumentModelBridge.class);
-        final Block galleryContent = new GroupBlock();
+        final XDOM galleryContent = new XDOM(Collections.<Block> emptyList());
         getMockery().checking(new Expectations()
         {
             {
@@ -210,7 +209,7 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
 
                 try {
                     oneOf(mockXHTMLParser).parse(with(aNonNull(StringReader.class)));
-                    will(returnValue(new XDOM(Collections.singletonList(galleryContent))));
+                    will(returnValue(galleryContent));
                 } catch (ParseException e) {
                     Assert.fail(e.getMessage());
                 }

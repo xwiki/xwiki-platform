@@ -225,7 +225,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
 
             Map<String, String> galleryParameters = Collections.emptyMap();
             ExpandedMacroBlock gallery = new ExpandedMacroBlock("gallery", galleryParameters, renderer, false);
-            gallery.addChildren(xhtmlParser.parse(new StringReader(html)).getChildren());
+            gallery.addChild(xhtmlParser.parse(new StringReader(html)));
 
             return new XDOM(Collections.singletonList((Block) gallery));
         } catch (Exception e) {

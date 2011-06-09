@@ -58,3 +58,12 @@ XWIKI_OPTS="$XWIKI_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOPPORT"
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME"
 
 java $XWIKI_OPTS -jar $JETTY_HOME/start.jar --stop
+
+# Wait till the XWiki lock file is removed by the start script
+# Wait 10 seconds at most and exits if the lock file hasn't been removed after
+# 10 seconds.
+timer=0
+while [ "$timer" -lt 100 -a -e xwiki.lck ]; do
+  timer=$((timer+1))
+  sleep .1
+done

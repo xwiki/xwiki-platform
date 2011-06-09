@@ -32,8 +32,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -49,13 +49,15 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
  * See {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI} for documentation.
  * 
  * @version $Id$
+ * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
+@Deprecated
 public class ZipExplorerPlugin extends XWikiDefaultPlugin
 {
     /**
      * Log object to log messages in this class.
      */
-    private static final Log LOG = LogFactory.getLog(ZipExplorerPlugin.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ZipExplorerPlugin.class);
 
     /**
      * Path separators for URL.

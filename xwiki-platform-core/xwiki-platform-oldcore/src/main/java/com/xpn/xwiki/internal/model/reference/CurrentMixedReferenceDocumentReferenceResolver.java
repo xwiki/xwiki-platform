@@ -36,7 +36,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * miss some parent references or have NULL values). The behavior is the one defined in
  * {@link com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider}.
  *
- * @version $Id: d2e39257bcd864b97421da77e2ce41dc972d367f $
+ * @version $Id$
  * @since 2.3M1
  */
 @Component

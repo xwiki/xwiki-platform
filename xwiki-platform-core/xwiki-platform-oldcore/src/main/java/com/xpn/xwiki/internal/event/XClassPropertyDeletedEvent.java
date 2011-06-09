@@ -26,6 +26,7 @@ import org.xwiki.model.reference.EntityReference;
  * An event triggered when an class property is deleted.
  * 
  * @version $Id$
+ * @since 3.2M1
  */
 public class XClassPropertyDeletedEvent extends AbstractXClassPropertyEvent
 {

@@ -24,7 +24,6 @@ package com.xpn.xwiki.objects;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
-import java.util.Date;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.dom4j.Document;
@@ -33,9 +32,6 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
-import org.suigeneris.jrcs.diff.Diff;
-import org.suigeneris.jrcs.diff.Revision;
-import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;

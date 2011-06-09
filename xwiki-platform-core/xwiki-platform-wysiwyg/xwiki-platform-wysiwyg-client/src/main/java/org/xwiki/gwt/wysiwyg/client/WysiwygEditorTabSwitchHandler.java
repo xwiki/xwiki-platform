@@ -350,7 +350,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         // Update the source text to prevent duplicated conversion requests while the conversion is in progress.
         lastConvertedSourceText = source;
         // Clear the saved selection because the document is reloaded.
-        domSelectionPreserver.clearPlaceHolders();
+        domSelectionPreserver.clearSelection();
         editor.getRichTextEditor().setLoading(true);
         if (reloader != null) {
             convertToHTMLWithTemplate(source);

@@ -21,9 +21,7 @@
 
 package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.web.Utils;
+import java.io.Serializable;
 
 import org.suigeneris.jrcs.diff.Diff;
 import org.suigeneris.jrcs.diff.Revision;
@@ -32,7 +30,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
-import java.io.Serializable;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Base class for representing an element having a name (either a reference of a free form name) and a pretty name.

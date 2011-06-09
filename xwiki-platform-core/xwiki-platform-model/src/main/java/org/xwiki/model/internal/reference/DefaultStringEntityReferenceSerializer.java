@@ -32,7 +32,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * Generate a string representation of an entity reference (eg "wiki:space.page" for a document reference in the "wiki"
  * Wiki, the "space" Space and the "page" Page).
  * 
- * @version $Id: e987f967efe838bd2aa97e52bf181faa2b8f15f4 $
+ * @version $Id$
  * @since 2.2M1
  */
 @Component

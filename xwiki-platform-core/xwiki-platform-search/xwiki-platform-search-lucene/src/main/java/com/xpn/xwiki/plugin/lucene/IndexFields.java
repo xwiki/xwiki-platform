@@ -70,6 +70,11 @@ public abstract class IndexFields
     public static final String DOCUMENT_FULLNAME = "fullname";
 
     /**
+     * Version of the document
+     */
+    public static final String DOCUMENT_VERSION = "version";
+    
+    /**
      * Language of the document
      */
     public static final String DOCUMENT_LANGUAGE = "lang";

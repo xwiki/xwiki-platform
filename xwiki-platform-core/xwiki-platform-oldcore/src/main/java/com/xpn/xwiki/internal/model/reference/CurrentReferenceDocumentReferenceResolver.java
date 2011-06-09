@@ -36,7 +36,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * or have NULL values). The behavior is the one defined in
  * {@link com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider}.
  *
- * @version $Id: b0ef24b5104dddee4387b4c899c3798fc3c09818 $
+ * @version $Id$
  * @since 2.2M1
  */
 @Component

@@ -746,7 +746,9 @@ public class WatchListStore implements EventListener
      */
     private void documentModifiedHandler(Event event, XWikiDocument currentDoc, XWikiContext context)
     {
-        if (!(event instanceof DocumentDeletedEvent)) {
+        // Does not auto-watch imported document, that's not the goal of this feature
+        if (!(event instanceof DocumentDeletedEvent)
+            && !currentDoc.getComment().equals(context.getMessageTool().get("core.importer.saveDocumentComment"))) {
 
             boolean register = false;
 

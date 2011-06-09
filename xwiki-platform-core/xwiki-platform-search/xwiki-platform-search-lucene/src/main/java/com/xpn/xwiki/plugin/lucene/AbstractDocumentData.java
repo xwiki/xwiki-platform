@@ -45,6 +45,8 @@ public abstract class AbstractDocumentData extends AbstractIndexData
 {
     private static final Log LOG = LogFactory.getLog(AbstractDocumentData.class);
 
+    private String version;
+
     private String documentTitle;
 
     private String author;
@@ -61,6 +63,7 @@ public abstract class AbstractDocumentData extends AbstractIndexData
     {
         super(type, doc.getDocumentReference(), deleted);
 
+        setVersion(doc.getVersion());
         setDocumentTitle(doc.getRenderedTitle(Syntax.PLAIN_1_0, context));
         setLanguage(doc.getLanguage());
     }
@@ -132,6 +135,9 @@ public abstract class AbstractDocumentData extends AbstractIndexData
         luceneDoc.add(new Field(IndexFields.DOCUMENT_SPACE, getDocumentSpace(), Field.Store.YES, Field.Index.ANALYZED));
         luceneDoc.add(new Field(IndexFields.DOCUMENT_FULLNAME, getDocumentFullName(), Field.Store.YES,
             Field.Index.ANALYZED));
+
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_VERSION, getVersion(), Field.Store.YES, Field.Index.ANALYZED));
+
         if (this.author != null) {
             luceneDoc.add(new Field(IndexFields.DOCUMENT_AUTHOR, this.author, Field.Store.YES, Field.Index.ANALYZED));
         }
@@ -204,6 +210,14 @@ public abstract class AbstractDocumentData extends AbstractIndexData
     }
 
     /**
+     * @param version the version of the document
+     */
+    public void setVersion(String version)
+    {
+        this.version = version;
+    }
+
+    /**
      * @param documentTitle the document title
      */
     public void setDocumentTitle(String documentTitle)
@@ -247,6 +261,11 @@ public abstract class AbstractDocumentData extends AbstractIndexData
     public String getDocumentFullName()
     {
         return (String) Utils.getComponent(EntityReferenceSerializer.class, "local").serialize(getEntityReference());
+    }
+
+    public String getVersion()
+    {
+        return this.version;
     }
 
     public Date getCreationDate()

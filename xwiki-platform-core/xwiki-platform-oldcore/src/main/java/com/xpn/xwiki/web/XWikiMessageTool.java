@@ -19,10 +19,8 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.StringReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,11 +59,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class XWikiMessageTool
 {
-    /**
-     * The encoding used for storing unicode characters as bytes.
-     */
-    public static final String BYTE_ENCODING = "UTF-8";
-
     /**
      * Log4J logger object to log messages in this class.
      */
@@ -297,19 +290,12 @@ public class XWikiMessageTool
     {
         Properties props = new Properties();
         String content = docBundle.getContent();
-        byte[] docContent;
         try {
-            docContent = content.getBytes(BYTE_ENCODING);
-        } catch (UnsupportedEncodingException ex) {
-            LOGGER.error("Error splitting the document into bytes", ex);
-            docContent = content.getBytes();
-        }
-        InputStream is = new ByteArrayInputStream(docContent);
-        try {
-            props.load(is);
+            props.load(new StringReader(content));
         } catch (IOException e) {
-            // Cannot do anything
+            LOGGER.error("Failed to parse content of document [" + docBundle + "] as translation content", e);
         }
+
         return props;
     }
 
@@ -339,19 +325,15 @@ public class XWikiMessageTool
                         // gets from cache
                         props = this.propsCache.get(docId);
                     }
-                    String translation = props.getProperty(key);
-                    if (translation != null) {
-                        returnValue = translation;
-                        try {
-                            returnValue = new String(returnValue.getBytes("ISO-8859-1"), BYTE_ENCODING);
-                        } catch (UnsupportedEncodingException ex) {
-                            LOGGER.error("Error recombining the value from bytes", ex);
-                        }
+
+                    returnValue = props.getProperty(key);
+                    if (returnValue != null) {
                         break;
                     }
                 }
             }
         }
+
         return returnValue;
     }
 }

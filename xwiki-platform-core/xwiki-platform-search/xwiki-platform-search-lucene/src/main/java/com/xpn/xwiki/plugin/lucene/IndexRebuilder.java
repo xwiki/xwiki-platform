@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.Term;
@@ -206,6 +207,8 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             context.setResponse(null);
 
             rebuildIndex(context);
+        } catch (InterruptedException e) {
+            LOG.warn("The thread has been interrupted", e);
         } catch (Exception e) {
             LOG.error("Error in lucene rebuild thread", e);
         } finally {
@@ -225,8 +228,9 @@ public class IndexRebuilder extends AbstractXWikiRunnable
      * 
      * @param context the XWiki context
      * @return the number of indexed elements
+     * @throws InterruptedException
      */
-    private int rebuildIndex(XWikiContext context)
+    private int rebuildIndex(XWikiContext context) throws InterruptedException
     {
         int retval = 0;
 
@@ -266,8 +270,9 @@ public class IndexRebuilder extends AbstractXWikiRunnable
      * @param wikiName the name of the wiki to index
      * @param context the XWiki context
      * @return the number of indexed elements
+     * @throws InterruptedException
      */
-    protected int indexWiki(String wikiName, XWikiContext context)
+    protected int indexWiki(String wikiName, XWikiContext context) throws InterruptedException
     {
         LOG.info("Reading content of wiki " + wikiName);
 
@@ -279,14 +284,23 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         try {
             context.setDatabase(wikiName);
 
-            // If only not ealread index document has to be indexed create a Searcher to find out
+            // If only not already indexed document has to be indexed create a Searcher to find out
             Searcher searcher = this.onlyNew ? createSearcher(this.indexUpdater.getDirectory(), context) : null;
 
             try {
-                List<DocumentReference> documentReferences =
-                    context.getWiki().getStore()
-                        .searchDocumentReferences(this.hqlFilter != null ? this.hqlFilter : "", context);
-                retval = indexDocuments(documentReferences, searcher, context);
+                String hql =
+                    "select distinct doc.space, doc.name, doc.version, doc.language from XWikiDocument as doc ";
+                if (StringUtils.isNotBlank(this.hqlFilter)) {
+                    if (this.hqlFilter.charAt(0) != ',' && !this.hqlFilter.contains("where")
+                        && !this.hqlFilter.contains("WHERE")) {
+                        hql += "where ";
+                    }
+                    hql += this.hqlFilter;
+                }
+
+                List<Object[]> documents = context.getWiki().search(hql, context);
+
+                retval = indexDocuments(wikiName, documents, searcher, context);
             } catch (XWikiException e) {
                 LOG.warn(MessageFormat.format("Error getting document names for wiki [{0}] and filter [{1}].",
                     wikiName, this.hqlFilter), e);
@@ -308,85 +322,64 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         return retval;
     }
 
-    private int indexDocuments(List<DocumentReference> documentReferences, Searcher searcher, XWikiContext context)
+    private int indexDocuments(String wikiName, List<Object[]> documents, Searcher searcher, XWikiContext context)
+        throws InterruptedException
     {
         int retval = 0;
 
-        for (DocumentReference documentReference : documentReferences) {
-            if (searcher == null || !isIndexed(documentReference, searcher)) {
-                retval += indexDocument(documentReference, context);
-            }
-        }
-
-        return retval;
-    }
-
-    private int indexDocument(DocumentReference documentReference, XWikiContext context)
-    {
-        int retval = 0;
-
-        XWikiDocument document;
-        try {
-            document = context.getWiki().getDocument(documentReference, context);
-        } catch (XWikiException e) {
-            LOG.error("error fetching document " + documentReference, e);
-
-            return retval;
-        }
-
-        if (document != null) {
-            // In order not to load the whole database in memory, we're limiting the number
-            // of documents that are in the processing queue at a moment. We could use a
-            // Bounded Queue in the index updater, but that would generate exceptions in the
-            // rest of the platform, as the index rebuilder could fill the queue, and then a
-            // user trying to save a document would cause an exception. Thus, it is better
-            // to limit the index rebuilder thread only, and not the index updater.
-            while (this.indexUpdater.getQueueSize() > this.indexUpdater.getMaxQueueSize()) {
+        for (Object[] document : documents) {
+            DocumentReference documentReference =
+                new DocumentReference(wikiName, (String) document[0], (String) document[1]);
+            String version = (String) document[2];
+            String language = (String) document[3];
+            if (searcher == null || !isIndexed(documentReference, version, language, searcher)) {
                 try {
-                    // Don't leave any database connections open while sleeping
-                    // This shouldn't be needed, but we never know what bugs might be there
-                    context.getWiki().getStore().cleanUp(context);
-                    Thread.sleep(RETRYINTERVAL);
-                } catch (InterruptedException e) {
-                    return -2;
+                    retval += addTranslationOfDocument(documentReference, language, context);
+                } catch (XWikiException e) {
+                    LOG.error("Error fetching document [" + documentReference + "] for language [" + language + "]", e);
+
+                    return retval;
                 }
             }
-            this.indexUpdater.queueDocument(document, context, false);
-            retval++;
-            retval += addTranslationsOfDocument(document, context);
-            retval += this.indexUpdater.queueAttachments(document, context);
-        } else {
-            if (LOG.isInfoEnabled()) {
-                LOG.info("XWiki delivered null for document " + documentReference);
-            }
         }
 
         return retval;
     }
 
-    protected int addTranslationsOfDocument(XWikiDocument document, XWikiContext wikiContext)
+    protected int addTranslationOfDocument(DocumentReference documentReference, String language,
+        XWikiContext wikiContext) throws XWikiException, InterruptedException
     {
         int retval = 0;
 
-        List<String> translations;
-        try {
-            translations = document.getTranslationList(wikiContext);
-        } catch (XWikiException e) {
-            LOG.error("error getting list of translations from document " + document, e);
+        XWikiDocument document = wikiContext.getWiki().getDocument(documentReference, wikiContext);
+        XWikiDocument tdocument = document.getTranslatedDocument(language, wikiContext);
 
-            return 0;
+        // In order not to load the whole database in memory, we're limiting the number
+        // of documents that are in the processing queue at a moment. We could use a
+        // Bounded Queue in the index updater, but that would generate exceptions in the
+        // rest of the platform, as the index rebuilder could fill the queue, and then a
+        // user trying to save a document would cause an exception. Thus, it is better
+        // to limit the index rebuilder thread only, and not the index updater.
+        while (this.indexUpdater.getQueueSize() > this.indexUpdater.getMaxQueueSize()) {
+            // Don't leave any database connections open while sleeping
+            // This shouldn't be needed, but we never know what bugs might be there
+            wikiContext.getWiki().getStore().cleanUp(wikiContext);
+            Thread.sleep(RETRYINTERVAL);
         }
 
-        for (String lang : translations) {
-            try {
-                this.indexUpdater.queueDocument(document.getTranslatedDocument(lang, wikiContext), wikiContext, false);
-                retval++;
-            } catch (XWikiException e) {
-                LOG.error("Error getting translated document for document " + document + " and language " + lang, e);
-            }
+        addTranslationOfDocument(tdocument, wikiContext);
+        ++retval;
+
+        if (document == tdocument) {
+            retval += this.indexUpdater.queueAttachments(document, wikiContext);
         }
 
         return retval;
+    }
+
+    protected void addTranslationOfDocument(XWikiDocument document, XWikiContext wikiContext)
+    {
+        this.indexUpdater.queueDocument(document, wikiContext, false);
     }
 
     private Collection<String> findWikiServers(XWikiContext context)
@@ -408,6 +401,11 @@ public class IndexRebuilder extends AbstractXWikiRunnable
 
     public boolean isIndexed(DocumentReference documentReference, Searcher searcher)
     {
+        return isIndexed(documentReference, null, null, searcher);
+    }
+
+    public boolean isIndexed(DocumentReference documentReference, String version, String language, Searcher searcher)
+    {
         boolean exists = false;
 
         BooleanQuery query = new BooleanQuery();
@@ -419,10 +417,19 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         query.add(new TermQuery(new Term(IndexFields.DOCUMENT_WIKI, documentReference.getWikiReference().getName()
             .toLowerCase())), BooleanClause.Occur.MUST);
 
+        if (version != null) {
+            query.add(new TermQuery(new Term(IndexFields.DOCUMENT_VERSION, version)), BooleanClause.Occur.MUST);
+        }
+
+        if (language != null) {
+            query.add(new TermQuery(new Term(IndexFields.DOCUMENT_LANGUAGE, StringUtils.isEmpty(language) ? "default"
+                : language)), BooleanClause.Occur.MUST);
+        }
+
         try {
             TopDocs topDocs = searcher.search(query, 1);
 
-            exists = topDocs.totalHits > 1;
+            exists = topDocs.totalHits == 1;
         } catch (IOException e) {
             LOG.error("Faild to search for page [" + documentReference + "] in Lucene index", e);
         }

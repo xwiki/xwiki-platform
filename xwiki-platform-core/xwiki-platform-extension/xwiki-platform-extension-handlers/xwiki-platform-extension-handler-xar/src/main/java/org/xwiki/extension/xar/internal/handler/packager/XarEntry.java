@@ -19,8 +19,6 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
-import java.util.zip.ZipEntry;
-
 import org.xwiki.model.reference.EntityReference;
 
 public class XarEntry
@@ -29,7 +27,7 @@ public class XarEntry
 
     private String language;
 
-    private ZipEntry zipEntry;
+    private String path;
 
     public EntityReference getDocumentReference()
     {
@@ -51,14 +49,14 @@ public class XarEntry
         this.language = language;
     }
 
-    public ZipEntry getZipEntry()
+    public String getPath()
     {
-        return this.zipEntry;
+        return this.path;
     }
 
-    public void setZipEntry(ZipEntry zipEntry)
+    public void setPath(String path)
     {
-        this.zipEntry = zipEntry;
+        this.path = path;
     }
 
     // Object

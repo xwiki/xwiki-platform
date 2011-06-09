@@ -22,19 +22,19 @@ package org.xwiki.extension.xar.internal.handler.packager.xml;
 import org.dom4j.io.SAXContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 public class DocumentImporterHandler extends AbstractHandler
 {
+    private boolean fromDatabase = false;
+
     private boolean needSave = true;
 
     /**
@@ -71,56 +71,28 @@ public class DocumentImporterHandler extends AbstractHandler
     {
         try {
             XWikiContext context = getXWikiContext();
-
             XWikiDocument document = getDocument();
-            XWikiDocument dbDocument = getDatabaseDocument();
-            // TODO: get previous document
 
-            // TODO: diff previous and new document
-            // TODO: if there is differences
-            // TODO: ..apply diff to db document
+            if (!this.fromDatabase) {
+                XWikiDocument existingDocument =
+                    context.getWiki().getDocument(document.getDocumentReference(), context);
+                existingDocument = existingDocument.getTranslatedDocument(document.getLanguage(), context);
+
+                if (!existingDocument.isNew()) {
+                    document.setVersion(existingDocument.getVersion());
+                }
+
+                this.fromDatabase = true;
+            }
+
+            context.getWiki().saveDocument(document, comment, context);
+
+            setCurrentBean(getXWikiContext().getWiki().getDocument(document.getDocumentReference(), context));
         } catch (Exception e) {
             throw new SAXException("Failed to save document", e);
         }
 
         this.needSave = false;
-    }
-
-    private XWikiDocument getDatabaseDocument() throws ComponentLookupException, XWikiException
-    {
-        XWikiContext context = getXWikiContext();
-        XWikiDocument document = getDocument();
-
-        XWikiDocument existingDocument = context.getWiki().getDocument(document.getDocumentReference(), context);
-        existingDocument = existingDocument.getTranslatedDocument(document.getLanguage(), context);
-
-        return existingDocument;
-    }
-
-    private void saveAttachment(XWikiAttachment attachment, String comment) throws SAXException
-    {
-        try {
-            XWikiContext context = getXWikiContext();
-            XWikiDocument dbDocument = getDatabaseDocument();
-
-            XWikiAttachment dbAttachment = dbDocument.getAttachment(attachment.getFilename());
-
-            if (dbAttachment == null) {
-                dbDocument.getAttachmentList().add(attachment);
-            } else {
-                dbAttachment.setContent(attachment.getContentInputStream(context));
-                dbAttachment.setFilename(attachment.getFilename());
-                dbAttachment.setAuthor(attachment.getAuthor());
-            }
-
-            context.getWiki().saveDocument(dbDocument, comment, context);
-
-            // reset content to since it could consume lots of memory and it's not used in diff for now
-            attachment.setAttachment_content(null);
-            getDocument().getAttachmentList().add(attachment);
-        } catch (Exception e) {
-            throw new SAXException("Failed to save attachment [" + attachment + "]", e);
-        }
     }
 
     @Override
@@ -147,9 +119,16 @@ public class DocumentImporterHandler extends AbstractHandler
     public void endElementInternal(String uri, String localName, String qName) throws SAXException
     {
         if (qName.equals("attachment")) {
+            if (!getDocument().getAttachmentList().isEmpty()) {
+                saveDocument("Import: save first attachment");
+            }
+
             AttachmentHandler handler = (AttachmentHandler) getCurrentHandler();
 
-            saveAttachment(handler.getAttachment(), "Import: add attachment");
+            getDocument().getAttachmentList().add(handler.getAttachment());
+
+            // TODO: add attachment to document
+            saveDocument("Import: add attachment");
         } else if (qName.equals("object")) {
             try {
                 BaseObject baseObject = new BaseObject();
@@ -177,7 +156,7 @@ public class DocumentImporterHandler extends AbstractHandler
     protected void endHandlerElement(String uri, String localName, String qName) throws SAXException
     {
         if (this.needSave) {
-            saveDocument(getDocument().getAttachmentList().isEmpty() ? "Import" : "Import: final save");
+            saveDocument(this.fromDatabase ? "Import: final save" : "Import");
         }
     }
 }

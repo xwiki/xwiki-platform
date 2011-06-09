@@ -15,14 +15,14 @@ public class XarFile
 {
     private ZipFile zipFile;
 
-    private Map<XarEntry, XarEntry> entries = new HashMap<XarEntry, XarEntry>();
+    private Map<EntityReference, XarEntry> entries = new HashMap<EntityReference, XarEntry>();
 
     public XarFile(File file, Collection<XarEntry> entries) throws ZipException, IOException
     {
         this.zipFile = new ZipFile(file);
 
         for (XarEntry xarEntry : entries) {
-            this.entries.put(xarEntry, xarEntry);
+            this.entries.put(xarEntry.getDocumentReference(), xarEntry);
         }
     }
 
@@ -41,8 +41,8 @@ public class XarFile
         return this.entries.values();
     }
 
-    public XarEntry getEntry(EntityReference reference, String language)
+    public XarEntry getEntry(EntityReference reference)
     {
-        return this.entries.get(new XarEntry(reference, language));
+        return this.entries.get(reference);
     }
 }

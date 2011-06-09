@@ -19,50 +19,52 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager.xml;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.commons.lang.ObjectUtils;
-import org.suigeneris.jrcs.diff.Diff;
-import org.suigeneris.jrcs.diff.Revision;
-import org.suigeneris.jrcs.util.ToString;
+import org.dom4j.io.SAXContentHandler;
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.extension.xar.internal.handler.packager.DefaultPackager;
-import org.xwiki.extension.xar.internal.handler.packager.NotADocumentException;
-import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
-import org.xwiki.extension.xar.internal.handler.packager.XarFile;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.AttachmentDiff;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.ObjectDiff;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.BaseClass;
 
-public class DocumentImporterHandler extends DocumentHandler
+public class DocumentImporterHandler extends AbstractHandler
 {
-    private XarFile previousXarFile;
+    private boolean needSave = true;
 
-    private DefaultPackager packager;
+    /**
+     * Avoid create a new SAXContentHandler for each object/class when the same can be used for all.
+     */
+    public SAXContentHandler domBuilder = new SAXContentHandler();
 
-    public DocumentImporterHandler(DefaultPackager packager, ComponentManager componentManager, String wiki)
+    public DocumentImporterHandler(ComponentManager componentManager, String wiki)
     {
-        super(componentManager, wiki);
+        super(componentManager);
 
-        this.packager = packager;
+        setCurrentBean(new XWikiDocument(new DocumentReference(wiki, "XWiki", "Page")));
+
+        // Default syntax in a XAR is xwiki/1.0
+        getDocument().setSyntax(Syntax.XWIKI_1_0);
+
+        // skip useless known elements
+        this.skippedElements.add("version");
+        this.skippedElements.add("minorEdit");
+        this.skippedElements.add("comment");
     }
 
-    public void setPreviousXarFile(XarFile previousXarFile)
+    public XWikiDocument getDocument()
     {
-        this.previousXarFile = previousXarFile;
+        return (XWikiDocument) getCurrentBean();
+    }
+
+    public void setWiki(String wiki)
+    {
+        getDocument().setDatabase(wiki);
     }
 
     private void saveDocument(String comment) throws SAXException
@@ -71,214 +73,17 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiContext context = getXWikiContext();
 
             XWikiDocument document = getDocument();
-            XWikiDocument dbDocument = getDatabaseDocument().clone();
-            XWikiDocument previousDocument = getPreviousDocument();
+            XWikiDocument dbDocument = getDatabaseDocument();
+            // TODO: get previous document
 
-            if (previousDocument != null) {
-                if (merge(previousDocument, document, dbDocument).isModified()) {
-                    context.getWiki().saveDocument(document, comment, context);
-                }
-            } else {
-                if (!dbDocument.isNew()) {
-                    document.setVersion(dbDocument.getVersion());
-                }
-
-                context.getWiki().saveDocument(document, comment, context);
-            }
+            // TODO: diff previous and new document
+            // TODO: if there is differences
+            // TODO: ..apply diff to db document
         } catch (Exception e) {
             throw new SAXException("Failed to save document", e);
         }
-    }
 
-    private MergeResult merge(XWikiDocument document1, XWikiDocument document2, XWikiDocument documentResult)
-    {
-        MergeResult mergeResult = new MergeResult();
-
-        XWikiContext context;
-        try {
-            context = getXWikiContext();
-        } catch (ComponentLookupException e) {
-            mergeResult.getErrors().add(e);
-
-            return mergeResult;
-        }
-
-        // Title
-        documentResult.setTitle(mergeString(document1.getTitle(), document2.getTitle(), documentResult.getTitle(),
-            mergeResult));
-
-        // Content
-        documentResult.setContent(mergeString(document1.getContent(), document2.getContent(),
-            documentResult.getContent(), mergeResult));
-
-        // Parent
-        // if (!ObjectUtils.equals(document1.getAuthorReference(), document2.getAuthorReference())
-        // && ObjectUtils.equals(document1.getAuthorReference(), result.getAuthorReference())) {
-        // result.setParentReference(document2.getParentReference());
-        //
-        // mergeResult.setModified(true);
-        // }
-
-        // Author
-        if (!ObjectUtils.equals(document1.getAuthorReference(), document2.getAuthorReference())
-            && ObjectUtils.equals(document1.getAuthorReference(), documentResult.getAuthorReference())) {
-            documentResult.setAuthorReference(document2.getAuthorReference());
-
-            mergeResult.setModified(true);
-        }
-
-        // Objects
-        try {
-            List<List<ObjectDiff>> objectsDiff = document1.getObjectDiff(document1, document2, context);
-            if (!objectsDiff.isEmpty()) {
-                // Apply diff on result
-                for (List<ObjectDiff> objectClassDiff : objectsDiff) {
-                    for (ObjectDiff diff : objectClassDiff) {
-                        BaseObject objectResult =
-                            documentResult.getXObject(diff.getXClassReference(), diff.getNumber());
-                        BaseObject object1 = document1.getXObject(diff.getXClassReference(), diff.getNumber());
-                        BaseObject object2 = document2.getXObject(diff.getXClassReference(), diff.getNumber());
-                        PropertyInterface propertyResult =
-                            objectResult != null ? objectResult.getField(diff.getPropName()) : null;
-                        PropertyInterface property1 =
-                            object1 != null ? objectResult.getField(diff.getPropName()) : null;
-                        PropertyInterface property2 =
-                            object2 != null ? objectResult.getField(diff.getPropName()) : null;
-
-                        if (diff.getAction() == ObjectDiff.ACTION_OBJECTADDED) {
-                            if (objectResult != null) {
-                                documentResult.setXObject(object2.getNumber(), object2);
-                            } else {
-                                // XXX: collision between db and new ?
-                            }
-                        } else if (diff.getAction() == ObjectDiff.ACTION_OBJECTREMOVED) {
-                            if (objectResult != null) {
-                                if (objectResult.equals(object1)) {
-                                    documentResult.removeXObject(objectResult);
-                                } else {
-                                    // XXX: collision between db and new ?
-                                }
-                            }
-                        } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
-                            if (propertyResult == null) {
-                                objectResult.addField(diff.getPropName(), property2);
-                            } else {
-                                // XXX: collision between db and new ?
-                            }
-                        } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
-                            if (propertyResult != null) {
-                                if (propertyResult.equals(property1)) {
-                                    objectResult.removeField(diff.getPropName());
-                                } else {
-                                    // XXX: collision between db and new ?
-                                }
-                            }
-                        } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
-                            if (propertyResult != null) {
-                                if (propertyResult.equals(property1)) {
-                                    // TODO: refactor property
-                                } else {
-                                    // XXX: collision between db and new ?
-                                }
-                            }
-                        }
-                    }
-                }
-
-                mergeResult.setModified(true);
-            }
-        } catch (XWikiException e) {
-            mergeResult.getErrors().add(e);
-        }
-
-        // Class
-        try {
-            List<List<ObjectDiff>> classDiff = document1.getClassDiff(document1, document2, context);
-            if (!classDiff.isEmpty()) {
-                // Apply diff on result
-                BaseClass classResult = documentResult.getXClass();
-                BaseClass class1 = document1.getXClass();
-                BaseClass class2 = document2.getXClass();
-                for (ObjectDiff diff : classDiff.get(0)) {
-                    PropertyInterface propertyResult = classResult.getField(diff.getPropName());
-                    PropertyInterface property1 = class1.getField(diff.getPropName());
-                    PropertyInterface property2 = class2.getField(diff.getPropName());
-
-                    if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
-                        if (propertyResult == null) {
-                            // Add if none has been added by user already
-                            classResult.addField(diff.getPropName(), class2.getField(diff.getPropName()));
-                        } else if (!propertyResult.equals(property2)) {
-                            // XXX: collision between db and new ?
-                        }
-                    } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
-                        if (propertyResult != null) {
-                            if (propertyResult.equals(property1)) {
-                                // Delete if it's the same as previous one
-                                classResult.removeField(diff.getPropName());
-                            } else {
-                                // XXX: collision between db and new ?
-                            }
-                        }
-                    } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
-                        if (propertyResult != null) {
-                            if (propertyResult.equals(property1)) {
-                                // TODO: modify existing class property
-                            } else if (!propertyResult.equals(property2)) {
-                                // XXX: collision between db and new ?
-                            }
-                        }
-                    }
-                }
-
-                mergeResult.setModified(true);
-            }
-        } catch (XWikiException e) {
-            mergeResult.getErrors().add(e);
-        }
-
-        // Attachments
-        try {
-            List<AttachmentDiff> attachmentsDiff = document1.getAttachmentDiff(document1, document2, context);
-            if (!attachmentsDiff.isEmpty()) {
-                // Apply deleted attachment diff on result (new attachment has already been saved)
-                for (AttachmentDiff diff : attachmentsDiff) {
-                    if (diff.getNewVersion() == null) {
-                        try {
-                            XWikiAttachment attachmentResult = documentResult.getAttachment(diff.getFileName());
-
-                            documentResult.deleteAttachment(attachmentResult, context);
-
-                            mergeResult.setModified(true);
-                        } catch (XWikiException e) {
-                            mergeResult.getErrors().add(e);
-                        }
-                    }
-                }
-            }
-        } catch (XWikiException e) {
-            mergeResult.getErrors().add(e);
-        }
-
-        return mergeResult;
-    }
-
-    private String mergeString(String str1, String str2, String current, MergeResult mergeResult)
-    {
-        String result = current;
-
-        try {
-            Revision revision = Diff.diff(ToString.stringToArray(str1), ToString.stringToArray(str2));
-            if (revision.size() > 0) {
-                result = ToString.arrayToString(revision.patch(ToString.stringToArray(current)));
-
-                mergeResult.setModified(true);
-            }
-        } catch (Exception e) {
-            mergeResult.getErrors().add(e);
-        }
-
-        return result;
+        this.needSave = false;
     }
 
     private XWikiDocument getDatabaseDocument() throws ComponentLookupException, XWikiException
@@ -290,19 +95,6 @@ public class DocumentImporterHandler extends DocumentHandler
         existingDocument = existingDocument.getTranslatedDocument(document.getLanguage(), context);
 
         return existingDocument;
-    }
-
-    private XWikiDocument getPreviousDocument() throws NotADocumentException, ParserConfigurationException,
-        SAXException, IOException
-    {
-        XWikiDocument document = getDocument();
-
-        DocumentHandler documentHandler = new DocumentHandler(getComponentManager(), document.getWikiName());
-
-        this.packager.parseDocument(this.previousXarFile.getInputStream(new XarEntry(document.getSpace(), document
-            .getName(), document.getLanguage())), documentHandler);
-
-        return documentHandler.getDocument();
     }
 
     private void saveAttachment(XWikiAttachment attachment, String comment) throws SAXException
@@ -332,16 +124,60 @@ public class DocumentImporterHandler extends DocumentHandler
     }
 
     @Override
-    protected void endAttachment(String uri, String localName, String qName) throws SAXException
+    protected void currentBeanModified()
     {
-        AttachmentHandler handler = (AttachmentHandler) getCurrentHandler();
+        this.needSave = true;
+    }
 
-        saveAttachment(handler.getAttachment(), "Import: add attachment");
+    @Override
+    public void startElementInternal(String uri, String localName, String qName, Attributes attributes)
+        throws SAXException
+    {
+        if (qName.equals("attachment")) {
+            setCurrentHandler(new AttachmentHandler(getComponentManager()));
+        } else if (qName.equals("class") || qName.equals("object")) {
+            this.domBuilder.startDocument();
+            setCurrentHandler(this.domBuilder);
+        } else {
+            super.startElementInternal(uri, localName, qName, attributes);
+        }
+    }
+
+    @Override
+    public void endElementInternal(String uri, String localName, String qName) throws SAXException
+    {
+        if (qName.equals("attachment")) {
+            AttachmentHandler handler = (AttachmentHandler) getCurrentHandler();
+
+            saveAttachment(handler.getAttachment(), "Import: add attachment");
+        } else if (qName.equals("object")) {
+            try {
+                BaseObject baseObject = new BaseObject();
+                baseObject.fromXML(this.domBuilder.getDocument().getRootElement());
+                getDocument().setXObject(baseObject.getNumber(), baseObject);
+            } catch (XWikiException e) {
+                throw new SAXException("Failed to parse object", e);
+            }
+
+            this.needSave = true;
+        } else if (qName.equals("class")) {
+            try {
+                getDocument().getXClass().fromXML(this.domBuilder.getDocument().getRootElement());
+            } catch (XWikiException e) {
+                throw new SAXException("Failed to parse object", e);
+            }
+
+            this.needSave = true;
+        } else {
+            super.endElementInternal(uri, localName, qName);
+        }
     }
 
     @Override
     protected void endHandlerElement(String uri, String localName, String qName) throws SAXException
     {
-        saveDocument(getDocument().getAttachmentList().isEmpty() ? "Import" : "Import: final save");
+        if (this.needSave) {
+            saveDocument(getDocument().getAttachmentList().isEmpty() ? "Import" : "Import: final save");
+        }
     }
 }

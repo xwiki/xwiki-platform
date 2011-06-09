@@ -84,4 +84,10 @@ XWIKI_OPTS="$XWIKI_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOPPORT"
 # Specify the encoding to use
 XWIKI_OPTS="$XWIKI_OPTS -Dfile.encoding=UTF8"
 
+# Create a lock file to signify that XWiki is running
+touch xwiki.lck
+
 java $XWIKI_OPTS $3 $4 $5 $6 $7 $8 $9 -jar $JETTY_HOME/start.jar
+
+# Remove XWiki lock file
+rm -f xwiki.lck

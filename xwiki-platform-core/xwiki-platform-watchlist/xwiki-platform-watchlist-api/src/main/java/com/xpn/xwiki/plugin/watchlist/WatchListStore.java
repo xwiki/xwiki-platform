@@ -548,8 +548,8 @@ public class WatchListStore implements EventListener
      * @param context Context of the request
      * @throws XWikiException if the user's profile cannot be saved
      */
-    private void setWatchListElementsProperty(String user, ElementType type, List<String> elements, XWikiContext context)
-        throws XWikiException
+    private void setWatchListElementsProperty(String user, ElementType type, List<String> elements,
+        XWikiContext context) throws XWikiException
     {
         XWikiDocument userDocument = context.getWiki().getDocument(user, context);
         userDocument.setLargeStringValue(WATCHLIST_CLASS, getWatchListClassPropertyForType(type),

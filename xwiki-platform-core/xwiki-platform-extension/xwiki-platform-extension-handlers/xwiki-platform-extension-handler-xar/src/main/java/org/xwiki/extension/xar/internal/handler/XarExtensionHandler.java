@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
@@ -37,6 +38,7 @@ import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
+import org.xwiki.extension.xar.internal.handler.packager.XarFile;
 import org.xwiki.extension.xar.internal.repository.XarLocalExtension;
 
 @Component
@@ -51,15 +53,13 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     @Named("xar")
     private LocalExtensionRepository xarRepository;
 
+    @Inject
+    private Logger logger;
+
     // TODO: support question/answer with the UI to resolve conflicts
     public void install(LocalExtension localExtension, String wiki) throws InstallException
     {
-        // import xar into wiki (add new version when the page already exists)
-        try {
-            this.packager.importXAR(localExtension.getFile(), wiki);
-        } catch (Exception e) {
-            throw new InstallException("Failed to import xar for extension [" + localExtension + "]", e);
-        }
+        install(null, localExtension, wiki);
     }
 
     // TODO: support question/answer with the UI to resolve conflicts
@@ -77,17 +77,20 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
         // CURRENT
 
-        // Produce a pages diff between previous and new version
-        Set<XarEntry> previousPages = new HashSet<XarEntry>();
+        XarLocalExtension previousXarExtension;
         try {
-            XarLocalExtension previousXarExtension =
-                (XarLocalExtension) this.xarRepository.resolve(previousLocalExtension.getId());
-            previousPages.addAll(previousXarExtension.getPages());
+            previousXarExtension = (XarLocalExtension) this.xarRepository.resolve(previousLocalExtension.getId());
         } catch (ResolveException e) {
             // Not supposed to be possible
             throw new InstallException("Failed to get xar extension [" + previousLocalExtension.getId()
                 + "] from xar repository", e);
         }
+
+        // Install new pages
+        install(previousXarExtension, newLocalExtension, namespace);
+
+        // Uninstall old version pages not anymore in the new version
+        Set<XarEntry> previousPages = new HashSet<XarEntry>(previousXarExtension.getPages());
 
         List<XarEntry> newPages;
         try {
@@ -106,21 +109,32 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             previousPages.remove(entry);
         }
 
-        // Install new pages
-        install(newLocalExtension, namespace);
-
-        // Remove old version pages not anymore in the new version
         try {
             this.packager.unimportPages(previousPages, namespace);
         } catch (Exception e) {
-            // TODO: log warning
+            this.logger.warn("Exception when cleaning pages removed since previous xar extension version", e);
+        }
+    }
+
+    public void install(XarLocalExtension previousExtension, LocalExtension localExtension, String wiki)
+        throws InstallException
+    {
+        // import xar into wiki (add new version when the page already exists)
+        try {
+            this.packager.importXAR(previousExtension != null ? new XarFile(previousExtension.getFile(),
+                previousExtension.getPages()) : null, localExtension.getFile(), wiki);
+        } catch (Exception e) {
+            throw new InstallException("Failed to import xar for extension [" + localExtension + "]", e);
         }
     }
 
     public void uninstall(LocalExtension localExtension, String namespace) throws UninstallException
     {
         // TODO: delete pages from the wiki which belong only to this extension (several extension could have some
-        // common pages which is not very nice but still could happen technically)
+        // common pages which will cause all sort of other issues but still could happen technically)
+
+        // TODO: maybe remove only unmodified page ? At least ask for sure when question/answer system will be
+        // implemented
 
         try {
             XarLocalExtension xarLocalExtension =

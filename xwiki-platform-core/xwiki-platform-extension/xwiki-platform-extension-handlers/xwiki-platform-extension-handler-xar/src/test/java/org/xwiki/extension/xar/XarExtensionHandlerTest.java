@@ -62,6 +62,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     private TaskManager taskManager;
     
     private LocalExtensionRepository localExtensionRepository;
+    
+    private Map<String, BaseClass> classes = new HashMap<String, BaseClass>();
 
     @Before
     public void setUp() throws Exception
@@ -80,6 +82,11 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         this.localXarExtensiontId1 = new ExtensionId("test", "1.0");
         this.localXarExtensiontId2 = new ExtensionId("test", "2.0");
+        
+        // classes
+        
+        BaseClass styleSheetClass = new BaseClass();
+        this.classes.put("StyleSheetExtension", styleSheetClass);
 
         // checking
 
@@ -146,6 +153,17 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                         }
 
                         return null;
+                    }
+                });
+                
+                allowing(mockXWiki).getXClass(with(any(DocumentReference.class)), with(any(XWikiContext.class)));
+                will(new CustomAction("getXClass")
+                {
+                    public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
+                    {
+                        DocumentReference documentReference = (DocumentReference) invocation.getParameter(0);
+
+                        return classes.get(documentReference.getName());
                     }
                 });
             }

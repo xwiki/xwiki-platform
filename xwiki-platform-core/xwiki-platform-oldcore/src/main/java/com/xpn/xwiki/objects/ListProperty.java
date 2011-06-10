@@ -31,6 +31,8 @@ import org.dom4j.dom.DOMElement;
 import org.hibernate.collection.PersistentCollection;
 import org.xwiki.xml.XMLUtils;
 
+import com.xpn.xwiki.doc.merge.MergeResult;
+
 public class ListProperty extends BaseProperty implements Cloneable
 {
     protected List<String> list = new ArrayList<String>();
@@ -228,5 +230,17 @@ public class ListProperty extends BaseProperty implements Cloneable
         }
 
         return toXMLString();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseProperty#mergeValue(java.lang.Object, java.lang.Object,
+     *      com.xpn.xwiki.doc.merge.MergeResult)
+     */
+    @Override
+    protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
+    {
+        // TODO
     }
 }

@@ -47,6 +47,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.merge.CollisionException;
+import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -1311,5 +1314,79 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
 
         return difflist;
+    }
+
+    /**
+     * Apply a 3 ways merge on the current class based on provided previous and new version of the class.
+     * <p>
+     * All 3 classes are supposed to have the same reference already.
+     * 
+     * @param previousClass the previous version of the class
+     * @param newClass the next version of the class
+     * @param context the XWiki context
+     * @param the merge report
+     * @since 3.2M1
+     */
+    public void merge(BaseClass previousClass, BaseClass newClass, XWikiContext context, MergeResult mergeResult)
+    {
+        List<ObjectDiff> classDiff = previousClass.getDiff(newClass, context);
+        for (ObjectDiff diff : classDiff) {
+            PropertyClass propertyResult = (PropertyClass) getField(diff.getPropName());
+            PropertyClass previousProperty = (PropertyClass) previousClass.getField(diff.getPropName());
+            PropertyClass newProperty = (PropertyClass) newClass.getField(diff.getPropName());
+
+            if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
+                if (propertyResult == null) {
+                    // Add if none has been added by user already
+                    addField(diff.getPropName(), newClass.getField(diff.getPropName()));
+                    mergeResult.setModified(true);
+                } else if (!propertyResult.equals(newProperty)) {
+                    // XXX: collision between DB and new: property to add but already exists in the DB
+                    mergeResult.getErrors()
+                        .add(
+                            new CollisionException("Collision found on class property [" + newProperty.getReference()
+                                + "]"));
+                }
+            } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
+                if (propertyResult != null) {
+                    if (propertyResult.equals(previousProperty)) {
+                        // Delete if it's the same as previous one
+                        removeField(diff.getPropName());
+                        mergeResult.setModified(true);
+                    } else {
+                        // XXX: collision between DB and new: property to remove but not the same as previous
+                        // version
+                        mergeResult.getErrors().add(
+                            new CollisionException("Collision found on class property ["
+                                + previousProperty.getReference() + "]"));
+                    }
+                } else {
+                    // Already removed from DB, lets assume the user is prescient
+                    mergeResult.getWarnings().add(
+                        new CollisionException("Object property [" + previousProperty.getReference()
+                            + "] already removed"));
+                }
+            } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
+                if (propertyResult != null) {
+                    if (propertyResult.equals(previousProperty)) {
+                        // Let some automatic migration take care of that modification between DB and new
+                        addField(diff.getPropName(), newClass.getField(diff.getPropName()));
+                        mergeResult.setModified(true);
+                    } else if (!propertyResult.equals(newProperty)) {
+                        propertyResult.merge(previousProperty, newProperty, context, mergeResult);
+                    }
+                } else {
+                    // XXX: collision between DB and new: property to modify but does not exists in DB
+                    // Lets assume it's a mistake to fix
+                    mergeResult.getWarnings()
+                        .add(
+                            new CollisionException("Collision found on class property [" + newProperty.getReference()
+                                + "]"));
+
+                    addField(diff.getPropName(), newClass.getField(diff.getPropName()));
+                    mergeResult.setModified(true);
+                }
+            }
+        }
     }
 }

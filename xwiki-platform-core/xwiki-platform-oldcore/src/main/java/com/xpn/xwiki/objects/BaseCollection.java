@@ -51,6 +51,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.merge.CollisionException;
+import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
@@ -65,7 +67,8 @@ import com.xpn.xwiki.web.Utils;
  * 
  * @version $Id$
  */
-public abstract class BaseCollection<R extends EntityReference> extends BaseElement<R> implements ObjectInterface, Cloneable
+public abstract class BaseCollection<R extends EntityReference> extends BaseElement<R> implements ObjectInterface,
+    Cloneable
 {
     protected static final Log LOG = LogFactory.getLog(BaseCollection.class);
 
@@ -680,8 +683,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                         String newPropertyValue =
                             (newProperty.getValue() instanceof String) ? newProperty.toText() : pclass.displayView(
                                 propertyName, this, context);
-                        difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYADDED,
-                            propertyName, propertyType, "", newPropertyValue));
+                        difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
+                            ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue));
                     }
                 }
             } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
@@ -694,12 +697,14 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                     String oldPropertyValue =
                         (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
                             propertyName, oldCollection, context);
-                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
-                        propertyName, propertyType, oldPropertyValue, newPropertyValue));
+                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
+                        ObjectDiff.ACTION_PROPERTYCHANGED, propertyName, propertyType, oldPropertyValue,
+                        newPropertyValue));
                 } else {
                     // Cannot get property definition, so use the plain value
-                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
-                        propertyName, propertyType, oldProperty.toText(), newProperty.toText()));
+                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
+                        ObjectDiff.ACTION_PROPERTYCHANGED, propertyName, propertyType, oldProperty.toText(),
+                        newProperty.toText()));
                 }
             }
         }
@@ -825,5 +830,78 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         // We force to refresh the XClass reference so that next time it's retrieved again it'll be resolved against
         // the new document reference.
         this.xClassReferenceCache = null;
+    }
+
+    /**
+     * Apply a 3 ways merge on the current element based on provided previous and new version of the element.
+     * <p>
+     * All 3 elements are supposed to have the same class and reference.
+     * 
+     * @param previousElement the previous version of the element
+     * @param newElement the next version of the element
+     * @param context the XWiki context
+     * @param the merge report
+     * @since 3.2M1
+     */
+    public void merge(ElementInterface previousElement, ElementInterface newElement, XWikiContext context,
+        MergeResult mergeResult)
+    {
+        BaseCollection<R> previousCollection = (BaseCollection<R>) previousElement;
+        BaseCollection<R> newCollection = (BaseCollection<R>) newElement;
+
+        List<ObjectDiff> classDiff = previousCollection.getDiff(newCollection, context);
+        for (ObjectDiff diff : classDiff) {
+            PropertyInterface propertyResult = getField(diff.getPropName());
+            PropertyInterface previousProperty = previousCollection.getField(diff.getPropName());
+            PropertyInterface newProperty = newCollection.getField(diff.getPropName());
+
+            if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
+                if (propertyResult == null) {
+                    // Add if none has been added by user already
+                    addField(diff.getPropName(), newProperty);
+                    mergeResult.setModified(true);
+                } else if (!propertyResult.equals(newProperty)) {
+                    // XXX: collision between DB and new: property to add but already exists in the DB
+                    mergeResult.error(new CollisionException("Collision found on property ["
+                        + newProperty.getReference() + "]"));
+                }
+            } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
+                if (propertyResult != null) {
+                    if (propertyResult.equals(previousProperty)) {
+                        // Delete if it's the same as previous one
+                        removeField(diff.getPropName());
+                        mergeResult.setModified(true);
+                    } else {
+                        // XXX: collision between DB and new: property to remove but not the same as previous
+                        // version
+                        mergeResult.error(new CollisionException("Collision found on property ["
+                            + previousProperty.getReference() + "]"));
+                    }
+                } else {
+                    // Already removed from DB, lets assume the user is prescient
+                    mergeResult.warn(new CollisionException("Property [" + previousProperty.getReference()
+                        + "] already removed"));
+                }
+            } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
+                if (propertyResult != null) {
+                    if (propertyResult.equals(previousProperty)) {
+                        // Let some automatic migration take care of that modification between DB and new
+                        addField(diff.getPropName(), newProperty);
+                        mergeResult.setModified(true);
+                    } else if (!propertyResult.equals(newProperty)) {
+                        // Try to apply 3 ways merge on the property
+                        propertyResult.merge(previousProperty, newProperty, context, mergeResult);
+                    }
+                } else {
+                    // XXX: collision between DB and new: property to modify but does not exists in DB
+                    // Lets assume it's a mistake to fix
+                    mergeResult.warn(new CollisionException("Collision found on property ["
+                        + newProperty.getReference() + "]"));
+
+                    addField(diff.getPropName(), newProperty);
+                    mergeResult.setModified(true);
+                }
+            }
+        }
     }
 }

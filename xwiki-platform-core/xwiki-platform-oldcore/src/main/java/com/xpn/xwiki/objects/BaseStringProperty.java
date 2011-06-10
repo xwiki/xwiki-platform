@@ -21,11 +21,11 @@
 
 package com.xpn.xwiki.objects;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.merge.MergeResult;
 
 /**
- * Base string XProperty which all types of string XProperties extend.
- *
- * $Id$
+ * Base string XProperty which all types of string XProperties extend. $Id$
  */
 public class BaseStringProperty extends BaseProperty
 {
@@ -106,5 +106,11 @@ public class BaseStringProperty extends BaseProperty
         property.setValue(getValue());
 
         return property;
+    }
+
+    @Override
+    protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
+    {
+        setValue(mergeString((String) previousValue, (String) newValue, (String) getValue(), mergeResult));
     }
 }

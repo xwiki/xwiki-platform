@@ -6,15 +6,15 @@ http://search.maven.org/remotecontent?filepath=org/apache/httpcomponents/httpcli
 
 http://search.maven.org/remotecontent?filepath=org/apache/httpcomponents/httpcore/4.0.1/httpcore-4.0.1.jar (new)
 
-http://maven.xwiki.org/externals/com/google/gwt/gwt-servlet/2.3.0-xwiki-20110506/gwt-servlet-2.3.0-xwiki-20110506.jar (remove existing jar)
+http://maven.xwiki.org/externals/com/google/gwt/gwt-servlet/2.3.0-xwiki-20110506/gwt-servlet-2.3.0-xwiki-20110506.jar (remove existing jar gwt-servlet-2.0.4.jar)
 
 xwiki-platform-wysiwyg-client-3.2-SNAPSHOT-shared.jar (remove existing jar xwiki-web-gwt-wysiwyg-client-2.7.2-shared.jar)
 
-xwiki-web-gwt-wysiwyg-server-2.7.2.jar (overwrite)
+xwiki-web-gwt-wysiwyg-server-2.7.2.jar (overwrite existing jar)
 
 xwiki-platform-wysiwyg-plugin-alfresco-server-3.2-SNAPSHOT.jar (new)
 
-2. Update resources/js/xwiki/wysiwyg/xwe directory (delete existing folder and copy the new one; don't overwrite!)
+2. Update resources/js/xwiki/wysiwyg/xwe directory (delete the existing folder and copy the new one from the zip; don't overwrite!)
 
 3. Enable Alfresco WYSIWYG editor plugin. Edit templates/macros.vm and replace this line:
 
@@ -54,3 +54,5 @@ alfresco.username=Admin
 
 ## Required only for basic and ticket authentication
 alfresco.password=admin
+
+6. Clear browser cache.

@@ -43,7 +43,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
-public class BaseObject extends BaseCollection implements ObjectInterface, Serializable, Cloneable
+public class BaseObject extends BaseCollection<BaseObjectReference> implements ObjectInterface, Serializable, Cloneable
 {
     private String guid = UUID.randomUUID().toString();
 
@@ -98,6 +98,44 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
             reference = this.currentMixedDocumentReferenceResolver.resolve(name);
         }
         setDocumentReference(reference);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseElement#createReference()
+     */
+    protected BaseObjectReference createReference()
+    {
+        return new BaseObjectReference(getXClassReference(), getNumber(), getDocumentReference());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseCollection#setNumber(int)
+     */
+    @Override
+    public void setNumber(int number)
+    {
+        super.setNumber(number);
+
+        // Reset reference cache
+        this.referenceCache = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseCollection#setXClassReference(org.xwiki.model.reference.EntityReference)
+     */
+    @Override
+    public void setXClassReference(EntityReference xClassReference)
+    {
+        super.setXClassReference(xClassReference);
+
+        // Reset reference cache
+        this.referenceCache = null;
     }
 
     /**

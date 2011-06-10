@@ -18,38 +18,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package com.xpn.xwiki.objects;
+package com.xpn.xwiki.internal.event;
 
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
-public interface ElementInterface
+/**
+ * An event triggered when an class property is modified.
+ * 
+ * @version $Id$
+ * @since 3.2M1
+ */
+public class XClassPropertyUpdatedEvent extends AbstractXClassPropertyEvent
 {
     /**
-     * @return the reference of the element
-     * @since 3.2M1
+     * Default constructor. Matches any {@link XClassPropertyUpdatedEvent}.
      */
-    EntityReference getReference();
-
-    String toString();
+    public XClassPropertyUpdatedEvent()
+    {
+    }
 
     /**
-     * @return the reference to the document in which this element is defined (for elements where this make sense, for
-     *         example for an XClass or a XObject).
-     * @since 2.2M2
+     * @param reference the class property reference
      */
-    DocumentReference getDocumentReference();
-
-    /**
-     * @return the free form name (for elements which don't point to a reference, for example for instances of
-     *         {@link BaseProperty}).
-     */
-    String getName();
-
-    /**
-     * @since 2.2M2
-     */
-    void setDocumentReference(DocumentReference reference);
-
-    void setName(String name);
+    public XClassPropertyUpdatedEvent(EntityReference reference)
+    {
+        super(reference);
+    }
 }

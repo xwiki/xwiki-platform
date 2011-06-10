@@ -49,6 +49,7 @@ public class DefaultStringEntityReferenceSerializer implements EntityReferenceSe
             put(EntityType.SPACE, new String[] {":", ".", "\\"});
             put(EntityType.OBJECT, new String[] {"^", "\\"});
             put(EntityType.OBJECT_PROPERTY, new String[] {".", "\\"});
+            put(EntityType.CLASS_PROPERTY, new String[] {"^", "\\"});
         }
     };
 
@@ -63,6 +64,7 @@ public class DefaultStringEntityReferenceSerializer implements EntityReferenceSe
             put(EntityType.SPACE, new String[] {"\\:", "\\.", "\\\\"});
             put(EntityType.OBJECT, new String[] {"\\^", "\\\\"});
             put(EntityType.OBJECT_PROPERTY, new String[] {"\\.", "\\\\"});
+            put(EntityType.CLASS_PROPERTY, new String[] {"\\^", "\\\\"});
         }
     };
 

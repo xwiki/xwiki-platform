@@ -28,6 +28,7 @@ import org.apache.velocity.VelocityContext;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.mapping.Property;
+import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -49,10 +50,10 @@ import com.xpn.xwiki.web.Utils;
  * 
  * @version $Id$
  */
-public class PropertyClass extends BaseCollection implements PropertyClassInterface, PropertyInterface,
-    Comparable<PropertyClass>
+public class PropertyClass extends BaseCollection<ClassPropertyReference> implements PropertyClassInterface,
+    PropertyInterface, Comparable<PropertyClass>
 {
-    private BaseClass object;
+    private BaseClass xclass;
 
     private int id;
 
@@ -64,12 +65,22 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public PropertyClass(String name, String prettyname, PropertyMetaClass xWikiClass)
     {
-        super();
         setName(name);
         setPrettyName(prettyname);
         setxWikiClass(xWikiClass);
         setUnmodifiable(false);
         setDisabled(false);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseElement#createReference()
+     */
+    @Override
+    protected ClassPropertyReference createReference()
+    {
+        return new ClassPropertyReference(getName(), this.xclass.getReference());
     }
 
     public BaseClass getxWikiClass()
@@ -88,12 +99,12 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public BaseCollection getObject()
     {
-        return this.object;
+        return this.xclass;
     }
 
     public void setObject(BaseCollection object)
     {
-        this.object = (BaseClass) object;
+        this.xclass = (BaseClass) object;
     }
 
     public String getFieldFullName()
@@ -598,8 +609,9 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
         return result;
     }
-    
-    protected String getFullQueryPropertyName() {
+
+    protected String getFullQueryPropertyName()
+    {
         return "obj." + getName();
     }
 }

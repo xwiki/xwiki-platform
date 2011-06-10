@@ -67,7 +67,7 @@ import com.xpn.xwiki.web.Utils;
  * 
  * @version $Id$
  */
-public class BaseClass extends BaseCollection implements ClassInterface
+public class BaseClass extends BaseCollection<DocumentReference> implements ClassInterface
 {
     private String customMapping;
 
@@ -100,6 +100,17 @@ public class BaseClass extends BaseCollection implements ClassInterface
      */
     private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.class, "relative");
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseElement#getReference()
+     */
+    @Override
+    public DocumentReference getReference()
+    {
+        return getDocumentReference();
+    }
 
     /**
      * {@inheritDoc}

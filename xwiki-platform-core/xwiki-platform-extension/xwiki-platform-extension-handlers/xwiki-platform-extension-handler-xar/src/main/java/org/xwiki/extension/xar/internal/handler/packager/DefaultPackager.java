@@ -94,7 +94,13 @@ public class DefaultPackager implements Packager, Initializable
         this.parserFactory = SAXParserFactory.newInstance();
     }
 
-    public void importXAR(File xarFile, String wiki) throws IOException, XWikiException
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.xar.internal.handler.packager.Packager#importXAR(org.xwiki.extension.xar.internal.handler.packager.XarFile,
+     *      java.io.File, java.lang.String)
+     */
+    public void importXAR(XarFile previousXarFile, File xarFile, String wiki) throws IOException, XWikiException
     {
         if (wiki == null) {
             XWikiContext context = getXWikiContext();
@@ -102,45 +108,66 @@ public class DefaultPackager implements Packager, Initializable
                 List<String> wikis = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(context);
 
                 if (!wikis.contains(context.getMainXWiki())) {
-                    importXARToWiki(xarFile, context.getMainXWiki());
+                    importXARToWiki(previousXarFile, xarFile, context.getMainXWiki());
                 }
 
                 for (String subwiki : wikis) {
-                    importXARToWiki(xarFile, subwiki);
+                    importXARToWiki(previousXarFile, xarFile, subwiki);
                 }
             } else {
-                importXARToWiki(xarFile, context.getMainXWiki());
+                importXARToWiki(previousXarFile, xarFile, context.getMainXWiki());
             }
         } else {
-            importXARToWiki(xarFile, wiki);
+            importXARToWiki(previousXarFile, xarFile, wiki);
         }
     }
 
-    public void importXARToWiki(File xarFile, String wiki) throws IOException
+    public XarMergeResult importXARToWiki(XarFile previousXarFile, File xarFile, String wiki) throws IOException
     {
         FileInputStream fis = new FileInputStream(xarFile);
-        ZipInputStream zis = new ZipInputStream(fis);
-
         try {
-            for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
-                if (!entry.isDirectory()) {
-                    try {
-                        DocumentImporterHandler documentHandler =
-                            new DocumentImporterHandler(this.componentManager, wiki);
-
-                        parseDocument(zis, documentHandler);
-                    } catch (NotADocumentException e) {
-                        // Impossible to know that before parsing
-                    } catch (Exception e) {
-                        this.logger.error("Failed to parse document [" + entry.getName() + "]", e);
-                    }
-                }
-            }
+            return importXARToWiki(previousXarFile, fis, wiki);
         } finally {
-            zis.close();
+            fis.close();
         }
     }
 
+    public XarMergeResult importXARToWiki(XarFile previousXarFile, InputStream xarInputStream, String wiki)
+        throws IOException
+    {
+        XarMergeResult mergeResult = new XarMergeResult();
+
+        ZipInputStream zis = new ZipInputStream(xarInputStream);
+
+        for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
+            if (!entry.isDirectory()) {
+                try {
+                    DocumentImporterHandler documentHandler =
+                        new DocumentImporterHandler(this, this.componentManager, wiki);
+                    documentHandler.setPreviousXarFile(previousXarFile);
+
+                    parseDocument(zis, documentHandler);
+
+                    if (documentHandler.getMergeResult() != null) {
+                        mergeResult.addMergeResult(documentHandler.getMergeResult());
+                    }
+                } catch (NotADocumentException e) {
+                    // Impossible to know that before parsing
+                    this.logger.debug("Entry [" + entry + "] is not a document", e);
+                } catch (Exception e) {
+                    this.logger.error("Failed to parse document [" + entry.getName() + "]", e);
+                }
+            }
+        }
+
+        return mergeResult;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.xar.internal.handler.packager.Packager#unimportXAR(java.io.File, java.lang.String)
+     */
     public void unimportXAR(File xarFile, String wiki) throws IOException, XWikiException
     {
         if (wiki == null) {
@@ -168,6 +195,12 @@ public class DefaultPackager implements Packager, Initializable
         unimportPagesFromWiki(getEntries(xarFile), wiki);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.xar.internal.handler.packager.Packager#unimportPages(java.util.Collection,
+     *      java.lang.String)
+     */
     public void unimportPages(Collection<XarEntry> pages, String wiki) throws XWikiException
     {
         if (wiki == null) {
@@ -215,6 +248,11 @@ public class DefaultPackager implements Packager, Initializable
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.xar.internal.handler.packager.Packager#getEntries(java.io.File)
+     */
     public List<XarEntry> getEntries(File xarFile) throws IOException
     {
         List<XarEntry> documents = null;
@@ -223,8 +261,8 @@ public class DefaultPackager implements Packager, Initializable
         ZipInputStream zis = new ZipInputStream(fis);
 
         try {
-            for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
-                if (!entry.isDirectory()) {
+            for (ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry = zis.getNextEntry()) {
+                if (!zipEntry.isDirectory()) {
                     try {
                         XarPageLimitedHandler documentHandler = new XarPageLimitedHandler(this.componentManager);
 
@@ -235,13 +273,13 @@ public class DefaultPackager implements Packager, Initializable
                         }
 
                         XarEntry xarEntry = documentHandler.getXarEntry();
-                        xarEntry.setPath(entry.getName());
+                        xarEntry.setZipEntry(zipEntry);
 
                         documents.add(xarEntry);
                     } catch (NotADocumentException e) {
                         // Impossible to know that before parsing
                     } catch (Exception e) {
-                        this.logger.error("Failed to parse document [" + entry.getName() + "]", e);
+                        this.logger.error("Failed to parse document [" + zipEntry.getName() + "]", e);
                     }
                 }
             }
@@ -252,7 +290,7 @@ public class DefaultPackager implements Packager, Initializable
         return documents != null ? documents : Collections.<XarEntry> emptyList();
     }
 
-    private void parseDocument(InputStream in, ContentHandler documentHandler) throws ParserConfigurationException,
+    public void parseDocument(InputStream in, ContentHandler documentHandler) throws ParserConfigurationException,
         SAXException, IOException, NotADocumentException
     {
         SAXParser saxParser = this.parserFactory.newSAXParser();

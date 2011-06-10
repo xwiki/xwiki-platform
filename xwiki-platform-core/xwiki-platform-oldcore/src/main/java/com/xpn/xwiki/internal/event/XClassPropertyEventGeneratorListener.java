@@ -23,10 +23,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -36,7 +34,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
@@ -58,12 +55,6 @@ public class XClassPropertyEventGeneratorListener implements EventListener
      */
     private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentDeletedEvent(),
         new DocumentCreatedEvent(), new DocumentUpdatedEvent());
-
-    /**
-     * The logger to log.
-     */
-    @Inject
-    private Logger logger;
 
     /**
      * {@inheritDoc}
@@ -143,27 +134,22 @@ public class XClassPropertyEventGeneratorListener implements EventListener
     {
         ObservationManager observation = Utils.getComponent(ObservationManager.class);
 
-        try {
-            BaseClass baseClass = doc.getXClass();
-            BaseClass baseClassOriginal = originalDoc.getXClass();
+        BaseClass baseClass = doc.getXClass();
+        BaseClass baseClassOriginal = originalDoc.getXClass();
 
-            for (List<ObjectDiff> objectChanges : doc.getClassDiff(originalDoc, doc, context)) {
-                for (ObjectDiff diff : objectChanges) {
-                    PropertyInterface property = baseClass.getField(diff.getPropName());
-                    PropertyInterface propertyOriginal = baseClassOriginal.getField(diff.getPropName());
+        for (List<ObjectDiff> objectChanges : doc.getClassDiff(originalDoc, doc, context)) {
+            for (ObjectDiff diff : objectChanges) {
+                PropertyInterface property = baseClass.getField(diff.getPropName());
+                PropertyInterface propertyOriginal = baseClassOriginal.getField(diff.getPropName());
 
-                    if (ObjectDiff.ACTION_PROPERTYREMOVED.equals(diff.getAction())) {
-                        observation.notify(new XClassPropertyDeletedEvent(propertyOriginal.getReference()), doc,
-                            context);
-                    } else if (ObjectDiff.ACTION_PROPERTYADDED.equals(diff.getAction())) {
-                        observation.notify(new XClassPropertyAddedEvent(property.getReference()), doc, context);
-                    } else if (ObjectDiff.ACTION_PROPERTYCHANGED.equals(diff.getAction())) {
-                        observation.notify(new XClassPropertyUpdatedEvent(property.getReference()), doc, context);
-                    }
+                if (ObjectDiff.ACTION_PROPERTYREMOVED.equals(diff.getAction())) {
+                    observation.notify(new XClassPropertyDeletedEvent(propertyOriginal.getReference()), doc, context);
+                } else if (ObjectDiff.ACTION_PROPERTYADDED.equals(diff.getAction())) {
+                    observation.notify(new XClassPropertyAddedEvent(property.getReference()), doc, context);
+                } else if (ObjectDiff.ACTION_PROPERTYCHANGED.equals(diff.getAction())) {
+                    observation.notify(new XClassPropertyUpdatedEvent(property.getReference()), doc, context);
                 }
             }
-        } catch (XWikiException e) {
-            this.logger.error("Failed to diff documents [" + originalDoc + "] and [" + doc + "]");
         }
     }
 }

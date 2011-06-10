@@ -1441,7 +1441,7 @@ public class Document extends Api
         }
     }
 
-    public List<List<ObjectDiff>> getObjectDiff(Document origdoc, Document newdoc) throws XWikiException
+    public List<List<ObjectDiff>> getObjectDiff(Document origdoc, Document newdoc)
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {
@@ -1469,7 +1469,7 @@ public class Document extends Api
         }
     }
 
-    public List<List<ObjectDiff>> getClassDiff(Document origdoc, Document newdoc) throws XWikiException
+    public List<List<ObjectDiff>> getClassDiff(Document origdoc, Document newdoc)
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {
@@ -1497,7 +1497,7 @@ public class Document extends Api
         }
     }
 
-    public List<AttachmentDiff> getAttachmentDiff(Document origdoc, Document newdoc) throws XWikiException
+    public List<AttachmentDiff> getAttachmentDiff(Document origdoc, Document newdoc)
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {

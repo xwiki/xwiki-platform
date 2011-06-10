@@ -23,11 +23,20 @@ package com.xpn.xwiki.objects;
 
 import org.dom4j.Element;
 
-public interface PropertyInterface extends ElementInterface {
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.merge.MergeResult;
+
+public interface PropertyInterface extends ElementInterface
+{
     public int getId();
+
     public void setId(int id);
+
     public BaseCollection getObject();
+
     public void setObject(BaseCollection object);
+
     public String toFormString();
+
     public Element toXML();
 }

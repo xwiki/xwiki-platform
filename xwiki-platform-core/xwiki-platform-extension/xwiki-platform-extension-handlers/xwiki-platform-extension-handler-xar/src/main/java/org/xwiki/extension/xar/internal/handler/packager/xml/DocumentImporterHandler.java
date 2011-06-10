@@ -19,144 +19,152 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager.xml;
 
-import org.dom4j.io.SAXContentHandler;
-import org.xml.sax.Attributes;
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.xml.sax.SAXException;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.extension.xar.internal.handler.packager.DefaultPackager;
+import org.xwiki.extension.xar.internal.handler.packager.NotADocumentException;
+import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
+import org.xwiki.extension.xar.internal.handler.packager.XarEntryMergeResult;
+import org.xwiki.extension.xar.internal.handler.packager.XarFile;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.doc.merge.MergeResult;
 
-public class DocumentImporterHandler extends AbstractHandler
+public class DocumentImporterHandler extends DocumentHandler
 {
-    private boolean fromDatabase = false;
+    private XarFile previousXarFile;
 
-    private boolean needSave = true;
+    private DefaultPackager packager;
 
-    /**
-     * Avoid create a new SAXContentHandler for each object/class when the same can be used for all.
-     */
-    public SAXContentHandler domBuilder = new SAXContentHandler();
+    private XarEntryMergeResult mergeResult;
 
-    public DocumentImporterHandler(ComponentManager componentManager, String wiki)
+    public DocumentImporterHandler(DefaultPackager packager, ComponentManager componentManager, String wiki)
     {
-        super(componentManager);
+        super(componentManager, wiki);
 
-        setCurrentBean(new XWikiDocument(new DocumentReference(wiki, "XWiki", "Page")));
-
-        // Default syntax in a XAR is xwiki/1.0
-        getDocument().setSyntax(Syntax.XWIKI_1_0);
-
-        // skip useless known elements
-        this.skippedElements.add("version");
-        this.skippedElements.add("minorEdit");
-        this.skippedElements.add("comment");
+        this.packager = packager;
     }
 
-    public XWikiDocument getDocument()
+    public void setPreviousXarFile(XarFile previousXarFile)
     {
-        return (XWikiDocument) getCurrentBean();
+        this.previousXarFile = previousXarFile;
     }
 
-    public void setWiki(String wiki)
+    public XarEntryMergeResult getMergeResult()
     {
-        getDocument().setDatabase(wiki);
+        return mergeResult;
     }
 
     private void saveDocument(String comment) throws SAXException
     {
         try {
             XWikiContext context = getXWikiContext();
+
             XWikiDocument document = getDocument();
+            XWikiDocument dbDocument = getDatabaseDocument().clone();
+            XWikiDocument previousDocument = getPreviousDocument();
 
-            if (!this.fromDatabase) {
-                XWikiDocument existingDocument =
-                    context.getWiki().getDocument(document.getDocumentReference(), context);
-                existingDocument = existingDocument.getTranslatedDocument(document.getLanguage(), context);
-
-                if (!existingDocument.isNew()) {
-                    document.setVersion(existingDocument.getVersion());
+            if (previousDocument != null && !dbDocument.isNew()) {
+                MergeResult documentMergeResult = dbDocument.merge(previousDocument, document, context);
+                if (documentMergeResult.isModified()) {
+                    context.getWiki().saveDocument(dbDocument, comment, context);
+                }
+                this.mergeResult =
+                    new XarEntryMergeResult(new XarEntry(dbDocument.getDocumentReference(), dbDocument.getLanguage()),
+                        documentMergeResult);
+            } else {
+                if (!dbDocument.isNew()) {
+                    document.setVersion(dbDocument.getVersion());
                 }
 
-                this.fromDatabase = true;
+                context.getWiki().saveDocument(document, comment, context);
             }
-
-            context.getWiki().saveDocument(document, comment, context);
-
-            setCurrentBean(getXWikiContext().getWiki().getDocument(document.getDocumentReference(), context));
         } catch (Exception e) {
             throw new SAXException("Failed to save document", e);
         }
-
-        this.needSave = false;
     }
 
-    @Override
-    protected void currentBeanModified()
+    private XWikiDocument getDatabaseDocument() throws ComponentLookupException, XWikiException
     {
-        this.needSave = true;
+        XWikiContext context = getXWikiContext();
+        XWikiDocument document = getDocument();
+
+        XWikiDocument existingDocument = context.getWiki().getDocument(document.getDocumentReference(), context);
+        existingDocument = existingDocument.getTranslatedDocument(document.getLanguage(), context);
+
+        return existingDocument;
     }
 
-    @Override
-    public void startElementInternal(String uri, String localName, String qName, Attributes attributes)
-        throws SAXException
+    private XWikiDocument getPreviousDocument() throws NotADocumentException, ParserConfigurationException,
+        SAXException, IOException
     {
-        if (qName.equals("attachment")) {
-            setCurrentHandler(new AttachmentHandler(getComponentManager()));
-        } else if (qName.equals("class") || qName.equals("object")) {
-            this.domBuilder.startDocument();
-            setCurrentHandler(this.domBuilder);
-        } else {
-            super.startElementInternal(uri, localName, qName, attributes);
+        XWikiDocument previousDocument = null;
+
+        if (previousXarFile != null) {
+            XWikiDocument document = getDocument();
+
+            DocumentHandler documentHandler = new DocumentHandler(getComponentManager(), document.getWikiName());
+
+            XarEntry realEntry =
+                this.previousXarFile.getEntry(new EntityReference(document.getName(), EntityType.DOCUMENT,
+                    new EntityReference(document.getSpace(), EntityType.SPACE)), document.getRealLanguage());
+            if (realEntry != null) {
+                this.packager.parseDocument(this.previousXarFile.getInputStream(realEntry), documentHandler);
+
+                previousDocument = documentHandler.getDocument();
+            }
+        }
+
+        return previousDocument;
+    }
+
+    private void saveAttachment(XWikiAttachment attachment, String comment) throws SAXException
+    {
+        try {
+            XWikiContext context = getXWikiContext();
+            XWikiDocument dbDocument = getDatabaseDocument();
+
+            XWikiAttachment dbAttachment = dbDocument.getAttachment(attachment.getFilename());
+
+            if (dbAttachment == null) {
+                dbDocument.getAttachmentList().add(attachment);
+            } else {
+                dbAttachment.setContent(attachment.getContentInputStream(context));
+                dbAttachment.setFilename(attachment.getFilename());
+                dbAttachment.setAuthor(attachment.getAuthor());
+            }
+
+            context.getWiki().saveDocument(dbDocument, comment, context);
+
+            // reset content to since it could consume lots of memory and it's not used in diff for now
+            attachment.setAttachment_content(null);
+            getDocument().getAttachmentList().add(attachment);
+        } catch (Exception e) {
+            throw new SAXException("Failed to save attachment [" + attachment + "]", e);
         }
     }
 
     @Override
-    public void endElementInternal(String uri, String localName, String qName) throws SAXException
+    protected void endAttachment(String uri, String localName, String qName) throws SAXException
     {
-        if (qName.equals("attachment")) {
-            if (!getDocument().getAttachmentList().isEmpty()) {
-                saveDocument("Import: save first attachment");
-            }
+        AttachmentHandler handler = (AttachmentHandler) getCurrentHandler();
 
-            AttachmentHandler handler = (AttachmentHandler) getCurrentHandler();
-
-            getDocument().getAttachmentList().add(handler.getAttachment());
-
-            // TODO: add attachment to document
-            saveDocument("Import: add attachment");
-        } else if (qName.equals("object")) {
-            try {
-                BaseObject baseObject = new BaseObject();
-                baseObject.fromXML(this.domBuilder.getDocument().getRootElement());
-                getDocument().setXObject(baseObject.getNumber(), baseObject);
-            } catch (XWikiException e) {
-                throw new SAXException("Failed to parse object", e);
-            }
-
-            this.needSave = true;
-        } else if (qName.equals("class")) {
-            try {
-                getDocument().getXClass().fromXML(this.domBuilder.getDocument().getRootElement());
-            } catch (XWikiException e) {
-                throw new SAXException("Failed to parse object", e);
-            }
-
-            this.needSave = true;
-        } else {
-            super.endElementInternal(uri, localName, qName);
-        }
+        saveAttachment(handler.getAttachment(), "Import: add attachment");
     }
 
     @Override
     protected void endHandlerElement(String uri, String localName, String qName) throws SAXException
     {
-        if (this.needSave) {
-            saveDocument(this.fromDatabase ? "Import: final save" : "Import");
-        }
+        saveDocument(getDocument().getAttachmentList().isEmpty() ? "Import" : "Import: final save");
     }
 }

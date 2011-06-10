@@ -21,12 +21,18 @@
 
 package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.web.Utils;
+import java.io.Serializable;
+
+import org.suigeneris.jrcs.diff.Diff;
+import org.suigeneris.jrcs.diff.Revision;
+import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
-import java.io.Serializable;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Base class for representing an element having a name (either a reference of a free form name) and a pretty name.
@@ -77,11 +83,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     }
 
     /**
-<<<<<<< HEAD
-     * @since 3.2M1
-=======
-     @since 3.2M1.2M1
->>>>>>> XWIKI-6661: Add API to get ElementInterface references
+     * @since 3.2M1.2M1
      */
     protected R createReference()
     {
@@ -233,5 +235,47 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         }
 
         return element;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.ElementInterface#merge(com.xpn.xwiki.objects.ElementInterface,
+     *      com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.XWikiContext, com.xpn.xwiki.doc.merge.MergeResult)
+     */
+    @Override
+    public void merge(ElementInterface previousElement, ElementInterface newElement, XWikiContext context,
+        MergeResult mergeResult)
+    {
+        setPrettyName(mergeString(((BaseElement) previousElement).getPrettyName(),
+            ((BaseElement) newElement).getPrettyName(), getPrettyName(), mergeResult));
+    }
+
+    /**
+     * Try to apply a 3 ways merge of provided String.
+     * 
+     * @param previousStr previous version of the string
+     * @param newStr new version of the string
+     * @param currentStr current version of the string
+     * @param mergeResult merge report
+     * @return the merged value of the string
+     * @since 3.2M1
+     */
+    protected String mergeString(String previousStr, String newStr, String currentStr, MergeResult mergeResult)
+    {
+        String result = currentStr;
+
+        try {
+            Revision revision = Diff.diff(ToString.stringToArray(previousStr), ToString.stringToArray(newStr));
+            if (revision.size() > 0) {
+                result = ToString.arrayToString(revision.patch(ToString.stringToArray(currentStr)));
+
+                mergeResult.setModified(true);
+            }
+        } catch (Exception e) {
+            mergeResult.getErrors().add(e);
+        }
+
+        return result;
     }
 }

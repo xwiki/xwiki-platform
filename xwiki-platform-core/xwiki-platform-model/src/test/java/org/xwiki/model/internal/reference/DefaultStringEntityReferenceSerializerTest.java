@@ -244,7 +244,7 @@ public class DefaultStringEntityReferenceSerializerTest
 
         // property reference with no object
         reference = resolver.resolve("wiki:space.page.property", EntityType.CLASS_PROPERTY);
-        Assert.assertEquals("defwiki:defspace.defpage^wiki:space.page.property", serializer.serialize(reference));
+        Assert.assertEquals("defwiki:defspace.defpage^wiki:space\\.page\\.property", serializer.serialize(reference));
 
         // test escaping character
         reference = resolver.resolve("wiki:space.page^Obje\\^ct", EntityType.CLASS_PROPERTY);
@@ -254,7 +254,7 @@ public class DefaultStringEntityReferenceSerializerTest
         Assert.assertEquals("wiki:spa^ce.page^Obje\\^ct", serializer.serialize(reference));
 
         reference = resolver.resolve(":.\\^@", EntityType.CLASS_PROPERTY);
-        Assert.assertEquals("defwiki:defspace.defpage^:.\\^@", serializer.serialize(reference));
+        Assert.assertEquals("defwiki:defspace.defpage^:\\.\\^@", serializer.serialize(reference));
     }
 
     @Test

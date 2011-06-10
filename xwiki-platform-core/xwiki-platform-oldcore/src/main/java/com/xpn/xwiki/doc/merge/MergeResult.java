@@ -32,7 +32,7 @@ public class MergeResult
     /**
      * @see #isModified()
      */
-    private boolean modified = false;
+    private boolean modified;
 
     /**
      * @see #getErrors()
@@ -85,11 +85,21 @@ public class MergeResult
         return this.warnings;
     }
 
+    /**
+     * Add error.
+     * 
+     * @param e the error
+     */
     public void error(Exception e)
     {
         getErrors().add(e);
     }
 
+    /**
+     * Add warning.
+     * 
+     * @param e the warning
+     */
     public void warn(Exception e)
     {
         getWarnings().add(e);

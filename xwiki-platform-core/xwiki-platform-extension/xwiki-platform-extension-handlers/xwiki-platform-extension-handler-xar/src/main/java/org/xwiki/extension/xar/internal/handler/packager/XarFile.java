@@ -33,7 +33,12 @@ public class XarFile
 
     public InputStream getInputStream(XarEntry entry) throws IOException
     {
-        return this.zipFile.getInputStream(entry.getZipEntry());
+        XarEntry realEntry = this.entries.get(entry);
+        if (realEntry == null) {
+            throw new IOException("Failed to find entry [" + entry + "]");
+        }
+
+        return this.zipFile.getInputStream(realEntry.getZipEntry());
     }
 
     public Collection<XarEntry> getEntries()

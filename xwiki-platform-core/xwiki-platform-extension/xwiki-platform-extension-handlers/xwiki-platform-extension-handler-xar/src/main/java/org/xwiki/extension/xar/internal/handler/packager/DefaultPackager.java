@@ -148,7 +148,9 @@ public class DefaultPackager implements Packager, Initializable
 
                     parseDocument(zis, documentHandler);
 
-                    mergeResult.addMergeResult(documentHandler.getMergeResult());
+                    if (documentHandler.getMergeResult() != null) {
+                        mergeResult.addMergeResult(documentHandler.getMergeResult());
+                    }
                 } catch (NotADocumentException e) {
                     // Impossible to know that before parsing
                     this.logger.debug("Entry [" + entry + "] is not a document", e);

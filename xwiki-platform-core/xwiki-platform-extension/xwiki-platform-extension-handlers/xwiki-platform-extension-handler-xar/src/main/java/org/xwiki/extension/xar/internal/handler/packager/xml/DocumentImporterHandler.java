@@ -31,6 +31,8 @@ import org.xwiki.extension.xar.internal.handler.packager.NotADocumentException;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntryMergeResult;
 import org.xwiki.extension.xar.internal.handler.packager.XarFile;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -72,10 +74,10 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiDocument dbDocument = getDatabaseDocument().clone();
             XWikiDocument previousDocument = getPreviousDocument();
 
-            if (previousDocument != null) {
+            if (previousDocument != null && !dbDocument.isNew()) {
                 MergeResult documentMergeResult = dbDocument.merge(previousDocument, document, context);
                 if (documentMergeResult.isModified()) {
-                    context.getWiki().saveDocument(document, comment, context);
+                    context.getWiki().saveDocument(dbDocument, comment, context);
                 }
                 this.mergeResult =
                     new XarEntryMergeResult(new XarEntry(dbDocument.getDocumentReference(), dbDocument.getLanguage()),
@@ -106,14 +108,24 @@ public class DocumentImporterHandler extends DocumentHandler
     private XWikiDocument getPreviousDocument() throws NotADocumentException, ParserConfigurationException,
         SAXException, IOException
     {
-        XWikiDocument document = getDocument();
+        XWikiDocument previousDocument = null;
 
-        DocumentHandler documentHandler = new DocumentHandler(getComponentManager(), document.getWikiName());
+        if (previousXarFile != null) {
+            XWikiDocument document = getDocument();
 
-        this.packager.parseDocument(this.previousXarFile.getInputStream(new XarEntry(document.getSpace(), document
-            .getName(), document.getLanguage())), documentHandler);
+            DocumentHandler documentHandler = new DocumentHandler(getComponentManager(), document.getWikiName());
 
-        return documentHandler.getDocument();
+            XarEntry realEntry =
+                this.previousXarFile.getEntry(new EntityReference(document.getName(), EntityType.DOCUMENT,
+                    new EntityReference(document.getSpace(), EntityType.SPACE)), document.getRealLanguage());
+            if (realEntry != null) {
+                this.packager.parseDocument(this.previousXarFile.getInputStream(realEntry), documentHandler);
+
+                previousDocument = documentHandler.getDocument();
+            }
+        }
+
+        return previousDocument;
     }
 
     private void saveAttachment(XWikiAttachment attachment, String comment) throws SAXException

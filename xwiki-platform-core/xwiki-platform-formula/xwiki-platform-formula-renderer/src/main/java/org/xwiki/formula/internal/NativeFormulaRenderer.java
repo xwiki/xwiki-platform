@@ -88,10 +88,11 @@ public class NativeFormulaRenderer extends AbstractFormulaRenderer implements In
         File tmpDirectory = null;
         try {
             String texContent =
-                "\\documentclass[10pt]{article}\n" + "\\usepackage{amsmath}\n" + "\\usepackage{amsfonts}\n"
-                    + "\\usepackage{amssymb}\n" + "\\usepackage{pst-plot}\n" + "\\usepackage{color}\n"
-                    + "\\pagestyle{empty}\n" + "\\begin{document}\n" + size.getCommand() + "\n"
-                    + wrapFormula(formula, inline) + "\\end{document}\n";
+                "\\documentclass[10pt]{article}\n" + "\\usepackage[paperheight=1000in]{geometry}\n"
+                    + "\\usepackage{amsmath}\n" + "\\usepackage{amsfonts}\n" + "\\usepackage{amssymb}\n"
+                    + "\\usepackage{pst-plot}\n" + "\\usepackage{color}\n" + "\\pagestyle{empty}\n"
+                    + "\\begin{document}\n" + size.getCommand() + "\n" + wrapFormula(formula, inline)
+                    + "\\end{document}\n";
             do {
                 tmpDirectory = new File(this.tempDirectory, RandomStringUtils.randomAlphanumeric(8));
             } while (tmpDirectory.exists());

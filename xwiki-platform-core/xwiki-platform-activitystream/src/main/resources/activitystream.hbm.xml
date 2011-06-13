@@ -9,15 +9,15 @@
       <generator class="assigned" />
     </id>
     <property name="requestId" type="string" column="ase_requestid" length="2000" />
-    <property name="stream" type="string" column="ase_stream" length="255" />
-    <property name="date" type="timestamp" column="ase_date" />
-    <property name="priority" type="integer" column="ase_priority" />
-    <property name="type" type="string" column="ase_type" length="255" />
-    <property name="application" type="string" column="ase_application" length="255" />
-    <property name="user" type="string" column="ase_user" length="255" />
-    <property name="wiki" type="string" column="ase_wiki" length="255" />
-    <property name="space" type="string" column="ase_space" length="255" />
-    <property name="page" type="string" column="ase_page" length="255" />
+    <property name="stream" type="string" column="ase_stream" length="255" index="EVENT_STREAM" />
+    <property name="date" type="timestamp" column="ase_date" index="EVENT_DATE" />
+    <property name="priority" type="integer" column="ase_priority" index="EVENT_PRIORITY" />
+    <property name="type" type="string" column="ase_type" length="255" index="EVENT_TYPE" />
+    <property name="application" type="string" column="ase_application" length="255" index="EVENT_APP" />
+    <property name="user" type="string" column="ase_user" length="255" index="EVENT_USER" />
+    <property name="wiki" type="string" column="ase_wiki" length="255" index="EVENT_WIKI" />
+    <property name="space" type="string" column="ase_space" length="255" index="EVENT_SPACE" />
+    <property name="page" type="string" column="ase_page" length="255" index="EVENT_PAGE" />
     <property name="url" type="string" column="ase_url" length="2000" />
     <property name="title" type="string" column="ase_title" length="2000" />
     <property name="body" type="string" column="ase_body" length="2000" />

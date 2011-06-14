@@ -152,7 +152,7 @@ public class XObjectEventGeneratorListener implements EventListener
                     if (ObjectDiff.ACTION_OBJECTADDED.equals(diff.getAction())) {
                         observation.notify(new XObjectAddedEvent(xobject.getReference()), doc, context);
                     } else {
-                        if (!modified) {
+                        if (!modified && xobject != null && xobjectOriginal != null) {
                             observation.notify(new XObjectUpdatedEvent(xobject.getReference()), doc, context);
                             modified = true;
                         }

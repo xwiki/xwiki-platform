@@ -22,6 +22,7 @@ package org.xwiki.rest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -31,7 +32,6 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
@@ -83,7 +83,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      * The XWiki component manager that is used to lookup XWiki components and context.
      * </p>
      */
-    @Requirement
+    @Inject
     protected ComponentManager componentManager;
 
     /**
@@ -91,7 +91,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      * The query manager to be used to perform low-level queries for retrieving information about wiki content.
      * </p>
      */
-    @Requirement
+    @Inject
     protected QueryManager queryManager;
 
     /**

@@ -79,12 +79,22 @@ import com.xpn.xwiki.objects.BaseElement;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.BaseStringProperty;
+import com.xpn.xwiki.objects.DBStringListProperty;
+import com.xpn.xwiki.objects.DoubleProperty;
+import com.xpn.xwiki.objects.FloatProperty;
+import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
+import com.xpn.xwiki.objects.LongProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
+import com.xpn.xwiki.objects.classes.ListClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.render.XWikiRenderer;
@@ -530,7 +540,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 bclass.setDocumentReference(doc.getDocumentReference());
                 // Store this XWikiClass in the context so that we can use it in case of recursive usage of classes
                 context.addBaseClass(bclass);
-
                 // Update instances of the class, in case some properties changed their storage type
 
                 // In case the current document has both a class and instances of that class, we have to take care
@@ -544,35 +553,108 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                 }
                 for (PropertyClass prop : (Collection<PropertyClass>) bclass.getFieldList()) {
-                    Query q = session.createQuery("select p from BaseProperty as p, BaseObject as o"
-                        + " where o.className=? and p.id=o.id and p.name=? and p.classType <> ?");
-                    q.setString(0, bclass.getName());
-                    q.setString(1, prop.getName());
-                    q.setString(2, prop.newProperty().getClassType());
-                    @SuppressWarnings("unchecked")
-                    List<BaseProperty> brokenProperties = q.list();
-                    for (BaseProperty brokenProperty : brokenProperties) {
-                        BaseProperty newProperty = prop.fromString(brokenProperty.toText());
-                        BaseObject localObject = localClassObjects.get(brokenProperty.getId());
-                        if (localObject != null) {
-                            BaseProperty currentProperty = (BaseProperty) localObject.get(prop.getName());
-                            if (currentProperty != null) {
-                                newProperty = prop.fromString(currentProperty.toText());
-                                if (newProperty != null) {
-                                    localObject.put(prop.getName(), newProperty);
-                                } else {
-                                    localObject.put(prop.getName(), brokenProperty);
+                    // migrate values of list properties
+                    if (prop instanceof StaticListClass || prop instanceof DBListClass) {
+                        ListClass lc = (ListClass) prop;
+                        String[] classes = {DBStringListProperty.class.getName(), StringListProperty.class.getName(),
+                            StringProperty.class.getName()}; // @see ListClass#newProperty()
+                        for (int i = 0; i < classes.length; i++) {
+                            String oldclass = classes[i];
+                            if (!oldclass.equals(lc.newProperty().getClass().getName())) {
+                                Query q = session.createQuery("select p from " + oldclass + " as p, BaseObject as o"
+                                    + " where o.className=? and p.id=o.id and p.name=?").setString(0,
+                                    bclass.getName()).setString(1, lc.getName());
+                                for (Iterator it = q.list().iterator(); it.hasNext();) {
+                                    BaseProperty lp = (BaseProperty) it.next();
+                                    BaseProperty lp1 = lc.newProperty();
+                                    lp1.setId(lp.getId());
+                                    lp1.setName(lp.getName());
+                                    if (lc.isMultiSelect()) {
+                                        List tmp;
+                                        if (lp.getValue() instanceof List) {
+                                            tmp = (List) lp.getValue();
+                                        } else {
+                                            tmp = new ArrayList<String>(1);
+                                            tmp.add(lp.getValue());
+                                        }
+                                        lp1.setValue(tmp);
+                                    } else {
+                                        Object tmp = lp.getValue();
+                                        if (tmp instanceof List && ((List) tmp).size() > 0) {
+                                            tmp = ((List) tmp).get(0);
+                                        }
+                                        lp1.setValue(tmp);
+                                    }
+                                    session.delete(lp);
+                                    session.save(lp1);
                                 }
                             }
                         }
-                        if (newProperty == null) {
-                            log.warn("Incompatible data migration when changing field {} of class {}", prop.getName(),
-                                prop.getClassName());
-                            continue;
+                    }
+                    // migrate values of list properties
+                    else if (prop instanceof NumberClass) {
+                        NumberClass nc = (NumberClass) prop;
+                        // @see NumberClass#newProperty()
+                        String[] classes =
+                            {IntegerProperty.class.getName(), LongProperty.class.getName(),
+                            FloatProperty.class.getName(), DoubleProperty.class.getName()};
+                        for (int i = 0; i < classes.length; i++) {
+                            String oldclass = classes[i];
+                            if (!oldclass.equals(nc.newProperty().getClass().getName())) {
+                                Query q = session.createQuery(
+                                    "select p from " + oldclass + " as p, BaseObject as o" + " where o.className=?"
+                                    + "  and p.id=o.id and p.name=?").setString(0, bclass.getName()).setString(
+                                    1, nc.getName());
+                                for (BaseProperty np : (List<BaseProperty>) q.list()) {
+                                    BaseProperty np1 = nc.newProperty();
+                                    np1.setId(np.getId());
+                                    np1.setName(np.getName());
+                                    if (nc.getNumberType().equals("integer")) {
+                                        np1.setValue(Integer.valueOf(((Number) np.getValue()).intValue()));
+                                    } else if (nc.getNumberType().equals("float")) {
+                                        np1.setValue(Float.valueOf(((Number) np.getValue()).floatValue()));
+                                    } else if (nc.getNumberType().equals("double")) {
+                                        np1.setValue(Double.valueOf(((Number) np.getValue()).doubleValue()));
+                                    } else if (nc.getNumberType().equals("long")) {
+                                        np1.setValue(Long.valueOf(((Number) np.getValue()).longValue()));
+                                    }
+                                    session.delete(np);
+                                    session.save(np1);
+                                }
+                            }
                         }
-                        newProperty.setId(brokenProperty.getId());
-                        session.delete(brokenProperty);
-                        session.save(newProperty);
+                    } else {
+                        // General migration of properties
+                        Query q = session.createQuery("select p from BaseProperty as p, BaseObject as o"
+                            + " where o.className=? and p.id=o.id and p.name=? and p.classType <> ?");
+                        q.setString(0, bclass.getName());
+                        q.setString(1, prop.getName());
+                        q.setString(2, prop.newProperty().getClassType());
+                        @SuppressWarnings("unchecked")
+                        List<BaseProperty> brokenProperties = q.list();
+                        for (BaseProperty brokenProperty : brokenProperties) {
+                            BaseProperty newProperty = prop.fromString(brokenProperty.toText());
+                            BaseObject localObject = localClassObjects.get(brokenProperty.getId());
+                            if (localObject != null) {
+                                BaseProperty currentProperty = (BaseProperty) localObject.get(prop.getName());
+                                if (currentProperty != null) {
+                                    newProperty = prop.fromString(currentProperty.toText());
+                                    if (newProperty != null) {
+                                        localObject.put(prop.getName(), newProperty);
+                                    } else {
+                                        localObject.put(prop.getName(), brokenProperty);
+                                    }
+                                }
+                            }
+                            if (newProperty == null) {
+                                log.warn("Incompatible data migration when changing field {} of class {}",
+                                    prop.getName(), prop.getClassName());
+                                continue;
+                            }
+                            newProperty.setId(brokenProperty.getId());
+                            session.delete(brokenProperty);
+                            session.save(newProperty);
+                        }
                     }
                 }
             }

@@ -19,18 +19,18 @@
  */
 package org.xwiki.rest;
 
-import java.security.Principal;
 import java.util.logging.Level;
 
 import org.restlet.Context;
-import org.restlet.Guard;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Form;
-import org.restlet.data.Request;
+import org.restlet.engine.http.header.HeaderConstants;
+import org.restlet.security.ChallengeAuthenticator;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rest.resources.BrowserAuthenticationResource;
 
-import com.noelios.restlet.http.HttpConstants;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -56,7 +56,7 @@ import com.xpn.xwiki.user.api.XWikiUser;
  * 
  * @version $Id$
  */
-public class XWikiAuthentication extends Guard
+public class XWikiAuthentication extends ChallengeAuthenticator
 {
     public XWikiAuthentication(Context context) throws IllegalArgumentException
     {
@@ -64,14 +64,14 @@ public class XWikiAuthentication extends Guard
     }
 
     @Override
-    public int authenticate(Request request)
+    public boolean authenticate(Request request, Response response)
     {
         /*
          * Browser authentication resource is a special resource that allows to trigger the authentication dialog box in
          * web browsers
          */
         if (request.getResourceRef().getPath().endsWith(BrowserAuthenticationResource.URI_PATTERN)) {
-            return super.authenticate(request);
+            return super.authenticate(request, response);
         }
 
         ComponentManager componentManager =
@@ -82,9 +82,9 @@ public class XWikiAuthentication extends Guard
         /* By default set XWiki.Guest as the user that is sending the request. */
         xwikiContext.setUser("XWiki.XWikiGuest");
 
-        Form headers = (Form) request.getAttributes().get(HttpConstants.ATTRIBUTE_HEADERS);
+        Form headers = (Form) request.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
 
-        if (headers.getValues(HttpConstants.HEADER_AUTHORIZATION) == null) {
+        if (headers.getValues(HeaderConstants.HEADER_AUTHORIZATION) == null) {
             /*
              * If there isn't an authorization header, check if the context contains an already authenticated session.
              * If it's the case use the previously authenticated user.
@@ -107,41 +107,14 @@ public class XWikiAuthentication extends Guard
              * three cases as "successful". In the first case we have an authenticated user, in the other two cases we
              * continue to process the request as "Guest".
              */
-            return 1;
+            return true;
         }
 
         /*
          * If we are here, then an authorization header is present in the request. Make Restlet process this request.
          * The standard way it does this is by calling the checkSecret() method with the appropriate parameters.
          */
-        return super.authenticate(request);
-    }
-
-    @Override
-    public boolean checkSecret(Request request, String identifier, char[] secret)
-    {
-        ComponentManager componentManager =
-            (ComponentManager) getContext().getAttributes().get(Constants.XWIKI_COMPONENT_MANAGER);
-        XWikiContext xwikiContext = Utils.getXWikiContext(componentManager);
-        XWiki xwiki = Utils.getXWiki(componentManager);
-
-        try {
-            Principal principal = xwiki.getAuthService().authenticate(identifier, new String(secret), xwikiContext);
-            if (principal != null) {
-                String xwikiUser = principal.getName();
-
-                xwikiContext.setUser(xwikiUser);
-                getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", identifier));
-
-                return true;
-            }
-        } catch (XWikiException e) {
-            getLogger().log(Level.WARNING, "Exception occurred while authenticating.", e);
-        }
-
-        getLogger().log(Level.WARNING, String.format("Cannot authenticate '%s'.", identifier));
-
-        return false;
+        return super.authenticate(request, response);
     }
 
 }

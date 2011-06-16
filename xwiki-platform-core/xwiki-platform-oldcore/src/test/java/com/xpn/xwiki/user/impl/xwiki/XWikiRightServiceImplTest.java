@@ -442,4 +442,23 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         assertFalse("Author retains programming right after calling dropPermissions()",
                    this.rightService.hasProgrammingRights(this.getContext()));
     }
+
+    public void testHasAccessLevelForDeleteRightWhenUserIsDocumentCreator() throws Exception
+    {
+        getContext().setDatabase(this.user.getWikiName());
+        final XWikiDocument doc = new XWikiDocument(new DocumentReference(this.user.getWikiName(), "Space", "Page"));
+
+        // Set the creator to be the user we test against since creator should get delete rights
+        doc.setCreatorReference(this.user.getDocumentReference());
+
+        this.mockXWiki.stubs().method("getDocument").with(eq(doc.getPrefixedFullName()), ANYTHING).will(
+            returnValue(doc));
+        final XWikiDocument xwikiPreferences = new XWikiDocument(
+            new DocumentReference(this.user.getWikiName(), "XWiki", "XWikiPreferences"));
+        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
+            returnValue(xwikiPreferences));
+
+        assertTrue("Should allow delete rights for page creator",
+            this.rightService.hasAccessLevel("delete", this.user.getFullName(), doc.getFullName(), true, getContext()));
+    }
 }

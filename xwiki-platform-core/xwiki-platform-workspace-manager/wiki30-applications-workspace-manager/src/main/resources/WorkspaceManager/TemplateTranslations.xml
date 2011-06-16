@@ -39,7 +39,7 @@ workspacemanager.prop.description.label=Description
 workspacemanager.prop.owner.label=Owner
 workspacemanager.prop.membershipType.label=Membership Type
 workspacemanager.prop.secure.label=Secure (SSL)
-workspacemanager.member.add=Add user to workspace:
+workspacemanager.member.add=Add or invite user to workspace
 
 # HINTS
 workspacemanager.prop.wikiprettyname.hint=The display name of the workspace.

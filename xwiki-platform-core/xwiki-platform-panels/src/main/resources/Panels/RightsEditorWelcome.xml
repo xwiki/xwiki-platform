@@ -20,7 +20,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -104,11 +104,16 @@
 <category>Information</category>
 </property>
 <property>
-<content>#largepanelheader($msg.get("welcome"))
-&lt;div&gt;$msg.get("xe.panels.rights.welcome")&lt;/div&gt;
-&lt;div&gt;$msg.get("xe.panels.rights.explanation")&lt;/div&gt;
-&lt;div&gt;&lt;strong&gt;$msg.get("xe.panels.rights.warning")&lt;/strong&gt; $msg.get("xe.panels.rights.noauthentication")&lt;/div&gt;
-#panelfooter()</content>
+<content>{{velocity}}
+#largepanelheader($msg.get('welcome'))
+
+$msg.get('xe.panels.rights.welcome')
+
+$msg.get('xe.panels.rights.explanation')
+
+**$msg.get('xe.panels.rights.warning')** $msg.get('xe.panels.rights.noauthentication')
+#panelfooter()
+{{/velocity}}</content>
 </property>
 <property>
 <description>Rights Editor Welcome message and brief information.</description>
@@ -120,5 +125,4 @@
 <type>edit</type>
 </property>
 </object>
-<content>#includeForm("Panels.PanelSheet")</content>
-</xwikidoc>
+<content>{{include document="Panels.PanelSheet"/}}</content></xwikidoc>

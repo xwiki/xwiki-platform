@@ -20,7 +20,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.1</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -116,13 +116,13 @@ XWiki.SyntaxConverter = Class.create({
    * Valid syntaxes as the initial content syntax. If the originally selected syntax is not among these, then a
    * conversion is not proposed.
    */
-  validSourceSyntaxes : [#foreach ($syntax in $services.rendering.availableParserSyntaxes)"$syntax.toIdString()"#if ($velocityHasNext), #end#end],
+  validSourceSyntaxes : [#foreach ($syntax in $services.rendering.availableParserSyntaxes)"$syntax.toIdString()"#if ($foreach.hasNext), #end#end],
 
   /**
    * Valid syntaxes as the target content syntax. If the newly selected syntax is not among these, then a conversion is
    * not proposed.
    */
-  validTargetSyntaxes : [#foreach ($syntax in $services.rendering.availableRendererSyntaxes)"$syntax.toIdString()"#if ($velocityHasNext), #end#end],
+  validTargetSyntaxes : [#foreach ($syntax in $services.rendering.availableRendererSyntaxes)"$syntax.toIdString()"#if ($foreach.hasNext), #end#end],
 
   /**
    * Constructor. If the syntax field is present in the HTML (and it should, as the extension is pulled iff the syntax
@@ -181,7 +181,7 @@ XWiki.SyntaxConverter = Class.create({
         // Conversion in WYSIWYG mode does not yet support conversion of the current content
         if (XWiki.docisnew || confirm("Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will reset the syntax to the previous one and do nothing. Note that if you choose 'ok' you will loose modifications and this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.")) {
           this.disableEditingArea();
-          var url = '$doc.getURL('view', "action=convertSyntax&amp;xpage=plain&amp;form_token=$!{services.csrf.getToken()}&amp;documentName=")' + encodeURIComponent(this.name) + '&amp;oldSyntaxId=' + encodeURIComponent(this.originalSyntax) + '&amp;newSyntaxId=' + encodeURIComponent(syntax);
+          var url = '$doc.getURL('view', "action=convertSyntax&amp;xpage=plain&amp;outputSyntax=plain&amp;form_token=$!{services.csrf.getToken()}&amp;documentName=")' + encodeURIComponent(this.name) + '&amp;oldSyntaxId=' + encodeURIComponent(this.originalSyntax) + '&amp;newSyntaxId=' + encodeURIComponent(syntax);
           new Ajax.Request(
             url,
             {
@@ -197,7 +197,7 @@ XWiki.SyntaxConverter = Class.create({
       } else if (!this.contentField.value.blank()) {
         if (confirm("Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will only change the syntax identifier, without modifying the document's content. Note that if you choose 'ok' this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.")) {
           this.disableEditingArea();
-          var url = '$doc.getURL('view', "action=convertSyntax&amp;xpage=plain&amp;form_token=$!{services.csrf.getToken()}&amp;documentName=")' + encodeURIComponent(this.name) + '&amp;oldSyntaxId=' + encodeURIComponent(this.originalSyntax) + '&amp;newSyntaxId=' + encodeURIComponent(syntax);
+          var url = '$doc.getURL('view', "action=convertSyntax&amp;xpage=plain&amp;outputSyntax=plain&amp;form_token=$!{services.csrf.getToken()}&amp;documentName=")' + encodeURIComponent(this.name) + '&amp;oldSyntaxId=' + encodeURIComponent(this.originalSyntax) + '&amp;newSyntaxId=' + encodeURIComponent(syntax);
           new Ajax.Request(
             url,
             {
@@ -380,54 +380,47 @@ document.observe("dom:loaded", function() { new XWiki.SyntaxConverter(); });</co
 <category>Tools</category>
 </property>
 <property>
-<content>$xwiki.ssx.use('Panels.DocumentInformation')##
-#set($pages = $tdoc.includedPages)
-#largepanelheader($msg.get("panels.documentInformation.title"))
-&lt;dl&gt;
-#if(($tdoc.language=="")&amp;&amp;($xwiki.isMultiLingual()))
-&lt;dt&gt;&lt;label for="xwikidoclanguageinput2"&gt;$msg.get("panels.documentInformation.defaultLanguage")&lt;/label&gt;&lt;/dt&gt; &lt;dd&gt;&lt;input type="text" id="xwikidoclanguageinput2" name="defaultLanguage" value="$!tdoc.defaultLanguage" size="30"/&gt;&lt;/dd&gt;
+<content>{{velocity}}
+$xwiki.ssx.use('Panels.DocumentInformation')##
+#set ($pages = $tdoc.includedPages)
+#largepanelheader($msg.get('panels.documentInformation.title'))
+#if ($tdoc.language == '' &amp;&amp; $xwiki.isMultiLingual())
+; {{html}}&lt;label for="xwikidoclanguageinput2"&gt;$msg.get('panels.documentInformation.defaultLanguage')&lt;/label&gt;{{/html}}
+: {{html}}&lt;input type="text" id="xwikidoclanguageinput2" name="defaultLanguage" value="$!tdoc.defaultLanguage" size="30"/&gt;{{/html}}
 #end
 ##--------------------------------------------------------------------------
 ## Display wiki syntax combo box if there's more than one configured syntax.
 ##--------------------------------------------------------------------------
 $xwiki.jsx.use($paneldoc.fullName)##
-#if($xwiki.getConfiguredSyntaxes().size() &gt; 1)
-&lt;dt&gt;&lt;label for="xwikidocsyntaxinput2"&gt;$msg.get('panels.documentInformation.syntax')&lt;/label&gt;&lt;/dt&gt;
-&lt;dd&gt;
-&lt;select name="syntaxId" id="xwikidocsyntaxinput2"&gt;
-&lt;option value="xwiki/1.0"#if($tdoc.getSyntax().toIdString().equalsIgnoreCase('xwiki/1.0')) selected="selected"#end&gt;XWiki 1.0&lt;/option&gt;
-#set($configuredSyntaxes = $xwiki.getConfiguredSyntaxes())
+#if ($xwiki.getConfiguredSyntaxes().size() &gt; 1)
+; {{html}}&lt;label for="xwikidocsyntaxinput2"&gt;$msg.get('panels.documentInformation.syntax')&lt;/label&gt;{{/html}}
+: {{html}}&lt;select name="syntaxId" id="xwikidocsyntaxinput2"&gt;
+&lt;option value="xwiki/1.0"#if ($tdoc.getSyntax().toIdString().equalsIgnoreCase('xwiki/1.0')) selected="selected"#end&gt;XWiki 1.0&lt;/option&gt;
+#set ($configuredSyntaxes = $xwiki.getConfiguredSyntaxes())
 ##
 ## Starting with XE 2.3 the $syntaxFactory binding has been removed and the new $services binding added.
 ## To make sure this Panel application still work with versions less than 2.3 we verify the availability of bindings.
-#set($availableParserSyntaxes = $services.rendering.getAvailableParserSyntaxes())
+#set ($availableParserSyntaxes = $services.rendering.getAvailableParserSyntaxes())
 #if (!$availableParserSyntaxes)
-  #set($availableParserSyntaxes = $syntaxFactory.getAvailableSyntaxes())
+  #set ($availableParserSyntaxes = $syntaxFactory.getAvailableSyntaxes())
 #end
 ##
-#foreach($syntax in $availableParserSyntaxes)
-  #if($configuredSyntaxes.contains($syntax.toIdString()) &amp;&amp; !$syntax.toIdString().equalsIgnoreCase('xwiki/1.0'))
+#foreach ($syntax in $availableParserSyntaxes)
+  #if ($configuredSyntaxes.contains($syntax.toIdString()) &amp;&amp; !$syntax.toIdString().equalsIgnoreCase('xwiki/1.0'))
     &lt;option value="$syntax.toIdString()"#if($tdoc.getSyntax().toIdString().equalsIgnoreCase($syntax.toIdString())) selected="selected"#end&gt;$syntax.toString()&lt;/option&gt;
   #end
 #end
-&lt;/select&gt;
-&lt;/dd&gt;
+&lt;/select&gt;{{/html}}
 #end
 ##--------------------------------------------------------------------------
 #if($pages.size() != 0)
-  &lt;dt&gt;$msg.get('panels.documentInformation.includesCount', [$pages.size()])&lt;/dt&gt;
-  &lt;dd&gt;
-  &lt;ul&gt;
+  ; $msg.get('panels.documentInformation.includesCount', [$pages.size()])
   #foreach ($page in $pages)
-    &lt;li&gt;&lt;a href="$xwiki.getURL($page, 'view')"&gt;$page&lt;/a&gt;
-    &lt;a href="$xwiki.getURL($page, 'edit')"&gt;&lt;img alt="$msg.get('panels.documentInformation.editIncluded', [$page])" src="$xwiki.getSkinFile('icons/silk/page_white_edit.gif')" /&gt;&lt;/a&gt;&lt;/li&gt;
+  : [[$page&gt;&gt;$page]] [[[[image:icon:page_white_edit||alt="$msg.get('panels.documentInformation.editIncluded', [$page])"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]
   #end
-  &lt;/ul&gt;
-  &lt;/dd&gt;
 #end
-&lt;/dl&gt;
-#template("tagedit.vm")
-#panelfooter()</content>
+#panelfooter()
+{{/velocity}}</content>
 </property>
 <property>
 <description>Displays and allows editing the document title, parent and included documents.</description>
@@ -547,29 +540,31 @@ $xwiki.jsx.use($paneldoc.fullName)##
 <use>onDemand</use>
 </property>
 </object>
-<content>##
+<content>{{velocity output="false"}}
 #macro(convertDocument $translatedDoc $error $oldSyntax $newSyntaxId $content)
   #if ($translatedDoc.realLanguage == $xwiki.languagePreference)
-    #set($theDoc = $translatedDoc)
+    #set ($theDoc = $translatedDoc)
     #if ($request.content)
-      #set($void = $translatedDoc.setContent($request.content))
+      #set ($void = $translatedDoc.setContent($request.content))
     #end
   #end
   ## Use the syntax and content received from the client, as the user might have made some changes that are not on saved yet.
-  #set($void = $translatedDoc.setSyntaxId($oldSyntax))
+  #set ($void = $translatedDoc.setSyntaxId($oldSyntax))
   #if (!$translatedDoc.convertSyntax($newSyntaxId) || !${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-    #set($error = true)
+    #set ($error = true)
   #else
-    #set($void = $translatedDoc.save("Document converted from syntax $oldSyntax to syntax $newSyntaxId"))
+    #set ($void = $translatedDoc.save("Document converted from syntax $oldSyntax to syntax $newSyntaxId"))
   #end
 #end
-##
-#if("$!{request.action}" == "convertSyntax")
-  #set($oldSyntax = $request.oldSyntaxId)
-  #set($newSyntaxId = $request.newSyntaxId)
-  #set($mainDoc = $xwiki.getDocument($request.documentName))
-  #set($theDoc = $mainDoc)
-  #set($error = false)
+{{/velocity}}
+
+{{velocity wiki="false"}}
+#if ("$!{request.action}" == 'convertSyntax')
+  #set ($oldSyntax = $request.oldSyntaxId)
+  #set ($newSyntaxId = $request.newSyntaxId)
+  #set ($mainDoc = $xwiki.getDocument($request.documentName))
+  #set ($theDoc = $mainDoc)
+  #set ($error = false)
   ##
   ## Convert current document
   ##
@@ -581,7 +576,7 @@ $xwiki.jsx.use($paneldoc.fullName)##
   #if (!$error)
     #foreach ($language in $languages)
       #if (!$error)
-        #set($translatedDoc = $mainDoc.getTranslatedDocument($language))
+        #set ($translatedDoc = $mainDoc.getTranslatedDocument($language))
         #if ($translatedDoc.language != $mainDoc.language)
           #convertDocument($translatedDoc $error $oldSyntax $newSyntaxId $theDoc)
         #end
@@ -593,13 +588,17 @@ $xwiki.jsx.use($paneldoc.fullName)##
   ##
   #if (!$error)
     ## Conversion successful. The "ok:" prefix is needed, since otherwise an empty content will result in a "This template does not exist" exception.
-    ok:{pre}$theDoc.content{/pre}
+    ok:${theDoc.content}##
   #else
     $response.setStatus(501)
     ## TODO: Find a way to put the exception in the context and send it to the client.
     failed
   #end
-#else
-  #includeForm("Panels.PanelSheet")
 #end
-</content></xwikidoc>
+{{/velocity}}
+
+{{velocity}}
+#if ("$!{request.action}" != 'convertSyntax')
+  {{include document="Panels.PanelSheet"/}}
+#end
+{{/velocity}}</content></xwikidoc>

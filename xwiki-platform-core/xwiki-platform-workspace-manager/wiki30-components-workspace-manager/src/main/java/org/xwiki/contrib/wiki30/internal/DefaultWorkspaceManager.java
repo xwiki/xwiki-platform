@@ -423,8 +423,7 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
 
             BaseObject workspaceObject = getWorkspaceObject(wikiDocument);
             if (workspaceObject == null) {
-                throw new WorkspaceManagerException(messageTool.get(WorkspaceManagerMessageTool.ERROR_NOTAWORKSPACE,
-                    Arrays.asList(workspaceId)));
+                return null;
             }
 
             DocumentReference groupReference =

@@ -149,8 +149,9 @@ public class LDAPProfileXClass
         }
 
         String objUid = getUid(ldapObject);
-        if (!uid.equalsIgnoreCase(objUid)) {
-            map.put(LDAP_XFIELD_UID, uid);
+        String lowerUid = uid.toLowerCase();
+        if (!lowerUid.equals(objUid)) {
+            map.put(LDAP_XFIELD_UID, lowerUid);
             needsUpdate = true;
         }
 

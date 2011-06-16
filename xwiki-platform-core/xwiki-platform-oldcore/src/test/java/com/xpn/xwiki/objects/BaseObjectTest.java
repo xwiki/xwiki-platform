@@ -98,4 +98,17 @@ public class BaseObjectTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("otherspace", baseObject.getDocumentReference().getLastSpaceReference().getName());
         Assert.assertEquals("otherpage", baseObject.getDocumentReference().getName());
     }
+    
+    @Test
+    public void getReference()
+    {
+        BaseObject baseObject = new BaseObject();
+
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        baseObject.setDocumentReference(documentReference);
+        DocumentReference classReference = new DocumentReference("wiki", "space", "class");
+        baseObject.setXClassReference(classReference);
+        
+        Assert.assertEquals(new BaseObjectReference(classReference, baseObject.getNumber(), documentReference), baseObject.getReference());
+    }
 }

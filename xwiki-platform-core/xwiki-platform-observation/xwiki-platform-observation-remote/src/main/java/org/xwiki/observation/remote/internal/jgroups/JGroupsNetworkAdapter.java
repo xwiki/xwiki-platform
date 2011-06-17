@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
 import org.xwiki.observation.remote.NetworkAdapter;
 import org.xwiki.observation.remote.RemoteEventData;
@@ -63,12 +64,6 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
      * Relative path where to find jgroups channels configurations.
      */
     public static final String CONFIGURATION_PATH = "observation/remote/jgroups/";
-
-    /**
-     * The container used to access configuration files.
-     */
-    @Inject
-    private Container container;
 
     /**
      * Used to lookup the receiver corresponding to the channel identifier.
@@ -218,7 +213,17 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
         String chanelFile = channelId + ".xml";
         String path = "/WEB-INF/" + CONFIGURATION_PATH + chanelFile;
 
-        InputStream is = this.container.getApplicationContext().getResourceAsStream(path);
+        InputStream is = null;
+        try {
+            Container container = this.componentManager.lookup(Container.class);
+            ApplicationContext applicationContext = container.getApplicationContext();
+           
+            if (applicationContext != null) {
+                is = applicationContext.getResourceAsStream(path);
+            }
+        } catch (ComponentLookupException e) {
+            this.logger.debug("Failed to lookup Container component.");
+        }
 
         if (is == null) {
             // Fallback on JGroups standard configuraton locations

@@ -18,7 +18,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 /**
  * Helper to manager LDAP profile XClass and XObject.
  * 
- * @version $Id: f804269348f21c24939ed4d08ef794a6f990dbae $
+ * @version $Id$
  */
 public class LDAPProfileXClass
 {
@@ -149,9 +149,8 @@ public class LDAPProfileXClass
         }
 
         String objUid = getUid(ldapObject);
-        String lowerUid = uid.toLowerCase();
-        if (!lowerUid.equals(objUid)) {
-            map.put(LDAP_XFIELD_UID, lowerUid);
+        if (!uid.equalsIgnoreCase(objUid)) {
+            map.put(LDAP_XFIELD_UID, uid);
             needsUpdate = true;
         }
 

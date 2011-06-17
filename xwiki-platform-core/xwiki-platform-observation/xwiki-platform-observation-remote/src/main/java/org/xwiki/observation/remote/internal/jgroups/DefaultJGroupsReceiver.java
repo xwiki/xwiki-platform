@@ -22,16 +22,14 @@ package org.xwiki.observation.remote.internal.jgroups;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.jgroups.Address;
 import org.jgroups.Message;
-import org.jgroups.View;
+import org.jgroups.ReceiverAdapter;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.RemoteObservationManager;
-import org.xwiki.observation.remote.jgroups.JGroupsReceiver;
 
 /**
  * Default implementation of JGroupsReceiver. Receive remote events and send them as is to
@@ -42,7 +40,7 @@ import org.xwiki.observation.remote.jgroups.JGroupsReceiver;
  */
 @Component
 @Singleton
-public class DefaultJGroupsReceiver implements JGroupsReceiver
+public class DefaultJGroupsReceiver extends ReceiverAdapter
 {
     /**
      * Used to send events for conversion.
@@ -80,16 +78,6 @@ public class DefaultJGroupsReceiver implements JGroupsReceiver
     /**
      * {@inheritDoc}
      * 
-     * @see org.jgroups.MessageListener#getState()
-     */
-    public byte[] getState()
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.jgroups.MessageListener#receive(org.jgroups.Message)
      */
     public void receive(Message msg)
@@ -99,45 +87,5 @@ public class DefaultJGroupsReceiver implements JGroupsReceiver
         this.logger.debug("Received JGroups remote event [" + remoteEvent + "]");
 
         getRemoteObservationManager().notify(remoteEvent);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.jgroups.MessageListener#setState(byte[])
-     */
-    public void setState(byte[] state)
-    {
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.jgroups.MembershipListener#block()
-     */
-    public void block()
-    {
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.jgroups.MembershipListener#suspect(org.jgroups.Address)
-     */
-    public void suspect(Address suspectedMbr)
-    {
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.jgroups.MembershipListener#viewAccepted(org.jgroups.View)
-     */
-    public void viewAccepted(View newView)
-    {
-
     }
 }

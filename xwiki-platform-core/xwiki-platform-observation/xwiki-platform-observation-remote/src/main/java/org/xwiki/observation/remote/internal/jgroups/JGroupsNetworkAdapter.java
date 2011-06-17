@@ -210,8 +210,8 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
      */
     private ProtocolStackConfigurator loadChannelConfiguration(String channelId) throws IOException, ChannelException
     {
-        String chanelFile = channelId + ".xml";
-        String path = "/WEB-INF/" + CONFIGURATION_PATH + chanelFile;
+        String channelFile = channelId + ".xml";
+        String path = "/WEB-INF/" + CONFIGURATION_PATH + channelFile;
 
         InputStream is = null;
         try {
@@ -227,9 +227,9 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
 
         if (is == null) {
             // Fallback on JGroups standard configuraton locations
-            is = ConfiguratorFactory.getConfigStream(chanelFile);
+            is = ConfiguratorFactory.getConfigStream(channelFile);
 
-            if (is == null && !JChannel.DEFAULT_PROTOCOL_STACK.equals(chanelFile)) {
+            if (is == null && !JChannel.DEFAULT_PROTOCOL_STACK.equals(channelFile)) {
                 // Fallback on default JGroups configuration
                 is = ConfiguratorFactory.getConfigStream(JChannel.DEFAULT_PROTOCOL_STACK);
             }

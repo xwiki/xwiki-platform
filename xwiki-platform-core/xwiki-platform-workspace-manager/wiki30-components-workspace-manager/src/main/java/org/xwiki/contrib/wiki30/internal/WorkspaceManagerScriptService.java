@@ -152,8 +152,8 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
 
             /* Check rights. */
             if (!canEditWorkspace(currentUser, workspaceName)) {
-                error(new WorkspaceManagerException(String.format(
-                    "Access denied for user '%s' to edit the workspace '%s'", currentUser, workspaceName)));
+                throw new WorkspaceManagerException(String.format(
+                    "Access denied for user '%s' to edit the workspace '%s'", currentUser, workspaceName));
             }
 
             /* Avoid "traps" by making sure the page from where this is executed has PR. */

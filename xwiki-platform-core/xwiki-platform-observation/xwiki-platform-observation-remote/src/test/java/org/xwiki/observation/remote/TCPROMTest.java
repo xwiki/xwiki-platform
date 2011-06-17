@@ -42,10 +42,10 @@ public class TCPROMTest extends AbstractROMTestCase
     {
         super.setUp();
         
-        getConfigurationSource1().setProperty("observation.remote.channels", Arrays.asList("tcp1"));
-        getComponentManager2().lookup(RemoteObservationManager.class).startChannel("tcp2");
+        getConfigurationSource1().setProperty("observation.remote.channels", Arrays.asList("udp"));
+        getComponentManager2().lookup(RemoteObservationManager.class).startChannel("udp");
     }
-    
+
     @After
     public void tearDown() throws Exception
     {

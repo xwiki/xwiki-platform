@@ -30,6 +30,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.RemoteObservationManager;
+import org.xwiki.observation.remote.jgroups.JGroupsReceiver;
 
 /**
  * Default implementation of JGroupsReceiver. Receive remote events and send them as is to
@@ -40,7 +41,7 @@ import org.xwiki.observation.remote.RemoteObservationManager;
  */
 @Component
 @Singleton
-public class DefaultJGroupsReceiver extends ReceiverAdapter
+public class DefaultJGroupsReceiver extends ReceiverAdapter implements JGroupsReceiver
 {
     /**
      * Used to send events for conversion.

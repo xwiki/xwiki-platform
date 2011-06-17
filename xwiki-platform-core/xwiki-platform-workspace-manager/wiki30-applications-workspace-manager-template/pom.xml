@@ -58,6 +58,9 @@
         <!-- XAR/UnXAR everything, excluding some pages that need to be excluded 
           for the workspace template -->
         <configuration>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
           <excludes>
             <exclude>**/META-INF/**</exclude>
             <!-- Disable local user registration. -->
@@ -187,6 +190,47 @@
                   </parameters>
                 </transformationSet>
               </transformationSets>
+            </configuration>
+          </execution>
+          <!-- Remove the local admin from XWikiAllGroup and XWikiAdminGroup. -->
+          <execution>
+            <id>remove-local-admin-from-groups</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformationSets>
+                <transformationSet>
+                  <dir>${project.build.outputDirectory}</dir>
+                  <outputDir>${project.build.outputDirectory}</outputDir>
+                  <includes>
+                    <include>XWiki/XWikiAdminGroup.xml</include>
+                    <include>XWiki/XWikiAllGroup.xml</include>
+                  </includes>
+                  <stylesheet>src/main/build/transformation/remove-local-admin-from-groups.xsl
+              </stylesheet>
+                </transformationSet>
+              </transformationSets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- Attach section icon for the WorkspaceUsers administration section. -->
+      <plugin>
+        <groupId>org.xwiki.platform.tools</groupId>
+        <artifactId>xwiki-xmldoc-update-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>process-resources</phase>
+            <id>attach-section-icon</id>
+            <goals>
+              <goal>attach</goal>
+            </goals>
+            <configuration>
+              <file>${basedir}/src/main/resources/icon.png</file>
+              <sourceDocument>${basedir}/src/main/resources/XWiki/WorkspaceUsers.xml</sourceDocument>
             </configuration>
           </execution>
         </executions>

@@ -175,7 +175,7 @@ public class LDAPProfileXClass
 
         List<XWikiDocument> documentList;
         try {
-            // Search for uid in database
+            // Search for uid in database, make sure to compare uids lower cased to make to to not take into account the case since LDAP does not
             String sql =
                 ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=? and obj.id=prop.id.id and prop.name=? and lower(prop.value)=?";
 

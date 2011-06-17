@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1303899640000</creationDate>
-<date>1303995581000</date>
-<contentUpdateDate>1303995581000</contentUpdateDate>
+<date>1308327581000</date>
+<contentUpdateDate>1308327581000</contentUpdateDate>
 <version>1.1</version>
 <title>Workspace</title>
 <template></template>
@@ -23,6 +23,9 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>{{velocity}}
+#if ("$!currentDoc" == '')
+  #set ($currentDoc = $doc.prefixedFullName)
+#end
 #set ($workspaceId = $xcontext.database)
 #set ($WorkspaceManager = $services.workspaceManager)
 ##
@@ -38,9 +41,10 @@
     {{error}}$xcontext.lastexception.class{{/error}}
   #end
 #else
-  #set($wikiDocument = $workspace.wikiDocument)
+  #set ($wikiDocument = $workspace.wikiDocument)
+  #set ($updateWorkspaceDocumentReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'UpdateWorkspaceCode'))
   {{html clean='false' wiki='true'}}
-  &lt;form class='xform half' action='$xwiki.getURL("$xcontext.mainWikiName:WorkspaceManager.UpdateWorkspaceCode")' method='post'&gt;
+  &lt;form class='xform half' action='$xwiki.getURL($updateWorkspaceDocumentReference)' method='post'&gt;
     &lt;dl&gt;
       &lt;dt&gt;
         &lt;label for='XWiki.XWikiServerClass_0_wikiprettyname'&gt;$msg.get('workspacemanager.prop.wikiprettyname.label')&lt;/label&gt;
@@ -71,7 +75,7 @@
       &lt;input class="button" type="submit" name='save' value="$msg.get('admin.save')"/&gt;
     &lt;/span&gt;
     &lt;input type='hidden' name='workspaceId' value="$workspaceId"/&gt;
-    &lt;input type="hidden" name="xredirect" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
+    &lt;input type='hidden' name='xredirect' value="$xwiki.getURL($currentDoc, $xcontext.action, ${request.queryString})" /&gt;
   &lt;/form&gt;
   {{/html}}
 #end

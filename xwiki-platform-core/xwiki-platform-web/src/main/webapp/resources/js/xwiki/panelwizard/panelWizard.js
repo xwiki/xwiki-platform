@@ -346,11 +346,6 @@ function attachDragHandler(el) {
   el.onDragEnd = function (x,y) {
     onDragEnd(this,x,y);
   };
-  var titlebar = el.getElementsByTagName("h5").item(0);
-  if (titlebar){
-    titlebar.onclick = function(ev) {};
-    titlebar.onClick = function(ev) {};
-  }
 }
 
 function getBlocNameList(el) {

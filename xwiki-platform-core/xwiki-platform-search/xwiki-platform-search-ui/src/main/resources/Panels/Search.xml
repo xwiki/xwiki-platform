@@ -100,8 +100,8 @@
 </property>
 <property>
 <content>{{velocity}}
-{{html}}
 #panelhiddenheader($msg.get("panels.search.title"))
+{{html}}
   &lt;form action="$xwiki.getURL('Main.Search')"&gt;
     &lt;div class="globalsearch"&gt;
       &lt;label for="globalsearchinput" class="hidden"&gt;$msg.get('panels.search.query')&lt;/label&gt;
@@ -110,8 +110,8 @@
       &lt;input class="button" value="$msg.get('panels.search.submit')" type="image" src="$xwiki.getSkinFile('go.png')" alt="$msg.get('panels.search.submit')"/&gt;
     &lt;/div&gt;
   &lt;/form&gt;
-#panelfooter()
 {{/html}}
+#panelfooter()
 {{/velocity}}</content>
 </property>
 <property>

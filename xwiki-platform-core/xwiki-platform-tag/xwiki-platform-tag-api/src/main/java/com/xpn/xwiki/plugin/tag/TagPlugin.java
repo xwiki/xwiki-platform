@@ -366,6 +366,10 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             List<String> commentArgs = new ArrayList<String>();
             commentArgs.add(tag);
             String comment = context.getMessageTool().get(DOC_COMMENT_TAG_ADDED, commentArgs);
+
+            // Since we're changing the document we need to set the new author
+            document.setAuthorReference(context.getUserReference());
+
             context.getWiki().saveDocument(document, comment, true, context);
 
             return TagOperationResult.OK;
@@ -418,6 +422,10 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         if (added) {
             setDocumentTags(document, documentTags, context);
             String comment = context.getMessageTool().get(DOC_COMMENT_TAG_ADDED, Collections.singletonList(tags));
+
+            // Since we're changing the document we need to set the new author
+            document.setAuthorReference(context.getUserReference());
+
             context.getWiki().saveDocument(document, comment, true, context);
 
             return TagOperationResult.OK;
@@ -484,6 +492,10 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             List<String> commentArgs = new ArrayList<String>();
             commentArgs.add(tag);
             String comment = context.getMessageTool().get("plugin.tag.editcomment.removed", commentArgs);
+
+            // Since we're changing the document we need to set the new author
+            document.setAuthorReference(context.getUserReference());
+
             context.getWiki().saveDocument(document, comment, true, context);
 
             return TagOperationResult.OK;
@@ -522,6 +534,10 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
                 }
             }
             setDocumentTags(doc, tags, context);
+
+            // Since we're changing the document we need to set the new author
+            doc.setAuthorReference(context.getUserReference());
+
             context.getWiki().saveDocument(doc, comment, true, context);
         }
 

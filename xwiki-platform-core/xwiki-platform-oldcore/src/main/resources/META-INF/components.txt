@@ -7,9 +7,10 @@ com.xpn.xwiki.internal.XWikiStubContextInitializer
 com.xpn.xwiki.internal.cache.DefaultDocumentCache
 com.xpn.xwiki.internal.cache.rendering.DefaultRenderingCache
 com.xpn.xwiki.internal.cache.rendering.DefaultRenderingCacheConfiguration
-com.xpn.xwiki.internal.event.XObjectEventGeneratorListener
-com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener
+com.xpn.xwiki.internal.event.AttachmentEventGeneratorListener
 com.xpn.xwiki.internal.event.CommentEventGeneratorListener
+com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener
+com.xpn.xwiki.internal.event.XObjectEventGeneratorListener
 com.xpn.xwiki.internal.macro.CoreWikiMacroBindingInitializer
 com.xpn.xwiki.internal.macro.DefaultWikiMacroFactory
 com.xpn.xwiki.internal.macro.DefaultWikiMacroInitializer

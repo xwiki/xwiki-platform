@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>Panels</web>
 <name>WebHome</name>
@@ -21,43 +20,41 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
+<syntaxId>xwiki/2.1</syntaxId>
 <hidden>false</hidden>
 <content>{{velocity}}
 #if($hasAdmin)
 
-= $msg.get("xe.panels.create") =
+= $msg.get('xe.panels.create') =
 
 {{include document="Panels.CreatePanel"/}}
 
 #end
+= $msg.get('xe.panels.viewer') =
 
-= $msg.get("xe.panels.viewer") =
-
-#set ($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='Panels.PanelClass' and doc.fullName!='Panels.PanelTemplate' order by doc.name")
-#set($searchResults = $xwiki.searchDocuments($sql))
+#set ($sql = ', BaseObject as obj where obj.name=doc.fullName and obj.className=? and doc.fullName!=? order by doc.name')
+#set ($searchResults = $xwiki.searchDocuments($sql, ['Panels.PanelClass', 'Panels.PanelTemplate']))
 #foreach ($item in $searchResults)
-#set($pdoc = $xwiki.getDocument($item))
-#set($obj = $pdoc.getObject("Panels.PanelClass"))
-#if($obj.type == 'view')
-* [[$item]] #if($hasAdmin)[ [[$msg.get("edit")&gt;&gt;$pdoc.getExternalURL("inline")]] [[$msg.get("delete")&gt;&gt;$pdoc.getExternalURL("delete")]] ]#end: $obj.description
-#end
+  #set ($pdoc = $xwiki.getDocument($item))
+  #set ($obj = $pdoc.getObject("Panels.PanelClass"))
+  #if ($obj.getProperty('type').value == 'view')
+* [[$item]] #if ($hasAdmin)[ [[$msg.get('edit')&gt;&gt;path:$pdoc.getURL('inline')]] [[$msg.get('delete')&gt;&gt;path:$pdoc.getURL('delete')]] ]#end: $obj.description
+  #end
 #end
 
-#if($hasAdmin) 
+#if ($hasAdmin)
 {{box}}
-{{html}}&lt;img src="$xwiki.getSkinFile('icons/silk/wand.gif')" alt=""/&gt;{{/html}} $msg.get("xe.panels.customize") [[$msg.get("panelwizard.panelwizard")&gt;&gt;Panels.PanelWizard]].
+[[image:icon:wand]] $msg.get('xe.panels.customize') [[$msg.get('panelwizard.panelwizard')&gt;&gt;Panels.PanelWizard]].
 {{/box}}
-#end
 
-= $msg.get("xe.panels.editor") =
+#end
+= $msg.get('xe.panels.editor') =
 
 #foreach ($item in $searchResults)
-#set($pdoc = $xwiki.getDocument($item))
-#set($obj = $pdoc.getObject("Panels.PanelClass"))
-#if($obj.type == 'edit')
-* [[$item]] #if($hasAdmin)[ [[$msg.get("edit")&gt;&gt;$pdoc.getExternalURL("inline")]] [[$msg.get("delete")&gt;&gt;$pdoc.getExternalURL("delete")"]] ]#end: $obj.description
+  #set ($pdoc = $xwiki.getDocument($item))
+  #set ($obj = $pdoc.getObject('Panels.PanelClass'))
+  #if ($obj.getProperty('type').value == 'edit')
+* [[$item]] #if ($hasAdmin)[ [[$msg.get('edit')&gt;&gt;path:$pdoc.getURL('inline')]] [[$msg.get('delete')&gt;&gt;path:$pdoc.getURL('delete')]] ]#end: $obj.description
+  #end
 #end
-#end
-{{/velocity}}</content>
-</xwikidoc>
+{{/velocity}}</content></xwikidoc>

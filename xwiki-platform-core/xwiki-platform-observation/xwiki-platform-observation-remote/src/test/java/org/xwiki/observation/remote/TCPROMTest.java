@@ -41,11 +41,13 @@ public class TCPROMTest extends AbstractROMTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        
-        getConfigurationSource1().setProperty("observation.remote.channels", Arrays.asList("tcp1"));
-        getComponentManager2().lookup(RemoteObservationManager.class).startChannel("tcp2");
+
+        System.setProperty("jgroups.bind_addr", "127.0.0.1");
+
+        getConfigurationSource1().setProperty("observation.remote.channels", Arrays.asList("tcp"));
+        getComponentManager2().lookup(RemoteObservationManager.class).startChannel("tcp");
     }
-    
+
     @After
     public void tearDown() throws Exception
     {

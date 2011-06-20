@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>Panels</web>
 <name>NewPage</name>
@@ -19,6 +18,10 @@
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>Panels.PanelClass</name>
@@ -29,112 +32,119 @@
 <defaultWeb></defaultWeb>
 <nameField></nameField>
 <validationScript></validationScript>
-<type>
-<name>type</name>
-<prettyName>Panel type</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>0</relationalStorage>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<size>1</size>
-<separator> </separator>
-<separators> ,|</separators>
-<values>view|edit</values>
-<number>2</number>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</type>
-<description>
-<name>description</name>
-<prettyName>Description</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>40</size>
-<rows>5</rows>
-<editor>Text</editor>
-<number>3</number>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
 <category>
-<name>category</name>
-<prettyName>Category</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>0</relationalStorage>
+<cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
-<size>1</size>
+<name>category</name>
+<number>5</number>
+<prettyName>Category</prettyName>
+<relationalStorage>0</relationalStorage>
 <separator> </separator>
 <separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
 <values>Information|Navigation|Tools|Administration|Other</values>
-<number>5</number>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </category>
 <content>
-<name>content</name>
-<prettyName>Content</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>60</size>
-<rows>25</rows>
+<disabled>0</disabled>
 <editor>Text</editor>
+<name>content</name>
 <number>4</number>
+<prettyName>Content</prettyName>
+<rows>25</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </content>
-<name>
-<name>name</name>
-<prettyName>Name</prettyName>
-<unmodifiable>0</unmodifiable>
+<description>
+<disabled>0</disabled>
+<editor>Text</editor>
+<name>description</name>
+<number>3</number>
+<prettyName>Description</prettyName>
+<rows>5</rows>
 <size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<name>
+<disabled>0</disabled>
+<name>name</name>
 <number>1</number>
+<prettyName>Name</prettyName>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
+<type>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>type</name>
+<number>2</number>
+<prettyName>Panel type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>view|edit</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
 </class>
 <name>Panels.NewPage</name>
 <number>0</number>
 <className>Panels.PanelClass</className>
+<guid>5ecfa384-8841-413d-957b-f956e8cd0bc2</guid>
 <property>
-<type>view</type>
+<category>Tools</category>
+</property>
+<property>
+<content>{{velocity}}
+#if ($hasEdit || $showEmptyPanels)
+#panelheader($msg.get('core.create.pageTitle'))
+#set ($panelId = $util.generateRandomString(4))
+{{html clean="false"}}
+&lt;form method="post" action="$doc.getURL('view', 'xpage=create')" onsubmit="cancelCancelEdit()"&gt;
+{{/html}}
+  (% class="padded centered" %)
+  (((
+    (% class="hidden" %)
+    {{html}}
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+    &lt;input type="hidden" name="tocreate" value="page"/&gt;
+    &lt;input type="hidden" name="parent" value="$!services.model.serialize($doc.documentReference, 'local')"/&gt;
+    {{/html}}
+    #set ($spaceInputId = "space$!{panelId}")
+    #set ($space = $doc.documentReference.lastSpaceReference.name)
+    #set ($pageInputId = "page$!{panelId}")
+    #set ($pageText = $msg.get('core.create.pageText'))
+    ; {{html}}&lt;label for="$spaceInputId"&gt;$msg.get('core.create.space')&lt;/label&gt;{{/html}}
+    : {{html}}&lt;input type="text" id="$spaceInputId" name="space" value="$!space" /&gt;{{/html}}
+    ; {{html}}&lt;label for="$pageInputId"&gt;$msg.get('core.create.page')&lt;/label&gt;{{/html}}
+    : {{html}}&lt;input type="text" id="$pageInputId" class="withTip" name="page" value="$pageText" /&gt;{{/html}}
+
+    {{html}}&lt;input type="submit" class="button" value="$msg.get('create')" /&gt;{{/html}}
+  )))
+{{html clean="false"}}
+&lt;/form&gt;
+{{/html}}
+#panelfooter()
+#end
+{{/velocity}}</content>
 </property>
 <property>
 <description>Form for creating a new page in the wiki.</description>
 </property>
 <property>
-<category>Tools</category>
-</property>
-<property>
-<content>#if($hasEdit || $showEmptyPanels)
-#panelheader($msg.get("core.create.pageTitle"))
-#set($panelId = $util.generateRandomString(4))
-&lt;form method="post" action="$doc.getURL('view', 'xpage=create')" onsubmit="cancelCancelEdit()"&gt;
-  &lt;div class="padded centered"&gt;
-    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-    &lt;input type="hidden" name="tocreate" value="page"/&gt;
-    &lt;dl&gt;
-      &lt;dt&gt;
-        #set($spaceInputId = "space$!{panelId}")
-        &lt;label for="$spaceInputId"&gt;$msg.get('core.create.space')&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        #set($space = $doc.documentReference.lastSpaceReference.name)
-        &lt;input type="text" id="$spaceInputId" name="space" value="$!space"/&gt;
-      &lt;/dd&gt;
-      &lt;dt&gt;
-        #set($pageInputId = "page$!{panelId}")
-        &lt;label for="$pageInputId"&gt;$msg.get('core.create.page')&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        #set($pageText = $msg.get('core.create.pageText'))
-        &lt;input type="text" id="$pageInputId" name="page" value="$pageText" onfocus="if(this.value=='$pageText') this.value=''" onblur="if(this.value=='') this.value='$pageText'"/&gt;
-      &lt;/dd&gt;
-    &lt;/dl&gt;
-    #set($parent = $services.model.serialize($doc.documentReference, "local"))
-    &lt;input type="hidden" name="parent" value="$!parent"/&gt;
-    &lt;input type="submit" class="button" value="$msg.get('create')"/&gt;
-  &lt;/div&gt;
-&lt;/form&gt;
-#panelfooter()
-#end</content>
-</property>
-<property>
 <name>New Page</name>
 </property>
+<property>
+<type>view</type>
+</property>
 </object>
-<content>#includeForm("Panels.PanelSheet")</content>
-</xwikidoc>
+<content>{{include document="Panels.PanelSheet"/}}</content></xwikidoc>

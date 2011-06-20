@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>Panels</web>
 <name>QuickLinks</name>
@@ -21,7 +20,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.1</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -35,6 +34,7 @@
 <validationScript></validationScript>
 <category>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>category</name>
@@ -49,6 +49,7 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </category>
 <content>
+<disabled>0</disabled>
 <editor>Text</editor>
 <name>content</name>
 <number>4</number>
@@ -59,6 +60,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </content>
 <description>
+<disabled>0</disabled>
 <editor>Text</editor>
 <name>description</name>
 <number>3</number>
@@ -69,6 +71,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </description>
 <name>
+<disabled>0</disabled>
 <name>name</name>
 <number>1</number>
 <prettyName>Name</prettyName>
@@ -78,6 +81,7 @@
 </name>
 <type>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>type</name>
@@ -100,16 +104,19 @@
 <category>Information</category>
 </property>
 <property>
-<content>#panelheader($msg.get("xe.panels.quicklinks"))
-* [$msg.get("xe.panels.quicklinks.dashboard")&gt;Main.Dashboard] &lt;a href="$xwiki.getURL('Main.WebRss', 'view', 'xpage=plain')"&gt;&lt;img src="$xwiki.getSkinFile('icons/xwiki/rss-medium.png')" alt="(RSS)" title="RSS feed for wiki updates" class="icon rss"/&gt;&lt;/a&gt;
-* [$msg.get("xe.panels.quicklinks.index")&gt;Main.AllDocs]
-* [$msg.get("xe.panels.quicklinks.userdirectory")&gt;Main.UserDirectory]
-* [$msg.get("xe.panels.quicklinks.blog")&gt;Blog.WebHome] &lt;a href="$xwiki.getURL('Blog.GlobalBlogRss', 'view', 'xpage=plain')"&gt;&lt;img src="$xwiki.getSkinFile('icons/xwiki/rss-medium.png')" alt="(RSS)" title="RSS feed for blog posts" class="icon rss"/&gt;&lt;/a&gt;
-* [$msg.get("xe.panels.quicklinks.sandbox")&gt;Sandbox.WebHome]
+<content>{{velocity}}
+#panelheader($msg.get('xe.panels.quicklinks'))
+* [[$msg.get('xe.panels.quicklinks.dashboard')&gt;&gt;Main.Dashboard]] [[[[image:path:$xwiki.getSkinFile('icons/xwiki/rss-medium.png')||alt="(RSS)" title="RSS feed for wiki updates" class="icon rss"]]&gt;&gt;path:${xwiki.getURL('Main.WebRss', 'view', 'xpage=plain')}]]
+* [[$msg.get('xe.panels.quicklinks.index')&gt;&gt;Main.AllDocs]]
+* [[$msg.get('xe.panels.quicklinks.userdirectory')&gt;&gt;Main.UserDirectory]]
+* [[$msg.get('xe.panels.quicklinks.blog')&gt;&gt;Blog.WebHome]] [[[[image:path:$xwiki.getSkinFile('icons/xwiki/rss-medium.png')||alt="(RSS)" title="RSS feed for blog posts" class="icon rss"]]&gt;&gt;path:${xwiki.getURL('Blog.GlobalBlogRss', 'view', 'xpage=plain')}]]
+* [[$msg.get('xe.panels.quicklinks.sandbox')&gt;&gt;Sandbox.WebHome]]
 #if ($xwiki.hasAdminRights())
-&lt;p&gt;&lt;a href="$xwiki.getDocument("Panels.QuickLinks").getURL("inline")"&gt;$msg.get("xe.panels.edit")&lt;/a&gt;&lt;/p&gt;
+
+[[$msg.get('xe.panels.edit')&gt;&gt;path:${xwiki.getURL('Panels.QuickLinks', 'inline')}]]
 #end
-#panelfooter()</content>
+#panelfooter()
+{{/velocity}}</content>
 </property>
 <property>
 <description>Important Navigation Links</description>
@@ -121,5 +128,4 @@
 <type>view</type>
 </property>
 </object>
-<content>#includeForm("Panels.PanelSheet")</content>
-</xwikidoc>
+<content>{{include document="Panels.PanelSheet"/}}</content></xwikidoc>

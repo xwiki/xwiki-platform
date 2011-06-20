@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>Panels</web>
 <name>PanelLayoutUpdate</name>
@@ -15,71 +14,62 @@
 <date>1166177445000</date>
 <contentUpdateDate>1213000374000</contentUpdateDate>
 <version>1.1</version>
-<title></title>
+<title>$msg.get('panelwizard.panellayoutupdate')</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<content>#set($place = $request.place)
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+#set ($place = $request.place)
 ##
 ## Get the preferences document where the new layout must be saved (XWiki.XWikiPreferences or Space.WebPreferences)
 ##
-#if("$!{request.prefsdoc}" != "")
-  #set($prefsdocument = $request.prefsdoc)
+#if ("$!{request.prefsdoc}" != '')
+  #set ($prefsdocument = $request.prefsdoc)
 #else
-  #set($prefsdocument = "XWiki.XWikiPreferences")
+  #set ($prefsdocument = 'XWiki.XWikiPreferences')
 #end
 ##
 ## Check to see if the current user has admin rights on the current preferences document.
 ##
-#if(!$xwiki.hasAccessLevel("admin", $xcontext.user, $prefsdocument) || !${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-  #xwikimessageboxstart("$msg.get('panelwizard.placemanager')" "")
-  $msg.get("panelwizard.notadmininplace", $place)
+#if (!$xwiki.hasAccessLevel('admin', $xcontext.user, $prefsdocument) || !${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+  {{html clean="false"}}
+  #xwikimessageboxstart($msg.get('panelwizard.placemanager') $msg.get('panelwizard.notadmininplace', [$place]))
   #xwikimessageboxend()
-## 
-## Set the current panel layout. Note that you must have at least one panel in the new layout column (left or right panels) to keep the layout.
-##
-#elseif($request.xpage &amp;&amp; $request.xpage == "plain")
-  #if( (!$place) || ($place == "") )
-    #set($prefsdoc = $xwiki.getDocument($prefsdocument))
-    #set($ok = $prefsdoc.use("XWiki.XWikiPreferences"))
-    #set($leftPanels = $request.leftPanels)
-    #set($rightPanels = $request.rightPanels)
-    #set($showLeftPanels = $request.showLeftPanels)
-    #set($showRightPanels = $request.showRightPanels)
-    #if($leftPanels)
-      #set($ok = $prefsdoc.set("leftPanels", $leftPanels))
-    #end
-    #if($showLeftPanels)
-      #set($ok = $prefsdoc.set("showLeftPanels", $showLeftPanels))
-    #end
-    #if($rightPanels)
-      #set($ok = $prefsdoc.set("rightPanels", $rightPanels))
-    #end
-    #if($showRightPanels)
-      #set($ok = $prefsdoc.set("showRightPanels", $showRightPanels))
-    #end
-    #set($ok = $prefsdoc.save())
-    SUCCESS
+  {{/html}}
+#elseif ("$!request.xpage" == 'plain')
+  ## Set the current panel layout.
+  #if ("$!place" == '')
+    #set ($prefsdoc = $xwiki.getDocument($prefsdocument))
   #else
-    #set($prefsdoc = $xwiki.getDocument("${place}:${prefsdocument}"))
-    #set($ok = $prefsdoc.use("XWiki.XWikiPreferences"))
-    #set($leftPanels = $request.leftPanels)
-    #set($rightPanels = $request.rightPanels)
-    #if($leftPanels&amp;&amp;$leftPanels!="")
-      #set($ok = $prefsdoc.set("leftPanels", $leftPanels))
-    #end
-    #if($rightPanels&amp;&amp;$rightPanels!="")
-      #set($ok = $prefsdoc.set("rightPanels", $rightPanels))
-    #end
-    #set($ok = $prefsdoc.save())
-    SUCCESS
+    #set ($prefsdoc = $xwiki.getDocument("${place}:${prefsdocument}"))
   #end
+  #set ($discard = $prefsdoc.use('XWiki.XWikiPreferences'))
+  #set ($leftPanels = $request.leftPanels)
+  #set ($rightPanels = $request.rightPanels)
+  #set ($showLeftPanels = $request.showLeftPanels)
+  #set ($showRightPanels = $request.showRightPanels)
+  #if ($leftPanels)
+    #set ($discard = $prefsdoc.set('leftPanels', $leftPanels))
+  #end
+  #if ($showLeftPanels)
+    #set ($discard = $prefsdoc.set('showLeftPanels', $showLeftPanels))
+  #end
+  #if ($rightPanels)
+    #set ($discard = $prefsdoc.set('rightPanels', $rightPanels))
+  #end
+  #if ($showRightPanels)
+    #set ($discard = $prefsdoc.set('showRightPanels', $showRightPanels))
+  #end
+  #set ($ok = $prefsdoc.save($msg.get('panelwizard.save.versionComment', true)))
+  SUCCESS
 #else
-1 $msg.get("panelwizard.panellayoutupdate")
-#set($url = $xwiki.getURL("Panels.PanelWizard"))
-#warning($msg.get("panelwizard.nodirectaccess", ["&lt;a href='$url'&gt;Panel Wizard&lt;/a&gt;"]))
-#end</content>
-</xwikidoc>
+
+= $msg.get('panelwizard.panellayoutupdate') =
+
+{{warning}}$msg.get('panelwizard.nodirectaccess', ['[[Panel Wizard&gt;&gt;Panels.PanelWizard]]']){{/warning}}
+#end
+{{/velocity}}</content></xwikidoc>

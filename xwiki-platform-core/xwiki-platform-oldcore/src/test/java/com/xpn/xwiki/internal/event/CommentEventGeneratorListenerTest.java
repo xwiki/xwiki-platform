@@ -127,4 +127,23 @@ public class CommentEventGeneratorListenerTest extends AbstractBridgedComponentT
         this.observation.notify(new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document,
             getContext());
     }
+
+    @Test
+    public void testNotComment()
+    {
+        this.commentXObject = new BaseObject();
+        this.commentXObject.setXClassReference(new DocumentReference("wiki", "XWiki", "XWikkiComments2"));
+        
+        this.document.addXObject(this.commentXObject);
+
+        final Event event = new CommentAddedEvent("wiki:space.page", "0");
+
+        getMockery().checking(new Expectations() {{
+            allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
+        }});
+        this.observation.addListener(this.listener);
+
+        this.observation.notify(new DocumentCreatedEvent(this.document.getDocumentReference()), this.document,
+            getContext());
+    }
 }

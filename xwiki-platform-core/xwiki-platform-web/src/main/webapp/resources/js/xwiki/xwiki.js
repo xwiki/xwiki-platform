@@ -578,13 +578,15 @@ Object.extend(XWiki, {
    *
    * @param form  {element} The panel element.
    */
-  togglePanelVisibility: function(element, cookieName){
+  togglePanelVisibility: function(element){
     element = $(element);
     element.toggleClassName("collapsed");
-    if (cookieName) {
-      var cookieValue = element.hasClassName('collapsed') ? 'collapsed' : 'expanded';
-      XWiki.cookies.create(cookieName, cookieValue, '');
-    }
+  },
+
+  registerPanelToggle: function() {
+    $$('.panel .xwikipaneltitle').each(function(item) {
+      item.observe('click', this.togglePanelVisibility.bind(this, item.up('.panel')));
+    }.bind(this));
   },
 
   /**
@@ -604,6 +606,7 @@ Object.extend(XWiki, {
       this.insertSectionEditLinks();
       this.insertCreatePageFromTemplateModalBoxes();
       this.watchlist.initialize();
+      this.registerPanelToggle();
 
       document.fire("xwiki:dom:loaded");
     }

@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -582,13 +583,10 @@ public class XWikiRightServiceImpl implements XWikiRightService
         // Fast return for delete right: allow the creator to delete the document
         if (accessLevel.equals("delete") && user) {
             currentdoc = context.getWiki().getDocument(entityReference, context);
-            String creator = currentdoc.getCreator();
-            if (creator != null) {
-                if (userOrGroupName.equals(creator)) {
-                    logAllow(userOrGroupName, entityReference, accessLevel, "delete right from document ownership");
-
-                    return true;
-                }
+            DocumentReference creator = currentdoc.getCreatorReference();
+            if (ObjectUtils.equals(userOrGroupNameReference, creator)) {
+                logAllow(userOrGroupName, entityReference, accessLevel, "delete right from document ownership");
+                return true;
             }
         }
 

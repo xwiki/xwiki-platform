@@ -52,6 +52,8 @@ public class RegexEntityReference extends EntityReference
     public RegexEntityReference(Pattern pattern, EntityType type)
     {
         super(pattern.pattern(), type);
+
+        this.pattern = pattern;
     }
 
     /**
@@ -62,6 +64,8 @@ public class RegexEntityReference extends EntityReference
     public RegexEntityReference(Pattern pattern, EntityType type, EntityReference parent)
     {
         super(pattern.pattern(), type, parent);
+
+        this.pattern = pattern;
     }
 
     /**

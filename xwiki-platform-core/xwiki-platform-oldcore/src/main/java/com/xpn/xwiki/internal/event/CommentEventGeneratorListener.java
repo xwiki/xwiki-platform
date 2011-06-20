@@ -53,9 +53,8 @@ public class CommentEventGeneratorListener implements EventListener
     /**
      * The reference to match class XWiki.Comment on whatever wiki.
      */
-    private static final RegexEntityReference COMMENTCLASS_REFERENCE = new RegexEntityReference(Pattern.compile(
-        "XWikiComments", Pattern.LITERAL), EntityType.DOCUMENT, new RegexEntityReference(Pattern.compile("XWiki",
-            Pattern.LITERAL), EntityType.SPACE));
+    private static final RegexEntityReference COMMENTCLASS_REFERENCE = new RegexEntityReference(
+        Pattern.compile(".*:XWiki.XWikiComments\\[\\d*\\]"), EntityType.OBJECT);
 
     /**
      * The matched events.

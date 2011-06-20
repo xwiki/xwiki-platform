@@ -51,6 +51,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
+import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
 
 import javax.naming.Context;
@@ -102,6 +103,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
@@ -120,21 +122,22 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
-import com.xpn.xwiki.doc.AttachmentDiff;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
-import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
-import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
-import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
-import com.xpn.xwiki.notify.DocObjectChangedRule;
-import com.xpn.xwiki.notify.PropertyChangedRule;
+import com.xpn.xwiki.internal.event.XObjectAddedEvent;
+import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
+import com.xpn.xwiki.internal.event.XObjectEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
+import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.notify.XWikiActionRule;
 import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.notify.XWikiPageNotification;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
@@ -190,7 +193,7 @@ import com.xpn.xwiki.web.XWikiURLFactoryService;
 import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
 import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 
-public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
+public class XWiki implements EventListener
 {
     /** Name of the default wiki. */
     public static final String DEFAULT_MAIN_WIKI = "xwiki";
@@ -811,10 +814,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         // Prepare the Plugin Engine
         preparePlugins(context);
 
-        // Add a notification rule if the preference property plugin is modified
-        getNotificationManager().addNamedRule("XWiki.XWikiPreferences",
-            new PropertyChangedRule(this, "XWiki.XWikiPreferences", "plugin"));
-
         // Make sure these classes exists
         if (noupdate) {
             initializeMandatoryClasses(context);
@@ -823,9 +822,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
         // Add a notification for notifications
         getNotificationManager().addGeneralRule(new XWikiActionRule(new XWikiPageNotification()));
-
-        // Add rule to get informed of new servers
-        getNotificationManager().addGeneralRule(new DocObjectChangedRule(this, "XWiki.XWikiServerClass"));
 
         String ro = Param("xwiki.readonly", "no");
         this.isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
@@ -2920,26 +2916,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     public void setNotificationManager(XWikiNotificationManager notificationManager)
     {
         this.notificationManager = notificationManager;
-    }
-
-    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event,
-        XWikiContext context)
-    {
-        if (!isVirtualMode()) {
-            if (newdoc.getFullName().equals("XWiki.XWikiPreferences")) {
-                // If the XWikiPreferences document is modified, reload all plugins. The reason is that plugins may
-                // cache data taken from XWikiPreferences during their initialization.
-                // TODO: Fix the plugins, they should implement Observation listeners if they want to be aware of a
-                // change in the XWikiPreferences document but we should definitely not reinitialize all plugins like
-                // this.
-                preparePlugins(context);
-            }
-        }
-
-        if (olddoc != null) {
-            flushVirtualWikis(olddoc);
-        }
-        flushVirtualWikis(newdoc);
     }
 
     private void flushVirtualWikis(XWikiDocument doc)
@@ -7382,29 +7358,51 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         XWikiDocument doc = (XWikiDocument) source;
-        XWikiDocument originalDoc = doc.getOriginalDocument();
         XWikiContext context = (XWikiContext) data;
 
-        ObservationManager om = Utils.getComponent(ObservationManager.class);
-        String reference = this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference());
-
-        for (AttachmentDiff diff : doc.getAttachmentDiff(originalDoc, doc, context)) {
-            if (StringUtils.isEmpty(diff.getOrigVersion())) {
-                om.notify(new AttachmentAddedEvent(reference, diff.getFileName()), source, data);
-            } else if (StringUtils.isEmpty(diff.getNewVersion())) {
-                om.notify(new AttachmentDeletedEvent(reference, diff.getFileName()), source, data);
-            } else {
-                om.notify(new AttachmentUpdatedEvent(reference, diff.getFileName()), source, data);
-            }
+        if (event instanceof XObjectPropertyEvent) {
+            onPluginPreferenceEvent(event, doc, context);
+        } else if (event instanceof XObjectEvent) {
+            onServerObjectEvent(event, doc, context);
         }
     }
+
+    private void onServerObjectEvent(Event event, XWikiDocument doc, XWikiContext context)
+    {
+        flushVirtualWikis(doc.getOriginalDocument());
+        flushVirtualWikis(doc);
+    }
+    
+    private void onPluginPreferenceEvent(Event event, XWikiDocument doc, XWikiContext context)
+    {
+        if (!isVirtualMode()) {
+            // If the XWikiPreferences plugin propery is modified, reload all plugins.
+            preparePlugins(context);
+        }
+    }
+
+    /**
+     * The reference to match class XWiki.XWikiServerClass on whatever wiki.
+     */
+    private static final RegexEntityReference SERVERCLASS_REFERENCE = new RegexEntityReference(
+        Pattern.compile(".*:XWiki.XWikiServerClass\\[\\d*\\]"), EntityType.OBJECT);
+
+    /**
+     * The reference to match class XWiki.XWikiPreference on whatever wiki.
+     */
+    private static final RegexEntityReference XWIKIPREFERENCE_PLUGINPROPERTY_REFERENCE = new RegexEntityReference(
+        Pattern.compile("plugin"), EntityType.OBJECT_PROPERTY, new RegexEntityReference(
+            Pattern.compile(".*:XWiki.XWikiPreference\\[\\d*\\]"), EntityType.OBJECT));
 
     private static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
     {
         {
-            add(new DocumentCreatedEvent());
-            add(new DocumentUpdatedEvent());
-            add(new DocumentDeletedEvent());
+            add(new XObjectAddedEvent(SERVERCLASS_REFERENCE));
+            add(new XObjectDeletedEvent(SERVERCLASS_REFERENCE));
+            add(new XObjectUpdatedEvent(SERVERCLASS_REFERENCE));
+            add(new XObjectPropertyAddedEvent(XWIKIPREFERENCE_PLUGINPROPERTY_REFERENCE));
+            add(new XObjectPropertyDeletedEvent(XWIKIPREFERENCE_PLUGINPROPERTY_REFERENCE));
+            add(new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PLUGINPROPERTY_REFERENCE));
         }
     };
 

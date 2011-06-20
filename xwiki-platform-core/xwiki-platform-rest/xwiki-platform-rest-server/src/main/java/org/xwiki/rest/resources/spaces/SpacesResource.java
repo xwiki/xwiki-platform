@@ -36,6 +36,7 @@ import org.xwiki.rest.model.jaxb.Spaces;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.XWiki;
 
 /**
  * @version $Id$
@@ -64,12 +65,16 @@ public class SpacesResource extends XWikiResource
                 String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
                 Document home = null;
 
-                if (Utils.getXWikiApi(componentManager).exists(homeId)) {
-                    home = Utils.getXWikiApi(componentManager).getDocument(homeId);
+                XWiki xwikiApi = Utils.getXWikiApi(componentManager);
+                if (xwikiApi.hasAccessLevel("view", homeId)) {
+                    if (xwikiApi.exists(homeId)) {
+                        home = Utils.getXWikiApi(componentManager).getDocument(homeId);
+                    }
+                    spaces.getSpaces()
+                        .add(
+                            DomainObjectFactory.createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName,
+                                home));
                 }
-
-                spaces.getSpaces().add(
-                    DomainObjectFactory.createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, home));
             }
         } finally {
             Utils.getXWikiContext(componentManager).setDatabase(database);

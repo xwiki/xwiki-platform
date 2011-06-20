@@ -79,4 +79,12 @@ public class RegexEntityReferenceTest
 
         Assert.assertTrue(reference.equals(REFERENCETOMATCH));
     }
+    
+    @Test
+    public void testPatternNotMatching()
+    {
+        EntityReference reference = new RegexEntityReference(Pattern.compile("space"), EntityType.DOCUMENT);
+
+        Assert.assertFalse(reference.equals(REFERENCETOMATCH));
+    }
 }

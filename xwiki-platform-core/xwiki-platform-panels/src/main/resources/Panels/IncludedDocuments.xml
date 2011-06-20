@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>Panels</web>
 <name>IncludedDocuments</name>
@@ -19,6 +18,10 @@
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.1</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>Panels.PanelClass</name>
@@ -29,93 +32,98 @@
 <defaultWeb></defaultWeb>
 <nameField></nameField>
 <validationScript></validationScript>
-<type>
-<name>type</name>
-<prettyName>Panel type</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>0</relationalStorage>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<size>1</size>
-<separator> </separator>
-<separators> ,|</separators>
-<values>view|edit</values>
-<number>2</number>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</type>
 <category>
-<name>category</name>
-<prettyName>Category</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>0</relationalStorage>
+<cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
-<size>1</size>
+<name>category</name>
+<number>5</number>
+<prettyName>Category</prettyName>
+<relationalStorage>0</relationalStorage>
 <separator> </separator>
 <separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
 <values>Information|Navigation|Tools|Administration|Other</values>
-<number>5</number>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </category>
-<description>
-<name>description</name>
-<prettyName>Description</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>40</size>
-<rows>5</rows>
-<number>3</number>
-<editor>Text</editor>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
 <content>
-<name>content</name>
-<prettyName>Content</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>60</size>
-<rows>25</rows>
-<number>4</number>
+<disabled>0</disabled>
 <editor>Text</editor>
+<name>content</name>
+<number>4</number>
+<prettyName>Content</prettyName>
+<rows>25</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </content>
-<name>
-<name>name</name>
-<prettyName>Name</prettyName>
-<unmodifiable>0</unmodifiable>
+<description>
+<disabled>0</disabled>
+<editor>Text</editor>
+<name>description</name>
+<number>3</number>
+<prettyName>Description</prettyName>
+<rows>5</rows>
 <size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<name>
+<disabled>0</disabled>
+<name>name</name>
 <number>1</number>
+<prettyName>Name</prettyName>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
+<type>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>type</name>
+<number>2</number>
+<prettyName>Panel type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>view|edit</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
 </class>
 <name>Panels.IncludedDocuments</name>
 <number>0</number>
 <className>Panels.PanelClass</className>
+<guid>71817d7c-8af6-45c0-a0ef-c4c8554917b2</guid>
 <property>
-<type>edit</type>
+<category>Information</category>
+</property>
+<property>
+<content>{{velocity}}
+#set ($pages = $tdoc.includedPages)
+#if ($pages.size() &gt; 0 || $showEmptyPanels)
+#largepanelheader($msg.get('xe.panels.includedDocs.title'))
+$msg.get('xe.panels.includedDocs.count', [$pages.size()])
+#foreach ($page in $pages)
+  * [[$page&gt;&gt;$page]] [[[[image:icon:page_white_edit||alt="$msg.get('panels.documentInformation.editIncluded', [$page])"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]
+#end
+#panelfooter()
+#end
+{{/velocity}}</content>
 </property>
 <property>
 <description>Displays the documents included in the curent document.</description>
 </property>
 <property>
-<category>Information</category>
-</property>
-<property>
-<content>#set($pages = $tdoc.includedPages)
-#if($pages.size() &gt; 0 || $showEmptyPanels)
-#largepanelheader($msg.get('xe.panels.includedDocs.title'))
-$msg.get('xe.panels.includedDocs.count', $pages.size)
-&lt;ul&gt;
-#foreach ($page in $pages)
-  &lt;li&gt;&lt;a href="$xwiki.getURL($page)"&gt;$page&lt;/a&gt;
-  &lt;a href="$xwiki.getURL($page, 'edit')"&gt;&lt;img alt="$msg.get('panels.documentInformation.editIncluded', [$page])" src="$xwiki.getSkinFile('icons/silk/page_white_edit.gif')" /&gt;&lt;/a&gt;&lt;/li&gt;
-#end
-&lt;/ul&gt;
-&lt;/dd&gt;
-#panelfooter()
-#end</content>
-</property>
-<property>
 <name>Included documents</name>
 </property>
+<property>
+<type>edit</type>
+</property>
 </object>
-<content>#includeForm("Panels.PanelSheet")</content>
-</xwikidoc>
+<content>{{include document="Panels.PanelSheet"/}}</content></xwikidoc>

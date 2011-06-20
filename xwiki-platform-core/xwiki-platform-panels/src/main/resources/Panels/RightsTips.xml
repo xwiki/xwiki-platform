@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>Panels</web>
 <name>RightsTips</name>
@@ -21,6 +20,8 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>Panels.PanelClass</name>
@@ -33,6 +34,7 @@
 <validationScript></validationScript>
 <category>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>category</name>
@@ -47,6 +49,7 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </category>
 <content>
+<disabled>0</disabled>
 <editor>Text</editor>
 <name>content</name>
 <number>4</number>
@@ -57,6 +60,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </content>
 <description>
+<disabled>0</disabled>
 <editor>Text</editor>
 <name>description</name>
 <number>3</number>
@@ -67,6 +71,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </description>
 <name>
+<disabled>0</disabled>
 <name>name</name>
 <number>1</number>
 <prettyName>Name</prettyName>
@@ -76,6 +81,7 @@
 </name>
 <type>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>type</name>
@@ -93,57 +99,67 @@
 <name>Panels.RightsTips</name>
 <number>0</number>
 <className>Panels.PanelClass</className>
+<guid>a8aa8609-72b1-430e-9430-99d6b68706e0</guid>
 <property>
 <category>Information</category>
 </property>
 <property>
-<content>&lt;div id="xwikirightstipspanel"&gt;
+<content>{{velocity}}
+(% id="xwikirightstipspanel" %)
+(((
 #largepanelheader($msg.get("xe.panels.rights.tips"))
-&lt;div id="xwikirightstips"&gt;
-  &lt;div id="xwikitipspublic"&gt;
-    &lt;div id="xwikitipspublicHeader" class="accordionTabTitleBar"&gt;&lt;h1&gt;$msg.get("xe.panels.rights.publicwiki")&lt;/h1&gt;&lt;/div&gt;
-    &lt;div id="xwikitipspublicContent" class="accordionTabContentBox"&gt;
-$msg.get("xe.panels.rights.openwiki")
-
+(% id="xwikirightstips" %)
+(((
+  (% id="xwikitipspublic" %)
+  (((
+    (% id="xwikitipspublicHeader" class="accordionTabTitleBar" %)
+    (((= $msg.get('xe.panels.rights.publicwiki') =)))
+    (% id="xwikitipspublicContent" class="accordionTabContentBox" %)
+    ((($msg.get('xe.panels.rights.openwiki')
 * $msg.get("xe.panels.rights.opengroups")
 * $msg.get("xe.panels.rights.openusers")
 * $msg.get("xe.panels.rights.openaccess")
 * $msg.get("xe.panels.rights.openallow")
-    &lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div id="xwikitipsregistered" class="accordion"&gt;
-    &lt;div id="xwikitipsregisteredHeader" class="accordionTabTitleBar"&gt;&lt;h1&gt;$msg.get("xe.panels.rights.authenticate")&lt;/h1&gt;&lt;/div&gt;
-    &lt;div id="xwikitipsregisteredContent" class="accordionTabContentBox"&gt;
-$msg.get("xe.panels.rights.protectedwiki")
-
-* $msg.get("xe.panels.rights.protectedgroups")
-* $msg.get("xe.panels.rights.protectedusers") 
-* $msg.get("xe.panels.rights.protectedaccess")
-* $msg.get("xe.panels.rights.protectedallow")
-    &lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div id="xwikitipsbanned"&gt;
-    &lt;div id="xwikitipsbannedHeader" class="accordionTabTitleBar"&gt;&lt;h1&gt;$msg.get("xe.panels.rights.banned")&lt;/h1&gt;&lt;/div&gt;
-    &lt;div id="xwikitipsbannedContent" class="accordionTabContentBox"&gt;
-$msg.get("xe.panels.rights.bannedgroup")
-
-* $msg.get("xe.panels.rights.banedgroups")
-* $msg.get("xe.panels.rights.bannedusers")
-* $msg.get("xe.panels.rights.bannedaccess")
-* $msg.get("xe.panels.rights.banneddeny")
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
+    )))
+  )))
+  (% id="xwikitipsregistered" class="accordion" %)
+  (((
+    (% id="xwikitipsregisteredHeader" class="accordionTabTitleBar"%)
+    (((= $msg.get('xe.panels.rights.authenticate') =)))
+    (% id="xwikitipsregisteredContent" class="accordionTabContentBox" %)
+    ((($msg.get('xe.panels.rights.protectedwiki')
+* $msg.get('xe.panels.rights.protectedgroups')
+* $msg.get('xe.panels.rights.protectedusers')
+* $msg.get('xe.panels.rights.protectedaccess')
+* $msg.get('xe.panels.rights.protectedallow')
+    )))
+  )))
+  (% id="xwikitipsbanned" %)
+  (((
+    (% id="xwikitipsbannedHeader" class="accordionTabTitleBar" %)
+    (((= $msg.get('xe.panels.rights.banned') =)))
+    (% id="xwikitipsbannedContent" class="accordionTabContentBox" %)
+    ((($msg.get('xe.panels.rights.bannedgroup')
+* $msg.get('xe.panels.rights.banedgroups')
+* $msg.get('xe.panels.rights.bannedusers')
+* $msg.get('xe.panels.rights.bannedaccess')
+* $msg.get('xe.panels.rights.banneddeny')
+    )))
+  )))
+)))## xwikirightstips
 #panelfooter()
-&lt;/div&gt;
-$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
-$xwiki.jsfx.use('js/xwiki/accordion/accordion.js')
+)))## xwikirightstipspanel
+$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')##
+$xwiki.jsfx.use('js/xwiki/accordion/accordion.js')##
+{{html clean="false"}}
 &lt;script type="text/javascript"&gt;
 document.observe('xwiki:dom:loaded', function() {
   var obj = {div:'xwikirightstips', no:0, height:250};
   var acc = createAccordion(obj);
   XWiki.togglePanelVisibility($('xwikirightstipspanel').down('div'));
-});&lt;/script&gt;</content>
+});&lt;/script&gt;
+{{/html}}
+{{/velocity}}</content>
 </property>
 <property>
 <description>Extended help on Rights Editor Usage.</description>
@@ -155,5 +171,4 @@ document.observe('xwiki:dom:loaded', function() {
 <type>edit</type>
 </property>
 </object>
-<content>#includeForm("Panels.PanelSheet")</content>
-</xwikidoc>
+<content>{{include document="Panels.PanelSheet"/}}</content></xwikidoc>

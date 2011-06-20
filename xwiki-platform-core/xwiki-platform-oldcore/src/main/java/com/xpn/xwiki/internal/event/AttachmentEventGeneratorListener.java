@@ -22,32 +22,34 @@ package com.xpn.xwiki.internal.event;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.AttachmentDiff;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.ObjectDiff;
-import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Produce {@link XObjectEvent} based on document events.
+ * Produce attachment events based on document events.
  * 
  * @version $Id$
  * @since 3.2M1
  */
 @Component
-@Named("XObjectEventGeneratorListener")
-public class XObjectEventGeneratorListener implements EventListener
+@Named("AttachmentEventGeneratorListener")
+public class AttachmentEventGeneratorListener implements EventListener
 {
     /**
      * The events to match.
@@ -56,13 +58,19 @@ public class XObjectEventGeneratorListener implements EventListener
         new DocumentCreatedEvent(), new DocumentUpdatedEvent());
 
     /**
+     * Used to serializer document.
+     */
+    @Inject
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.observation.EventListener#getName()
      */
     public String getName()
     {
-        return "XObjectEventGeneratorListener";
+        return "AttachmentEventGeneratorListener";
     }
 
     /**
@@ -105,12 +113,10 @@ public class XObjectEventGeneratorListener implements EventListener
     {
         ObservationManager observation = Utils.getComponent(ObservationManager.class);
 
-        for (List<BaseObject> xobjects : doc.getXObjects().values()) {
-            for (BaseObject xobject : xobjects) {
-                if (xobject != null) {
-                    observation.notify(new XObjectAddedEvent(xobject.getReference()), doc, context);
-                }
-            }
+        for (XWikiAttachment attachment : originalDoc.getAttachmentList()) {
+            String reference =
+                this.defaultEntityReferenceSerializer.serialize(attachment.getDoc().getDocumentReference());
+            observation.notify(new AttachmentAddedEvent(reference, attachment.getFilename()), doc, context);
         }
     }
 
@@ -123,12 +129,10 @@ public class XObjectEventGeneratorListener implements EventListener
     {
         ObservationManager observation = Utils.getComponent(ObservationManager.class);
 
-        for (List<BaseObject> xobjects : originalDoc.getXObjects().values()) {
-            for (BaseObject xobject : xobjects) {
-                if (xobject != null) {
-                    observation.notify(new XObjectDeletedEvent(xobject.getReference()), doc, context);
-                }
-            }
+        for (XWikiAttachment attachment : originalDoc.getAttachmentList()) {
+            String reference =
+                this.defaultEntityReferenceSerializer.serialize(attachment.getDoc().getDocumentReference());
+            observation.notify(new AttachmentDeletedEvent(reference, attachment.getFilename()), doc, context);
         }
     }
 
@@ -141,51 +145,15 @@ public class XObjectEventGeneratorListener implements EventListener
     {
         ObservationManager observation = Utils.getComponent(ObservationManager.class);
 
-        for (List<ObjectDiff> objectChanges : doc.getObjectDiff(originalDoc, doc, context)) {
-            boolean modified = false;
-            for (ObjectDiff diff : objectChanges) {
-                BaseObject xobject = doc.getXObject(diff.getXClassReference(), diff.getNumber());
-                BaseObject xobjectOriginal = originalDoc.getXObject(diff.getXClassReference(), diff.getNumber());
-                if (ObjectDiff.ACTION_OBJECTREMOVED.equals(diff.getAction())) {
-                    observation.notify(new XObjectDeletedEvent(xobjectOriginal.getReference()), doc, context);
-                } else {
-                    if (ObjectDiff.ACTION_OBJECTADDED.equals(diff.getAction())) {
-                        observation.notify(new XObjectAddedEvent(xobject.getReference()), doc, context);
-                    } else {
-                        if (!modified && xobject != null && xobjectOriginal != null) {
-                            observation.notify(new XObjectUpdatedEvent(xobject.getReference()), doc, context);
-                            modified = true;
-                        }
+        String reference = this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference());
 
-                        onObjectPropertyModified(observation, doc, diff, context);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Generate object property related events.
-     * 
-     * @param observation the object manager
-     * @param doc the new version of the document
-     * @param diff the diff entry
-     * @param context the XWiki context
-     */
-    private void onObjectPropertyModified(ObservationManager observation, XWikiDocument doc, ObjectDiff diff,
-        XWikiContext context)
-    {
-        if (ObjectDiff.ACTION_PROPERTYREMOVED.equals(diff.getAction())) {
-            BaseObject object = doc.getOriginalDocument().getXObject(diff.getXClassReference(), diff.getNumber());
-            PropertyInterface property = object.getField(diff.getPropName());
-            observation.notify(new XObjectPropertyDeletedEvent(property.getReference()), doc, context);
-        } else {
-            BaseObject object = doc.getXObject(diff.getXClassReference(), diff.getNumber());
-            PropertyInterface property = object.getField(diff.getPropName());
-            if (ObjectDiff.ACTION_PROPERTYADDED.equals(diff.getAction())) {
-                observation.notify(new XObjectPropertyAddedEvent(property.getReference()), doc, context);
-            } else if (ObjectDiff.ACTION_PROPERTYCHANGED.equals(diff.getAction())) {
-                observation.notify(new XObjectPropertyUpdatedEvent(property.getReference()), doc, context);
+        for (AttachmentDiff diff : doc.getAttachmentDiff(originalDoc, doc, context)) {
+            if (StringUtils.isEmpty(diff.getOrigVersion())) {
+                observation.notify(new AttachmentAddedEvent(reference, diff.getFileName()), doc, context);
+            } else if (StringUtils.isEmpty(diff.getNewVersion())) {
+                observation.notify(new AttachmentDeletedEvent(reference, diff.getFileName()), doc, context);
+            } else {
+                observation.notify(new AttachmentUpdatedEvent(reference, diff.getFileName()), doc, context);
             }
         }
     }

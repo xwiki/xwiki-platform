@@ -72,38 +72,55 @@ public class WatchListEventFeedManager
         List<Object> parameters = new ArrayList<Object>(); 
         ActivityStreamPluginApi asApi =
             (ActivityStreamPluginApi) context.getWiki().getPluginApi("activitystream", context);
-        
-        parameters.addAll(wikis);        
+
+        parameters.addAll(wikis);
         parameters.addAll(spaces);
         parameters.addAll(documents);
-        
+
         Transformer transformer = new ConstantTransformer("?");
         List<String> wikisPlaceholders = ListUtils.transformedList(new ArrayList<String>(), transformer);
-        wikisPlaceholders.addAll(wikis);        
+        wikisPlaceholders.addAll(wikis);
         List<String> spacesPlaceholders = ListUtils.transformedList(new ArrayList<String>(), transformer);
-        spacesPlaceholders.addAll(spaces);        
+        spacesPlaceholders.addAll(spaces);
         List<String> documentsPlaceholders = ListUtils.transformedList(new ArrayList<String>(), transformer);
         documentsPlaceholders.addAll(documents);
-         
+
         String listItemsJoint = ",";
-        String concatWiki = ") or concat(act.wiki,'";
-        List<ActivityEvent> events =
-            asApi.searchEvents("act.wiki in (" 
-                + StringUtils.join(wikisPlaceholders, listItemsJoint) 
-                + concatWiki + WatchListStore.WIKI_SPACE_SEP + "',act.space) in (" 
-                + StringUtils.join(spacesPlaceholders, listItemsJoint) 
-                + concatWiki + WatchListStore.WIKI_SPACE_SEP + "',act.page) in (" 
-                + StringUtils.join(documentsPlaceholders, listItemsJoint) 
-                + ")", false, true, entryNumber, 0, parameters);
-        
+        String concatWiki = " or concat(act.wiki,'";
+        String query = "1=0";
+        if (!wikis.isEmpty()) {
+            query += " or act.wiki in (" + StringUtils.join(wikisPlaceholders, listItemsJoint) + ')';
+        }
+        if (!spaces.isEmpty()) {
+            query += concatWiki + WatchListStore.WIKI_SPACE_SEP + "',act.space) in ("
+                + StringUtils.join(spacesPlaceholders, listItemsJoint) + ')';
+        }
+        if (!documents.isEmpty()) {
+            query += concatWiki + WatchListStore.WIKI_SPACE_SEP + "',act.page) in ("
+                + StringUtils.join(documentsPlaceholders, listItemsJoint) + ')';
+        }
+        List<ActivityEvent> events = asApi.searchEvents(query, false, true, entryNumber, 0, parameters);
+
+        SyndFeed feed = asApi.getFeed(events);
+        setFeedMetaData(feed, context);
+
+        return feed;
+    }
+
+    /**
+     * Set the standard feed metadata values, based on static translated messages and wiki configuration.
+     *
+     * @param feed the feed to configure
+     * @param context the current request context
+     * @throws XWikiException if the wiki can't be properly accessed
+     */
+    private void setFeedMetaData(SyndFeed feed, XWikiContext context) throws XWikiException
+    {
         String msgPrefix = WatchListPlugin.APP_RES_PREFIX + "rss.";
-        SyndFeed feed = asApi.getFeed(events);        
         feed.setAuthor(context.getMessageTool().get(msgPrefix + "author"));
         feed.setTitle(context.getMessageTool().get(msgPrefix + "title")); 
         feed.setDescription(context.getMessageTool().get(msgPrefix + "description")); 
         feed.setCopyright(context.getWiki().getXWikiPreference("copyright", context));
         feed.setLink(context.getWiki().getExternalURL("xwiki:Main.WebHome", "view", context));
-
-        return feed;
     }
 }

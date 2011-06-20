@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>Panels</web>
 <name>Backlinks</name>
@@ -20,6 +19,9 @@
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>Panels.PanelClass</name>
@@ -30,95 +32,101 @@
 <defaultWeb></defaultWeb>
 <nameField></nameField>
 <validationScript></validationScript>
-<type>
-<name>type</name>
-<prettyName>Panel type</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>0</relationalStorage>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<size>1</size>
-<separator> </separator>
-<cache>0</cache>
-<separators> ,|</separators>
-<values>view|edit</values>
-<number>2</number>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</type>
 <category>
-<name>category</name>
-<prettyName>Category</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>0</relationalStorage>
+<cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
-<size>1</size>
-<separator> </separator>
-<cache>0</cache>
-<separators> ,|</separators>
-<values>Information|Navigation|Tools|Administration|Other</values>
+<name>category</name>
 <number>5</number>
+<prettyName>Category</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>Information|Navigation|Tools|Administration|Other</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </category>
-<description>
-<name>description</name>
-<prettyName>Description</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>40</size>
-<rows>5</rows>
-<number>3</number>
-<editor>Text</editor>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
 <content>
-<name>content</name>
-<prettyName>Content</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>60</size>
-<rows>25</rows>
-<number>4</number>
+<disabled>0</disabled>
 <editor>Text</editor>
+<name>content</name>
+<number>4</number>
+<prettyName>Content</prettyName>
+<rows>25</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </content>
-<name>
-<name>name</name>
-<prettyName>Name</prettyName>
-<unmodifiable>0</unmodifiable>
+<description>
+<disabled>0</disabled>
+<editor>Text</editor>
+<name>description</name>
+<number>3</number>
+<prettyName>Description</prettyName>
+<rows>5</rows>
 <size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<name>
+<disabled>0</disabled>
+<name>name</name>
 <number>1</number>
+<prettyName>Name</prettyName>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
+<type>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>type</name>
+<number>2</number>
+<prettyName>Panel type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>view|edit</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
 </class>
 <name>Panels.Backlinks</name>
 <number>0</number>
 <className>Panels.PanelClass</className>
+<guid>944bac30-7b89-402a-929a-4d317ed79bfd</guid>
 <property>
-<type>view</type>
+<category>Information</category>
+</property>
+<property>
+<content>{{velocity}}
+#set ($blinks = $doc.getBacklinks())
+#if ($blinks.size() &gt; 0 || $showEmptyPanels)
+  #panelheader($msg.get('docextra.backlinks'))
+  #foreach ($docname in $blinks)
+    #set ($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
+    #if ($foreach.index &gt; 0)
+      (% class="pitemseparator" %) ~| (%%)##
+    #end
+    (% class="panelitem" %)[[$rdoc.plainTitle&gt;&gt;$rdoc]](%%)##
+  #end
+  #panelfooter()
+#end
+{{/velocity}}</content>
 </property>
 <property>
 <description>List all pages having links to the page being viewed. Displays nothing if there are no links to the page being viewed.</description>
 </property>
 <property>
-<category>Information</category>
+<name>Backlinks</name>
 </property>
 <property>
-<content>#set($blinks = $doc.getBacklinks())
-#if($blinks.size()&gt;0 || $showEmptyPanels)
-#panelheader($msg.get("docextra.backlinks"))
-#set($first = true)
-#foreach($docname in $blinks)
-#set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
-#if($first == true)
-#set($first = false)
-#else
-&lt;span class="pitemseparator"&gt; | &lt;/span&gt;
-#end
-&lt;span class="panelitem"&gt;&lt;a href="$rdoc.getURL()"&gt;$escapetool.xml($rdoc.plainTitle)&lt;/a&gt;&lt;/span&gt;
-#end
-#panelfooter()
-#end
-</content></property><property><name>Backlinks</name>
+<type>view</type>
 </property>
 </object>
-<content>#includeForm("Panels.PanelSheet")</content>
-</xwikidoc>
+<content>{{include document="Panels.PanelSheet"/}}</content></xwikidoc>

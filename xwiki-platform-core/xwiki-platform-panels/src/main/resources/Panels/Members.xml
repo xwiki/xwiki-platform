@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>Panels</web>
 <name>Members</name>
@@ -33,96 +32,98 @@
 <defaultWeb></defaultWeb>
 <nameField></nameField>
 <validationScript></validationScript>
-<type>
-<name>type</name>
-<prettyName>Panel type</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>0</relationalStorage>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<size>1</size>
-<separator> </separator>
-<cache>0</cache>
-<separators> ,|</separators>
-<values>view|edit</values>
-<number>2</number>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</type>
 <category>
-<name>category</name>
-<prettyName>Category</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>0</relationalStorage>
+<cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
-<size>1</size>
-<separator> </separator>
-<cache>0</cache>
-<separators> ,|</separators>
-<values>Information|Navigation|Tools|Administration|Other</values>
+<name>category</name>
 <number>5</number>
+<prettyName>Category</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>Information|Navigation|Tools|Administration|Other</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </category>
-<description>
-<name>description</name>
-<prettyName>Description</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>40</size>
-<rows>5</rows>
-<number>3</number>
-<editor>Text</editor>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
 <content>
-<name>content</name>
-<prettyName>Content</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>60</size>
-<rows>25</rows>
-<number>4</number>
+<disabled>0</disabled>
 <editor>Text</editor>
+<name>content</name>
+<number>4</number>
+<prettyName>Content</prettyName>
+<rows>25</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </content>
-<name>
-<name>name</name>
-<prettyName>Name</prettyName>
-<unmodifiable>0</unmodifiable>
+<description>
+<disabled>0</disabled>
+<editor>Text</editor>
+<name>description</name>
+<number>3</number>
+<prettyName>Description</prettyName>
+<rows>5</rows>
 <size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<name>
+<disabled>0</disabled>
+<name>name</name>
 <number>1</number>
+<prettyName>Name</prettyName>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
+<type>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>type</name>
+<number>2</number>
+<prettyName>Panel type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>view|edit</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
 </class>
 <name>Panels.Members</name>
 <number>0</number>
 <className>Panels.PanelClass</className>
-<property>
-<type>view</type>
-</property>
-<property>
-<description>List the last 5 members who have registered on this wiki along with their pictures (a default picture is displayed if the user hasn't uploaded any picture).</description>
-</property>
+<guid>268e55bd-92e7-42ff-a818-3ba46ef45364</guid>
 <property>
 <category>Information</category>
 </property>
 <property>
 <content>{{velocity}}
-{{html wiki="true"}}
-#panelheader($msg.get("xe.panels.last.members"))
-#set($list = $xwiki.searchDocuments(",BaseObject as obj where doc.fullName=obj.name and obj.className='XWiki.XWikiUsers' order by doc.creationDate desc", 5, 0))
-|=(% scope="col" %)$msg.get("xe.panels.members.photo") |=(% scope="col" %) $msg.get("xe.panels.members.name")
-#foreach($user in $list)
-#set($userdoc = $xwiki.getDocument($user)) $userdoc.use("XWiki.XWikiUsers") 
-| #if($userdoc.attachmentList.size()&gt;0) #set($attach = $userdoc.attachmentList.get(0)) &lt;img src="$userdoc.getAttachmentURL($attach.filename, "download", "width=30")" width="30"/&gt; #end | [[$userdoc.display("first_name","view") $userdoc.display("last_name","view")&gt;&gt;$userdoc.fullName]]
+#panelheader($msg.get('xe.panels.last.members'))
+#set ($list = $xwiki.searchDocuments(',BaseObject as obj where doc.fullName=obj.name and obj.className=''XWiki.XWikiUsers'' order by doc.creationDate desc', 5, 0))
+|=(% scope="col" %)$msg.get('xe.panels.members.photo')|=(% scope="col" %)$msg.get('xe.panels.members.name')
+#foreach ($user in $list)
+  |{{html}}#smallUserAvatar($user){{/html}}|[[$xwiki.getUserName($user, false)&gt;&gt;$user]]
 #end
 
-[[$msg.get("xe.panels.members.viewall")&gt;&gt;XWiki.XWikiUsers]]
+[[$msg.get('xe.panels.members.viewall')&gt;&gt;Main.UserDirectory]]
 #panelfooter()
-{{/html}}
 {{/velocity}}</content>
+</property>
+<property>
+<description>List the last 5 members who have registered on this wiki along with their pictures (a default picture is displayed if the user hasn't uploaded any picture).</description>
 </property>
 <property>
 <name>Members</name>
 </property>
+<property>
+<type>view</type>
+</property>
 </object>
-<content>{{include document="Panels.PanelSheet"/}}</content>
-</xwikidoc>
+<content>{{include document="Panels.PanelSheet"/}}</content></xwikidoc>

@@ -648,49 +648,60 @@ $fn
 ### @param title The panel caption title
 ###
 #macro(panelheader $title)
-#set($cookieName = "${xcontext.user}_${panel}")
-#set($expanded = $xwiki.getUserPreferenceFromCookie($cookieName))
-#if(!$expanded)
-  #set($expanded = 'expanded')
-#end
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
-#set ($specialClassAttribute = "")
-#if ($paneldoc && $paneldoc != "")
+#set ($specialClassAttribute = '')
+#if ($paneldoc)
   #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
 #end
-<div class="panel $expanded $specialClassAttribute">
-<h1 class="xwikipaneltitle" onclick="XWiki.togglePanelVisibility(this.parentNode, '${cookieName}');">$title</h1>
+#if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
+<div class="panel expanded $!specialClassAttribute">
+<h1 class="xwikipaneltitle">$title</h1>
 <div class="xwikipanelcontents">
+#else
+(% class="panel expanded $specialClassAttribute" %)(((
+(% class="xwikipaneltitle" %)
+= $title =
+(% class="xwikipanelcontents" %)(((
+#end
 #end
 
 #macro(panelhiddenheader $title)
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
-#set ($specialClassAttribute = "")
-#if ($paneldoc && $paneldoc != "")
+#set ($specialClassAttribute = '')
+#if ($paneldoc && $paneldoc != '')
   #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
 #end
-<div class="panel expanded $specialClassAttribute">
+#if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
+<div class="panel expanded $!specialClassAttribute">
 <h1 class="xwikipaneltitle hidden">$title</h1>
 <div class="xwikipanelcontents">
+#else
+(% class="panel expanded $specialClassAttribute" %)(((
+(% class="xwikipaneltitle hidden" %)
+= $title =
+(% class="xwikipanelcontents" %)(((
+#end
 #end
 
 #macro(largepanelheader $title)
-#set($cookieName = "${xcontext.user}_${panel}")
-#set($expanded = $xwiki.getUserPreferenceFromCookie($cookieName))
-#if(!$expanded)
-  #set($expanded = 'expanded')
-#end
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
-#set ($specialClassAttribute = "")
-#if ($paneldoc && $paneldoc != "")
+#set ($specialClassAttribute = '')
+#if ($paneldoc && $paneldoc != '')
   #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
 #end
-<div class="large panel $expanded $specialClassAttribute">
-<h1 class="xwikipaneltitle" onclick="XWiki.togglePanelVisibility(this.parentNode, '${cookieName}');">$title</h1>
+#if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
+<div class="large panel $expanded $!specialClassAttribute">
+<h1 class="xwikipaneltitle">$title</h1>
 <div class="xwikipanelcontents">
+#else
+(% class="large panel expanded $!specialClassAttribute" %)(((
+(% class="xwikipaneltitle" %)
+= $title =
+(% class="xwikipanelcontents" %)(((
+#end
 #end
 
 ###
@@ -699,8 +710,13 @@ $fn
 ### Generate the ending html code for a panel
 ###
 #macro(panelfooter)
+#if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
 </div>
 </div>
+#else
+)))
+)))
+#end
 #end
 
 ###
@@ -709,18 +725,11 @@ $fn
 ### Extract and display the panel code from the panel object
 ###
 #macro(displaypanel $name)
-  #set ($pobj = "")
-  ## Since Velocity does not do any assignment if the RHS is null we need to reset the paneldoc
-  ## as otherwise the previously set panel will be displayed. getDocument() returns null if the
-  ## user doesn't have the right to view a document.
-  #set ($paneldoc = "")
   #set ($paneldoc = $xwiki.getDocument($name))
-  #if ($paneldoc != "")
-    #set ($pobj = $paneldoc.getObject("Panels.PanelClass"))
-    #if (!$pobj)
-      ## discarded
-    #else
-      $!doc.display("content", "view", $pobj)
+  #if ($paneldoc)
+    #set ($pobj = $paneldoc.getObject('Panels.PanelClass'))
+    #if ($pobj)
+      $!doc.display('content', 'view', $pobj)
     #end
   #end
 #end

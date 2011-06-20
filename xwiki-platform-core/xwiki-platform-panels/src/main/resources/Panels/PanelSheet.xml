@@ -50,34 +50,27 @@
 <defaultEditMode></defaultEditMode>
 </property>
 </object>
-<content>{{velocity}}
-#macro(displayPropName $prop)
-#if($msg.get("$class.getName()_$prop.name") == "$class.getName()_$prop.name")
-$prop.prettyName#else
-$msg.get($prop.name)#end
+<content>{{velocity output="false"}}
+#macro(displayPanelProperty $obj $propName)
+  ; #if ($xcontext.action == 'inline')
+    {{html}}&lt;label for="${class.getName()}_${obj.number}_${propName}"&gt;$msg.get("${class.getName()}_${propName}")&lt;/label&gt;{{/html}}
+  #else
+    $msg.get("${class.getName()}_${propName}")
+  #end
+  : $doc.display($propName, $obj)
 #end
-#set($obj = "")
-#set($obj = $doc.getObject("Panels.PanelClass"))
+
+#set ($paneldoc = $doc)
+{{/velocity}}
+
+{{velocity}}
+#set ($obj = $doc.getObject('Panels.PanelClass'))
 #if ($obj)
   #set($class = $obj.xWikiClass)
-  #macro(displayPanelProperty $obj $propName)
-    &lt;dt&gt;
-      #if ($xcontext.action == 'inline')
-        &lt;label for="${class.getName()}_${obj.number}_${propName}"&gt;$msg.get("${class.getName()}_${propName}")&lt;/label&gt;
-      #else
-        $msg.get("${class.getName()}_${propName}")
-      #end
-    &lt;/dt&gt;
-
-    &lt;dd&gt;$doc.display($propName, $obj)&lt;/dd&gt;
-  #end
-  {{html wiki="true"}}
-    &lt;dl&gt;
-      #displayPanelProperty($obj "name")
-      #displayPanelProperty($obj "type")
-      #displayPanelProperty($obj "category")
-      #displayPanelProperty($obj "description")
-      #displayPanelProperty($obj "content")
-    &lt;/dl&gt;
-  {{/html}}#end
+  #displayPanelProperty($obj 'name')
+  #displayPanelProperty($obj 'type')
+  #displayPanelProperty($obj 'category')
+  #displayPanelProperty($obj 'description')
+  #displayPanelProperty($obj 'content')
+#end
 {{/velocity}}</content></xwikidoc>

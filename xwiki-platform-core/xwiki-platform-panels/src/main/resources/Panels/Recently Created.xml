@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>Panels</web>
 <name>Recently Created</name>
@@ -21,7 +20,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.1</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -35,6 +34,7 @@
 <validationScript></validationScript>
 <category>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>category</name>
@@ -49,6 +49,7 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </category>
 <content>
+<disabled>0</disabled>
 <editor>Text</editor>
 <name>content</name>
 <number>4</number>
@@ -59,6 +60,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </content>
 <description>
+<disabled>0</disabled>
 <editor>Text</editor>
 <name>description</name>
 <number>3</number>
@@ -69,6 +71,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </description>
 <name>
+<disabled>0</disabled>
 <name>name</name>
 <number>1</number>
 <prettyName>Name</prettyName>
@@ -78,6 +81,7 @@
 </name>
 <type>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>type</name>
@@ -100,23 +104,22 @@
 <category>Information</category>
 </property>
 <property>
-<content>#set($recentlyCreated = $xwiki.searchDocuments('where 1=1 order by doc.creationDate desc', 5, 0))
-#if($recentlyCreated.size() &gt; 0 || $showEmptyPanels)
+<content>{{velocity}}
+#set ($recentlyCreated = $xwiki.searchDocuments('where 1=1 order by doc.creationDate desc', 5, 0))
+#if ($recentlyCreated.size() &gt; 0 || $showEmptyPanels)
   #panelheader($msg.get('panels.recentlyCreated.title'))
-  #set($first = true)
-  #foreach($docname in $recentlyCreated)
-    #if($xwiki.hasAccessLevel('view', $xcontext.getUser(), $docname))
-      #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
-      #if($first == true)
-        #set($first = false)
-      #else
-        &lt;span class="pitemseparator"&gt; | &lt;/span&gt;
+  #foreach ($docname in $recentlyCreated)
+    #if ($xwiki.hasAccessLevel('view', $xcontext.getUser(), $docname))
+      #set ($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
+      #if ($foreach.index &gt; 0)
+        (% class="pitemseparator" %) ~| (%%)##
       #end
-      &lt;span class="panelitem"&gt;&lt;a href="$rdoc.getURL()"&gt;$escapetool.xml($rdoc.plainTitle)&lt;/a&gt;&lt;/span&gt;
+      (% class="panelitem" %)[[$rdoc.plainTitle&gt;&gt;$rdoc]](%%)##
     #end
   #end
 #panelfooter()
-#end</content>
+#end
+{{/velocity}}</content>
 </property>
 <property>
 <description>List the last 5 documents created.</description>
@@ -128,5 +131,4 @@
 <type>view</type>
 </property>
 </object>
-<content>#includeForm("Panels.PanelSheet")</content>
-</xwikidoc>
+<content>{{include document="Panels.PanelSheet"/}}</content></xwikidoc>

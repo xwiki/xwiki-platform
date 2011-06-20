@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>Panels</web>
 <name>EditModes</name>
@@ -21,6 +20,8 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>Panels.PanelClass</name>
@@ -33,6 +34,7 @@
 <validationScript></validationScript>
 <category>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>category</name>
@@ -47,6 +49,7 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </category>
 <content>
+<disabled>0</disabled>
 <editor>Text</editor>
 <name>content</name>
 <number>4</number>
@@ -57,6 +60,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </content>
 <description>
+<disabled>0</disabled>
 <editor>Text</editor>
 <name>description</name>
 <number>3</number>
@@ -67,6 +71,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </description>
 <name>
+<disabled>0</disabled>
 <name>name</name>
 <number>1</number>
 <prettyName>Name</prettyName>
@@ -76,6 +81,7 @@
 </name>
 <type>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>type</name>
@@ -93,23 +99,28 @@
 <name>Panels.EditModes</name>
 <number>0</number>
 <className>Panels.PanelClass</className>
+<guid>a6e5fb8a-4cab-41d0-91da-e3ea0536611a</guid>
 <property>
 <category>Navigation</category>
 </property>
 <property>
-<content>#largepanelheader($msg.get("chooseeditor"))
+<content>{{velocity}}
+#largepanelheader($msg.get('chooseeditor'))
 ###
 ### Edit mode tabs
 ###
 ###
+{{html}}
 &lt;ul&gt;
-&lt;li id="xwikieditwysiwyg"#if($editor &amp;&amp; $editor == "wysiwyg") class="active"#end&gt;&lt;a href="$doc.getURL("edit", "editor=wysiwyg&amp;amp;$param")" onclick="if (checkAdvancedContent('$msg.get("checkadvancedcontent")')==false) return false; return Try.these(function() {document.forms.${formname}.action='$doc.getURL("edit", "editor=wysiwyg&amp;amp;$languageparams&amp;amp;$param")'; document.forms.${formname}.submit(); return false;});"&gt;$msg.get("editVisual")&lt;/a&gt;&lt;/li&gt;
-&lt;li id="xwikieditwiki"#if($editor &amp;&amp; $editor == "wiki") class="active"#end&gt;&lt;a href="$doc.getURL("edit", "editor=wiki&amp;amp;$param")" onclick="return Try.these(function() {document.forms.${formname}.action='$doc.getURL("edit", "editor=wiki&amp;amp;$languageparams&amp;amp;$param")'; document.forms.${formname}.submit(); return false;});"&gt;$msg.get("editWiki")&lt;/a&gt;&lt;/li&gt;
-#if($isAdvancedUser)&lt;li id="xwikieditobject"#if($editor &amp;&amp; $editor == "object") class="active"#end&gt;&lt;a href="$doc.getURL("edit", "editor=object&amp;amp;$param")"&gt;$msg.get("editObject")&lt;/a&gt;&lt;/li&gt; #end
-#if($isAdvancedUser)&lt;li id="xwikieditclass"#if($editor &amp;&amp; $editor == "class") class="active"#end&gt;&lt;a href="$doc.getURL("edit", "editor=class&amp;amp;$param")"&gt;$msg.get("editClass")&lt;/a&gt;&lt;/li&gt; #end
-&lt;li id="xwikieditrights"#if($editor &amp;&amp; $editor == "rights") class="active"#end&gt;&lt;a href="$doc.getURL("edit", "editor=rights&amp;amp;$param")"&gt;$msg.get("editRights")&lt;/a&gt;&lt;/li&gt;
+&lt;li id="xwikieditwysiwyg"#if ("$!editor" == 'wysiwyg') class="active"#end&gt;&lt;a href="$doc.getURL('edit', "editor=wysiwyg&amp;amp;$param")" onclick="if (checkAdvancedContent('$msg.get('checkadvancedcontent')')==false) return false; return Try.these(function() {document.forms.${formname}.action='$doc.getURL('edit', "editor=wysiwyg&amp;amp;$languageparams&amp;amp;$param")'; document.forms.${formname}.submit(); return false;});"&gt;$msg.get('editVisual')&lt;/a&gt;&lt;/li&gt;
+&lt;li id="xwikieditwiki"#if ("$!editor" == 'wiki') class="active"#end&gt;&lt;a href="$doc.getURL('edit', "editor=wiki&amp;amp;$param")" onclick="return Try.these(function() {document.forms.${formname}.action='$doc.getURL('edit', "editor=wiki&amp;amp;$languageparams&amp;amp;$param")'; document.forms.${formname}.submit(); return false;});"&gt;$msg.get('editWiki')&lt;/a&gt;&lt;/li&gt;
+#if ($isAdvancedUser)&lt;li id="xwikieditobject"#if ("$!editor" == 'object') class="active"#end&gt;&lt;a href="$doc.getURL('edit', "editor=object&amp;amp;$param")"&gt;$msg.get('editObject')&lt;/a&gt;&lt;/li&gt;#end
+#if ($isAdvancedUser)&lt;li id="xwikieditclass"#if ("$!editor" == 'class') class="active"#end&gt;&lt;a href="$doc.getURL('edit', "editor=class&amp;amp;$param")"&gt;$msg.get('editClass')&lt;/a&gt;&lt;/li&gt;#end
+&lt;li id="xwikieditrights"#if ("$!editor" == 'rights') class="active"#end&gt;&lt;a href="$doc.getURL('edit', "editor=rights&amp;amp;$param")"&gt;$msg.get('editRights')&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-#panelfooter()</content>
+{{/html}}
+#panelfooter()
+{{/velocity}}</content>
 </property>
 <property>
 <description>Panel Description</description>
@@ -121,5 +132,4 @@
 <type>edit</type>
 </property>
 </object>
-<content>#includeForm("Panels.PanelSheet")</content>
-</xwikidoc>
+<content>{{include document="Panels.PanelSheet"/}}</content></xwikidoc>

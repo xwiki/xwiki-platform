@@ -20,17 +20,9 @@
  */
 package org.xwiki.observation.remote.test;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.junit.Before;
 import org.xwiki.component.embed.EmbeddableComponentManager;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.remote.internal.jgroups.JGroupsNetworkAdapter;
 import org.xwiki.test.MockConfigurationSource;
 import org.xwiki.test.XWikiComponentInitializer;
 
@@ -57,28 +49,6 @@ public abstract class AbstractROMTestCase
 
         this.initializer2.initializeConfigurationSource();
         this.initializer2.initializeExecution();
-
-        ApplicationContext applicationContext = new ApplicationContext()
-        {
-            public File getTemporaryDirectory()
-            {
-                throw new RuntimeException("Not implemented");
-            }
-
-            public InputStream getResourceAsStream(String resourceName)
-            {
-                return this.getClass().getClassLoader().getResourceAsStream(
-                    resourceName.substring(("/WEB-INF/" + JGroupsNetworkAdapter.CONFIGURATION_PATH).length()));
-            }
-
-            public URL getResource(String resourceName) throws MalformedURLException
-            {
-                throw new RuntimeException("Not implemented");
-            }
-        };
-
-        getComponentManager1().lookup(Container.class).setApplicationContext(applicationContext);
-        getComponentManager2().lookup(Container.class).setApplicationContext(applicationContext);
 
         getConfigurationSource1().setProperty("observation.remote.enabled", Boolean.TRUE);
         getConfigurationSource2().setProperty("observation.remote.enabled", Boolean.TRUE);

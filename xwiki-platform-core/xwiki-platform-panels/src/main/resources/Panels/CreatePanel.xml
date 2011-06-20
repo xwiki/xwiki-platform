@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>Panels</web>
 <name>CreatePanel</name>
@@ -23,51 +22,42 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>{{velocity}}
-#macro(displayCreatePanelForm)
+<content>{{velocity output="false"}}
+#macro (displayCreatePanelForm)
 {{html}}
   &lt;form method="post" action="$doc.getURL('view', 'xpage=plain')" onsubmit="cancelCancelEdit()"&gt;
     &lt;div&gt;
       &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
       &lt;input type="hidden" name="create" value="1"/&gt;
-      &lt;label for="panelTitle" class="hidden"&gt;$msg.get("xe.panels.create.title")&lt;/label&gt;
-      &lt;input type="text" id="panelTitle" name="panelTitle" value="$msg.get("xe.panels.create.title")" class="panelinput" onfocus="if(this.value=='$msg.get("xe.panels.create.title")') this.value=''" onblur="if(this.value=='') this.value='$msg.get("xe.panels.create.title")'"/&gt;
-      &lt;input type="submit" class="button" value="$msg.get("create")"/&gt;
+      &lt;label for="panelTitle" class="hidden"&gt;$msg.get('xe.panels.create.title')&lt;/label&gt;
+      &lt;input type="text" id="panelTitle" name="panelTitle" value="$msg.get('xe.panels.create.title')" class="panelinput withTip" /&gt;
+      &lt;input type="submit" class="button" value="$msg.get('create')"/&gt;
     &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}##
 #end
-#macro(createPanel $title)
-  #set($docName=$title.replaceAll(':', '%3A'))
-  #set($displayTitle = $title)
-  #set($displayTitle = $displayTitle.replaceAll('&amp;(?!#)', '&amp;#38;'))
-  #set($displayTitle = $displayTitle.replaceAll('\\', '&amp;#92;'))
-  #set($panelName = $displayTitle)
-  #set($panelName = $util.encodeURI($panelName))
-  #set($displayTitle = $displayTitle.replaceAll("'", '&amp;#39;'))
-  #set($template = "$!{request.getParameter('template')}")
-  #if($template == "")
-    #set($template="Panels.PanelTemplate")
-  #end
-  #set($pcontent = "#")
-  #set($pcontent = "${pcontent}panelheader('${displayTitle}')${util.getNewline()}${util.getNewline()}#")
-  #set($pcontent = "${pcontent}panelfooter()")
-  #set($pcontent = $util.encodeURI($pcontent))
-  #set($redirectaction = "inline")
-  #set($redirectparams = "template=${template}&amp;Panels.PanelClass_0_name=${panelName}&amp;Panels.PanelClass_0_content=$pcontent")
-  #set($newdoc=$xwiki.getDocument($docName))
-  #if(!$newdoc.isNew())
-    #set($redirecturl = $newdoc.getURL("view", "xpage=docalreadyexists"))
+
+#macro (createPanel $title)
+  #set ($newPanelDoc = $xwiki.getDocument($services.model.createDocumentReference('', '', $title)))
+  #if (!$newPanelDoc.isNew())
+    #set ($redirecturl = $newPanelDoc.getURL('view', 'xpage=docalreadyexists'))
   #else
-    #set($redirecturl = $newdoc.getURL($redirectaction, $redirectparams))
+    #set ($template = "$!{request.getParameter('template')}")
+    #if ($template == '')
+      #set ($template = 'Panels.PanelTemplate')
+    #end
+    #set ($pcontent = "{{velocity}}${util.newline}${escapetool.h}panelheader('${title.replace('''', '''''')}')${util.newline}${util.newline}${escapetool.h}panelfooter()${util.newline}{{/velocity}}")
+    #set ($redirectparams = "template=${escapetool.url($template)}&amp;Panels.PanelClass_0_name=${escapetool.url($title)}&amp;Panels.PanelClass_0_content=${escapetool.url($pcontent)}")
+    #set ($redirecturl = $newPanelDoc.getURL('inline', $redirectparams))
   #end
   $response.sendRedirect($redirecturl)
-$title
 #end
+{{/velocity}}
+
+{{velocity}}
 #if("$!{request.create}" == '')
   #displayCreatePanelForm()
 #else
-  #createPanel("$!{request.getParameter('panelTitle')}")
+  #createPanel("$!{request.panelTitle.trim()}")
 #end
-{{/velocity}}</content>
-</xwikidoc>
+{{/velocity}}</content></xwikidoc>

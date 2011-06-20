@@ -42,7 +42,7 @@ public class TCPROMTest extends AbstractROMTestCase
     {
         super.setUp();
 
-        System.setProperty("jgroups.bind_addr", "127.0.0.1");
+        System.setProperty("jgroups.bind_addr", "localhost");
 
         getConfigurationSource1().setProperty("observation.remote.channels", Arrays.asList("tcp"));
         getComponentManager2().lookup(RemoteObservationManager.class).startChannel("tcp");

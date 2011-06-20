@@ -642,7 +642,7 @@ public class XWikiHibernateBaseStore implements Initializable
                 Object[] args = {context.getDatabase()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE,
-                    "Exception while switching to database {0}", e, args);
+                    "Exception while switching to database [{0}]", e, args);
             }
         }
     }

@@ -847,7 +847,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         } catch (Exception e) {
             Object[] args = {doc.getDocumentReference()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC, "Exception while reading document {0}", e, args);
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC,
+                "Exception while reading document [{0}]", e, args);
         } finally {
             try {
                 if (bTransaction) {

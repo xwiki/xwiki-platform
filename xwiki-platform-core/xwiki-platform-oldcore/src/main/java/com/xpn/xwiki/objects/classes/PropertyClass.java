@@ -405,7 +405,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     }
 
     @Override
-    public Object clone()
+    public PropertyClass clone()
     {
         PropertyClass pclass = (PropertyClass) super.clone();
         pclass.setObject(getObject());

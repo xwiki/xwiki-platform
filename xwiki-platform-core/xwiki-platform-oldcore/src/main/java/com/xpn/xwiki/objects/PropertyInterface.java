@@ -28,15 +28,17 @@ import com.xpn.xwiki.doc.merge.MergeResult;
 
 public interface PropertyInterface extends ElementInterface
 {
-    public int getId();
+    int getId();
 
-    public void setId(int id);
+    void setId(int id);
 
-    public BaseCollection getObject();
+    BaseCollection getObject();
 
-    public void setObject(BaseCollection object);
+    void setObject(BaseCollection object);
 
-    public String toFormString();
+    String toFormString();
 
-    public Element toXML();
+    Element toXML();
+
+    PropertyInterface clone();
 }

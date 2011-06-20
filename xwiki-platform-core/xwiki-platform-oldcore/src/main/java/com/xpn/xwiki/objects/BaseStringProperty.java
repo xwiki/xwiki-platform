@@ -100,7 +100,7 @@ public class BaseStringProperty extends BaseProperty
      * @see com.xpn.xwiki.objects.BaseProperty#clone()
      */
     @Override
-    public Object clone()
+    public BaseStringProperty clone()
     {
         BaseStringProperty property = (BaseStringProperty) super.clone();
         property.setValue(getValue());

@@ -161,7 +161,7 @@ public class ListProperty extends BaseProperty implements Cloneable
      * @see com.xpn.xwiki.objects.BaseProperty#clone()
      */
     @Override
-    public Object clone()
+    public ListProperty clone()
     {
         ListProperty property = (ListProperty) super.clone();
         List<String> list = new ArrayList<String>();

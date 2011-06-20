@@ -31,6 +31,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.web.Utils;
 
@@ -215,11 +216,11 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      * @see java.lang.Object#clone()
      */
     @Override
-    public Object clone()
+    public BaseElement clone()
     {
         BaseElement element;
         try {
-            element = getClass().newInstance();
+            element = (BaseElement) super.clone();
 
             // Make sure we clone either the reference or the name depending on which one is used.
             if (this.documentReference != null) {
@@ -241,11 +242,12 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.objects.ElementInterface#merge(com.xpn.xwiki.objects.ElementInterface,
-     *      com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.XWikiContext, com.xpn.xwiki.doc.merge.MergeResult)
+     *      com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.doc.merge.MergeConfiguration,
+     *      com.xpn.xwiki.XWikiContext, com.xpn.xwiki.doc.merge.MergeResult)
      */
     @Override
-    public void merge(ElementInterface previousElement, ElementInterface newElement, XWikiContext context,
-        MergeResult mergeResult)
+    public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
+        XWikiContext context, MergeResult mergeResult)
     {
         setPrettyName(mergeString(((BaseElement) previousElement).getPrettyName(),
             ((BaseElement) newElement).getPrettyName(), getPrettyName(), mergeResult));

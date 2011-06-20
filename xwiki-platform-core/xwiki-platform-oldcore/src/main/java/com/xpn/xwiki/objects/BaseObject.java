@@ -225,7 +225,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * @see com.xpn.xwiki.objects.BaseCollection#clone()
      */
     @Override
-    public Object clone()
+    public BaseObject clone()
     {
         BaseObject object = (BaseObject) super.clone();
         object.setGuid(getGuid());

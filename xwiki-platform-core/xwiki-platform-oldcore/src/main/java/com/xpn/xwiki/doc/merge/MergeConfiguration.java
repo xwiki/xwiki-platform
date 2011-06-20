@@ -23,6 +23,7 @@ package com.xpn.xwiki.doc.merge;
  * Allow to define some behaviors of the merge.
  * 
  * @version $Id$
+ * @since 3.2M1
  */
 public class MergeConfiguration
 {

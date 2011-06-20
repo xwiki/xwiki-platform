@@ -23,6 +23,7 @@ package com.xpn.xwiki.doc.merge;
  * Any exception raised during a merge.
  * 
  * @version $Id$
+ * @since 3.2M1
  */
 public class MergeException extends Exception
 {

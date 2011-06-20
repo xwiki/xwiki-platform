@@ -128,6 +128,7 @@ import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.doc.merge.CollisionException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.doc.merge.MergeUtils;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.internal.xml.DOMXMLWriter;
@@ -7853,10 +7854,11 @@ public class XWikiDocument implements DocumentModelBridge
         MergeResult mergeResult = new MergeResult();
 
         // Title
-        setTitle(mergeString(previousDocument.getTitle(), newDocument.getTitle(), getTitle(), mergeResult));
+        setTitle(MergeUtils.mergeString(previousDocument.getTitle(), newDocument.getTitle(), getTitle(), mergeResult));
 
         // Content
-        setContent(mergeString(previousDocument.getContent(), newDocument.getContent(), getContent(), mergeResult));
+        setContent(MergeUtils.mergeString(previousDocument.getContent(), newDocument.getContent(), getContent(),
+            mergeResult));
 
         // Parent
         if (!ObjectUtils.equals(previousDocument.getAuthorReference(), newDocument.getAuthorReference())) {
@@ -8001,23 +8003,5 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         return mergeResult;
-    }
-
-    private String mergeString(String previousStr, String newStr, String currentStr, MergeResult mergeResult)
-    {
-        String result = currentStr;
-
-        try {
-            Revision revision = Diff.diff(ToString.stringToArray(previousStr), ToString.stringToArray(newStr));
-            if (revision.size() > 0) {
-                result = ToString.arrayToString(revision.patch(ToString.stringToArray(currentStr)));
-
-                mergeResult.setModified(true);
-            }
-        } catch (Exception e) {
-            mergeResult.getErrors().add(e);
-        }
-
-        return result;
     }
 }

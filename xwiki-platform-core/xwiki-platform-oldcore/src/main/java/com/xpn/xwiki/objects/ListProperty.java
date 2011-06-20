@@ -32,6 +32,7 @@ import org.hibernate.collection.PersistentCollection;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.doc.merge.MergeUtils;
 
 public class ListProperty extends BaseProperty implements Cloneable
 {
@@ -241,6 +242,6 @@ public class ListProperty extends BaseProperty implements Cloneable
     @Override
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
-        // TODO
+        MergeUtils.mergeCollection((List<String>) previousValue, (List<String>) newValue, this.list, mergeResult);
     }
 }

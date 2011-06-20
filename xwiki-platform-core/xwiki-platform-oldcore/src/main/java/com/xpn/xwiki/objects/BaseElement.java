@@ -33,6 +33,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.doc.merge.MergeUtils;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -249,35 +250,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult)
     {
-        setPrettyName(mergeString(((BaseElement) previousElement).getPrettyName(),
+        setPrettyName(MergeUtils.mergeString(((BaseElement) previousElement).getPrettyName(),
             ((BaseElement) newElement).getPrettyName(), getPrettyName(), mergeResult));
-    }
-
-    /**
-     * Try to apply a 3 ways merge of provided String.
-     * 
-     * @param previousStr previous version of the string
-     * @param newStr new version of the string
-     * @param currentStr current version of the string
-     * @param mergeResult merge report
-     * @return the merged value of the string
-     * @since 3.2M1
-     */
-    protected String mergeString(String previousStr, String newStr, String currentStr, MergeResult mergeResult)
-    {
-        String result = currentStr;
-
-        try {
-            Revision revision = Diff.diff(ToString.stringToArray(previousStr), ToString.stringToArray(newStr));
-            if (revision.size() > 0) {
-                result = ToString.arrayToString(revision.patch(ToString.stringToArray(currentStr)));
-
-                mergeResult.setModified(true);
-            }
-        } catch (Exception e) {
-            mergeResult.getErrors().add(e);
-        }
-
-        return result;
     }
 }

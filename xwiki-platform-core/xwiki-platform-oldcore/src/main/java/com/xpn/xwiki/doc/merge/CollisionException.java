@@ -19,12 +19,11 @@
  */
 package com.xpn.xwiki.doc.merge;
 
-
-
 /**
  * Any exception raised when facing a collision during a 3 ways merge.
  * 
  * @version $Id$
+ * @since 3.2M1
  */
 public class CollisionException extends MergeException
 {

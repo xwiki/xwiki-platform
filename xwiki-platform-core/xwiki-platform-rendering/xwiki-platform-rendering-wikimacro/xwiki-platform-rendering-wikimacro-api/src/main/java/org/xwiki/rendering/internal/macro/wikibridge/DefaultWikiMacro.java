@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.wikibridge;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.script.NestedScriptMacroEnabled;
@@ -198,11 +200,17 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
             xwikiContext.put(MACRO_KEY, macroBinding);
 
             MacroBlock wikiMacroBlock = context.getCurrentMacroBlock();
+
             MacroMarkerBlock wikiMacroMarker =
                 new MacroMarkerBlock(wikiMacroBlock.getId(), wikiMacroBlock.getParameters(),
                     wikiMacroBlock.getContent(), xdom.getChildren(), wikiMacroBlock.isInline());
+
+            // make sure to use provided metadatas
+            MetaDataBlock metaDataBlock =
+                new MetaDataBlock(Collections.<Block> singletonList(wikiMacroMarker), xdom.getMetaData());
+
             // otherwise the inner macros will not be able to access the parent DOM
-            wikiMacroMarker.setParent(wikiMacroBlock.getParent());
+            metaDataBlock.setParent(wikiMacroBlock.getParent());
 
             if (observation != null) {
                 observation.notify(STARTEXECUTION_EVENT, this, macroBinding);

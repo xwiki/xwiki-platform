@@ -27,6 +27,7 @@ import java.util.List;
 import org.xwiki.component.annotation.ComponentRole;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
 
 /**
  * Take care of parsing xar files and handling database actions.
@@ -36,7 +37,8 @@ import com.xpn.xwiki.XWikiException;
 @ComponentRole
 public interface Packager
 {
-    void importXAR(XarFile previousXarFile, File xarFile, String wiki) throws IOException, XWikiException;
+    void importXAR(XarFile previousXarFile, File xarFile, String wiki, MergeConfiguration mergeConfiguration)
+        throws IOException, XWikiException;
 
     void unimportXAR(File xarFile, String wiki) throws IOException, XWikiException;
 

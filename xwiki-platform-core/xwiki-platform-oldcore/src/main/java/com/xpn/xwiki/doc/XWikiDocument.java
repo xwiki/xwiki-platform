@@ -7844,12 +7844,12 @@ public class XWikiDocument implements DocumentModelBridge
      * 
      * @param previousDocument the previous version of the document
      * @param newDocument the next version of the document
-     * @param context the XWiki context
      * @param configuration the configuration of the merge Indicate how to deal with some conflicts use cases, etc.
+     * @param context the XWiki context
      * @return a repport of what happen during the merge (errors, etc.)
      * @since 3.2M1
      */
-    public MergeResult merge(XWikiDocument previousDocument, XWikiDocument newDocument, XWikiContext context, MergeConfiguration configuration)
+    public MergeResult merge(XWikiDocument previousDocument, XWikiDocument newDocument, MergeConfiguration configuration, XWikiContext context)
     {
         MergeResult mergeResult = new MergeResult();
 

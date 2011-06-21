@@ -61,6 +61,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
 
 @Component
 @Singleton
@@ -98,9 +99,10 @@ public class DefaultPackager implements Packager, Initializable
      * {@inheritDoc}
      * 
      * @see org.xwiki.extension.xar.internal.handler.packager.Packager#importXAR(org.xwiki.extension.xar.internal.handler.packager.XarFile,
-     *      java.io.File, java.lang.String)
+     *      java.io.File, java.lang.String, com.xpn.xwiki.doc.merge.MergeConfiguration)
      */
-    public void importXAR(XarFile previousXarFile, File xarFile, String wiki) throws IOException, XWikiException
+    public void importXAR(XarFile previousXarFile, File xarFile, String wiki, MergeConfiguration mergeConfiguration)
+        throws IOException, XWikiException
     {
         if (wiki == null) {
             XWikiContext context = getXWikiContext();
@@ -108,32 +110,33 @@ public class DefaultPackager implements Packager, Initializable
                 List<String> wikis = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(context);
 
                 if (!wikis.contains(context.getMainXWiki())) {
-                    importXARToWiki(previousXarFile, xarFile, context.getMainXWiki());
+                    importXARToWiki(previousXarFile, xarFile, context.getMainXWiki(), mergeConfiguration);
                 }
 
                 for (String subwiki : wikis) {
-                    importXARToWiki(previousXarFile, xarFile, subwiki);
+                    importXARToWiki(previousXarFile, xarFile, subwiki, mergeConfiguration);
                 }
             } else {
-                importXARToWiki(previousXarFile, xarFile, context.getMainXWiki());
+                importXARToWiki(previousXarFile, xarFile, context.getMainXWiki(), mergeConfiguration);
             }
         } else {
-            importXARToWiki(previousXarFile, xarFile, wiki);
+            importXARToWiki(previousXarFile, xarFile, wiki, mergeConfiguration);
         }
     }
 
-    public XarMergeResult importXARToWiki(XarFile previousXarFile, File xarFile, String wiki) throws IOException
+    public XarMergeResult importXARToWiki(XarFile previousXarFile, File xarFile, String wiki,
+        MergeConfiguration mergeConfiguration) throws IOException
     {
         FileInputStream fis = new FileInputStream(xarFile);
         try {
-            return importXARToWiki(previousXarFile, fis, wiki);
+            return importXARToWiki(previousXarFile, fis, wiki, mergeConfiguration);
         } finally {
             fis.close();
         }
     }
 
-    public XarMergeResult importXARToWiki(XarFile previousXarFile, InputStream xarInputStream, String wiki)
-        throws IOException
+    public XarMergeResult importXARToWiki(XarFile previousXarFile, InputStream xarInputStream, String wiki,
+        MergeConfiguration mergeConfiguration) throws IOException
     {
         XarMergeResult mergeResult = new XarMergeResult();
 
@@ -145,6 +148,7 @@ public class DefaultPackager implements Packager, Initializable
                     DocumentImporterHandler documentHandler =
                         new DocumentImporterHandler(this, this.componentManager, wiki);
                     documentHandler.setPreviousXarFile(previousXarFile);
+                    documentHandler.setMergeConfiguration(mergeConfiguration);
 
                     parseDocument(zis, documentHandler);
 

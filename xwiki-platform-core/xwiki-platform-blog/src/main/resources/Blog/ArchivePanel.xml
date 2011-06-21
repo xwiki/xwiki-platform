@@ -106,61 +106,57 @@
 <property>
 <content>{{include document="Blog.BlogCode"/}}
 
-{{velocity filter="none"}}
-{{html clean="false" wiki="true"}}
-#set($space = "$!{request.space}")
-#if($space == '')
-  #set($space = $doc.space)
+{{velocity}}
+#set ($space = "$!{request.space}")
+#if ($space == '')
+  #set ($space = $doc.space)
 #end
 #getBlogDocument($space $blogDoc)
-#if($space == $blogDoc.space || $showEmptyPanels)
+#if ($space == $blogDoc.space || $showEmptyPanels)
   #panelheader('Blog Archive')
   #getBlogEntriesBaseQuery($query)
-  #set($query = "${query} and (doc.space = ? or doc.parent = ?)")
+  #set ($query = "${query} and (doc.space = ? or doc.parent = ?)")
   #set ($queryParams = [$blogDoc.space, $blogDoc.fullName])
   ## Create a Jodatime date formatter that will be used to format dates
-  #set($monthFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern('MMMM'))
-  #set($tempDate = $xwiki.jodatime.mutableDateTime)
-  #set($currentYear = $xwiki.formatDate($util.date, 'yyyy'))
-  #set($currentMonth = $xwiki.formatDate($util.date, 'M'))
-  #set($firstYear = '')
-  #set($lastYear = '')
-  #foreach($firstEntry in $xwiki.searchDocuments("${query} order by year(publishDate.value)", 1, 0, $queryParams))
-    #set($discard = $xwiki.getDocument($firstEntry))
+  #set ($monthFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern('MMMM'))
+  #set ($tempDate = $xwiki.jodatime.mutableDateTime)
+  #set ($currentYear = $xwiki.formatDate($util.date, 'yyyy'))
+  #set ($currentMonth = $xwiki.formatDate($util.date, 'M'))
+  #set ($firstYear = '')
+  #set ($lastYear = '')
+  #foreach ($firstEntry in $xwiki.searchDocuments("${query} order by year(publishDate.value)", 1, 0, $queryParams))
+    #set ($discard = $xwiki.getDocument($firstEntry))
     #getEntryObject($discard $entryObj)
     #getEntryDate($discard $entryObj $firstYear)
-    #set($firstYear = $util.parseInt($xwiki.formatDate($firstYear, 'yyyy')))
+    #set ($firstYear = $util.parseInt($xwiki.formatDate($firstYear, 'yyyy')))
   #end
-  #foreach($lastEntry in $xwiki.searchDocuments("${query} order by year(publishDate.value) desc", 1, 0, $queryParams))
-    #set($discard = $xwiki.getDocument($lastEntry))
+  #foreach ($lastEntry in $xwiki.searchDocuments("${query} order by year(publishDate.value) desc", 1, 0, $queryParams))
+    #set ($discard = $xwiki.getDocument($lastEntry))
     #getEntryObject($discard $entryObj)
     #getEntryDate($discard $entryObj $lastYear)
-    #set($lastYear = $util.parseInt($xwiki.formatDate($lastYear, 'yyyy')))
+    #set ($lastYear = $util.parseInt($xwiki.formatDate($lastYear, 'yyyy')))
   #end
-  #if("$!{firstYear}" != '') ## At least one entry exists
-    #foreach($year in [$firstYear..$lastYear])
-      #set($yearArticleCount = $xwiki.countDocuments("${query} and year(publishDate.value) = $year", $queryParams))
-      #if($yearArticleCount &gt; 0)
+  #if ("$!{firstYear}" != '') ## At least one entry exists
+    #foreach ($year in [$firstYear..$lastYear])
+      #set ($yearArticleCount = $xwiki.countDocuments("${query} and year(publishDate.value) = $year", $queryParams))
+      #if ($yearArticleCount &gt; 0)
         * [[$year (% class="itemCount" %)(${yearArticleCount})(%%)&gt;&gt;Blog.Archive?space=${blogDoc.space}&amp;year=${year}]]
-        #if($year == $currentYear)
-          #foreach($month in [1..12])
-            #set($monthArticleCount = $xwiki.countDocuments("${query} and year(publishDate.value) = $year and month(publishDate.value) = $month", $queryParams))
-            #if($monthArticleCount &gt; 0)
-              $tempDate.setMonthOfYear($month)
+        #if ($year == $currentYear)
+          #foreach ($month in [1..12])
+            #set ($monthArticleCount = $xwiki.countDocuments("${query} and year(publishDate.value) = $year and month(publishDate.value) = $month", $queryParams))
+            #if ($monthArticleCount &gt; 0)
+              $tempDate.setMonthOfYear($month)##
               ** [[$monthFormatter.print($tempDate) (% class="itemCount" %)(${monthArticleCount})(%%)&gt;&gt;Blog.Archive?space=${blogDoc.space}&amp;year=${year}&amp;month=${month}]]
             #end
           #end
         #end
       #end
     #end
-
-
   #else
     #info($msg.get('xe.blog.archive.noarticle'))
   #end
   #panelfooter()
 #end
-{{/html}}
 {{/velocity}}</content>
 </property>
 <property>

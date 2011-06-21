@@ -26,6 +26,7 @@ import java.util.List;
  * Report of what happen during merge.
  * 
  * @version $Id$
+ * @since 3.2M1
  */
 public class MergeResult
 {

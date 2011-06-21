@@ -52,6 +52,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.merge.CollisionException;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -634,7 +635,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * @see com.xpn.xwiki.objects.BaseElement#clone()
      */
     @Override
-    public Object clone()
+    public BaseCollection clone()
     {
         BaseCollection collection = (BaseCollection) super.clone();
         collection.setXClassReference(getRelativeXClassReference());
@@ -833,18 +834,14 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     /**
-     * Apply a 3 ways merge on the current element based on provided previous and new version of the element.
-     * <p>
-     * All 3 elements are supposed to have the same class and reference.
+     * {@inheritDoc}
      * 
-     * @param previousElement the previous version of the element
-     * @param newElement the next version of the element
-     * @param context the XWiki context
-     * @param the merge report
-     * @since 3.2M1
+     * @see com.xpn.xwiki.objects.BaseElement#merge(com.xpn.xwiki.objects.ElementInterface,
+     *      com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.doc.merge.MergeConfiguration,
+     *      com.xpn.xwiki.XWikiContext, com.xpn.xwiki.doc.merge.MergeResult)
      */
-    public void merge(ElementInterface previousElement, ElementInterface newElement, XWikiContext context,
-        MergeResult mergeResult)
+    public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
+        XWikiContext context, MergeResult mergeResult)
     {
         BaseCollection<R> previousCollection = (BaseCollection<R>) previousElement;
         BaseCollection<R> newCollection = (BaseCollection<R>) newElement;
@@ -858,7 +855,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
                 if (propertyResult == null) {
                     // Add if none has been added by user already
-                    addField(diff.getPropName(), newProperty);
+                    addField(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
+                        : newProperty.clone());
                     mergeResult.setModified(true);
                 } else if (!propertyResult.equals(newProperty)) {
                     // XXX: collision between DB and new: property to add but already exists in the DB
@@ -886,11 +884,12 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 if (propertyResult != null) {
                     if (propertyResult.equals(previousProperty)) {
                         // Let some automatic migration take care of that modification between DB and new
-                        addField(diff.getPropName(), newProperty);
+                        addField(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
+                            : newProperty.clone());
                         mergeResult.setModified(true);
                     } else if (!propertyResult.equals(newProperty)) {
                         // Try to apply 3 ways merge on the property
-                        propertyResult.merge(previousProperty, newProperty, context, mergeResult);
+                        propertyResult.merge(previousProperty, newProperty, configuration, context, mergeResult);
                     }
                 } else {
                     // XXX: collision between DB and new: property to modify but does not exists in DB
@@ -898,7 +897,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                     mergeResult.warn(new CollisionException("Collision found on property ["
                         + newProperty.getReference() + "]"));
 
-                    addField(diff.getPropName(), newProperty);
+                    addField(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
+                        : newProperty.clone());
                     mergeResult.setModified(true);
                 }
             }

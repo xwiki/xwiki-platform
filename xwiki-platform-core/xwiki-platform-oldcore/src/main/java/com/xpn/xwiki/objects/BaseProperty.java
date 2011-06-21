@@ -38,6 +38,7 @@ import org.xwiki.model.reference.ObjectReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.merge.CollisionException;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.web.Utils;
 
@@ -168,7 +169,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      * @see com.xpn.xwiki.objects.BaseElement#clone()
      */
     @Override
-    public Object clone()
+    public BaseProperty clone()
     {
         BaseProperty<R> property = (BaseProperty<R>) super.clone();
 
@@ -254,14 +255,15 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.objects.ElementInterface#merge(com.xpn.xwiki.objects.ElementInterface,
-     *      com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.XWikiContext, com.xpn.xwiki.doc.merge.MergeResult)
+     * @see com.xpn.xwiki.objects.BaseElement#merge(com.xpn.xwiki.objects.ElementInterface,
+     *      com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.doc.merge.MergeConfiguration,
+     *      com.xpn.xwiki.XWikiContext, com.xpn.xwiki.doc.merge.MergeResult)
      */
     @Override
-    public void merge(ElementInterface previousElement, ElementInterface newElement, XWikiContext context,
-        MergeResult mergeResult)
+    public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
+        XWikiContext context, MergeResult mergeResult)
     {
-        super.merge(previousElement, newElement, context, mergeResult);
+        super.merge(previousElement, newElement, configuration, context, mergeResult);
 
         // Value
         Object previousValue = ((BaseProperty<R>) previousElement).getValue();

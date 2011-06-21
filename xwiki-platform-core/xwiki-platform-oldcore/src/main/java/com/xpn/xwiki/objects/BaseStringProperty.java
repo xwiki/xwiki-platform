@@ -23,6 +23,7 @@ package com.xpn.xwiki.objects;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.doc.merge.MergeUtils;
 
 /**
  * Base string XProperty which all types of string XProperties extend. $Id$
@@ -100,7 +101,7 @@ public class BaseStringProperty extends BaseProperty
      * @see com.xpn.xwiki.objects.BaseProperty#clone()
      */
     @Override
-    public Object clone()
+    public BaseStringProperty clone()
     {
         BaseStringProperty property = (BaseStringProperty) super.clone();
         property.setValue(getValue());
@@ -111,6 +112,6 @@ public class BaseStringProperty extends BaseProperty
     @Override
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
-        setValue(mergeString((String) previousValue, (String) newValue, (String) getValue(), mergeResult));
+        setValue(MergeUtils.mergeString((String) previousValue, (String) newValue, (String) getValue(), mergeResult));
     }
 }

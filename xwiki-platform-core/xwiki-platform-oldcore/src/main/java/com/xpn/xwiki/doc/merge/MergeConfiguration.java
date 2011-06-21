@@ -20,33 +20,36 @@
 package com.xpn.xwiki.doc.merge;
 
 /**
- * Any exception raised when facing a collision during a 3 ways merge.
+ * Allow to define some behaviors of the merge.
  * 
  * @version $Id$
  * @since 3.2M1
  */
-public class CollisionException extends MergeException
+public class MergeConfiguration
 {
     /**
-     * Constructs a new exception with the specified detail message. The cause is not initialized, and may subsequently
-     * be initialized by a call to {@link #initCause(Throwable)}.
-     * 
-     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
+     * @see #isProvidedVersionsModifiables()
      */
-    public CollisionException(String message)
+    private boolean providedVersionsModifiables = true;
+
+    /**
+     * @param providedVersionsModifiables true if the merge is allowed to modify input elements
+     */
+    public void setProvidedVersionsModifiables(boolean providedVersionsModifiables)
     {
-        super(message);
+        this.providedVersionsModifiables = providedVersionsModifiables;
     }
 
     /**
-     * Constructs a new exception with the specified detail message and cause.
+     * Indicate of the provided previous/new document can be modified.
+     * <p>
+     * By default merge can modify provided documents by performances reason. For example when the new version of the
+     * document contains a new object it's directly moved without being cloned.
      * 
-     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
-     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is
-     *            permitted, and indicates that the cause is nonexistent or unknown
+     * @return true if merge is allowed to modify provided versions
      */
-    public CollisionException(String message, Throwable cause)
+    public boolean isProvidedVersionsModifiables()
     {
-        super(message, cause);
+        return this.providedVersionsModifiables;
     }
 }

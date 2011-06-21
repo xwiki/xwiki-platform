@@ -49,10 +49,12 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.CollisionException;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.ElementInterface;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.meta.MetaClass;
@@ -430,7 +432,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * @see com.xpn.xwiki.objects.BaseCollection#clone()
      */
     @Override
-    public Object clone()
+    public BaseClass clone()
     {
         BaseClass bclass = (BaseClass) super.clone();
         bclass.setCustomClass(getCustomClass());
@@ -1317,18 +1319,18 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * Apply a 3 ways merge on the current class based on provided previous and new version of the class.
-     * <p>
-     * All 3 classes are supposed to have the same reference already.
+     * {@inheritDoc}
      * 
-     * @param previousClass the previous version of the class
-     * @param newClass the next version of the class
-     * @param context the XWiki context
-     * @param the merge report
-     * @since 3.2M1
+     * @see com.xpn.xwiki.objects.BaseCollection#merge(com.xpn.xwiki.objects.ElementInterface,
+     *      com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.doc.merge.MergeConfiguration,
+     *      com.xpn.xwiki.XWikiContext, com.xpn.xwiki.doc.merge.MergeResult)
      */
-    public void merge(BaseClass previousClass, BaseClass newClass, XWikiContext context, MergeResult mergeResult)
+    public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
+        XWikiContext context, MergeResult mergeResult)
     {
+        BaseClass previousClass = (BaseClass) previousElement;
+        BaseClass newClass = (BaseClass) newElement;
+
         List<ObjectDiff> classDiff = previousClass.getDiff(newClass, context);
         for (ObjectDiff diff : classDiff) {
             PropertyClass propertyResult = (PropertyClass) getField(diff.getPropName());
@@ -1338,7 +1340,9 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
                 if (propertyResult == null) {
                     // Add if none has been added by user already
-                    addField(diff.getPropName(), newClass.getField(diff.getPropName()));
+                    addField(diff.getPropName(),
+                        configuration.isProvidedVersionsModifiables() ? newClass.getField(diff.getPropName())
+                            : newClass.getField(diff.getPropName()).clone());
                     mergeResult.setModified(true);
                 } else if (!propertyResult.equals(newProperty)) {
                     // XXX: collision between DB and new: property to add but already exists in the DB
@@ -1373,7 +1377,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                         addField(diff.getPropName(), newClass.getField(diff.getPropName()));
                         mergeResult.setModified(true);
                     } else if (!propertyResult.equals(newProperty)) {
-                        propertyResult.merge(previousProperty, newProperty, context, mergeResult);
+                        propertyResult.merge(previousProperty, newProperty, configuration, context, mergeResult);
                     }
                 } else {
                     // XXX: collision between DB and new: property to modify but does not exists in DB

@@ -166,18 +166,6 @@ public class XWikiStats extends BaseCollection
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.objects.BaseCollection#clone()
-     */
-    @Override
-    public Object clone()
-    {
-        BaseCollection object = (BaseCollection) super.clone();
-        return object;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see com.xpn.xwiki.objects.BaseCollection#equals(java.lang.Object)
      */
     @Override

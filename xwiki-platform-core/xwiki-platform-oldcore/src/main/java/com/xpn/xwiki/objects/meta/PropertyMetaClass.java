@@ -117,4 +117,10 @@ public class PropertyMetaClass extends BaseClass implements PropertyInterface
     {
         return null;
     }
+    
+    @Override
+    public PropertyMetaClass clone()
+    {
+        return (PropertyMetaClass) super.clone();
+    }
 }

@@ -697,7 +697,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                                           extent="{$page-margin-bottom}"
                                           display-align="after"/>
                         <fo:region-start  extent="{$page-margin-left}"/>
-                        <fo:region-end    extent="{$page-margin-bottom}"/>
+                        <fo:region-end    extent="{$page-margin-right}"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </fo:simple-page-master>
@@ -740,7 +740,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                                           extent="{$page-margin-bottom}"
                                           display-align="after"/>
                         <fo:region-start  extent="{$page-margin-left}"/>
-                        <fo:region-end    extent="{$page-margin-bottom}"/>
+                        <fo:region-end    extent="{$page-margin-right}"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </fo:simple-page-master>

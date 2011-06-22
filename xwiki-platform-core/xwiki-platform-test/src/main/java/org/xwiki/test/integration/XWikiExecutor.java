@@ -147,7 +147,7 @@ public class XWikiExecutor
         return this.executionDirectory;
     }
 
-    public void addEnv(String key, String value)
+    public void addEnvironmentVariable(String key, String value)
     {
         Environment.Variable variable = new Environment.Variable();
 

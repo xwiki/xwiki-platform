@@ -4454,6 +4454,8 @@ public class XWiki implements EventListener
         String sourceWiki = sourceDocumentReference.getWikiReference().getName();
         String targetWiki = targetDocumentReference.getWikiReference().getName();
 
+        String sourceStringReference = this.defaultEntityReferenceSerializer.serialize(sourceDocumentReference);
+
         try {
             context.setDatabase(sourceWiki);
             XWikiDocument sdoc = getDocument(sourceDocumentReference, context);
@@ -4499,7 +4501,7 @@ public class XWiki implements EventListener
                     tdoc.setMetaDataDirty(false);
                     tdoc.setContentDirty(false);
 
-                    saveDocument(tdoc, context);
+                    saveDocument(tdoc, "Copied from " + sourceStringReference, context);
 
                     if (!reset) {
                         context.setDatabase(sourceWiki);
@@ -4558,7 +4560,7 @@ public class XWiki implements EventListener
                         tdoc.setMetaDataDirty(false);
                         tdoc.setContentDirty(false);
 
-                        saveDocument(ttdoc, context);
+                        saveDocument(ttdoc, "Copied from " + sourceStringReference, context);
 
                         if (!reset) {
                             context.setDatabase(sourceWiki);
@@ -4598,7 +4600,7 @@ public class XWiki implements EventListener
                     tdoc.setMetaDataDirty(false);
                     tdoc.setContentDirty(false);
 
-                    saveDocument(tdoc, context);
+                    saveDocument(tdoc, "Copied from " + sourceStringReference, context);
 
                     if (!reset) {
                         context.setDatabase(sourceWiki);

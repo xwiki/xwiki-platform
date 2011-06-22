@@ -38,6 +38,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 
 public class DocumentImporterHandler extends DocumentHandler
@@ -47,6 +48,8 @@ public class DocumentImporterHandler extends DocumentHandler
     private DefaultPackager packager;
 
     private XarEntryMergeResult mergeResult;
+    
+    private MergeConfiguration mergeConfiguration;
 
     public DocumentImporterHandler(DefaultPackager packager, ComponentManager componentManager, String wiki)
     {
@@ -58,6 +61,11 @@ public class DocumentImporterHandler extends DocumentHandler
     public void setPreviousXarFile(XarFile previousXarFile)
     {
         this.previousXarFile = previousXarFile;
+    }
+
+    public void setMergeConfiguration(MergeConfiguration mergeConfiguration)
+    {
+        this.mergeConfiguration = mergeConfiguration;
     }
 
     public XarEntryMergeResult getMergeResult()
@@ -75,7 +83,7 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiDocument previousDocument = getPreviousDocument();
 
             if (previousDocument != null && !dbDocument.isNew()) {
-                MergeResult documentMergeResult = dbDocument.merge(previousDocument, document, context);
+                MergeResult documentMergeResult = dbDocument.merge(previousDocument, document, this.mergeConfiguration, context);
                 if (documentMergeResult.isModified()) {
                     context.getWiki().saveDocument(dbDocument, comment, context);
                 }

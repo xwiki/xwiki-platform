@@ -90,7 +90,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     private void merge() throws Exception
     {
         MergeResult result =
-            this.document.merge(this.previousDocument, this.newDocument, getContext(), this.configuration);
+            this.document.merge(this.previousDocument, this.newDocument, this.configuration, getContext());
 
         List<Exception> exception = result.getErrors();
         if (!exception.isEmpty()) {

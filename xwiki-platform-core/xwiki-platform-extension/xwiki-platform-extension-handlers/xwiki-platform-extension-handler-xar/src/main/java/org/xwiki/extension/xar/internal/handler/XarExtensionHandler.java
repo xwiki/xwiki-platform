@@ -41,6 +41,8 @@ import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 import org.xwiki.extension.xar.internal.handler.packager.XarFile;
 import org.xwiki.extension.xar.internal.repository.XarLocalExtension;
 
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+
 @Component
 @Singleton
 @Named("xar")
@@ -119,10 +121,13 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     public void install(XarLocalExtension previousExtension, LocalExtension localExtension, String wiki)
         throws InstallException
     {
+        // TODO: should be configurable
+        MergeConfiguration mergeConfiguration = new MergeConfiguration();
+
         // import xar into wiki (add new version when the page already exists)
         try {
             this.packager.importXAR(previousExtension != null ? new XarFile(previousExtension.getFile(),
-                previousExtension.getPages()) : null, localExtension.getFile(), wiki);
+                previousExtension.getPages()) : null, localExtension.getFile(), wiki, mergeConfiguration);
         } catch (Exception e) {
             throw new InstallException("Failed to import xar for extension [" + localExtension + "]", e);
         }

@@ -29,6 +29,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.ObjectPropertyReference;
 
 /**
  * Unit tests for {@link DefaultStringEntityReferenceResolver}.
@@ -269,88 +270,88 @@ public class DefaultStringEntityReferenceResolverTest
     @Test
     public void testResolvePropertyReference()
     {
-        EntityReference reference = resolver.resolve("wiki:space.page^object.prop", EntityType.OBJECT_PROPERTY);
+        EntityReference reference = new ObjectPropertyReference(resolver.resolve("wiki:space.page^object.prop", EntityType.OBJECT_PROPERTY));
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("object", reference.extractReference(EntityType.OBJECT).getName());
-        Assert.assertEquals("prop", reference.getName());
+        Assert.assertEquals("prop", reference.extractReference(EntityType.OBJECT_PROPERTY).getName());
 
         // default values
-        reference = resolver.resolve("", EntityType.OBJECT_PROPERTY);
+        reference = new ObjectPropertyReference(resolver.resolve("", EntityType.OBJECT_PROPERTY));
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(DEFAULT_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals(DEFAULT_OBJECT, reference.extractReference(EntityType.OBJECT).getName());
-        Assert.assertEquals(DEFAULT_OBJECT_PROPERTY, reference.getName());
+        Assert.assertEquals(DEFAULT_OBJECT_PROPERTY, reference.extractReference(EntityType.OBJECT_PROPERTY).getName());
 
         // without some of the parents
-        reference = resolver.resolve("space.page^Object.prop", EntityType.OBJECT_PROPERTY);
+        reference = new ObjectPropertyReference(resolver.resolve("space.page^Object.prop", EntityType.OBJECT_PROPERTY));
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("Object", reference.extractReference(EntityType.OBJECT).getName());
-        Assert.assertEquals("prop", reference.getName());
+        Assert.assertEquals("prop", reference.extractReference(EntityType.OBJECT_PROPERTY).getName());
 
-        reference = resolver.resolve("page^Object.prop", EntityType.OBJECT_PROPERTY);
+        reference = new ObjectPropertyReference(resolver.resolve("page^Object.prop", EntityType.OBJECT_PROPERTY));
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("Object", reference.extractReference(EntityType.OBJECT).getName());
-        Assert.assertEquals("prop", reference.getName());
+        Assert.assertEquals("prop", reference.extractReference(EntityType.OBJECT_PROPERTY).getName());
 
-        reference = resolver.resolve("Object.prop", EntityType.OBJECT_PROPERTY);
+        reference = new ObjectPropertyReference(resolver.resolve("Object.prop", EntityType.OBJECT_PROPERTY));
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(DEFAULT_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("Object", reference.extractReference(EntityType.OBJECT).getName());
-        Assert.assertEquals("prop", reference.getName());
+        Assert.assertEquals("prop", reference.extractReference(EntityType.OBJECT_PROPERTY).getName());
 
-        reference = resolver.resolve("FooBar", EntityType.OBJECT_PROPERTY);
+        reference = new ObjectPropertyReference(resolver.resolve("FooBar", EntityType.OBJECT_PROPERTY));
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(DEFAULT_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals(DEFAULT_OBJECT, reference.extractReference(EntityType.OBJECT).getName());
-        Assert.assertEquals("FooBar", reference.getName());
+        Assert.assertEquals("FooBar", reference.extractReference(EntityType.OBJECT_PROPERTY).getName());
 
         // object without property, parsed as property
-        reference = resolver.resolve("page^Object", EntityType.OBJECT_PROPERTY);
+        reference = new ObjectPropertyReference(resolver.resolve("page^Object", EntityType.OBJECT_PROPERTY));
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(DEFAULT_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals(DEFAULT_OBJECT, reference.extractReference(EntityType.OBJECT).getName());
-        Assert.assertEquals("page^Object", reference.getName());
+        Assert.assertEquals("page^Object", reference.extractReference(EntityType.OBJECT_PROPERTY).getName());
 
         // empty prop
-        reference = resolver.resolve("wiki:space.page^Object.", EntityType.OBJECT_PROPERTY);
+        reference = new ObjectPropertyReference(resolver.resolve("wiki:space.page^Object.", EntityType.OBJECT_PROPERTY));
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("Object", reference.extractReference(EntityType.OBJECT).getName());
-        Assert.assertEquals(DEFAULT_OBJECT_PROPERTY, reference.getName());
+        Assert.assertEquals(DEFAULT_OBJECT_PROPERTY, reference.extractReference(EntityType.OBJECT_PROPERTY).getName());
 
         // test separator escape
-        reference = resolver.resolve("wiki:space.page^Object.prop\\.erty", EntityType.OBJECT_PROPERTY);
+        reference = new ObjectPropertyReference(resolver.resolve("wiki:space.page^Object.prop\\.erty", EntityType.OBJECT_PROPERTY));
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("Object", reference.extractReference(EntityType.OBJECT).getName());
-        Assert.assertEquals("prop.erty", reference.getName());
+        Assert.assertEquals("prop.erty", reference.extractReference(EntityType.OBJECT_PROPERTY).getName());
 
         // and that separators don't need to be escaped other than in the property name
-        reference = resolver.resolve("wiki:space.page^x.wiki.class[0].prop", EntityType.OBJECT_PROPERTY);
+        reference = new ObjectPropertyReference(resolver.resolve("wiki:space.page^x.wiki.class[0].prop", EntityType.OBJECT_PROPERTY));
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("x.wiki.class[0]", reference.extractReference(EntityType.OBJECT).getName());
-        Assert.assertEquals("prop", reference.getName());
+        Assert.assertEquals("prop", reference.extractReference(EntityType.OBJECT_PROPERTY).getName());
 
-        reference = resolver.resolve(":^\\.@", EntityType.OBJECT_PROPERTY);
+        reference = new ObjectPropertyReference(resolver.resolve(":^\\.@", EntityType.OBJECT_PROPERTY));
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(DEFAULT_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals(DEFAULT_OBJECT, reference.extractReference(EntityType.OBJECT).getName());
-        Assert.assertEquals(":^.@", reference.getName());
+        Assert.assertEquals(":^.@", reference.extractReference(EntityType.OBJECT_PROPERTY).getName());
     }
 
     @Test

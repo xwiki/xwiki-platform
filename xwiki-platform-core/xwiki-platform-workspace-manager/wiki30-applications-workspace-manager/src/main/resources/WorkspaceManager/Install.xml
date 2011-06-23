@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1187017247000</creationDate>
-<date>1303407212000</date>
-<contentUpdateDate>1303407212000</contentUpdateDate>
+<date>1308815949000</date>
+<contentUpdateDate>1308815949000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -23,31 +23,37 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>{{velocity}}
-#set($WikiManager = $xwiki.wikimanager)
-#if(!$WikiManager)
-  {{error}}$msg.get("wikimanager.pluginnotenabled"){{/error}}
+#if (!$WikiManager)
+  #set($WikiManager = $xwiki.wikimanager)
+  #if(!$WikiManager)
+    {{error}}$msg.get('wikimanager.pluginnotenabled'){{/error}}
+  #end
 #end
 #if(!$xwiki.applicationmanager)
-  {{error}}$msg.get("xapp.pluginnotenabled"){{/error}}
+  {{error}}$msg.get('xapp.pluginnotenabled'){{/error}}
 #end
 ##
+## Constants
+#set ($TEMPLATE_NAME = 'workspacetemplate')
+#set ($TEMPLATE_PACKAGE = 'workspace-template.xar')
+##
 #set($Exception = $WikiManager.DefaultException)
-#set($templateList = $WikiManager.getWikiTemplateList())
-#if($templateList.size() == 0)
-  #set($result = $WikiManager.createWikiTemplate("workspacetemplate", "Workspace Template", "workspace-template.xar"))
+#set($template = $WikiManager.getWikiTemplateDocument($TEMPLATE_NAME))
+#if("$!template" == '')
+  #set($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, 'Workspace Template', $TEMPLATE_PACKAGE))
   #if ($result == $Exception.ERROR_NOERROR)
-    {{info}}$msg.get("workspacemanager.template.install.success"){{/info}}
+    {{info}}$msg.get('workspacemanager.template.install.success'){{/info}}
   #elseif ($result == $Exception.ERROR_XWIKI_ACCESS_DENIED)
-    {{error}}$msg.get("workspacemanager.template.install.notallowed"){{/error}}
+    {{error}}$msg.get('workspacemanager.template.install.notallowed'){{/error}}
   #else
-    {{error}}$msg.get("workspacemanager.template.install.error", [$context.lastexception]){{/error}}
+    {{error}}$msg.get('workspacemanager.template.install.error', [$context.lastexception]){{/error}}
   #end
 #else
   ##
   ##Don't display this information if the code is included from somewhere else.
   ##
   #if($context.doc == $context.tdoc)
-    {{info}}$msg.get("workspacemanager.template.install.success"){{/info}}
+    {{info}}$msg.get('workspacemanager.template.install.success'){{/info}}
   #end
 #end
 {{/velocity}}</content></xwikidoc>

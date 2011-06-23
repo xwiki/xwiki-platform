@@ -252,23 +252,20 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
             deprecatedContext.setDatabase(workspaceName);
 
             XWiki wiki = deprecatedContext.getWiki();
+            DocumentReference groupClassReference = wiki.getGroupClass(deprecatedContext).getDocumentReference();
 
             /* Add user as workspace member. */
-            String workspaceGroupName = "XWikiAllGroup";
-            DocumentReference workspaceGroupReference =
-                new DocumentReference(workspaceName, "XWiki", workspaceGroupName);
+            DocumentReference workspaceGroupReference = new DocumentReference(workspaceName, "XWiki", "XWikiAllGroup");
             XWikiDocument workspaceGroupDocument = wiki.getDocument(workspaceGroupReference, deprecatedContext);
 
-            DocumentReference groupClassReference = wiki.getGroupClass(deprecatedContext).getDocumentReference();
             BaseObject workspaceGroupObject = workspaceGroupDocument.newXObject(groupClassReference, deprecatedContext);
             workspaceGroupObject.setStringValue("member", workspaceOwner);
 
             wiki.saveDocument(workspaceGroupDocument, comment, deprecatedContext);
 
             /* Add user as workspace admin. */
-            String workspaceAdminGroupName = "XWikiAdminGroup";
             DocumentReference workspaceAdminGroupReference =
-                new DocumentReference(workspaceName, "XWiki", workspaceAdminGroupName);
+                new DocumentReference(workspaceName, "XWiki", "XWikiAdminGroup");
             XWikiDocument workspaceAdminGroupDocument =
                 wiki.getDocument(workspaceAdminGroupReference, deprecatedContext);
 

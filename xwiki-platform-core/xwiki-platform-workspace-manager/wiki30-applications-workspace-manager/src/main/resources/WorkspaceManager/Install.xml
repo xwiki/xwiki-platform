@@ -11,15 +11,15 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1187017247000</creationDate>
-<date>1308815949000</date>
-<contentUpdateDate>1308815949000</contentUpdateDate>
+<date>1308845948000</date>
+<contentUpdateDate>1308845948000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>true</minorEdit>
+<minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>{{velocity}}
@@ -40,13 +40,17 @@
 #set($Exception = $WikiManager.DefaultException)
 #set($template = $WikiManager.getWikiTemplateDocument($TEMPLATE_NAME))
 #if("$!template" == '')
-  #set($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, 'Workspace Template', $TEMPLATE_PACKAGE))
-  #if ($result == $Exception.ERROR_NOERROR)
-    {{info}}$msg.get('workspacemanager.template.install.success'){{/info}}
-  #elseif ($result == $Exception.ERROR_XWIKI_ACCESS_DENIED)
-    {{error}}$msg.get('workspacemanager.template.install.notallowed'){{/error}}
+  #if ($doc.getAttachment($TEMPLATE_PACKAGE))
+    #set($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, 'Workspace Template', $TEMPLATE_PACKAGE))
+    #if ($result == $Exception.ERROR_NOERROR)
+      {{info}}$msg.get('workspacemanager.template.install.success'){{/info}}
+    #elseif ($result == $Exception.ERROR_XWIKI_ACCESS_DENIED)
+      {{error}}$msg.get('workspacemanager.template.install.notallowed'){{/error}}
+    #else
+      {{error}}$msg.get('workspacemanager.template.install.error', [$context.lastexception]){{/error}}
+    #end
   #else
-    {{error}}$msg.get('workspacemanager.template.install.error', [$context.lastexception]){{/error}}
+    {{error}}$msg.get('workspacemanager.template.install.error.missingattachment', [$TEMPLATE_PACKAGE, $doc.fullName]){{/error}}
   #end
 #else
   ##

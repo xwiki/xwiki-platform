@@ -41,12 +41,7 @@
       <groupId>jfree</groupId>
       <artifactId>jfreechart</artifactId>
     </dependency>
-    <!-- JFreeChart 1.0.13 has no POM file in the Maven Central Repository and thus we need to manually define
-         its own Maven dependency on JFree Common. Remove this dependency when it's fixed. -->
-    <dependency>
-      <groupId>jfree</groupId>
-      <artifactId>jcommon</artifactId>
-    </dependency>
+
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

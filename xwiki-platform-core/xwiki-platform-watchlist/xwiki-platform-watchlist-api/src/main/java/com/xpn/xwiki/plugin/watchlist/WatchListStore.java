@@ -772,7 +772,7 @@ public class WatchListStore implements EventListener
 
             if (register) {
                 try {
-                    if (context.getWiki().exists(user, context)) {
+                    if (StringUtils.isNotEmpty(user) && context.getWiki().exists(user, context)) {
                         addWatchedElement(user, currentDoc.getPrefixedFullName(), ElementType.DOCUMENT, context);
                     }
                 } catch (XWikiException e) {

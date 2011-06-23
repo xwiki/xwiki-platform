@@ -117,7 +117,7 @@ public class XWikiExecutorSuite extends ClasspathSuite
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize XWiki Executors befpre start", e);
+            throw new RuntimeException("Failed to initialize XWiki Executors before start", e);
         }
 
         try {

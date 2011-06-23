@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
@@ -33,6 +35,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.ExecTask;
 import org.apache.tools.ant.types.Commandline;
+import org.apache.tools.ant.types.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +81,8 @@ public class XWikiExecutor
 
     private String executionDirectory;
 
+    private List<Environment.Variable> env = new ArrayList<Environment.Variable>();
+
     /**
      * Was XWiki server already started. We don't try to stop it if it was already started.
      */
@@ -86,10 +91,12 @@ public class XWikiExecutor
     private class Response
     {
         public boolean timedOut;
+
         public byte[] responseBody;
+
         public int responseCode;
     }
-    
+
     public XWikiExecutor(int index)
     {
         this.project = new Project();
@@ -140,6 +147,16 @@ public class XWikiExecutor
         return this.executionDirectory;
     }
 
+    public void addEnvironmentVariable(String key, String value)
+    {
+        Environment.Variable variable = new Environment.Variable();
+
+        variable.setKey(key);
+        variable.setValue(value);
+
+        this.env.add(variable);
+    }
+
     public void start() throws Exception
     {
         System.out.println("Starting XWiki server start");
@@ -176,6 +193,9 @@ public class XWikiExecutor
         if (dir.exists()) {
             ExecTask execTask = (ExecTask) this.project.createTask("exec");
             execTask.setDir(new File(getExecutionDirectory()));
+            for (Environment.Variable variable : this.env) {
+                execTask.addEnv(variable);
+            }
 
             String startCommand = START_COMMAND;
             startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(getPort()));
@@ -218,8 +238,9 @@ public class XWikiExecutor
 
         Response response = isXWikiStarted(getURL(), TIMEOUT_SECONDS);
         if (response.timedOut) {
-            String message = "Failed to start XWiki in [" + TIMEOUT_SECONDS + "] seconds, last error code ["
-                + response.responseCode + ", message [" + new String(response.responseBody) + "]";
+            String message =
+                "Failed to start XWiki in [" + TIMEOUT_SECONDS + "] seconds, last error code [" + response.responseCode
+                    + ", message [" + new String(response.responseBody) + "]";
             System.out.println(message);
             stop();
             throw new RuntimeException(message);
@@ -242,8 +263,8 @@ public class XWikiExecutor
             GetMethod method = new GetMethod(url);
 
             // Don't retry automatically since we're doing that in the algorithm below
-            method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
-                new DefaultHttpMethodRetryHandler(0, false));
+            method.getParams()
+                .setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler(0, false));
             // Set a socket timeout to ensure the server has no chance of not answering to our request...
             method.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, new Integer(10000));
 

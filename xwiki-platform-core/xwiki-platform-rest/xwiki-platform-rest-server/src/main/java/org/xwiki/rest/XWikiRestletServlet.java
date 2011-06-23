@@ -28,7 +28,7 @@ import org.restlet.Application;
 import org.restlet.Context;
 import org.xwiki.component.manager.ComponentManager;
 
-import org.restlet.ext.servlet.ServerServlet;
+import com.noelios.restlet.ext.servlet.ServerServlet;
 
 /**
  * <p>

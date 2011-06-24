@@ -136,7 +136,12 @@
     #if ($hasJoin)
       #set ($joinPageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'JoinWorkspaceCode'))
       #set ($joinUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiprettyname}"))
-      &lt;span class='buttonwrapper'&gt;&lt;a href="$joinUrl" class='button'&gt;Join Workspace&lt;a/&gt;&lt;/span&gt;
+      #set ($membershipType = $wikiDescriptor.getObject('WorkspaceManager.WorkspaceClass').getProperty('membershipType').getValue())
+      #if ($membershipType != 'invite')
+        &lt;span class='buttonwrapper'&gt;&lt;a href="$joinUrl" class='button'&gt;Join Workspace&lt;a/&gt;&lt;/span&gt;
+      #else
+        This workspace is invite only.
+      #end
     #elseif (!$hasOwner)
       #set ($leavePageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'LeaveWorkspaceCode'))
       #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiprettyname}"))

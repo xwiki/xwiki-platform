@@ -26,37 +26,52 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-application-manager</artifactId>
+    <artifactId>xwiki-platform-legacy</artifactId>
     <version>3.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-application-manager-api</artifactId>
-  <name>XWiki Platform - Application Manager - API</name>
-  <description>XWiki Platform - Application Manager - API</description>
+  <artifactId>xwiki-platform-legacy-annotation</artifactId>
+  <name>XWiki Platform - Legacy</name>
+  <packaging>jar</packaging>
+  <description>Legacy package for xwiki-platform-annotation</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
     </dependency>
-
-    <!-- Test dependencies -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <scope>test</scope>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-observation-api</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
+      <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
-      <type>test-jar</type>
+    </dependency>
+    
+    <!-- Testing dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-observation-local</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-test</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- For some tests we need to have the Servlet API JAR available -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -66,7 +81,34 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+              **/LDAP*.java
+          </excludes>
+        </configuration>
       </plugin>
+      <!-- <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>aspectj-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>backward-compatibility-aspects</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <aspectDirectory>src/main/aspect/compatibility</aspectDirectory>
+              <weaveDependencies>
+                <weaveDependency>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-oldcore</artifactId>
+                </weaveDependency>
+              </weaveDependencies>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin> -->
     </plugins>
   </build>
 </project>
+       

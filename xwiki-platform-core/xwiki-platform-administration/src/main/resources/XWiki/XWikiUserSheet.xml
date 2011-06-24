@@ -222,7 +222,8 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
   }
 });
 
-Event.observe(window, 'load', function() { XWiki.userprofile.init() });</code>
+Event.observe(window, 'load', function() { XWiki.userprofile.init() });
+document.observe('lightbox:userprofile:loaded', function() { XWiki.userprofile.init() });</code>
 </property>
 <property>
 <name>userprofile</name>
@@ -644,6 +645,11 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
     #end
     &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
   &lt;/div&gt;
+  #if ($request.get('xpage'))
+    &lt;script type="text/javascript"&gt;
+    document.fire('lightbox:userprofile:loaded');
+    &lt;/script&gt;
+  #end
 {{/html}}
 {{/velocity}}</content>
 </xwikidoc>

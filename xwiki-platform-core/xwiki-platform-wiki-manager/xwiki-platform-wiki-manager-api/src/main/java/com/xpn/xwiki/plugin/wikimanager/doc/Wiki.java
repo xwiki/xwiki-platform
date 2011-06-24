@@ -69,21 +69,22 @@ public class Wiki extends Document
                 this.context).get(WikiManagerMessageTool.ERROR_DELETEMAINWIKI, wikiName));
         }
 
-        if (hasAdminRights()) {
-            try {
-                this.context.getWiki().getStore().deleteWiki(wikiName, this.context);
-                Utils.getComponent(ObservationManager.class).notify(new WikiDeletedEvent(wikiName), wikiName,
-                    this.context);
-            } catch (XWikiException e) {
-                LOG.error("Failed to delete wiki from database", e);
+        if (deleteDatabase) {
+            if (hasAdminRights()) {
+                try {
+                    this.context.getWiki().getStore().deleteWiki(wikiName, this.context);
+                } catch (XWikiException e) {
+                    LOG.error("Failed to delete wiki from database", e);
+                }
+            } else {
+                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, WikiManagerMessageTool
+                    .getDefault(this.context).get(WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI, wikiName));
             }
-            this.context.getWiki().getVirtualWikiList().remove(wikiName);
-        } else {
-            throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, WikiManagerMessageTool.getDefault(
-                this.context).get(WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI, wikiName));
         }
 
         super.delete();
+
+        Utils.getComponent(ObservationManager.class).notify(new WikiDeletedEvent(wikiName), wikiName, this.context);
     }
 
     /**

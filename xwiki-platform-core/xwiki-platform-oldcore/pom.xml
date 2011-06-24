@@ -97,12 +97,6 @@
       <groupId>jfree</groupId>
       <artifactId>jfreechart</artifactId>
     </dependency>
-    <!-- JFreeChart 1.0.13 has no POM file in the Maven Central Repository and thus we need to manually define
-         its own Maven dependency on JFree Common. Remove this dependency when it's fixed. -->
-    <dependency>
-      <groupId>jfree</groupId>
-      <artifactId>jcommon</artifactId>
-    </dependency>
 
     <!-- See http://jira.codehaus.org/browse/MEV-488 -->
     <dependency>
@@ -453,9 +447,9 @@
     </dependency>
     <!-- RSS Feed processing -->
     <dependency>
-      <groupId>rome</groupId>
+      <groupId>net.java.dev.rome</groupId>
       <artifactId>rome</artifactId>
-      <version>1.0</version>
+      <version>1.0.0</version>
       <!-- Exclude JDOM since Rome depends on JDOM 1.0 and we want to use JDOM 1.1 -->
       <exclusions>
         <exclusion>
@@ -465,9 +459,9 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>rome</groupId>
+      <groupId>net.java.dev.rome</groupId>
       <artifactId>rome-fetcher</artifactId>
-      <version>1.0</version>
+      <version>1.0.0</version>
       <!-- Exclude JDOM since Rome depends on JDOM 1.0 and we want to use JDOM 1.1 -->
       <exclusions>
         <exclusion>
@@ -1332,12 +1326,4 @@
       </build>
     </profile>
   </profiles>
-  <repositories>
-    <!-- Used to get Rome 1.0 which is not yet on the Central Maven repo. Remove this when it is -->
-    <repository>
-      <id>maven2-repository.dev.java.net.2</id>
-      <name>Java.net Repository for Maven</name>
-      <url>http://download.java.net/maven/2</url>
-    </repository>
-  </repositories>  
 </project>

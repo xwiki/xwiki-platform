@@ -159,6 +159,11 @@ public class WatchListStore implements EventListener
     private static final String WATCHLIST_CLASS_AUTOMATICWATCH = "automaticwatch";
 
     /**
+     * XWiki Class used to store user.
+     */
+    private static final String USERS_CLASS = "XWiki.XWikiUsers";
+
+    /**
      * Watchlist jobs document names in the wiki.
      */
     private List<String> jobDocumentNames;
@@ -271,11 +276,13 @@ public class WatchListStore implements EventListener
         List<Object> queryParams = new ArrayList<Object>();
         queryParams.add(WATCHLIST_CLASS);
         queryParams.add(jobName);
+        queryParams.add(USERS_CLASS);
 
         List<String> subscribersForJob =
-            globalSearchDocuments(
-                ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=?"
-                    + " and obj.id=prop.id.id and prop.value=?", 0, 0, queryParams, context);
+            globalSearchDocuments(", BaseObject as obj, StringProperty as prop, BaseObject as userobj where"
+                + " doc.fullName=obj.name and obj.className=? and obj.id=prop.id.id and prop.value=?"
+                + " and doc.fullName=userobj.name and userobj.className=?", 0, 0,
+                queryParams, context);
         subscribers.put(jobName, subscribersForJob);
     }
 
@@ -526,7 +533,7 @@ public class WatchListStore implements EventListener
     public BaseObject getWatchListObject(String user, XWikiContext context) throws XWikiException
     {
         XWikiDocument userDocument = context.getWiki().getDocument(user, context);
-        if (userDocument.isNew() || userDocument.getObject("XWiki.XWikiUsers") == null) {
+        if (userDocument.isNew() || userDocument.getObject(USERS_CLASS) == null) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "User ["
                 + user + "] does not exists");
         }

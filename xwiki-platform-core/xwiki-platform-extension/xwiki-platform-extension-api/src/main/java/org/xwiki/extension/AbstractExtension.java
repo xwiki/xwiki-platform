@@ -20,10 +20,13 @@
 package org.xwiki.extension;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.xwiki.extension.repository.ExtensionRepository;
 
@@ -38,6 +41,11 @@ public abstract class AbstractExtension implements Extension
      * @see #getId()
      */
     protected ExtensionId id;
+    
+    /**
+     * @see #getVirtualIds()
+     */
+    protected Set<String> virtualIds = new HashSet<String>();
 
     /**
      * @see #getType()
@@ -131,6 +139,17 @@ public abstract class AbstractExtension implements Extension
         this.id = id;
     }
 
+    public Collection<String> getVirtualIds()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    protected void addVirtualId(String virtualId)
+    {
+        
+    }
+    
     /**
      * {@inheritDoc}
      * 

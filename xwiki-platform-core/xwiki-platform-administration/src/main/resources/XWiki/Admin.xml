@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1108467450000</creationDate>
-<date>1108467450000</date>
-<contentUpdateDate>1108467450000</contentUpdateDate>
+<date>1309251436000</date>
+<contentUpdateDate>1309251436000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -32,6 +32,22 @@
 <defaultWeb></defaultWeb>
 <nameField></nameField>
 <validationScript></validationScript>
+<automaticwatch>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>automaticwatch</name>
+<number>6</number>
+<prettyName>Automatic watching</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>default|NONE|ALL|MAJOR|NEW</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</automaticwatch>
 <documents>
 <name>documents</name>
 <number>4</number>
@@ -87,6 +103,12 @@
 <name>XWiki.Admin</name>
 <number>0</number>
 <className>XWiki.WatchListClass</className>
+<property>
+<automaticwatch>NONE</automaticwatch>
+</property>
+<property>
+<interval></interval>
+</property>
 </object>
 <object>
 <class>
@@ -254,6 +276,16 @@
 <defaultWeb></defaultWeb>
 <nameField></nameField>
 <validationScript></validationScript>
+<accessibility>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>accessibility</name>
+<number>16</number>
+<prettyName>Enable extra accessibility features</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</accessibility>
 <active>
 <displayFormType>select</displayFormType>
 <displayType>active</displayType>
@@ -383,21 +415,6 @@
 <unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </last_name>
-<pageWidth>
-<cache>0</cache>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>pageWidth</name>
-<number>17</number>
-<prettyName>Preferred page width</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>default|640|800|1024|1280|1600</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</pageWidth>
 <password>
 <name>password</name>
 <number>4</number>
@@ -416,7 +433,7 @@
 </phone>
 <skin>
 <name>skin</name>
-<number>16</number>
+<number>17</number>
 <prettyName>skin</prettyName>
 <size>30</size>
 <unmodifiable>0</unmodifiable>
@@ -450,7 +467,13 @@
 <number>0</number>
 <className>XWiki.XWikiUsers</className>
 <property>
+<accessibility></accessibility>
+</property>
+<property>
 <active>1</active>
+</property>
+<property>
+<address></address>
 </property>
 <property>
 <avatar></avatar>
@@ -462,16 +485,10 @@
 <blogfeed>http://www.xwiki.org/xwiki/bin/view/Blog/BlogRss?xpage=plain</blogfeed>
 </property>
 <property>
-<city></city>
-</property>
-<property>
 <comment>Admin is the default Wiki Admin.</comment>
 </property>
 <property>
 <company>XWiki.org</company>
-</property>
-<property>
-<country></country>
 </property>
 <property>
 <default_language></default_language>
@@ -484,9 +501,6 @@
 </property>
 <property>
 <first_name>Administrator</first_name>
-</property>
-<property>
-<fullname></fullname>
 </property>
 <property>
 <imaccount></imaccount>
@@ -504,6 +518,9 @@
 <password>admin</password>
 </property>
 <property>
+<phone></phone>
+</property>
+<property>
 <skin></skin>
 </property>
 <property>
@@ -513,5 +530,4 @@
 <validkey></validkey>
 </property>
 </object>
-<content>{{include document="XWiki.XWikiUserSheet"/}}</content>
-</xwikidoc>
+<content>{{include document="XWiki.XWikiUserSheet"/}}</content></xwikidoc>

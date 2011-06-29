@@ -23,9 +23,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
@@ -46,13 +49,15 @@ import com.xpn.xwiki.util.Util;
  * @version $Id$
  * @since 1.6M1
  */
-@Component("hql")
+@Component
+@Named("hql")
+@Singleton
 public class HqlQueryExecutor implements QueryExecutor, Initializable
 {
     /**
      * Session factory needed for register named queries mapping.
      */
-    @Requirement
+    @Inject
     private HibernateSessionFactory sessionFactory;
 
     /**
@@ -63,7 +68,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     /**
      * Used for access to XWikiContext.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
@@ -159,6 +164,6 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
      */
     protected XWikiContext getContext()
     {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 }

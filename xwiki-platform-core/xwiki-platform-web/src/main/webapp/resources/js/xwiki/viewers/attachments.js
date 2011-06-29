@@ -183,9 +183,12 @@ viewers.Attachments = Class.create({
     document.observe("xwiki:docextra:loaded", listener);
   }
 });
+
+// When the document is loaded, trigger the attachment form enhancements.
+(XWiki.domIsLoaded && new viewers.Attachments())
+|| document.observe("xwiki:dom:loaded", function() { new viewers.Attachments(); });
+
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
 
-// When the document is loaded, trigger the attachment form enhancements.
-document.observe("xwiki:dom:loaded", function() { new XWiki.viewers.Attachments(); });

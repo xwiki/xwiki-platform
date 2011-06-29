@@ -22,8 +22,11 @@ package org.xwiki.query.xwql.internal;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.query.Query;
@@ -31,13 +34,16 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryManager;
 
-@Component("xwql")
+@Component
+@Named("xwql")
+@Singleton
 public class XWQLQueryExecutor implements QueryExecutor
 {
-    @Requirement("hql")
+    @Inject
+    @Named("hql")
     private QueryTranslator translator;
 
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     public QueryManager getQueryManager() throws ComponentLookupException
@@ -68,12 +74,12 @@ public class XWQLQueryExecutor implements QueryExecutor
                 throw (QueryException) e;
             }
             throw new QueryException("Exception while translating [" + query.getStatement() + "] XWQL query to the ["
-                + translator.getOutputLanguage() + "] language", query, e);
+                + this.translator.getOutputLanguage() + "] language", query, e);
         }
     }
 
     public QueryTranslator getTranslator()
     {
-        return translator;
+        return this.translator;
     }
 }

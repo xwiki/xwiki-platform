@@ -24,6 +24,7 @@ import junit.framework.Assert;
 import org.jmock.Mock;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
@@ -62,6 +63,7 @@ public class DefaultDocumentCacheTest extends AbstractBridgedXWikiComponentTestC
         this.cache.create(cacheConfiguration);
 
         this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        this.document.setOriginalDocument(this.document.clone());
 
         this.mockXWiki = mock(XWiki.class);
         getContext().setWiki((XWiki) this.mockXWiki.proxy());

@@ -1,3 +1,5 @@
+#if (!$XWIKIVARS_VM)
+#set ($XWIKIVARS_VM = true)
 #template("frequentlyUsedDocs.vm")
 #set ($isGuest = $xcontext.getUser().equals('XWiki.XWikiGuest'))
 #set ($isSuperAdmin = ($xcontext.user == 'XWiki.superadmin'))
@@ -123,3 +125,4 @@
 #set ($isInServletMode = $xwikimode == 0)
 #set ($isInPortletMode = $xwikimode == 1)
 #template("deprecatedVars.vm")
+#end

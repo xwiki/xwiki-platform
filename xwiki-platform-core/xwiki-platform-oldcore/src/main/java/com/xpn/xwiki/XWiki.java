@@ -417,8 +417,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                 context.setWiki(xwiki);
             }
 
-            xwiki.setDatabase(context.getDatabase());
-
             return xwiki;
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_INIT_FAILED,
@@ -750,6 +748,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     public void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
         throws XWikiException
     {
+        context.setDatabase(context.getMainXWiki());
+
         setEngineContext(engine_context);
         context.setWiki(this);
 

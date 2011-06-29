@@ -413,11 +413,15 @@ viewers.Comments = Class.create({
     return msg;
   }
 });
+
+function init() {
+  return new viewers.Comments();
+}
+
+// When the document is loaded, trigger the Comments form enhancements.
+(XWiki.domIsLoaded && init())
+|| document.observe("xwiki:dom:loaded", init);
+
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
-// ======================================
-// Comment actions enhancements
-document.observe('xwiki:dom:loaded', function() {
-  new XWiki.viewers.Comments();
-});

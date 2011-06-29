@@ -1,16 +1,12 @@
+var XWiki = (function(XWiki) {
+// Start XWiki augmentation.
 // Make sure the XWiki 'namespace' and the AjaxSaveAndContinue class exist.
-if (typeof(XWiki) == "undefined"
-  || typeof(XWiki.actionButtons) == "undefined"
-  || typeof(XWiki.actionButtons.AjaxSaveAndContinue) == "undefined") {
-  if (typeof console != "undefined" && typeof console.warn == "function") {
+if (!XWiki.actionButtons || !XWiki.actionButtons.AjaxSaveAndContinue) {
+  if (console && console.warn) {
     console.warn("[Autosave feature] Required class missing: XWiki.actionButtons.AjaxSaveAndContinue");
   }
 } else {
-// Make sure the editors 'namespace' exists.
-if (typeof(XWiki.editors) == 'undefined') {
-  XWiki.editors = new Object();
-}
-
+var editors = XWiki.editors = XWiki.editors || {};
 /**
  * Autosave feature.
  * TODO Improve i18n support
@@ -18,7 +14,7 @@ if (typeof(XWiki.editors) == 'undefined') {
  * TODO Support for the WYSIWYG editors
  * TODO Don't show in the class editor, if there is no class defined
  */
-XWiki.editors.AutoSave = Class.create({
+editors.AutoSave = Class.create({
   /** Is the autosave enabled ? */
   enabled: false,
   /** If enabled, how frequent are the savings */
@@ -196,7 +192,7 @@ XWiki.editors.AutoSave = Class.create({
   /**
    * The function that performs the actual automatic save, if the content has changed.
    * It marks the version as minor and updates the version comment with "(Autosaved)".
-   * Then, it fires the custom event <tt>xwiki:actions:save</tt> to invoke the 
+   * Then, it fires the custom event <tt>xwiki:actions:save</tt> to invoke the
    * AjaxSaveAndContinue. Afterwards, it resets the version metadata elements to their
    * previous state.
    */
@@ -235,8 +231,15 @@ XWiki.editors.AutoSave = Class.create({
   }
 });
 
+function init() {
+  return new editor.AutoSave();
+}
+
 // When the document is loaded, create the Autosave control
-document.observe("xwiki:dom:loaded", function() {
-  new XWiki.editors.AutoSave();
-});
+(XWiki.domIsLoaded && init())
+|| document.observe("xwiki:dom:loaded", init);
+
 }//XWiki.actionButtons.AjaxSaveAndContinue exists
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));

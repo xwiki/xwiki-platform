@@ -1,21 +1,12 @@
-// ======================================
-// Full screen editing for page content
-// 
-// Make sure the XWiki 'namespace' exists.
-if (typeof(XWiki) == 'undefined') {
-  XWiki = new Object();
-}
-// Make sure the editors 'namespace' exists.
-if (typeof(XWiki.widgets) == 'undefined') {
-  XWiki.widgets = new Object();
-}
-
+var XWiki = (function(XWiki) {
+// Start XWiki augmentation.
+var widgets = XWiki.widgets = XWiki.widgets || {};
 /**
  * Full screen editing for textareas or maximizable elements.
  *
  * TODO Revisit once the new WYSIWYG supports inline editing.
  */
-XWiki.widgets.FullScreen = Class.create({
+widgets.FullScreen = Class.create({
   // Some layout settings, to be customized for other skins
   /** Maximized element margins */
   margin : 0,
@@ -528,7 +519,14 @@ XWiki.widgets.FullScreen = Class.create({
   }
 });
 
-// Create the fullscreen behavior on startup.
-document.observe('xwiki:dom:loaded', function() {
-  new XWiki.widgets.FullScreen();
-});
+function init() {
+  return new widgets.FullScreen();
+}
+
+// When the document is loaded, enable the fullscreen behavior.
+(XWiki.domIsLoaded && init())
+|| document.observe("xwiki:dom:loaded", init);
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));
+

@@ -177,25 +177,26 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     <script type="text/javascript">
     //<![CDATA[
 (function() {
-  var startup = function() {
-    window.activeRights = [#foreach($i in [0..$maxlevel])"$levelsRights.get($i)",#end];
-    window.saveUrl = "$saveUrl";
-    saveUrl.replace(/&amp;/g, "&");
-    window.currentUser = "$!{escapetool.javascript($xcontext.user)}";
-    window.unregUser = "XWiki.XWikiGuest";
-    // the callback function is called from LiveTable with 3 arguments
-    var callback = function(row, i, table, idx) { return displayUsersAndGroups(row, i, table, idx, "$!{services.csrf.getToken()}") };
-    var ta = new XWiki.widgets.LiveTable("$url", "usersandgroupstable", callback, {"filtersNode": $('usersandgroupstable')});
+  function startup() {
+    if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
+      window.activeRights = [#foreach($i in [0..$maxlevel])"$levelsRights.get($i)",#end];
+      window.saveUrl = "$saveUrl";
+      saveUrl.replace(/&amp;/g, "&");
+      window.currentUser = "$!{escapetool.javascript($xcontext.user)}";
+      window.unregUser = "XWiki.XWikiGuest";
+      // the callback function is called from LiveTable with 3 arguments
+      var callback = function(row, i, table, idx) { return displayUsersAndGroups(row, i, table, idx, "$!{services.csrf.getToken()}") };
+      var ta = new XWiki.widgets.LiveTable("$url", "usersandgroupstable", callback, {"filtersNode": $('usersandgroupstable')});
     #foreach($i in [0..$maxlevel])
       var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", saveUrl, "${r.get($i)}");
     #end
-    Event.observe(window, 'load', function() {
-      if($('uorgg').checked && !$('unregistered').hasClassName('hidden')) {
-        $('unregistered').addClassName('hidden');
-      } else if($('uorgu').checked && $('unregistered').hasClassName('hidden')) {
-        $('unregistered').removeClassName('hidden');
-      }
-    });
+      Event.observe(window, 'load', function() {
+        if($('uorgg').checked && !$('unregistered').hasClassName('hidden')) {
+          $('unregistered').addClassName('hidden');
+        } else if($('uorgu').checked && $('unregistered').hasClassName('hidden')) {
+          $('unregistered').removeClassName('hidden');
+        }
+      });
     #if("$!editor" == 'globaladmin')
       Event.observe($('authenticate_view'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_view'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
       Event.observe($('authenticate_edit'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_edit'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
@@ -203,12 +204,12 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     #if($guest_comment_captcha_prop)
       Event.observe($('guest_comment_requires_captcha'), 'click', setBooleanPropertyFromLiveCheckbox($('guest_comment_requires_captcha'), '$doc.getURL('save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
     #end
+      return true;
+    }
+    return false;
   }
-  if ((typeof(XWiki) != 'undefined') && (typeof(XWiki.widgets) != 'undefined') && (typeof(XWiki.widgets.LiveTable) != 'undefined')) {
-    startup();
-  } else {
-    document.observe('xwiki:dom:loading', startup);
-  }
+  // Initialize liveTable
+  (XWiki && XWiki.isInitialized && startup()) || document.observe('xwiki:livetable:loading', startup);
 })();
     //]]>
     </script>

@@ -32,6 +32,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 
@@ -132,7 +133,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
             lru.setMaxEntries(iCapacity);
             configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
-            this.cache = context.getWiki().getCacheFactory().newCache(configuration);
+            this.cache = Utils.getComponent(CacheManager.class).createNewCache(configuration);
         } catch (CacheException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING,
                 "Failed to create cache");

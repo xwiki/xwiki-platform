@@ -330,21 +330,26 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
     public void testProgrammingRightsWhenNoContextDocumentIsSet()
     {
         // Setup an XWikiPreferences document granting programming rights to XWiki.Programmer
-        XWikiDocument prefs = new XWikiDocument("XWiki", "XWikiPreferences");
+        XWikiDocument prefs = new XWikiDocument(new DocumentReference(getContext().getMainXWiki(), "XWiki", "XWikiPreferences"));
         Mock mockGlobalRightObj = mock(BaseObject.class, new Class[] {}, new Object[] {});
-        mockGlobalRightObj.stubs().method("getStringValue").with(eq("levels")).will(returnValue("programming,admin"));
+        mockGlobalRightObj.stubs().method("getStringValue").with(eq("levels")).will(returnValue("programming"));
         mockGlobalRightObj.stubs().method("getStringValue").with(eq("users")).will(returnValue("XWiki.Programmer"));
         mockGlobalRightObj.stubs().method("getIntValue").with(eq("allow")).will(returnValue(1));
         mockGlobalRightObj.stubs().method("setNumber");
         mockGlobalRightObj.stubs().method("setDocumentReference");
         prefs.addObject("XWiki.XWikiGlobalRights", (BaseObject) mockGlobalRightObj.proxy());
-        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), eq(getContext())).will(
-            returnValue(prefs));
+        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), eq(getContext()))
+            .will(returnValue(prefs));
+        this.mockGroupService.stubs().method("getAllGroupsReferencesForMember")
+            .with(eq(new DocumentReference(getContext().getMainXWiki(), "XWiki", "Programmer")), eq(0), eq(0), same(getContext()))
+            .will(returnValue(Collections.EMPTY_LIST));
 
         // Setup the context (no context document)
         this.mockXWiki.stubs().method("getDatabase").will(returnValue("xwiki"));
         getContext().remove("doc");
         getContext().remove("sdoc");
+      
+        getContext().setDatabase(getContext().getMainXWiki());
 
         // XWiki.Programmer should have PR, as per the global rights.
         getContext().setUser("XWiki.Programmer");

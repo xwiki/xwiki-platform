@@ -844,7 +844,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             // Verify XWiki programming right
             if (accessLevel.equals("programming")) {
                 // Programming right can only been given if user is from main wiki
-                if (!name.startsWith(context.getWiki().getDatabase() + ":")) {
+                if (!name.startsWith(context.getMainXWiki() + ":")) {
                     return false;
                 }
 
@@ -948,7 +948,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
         try {
             if (doc == null) {
                 // If no context document is set, then check the rights of the current user
-                return isSuperAdminOrProgramming(context.getUser(), null, "programming", true, context);
+                return isSuperAdminOrProgramming(this.entityReferenceSerializer.serialize(context.getUserReference()),
+                    null, "programming", true, context);
             }
 
             String username = doc.getContentAuthor();

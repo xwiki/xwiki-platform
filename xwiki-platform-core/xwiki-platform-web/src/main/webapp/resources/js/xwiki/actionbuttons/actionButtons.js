@@ -2,16 +2,11 @@
 // Form buttons: shortcuts, AJAX improvements and form validation
 // To be completed.
 
-// Make sure the XWiki 'namespace' exists.
-if (typeof(XWiki) == 'undefined') {
-  XWiki = new Object();
-}
-// Make sure the actionButtons 'namespace' exists.
-if (typeof(XWiki.actionButtons) == 'undefined') {
-  XWiki.actionButtons = new Object();
-}
+var XWiki = (function(XWiki) {
+// Start XWiki augmentation.
+var actionButtons = XWiki.actionButtons = XWiki.actionButtons || {};
 
-XWiki.actionButtons.EditActions = Class.create({
+actionButtons.EditActions = Class.create({
   initialize : function() {
     this.addListeners();
     this.addShortcuts();
@@ -148,7 +143,7 @@ XWiki.actionButtons.EditActions = Class.create({
 
 // ======================================
 // Save and continue button: Ajax improvements
-XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
+actionButtons.AjaxSaveAndContinue = Class.create({
   initialize : function() {
     this.createMessages();
     this.addListeners();
@@ -220,13 +215,20 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
     document.fire("xwiki:document:saveFailed", {'response' : response});
   }
 });
-document.observe('dom:loaded', function() {
-  new XWiki.actionButtons.EditActions();
+
+function init() {
+  new actionButtons.EditActions();
   // In preview mode, the &continue part of the save&continue should lead back to the edit action.
   if (!$(document.body).hasClassName("previewbody")) {
-    new XWiki.actionButtons.AjaxSaveAndContinue();
+    new actionButtons.AjaxSaveAndContinue();
   }
-});
+  return true;
+}
+
+// When the document is loaded, install action buttons
+(XWiki.isInitialized && init())
+|| document.observe('xwiki:dom:loading', init );
+
 function updateForShortcut() {
   if (typeof(Wysiwyg) == 'undefined') {
     return;
@@ -244,3 +246,6 @@ function updateForShortcut() {
 }
 document.observe("xwiki:actions:save", updateForShortcut);
 document.observe("xwiki:actions:preview", updateForShortcut);
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));

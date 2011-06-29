@@ -563,4 +563,5 @@ function panelEditorInit() {
   start1();
 }
 
-document.observe('xwiki:dom:loading', panelEditorInit);
+(XWiki && XWiki.isInitialized && panelEditorInit())
+|| document.observe('xwiki:dom:loading', panelEditorInit);

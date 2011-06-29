@@ -1441,35 +1441,34 @@ ${Msz}Mb##
   <script type="text/javascript">
   //<![CDATA[
 (function() {
- var startup = function() {
-  if (typeof XWiki !== "undefined" && typeof XWiki.widgets !== "undefined" && typeof XWiki.widgets.LiveTable !== "undefined") {
-    // Make sure the Livetable widgets exists (It does not in the WYSIWYG for example).
-  #if($callback)
-    $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{
-                         "maxPages":$maxPages
-	                    ,"limit":$count
-     #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end
-     #if($hasPageSize && "$!pageSizeBounds" != ''),"pageSizeBounds" : $pageSizeBounds#end
-	          });
-  #else
-    $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix), {
-                         "maxPages":$maxPages
-	                    ,"limit":$count
-     #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end
-     #if($hasPageSize && "$!pageSizeBounds" != ''),"pageSizeBounds" : $pageSizeBounds#end
-	          });
-  #end
-  #if($!hasPageSize)
-    document.observe("xwiki:livetable:${divid}:loadingEntries", function() { $('${divid}-pagesize').addClassName("hidden"); } );
-    document.observe("xwiki:livetable:${divid}:loadingComplete", function() { $('${divid}-pagesize').removeClassName("hidden"); } );
-  #end
+  function startup() {
+    if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
+      // Make sure the Livetable widgets exists (It does not in the WYSIWYG for example).
+    #if($callback)
+      $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{
+                           "maxPages":$maxPages
+                        ,"limit":$count
+       #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end
+       #if($hasPageSize && "$!pageSizeBounds" != ''),"pageSizeBounds" : $pageSizeBounds#end
+              });
+    #else
+      $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix), {
+                           "maxPages":$maxPages
+                        ,"limit":$count
+       #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end
+       #if($hasPageSize && "$!pageSizeBounds" != ''),"pageSizeBounds" : $pageSizeBounds#end
+              });
+    #end
+    #if($!hasPageSize)
+      document.observe("xwiki:livetable:${divid}:loadingEntries", function() { $('${divid}-pagesize').addClassName("hidden"); } );
+      document.observe("xwiki:livetable:${divid}:loadingComplete", function() { $('${divid}-pagesize').removeClassName("hidden"); } );
+    #end
+      return true;
+    }
+    return false;
   }
- }
- if ((typeof(XWiki) != 'undefined') && (typeof(XWiki.widgets) != 'undefined') && (typeof(XWiki.widgets.LiveTable) != 'undefined')) {
-   startup();
- } else {
-   document.observe('xwiki:dom:loading', startup);
- }
+  // Initialize liveTable
+  (XWiki && XWiki.isInitialized && startup()) || document.observe('xwiki:livetable:loading', startup);
 })();
    //]]>
   </script>

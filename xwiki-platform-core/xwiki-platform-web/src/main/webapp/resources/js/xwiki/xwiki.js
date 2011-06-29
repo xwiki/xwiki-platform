@@ -605,6 +605,7 @@ Object.extend(XWiki, {
       this.insertCreatePageFromTemplateModalBoxes();
       this.watchlist.initialize();
 
+      this.domIsLoaded = true;
       document.fire("xwiki:dom:loaded");
     }
   }

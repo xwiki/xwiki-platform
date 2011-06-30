@@ -221,9 +221,9 @@
 #-# The list of events communication channels to start when the application starts.
 #-# By default no channel is configured.
 #-#
-#-# The default remote event distribution implementation is using JGroups and you'll need to drop your JGroups channel
-#-# xml files in the WEB-INF/observation/remote/jgroups/ directory. There's a README file in that directory with more
-#-# information.
+#-# The default remote event distribution implementation is using JGroups and you'll need to either use embedded JGroups configuration
+#-# files or drop your custom configuration in the WEB-INF/observation/remote/jgroups/ directory.
+#-# There's a README file in that directory with more information.
 #-# Example: observation.remote.channels = public, cluster
 
 #-# [Since 2.0M4]

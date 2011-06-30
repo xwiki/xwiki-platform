@@ -113,7 +113,7 @@ public class AttachmentEventGeneratorListener implements EventListener
     {
         ObservationManager observation = Utils.getComponent(ObservationManager.class);
 
-        for (XWikiAttachment attachment : originalDoc.getAttachmentList()) {
+        for (XWikiAttachment attachment : doc.getAttachmentList()) {
             String reference =
                 this.defaultEntityReferenceSerializer.serialize(attachment.getDoc().getDocumentReference());
             observation.notify(new AttachmentAddedEvent(reference, attachment.getFilename()), doc, context);

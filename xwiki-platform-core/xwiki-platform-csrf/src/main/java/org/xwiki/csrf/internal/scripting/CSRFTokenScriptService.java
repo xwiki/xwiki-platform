@@ -47,6 +47,7 @@ public class CSRFTokenScriptService implements CSRFToken, ScriptService
      * 
      * @see CSRFToken#isTokenValid(String)
      */
+    @Override
     public String getToken()
     {
         return this.csrf.getToken();
@@ -57,6 +58,7 @@ public class CSRFTokenScriptService implements CSRFToken, ScriptService
      * 
      * @see CSRFToken#clearToken()
      */
+    @Override
     public void clearToken()
     {
         this.csrf.clearToken();
@@ -67,6 +69,7 @@ public class CSRFTokenScriptService implements CSRFToken, ScriptService
      * 
      * @see CSRFToken#isTokenValid(String)
      */
+    @Override
     public boolean isTokenValid(String token)
     {
         return this.csrf.isTokenValid(token);
@@ -77,6 +80,7 @@ public class CSRFTokenScriptService implements CSRFToken, ScriptService
      * 
      * @see CSRFToken#getResubmissionURL()
      */
+    @Override
     public String getResubmissionURL()
     {
         return this.csrf.getResubmissionURL();

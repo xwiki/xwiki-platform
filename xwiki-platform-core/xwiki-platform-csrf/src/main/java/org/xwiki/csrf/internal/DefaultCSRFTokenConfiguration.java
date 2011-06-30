@@ -49,6 +49,7 @@ public class DefaultCSRFTokenConfiguration implements CSRFTokenConfiguration
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isEnabled()
     {
         String key = PREFIX + "enabled";

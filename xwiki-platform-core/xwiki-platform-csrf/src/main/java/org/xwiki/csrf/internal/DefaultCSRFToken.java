@@ -98,6 +98,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
      * 
      * {@inheritDoc}
      */
+    @Override
     public void initialize() throws InitializationException
     {
         this.tokens = new ConcurrentHashMap<String, String>();
@@ -116,6 +117,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getToken()
     {
         String key = getTokenKey();
@@ -142,6 +144,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     /**
      * {@inheritDoc}
      */
+    @Override
     public void clearToken()
     {
         this.tokens.remove(getTokenKey());
@@ -150,6 +153,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isTokenValid(String token)
     {
         if (!this.configuration.isEnabled()) {
@@ -167,6 +171,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getResubmissionURL()
     {
         // request URL is the one that performs the modification

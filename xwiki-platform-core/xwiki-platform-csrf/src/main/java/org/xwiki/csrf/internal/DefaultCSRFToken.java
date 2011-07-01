@@ -59,7 +59,7 @@ import org.xwiki.model.reference.DocumentReference;
  * @version $Id$
  * @since 2.5M2
  */
-@Component(roles = CSRFToken.class)
+@Component
 @Singleton
 public class DefaultCSRFToken implements CSRFToken, Initializable
 {

@@ -1,18 +1,6 @@
-(function(){
-
-/**
- * XWiki namespace
- */
-if (typeof XWiki == "undefined") {
-    XWiki = new Object();
-}
-
-/**
- * widgets namespace
- */
-if (typeof XWiki.widgets == "undefined") {
-    XWiki.widgets = new Object();
-}
+var XWiki = (function(XWiki) {
+// Start XWiki augmentation.
+var widgets = XWiki.widgets = XWiki.widgets || {};
 
 /**
   * The class representing an AJAX-populated live table.
@@ -1138,4 +1126,14 @@ if(browser.isIE6x) {
   });
 }
 
-})();
+// Trigger table loading when document and scripts are ready
+function init() {
+  document.fire("xwiki:livetable:loading");
+}
+
+(XWiki.isInitialized && init())
+|| document.observe("xwiki:dom:loading", init);
+
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));

@@ -1,16 +1,10 @@
-// Make sure the XWiki 'namespace' exists.
-if(typeof(XWiki) == 'undefined') {
-  XWiki = new Object();
-}
-// Make sure the viewers 'namespace' exists.
-if(typeof(XWiki.viewers) == 'undefined') {
-  XWiki.viewers = new Object();
-}
-
+var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+var viewers = XWiki.viewers = XWiki.viewers || {};
 /**
  * JavaScript snippet that toggles line numbers on code view.
  */
-XWiki.viewers.Code = Class.create({
+viewers.Code = Class.create({
   initialize : function (initialShowLineNumbers) {
     this.showingLineNumbers = initialShowLineNumbers;
     this.toggleLink = $('toggleLineNumbers');
@@ -54,10 +48,19 @@ XWiki.viewers.Code = Class.create({
   }
 });
 
-document.observe('dom:loaded', function() {
+function init() {
   var initialLineNumbers = true;
   if (window.location.search.indexOf('showlinenumbers=0') >= 0) {
     initialLineNumbers = false;
   }
-  new XWiki.viewers.Code(initialLineNumbers);
-});
+  new viewers.Code(initialLineNumbers);
+  return true;
+}
+
+// When the document is loaded, trigger the code behaviors.
+(XWiki.isInitialized && init())
+|| document.observe("xwiki:dom:loading", init);
+
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));

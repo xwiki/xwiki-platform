@@ -23,6 +23,7 @@
 #if("$!request.srid" != '')
   <input type="hidden" name="srid" value="$!escapetool.xml($request.srid)"/>
 #end
+  <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}"/>
 </div>
 #xwikimessageboxstart($msg.get('login') '')
 #set($message = $msg.get($xwiki.parseMessage()))

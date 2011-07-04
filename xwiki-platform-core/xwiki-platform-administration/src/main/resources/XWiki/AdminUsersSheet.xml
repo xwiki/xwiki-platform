@@ -101,7 +101,8 @@
     // &lt;![CDATA[
     (function() {
       var startup = function() {
-        var ta = new XWiki.widgets.LiveTable("$url", "userstable", displayUsers);
+        var callback = function(row, i, table) { return displayUsers(row, i, table, "$!{services.csrf.getToken()}"); };
+        var ta = new XWiki.widgets.LiveTable("$url", "userstable", callback);
         #set($registerurl = $doc.getURL('view', 'xpage=registerinline'))
         #set($saveurl = $doc.getURL('register', 'xpage=registerinline'))
         #set($redirectuserurl = $xwiki.getDocument('XWiki.XWikiPreferences').getURL('admin', "editor=${editor}&amp;section=Users"))

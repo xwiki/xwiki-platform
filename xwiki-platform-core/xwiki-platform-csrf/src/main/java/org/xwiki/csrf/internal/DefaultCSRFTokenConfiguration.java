@@ -19,8 +19,10 @@
  */
 package org.xwiki.csrf.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.csrf.CSRFTokenConfiguration;
 
@@ -40,12 +42,14 @@ public class DefaultCSRFTokenConfiguration implements CSRFTokenConfiguration
     private static final String PREFIX = "csrf.";
 
     /** Main XWiki properties configuration source. */
-    @Requirement("xwikiproperties")
+    @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource configuration;
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isEnabled()
     {
         String key = PREFIX + "enabled";

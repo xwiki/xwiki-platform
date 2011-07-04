@@ -1,6 +1,9 @@
-// Make sure the XWiki 'namespace' and the ModalPopup class exist.
-if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeof(XWiki.widgets.ModalPopup) == "undefined") {
-  if (typeof console != "undefined" && typeof console.warn == "function") {
+var XWiki = (function(XWiki) {
+// Start XWiki augmentation.
+var widgets = XWiki.widgets = XWiki.widgets || {};
+// Make sure the ModalPopup class exist.
+if (!XWiki.widgets.ModalPopup) {
+  if (console && console.warn) {
     console.warn("[JumpToPage widget] Required class missing: XWiki.widgets.ModalPopup");
   }
 } else {
@@ -8,7 +11,7 @@ if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeo
  * "Jump to page" behavior. Allows the users to jump to any other page by pressing a shortcut, entering a page name, and
  * pressing enter. It also enables a Suggest behavior on the document name selector, for easier selection.
  */
-XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
+widgets.JumpToPage = Class.create(widgets.ModalPopup, {
   /** The template of the XWiki URL. */
   urlTemplate : "$xwiki.getURL('__space__.__document__', '__action__')",
   /** Constructor. Registers the key listener that pops up the dialog. */
@@ -102,8 +105,15 @@ XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
   }
 });
 
+function init() {
+  return new widgets.JumpToPage();
+}
+
 // When the document is loaded, enable the keyboard listener that triggers the dialog.
-document.observe("xwiki:dom:loaded", function() {
-  new XWiki.widgets.JumpToPage();
-});
+(XWiki.domIsLoaded && init())
+|| document.observe("xwiki:dom:loaded", init);
+
 } // if the parent widget is defined
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));

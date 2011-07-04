@@ -254,6 +254,7 @@ public class DefaultCoreExtensionScanner
      * @param urls base URLs to modify
      * @return modified base URLs
      */
+    // TODO: remove when http://code.google.com/p/reflections/issues/detail?id=76 is fixed
     private Set<URL> filterURLs(Set<URL> urls)
     {
         Set<URL> results = new HashSet<URL>(urls.size());

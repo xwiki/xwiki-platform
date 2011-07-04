@@ -608,6 +608,7 @@ Object.extend(XWiki, {
       this.watchlist.initialize();
       this.registerPanelToggle();
 
+      this.domIsLoaded = true;
       document.fire("xwiki:dom:loaded");
     }
   }

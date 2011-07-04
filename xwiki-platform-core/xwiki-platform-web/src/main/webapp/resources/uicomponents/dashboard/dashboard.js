@@ -633,17 +633,24 @@ XWiki.Dashboard = Class.create( {
     return parameters;
   }  
 });
-//End XWiki augmentation.
-return XWiki;
-}(XWiki || {}));
 
-document.observe('xwiki:dom:loaded', function(event) {
+function init() {
   // editable dashboard only in inline mode
   if (XWiki.contextaction == 'inline') {
     // edit first dashboard FIXME: to create a dashboard editor for all dashboards
     var dashboardRootElt = $$('.dashboard')[0];
     if (dashboardRootElt) {
-      var dashboard = new XWiki.Dashboard(dashboardRootElt);
+      new XWiki.Dashboard(dashboardRootElt);
     }
   }
-});
+  return true;
+}
+
+// When the document is loaded, enable the dashboard editor in inline mode.
+(XWiki.domIsLoaded && init())
+|| document.observe("xwiki:dom:loaded", init);
+
+//End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));
+

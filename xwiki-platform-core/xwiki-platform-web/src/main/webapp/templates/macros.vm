@@ -1575,7 +1575,7 @@ function (row, i, table) {
             #if("$!colprop.ajaxActions.get($action)" == 'true')
               link.observe('click', function(event) {
                 event.stop();
-                new Ajax.Request(row.doc_${action}_url, {
+                new Ajax.Request(link.href, {
                   onSuccess : function() {
                     $colprop.actionCallbacks.get($action)
                   }

@@ -31,6 +31,22 @@ $response.setContentType('application/x-json')
     #set($wikiname = $xwiki.getDocument($m).getWiki())
     #if($wikiname != 'xwiki' || $wikiname == $xcontext.database) #set($wikiname = 'local') #end
     #set($emptyValue = $msg.get('xe.admin.groups.emptyvalue'))
+
+    #set ($queryStringPrefix = 'xpage=watch')
+    #set ($followQueryString = "$queryStringPrefix&do=adduser")
+    #set ($followUrl = "$memberDocument.getURL('view', $followQueryString)")
+    #set ($unfollowQueryString = "$queryStringPrefix&do=removeuser")
+    #set ($unfollowUrl = "$memberDocument.getURL('view', $unfollowQueryString)")
+    #set ($followAction = '')
+    ## Skip guests or the same user for the follow action.
+    #if (!$isGuest && $xcontext.user != $m)
+      #if ($xwiki.watchlist.isUserWatched($memberDocument.prefixedFullName))
+        #set ($followAction = 'unfollow')
+      #else
+        #set ($followAction = 'follow')
+      #end
+    #end
+
     #if( $velocityCount > 1 ) , #end
    {
     "fullname"     : "$m",
@@ -48,7 +64,12 @@ $response.setContentType('application/x-json')
     "member_url" : "$xwiki.getURL($m)",
     "doc_delete_url" : "$doc.getURL('view', "xpage=deletegroupmember&fullname=${m}&ajax=true")",
     "_avatar" : "$escapetool.javascript("#mediumUserAvatar($m)").trim()",
-    "_avatar_url" : "$xwiki.getURL($m)"
+    "_avatar_url" : "$xwiki.getURL($m)",
+    'doc_follow_url'   : "$followUrl",
+    'doc_hasfollow'    : true,
+    'doc_unfollow_url' : "$unfollowUrl",
+    'doc_hasunfollow'  : true, 
+    'doc_followaction' : "$followAction"
    }
 #end
 ]}

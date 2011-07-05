@@ -1575,12 +1575,12 @@ function (row, i, table) {
             #if("$!colprop.ajaxActions.get($action)" == 'true')
               link.observe('click', function(event) {
                 event.stop();
-                new Ajax.Request(link.href, {
+                new Ajax.Request(this.href, {
                   onSuccess : function() {
                     $colprop.actionCallbacks.get($action)
                   }
                 });
-              });
+              }.bindAsEventListener(link));
             #end
             td.insert(link);
           }

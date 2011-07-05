@@ -748,7 +748,7 @@ public class XWiki implements EventListener
     public void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
         throws XWikiException
     {
-        context.setDatabase(context.getMainXWiki());
+        setDatabase(context.getMainXWiki());
 
         setEngineContext(engine_context);
         context.setWiki(this);

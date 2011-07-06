@@ -102,15 +102,9 @@
 <cache>long</cache>
 </property>
 <property>
-<code>(function(){
-
-if (typeof XWiki == "undefined") {
-   XWiki = new Object();
-}
-
-if (typeof XWiki.GroupSheet == "undefined") {
-   XWiki.GroupSheet = new Object();
-}
+<code>var XWiki = (function(XWiki) {
+// Start XWiki augmentation.
+var GroupSheet = XWiki.GroupSheet = XWiki.GroupSheet || {};
 
 const ACTION_PREFIX = 'action';
 const ACTION_FOLLOW = 'follow';
@@ -126,17 +120,17 @@ document.observe('xwiki:livetable:newrow', function(event) {
   var followElement = rowElement.down('.' + ACTION_PREFIX + ACTION_FOLLOW);
   var unfollowElement = rowElement.down('.' + ACTION_PREFIX + ACTION_UNFOLLOW);
 
-  XWiki.GroupSheet.hideFollowAction(followElement, followActionClass);
-  XWiki.GroupSheet.hideFollowAction(unfollowElement, followActionClass);
+  GroupSheet.hideFollowAction(followElement, followActionClass);
+  GroupSheet.hideFollowAction(unfollowElement, followActionClass);
 });
 
-XWiki.GroupSheet.hideFollowAction = function (actionElement, visibleActionClassName) {
+GroupSheet.hideFollowAction = function (actionElement, visibleActionClassName) {
   if (actionElement.className.indexOf(visibleActionClassName) == -1 || visibleActionClassName == ACTION_PREFIX) {
     actionElement.hide();
   } 
 }
 
-XWiki.GroupSheet.toggleFollowAction = function (td, toggledAction) {
+GroupSheet.toggleFollowAction = function (td, toggledAction) {
   /* Hide the clicked action. */
   var actionClass = '.' + ACTION_PREFIX + toggledAction;
   td.down(actionClass).hide();
@@ -149,13 +143,15 @@ XWiki.GroupSheet.toggleFollowAction = function (td, toggledAction) {
   } 
 }
 
-})();</code>
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}))</code>
 </property>
 <property>
 <name></name>
 </property>
 <property>
-<parse></parse>
+<parse>0</parse>
 </property>
 <property>
 <use>onDemand</use>
@@ -270,11 +266,11 @@ XWiki.GroupSheet.toggleFollowAction = function (td, toggledAction) {
 </property>
 <property>
 <code>.actionfollow {
-  background-image: url($xwiki.getSkinFile('icons/silk/add.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/add.gif')");
 }
 
 .actionunfollow {
-  background-image: url($xwiki.getSkinFile('icons/silk/delete.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/delete.gif')");
 }</code>
 </property>
 <property>
@@ -293,8 +289,8 @@ $xwiki.jsfx.use('js/xwiki/usersandgroups/usersandgroups.js', true)
 $xwiki.ssfx.use('js/xwiki/usersandgroups/usersandgroups.css')
 $xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
 $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
-#set($temp = $xwiki.ssx.use('XWiki.XWikiGroupSheet'))
-#set($temp = $xwiki.jsx.use('XWiki.XWikiGroupSheet'))
+$xwiki.ssx.use('XWiki.XWikiGroupSheet')
+$xwiki.jsx.use('XWiki.XWikiGroupSheet')
 #set($groupDoc = $doc)
 #if($doc.fullName == 'Main.UserDirectory')
   #set($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))

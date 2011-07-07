@@ -19,33 +19,35 @@
  */
 package org.xwiki.extension.internal;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+
 import junit.framework.Assert;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.extension.ExtensionManagerConfiguration;
+import org.xwiki.extension.repository.ExtensionRepositoryId;
+import org.xwiki.test.AbstractComponentTestCase;
 
-public class DefaultVersionManagerTest
+public class DefaultExtensionManagerConfigurationTest extends AbstractComponentTestCase
 {
-    private VersionManager versionManager;
-    
-    @Before
+    private ExtensionManagerConfiguration configuration;
+
+    @Override
     public void setUp() throws Exception
     {
-        this.versionManager = new DefaultVersionManager();
+        super.setUp();
+
+        this.configuration = getComponentManager().lookup(ExtensionManagerConfiguration.class);
     }
-    
+
     @Test
-    public void testWithIntegers()
+    public void testGetRepositories() throws URISyntaxException
     {
-        Assert.assertEquals(1, versionManager.compareVersions("1.1", "1.0"));
-        Assert.assertEquals(8, versionManager.compareVersions("1.10", "1.2"));
-    }
-    
-    @Test
-    public void testWithStrings()
-    {
-        Assert.assertEquals(8, versionManager.compareVersions("1.10-sometext", "1.2"));
-        Assert.assertEquals(1, versionManager.compareVersions("1.1-sometext", "1.1"));
-        Assert.assertEquals(67, versionManager.compareVersions("1.sometext", "1.0"));
+        getConfigurationSource().setProperty("extension.repositories", Arrays.asList("id:type:http://url", "invalid"));
+
+        Assert.assertEquals(Arrays.asList(new ExtensionRepositoryId("id", "type", new URI("http://url"))),
+            this.configuration.getRepositories());
     }
 }

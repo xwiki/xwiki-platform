@@ -66,7 +66,7 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
      * Used to parse repositories entries from the configuration.
      */
     private static final Pattern REPOSITORYIDPATTERN = Pattern.compile("([^:]+):([^:]+):(.+)");
-    
+
     /**
      * The type identifier for a maven repository.
      */
@@ -161,16 +161,18 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
      * @param repositoryString the repository configuration entry
      * @return the {@link ExtensionRepositoryId}
      * @throws URISyntaxException Failed to create an {@link URI} object from the configuration entry
+     * @throws ExtensionManagerConfigurationException Failed to parse configuration
      */
-    private ExtensionRepositoryId parseRepository(String repositoryString) throws URISyntaxException
+    private ExtensionRepositoryId parseRepository(String repositoryString) throws URISyntaxException,
+        ExtensionManagerConfigurationException
     {
         Matcher matcher = REPOSITORYIDPATTERN.matcher(repositoryString);
 
         if (matcher.matches()) {
-            new ExtensionRepositoryId(matcher.group(1), matcher.group(2), new URI(matcher.group(3)));
+            return new ExtensionRepositoryId(matcher.group(1), matcher.group(2), new URI(matcher.group(3)));
         }
 
-        // TODO: throw exception
-        return null;
+        throw new ExtensionManagerConfigurationException("Don't match repository configuration [" + repositoryString
+            + "]");
     }
 }

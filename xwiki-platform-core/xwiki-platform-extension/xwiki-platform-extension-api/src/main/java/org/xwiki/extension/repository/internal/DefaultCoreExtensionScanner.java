@@ -49,7 +49,7 @@ import com.google.common.base.Predicates;
 /**
  * Scan jars to find core extensions.
  * 
- * @version $Id$
+ * @version $Id: 5e4690f5a8a326d3d5332f4e55989d741e78d5d7 $
  */
 public class DefaultCoreExtensionScanner
 {

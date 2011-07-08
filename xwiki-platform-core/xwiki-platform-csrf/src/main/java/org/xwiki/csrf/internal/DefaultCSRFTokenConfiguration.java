@@ -29,7 +29,7 @@ import org.xwiki.csrf.CSRFTokenConfiguration;
 /**
  * Get configuration data from the XWiki properties file. Supported options:
  * <ul>
- *   <li>"csrf.enabled", default = false</li>
+ *   <li>"csrf.enabled", default = true</li>
  * </ul>
  * 
  * @version $Id$
@@ -53,6 +53,6 @@ public class DefaultCSRFTokenConfiguration implements CSRFTokenConfiguration
     public boolean isEnabled()
     {
         String key = PREFIX + "enabled";
-        return this.configuration.getProperty(key, Boolean.FALSE).booleanValue();
+        return this.configuration.getProperty(key, Boolean.TRUE).booleanValue();
     }
 }

@@ -282,19 +282,19 @@ lq1soW/lB5YqcHYSQfVSAAAAAElFTkSuQmCC</content></attachment>
 #set($msgRestart=$msg.get("xe.officeimporter.openoffice.actions.restart"))
 #set($msgUpdate=$msg.get("xe.officeimporter.openoffice.update"))
 #set($msgLimitedControl=$msg.get("xe.officeimporter.openoffice.limitedcontrol"))
-#if($hasAdmin &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+#if($hasAdmin)
   #set($currentAction = "$!{request.action}")
-  #if($currentAction == "stop")
+  #if($currentAction == "stop" &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
     #if(!$oomanager.stopServer())
       {{error}}$oomanager.lastErrorMessage{{/error}}
 
     #end
-  #elseif($currentAction == "start")
+  #elseif($currentAction == "start" &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
     #if(!$oomanager.startServer())
       {{error}}$oomanager.lastErrorMessage{{/error}}
 
     #end
-  #elseif($currentAction == "restart")
+  #elseif($currentAction == "restart" &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
     #if(!$oomanager.stopServer())
       {{error}}$oomanager.lastErrorMessage{{/error}}
 

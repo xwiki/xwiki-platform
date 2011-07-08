@@ -21,6 +21,7 @@
 package org.xwiki.extension.xar;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.Assert;
@@ -31,12 +32,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.LocalExtensionRepository;
-import org.xwiki.extension.task.InstallRequest;
-import org.xwiki.extension.task.Task;
-import org.xwiki.extension.task.TaskManager;
-import org.xwiki.extension.task.UninstallRequest;
+import org.xwiki.extension.job.InstallRequest;
+import org.xwiki.extension.job.Job;
+import org.xwiki.extension.job.JobManager;
+import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.test.RepositoryUtil;
 import org.xwiki.extension.xar.internal.repository.XarLocalExtension;
+import org.xwiki.logging.event.LogEvent;
+import org.xwiki.logging.event.LogLevel;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
@@ -58,11 +61,11 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     private ExtensionId localXarExtensiontId2;
 
     private RepositoryUtil repositoryUtil;
-    
-    private TaskManager taskManager;
-    
+
+    private JobManager taskManager;
+
     private LocalExtensionRepository localExtensionRepository;
-    
+
     private Map<String, BaseClass> classes = new HashMap<String, BaseClass>();
 
     @Before
@@ -82,9 +85,9 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         this.localXarExtensiontId1 = new ExtensionId("test", "1.0");
         this.localXarExtensiontId2 = new ExtensionId("test", "2.0");
-        
+
         // classes
-        
+
         BaseClass styleSheetClass = new BaseClass();
         this.classes.put("StyleSheetExtension", styleSheetClass);
 
@@ -155,7 +158,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                         return null;
                     }
                 });
-                
+
                 allowing(mockXWiki).getXClass(with(any(DocumentReference.class)), with(any(XWikiContext.class)));
                 will(new CustomAction("getXClass")
                 {
@@ -171,38 +174,40 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // lookup
 
-        this.taskManager = getComponentManager().lookup(TaskManager.class);
+        this.taskManager = getComponentManager().lookup(JobManager.class);
         this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class, "xar");
     }
 
-    private XarLocalExtension install(ExtensionId extensionId, String namespace) throws Exception
+    private XarLocalExtension install(ExtensionId extensionId, String namespace) throws Throwable
     {
         InstallRequest installRequest = new InstallRequest();
         installRequest.addExtension(extensionId);
         installRequest.addNamespace(namespace);
-        Task installTask = this.taskManager.install(installRequest);
+        Job installJob = this.taskManager.install(installRequest);
 
-        if (installTask.getExceptions() != null) {
-            throw installTask.getExceptions().get(0);
+        List<LogEvent> errors = installJob.getStatus().getLog(LogLevel.ERROR);
+        if (!errors.isEmpty()) {
+            throw errors.get(0).getThrowable();
         }
 
         return (XarLocalExtension) this.localExtensionRepository.resolve(extensionId);
     }
-    
-    protected void uninstall(ExtensionId extensionId, String namespace) throws Exception
+
+    protected void uninstall(ExtensionId extensionId, String namespace) throws Throwable
     {
         UninstallRequest uninstallRequest = new UninstallRequest();
         uninstallRequest.addExtension(extensionId);
         uninstallRequest.addNamespace(namespace);
-        Task uninstallTask = this.taskManager.uninstall(uninstallRequest);
+        Job uninstallJob = this.taskManager.uninstall(uninstallRequest);
 
-        if (uninstallTask.getExceptions() != null) {
-            throw uninstallTask.getExceptions().get(0);
+        List<LogEvent> errors = uninstallJob.getStatus().getLog(LogLevel.ERROR);
+        if (!errors.isEmpty()) {
+            throw errors.get(0).getThrowable();
         }
     }
 
     @Test
-    public void testInstall() throws Exception
+    public void testInstall() throws Throwable
     {
         // install
 
@@ -230,7 +235,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     }
 
     @Test
-    public void testUpgrade() throws Exception
+    public void testUpgrade() throws Throwable
     {
         install(this.localXarExtensiontId1, "wiki");
 
@@ -265,7 +270,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     }
 
     @Test
-    public void testUninstall() throws Exception
+    public void testUninstall() throws Throwable
     {
         install(this.localXarExtensiontId1, "wiki");
 

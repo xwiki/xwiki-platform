@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.task;
+package org.xwiki.extension.job;
 
 import org.xwiki.component.annotation.ComponentRole;
 
@@ -27,34 +27,34 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  */
 @ComponentRole
-public interface TaskManager
+public interface JobManager
 {
     /**
      * @return the task currently running or the lastest task
      */
-    Task getCurrentTask();
+    Job getCurrentJob();
 
     /**
      * Start an extension installation task.
      * <p>
-     * It's the same as calling {@link #executeTask(String, Request)} with identifier "install".
+     * It's the same as calling {@link #executeJob(String, Request)} with identifier "install".
      * 
      * @param request the request
      * @return the created install task
-     * @throws TaskException error when trying to run install task
+     * @throws JobException error when trying to run install task
      */
-    Task install(InstallRequest request) throws TaskException;
+    Job install(InstallRequest request) throws JobException;
 
     /**
      * Start an extension uninstall task.
      * <p>
-     * It's the same as calling {@link #executeTask(String, Request)} with identifier "uninstall".
+     * It's the same as calling {@link #executeJob(String, Request)} with identifier "uninstall".
      * 
      * @param request the request
      * @return the created uninstall task
-     * @throws TaskException error when trying to run uninstall task
+     * @throws JobException error when trying to run uninstall task
      */
-    Task uninstall(UninstallRequest request) throws TaskException;
+    Job uninstall(UninstallRequest request) throws JobException;
 
     /**
      * Start a new task with teh provided identifier.
@@ -62,7 +62,7 @@ public interface TaskManager
      * @param taskId the role hint of the task component
      * @param request the request
      * @return the created task
-     * @throws TaskException error when trying to run the task
+     * @throws JobException error when trying to run the task
      */
-    Task executeTask(String taskId, Request request) throws TaskException;
+    Job executeJob(String taskId, Request request) throws JobException;
 }

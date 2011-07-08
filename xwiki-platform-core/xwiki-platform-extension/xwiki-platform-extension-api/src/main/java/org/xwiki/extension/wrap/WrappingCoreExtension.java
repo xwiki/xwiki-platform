@@ -1,6 +1,8 @@
-package org.xwiki.extension;
+package org.xwiki.extension.wrap;
 
 import java.net.URL;
+
+import org.xwiki.extension.CoreExtension;
 
 /**
  * Wrap a Core extension.

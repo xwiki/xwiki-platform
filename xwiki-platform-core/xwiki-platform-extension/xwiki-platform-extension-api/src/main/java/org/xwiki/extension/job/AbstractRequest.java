@@ -17,14 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.task;
+package org.xwiki.extension.job;
 
 /**
- * A {@link Task} request.
+ * Base class for {@link Request} implementations.
  * 
  * @version $Id$
  */
-public interface Request
+public abstract class AbstractRequest implements Request
 {
 
 }

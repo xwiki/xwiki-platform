@@ -17,13 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.task.internal;
+package org.xwiki.extension.job.internal;
 
 import java.text.MessageFormat;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -38,11 +37,10 @@ import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
 import org.xwiki.extension.internal.VersionManager;
+import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
-import org.xwiki.extension.task.InstallRequest;
-import org.xwiki.observation.ObservationManager;
 
 /**
  * Extension installation related task.
@@ -53,9 +51,8 @@ import org.xwiki.observation.ObservationManager;
  * @version $Id$
  */
 @Component
-@Singleton
 @Named("install")
-public class InstallTask extends AbstractTask<InstallRequest>
+public class InstallJob extends AbstractJob<InstallRequest>
 {
     /**
      * Used to resolve extensions to install.
@@ -88,15 +85,9 @@ public class InstallTask extends AbstractTask<InstallRequest>
     private ExtensionHandlerManager extensionHandlerManager;
 
     /**
-     * Used to send extensions installation and upgrade related events.
-     */
-    @Inject
-    private ObservationManager observationManager;
-
-    /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.extension.task.internal.AbstractTask#start()
+     * @see org.xwiki.extension.job.internal.AbstractJob#start()
      */
     @Override
     protected void start() throws Exception

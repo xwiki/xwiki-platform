@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.WrappingLocalExtension;
 import org.xwiki.extension.repository.ExtensionRepository;
+import org.xwiki.extension.wrap.WrappingLocalExtension;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 

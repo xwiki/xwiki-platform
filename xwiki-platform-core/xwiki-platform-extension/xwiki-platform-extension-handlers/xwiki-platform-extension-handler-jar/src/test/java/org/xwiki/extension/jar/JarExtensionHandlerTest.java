@@ -60,7 +60,7 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
     }
 
     @Test
-    public void testInstallAndUninstallExtension() throws Exception
+    public void testInstallAndUninstallExtension() throws Throwable
     {
         // actual test
         LocalExtension localExtension = install(this.testArtifactId);

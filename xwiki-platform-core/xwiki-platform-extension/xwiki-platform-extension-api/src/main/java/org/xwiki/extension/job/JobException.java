@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.task;
+package org.xwiki.extension.job;
 
 import org.xwiki.extension.ExtensionException;
 
@@ -26,7 +26,7 @@ import org.xwiki.extension.ExtensionException;
  * 
  * @version $Id$
  */
-public class TaskException extends ExtensionException
+public class JobException extends ExtensionException
 {
     /**
      * Constructs a new exception with the specified detail message. The cause is not initialized, and may subsequently
@@ -34,7 +34,7 @@ public class TaskException extends ExtensionException
      * 
      * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
      */
-    public TaskException(String message)
+    public JobException(String message)
     {
         super(message);
     }
@@ -46,7 +46,7 @@ public class TaskException extends ExtensionException
      * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is
      *            permitted, and indicates that the cause is nonexistent or unknown
      */
-    public TaskException(String message, Throwable cause)
+    public JobException(String message, Throwable cause)
     {
         super(message, cause);
     }

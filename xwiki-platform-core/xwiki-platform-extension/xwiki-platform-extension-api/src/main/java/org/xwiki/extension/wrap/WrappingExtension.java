@@ -17,12 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension;
+package org.xwiki.extension.wrap;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
+import org.xwiki.extension.ExtensionException;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.ExtensionRepository;
 
 /**

@@ -17,9 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.task;
-
-import java.util.List;
+package org.xwiki.extension.job;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -30,45 +28,12 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
  */
 @ComponentRole
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public interface Task
+public interface Job
 {
-    /**
-     * Taks status.
-     * 
-     * @version $Id$
-     */
-    enum Status
-    {
-        /**
-         * Default status, generally mean that the task has not been started yet.
-         */
-        NONE,
-
-        /**
-         * The task has been paused.
-         */
-        PAUSED,
-
-        /**
-         * The task is running.
-         */
-        RUNNING,
-
-        /**
-         * The task is done.
-         */
-        FINISHED
-    }
-
     /**
      * @return the status of the task
      */
-    Status getStatus();
-
-    /**
-     * @return the exceptions raised during the task execution, null of all went well
-     */
-    List<Exception> getExceptions();
+    JobStatus getStatus();
 
     /**
      * @return the task request

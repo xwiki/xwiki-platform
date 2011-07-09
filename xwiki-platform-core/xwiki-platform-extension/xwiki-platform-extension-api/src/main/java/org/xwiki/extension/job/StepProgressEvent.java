@@ -17,14 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.task;
+package org.xwiki.extension.job;
+
+import org.xwiki.observation.event.Event;
 
 /**
- * Request used in {@link org.xwiki.extension.task.internal.InstallTask}.
+ * Indicate to the progress listener that a new step is starting.
  * 
  * @version $Id$
  */
-public class UninstallRequest extends AbstractExtensionRequest
+public class StepProgressEvent implements Event
 {
-
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.event.Event#matches(java.lang.Object)
+     */
+    @Override
+    public boolean matches(Object arg0)
+    {
+        return true;
+    }
 }

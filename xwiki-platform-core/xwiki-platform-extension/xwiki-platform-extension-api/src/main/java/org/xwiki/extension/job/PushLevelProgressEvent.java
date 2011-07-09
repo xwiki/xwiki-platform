@@ -17,14 +17,54 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.task;
+package org.xwiki.extension.job;
+
+import org.xwiki.observation.event.Event;
 
 /**
- * Request used in {@link org.xwiki.extension.task.internal.InstallTask}.
+ * Indicate to the progress listener that a new step level is starting.
  * 
  * @version $Id$
  */
-public class InstallRequest extends AbstractExtensionRequest
+public class PushLevelProgressEvent implements Event
 {
+    /**
+     * Number of sub steps.
+     */
+    private int steps;
 
+    /**
+     * Matches any {@link PushLevelProgressEvent}.
+     */
+    public PushLevelProgressEvent()
+    {
+
+    }
+
+    /**
+     * @param steps the number of sub steps.
+     */
+    public PushLevelProgressEvent(int steps)
+    {
+        this.steps = steps;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.event.Event#matches(java.lang.Object)
+     */
+    @Override
+    public boolean matches(Object arg0)
+    {
+        return true;
+    }
+
+    /**
+     * @return the number of sub steps
+     */
+    public int getSteps()
+    {
+        return steps;
+    }
 }

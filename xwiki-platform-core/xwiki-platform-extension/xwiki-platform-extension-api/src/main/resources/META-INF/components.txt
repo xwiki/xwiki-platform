@@ -6,6 +6,6 @@ org.xwiki.extension.repository.internal.DefaultExtensionRepositoryManager
 org.xwiki.extension.repository.internal.DefaultLocalExtensionRepository
 org.xwiki.extension.repository.internal.DefaultCoreExtensionRepository
 org.xwiki.extension.repository.internal.ConfigurationExtensionRepositorySource
-org.xwiki.extension.task.internal.DefaultTaskManager
-org.xwiki.extension.task.internal.InstallTask
-org.xwiki.extension.task.internal.UninstallTask
+org.xwiki.extension.job.internal.DefaultJobManager
+org.xwiki.extension.job.internal.InstallJob
+org.xwiki.extension.job.internal.UninstallJob

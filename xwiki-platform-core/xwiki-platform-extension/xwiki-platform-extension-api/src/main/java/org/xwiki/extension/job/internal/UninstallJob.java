@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.task.internal;
+package org.xwiki.extension.job.internal;
 
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -25,7 +25,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionId;
@@ -34,9 +33,8 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
+import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.repository.LocalExtensionRepository;
-import org.xwiki.extension.task.UninstallRequest;
-import org.xwiki.observation.ObservationManager;
 
 /**
  * Extension uninstallation related task.
@@ -46,9 +44,8 @@ import org.xwiki.observation.ObservationManager;
  * @version $Id$
  */
 @Component
-@Singleton
 @Named("uninstall")
-public class UninstallTask extends AbstractTask<UninstallRequest>
+public class UninstallJob extends AbstractJob<UninstallRequest>
 {
     /**
      * Used to manipulate local repository.
@@ -63,15 +60,9 @@ public class UninstallTask extends AbstractTask<UninstallRequest>
     private ExtensionHandlerManager extensionHandlerManager;
 
     /**
-     * Used to generated {@link ExtensionUninstalledEvent} event.
-     */
-    @Inject
-    private ObservationManager observationManager;
-
-    /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.extension.task.internal.AbstractTask#start()
+     * @see org.xwiki.extension.job.internal.AbstractJob#start()
      */
     @Override
     protected void start() throws Exception

@@ -34,9 +34,8 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Extension - Repository - Aether</description>
   <properties>
-    <aether.version>1.11</aether.version>
+    <aether.version>1.12</aether.version>
     <maven.version>3.0.3</maven.version>
-    <wagon.providers.version>1.0-beta-7</wagon.providers.version>
   </properties>
   <dependencies>
     <dependency>
@@ -44,26 +43,8 @@
       <artifactId>xwiki-platform-extension-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
-    <!-- Wagon -->
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-ftp</artifactId>
-      <version>${wagon.providers.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-ssh</artifactId>
-      <version>${wagon.providers.version}</version>
-    </dependency>
 
     <!-- Aether -->
-    <!-- Make sure using the proper version of plexus -->
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <version>2.0.4</version>
-    </dependency>
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-api</artifactId>
@@ -111,13 +92,13 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-aether-provider</artifactId>
       <version>${maven.version}</version>
     </dependency>
-    
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

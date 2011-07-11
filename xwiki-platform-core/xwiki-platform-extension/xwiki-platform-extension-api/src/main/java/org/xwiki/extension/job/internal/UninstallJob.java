@@ -21,6 +21,7 @@ package org.xwiki.extension.job.internal;
 
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -67,24 +68,34 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
     @Override
     protected void start() throws Exception
     {
-        for (ExtensionId extensionId : getRequest().getExtensions()) {
-            if (extensionId.getVersion() != null) {
-                LocalExtension localExtension = (LocalExtension) this.localExtensionRepository.resolve(extensionId);
+        List<ExtensionId> extensions = getRequest().getExtensions();
 
-                if (getRequest().hasNamespaces()) {
-                    uninstallExtension(localExtension, getRequest().getNamespaces());
-                } else if (localExtension.getNamespaces() != null) {
-                    uninstallExtension(localExtension, localExtension.getNamespaces());
+        notifyPushLevelProgress(extensions.size());
+
+        try {
+            for (ExtensionId extensionId : extensions) {
+                if (extensionId.getVersion() != null) {
+                    LocalExtension localExtension = (LocalExtension) this.localExtensionRepository.resolve(extensionId);
+
+                    if (getRequest().hasNamespaces()) {
+                        uninstallExtension(localExtension, getRequest().getNamespaces());
+                    } else if (localExtension.getNamespaces() != null) {
+                        uninstallExtension(localExtension, localExtension.getNamespaces());
+                    } else {
+                        uninstallExtension(localExtension, (String) null);
+                    }
                 } else {
-                    uninstallExtension(localExtension, (String) null);
+                    if (getRequest().hasNamespaces()) {
+                        uninstallExtension(extensionId.getId(), getRequest().getNamespaces());
+                    } else {
+                        uninstallExtension(extensionId.getId(), (String) null);
+                    }
                 }
-            } else {
-                if (getRequest().hasNamespaces()) {
-                    uninstallExtension(extensionId.getId(), getRequest().getNamespaces());
-                } else {
-                    uninstallExtension(extensionId.getId(), (String) null);
-                }
+
+                notifyStepPropress();
             }
+        } finally {
+            notifyPopLevelProgress();
         }
     }
 
@@ -95,8 +106,16 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
      */
     public void uninstallExtension(String extensionId, Collection<String> namespaces) throws UninstallException
     {
-        for (String namespace : namespaces) {
-            uninstallExtension(extensionId, namespace);
+        notifyPushLevelProgress(namespaces.size());
+
+        try {
+            for (String namespace : namespaces) {
+                uninstallExtension(extensionId, namespace);
+
+                notifyStepPropress();
+            }
+        } finally {
+            notifyPopLevelProgress();
         }
     }
 
@@ -134,6 +153,18 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
     }
 
     /**
+     * @param extensions the local extensions to uninstall
+     * @param namespace the namespaces from where to uninstall the extensions
+     * @throws UninstallException error when trying to uninstall provided extensions
+     */
+    public void uninstallExtensions(Collection<LocalExtension> extensions, String namespace) throws UninstallException
+    {
+        for (LocalExtension backardDependency : extensions) {
+            uninstallExtension(backardDependency, namespace);
+        }
+    }
+
+    /**
      * @param localExtension the extension to uninstall
      * @param namespace the namespace from where to uninstall the extension
      * @throws UninstallException error when trying to uninstall provided extension
@@ -145,34 +176,43 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
                 localExtension, namespace));
         }
 
-        // Uninstall backward dependencies
-        try {
-            if (namespace != null) {
-                for (LocalExtension backardDependency : this.localExtensionRepository.getBackwardDependencies(
-                    localExtension.getId().getId(), namespace)) {
-                    uninstallExtension(backardDependency, namespace);
-                }
-            } else {
-                for (Map.Entry<String, Collection<LocalExtension>> entry : this.localExtensionRepository
-                    .getBackwardDependencies(localExtension.getId()).entrySet()) {
-                    String dependenciesNamespace = entry.getKey();
-                    for (LocalExtension backardDependency : entry.getValue()) {
-                        uninstallExtension(backardDependency, dependenciesNamespace);
-                    }
-                }
-            }
-        } catch (ResolveException e) {
-            throw new UninstallException("Failed to resolve backward dependencies of extension [" + localExtension
-                + "]", e);
+        if (namespace != null) {
+            this.logger.info("Uninstalling extension [{0}] from namespace [{1}]", localExtension, namespace);
+        } else {
+            this.logger.info("Uninstalling extension [{0}]", localExtension);
         }
 
-        // Unload extension
-        this.extensionHandlerManager.uninstall(localExtension, namespace);
+        notifyPushLevelProgress(3);
 
-        // Remove from local repository if it's removed from all namespaces or if it was installed only on this
-        // namespace
-        if (namespace == null || localExtension.getNamespaces().size() == 1) {
+        try {
+            // Uninstall backward dependencies
+            try {
+                if (namespace != null) {
+                    uninstallExtensions(this.localExtensionRepository.getBackwardDependencies(localExtension.getId()
+                        .getId(), namespace), namespace);
+                } else {
+                    for (Map.Entry<String, Collection<LocalExtension>> entry : this.localExtensionRepository
+                        .getBackwardDependencies(localExtension.getId()).entrySet()) {
+                        uninstallExtensions(entry.getValue(), entry.getKey());
+                    }
+                }
+            } catch (ResolveException e) {
+                throw new UninstallException("Failed to resolve backward dependencies of extension [" + localExtension
+                    + "]", e);
+            }
+
+            notifyStepPropress();
+
+            // Unload extension
+            this.extensionHandlerManager.uninstall(localExtension, namespace);
+
+            notifyStepPropress();
+
+            // Remove from local repository if it's removed from all namespaces or if it was installed only on this
+            // namespace
             this.localExtensionRepository.uninstallExtension(localExtension, namespace);
+        } finally {
+            notifyPopLevelProgress();
         }
 
         this.observationManager.notify(new ExtensionUninstalledEvent(localExtension.getId()), localExtension, null);

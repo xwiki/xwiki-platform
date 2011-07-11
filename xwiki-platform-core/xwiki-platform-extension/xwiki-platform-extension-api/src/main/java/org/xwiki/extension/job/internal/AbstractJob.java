@@ -25,7 +25,10 @@ import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.job.Job;
 import org.xwiki.extension.job.JobStatus;
+import org.xwiki.extension.job.PopLevelProgressEvent;
+import org.xwiki.extension.job.PushLevelProgressEvent;
 import org.xwiki.extension.job.Request;
+import org.xwiki.extension.job.StepProgressEvent;
 import org.xwiki.observation.ObservationManager;
 
 /**
@@ -107,6 +110,32 @@ public abstract class AbstractJob<R extends Request> implements Job
     protected String getId()
     {
         return getClass().getName() + "_" + Integer.toHexString(hashCode());
+    }
+
+    /**
+     * Push new progression level.
+     * 
+     * @param steps number of steps in this new level
+     */
+    protected void notifyPushLevelProgress(int steps)
+    {
+        this.observationManager.notify(new PushLevelProgressEvent(steps), this);
+    }
+
+    /**
+     * Next step.
+     */
+    protected void notifyStepPropress()
+    {
+        this.observationManager.notify(new StepProgressEvent(), this);
+    }
+
+    /**
+     * Pop progression level.
+     */
+    protected void notifyPopLevelProgress()
+    {
+        this.observationManager.notify(new PopLevelProgressEvent(), this);
     }
 
     /**

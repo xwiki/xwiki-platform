@@ -34,7 +34,6 @@ import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.xwiki.extension.AbstractExtension;
-import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
@@ -64,24 +63,19 @@ public class AetherExtension extends AbstractExtension
         // setAuthor();
         setWebsite(this.mavenModel.getUrl());
 
-        putProperty(PKEY_GROUPID, this.mavenModel.getGroupId());
-        putProperty(PKEY_ARTIFACTID, this.mavenModel.getArtifactId());
-    }
-
-    public List<ExtensionDependency> getDependencies()
-    {
-        if (this.dependencies == null) {
-            for (Dependency mavenDependency : this.mavenModel.getDependencies()) {
-                if (!mavenDependency.isOptional()
-                    && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime") || mavenDependency
-                        .getScope().equals("provided"))) {
-                    addDependency(new AetherExtensionDependency(new ExtensionId(mavenDependency.getGroupId() + ":"
-                        + mavenDependency.getArtifactId(), mavenDependency.getVersion())));
-                }
+        // dependencies
+        for (Dependency mavenDependency : this.mavenModel.getDependencies()) {
+            if (!mavenDependency.isOptional()
+                && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime") || mavenDependency
+                    .getScope().equals("provided"))) {
+                addDependency(new AetherExtensionDependency(new ExtensionId(mavenDependency.getGroupId() + ":"
+                    + mavenDependency.getArtifactId(), mavenDependency.getVersion())));
             }
         }
-
-        return this.dependencies;
+        
+        // custom properties
+        putProperty(PKEY_GROUPID, this.mavenModel.getGroupId());
+        putProperty(PKEY_ARTIFACTID, this.mavenModel.getArtifactId());
     }
 
     // IDEA

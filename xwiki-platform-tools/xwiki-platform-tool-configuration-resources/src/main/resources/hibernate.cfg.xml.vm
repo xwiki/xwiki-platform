@@ -61,12 +61,11 @@
     
     <!-- MySQL configuration.
          Uncomment if you want to use MySQL and comment out other database configurations.
-         We need to set the sql_mode to a less strict value, see XWIKI-1945
-    <property name="connection.url">jdbc:mysql://localhost/xwiki?useServerPrepStmts=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;sessionVariables=sql_mode=''</property>
+    <property name="connection.url">jdbc:mysql://localhost/xwiki?useServerPrepStmts=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</property>
     <property name="connection.username">xwiki</property>
     <property name="connection.password">xwiki</property>
     <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-    <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+    <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
     <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
     <property name="connection.pool_size">2</property>
     <property name="statement_cache.size">2</property>

@@ -37,20 +37,27 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.WrappingCoreExtension;
-import org.xwiki.extension.WrappingExtension;
-import org.xwiki.extension.WrappingLocalExtension;
 import org.xwiki.extension.internal.VersionManager;
+import org.xwiki.extension.job.InstallRequest;
+import org.xwiki.extension.job.Job;
+import org.xwiki.extension.job.JobException;
+import org.xwiki.extension.job.JobManager;
+import org.xwiki.extension.job.JobStatus;
+import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
-import org.xwiki.extension.task.InstallRequest;
-import org.xwiki.extension.task.Task;
-import org.xwiki.extension.task.TaskException;
-import org.xwiki.extension.task.TaskManager;
-import org.xwiki.extension.task.UninstallRequest;
+import org.xwiki.extension.wrap.WrappingCoreExtension;
+import org.xwiki.extension.wrap.WrappingExtension;
+import org.xwiki.extension.wrap.WrappingJobStatus;
+import org.xwiki.extension.wrap.WrappingLocalExtension;
 import org.xwiki.script.service.ScriptService;
 
+/**
+ * Entry point of extension manager from scripts.
+ * 
+ * @version $Id$
+ */
 @Component
 @Named("extension")
 @Singleton
@@ -77,7 +84,7 @@ public class ExtensionManagerScriptService implements ScriptService
     private ExtensionRepositoryManager reporitoryManager;
 
     @Inject
-    private TaskManager taskManager;
+    private JobManager taskManager;
 
     @Inject
     private Execution execution;
@@ -202,23 +209,40 @@ public class ExtensionManagerScriptService implements ScriptService
         return this.versionManager;
     }
 
-    // Tasks
+    // Jobs
 
-    public Task getCurrentTask()
+    public Job getCurrentJob()
     {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
-            setError(new TaskException("Need programming right to get current task"));
+            setError(new JobException("Need programming right to get current task"));
 
             return null;
         }
 
-        return this.taskManager.getCurrentTask();
+        return this.taskManager.getCurrentJob();
     }
 
-    public Task install(String id, String version, String wiki)
+    public JobStatus getCurrentJobStatus()
+    {
+        Job job = this.taskManager.getCurrentJob();
+
+        JobStatus jobStatus;
+        if (job != null) {
+            jobStatus = job.getStatus();
+            if (!this.documentAccessBridge.hasProgrammingRights()) {
+                jobStatus = new WrappingJobStatus(jobStatus);
+            }
+        } else {
+            jobStatus = null;
+        }
+
+        return jobStatus;
+    }
+
+    public Job install(String id, String version, String wiki)
     {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
-            setError(new TaskException("Need programming right to install an extension"));
+            setError(new JobException("Need programming right to install an extension"));
 
             return null;
         }
@@ -231,10 +255,10 @@ public class ExtensionManagerScriptService implements ScriptService
             installRequest.addNamespace(wiki);
         }
 
-        Task task;
+        Job task;
         try {
             task = this.taskManager.install(installRequest);
-        } catch (TaskException e) {
+        } catch (JobException e) {
             setError(e);
 
             task = null;
@@ -243,10 +267,10 @@ public class ExtensionManagerScriptService implements ScriptService
         return task;
     }
 
-    public Task uninstall(String id, String version)
+    public Job uninstall(String id, String version)
     {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
-            setError(new TaskException("Need programming right to uninstall an extension"));
+            setError(new JobException("Need programming right to uninstall an extension"));
 
             return null;
         }
@@ -256,7 +280,7 @@ public class ExtensionManagerScriptService implements ScriptService
         UninstallRequest uninstallRequest = new UninstallRequest();
         uninstallRequest.addExtension(new ExtensionId(id, version));
 
-        Task task;
+        Job task;
         try {
             task = this.taskManager.uninstall(uninstallRequest);
         } catch (Exception e) {

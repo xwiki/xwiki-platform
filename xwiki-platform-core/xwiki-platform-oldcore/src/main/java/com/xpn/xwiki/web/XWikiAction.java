@@ -466,11 +466,13 @@ public abstract class XWikiAction extends Action
 
             if (redirects != null) {
                 for (BaseObject redir : redirects) {
-                    String p = redir.getStringValue("pattern");
-                    if (url.matches(p)) {
-                        String dest = redir.getStringValue("destination");
-                        response.sendRedirect(url.replaceAll(p, dest));
-                        return true;
+                    if (redir != null) {
+                        String p = redir.getStringValue("pattern");
+                        if (p != null && url.matches(p)) {
+                            String dest = redir.getStringValue("destination");
+                            response.sendRedirect(url.replaceAll(p, dest));
+                            return true;
+                        }
                     }
                 }
             }

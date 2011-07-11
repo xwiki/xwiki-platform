@@ -157,11 +157,16 @@ viewers.Tags = Class.create({
     });
   }
 });
+
+function init() {
+  return new viewers.Tags();
+}
+
+// When the document is loaded, trigger the Tags enhancements.
+(XWiki.domIsLoaded && init())
+|| document.observe("xwiki:dom:loaded", init);
+
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
 
-// Create the tags editing behavior on startup.
-document.observe('xwiki:dom:loaded', function() {
-    new XWiki.viewers.Tags();
-});

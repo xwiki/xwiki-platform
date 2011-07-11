@@ -53,6 +53,7 @@ public class DefaultRenderingCacheTest extends AbstractBridgedXWikiComponentTest
         super.setUp();
 
         this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        this.document.setOriginalDocument(this.document.clone());
 
         this.mockXWiki = mock(XWiki.class);
         getContext().setWiki((XWiki) this.mockXWiki.proxy());

@@ -27,15 +27,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.container.Container;
@@ -62,7 +60,7 @@ import org.xwiki.model.reference.DocumentReference;
  * @since 2.5M2
  */
 @Component
-@InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)
+@Singleton
 public class DefaultCSRFToken implements CSRFToken, Initializable
 {
     /** Length of the random string in bytes. */
@@ -78,15 +76,15 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     private SecureRandom random;
 
     /** Used to find out the current user name and the current document. */
-    @Requirement
+    @Inject
     private DocumentAccessBridge docBridge;
 
     /** Needed to access the current request. */
-    @Requirement
+    @Inject
     private Container container;
 
     /** CSRFToken component configuration. */
-    @Requirement
+    @Inject
     private CSRFTokenConfiguration configuration;
 
     /**
@@ -100,6 +98,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
      * 
      * {@inheritDoc}
      */
+    @Override
     public void initialize() throws InitializationException
     {
         this.tokens = new ConcurrentHashMap<String, String>();
@@ -118,6 +117,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getToken()
     {
         String key = getTokenKey();
@@ -144,6 +144,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     /**
      * {@inheritDoc}
      */
+    @Override
     public void clearToken()
     {
         this.tokens.remove(getTokenKey());
@@ -152,6 +153,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isTokenValid(String token)
     {
         if (!this.configuration.isEnabled()) {
@@ -169,6 +171,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getResubmissionURL()
     {
         // request URL is the one that performs the modification

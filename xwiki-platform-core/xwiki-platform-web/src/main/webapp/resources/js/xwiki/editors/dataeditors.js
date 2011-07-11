@@ -1,14 +1,7 @@
-// ======================================
-// Object and Class editor enhancements
-if (typeof(XWiki) == 'undefined') {
-  XWiki = new Object();
-}
-if (typeof(XWiki.editors) == 'undefined') {
-  XWiki.editors = new Object();
-}
-// ======================================
-//
-XWiki.editors.XDataEditors = Class.create({
+var XWiki = (function(XWiki) {
+// Start XWiki augmentation.
+var editors = XWiki.editors = XWiki.editors || {};
+editors.XDataEditors = Class.create({
   initialize : function() {
     this.classDocument = $$('meta[name=document]')[0].content;
     this.classDocumentName = $$('meta[name=page]')[0].content;
@@ -308,7 +301,7 @@ XWiki.editors.XDataEditors = Class.create({
     });
   },
   // ------------------------------------
-  // 
+  //
   makeDisableVisible : function(property) {
     property.down('.disabletool input').observe("click", function(event) {
       property.toggleClassName('disabled');
@@ -509,6 +502,14 @@ XWiki.editors.XDataEditors = Class.create({
   }
 });
 
-document.observe('xwiki:dom:loaded', function() {
-  new XWiki.editors.XDataEditors();
-});
+function init() {
+  return new editors.XDataEditors();
+}
+
+// When the document is loaded, create the Autosave control
+(XWiki.domIsLoaded && init())
+|| document.observe('xwiki:dom:loaded', init);
+
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));

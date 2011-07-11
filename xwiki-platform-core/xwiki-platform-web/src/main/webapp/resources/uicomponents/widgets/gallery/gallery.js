@@ -178,12 +178,18 @@ XWiki.Gallery = Class.create({
     this.indexDisplay.update((index + 1) + ' / ' + this.images.length);
   }
 });
+
+function init() {
+  $$('.gallery').each(function(gallery) {
+    new XWiki.Gallery(gallery);
+  });
+}
+
+// When the document is loaded, install galleries
+(XWiki.isInitialized && init())
+|| document.observe('xwiki:dom:loading', init);
+
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
 
-Element.observe(document, "dom:loaded", function() {
-  $$('.gallery').each(function(gallery) {
-    new XWiki.Gallery(gallery);
-  });
-});

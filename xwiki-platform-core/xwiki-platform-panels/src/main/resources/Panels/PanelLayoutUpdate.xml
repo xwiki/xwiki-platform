@@ -35,7 +35,7 @@
 ##
 ## Check to see if the current user has admin rights on the current preferences document.
 ##
-#if (!$xwiki.hasAccessLevel('admin', $xcontext.user, $prefsdocument) || !${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+#if (!$xwiki.hasAccessLevel('admin', $xcontext.user, $prefsdocument))
   {{html clean="false"}}
   #xwikimessageboxstart($msg.get('panelwizard.placemanager') $msg.get('panelwizard.notadmininplace', [$place]))
   #xwikimessageboxend()
@@ -64,7 +64,12 @@
   #if ($showRightPanels)
     #set ($discard = $prefsdoc.set('showRightPanels', $showRightPanels))
   #end
-  #set ($ok = $prefsdoc.save($msg.get('panelwizard.save.versionComment', true)))
+  #if (${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+    #set ($ok = $prefsdoc.save($msg.get('panelwizard.save.versionComment', true)))
+  #else
+    ## CSRF protection
+    $response.sendRedirect("$!{services.csrf.getResubmissionURL()}")
+  #end
   SUCCESS
 #else
 

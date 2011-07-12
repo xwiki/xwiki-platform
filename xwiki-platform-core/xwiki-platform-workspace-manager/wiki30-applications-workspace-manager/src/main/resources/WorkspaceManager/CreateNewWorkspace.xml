@@ -315,11 +315,17 @@ document.observe('xwiki:dom:loaded', function() {
   #set($temp = $wikidocument.set('owner', "${xcontext.mainWikiName}:${wikidocument.owner}"))
 #end
 #if ($wikidocument.server == '' &amp;&amp; "$!wikiname" != '')
-  #if ("$ALIASSUFFIX" != '')
-    #set($temp = $wikidocument.set('server', "${wikiname}.${ALIASSUFFIX}"))
+  #set ($alias = "${wikiname}")
+  #if ("$!ALIASSUFFIX" != '')
+    #set ($alias = "${alias}.${ALIASSUFFIX}")
   #else
-    #set($temp = $wikidocument.set('server', "${wikiname}"))
+    #set ($usePath = $xwiki.xWiki.Param('xwiki.virtual.usepath', '0'))
+    #if ($usePath == '0')
+      #set ($serverURL = $xcontext.getURLFactory().getServerURL($xcontext.context))
+      #set ($alias = "${alias}.$serverURL.host")
+    #end
   #end
+  #set($temp = $wikidocument.set('server', "${alias}"))
 #end
 ##
 #set($members = [])

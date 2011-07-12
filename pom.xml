@@ -41,7 +41,7 @@
     <rendering.version>${project.version}</rendering.version>
     <commons.version>${project.version}</commons.version>
     <!-- The previous stable version of this project, used to catch API breakages. -->
-    <clirr.previous.version>3.0</clirr.previous.version>
+    <clirr.previous.version>3.1</clirr.previous.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>

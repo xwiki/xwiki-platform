@@ -338,8 +338,8 @@
               <excludes>
                 <exclude>**/internal/**</exclude>
                 <exclude>**/test/**</exclude>
-                <!-- To be removed when we release 3.1 -->
-                <exclude>com/xpn/xwiki/pref/api/XWikiPrefService</exclude>
+                <!-- To be removed when we release 3.2 -->
+                <exclude>com/xpn/xwiki/plugin/lucene/IndexRebuilder</exclude>
               </excludes>
             </configuration>
           </plugin>

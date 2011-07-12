@@ -134,7 +134,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
             this.logger.warn("Failed to register channel [" + channelId + "] against the JMX Server", e);
         }
 
-        this.logger.info(MessageFormat.format("Channel [{0}] started", channelId));
+        this.logger.info("Channel [{}] started", channelId);
     }
 
     /**
@@ -162,7 +162,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
             this.logger.warn("Failed to unregister channel [" + channelId + "] from the JMX Server", e);
         }
 
-        this.logger.info(MessageFormat.format("Channel [{0}] stopped", channelId));
+        this.logger.info("Channel [{}] stopped", channelId);
     }
 
     /**
@@ -217,7 +217,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
         try {
             Container container = this.componentManager.lookup(Container.class);
             ApplicationContext applicationContext = container.getApplicationContext();
-           
+
             if (applicationContext != null) {
                 is = applicationContext.getResourceAsStream(path);
             }

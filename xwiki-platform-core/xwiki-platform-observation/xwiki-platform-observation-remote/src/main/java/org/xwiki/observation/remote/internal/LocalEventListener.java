@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.AllEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
@@ -116,12 +117,17 @@ public class LocalEventListener implements EventListener
     {
         if (this.remoteObservationManager == null) {
             try {
+                // Make sure to not receive events until RemoteObservationManager is ready
+                this.componentManager.lookup(ObservationManager.class).removeListener(getName());
                 this.remoteObservationManager = this.componentManager.lookup(RemoteObservationManager.class);
+                this.componentManager.lookup(ObservationManager.class).addListener(this);
+
+                this.remoteObservationManager.notify(new LocalEventData(event, source, data));
             } catch (ComponentLookupException e) {
                 this.logger.error("Failed to initialize the Remote Observation Manager", e);
             }
+        } else {
+            this.remoteObservationManager.notify(new LocalEventData(event, source, data));
         }
-
-        this.remoteObservationManager.notify(new LocalEventData(event, source, data));
     }
 }

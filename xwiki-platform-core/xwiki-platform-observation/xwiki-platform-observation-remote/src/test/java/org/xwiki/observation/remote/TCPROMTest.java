@@ -60,8 +60,8 @@ public class TCPROMTest extends AbstractROMTestCase
     @Test
     public void testSerializableEvent() throws InterruptedException
     {
-        final EventListener localListener = this.context.mock(EventListener.class, "listener1");
-        final EventListener remoteListener = this.context.mock(EventListener.class, "listener2");
+        final EventListener localListener = this.context.mock(EventListener.class, "local");
+        final EventListener remoteListener = this.context.mock(EventListener.class, "remote");
 
         final TestEvent event = new TestEvent();
 

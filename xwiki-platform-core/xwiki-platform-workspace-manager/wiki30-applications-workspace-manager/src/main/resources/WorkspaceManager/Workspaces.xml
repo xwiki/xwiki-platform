@@ -275,33 +275,35 @@ ul.xlist li.xitem div.xshowonhover img {
 ##
 ## List all the workspaces.
 ##
-$xwiki.ssx.use('WorkspaceManager.Workspaces')##
-#set($workspaceList = $xwiki.queryManager.xwql("select wikiServerDescriptor.server, wikiServerDescriptor.wikiprettyname from Document workspaceDescriptorDocument, Document wikiServerDescriptorDocument, workspaceDescriptorDocument.object(WorkspaceManager.WorkspaceClass) as workspaceDescriptor, wikiServerDescriptorDocument.object(XWiki.XWikiServerClass) as wikiServerDescriptor where workspaceDescriptor.name = wikiServerDescriptorDocument.fullName").execute())
-{{html wiki="true"}}
-&lt;ul class="xlist"&gt;
+$xwiki.ssx.use('WorkspaceManager.Workspaces')
+#set($workspaceDocumentsList = $xwiki.queryManager.xwql('select wikiServerDescriptorDocument.fullName from Document wikiServerDescriptorDocument, wikiServerDescriptorDocument.object(WorkspaceManager.WorkspaceClass) as workspaceDescriptor, wikiServerDescriptorDocument.object(XWiki.XWikiServerClass) as wikiServerDescriptor').execute())
+{{html wiki='true'}}
+&lt;ul class='xlist'&gt;
   ##
   ## List workspaces.
   ##
-  #foreach($workspace in $workspaceList)    
-      &lt;li id="spWorkspaceItem" class="xitem xunderline xhighlight workspace"&gt;
-        &lt;div class="xitemcontainer"&gt;
-          &lt;div class="spWorkspaceName"&gt;{{html}}&lt;a href="$services.workspaceManager.getWorkspace($workspace.get(0)).wikiDescriptor.homePageUrl"&gt;$workspace.get(1)&lt;/a&gt;{{/html}}&lt;/div&gt;  
-          &lt;div class="xspacer"&gt;&amp;nbsp;&lt;/div&gt;
+  #foreach($workspaceDocumentName in $workspaceDocumentsList)
+    #set ($workspaceWikiDocument = $xwiki.wikimanager.getWikiFromDocumentName($workspaceDocumentName))
+    #set ($workspaceWikiDescriptor = $workspaceWikiDocument.firstWikiAlias)
+      &lt;li id='spWorkspaceItem' class='xitem xunderline xhighlight workspace'&gt;
+        &lt;div class='xitemcontainer'&gt;
+          &lt;div class='spWorkspaceName'&gt;{{html}}&lt;a href="${workspaceWikiDescriptor.homePageUrl}"&gt;${workspaceWikiDescriptor.wikiPrettyName}&lt;/a&gt;{{/html}}&lt;/div&gt;  
+          &lt;div class='xspacer'&gt;&amp;nbsp;&lt;/div&gt;
         &lt;/div&gt;
-      &lt;/li&gt;    
+      &lt;/li&gt;
   #end
-## Space creation.
+## Workspace creation.
   ##
-  ## Only if the current user has admin rights and the current action is not inline. If it's inline, then there is already a form, and if we render the second, nested one, the DOM is messed up in IE.
-  #if($xwiki.hasAdminRights() &amp;&amp; "$!context.action" != "inline")
-    &lt;li id="spWorkspaceCreateItem" class="xitem workspace"&gt;
-      &lt;div class="xitemcontainer"&gt;
-        &lt;div id="spWorkspaceCreateLabel" class="spWorkspaceName"&gt;&lt;a href="{{html wiki="false"}}$xwiki.getURL('WorkspaceManager.CreateNewWorkspace', 'view'){{/html}}" &gt;$msg.get('workspacemanager.createworkspace')&lt;/a&gt;&lt;/div&gt;
-        &lt;div class="spacer"&gt;&amp;nbsp;&lt;/div&gt;        
+  ## Only if the current action is not inline. If it's inline, then there is already a form, and if we render the second, nested one, the DOM is messed up in IE.
+  #if(!$isGuest && "$!context.action" != 'inline')
+    &lt;li id='spWorkspaceCreateItem' class='xitem workspace'&gt;
+      &lt;div class='xitemcontainer'&gt;
+        #set ($createWorkspaceDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'CreateNewWorkspace'))
+        &lt;div id='spWorkspaceCreateLabel' class='spWorkspaceName'&gt;&lt;a href="$xwiki.getURL($createWorkspaceDocumentReference)"&gt;$msg.get('workspacemanager.createworkspace')&lt;/a&gt;&lt;/div&gt;
+        &lt;div class='spacer'&gt;&amp;nbsp;&lt;/div&gt;
       &lt;/div&gt;
     &lt;/li&gt;
   #end
-
 &lt;/ul&gt;
 {{/html}}
 {{/velocity}}</code>

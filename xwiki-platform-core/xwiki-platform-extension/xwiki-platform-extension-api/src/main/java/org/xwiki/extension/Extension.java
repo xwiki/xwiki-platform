@@ -44,7 +44,7 @@ public interface Extension
      * 
      * @return the extension ids also provided by this extension
      */
-    Collection<String> getVirtualIds();
+    Collection<String> getFeatures();
 
     /**
      * @return the type of the extension

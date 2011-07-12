@@ -56,7 +56,7 @@ import org.xwiki.script.service.ScriptService;
 /**
  * Entry point of extension manager from scripts.
  * 
- * @version $Id$
+ * @version $Id: 644153d4508f75937c97aa4cf90510b489ece05a $
  */
 @Component
 @Named("extension")

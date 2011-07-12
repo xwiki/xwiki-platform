@@ -41,11 +41,11 @@ public abstract class AbstractExtension implements Extension
      * @see #getId()
      */
     protected ExtensionId id;
-    
+
     /**
-     * @see #getVirtualIds()
+     * @see #getFeatures()
      */
-    protected Set<String> virtualIds = new HashSet<String>();
+    protected Set<String> features = new HashSet<String>();
 
     /**
      * @see #getType()
@@ -86,7 +86,7 @@ public abstract class AbstractExtension implements Extension
      * @see #getDependencies()
      */
     protected List<ExtensionDependency> dependencies;
-    
+
     /**
      * @param repository the repository where this extension comes from
      * @param id the extension identifier
@@ -139,17 +139,26 @@ public abstract class AbstractExtension implements Extension
         this.id = id;
     }
 
-    public Collection<String> getVirtualIds()
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#getFeatures()
+     */
+    public Collection<String> getFeatures()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return this.features;
     }
-    
-    protected void addVirtualId(String virtualId)
+
+    /**
+     * Add a new feature to the extension.
+     * 
+     * @param feature an author name
+     */
+    public void addFeature(String feature)
     {
-        
+        this.features.add(feature);
     }
-    
+
     /**
      * {@inheritDoc}
      * 

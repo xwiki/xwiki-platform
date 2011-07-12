@@ -123,7 +123,7 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
      */
     public Collection<String> getNamespaces()
     {
-        return namespaces;
+        return this.namespaces;
     }
 
     /**

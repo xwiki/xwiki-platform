@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
-import org.xwiki.extension.repository.internal.DefaultLocalExtensionRepository;
 import org.xwiki.extension.test.ConfigurableDefaultCoreExtensionRepository;
 import org.xwiki.extension.test.RepositoryUtil;
 import org.xwiki.test.AbstractComponentTestCase;
@@ -48,8 +47,7 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
 
         // lookup
 
-        this.localExtensionRepository =
-            (DefaultLocalExtensionRepository) getComponentManager().lookup(LocalExtensionRepository.class);
+        this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class);
     }
 
     @Override

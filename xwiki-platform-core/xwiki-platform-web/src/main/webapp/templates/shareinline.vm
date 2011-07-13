@@ -9,7 +9,7 @@
 ##  #if ("$!{xwiki.getXWikiPreference('admin_email')}" != '')
 ##    #set ($sender = "$sender <$!{xwiki.getXWikiPreference('admin_email')}>")
 ##  #else
-    #set ($sender = "$sender <noreply@$!{request.localName}>")
+    #set ($sender = "$!{escapetool.q($sender)} <noreply@$!{request.localName}>")
 ##  #end
 
   #set ($recipients = [])
@@ -23,6 +23,7 @@
         #if ($recipient.indexOf('@') > 0)
           #if ($recipient.indexOf('<') > 0)
             #set ($recipientName = $recipient.substring(0, $recipient.indexOf('<')).trim())
+            #set ($recipient = "$!{escapetool.q($recipientName)} <${recipient.substring($mathtool.add($recipient.indexOf('<'), 1), $recipient.indexOf('>'))}>")
           #else
             #set ($recipientName = $recipient.substring(0, $recipient.indexOf('@')).trim())
           #end
@@ -41,7 +42,7 @@
             #set ($discard = $successes.add($fullRecipientName))
           #end
         #elseif ("$!recipient" == '')
-          #set($discard = $errors.put($fullRecipientName, $msg.get('core.viewers.share.error.unknownEmail')))
+          #set ($discard = $errors.put($fullRecipientName, $msg.get('core.viewers.share.error.unknownEmail')))
         #end ## Non empty/handled recipient
       #end ## Non empty recipient
     #end ## Foreach recipient

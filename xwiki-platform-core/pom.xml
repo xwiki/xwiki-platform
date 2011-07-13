@@ -344,6 +344,7 @@
                 <exclude>org/xwiki/bridge/AttachmentNameSerializer</exclude>
                 <exclude>org/xwiki/bridge/DocumentNameFactory</exclude>
                 <exclude>org/xwiki/bridge/DocumentNameSerializer</exclude>
+                <exclude>com/xpn/xwiki/plugin/wikimanager/WikiManager</exclude>
               </excludes>
             </configuration>
           </plugin>

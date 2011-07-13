@@ -20,32 +20,25 @@
 
 package com.xpn.xwiki.plugin.wikimanager;
 
-import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.bridge.event.WikiCreateFailedEvent;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
-import org.xwiki.bridge.event.WikiCreateFailedEvent;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPluginApi;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument;
 import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
-import com.xpn.xwiki.plugin.packaging.DocumentInfo;
-import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServerClass;
@@ -63,12 +56,17 @@ public final class WikiManager
     /**
      * The logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(WikiManager.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(WikiManager.class);
 
     /**
      * The message tool to use to generate error or comments.
      */
     private XWikiPluginMessageTool messageTool;
+
+    /**
+     * Used to fill newly created wiki.
+     */
+    private WikiCopy wikiCopy;
 
     // ////////////////////////////////////////////////////////////////////////////
 
@@ -78,6 +76,7 @@ public final class WikiManager
     public WikiManager(XWikiPluginMessageTool messageTool)
     {
         this.messageTool = messageTool;
+        this.wikiCopy = new WikiCopy(messageTool);
     }
 
     /**
@@ -299,68 +298,6 @@ public final class WikiManager
     }
 
     /**
-     * Copy all documents from <code>sourceWiki</code> wiki to <code>targetWiki</code> wiki.
-     * <p>
-     * It also take care of ApplicationManager descriptors "documents to include" and "documents to link".
-     * </p>
-     * 
-     * @param sourceWiki the wiki from where to copy documents and get lists of "document to link" and "documents to
-     *            copy".
-     * @param targetWiki the wiki where to copy documents.
-     * @param comment the comment to use when saving documents.
-     * @param context the XWiki context.
-     * @throws XWikiException error when:
-     *             <ul>
-     *             <li>copying on of the source wiki to target wiki.</li>
-     *             <li>or getting documents to include.</li>
-     *             <li>or getting documents to link.</li>
-     *             </ul>
-     */
-    private void copyWiki(String sourceWiki, String targetWiki, String comment, XWikiContext context)
-        throws XWikiException
-    {
-        XWiki xwiki = context.getWiki();
-
-        // Copy all the wiki
-        xwiki.copyWiki(sourceWiki, targetWiki, null, context);
-
-        String database = context.getDatabase();
-        try {
-            context.setDatabase(targetWiki);
-
-            Collection<String>[] docsNames = getDocsNames(sourceWiki, context);
-
-            if (docsNames != null) {
-                Object[] includeFormatParams = new Object[] {sourceWiki, XObjectDocument.WIKI_SPACE_SEPARATOR, null};
-
-                // Replace documents contents to include
-                for (Object item : docsNames[0]) {
-                    String docFullName = (String) item;
-                    XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
-
-                    includeFormatParams[2] = docFullName;
-                    targetDoc.setContent(MessageFormat.format("#includeInContext(\"{0}{1}{2}\")", includeFormatParams));
-                    targetDoc.setSyntax(Syntax.XWIKI_1_0);
-                    xwiki.saveDocument(targetDoc, context);
-                }
-
-                // Replace documents contents to link
-                for (Object item : docsNames[1]) {
-                    String docFullName = (String) item;
-                    XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
-
-                    includeFormatParams[2] = docFullName;
-                    targetDoc.setContent(MessageFormat.format("#includeTopic(\"{0}{1}{2}\")", includeFormatParams));
-                    targetDoc.setSyntax(Syntax.XWIKI_1_0);
-                    xwiki.saveDocument(targetDoc, context);
-                }
-            }
-        } finally {
-            context.setDatabase(database);
-        }
-    }
-
-    /**
      * Create a new virtual wiki. The new wiki is initialized with provided xar package.
      * 
      * @param userWikiSuperDoc a wiki descriptor document from which the new wiki descriptor document will be created.
@@ -505,7 +442,7 @@ public final class WikiManager
 
             // Check owner
             if (getDocument(xwiki.getDatabase(), wikiSuperDocToSave.getOwner(), context).isNew()) {
-                LOG.warn(msg.get(WikiManagerMessageTool.ERROR_USERDOESNOTEXIST, wikiSuperDocToSave.getOwner()));
+                LOGGER.warn(msg.get(WikiManagerMessageTool.ERROR_USERDOESNOTEXIST, wikiSuperDocToSave.getOwner()));
                 wikiSuperDocToSave.setOwner(XWikiRightService.SUPERADMIN_USER);
             }
 
@@ -524,12 +461,12 @@ public final class WikiManager
 
                 // Copy template wiki into new wiki
                 if (templateWikiName != null) {
-                    copyWiki(templateWikiName, newWikiName, comment, context);
+                    this.wikiCopy.copyWiki(templateWikiName, newWikiName, comment, context);
                 }
 
                 // Import XAR package into new wiki
                 if (packageName != null) {
-                    importPackage(packageName, newWikiName, context);
+                    this.wikiCopy.importPackage(packageName, newWikiName, context);
                 }
 
                 // Return to root database
@@ -540,8 +477,8 @@ public final class WikiManager
                         context);
                 } else {
                     // Sending this event because we send WikiCreatingEvent
-                    Utils.getComponent(ObservationManager.class).notify(new WikiCreateFailedEvent(newWikiName), newWikiName,
-                        context);
+                    Utils.getComponent(ObservationManager.class).notify(new WikiCreateFailedEvent(newWikiName),
+                        newWikiName, context);
                 }
             }
 
@@ -584,8 +521,9 @@ public final class WikiManager
                 if (failOnExist) {
                     throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIALREADYEXISTS, msg.get(
                         WikiManagerMessageTool.ERROR_DESCRIPTORALREADYEXISTS, userWikiSuperDoc.getFullName()));
-                } else if (LOG.isWarnEnabled()) {
-                    LOG.warn(msg.get(WikiManagerMessageTool.LOG_DESCRIPTORALREADYEXISTS, userWikiSuperDoc.toString()));
+                } else if (LOGGER.isWarnEnabled()) {
+                    LOGGER
+                        .warn(msg.get(WikiManagerMessageTool.LOG_DESCRIPTORALREADYEXISTS, userWikiSuperDoc.toString()));
                 }
             }
 
@@ -631,7 +569,7 @@ public final class WikiManager
         try {
             xwiki.getStore().createWiki(targetWiki, context);
         } catch (Exception e) {
-            LOG.warn(msg.get(WikiManagerMessageTool.LOG_DATABASECREATIONEXCEPTION, targetWiki), e);
+            LOGGER.warn(msg.get(WikiManagerMessageTool.LOG_DATABASECREATIONEXCEPTION, targetWiki), e);
         }
 
         // Init database/schema
@@ -640,68 +578,6 @@ public final class WikiManager
         } catch (Exception e) {
             throw new WikiManagerException(WikiManagerException.ERROR_WM_UPDATEDATABASE, msg.get(
                 WikiManagerMessageTool.ERROR_UPDATEDATABASE, targetWiki), e);
-        }
-    }
-
-    /**
-     * Import XAR package into wiki.
-     * 
-     * @param packageName the name of the attached package file.
-     * @param targetWiki the name of the wiki where to install loaded {@link XWikiDocument} from XAR package.
-     * @param context the XWiki context.
-     * @throws XWikiException error when:
-     *             <ul>
-     *             <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in virtual mode.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_PACKAGEDOESNOTEXISTS}: attached package does not exists.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_PACKAGEIMPORT}: package loading failed.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database
-     *             failed.</li>
-     *             </ul>
-     */
-    public void importPackage(String packageName, String targetWiki, XWikiContext context) throws XWikiException
-    {
-        XWikiPluginMessageTool msg = getMessageTool(context);
-
-        XWiki xwiki = context.getWiki();
-
-        if (!xwiki.isVirtualMode()) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_XWIKINOTVIRTUAL,
-                msg.get(WikiManagerMessageTool.ERROR_XWIKINOTVIRTUAL));
-        }
-
-        // Prepare to import
-        XWikiDocument doc = context.getDoc();
-
-        XWikiAttachment packFile = doc.getAttachment(packageName);
-
-        if (packFile == null) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEDOESNOTEXISTS, msg.get(
-                WikiManagerMessageTool.ERROR_PACKAGEDOESNOTEXISTS, packageName));
-        }
-
-        // Get packager plugin
-        PackageAPI importer = ((PackageAPI) context.getWiki().getPluginApi("package", context));
-
-        String database = context.getDatabase();
-
-        try {
-            context.setDatabase(targetWiki);
-
-            // Import package
-            try {
-                importer.Import(packFile.getContent(context));
-            } catch (IOException e) {
-                throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEIMPORT, msg.get(
-                    WikiManagerMessageTool.ERROR_PACKAGEIMPORT, packageName), e);
-            }
-
-            // Install imported documents
-            if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE) {
-                throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEINSTALL, msg.get(
-                    WikiManagerMessageTool.ERROR_PACKAGEINSTALL, packageName));
-            }
-        } finally {
-            context.setDatabase(database);
         }
     }
 

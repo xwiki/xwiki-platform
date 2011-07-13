@@ -43,8 +43,12 @@
 #else
   #set ($wikiDocument = $workspace.wikiDocument)
   #set ($updateWorkspaceDocumentReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'UpdateWorkspaceCode'))
+  {{html clean='false'}}
+  &lt;form class='xform half' action="$xwiki.getURL($updateWorkspaceDocumentReference)" method='POST'&gt;
+  {{/html}}
+
+  ## Use a second html macro because wiki='true' in the first causes the action URL to be interpreted as wiki syntax and it's rendered as an &lt;a&gt; tag. We need an $escapetool.wiki(...) method to escape wiki syntax.
   {{html clean='false' wiki='true'}}
-  &lt;form class='xform half' action='$xwiki.getURL($updateWorkspaceDocumentReference)' method='post'&gt;
     &lt;dl&gt;
       &lt;dt&gt;
         &lt;label for='XWiki.XWikiServerClass_0_wikiprettyname'&gt;$msg.get('workspacemanager.prop.wikiprettyname.label')&lt;/label&gt;
@@ -75,7 +79,12 @@
       &lt;input class="button" type="submit" name='save' value="$msg.get('admin.save')"/&gt;
     &lt;/span&gt;
     &lt;input type='hidden' name='workspaceId' value="$workspaceId"/&gt;
-    &lt;input type='hidden' name='xredirect' value="$xwiki.getURL($currentDoc, $xcontext.action, ${request.queryString})" /&gt;
+  {{/html}}
+
+  ## Again, because of the URL in the xredirect field, we need to have it in a html macro with wiki='false' (default).
+  {{html clean='false'}}
+    #set ($currentDocument = $xwiki.getDocument($currentDoc))
+    &lt;input type='hidden' name='xredirect' value="$currentDocument.getExternalURL($xcontext.action, ${request.queryString})" /&gt;
   &lt;/form&gt;
   {{/html}}
 #end

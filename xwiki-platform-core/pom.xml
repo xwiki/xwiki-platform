@@ -340,6 +340,10 @@
                 <exclude>**/test/**</exclude>
                 <!-- To be removed when we release 3.2 -->
                 <exclude>com/xpn/xwiki/plugin/lucene/IndexRebuilder</exclude>
+                <exclude>org/xwiki/bridge/AttachmentNameFactory</exclude>
+                <exclude>org/xwiki/bridge/AttachmentNameSerializer</exclude>
+                <exclude>org/xwiki/bridge/DocumentNameFactory</exclude>
+                <exclude>org/xwiki/bridge/DocumentNameSerializer</exclude>
               </excludes>
             </configuration>
           </plugin>

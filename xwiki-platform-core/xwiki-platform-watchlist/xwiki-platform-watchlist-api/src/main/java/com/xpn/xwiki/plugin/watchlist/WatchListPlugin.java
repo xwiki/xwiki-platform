@@ -19,15 +19,15 @@
  */
 package com.xpn.xwiki.plugin.watchlist;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.observation.ObservationManager;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.web.Utils;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xwiki.observation.ObservationManager;
 
 /**
  * Plugin that offers WatchList features to XWiki. These feature allow users to build lists of pages and spaces they
@@ -41,8 +41,8 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     /**
      * Plugin name.
      */
-    public static final String ID = "watchlist";   
-    
+    public static final String ID = "watchlist";
+
     /**
      * Prefix used in ApplicationResources for this plugin.
      */
@@ -57,27 +57,32 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
      * Default parent to use for class pages.
      */
     public static final String DEFAULT_CLASS_PARENT = "XWiki.XWikiClasses";
-    
+
     /**
-     * Logger.
+     * Logger to log.
      */
-    private static final Log LOG = LogFactory.getLog(WatchListPlugin.class);
-        
+    private static final Logger LOGGER = LoggerFactory.getLogger(WatchListPlugin.class);
+
     /**
      * Job manager instance.
      */
     private final WatchListJobManager jobManager = new WatchListJobManager();
-    
-    /** 
+
+    /**
      * Store instance.
      */
     private WatchListStore store = new WatchListStore();
-    
+
+    /**
+     * Auto watch listener.
+     */
+    private AutomaticWatchModeListener autoWatch = new AutomaticWatchModeListener(store);
+
     /**
      * Notifier instance.
      */
     private WatchListNotifier notifier = new WatchListNotifier();
-    
+
     /**
      * Feed manager instance.
      */
@@ -87,7 +92,6 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
      * @param name the plugin name
      * @param className the plugin classname (used in logs for example)
      * @param context the XWiki Context
-     *
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
     public WatchListPlugin(String name, String className, XWikiContext context)
@@ -104,7 +108,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     {
         return ID;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -112,20 +116,20 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
      */
     public void init(XWikiContext context)
     {
-        super.init(context);               
-        
+        super.init(context);
+
         try {
-            jobManager.init(context);
-            store.init(context);
+            this.jobManager.init(context);
+            this.store.init(context);
 
             // Listen to Events.
             ObservationManager observationManager = Utils.getComponent(ObservationManager.class);
-            if (observationManager.getListener(store.getName()) == null) {
-                observationManager.addListener(store);
+            if (observationManager.getListener(this.store.getName()) == null) {
+                observationManager.addListener(this.store);
+                observationManager.addListener(this.autoWatch);
             }
         } catch (XWikiException e) {
-            LOG.error("init", e);
-            e.printStackTrace();
+            LOGGER.error("init", e);
         }
     }
 
@@ -137,11 +141,10 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     public void virtualInit(XWikiContext context)
     {
         super.virtualInit(context);
-        try {            
-            store.virtualInit(context);
+        try {
+            this.store.virtualInit(context);
         } catch (XWikiException e) {
-            LOG.error("virtualInit", e);
-            e.printStackTrace();
+            LOGGER.error("virtualInit", e);
         }
     }
 
@@ -154,13 +157,13 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     {
         return new WatchListPluginApi((WatchListPlugin) plugin, context);
     }
-    
+
     /**
      * @return the job manager instance.
      */
     public WatchListJobManager getJobManager()
     {
-        return jobManager;
+        return this.jobManager;
     }
 
     /**
@@ -168,22 +171,22 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
      */
     public WatchListStore getStore()
     {
-        return store;
+        return this.store;
     }
-    
+
     /**
      * @return the notifier instance.
-     */    
+     */
     public WatchListNotifier getNotifier()
     {
-        return notifier;
+        return this.notifier;
     }
-    
+
     /**
      * @return the feed manager instance.
-     */    
+     */
     public WatchListEventFeedManager getFeedManager()
     {
-        return feedManager;
+        return this.feedManager;
     }
 }

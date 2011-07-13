@@ -60,6 +60,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
+import com.xpn.xwiki.internal.event.XARImportingEvent;
 import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
@@ -369,7 +370,7 @@ public class Package
         return "";
     }
 
-    /**
+/**
      * Load this package in memory from a byte array. It may be installed later using {@link #install(XWikiContext)}.
      * Your should prefer {@link #Import(InputStream, XWikiContext) which may avoid loading the package twice in memory.
      *
@@ -442,8 +443,7 @@ public class Package
             }
             // Make sure a manifest was included in the package...
             if (description == null) {
-                throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN,
-                    "Could not find the package definition");
+                throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN, "Could not find the package definition");
             }
             /*
              * Loop 2: Cycle through the list of documents and if they are in the manifest then add them, otherwise log
@@ -581,29 +581,37 @@ public class Package
         // We test it once for the whole import in case one of the document break user during the import process.
         boolean backup = this.backupPack && isFarmAdmin(context);
 
-        // Start by installing all documents having a class definition so that their
-        // definitions are available when installing documents using them.
-        for (DocumentInfo classFile : this.classFiles) {
-            if (installDocument(classFile, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
-                status = DocumentInfo.INSTALL_ERROR;
-            }
-        }
+        // Notify all the listeners about import
+        ObservationManager om = Utils.getComponent(ObservationManager.class);
 
-        // Install the remaining documents (without class definitions).
-        for (DocumentInfo docInfo : this.files) {
-            if (!this.classFiles.contains(docInfo)) {
-                if (installDocument(docInfo, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
+        // FIXME: should be able to pass some sort of source here, the name of the attachment or the list of
+        // imported documents. But for the moment it's fine
+        om.notify(new XARImportingEvent(), null, context);
+
+        try {
+            // Start by installing all documents having a class definition so that their
+            // definitions are available when installing documents using them.
+            for (DocumentInfo classFile : this.classFiles) {
+                if (installDocument(classFile, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
                     status = DocumentInfo.INSTALL_ERROR;
                 }
             }
-        }
-        setStatus(status, context);
 
-        // Notify all the listeners about the just done import
-        ObservationManager om = Utils.getComponent(ObservationManager.class);
-        // FIXME: should be able to pass some sort of source here, the name of the attachment or the list of
-        // imported documents. But for the moment it's fine
-        om.notify(new XARImportedEvent(), null, context);
+            // Install the remaining documents (without class definitions).
+            for (DocumentInfo docInfo : this.files) {
+                if (!this.classFiles.contains(docInfo)) {
+                    if (installDocument(docInfo, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
+                        status = DocumentInfo.INSTALL_ERROR;
+                    }
+                }
+            }
+            setStatus(status, context);
+
+        } finally {
+            // FIXME: should be able to pass some sort of source here, the name of the attachment or the list of
+            // imported documents. But for the moment it's fine
+            om.notify(new XARImportedEvent(), null, context);
+        }
 
         return status;
     }
@@ -740,8 +748,8 @@ public class Package
                 if ((this.withVersions && packageHasHistory) || conserveExistingHistory) {
                     // we need to force the saving the document archive.
                     if (doc.getDoc().getDocumentArchive() != null) {
-                        context.getWiki().getVersioningStore().saveXWikiDocArchive(
-                            doc.getDoc().getDocumentArchive(context), true, context);
+                        context.getWiki().getVersioningStore()
+                            .saveXWikiDocArchive(doc.getDoc().getDocumentArchive(context), true, context);
                     }
                 }
 
@@ -897,7 +905,7 @@ public class Package
 
     /**
      * Write the package.xml file to an {@link XMLWriter}.
-     *
+     * 
      * @param wr the writer to write to
      * @throws IOException when an error occurs during streaming operation
      * @since 2.3M2

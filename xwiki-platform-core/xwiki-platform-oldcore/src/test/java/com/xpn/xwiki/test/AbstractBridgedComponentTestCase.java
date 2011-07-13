@@ -19,12 +19,8 @@
  */
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.CoreConfiguration;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.util.XWikiStubContextProvider;
-import com.xpn.xwiki.web.Utils;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.jmock.api.Imposteriser;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
 import org.junit.Before;
@@ -33,6 +29,11 @@ import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.AbstractComponentTestCase;
+
+import com.xpn.xwiki.CoreConfiguration;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.util.XWikiStubContextProvider;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Same as {@link com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase} but for JUnit 4.x and JMock 2.x.
@@ -44,13 +45,16 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
 {
     private XWikiContext context;
 
-    private Mockery mockery = new Mockery()
+    protected AbstractBridgedComponentTestCase()
     {
-        {
-            // Used to be able to mock class instances (and not only interfaces).
-            setImposteriser(ClassImposteriser.INSTANCE);
-        }
-    };
+        // We often need to mock com.xpn.xwiki.XWiki class
+        this(ClassImposteriser.INSTANCE);
+    }
+
+    protected AbstractBridgedComponentTestCase(Imposteriser imposteriser)
+    {
+        getMockery().setImposteriser(imposteriser);
+    }
 
     @Before
     public void setUp() throws Exception
@@ -79,7 +83,7 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
         c.setApplicationContext(new TestApplicationContext());
 
         final CoreConfiguration mockCoreConfiguration = registerMockComponent(CoreConfiguration.class);
-        this.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockCoreConfiguration).getDefaultDocumentSyntax(); will(returnValue(Syntax.XWIKI_1_0));
         }});
     }
@@ -94,10 +98,5 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
     public XWikiContext getContext()
     {
         return this.context;
-    }
-
-    public Mockery getMockery()
-    {
-        return this.mockery;
     }
 }

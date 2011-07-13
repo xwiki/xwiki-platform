@@ -17,24 +17,53 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.event;
+package org.xwiki.bridge.event;
 
-import org.xwiki.observation.event.AbstractFilterableEvent;
-import org.xwiki.observation.event.EndEvent;
+import org.xwiki.observation.event.BeginEvent;
+import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * Event to notify of the finished import of a XAR package.
- * <p>
- * TODO: this event should take the name of the imported xar as a parameter, and listeners should be able to match on
- * it. For the moment, I cannot figure out how to get the name of the imported xar from the Package plugin.
+ * An event triggered after a wiki is created.
  * 
  * @version $Id$
+ * @since 3.2M1
  */
-public class XARImportedEvent extends AbstractFilterableEvent implements EndEvent
+public class WikiCreatingEvent extends AbstractWikiEvent implements BeginEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
      * changes.
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor initializing the event filter with an
+     * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
+     * other document delete event.
+     */
+    public WikiCreatingEvent()
+    {
+
+    }
+
+    /**
+     * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
+     * meaning that this event will match only events affecting the same wiki.
+     * 
+     * @param wikiId the wiki identifier
+     */
+    public WikiCreatingEvent(String wikiId)
+    {
+        super(wikiId);
+    }
+
+    /**
+     * Constructor using a custom {@link EventFilter}.
+     * 
+     * @param eventFilter the filter to use for matching events
+     */
+    public WikiCreatingEvent(EventFilter eventFilter)
+    {
+        super(eventFilter);
+    }
 }

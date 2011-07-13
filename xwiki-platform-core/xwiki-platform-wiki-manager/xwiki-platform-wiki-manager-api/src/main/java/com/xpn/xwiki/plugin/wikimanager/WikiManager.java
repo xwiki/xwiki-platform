@@ -29,6 +29,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.event.WikiCreatedEvent;
+import org.xwiki.bridge.event.WikiCreatingEvent;
+import org.xwiki.bridge.event.WikiCreateFailedEvent;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -507,24 +509,41 @@ public final class WikiManager
                 wikiSuperDocToSave.setOwner(XWikiRightService.SUPERADMIN_USER);
             }
 
-            // Create wiki database/schema
-            createWikiDatabase(newWikiName, context, templateWikiName == null);
+            Utils.getComponent(ObservationManager.class).notify(new WikiCreatingEvent(newWikiName), newWikiName,
+                context);
 
-            // Save new wiki descriptor document.
-            wikiSuperDocToSave.save(comment);
+            boolean sucess = false;
+            try {
+                // Create wiki database/schema
+                createWikiDatabase(newWikiName, context, templateWikiName == null);
 
-            // Copy template wiki into new wiki
-            if (templateWikiName != null) {
-                copyWiki(templateWikiName, newWikiName, comment, context);
+                // Save new wiki descriptor document.
+                wikiSuperDocToSave.save(comment);
+
+                sucess = true;
+
+                // Copy template wiki into new wiki
+                if (templateWikiName != null) {
+                    copyWiki(templateWikiName, newWikiName, comment, context);
+                }
+
+                // Import XAR package into new wiki
+                if (packageName != null) {
+                    importPackage(packageName, newWikiName, context);
+                }
+
+                // Return to root database
+                context.setDatabase(context.getMainXWiki());
+            } finally {
+                if (sucess) {
+                    Utils.getComponent(ObservationManager.class).notify(new WikiCreatedEvent(newWikiName), newWikiName,
+                        context);
+                } else {
+                    // Sending this event because we send WikiCreatingEvent
+                    Utils.getComponent(ObservationManager.class).notify(new WikiCreateFailedEvent(newWikiName), newWikiName,
+                        context);
+                }
             }
-
-            // Import XAR package into new wiki
-            if (packageName != null) {
-                importPackage(packageName, newWikiName, context);
-            }
-
-            // Return to root database
-            context.setDatabase(context.getMainXWiki());
 
             return wikiSuperDocToSave;
         } finally {
@@ -622,8 +641,6 @@ public final class WikiManager
             throw new WikiManagerException(WikiManagerException.ERROR_WM_UPDATEDATABASE, msg.get(
                 WikiManagerMessageTool.ERROR_UPDATEDATABASE, targetWiki), e);
         }
-
-        Utils.getComponent(ObservationManager.class).notify(new WikiCreatedEvent(targetWiki), targetWiki, context);
     }
 
     /**

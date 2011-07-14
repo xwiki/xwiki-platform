@@ -56,6 +56,7 @@
  *#
 #macro(getTitleField $props)
   #set($foundStringProperty = false)
+  #set ($foundAlternativeProperty = false)
   ## As a backup, use the first field of the class; will be overwritten later by better values
   #set ($titleField = false)
   #foreach ($prop in $props)
@@ -64,11 +65,14 @@
       #set ($titleField = $prop.name)
       #break
     ## String properties have precedence over other types
-    #elseif ($prop.type == 'StringClass' && !$foundStringProperty)
-      #set ($titleField = $prop.name)
-      #set ($foundStringProperty = true)
-    #elseif ($prop.type != 'TextAreaClass')
-      #set ($titleField = $prop.name)
+    #elseif (!$foundStringProperty)
+      #if ($prop.type == 'StringClass')
+        #set ($titleField = $prop.name)
+        #set ($foundStringProperty = true)
+      #elseif ($prop.type != 'TextAreaClass' && !$foundAlternativeProperty)
+        #set ($titleField = $prop.name)
+        #set ($foundAlternativeProperty = true)
+      #end
     #end
   #end
 #end

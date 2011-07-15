@@ -559,7 +559,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayPublishButton $entryDoc $entryObj)
   #isPublished($entryObj $isPublished)
   #if(!$isPublished &amp;&amp; $entryDoc.creator == $xcontext.user &amp;&amp; $xwiki.hasAccessLevel('edit', $xcontext.user, $entryDoc.fullName))
-    &lt;a href="$blogPublisher.getURL('view', "entryName=${escapetool.url($entryDoc.fullName)}&amp;amp;xredirect=${escapetool.url($thisURL)}")" title="${escapetool.xml($msg.get('xe.blog.code.notpublished'))}"&gt;#toolImage('page_white_world' 'publish ')&lt;/a&gt;##
+    &lt;a href="$blogPublisher.getURL('view', "entryName=${escapetool.url($entryDoc.fullName)}&amp;amp;xredirect=${escapetool.url($thisURL)}&amp;amp;form_token=$!{services.csrf.getToken()}")" title="${escapetool.xml($msg.get('xe.blog.code.notpublished'))}"&gt;#toolImage('page_white_world' 'publish ')&lt;/a&gt;##
   #end
 #end
 ##

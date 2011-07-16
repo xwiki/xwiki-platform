@@ -48,5 +48,9 @@
   #set($origdoc = $xwiki.getDocument($tdoc, $rev1))
   #set($newdoc = $xwiki.getDocument($tdoc, $rev2))
 #end
+#if ($request.queryString.indexOf("rev1=${rev1}") < 0 && $request.queryString.indexOf("rev2=${rev2}") < 0)
+  $response.sendRedirect($doc.getURL('view', "viewer=changes&rev1=${rev1}&rev2=${rev2}"))
+  #stop
+#end
 #template('changesdoc.vm')
 </div>

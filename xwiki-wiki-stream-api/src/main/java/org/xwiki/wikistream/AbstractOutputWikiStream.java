@@ -19,8 +19,8 @@
  */
 package org.xwiki.wikistream;
 
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
+import javax.inject.Inject;
+
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.properties.BeanManager;
@@ -29,13 +29,13 @@ import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 /**
  * @version $Id$
  */
-public abstract class AbstractOutputWikiStream<P> extends AbstractLogEnabled implements WikiStream<P>, Initializable
+public abstract class AbstractOutputWikiStream<P> implements OutputWikiStream<P>, Initializable
 {
 
     /**
      * The {@link BeanManager} component.
      */
-    @Requirement
+    @Inject
     protected BeanManager beanManager;
 
     private String name;

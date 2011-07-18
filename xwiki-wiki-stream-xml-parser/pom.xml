@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<project
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+  xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>xwiki-wiki-stream</artifactId>
+    <groupId>org.xwiki.platform</groupId>
+    <version>3.2-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-wiki-stream-xml-parser</artifactId>
+  <name>Wiki stream xml parser</name>
+  <packaging>jar</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-properties</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>dom4j</groupId>
+      <artifactId>dom4j-core</artifactId>
+      <version>1.4-dev-8</version>
+    </dependency>
+  </dependencies>
+</project>

@@ -29,7 +29,7 @@ import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 /**
  * @version $Id$
  */
-public abstract class AbstractInputWikiStream<P> implements WikiStream<P>, Initializable
+public abstract class AbstractInputWikiStream<P> implements InputWikiStream<P>, Initializable
 {
 
     /**

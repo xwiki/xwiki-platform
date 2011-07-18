@@ -660,8 +660,7 @@ $fn
 <div class="xwikipanelcontents">
 #else
 (% class="panel expanded $specialClassAttribute" %)(((
-(% class="xwikipaneltitle" %)
-= $title =
+{{html}}<h1 class="xwikipaneltitle">$title</h1>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end
 #end
@@ -679,8 +678,7 @@ $fn
 <div class="xwikipanelcontents">
 #else
 (% class="panel expanded $specialClassAttribute" %)(((
-(% class="xwikipaneltitle hidden" %)
-= $title =
+{{html}}<h1 class="xwikipaneltitle hidden">$title</h1>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end
 #end
@@ -698,8 +696,7 @@ $fn
 <div class="xwikipanelcontents">
 #else
 (% class="large panel expanded $!specialClassAttribute" %)(((
-(% class="xwikipaneltitle" %)
-= $title =
+{{html}}<h1 class="xwikipaneltitle">$title</h1>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end
 #end

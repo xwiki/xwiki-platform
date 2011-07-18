@@ -24,13 +24,13 @@ import java.net.URL;
 import java.util.Collections;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
@@ -52,6 +52,7 @@ import org.xwiki.url.XWikiURL;
 import org.xwiki.url.XWikiURLFactory;
 
 @Component
+@Singleton
 public class DefaultServletContainerInitializer implements ServletContainerInitializer
 {
      // Implementation note: It's important that we don't use @Requirement annotations here
@@ -61,16 +62,16 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
      // (i.e. initializeApplicationContext() needs to have been called) before they are 
      // looked up (and thus initialized).
 
-    @Requirement
+    @Inject
     private ApplicationContextListenerManager applicationContextListenerManager;
 
-    @Requirement
+    @Inject
     private Container container;
 
-    @Requirement
+    @Inject
     private Execution execution;
 
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**

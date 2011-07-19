@@ -35,6 +35,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Makes the WorkspaceManager API available to scripting.
@@ -171,15 +172,19 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
 
     /**
      * @param userName a wiki name prefixed or un-prefixed user name.
-     * @return always the a wiki name prefixed user name.
+     * @return always the a wiki name prefixed user name or {@link XWikiRightService#GUEST_USER_FULLNAME} if the guest user name was given. 
      */
     private String getPrefixedUserName(String userName)
     {
         XWikiContext deprecatedContext = getXWikiContext();
 
+        if (XWikiRightService.GUEST_USER_FULLNAME.equals(userName)) {
+            return userName;
+        }
+        
         String result = userName;
-        if (!result.startsWith(String.format("%s:", deprecatedContext.getMainXWiki()))) {
-            result = String.format("%s:%s", deprecatedContext.getMainXWiki(), result);
+        if (!result.startsWith(String.format("%s:", deprecatedContext.getMainXWiki())) && !result.startsWith(String.format("%s:", deprecatedContext.getDatabase()))) {
+            result = String.format("%s:%s", deprecatedContext.getDatabase(), result);
         }
 
         return result;

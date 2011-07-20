@@ -11,6 +11,10 @@ ul.xlist li.showAllResuts {
   padding:0;
 }
 
+ul.xlist li.showAllResuts.loading {
+  background-position:6px center;
+}
+
 ul.xlist li.showAllResuts div.xitemcontainer {
   margin-left:0;
   padding-left:10px;

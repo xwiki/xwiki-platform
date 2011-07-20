@@ -117,7 +117,7 @@
 #else
   #set($wikiDescriptor = $workspace.wikiDescriptor)
   *Name*\\
-  $wikiDescriptor.getValue('wikiprettyname')\\
+  $wikiDescriptor.wikiPrettyName\\
   #set ($workspaceDescription = $wikiDescriptor.description)
   #if ("$!workspaceDescription" != '')
     *Description*\\
@@ -135,7 +135,7 @@
     #set ($hasJoin = ("$!currentUserGroupObject" == ''))
     #if ($hasJoin)
       #set ($joinPageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'JoinWorkspaceCode'))
-      #set ($joinUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiprettyname}"))
+      #set ($joinUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiPrettyName}"))
       #set ($membershipType = $wikiDescriptor.getObject('WorkspaceManager.WorkspaceClass').getProperty('membershipType').getValue())
       #if ($membershipType != 'invite')
         &lt;span class='buttonwrapper'&gt;&lt;a href="$joinUrl" class='button'&gt;Join Workspace&lt;a/&gt;&lt;/span&gt;
@@ -144,7 +144,7 @@
       #end
     #elseif (!$hasOwner)
       #set ($leavePageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'LeaveWorkspaceCode'))
-      #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiprettyname}"))
+      #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiPrettyName}"))
       &lt;span class='buttonwrapper'&gt;&lt;a href="$leaveUrl" class='button'&gt;Leave Workspace&lt;a/&gt;&lt;/span&gt;
     #else
       You are the owner.
@@ -156,11 +156,13 @@
   #set ($workspaceGroupMemberObjects = $workspaceGroupDocument.getObjects('XWiki.XWikiGroups'))
   #foreach($workspaceGroupMemberObject in $workspaceGroupMemberObjects)
     #set ($user = $workspaceGroupDocument.getValue('member', $workspaceGroupMemberObject))
-    #if ($user != 'XWiki.XWikiGuest')
-      &lt;a href="$xwiki.getURL($user)"&gt;#smallUserAvatar("$user")&lt;/a&gt;
-    #else
-      #smallUserAvatar("$user")
-    #end  
+    #if ("$!user" != '')
+      #if ("$!user" != 'XWiki.XWikiGuest')
+        &lt;a href="$xwiki.getURL($user)"&gt;#smallUserAvatar("$user")&lt;/a&gt;
+      #else
+        #smallUserAvatar("$user")
+      #end  
+    #end
   #end
 #end
 #panelfooter()</content>

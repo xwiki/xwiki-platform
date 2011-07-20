@@ -281,6 +281,10 @@ var XWiki = (function(XWiki){
    */
   doAjaxRequests: function (requestId)
   {
+    if (this.fld.value.length < this.options.minchars) {
+      return;
+    }
+    
     for (var i=0;i<this.sources.length;i++) {
       var source = this.sources[i];
       

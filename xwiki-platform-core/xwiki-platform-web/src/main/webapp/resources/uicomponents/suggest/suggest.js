@@ -505,16 +505,14 @@ var XWiki = (function(XWiki){
 
     this.killTimeout();
 
-    // if no results, and shownoresults is false, do nothing
-    if (arr.length == 0 && !this.options.shownoresults)
-      return false;
-
     // create holding div
     //
     if (this.sources.length > 1) {
       var div = this.resultContainer.down(".results" + source.id);
-      div.down('.sourceContent').removeClassName('loading');
-      this.resultContainer.down(".results" + source.id).removeClassName("hidden loading");
+      if (arr.length > 0 || this.options.shownoresults) {
+        div.down('.sourceContent').removeClassName('loading');
+        this.resultContainer.down(".results" + source.id).removeClassName("hidden loading");
+      }
       
       // If we are in mode "unified loader" (showing one loading indicator for all requests and not one per request)
       // and there aren't any source still loading, we remove the unified loading status.
@@ -524,6 +522,11 @@ var XWiki = (function(XWiki){
     }
     else {
       var div = this.resultContainer;
+    }
+    
+    // if no results, and shownoresults is false, go no further
+    if (arr.length == 0 && !this.options.shownoresults) {
+      return false;
     }
     
     // Ensure any previous list of results for this source gets removed

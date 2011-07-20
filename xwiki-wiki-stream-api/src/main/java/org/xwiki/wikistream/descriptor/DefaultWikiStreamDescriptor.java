@@ -24,18 +24,14 @@ import java.util.Map;
 
 import org.xwiki.properties.BeanDescriptor;
 import org.xwiki.properties.PropertyDescriptor;
-import org.xwiki.rendering.macro.descriptor.DefaultParameterDescriptor;
-import org.xwiki.wikistream.type.WikiStreamType;
 
 /**
  * @version $Id$
  */
-public class AbstractWikiStreamDescriptor implements WikiStreamDescriptor
+public class DefaultWikiStreamDescriptor implements WikiStreamDescriptor
 {
 
-    private WikiStreamType type;
-
-    /**
+     /**
      * @see #getName()
      */
     private String name;
@@ -60,17 +56,15 @@ public class AbstractWikiStreamDescriptor implements WikiStreamDescriptor
         new LinkedHashMap<String, WikiStreamParameterDescriptor>();
 
     /**
-     * //TODO - Documentation
      * @param type
      * @param name
      * @param description
      * @param parametersBeanDescriptor
      */
-    public AbstractWikiStreamDescriptor(WikiStreamType type, String name, String description,
+    public DefaultWikiStreamDescriptor( String name, String description,
         BeanDescriptor parametersBeanDescriptor)
     {
         super();
-        this.type = type;
         this.name = name;
         this.description = description;
         this.parametersBeanDescriptor = parametersBeanDescriptor;
@@ -83,10 +77,6 @@ public class AbstractWikiStreamDescriptor implements WikiStreamDescriptor
         }
     }
     
-    public WikiStreamType getType(){
-        return type;
-    }
-
     /**
      * {@inheritDoc}
      * 

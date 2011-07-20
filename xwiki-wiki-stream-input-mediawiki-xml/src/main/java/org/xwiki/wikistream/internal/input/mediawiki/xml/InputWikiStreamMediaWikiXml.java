@@ -19,28 +19,33 @@
  */
 package org.xwiki.wikistream.internal.input.mediawiki.xml;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.wikistream.AbstractInputWikiStream;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 import org.xwiki.wikistream.input.mediawiki.xml.MediaWikiXmlParameters;
 import org.xwiki.wikistream.type.WikiStreamType;
 
 /**
  * @version $Id: 5c213c4c836ba7a506c7fae073a3c2eee28e20be $
  */
-@Component("mediawiki-xml")
+@Component
 @Singleton
+@Named("mediawiki-xml")
 public class InputWikiStreamMediaWikiXml extends AbstractInputWikiStream<MediaWikiXmlParameters>
 {
 
-    public InputWikiStreamMediaWikiXml(String name, String description, WikiStreamDescriptor descriptor)
+    /**
+     * The description of the wiki stream
+     */
+    private static final String DESCRIPTION = "Generates wiki events from MediaWiki XML inputstream.";
+
+    public InputWikiStreamMediaWikiXml()
     {
-        super(name, description, descriptor);
-        // TODO Auto-generated constructor stub
+        super("MediaWiki XML InputWikiStream", DESCRIPTION, MediaWikiXmlParameters.class);
     }
 
     /**

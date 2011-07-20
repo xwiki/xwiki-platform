@@ -19,11 +19,117 @@
  */
 package org.xwiki.wikistream.input.mediawiki.xml;
 
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.properties.annotation.PropertyName;
+
 /**
  * 
  * @version $Id: 5c213c4c836ba7a506c7fae073a3c2eee28e20be $
  */
 public class MediaWikiXmlParameters
 {
+    private String srcPath;
+
+    private String attachmentSrcPath;
+
+    private String attachmentExcludeDirs;
+
+    private String defaultSpace = "Main";
+
+    private String allowedImageExtensions;
+
+    /**
+     * @param srcPath absolute path of the exported xml file.
+     */
+    @PropertyName("Source Path")
+    @PropertyDescription("Absolute Path to Exported XML file")
+    @PropertyMandatory
+    public void setSrcPath(String srcPath)
+    {
+        this.srcPath = srcPath;
+    }
+
+    /**
+     * @param attachmentSrcPath absolute path to MediaWiki attachments directory.
+     */
+    @PropertyName("Attachment Path")
+    @PropertyDescription("Absolute Path to MediaWiki Attachments Directory")
+    public void setAttachmentSrcPath(String attachmentSrcPath)
+    {
+        this.attachmentSrcPath = attachmentSrcPath;
+    }
+
+    /**
+     * @param attachmentExcludeDirs the list of directories to be excluded to search for attachments in the MediaWiki
+     *            Image directory.
+     */
+    @PropertyName("Exclude Directories")
+    @PropertyDescription("Comma seperated list of all directories to be excluded to search for attachments")
+    public void setAttachmentExcludeDirs(String attachmentExcludeDirs)
+    {
+        this.attachmentExcludeDirs = attachmentExcludeDirs;
+    }
+
+    /**
+     * @return the srcPath
+     */
+    public String getSrcPath()
+    {
+        return srcPath;
+    }
+
+    /**
+     * @return the attachmentSrcPath
+     */
+    public String getAttachmentSrcPath()
+    {
+        return attachmentSrcPath;
+    }
+
+    /**
+     * @return the attachmentExcludeDirs
+     */
+    public String getAttachmentExcludeDirs()
+    {
+        return attachmentExcludeDirs;
+    }
+
+    /**
+     * @return the defaultSpace
+     */
+    public String getDefaultSpace()
+    {
+        return defaultSpace;
+    }
+
+    /**
+     * @param defaultSpace the defaultSpace to set
+     */
+    @PropertyName("Default Space")
+    @PropertyDescription("Default Space for importing the data.XWiki uses Main as default space")
+    public void setDefaultSpace(String defaultSpace)
+    {
+        this.defaultSpace = defaultSpace;
+    }
+
+    /**
+     * @return the allowedImageExtensions
+     */
+    public String getAllowedImageExtensions()
+    {
+        return allowedImageExtensions;
+    }
+
+    /**
+     * @param allowedImageExtensions the list of all the image formats to be considered during import
+     */
+    @PropertyName("Image Extensions")
+    @PropertyDescription("Comma seperated list of all the image formats to be considered during import")
+    public void setAllowedImageExtensions(String allowedImageExtensions)
+    {
+        this.allowedImageExtensions = allowedImageExtensions;
+    }
+
 
 }

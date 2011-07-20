@@ -17,42 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.parser;
+package org.xwiki.wikistream.test;
+
+import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * 
  * @version $Id: 5c213c4c836ba7a506c7fae073a3c2eee28e20be $
  */
-public class XmlParserException extends Exception
+public abstract class AbstractWikiStreamTest extends AbstractComponentTestCase
 {
 
     /**
+     * {@inheritDoc}
      * 
+     * @see org.xwiki.test.AbstractComponentTestCase#setUp()
      */
-    private static final long serialVersionUID = 4459350182360063314L;
-
-    public XmlParserException()
+    @Override
+    public void setUp() throws Exception
     {
-        super();
-        // TODO Auto-generated constructor stub
+        // TODO Auto-generated method stub
+        super.setUp();
     }
 
-    public XmlParserException(String arg0, Throwable arg1)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.test.AbstractComponentTestCase#tearDown()
+     */
+    @Override
+    public void tearDown() throws Exception
     {
-        super(arg0, arg1);
-        // TODO Auto-generated constructor stub
-    }
-
-    public XmlParserException(String arg0)
-    {
-        super(arg0);
-        // TODO Auto-generated constructor stub
-    }
-
-    public XmlParserException(Throwable arg0)
-    {
-        super(arg0);
-        // TODO Auto-generated constructor stub
+        // TODO Auto-generated method stub
+        super.tearDown();
     }
 
 }

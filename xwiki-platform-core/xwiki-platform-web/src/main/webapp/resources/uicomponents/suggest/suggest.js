@@ -510,16 +510,34 @@ var XWiki = (function(XWiki){
     // loop throught arr of suggestions
     // creating an XlistItem for each suggestion
     //
-    for (var i=0;i<arr.length;i++)
+    for (var i=0,len=arr.length;i<len;i++)
     {
       // format output with the input enclosed in a EM element
       // (as HTML, not DOM)
       //
       if (source.highlight) {
         // If the source declares that results are matching, we highlight them in the value
-        var val = arr[i].value;
-        var st = val.toLowerCase().indexOf( this.sInput.toLowerCase() );
-        var output = val.substring(0,st) + "<em>" + val.substring(st, st+this.sInput.length) + "</em>" + val.substring(st+this.sInput.length);
+        var val = arr[i].value,
+            output = val,
+            fragments = this.sInput.split(' ').uniq().compact();
+
+        for(var j=0,flen=fragments.length;j<flen;j++) {
+          var index = output.toLowerCase().indexOf(fragments[j].toLowerCase());
+          var matches = {}, k = 0;
+          while (index >= 0) {
+            var match = output.substring(index, index + fragments[j].length),
+                placeholder = "";    
+            fragments[j].length.times(function(){
+              placeholder += " ";
+            });
+            matches[index] = match;
+            output = output.substring(0, index) + placeholder + output.substring(index + fragments[j].length);
+            index = output.toLowerCase().indexOf(fragments[j].toLowerCase());
+          }
+          Object.keys(matches).each(function(key){
+            output = output.substring(0, key) + "<em>" + matches[key] + "</em>" + output.substring(parseInt(key) + matches[key].length);
+          });
+        }
       }
       else {
         // Otherwise we just put row result value

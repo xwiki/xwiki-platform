@@ -132,9 +132,15 @@ var XWiki = (function(XWiki){
     } else {
       this.fld.observe("keypress", this.onKeyPress.bindAsEventListener(this));
     }
-
+    
     // Prevent normal browser autocomplete
     this.fld.setAttribute("autocomplete", "off");
+    
+    this.fld.observe("blur", function(event){
+      // Make sure any running request will be dropped after the input field has been left
+      this.latestRequest++;
+      
+    }.bind(this));
   },
 
   /**

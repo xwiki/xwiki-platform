@@ -99,6 +99,7 @@ var XWiki = (function (XWiki) {
           }
         }
       });
+      var allResults = allResultsNode.getElement();
       this.suggest = new XWiki.widgets.Suggest( this.searchInput, {
         parentContainer: $('searchSuggest'),
         className: 'searchSuggest horizontalLayout',
@@ -106,12 +107,15 @@ var XWiki = (function (XWiki) {
         align: "right",
         minchars: 3,    
         sources : this.sources,
-        insertBeforeSuggestions : new Element("div", {'class' : 'results'}).update(allResultsNode.getElement()),
+        insertBeforeSuggestions : new Element("div", {'class' : 'results'}).update( allResults ),
         displayValue:true,
         displayValueText: "in ",
         timeout: 0,
         width: 500,
-        align: "right"
+        align: "right",
+        unifiedLoader:true,
+        loaderNode: allResults.down("li"),
+        shownoresults:false
       });
     },
     

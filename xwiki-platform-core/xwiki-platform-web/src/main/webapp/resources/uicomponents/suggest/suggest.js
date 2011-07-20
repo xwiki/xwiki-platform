@@ -766,7 +766,8 @@ var XWiki = (function(XWiki){
         'suggest' : this,
         'id': this.iHighlighted.down(".suggestId").innerHTML,
         'value': this.iHighlighted.down(".suggestValue").innerHTML,
-        'info': this.iHighlighted.down(".suggestInfo").innerHTML
+        'info': this.iHighlighted.down(".suggestInfo").innerHTML,
+        'icon' : this.iHighlighted.down('img.icon') ? this.iHighlighted.down('img.icon').src : ''
       });
 
       if (!event.stopped) {

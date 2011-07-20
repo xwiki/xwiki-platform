@@ -56,10 +56,16 @@ var XWiki = (function(XWiki){
     insertBeforeSuggestions: null,
     // Should value be displayed as a hint
     displayValue: false,
-    // Display value prefix text 
+    // Display value prefix text
     displayValueText: "Value :",
     // How to align the suggestion list when its with is different than the input field width
-    align: "left"
+    align: "left",
+    // When there are several suggest sources, should the widget displays only one, unified, "loading" indicator for all requests undergoing,
+    // Or should it displays one loading indicator per request next to the corresponding source.
+    unifiedLoader: false,
+    // The DOM node to use to display the loading indicator when in mode unified loader (it will receive a "loading" class name for the time of the loading)
+    // Default is null, which falls back on the input itself. This option is used only when unifiedLoader is true.
+    loaderNode: null
   },
   sInput : "",
   nInputChars : 0,
@@ -420,13 +426,23 @@ var XWiki = (function(XWiki){
           if (this.resultContainer.down('.results' + source.id).down('ul')) {
             this.resultContainer.down('.results' + source.id).down('ul').remove();
           }
-          this.resultContainer.down('.results' + source.id).down('.sourceContent').addClassName('loading');
+          if (!this.options.unifiedLoader) {
+            this.resultContainer.down('.results' + source.id).down('.sourceContent').addClassName('loading');
+          }
+          else {
+            (this.options.loaderNode || this.fld).addClassName("loading");
+            this.resultContainer.down('.results' + source.id).addClassName('hidden loading');
+          }
         }
         else {
           // The sub-container for this source has not been created yet
           // Really create the subcontainer for this source and inject it in the global container
           var sourceContainer = new Element('div', {'class' : 'results results' + source.id}),
               sourceHeader = new Element('div', {'class':'sourceName'});
+
+          if (this.options.unifiedLoader) {
+            sourceContainer.addClassName('hidden loading');
+          }
 
           if (typeof source.icon != 'undefined') {
             // If there is an icon for this source group, set it as background image
@@ -446,7 +462,8 @@ var XWiki = (function(XWiki){
           }
           sourceHeader.insert(source.name)
           sourceContainer.insert( sourceHeader );
-          sourceContainer.insert( new Element('div', {'class':'sourceContent loading'}));
+          var classes = "sourceContent " + (this.options.unifiedLoader ? "" : "loading");
+          sourceContainer.insert( new Element('div', {'class':classes}));
           this.resultContainer.insert(sourceContainer);
         }
       }
@@ -487,11 +504,18 @@ var XWiki = (function(XWiki){
     if (this.sources.length > 1) {
       var div = this.resultContainer.down(".results" + source.id);
       div.down('.sourceContent').removeClassName('loading');
+      this.resultContainer.down(".results" + source.id).removeClassName("hidden loading");
+      
+      // If we are in mode "unified loader" (showing one loading indicator for all requests and not one per request)
+      // and there aren't any source still loading, we remove the unified loading status.
+      if (this.options.unifiedLoader && !this.resultContainer.down("loading")) {
+        (this.options.loaderNode || this.fld).removeClassName("loading");
+      }
     }
     else {
       var div = this.resultContainer;
     }
-
+    
     // Ensure any previous list of results for this source gets removed
     if (div.down('ul')) {
       div.down('ul').remove();

@@ -107,7 +107,30 @@
   <profiles>
     <profile>
       <id>debug</id>
-      <!-- The debug profile doesn't have any property, its goal is to avoid JS/CSS compression -->
+      <!-- The debug profile goal is to avoid JS/CSS compression (see default profile below) -->
+      <build>
+        <plugins>
+          <plugin>
+            <!-- Make sure the minimized dir exists, since it is expected by the war plugin and will not be created
+                 in this profile -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <mkdir dir="${project.build.directory}/minimized" />
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     <profile>
       <id>default</id>

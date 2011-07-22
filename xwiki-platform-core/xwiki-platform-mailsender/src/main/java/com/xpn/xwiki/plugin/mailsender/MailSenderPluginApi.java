@@ -20,6 +20,7 @@
 package com.xpn.xwiki.plugin.mailsender;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -42,6 +43,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
      * Log object to log messages in this class.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(MailSenderPluginApi.class);
+    private Map parameters;
 
     /**
      * API constructor.
@@ -134,6 +136,28 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
     {
         try {
             return getProtectedPlugin().sendMailFromTemplate(documentFullName, from, to, cc, bcc, language, vcontext,
+                this.context);
+        } catch (Exception e) {
+            // If the exception is a null pointer exception there is no message and e.getMessage() is null.
+            if (e.getMessage() != null) {
+                this.context.put("error", e.getMessage());
+            }
+            LOGGER.error("sendMessageFromTemplate", e);
+            return -1;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see MailSender#sendMessageFromTemplate(String, String, String, String, String, String, java.util.Map)
+     */
+    public int sendMessageFromTemplate(String from, String to, String cc, String bcc, String language,
+        String documentFullName, Map parameters)
+    {
+        this.parameters = parameters;
+        try {
+            return getProtectedPlugin().sendMailFromTemplate(documentFullName, from, to, cc, bcc, language, parameters,
                 this.context);
         } catch (Exception e) {
             // If the exception is a null pointer exception there is no message and e.getMessage() is null.

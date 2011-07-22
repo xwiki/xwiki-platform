@@ -114,128 +114,124 @@
 ## CONSTANTS
 #set ($ISWIKINAMEAVAILABLE = $xwiki.getDocument("WikiCode.IsWikiOrDatabaseAvailableService").URL)
 ############################################################################################
-  var domainnamesetted = false;
-  var prettynamesetted = false;
-  var lastwikiname;
+var domainnamesetted = false;
+var prettynamesetted = false;
+var lastwikiname;
 
-  function validate()
-  {
-    validateWikiName()
-    validatePrettyName()
+function validate()
+{
+  validateWikiName()
+  validatePrettyName()
+
+  return (!($('actioncreatebutton').disabled));
+}
+
+function validateWikiName()
+{
+  if ($('wikiname').value != noaccent($('wikiname').value).toLowerCase()) {
+    $('wikiname').value = noaccent($('wikiname').value).toLowerCase();
   }
 
-  function wikiNameChanged()
-  {
-    validateWikiName();
+  var wikiname = $('wikiname').value;
 
-    if (prettynamesetted == false) {
-      $("XWiki.XWikiServerClass_0_wikiprettyname").value = $("wikiname").value.substring(0,1).toUpperCase() + $("wikiname").value.substring(1);
-      validatePrettyName();
-    }
+  if (lastwikiname == wikiname)
+  {
+    return;
   }
 
-  function validateWikiName()
+  lastwikiname = wikiname;
+
+  if (wikiname &amp;&amp; wikiname != "")
   {
-    if ($('wikiname').value != noaccent($('wikiname').value).toLowerCase()) {
-      $('wikiname').value = noaccent($('wikiname').value).toLowerCase();
-    }
-
-    var wikiname = $('wikiname').value;
-
-    if (lastwikiname == wikiname)
+    var surl = "$ISWIKINAMEAVAILABLE" + "?xpage=plain&amp;ajax=1&amp;wikiname=" + escape(wikiname);
+    surl += "&amp;form_token=$!{services.csrf.getToken()}";
+    new Ajax.Request(surl,
     {
-      return;
-    }
+      method: 'get',
+      onSuccess: function(transport) {
+          if (transport.responseText == "true")
+          {
+            $('wikinamevalidation').innerHTML = "";
+            rmClass($('wikiname'), 'xErrorField');
 
-    lastwikiname = wikiname;
-
-    if (wikiname &amp;&amp; wikiname != "")
-    {
-      var surl = "$ISWIKINAMEAVAILABLE" + "?xpage=plain&amp;ajax=1&amp;wikiname=" + escape(wikiname);
-      surl += "&amp;form_token=$!{services.csrf.getToken()}";
-      new Ajax.Request(surl,
-      {
-        method: 'get',
-        onSuccess: function(transport) {
-            var hideForceWikiName = true;
-
-            if (transport.responseText == "true")
-            {
-              $('wikinamevalidation').innerHTML = "";
+            if (isWikiPrettyNameValid()) {
               $('actioncreatebutton').disabled = false;
-              rmClass($('wikiname'), 'xErrorField');
-            }
-            else if (transport.responseText == "database")
-            {
-              hideForceWikiName = false;
-
-              forceWikiNameChanged();
-            }
-            else if (transport.responseText == "wiki")
-            {
-              $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKIALREADYEXISTS";
-              $('actioncreatebutton').disabled = true;
-              addClass($('wikiname'), 'xErrorField');
-            }
-            else
-            {
-              $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEALREADYUSED";
-              $('actioncreatebutton').disabled = true;
-              addClass($('wikiname'), 'xErrorField');
-            }
-
-            if (hideForceWikiName)
-            {
-              addClass($('forcewikinamediv'), "hidden");
-            }
-            else
-            {
-              rmClass($('forcewikinamediv'), "hidden");
             }
           }
-      });
-    }
-    else
-    {
-      $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEEMPTY";
-      $('actioncreatebutton').disabled = true;
-      addClass($('forcewikinamediv'), "hidden");
-    }
-  }
+          else if (transport.responseText == "database")
+          {
+            $('wikinamevalidation').innerHTML = "$MSG_WARNING_DATABASEALREADYEXISTS";
+            addClass($('wikiname'), 'xErrorField');
 
-  function forceWikiNameChanged()
+            $('actioncreatebutton').disabled = true;
+          }
+          else if (transport.responseText == "wiki")
+          {
+            $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKIALREADYEXISTS";
+            addClass($('wikiname'), 'xErrorField');
+
+            $('actioncreatebutton').disabled = true;
+          }
+          else
+          {
+            $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEALREADYUSED";
+            addClass($('wikiname'), 'xErrorField');
+
+            $('actioncreatebutton').disabled = true;
+          }
+        }
+    });
+  }
+  else
   {
-    if ($('forcewikiname').checked == true)
-    {
-      $('wikinamevalidation').innerHTML = "$MSG_WARNING_DATABASEALREADYEXISTS";
+    $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEEMPTY";
+    addClass($('forcewikinamediv'), "hidden");
+
+    $('actioncreatebutton').disabled = true;
+  }
+}
+
+function validatePrettyName()
+{
+  if ($('XWiki.XWikiServerClass_0_wikiprettyname').value == '') {
+    $('wikiprettynamevalidation').innerHTML = "$MSG_ERROR_WIKIPRETTYNAMEEMPTY";
+
+    $('actioncreatebutton').disabled = true;
+  } else {
+    $('wikiprettynamevalidation').innerHTML = "";
+
+    if (isWikiNameValid()) {
       $('actioncreatebutton').disabled = false;
     }
-    else
-    {
-      $('wikinamevalidation').innerHTML = "$MSG_ERROR_DATABASEALREADYEXISTS";
-      $('actioncreatebutton').disabled = true;
-    }
   }
+}
 
-  function prettyNameChanged()
-  {
+function isWikiNameValid()
+{
+  return ($('wikinamevalidation').innerHTML == "");
+}
+
+function isWikiPrettyNameValid()
+{
+  return ($('wikiprettynamevalidation').innerHTML == "");
+}
+
+function wikiNameChanged()
+{
+  validateWikiName();
+
+  if (prettynamesetted == false) {
+    $("XWiki.XWikiServerClass_0_wikiprettyname").value = $("wikiname").value.substring(0,1).toUpperCase() + $("wikiname").value.substring(1);
     validatePrettyName();
-
-    prettynamesetted = true;
   }
+}
 
-  function validatePrettyName()
-  {
-    if ($('XWiki.XWikiServerClass_0_wikiprettyname').value == '') {
-      $('wikiprettynamevalidation').innerHTML = "$MSG_ERROR_WIKIPRETTYNAMEEMPTY";
-    } else {
-      $('wikiprettynamevalidation').innerHTML = "";
-    }
-  } 
+function prettyNameChanged()
+{
+  validatePrettyName();
 
-document.observe('xwiki:dom:loaded', function() {
-  validate();
-});</code>
+  prettynamesetted = true;
+}</code>
 </property>
 <property>
 <name>Validation</name>
@@ -244,10 +240,12 @@ document.observe('xwiki:dom:loaded', function() {
 <parse>1</parse>
 </property>
 <property>
-<use>currentPage</use>
+<use>onDemand</use>
 </property>
 </object>
-<content>## TRANLSATIONS AUTOMATIC REGISTRATION
+<content>$xwiki.jsx.use($doc.fullName, {'minify' : false})
+############################################################################################
+## TRANLSATIONS AUTOMATIC REGISTRATION
 #set ($WORKSPACE_MANAGER_TRANSLATIONS_PAGE = 'WorkspaceManager.Translations')
 #set ($xwikiPreferencesDocumentReference = $services.model.createDocumentReference('xwiki', 'XWiki', 'XWikiPreferences'))
 #set ($xwikiPreferencesDocument = $xwiki.getDocument($xwikiPreferencesDocumentReference))
@@ -330,12 +328,6 @@ document.observe('xwiki:dom:loaded', function() {
 ##
 #set($members = [])
 #getRequestList($members 'members')
-##
-#if ($request.forcewikiname &amp;&amp; $request.forcewikiname == 'on')
-  #set ($failonexist = false)
-#else
-  #set ($failonexist = true)
-#end
 #############################################################################
 ##
 #if ($action &amp;&amp; $action == "create")
@@ -381,7 +373,6 @@ document.observe('xwiki:dom:loaded', function() {
 
     &lt;dd&gt;
       &lt;input size="60" id="wikiname" name="wikiname" type="text" onchange="wikiNameChanged();" onkeyup="wikiNameChanged();" /&gt;
-      &lt;div id="forcewikinamediv"&gt;&lt;input id="forcewikiname" name="forcewikiname" type="checkbox" #if ($failonexist == false)checked="true"#end onchange="forceWikiNameChanged();"/&gt;$msg.get("wikimanager.wikiname.force")&lt;/div&gt;
     &lt;/dd&gt;
   &lt;/dl&gt;
   ##
@@ -404,14 +395,28 @@ document.observe('xwiki:dom:loaded', function() {
     &lt;dd&gt;$wikidocument.display("description", "edit")&lt;/dd&gt;
   &lt;/dl&gt;
 
+  #set ($rightsmanager = $xwiki.rightsmanager)
+  #set ($users = $sorttool.sort($rightsmanager.usersApi.allGlobalUsersNames))
+
   ## Make this section available only to admins, so that only admins can create workspaces in the name of other users.
   #if ($hasAdmin)
   &lt;dl&gt;
     &lt;dt&gt;
       &lt;label for="XWiki.XWikiServerClass_0_owner"&gt;$msg.get("workspacemanager.prop.wiki.owner") &lt;span class="xRequired"&gt;(Required)&lt;/span&gt;&lt;/label&gt;
-      &lt;span class="xHint"&gt;$msg.get("workspacemanager.doc.createwiki.desc.owner")&lt;/span&gt;
+      &lt;span class='xHint'&gt;$msg.get("workspacemanager.doc.createwiki.desc.owner")&lt;/span&gt;
     &lt;/dt&gt;
-    &lt;dd&gt;$wikidocument.display("owner", "edit")&lt;/dd&gt;
+    &lt;dd&gt;
+      &lt;select name="XWiki.XWikiServerClass_0_owner" id="XWiki.XWikiServerClass_0_owner" size='4'&gt;
+        #foreach ($user in $users))
+          ## Skip the guest user.
+          #if ($user != 'XWiki.XWikiGuest')
+            #set ($selectAsOwner = ($xcontext.user == $user))
+            #if ($xcontext.isMainWiki()) #set ($user = "${xcontext.mainWikiName}:${user}") #end
+            &lt;option value="$user" #if($selectAsOwner)selected='selected'#{end}&gt;$xwiki.getUserName($user, $util.null, false)&lt;/option&gt;
+          #end
+        #end
+      &lt;/select&gt;
+    &lt;/dd&gt;
   &lt;/dl&gt;
   #else
   &lt;input id="XWiki.XWikiServerClass_0_owner" name="XWiki.XWikiServerClass_0_owner" type="hidden" value="${xcontext.mainWikiName}:${xcontext.user}" /&gt;
@@ -419,8 +424,6 @@ document.observe('xwiki:dom:loaded', function() {
   ##
   #############################################################################
   ##
-  #set ($rightsmanager = $xwiki.rightsmanager)
-  #set ($users = $rightsmanager.usersApi.allGlobalUsersNames)
   &lt;dl&gt;
     &lt;dt&gt;
       &lt;label for="members"&gt;$msg.get("workspacemanager.members")&lt;/label&gt;
@@ -430,17 +433,17 @@ document.observe('xwiki:dom:loaded', function() {
       &lt;select name="members" id="members" multiple="multiple"&gt;
         #foreach ($user in $users)
           ## Skip the current user if the user is not an admin. The current user is made owner by default and,
-          ## thus, a member of the workspace. However, an admin can choose a diferent owner.
-          #if ($user == $xcontext.user &amp;&amp; !$hasAdmin)
-            #continue
+          ## thus, a member of the workspace. However, an admin can choose a different owner.
+          ## Also skip the guest user.
+          #if (($hasAdmin || (!$hasAdmin &amp;&amp; $user != $xcontext.user)) &amp;&amp; ($user != 'XWiki.XWikiGuest'))
+            #if ($xcontext.isMainWiki()) #set ($user = "${xcontext.mainWikiName}:${user}") #end
+            &lt;option value="$user"&gt;$xwiki.getUserName($user, $util.null, false)&lt;/option&gt;
           #end
-          #if ($xcontext.database == $xcontext.mainWikiName) #set ($user = "${xcontext.mainWikiName}:${user}") #end
-        &lt;option value="$user"&gt;$xwiki.getUserName($user, $util.null, false)&lt;/option&gt;
         #end
       &lt;/select&gt;
     &lt;/dd&gt;
   &lt;/dl&gt;
-  
+
   #set($workspaceClass = $xwiki.getDocument('WorkspaceClass').getxWikiClass())
   #set($membershipTypeProperty = $workspaceClass.get('membershipType'))
   #set($membershipTypeValues = '')
@@ -451,7 +454,7 @@ document.observe('xwiki:dom:loaded', function() {
       &lt;label for="membershipType"&gt;$msg.get("workspacemanager.prop.workspace.membershipType.label")&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get("workspacemanager.prop.workspace.membershipType.hint")&lt;/span&gt;
     &lt;/dt&gt;
-    
+
     #foreach($membershipTypeValue in $membershipTypeValues)
     &lt;dd&gt;
       &lt;input type='radio' name='WorkspaceManager.WorkspaceClass_0_membershipType' value="$membershipTypeValue" #if($foreach.index==0)checked='checked'#end&gt;$membershipTypeDetailsMap.get($membershipTypeValue).getValue()&lt;/input&gt;

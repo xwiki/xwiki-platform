@@ -549,53 +549,9 @@ var XWiki = (function(XWiki){
     //
     for (var i=0,len=arr.length;i<len;i++)
     {
-      // format output with the input enclosed in a EM element
-      // (as HTML, not DOM)
-      //
-      if (source.highlight) {
-        // If the source declares that results are matching, we highlight them in the value
-        var val = arr[i].value,
-            output = val,
-            // Separate words (called fragments hereafter) in user input
-            fragments = this.sInput.split(' ').uniq().compact(),
-            offset = 0,
-            matches = {};
+	  // Output is either emphasized or row value depending on source option
+      var output = source.highlight ? this.emphasizeMatches(arr[i].value) : arr[i].value;
 
-        for(var j=0,flen=fragments.length;j<flen;j++) {
-          // We iterate over each fragments, and try to find one or several matches in this suggestion
-          // item display value.
-          var index = output.toLowerCase().indexOf(fragments[j].toLowerCase());
-          while (index >= 0) {
-            // As long as we have matches, we store their index and replace them in the output string with the space char
-            // so that they don't get matched for ever.
-            // Note that the space char is the only one safe to use, as it cannot be part of a fragment.
-            var match = output.substring(index, index + fragments[j].length),
-                placeholder = "";    
-            fragments[j].length.times(function(){
-              placeholder += " ";
-            });
-            matches[index] = match;
-            output = output.substring(0, index) + placeholder + output.substring(index + fragments[j].length);
-            index = output.toLowerCase().indexOf(fragments[j].toLowerCase());
-          }
-        }
-        // Now that we have found all matches for all possible fragments, we iterate over them
-        // to construct the final "output String" that will be injected as a suggestion item,
-        // with all matches emphasized
-        Object.keys(matches).each(function(key){
-          var before = output.substring(0, parseInt(key) + offset);
-          var after = output.substring(parseInt(key) + matches[key].length + offset);
-          // Emphasize the match in the output string that will be displayed
-          output = before + "<em>" + matches[key] + "</em>" + after;
-          // Increase the offset by 9, which correspond to the number of chars in the opening and closing "em" tags
-          // we have introduced for this match in the output String
-          offset += 9;
-        });
-      }
-      else {
-        // Otherwise we just put row result value
-        var output = arr[i].value;
-      }
       if (!this.options.displayValue) {
         var displayNode = new Element("span", {'class':'info'}).update(output);
       }
@@ -642,6 +598,54 @@ var XWiki = (function(XWiki){
     if (this.options.timeout > 0) {
       this.toID = setTimeout(function () { pointer.clearSuggestions() }, this.options.timeout);
     }
+  },
+
+  /**
+   * Emphesize the elements in passed value that matches one of the words typed as input by the user.
+   *
+   * @param String value the value to emphasize
+   */
+  emphasizeMatches:function(value)
+  {
+    // If the source declares that results are matching, we highlight them in the value
+    var output = value,
+        // Separate words (called fragments hereafter) in user input
+        fragments = this.sInput.split(' ').uniq().compact(),
+        offset = 0,
+        matches = {};
+
+    for (var j=0,flen=fragments.length;j<flen;j++) {
+      // We iterate over each fragments, and try to find one or several matches in this suggestion
+      // item display value.
+      var index = output.toLowerCase().indexOf(fragments[j].toLowerCase());
+      while (index >= 0) {
+        // As long as we have matches, we store their index and replace them in the output string with the space char
+        // so that they don't get matched for ever.
+        // Note that the space char is the only one safe to use, as it cannot be part of a fragment.
+        var match = output.substring(index, index + fragments[j].length),
+            placeholder = "";    
+        fragments[j].length.times(function(){
+          placeholder += " ";
+        });
+        matches[index] = match;
+        output = output.substring(0, index) + placeholder + output.substring(index + fragments[j].length);
+        index = output.toLowerCase().indexOf(fragments[j].toLowerCase());
+      }
+    }
+    // Now that we have found all matches for all possible fragments, we iterate over them
+    // to construct the final "output String" that will be injected as a suggestion item,
+    // with all matches emphasized
+    Object.keys(matches).each(function(key){
+      var before = output.substring(0, parseInt(key) + offset);
+      var after = output.substring(parseInt(key) + matches[key].length + offset);
+      // Emphasize the match in the output string that will be displayed
+      output = before + "<em>" + matches[key] + "</em>" + after;
+      // Increase the offset by 9, which correspond to the number of chars in the opening and closing "em" tags
+      // we have introduced for this match in the output String
+      offset += 9;
+    });
+
+    return output;
   },
 
   /**

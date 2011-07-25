@@ -30,7 +30,7 @@
   <name>XWiki Macro - Hello World Component</name>
   <description>XWiki Macro - Hello World Component</description>
   <properties>
-    <platform.core.version>2.5</platform.core.version>
+    <platform.core.version>3.1</platform.core.version>
   </properties>
   <build>
     <plugins>

@@ -4,7 +4,7 @@
     <archetype>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-archetype-component</artifactId>
-      <version>3.1-SNAPSHOT</version>
+      <version>3.2-SNAPSHOT</version>
       <description>Make it easy to create a maven project for creating a XWiki Component.</description>
       <repository>http://maven.xwiki.org/snapshots/</repository>
     </archetype>

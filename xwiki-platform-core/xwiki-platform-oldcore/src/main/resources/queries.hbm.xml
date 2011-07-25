@@ -36,4 +36,9 @@
     select distinct doc.fullName from XWikiDocument as doc, BaseObject as obj
     where obj.name=doc.fullName and obj.className='XWiki.XWikiUsers'
   </query>
+  <query name="getWikiMacroDocuments">
+    select doc from XWikiDocument doc, BaseObject obj
+    where doc.fullName=obj.name
+      and obj.className=?
+  </query>
 </hibernate-mapping>

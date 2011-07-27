@@ -97,7 +97,7 @@ var XWiki = (function(XWiki){
     }
 
     // Flatten sources
-    this.sources = [ this.sources ].flatten().compact(); 
+    this.sources = [ this.sources ].flatten().compact();
 
     // Reset the container if the configured parameter is not valid
     if (!$(this.options.parentContainer)) {
@@ -132,14 +132,14 @@ var XWiki = (function(XWiki){
     } else {
       this.fld.observe("keypress", this.onKeyPress.bindAsEventListener(this));
     }
-    
+
     // Prevent normal browser autocomplete
     this.fld.setAttribute("autocomplete", "off");
-    
+
     this.fld.observe("blur", function(event){
       // Make sure any running request will be dropped after the input field has been left
       this.latestRequest++;
-      
+
     }.bind(this));
   },
 
@@ -284,10 +284,10 @@ var XWiki = (function(XWiki){
     if (this.fld.value.length < this.options.minchars) {
       return;
     }
-    
+
     for (var i=0;i<this.sources.length;i++) {
       var source = this.sources[i];
-      
+
       // create ajax request
       var url = source.script + source.varname + "=" + encodeURIComponent(this.fld.value.strip());
       var method = source.method || "get";
@@ -370,12 +370,12 @@ var XWiki = (function(XWiki){
    * Creates the container that will hold one or multiple source results.
    */
   prepareContainer: function(){
-    
+
     if (!$(this.options.parentContainer).down('.suggestItems')) {
       // If the suggestion top container is not in the DOM already, we create it and inject it
 
       var div = new Element("div", { 'class': "suggestItems "+ this.options.className });
-    
+
       // Get position of target textfield
       var pos = this.fld.cumulativeOffset();
 
@@ -425,10 +425,10 @@ var XWiki = (function(XWiki){
     if (this.sources.length > 1) {
       // If we are in multi-source mode, we need to prepare a sub-container for each of the suggestion source
       for (var i=0;i<this.sources.length;i++) {
-    
+
         var source = this.sources[i];
         source.id = i
-    
+
         if(this.resultContainer.down('.results' + source.id)) {
           // If the sub-container for this source is already present, we just re-initialize it :
           // - remove its content
@@ -513,7 +513,7 @@ var XWiki = (function(XWiki){
         div.down('.sourceContent').removeClassName('loading');
         this.resultContainer.down(".results" + source.id).removeClassName("hidden loading");
       }
-      
+
       // If we are in mode "unified loader" (showing one loading indicator for all requests and not one per request)
       // and there aren't any source still loading, we remove the unified loading status.
       if (this.options.unifiedLoader && !this.resultContainer.down("loading")) {
@@ -523,12 +523,12 @@ var XWiki = (function(XWiki){
     else {
       var div = this.resultContainer;
     }
-    
+
     // if no results, and shownoresults is false, go no further
     if (arr.length == 0 && !this.options.shownoresults) {
       return false;
     }
-    
+
     // Ensure any previous list of results for this source gets removed
     if (div.down('ul')) {
       div.down('ul').remove();
@@ -623,7 +623,7 @@ var XWiki = (function(XWiki){
         // so that they don't get matched for ever.
         // Note that the space char is the only one safe to use, as it cannot be part of a fragment.
         var match = output.substring(index, index + fragments[j].length),
-            placeholder = "";    
+            placeholder = "";
         fragments[j].length.times(function(){
           placeholder += " ";
         });
@@ -654,7 +654,7 @@ var XWiki = (function(XWiki){
    * @param {Object} key
    */
   changeHighlight: function(key)
-  { 
+  {
     var list = this.resultContainer;
     if (!list)
       return false;

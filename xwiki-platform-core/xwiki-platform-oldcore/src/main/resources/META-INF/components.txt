@@ -33,11 +33,13 @@ com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverter
 com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
+com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
 com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiVelocityContextInitializer
 com.xpn.xwiki.render.XWikiScriptContextInitializer
 com.xpn.xwiki.store.hibernate.DefaultHibernateSessionFactory
 com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor
+com.xpn.xwiki.store.hibernate.query.DefaultQueryExecutor
 com.xpn.xwiki.store.XWikiHibernateStore
 com.xpn.xwiki.store.XWikiHibernateVersioningStore
 com.xpn.xwiki.store.XWikiHibernateAttachmentStore

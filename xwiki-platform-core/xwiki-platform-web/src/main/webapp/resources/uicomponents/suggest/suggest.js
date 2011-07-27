@@ -47,6 +47,8 @@ var XWiki = (function(XWiki){
     resultInfo : "info",
     // The name of the JSON parameter or XML attribute holding the result icon.
     resultIcon: "icon",
+    // The name of the JSON parameter or XML attribute holding a potential result hint (displayed next to the value).
+    resultHint: "hint",
     // The id of the element that will hold the suggest element
     parentContainer : "body",
     // Should results fragments be highlighted when matching typed input
@@ -340,7 +342,8 @@ var XWiki = (function(XWiki){
            'id': results[i][source.resultId || this.options.resultId],
            'value': results[i][source.resultValue || this.options.resultValue],
            'info': results[i][source.resultInfo || this.options.resultInfo],
-           'icon' : results[i][source.resultIcon || this.options.resultIcon]
+           'icon' : results[i][source.resultIcon || this.options.resultIcon],
+           'hint' : results[i][source.resultHint || this.options.resultHint]
         });
       }
     } else {
@@ -357,7 +360,8 @@ var XWiki = (function(XWiki){
             'id': results[i].getAttribute('id'),
             'value':results[i].childNodes[0].nodeValue,
             'info':results[i].getAttribute('info'),
-            'icon':results[i].getAttribute('icon')
+            'icon':results[i].getAttribute('icon'),
+            'hint':results[i].getAttribute('hint')
           });
         }
       }
@@ -551,6 +555,9 @@ var XWiki = (function(XWiki){
     {
 	  // Output is either emphasized or row value depending on source option
       var output = source.highlight ? this.emphasizeMatches(arr[i].value) : arr[i].value;
+      if (arr[i].hint) {
+        output += "<span class='hint'>" + arr[i].hint + "</span>";
+      }
 
       if (!this.options.displayValue) {
         var displayNode = new Element("span", {'class':'info'}).update(output);

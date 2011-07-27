@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -33,6 +32,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryExecutorManager;
+import org.xwiki.query.QueryExecutorProvider;
 
 /**
  * Default implementation of {@link QueryExecutorManager}.
@@ -53,11 +53,11 @@ public class DefaultQueryExecutorManager implements QueryExecutorManager
     private Map<String, QueryExecutor> executors;
 
     /**
-     * Executor for named HQL queries.
+     * Executor provider for named queries.
+     * This provider will give us an executor which is native to the type of storage engine used.
      */
     @Inject
-    @Named("hql")
-    private QueryExecutor namedQueryExecutor;
+    private QueryExecutorProvider namedQueryExecutorProvider;
 
     /**
      * {@inheritDoc}
@@ -65,7 +65,7 @@ public class DefaultQueryExecutorManager implements QueryExecutorManager
     public <T> List<T> execute(Query query) throws QueryException
     {
         if (query.isNamed()) {
-            return this.namedQueryExecutor.execute(query);
+            return this.namedQueryExecutorProvider.get().execute(query);
         } else {
             return this.executors.get(query.getLanguage()).execute(query);
         }

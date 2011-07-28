@@ -42,6 +42,7 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -198,13 +199,8 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
     private List<Object[]> getWikiMacroDocumentData(XWikiContext xcontext) throws Exception
     {
         final QueryManager qm = xcontext.getWiki().getStore().getQueryManager();
-        final List<XWikiDocument> macroDocs =
-            qm.getNamedQuery("getWikiMacroDocuments").bindValue(0, WIKI_MACRO_CLASS).execute();
-        final List<Object[]> out = new ArrayList<Object[]>(macroDocs.size());
-        for (final XWikiDocument doc : macroDocs) {
-            out.add(new Object[] { doc.getSpace(), doc.getName(), doc.getAuthor() });
-        }
-        return out;
+        final Query q = qm.getNamedQuery("getWikiMacroDocuments").bindValue("classname", WIKI_MACRO_CLASS);
+        return (List<Object[]>) (List) q.execute();
     }
 
     /**

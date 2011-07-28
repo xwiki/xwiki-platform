@@ -37,8 +37,8 @@
     where obj.name=doc.fullName and obj.className='XWiki.XWikiUsers'
   </query>
   <query name="getWikiMacroDocuments">
-    select doc from XWikiDocument doc, BaseObject obj
+    select doc.space, doc.name, doc.author from XWikiDocument doc, BaseObject obj
     where doc.fullName=obj.name
-      and obj.className=?
+      and obj.className=:classname
   </query>
 </hibernate-mapping>

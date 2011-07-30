@@ -21,11 +21,10 @@ package com.xpn.xwiki.internal.query;
 
 import com.xpn.xwiki.XWikiContext;
 import javax.inject.Inject;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryExecutorProvider;
@@ -38,7 +37,7 @@ import org.xwiki.query.QueryExecutorProvider;
  * @since 3.2M2
  */
 @Component
-public class ConfiguredQueryExecutorProvider implements QueryExecutorProvider, Initializable
+public class ConfiguredQueryExecutorProvider implements QueryExecutorProvider
 {
     /** A means of getting QueryExecutors. */
     @Inject
@@ -48,25 +47,45 @@ public class ConfiguredQueryExecutorProvider implements QueryExecutorProvider, I
     @Inject
     private Execution exec;
 
-    /** The QueryExecutor which we will provide. */
+    /**
+     * The QueryExecutor which we will provide.
+     * Start off by injecting the default then later (once the XWiki object is initialized)
+     * that will be swapped out for whatever type of storage the system is using as per it's configuration.
+     */
+    @Inject
     private QueryExecutor queryExecutor;
 
+    /** The man who cuts down trees. */
+    @Inject
+    private Logger logger;
+
+    /** Set to true once the query executor has been initialized. */
+    private boolean initialized;
+
     /**
-     * {@inheritDoc}
-     *
-     * @see Initializable#initialize()
+     * Switch the queryExecutor based on what main store is being used.
+     * This is called lazily because the XWikiContext might not yet exist when this class is instantiated.
      */
-    public void initialize() throws InitializationException
+    private void init()
     {
-        final XWikiContext context = (XWikiContext) exec.getContext().getProperty("xwikicontext");
+        final XWikiContext context;
+        try {
+            context = (XWikiContext) exec.getContext().getProperty("xwikicontext");
+        } catch (NullPointerException e) {
+            this.logger.warn("The QueryExecutor was called without an XWikiContext available. "
+                             + "This means the old core (and likely the storage engine) is probably "
+                             + "not yet initialized. The default QueryExecutor will be returned.", e); 
+            return;
+        }
         final String storeName = context.getWiki().Param("xwiki.store.main.hint", "default");
         try {
             this.queryExecutor = this.manager.lookup(QueryExecutor.class, storeName);
         } catch (ComponentLookupException e) {
-            throw new InitializationException("Could not find a QueryExecutor with hint " + storeName
-                                              + " which is the hint for the storage engine. "
-                                              + "a QueryExecutor will not be available", e);
+            this.logger.warn("Could not find a QueryExecutor with hint " + storeName
+                             + " which is the hint for the storage engine. "
+                             + "the default QueryExecutor will not be used instead.", e);
         }
+        this.initialized = true;
     }
 
     /**
@@ -76,6 +95,9 @@ public class ConfiguredQueryExecutorProvider implements QueryExecutorProvider, I
      */
     public QueryExecutor get()
     {
+        if (!this.initialized) {
+            this.init();
+        }
         return this.queryExecutor;
     }
 }

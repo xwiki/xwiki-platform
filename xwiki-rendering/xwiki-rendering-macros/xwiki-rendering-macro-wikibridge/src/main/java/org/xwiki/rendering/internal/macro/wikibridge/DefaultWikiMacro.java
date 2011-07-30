@@ -53,7 +53,7 @@ import org.xwiki.rendering.transformation.TransformationContext;
 /**
  * Default implementation of {@link WikiMacro}.
  * 
- * @version $Id: 4ae941bc6bfc43bfdf4a657039682cbaa3d50ffe $
+ * @version $Id$
  * @since 2.0M1
  */
 public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled

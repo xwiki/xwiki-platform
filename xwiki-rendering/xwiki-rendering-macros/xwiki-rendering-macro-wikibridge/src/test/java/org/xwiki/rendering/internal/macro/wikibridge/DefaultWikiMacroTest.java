@@ -59,7 +59,7 @@ import org.xwiki.velocity.VelocityManager;
 /**
  * Unit tests for {@link DefaultWikiMacro}.
  * 
- * @version $Id: fa5d0726aab38a08a5c702ba2a43aaa074b9b64d $
+ * @version $Id$
  * @since 2.2M1
  */
 public class DefaultWikiMacroTest extends AbstractComponentTestCase

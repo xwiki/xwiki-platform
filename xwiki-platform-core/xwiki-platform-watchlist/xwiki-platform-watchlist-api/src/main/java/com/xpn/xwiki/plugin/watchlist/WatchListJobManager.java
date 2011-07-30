@@ -237,6 +237,11 @@ public class WatchListJobManager
             needsUpdate = true;
         }
 
+        if (needsUpdate) {
+            // Make sure the XWikiRights class actually exists.
+            context.getWiki().getRightsClass(context);
+        }
+
         return needsUpdate;
     }
 

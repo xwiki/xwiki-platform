@@ -39,6 +39,6 @@
   <query name="getWikiMacroDocuments">
     select doc.space, doc.name, doc.author from XWikiDocument doc, BaseObject obj
     where doc.fullName=obj.name
-      and obj.className=:classname
+      and obj.className='XWiki.WikiMacroClass'
   </query>
 </hibernate-mapping>

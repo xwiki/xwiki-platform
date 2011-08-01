@@ -199,7 +199,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
     private List<Object[]> getWikiMacroDocumentData(XWikiContext xcontext) throws Exception
     {
         final QueryManager qm = xcontext.getWiki().getStore().getQueryManager();
-        final Query q = qm.getNamedQuery("getWikiMacroDocuments").bindValue("classname", WIKI_MACRO_CLASS);
+        final Query q = qm.getNamedQuery("getWikiMacroDocuments");
         return (List<Object[]>) (List) q.execute();
     }
 

@@ -41,4 +41,9 @@
     where doc.fullName=obj.name
       and obj.className='XWiki.WikiMacroClass'
   </query>
+  <query name="getWatchlistJobDocuments">
+    SELECT doc.fullName FROM XWikiDocument as doc, BaseObject as obj
+    WHERE obj.name = doc.fullName
+      AND obj.className = 'XWiki.WatchListJob'
+  </query>
 </hibernate-mapping>

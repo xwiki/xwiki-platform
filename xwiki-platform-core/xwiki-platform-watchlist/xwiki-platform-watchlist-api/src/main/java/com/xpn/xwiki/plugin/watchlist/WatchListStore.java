@@ -36,6 +36,8 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
@@ -305,14 +307,13 @@ public class WatchListStore implements EventListener
      */
     public void init(XWikiContext context) throws XWikiException
     {
-        // Retreive jobs in the wiki, must be done first since initWatchListClass relies on them
-        jobDocumentNames =
-            context
-                .getWiki()
-                .getStore()
-                .searchDocumentsNames(
-                    ", BaseObject as obj where doc.fullName=obj.name and obj.className='"
-                        + WatchListJobManager.WATCHLIST_JOB_CLASS + "'", context);
+        try {
+            final Query q =
+                context.getWiki().getStore().getQueryManager().getNamedQuery("getWatchlistJobDocuments");
+            this.jobDocumentNames = (List<String>) (List) q.execute();
+        } catch (QueryException e) {
+            throw new XWikiException(0, 0, "Failed to run query for watchlist jobs.", e);
+        }
 
         initWatchListClass(context);
 

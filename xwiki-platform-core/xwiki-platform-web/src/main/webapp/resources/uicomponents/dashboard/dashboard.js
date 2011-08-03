@@ -294,6 +294,9 @@ XWiki.Dashboard = Class.create( {
     addParameters.set(this.gadgetsClass + '_content_syntax', "xwiki/2.0");
     // position
     addParameters.set(this.gadgetsClass + '_position', lastColumn + ', ' + lastIndex);
+    // steal the form token of the edit form around the dashboard and send it with the form
+    var formToken = this.getFormToken();
+    addParameters.set('form_token', formToken);
     // aaaand send the request
     this._x_notification = new XWiki.widgets.Notification("$escapetool.javascript($msg.get('dashboard.actions.add.loading'))", "inprogress"); 
     new Ajax.Request(
@@ -395,6 +398,9 @@ XWiki.Dashboard = Class.create( {
     editParameters.set('RequiresHTMLConversion', this.gadgetsClass + '_' + gadgetId + '_content');
     editParameters.set(this.gadgetsClass + '_' + gadgetId + '_content_syntax', "xwiki/2.0");
     editParameters.set('ajax', '1');
+    // steal form token parameter to be able to submit a valid form on the server
+    var formToken = this.getFormToken();
+    editParameters.set('form_token', formToken);
 
     // TODO: since I will not save position at this point, there will be an issue if a gadget is moved and then its 
     // parameters are edited, since it will not preserve position    
@@ -446,7 +452,8 @@ XWiki.Dashboard = Class.create( {
         parameters : {
           'classname' : encodeURIComponent(this.gadgetsClass),
           'classid' : encodeURIComponent(gadgetId),
-          'ajax' : '1'
+          'ajax' : '1',
+          'form_token' : this.getFormToken()
         },
         onCreate : function() {
           // Disable the button, to avoid a cascade of clicks from impatient users
@@ -528,6 +535,9 @@ XWiki.Dashboard = Class.create( {
     var editParameters = this.prepareEditParameters();
     // add the ajax parameter to the edit, to not get redirected after the call 
     editParameters.set('ajax', '1');
+    // steal the form token from the edit form to be able to submit valid form data on the server
+    var formToken = this.getFormToken();
+    editParameters.set('form_token', formToken);
     // send the ajax request to do the edit
     new Ajax.Request(
       this.editURL,
@@ -631,7 +641,23 @@ XWiki.Dashboard = Class.create( {
     }, this);
     
     return parameters;
-  }  
+  },
+  
+  /**
+   * Gets the form token from the underlying xwiki edit inline form, to be able to submit a valid form on the server.
+   * @return the form token of the form where the dashboard element appears in (the inline edit form), or empty string 
+   *         if such form does not exist
+   */
+  getFormToken : function() {
+    var editForm = this.element.up('form');
+    if (editForm) {
+      var formTokenElt = editForm['form_token'];
+      if (formTokenElt) {
+        return formTokenElt.getValue();
+      }
+    }
+    return '';
+  }
 });
 
 function init() {

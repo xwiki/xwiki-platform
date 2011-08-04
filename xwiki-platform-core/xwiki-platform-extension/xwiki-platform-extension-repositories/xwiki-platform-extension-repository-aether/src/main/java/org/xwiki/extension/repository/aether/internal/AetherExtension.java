@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Developer;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.aether.RepositorySystem;
@@ -44,6 +45,8 @@ public class AetherExtension extends AbstractExtension
 
     private String PKEY_ARTIFACTID = "aether.artifactid";
 
+    private String MPKEY_FEATURES = "xwiki.features";
+
     private PlexusComponentManager plexusComponentManager;
 
     private List<ExtensionId> suggested;
@@ -51,7 +54,7 @@ public class AetherExtension extends AbstractExtension
     private Model mavenModel;
 
     public AetherExtension(ExtensionId id, Model mavenModel, AetherExtensionRepository repository,
-        PlexusComponentManager mavenComponentManager) throws ComponentLookupException
+        PlexusComponentManager mavenComponentManager)
     {
         super(repository, id, mavenModel.getPackaging());
 
@@ -60,8 +63,14 @@ public class AetherExtension extends AbstractExtension
 
         setName(this.mavenModel.getName());
         setDescription(this.mavenModel.getDescription());
-        // setAuthor();
+        for (Developer developer : this.mavenModel.getDevelopers()) {
+            addAuthor(developer.getId());
+        }
         setWebsite(this.mavenModel.getUrl());
+        
+        // features
+        String featuresString = this.mavenModel.getProperties().getProperty(MPKEY_FEATURES);
+        // TODO: parse features list
 
         // dependencies
         for (Dependency mavenDependency : this.mavenModel.getDependencies()) {
@@ -72,7 +81,7 @@ public class AetherExtension extends AbstractExtension
                     + mavenDependency.getArtifactId(), mavenDependency.getVersion())));
             }
         }
-        
+
         // custom properties
         putProperty(PKEY_GROUPID, this.mavenModel.getGroupId());
         putProperty(PKEY_ARTIFACTID, this.mavenModel.getArtifactId());
@@ -95,6 +104,11 @@ public class AetherExtension extends AbstractExtension
         return this.suggested;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#download(java.io.File)
+     */
     public void download(File file) throws ExtensionException
     {
         RepositorySystem repositorySystem;
@@ -123,7 +137,7 @@ public class AetherExtension extends AbstractExtension
         try {
             FileUtils.copyFile(aetherFile, file);
         } catch (IOException e) {
-            new ExtensionException("Failed to copy file", e);
+            throw new ExtensionException("Failed to copy file", e);
         }
     }
 }

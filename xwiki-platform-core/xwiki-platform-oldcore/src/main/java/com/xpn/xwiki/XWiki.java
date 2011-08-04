@@ -103,6 +103,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -368,6 +369,13 @@ public class XWiki implements EventListener
     private SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
 
     private XWikiURLBuilder entityXWikiURLBuilder = Utils.getComponent(XWikiURLBuilder.class, "entity");
+
+    /**
+     * Whether backlinks are enabled or not (cached for performance).
+     *
+     * @since 3.2M2
+     */
+    private Boolean hasBacklinks;
 
     public static String getConfigPath() throws NamingException
     {
@@ -6207,7 +6215,10 @@ public class XWiki implements EventListener
 
     public boolean hasBacklinks(XWikiContext context)
     {
-        return "1".equals(getXWikiPreference("backlinks", "xwiki.backlinks", "0", context));
+        if (this.hasBacklinks == null) {
+            this.hasBacklinks = "1".equals(getXWikiPreference("backlinks", "xwiki.backlinks", "0", context));
+        }
+        return this.hasBacklinks;
     }
 
     public boolean hasTags(XWikiContext context)
@@ -7363,7 +7374,14 @@ public class XWiki implements EventListener
         XWikiContext context = (XWikiContext) data;
 
         if (event instanceof XObjectPropertyEvent) {
-            onPluginPreferenceEvent(event, doc, context);
+            EntityReference reference = ((XObjectPropertyEvent) event).getReference();
+            String modifiedProperty = reference.getName();
+            if ("plugins".equals(modifiedProperty)) {
+                onPluginPreferenceEvent(event, doc, context);
+            } else if ("backlinks".equals(modifiedProperty)) {
+                this.hasBacklinks = doc.getXObject((ObjectReference) reference.getParent()).getIntValue("backlinks",
+                    (int) ParamAsLong("xwiki.backlinks", 0)) == 1;
+            }
         } else if (event instanceof XObjectEvent) {
             onServerObjectEvent(event, doc, context);
         }
@@ -7390,11 +7408,11 @@ public class XWiki implements EventListener
         Pattern.compile(".*:XWiki.XWikiServerClass\\[\\d*\\]"), EntityType.OBJECT);
 
     /**
-     * The reference to match class XWiki.XWikiPreference on whatever wiki.
+     * The reference to match properties "plugins" and "backlinks" of class XWiki.XWikiPreference on whatever wiki.
      */
-    private static final RegexEntityReference XWIKIPREFERENCE_PLUGINPROPERTY_REFERENCE = new RegexEntityReference(
-        Pattern.compile("plugin"), EntityType.OBJECT_PROPERTY, new RegexEntityReference(
-            Pattern.compile(".*:XWiki.XWikiPreference\\[\\d*\\]"), EntityType.OBJECT));
+    private static final RegexEntityReference XWIKIPREFERENCE_PROPERTY_REFERENCE = new RegexEntityReference(
+        Pattern.compile("plugins|backlinks"), EntityType.OBJECT_PROPERTY, new RegexEntityReference(
+            Pattern.compile(".*:XWiki.XWikiPreferences\\[\\d*\\]"), EntityType.OBJECT));
 
     private static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
     {
@@ -7402,9 +7420,9 @@ public class XWiki implements EventListener
             add(new XObjectAddedEvent(SERVERCLASS_REFERENCE));
             add(new XObjectDeletedEvent(SERVERCLASS_REFERENCE));
             add(new XObjectUpdatedEvent(SERVERCLASS_REFERENCE));
-            add(new XObjectPropertyAddedEvent(XWIKIPREFERENCE_PLUGINPROPERTY_REFERENCE));
-            add(new XObjectPropertyDeletedEvent(XWIKIPREFERENCE_PLUGINPROPERTY_REFERENCE));
-            add(new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PLUGINPROPERTY_REFERENCE));
+            add(new XObjectPropertyAddedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE));
+            add(new XObjectPropertyDeletedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE));
+            add(new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE));
         }
     };
 

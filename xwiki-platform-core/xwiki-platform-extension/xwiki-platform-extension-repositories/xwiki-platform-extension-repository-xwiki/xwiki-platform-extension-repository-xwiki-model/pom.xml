@@ -32,7 +32,7 @@
   <artifactId>xwiki-platform-extension-repository-xwiki-model</artifactId>
   <name>XWiki Platform - Extension - Repository - XWiki model</name>
   <packaging>jar</packaging>
-  <description>he (JAXB) model for XML resource representations served by the Extension REST module.</description>
+  <description>The (JAXB) model for XML resource representations served by the Extension REST module.</description>
   <build>
     <plugins>
       <plugin>

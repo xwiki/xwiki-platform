@@ -221,7 +221,7 @@ public class XarLocalExtensionRepository implements LocalExtensionRepository, In
         return extension;
     }
 
-    public LocalExtension installExtension(Extension extension, boolean dependency, String namespace)
+    public LocalExtension storeExtension(Extension extension, boolean dependency, String namespace)
         throws InstallException
     {
         throw new InstallException("Not implemented");

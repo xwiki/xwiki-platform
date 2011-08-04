@@ -42,6 +42,7 @@ import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.repository.LocalExtensionRepositoryException;
 
 /**
  * Extension installation related task.
@@ -263,9 +264,11 @@ public class InstallJob extends AbstractJob<InstallRequest>
      * @return the newly installed local extension
      * @throws ComponentLookupException failed to find proper {@link org.xwiki.extension.handler.ExtensionHandler}
      * @throws InstallException error when trying to install provided extension
+     * @throws LocalExtensionRepositoryException error when storing extension
      */
     private LocalExtension installExtension(LocalExtension previousExtension, Extension remoteExtension,
-        boolean dependency, String namespace) throws ComponentLookupException, InstallException
+        boolean dependency, String namespace) throws ComponentLookupException, InstallException,
+        LocalExtensionRepositoryException
     {
         for (ExtensionDependency dependencyDependency : remoteExtension.getDependencies()) {
             installExtensionDependency(dependencyDependency, namespace);
@@ -276,8 +279,8 @@ public class InstallJob extends AbstractJob<InstallRequest>
         try {
             // Store extension in local repository
             LocalExtension localExtension =
-                this.localExtensionRepository.installExtension(remoteExtension, previousExtension != null
-                    ? previousExtension.isDependency() : dependency, namespace);
+                this.localExtensionRepository.storeExtension(remoteExtension, previousExtension != null
+                    ? previousExtension.isDependency() : dependency);
 
             notifyStepPropress();
 
@@ -298,6 +301,8 @@ public class InstallJob extends AbstractJob<InstallRequest>
                 this.observationManager.notify(new ExtensionInstalledEvent(localExtension.getId()), localExtension,
                     previousExtension);
             }
+
+            this.localExtensionRepository.installExtension(localExtension, namespace);
 
             return localExtension;
         } finally {

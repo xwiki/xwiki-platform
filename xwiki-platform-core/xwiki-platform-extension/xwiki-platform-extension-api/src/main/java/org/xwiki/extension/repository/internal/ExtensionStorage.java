@@ -191,4 +191,15 @@ public class ExtensionStorage
             return fileName;
         }
     }
+
+    /**
+     * Remove extension from storage.
+     * 
+     * @param extension extension to remove
+     */
+    protected void removeExtension(LocalExtension extension)
+    {
+        getExtensionFile(extension.getId(), extension.getType()).delete();
+        getDescriptorFile(extension.getId()).delete();
+    }
 }

@@ -47,7 +47,7 @@
     <dependency>
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.jaxrs</artifactId>
-      <version>2.0.7</version>
+      <version>${restlet.version}</version>
       <scope>provided</scope>
       <exclusions>
         <!-- Included in Java6 -->

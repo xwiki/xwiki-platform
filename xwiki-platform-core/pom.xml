@@ -38,6 +38,7 @@
     <gwt.version>2.3.0-xwiki-20110506</gwt.version>
     <gwt.maven.plugin.version>2.2.0</gwt.maven.plugin.version>
     <smartgwt.version>2.4</smartgwt.version>
+    <restlet.version>2.0.8</restlet.version>
   </properties>
   <dependencies>
     <dependency>
@@ -345,6 +346,11 @@
                 <exclude>org/xwiki/bridge/DocumentNameFactory</exclude>
                 <exclude>org/xwiki/bridge/DocumentNameSerializer</exclude>
                 <exclude>com/xpn/xwiki/plugin/wikimanager/WikiManager</exclude>
+                <exclude>org/xwiki/rest/XWikiAuthentication</exclude>
+                <exclude>org/xwiki/rest/XWikiRestletJaxRsApplication</exclude>
+                <exclude>org/xwiki/rest/XWikiRestletServlet</exclude>
+                <exclude>org/xwiki/rest/XWikiSetupCleanupFilter</exclude>
+                <exclude>org/xwiki/rest/resources/BrowserAuthenticationResource</exclude>
               </excludes>
             </configuration>
           </plugin>

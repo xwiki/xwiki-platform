@@ -82,7 +82,7 @@ public class XWikiExecutor
     private String executionDirectory;
 
     private List<Environment.Variable> env = new ArrayList<Environment.Variable>();
-    
+
     private String opts;
 
     /**
@@ -204,10 +204,12 @@ public class XWikiExecutor
                 execTask.addEnv(variable);
             }
 
-            Environment.Variable optsVariable = new Environment.Variable();
-            optsVariable.setKey("XWIKI_OPTS");
-            optsVariable.setValue(this.opts);
-            execTask.addEnv(optsVariable);
+            if (this.opts != null) {
+                Environment.Variable optsVariable = new Environment.Variable();
+                optsVariable.setKey("XWIKI_OPTS");
+                optsVariable.setValue(this.opts);
+                execTask.addEnv(optsVariable);
+            }
 
             String startCommand = START_COMMAND;
             startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(getPort()));

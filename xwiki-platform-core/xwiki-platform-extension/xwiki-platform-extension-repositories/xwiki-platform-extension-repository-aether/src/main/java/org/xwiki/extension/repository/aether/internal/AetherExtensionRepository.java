@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.model.Model;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.impl.ArtifactDescriptorReader;
@@ -103,11 +102,7 @@ public class AetherExtensionRepository implements ExtensionRepository
             throw new ResolveException("Failed to resolve extension [" + extensionId + "] descriptor", e);
         }
 
-        try {
-            return new AetherExtension(extensionId, model, this, this.plexusComponentManager);
-        } catch (ComponentLookupException e) {
-            throw new ResolveException("Failed to resolve extension [" + extensionId + "]", e);
-        }
+        return new AetherExtension(extensionId, model, this, this.plexusComponentManager);
     }
 
     private Model loadPom(RepositorySystemSession session, ExtensionId extensionId) throws IllegalArgumentException,

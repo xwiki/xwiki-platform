@@ -374,7 +374,7 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
 
         DefaultInstalledExtension installedExtension = installedExtensionsForFeature.get(namespace);
         if (installedExtension == null) {
-            installedExtension = new DefaultInstalledExtension(localExtension, namespace);
+            installedExtension = new DefaultInstalledExtension(localExtension, feature, namespace);
             installedExtensionsForFeature.put(namespace, installedExtension);
         }
 

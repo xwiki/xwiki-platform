@@ -1257,6 +1257,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url("$xwiki.getSkinFile('icons/silk/group.gif')");
 }
 
+.actionmenu .tmUserDashboard {
+  background-image: url("$xwiki.getSkinFile('icons/silk/application_view_tile.gif')");
+}
+
 /* @group FORMS */
 /* --------------------------------------------------------------
   * forms components

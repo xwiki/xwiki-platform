@@ -610,6 +610,7 @@ var XWiki = (function(XWiki){
   /**
    * Emphesize the elements in passed value that matches one of the words typed as input by the user.
    *
+   * @param String input the (typed) input
    * @param String value the value to emphasize
    */
   emphasizeMatches:function(input, value)

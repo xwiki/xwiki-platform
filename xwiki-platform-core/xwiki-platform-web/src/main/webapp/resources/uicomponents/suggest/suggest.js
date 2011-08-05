@@ -554,7 +554,7 @@ var XWiki = (function(XWiki){
     for (var i=0,len=arr.length;i<len;i++)
     {
 	  // Output is either emphasized or row value depending on source option
-      var output = source.highlight ? this.emphasizeMatches(arr[i].value) : arr[i].value;
+      var output = source.highlight ? this.emphasizeMatches(this.sInput, arr[i].value) : arr[i].value;
       if (arr[i].hint) {
         output += "<span class='hint'>" + arr[i].hint + "</span>";
       }
@@ -612,12 +612,12 @@ var XWiki = (function(XWiki){
    *
    * @param String value the value to emphasize
    */
-  emphasizeMatches:function(value)
+  emphasizeMatches:function(input, value)
   {
     // If the source declares that results are matching, we highlight them in the value
     var output = value,
         // Separate words (called fragments hereafter) in user input
-        fragments = this.sInput.split(' ').uniq().compact(),
+        fragments = input.split(' ').uniq().compact(),
         offset = 0,
         matches = {};
 
@@ -642,7 +642,7 @@ var XWiki = (function(XWiki){
     // Now that we have found all matches for all possible fragments, we iterate over them
     // to construct the final "output String" that will be injected as a suggestion item,
     // with all matches emphasized
-    Object.keys(matches).each(function(key){
+    Object.keys(matches).sortBy(function(s){return parseInt(s)}).each(function(key){
       var before = output.substring(0, parseInt(key) + offset);
       var after = output.substring(parseInt(key) + matches[key].length + offset);
       // Emphasize the match in the output string that will be displayed

@@ -3223,6 +3223,11 @@ public class XWiki implements EventListener
 
         needsUpdate |= bclass.addNumberField("upload_maxsize", "Maximum Upload Size", 5, "long");
 
+        // Captcha for guest comments
+        needsUpdate |=
+            bclass.addBooleanField("guest_comment_requires_captcha",
+                "Enable CAPTCHA in Comments for Unregistered Users", "select");
+
         // Document editing
         needsUpdate |= bclass.addTextField("core.defaultDocumentSyntax", "Default document syntax", 60);
         needsUpdate |= bclass.addBooleanField("xwiki.title.mandatory", "Make document title field mandatory", "yesno");

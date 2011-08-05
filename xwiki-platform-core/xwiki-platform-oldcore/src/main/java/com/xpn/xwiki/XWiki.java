@@ -860,7 +860,6 @@ public class XWiki implements EventListener
         getCommentsClass(context);
         getSkinClass(context);
         getGlobalRightsClass(context);
-        getSheetClass(context);
         getEditModeClass(context);
 
         try {
@@ -2982,53 +2981,12 @@ public class XWiki implements EventListener
     }
 
     /**
-     * Verify if the <code>XWiki.SheetClass</code> page exists and that it contains all the required configuration
-     * properties to make the sheet feature work properly. If some properties are missing they are created and saved in
-     * the database. SheetClass is used to a page as a sheet. When a page is tagged as a sheet and that page is included
-     * in another page using the include macro then editing it triggers automatic inline edition (for XWiki Syntax 2.0
-     * only - for XWiki Syntax 1.0 automatic inline edition is triggered using #includeForm).
-     * 
-     * @param context the XWiki Context
-     * @return the SheetClass Base Class object containing the properties
-     * @throws XWikiException if an error happens during the save to the database
-     * @deprecated since 3.1M2 edit mode class should be used for this purpose, not the sheet class
-     * @see #getEditModeClass(XWikiContext)
-     */
-    public BaseClass getSheetClass(XWikiContext context) throws XWikiException
-    {
-        XWikiDocument doc =
-            getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "SheetClass"), context);
-        boolean needsUpdate = doc.isNew();
-
-        BaseClass bclass = doc.getXClass();
-        if (context.get("initdone") != null) {
-            return bclass;
-        }
-
-        // Note: Ideally we don't want a special field in the sheet class but XWiki classes must have at
-        // least one field or they're not saved. Thus we are introducing a "defaultEditMode" which will
-        // tell what edit mode to use. If empty it'll default to "inline".
-        needsUpdate |= bclass.addTextField("defaultEditMode", "Default Edit Mode", 15);
-
-        if (doc.isNew()) {
-            needsUpdate |= setClassDocumentFields(doc, "XWiki Sheet Class");
-            doc.setContent(doc.getContent() + "\n\nClass that should be used to recognize sheet pages.");
-        }
-
-        if (needsUpdate) {
-            saveDocument(doc, context);
-        }
-        return bclass;
-    }
-
-    /**
      * Verify if the {@code XWiki.EditModeClass} page exists and that it contains all the required configuration
      * properties to make the edit mode feature work properly. If some properties are missing they are created and saved
      * in the database. EditModeClass is used to specify the default edit mode of a page. It can also be used to mark a
      * page as a sheet. When a page is marked as a sheet and that page is included in another page using the include
      * macro then editing it triggers automatic inline edition (for XWiki Syntax 2.0 only - for XWiki Syntax 1.0
-     * automatic inline edition is triggered using #includeForm). It replaces and enhances the SheetClass mechanism (see
-     * {@link #getSheetClass(XWikiContext)}).
+     * automatic inline edition is triggered using #includeForm).
      * 
      * @param context the XWiki Context
      * @return the EditModeClass Base Class object containing the properties
@@ -3053,7 +3011,7 @@ public class XWiki implements EventListener
 
         if (doc.isNew()) {
             needsUpdate |= setClassDocumentFields(doc, "XWiki Edit Mode Class");
-            doc.setContent(doc.getContent() + "\n\nClass that should be used to specify the edit mode of a page.");
+            doc.setContent("Class that should be used to specify the edit mode of a page.");
         }
 
         if (needsUpdate) {
@@ -3291,25 +3249,6 @@ public class XWiki implements EventListener
 
         if (needsUpdate) {
             saveDocument(doc, context);
-        }
-
-        // Create the group template document and attach a XWiki.XWikiGroupClass object
-        template =
-            getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiGroupTemplate"), context);
-        if (template.isNew()) {
-            if (!getDefaultDocumentSyntax().equalsIgnoreCase(Syntax.XWIKI_1_0.toIdString())) {
-                template.setContent("{{include document=\"XWiki.XWikiGroupSheet\"/}}");
-                template.setSyntax(Syntax.XWIKI_2_0);
-            } else {
-                template.setContent("#includeForm(\"XWiki.XWikiGroupSheet\")");
-                template.setSyntax(Syntax.XWIKI_1_0);
-            }
-            template.createXObject(doc.getDocumentReference(), context);
-            template.setCreator(XWikiRightService.SUPERADMIN_USER);
-            template.setAuthor(template.getCreator());
-            List<String> args = new ArrayList<String>(1);
-            args.add("Group");
-            saveDocument(template, context.getMessageTool().get("core.comment.createdTemplate", args), context);
         }
 
         return bclass;
@@ -7273,16 +7212,6 @@ public class XWiki implements EventListener
         if (StringUtils.isBlank(doc.getTitle())) {
             needsUpdate = true;
             doc.setTitle(title);
-        }
-        if (StringUtils.isBlank(doc.getContent())) {
-            needsUpdate = true;
-            if (!getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
-                doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
-                doc.setSyntax(Syntax.XWIKI_2_0);
-            } else {
-                doc.setContent("#includeForm(\"XWiki.ClassSheet\")");
-                doc.setSyntax(Syntax.XWIKI_1_0);
-            }
         }
 
         return needsUpdate;

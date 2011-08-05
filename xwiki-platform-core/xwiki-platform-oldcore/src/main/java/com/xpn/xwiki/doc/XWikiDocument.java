@@ -6165,7 +6165,7 @@ public class XWikiDocument implements DocumentModelBridge
                         // is not found
                         editModeObject = includedDocument.getXObject(editModeClass);
                         if (editModeObject == null) {
-                            editModeObject = includedDocument.getObject(XWikiConstant.SHEET_CLASS);
+                            editModeObject = includedDocument.getObject("XWiki.SheetClass");
                         }
                         if (editModeObject != null) {
                             // Use the user-defined default edit mode if set.

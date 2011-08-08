@@ -44,5 +44,6 @@
     <module>xwiki-platform-legacy-oldcore</module>
     <module>xwiki-platform-legacy-observation</module>
     <module>xwiki-platform-legacy-annotation</module>
+    <module>xwiki-platform-legacy-bridge</module>
   </modules>
 </project>

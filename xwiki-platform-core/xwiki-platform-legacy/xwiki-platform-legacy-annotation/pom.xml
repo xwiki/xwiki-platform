@@ -30,7 +30,7 @@
     <version>3.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-annotation</artifactId>
-  <name>XWiki Platform - Legacy</name>
+  <name>XWiki Platform - Legacy - Annotation</name>
   <packaging>jar</packaging>
   <description>Legacy package for xwiki-platform-annotation</description>
   <dependencies>

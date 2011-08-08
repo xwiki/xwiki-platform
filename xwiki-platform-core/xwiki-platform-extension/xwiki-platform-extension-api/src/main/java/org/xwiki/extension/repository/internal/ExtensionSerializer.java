@@ -130,9 +130,11 @@ public class ExtensionSerializer
         if (authorsNodes.getLength() > 0) {
             NodeList authors = authorsNodes.item(0).getChildNodes();
             for (int i = 0; i < authors.getLength(); ++i) {
-                Node authorsNode = authors.item(i);
+                Node authorNode = authors.item(i);
 
-                localExtension.addAuthor(authorsNode.getTextContent());
+                if (authorNode.getNodeName() == ELEMENT_AAUTHOR) {
+                    localExtension.addAuthor(authorNode.getTextContent());
+                }
             }
         }
 
@@ -141,9 +143,11 @@ public class ExtensionSerializer
         if (featuresNodes.getLength() > 0) {
             NodeList features = featuresNodes.item(0).getChildNodes();
             for (int i = 0; i < features.getLength(); ++i) {
-                Node authorsNode = features.item(i);
+                Node featureNode = features.item(i);
 
-                localExtension.addFeature(authorsNode.getTextContent());
+                if (featureNode.getNodeName() == ELEMENT_NFEATURE) {
+                    localExtension.addFeature(featureNode.getTextContent().trim());
+                }
             }
         }
 

@@ -75,7 +75,7 @@ public interface LocalExtensionRepository extends ExtensionRepository
      * @param extension the extension to store
      * @param dependency indicate if the extension is stored as a dependency of another one
      * @return the new local extension
-     * @throws InstallException error when trying store provided extension in the local repository
+     * @throws LocalExtensionRepositoryException error when trying store provided extension in the local repository
      */
     LocalExtension storeExtension(Extension extension, boolean dependency) throws LocalExtensionRepositoryException;
 

@@ -1,7 +1,6 @@
 package org.xwiki.extension.repository.internal;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 
@@ -41,8 +40,6 @@ public class ExtensionSerializer
 
     private static final String ELEMENT_DEPENDENCY = "dependency";
 
-    private static final String ELEMENT_INSTALLED = "installed";
-
     private static final String ELEMENT_NAME = "name";
 
     private static final String ELEMENT_DESCRIPTION = "description";
@@ -56,6 +53,12 @@ public class ExtensionSerializer
     private static final String ELEMENT_DEPENDENCIES = "dependencies";
 
     private static final String ELEMENT_DDEPENDENCY = "dependency";
+
+    private static final String ELEMENT_FEATURES = "features";
+
+    private static final String ELEMENT_NFEATURE = "feature";
+
+    private static final String ELEMENT_INSTALLED = "installed";
 
     private static final String ELEMENT_NAMESPACES = "namespaces";
 
@@ -109,10 +112,6 @@ public class ExtensionSerializer
         if (dependencyNode != null) {
             localExtension.setDependency(Boolean.valueOf(dependencyNode.getTextContent()));
         }
-        Node enabledNode = getNode(extensionElement, ELEMENT_INSTALLED);
-        if (enabledNode != null) {
-            localExtension.setInstalled(Boolean.valueOf(enabledNode.getTextContent()));
-        }
         Node nameNode = getNode(extensionElement, ELEMENT_NAME);
         if (nameNode != null) {
             localExtension.setName(nameNode.getTextContent());
@@ -131,9 +130,24 @@ public class ExtensionSerializer
         if (authorsNodes.getLength() > 0) {
             NodeList authors = authorsNodes.item(0).getChildNodes();
             for (int i = 0; i < authors.getLength(); ++i) {
-                Node authorsNode = authors.item(i);
+                Node authorNode = authors.item(i);
 
-                localExtension.addAuthor(authorsNode.getTextContent());
+                if (authorNode.getNodeName() == ELEMENT_AAUTHOR) {
+                    localExtension.addAuthor(authorNode.getTextContent());
+                }
+            }
+        }
+
+        // Features
+        NodeList featuresNodes = extensionElement.getElementsByTagName(ELEMENT_FEATURES);
+        if (featuresNodes.getLength() > 0) {
+            NodeList features = featuresNodes.item(0).getChildNodes();
+            for (int i = 0; i < features.getLength(); ++i) {
+                Node featureNode = features.item(i);
+
+                if (featureNode.getNodeName() == ELEMENT_NFEATURE) {
+                    localExtension.addFeature(featureNode.getTextContent().trim());
+                }
             }
         }
 
@@ -152,6 +166,13 @@ public class ExtensionSerializer
                         dependencyVersionNode.getTextContent()));
                 }
             }
+        }
+
+        // Install fields
+
+        Node enabledNode = getNode(extensionElement, ELEMENT_INSTALLED);
+        if (enabledNode != null) {
+            localExtension.setInstalled(Boolean.valueOf(enabledNode.getTextContent()));
         }
 
         // Namespaces
@@ -190,7 +211,7 @@ public class ExtensionSerializer
     }
 
     public void saveDescriptor(LocalExtension extension, FileOutputStream fos) throws ParserConfigurationException,
-        TransformerException, IOException
+        TransformerException
     {
         DocumentBuilder documentBuilder = this.documentBuilderFactory.newDocumentBuilder();
         Document document = documentBuilder.newDocument();
@@ -201,16 +222,21 @@ public class ExtensionSerializer
         addElement(document, extensionElement, ELEMENT_ID, extension.getId().getId());
         addElement(document, extensionElement, ELEMENT_VERSION, extension.getId().getVersion());
         addElement(document, extensionElement, ELEMENT_TYPE, extension.getType());
-
         addElement(document, extensionElement, ELEMENT_DEPENDENCY, String.valueOf(extension.isDependency()));
-        addElement(document, extensionElement, ELEMENT_INSTALLED, String.valueOf(extension.isInstalled()));
         addElement(document, extensionElement, ELEMENT_NAME, extension.getName());
         addElement(document, extensionElement, ELEMENT_DESCRIPTION, extension.getDescription());
         addElement(document, extensionElement, ELEMENT_WEBSITE, extension.getWebSite());
+        addCollection(document, extensionElement, extension.getAuthors(), ELEMENT_AAUTHOR, ELEMENT_AUTHORS);
+        addCollection(document, extensionElement, extension.getNamespaces(), ELEMENT_NFEATURE, ELEMENT_FEATURES);
 
-        addAuthors(document, extensionElement, extension);
         addDependencies(document, extensionElement, extension);
-        addNamespaces(document, extensionElement, extension);
+
+        // install metadata
+
+        addElement(document, extensionElement, ELEMENT_INSTALLED, String.valueOf(extension.isInstalled()));
+        addCollection(document, extensionElement, extension.getNamespaces(), ELEMENT_NNAMESPACE, ELEMENT_NAMESPACES);
+
+        // save
 
         TransformerFactory transfac = TransformerFactory.newInstance();
         Transformer trans = transfac.newTransformer();
@@ -243,16 +269,6 @@ public class ExtensionSerializer
                 addElement(document, dependencyElement, ELEMENT_VERSION, dependency.getVersion());
             }
         }
-    }
-
-    private void addNamespaces(Document document, Element parentElement, LocalExtension extension)
-    {
-        addCollection(document, parentElement, extension.getNamespaces(), ELEMENT_NNAMESPACE, ELEMENT_NAMESPACES);
-    }
-
-    private void addAuthors(Document document, Element parentElement, LocalExtension extension)
-    {
-        addCollection(document, parentElement, extension.getAuthors(), ELEMENT_AAUTHOR, ELEMENT_AUTHORS);
     }
 
     private void addCollection(Document document, Element parentElement, Collection<String> elements,

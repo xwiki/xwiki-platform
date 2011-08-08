@@ -78,6 +78,8 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
             // expected
         }
 
+        Assert.assertNotNull(localExtensionRepository.getInstalledExtension("feature", null));
+
         uninstall(this.testArtifactId);
 
         Assert.assertNull(this.localExtensionRepository.getInstalledExtension(this.testArtifactId.getId(), null));

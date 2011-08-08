@@ -37,18 +37,21 @@ import org.xwiki.extension.repository.ExtensionRepositoryFactory;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.aether.internal.configuration.AetherConfiguration;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
+import org.xwiki.properties.ConverterManager;
 
 @Component
 @Singleton
 @Named("maven")
-public class AetherExtensionRepositoryFactory implements ExtensionRepositoryFactory,
-    Initializable
+public class AetherExtensionRepositoryFactory implements ExtensionRepositoryFactory, Initializable
 {
     @Inject
     private PlexusComponentManager aetherComponentManager;
 
     @Inject
     private AetherConfiguration aetherConfiguration;
+
+    @Inject
+    private ConverterManager converterManager;
 
     private DefaultRepositorySystemSession session;
 
@@ -72,7 +75,8 @@ public class AetherExtensionRepositoryFactory implements ExtensionRepositoryFact
     public ExtensionRepository createRepository(ExtensionRepositoryId repositoryId) throws ExtensionRepositoryException
     {
         try {
-            return new AetherExtensionRepository(repositoryId, this.session, this.aetherComponentManager);
+            return new AetherExtensionRepository(repositoryId, this.session, this.aetherComponentManager,
+                this.converterManager);
         } catch (Exception e) {
             throw new ExtensionRepositoryException("Failed to create repository [" + repositoryId + "]", e);
         }

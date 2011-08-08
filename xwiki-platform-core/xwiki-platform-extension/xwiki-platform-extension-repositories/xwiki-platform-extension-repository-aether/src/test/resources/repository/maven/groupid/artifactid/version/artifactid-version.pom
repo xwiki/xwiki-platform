@@ -10,6 +10,9 @@
 	<packaging>type</packaging>
 	<description>description</description>
 	<url>http://website</url>
+    <properties>
+      <xwiki.extension.features>feature1,feature2</xwiki.extension.features>
+    </properties>
 	<dependencies>
 	  <dependency>
 	    <groupId>dgroupid</groupId>

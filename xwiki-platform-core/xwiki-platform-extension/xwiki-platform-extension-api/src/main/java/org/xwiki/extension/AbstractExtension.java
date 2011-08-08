@@ -20,10 +20,14 @@
 package org.xwiki.extension;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.xwiki.extension.repository.ExtensionRepository;
 
@@ -38,6 +42,11 @@ public abstract class AbstractExtension implements Extension
      * @see #getId()
      */
     protected ExtensionId id;
+
+    /**
+     * @see #getFeatures()
+     */
+    protected Set<String> features = new HashSet<String>();
 
     /**
      * @see #getType()
@@ -78,7 +87,7 @@ public abstract class AbstractExtension implements Extension
      * @see #getDependencies()
      */
     protected List<ExtensionDependency> dependencies;
-    
+
     /**
      * @param repository the repository where this extension comes from
      * @param id the extension identifier
@@ -102,6 +111,8 @@ public abstract class AbstractExtension implements Extension
     {
         this(repository, extension.getId(), extension.getType());
 
+        setFeatures(extension.getFeatures());
+        
         setDescription(extension.getDescription());
         setAuthors(extension.getAuthors());
         setWebsite(extension.getWebSite());
@@ -129,6 +140,34 @@ public abstract class AbstractExtension implements Extension
     protected void setId(ExtensionId id)
     {
         this.id = id;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#getFeatures()
+     */
+    public Collection<String> getFeatures()
+    {
+        return this.features;
+    }
+
+    /**
+     * @param features the extension ids also provided by this extension
+     */
+    public void setFeatures(Collection<String> features)
+    {
+        this.features = new LinkedHashSet<String>(features);
+    }
+
+    /**
+     * Add a new feature to the extension.
+     * 
+     * @param feature a feature name
+     */
+    public void addFeature(String feature)
+    {
+        this.features.add(feature);
     }
 
     /**

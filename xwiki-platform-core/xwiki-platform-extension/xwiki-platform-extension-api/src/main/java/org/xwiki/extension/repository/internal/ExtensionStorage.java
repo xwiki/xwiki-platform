@@ -84,7 +84,7 @@ public class ExtensionStorage
             for (File child : this.rootFolder.listFiles(descriptorFilter)) {
                 if (!child.isDirectory()) {
                     try {
-                        LocalExtension localExtension = loadDescriptor(child);
+                        DefaultLocalExtension localExtension = loadDescriptor(child);
 
                         repository.addLocalExtension(localExtension);
                     } catch (Exception e) {
@@ -104,7 +104,7 @@ public class ExtensionStorage
      * @return the extension descriptor
      * @throws InvalidExtensionException error when trying to load extension descriptor
      */
-    private LocalExtension loadDescriptor(File descriptor) throws InvalidExtensionException
+    private DefaultLocalExtension loadDescriptor(File descriptor) throws InvalidExtensionException
     {
         FileInputStream fis;
         try {
@@ -190,5 +190,16 @@ public class ExtensionStorage
 
             return fileName;
         }
+    }
+
+    /**
+     * Remove extension from storage.
+     * 
+     * @param extension extension to remove
+     */
+    protected void removeExtension(LocalExtension extension)
+    {
+        getExtensionFile(extension.getId(), extension.getType()).delete();
+        getDescriptorFile(extension.getId()).delete();
     }
 }

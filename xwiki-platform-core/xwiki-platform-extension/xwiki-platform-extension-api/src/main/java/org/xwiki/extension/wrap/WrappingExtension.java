@@ -20,6 +20,7 @@
 package org.xwiki.extension.wrap;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -68,6 +69,17 @@ public class WrappingExtension<T extends Extension> implements Extension
     public ExtensionId getId()
     {
         return getExtension().getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.Extension#getFeatures()
+     */
+    @Override
+    public Collection<String> getFeatures()
+    {
+        return getExtension().getFeatures();
     }
 
     /**

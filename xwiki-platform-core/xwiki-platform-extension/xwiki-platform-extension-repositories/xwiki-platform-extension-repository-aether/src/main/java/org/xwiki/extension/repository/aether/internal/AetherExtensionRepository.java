@@ -38,6 +38,7 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
+import org.xwiki.properties.ConverterManager;
 
 public class AetherExtensionRepository implements ExtensionRepository
 {
@@ -53,8 +54,10 @@ public class AetherExtensionRepository implements ExtensionRepository
 
     private Method loadPomMethod;
 
+    private ConverterManager converter;
+
     public AetherExtensionRepository(ExtensionRepositoryId repositoryId, RepositorySystemSession session,
-        PlexusComponentManager mavenComponentManager) throws Exception
+        PlexusComponentManager mavenComponentManager, ConverterManager converter) throws Exception
     {
         this.repositoryId = repositoryId;
 
@@ -65,6 +68,8 @@ public class AetherExtensionRepository implements ExtensionRepository
         this.artifactDescriptorReader = this.plexusComponentManager.getPlexus().lookup(ArtifactDescriptorReader.class);
 
         this.remoteRepository = new RemoteRepository(repositoryId.getId(), "default", repositoryId.getURI().toString());
+
+        this.converter = converter;
 
         // FIXME: not very nice
         // * use a private method of a library we don't control is not the nicest thing...
@@ -102,7 +107,7 @@ public class AetherExtensionRepository implements ExtensionRepository
             throw new ResolveException("Failed to resolve extension [" + extensionId + "] descriptor", e);
         }
 
-        return new AetherExtension(extensionId, model, this, this.plexusComponentManager);
+        return new AetherExtension(extensionId, model, this, this.plexusComponentManager, this.converter);
     }
 
     private Model loadPom(RepositorySystemSession session, ExtensionId extensionId) throws IllegalArgumentException,

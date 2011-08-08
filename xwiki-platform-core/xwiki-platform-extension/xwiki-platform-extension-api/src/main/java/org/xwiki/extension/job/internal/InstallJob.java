@@ -293,16 +293,18 @@ public class InstallJob extends AbstractJob<InstallRequest>
                     this.logger.error("Failed to uninstall extension [" + previousExtension + "]", e);
                 }
 
+                this.localExtensionRepository.installExtension(localExtension, namespace);
+                
                 this.observationManager.notify(new ExtensionUpgradedEvent(localExtension.getId()), localExtension,
                     previousExtension);
             } else {
                 this.extensionHandlerManager.install(localExtension, namespace);
 
+                this.localExtensionRepository.installExtension(localExtension, namespace);
+                
                 this.observationManager.notify(new ExtensionInstalledEvent(localExtension.getId()), localExtension,
                     previousExtension);
             }
-
-            this.localExtensionRepository.installExtension(localExtension, namespace);
 
             return localExtension;
         } finally {

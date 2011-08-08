@@ -22,6 +22,7 @@ package org.xwiki.extension.repository.aether.internal;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -38,6 +39,7 @@ import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
+import org.xwiki.properties.ConverterManager;
 
 public class AetherExtension extends AbstractExtension
 {
@@ -45,7 +47,9 @@ public class AetherExtension extends AbstractExtension
 
     private String PKEY_ARTIFACTID = "aether.artifactid";
 
-    private String MPKEY_FEATURES = "xwiki.features";
+    private String MPKEYPREFIX = "xwiki.extension.";
+
+    private String MPKEY_FEATURES = MPKEYPREFIX + "features";
 
     private PlexusComponentManager plexusComponentManager;
 
@@ -54,7 +58,7 @@ public class AetherExtension extends AbstractExtension
     private Model mavenModel;
 
     public AetherExtension(ExtensionId id, Model mavenModel, AetherExtensionRepository repository,
-        PlexusComponentManager mavenComponentManager)
+        PlexusComponentManager mavenComponentManager, ConverterManager converter)
     {
         super(repository, id, mavenModel.getPackaging());
 
@@ -67,9 +71,11 @@ public class AetherExtension extends AbstractExtension
             addAuthor(developer.getId());
         }
         setWebsite(this.mavenModel.getUrl());
-        
+
         // features
         String featuresString = this.mavenModel.getProperties().getProperty(MPKEY_FEATURES);
+        setFeatures(converter.<Collection<String>> convert(List.class, featuresString));
+
         // TODO: parse features list
 
         // dependencies

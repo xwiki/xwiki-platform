@@ -262,7 +262,7 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
      */
     private void installLocalExtension(DefaultLocalExtension localExtension, String namespace) throws InstallException
     {
-        localExtension.setInstalled(false, namespace);
+        localExtension.setInstalled(true, namespace);
 
         try {
             this.storage.saveDescriptor(localExtension);

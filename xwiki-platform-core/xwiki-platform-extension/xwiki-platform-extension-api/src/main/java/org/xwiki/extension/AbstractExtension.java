@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -110,6 +111,8 @@ public abstract class AbstractExtension implements Extension
     {
         this(repository, extension.getId(), extension.getType());
 
+        setFeatures(extension.getFeatures());
+        
         setDescription(extension.getDescription());
         setAuthors(extension.getAuthors());
         setWebsite(extension.getWebSite());
@@ -150,9 +153,17 @@ public abstract class AbstractExtension implements Extension
     }
 
     /**
+     * @param features the extension ids also provided by this extension
+     */
+    public void setFeatures(Collection<String> features)
+    {
+        this.features = new LinkedHashSet<String>(features);
+    }
+
+    /**
      * Add a new feature to the extension.
      * 
-     * @param feature an author name
+     * @param feature a feature name
      */
     public void addFeature(String feature)
     {

@@ -34,7 +34,7 @@ import org.xwiki.extension.repository.ExtensionRepository;
  * Wrap an extension.
  * 
  * @param <T> the extension type
- * @version $Id: fa8307e45f05478aaaf1fe492059e1054e7865a2 $
+ * @version $Id$
  */
 public class WrappingExtension<T extends Extension> implements Extension
 {

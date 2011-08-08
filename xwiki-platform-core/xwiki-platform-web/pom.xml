@@ -65,6 +65,29 @@
           <packagingExcludes>WEB-INF/classes/META-INF/**</packagingExcludes>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>com.github.searls</groupId>
+        <artifactId>jasmine-maven-plugin</artifactId>
+        <version>1.0.2-beta-5</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <sourceIncludes>
+            <include>js/prototype/prototype.js</include>
+            <include>uicomponents/widgets/list/xlist.js</include>
+            <include>uicomponents/suggest/suggest.js</include>
+          </sourceIncludes>
+          <specIncludes>
+            <include>spec/**/*.js</include>
+          </specIncludes>
+          <jsSrcDir>${project.basedir}/src/main/webapp/resources</jsSrcDir>
+        </configuration>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>

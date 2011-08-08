@@ -40,6 +40,7 @@ public class XWikiExtension extends AbstractExtension
         setDescription(extension.getDescription());
         setAuthors(extension.getAuthors());
         setWebsite(extension.getWebsite());
+        setFeatures(extension.getFeatures());
 
         for (ExtensionDependency dependency : extension.getDependencies()) {
             addDependency(new XWikiExtensionDependency(dependency));

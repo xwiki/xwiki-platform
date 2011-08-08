@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.Model;
@@ -74,7 +75,9 @@ public class AetherExtension extends AbstractExtension
 
         // features
         String featuresString = this.mavenModel.getProperties().getProperty(MPKEY_FEATURES);
-        setFeatures(converter.<Collection<String>> convert(List.class, featuresString));
+        if (StringUtils.isNotBlank(featuresString)) {
+            setFeatures(converter.<Collection<String>> convert(List.class, featuresString));
+        }
 
         // TODO: parse features list
 

@@ -41,8 +41,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
-      <!-- The jar is repackaged into the current one -->
-      <scope>provided</scope>
     </dependency>
 
     <!-- Build tools -->

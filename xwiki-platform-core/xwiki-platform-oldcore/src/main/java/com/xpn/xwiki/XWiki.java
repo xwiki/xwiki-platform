@@ -5179,7 +5179,11 @@ public class XWiki implements EventListener
                 if ("1".equals(Param("xwiki.virtual.usepath", "0"))
                     && servletPath.equals("/" + Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
                     // Virtual mode, skip the wiki name
-                    path = path.substring(path.indexOf('/', 1));
+                    if (path.indexOf('/', 1) < 0) {
+                        path = "";
+                    } else {
+                        path = path.substring(path.indexOf('/', 1));
+                    }
                 }
 
                 // Fix error in some containers, which don't hide the jsessionid parameter from the URL

@@ -345,6 +345,8 @@
                 <exclude>org/xwiki/bridge/DocumentNameFactory</exclude>
                 <exclude>org/xwiki/bridge/DocumentNameSerializer</exclude>
                 <exclude>com/xpn/xwiki/plugin/wikimanager/WikiManager</exclude>
+                <exclude>com/xpn/xwiki/plugin/adwords/AdWordsPluginApi</exclude>
+                <exclude>com/xpn/xwiki/plugin/alexa/AlexaPluginApi</exclude>
               </excludes>
             </configuration>
           </plugin>

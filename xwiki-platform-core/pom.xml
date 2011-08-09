@@ -347,6 +347,12 @@
                 <exclude>com/xpn/xwiki/plugin/wikimanager/WikiManager</exclude>
                 <exclude>com/xpn/xwiki/plugin/adwords/AdWordsPluginApi</exclude>
                 <exclude>com/xpn/xwiki/plugin/alexa/AlexaPluginApi</exclude>
+                <excludes>com/xpn/xwiki/api/Api</excludes>
+                <excludes>com/xpn/xwiki/api/Context</excludes>
+                <excludes>com/xpn/xwiki/api/Document</excludes>
+                <excludes>com/xpn/xwiki/api/StatsService</excludes>
+                <excludes>com/xpn/xwiki/api/StatsServiceCompatibilityAspect</excludes>
+                <excludes>com/xpn/xwiki/api/XWiki</excludes>
               </excludes>
             </configuration>
           </plugin>

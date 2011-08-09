@@ -33,6 +33,9 @@
   <name>XWiki Platform - Old Core</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Old Core</description>
+  <properties>
+    <xwiki.extension.features>com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
+  </properties>
   <dependencies>
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->

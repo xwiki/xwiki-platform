@@ -34,7 +34,7 @@
   <packaging>jar</packaging>
   <description>xwiki-platform-oldcore repackaging including legacy aspects</description>
   <properties>
-    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-oldcore</xwiki.extension.features>
+    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-oldcore,com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

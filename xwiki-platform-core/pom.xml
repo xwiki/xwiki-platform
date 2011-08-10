@@ -353,6 +353,10 @@
                 <excludes>com/xpn/xwiki/api/StatsService</excludes>
                 <excludes>com/xpn/xwiki/api/StatsServiceCompatibilityAspect</excludes>
                 <excludes>com/xpn/xwiki/api/XWiki</excludes>
+                <excludes>com/xpn/xwiki/api/XWikiCompatibilityAspect</excludes>
+                <excludes>compatibility/com/xpn/xwiki/api/ApiCompatibilityAspect</excludes>
+                <excludes>compatibility/com/xpn/xwiki/api/ContextCompatibilityAspect</excludes>
+                <excludes>compatibility/com/xpn/xwiki/api/DocumentCompatibilityAspect</excludes>
               </excludes>
             </configuration>
           </plugin>

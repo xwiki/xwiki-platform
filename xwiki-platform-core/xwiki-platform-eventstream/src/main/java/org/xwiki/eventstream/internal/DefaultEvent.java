@@ -24,6 +24,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.eventstream.Event;
@@ -479,7 +480,8 @@ public class DefaultEvent implements Event
      */
     public Map<String, String> getParameters()
     {
-        return this.parameters == null ? Collections.<String, String> emptyMap() : this.parameters;
+        return this.parameters == null ? Collections.<String, String> emptyMap()
+            : Collections.unmodifiableMap(this.parameters);
     }
 
     /**
@@ -490,7 +492,7 @@ public class DefaultEvent implements Event
      */
     public void setParameters(Map<String, String> parameters)
     {
-        this.parameters = parameters;
+        this.parameters = new HashMap<String, String>(parameters);
     }
     
     /**

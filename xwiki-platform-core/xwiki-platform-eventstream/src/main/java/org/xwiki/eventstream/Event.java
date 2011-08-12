@@ -47,7 +47,7 @@ import org.xwiki.model.reference.WikiReference;
  * <ul>
  * <li>a {@link #getTitle() title}</li>
  * <li>a {@link #getBody() body}</li>
- * <li>and a map of {@link #getParameters()} parameters</li>
+ * <li>and a map of {@link #getParameters() parameters}</li>
  * </ul>
  * </p>
  * <p>

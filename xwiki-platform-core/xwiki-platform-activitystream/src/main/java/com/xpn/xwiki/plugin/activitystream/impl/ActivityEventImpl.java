@@ -22,6 +22,7 @@ package com.xpn.xwiki.plugin.activitystream.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
@@ -131,6 +132,11 @@ public class ActivityEventImpl implements ActivityEvent
      */
     private String param5 = "";
 
+    /**
+     * Named parameters.
+     */
+    private Map<String, String> parameters;
+    
     /**
      * {@inheritDoc}
      */
@@ -521,5 +527,21 @@ public class ActivityEventImpl implements ActivityEvent
     public void setApplication(String application)
     {
         this.application = application;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setParameters(Map<String, String> parameters)
+    {
+        this.parameters = parameters;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String, String> getParameters()
+    {
+        return this.parameters;
     }
 }

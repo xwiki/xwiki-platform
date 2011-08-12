@@ -357,6 +357,9 @@
                 <excludes>compatibility/com/xpn/xwiki/api/ApiCompatibilityAspect</excludes>
                 <excludes>compatibility/com/xpn/xwiki/api/ContextCompatibilityAspect</excludes>
                 <excludes>compatibility/com/xpn/xwiki/api/DocumentCompatibilityAspect</excludes>
+                <exclude>org/xwiki/eventstream/Event</exclude>
+                <exclude>com/xpn/xwiki/plugin/activitystream/api/ActivityEvent</exclude>
+                <exclude>com/xpn/xwiki/plugin/activitystream/plugin/ActivityEvent</exclude>
               </excludes>
             </configuration>
           </plugin>

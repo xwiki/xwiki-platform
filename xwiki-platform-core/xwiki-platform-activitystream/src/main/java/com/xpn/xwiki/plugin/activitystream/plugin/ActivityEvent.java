@@ -23,6 +23,7 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.XWikiContext;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Api wrapper for a {@link com.xpn.xwiki.plugin.activitystream.api.ActivityEvent} to be exposed from velocity.
@@ -264,6 +265,14 @@ public class ActivityEvent extends Api
         return event.getDisplayUser(context);
     }
 
+    /**
+     * @return the parameters associated with the event
+     */
+    public Map<String, String> getParameters()
+    {
+        return event.getParameters();
+    }
+    
     /**
      * @return the wrapped event
      */

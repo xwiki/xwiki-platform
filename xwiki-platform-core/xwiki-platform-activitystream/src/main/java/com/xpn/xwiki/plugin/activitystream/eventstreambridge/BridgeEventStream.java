@@ -215,6 +215,8 @@ public class BridgeEventStream implements EventStream
         result.setVersion(e.getDocumentVersion());
         result.setWiki(this.serializer.serialize(e.getWiki()));
 
+        result.setParameters(e.getParameters());
+        
         return result;
     }
 
@@ -280,6 +282,7 @@ public class BridgeEventStream implements EventStream
         result.setUser(new DocumentReference(this.resolver.resolve(e.getUser(), EntityType.DOCUMENT)));
         result.setDocumentVersion(e.getVersion());
 
+        result.setParameters(e.getParameters());
         return result;
     }
 }

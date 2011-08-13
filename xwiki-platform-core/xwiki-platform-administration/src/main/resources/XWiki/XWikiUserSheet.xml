@@ -476,7 +476,7 @@ span#avatarUpload {
 }
 
 #vertical-tabs ul li a {
-  padding: 3px 0px 3px 10px;
+  padding: 3px 0px 3px 4px;
   text-decoration: none;
   display:block;
   color:$theme.menuBackgroundColor;
@@ -488,7 +488,7 @@ span#avatarUpload {
   left:1px;
   background:$theme.pageContentBackgroundColor;
   color: $theme.textColor;
-  padding-left: 9px;
+  padding-left: 3px;
 }
 
 .vertical-pane {

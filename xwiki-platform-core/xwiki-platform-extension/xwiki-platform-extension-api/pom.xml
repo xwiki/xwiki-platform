@@ -72,13 +72,7 @@
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
-      <version>0.9.5-RC2</version>
-      <exclusions>
-        <exclusion>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>0.9.5</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>

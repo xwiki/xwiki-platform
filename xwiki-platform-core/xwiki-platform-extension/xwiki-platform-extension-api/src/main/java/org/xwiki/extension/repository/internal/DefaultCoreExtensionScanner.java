@@ -95,7 +95,7 @@ public class DefaultCoreExtensionScanner
      */
     public Map<String, DefaultCoreExtension> loadExtensions(DefaultCoreExtensionRepository repository)
     {
-        Set<URL> baseURLs = ClasspathHelper.getUrlsForPackagePrefix(MAVENPACKAGE);
+        Set<URL> baseURLs = ClasspathHelper.forPackage(MAVENPACKAGE);
 
         baseURLs = filterURLs(baseURLs);
 
@@ -150,7 +150,7 @@ public class DefaultCoreExtensionScanner
                 }
 
                 DefaultCoreExtension coreExtension =
-                    new DefaultCoreExtension(repository, ClasspathHelper.getBaseUrl(descriptorUrl, baseURLs),
+                    new DefaultCoreExtension(repository, descriptorUrl,
                         new ExtensionId(groupId + ':' + mavenModel.getArtifactId(), version),
                         packagingToType(mavenModel.getPackaging()));
 
@@ -184,7 +184,7 @@ public class DefaultCoreExtensionScanner
             // Normalize and guess
 
             Map<String, Object[]> artefacts = new HashMap<String, Object[]>();
-            Set<URL> urls = ClasspathHelper.getUrlsForCurrentClasspath();
+            Set<URL> urls = ClasspathHelper.forClassLoader();
 
             for (URL url : urls) {
                 String filename = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);

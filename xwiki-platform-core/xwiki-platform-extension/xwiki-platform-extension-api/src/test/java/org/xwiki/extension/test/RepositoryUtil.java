@@ -114,7 +114,7 @@ public class RepositoryUtil
 
         Reflections reflections =
             new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner())
-                .setUrls(ClasspathHelper.getUrlsForPackagePrefix(""))
+                .setUrls(ClasspathHelper.forPackage(""))
                 .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(resourcePackage))));
 
         for (String resource : reflections.getResources(Pattern.compile(".*"))) {

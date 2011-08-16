@@ -154,6 +154,12 @@ textarea, select {
 textarea {
   max-width: 100%; /* Prevent resizing beyond the visible area in modern browsers */
 }
+/* IE7 will shrink floated textareas continuously if we set a max-width,
+   since 100% max-width is computed within the border, while the current width includes the border.
+   Disable it since anyway it doesn't support native textarea resizing. */
+*+html textarea {
+  max-width: none;
+}
 
 /* -----------------------Tables-------------------------*/
 table {
@@ -1255,6 +1261,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 .actionmenu .tmUserNetwork {
   background-image: url("$xwiki.getSkinFile('icons/silk/group.gif')");
+}
+
+.actionmenu .tmUserDashboard {
+  background-image: url("$xwiki.getSkinFile('icons/silk/application_view_tile.gif')");
 }
 
 /* @group FORMS */

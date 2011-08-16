@@ -3181,6 +3181,11 @@ public class XWiki implements EventListener
 
         needsUpdate |= bclass.addNumberField("upload_maxsize", "Maximum Upload Size", 5, "long");
 
+        // Captcha for guest comments
+        needsUpdate |=
+            bclass.addBooleanField("guest_comment_requires_captcha",
+                "Enable CAPTCHA in Comments for Unregistered Users", "select");
+
         // Document editing
         needsUpdate |= bclass.addTextField("core.defaultDocumentSyntax", "Default document syntax", 60);
         needsUpdate |= bclass.addBooleanField("xwiki.title.mandatory", "Make document title field mandatory", "yesno");
@@ -5113,7 +5118,11 @@ public class XWiki implements EventListener
                 if ("1".equals(Param("xwiki.virtual.usepath", "0"))
                     && servletPath.equals("/" + Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
                     // Virtual mode, skip the wiki name
-                    path = path.substring(path.indexOf('/', 1));
+                    if (path.indexOf('/', 1) < 0) {
+                        path = "";
+                    } else {
+                        path = path.substring(path.indexOf('/', 1));
+                    }
                 }
 
                 // Fix error in some containers, which don't hide the jsessionid parameter from the URL

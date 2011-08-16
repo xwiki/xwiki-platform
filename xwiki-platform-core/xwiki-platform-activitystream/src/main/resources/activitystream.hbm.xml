@@ -27,5 +27,10 @@
     <property name="param3" type="string" column="ase_param3" length="2000" />
     <property name="param4" type="string" column="ase_param4" length="2000" />
     <property name="param5" type="string" column="ase_param5" length="2000" />
+    <map name="parameters" table="activitystream_events_parameters" lazy="false">
+      <key column="eventId"/>
+      <index column="name" type="string" length="255"/>
+      <element column="value" type="string" length="2000"/>
+    </map>
   </class>
 </hibernate-mapping>

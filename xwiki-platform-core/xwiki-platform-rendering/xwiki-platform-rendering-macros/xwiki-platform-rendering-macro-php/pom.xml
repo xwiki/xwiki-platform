@@ -65,11 +65,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <id>maven2-repository.caucho.com</id>
-      <name>Caucho Repository for Maven</name>
-      <url>http://caucho.com/m2/</url>
-    </repository>
-  </repositories>
 </project>

@@ -836,12 +836,12 @@ $heading
 
       {{html clean=false wiki=false}}
         &lt;form id="loginForm" action="$loginURL" method="post"&gt;
-          &lt;div&gt;
+          &lt;div class="centered"&gt;
           &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
           &lt;input id="j_username" name="j_username" type="hidden" value="$escapetool.xml($!userName)" /&gt;
           &lt;input id="j_password" name="j_password" type="hidden" value="$escapetool.xml($!password)" /&gt;
           &lt;input id="$redirectParam" name="$redirectParam" type="hidden" value="$escapetool.xml($redirect)" /&gt;
-          &lt;span class="buttonwrapper" style="margin-left:47%;"&gt;
+          &lt;span class="buttonwrapper"&gt;
             &lt;input type="submit" value="$msg.get('login')" class="button"/&gt;
           &lt;/span&gt;
           &lt;/div&gt;

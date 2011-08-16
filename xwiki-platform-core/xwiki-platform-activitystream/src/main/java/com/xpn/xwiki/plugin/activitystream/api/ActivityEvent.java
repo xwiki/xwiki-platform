@@ -21,6 +21,7 @@ package com.xpn.xwiki.plugin.activitystream.api;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -340,5 +341,17 @@ public interface ActivityEvent
      * @param params parameters to set, a list of at most 5 entries
      */
     void setParams(List<String> params);
+
+    /**
+     * Associates name-value pair parameters with this event.
+     * 
+     * @param parameters the parameters to associate
+     */
+    void setParameters(Map<String, String> parameters);
+
+    /**
+     * @return name-value pair parameters associated with this event.
+     */
+    Map<String, String> getParameters();
 
 }

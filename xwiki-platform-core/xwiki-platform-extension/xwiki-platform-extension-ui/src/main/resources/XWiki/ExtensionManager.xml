@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1284039567000</creationDate>
-<date>1305186885000</date>
-<contentUpdateDate>1305186885000</contentUpdateDate>
+<date>1312961417000</date>
+<contentUpdateDate>1312961417000</contentUpdateDate>
 <version>1.1</version>
 <title>Extension Manager</title>
 <template></template>
@@ -525,31 +525,31 @@ This application is experimental, use it at your own risk.
 
       #end
       #if (!$coreExtensionsConflicts.isEmpty())
-        {{warning}}
+        {{error}}
           Conflict with core extensions:
           #foreach ($conflict in $coreExtensionsConflicts.values())
             * extension **$conflict.get(0).id.id** is needed in version **$conflict.get(1)** but core extension has version **$conflict.get(0).id.version**
           #end
-
-          Are you sure you want to install ?
-        {{/warning}}
+        {{/error}}
 
       #end
-      {{html}}
-      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform"&gt;
-        &lt;div&gt;
-          &lt;input name="extensionid" value="${escapetool.xml($request.extensionid)}" type="hidden" /&gt;
-          &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;
-          #if ($extensionwiki)
-            &lt;input name="extensionwiki" value="$extensionwiki" type="hidden" /&gt;
-          #end
-          &lt;input name="actioninstall" type="hidden" /&gt;
-          &lt;p&gt;
-            &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
-          &lt;/p&gt;
-        &lt;/div&gt;
-      &lt;/form&gt;
-      {{/html}}
+      #if ($coreExtensionsConflicts.isEmpty())
+        {{html}}
+        &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform"&gt;
+          &lt;div&gt;
+            &lt;input name="extensionid" value="${escapetool.xml($request.extensionid)}" type="hidden" /&gt;
+            &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;
+            #if ($extensionwiki)
+              &lt;input name="extensionwiki" value="$extensionwiki" type="hidden" /&gt;
+            #end
+            &lt;input name="actioninstall" type="hidden" /&gt;
+            &lt;p&gt;
+              &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/form&gt;
+        {{/html}}
+      #end
     #end
   #end
 #elseif($request.actionuninstall)

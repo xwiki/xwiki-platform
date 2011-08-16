@@ -1,4 +1,0 @@
-org.xwiki.legacy.internal.LegacyEventDispatcher
-org.xwiki.annotation.internal.AnnotationVelocityContextInitializer
-org.xwiki.bridge.internal.DefaultAttachmentNameFactory
-org.xwiki.bridge.internal.DefaultAttachmentNameSerializer

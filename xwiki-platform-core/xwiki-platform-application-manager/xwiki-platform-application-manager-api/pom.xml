@@ -37,8 +37,10 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
-    <!-- Needed at test time. Some versions of Maven don't inherit provided dependencies. -->
+
+    <!-- Test dependencies -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>

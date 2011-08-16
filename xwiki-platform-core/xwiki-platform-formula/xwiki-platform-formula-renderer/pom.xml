@@ -122,11 +122,4 @@
       </plugin>
     </plugins>
   </build>
-  <repositories>
-    <!-- SnuggleTeX repository -->
-    <repository>
-      <id>www.ph.ed.ac.uk-releases</id>
-      <url>http://www.ph.ed.ac.uk/maven2</url>
-    </repository>
-  </repositories>
 </project>

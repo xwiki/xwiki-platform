@@ -47,6 +47,7 @@ import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.repository.LocalExtensionRepositoryException;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -185,7 +186,7 @@ public class XarLocalExtensionRepository implements LocalExtensionRepository, In
     {
         return new ArrayList<LocalExtension>(this.extensions.values()).subList(offset, offset + nb);
     }
-    
+
     public Collection<LocalExtension> getLocalExtensions()
     {
         return Collections.<LocalExtension> unmodifiableCollection(this.extensions.values());
@@ -221,15 +222,47 @@ public class XarLocalExtensionRepository implements LocalExtensionRepository, In
         return extension;
     }
 
-    public LocalExtension installExtension(Extension extension, boolean dependency, String namespace)
-        throws InstallException
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.repository.LocalExtensionRepository#storeExtension(org.xwiki.extension.Extension,
+     *      boolean)
+     */
+    @Override
+    public LocalExtension storeExtension(Extension extension, boolean dependency)
+        throws LocalExtensionRepositoryException
     {
-        throw new InstallException("Not implemented");
+        throw new RuntimeException("Not implemented");
     }
 
+    @Override
+    public void removeExtension(LocalExtension extension) throws ResolveException
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.repository.LocalExtensionRepository#installExtension(org.xwiki.extension.LocalExtension,
+     *      java.lang.String)
+     */
+    @Override
+    public void installExtension(LocalExtension extension, String namespace) throws InstallException
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.extension.repository.LocalExtensionRepository#uninstallExtension(org.xwiki.extension.LocalExtension,
+     *      java.lang.String)
+     */
+    @Override
     public void uninstallExtension(LocalExtension extension, String namespace) throws UninstallException
     {
-        throw new UninstallException("Not implemented");
+        throw new RuntimeException("Not implemented");
     }
 
     public Collection<LocalExtension> getBackwardDependencies(String id, String namespace) throws ResolveException

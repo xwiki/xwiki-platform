@@ -117,4 +117,4 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </title>
 </class>
-<content>{{include document="XWiki.ClassSheet"/}}</content></xwikidoc>
+<content></content></xwikidoc>

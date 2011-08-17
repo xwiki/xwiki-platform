@@ -62,5 +62,4 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
 </class>
-<content>{{include document="XWiki.ClassSheet"/}}</content>
-</xwikidoc>
+<content></content></xwikidoc>

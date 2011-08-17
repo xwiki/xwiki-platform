@@ -33,21 +33,50 @@
 <defaultWeb></defaultWeb>
 <nameField></nameField>
 <validationScript></validationScript>
-<defaultEditMode>
-<name>defaultEditMode</name>
-<number>1</number>
-<prettyName>Default Edit Mode</prettyName>
-<size>15</size>
+<action>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<name>action</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>Action</prettyName>
+<size>30</size>
 <unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</defaultEditMode>
+</action>
+<display>
+<cache>0</cache>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>display</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>Display</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values>inline|page</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</display>
 </class>
 <name>Blog.CategorySheet</name>
 <number>0</number>
 <className>XWiki.SheetClass</className>
 <guid>a0c19db1-addb-4599-855e-55696c51eecd</guid>
 <property>
-<defaultEditMode></defaultEditMode>
+<action>view</action>
+</property>
+<property>
+<display>inline</display>
 </property>
 </object>
 <content>{{include document="Blog.CategoriesCode"/}}

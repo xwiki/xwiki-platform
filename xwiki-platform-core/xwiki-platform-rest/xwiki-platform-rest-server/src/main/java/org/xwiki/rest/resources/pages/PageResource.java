@@ -25,6 +25,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
@@ -33,6 +34,7 @@ import org.xwiki.rest.model.jaxb.Page;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @version $Id$
@@ -56,10 +58,77 @@ public class PageResource extends ModifiablePageResource
     @PUT
     public Response putPage(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, Page page) throws XWikiException
-    {
-        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, false, true);
+    {   
+		if (uriInfo.getQueryParameters().size() == 0) {
+			DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName,
+					pageName, null, null, false, true);
 
-        return putPage(documentInfo, page);
+			return putPage(documentInfo, page);
+		} else if (uriInfo.getQueryParameters().size() == 1) {
+			// look for query parameter of copyFrom=pageId or moveFrom=pageId
+			String action = uriInfo.getQueryParameters().keySet().iterator()
+					.next();
+			String otherPageId = uriInfo.getQueryParameters().get(action)
+					.get(0);
+
+			String wikiOfSourcePage = otherPageId.substring(0,
+					otherPageId.indexOf(":"));
+			String fullNameOfSourcePage = otherPageId.substring(otherPageId
+					.indexOf(":") + 1);
+			String spaceOfSourcePage = fullNameOfSourcePage.split("\\.")[0];
+			String pageOfSourcePage = fullNameOfSourcePage.split("\\.")[1];
+
+			DocumentInfo targetDocumentInfo = getDocumentInfo(wikiName,
+					spaceName, pageName, null, null, false, true);
+			XWikiDocument targetPage = targetDocumentInfo.getDocument()
+					.getDocument();
+
+			DocumentInfo sourcePageInfo = getDocumentInfo(wikiOfSourcePage,
+					spaceOfSourcePage, pageOfSourcePage, null, null, false,
+					true);
+
+			if (action.equalsIgnoreCase("moveFrom")) {
+				// invoke XWikiDocument.rename(newDocumentReference, context)
+				sourcePageInfo.getDocument().rename(
+						targetPage.getDocumentReference());
+
+				page = DomainObjectFactory.createPage(objectFactory,
+						uriInfo.getBaseUri(), uriInfo.getAbsolutePath(),
+						targetDocumentInfo.getDocument(), false,
+						Utils.getXWikiApi(componentManager));
+				if (targetDocumentInfo.isCreated()) {
+					return Response.created(uriInfo.getAbsolutePath())
+							.entity(page).build();
+				} else {
+					return Response.status(Status.ACCEPTED).entity(page)
+							.build();
+				}
+			}
+
+			if (action.equalsIgnoreCase("copyFrom")) {
+				// invoke XWiki.copyDocument(sourceDocumentReference,
+				// targetDocumentReference, context)
+				Utils.getXWiki(componentManager).copyDocument(
+						sourcePageInfo.getDocument().getDocumentReference(),
+						targetPage.getDocumentReference(),
+						Utils.getXWikiContext(componentManager));
+
+				page = DomainObjectFactory.createPage(objectFactory,
+						uriInfo.getBaseUri(), uriInfo.getAbsolutePath(),
+						targetDocumentInfo.getDocument(), false,
+						Utils.getXWikiApi(componentManager));
+
+				if (targetDocumentInfo.isCreated()) {
+					return Response.created(uriInfo.getAbsolutePath())
+							.entity(page).build();
+				} else {
+					return Response.status(Status.ACCEPTED).entity(page)
+							.build();
+				}
+			}
+		}
+
+		return Response.status(Status.NOT_MODIFIED).build();
     }
 
     @DELETE

@@ -908,7 +908,6 @@
               **/objects/PropertyInterface.java,
               **/objects/StringListProperty.java,
               **/pdf/impl/PdfExportImpl.java,
-              **/pdf/impl/PdfURLFactory.java,
               **/plugin/autotag/AutoTagPluginAPI.java,
               **/plugin/autotag/AutoTagPlugin.java,
               **/plugin/autotag/FrenchStemmer.java,

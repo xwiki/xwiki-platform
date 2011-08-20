@@ -90,6 +90,53 @@ public class PdfURLFactory extends XWikiServletURLFactory
 
     /**
      * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.web.XWikiURLFactory.createSkinURL(String, String, XWikiContext)
+     */
+    @Override
+    public URL createSkinURL(String filename, String skin, XWikiContext context)
+    {
+        try {
+            Map<String, File> usedFiles = getFileMapping(context);
+            String key = getSkinfileKey(filename, skin);
+            if (!usedFiles.containsKey(key)) {
+                if (!copyResource("/skins/" + skin + '/' + filename, key, usedFiles, context)) {
+                    // The resource does not exist, just return a http:// URL
+                    return super.createSkinURL(filename, skin, context);
+                }
+            }
+            return usedFiles.get(key).toURI().toURL();
+        } catch (Exception ex) {
+            // Shouldn't happen
+            return super.createSkinURL(filename, skin, context);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.web.XWikiURLFactory.createResourceURL(String, boolean, XWikiContext)
+     */
+    @Override
+    public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
+    {
+        try {
+            Map<String, File> usedFiles = getFileMapping(context);
+            String key = getResourceKey(filename);
+            if (!usedFiles.containsKey(key)) {
+                if (!copyResource("/resources/" + filename, key, usedFiles, context)) {
+                    return super.createResourceURL(filename, forceSkinAction, context);
+                }
+            }
+            return usedFiles.get(key).toURI().toURL();
+        } catch (Exception ex) {
+            // Shouldn't happen
+            return super.createResourceURL(filename, forceSkinAction, context);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public String getURL(URL url, XWikiContext context)
@@ -134,6 +181,37 @@ public class PdfURLFactory extends XWikiServletURLFactory
     }
 
     /**
+     * Copy a resource from the filesystem into a temporary file and map this resulting file to the requested resource
+     * location.
+     * 
+     * @param resourceName the name of the file to copy, possibly including a path to it, for example {@code
+     *        icons/silk/add.gif}
+     * @param key the collision-free identifier of the resource
+     * @param usedFiles the mapping of resource keys to temporary files where to put the resulting temporary file
+     * @param context the current request context
+     * @return {@code true} if copying the resource succeeded and the new temporary file was mapped to the resource key,
+     *         {@code false} otherwise
+     */
+    private boolean copyResource(String resourceName, String key, Map<String, File> usedFiles, XWikiContext context)
+    {
+        try {
+            InputStream data = context.getWiki().getResourceAsStream(resourceName);
+            if (data != null) {
+                // Copy the resource to a temporary file
+                File file = getTemporaryFile(key, context);
+                FileOutputStream fos = new FileOutputStream(file);
+                IOUtils.copy(data, fos);
+                fos.close();
+                usedFiles.put(key, file);
+                return true;
+            }
+        } catch (Exception ex) {
+            // Can't access the resource, let's hope FOP can handle the http:// URL
+        }
+        return false;
+    }
+
+    /**
      * Computes a safe identifier for an attachment, guaranteed to be collision-free.
      * 
      * @param space the name of the owner document's space
@@ -152,6 +230,40 @@ public class PdfURLFactory extends XWikiServletURLFactory
         } catch (UnsupportedEncodingException ex) {
             // This should never happen, UTF-8 is always available
             return space + SEPARATOR + name + SEPARATOR + filename + SEPARATOR + StringUtils.defaultString(revision);
+        }
+    }
+
+    /**
+     * Computes a safe identifier for a resource file, guaranteed to be collision-free.
+     * 
+     * @param filename the name of the file, possibly including a path to it, for example {@code icons/silk/add.gif}
+     * @return an identifier for this file
+     */
+    private String getResourceKey(String filename)
+    {
+        try {
+            return "resource" + SEPARATOR + URLEncoder.encode(filename, XWiki.DEFAULT_ENCODING);
+        } catch (UnsupportedEncodingException ex) {
+            // This should never happen, UTF-8 is always available
+            return filename;
+        }
+    }
+
+    /**
+     * Computes a safe identifier for a skin filename, guaranteed to be collision-free.
+     * 
+     * @param filename the name of the file, possibly including a path to it, for example {@code css/colors/black.css}
+     * @param skin the name of the skin where the file is expected to be
+     * @return an identifier for this file
+     */
+    private String getSkinfileKey(String filename, String skin)
+    {
+        try {
+            return "skin" + SEPARATOR + URLEncoder.encode(skin, XWiki.DEFAULT_ENCODING) + SEPARATOR
+                + URLEncoder.encode(filename, XWiki.DEFAULT_ENCODING);
+        } catch (UnsupportedEncodingException ex) {
+            // This should never happen, UTF-8 is always available
+            return skin + SEPARATOR + filename;
         }
     }
 

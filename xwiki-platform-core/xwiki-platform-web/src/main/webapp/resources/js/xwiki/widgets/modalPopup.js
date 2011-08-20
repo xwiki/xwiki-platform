@@ -13,7 +13,8 @@ widgets.ModalPopup = Class.create({
     screenOpacity : "0.5",
     verticalPosition : "center",
     horizontalPosition : "center",
-    removeOnClose : false
+    removeOnClose : false,
+    onClose : Prototype.emptyFunction
   },
   /** Constructor. Registers the key listener that pops up the dialog. */
   initialize : function(content, shortcuts, options) {
@@ -148,6 +149,8 @@ widgets.ModalPopup = Class.create({
         item.style.visibility = item._x_initiallyVisible;
       });
     }
+    // Call optional callback
+    this.options.onClose.call(this);
     // Hide the dialog, without removing it from the DOM.
     this.dialog.hide();
     if (this.options.removeOnClose) {
@@ -193,7 +196,7 @@ widgets.ModalPopup = Class.create({
   },
   /**
    * Disables the keyboard shortcuts for a specific action.
-   * 
+   *
    * @param {String} action The action to unregister {@see #shortcuts}
    */
   unregisterShortcuts : function(action) {

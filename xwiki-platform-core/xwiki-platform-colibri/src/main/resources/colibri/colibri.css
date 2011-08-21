@@ -1673,6 +1673,13 @@ ul.xlist li.attachment {
   padding-bottom: 0;
 }
 
+ul.xlist li.create a {
+  background: url("$xwiki.getSkinFile('icons/silk/bullet_add.gif')") 7px 3px no-repeat;
+  color: $theme.textSecondaryColor;
+  text-decoration: none;
+  padding-left: 1.5em;
+}
+
 ul.xlist li.xitem div.xitemcontainer {
   text-indent: 1.5em;
 }

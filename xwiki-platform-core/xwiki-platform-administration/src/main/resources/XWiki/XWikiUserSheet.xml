@@ -6,23 +6,22 @@
 <defaultLanguage></defaultLanguage>
 <translation>0</translation>
 <parent>Main.XWikiUsers</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1106308018000</creationDate>
-<date>1305818123000</date>
-<contentUpdateDate>1305818123000</contentUpdateDate>
-<version>1.1</version>
+<date>1313920155000</date>
+<contentUpdateDate>1313920155000</contentUpdateDate>
+<version>3.5</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>false</minorEdit>
+<minorEdit>true</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<attachment>
+<hidden>false</hidden><attachment>
 <filename>noavatar.png</filename>
 <filesize>3076</filesize>
 <author>xwiki:XWiki.Admin</author>
@@ -184,6 +183,7 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
         document.fire('xwiki:profile:switchedCategory', {'category' : activeTab.__name});
       });
       XWiki.userprofile.adjustTabsContainerHeight();
+      XWiki.userprofile.hookThumbnailEditorOnAvatarSelected();
     },
 
     /*
@@ -218,6 +218,40 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
       $(tab + 'Tab').addClassName('active');
       XWiki.userprofile.adjustTabsContainerHeight();
       document.fire('xwiki:profile:switchedCategory', {'category' : tab});
+    },
+
+    hookThumbnailEditorOnAvatarSelected: function() {
+      if (XWiki.ThumbnailEditor) {
+        document.observe("xwiki:attachmentSelector:selected", function(event) {
+          var loading = new Element('div', {'class' : 'loading', 'style': 'min-height:30px'});
+          var ref = XWiki.currentDocument.space + "." + XWiki.currentDocument.page + "@" + event.memo.attachment
+          var url = new XWiki.Document("ThumbnailEditor", "XWiki").getURL('view', 'xpage=plain&amp;image=' + ref);
+          var dialog = new XWiki.widgets.ModalPopup(
+            loading, {}, { 
+             'verticalPosition' : 'top',
+             'removeOnClose' : true,
+             'title' : "$msg.get('xe.thumbnailEditor.title')"
+            }
+          );
+          dialog.showDialog();
+          if (window.browser.isIE6x) {
+             dialog.dialog.down().setStyle({position: "absolute"});
+          } else {
+            dialog.dialog.down().setStyle({position: "fixed"});
+          } 
+          dialog.dialog.setStyle({top: document.viewport.getScrollOffsets().top + "px", position: "absolute"});
+          dialog.dialogBox.setStyle({overflow: "hidden", width: "80%", margin: "0 10%"});
+          new Ajax.Updater(loading.up(), url, {
+            evalScripts: true,
+            onComplete : function() {
+             (function(){
+               document.fire("xwiki:thumbnailEditor:popupReady");
+               // Deferring this event to ensure the scripts in AJAX response have been evaluated.
+             }).defer();
+            } 
+          });
+        });
+      }
     }
   }
 });
@@ -476,7 +510,7 @@ span#avatarUpload {
 }
 
 #vertical-tabs ul li a {
-  padding: 3px 0px 3px 4px;
+  padding: 3px 0px 3px 10px;
   text-decoration: none;
   display:block;
   color:$theme.menuBackgroundColor;
@@ -488,7 +522,7 @@ span#avatarUpload {
   left:1px;
   background:$theme.pageContentBackgroundColor;
   color: $theme.textColor;
-  padding-left: 3px;
+  padding-left: 9px;
 }
 
 .vertical-pane {
@@ -564,6 +598,44 @@ span#avatarUpload {
 }
 
 ## --------------------------------------
+## Thumbnail editor
+
+.thumbnail-edit {
+  position:relative;
+}
+
+.thumbnail-edit p {
+  padding: 0;
+  margin: 0;
+}
+
+.thumbnail-edit .buttonwrapper {
+  margin: 0;
+}
+
+.edit-thumbnail-link {
+  background: url("$xwiki.getSkinFile('icons/silk/shape_handles.gif')") no-repeat center center $theme.pageContentBackgroundColor !important;
+  border: 0 none !important;
+  border-top-left-radius: 8px;
+  -moz-border-radius-top-left: 8px;
+  -webkit-border-top-left-radius: 8px;
+  height: 18px;
+  position: absolute;
+  right: 0;
+  text-align: left;
+  text-indent: -9999px;
+  bottom: 0;
+  width: 18px !important;
+  z-index: 1;
+}
+
+.attachment-picker .buttonwrapper {
+  margin: 0;
+}
+
+
+
+## --------------------------------------
 ## Dashboard
 /* prevent the clearfloats between buttons &amp; dashboard gadgets from clearing the tabs as well, only the buttons float */
 .dashboard .clearfloats {
@@ -627,6 +699,8 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
 
 {{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($isMyProfile) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="120" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$msg.get('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,gif"/}}
 
+{{thumbnailEditor property="${services.model.serialize($doc.documentReference, 'default')}^XWiki.XWikiUsers.avatar" ratio="1:1" minimumWidth="60" minimumHeight="60" previewSizes="30:30;50:50;120:120"/}}
+
 {{html clean="false"}}
       &lt;/div&gt;## avatar
       &lt;div&gt; 
@@ -662,5 +736,4 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
     &lt;/script&gt;
   #end
 {{/html}}
-{{/velocity}}</content>
-</xwikidoc>
+{{/velocity}}</content></xwikidoc>

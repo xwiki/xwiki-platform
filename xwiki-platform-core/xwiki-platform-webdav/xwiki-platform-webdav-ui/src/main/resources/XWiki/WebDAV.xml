@@ -156,7 +156,7 @@ return XWiki;
 <parse>1</parse>
 </property>
 <property>
-<use>always</use>
+<use>onDemand</use>
 </property>
 </object>
 <content>#info($msg.get('xe.webdav.info'))</content>

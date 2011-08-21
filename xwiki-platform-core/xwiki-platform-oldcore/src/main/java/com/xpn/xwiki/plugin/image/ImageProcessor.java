@@ -21,6 +21,7 @@
 package com.xpn.xwiki.plugin.image;
 
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,6 +69,18 @@ public interface ImageProcessor
      * @return the scaled image
      */
     RenderedImage scaleImage(Image image, int width, int height);
+
+    /**
+     * Creates a thumbnail of the passed image by cropping it to the top left and bottom right boundaries passed
+     * (relative to the original image) and scaling it to the passed width and height.
+     * 
+     * @param image the image to create a thumbnail of
+     * @param width the new image width
+     * @param height the new image height
+     * @param boundaries the boundaries to crop image from
+     * @return the thumbnail created
+     */
+    RenderedImage createThumbnail(Image image, int width, int height, Rectangle boundaries);
 
     /**
      * @param mimeType the mime type to be checked

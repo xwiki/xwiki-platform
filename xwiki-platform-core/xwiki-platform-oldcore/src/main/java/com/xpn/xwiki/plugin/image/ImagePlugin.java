@@ -21,6 +21,7 @@
 package com.xpn.xwiki.plugin.image;
 
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -62,6 +63,11 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * @see XWikiPluginInterface#getName()
      */
     private static final String PLUGIN_NAME = "image";
+
+    /**
+     * The comma sign, used as a separator for x and y in boundaries request parameters (top left and bottom right).
+     */
+    private static final String COMMA = ",";
 
     /**
      * Cache for already served images.
@@ -231,14 +237,16 @@ public class ImagePlugin extends XWikiDefaultPlugin
             // Ignore.
         }
 
-        // If no scaling is needed, return the original image.
-        if (height <= 0 && width <= 0 && quality < 0) {
+        Rectangle cropCanvas = getBoundariesFromRequestParameter("boundaries", context);
+        
+        // If no scaling or cropping needed, return the original image.
+        if (!this.doesAffectImage(cropCanvas, width, height, quality)) {
             return attachment;
         }
 
         try {
             // Transform the image attachment before is it downloaded.
-            return downloadImage(attachment, width, height, quality, context);
+            return downloadImage(attachment, width, height, cropCanvas, quality, context);
         } catch (Exception e) {
             LOG.warn("Failed to transform image attachment.", e);
             return attachment;
@@ -246,28 +254,78 @@ public class ImagePlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * Transforms the given image (i.e. shrinks the image and changes its quality) before it is downloaded.
+     * Helper method to test if passed parameters would affect or not an image.
+     * 
+     * @param boundaries the boundaries to crop the image to.
+     * @param width the width to render the image with
+     * @param height the height to render the image with
+     * @param quality the quality to render the image with
+     * @return true if the image would change, false otherwise
+     */
+    private boolean doesAffectImage(Rectangle boundaries, int width, int height, float quality)
+    {
+        return !(boundaries == null && height <= 0 && width <= 0 && quality < 0);
+    }
+    
+    /**
+     * Gets boundaries from a request parameter. Expected form is 4 integers, comma separated. Each individual integer
+     * means the following (in expected order) :
+     * <ul>
+     * <li><tt>x</tt> : the x position of the top left corner of the boundary.
+     * <li><tt>y</tt> : the y position of the top left corner of the boundary.
+     * <li><tt>width</tt> : the width of the boundary.
+     * <li><tt>height</tt> : the height of the boundary.
+     * </ul>
+     * 
+     * @param parameterName the name of the parameter to try and get boundaries from
+     * @param context the XWiki context (used to access current request)
+     * @return the boundaries, or {@code null} if none was passed for this parameter or if the format does not match
+     *         the expected format
+     */
+    private Rectangle getBoundariesFromRequestParameter(String parameterName, XWikiContext context)
+    {
+        String parameterValue = context.getRequest().getParameter(parameterName);
+        if (!StringUtils.isBlank(parameterValue)
+            && StringUtils.countMatches(parameterValue, COMMA) == 3) {
+            try {
+                int x = Integer.parseInt(parameterValue.split(COMMA)[0]);
+                int y = Integer.parseInt(parameterValue.split(COMMA)[1]);
+                int width = Integer.parseInt(parameterValue.split(COMMA)[2]);
+                int height = Integer.parseInt(parameterValue.split(COMMA)[3]);
+                return new Rectangle(x, y, width, height);
+            } catch (NumberFormatException e) {
+                // Ignore
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Transforms the given image (i.e. crop, shrinks the image and changes its quality) before it is downloaded.
      * 
      * @param image the image to be downloaded
      * @param width the desired image width; this value is taken into account only if it is greater than zero and less
      *            than the current image width
      * @param height the desired image height; this value is taken into account only if it is greater than zero and less
      *            than the current image height
+     * @param boundaries the boundaries to crop the original image from. May be {@code null} when the image does not 
+     *            have to be cropped            
      * @param quality the desired compression quality
      * @param context the XWiki context
      * @return the transformed image
      * @throws Exception if transforming the image fails
      */
-    private XWikiAttachment downloadImage(XWikiAttachment image, int width, int height, float quality,
-        XWikiContext context) throws Exception
+    private XWikiAttachment downloadImage(XWikiAttachment image, int width, int height, Rectangle boundaries,
+        float quality, XWikiContext context) throws Exception
     {
         if (this.imageCache == null) {
             initCache(context);
         }
         boolean keepAspectRatio = Boolean.valueOf(context.getRequest().getParameter("keepAspectRatio"));
         XWikiAttachment thumbnail =
-            this.imageCache == null ? shrinkImage(image, width, height, keepAspectRatio, quality, context)
-                : downloadImageFromCache(image, width, height, keepAspectRatio, quality, context);
+            this.imageCache == null ? createAttachmentThumbnail(image, width, height, boundaries, keepAspectRatio,
+                quality, context)
+                : downloadImageFromCache(image, width, height, boundaries, keepAspectRatio, quality, context);
         // If the image has been transformed, update the file name extension to match the image format.
         String fileName = thumbnail.getFilename();
         String extension = StringUtils.lowerCase(StringUtils.substringAfterLast(fileName, String.valueOf('.')));
@@ -283,28 +341,34 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * 
      * @param image the image to be downloaded
      * @param width the desired image width; this value is taken into account only if it is greater than zero and less
-     *            than the current image width
+     *            than the current (or cropped if top left and bottom right parameters are used) image width
      * @param height the desired image height; this value is taken into account only if it is greater than zero and less
-     *            than the current image height
+     *            than the current (or cropped if top left and bottom right parameters are used) image height
+     * @param boundaries the boundaries to crop the original image from
      * @param keepAspectRatio {@code true} to preserve aspect ratio when resizing the image, {@code false} otherwise
      * @param quality the desired compression quality
      * @param context the XWiki context
      * @return the transformed image
      * @throws Exception if transforming the image fails
      */
-    private XWikiAttachment downloadImageFromCache(XWikiAttachment image, int width, int height,
+    private XWikiAttachment downloadImageFromCache(XWikiAttachment image, int width, int height, Rectangle boundaries,
         boolean keepAspectRatio, float quality, XWikiContext context) throws Exception
     {
+        String boundariesKey = "-1,-1,-1,-1";
+        if (boundaries != null) {
+            boundariesKey = String.format("%s,%s", boundaries.x, boundaries.width, boundaries.y, boundaries.height);
+        }
+
         String key =
-            String.format("%s;%s;%s;%s;%s;%s", image.getId(), image.getVersion(), width, height, keepAspectRatio,
-                quality);
+            String.format("%s;%s;%s;%s;%s;%s;%s", image.getId(), image.getVersion(), width, height, keepAspectRatio,
+                quality, boundariesKey);
         byte[] data = this.imageCache.get(key);
         XWikiAttachment thumbnail;
         if (data != null) {
             thumbnail = (XWikiAttachment) image.clone();
             thumbnail.setContent(new ByteArrayInputStream(data), data.length);
         } else {
-            thumbnail = shrinkImage(image, width, height, keepAspectRatio, quality, context);
+            thumbnail = createAttachmentThumbnail(image, width, height, boundaries, keepAspectRatio, quality, context);
             this.imageCache.set(key, thumbnail.getContent(context));
         }
         return thumbnail;
@@ -319,6 +383,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
      *            and less than the current image width
      * @param requestedHeight the desired image height; this value is taken into account only if it is greater than zero
      *            and less than the current image height
+     * @param boundaries the boundaries to crop the original image from
      * @param keepAspectRatio {@code true} to preserve the image aspect ratio even when both requested dimensions are
      *            properly specified (in this case the image will be resized to best fit the rectangle with the
      *            requested width and height), {@code false} otherwise
@@ -327,28 +392,35 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * @return the modified image attachment
      * @throws Exception if shrinking the image fails
      */
-    private XWikiAttachment shrinkImage(XWikiAttachment attachment, int requestedWidth, int requestedHeight,
-        boolean keepAspectRatio, float requestedQuality, XWikiContext context) throws Exception
+    private XWikiAttachment createAttachmentThumbnail(XWikiAttachment attachment, int requestedWidth,
+        int requestedHeight, Rectangle boundaries, boolean keepAspectRatio, float requestedQuality,
+        XWikiContext context)
+        throws Exception
     {
         Image image = this.imageProcessor.readImage(attachment.getContentInputStream(context));
 
         // Compute the new image dimension.
         int currentWidth = image.getWidth(null);
         int currentHeight = image.getHeight(null);
+        if (boundaries != null) {
+            currentWidth = boundaries.getSize().width;
+            currentHeight = boundaries.getSize().height;
+        }
         int[] dimensions =
             reduceImageDimensions(currentWidth, currentHeight, requestedWidth, requestedHeight, keepAspectRatio);
 
         float quality = requestedQuality;
         if (quality < 0) {
             // If no scaling is needed and the quality parameter is not specified, return the original image.
-            if (dimensions[0] == currentWidth && dimensions[1] == currentHeight) {
+            if (dimensions[0] == image.getWidth(null) && dimensions[1] == image.getHeight(null)) {
                 return attachment;
             }
             quality = this.defaultQuality;
         }
 
         // Scale the image to the new dimensions.
-        RenderedImage shrunkImage = this.imageProcessor.scaleImage(image, dimensions[0], dimensions[1]);
+        RenderedImage shrunkImage =
+            this.imageProcessor.createThumbnail(image, dimensions[0], dimensions[1], boundaries);
 
         // Write the shrunk image to a byte array output stream.
         ByteArrayOutputStream bout = new ByteArrayOutputStream();

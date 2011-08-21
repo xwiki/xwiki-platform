@@ -22,6 +22,7 @@ package com.xpn.xwiki.internal.plugin.image;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -102,7 +103,16 @@ public class DefaultImageProcessor implements ImageProcessor
      */
     public RenderedImage scaleImage(Image image, int width, int height)
     {
-        // Draw the given image to a buffered image object and scale it to the new size on-the-fly.
+        return this.createThumbnail(image, width, height, null);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ImageProcessor#creatThumbnail(Image, int, int, Rectangle)
+     */
+    public RenderedImage createThumbnail(Image image, int width, int height, Rectangle boundaries)
+    {
         int imageType = BufferedImage.TYPE_4BYTE_ABGR;
         if (image instanceof BufferedImage) {
             imageType = ((BufferedImage) image).getType();
@@ -117,9 +127,17 @@ public class DefaultImageProcessor implements ImageProcessor
         Graphics2D graphics2D = bufferedImage.createGraphics();
         graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         // We should test the return code here because an exception can be throw but caught.
-        if (!graphics2D.drawImage(image, 0, 0, width, height, null)) {
-            // Conversion failed.
-            throw new RuntimeException("Failed to resize image.");
+        if (boundaries == null) {
+            if (!graphics2D.drawImage(image, 0, 0, width, height, null)) {
+                // Conversion failed.
+                throw new RuntimeException("Failed to resize image.");
+            }
+        } else {
+            if (!graphics2D.drawImage(image, 0, 0, width, height, boundaries.x, boundaries.y, boundaries.x
+                + boundaries.width, boundaries.y + boundaries.height, null)) {
+                // Conversion failed.
+                throw new RuntimeException("Failed to crop and resize image.");
+            }
         }
         return bufferedImage;
     }
@@ -138,4 +156,5 @@ public class DefaultImageProcessor implements ImageProcessor
             return false;
         }
     }
+    
 }

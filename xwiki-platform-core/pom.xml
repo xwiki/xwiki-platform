@@ -360,6 +360,7 @@
                 <exclude>org/xwiki/eventstream/Event</exclude>
                 <exclude>com/xpn/xwiki/plugin/activitystream/api/ActivityEvent</exclude>
                 <exclude>com/xpn/xwiki/plugin/activitystream/plugin/ActivityEvent</exclude>
+                <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
               </excludes>
             </configuration>
           </plugin>

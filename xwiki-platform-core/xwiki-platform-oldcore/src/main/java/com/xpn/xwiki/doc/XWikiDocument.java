@@ -2326,7 +2326,9 @@ public class XWikiDocument implements DocumentModelBridge
             baseObjectReference = new BaseObjectReference(objectReference);
         }
 
-        return getXObject(baseObjectReference.getXClassReference(), baseObjectReference.getObjectNumber());
+        return baseObjectReference.getObjectNumber() == null ? this
+            .getXObject(baseObjectReference.getXClassReference()) : getXObject(
+            baseObjectReference.getXClassReference(), baseObjectReference.getObjectNumber());
     }
 
     /**

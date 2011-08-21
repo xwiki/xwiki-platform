@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang.StringUtils;
 
 import com.novell.ldap.LDAPAttribute;
 import com.novell.ldap.LDAPAttributeSet;
@@ -378,7 +379,7 @@ public class XWikiLDAPConnection
      */
     public static String escapeLDAPDNValue(String value)
     {
-        return LDAPDN.escapeRDN("key=" + value).substring(4);
+        return StringUtils.isBlank(value) ? value : LDAPDN.escapeRDN("key=" + value).substring(4);
     }
 
     /**

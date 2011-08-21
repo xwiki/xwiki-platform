@@ -9,7 +9,7 @@
 ##  #if ("$!{xwiki.getXWikiPreference('admin_email')}" != '')
 ##    #set ($sender = "$sender <$!{xwiki.getXWikiPreference('admin_email')}>")
 ##  #else
-    #set ($sender = "$!{escapetool.q($sender)} <noreply@$!{request.localName}>")
+    #set ($sender = "$!{escapetool.q($sender)} <noreply@$!{request.serverName}>")
 ##  #end
 
   #set ($recipients = [])

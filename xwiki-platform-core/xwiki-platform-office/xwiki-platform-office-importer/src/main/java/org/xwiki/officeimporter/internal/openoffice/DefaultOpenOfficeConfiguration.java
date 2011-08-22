@@ -55,11 +55,6 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration
     private static final String DEFAULT_HOME_PATH = OfficeUtils.getDefaultOfficeHome().getAbsolutePath();
 
     /**
-     * @see OpenOfficeConfiguration#getProfilePath()
-     */
-    private static final String DEFAULT_PROFILE_PATH = OfficeUtils.getDefaultProfileDir().getAbsolutePath();
-
-    /**
      * @see OpenOfficeConfiguration#isAutoStart()
      */
     private static final boolean DEFAULT_AUTO_START = false;
@@ -122,7 +117,7 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration
      */
     public String getProfilePath()
     {
-        return this.configuration.getProperty(PREFIX + "profilePath", DEFAULT_PROFILE_PATH);
+        return this.configuration.getProperty(PREFIX + "profilePath");
     }
 
     /**

@@ -107,7 +107,8 @@ public class DefaultOpenOfficeManager implements OpenOfficeManager
     {
         if (this.conf.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_INTERNAL) {
             File officeHome = new File(this.conf.getHomePath());
-            File officeProfile = new File(this.conf.getProfilePath());
+            String profilePath = this.conf.getProfilePath();
+            File officeProfile = profilePath != null ? new File(profilePath) : null;
             DefaultOfficeManagerConfiguration configuration = new DefaultOfficeManagerConfiguration();
             configuration.setPortNumber(this.conf.getServerPort());
             configuration.setOfficeHome(officeHome);

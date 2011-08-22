@@ -145,6 +145,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 #if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end
       </div>
       <span class="commenttools">
+      <span class="commenttool comment-permalink"><a class="permalink" href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}" title="$msg.get('core.viewers.comments.permalink')">$msg.get('core.viewers.comments.permalink')</a></span>
       #if($xwiki.hasAccessLevel('comment'))
         <span class="commenttool commentreply"><a class="commentreply" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$msg.get('core.viewers.comments.reply')"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>$msg.get('core.viewers.comments.reply')</a></span>
         #if($comment.author == $xcontext.user && $hasEdit)

@@ -114,7 +114,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 ##
 #if("$!{request.xaction}" == 'displayProperty')
   ## AJAX request for displaying the HTML code for a property
-  #displayProperty($class.get($request.getParameter('propName')))
+  #displayProperty($class.get($request.getParameter('propName').replace(' ', '')))
 #elseif("$!request.xpage" == 'editclass')
   ## Old (pre 1.0) way of using this template
   $response.sendRedirect($doc.getURL('edit', 'editor=class'))

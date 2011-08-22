@@ -30,12 +30,7 @@
         <span class="xHint">$msg.get('core.rename.newspace.hint')</span>
       </dt>
       <dd>
-        <select id="newSpaceName" name="newSpaceName">
-          #set ($spaces = $xwiki.getSpaces())
-          #foreach ($space in $spaces)
-            <option #if ($space == $pweb) selected="selected" #end>$escapetool.xml($space)</option>
-          #end
-        </select>
+        <input type="text" name="newSpaceName" id="newSpaceName" size="60" class="suggestSpaces" value="$escapetool.xml($doc.space)"/>
       </dd>
       <dt>
         <label for="newPageName">$msg.get('core.rename.newpage')</label>

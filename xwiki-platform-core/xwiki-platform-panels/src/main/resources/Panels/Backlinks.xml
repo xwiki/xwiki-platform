@@ -105,15 +105,25 @@
 </property>
 <property>
 <content>{{velocity}}
-#set ($blinks = $doc.getBacklinks())
-#if ($blinks.size() &gt; 0 || $showEmptyPanels)
+#set ($backlinks = $doc.getBacklinks())
+#set ($previousDoc = '')
+#set ($backlinkDocs = [])
+#foreach ($docname in $backlinks)
+  #if ($docname != $previousDoc)
+    #set ($backlinkDoc = $xwiki.getDocument($docname).getTranslatedDocument())
+    #if ($backlinkDoc &amp;&amp; !$blacklistedSpaces.contains($backlinkDoc.space))
+      #set ($discard = $backlinkDocs.add($backlinkDoc))
+    #end
+  #end
+  #set ($previousDoc = $docname)
+#end
+#if ($backlinkDocs.size() &gt; 0 || $showEmptyPanels)
   #panelheader($msg.get('docextra.backlinks'))
-  #foreach ($docname in $blinks)
-    #set ($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
-    #if ($foreach.index &gt; 0)
+  #foreach ($backlinkDoc in $backlinkDocs)
+    #if (!$foreach.first)
       (% class="pitemseparator" %) ~| (%%)##
     #end
-    (% class="panelitem" %)[[$rdoc.plainTitle&gt;&gt;$rdoc]](%%)##
+    (% class="panelitem" %)[[$backlinkDoc.plainTitle&gt;&gt;$backlinkDoc.fullName]](%%)##
   #end
   #panelfooter()
 #end

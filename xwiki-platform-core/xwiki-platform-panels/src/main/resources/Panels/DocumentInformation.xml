@@ -423,7 +423,7 @@ $xwiki.jsx.use($paneldoc.fullName)##
 {{/velocity}}</content>
 </property>
 <property>
-<description>Displays and allows editing the document title, parent and included documents.</description>
+<description>Displays and allows editing the document title and syntax, and lists the included documents.</description>
 </property>
 <property>
 <name>Document Information</name>

@@ -525,7 +525,7 @@
 <name>ldap_fields_mapping</name>
 <number>70</number>
 <picker>0</picker>
-<prettyName>Ldap user fiels mapping</prettyName>
+<prettyName>Ldap user fields mapping</prettyName>
 <size>60</size>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -600,7 +600,7 @@
 <name>ldap_server</name>
 <number>61</number>
 <picker>0</picker>
-<prettyName>Ldap server adress</prettyName>
+<prettyName>Ldap server address</prettyName>
 <size>60</size>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -1872,7 +1872,7 @@
 <name>ldap_fields_mapping</name>
 <number>70</number>
 <picker>0</picker>
-<prettyName>Ldap user fiels mapping</prettyName>
+<prettyName>Ldap user fields mapping</prettyName>
 <size>60</size>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -1947,7 +1947,7 @@
 <name>ldap_server</name>
 <number>61</number>
 <picker>0</picker>
-<prettyName>Ldap server adress</prettyName>
+<prettyName>Ldap server address</prettyName>
 <size>60</size>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>

@@ -9,7 +9,7 @@
 ##  #if ("$!{xwiki.getXWikiPreference('admin_email')}" != '')
 ##    #set ($sender = "$sender <$!{xwiki.getXWikiPreference('admin_email')}>")
 ##  #else
-    #set ($sender = "$!{escapetool.q($sender)} <noreply@$!{request.localName}>")
+    #set ($sender = "$!{escapetool.q($sender)} <noreply@$!{request.serverName}>")
 ##  #end
 
   #set ($recipients = [])
@@ -20,7 +20,7 @@
     #foreach ($recipient in $recipientValue.split(','))
       #set ($recipient = $recipient.trim())
       #if ($recipient != '')
-        #if ($recipient.indexOf('@') > 0)
+        #if ("$!xwiki.getDocument($recipient).getObject('XWiki.XWikiUsers', false)" == '' && $recipient.indexOf('@') > 0)
           #if ($recipient.indexOf('<') > 0)
             #set ($recipientName = $recipient.substring(0, $recipient.indexOf('<')).trim())
             #set ($recipient = "$!{escapetool.q($recipientName)} <${recipient.substring($mathtool.add($recipient.indexOf('<'), 1), $recipient.indexOf('>'))}>")

@@ -3,13 +3,13 @@
 <web>Scheduler</web>
 <name>WebHome</name>
 <language></language>
-<defaultLanguage>en</defaultLanguage>
+<defaultLanguage></defaultLanguage>
 <translation>0</translation>
 <parent>Main.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1252454400000</creationDate>
 <date>1288213047000</date>
 <contentUpdateDate>1288213047000</contentUpdateDate>
@@ -183,18 +183,16 @@ $msg.get('xe.scheduler.welcome')
 {{info}}$msg.get('xe.scheduler.jobs.explaincreate'){{/info}}
 
 {{html}}
-&lt;form action="" id="newdoc"&gt;
+&lt;form action="$doc.getURL('create')" id="newdoc"&gt;
 &lt;div&gt;
 &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 &lt;input type="hidden" name="parent" value="Scheduler.WebHome" /&gt;
 &lt;input type="hidden" name="template" value="XWiki.SchedulerJobTemplate" /&gt;
 &lt;input type="hidden" name="sheet" value="1" /&gt;
-&lt;input type="hidden" name="webname" value="Scheduler"/&gt;
-&lt;input type="hidden" name="name" value=""/&gt;
-&lt;input type="hidden" name="parent" value="${doc.fullName}"/&gt;
-&lt;label class="hidden" for="title"&gt;Job page name&lt;/label&gt;
-&lt;input id="title" name="title" size="30" type="text" value="Job page name" /&gt;
-&lt;span class="buttonwrapper"&gt;&lt;input type="button" class="button" value="$msg.get('xe.scheduler.jobs.add')" onclick='if (updateName(this.form.title,this.form.name)) { action="../../inline/" + this.form.webname.value + "/" + this.form.name.value; this.form.submit(); }' /&gt;&lt;/span&gt;
+&lt;input type="hidden" name="space" value="Scheduler"/&gt;
+&lt;label class="hidden" for="page"&gt;Job page name&lt;/label&gt;
+&lt;input id="page" name="page" size="30" type="text" class="withTip" value="$msg.get('xe.scheduler.jobs.create.nameTip')" /&gt;
+&lt;span class="buttonwrapper"&gt;&lt;input type="submit" class="button" value="$msg.get('xe.scheduler.jobs.add')"/&gt;&lt;/span&gt;
 &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}

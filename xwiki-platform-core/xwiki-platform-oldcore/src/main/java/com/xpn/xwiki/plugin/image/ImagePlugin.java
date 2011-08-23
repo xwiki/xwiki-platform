@@ -358,7 +358,8 @@ public class ImagePlugin extends XWikiDefaultPlugin
     {
         String boundariesKey = "-1,-1,-1,-1";
         if (boundaries != null) {
-            boundariesKey = String.format("%s,%s,%s,%s", boundaries.x, boundaries.width, boundaries.y, boundaries.height);
+            boundariesKey = String.format("%s,%s,%s,%s",
+                boundaries.x, boundaries.width, boundaries.y, boundaries.height);
         }
 
         String key =

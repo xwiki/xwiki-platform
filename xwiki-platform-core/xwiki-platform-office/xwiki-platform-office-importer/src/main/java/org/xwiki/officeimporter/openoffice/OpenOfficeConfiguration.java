@@ -34,56 +34,61 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface OpenOfficeConfiguration
 {
     /**
-     * Indicates an internally managed oo server instance.
+     * Indicates an internally managed office server instance.
      */
     int SERVER_TYPE_INTERNAL = 0;
-    
+
     /**
-     * Indicates an externally managed locally deployed oo server instance.
+     * Indicates an externally managed locally deployed office server instance.
      */
     int SERVER_TYPE_EXTERNAL_LOCAL = 1;
-    
+
     /**
-     * Indicates an externally managed remotely deployed oo server instance.
+     * Indicates an externally managed remotely deployed office server instance.
      */
     int SERVER_TYPE_EXTERNAL_REMOTE = 2;
-    
+
     /**
-     * Returns the type of the openoffice server instance consumed by officeimporter.<br/>
-     * 0 - Internally managed server instance.<br/>
-     * 1 - Externally managed (local) server instance.<br/>
+     * Returns the type of the office server instance consumed by office importer module:
+     * <ul>
+     * <li>0 - Internally managed server instance</li>
+     * <li>1 - Externally managed (local) server instance</li>
+     * </ul>
+     * .
      * 
-     * @return type of the openoffice server used by officeimporter.
+     * @return type of the office server used by the office importer module
      */
     int getServerType();
-    
+
     /**
-     * @return port number used for connecting to the openoffice server instance.
+     * @return the port number used for connecting to the office server instance
      */
     int getServerPort();
 
     /**
-     * @return whether openoffice server should be started / connected automatically with XE.
+     * @return whether office server should be started / connected automatically with XWiki Enterprise
      */
     boolean isAutoStart();
-    
+
     /**
-     * @return path to openoffice server installation.
+     * @return the path to the office server installation, or {@code null} if the home path is not configured and the
+     *         office installation is not detected (which means the office server is either not installed or it is
+     *         installed at a custom path)
      */
     String getHomePath();
 
     /**
-     * @return path to openoffice execution profile.
+     * @return the path to office server execution profile, {@code null} by default
      */
     String getProfilePath();
-    
+
     /**
-     * @return maximum number of simultaneous conversion tasks to be handled by a single oo process instance.
+     * @return the maximum number of simultaneous conversion tasks to be handled by a single office process instance
      */
     int getMaxTasksPerProcess();
 
     /**
-     * @return timeout for document conversion tasks.
+     * @return the timeout for document conversion tasks
      */
     long getTaskExecutionTimeout();
 }

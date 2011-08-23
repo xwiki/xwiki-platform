@@ -159,6 +159,6 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration, 
     public void initialize() throws InitializationException
     {
         File defaultHomeFolder = OfficeUtils.getDefaultOfficeHome();
-        defaultHomePath = defaultHomeFolder != null ? defaultHomeFolder.getAbsolutePath() : "/usr/lib/openoffice";
+        defaultHomePath = defaultHomeFolder != null ? defaultHomeFolder.getAbsolutePath() : null;
     }
 }

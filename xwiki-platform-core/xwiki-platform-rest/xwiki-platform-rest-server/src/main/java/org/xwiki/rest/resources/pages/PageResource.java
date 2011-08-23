@@ -34,7 +34,6 @@ import org.xwiki.rest.model.jaxb.Page;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.Util;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**

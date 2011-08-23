@@ -42,6 +42,13 @@
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
     </dependency>
+    <!-- Adding a dependency on Ivy since groovy-all only has an optional dependency on it and since we want to bundle
+         it so that XWiki users scripting in Groovy can use Grapes out of the box. -->
+    <dependency>
+      <groupId>org.apache.ivy</groupId>
+      <artifactId>ivy</artifactId>
+      <version>2.2.0</version>
+    </dependency>
 
     <!-- Testing dependencies -->
     <dependency>

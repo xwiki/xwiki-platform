@@ -1,2 +1,3 @@
 org.xwiki.thumbnails.internal.ThumbnailsScriptService
 org.xwiki.thumbnails.internal.DefaultThumbnailURLProvider
+org.xwiki.thumbnails.internal.DefaultThumbnailsConfiguration

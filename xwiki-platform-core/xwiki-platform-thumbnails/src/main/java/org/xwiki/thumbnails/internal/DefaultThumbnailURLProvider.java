@@ -21,8 +21,6 @@ package org.xwiki.thumbnails.internal;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +47,7 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.thumbnails.NoSuchImageException;
 import org.xwiki.thumbnails.ThumbnailURLProvider;
+import org.xwiki.thumbnails.ThumbnailsConfiguration;
 
 /**
  * Default thumbnail URL provider that checks for an image attachment if its document contains an XObject of class
@@ -64,11 +63,6 @@ public class DefaultThumbnailURLProvider implements ThumbnailURLProvider, EventL
      * The question mark sign (indicates the beginning of query string parameters in a URL).
      */
     private static final String QUESTION_MARK = "?";
-
-    /**
-     * Maximum number of entries to cache.
-     */
-    private static final int CACHE_MAX_ENTRIES = 1000;
 
     /**
      * Cache manager used to create the URL cache.
@@ -94,13 +88,27 @@ public class DefaultThumbnailURLProvider implements ThumbnailURLProvider, EventL
      */
     @Inject
     private DocumentAccessBridge documentAccessBridge;
-        
+
+    /**
+     * Configuration for this module.
+     */
+    @Inject
+    private ThumbnailsConfiguration thumbnailsConfiguration;
+    
     /**
      * Cache for documents that holds a property pointing to an image.
      * 
-     * Cached values are grouped by document document, in order to ease entry flushing.
+     * Cached values are grouped by document, in order to ease entry flushing.
      */
     private Cache<Map<String, String>> thumbnailURLCache;
+    
+    /**
+     * Cache for properties value pointing to an image
+     * 
+     * Cached values are grouped by document, in order to ease entry flushing.
+     */
+    private Cache<Map<String, String>> propertiesValueCache;
+    
     
     /**
      * {@inheritDoc}
@@ -109,7 +117,7 @@ public class DefaultThumbnailURLProvider implements ThumbnailURLProvider, EventL
      */
     public String getURL(ObjectPropertyReference reference) throws NoSuchImageException
     {
-        return this.getURL(reference, Collections.<String, Object> emptyMap());
+        return this.getURL(reference, null);
     }
 
     /**
@@ -123,13 +131,29 @@ public class DefaultThumbnailURLProvider implements ThumbnailURLProvider, EventL
         if (reference == null) {
             throw new NoSuchImageException();
         }
+
         DocumentReference documentReference = (DocumentReference) reference.extractReference(EntityType.DOCUMENT);
-        
-        // TODO caching for property values
-        String imageName = (String) this.documentAccessBridge.getProperty(reference);
-        
+        String serializedDocumentReference = (String) this.serializer.serialize(documentReference);
+        String serializedReference = (String) this.serializer.serialize(reference);
+        String imageName;
+
+        if (this.getPropertiesValueCache().get(serializedDocumentReference) != null
+            && this.getPropertiesValueCache().get(serializedDocumentReference).containsKey(serializedReference)) {
+            // Cache already contains this property
+            imageName = this.getPropertiesValueCache().get(serializedDocumentReference).get(serializedReference);
+        } else {
+            // Cache does not contain this property : we retrieve it and add it to the cache
+            imageName = (String) this.documentAccessBridge.getProperty(reference);
+            synchronized (this.propertiesValueCache) {
+                if (this.getPropertiesValueCache().get(serializedDocumentReference) == null) {
+                    this.getPropertiesValueCache().set(serializedDocumentReference, new HashMap<String, String>());
+                }
+                this.getPropertiesValueCache().get(serializedDocumentReference).put(serializedReference, imageName);
+            }
+        }
+
         AttachmentReference ref = new AttachmentReference(imageName, documentReference);
-        
+
         return this.getURL(ref, extraParameters);
     }
 
@@ -158,19 +182,19 @@ public class DefaultThumbnailURLProvider implements ThumbnailURLProvider, EventL
      */
     private String appendExtraParameters(String url, Map<String, Object> extraParameters)
     {
-        if (url == null) {
+        if (url == null || extraParameters == null) {
             return url;
         }
         String result = url;
-        if (extraParameters != null && !extraParameters.isEmpty()) {
+        if (!extraParameters.isEmpty()) {
             if (result.indexOf(QUESTION_MARK) < 0) {
                 result += QUESTION_MARK;
             }
             for (String parameter : extraParameters.keySet()) {
                 Object value = extraParameters.get(parameter);
-                Collection<Object> values;
-                if (value instanceof Collection) {
-                    values = (Collection<Object>) value;
+                List<Object> values;
+                if (value instanceof List) {
+                    values = (List<Object>) value;
                 } else {
                     values = Arrays.asList(value);
                 }
@@ -189,7 +213,7 @@ public class DefaultThumbnailURLProvider implements ThumbnailURLProvider, EventL
      */
     public String getURL(AttachmentReference reference) throws NoSuchImageException
     {
-        return this.getURL(reference, Collections.<String, Object> emptyMap());
+        return this.getURL(reference, null);
     }
 
     /**
@@ -265,7 +289,33 @@ public class DefaultThumbnailURLProvider implements ThumbnailURLProvider, EventL
     }
     
     /**
-     * Get (and lazily initializes if needed) the cache of property documents.
+     * Get (and lazily initializes if needed) the cache of property values.
+     * 
+     * @return the properties value cache.
+     */
+    private Cache<Map<String, String>> getPropertiesValueCache()
+    {
+        if (this.propertiesValueCache == null) {
+            CacheConfiguration configuration = new CacheConfiguration();
+
+            configuration.setConfigurationId("xwiki.thumbnails.properties");
+            // Set cache constraints.
+            LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
+            configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+
+            lru.setMaxEntries(this.thumbnailsConfiguration.getPropertyCacheSize());
+
+            try {
+                this.propertiesValueCache = this.cacheManager.createNewCache(configuration);
+            } catch (CacheException e) {
+                this.logger.error("Error initializing the property document cache.", e);
+            }
+        }
+        return propertiesValueCache;
+    }
+    
+    /**
+     * Get (and lazily initializes if needed) the cache of thumbnails URLs.
      * 
      * @return the thumbnail URL cache.
      */
@@ -279,12 +329,12 @@ public class DefaultThumbnailURLProvider implements ThumbnailURLProvider, EventL
             LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
             configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
-            lru.setMaxEntries(CACHE_MAX_ENTRIES);
+            lru.setMaxEntries(this.thumbnailsConfiguration.getThumbnailsCacheSize());
 
             try {
                 this.thumbnailURLCache = this.cacheManager.createNewCache(configuration);
             } catch (CacheException e) {
-                this.logger.error("Error initializing the property document cache.", e);
+                this.logger.error("Error initializing the thumbnails url cache.", e);
             }
         }
         return this.thumbnailURLCache;
@@ -316,10 +366,20 @@ public class DefaultThumbnailURLProvider implements ThumbnailURLProvider, EventL
             if (this.getThumbnailURLCache().get(
                 (String) this.serializer.serialize(document.getDocumentReference())) != null) {
 
+                // Pessimistic cache flushing : if a document with an image with a thumbnail URL
+                // has been saved ; just remove this document from the cache.
+
+                this.getThumbnailURLCache().remove((String) this.serializer.serialize(document.getDocumentReference()));
+            }
+
+            if (this.getPropertiesValueCache().get(
+                (String) this.serializer.serialize(document.getDocumentReference())) != null) {
+
                 // Pessimistic cache flushing : if a document with a property pointing to an image with
                 // thumbnail has been saved ; just remove this document from the cache.
 
-                this.getThumbnailURLCache().remove((String) this.serializer.serialize(document.getDocumentReference()));
+                this.getPropertiesValueCache().remove(
+                    (String) this.serializer.serialize(document.getDocumentReference()));
             }
             
         } catch (ClassCastException e) {

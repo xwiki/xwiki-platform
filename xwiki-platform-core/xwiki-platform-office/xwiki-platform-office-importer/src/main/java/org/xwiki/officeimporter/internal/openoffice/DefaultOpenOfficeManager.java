@@ -106,13 +106,19 @@ public class DefaultOpenOfficeManager implements OpenOfficeManager
     public void initialize() throws OpenOfficeManagerException
     {
         if (this.conf.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_INTERNAL) {
-            File officeHome = new File(this.conf.getHomePath());
-            String profilePath = this.conf.getProfilePath();
-            File officeProfile = profilePath != null ? new File(profilePath) : null;
             DefaultOfficeManagerConfiguration configuration = new DefaultOfficeManagerConfiguration();
             configuration.setPortNumber(this.conf.getServerPort());
-            configuration.setOfficeHome(officeHome);
-            configuration.setTemplateProfileDir(officeProfile);
+
+            String homePath = this.conf.getHomePath();
+            if (homePath != null) {
+                configuration.setOfficeHome(homePath);
+            }
+
+            String profilePath = this.conf.getProfilePath();
+            if (profilePath != null) {
+                configuration.setTemplateProfileDir(new File(profilePath));
+            }
+
             configuration.setMaxTasksPerProcess(this.conf.getMaxTasksPerProcess());
             configuration.setTaskExecutionTimeout(this.conf.getTaskExecutionTimeout());
             this.jodOOManager = configuration.buildOfficeManager();

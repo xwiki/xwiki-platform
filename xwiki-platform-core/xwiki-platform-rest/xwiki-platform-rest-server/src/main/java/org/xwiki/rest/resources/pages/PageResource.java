@@ -34,6 +34,7 @@ import org.xwiki.rest.model.jaxb.Page;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.Util;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -59,54 +60,49 @@ public class PageResource extends ModifiablePageResource
     public Response putPage(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, Page page) throws XWikiException
     {
-        if (uriInfo.getQueryParameters().size() == 1) {
-            // look for query parameter of copyFrom=pageId or moveFrom=pageId
-            String action = uriInfo.getQueryParameters().keySet().iterator().next();
+        if (uriInfo.getQueryParameters().containsKey("copyfrom")
+            || uriInfo.getQueryParameters().containsKey("movefrom")) {
+            String sourcePageId = null;
+            if (uriInfo.getQueryParameters().containsKey("copyfrom")) {
+                sourcePageId = uriInfo.getQueryParameters().getFirst("copyfrom");
+            }
 
-            if (action.equalsIgnoreCase("copyFrom") || action.equalsIgnoreCase("moveFrom")) {
-                String sourcePageId = uriInfo.getQueryParameters().get(action).get(0);
+            if (uriInfo.getQueryParameters().containsKey("movefrom")) {
+                sourcePageId = uriInfo.getQueryParameters().getFirst("movefrom");
+            }
 
-                String wikiOfSourcePage = sourcePageId.substring(0, sourcePageId.indexOf(":"));
-                String fullNameOfSourcePage = sourcePageId.substring(sourcePageId.indexOf(":") + 1);
-                String spaceOfSourcePage = fullNameOfSourcePage.split("\\.")[0];
-                String pageOfSourcePage = fullNameOfSourcePage.split("\\.")[1];
-
-                /* test whether the target page exists or not */
-                String pageFullName = Utils.getPageId(wikiName, spaceName, pageName);
-                boolean existed = Utils.getXWikiApi(componentManager).exists(pageFullName);
-                if (existed) {
-                    return Response.status(HttpStatus.SC_CONFLICT).build();
-                }
+            if (sourcePageId != null) {
+                Document sourceDoc = Utils.getXWikiApi(componentManager).getDocument(sourcePageId);
 
                 DocumentInfo targetDocumentInfo =
                     getDocumentInfo(wikiName, spaceName, pageName, null, null, false, true);
 
-                DocumentInfo sourcePageInfo =
-                    getDocumentInfo(wikiOfSourcePage, spaceOfSourcePage, pageOfSourcePage, null, null, true, true);
+                boolean existed =
+                    Utils.getXWikiApi(componentManager).exists(targetDocumentInfo.getDocument().getFullName());
+                if (existed) {
+                    return Response.status(HttpStatus.SC_CONFLICT).build();
+                }
 
-                if (action.equalsIgnoreCase("moveFrom")) {
+                if (uriInfo.getQueryParameters().containsKey("movefrom")) {
                     // invoke XWikiDocument.rename(newDocumentReference, context)
                     XWikiDocument targetDoc = targetDocumentInfo.getDocument().getDocument();
-                    sourcePageInfo.getDocument().getDocument()
-                        .rename(targetDoc.getDocumentReference(), Utils.getXWikiContext(componentManager));
+
+                    sourceDoc.rename(targetDoc.getDocumentReference());
 
                     page =
                         DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(),
-                            sourcePageInfo.getDocument(), false, Utils.getXWikiApi(componentManager));
+                            sourceDoc, false, Utils.getXWikiApi(componentManager));
 
                     if (targetDocumentInfo.isCreated()) {
                         return Response.created(uriInfo.getAbsolutePath()).entity(page).build();
                     }
                 }
 
-                if (action.equalsIgnoreCase("copyFrom")) {
+                if (uriInfo.getQueryParameters().containsKey("movefrom")) {
                     // invoke XWikiDocument.copyDocument(targetDocumentReference, context)
                     XWikiDocument targetDoc =
-                        sourcePageInfo
-                            .getDocument()
-                            .getDocument()
-                            .copyDocument(targetDocumentInfo.getDocument().getDocumentReference(),
-                                Utils.getXWikiContext(componentManager));
+                        sourceDoc.getDocument().copyDocument(targetDocumentInfo.getDocument().getDocumentReference(),
+                            Utils.getXWikiContext(componentManager));
                     Document doc = targetDoc.newDocument(Utils.getXWikiContext(componentManager));
                     doc.save();
 

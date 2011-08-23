@@ -25,8 +25,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Utils;
@@ -56,83 +56,75 @@ public class PageResource extends ModifiablePageResource
     }
 
     @PUT
-	public Response putPage(@PathParam("wikiName") String wikiName,
-			@PathParam("spaceName") String spaceName,
-			@PathParam("pageName") String pageName, Page page)
-			throws XWikiException
-	{    	
-		if (uriInfo.getQueryParameters().size() == 1) {
-			// look for query parameter of copyFrom=pageId or moveFrom=pageId
-			String action = uriInfo.getQueryParameters().keySet().iterator()
-					.next();
-			
-			if (action.equalsIgnoreCase("copyFrom") || action.equalsIgnoreCase("copyFrom")) {
-				String sourcePageId = uriInfo.getQueryParameters().get(action)
-						.get(0);
+    public Response putPage(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+        @PathParam("pageName") String pageName, Page page) throws XWikiException
+    {
+        if (uriInfo.getQueryParameters().size() == 1) {
+            // look for query parameter of copyFrom=pageId or moveFrom=pageId
+            String action = uriInfo.getQueryParameters().keySet().iterator().next();
 
-				String wikiOfSourcePage = sourcePageId.substring(0,
-						sourcePageId.indexOf(":"));
-				String fullNameOfSourcePage = sourcePageId.substring(sourcePageId
-						.indexOf(":") + 1);
-				String spaceOfSourcePage = fullNameOfSourcePage.split("\\.")[0];
-				String pageOfSourcePage = fullNameOfSourcePage.split("\\.")[1];
+            if (action.equalsIgnoreCase("copyFrom") || action.equalsIgnoreCase("moveFrom")) {
+                String sourcePageId = uriInfo.getQueryParameters().get(action).get(0);
 
-				DocumentInfo targetDocumentInfo = getDocumentInfo(wikiName,
-						spaceName, pageName, null, null, false, true);
-				XWikiDocument targetPage = targetDocumentInfo.getDocument()
-						.getDocument();
+                String wikiOfSourcePage = sourcePageId.substring(0, sourcePageId.indexOf(":"));
+                String fullNameOfSourcePage = sourcePageId.substring(sourcePageId.indexOf(":") + 1);
+                String spaceOfSourcePage = fullNameOfSourcePage.split("\\.")[0];
+                String pageOfSourcePage = fullNameOfSourcePage.split("\\.")[1];
 
-				DocumentInfo sourcePageInfo = getDocumentInfo(wikiOfSourcePage,
-						spaceOfSourcePage, pageOfSourcePage, null, null, false,
-						true);
+                /* test whether the target page exists or not */
+                String pageFullName = Utils.getPageId(wikiName, spaceName, pageName);
+                boolean existed = Utils.getXWikiApi(componentManager).exists(pageFullName);
+                if (existed) {
+                    return Response.status(HttpStatus.SC_CONFLICT).build();
+                }
 
-				if (action.equalsIgnoreCase("moveFrom")) {
-					// invoke XWikiDocument.rename(newDocumentReference, context)
-					sourcePageInfo.getDocument().getDocument()
-							.rename(targetPage.getDocumentReference(),
-									Utils.getXWikiContext(componentManager));
+                DocumentInfo targetDocumentInfo =
+                    getDocumentInfo(wikiName, spaceName, pageName, null, null, false, true);
 
-					page = DomainObjectFactory.createPage(objectFactory,
-							uriInfo.getBaseUri(), uriInfo.getAbsolutePath(),
-							targetDocumentInfo.getDocument(), false,
-							Utils.getXWikiApi(componentManager));
-					
-					if (targetDocumentInfo.isCreated()) {
-						return Response.created(uriInfo.getAbsolutePath())
-								.entity(page).build();
-					} else {
-						return Response.status(Status.CONFLICT).entity(page)
-								.build();
-					}
-				}
+                DocumentInfo sourcePageInfo =
+                    getDocumentInfo(wikiOfSourcePage, spaceOfSourcePage, pageOfSourcePage, null, null, true, true);
 
-				if (action.equalsIgnoreCase("copyFrom")) {
-					// invoke XWiki.copyDocument(sourceDocumentReference,
-					// targetDocumentReference, context)
-					XWikiDocument targetDoc = sourcePageInfo.getDocument().getDocument().copyDocument(targetPage.getDocumentReference(),
-							Utils.getXWikiContext(componentManager));
-					
-					page = DomainObjectFactory.createPage(objectFactory,
-							uriInfo.getBaseUri(), uriInfo.getAbsolutePath(),
-							targetDoc.newDocument(Utils.getXWikiContext(componentManager)), false,
-							Utils.getXWikiApi(componentManager));
-					
-					if (targetDocumentInfo.isCreated()) {
-						return Response.created(uriInfo.getAbsolutePath())
-								.entity(page).build();
-					} else {
-						return Response.status(Status.CONFLICT).entity(page)
-								.build();
-					}
-				}		
-			}			
-		}
+                if (action.equalsIgnoreCase("moveFrom")) {
+                    // invoke XWikiDocument.rename(newDocumentReference, context)
+                    XWikiDocument targetDoc = targetDocumentInfo.getDocument().getDocument();
+                    sourcePageInfo.getDocument().getDocument()
+                        .rename(targetDoc.getDocumentReference(), Utils.getXWikiContext(componentManager));
 
-		DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName,
-				pageName, null, null, false, true);
+                    page =
+                        DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(),
+                            sourcePageInfo.getDocument(), false, Utils.getXWikiApi(componentManager));
 
-		return putPage(documentInfo, page);
-	}
+                    if (targetDocumentInfo.isCreated()) {
+                        return Response.created(uriInfo.getAbsolutePath()).entity(page).build();
+                    }
+                }
+
+                if (action.equalsIgnoreCase("copyFrom")) {
+                    // invoke XWikiDocument.copyDocument(targetDocumentReference, context)
+                    XWikiDocument targetDoc =
+                        sourcePageInfo
+                            .getDocument()
+                            .getDocument()
+                            .copyDocument(targetDocumentInfo.getDocument().getDocumentReference(),
+                                Utils.getXWikiContext(componentManager));
+                    Document doc = targetDoc.newDocument(Utils.getXWikiContext(componentManager));
+                    doc.save();
+
+                    page =
+                        DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(),
+                            doc, false, Utils.getXWikiApi(componentManager));
+
+                    if (targetDocumentInfo.isCreated()) {
+                        return Response.created(uriInfo.getAbsolutePath()).entity(page).build();
+                    }
+                }
+            }
+        }
+
+        DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, false, true);
+
+        return putPage(documentInfo, page);
+    }
 
     @DELETE
     public void deletePage(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,

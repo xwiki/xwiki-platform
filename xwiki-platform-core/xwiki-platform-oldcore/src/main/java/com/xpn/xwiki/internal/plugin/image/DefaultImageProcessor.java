@@ -109,7 +109,7 @@ public class DefaultImageProcessor implements ImageProcessor
     /**
      * {@inheritDoc}
      * 
-     * @see ImageProcessor#creatThumbnail(Image, int, int, Rectangle)
+     * @see ImageProcessor#createThumbnail(Image, int, int, Rectangle)
      */
     public RenderedImage createThumbnail(Image image, int width, int height, Rectangle boundaries)
     {

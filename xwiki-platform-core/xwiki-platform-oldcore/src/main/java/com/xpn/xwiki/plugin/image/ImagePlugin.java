@@ -201,9 +201,10 @@ public class ImagePlugin extends XWikiDefaultPlugin
     /**
      * {@inheritDoc}
      * <p>
-     * Allows to scale images server-side, in order to have real thumbnails for reduced traffic. The new image
-     * dimensions are passed in the request as the {@code width} and {@code height} parameters. If only one of the
-     * dimensions is specified, then the other one is computed to preserve the original aspect ratio of the image.
+     * Allows to scale and crop images server-side, in order to have real thumbnails for reduced traffic. The new image
+     * dimensions and boundaries are passed in the request as the {@code width}, {@code height} and {@boundaries}
+     * parameters. If only one of the dimensions is specified, then the other one is computed to preserve
+     * the original aspect ratio of designated area of the image (or the whole image if no boundaries are specified).
      * 
      * @see XWikiDefaultPlugin#downloadAttachment(XWikiAttachment, XWikiContext)
      */
@@ -288,10 +289,11 @@ public class ImagePlugin extends XWikiDefaultPlugin
         if (!StringUtils.isBlank(parameterValue)
             && StringUtils.countMatches(parameterValue, COMMA) == 3) {
             try {
-                int x = Integer.parseInt(parameterValue.split(COMMA)[0]);
-                int y = Integer.parseInt(parameterValue.split(COMMA)[1]);
-                int width = Integer.parseInt(parameterValue.split(COMMA)[2]);
-                int height = Integer.parseInt(parameterValue.split(COMMA)[3]);
+                String[] values = parameterValue.split(COMMA);
+                int x = Integer.parseInt(values[0]);
+                int y = Integer.parseInt(values[1]);
+                int width = Integer.parseInt(values[2]);
+                int height = Integer.parseInt(values[3]);
                 return new Rectangle(x, y, width, height);
             } catch (NumberFormatException e) {
                 // Ignore
@@ -356,7 +358,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     {
         String boundariesKey = "-1,-1,-1,-1";
         if (boundaries != null) {
-            boundariesKey = String.format("%s,%s", boundaries.x, boundaries.width, boundaries.y, boundaries.height);
+            boundariesKey = String.format("%s,%s,%s,%s", boundaries.x, boundaries.width, boundaries.y, boundaries.height);
         }
 
         String key =

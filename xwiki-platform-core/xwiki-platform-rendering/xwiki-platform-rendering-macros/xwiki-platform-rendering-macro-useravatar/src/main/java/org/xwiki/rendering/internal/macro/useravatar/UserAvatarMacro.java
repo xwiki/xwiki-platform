@@ -64,6 +64,11 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
     private static final String DESCRIPTION = "Allows displaying the avatar for a specific user.";
 
     /**
+     * Space where XWiki user profiles are located.
+     */
+    private static final String USER_SPACE = "XWiki";
+
+    /**
      * Used to get the user avatar picture from his profile.
      */
     @Inject
@@ -117,7 +122,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
         throws MacroExecutionException
     {
         DocumentReference userReference = this.currentDocumentReferenceResolver.resolve(parameters.getUsername(),
-            new EntityReference("XWiki", EntityType.SPACE));
+            new EntityReference(USER_SPACE, EntityType.SPACE));
 
         // Find the avatar attachment name or null if not defined or an error happened when locating it
         String fileName = null;

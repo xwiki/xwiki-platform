@@ -129,7 +129,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
         if (this.documentAccessBridge.exists(userReference)) {
             Object avatarProperty = this.documentAccessBridge.getProperty(userReference,
                 new DocumentReference(this.currentEntityReferenceValueProvider.getDefaultValue(EntityType.WIKI),
-                    "XWiki", "XWikiUsers"), "avatar");
+                    USER_SPACE, "XWikiUsers"), "avatar");
             if (avatarProperty != null) {
                 fileName = avatarProperty.toString();
             }

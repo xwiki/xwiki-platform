@@ -2494,7 +2494,7 @@ public class XWiki implements EventListener
                 List<String> acceptedLanguages = getAcceptedLanguages(context.getRequest());
                 // We can force one of the configured languages to be accepted
                 if (Param("xwiki.language.forceSupported", "0").equals("1")) {
-                    List<String> available = Arrays.asList(getXWikiPreference("languages", context).split(", |"));
+                    List<String> available = Arrays.asList(getXWikiPreference("languages", context).split("[, |]"));
                     // Filter only configured languages
                     acceptedLanguages.retainAll(available);
                 }

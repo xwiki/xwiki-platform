@@ -35,6 +35,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rendering.block.Block;
@@ -115,7 +116,8 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
     public List<Block> execute(UserAvatarMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        DocumentReference userReference = this.currentDocumentReferenceResolver.resolve(parameters.getUsername());
+        DocumentReference userReference = this.currentDocumentReferenceResolver.resolve(parameters.getUsername(),
+            new EntityReference("XWiki", EntityType.SPACE));
 
         // Find the avatar attachment name or null if not defined or an error happened when locating it
         String fileName = null;

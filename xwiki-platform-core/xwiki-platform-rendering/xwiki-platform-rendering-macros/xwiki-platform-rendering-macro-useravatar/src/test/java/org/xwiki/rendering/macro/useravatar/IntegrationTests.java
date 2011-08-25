@@ -32,6 +32,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
@@ -79,8 +80,14 @@ public class IntegrationTests
         final DocumentReferenceResolver<String> mockDocumentReferenceResolver =
             registerMockComponent(componentManager, mockery, DocumentReferenceResolver.class, "current");
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentReferenceResolver).resolve("XWiki.Admin"); will(returnValue(adminUserReference));
-            allowing(mockDocumentReferenceResolver).resolve("XWiki.ExistingUserWithoutAvatar");
+            allowing(mockDocumentReferenceResolver).resolve("XWiki.Admin",
+                new EntityReference("XWiki", EntityType.SPACE));
+                will(returnValue(adminUserReference));
+            allowing(mockDocumentReferenceResolver).resolve("Admin",
+                new EntityReference("XWiki", EntityType.SPACE));
+                will(returnValue(adminUserReference));
+            allowing(mockDocumentReferenceResolver).resolve("XWiki.ExistingUserWithoutAvatar",
+                new EntityReference("XWiki", EntityType.SPACE));
                 will(returnValue(userWithoutAvatarReference));
         }});
 

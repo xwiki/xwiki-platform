@@ -35,6 +35,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rendering.block.Block;
@@ -61,6 +62,11 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
      * The description of the macro.
      */
     private static final String DESCRIPTION = "Allows displaying the avatar for a specific user.";
+
+    /**
+     * Space where XWiki user profiles are located.
+     */
+    private static final String USER_SPACE = "XWiki";
 
     /**
      * Used to get the user avatar picture from his profile.
@@ -115,14 +121,15 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
     public List<Block> execute(UserAvatarMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        DocumentReference userReference = this.currentDocumentReferenceResolver.resolve(parameters.getUsername());
+        DocumentReference userReference = this.currentDocumentReferenceResolver.resolve(parameters.getUsername(),
+            new EntityReference(USER_SPACE, EntityType.SPACE));
 
         // Find the avatar attachment name or null if not defined or an error happened when locating it
         String fileName = null;
         if (this.documentAccessBridge.exists(userReference)) {
             Object avatarProperty = this.documentAccessBridge.getProperty(userReference,
                 new DocumentReference(this.currentEntityReferenceValueProvider.getDefaultValue(EntityType.WIKI),
-                    "XWiki", "XWikiUsers"), "avatar");
+                    USER_SPACE, "XWikiUsers"), "avatar");
             if (avatarProperty != null) {
                 fileName = avatarProperty.toString();
             }

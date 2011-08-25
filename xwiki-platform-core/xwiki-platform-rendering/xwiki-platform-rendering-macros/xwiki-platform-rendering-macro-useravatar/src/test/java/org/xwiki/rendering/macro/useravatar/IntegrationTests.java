@@ -83,6 +83,9 @@ public class IntegrationTests
             allowing(mockDocumentReferenceResolver).resolve("XWiki.Admin",
                 new EntityReference("XWiki", EntityType.SPACE));
                 will(returnValue(adminUserReference));
+            allowing(mockDocumentReferenceResolver).resolve("Admin",
+                new EntityReference("XWiki", EntityType.SPACE));
+                will(returnValue(adminUserReference));
             allowing(mockDocumentReferenceResolver).resolve("XWiki.ExistingUserWithoutAvatar",
                 new EntityReference("XWiki", EntityType.SPACE));
                 will(returnValue(userWithoutAvatarReference));

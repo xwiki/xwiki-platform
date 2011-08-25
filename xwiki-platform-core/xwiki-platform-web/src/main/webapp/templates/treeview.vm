@@ -81,10 +81,10 @@
         #set($title_item = $title_item.replaceAll("[\r\n]"," "))
         #if($mode == "view")
          #if($checked)
-          addTreeElementViewMode(tree, nodes, "$item.id", "$title_item", "$item.parent")
+          addTreeElementViewMode(tree, nodes, "${escapetool.javascript($item.id)}", "${escapetool.javascript($title_item)}", "${escapetool.javascript($item.parent)}")
          #end
         #else
-         addTreeElement(tree, nodes, "$item.id", "$title_item", "$item.parent", #if($checked) true #else false #end)
+         addTreeElement(tree, nodes, "${escapetool.javascript($item.id)}", "${escapetool.javascript($title_item)}", "${escapetool.javascript($item.parent)}", #if($checked) true #else false #end)
         #end
         #end
    		tree.draw();

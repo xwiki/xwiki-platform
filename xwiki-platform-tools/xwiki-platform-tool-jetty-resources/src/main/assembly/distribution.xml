@@ -32,13 +32,13 @@
       <outputFileNameMapping>start.jar</outputFileNameMapping>
       <outputDirectory>/jetty</outputDirectory>
       <includes>
-        <include>org.mortbay.jetty:start</include>
+        <include>org.eclipse.jetty:jetty-start</include>
       </includes>
     </dependencySet>
     <dependencySet>
       <outputDirectory>/jetty/lib</outputDirectory>
       <excludes>
-        <exclude>org.mortbay.jetty:start</exclude>
+        <exclude>org.eclipse.jetty:jetty-start</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>

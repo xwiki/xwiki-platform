@@ -139,12 +139,12 @@
 #-# The default local cache implementation is JBoss Cache.
 # cache.defaultLocalCache=jbosscache/local
 
-#----------------------------------------------------------------------------------
-# Settings for the OpenOffice server instance consumed by the OfficeImporter plugin
-#----------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------
+# Settings for the OpenOffice server instance consumed by the OfficeImporter component
+#-------------------------------------------------------------------------------------
  
 #-# [Since 1.9M2]
-#-# Type of the openoffice server instance used by officeimporter plugin.
+#-# Type of the openoffice server instance used by officeimporter component.
 #-# 0 - Internally managed server instance. (Default)
 #-# 1 - Externally managed (local) server instance.
 # openoffice.serverType=0

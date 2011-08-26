@@ -10,8 +10,8 @@ import org.xwiki.extension.job.Job;
 import org.xwiki.extension.job.JobManager;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
-import org.xwiki.logging.event.LogLevel;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.AbstractComponentTestCase;
 

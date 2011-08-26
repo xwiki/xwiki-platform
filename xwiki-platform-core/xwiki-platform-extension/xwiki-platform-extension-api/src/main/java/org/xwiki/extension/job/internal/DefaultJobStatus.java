@@ -20,39 +20,35 @@
 package org.xwiki.extension.job.internal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.xwiki.extension.job.JobProgress;
 import org.xwiki.extension.job.JobStatus;
 import org.xwiki.extension.job.Request;
+import org.xwiki.logging.LogLevel;
+import org.xwiki.logging.LogQueue;
+import org.xwiki.logging.LoggerManager;
 import org.xwiki.logging.event.LogEvent;
-import org.xwiki.logging.event.LogLevel;
-import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.Event;
 
 /**
+ * Default implementation of {@link JobStatus}.
+ * 
  * @param <R>
  * @version $Id$
  */
-public class DefaultJobStatus<R extends Request> implements JobStatus, EventListener
+public class DefaultJobStatus<R extends Request> implements JobStatus
 {
-    /**
-     * The matched events.
-     */
-    private static final List<Event> EVENTS = Collections.<Event> singletonList(new LogEvent());
-
     /**
      * Used register itself to receive logging and progress related events.
      */
     private ObservationManager observationManager;
-
+    
     /**
-     * Unique name mostly used for observation.
+     * Used to isolate job related log.
      */
-    private String name;
+    private LoggerManager loggerManager;
 
     /**
      * General state of the job.
@@ -67,7 +63,7 @@ public class DefaultJobStatus<R extends Request> implements JobStatus, EventList
     /**
      * Log sent during job execution.
      */
-    private ConcurrentLinkedQueue<LogEvent> logs = new ConcurrentLinkedQueue<LogEvent>();
+    private LogQueue logs = new LogQueue();
 
     /**
      * Take care of progress related events to produce a progression information usually used in a progress bar.
@@ -75,25 +71,18 @@ public class DefaultJobStatus<R extends Request> implements JobStatus, EventList
     private DefaultJobProgress progress;
 
     /**
-     * The thread used to filter event for the job thread.
-     */
-    private Thread thread;
-
-    /**
      * @param request the request provided when started the job
      * @param id the unique id of the job
      * @param observationManager the observation manager component
+     * @param loggerManager the logger manager component
      */
-    public DefaultJobStatus(R request, String id, ObservationManager observationManager)
+    public DefaultJobStatus(R request, String id, ObservationManager observationManager, LoggerManager loggerManager)
     {
         this.request = request;
         this.observationManager = observationManager;
-
-        this.name = getClass().getName() + '_' + id;
+        this.loggerManager = loggerManager;
 
         this.progress = new DefaultJobProgress(id);
-
-        this.thread = Thread.currentThread();
     }
 
     /**
@@ -101,8 +90,8 @@ public class DefaultJobStatus<R extends Request> implements JobStatus, EventList
      */
     void startListening()
     {
-        this.observationManager.addListener(this);
         this.observationManager.addListener(this.progress);
+        this.loggerManager.puchLogQueue(this.logs);
     }
 
     /**
@@ -110,46 +99,8 @@ public class DefaultJobStatus<R extends Request> implements JobStatus, EventList
      */
     void stopListening()
     {
-        this.observationManager.removeListener(this.getName());
+        this.loggerManager.popLogListener();
         this.observationManager.removeListener(this.progress.getName());
-    }
-
-    // EventListener
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
-    @Override
-    public String getName()
-    {
-        return this.name;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
-    @Override
-    public List<Event> getEvents()
-    {
-        return EVENTS;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-     *      java.lang.Object)
-     */
-    @Override
-    public void onEvent(Event event, Object arg1, Object arg2)
-    {
-        if (Thread.currentThread() == this.thread) {
-            this.logs.add((LogEvent) event);
-        }
     }
 
     // JobStatus
@@ -196,7 +147,7 @@ public class DefaultJobStatus<R extends Request> implements JobStatus, EventList
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.extension.job.JobStatus#getLog(org.xwiki.logging.event.LogLevel)
+     * @see org.xwiki.extension.job.JobStatus#getLog(org.xwiki.logging.LogLevel)
      */
     public List<LogEvent> getLog(LogLevel level)
     {

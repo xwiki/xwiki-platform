@@ -22,8 +22,8 @@ package org.xwiki.extension.job;
 import java.util.List;
 import java.util.Queue;
 
+import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
-import org.xwiki.logging.event.LogLevel;
 
 /**
  * Describe the current status of a job.

@@ -30,13 +30,14 @@ import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogQueue;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.logging.event.LogEvent;
+import org.xwiki.logging.event.LogQueueListener;
 import org.xwiki.observation.ObservationManager;
 
 /**
  * Default implementation of {@link JobStatus}.
  * 
  * @param <R>
- * @version $Id$
+ * @version $Id: 03c25cf114c70160580076cbe31e614549c63ff8 $
  */
 public class DefaultJobStatus<R extends Request> implements JobStatus
 {
@@ -44,11 +45,16 @@ public class DefaultJobStatus<R extends Request> implements JobStatus
      * Used register itself to receive logging and progress related events.
      */
     private ObservationManager observationManager;
-    
+
     /**
      * Used to isolate job related log.
      */
     private LoggerManager loggerManager;
+
+    /**
+     * The unique id of the job
+     */
+    private String id;
 
     /**
      * General state of the job.
@@ -81,8 +87,9 @@ public class DefaultJobStatus<R extends Request> implements JobStatus
         this.request = request;
         this.observationManager = observationManager;
         this.loggerManager = loggerManager;
+        this.id = id;
 
-        this.progress = new DefaultJobProgress(id);
+        this.progress = new DefaultJobProgress(this.id);
     }
 
     /**
@@ -91,7 +98,8 @@ public class DefaultJobStatus<R extends Request> implements JobStatus
     void startListening()
     {
         this.observationManager.addListener(this.progress);
-        this.loggerManager.pushLogQueue(this.logs);
+        this.loggerManager.pushLogListener(new LogQueueListener(LogQueueListener.class.getName() + '_' + this.id,
+            this.logs));
     }
 
     /**

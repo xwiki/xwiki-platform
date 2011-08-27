@@ -37,7 +37,7 @@ import org.xwiki.observation.ObservationManager;
  * Default implementation of {@link JobStatus}.
  * 
  * @param <R>
- * @version $Id: 03c25cf114c70160580076cbe31e614549c63ff8 $
+ * @version $Id$
  */
 public class DefaultJobStatus<R extends Request> implements JobStatus
 {

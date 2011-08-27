@@ -52,7 +52,7 @@ public class DefaultJobStatus<R extends Request> implements JobStatus
     private LoggerManager loggerManager;
 
     /**
-     * The unique id of the job
+     * The unique id of the job.
      */
     private String id;
 

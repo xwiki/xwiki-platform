@@ -91,7 +91,7 @@ public class DefaultJobStatus<R extends Request> implements JobStatus
     void startListening()
     {
         this.observationManager.addListener(this.progress);
-        this.loggerManager.puchLogQueue(this.logs);
+        this.loggerManager.pushLogQueue(this.logs);
     }
 
     /**

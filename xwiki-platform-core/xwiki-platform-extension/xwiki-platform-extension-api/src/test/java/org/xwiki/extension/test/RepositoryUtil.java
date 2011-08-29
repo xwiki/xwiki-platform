@@ -58,6 +58,11 @@ public class RepositoryUtil
         return name;
     }
 
+    public File getWorkingDirectory()
+    {
+        return workingDirectory;
+    }
+
     public File getLocalRepository()
     {
         return this.localRepository;

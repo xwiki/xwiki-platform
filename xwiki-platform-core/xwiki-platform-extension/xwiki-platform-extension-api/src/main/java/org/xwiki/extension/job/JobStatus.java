@@ -20,9 +20,9 @@
 package org.xwiki.extension.job;
 
 import java.util.List;
-import java.util.Queue;
 
 import org.xwiki.logging.LogLevel;
+import org.xwiki.logging.LogQueue;
 import org.xwiki.logging.event.LogEvent;
 
 /**
@@ -73,7 +73,7 @@ public interface JobStatus
     /**
      * @return the log sent during job execution
      */
-    Queue<LogEvent> getLog();
+    LogQueue getLog();
 
     /**
      * @param level the level of the log

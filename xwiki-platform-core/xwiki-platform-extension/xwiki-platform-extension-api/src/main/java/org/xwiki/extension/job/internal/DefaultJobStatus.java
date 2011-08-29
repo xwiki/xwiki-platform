@@ -21,7 +21,6 @@ package org.xwiki.extension.job.internal;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.xwiki.extension.job.JobProgress;
 import org.xwiki.extension.job.JobStatus;
@@ -147,7 +146,7 @@ public class DefaultJobStatus<R extends Request> implements JobStatus
      * 
      * @see org.xwiki.extension.job.JobStatus#getLog()
      */
-    public ConcurrentLinkedQueue<LogEvent> getLog()
+    public LogQueue getLog()
     {
         return this.logs;
     }

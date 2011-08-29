@@ -29,41 +29,15 @@
     <artifactId>xwiki-platform-extension-repository-xwiki</artifactId>
     <version>3.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-extension-repository-xwiki-model</artifactId>
-  <name>XWiki Platform - Extension - Repository - XWiki model</name>
+  <artifactId>xwiki-platform-extension-repository-xwiki-api</artifactId>
+  <name>XWiki Platform - Extension - Repository - XWiki api</name>
   <packaging>jar</packaging>
-  <description>The (JAXB) model for XML resource representations served by the Extension REST module.</description>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.jvnet.jaxb2.maven2</groupId>
-        <artifactId>maven-jaxb2-plugin</artifactId>
-        <version>0.7.5</version>
-        <configuration>
-          <extension>true</extension>
-          <args>
-            <arg>-Xfluent-api</arg>
-          </args>
-          <schemaDirectory>src/main/resources</schemaDirectory>
-          <generatePackage>org.xwiki.extension.repository.xwiki.model.jaxb</generatePackage>
-          <verbose>true</verbose>
-          <removeOldOutput>false</removeOldOutput>
-          <plugins>
-            <plugin>
-              <groupId>org.jvnet.jaxb2_commons</groupId>
-              <artifactId>jaxb2-fluent-api</artifactId>
-              <version>3.0</version>
-            </plugin>
-          </plugins>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  <description>Contains stuff common to server and client</description>
+  <dependencies>
+  <dependency>
+    <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-repository-xwiki-model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

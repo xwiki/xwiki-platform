@@ -41,7 +41,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-extension-repository-xwiki-model</artifactId>
+      <artifactId>xwiki-platform-extension-repository-xwiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

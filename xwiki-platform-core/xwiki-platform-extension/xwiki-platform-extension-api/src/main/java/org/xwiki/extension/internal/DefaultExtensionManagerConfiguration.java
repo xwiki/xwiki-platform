@@ -143,10 +143,8 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
             }
         } else {
             try {
-                repositories.add(new ExtensionRepositoryId("maven-xwiki-releases", TYPE_MAVEN, new URI(
-                    "http://maven.xwiki.org/releases/")));
-                repositories.add(new ExtensionRepositoryId("maven-central", TYPE_MAVEN, new URI(
-                    "http://repo1.maven.org/maven2/")));
+                repositories.add(new ExtensionRepositoryId("maven-xwiki", TYPE_MAVEN, new URI(
+                    "http://nexus.xwiki.org/nexus/content/groups/public")));
             } catch (Exception e) {
                 // Should never happen
             }

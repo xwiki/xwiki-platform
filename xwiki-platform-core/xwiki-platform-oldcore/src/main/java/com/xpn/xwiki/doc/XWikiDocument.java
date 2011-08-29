@@ -555,6 +555,11 @@ public class XWikiDocument implements DocumentModelBridge
         // Note: We don't use the wiki name in the document id's computation. The main historical reason is so
         // that all things saved in a given wiki's database are always stored relative to that wiki so that
         // changing that wiki's name is simpler.
+        // It is important to note that a document called "Main.WebHome:es" will have
+        // the same cache ID as the Spanish version of "Main.WebHome".
+        // This is a problem which must be fixed here and in XWikiCacheStore#getKey()
+        // simultaneously.
+        // See: http://jira.xwiki.org/jira/browse/XWIKI-6169
         if ((this.language == null) || this.language.trim().equals("")) {
             this.id = this.localEntityReferenceSerializer.serialize(getDocumentReference()).hashCode();
         } else {

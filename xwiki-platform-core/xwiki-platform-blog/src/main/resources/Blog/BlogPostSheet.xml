@@ -34,7 +34,7 @@ $xwiki.ssx.use('Blog.ManageCategories')##
 #getEntryObject($doc $entryObj)
 #if("$!entryObj" == '')
   #warning($msg.get('xe.blog.sheet.notpost'))
-#elseif($xcontext.action != 'inline')
+#elseif($xcontext.action != 'edit')
   ## View mode
   #isPublished($entryObj $isPublished)
   #isHidden($entryObj $isHidden)

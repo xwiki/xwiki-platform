@@ -61,7 +61,8 @@ public class AetherExtension extends AbstractExtension
     public AetherExtension(ExtensionId id, Model mavenModel, AetherExtensionRepository repository,
         PlexusComponentManager mavenComponentManager, ConverterManager converter)
     {
-        super(repository, id, mavenModel.getPackaging());
+        // See bundle as jar packages since bundle are actually store as jar files
+        super(repository, id, mavenModel.getPackaging().equals("bundle") ? "jar" : mavenModel.getPackaging());
 
         this.plexusComponentManager = mavenComponentManager;
         this.mavenModel = mavenModel;

@@ -46,6 +46,8 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
 
     private ExtensionId dependencyExtensionId;
 
+    private ExtensionId bundleExtensionId;
+
     private RepositoryUtil repositoryUtil;
 
     @Before
@@ -59,6 +61,8 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
 
         this.extensionId = new ExtensionId("groupid:artifactid", "version");
         this.dependencyExtensionId = new ExtensionId("dgroupid:dartifactid", "dversion");
+
+        this.bundleExtensionId = new ExtensionId("groupid:bundleartifactid", "version");
 
         // lookup
 
@@ -93,7 +97,25 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
     {
         Extension extension = this.repositoryManager.resolve(this.extensionId);
 
-        File file = new File("target/downloaded/" + this.extensionId.getId() + "." + extension.getType());
+        File file = new File(this.repositoryUtil.getWorkingDirectory() + "/downloaded/extension." + extension.getType());
+
+        if (file.exists()) {
+            file.delete();
+        }
+
+        extension.download(file);
+
+        Assert.assertTrue("File has not been downloaded", file.exists());
+
+        Assert.assertEquals("content", FileUtils.readFileToString(file));
+    }
+
+    @Test
+    public void testDownloadBundle() throws ExtensionException, IOException
+    {
+        Extension extension = this.repositoryManager.resolve(this.bundleExtensionId);
+
+        File file = new File(this.repositoryUtil.getWorkingDirectory() + "/downloaded/bundleextension.jar");
 
         if (file.exists()) {
             file.delete();

@@ -19,8 +19,10 @@
  */
 package org.xwiki.rendering.internal.macro.script;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.macro.Macro;
@@ -38,14 +40,15 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 2.5M1
  */
-@Component("nestedscriptmacrovalidator")
+@Component
+@Named("nestedscriptmacrovalidator")
 public class NestedScriptMacroValidatorListener extends AbstractScriptCheckerListener
 {
     /**
      * Used to find the type of a Macro defined by a Macro Marker block; we're interested to prevent nested scripts only
      * in Script macros.
      */
-    @Requirement
+    @Inject
     private MacroManager macroManager;
 
     /**

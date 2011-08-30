@@ -43,7 +43,7 @@ import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
 /**
- * Unit tests for {@link org.xwiki.rendering.internal.macro.script.NestedScriptMacroValidator}.
+ * Unit tests for {@link NestedScriptMacroValidatorListener}.
  * 
  * @version $Id$
  * @since 2.4M2

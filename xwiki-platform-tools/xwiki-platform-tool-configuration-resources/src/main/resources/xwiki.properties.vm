@@ -321,6 +321,6 @@
 #-#   true : Enabled
 #-#   false: Disabled
 #-#
-#-# Default value is false
-# csrf.enabled = false
+#-# Default value is true
+# csrf.enabled = true
 

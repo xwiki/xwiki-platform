@@ -86,8 +86,8 @@ public class AetherExtension extends AbstractExtension
         for (Dependency mavenDependency : this.mavenModel.getDependencies()) {
             if (!mavenDependency.isOptional()
                 && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime"))) {
-                addDependency(new AetherExtensionDependency(new ExtensionId(mavenDependency.getGroupId() + ":"
-                    + mavenDependency.getArtifactId(), mavenDependency.getVersion())));
+                addDependency(new AetherExtensionDependency(mavenDependency.getGroupId(),
+                    mavenDependency.getArtifactId(), mavenDependency.getVersion()));
             }
         }
 

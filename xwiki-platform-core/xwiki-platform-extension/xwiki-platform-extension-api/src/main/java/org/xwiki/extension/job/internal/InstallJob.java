@@ -155,9 +155,9 @@ public class InstallJob extends AbstractJob<InstallRequest>
         }
 
         if (namespace != null) {
-            this.logger.info("Installing extension [{0}] on namespace [{1}]", extensionId, namespace);
+            this.logger.info("Installing extension [{}] on namespace [{}]", extensionId, namespace);
         } else {
-            this.logger.info("Installing extension [{0}]", extensionId);
+            this.logger.info("Installing extension [{}]", extensionId);
         }
 
         LocalExtension previousExtension = null;
@@ -197,6 +197,12 @@ public class InstallJob extends AbstractJob<InstallRequest>
     {
         if (this.coreExtensionRepository.exists(extensionDependency.getId())) {
             return null;
+        }
+
+        if (namespace != null) {
+            this.logger.info("Installing extension dependency [{}] on namespace [{}]", extensionDependency, namespace);
+        } else {
+            this.logger.info("Installing extension dependency [{}]", extensionDependency);
         }
 
         LocalExtension previousExtension = null;

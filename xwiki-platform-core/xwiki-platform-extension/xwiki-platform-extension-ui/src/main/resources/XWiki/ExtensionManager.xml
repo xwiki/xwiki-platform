@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1284039567000</creationDate>
-<date>1312961417000</date>
-<contentUpdateDate>1312961417000</contentUpdateDate>
+<date>1314707690000</date>
+<contentUpdateDate>1314707690000</contentUpdateDate>
 <version>1.1</version>
 <title>Extension Manager</title>
 <template></template>
@@ -355,6 +355,29 @@ This application is experimental, use it at your own risk.
 #if ($request.extensionwiki &amp;&amp; $request.extensionwiki.trim() != '')
   #set($extensionwiki = $request.extensionwiki)
 #end
+
+#macro(printThrowable $throwable)
+  $throwable.class: #if(!$throwable.message)null#else$throwable.message#end
+
+  #foreach($stackTraceElement in $throwable.stackTrace)
+    ~    at $stackTraceElement
+  #end
+  #if ($throwable.cause)
+    Caused by: #printThrowable($throwable.cause)
+  #end
+#end
+
+#macro(printJobLog $job)
+  #foreach($log in $installJob.status.log)
+    #set($logLevel = $log.level.toString().toLowerCase())
+    {{$logLevel}}
+      $log.formattedMessage
+      #if ($log.throwable)
+        #printThrowable($log.throwable)
+      #end
+    {{/$logLevel}}
+  #end
+#end
 {{/velocity}}
 
 {{velocity}}
@@ -430,7 +453,7 @@ This application is experimental, use it at your own risk.
 #if ($request.actionresolve)
   = Resolve
 
-  #if (!$request.extensionid || !$request.extensionversion)
+  #if (!$request.extensionid || $request.extensionid == '' || !$request.extensionversion || $request.extensionversion == '')
     {{error}}You have to provide both extension id and version.{{/error}}
   #else
     #macro(resolveExtension $extensionid $extensionversion $extensionlevel)
@@ -463,14 +486,16 @@ This application is experimental, use it at your own risk.
   #if (!$request.extensionid || !$request.extensionversion)
     {{error}}You have to provide both extension id and version.{{/error}}
   #elseif ($request.confirm)
-    #set($extension = $extensionManager.install($request.extensionid, $request.extensionversion, $extensionwiki))
+    #set($installJob = $extensionManager.install($request.extensionid, $request.extensionversion, $extensionwiki))
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
-      {{error}}Failed to install extension with id $request.extensionid and version $request.extensionversion#if($extensionwiki) on wiki $extensionwiki#end: $lasterror.message{{/error}}
-    #elseif ($extension.exceptions)
-      {{error}}Failed to install extension with id $request.extensionid and version $request.extensionversion#if($extensionwiki) on wiki $extensionwiki#end: $extension.exceptions[0].message{{/error}}
+      {{error}}
+        Failed to install extension with id $request.extensionid and version $request.extensionversion#if($extensionwiki) on wiki $extensionwiki#end: #printThrowable($lasterror)
+      {{/error}}
     #else
-      {{info}}Extension with id $request.extensionid and version $request.extensionversion has been installed#if($extensionwiki) on wiki $extensionwiki#end.{{/info}} 
+      {{box}}
+        #printJobLog($installJob)
+      {{/box}}
     #end
   #else
     #macro(prepareInstall $extensionid $extensionversion $extensionsToInstall $extensionsToUpgrade $extensionsSuggested, $coreExtensionsConflicts)
@@ -558,14 +583,16 @@ This application is experimental, use it at your own risk.
   #if (!$request.extensionid || !$request.extensionversion)
     {{error}}You have to provide both extension id and version.{{/error}}
   #elseif($request.confirm)
-    #set($extension = $extensionManager.uninstall($request.extensionid, $request.extensionversion))
+    #set($uninstallJob = $extensionManager.uninstall($request.extensionid, $request.extensionversion))
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
-      {{error}}Failed to uninstall extension with id $request.extensionid and version $request.extensionversion: $lasterror.message{{/error}}
-    #elseif ($extension.exceptions)
-      {{error}}Failed to uninstall extension with id $request.extensionid and version $request.extensionversion: $extension.exceptions[0].message{{/error}}
+      {{error}}
+        Failed to uninstall extension with id $request.extensionid and version $request.extensionversion: #printThrowable($lasterror)
+      {{/error}}
     #else
-      {{info}}Extension with id $request.extensionid and version $request.extensionversion has been uninstalled.{{/info}} 
+      {{box}}
+        #printJobLog($uninstallJob)
+      {{/box}}
     #end
   #else
     #macro(prepareUninstall $extensionid $extensionversion $extensionsToUninstall)

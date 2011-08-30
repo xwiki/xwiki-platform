@@ -29,6 +29,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 
+/**
+ * @deprecated use {@link EditAction} with {@code editor=inline} in the query string instead since 3.2
+ */
+@Deprecated
 public class InlineAction extends XWikiAction {
     private static final Log log = LogFactory.getLog(InlineAction.class);
 

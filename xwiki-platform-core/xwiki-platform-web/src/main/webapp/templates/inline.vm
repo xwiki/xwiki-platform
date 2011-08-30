@@ -1,3 +1,6 @@
+##
+## Deprecated since 3.2. Use edit action with editor=inline in the query string instead.
+##
 $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
 #if((!$request.editor) || ($request.editor.trim() == ""))
   #set($editor = "inline")

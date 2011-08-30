@@ -20,15 +20,18 @@
 package org.xwiki.extension.repository.internal;
 
 import org.xwiki.extension.AbstractExtensionDependency;
-import org.xwiki.extension.ExtensionDependency;
 
 /**
- * Default implementation of {@link ExtensionDependency}.
+ * Default implementation of {@link org.xwiki.extension.ExtensionDependency}.
  * 
  * @version $Id$
  */
 public class LocalExtensionDependency extends AbstractExtensionDependency
 {
+    /**
+     * @param id the id of the extension
+     * @param version the version of the extension
+     */
     public LocalExtensionDependency(String id, String version)
     {
         super(id, version);

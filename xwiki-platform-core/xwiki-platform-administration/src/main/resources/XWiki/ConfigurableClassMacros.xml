@@ -29,17 +29,6 @@
 
 
 #*
- * If this document is saved with programming access or is includeForm'd into a document with programming, we have to
- * drop programming rights in order for it to run safely because it evaluates potentially untrustworthy code.
- *###
-#macro(sandboxDocument)
-  #if($xcontext.hasProgrammingRights())
-    $xcontext.dropPermissions()##
-  #end
-#end
-
-
-#*
  * Any documents which are on the provided list ($documentNames) which are locked by the current user will be unlocked.
  * If this macro has programming rights, then they are unlocked programmatically, otherwise a javascript tag is
  * generated with ajax calls to cancel for all of the documents. If there are documents on this list which are not

@@ -466,7 +466,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 ##
 ## This application should not run with programming rights because it evaluates code which may not be trustworthy.
 ## Removing the next line will open a security hole.
-#sandboxDocument()
+$doc.dropPermissions()##
 ##
 ## This application locks every document in a section while that section is being edited so we should
 ## check for locks held by the current user on any of the applications configured here and remove them.

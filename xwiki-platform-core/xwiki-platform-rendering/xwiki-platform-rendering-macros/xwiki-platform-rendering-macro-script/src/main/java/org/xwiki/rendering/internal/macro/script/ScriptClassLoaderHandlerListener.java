@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -51,6 +52,7 @@ import org.xwiki.rendering.macro.script.ScriptMacroParameters;
  */
 @Component
 @Named("scriptmacroclassloader")
+@Singleton
 public class ScriptClassLoaderHandlerListener implements EventListener
 {
     /** Key used to store the original class loader in the Execution Context. */

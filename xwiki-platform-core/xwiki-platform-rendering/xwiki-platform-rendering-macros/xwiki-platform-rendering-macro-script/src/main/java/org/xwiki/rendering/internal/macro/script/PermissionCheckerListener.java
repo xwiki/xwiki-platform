@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.macro.script;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -41,6 +42,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  */
 @Component
 @Named("permissionchecker")
+@Singleton
 public class PermissionCheckerListener extends AbstractScriptCheckerListener
 {
     /** Used to find the type of a Macro defined by a Macro Marker block. */

@@ -22,4 +22,7 @@ public class XWikiConstant
      */
     public static final EntityReference EDIT_MODE_CLASS = new EntityReference("EditModeClass", EntityType.DOCUMENT,
         new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
+
+    /** The context key which is used to signify that permissions have been dropped. */
+    public static final String DROPPED_PERMISSIONS = "hasDroppedPermissions";
 }

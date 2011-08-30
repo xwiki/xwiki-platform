@@ -39,9 +39,12 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 
 /**
+ * Replaces the context class loader by a custom one that takes into account the "jars" Script parameter that allows
+ * to add jars that will be visible to the executing script.
+ *
  * Listens to script evaluation events ({@link org.xwiki.script.event.ScriptEvaluatingEvent} and
- * {@link org.xwiki.script.event.ScriptEvaluatedEvent}).
- * Sets the context class loader for the evaluation and restores the original class loader afterwards.
+ * {@link org.xwiki.script.event.ScriptEvaluatedEvent}) to set the context class loader and to restore the original
+ * one.
  * 
  * @version $Id$
  * @since 2.5M1

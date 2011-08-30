@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -77,6 +78,12 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
      */
     @Inject
     private VersionManager versionManager;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * The repository identifier.
@@ -199,7 +206,7 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
                 List<DefaultLocalExtension> dependencyVersions = this.extensionsById.get(dependency.getId());
                 if (dependencyVersions != null) {
                     for (ListIterator<DefaultLocalExtension> it =
-                            dependencyVersions.listIterator(dependencyVersions.size()); it.hasPrevious();) {
+                        dependencyVersions.listIterator(dependencyVersions.size()); it.hasPrevious();) {
                         DefaultLocalExtension dependencyExtension = it.previous();
 
                         if (!validatedExtensions.contains(dependency.getId())) {
@@ -345,9 +352,17 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
 
         // Add backward dependencies
         for (ExtensionDependency dependency : localExtension.getDependencies()) {
-            DefaultInstalledExtension dependencyExtension =
-                getInstalledExtensionFromCache(dependency.getId(), namespace);
-            dependencyExtension.addBackwardDependency(localExtension);
+            if (!this.coreExtensionRepository.exists(dependency.getId())) {
+                DefaultInstalledExtension dependencyExtension =
+                    getInstalledExtensionFromCache(dependency.getId(), namespace);
+                if (dependencyExtension == null) {
+                    // That should never happen but better be careful
+                    this.logger.error("Requeired dependency [" + dependency + "] is not installed when registering ["
+                        + localExtension + "]");
+                }
+
+                dependencyExtension.addBackwardDependency(localExtension);
+            }
         }
 
         return installedExtension;

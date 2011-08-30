@@ -19,25 +19,29 @@
  */
 package org.xwiki.extension.repository.aether.internal;
 
-import org.xwiki.extension.ExtensionDependency;
-import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.AbstractExtensionDependency;
 
-public class AetherExtensionDependency implements ExtensionDependency
+public class AetherExtensionDependency extends AbstractExtensionDependency
 {
-    private ExtensionId artifactId;
+    private String groupId;
 
-    public AetherExtensionDependency(ExtensionId artifactId)
+    private String artifactId;
+
+    public AetherExtensionDependency(String groupId, String artifactId, String version)
     {
+        super(groupId + ':' + artifactId, version);
+
+        this.groupId = groupId;
         this.artifactId = artifactId;
     }
 
-    public String getId()
+    public String getGroupId()
     {
-        return this.artifactId.getId();
+        return groupId;
     }
 
-    public String getVersion()
+    public String getArtifactId()
     {
-        return this.artifactId.getVersion();
+        return artifactId;
     }
 }

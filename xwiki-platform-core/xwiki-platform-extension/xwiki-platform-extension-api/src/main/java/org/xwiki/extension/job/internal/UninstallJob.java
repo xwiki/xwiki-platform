@@ -177,9 +177,9 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
         }
 
         if (namespace != null) {
-            this.logger.info("Uninstalling extension [{0}] from namespace [{1}]", localExtension, namespace);
+            this.logger.info("Uninstalling extension [{}] from namespace [{}]", localExtension, namespace);
         } else {
-            this.logger.info("Uninstalling extension [{0}]", localExtension);
+            this.logger.info("Uninstalling extension [{}]", localExtension);
         }
 
         notifyPushLevelProgress(3);

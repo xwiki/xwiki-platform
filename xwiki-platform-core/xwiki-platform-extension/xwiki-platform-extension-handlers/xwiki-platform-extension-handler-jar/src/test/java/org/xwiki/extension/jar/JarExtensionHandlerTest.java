@@ -29,7 +29,6 @@ import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.test.AbstractExtensionHandlerTest;
-import org.xwiki.extension.test.ConfigurableDefaultCoreExtensionRepository;
 import org.xwiki.test.TestComponent;
 
 public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
@@ -49,14 +48,6 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
         this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class);
 
         this.testArtifactId = new ExtensionId("org.xwiki.test:test-extension", "test");
-    }
-
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        ConfigurableDefaultCoreExtensionRepository.register(getComponentManager());
     }
 
     @Test

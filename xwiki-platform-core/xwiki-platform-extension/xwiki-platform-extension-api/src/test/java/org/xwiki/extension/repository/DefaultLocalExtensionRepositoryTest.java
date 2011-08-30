@@ -25,6 +25,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstallException;
+import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.test.ConfigurableDefaultCoreExtensionRepository;
 import org.xwiki.extension.test.RepositoryUtil;
@@ -35,6 +37,12 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     private LocalExtensionRepository localExtensionRepository;
 
     private RepositoryUtil repositoryUtil;
+
+    private ExtensionRepositoryManager repositoryManager;
+
+    private ExtensionId remoteExtensionId;
+
+    private ConfigurableDefaultCoreExtensionRepository coreRepository;
 
     @Before
     public void setUp() throws Exception
@@ -48,6 +56,14 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
         // lookup
 
         this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class);
+        this.repositoryManager = getComponentManager().lookup(ExtensionRepositoryManager.class);
+        this.coreRepository =
+            (ConfigurableDefaultCoreExtensionRepository) getComponentManager().lookup(CoreExtensionRepository.class);
+
+        // resources
+
+        this.remoteExtensionId = new ExtensionId("remoteextension", "version");
+
     }
 
     @Override
@@ -103,5 +119,30 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
         Assert.assertNotNull(extension);
         Assert.assertEquals("existingextension", extension.getId().getId());
         Assert.assertEquals("version", extension.getId().getVersion());
+    }
+
+    @Test
+    public void testStoreExtensionAndInstall() throws ResolveException, LocalExtensionRepositoryException,
+        InstallException
+    {
+        Extension extension = this.repositoryManager.resolve(this.remoteExtensionId);
+
+        // store
+
+        this.localExtensionRepository.storeExtension(extension, false);
+
+        LocalExtension localExtension = (LocalExtension) this.localExtensionRepository.resolve(this.remoteExtensionId);
+
+        Assert.assertEquals(this.remoteExtensionId, localExtension.getId());
+        Assert.assertFalse(localExtension.isInstalled());
+
+        // install
+
+        this.coreRepository.addExtensions("coreextension", "version");
+        
+        this.localExtensionRepository.installExtension(localExtension, null);
+
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(this.remoteExtensionId.getId(), null));
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension("feature", null));
     }
 }

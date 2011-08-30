@@ -22,8 +22,8 @@
       <type>xar</type>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform.applications</groupId>
-      <artifactId>xwiki-application-application-manager</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-application-manager-ui</artifactId>
       <type>xar</type>
     </dependency>
     <dependency>
@@ -37,8 +37,8 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.xwiki.platform.tools</groupId>
-        <artifactId>xwiki-xar-plugin</artifactId>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
         <executions>
           <!-- Unpack XE xar so that we can transform XWiki.XWikiPreferences -->
           <execution>
@@ -395,8 +395,8 @@
       <!-- TODO: Find icons for the new sections. -->
       <!-- Attach section icon for the WorkspaceUsers administration section. -->
 <!--       <plugin> -->
-<!--         <groupId>org.xwiki.platform.tools</groupId> -->
-<!--         <artifactId>xwiki-xmldoc-update-plugin</artifactId> -->
+<!--         <groupId>org.xwiki.platform</groupId> -->
+<!--         <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId> -->
 <!--         <executions> -->
 <!--           <execution> -->
 <!--             <phase>process-resources</phase> -->

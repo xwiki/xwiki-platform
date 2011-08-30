@@ -21,8 +21,8 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>com.xpn.xwiki.platform.plugins</groupId>
-      <artifactId>xwiki-plugin-wiki-manager</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-manager-api</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -64,8 +64,8 @@
 
       <!-- Step 2: Attach template xar to WikiManager install page -->
       <plugin>
-        <groupId>org.xwiki.platform.tools</groupId>
-        <artifactId>xwiki-xmldoc-update-plugin</artifactId>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
         <executions>
           <execution>
             <phase>generate-resources</phase>

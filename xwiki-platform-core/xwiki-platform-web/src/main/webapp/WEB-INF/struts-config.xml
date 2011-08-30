@@ -28,6 +28,8 @@
         <!-- XWiki Struts Application -->
         <form-bean name="edit"
                    type="com.xpn.xwiki.web.EditForm"/>
+        <form-bean name="inline"
+                   type="com.xpn.xwiki.web.EditForm"/>
         <form-bean name="lock"
                    type="com.xpn.xwiki.web.EditForm"/>
         <form-bean name="preview"
@@ -125,6 +127,16 @@
                 scope="request">
             <forward name="create" path="/templates/create.vm" />
         </action>
+
+        <action path="/inline/"
+                type="com.xpn.xwiki.web.InlineAction"
+                name="inline"
+                scope="request">
+            <forward name="inline" path="/templates/inline.vm"/>
+            <forward name="pageexist" path="/templates/inline.vm"/>
+
+        </action>
+
         <action path="/preview/"
                 type="com.xpn.xwiki.web.PreviewAction"
                 name="preview"

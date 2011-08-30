@@ -254,6 +254,8 @@ public class XWikiPortlet extends GenericPortlet
                 new LogoutAction().action(context);
             } else if (context.getAction().equals("register")) {
                 new RegisterAction().action(context);
+            } else if (context.getAction().equals("inline")) {
+                new InlineAction().action(context);
             } else if (context.getAction().equals("deleteversions")) {
                 new DeleteVersionsAction().action(context);
             }
@@ -329,6 +331,8 @@ public class XWikiPortlet extends GenericPortlet
                 renderResult = new ViewAction().render(context);
             } else if (context.getAction().equals("viewrev")) {
                 renderResult = new ViewrevAction().render(context);
+            } else if (context.getAction().equals("inline")) {
+                renderResult = new InlineAction().render(context);
             } else if (context.getAction().equals("edit")) {
                 renderResult = new EditAction().render(context);
             } else if (context.getAction().equals("preview")) {

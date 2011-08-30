@@ -29,12 +29,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.classloader.ExtendedURLStreamHandler;
 import org.xwiki.classloader.URIClassLoader;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 
 /**
  * Supports the following syntax for JARs attached to wiki pages:
@@ -56,14 +58,15 @@ public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoade
      * The Stream handler factory to use in the created classloader in order to be able to load our custom 
      * {@code attachmentjar} custom protocol.
      */
-    @Requirement
+    @Inject
     private URLStreamHandlerFactory streamHandlerFactory;
 
     /**
      * The stream handler for our custom {@code attachmentjar} protocol. We use it to get access to the protocol 
      * name and to transform from URI to URL.
      */
-    @Requirement("attachmentjar")
+    @Inject
+    @Named("attachmentjar")
     private ExtendedURLStreamHandler attachmentJarHander;
     
     /**

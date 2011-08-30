@@ -22,11 +22,13 @@ package org.xwiki.rendering.internal.macro.script;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.CancelableEvent;
@@ -44,7 +46,8 @@ import org.xwiki.rendering.macro.script.ScriptMacroParameters;
  * @version $Id$
  * @since 2.5M1
  */
-@Component("scriptmacroclassloader")
+@Component
+@Named("scriptmacroclassloader")
 public class ScriptClassLoaderHandlerListener implements EventListener
 {
     /** Key used to store the original class loader in the Execution Context. */
@@ -57,20 +60,20 @@ public class ScriptClassLoaderHandlerListener implements EventListener
     private static final String EXECUTION_CONTEXT_JARPARAMS_KEY = "scriptJarParams";
 
     /** Used to find if the current document's author has programming rights. */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * Used to set the classLoader to be used by scripts across invocations. We save it in the Execution Context to be
      * sure it's the same classLoader used.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
      * Used to create a custom class loader that knows how to support JARs attached to wiki page.
      */
-    @Requirement
+    @Inject
     private AttachmentClassLoaderFactory attachmentClassLoaderFactory;
 
     /**

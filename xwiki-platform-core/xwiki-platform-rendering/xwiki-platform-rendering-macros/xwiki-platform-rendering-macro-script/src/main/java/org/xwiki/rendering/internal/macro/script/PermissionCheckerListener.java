@@ -19,9 +19,11 @@
  */
 package org.xwiki.rendering.internal.macro.script;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroLookupException;
@@ -37,15 +39,16 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 2.5M1
  */
-@Component("permissionchecker")
+@Component
+@Named("permissionchecker")
 public class PermissionCheckerListener extends AbstractScriptCheckerListener
 {
     /** Used to find the type of a Macro defined by a Macro Marker block. */
-    @Requirement
+    @Inject
     private MacroManager macroManager;
 
     /** Used to check if the current document's author has programming rights. */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
     
     /**

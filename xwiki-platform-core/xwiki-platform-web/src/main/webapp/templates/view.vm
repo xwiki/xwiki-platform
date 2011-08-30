@@ -19,17 +19,25 @@
     #template("contentmenu.vm")
     </div>
   #end
-  <div id="mainContentArea">
-  #template("hierarchy.vm")
-  #if($viewer == 'content')
-    #template("contentview.vm")
+  #set($pageSheetReference = $services.sheet.getPageSheet($doc.documentReference, $context.action))
+  #if($pageSheetReference && $viewer == 'content')
+    <div id="mainContentArea">
+      #set($sheetDocument = $xwiki.getDocument($pageSheetReference))
+      #renderContent($sheetDocument.content $sheetDocument.syntax.toIdString())
+    </div>
   #else
-    #template("${viewer}.vm")
-  #end
-  <div class="clearfloats"></div>
-  </div>## mainContentArea
-  #if($viewer == 'content' && $displayDocExtra)
-    #template("docextra.vm")
+    <div id="mainContentArea">
+    #template("hierarchy.vm")
+    #if($viewer == 'content')
+      #template("contentview.vm")
+    #else
+      #template("${viewer}.vm")
+    #end
+    <div class="clearfloats"></div>
+    </div>## mainContentArea
+    #if($viewer == 'content' && $displayDocExtra)
+      #template("docextra.vm")
+    #end
   #end
   </div>## main
   #template("endpage.vm")

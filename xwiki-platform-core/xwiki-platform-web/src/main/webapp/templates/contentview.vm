@@ -4,21 +4,17 @@
 ## -------------------------------
 ## Compute the content to display 
 ## -------------------------------
-## Honor the syntax if it's passed in the request.
-#set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
-#if ($outputSyntax)
-  ## If the passed syntax is not an HTML-compatible syntax we need to HTML-escape it so that it can be 
-  ## displayed fine in HTML (since at the point this vm file is called we're already inside an HTML page with
-  ## panels on the side, header, etc).
-  #set($syntaxType = $outputSyntax.type.toIdString())
-  #if (($syntaxType == "xhtml") || ($syntaxType == "html"))
-    #set ($renderedContent = $cdoc.getRenderedContent($outputSyntax))
-  #else
-    ## Make sure to print correctly the result when it's not HTML
-    #set ($renderedContent = "<pre>$escapetool.html($cdoc.getRenderedContent($outputSyntax))</pre>")
-  #end
+#set($inlineSheets = $services.sheet.getInlineSheets($cdoc.documentReference, $context.action))
+#set($renderedContent = $util.null)
+#if($inlineSheets.isEmpty())
+  #setVariable("$renderedContent" "#renderContent($cdoc.content $cdoc.syntax.toIdString())")
 #else
-  #set ($renderedContent = $cdoc.getRenderedContent())
+  #foreach($inlineSheet in $inlineSheets)
+    #set($sheetDoc = $xwiki.getDocument($inlineSheet))
+    #set($renderedPartialContent = $util.null)
+    #setVariable("$renderedPartialContent" "#renderContent($sheetDoc.content $sheetDoc.syntax.toIdString())")
+    #set($renderedContent = "$!{renderedContent}$!{renderedPartialContent}")
+  #end
 #end
 ## ----------------------------------------------------------------------------
 ## Compute title to display and modify rendered content accordingly.

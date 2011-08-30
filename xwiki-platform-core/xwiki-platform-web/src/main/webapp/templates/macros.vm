@@ -2187,3 +2187,29 @@ Wysiwyg.onModuleLoad(function() {
     #end
   #end
 #end
+
+#**
+ * Renders the given content in the context of the current document. The content has the the specified syntax. The output
+ * syntax is by default xhtml/1.0 but it can be overwriten from the request parameters.
+ *
+ * @param $content the content to be rendered
+ * @param $contentSyntaxId the syntax of the given content
+ *#
+#macro(renderContent $content $contentSyntaxId)
+  ## Honor the syntax if it's passed in the request.
+  #set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
+  #if ($outputSyntax)
+    ## If the passed syntax is not an HTML-compatible syntax we need to HTML-escape it so that it can be 
+    ## displayed fine in HTML (since at the point this vm file is called we're already inside an HTML page with
+    ## panels on the side, header, etc).
+    #set($syntaxType = $outputSyntax.type.toIdString())
+    #if (($syntaxType == "xhtml") || ($syntaxType == "html"))
+      $cdoc.getRenderedContent($content, $contentSyntaxId, $outputSyntax)
+    #else
+      ## Make sure to print correctly the result when it's not HTML
+      <pre>$escapetool.html($cdoc.getRenderedContent($content, $contentSyntaxId, $outputSyntax))</pre>
+    #end
+  #else
+    $cdoc.getRenderedContent($content, $contentSyntaxId)
+  #end
+#end

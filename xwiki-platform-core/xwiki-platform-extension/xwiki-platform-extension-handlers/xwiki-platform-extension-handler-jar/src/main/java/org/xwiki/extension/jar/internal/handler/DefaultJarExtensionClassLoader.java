@@ -43,9 +43,13 @@ public class DefaultJarExtensionClassLoader implements JarExtensionClassLoader
         if (namespace != null) {
             wikiClassLoader = this.wikiClassLoaderMap.get(namespace);
 
-            if (wikiClassLoader == null && create) {
-                wikiClassLoader = new ExtensionURLClassLoader(new URI[] {}, this.rootClassLoader, namespace);
-                this.wikiClassLoaderMap.put(namespace, wikiClassLoader);
+            if (wikiClassLoader == null) {
+                if (create) {
+                    wikiClassLoader = new ExtensionURLClassLoader(new URI[] {}, this.rootClassLoader, namespace);
+                    this.wikiClassLoaderMap.put(namespace, wikiClassLoader);
+                } else {
+                    wikiClassLoader = this.rootClassLoader;
+                }
             }
         }
 

@@ -506,7 +506,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
     protected String parseString(String mapping, Document doc, XWikiContext context) throws XWikiException
     {
         if (isVelocityCode(mapping)) {
-            return doc.getRenderedContent(mapping.substring(1, mapping.length() - 1));
+            return doc.getRenderedContent(mapping.substring(1, mapping.length() - 1), doc.getSyntax().toIdString());
         } else {
             return mapping;
         }

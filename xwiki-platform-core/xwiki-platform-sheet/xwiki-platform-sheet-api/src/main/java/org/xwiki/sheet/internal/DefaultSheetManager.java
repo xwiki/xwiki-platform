@@ -90,11 +90,7 @@ public class DefaultSheetManager implements SheetManager
     @Inject
     private SheetManagerConfiguration configuration;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SheetManager#getSheets(DocumentReference, String, SheetDisplay)
-     */
+    @Override
     public List<DocumentReference> getSheets(DocumentReference documentReference, String action, SheetDisplay display)
     {
         // (1) Check if there is a sheet specified for the current request.
@@ -134,31 +130,7 @@ public class DefaultSheetManager implements SheetManager
         return sheets;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SheetManager#bindDocumentSheet(DocumentReference, DocumentReference)
-     */
-    public void bindDocumentSheet(DocumentReference documentReference, DocumentReference sheetReference)
-    {
-        // TODO
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SheetManager#unbindDocumentSheet(DocumentReference, DocumentReference)
-     */
-    public void unbindDocumentSheet(DocumentReference documentReference, DocumentReference sheetReference)
-    {
-        // TODO
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SheetManager#getClassSheet(DocumentReference, String)
-     */
+    @Override
     public DocumentReference getClassSheet(DocumentReference classReference, String action)
     {
         XWikiContext context = getXWikiContext();
@@ -206,26 +178,6 @@ public class DefaultSheetManager implements SheetManager
         }
 
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SheetManager#bindClassSheet(DocumentReference, DocumentReference)
-     */
-    public void bindClassSheet(DocumentReference classReference, DocumentReference sheetReference)
-    {
-        // TODO
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SheetManager#unbindClassSheet(DocumentReference, DocumentReference)
-     */
-    public void unbindClassSheet(DocumentReference classReference, DocumentReference sheetReference)
-    {
-        // TODO
     }
 
     /**

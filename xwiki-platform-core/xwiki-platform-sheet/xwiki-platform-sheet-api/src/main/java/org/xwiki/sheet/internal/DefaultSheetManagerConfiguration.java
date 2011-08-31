@@ -51,21 +51,13 @@ public class DefaultSheetManagerConfiguration implements SheetManagerConfigurati
      */
     private Properties defaultClassSheetBinding = new Properties();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SheetManagerConfiguration#getDefaultClassSheet()
-     */
+    @Override
     public String getDefaultClassSheet()
     {
         return configuration.getProperty(PREFIX + "defaultClassSheet", "XWiki.ClassSheet");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SheetManagerConfiguration#getDefaultClassSheetBinding()
-     */
+    @Override
     public Properties getDefaultClassSheetBinding()
     {
         Properties props = new Properties();
@@ -74,11 +66,7 @@ public class DefaultSheetManagerConfiguration implements SheetManagerConfigurati
         return props;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         // As you can see, the following sheets don't follow the naming convention.

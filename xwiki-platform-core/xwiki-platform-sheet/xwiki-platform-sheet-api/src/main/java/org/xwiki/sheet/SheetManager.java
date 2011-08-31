@@ -57,49 +57,10 @@ public interface SheetManager
     List<DocumentReference> getSheets(DocumentReference documentReference, String action, SheetDisplay display);
 
     /**
-     * Use this method if you want to apply a custom sheet to a document. The sheet can be automatically determined
-     * based on the type of objects attached to the document (see
-     * {@link #bindClassSheet(DocumentReference, DocumentReference)}) but this method allows you to overwrite this sheet
-     * with a custom one.
-     * 
-     * @param documentReference a reference to the document where to include the sheet
-     * @param sheetReference specifies the sheet to be included
-     */
-    void bindDocumentSheet(DocumentReference documentReference, DocumentReference sheetReference);
-
-    /**
-     * Use this method if you want to prevent a custom sheet from applying to a document. This is the opposite of
-     * {@link #bindDocumentSheet(DocumentReference, DocumentReference)}
-     * 
-     * @param documentReference a reference to the document from which to exclude the sheet
-     * @param sheetReference specifies the sheet to be excluded
-     */
-    void unbindDocumentSheet(DocumentReference documentReference, DocumentReference sheetReference);
-
-    /**
      * @param classReference a reference to a XWiki class
      * @param action the action for which to retrieve the sheet
      * @return a sheet that can be used to render objects of the specified class for the specified action, {@code null}
      *         is no proper sheet is found
      */
     DocumentReference getClassSheet(DocumentReference classReference, String action);
-
-    /**
-     * Binds a XWiki class to a sheet so that whenever a document with an object of the specified type is rendered the
-     * specified sheet is used.
-     * 
-     * @param classReference a XWiki class
-     * @param sheetReference a class sheet that renders objects of the specified class
-     */
-    void bindClassSheet(DocumentReference classReference, DocumentReference sheetReference);
-
-    /**
-     * Removes the binding between the specified XWiki class and the specified sheet. This is the opposite of
-     * {@link #bindClassSheet(DocumentReference, DocumentReference)}
-     * 
-     * @param classReference a XWiki class
-     * @param sheetReference the class sheet that shouldn't be used anymore for rendering the objects of the specified
-     *            class
-     */
-    void unbindClassSheet(DocumentReference classReference, DocumentReference sheetReference);
 }

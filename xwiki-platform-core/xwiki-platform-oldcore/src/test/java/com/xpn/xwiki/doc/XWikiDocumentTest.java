@@ -31,10 +31,13 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
 
+import junit.framework.Assert;
+
 import org.jmock.Mock;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
@@ -1228,5 +1231,12 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("somewiki", "somespace", "somepage"));
         assertEquals("", doc.getContent());
+    }
+
+    public void testGetXObjectWithObjectReference()
+    {
+        Assert.assertSame(this.baseObject, this.document.getXObject(this.baseObject.getReference()));
+        
+        Assert.assertSame(this.baseObject, this.document.getXObject(new ObjectReference(CLASSNAME, this.document.getDocumentReference())));
     }
 }

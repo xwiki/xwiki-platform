@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.macro.script;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.event.CancelableEvent;
@@ -42,6 +43,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  */
 @Component
 @Named("nestedscriptmacrovalidator")
+@Singleton
 public class NestedScriptMacroValidatorListener extends AbstractScriptCheckerListener
 {
     /**

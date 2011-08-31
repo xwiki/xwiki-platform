@@ -31,6 +31,7 @@ import java.util.StringTokenizer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.classloader.ExtendedURLClassLoader;
@@ -46,6 +47,7 @@ import org.xwiki.component.annotation.Component;
  * @since 2.0.1
  */
 @Component
+@Singleton
 public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoaderFactory
 {
     /**

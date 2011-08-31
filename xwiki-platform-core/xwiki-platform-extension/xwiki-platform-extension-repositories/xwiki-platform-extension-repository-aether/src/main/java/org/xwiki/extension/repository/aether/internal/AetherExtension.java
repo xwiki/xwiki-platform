@@ -144,7 +144,7 @@ public class AetherExtension extends AbstractExtension
         File aetherFile = artifactResult.getArtifact().getFile();
 
         try {
-            FileUtils.copyFile(aetherFile, file);
+            FileUtils.moveFile(aetherFile, file);
         } catch (IOException e) {
             throw new ExtensionException("Failed to copy file", e);
         }

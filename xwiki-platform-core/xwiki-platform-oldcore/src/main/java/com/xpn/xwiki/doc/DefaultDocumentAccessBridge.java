@@ -32,10 +32,13 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -345,6 +348,62 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         doc.setTitle(title);
         saveDocument(doc, String.format("Changed document syntax from [%s] to [%s].", oldTitle, title), true);
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getObjectNumber(DocumentReference, DocumentReference, String, String)
+     */
+    public int getObjectNumber(DocumentReference documentReference, DocumentReference classReference, 
+        String propertyName, String valueToMatch)
+    {
+        try {
+            XWikiContext xcontext = getContext();
+            XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+            BaseObject object = doc.getXObject(classReference, propertyName, valueToMatch, false);
+            return object != null ? object.getNumber() : -1;
+        } catch (XWikiException e) {
+            return -1;
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getProperty(ObjectPropertyReference)
+     */
+    public Object getProperty(ObjectPropertyReference objectPropertyReference)
+    {
+        try {
+            DocumentReference documentReference =
+                (DocumentReference) objectPropertyReference.extractReference(EntityType.DOCUMENT);
+            ObjectReference objectReference =
+                (ObjectReference) objectPropertyReference.extractReference(EntityType.OBJECT);
+            XWikiContext xcontext = getContext();
+            return ((BaseProperty) xcontext.getWiki().getDocument(documentReference, xcontext)
+                .getXObject(objectReference).get(objectPropertyReference.getName())).getValue();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getProperty(ObjectReference, String propertyName)
+     */
+    public Object getProperty(ObjectReference objectReference, String propertyName)
+    {
+        try {
+            DocumentReference documentReference =
+                (DocumentReference) objectReference.extractReference(EntityType.DOCUMENT);
+            XWikiContext xcontext = getContext();
+            return ((BaseProperty) xcontext.getWiki().getDocument(documentReference, xcontext)
+                .getXObject(objectReference).get(propertyName)).getValue();
+        } catch (Exception e) {
+            return null;
+        }
+    }
     
     /**
      * {@inheritDoc}
@@ -405,6 +464,28 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         return value;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getProperty(DocumentReference, DocumentReference, int, String)
+     */
+    public Object getProperty(DocumentReference documentReference, DocumentReference classReference, int objectNumber,
+        String propertyName)
+    {
+        Object value;
+
+        try {
+            XWikiContext xcontext = getContext();
+            XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+            BaseObject object = doc.getXObject(classReference, objectNumber);
+            BaseProperty property = (BaseProperty) object.get(propertyName);
+            value = property.getValue();
+        } catch (Exception ex) {
+            value = null;
+        }
+        return value;
+    }
+    
     /**
      * {@inheritDoc}
      * 
@@ -1028,4 +1109,5 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         }
         getContext().getWiki().saveDocument(doc, comment, isMinorEdit, getContext());
     }
+    
 }

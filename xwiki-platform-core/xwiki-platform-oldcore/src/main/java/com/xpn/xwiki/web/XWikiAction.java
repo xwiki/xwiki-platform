@@ -297,15 +297,6 @@ public abstract class XWikiAction extends Action
                     monitor.startTimer("notify");
                 }
 
-                // Let's handle the notification and make sure it never fails
-                // This is the old notification mechanism. It is kept here because it is in a
-                // deprecation stage. It will be removed later.
-                try {
-                    xwiki.getNotificationManager().verify(context.getDoc(), context.getAction(), context);
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
-                // This is the new notification mechanism, implemented as a Plexus Component.
                 // For the moment we're sending the XWiki context as the data, but this will be
                 // changed in the future, when the whole platform will be written using components
                 // and there won't be a need for the context.

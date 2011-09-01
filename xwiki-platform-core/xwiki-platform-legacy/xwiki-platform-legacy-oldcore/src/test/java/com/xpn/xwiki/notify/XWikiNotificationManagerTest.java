@@ -33,7 +33,6 @@ import junit.framework.TestCase;
  */
 public class XWikiNotificationManagerTest extends TestCase
 {
-
     private XWikiNotificationManager notificationManager;
 
     protected void setUp() throws Exception

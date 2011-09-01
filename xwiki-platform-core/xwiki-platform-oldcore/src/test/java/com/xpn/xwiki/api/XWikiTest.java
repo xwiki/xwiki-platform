@@ -36,7 +36,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
-import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -75,7 +74,6 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.xwiki = new com.xpn.xwiki.XWiki();
         getContext().setWiki(this.xwiki);
         this.xwiki.setConfig(new XWikiConfig());
-        this.xwiki.setNotificationManager(new XWikiNotificationManager());
 
         this.apiXWiki = new XWiki(this.xwiki, getContext());
 

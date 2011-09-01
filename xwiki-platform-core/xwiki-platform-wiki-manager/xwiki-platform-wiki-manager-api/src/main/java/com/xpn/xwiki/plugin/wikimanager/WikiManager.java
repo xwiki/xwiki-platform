@@ -455,7 +455,12 @@ public final class WikiManager
                 createWikiDatabase(newWikiName, context, templateWikiName == null);
 
                 // Save new wiki descriptor document.
-                wikiSuperDocToSave.save(comment);
+                // XXX: Because we are inside the platform and we have already done rights checking in the script service, we
+                // should use the un-checked XWikiDocument instance to avoid checking for the user's or the document's
+                // rights twice. Also, doing this, we allow the workspaceManager plugin to let normal users create a
+                // workspace (wiki). See XWIKI-6902
+                XWikiDocument wikiSuperXDocToSave = wikiSuperDocToSave.getDocument();
+                context.getWiki().saveDocument(wikiSuperXDocToSave, comment, context);
 
                 sucess = true;
 

@@ -334,7 +334,7 @@
             <artifactId>clirr-maven-plugin</artifactId>
             <configuration>
               <skip>${xwiki.clirr.skip}</skip>
-              <comparisonVersion>${clirr.previous.version}</comparisonVersion>
+              <comparisonVersion>${xwiki.clirr.previous.version}</comparisonVersion>
               <excludes>
                 <exclude>**/internal/**</exclude>
                 <exclude>**/test/**</exclude>

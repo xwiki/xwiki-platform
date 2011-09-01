@@ -33,6 +33,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.sheet.SheetManager;
 import org.xwiki.sheet.SheetManagerConfiguration;
 
@@ -42,6 +43,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Default {@link SheetManager} implementation.
@@ -329,6 +331,73 @@ public class DefaultSheetManager implements SheetManager
             return context.getWiki().getDocument(documentReference, context).getXObjects().keySet();
         } catch (XWikiException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String apply(DocumentReference documentReference, DocumentReference sheetReference, Syntax outputSyntax)
+    {
+        XWikiContext context = getXWikiContext();
+        XWiki xwiki = context.getWiki();
+        XWikiRightService rightsService = xwiki.getRightService();
+        try {
+            XWikiDocument targetDocument = xwiki.getDocument(documentReference, context);
+            XWikiDocument translatedTargetDocument = targetDocument.getTranslatedDocument(context);
+            XWikiDocument sheetDocument = xwiki.getDocument(sheetReference, context);
+            XWikiDocument translatedSheetDocument = sheetDocument.getTranslatedDocument(context);
+            boolean sheetDocumentHasPR = rightsService.hasProgrammingRights(sheetDocument, context);
+            boolean targetDocumentHasPR = rightsService.hasProgrammingRights(targetDocument, context);
+            if (sheetDocumentHasPR ^ targetDocumentHasPR) {
+                // FIXME: If the target document and the sheet don't have the same programming level then we preserve
+                // the programming level of the sheet by rendering it as if the author of the target document is the
+                // author of the sheet.
+                return renderAsSheetAuthor(translatedTargetDocument, translatedSheetDocument, outputSyntax);
+            } else {
+                return render(translatedTargetDocument, translatedSheetDocument, outputSyntax);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Renders the sheet in the context of the target document after changing the author of the target document to match
+     * the sheet author. This way the level of programming rights available in the sheet is preserved.
+     * 
+     * @param targetDocument the target document
+     * @param sheetDocument the sheet document
+     * @param outputSyntax the output syntax
+     * @return the result of rendering the sheet in the context of the target document
+     */
+    private String renderAsSheetAuthor(XWikiDocument targetDocument, XWikiDocument sheetDocument, Syntax outputSyntax)
+    {
+        DocumentReference targetDocContentAuthorRef = targetDocument.getContentAuthorReference();
+        try {
+            // This is a hack. We need a better way to preserve the programming rights level of the sheet.
+            targetDocument.setContentAuthorReference(sheetDocument.getContentAuthorReference());
+            return render(targetDocument, sheetDocument, outputSyntax);
+        } finally {
+            // Restore the content author of the target document.
+            targetDocument.setContentAuthorReference(targetDocContentAuthorRef);
+        }
+    }
+
+    /**
+     * Renders the sheet document in the context of the target document.
+     * 
+     * @param targetDocument the target document
+     * @param sheetDocument the sheet document
+     * @param outputSyntax the output syntax
+     * @return the result of rendering the sheet document in the context of the target document
+     */
+    private String render(XWikiDocument targetDocument, XWikiDocument sheetDocument, Syntax outputSyntax)
+    {
+        if (outputSyntax == null) {
+            return targetDocument.getRenderedContent(sheetDocument.getContent(),
+                sheetDocument.getSyntax().toIdString(), getXWikiContext());
+        } else {
+            return targetDocument.getRenderedContent(sheetDocument.getContent(),
+                sheetDocument.getSyntax().toIdString(), outputSyntax.toIdString(), getXWikiContext());
         }
     }
 }

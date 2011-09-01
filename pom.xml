@@ -37,7 +37,7 @@
   <version>3.2-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
-    <!-- Useful for Enterprise extensions -->
+    <!-- Useful for Platform extensions -->
     <platform.version>${commons.version}</platform.version>
     <!-- Versions of XWiki dependencies used in Platform modules -->
     <rendering.version>${platform.version}</rendering.version>

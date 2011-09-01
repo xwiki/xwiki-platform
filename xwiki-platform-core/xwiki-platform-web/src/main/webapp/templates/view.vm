@@ -22,8 +22,7 @@
   #set($pageSheetReference = $services.sheet.getPageSheet($doc.documentReference, $context.action))
   #if($pageSheetReference && $viewer == 'content')
     <div id="mainContentArea">
-      #set($sheetDocument = $xwiki.getDocument($pageSheetReference))
-      #renderContent($sheetDocument.content $sheetDocument.syntax.toIdString())
+      #applySheet($pageSheetReference)
     </div>
   #else
     <div id="mainContentArea">

@@ -52,7 +52,7 @@
 #xwikitopmenuentrystart($doc.getURL($editaction, $!languageparams) $msg.get('core.menu.edit') 'tmEdit')
 #submenuitem($doc.getURL('edit', "$!{languageparams}&amp;editor=wiki") $msg.get('core.menu.edit.wiki') 'tmEditWiki')
 #submenuitem($doc.getURL('edit', "$!{languageparams}&amp;editor=wysiwyg") $msg.get('core.menu.edit.wysiwyg') 'tmEditWysiwyg')
-#submenuitem($doc.getURL('edit', "$!{languageparams}&amp;editor=inline") $msg.get('core.menu.edit.inline') 'tmEditInline')
+#submenuitem($doc.getURL($editaction, "$!{languageparams}&amp;editor=inline") $msg.get('core.menu.edit.inline') 'tmEditInline')
 #submenuseparator()
 #submenuitem($doc.getURL('edit', 'editor=rights') $msg.get('core.menu.edit.rights') 'tmEditRights')
 #submenuseparator()

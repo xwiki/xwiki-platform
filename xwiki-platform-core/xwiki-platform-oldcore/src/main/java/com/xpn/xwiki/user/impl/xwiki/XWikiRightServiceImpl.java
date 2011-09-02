@@ -991,23 +991,34 @@ public class XWikiRightServiceImpl implements XWikiRightService
      */
     public boolean hasAdminRights(XWikiContext context)
     {
-        boolean hasAdmin = false;
-        try {
-            hasAdmin = hasAccessLevel("admin", context.getUser(), "XWiki.XWikiPreferences", context);
-        } catch (Exception e) {
-            LOG.error("Failed to check admin right for user [" + context.getUser() + "]", e);
-        }
+        boolean hasAdmin = hasWikiAdminRights(context);
 
         if (!hasAdmin) {
             try {
                 hasAdmin =
                     hasAccessLevel("admin", context.getUser(), context.getDoc().getSpace() + ".WebPreferences", context);
             } catch (Exception e) {
-                e.printStackTrace();
+                LOG.error("Failed to check space admin right for user [" + context.getUser() + "]", e);
             }
         }
 
         return hasAdmin;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.user.api.XWikiRightService#hasWikiAdminRights(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public boolean hasWikiAdminRights(XWikiContext context)
+    {
+        try {
+            return hasAccessLevel("admin", context.getUser(), "XWiki.XWikiPreferences", context);
+        } catch (Exception e) {
+            LOG.error("Failed to check wiki admin right for user [" + context.getUser() + "]", e);
+            return false;
+        }
     }
 
 }

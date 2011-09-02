@@ -34,13 +34,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.bridge.event.ActionExecutedEvent;
+import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.context.Execution;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -198,11 +199,18 @@ public abstract class XWikiAction extends Action
                 if (monitor != null) {
                     monitor.startTimer("prenotify");
                 }
+
+                // For the moment we're sending the XWiki context as the data, but this will be
+                // changed in the future, when the whole platform will be written using components
+                // and there won't be a need for the context.
                 try {
-                    xwiki.getNotificationManager().preverify(context.getDoc(), context.getAction(), context);
-                } catch (Throwable e) {
-                    LOG.error("Exception while pre-notifying", e);
+                    ObservationManager om = Utils.getComponent(ObservationManager.class);
+                    om.notify(new ActionExecutingEvent(context.getAction()), context.getDoc(), context);
+                } catch (Throwable ex) {
+                    LOG.error("Cannot send action notifications for document [" + context.getDoc() + " using action ["
+                        + context.getAction() + "]", ex);
                 }
+
                 if (monitor != null) {
                     monitor.endTimer("prenotify");
                 }
@@ -302,7 +310,7 @@ public abstract class XWikiAction extends Action
                 // and there won't be a need for the context.
                 try {
                     ObservationManager om = Utils.getComponent(ObservationManager.class);
-                    om.notify(new ActionExecutionEvent(context.getAction()), context.getDoc(), context);
+                    om.notify(new ActionExecutedEvent(context.getAction()), context.getDoc(), context);
                 } catch (Throwable ex) {
                     LOG.error("Cannot send action notifications for document [" + docName + " using action ["
                         + context.getAction() + "]", ex);

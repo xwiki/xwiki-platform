@@ -84,6 +84,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.Block;
@@ -2336,6 +2337,20 @@ public class XWikiDocument implements DocumentModelBridge
         return baseObjectReference.getObjectNumber() == null ? this
             .getXObject(baseObjectReference.getXClassReference()) : getXObject(
             baseObjectReference.getXClassReference(), baseObjectReference.getObjectNumber());
+    }
+
+    /**
+     * Get an object property of this document based on its reference.
+     * 
+     * @param objectPropertyReference the reference of the object property
+     * @return the object property
+     * @since 3.2M3
+     */
+    public BaseProperty<ObjectPropertyReference> getXObjectProperty(ObjectPropertyReference objectPropertyReference)
+    {
+        BaseObject object = getXObject((ObjectReference) objectPropertyReference.getParent());
+
+        return (BaseProperty<ObjectPropertyReference>) object.getField(objectPropertyReference.getName());
     }
 
     /**
@@ -7858,7 +7873,8 @@ public class XWikiDocument implements DocumentModelBridge
      * @return a repport of what happen during the merge (errors, etc.)
      * @since 3.2M1
      */
-    public MergeResult merge(XWikiDocument previousDocument, XWikiDocument newDocument, MergeConfiguration configuration, XWikiContext context)
+    public MergeResult merge(XWikiDocument previousDocument, XWikiDocument newDocument,
+        MergeConfiguration configuration, XWikiContext context)
     {
         MergeResult mergeResult = new MergeResult();
 

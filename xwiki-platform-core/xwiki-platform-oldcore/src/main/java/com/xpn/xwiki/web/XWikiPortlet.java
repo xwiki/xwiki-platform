@@ -38,13 +38,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.portlet.PortletContainerException;
 import org.xwiki.container.portlet.PortletContainerInitializer;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -394,7 +394,7 @@ public class XWikiPortlet extends GenericPortlet
             // and there won't be a need for the context.
             try {
                 ObservationManager om = Utils.getComponent(ObservationManager.class);
-                om.notify(new ActionExecutionEvent(context.getAction()), context.getDoc(), context);
+                om.notify(new ActionExecutedEvent(context.getAction()), context.getDoc(), context);
             } catch (Throwable ex) {
                 LOG.error("Cannot send action notifications for document [" + context.getDoc() + " using action ["
                     + context.getAction() + "]", ex);

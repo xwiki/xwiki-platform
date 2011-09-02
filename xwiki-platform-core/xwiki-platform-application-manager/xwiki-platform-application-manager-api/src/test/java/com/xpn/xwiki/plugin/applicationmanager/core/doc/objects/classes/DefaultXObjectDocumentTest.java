@@ -24,7 +24,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -67,7 +66,6 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
         super.setUp();
         
         this.xwiki = new XWiki();
-        this.xwiki.setNotificationManager(new XWikiNotificationManager());
         getContext().setWiki(this.xwiki);
 
         // //////////////////////////////////////////////////

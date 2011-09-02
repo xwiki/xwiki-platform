@@ -20,6 +20,8 @@
  */
 package com.xpn.xwiki;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
@@ -68,8 +70,6 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
         this.xwiki = new XWiki();
         getContext().setWiki(this.xwiki);
 
-        this.xwiki.setNotificationManager(new XWikiNotificationManager());
-
         Mock mockStore = mock(XWikiStoreInterface.class);
         mockStore.expects(atLeastOnce()).method("saveXWikiDoc");
         mockStore.stubs().method("loadXWikiDoc").will(new CustomStub("Implements XWiki.getDocument")
@@ -82,6 +82,13 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
         this.xwiki.setStore((XWikiStoreInterface) mockStore.proxy());
     }
 
+    private XWikiNotificationManager getNotificationManager() throws IllegalArgumentException, SecurityException,
+        IllegalAccessException, InvocationTargetException, NoSuchMethodException
+    {
+        return (XWikiNotificationManager) XWiki.class.getMethod("getNotificationManager")
+            .invoke(getContext().getWiki());
+    }
+
     /**
      * We only verify here that the saveDocument API calls the Notification Manager. Detailed tests of the notification
      * classes are implemented in the notification package.
@@ -89,7 +96,7 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
     public void testSaveDocumentSendNotifications() throws Exception
     {
         TestListener listener = new TestListener();
-        this.xwiki.getNotificationManager().addGeneralRule(new DocChangeRule(listener));
+        getNotificationManager().addGeneralRule(new DocChangeRule(listener));
 
         XWikiDocument document = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
 
@@ -109,7 +116,7 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
 
         TestListener listener = new TestListener();
         listener.expectedNewStatus = false;
-        this.xwiki.getNotificationManager().addGeneralRule(new DocChangeRule(listener));
+        getNotificationManager().addGeneralRule(new DocChangeRule(listener));
 
         XWikiDocument original = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
         original.setNew(false);

@@ -18,24 +18,23 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
+package org.xwiki.observation;
 
-package com.xpn.xwiki.objects;
+import org.junit.Assert;
+import org.junit.Test;
+import org.xwiki.observation.event.ActionExecutionEvent;
+import org.xwiki.observation.event.Event;
 
-import org.dom4j.Element;
-
-public interface PropertyInterface extends ElementInterface
+public class ActionExecutionEventTest
 {
-    int getId();
-
-    void setId(int id);
-
-    BaseCollection getObject();
-
-    void setObject(BaseCollection object);
-
-    String toFormString();
-
-    Element toXML();
-
-    PropertyInterface clone();
+    @Test
+    public void testActionExecutionEventEquals()
+    {
+        Event e1 = new ActionExecutionEvent("test");
+        Event e2 = new ActionExecutionEvent("test");
+        Event e3 = new ActionExecutionEvent("different");
+        Assert.assertTrue(e1.equals(e1));
+        Assert.assertTrue(e1.equals(e2));
+        Assert.assertFalse(e1.equals(e3));
+    }
 }

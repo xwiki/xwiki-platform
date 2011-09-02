@@ -19,13 +19,14 @@
  */
 package org.xwiki.legacy.internal.oldcore.notification;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.ActionExecutedEvent;
+import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
@@ -33,13 +34,7 @@ import org.xwiki.bridge.event.DocumentDeletingEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
@@ -58,20 +53,10 @@ import com.xpn.xwiki.notify.XWikiNotificationManager;
 public class LegacyNotificationDispatcher implements EventListener
 {
     /**
-     * Component manager, used to get access to the observation manager that we cannot get injected because of a cyclic
-     * dependency.
-     */
-    @Inject
-    private ComponentManager componentManager;
-
-    /**
      * The logger to log.
      */
     @Inject
     private Logger logger;
-
-    @Inject
-    private Execution execution;
 
     /**
      * {@inheritDoc}
@@ -95,7 +80,7 @@ public class LegacyNotificationDispatcher implements EventListener
                 add(new DocumentDeletingEvent());
                 add(new DocumentCreatingEvent());
                 add(new DocumentUpdatingEvent());
-                add(new ActionExecutionEvent());
+                add(new ActionExecutedEvent());
                 add(new ActionExecutingEvent());
             }
         };
@@ -139,8 +124,10 @@ public class LegacyNotificationDispatcher implements EventListener
             } else if (event instanceof DocumentDeletingEvent) {
                 manager.preverify(document, new XWikiDocument(document.getDocumentReference()),
                     XWikiDocChangeNotificationInterface.EVENT_DELETE, context);
-            } else if (event instanceof ActionExecutionEvent) {
-                manager.verify(document, ((ActionExecutionEvent) event).getActionName(), context);
+            } else if (event instanceof ActionExecutedEvent) {
+                manager.verify(document, ((ActionExecutedEvent) event).getActionName(), context);
+            } else if (event instanceof ActionExecutingEvent) {
+                manager.preverify(document, ((ActionExecutingEvent) event).getActionName(), context);
             }
         }
     }

@@ -18,24 +18,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
+package org.xwiki.bridge.event;
 
-package com.xpn.xwiki.objects;
-
-import org.dom4j.Element;
-
-public interface PropertyInterface extends ElementInterface
+/**
+ * An event triggered whenever a client request (action) is processed, like <tt>/upload/</tt> or <tt>/view/</tt>. A
+ * specific event corresponds to only one {@link #actionName action type}.
+ * 
+ * @version $Id$
+ * @since 3.2M3
+ */
+public interface ActionExecutionEvent
 {
-    int getId();
-
-    void setId(int id);
-
-    BaseCollection getObject();
-
-    void setObject(BaseCollection object);
-
-    String toFormString();
-
-    Element toXML();
-
-    PropertyInterface clone();
+    /**
+     * Gets the name of the action causing this event.
+     * 
+     * @return the action causing this event, like <code>upload</code> or <code>login</code>
+     */
+    String getActionName();
 }

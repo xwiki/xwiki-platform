@@ -31,7 +31,7 @@
 ##
 ##
 #showBlogInfo($doc)
-#if($xcontext.action != 'inline')
+#if($xcontext.action != 'edit')
   #printBlog($doc)
 #end
 {{/html}}

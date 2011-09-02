@@ -20,18 +20,22 @@ public class Resources
 {
     // Entry point
 
-    public final static String ENTRYPOINT = "/extensions";
+    public final static String ENTRYPOINT = "/repository";
 
     // Extensions
 
     /**
      * ?start={offset}&number={number}
      */
-    public final static String EXTENSION_ID = ENTRYPOINT + "/ids/{extensionId}";
+    public final static String EXTENSIONS = ENTRYPOINT + "/extensions";
 
-    public final static String EXTENSION = EXTENSION_ID + "/versions/{extensionVersion}";
+    public final static String EXTENSIONS_ID = EXTENSIONS + "/{extensionId}";
 
-    public final static String EXTENSIONFILE = EXTENSION + "/file";
+    public final static String EXTENSIONSVERSIONS = EXTENSIONS_ID + "/versions";
+
+    public final static String EXTENSIONSVERSIONS_VERSION = EXTENSIONSVERSIONS + "/{extensionVersion}";
+
+    public final static String EXTENSIONFILE = EXTENSIONSVERSIONS + "/file";
 
     // Search
 
@@ -43,9 +47,5 @@ public class Resources
     /**
      * ?q={keywords}
      */
-    public final static String SEARCH_FROM_ID = EXTENSION_ID + "/search";
-
-    // Index
-
-    public final static String EXTENSION_INDEX = ENTRYPOINT + "/index";
+    public final static String SEARCH_FROM_ID = EXTENSIONS_ID + "/search";
 }

@@ -548,8 +548,8 @@ public class Context extends Api
 
     /**
      * Sets the default field display mode, when using {@link Document#display(String)} or
-     * {@link Document#display(String, Object)}. It is automatically set to "edit" when the action is "inline", and to
-     * "view" in all other cases.
+     * {@link Document#display(String, Object)}. It is automatically set to "edit" when the action is "edit" or
+     * "inline", and to "view" in all other cases.
      * 
      * @param mode the display mode, one of "view", "edit", "hidden", "search", "rendered".
      */

@@ -138,12 +138,12 @@ public class SaveAction extends PreviewAction
         // Validate the document if we have xvalidate=1 in the request
         if ("1".equals(request.getParameter("xvalidate"))) {
             boolean validationResult = tdoc.validate(context);
-            // if the validation fails we should show the inline action
+            // If the validation fails we should show the default edit mode
             if (validationResult == false) {
                 // Set display context to 'edit'
                 context.put("display", "edit");
-                // Set the action to inline
-                context.setAction("inline");
+                // Set the action to the default edit mode
+                context.setAction(tdoc.getDefaultEditMode(context));
                 // Set the document in the context
                 VelocityContext vcontext = (VelocityContext) context.get("vcontext");
                 context.put("doc", doc);
@@ -207,8 +207,9 @@ public class SaveAction extends PreviewAction
         }
 
         if ("edit".equals(context.get("display"))) {
-            // When form validation (xvalidate) fails the save action forwards to the inline action.
-            return "inline";
+            // When form validation (xvalidate) fails the save action forwards to the appropriate edit mode. In this
+            // case the context action is not save anymore because it was changed in #save(XWikiContext).
+            return context.getAction();
         }
 
         return "exception";

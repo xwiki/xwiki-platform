@@ -177,6 +177,11 @@ public class EditAction extends XWikiAction
             }
         }
 
+        // Make sure object property fields are displayed in edit mode.
+        // See XWikiDocument#display(String, BaseObject, XWikiContext)
+        // TODO: Revisit the display mode after the inline action is removed. Is the display mode still needed when
+        // there is only one edit action?
+        context.put("display", "edit");
         return "edit";
     }
 }

@@ -95,7 +95,8 @@ public class InlineAction extends XWikiAction {
             }
         }
 
-        // Set display context to 'view'
+        // Make sure object property fields are displayed in edit mode.
+        // See XWikiDocument#display(String, BaseObject, XWikiContext)
         context.put("display", "edit");
         return "inline";
     }

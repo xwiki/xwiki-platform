@@ -20,6 +20,7 @@
  */
 package com.xpn.xwiki.web;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,8 +40,8 @@ public class EditAction extends XWikiAction
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
-        String content = request.getParameter("content");
-        String title = request.getParameter("title");
+        String contentFromRequest = request.getParameter("content");
+        String titleFromRequest = request.getParameter("title");
         XWikiDocument doc = context.getDoc();
         XWiki xwiki = context.getWiki();
         XWikiForm form = context.getForm();
@@ -119,7 +120,7 @@ public class EditAction extends XWikiAction
                     tdoc.setLanguage(languagetoedit);
                     tdoc.setContent(doc.getContent());
                     tdoc.setSyntax(doc.getSyntax());
-                    tdoc.setAuthor(context.getUser());
+                    tdoc.setAuthorReference(context.getUserReference());
                     tdoc.setStore(doc.getStore());
                     context.put("tdoc", tdoc);
                     vcontext.put("tdoc", tdoc.newDocument(context));
@@ -136,20 +137,18 @@ public class EditAction extends XWikiAction
             vcontext.put("sectionNumber", new Integer(sectionNumber));
 
             XWikiDocument tdoc2 = tdoc.clone();
-            if (content != null) {
-                tdoc2.setContent(content);
-                tdoc2.setTitle(title);
+            if (contentFromRequest != null) {
+                tdoc2.setContent(contentFromRequest);
             }
-            if (sectionContent != null && !sectionContent.equals("")) {
-                if (content != null) {
-                    tdoc2.setContent(content);
-                } else {
+            if (titleFromRequest != null) {
+                tdoc2.setTitle(titleFromRequest);
+            }
+            if (StringUtils.isNotEmpty(sectionContent)) {
+                if (contentFromRequest == null) {
                     tdoc2.setContent(sectionContent);
                 }
-                if (title != null) {
+                if (titleFromRequest != null) {
                     tdoc2.setTitle(doc.getDocumentSection(sectionNumber).getSectionTitle());
-                } else {
-                    tdoc2.setTitle(title);
                 }
             }
             context.put("tdoc", tdoc2);

@@ -137,6 +137,14 @@ public class EditAction extends XWikiAction
             vcontext.put("sectionNumber", new Integer(sectionNumber));
 
             XWikiDocument tdoc2 = tdoc.clone();
+            try {
+                tdoc2.readFromTemplate(peform, context);
+            } catch (XWikiException e) {
+                if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
+                    context.put("exception", e);
+                    return "docalreadyexists";
+                }
+            }
             if (contentFromRequest != null) {
                 tdoc2.setContent(contentFromRequest);
             }
@@ -153,14 +161,6 @@ public class EditAction extends XWikiAction
             }
             context.put("tdoc", tdoc2);
             vcontext.put("tdoc", tdoc2.newDocument(context));
-            try {
-                tdoc2.readFromTemplate(peform, context);
-            } catch (XWikiException e) {
-                if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
-                    context.put("exception", e);
-                    return "docalreadyexists";
-                }
-            }
 
             /* Setup a lock */
             try {

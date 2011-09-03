@@ -25,6 +25,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -155,8 +156,11 @@ public class EditAction extends XWikiAction
                 if (contentFromRequest == null) {
                     tdoc2.setContent(sectionContent);
                 }
-                if (titleFromRequest != null) {
-                    tdoc2.setTitle(doc.getDocumentSection(sectionNumber).getSectionTitle());
+                String sectionTitle = doc.getDocumentSection(sectionNumber).getSectionTitle();
+                if (titleFromRequest == null && StringUtils.isNotBlank(sectionTitle)) {
+                    sectionTitle = context.getMessageTool().get("core.editors.content.titleField.sectionEditingFormat",
+                        tdoc2.getRenderedTitle(Syntax.PLAIN_1_0, context), sectionNumber, sectionTitle);
+                    tdoc2.setTitle(sectionTitle);
                 }
             }
             context.put("tdoc", tdoc2);

@@ -151,9 +151,23 @@ public class XWikiMessageTool
      */
     public String get(String key, List< ? > params)
     {
+        return get(key, params.toArray());
+    }
+
+    /**
+     * Find a translation and then replace any parameters found in the translation by the passed parameters. The format
+     * is the one used by {@link java.text.MessageFormat}.
+     * 
+     * @param key the key of the string to find
+     * @param params the list of parameters to use for replacing "{N}" elements in the string. See
+     *        {@link java.text.MessageFormat} for the full syntax
+     * @return the translated string with parameters resolved
+     */
+    public String get(String key, Object... params)
+    {
         String translation = get(key);
         if (params != null) {
-            translation = MessageFormat.format(translation, params.toArray());
+            translation = MessageFormat.format(translation, params);
         }
         return translation;
     }

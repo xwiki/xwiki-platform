@@ -1,0 +1,96 @@
+#body, #xwikimaincontainer, #xwikimaincontainerinner, #xwikicontent, #mainContentArea {
+  background-color: #FFF !important;
+  background-image: none !important;
+  border: none !important;
+  float: none !important;
+  margin: 0px !important;
+  overflow: visible !important;
+  padding: 10px !important;
+  width: auto !important;
+}
+* html #body {
+  overflow: auto !important;
+}
+/* Hide unneeded stuff */
+.edit_section,
+#rightPanels, #leftPanels,
+#mainmenu, #contentmenu, #menuview, #editmenu,
+#globallinks, #footerglobal,
+#commentform, .xwikitabbar li, #Historyshortcut, #Informationshortcut, .separator,
+.commentheader .commenttools a, a.tag-delete , .tag-add a {
+  display: none !important;
+}
+#printcontainer {
+  border: none;
+  float: none !important;
+  overflow: visible !important;
+  padding: 10px;
+  text-align: justify;
+}
+
+#headerglobal {
+  float: none;
+}
+#headerspace {
+  margin: 0 !important;
+}
+#contentcolumn .main {
+  margin: 0 !important;
+}
+/*-------------------------------------------------------------------*/
+.main {
+  background-color: white;
+  padding: 10px;
+}
+
+.xwikitabbar li.active {
+  display: block;
+}
+
+#docextrapanes #AddComment {
+  border: none;
+}
+
+#xwikidatacontents, #docExtraTabs {
+  background: white;
+}
+
+#xdocFooter, #docextrapanes {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#xwikicontent a , #xdocFooter a, #docextrapanes .commentauthor a, #breadcrumbs a {
+  color: #00F !important;
+}
+
+#docExtraTabs ul.xwikitabbar {
+  background: white;
+  padding: 0px;
+}
+
+.leftsidecolumns, #contentcolumn {
+  float: none !important;
+}
+
+#docextrapanes { /* display all comments */
+  float: none !important;
+  overflow: visible !important;
+}
+
+/* Remove shortcuts */
+#document-info>div+div,
+#historyshortcut, #informationshortcut, #annotationsshortcut {
+  display: none;
+}
+.xdocLastModification {
+  width: auto;
+}
+.recentChangesMoreActions {
+  display: none;
+}
+
+/* Fix XWIKI-5567 */
+.box {
+  overflow: visible;
+}

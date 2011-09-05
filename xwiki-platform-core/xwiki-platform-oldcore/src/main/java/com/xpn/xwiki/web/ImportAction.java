@@ -109,7 +109,7 @@ public class ImportAction extends XWikiAction
                                 }
                             }
 
-                            String docName = pageName.replaceAll(":.*$", "");
+                            String docName = pageName.replaceAll(":[^:]*$", "");
                             if (language == null) {
                                 importer.setDocumentAction(docName, iAction);
                             } else {

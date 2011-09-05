@@ -20,6 +20,8 @@
 package com.xpn.xwiki.user.impl.xwiki;
 
 import java.util.Collections;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
@@ -29,6 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
@@ -445,6 +448,51 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
                    this.rightService.hasProgrammingRights(this.getContext()));
         this.getContext().dropPermissions();
         assertFalse("Author retains programming right after calling dropPermissions()",
+                   this.rightService.hasProgrammingRights(this.getContext()));
+    }
+
+    /**
+     * 
+     * This test will fail unless:
+     * SuperAdmin has programming permission before calling Document#dropPermissions().
+     * SuperAdmin does not have programming permission after calling dropPermissions().
+     */
+    public void testProgrammingRightsAfterDropPermissionsForRenderingCycle()
+    {
+        final Document doc =
+            new Document(new XWikiDocument(new DocumentReference("XWiki", "Test", "Permissions")), this.getContext());
+
+       // doc.setContentAuthor(XWikiRightService.SUPERADMIN_USER_FULLNAME);
+
+        //this.getContext().setDoc(doc);
+        this.getContext().setUser(XWikiRightService.SUPERADMIN_USER_FULLNAME);
+
+        assertTrue("User does not have programming right prior to calling "
+                   + "doc.dropPermissions()",
+                   this.rightService.hasProgrammingRights(this.getContext()));
+
+        final Map<String, Object> backup = new HashMap<String, Object>();
+        XWikiDocument.backupContext(backup, this.getContext());
+
+        doc.dropPermissions();
+
+        assertFalse("Author retains programming right after calling doc.dropPermissions()",
+                   this.rightService.hasProgrammingRights(this.getContext()));
+
+        final Map<String, Object> backup2 = new HashMap<String, Object>();
+        XWikiDocument.backupContext(backup2, this.getContext());
+
+        assertTrue("User does not have programming right after switching contexts.",
+                   this.rightService.hasProgrammingRights(this.getContext()));
+
+        XWikiDocument.restoreContext(backup2, this.getContext());
+
+        assertFalse("Author did not lose programming right after switching contexts back.",
+                   this.rightService.hasProgrammingRights(this.getContext()));
+
+        XWikiDocument.restoreContext(backup, this.getContext());
+
+        assertTrue("Author did not regain programming right after switching contexts back.",
                    this.rightService.hasProgrammingRights(this.getContext()));
     }
 

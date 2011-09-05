@@ -61,7 +61,8 @@ public class AetherExtension extends AbstractExtension
     public AetherExtension(ExtensionId id, Model mavenModel, AetherExtensionRepository repository,
         PlexusComponentManager mavenComponentManager, ConverterManager converter)
     {
-        super(repository, id, mavenModel.getPackaging());
+        // See bundle as jar packages since bundle are actually store as jar files
+        super(repository, id, mavenModel.getPackaging().equals("bundle") ? "jar" : mavenModel.getPackaging());
 
         this.plexusComponentManager = mavenComponentManager;
         this.mavenModel = mavenModel;
@@ -85,8 +86,8 @@ public class AetherExtension extends AbstractExtension
         for (Dependency mavenDependency : this.mavenModel.getDependencies()) {
             if (!mavenDependency.isOptional()
                 && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime"))) {
-                addDependency(new AetherExtensionDependency(new ExtensionId(mavenDependency.getGroupId() + ":"
-                    + mavenDependency.getArtifactId(), mavenDependency.getVersion())));
+                addDependency(new AetherExtensionDependency(mavenDependency.getGroupId(),
+                    mavenDependency.getArtifactId(), mavenDependency.getVersion()));
             }
         }
 
@@ -143,7 +144,7 @@ public class AetherExtension extends AbstractExtension
         File aetherFile = artifactResult.getArtifact().getFile();
 
         try {
-            FileUtils.copyFile(aetherFile, file);
+            FileUtils.moveFile(aetherFile, file);
         } catch (IOException e) {
             throw new ExtensionException("Failed to copy file", e);
         }

@@ -19,52 +19,21 @@
  */
 package org.xwiki.extension.repository.internal;
 
-import org.xwiki.extension.ExtensionDependency;
+import org.xwiki.extension.AbstractExtensionDependency;
 
 /**
- * Default implementation of {@link ExtensionDependency}.
+ * Default implementation of {@link org.xwiki.extension.ExtensionDependency}.
  * 
  * @version $Id$
  */
-public class LocalExtensionDependency implements ExtensionDependency
+public class LocalExtensionDependency extends AbstractExtensionDependency
 {
     /**
-     * @see #getId()
-     */
-    private String id;
-
-    /**
-     * @see #getVersion()
-     */
-    private String version;
-
-    /**
-     * @param id the target extension identifier
-     * @param version the target extension version
+     * @param id the id of the extension
+     * @param version the version of the extension
      */
     public LocalExtensionDependency(String id, String version)
     {
-        this.id = id;
-        this.version = version;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.ExtensionDependency#getId()
-     */
-    public String getId()
-    {
-        return this.id;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.ExtensionDependency#getVersion()
-     */
-    public String getVersion()
-    {
-        return this.version;
+        super(id, version);
     }
 }

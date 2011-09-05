@@ -19,17 +19,26 @@
  */
 package org.xwiki.extension.jar;
 
+import java.util.Collections;
+
 import junit.framework.Assert;
 
+import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.test.AbstractExtensionHandlerTest;
-import org.xwiki.extension.test.ConfigurableDefaultCoreExtensionRepository;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
+import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.TestComponent;
 
 public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
@@ -37,6 +46,17 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
     private ExtensionId testArtifactId;
 
     private LocalExtensionRepository localExtensionRepository;
+
+    private DocumentAccessBridge mockDocumentAccessBridge;
+
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        this.mockDocumentAccessBridge = registerMockComponent(DocumentAccessBridge.class);
+        registerMockComponent(AttachmentReferenceResolver.class, "current");
+    }
 
     @Before
     @Override
@@ -49,14 +69,15 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
         this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class);
 
         this.testArtifactId = new ExtensionId("org.xwiki.test:test-extension", "test");
-    }
 
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
+        // setup mock
 
-        ConfigurableDefaultCoreExtensionRepository.register(getComponentManager());
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockDocumentAccessBridge).hasProgrammingRights(); will(returnValue(true));
+            }
+        });
     }
 
     @Test
@@ -71,6 +92,8 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
 
         getComponentManager().lookup(TestComponent.class);
 
+        // lookup registered component
+
         try {
             install(this.testArtifactId);
             Assert.fail("installExtension should have failed");
@@ -78,7 +101,17 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
             // expected
         }
 
-        Assert.assertNotNull(localExtensionRepository.getInstalledExtension("feature", null));
+        // use registered class in script macro
+        Macro<JSR223ScriptMacroParameters> groovyMacro = getComponentManager().lookup(Macro.class, "groovy");
+        MacroBlock macroBlock = new MacroBlock("groovy", Collections.<String, String> emptyMap(), false);
+        JSR223ScriptMacroParameters parameters = new JSR223ScriptMacroParameters();
+        MacroTransformationContext context = new MacroTransformationContext();
+        context.setCurrentMacroBlock(macroBlock);
+
+        getComponentManager().lookup(ExecutionContextInitializer.class, "jarextension").initialize(null);
+        groovyMacro.execute(parameters, "new org.xwiki.test.DefaultTestComponent()", context);
+
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension("feature", null));
 
         uninstall(this.testArtifactId);
 

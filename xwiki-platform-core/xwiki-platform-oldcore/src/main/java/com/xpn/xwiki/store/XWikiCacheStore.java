@@ -24,7 +24,6 @@ package com.xpn.xwiki.store;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
@@ -256,9 +255,15 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 
     public String getKey(String wiki, String fullName, String language)
     {
-        String key = (wiki == null ? "" : wiki) + ":" + fullName;
+        final String key = (wiki == null ? "" : wiki) + ":" + fullName;
 
-        if (StringUtils.isEmpty(language)) {
+        // This is copied strait from XWikiDocument#getId()
+        // It is important to note that a document called "Main.WebHome:es" will have
+        // the same cache key as the Spanish version of "Main.WebHome".
+        // This is a problem which must be fixed here and in XWikiDocument#getId()
+        // simultaneously.
+        // See: http://jira.xwiki.org/jira/browse/XWIKI-6169
+        if ((language == null) || language.trim().equals("")) {
             return key;
         } else {
             return key + ":" + language;

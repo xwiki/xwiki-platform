@@ -321,6 +321,20 @@
 #-#   true : Enabled
 #-#   false: Disabled
 #-#
-#-# Default value is false
-# csrf.enabled = false
+#-# Default value is true
+# csrf.enabled = true
 
+#-------------------------------------------------------------------------------------
+# Extension Manager
+#-------------------------------------------------------------------------------------
+
+#-# [Since 2.5]
+#-# Repositories to use when downloading extensions.
+#-# 
+#-# The format is <id>:<type>:<url> where
+#-# * id can be anything as long as there is only one
+#-# * type is the type of the repository (maven, xwiki, etc.)
+#-# * url is thee URL or the root of the repository
+#-# 
+#-# The default is:
+# extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public

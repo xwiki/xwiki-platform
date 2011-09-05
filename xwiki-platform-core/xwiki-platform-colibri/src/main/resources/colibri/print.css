@@ -1,42 +1,43 @@
 /* #template('colorThemeInit.vm') */
 
 #body, #xwikimaincontainer, #xwikimaincontainerinner, #xwikicontent, #mainContentArea {
-  background-image: none !important;
   background-color: #FFF !important;
-  float: none !important;
+  background-image: none !important;
   border: none !important;
-  width: auto !important;
+  float: none !important;
   margin: 0px !important;
-  padding: 10px !important;
   overflow: visible !important;
+  padding: 10px !important;
+  width: auto !important;
 }
 * html #body {
   overflow: auto !important;
 }
 /* Hide unneeded stuff */
 .edit_section,
-#rightPanels, #leftPanels, #mainmenu, #contentmenu, #editmenu,
+#rightPanels, #leftPanels,
+#mainmenu, #contentmenu, #menuview, #editmenu,
 #globallinks, #footerglobal,
 #commentform, .xwikitabbar li, #Historyshortcut, #Informationshortcut, .separator,
 .commentheader .commenttools a, a.tag-delete , .tag-add a {
   display: none !important;
 }
 #printcontainer {
-  overflow: visible !important; 
-  border: none; 
-  padding: 10px; 
-  text-align: justify;
+  border: none;
   float: none !important;
+  overflow: visible !important;
+  padding: 10px;
+  text-align: justify;
 }
 
 #headerglobal {
   float: none;
 }
 #headerspace {
-  margin:0 !important;
+  margin: 0 !important;
 }
 #contentcolumn .main {
-  margin:0 !important;
+  margin: 0 !important;
 }
 /*-------------------------------------------------------------------*/
 .main {
@@ -61,13 +62,13 @@
   padding-right: 10px;
 }
 
-#xwikicontent a , #xdocFooter a, #docextrapanes .commentauthor a, #breadcrumbs a{
+#xwikicontent a , #xdocFooter a, #docextrapanes .commentauthor a, #breadcrumbs a {
   color: $theme.textPrimaryColor !important;
 }
 
 #docExtraTabs ul.xwikitabbar {
-  padding: 0px;
   background: white;
+  padding: 0px;
 }
 
 .leftsidecolumns, #contentcolumn {

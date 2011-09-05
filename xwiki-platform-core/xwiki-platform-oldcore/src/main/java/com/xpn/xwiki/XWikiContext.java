@@ -31,6 +31,7 @@ import java.util.Map;
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.xmlrpc.server.XmlRpcServer;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -156,6 +157,9 @@ public class XWikiContext extends Hashtable<Object, Object>
     @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.class, "compactwiki");
+
+    /** The Execution so that we can check if permissions were dropped there. */
+    private final Execution execution = Utils.getComponent(Execution.class);
 
     public XWikiContext()
     {
@@ -685,6 +689,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
+     * Drop permissions for the remainder of the request cycle.
      * After this is called:
      * <ul>
      * <li>1. {@link com.xpn.xwiki.api.Api#hasProgrammingRights()} will always return false.</li>
@@ -701,19 +706,39 @@ public class XWikiContext extends Hashtable<Object, Object>
      * way for code following this call to save another document as this user, blessing it too with programming right.
      * <p>
      * Once dropped, permissions cannot be regained for the duration of the request.
+     *
+     * <p>
+     * If you are interested in a more flexable sandboxing method which sandboxed code only
+     * for the remainder of the rendering cycle, consider using
+     * {@link com.xpn.xwiki.api.Document#dropPermissions()}.
+     * <p>
      * 
      * @since 3.0M3
      */
     public void dropPermissions()
     {
-        put("hasDroppedPermissions", "true");
+        this.put(XWikiConstant.DROPPED_PERMISSIONS, Boolean.TRUE);
     }
 
     /**
-     * @return true if {@link XWikiContext#dropPermissions()} has been called on this context.
+     * @return true if {@link XWikiContext#dropPermissions()} has been called
+     *              on this context, or if the {@link XWikiConstant.DROPPED_PERMISSIONS}
+     *              key has been set in the {@link org.xwiki.context.ExecutionContext}
+     *              for this thread. This is done by calling {@Document#dropPermissions()}
      */
     public boolean hasDroppedPermissions()
     {
-        return this.get("hasDroppedPermissions") != null;
+        if (this.get(XWikiConstant.DROPPED_PERMISSIONS) != null) {
+            return true;
+        }
+
+        final Object dropped =
+            this.execution.getContext().getProperty(XWikiConstant.DROPPED_PERMISSIONS);
+
+        if (dropped == null || !(dropped instanceof Integer)) {
+            return false;
+        }
+
+        return ((Integer) dropped) == System.identityHashCode(this.execution.getContext());
     }
 }

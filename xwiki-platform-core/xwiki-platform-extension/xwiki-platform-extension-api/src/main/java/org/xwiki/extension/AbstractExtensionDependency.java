@@ -64,4 +64,10 @@ public abstract class AbstractExtensionDependency implements ExtensionDependency
     {
         this.version = version;
     }
+
+    @Override
+    public String toString()
+    {
+        return getId() + '-' + getVersion();
+    }
 }

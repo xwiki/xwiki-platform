@@ -99,7 +99,7 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
             List<String>[] components = getDeclaredComponents(jarFile);
 
             if (components[0] == null) {
-                this.logger.debug(jarFile + " does not contains any component");
+                this.logger.debug("{} does not contains any component", jarFile);
                 return;
             }
 
@@ -139,7 +139,7 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
             List<String>[] components = getDeclaredComponents(jarFile);
 
             if (components[0] == null) {
-                this.logger.debug(jarFile + " does not contains any component");
+                this.logger.debug("{} does not contains any component", jarFile);
                 return;
             }
 

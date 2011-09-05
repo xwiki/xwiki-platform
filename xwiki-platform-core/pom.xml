@@ -303,7 +303,7 @@
     <module>xwiki-platform-skin</module>
     <module>xwiki-platform-statistics</module>
     <module>xwiki-platform-store</module>
-    <module>xwiki-platform-swizzle</module>
+    <module>xwiki-platform-jira</module>
     <module>xwiki-platform-tag</module>
     <module>xwiki-platform-test</module>
     <module>xwiki-platform-toucan</module>
@@ -334,7 +334,7 @@
             <artifactId>clirr-maven-plugin</artifactId>
             <configuration>
               <skip>${xwiki.clirr.skip}</skip>
-              <comparisonVersion>${clirr.previous.version}</comparisonVersion>
+              <comparisonVersion>${xwiki.clirr.previous.version}</comparisonVersion>
               <excludes>
                 <exclude>**/internal/**</exclude>
                 <exclude>**/test/**</exclude>
@@ -360,6 +360,7 @@
                 <exclude>org/xwiki/eventstream/Event</exclude>
                 <exclude>com/xpn/xwiki/plugin/activitystream/api/ActivityEvent</exclude>
                 <exclude>com/xpn/xwiki/plugin/activitystream/plugin/ActivityEvent</exclude>
+                <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
               </excludes>
             </configuration>
           </plugin>

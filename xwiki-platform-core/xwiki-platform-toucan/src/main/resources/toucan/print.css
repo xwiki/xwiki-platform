@@ -1,5 +1,3 @@
-/* #template('colorThemeInit.vm') */
-
 #body, #xwikimaincontainer, #xwikimaincontainerinner, #xwikicontent, #mainContentArea {
   background-color: #FFF !important;
   background-image: none !important;
@@ -63,7 +61,7 @@
 }
 
 #xwikicontent a , #xdocFooter a, #docextrapanes .commentauthor a, #breadcrumbs a {
-  color: $theme.textPrimaryColor !important;
+  color: #00F !important;
 }
 
 #docExtraTabs ul.xwikitabbar {

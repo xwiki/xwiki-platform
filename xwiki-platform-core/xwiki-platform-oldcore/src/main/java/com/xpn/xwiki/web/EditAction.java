@@ -20,10 +20,12 @@
  */
 package com.xpn.xwiki.web;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -39,8 +41,8 @@ public class EditAction extends XWikiAction
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
-        String content = request.getParameter("content");
-        String title = request.getParameter("title");
+        String contentFromRequest = request.getParameter("content");
+        String titleFromRequest = request.getParameter("title");
         XWikiDocument doc = context.getDoc();
         XWiki xwiki = context.getWiki();
         XWikiForm form = context.getForm();
@@ -119,7 +121,7 @@ public class EditAction extends XWikiAction
                     tdoc.setLanguage(languagetoedit);
                     tdoc.setContent(doc.getContent());
                     tdoc.setSyntax(doc.getSyntax());
-                    tdoc.setAuthor(context.getUser());
+                    tdoc.setAuthorReference(context.getUserReference());
                     tdoc.setStore(doc.getStore());
                     context.put("tdoc", tdoc);
                     vcontext.put("tdoc", tdoc.newDocument(context));
@@ -136,24 +138,6 @@ public class EditAction extends XWikiAction
             vcontext.put("sectionNumber", new Integer(sectionNumber));
 
             XWikiDocument tdoc2 = tdoc.clone();
-            if (content != null) {
-                tdoc2.setContent(content);
-                tdoc2.setTitle(title);
-            }
-            if (sectionContent != null && !sectionContent.equals("")) {
-                if (content != null) {
-                    tdoc2.setContent(content);
-                } else {
-                    tdoc2.setContent(sectionContent);
-                }
-                if (title != null) {
-                    tdoc2.setTitle(doc.getDocumentSection(sectionNumber).getSectionTitle());
-                } else {
-                    tdoc2.setTitle(title);
-                }
-            }
-            context.put("tdoc", tdoc2);
-            vcontext.put("tdoc", tdoc2.newDocument(context));
             try {
                 tdoc2.readFromTemplate(peform, context);
             } catch (XWikiException e) {
@@ -162,6 +146,25 @@ public class EditAction extends XWikiAction
                     return "docalreadyexists";
                 }
             }
+            if (contentFromRequest != null) {
+                tdoc2.setContent(contentFromRequest);
+            }
+            if (titleFromRequest != null) {
+                tdoc2.setTitle(titleFromRequest);
+            }
+            if (StringUtils.isNotEmpty(sectionContent)) {
+                if (contentFromRequest == null) {
+                    tdoc2.setContent(sectionContent);
+                }
+                String sectionTitle = doc.getDocumentSection(sectionNumber).getSectionTitle();
+                if (titleFromRequest == null && StringUtils.isNotBlank(sectionTitle)) {
+                    sectionTitle = context.getMessageTool().get("core.editors.content.titleField.sectionEditingFormat",
+                        tdoc2.getRenderedTitle(Syntax.PLAIN_1_0, context), sectionNumber, sectionTitle);
+                    tdoc2.setTitle(sectionTitle);
+                }
+            }
+            context.put("tdoc", tdoc2);
+            vcontext.put("tdoc", tdoc2.newDocument(context));
 
             /* Setup a lock */
             try {

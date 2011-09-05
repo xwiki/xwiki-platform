@@ -166,7 +166,7 @@ public class XWikiMessageTool
     public String get(String key, Object... params)
     {
         String translation = get(key);
-        if (params != null) {
+        if (params != null && translation != null) {
             translation = MessageFormat.format(translation, params);
         }
         return translation;

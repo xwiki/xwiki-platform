@@ -2197,7 +2197,7 @@ Wysiwyg.onModuleLoad(function() {
 #macro(applySheet $sheetReference)
   ## Honor the syntax if it's passed in the request.
   #set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
-  #set($output = $services.sheet.apply($doc.documentReference, $sheetReference, $outputSyntax))
+  #set($output = $services.sheet.renderContent($doc.documentReference, $sheetReference, $outputSyntax))
   #set($htmlCompatibleSyntaxes = ['xhtml', 'html'])
   ## If the passed syntax is not an HTML-compatible syntax we need to HTML-escape it so that it can be 
   ## displayed fine in HTML (since at the point this macro is called we're already inside an HTML page with

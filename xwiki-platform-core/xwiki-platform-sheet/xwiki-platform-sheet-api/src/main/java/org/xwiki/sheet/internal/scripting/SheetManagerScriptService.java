@@ -33,6 +33,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.sheet.SheetManager;
 import org.xwiki.sheet.SheetManager.SheetDisplay;
+import org.xwiki.sheet.SheetRenderer;
 
 /**
  * Exposes {@link SheetManager} to Velocity scripts.
@@ -48,6 +49,20 @@ public class SheetManagerScriptService implements ScriptService
      */
     @Inject
     private SheetManager sheetManager;
+
+    /**
+     * The component used to render the content of the sheet.
+     */
+    @Inject
+    @Named("content")
+    private SheetRenderer contentSheetRenderer;
+
+    /**
+     * The component used to render the title of the sheet.
+     */
+    @Inject
+    @Named("title")
+    private SheetRenderer titleSheetRenderer;
 
     /**
      * The component used to check access rights on sheets.
@@ -118,22 +133,45 @@ public class SheetManagerScriptService implements ScriptService
     }
 
     /**
-     * Applies a sheet to a document by rendering the sheet in the context of the document. View rights are required
-     * both on the sheet and on the target document. This method ensures the programming rights of the sheet are
-     * preserved: if the sheet doesn't have programming rights then it is evaluated without them, otherwise, if the
-     * sheet has programming rights, it is evaluated with programming rights even if the target document doesn't have
-     * them.
+     * Applies a sheet to a document by rendering the content of the sheet in the context of the document. View rights
+     * are required both on the sheet and on the target document. This method ensures the programming rights of the
+     * sheet are preserved: if the sheet doesn't have programming rights then its content is evaluated without them,
+     * otherwise, if the sheet has programming rights, the content is evaluated with programming rights even if the
+     * target document doesn't have them.
      * 
      * @param documentReference the target document, i.e. the document the sheet is applied to
-     * @param sheetReference the sheet to apply
+     * @param sheetReference the sheet whose content is rendered
      * @param outputSyntax the output syntax
-     * @return the result of rendering the specified sheet in the context of the target document
+     * @return the result of rendering the content of the specified sheet in the context of the target document
      */
-    public String apply(DocumentReference documentReference, DocumentReference sheetReference, Syntax outputSyntax)
+    public String renderContent(DocumentReference documentReference, DocumentReference sheetReference,
+        Syntax outputSyntax)
     {
-        if (documentAccessBridge.isDocumentViewable(documentReference) && sheetReference != null
+        if (documentAccessBridge.isDocumentViewable(documentReference)
             && documentAccessBridge.isDocumentViewable(sheetReference)) {
-            return sheetManager.apply(documentReference, sheetReference, outputSyntax);
+            return contentSheetRenderer.render(documentReference, sheetReference, outputSyntax);
+        }
+        return null;
+    }
+
+    /**
+     * Applies a sheet to a document by rendering the title of the sheet in the context of the document. View rights are
+     * required both on the sheet and on the target document. This method ensures the programming rights of the sheet
+     * are preserved: if the sheet doesn't have programming rights then its title is evaluated without them, otherwise,
+     * if the sheet has programming rights, the title is evaluated with programming rights even if the target document
+     * doesn't have them.
+     * 
+     * @param documentReference the target document, i.e. the document the sheet is applied to
+     * @param sheetReference the sheet whose title is rendered
+     * @param outputSyntax the output syntax
+     * @return the result of rendering the title of the specified sheet in the context of the target document
+     */
+    public String renderTitle(DocumentReference documentReference, DocumentReference sheetReference,
+        Syntax outputSyntax)
+    {
+        if (documentAccessBridge.isDocumentViewable(documentReference)
+            && documentAccessBridge.isDocumentViewable(sheetReference)) {
+            return titleSheetRenderer.render(documentReference, sheetReference, outputSyntax);
         }
         return null;
     }

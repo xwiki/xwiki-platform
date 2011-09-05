@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * The interface used to manage document and class sheets.
@@ -64,17 +63,4 @@ public interface SheetManager
      *         is no proper sheet is found
      */
     DocumentReference getClassSheet(DocumentReference classReference, String action);
-
-    /**
-     * Applies a sheet to a document by rendering the sheet in the context of the document. This method ensures the
-     * programming rights of the sheet are preserved: if the sheet doesn't have programming rights then it is evaluated
-     * without them, otherwise, if the sheet has programming rights, it is evaluated with programming rights even if the
-     * target document doesn't have them.
-     * 
-     * @param documentReference the target document, i.e. the document the sheet is applied to
-     * @param sheetReference the sheet to apply
-     * @param outputSyntax the output syntax
-     * @return the result of rendering the specified sheet in the context of the target document
-     */
-    String apply(DocumentReference documentReference, DocumentReference sheetReference, Syntax outputSyntax);
 }

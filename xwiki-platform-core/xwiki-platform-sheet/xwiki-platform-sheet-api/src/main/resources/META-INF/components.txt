@@ -1,3 +1,5 @@
 org.xwiki.sheet.internal.DefaultSheetManager
 org.xwiki.sheet.internal.DefaultSheetManagerConfiguration
+org.xwiki.sheet.internal.TitleSheetRenderer
+org.xwiki.sheet.internal.ContentSheetRenderer
 org.xwiki.sheet.internal.scripting.SheetManagerScriptService

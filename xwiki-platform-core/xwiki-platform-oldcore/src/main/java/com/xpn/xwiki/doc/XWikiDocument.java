@@ -1284,6 +1284,38 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * Renders the specified title in the context of this document. First the Velocity code is evaluated and then, if
+     * the output syntax is not HTML-compatible, the result is converted to the output syntax.
+     * 
+     * @param title the title to render
+     * @param outputSyntax the output syntax
+     * @param context the XWiki context
+     * @return the result of rendering the given title in the context of this document
+     * @throws XWikiException if rendering the title fails
+     */
+    public String getRenderedTitle(String title, Syntax outputSyntax, XWikiContext context) throws XWikiException
+    {
+        String renderedTitle = context.getWiki().getRenderingEngine().interpretText(title, this, context);
+
+        // TODO: Since interpretText() never throws an exception it's hard to know if there's been an error. Right now
+        // interpretText() returns some HTML when there's an error, so we need to check the returned result for some
+        // marker to decide if an error has occurred... Fix this by refactoring the whole system used for Velocity
+        // evaluation.
+        if (renderedTitle.contains("<div id=\"xwikierror")) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
+                XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Failed to evaluate the title.");
+        }
+
+        if (!outputSyntax.equals(Syntax.HTML_4_01) && !outputSyntax.equals(Syntax.XHTML_1_0)) {
+            XDOM xdom = parseContent(Syntax.HTML_4_01.toIdString(), renderedTitle);
+            this.parserUtils.removeTopLevelParagraph(xdom.getChildren());
+            renderedTitle = renderXDOM(xdom, outputSyntax);
+        }
+
+        return renderedTitle;
+    }
+
+    /**
      * Get the rendered version of the title of the document.
      * <ul>
      * <li>if document <code>title</code> field is not empty: it's returned after a call to
@@ -1301,30 +1333,14 @@ public class XWikiDocument implements DocumentModelBridge
         // 1) Check if the user has provided a title
         String title = getTitle();
 
-        try {
-            if (!StringUtils.isEmpty(title)) {
-                title = context.getWiki().getRenderingEngine().interpretText(title, this, context);
-
-                // If there's been an error during the Velocity evaluation then consider that the title is empty as a
-                // fallback.
-                // TODO: Since interpretText() never throws an exception it's hard to know if there's been an error.
-                // Right now interpretText() returns some HTML when there's an error, so we need to check the returned
-                // result for some marker to decide if an error has occurred... Fix this by refactoring the whole
-                // system used for Velocity evaluation.
-                if (title.indexOf("<div id=\"xwikierror") == -1) {
-                    if (!outputSyntax.equals(Syntax.HTML_4_01) && !outputSyntax.equals(Syntax.XHTML_1_0)) {
-                        XDOM xdom = parseContent(Syntax.HTML_4_01.toIdString(), title);
-                        this.parserUtils.removeTopLevelParagraph(xdom.getChildren());
-                        title = renderXDOM(xdom, outputSyntax);
-                    }
-
-                    return title;
-                }
+        if (!StringUtils.isEmpty(title)) {
+            try {
+                return getRenderedTitle(title, outputSyntax, context);
+            } catch (Exception e) {
+                LOGGER.warn(
+                    "Failed to interpret title of document ["
+                        + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
             }
-        } catch (Exception e) {
-            LOGGER.warn(
-                "Failed to interpret title of document ["
-                    + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
         }
 
         try {

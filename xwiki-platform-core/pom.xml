@@ -361,6 +361,7 @@
                 <exclude>com/xpn/xwiki/plugin/activitystream/api/ActivityEvent</exclude>
                 <exclude>com/xpn/xwiki/plugin/activitystream/plugin/ActivityEvent</exclude>
                 <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
+                <exclude>com/xpn/xwiki/user/api/XWikiRightService</exclude>
               </excludes>
             </configuration>
           </plugin>

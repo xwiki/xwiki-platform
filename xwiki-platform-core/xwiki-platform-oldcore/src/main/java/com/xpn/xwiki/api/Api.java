@@ -79,7 +79,7 @@ public class Api
     }
 
     /**
-     * Check if the current user has administration rights on the current wiki.
+     * Check if the current user has administration rights either on the current wiki or on the current space.
      * 
      * @return <code>true</code> if the current user has the <code>admin</code> right or <code>false</code> otherwise.
      */
@@ -87,6 +87,19 @@ public class Api
     {
         com.xpn.xwiki.XWiki xwiki = this.context.getWiki();
         return xwiki.getRightService().hasAdminRights(this.context);
+    }
+
+    /**
+     * Check if the current user has administration rights on the current wiki, regardless of any space admin rights
+     * that might also be available.
+     * 
+     * @return <code>true</code> if the current user has the <code>admin</code> right or <code>false</code> otherwise.
+     * @since 3.2M3
+     */
+    public boolean hasWikiAdminRights()
+    {
+        com.xpn.xwiki.XWiki xwiki = this.context.getWiki();
+        return xwiki.getRightService().hasWikiAdminRights(this.context);
     }
 
     /**
@@ -131,12 +144,11 @@ public class Api
     }
 
     /**
-     * Get the name of the content author of the current document for security checking.
-     * If {@link Context#dropPermissions()} has been called then this will return the guest user no matter
-     * who the real author is.
-     * If there is no current document then the guest user is returned because there is no reason for script to
-     * have any permission if does not exist in any document.
-     *
+     * Get the name of the content author of the current document for security checking. If
+     * {@link Context#dropPermissions()} has been called then this will return the guest user no matter who the real
+     * author is. If there is no current document then the guest user is returned because there is no reason for script
+     * to have any permission if does not exist in any document.
+     * 
      * @return the name of the document author or guest.
      */
     String getEffectiveScriptAuthorName()

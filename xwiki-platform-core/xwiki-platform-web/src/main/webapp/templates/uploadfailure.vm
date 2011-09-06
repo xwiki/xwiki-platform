@@ -5,13 +5,15 @@ $response.setStatus(500)##
   #set ($parameter = $xwiki.getSpacePreference('upload_maxsize'))
   #if ("$!{parameter}" == '')
     #set ($parameter = 33554432)
+  #else
+    #set ($parameter = $mathtool.toInteger($parameter))
   #end
   #set ($parameter = "#dynamicsize($parameter)")
 #else
   #set ($parameter = $mathtool.add($failedFiles.size(), $wrongFileNames.size()))
 #end
 #xwikimessageboxstart($msg.get('notice') $msg.get($message, $parameter))
-#if ($wrongFileNames.size() > 0)
+#if ($wrongFileNames && $wrongFileNames.size() > 0)
   <p>$msg.get('core.action.upload.failure.wrongFileNames')</p>
   <ul>
   #foreach ($filename in $wrongFileNames)
@@ -19,7 +21,7 @@ $response.setStatus(500)##
   #end
   </ul>
 #end
-#if ($failedFiles.size() > 0)
+#if ($failedFiles && $failedFiles.size() > 0)
   <p>$msg.get('core.action.upload.failure.failedFiles')</p>
   <ul>
   #foreach ($file in $failedFiles.entrySet())

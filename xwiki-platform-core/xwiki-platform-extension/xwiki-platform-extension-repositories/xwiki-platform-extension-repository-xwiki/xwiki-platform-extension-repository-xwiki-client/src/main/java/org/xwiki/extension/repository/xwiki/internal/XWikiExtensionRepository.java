@@ -39,7 +39,8 @@ import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.SearchException;
 import org.xwiki.extension.repository.Searchable;
-import org.xwiki.extension.repository.xwiki.model.jaxb.Extensions;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
+import org.xwiki.extension.repository.xwiki.model.jaxb.SearchResult;
 
 /**
  * @version $Id$
@@ -106,12 +107,8 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
         try {
-            return new XWikiExtension(
-                this,
-                (org.xwiki.extension.repository.xwiki.model.jaxb.Extension) this.repositoryFactory
-                    .getUnmarshaller()
-                    .unmarshal(
-                        getRESTResourceAsStream(this.extensionUriBuider, extensionId.getId(), extensionId.getVersion())));
+            return new XWikiExtension(this, (ExtensionVersion) this.repositoryFactory.getUnmarshaller().unmarshal(
+                getRESTResourceAsStream(this.extensionUriBuider, extensionId.getId(), extensionId.getVersion())));
         } catch (Exception e) {
             throw new ResolveException("Failed to create extension object for extension [" + extensionId + "]", e);
         }
@@ -139,17 +136,17 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
 
     public List<Extension> search(String pattern, int offset, int nb) throws SearchException
     {
-        Extensions restExtensions;
+        SearchResult restExtensions;
         try {
             restExtensions =
-                (Extensions) this.repositoryFactory.getUnmarshaller().unmarshal(
+                (SearchResult) this.repositoryFactory.getUnmarshaller().unmarshal(
                     getRESTResourceAsStream(this.simplesearchUriBuider, pattern));
         } catch (Exception e) {
             throw new SearchException("Failed to search extensions based on pattern [" + pattern + "]", e);
         }
 
         List<Extension> extensions = new ArrayList<Extension>(restExtensions.getExtensions().size());
-        for (org.xwiki.extension.repository.xwiki.model.jaxb.Extension restExtension : restExtensions.getExtensions()) {
+        for (ExtensionVersion restExtension : restExtensions.getExtensions()) {
             extensions.add(new XWikiExtension(this, restExtension));
         }
 

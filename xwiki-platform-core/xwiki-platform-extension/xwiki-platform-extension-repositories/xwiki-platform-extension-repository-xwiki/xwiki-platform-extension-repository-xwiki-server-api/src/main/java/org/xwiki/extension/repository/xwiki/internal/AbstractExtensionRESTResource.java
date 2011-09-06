@@ -32,6 +32,10 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.repository.xwiki.model.jaxb.Extension;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionSummary;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersionSummary;
+import org.xwiki.extension.repository.xwiki.model.jaxb.Extensions;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ObjectFactory;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -47,10 +51,16 @@ import com.xpn.xwiki.api.Property;
  * Base class for the annotation REST services, to implement common functionality to all annotation REST services.
  * 
  * @version $Id$
- * @since 3.1M2
+ * @since 3.2M3
  */
 public abstract class AbstractExtensionRESTResource extends XWikiResource implements Initializable
 {
+    protected final static String EXTENSION_CLASSNAME = "XWiki.ExtensionClass";
+
+    protected final static String EXTENSIONVERSION_CLASSNAME = "XWiki.ExtensionVersionClass";
+
+    protected final static String EXTENSIONDEPENDENCY_CLASSNAME = "XWiki.ExtensionVersionClass";
+
     /**
      * The execution needed to get the annotation author from the context user.
      */
@@ -58,9 +68,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     protected Execution execution;
 
     /**
-     * <p>
      * The object factory for model objects to be used when creating representations.
-     * </p>
      */
     protected ObjectFactory objectFactory;
 
@@ -72,12 +80,85 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         this.objectFactory = new ObjectFactory();
     }
 
+    protected Query createExtensionsQuery(String from, String where, int offset, int number, boolean versions)
+        throws QueryException
+    {
+        // select
+
+        String select =
+            "extension.id, extension.type, extension.name, extension.lastVersion"
+                + ", extension.description, extension.website, extension.authors, extension.features";
+
+        // TODO: add support for lists: GROUP_CONCAT seems to exist only in MySQL and can't find any HQL or JPQL
+        // solution yet
+        // * authors
+        // * features
+        // * dependencies
+
+        return createExtensionsQuery(select, from, where, offset, number, versions);
+    }
+
+    protected Query createExtensionsSummariesQuery(String from, String where, int offset, int number, boolean versions)
+        throws QueryException
+    {
+        String select = "extension.id, extension.type, extension.name";
+
+        return createExtensionsQuery(select, from, where, offset, number, versions);
+    }
+
+    private Query createExtensionsQuery(String select, String from, String where, int offset, int number,
+        boolean versions) throws QueryException
+    {
+        // select
+
+        StringBuilder queryStr = new StringBuilder("select ");
+        queryStr.append(select);
+
+        if (versions) {
+            queryStr.append(", extensionVersion.version");
+        }
+
+        // from
+
+        queryStr.append(" from Document doc, doc.object(" + EXTENSION_CLASSNAME + ") as extension");
+
+        if (versions) {
+            queryStr.append(", doc.object(" + EXTENSIONVERSION_CLASSNAME + ") as extensionVersion");
+        }
+
+        // where
+
+        if (from != null) {
+            queryStr.append(',');
+            queryStr.append(from);
+        }
+
+        if (where != null) {
+            queryStr.append(" where ");
+            queryStr.append(where);
+        }
+
+        Query query = this.queryManager.createQuery(queryStr.toString(), Query.XWQL);
+
+        if (offset > 0) {
+            query.setOffset(offset);
+        }
+        if (number > 0) {
+            query.setLimit(number);
+        }
+
+        return query;
+    }
+
     protected Document getExtensionDocument(String extensionId) throws XWikiException, QueryException
     {
-        String query = "from doc.object(XWiki.ExtensionClass) as extension where extension.id = :extensionId";
+        Query query =
+            this.queryManager.createQuery("from doc.object(" + EXTENSION_CLASSNAME
+                + ") where extension.id = :extensionId", Query.XWQL);
 
-        List<String> documentNames =
-            this.queryManager.createQuery(query, Query.XWQL).bindValue("extensionId", extensionId).execute();
+        query.bindValue("extensionId", extensionId);
+
+        List<String> documentNames = query.execute();
 
         if (documentNames.isEmpty()) {
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -88,7 +169,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
     protected com.xpn.xwiki.api.Object getExtensionObject(Document extensionDocument)
     {
-        return extensionDocument.getObject("XWiki.ExtensionClass");
+        return extensionDocument.getObject(EXTENSION_CLASSNAME);
     }
 
     protected com.xpn.xwiki.api.Object getExtensionObject(String extensionId, String extensionVersion)
@@ -100,7 +181,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     protected com.xpn.xwiki.api.Object getExtensionVersionObject(Document extensionDocument, String version)
     {
         if (version == null) {
-            Vector<com.xpn.xwiki.api.Object> objects = extensionDocument.getObjects("XWiki.ExtensionVersionClass");
+            Vector<com.xpn.xwiki.api.Object> objects = extensionDocument.getObjects(EXTENSIONVERSION_CLASSNAME);
 
             if (objects.isEmpty()) {
                 return null;
@@ -109,7 +190,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             }
         }
 
-        return extensionDocument.getObject("XWiki.ExtensionVersionClass", "version", version, false);
+        return extensionDocument.getObject(EXTENSIONVERSION_CLASSNAME, "version", version, false);
     }
 
     protected com.xpn.xwiki.api.Object getExtensionVersionObject(String extensionId, String version)
@@ -132,9 +213,17 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        Extension extension = this.objectFactory.createExtension();
+        Extension extension;
+        ExtensionVersion extensionVersion;
+        if (version == null) {
+            extension = this.objectFactory.createExtension();
+            extensionVersion = null;
+        } else {
+            extension = extensionVersion = this.objectFactory.createExtensionVersion();
+            extensionVersion.setVersion((String) getValue(extensionVersionObject, "version"));
+        }
+
         extension.setId((String) getValue(extensionObject, "id"));
-        extension.setVersion((String) getValue(extensionVersionObject, "version"));
         extension.setType((String) getValue(extensionObject, "type"));
 
         extension.getAuthors().addAll((List<String>) getValue(extensionObject, "authors"));
@@ -143,14 +232,82 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setWebsite((String) getValue(extensionObject, "website"));
         extension.getFeatures().addAll((List<String>) getValue(extensionObject, "features"));
 
-        for (com.xpn.xwiki.api.Object dependencyObject : extensionDocument.getObjects("XWiki.ExtensionDependencyClass",
-            "extensionversion", version)) {
-            ExtensionDependency dependency = new ExtensionDependency();
-            dependency.setId((String) getValue(dependencyObject, "id"));
-            dependency.setVersion((String) getValue(dependencyObject, "version"));
+        if (extensionVersion != null) {
+            for (com.xpn.xwiki.api.Object dependencyObject : extensionDocument.getObjects(
+                EXTENSIONDEPENDENCY_CLASSNAME, "extensionversion", version)) {
+                ExtensionDependency dependency = new ExtensionDependency();
+                dependency.setId((String) getValue(dependencyObject, "id"));
+                dependency.setVersion((String) getValue(dependencyObject, "version"));
 
-            extension.getDependencies().add(dependency);
+                extensionVersion.getDependencies().add(dependency);
+            }
         }
+
+        return extension;
+    }
+
+    protected Extensions getExtensionSummaries(Query query) throws QueryException
+    {
+        Extensions extensions = this.objectFactory.createExtensions();
+
+        getExtensionSummaries(extensions.getExtensionSummaries(), query);
+
+        return extensions;
+    }
+
+    protected void getExtensions(List<ExtensionVersion> extensions, Query query) throws QueryException
+    {
+        List<Object[]> entries = query.execute();
+
+        for (Object[] entry : entries) {
+            extensions.add(createExtensionVersionFromQueryResult(entry));
+        }
+    }
+
+    private ExtensionVersion createExtensionVersionFromQueryResult(Object[] entry)
+    {
+        ExtensionVersion extension = this.objectFactory.createExtensionVersion();
+
+        extension.setId((String) entry[0]);
+        extension.setVersion((String) entry[1]);
+        extension.setType((String) entry[2]);
+        extension.setName((String) entry[3]);
+        extension.setDescription((String) entry[4]);
+        extension.setWebsite((String) entry[5]);
+
+        // TODO: add support for
+        // * authors
+        // * features
+        // * dependencies
+
+        return extension;
+    }
+
+    protected <E extends ExtensionSummary> void getExtensionSummaries(List<E> extensions, Query query)
+        throws QueryException
+    {
+        List<Object[]> entries = query.execute();
+
+        for (Object[] entry : entries) {
+            extensions.add((E) createExtensionSummaryFromQueryResult(entry));
+        }
+    }
+
+    private ExtensionSummary createExtensionSummaryFromQueryResult(Object[] entry)
+    {
+        ExtensionSummary extension;
+        ExtensionVersionSummary extensionVersion;
+        if (entry.length == 3) {
+            extension = this.objectFactory.createExtensionSummary();
+            extensionVersion = null;
+        } else {
+            extension = extensionVersion = this.objectFactory.createExtensionVersionSummary();
+            extensionVersion.setVersion((String) entry[3]);
+        }
+
+        extension.setId((String) entry[0]);
+        extension.setType((String) entry[1]);
+        extension.setName((String) entry[2]);
 
         return extension;
     }

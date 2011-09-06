@@ -27,12 +27,12 @@ import org.apache.commons.io.FileUtils;
 import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.repository.xwiki.model.jaxb.Extension;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 
 public class XWikiExtension extends AbstractExtension
 {
-    public XWikiExtension(XWikiExtensionRepository repository, Extension extension)
+    public XWikiExtension(XWikiExtensionRepository repository, ExtensionVersion extension)
     {
         super(repository, new ExtensionId(extension.getId(), extension.getVersion()), extension.getType());
 

@@ -2,50 +2,89 @@ package org.xwiki.extension.repository.xwiki;
 
 /**
  * Resources to use to access Extension Manager REST service.
- * <p>
- * Resources producing list of result support the following arguments:
- * <ul>
- * <li>start: offset where the search start to return results</li>
- * <li>number: maximum number of results</li>
- * </ul>
- * <p>
- * Resources producing extensions descriptor support the following arguments:
- * <ul>
- * <li>language: language used to resolve the descriptor values</li>
- * </ul>
  * 
  * @version $Id$
+ * @since 3.2M3
  */
 public class Resources
 {
     // Entry point
 
+    /**
+     * Entry point of XWiki Repository protocol.
+     */
     public final static String ENTRYPOINT = "/repository";
+
+    // Path parameters
+
+    /**
+     * Name of the parameter indication the id of the extension.
+     */
+    public final static String PPARAM_EXTENSIONID = "extensionId";
+
+    /**
+     * Name of the parameter indication the version of the extension.
+     */
+    public final static String PPARAM_EXTENSIONVERSION = "extensionVersion";
 
     // Extensions
 
     /**
-     * ?start={offset}&number={number}
+     * Get extensions.
      */
     public final static String EXTENSIONS = ENTRYPOINT + "/extensions";
 
-    public final static String EXTENSIONS_ID = EXTENSIONS + "/{extensionId}";
+    /**
+     * Get extension informations.
+     */
+    public final static String EXTENSION = EXTENSIONS + "/{" + PPARAM_EXTENSIONID + "}";
 
-    public final static String EXTENSIONSVERSIONS = EXTENSIONS_ID + "/versions";
+    /**
+     * Get extension versions
+     */
+    public final static String EXTENSION_VERSIONS = EXTENSION + "/versions";
 
-    public final static String EXTENSIONSVERSIONS_VERSION = EXTENSIONSVERSIONS + "/{extensionVersion}";
+    /**
+     * Get extension version informations
+     */
+    public final static String EXTENSION_VERSION = EXTENSION_VERSIONS + "/{" + PPARAM_EXTENSIONVERSION + "}";
 
-    public final static String EXTENSIONFILE = EXTENSIONSVERSIONS + "/file";
+    /**
+     * Download extension file.
+     */
+    public final static String EXTENSION_VERSION_FILE = EXTENSION_VERSIONS + "/file";
 
     // Search
 
     /**
-     * ?q={keywords}
+     * Execute search query among extensions.
      */
     public final static String SEARCH = ENTRYPOINT + "/search";
 
     /**
-     * ?q={keywords}
+     * Execute search query among versions of an extension.
      */
-    public final static String SEARCH_FROM_ID = EXTENSIONS_ID + "/search";
+    public final static String SEARCH_FROM_ID = EXTENSION + "/search";
+
+    // Query parameters
+
+    /**
+     * Language of the result to produce.
+     */
+    public final static String QPARAM_LANGUAGE = "language";
+
+    /**
+     * The search query.
+     */
+    public final static String QPARAM_SEARCH_QUERY = "q";
+
+    /**
+     * Offset from where the search start to return results.
+     */
+    public final static String QPARAM_SEARCH_START = "start";
+
+    /**
+     * Maximum number of results.
+     */
+    public final static String QPARAM_SEARCH_NUMBER = "number";
 }

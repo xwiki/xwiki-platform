@@ -121,6 +121,7 @@ public interface XWikiRightService
      * 
      * @param context the xwiki context of this request
      * @return {@code true} if the current user in the context has the {@code admin} right, {@code false} otherwise
+     * @since 3.2M3
      */
     public boolean hasWikiAdminRights(XWikiContext context);
 

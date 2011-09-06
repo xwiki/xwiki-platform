@@ -94,6 +94,7 @@ public class Api
      * that might also be available.
      * 
      * @return <code>true</code> if the current user has the <code>admin</code> right or <code>false</code> otherwise.
+     * @since 3.2M3
      */
     public boolean hasWikiAdminRights()
     {

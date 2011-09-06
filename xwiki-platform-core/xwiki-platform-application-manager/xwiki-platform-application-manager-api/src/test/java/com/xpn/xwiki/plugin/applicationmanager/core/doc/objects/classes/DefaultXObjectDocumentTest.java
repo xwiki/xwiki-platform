@@ -120,35 +120,47 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
         this.xwiki.setRightService(new XWikiRightService()
         {
+            @Override
             public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
             {
                 return true;
             }
 
+            @Override
             public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)
                 throws XWikiException
             {
                 return true;
             }
 
+            @Override
             public boolean hasAdminRights(XWikiContext context)
             {
                 return true;
             }
 
+            @Override
             public boolean hasProgrammingRights(XWikiContext context)
             {
                 return true;
             }
 
+            @Override
             public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
             {
                 return true;
             }
 
+            @Override
             public List listAllLevels(XWikiContext context) throws XWikiException
             {
                 return Collections.EMPTY_LIST;
+            }
+
+            @Override
+            public boolean hasWikiAdminRights(XWikiContext context)
+            {
+                return true;
             }
         });
     }

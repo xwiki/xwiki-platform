@@ -481,7 +481,14 @@ var XWiki = (function(XWiki){
           sourceContainer.insert( sourceHeader );
           var classes = "sourceContent " + (this.options.unifiedLoader ? "" : "loading");
           sourceContainer.insert( new Element('div', {'class':classes}));
+
+          if (typeof source.before !== 'undefined') {
+            this.resultContainer.insert(source.before);
+          }
           this.resultContainer.insert(sourceContainer);
+          if (typeof source.after !== 'undefined') {
+            this.resultContainer.insert(source.after);
+          }
         }
       }
     } else {

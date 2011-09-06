@@ -52,6 +52,6 @@ public class ExtensionVersionRESTResource extends AbstractExtensionRESTResource
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        return (ExtensionVersion) createExtension(extensionDocument, extensionVersion);
+        return createExtension(extensionDocument, extensionVersion);
     }
 }

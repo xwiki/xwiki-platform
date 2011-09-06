@@ -47,7 +47,7 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         String where =
             "extension.id like :pattern or extension.name like :pattern or extension.description like :pattern";
 
-        Query query = createExtensionsQuery(null, where, offset, number, false);
+        Query query = createExtensionsQuery(null, where, offset, number);
 
         query.bindValue("pattern", '%' + pattern + '%');
 

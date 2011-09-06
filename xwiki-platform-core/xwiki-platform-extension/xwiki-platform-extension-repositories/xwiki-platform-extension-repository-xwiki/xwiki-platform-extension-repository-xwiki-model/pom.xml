@@ -38,7 +38,7 @@
       <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb2-plugin</artifactId>
-        <version>0.7.5</version>
+        <version>0.8.0</version>
         <configuration>
           <extension>true</extension>
           <args>

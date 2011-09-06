@@ -152,19 +152,6 @@ public abstract class XWikiAction extends Action
                 return null;
             }
 
-            // Start monitoring timer
-            monitor = (MonitorPlugin) xwiki.getPlugin("monitor", context);
-            if (monitor != null) {
-                monitor.startRequest("", context.getAction(), context.getURL());
-                monitor.startTimer("multipart");
-            }
-
-            // Parses multipart so that params in multipart are available for all actions
-            fileupload = Utils.handleMultipart(context.getRequest().getHttpServletRequest(), context);
-            if (monitor != null) {
-                monitor.endTimer("multipart");
-            }
-
             XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
             context.setURLFactory(urlf);
 
@@ -188,6 +175,19 @@ public abstract class XWikiAction extends Action
                 // Prepare documents and put them in the context
                 if (!xwiki.prepareDocuments(context.getRequest(), context, vcontext)) {
                     return null;
+                }
+
+                // Start monitoring timer
+                monitor = (MonitorPlugin) xwiki.getPlugin("monitor", context);
+                if (monitor != null) {
+                    monitor.startRequest("", context.getAction(), context.getURL());
+                    monitor.startTimer("multipart");
+                }
+
+                // Parses multipart so that params in multipart are available for all actions
+                fileupload = Utils.handleMultipart(context.getRequest().getHttpServletRequest(), context);
+                if (monitor != null) {
+                    monitor.endTimer("multipart");
                 }
 
                 if (monitor != null) {

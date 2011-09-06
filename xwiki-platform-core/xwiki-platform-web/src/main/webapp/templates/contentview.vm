@@ -4,7 +4,7 @@
 ## -------------------------------
 ## Compute the content to display 
 ## -------------------------------
-#set($inlineSheetReferences = $services.sheet.getInlineSheets($cdoc.documentReference, $context.action))
+#set($inlineSheetReferences = $services.sheet.getInlineSheets($tdoc, $context.action))
 #set($renderedContent = "#applySheets($inlineSheetReferences)")
 ## ----------------------------------------------------------------------------
 ## Compute title to display and modify rendered content accordingly.

@@ -21,6 +21,7 @@ package org.xwiki.sheet;
 
 import java.util.List;
 
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -49,12 +50,15 @@ public interface SheetManager
     }
 
     /**
-     * @param documentReference a reference to the document that is being rendered
+     * Note: We can't use a document reference because the document might have unsaved objects. The create forms usually
+     * render an unsaved document that has some objects attached.
+     * 
+     * @param document the document that is being rendered
      * @param action the action taken on the rendered document ('view', 'edit' etc.)
      * @param display where the sheet output will be placed
      * @return the list of sheets that match the specified document, action and display
      */
-    List<DocumentReference> getSheets(DocumentReference documentReference, String action, SheetDisplay display);
+    List<DocumentReference> getSheets(DocumentModelBridge document, String action, SheetDisplay display);
 
     /**
      * @param classReference a reference to a XWiki class

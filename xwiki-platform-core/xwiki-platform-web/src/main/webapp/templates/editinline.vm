@@ -11,7 +11,7 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 <div id="mainContentArea">
 ## $pageSheetReference might have been initialized in edit.vm
 #if (!$pageSheetReference)
-  #set($pageSheetReference = $services.sheet.getPageSheet($doc.documentReference, $context.action))
+  #set($pageSheetReference = $services.sheet.getPageSheet($tdoc, $context.action))
 #end
 #if($pageSheetReference)
   ## Page sheet rendering.
@@ -24,7 +24,7 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 ## Compute title to display and modify rendered content accordingly.
 ## ----------------------------------------------------------------------------
 #if (!$inlineSheetReferences)
-  #set($inlineSheetReferences = $services.sheet.getInlineSheets($cdoc.documentReference, $context.action))
+  #set($inlineSheetReferences = $services.sheet.getInlineSheets($tdoc, $context.action))
 #end
 #set ($renderedContent = "#applySheets($inlineSheetReferences)")
 #template("titlevars.vm")

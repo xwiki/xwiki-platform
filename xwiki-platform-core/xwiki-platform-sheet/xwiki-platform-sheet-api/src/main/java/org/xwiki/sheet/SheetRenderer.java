@@ -19,8 +19,8 @@
  */
 package org.xwiki.sheet;
 
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
@@ -37,10 +37,10 @@ public interface SheetRenderer
      * without them, otherwise, if the sheet has programming rights, it is evaluated with programming rights even if the
      * target document doesn't have them.
      * 
-     * @param documentReference the target document, i.e. the document the sheet is applied to
-     * @param sheetReference the sheet to render
+     * @param document the target document, i.e. the document the sheet is applied to
+     * @param sheet the sheet to render
      * @param outputSyntax the output syntax
      * @return the result of rendering the specified sheet in the context of the target document
      */
-    String render(DocumentReference documentReference, DocumentReference sheetReference, Syntax outputSyntax);
+    String render(DocumentModelBridge document, DocumentModelBridge sheet, Syntax outputSyntax);
 }

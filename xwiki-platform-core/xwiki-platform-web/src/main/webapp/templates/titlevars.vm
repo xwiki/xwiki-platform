@@ -22,11 +22,12 @@
 #if ($inlineSheetReferences)
   ## Inline sheets can control the displayed title. Look for the first sheet that specifies a title.
   #foreach($sheetReference in $inlineSheetReferences)
-    #if ($xwiki.getDocument($sheetReference).translatedDocument.title.length() > 0)
+    #set($sheet = $xwiki.getDocument($sheetReference).translatedDocument)
+    #if ($sheet.title.length() > 0)
       #set($titleIsSpecified = true)
       ## Honor the syntax if it's passed in the request.
       #set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
-      #set($titleToDisplay = $services.sheet.renderTitle($doc.documentReference, $sheetReference, $outputSyntax))
+      #set($titleToDisplay = $services.sheet.renderTitle($tdoc, $sheet, $outputSyntax))
       #break
     #end
   #end

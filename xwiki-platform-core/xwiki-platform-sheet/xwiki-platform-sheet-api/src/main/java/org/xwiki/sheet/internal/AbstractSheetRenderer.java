@@ -21,6 +21,7 @@ package org.xwiki.sheet.internal;
 
 import javax.inject.Inject;
 
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
@@ -55,25 +56,23 @@ public abstract class AbstractSheetRenderer implements SheetRenderer
     }
 
     @Override
-    public String render(DocumentReference documentReference, DocumentReference sheetReference, Syntax outputSyntax)
+    public String render(DocumentModelBridge document, DocumentModelBridge sheet, Syntax outputSyntax)
     {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
         XWikiRightService rightsService = xwiki.getRightService();
         try {
-            XWikiDocument targetDocument = xwiki.getDocument(documentReference, context);
-            XWikiDocument translatedTargetDocument = targetDocument.getTranslatedDocument(context);
-            XWikiDocument sheetDocument = xwiki.getDocument(sheetReference, context);
-            XWikiDocument translatedSheetDocument = sheetDocument.getTranslatedDocument(context);
+            XWikiDocument targetDocument = getDocument(document);
+            XWikiDocument sheetDocument = getDocument(sheet);
             boolean sheetDocumentHasPR = rightsService.hasProgrammingRights(sheetDocument, context);
             boolean targetDocumentHasPR = rightsService.hasProgrammingRights(targetDocument, context);
             if (sheetDocumentHasPR ^ targetDocumentHasPR) {
                 // FIXME: If the target document and the sheet don't have the same programming level then we preserve
                 // the programming level of the sheet by rendering it as if the author of the target document is the
                 // author of the sheet.
-                return renderAsSheetAuthor(translatedTargetDocument, translatedSheetDocument, outputSyntax);
+                return renderAsSheetAuthor(targetDocument, sheetDocument, outputSyntax);
             } else {
-                return render(translatedTargetDocument, translatedSheetDocument, outputSyntax);
+                return render(targetDocument, sheetDocument, outputSyntax);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -100,6 +99,16 @@ public abstract class AbstractSheetRenderer implements SheetRenderer
             // Restore the content author of the target document.
             targetDocument.setContentAuthorReference(targetDocContentAuthorRef);
         }
+    }
+
+    /**
+     * @param document a {@link DocumentModelBridge} instance
+     * @return the XWiki document object wrapped by the given {@link DocumentModelBridge} instance
+     * @deprecated avoid using this method as much as possible; use the bridge methods instead
+     */
+    private XWikiDocument getDocument(DocumentModelBridge document)
+    {
+        return (XWikiDocument) document;
     }
 
     /**

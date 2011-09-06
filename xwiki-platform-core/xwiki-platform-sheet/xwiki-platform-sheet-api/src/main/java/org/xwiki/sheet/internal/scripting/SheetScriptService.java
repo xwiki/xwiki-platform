@@ -19,6 +19,7 @@
  */
 package org.xwiki.sheet.internal.scripting;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
@@ -35,14 +37,16 @@ import org.xwiki.sheet.SheetManager;
 import org.xwiki.sheet.SheetManager.SheetDisplay;
 import org.xwiki.sheet.SheetRenderer;
 
+import com.xpn.xwiki.api.Document;
+
 /**
- * Exposes {@link SheetManager} to Velocity scripts.
+ * Exposes {@link SheetManager} and {@link SheetRenderer} to Velocity scripts.
  * 
  * @version $Id$
  */
 @Component
 @Named("sheet")
-public class SheetManagerScriptService implements ScriptService
+public class SheetScriptService implements ScriptService
 {
     /**
      * The component used to manage the sheets.
@@ -71,31 +75,31 @@ public class SheetManagerScriptService implements ScriptService
     private DocumentAccessBridge documentAccessBridge;
 
     /**
-     * @param documentReference a reference to the document that is being rendered
+     * @param document the document that is being rendered
      * @param action the action taken on the rendered document ('view', 'edit' etc.)
      * @return the list of {@code page} sheets available for the specified document on the specified action; a page
      *         sheet controls most of the generated HTML page; only one page sheet can be applied to a document
      */
-    public DocumentReference getPageSheet(DocumentReference documentReference, String action)
+    public DocumentReference getPageSheet(Document document, String action)
     {
-        if (documentAccessBridge.isDocumentViewable(documentReference)) {
+        if (documentAccessBridge.isDocumentViewable(document.getDocumentReference())) {
             List<DocumentReference> pageSheets =
-                filterViewable(sheetManager.getSheets(documentReference, action, SheetDisplay.PAGE));
+                filterViewable(sheetManager.getSheets(getDocument(document), action, SheetDisplay.PAGE));
             return pageSheets.isEmpty() ? null : pageSheets.get(0);
         }
         return null;
     }
 
     /**
-     * @param documentReference a reference to the document that is being rendered
+     * @param document the document that is being rendered
      * @param action the action taken on the rendered document ('view', 'edit' etc.)
      * @return the list of {@code inline} sheets available for the specified document on the specified action; multiple
      *         in-line sheets can be aggregated and displayed in the content area of the generated HTML page
      */
-    public List<DocumentReference> getInlineSheets(DocumentReference documentReference, String action)
+    public List<DocumentReference> getInlineSheets(Document document, String action)
     {
-        if (documentAccessBridge.isDocumentViewable(documentReference)) {
-            return filterViewable(sheetManager.getSheets(documentReference, action, SheetDisplay.INLINE));
+        if (documentAccessBridge.isDocumentViewable(document.getDocumentReference())) {
+            return filterViewable(sheetManager.getSheets(getDocument(document), action, SheetDisplay.INLINE));
         } else {
             return Collections.emptyList();
         }
@@ -139,17 +143,16 @@ public class SheetManagerScriptService implements ScriptService
      * otherwise, if the sheet has programming rights, the content is evaluated with programming rights even if the
      * target document doesn't have them.
      * 
-     * @param documentReference the target document, i.e. the document the sheet is applied to
-     * @param sheetReference the sheet whose content is rendered
+     * @param document the target document, i.e. the document the sheet is applied to
+     * @param sheet the sheet whose content is rendered
      * @param outputSyntax the output syntax
      * @return the result of rendering the content of the specified sheet in the context of the target document
      */
-    public String renderContent(DocumentReference documentReference, DocumentReference sheetReference,
-        Syntax outputSyntax)
+    public String renderContent(Document document, Document sheet, Syntax outputSyntax)
     {
-        if (documentAccessBridge.isDocumentViewable(documentReference)
-            && documentAccessBridge.isDocumentViewable(sheetReference)) {
-            return contentSheetRenderer.render(documentReference, sheetReference, outputSyntax);
+        if (documentAccessBridge.isDocumentViewable(document.getDocumentReference())
+            && documentAccessBridge.isDocumentViewable(sheet.getDocumentReference())) {
+            return contentSheetRenderer.render(getDocument(document), getDocument(sheet), outputSyntax);
         }
         return null;
     }
@@ -161,18 +164,37 @@ public class SheetManagerScriptService implements ScriptService
      * if the sheet has programming rights, the title is evaluated with programming rights even if the target document
      * doesn't have them.
      * 
-     * @param documentReference the target document, i.e. the document the sheet is applied to
-     * @param sheetReference the sheet whose title is rendered
+     * @param document the target document, i.e. the document the sheet is applied to
+     * @param sheet the sheet whose title is rendered
      * @param outputSyntax the output syntax
      * @return the result of rendering the title of the specified sheet in the context of the target document
      */
-    public String renderTitle(DocumentReference documentReference, DocumentReference sheetReference,
-        Syntax outputSyntax)
+    public String renderTitle(Document document, Document sheet, Syntax outputSyntax)
     {
-        if (documentAccessBridge.isDocumentViewable(documentReference)
-            && documentAccessBridge.isDocumentViewable(sheetReference)) {
-            return titleSheetRenderer.render(documentReference, sheetReference, outputSyntax);
+        if (documentAccessBridge.isDocumentViewable(document.getDocumentReference())
+            && documentAccessBridge.isDocumentViewable(sheet.getDocumentReference())) {
+            return titleSheetRenderer.render(getDocument(document), getDocument(sheet), outputSyntax);
         }
         return null;
+    }
+
+    /**
+     * Note: This method accesses the low level XWiki document through reflection in order to bypass programming rights.
+     * 
+     * @param document an instance of {@link Document} received from a script
+     * @return an instance of {@link DocumentModelBridge} that wraps the low level document object exposed by the given
+     *         document API
+     */
+    private DocumentModelBridge getDocument(Document document)
+    {
+        try {
+            // HACK: We try to access the XWikiDocument instance wrapped by the document API using reflection because we
+            // want to bypass the programming rights requirements.
+            Field docField = Document.class.getDeclaredField("doc");
+            docField.setAccessible(true);
+            return (DocumentModelBridge) docField.get(document);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to access the XWikiDocument instance wrapped by the document API.", e);
+        }
     }
 }

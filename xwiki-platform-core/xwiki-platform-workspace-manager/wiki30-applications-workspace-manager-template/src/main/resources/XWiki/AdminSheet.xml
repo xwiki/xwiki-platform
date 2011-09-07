@@ -3103,7 +3103,7 @@ document.observe('xwiki:dom:loaded', function() {
 <use>onDemand</use>
 </property>
 </object>
-<content>{{include document="XWiki.ConfigurableClassMacros"/}}
+<content>{{include document="XWiki.ConfigurableClassMacros" /}}
 
 {{velocity output="false"}}
 #if ($request.xaction == 'switchContext')
@@ -3230,6 +3230,8 @@ document.observe('xwiki:dom:loaded', function() {
         #set ($section.name = $sectionDoc.getDisplayTitle())
         #if ($sectionDoc.getAttachment('icon.png'))
           #set ($section.iconReference = "${sectionDoc}@icon.png")
+        #else
+          #set ($section.iconReference = 'XWiki.ConfigurableClass@DefaultAdminSectionIcon.png')
         #end
       #else
         #set ($sectionDoc = $xwiki.getDocument('XWiki.AdminSheet'))

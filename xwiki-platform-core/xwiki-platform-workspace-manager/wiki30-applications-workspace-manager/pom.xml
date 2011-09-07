@@ -68,7 +68,7 @@
         <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
         <executions>
           <execution>
-            <phase>generate-resources</phase>
+            <phase>process-resources</phase>
             <id>attach-template-xar</id>
             <goals>
               <goal>attach</goal>

@@ -29,8 +29,8 @@
     <artifactId>xwiki-platform-extension-repository-xwiki</artifactId>
     <version>3.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-extension-repository-xwiki-client</artifactId>
-  <name>XWiki Platform - Extension - Repository - XWiki client</name>
+  <artifactId>xwiki-platform-extension-repository-xwiki-handler</artifactId>
+  <name>XWiki Platform - Extension - Repository - XWiki handler</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Extension - Repository - XWiki client</description>
   <dependencies>

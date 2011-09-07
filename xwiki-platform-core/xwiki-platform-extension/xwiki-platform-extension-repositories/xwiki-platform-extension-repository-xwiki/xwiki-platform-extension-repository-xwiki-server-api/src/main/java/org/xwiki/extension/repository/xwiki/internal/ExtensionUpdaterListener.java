@@ -54,15 +54,17 @@ public class ExtensionUpdaterListener implements EventListener
     /**
      * The reference to match class extension version class on whatever wiki.
      */
-    private static final RegexEntityReference EXTENSIONVERSIONCLASS_REFERENCE = new RegexEntityReference(
-        Pattern.compile(".*:" + XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME + "\\[\\d*\\]"), EntityType.OBJECT);
+    private static final RegexEntityReference EXTENSIONVERSION_REFERENCE =
+        new RegexEntityReference(Pattern.compile(XWikiRepositoryModel.PROP_VERSION_VERSION),
+            EntityType.OBJECT_PROPERTY, new RegexEntityReference(Pattern.compile(".*:"
+                + XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME + "\\[\\d*\\]"), EntityType.OBJECT));
 
     /**
      * Listened events.
      */
     private static final List<Event> EVENTS = Arrays.<Event> asList(new XObjectPropertyAddedEvent(
-        EXTENSIONVERSIONCLASS_REFERENCE), new XObjectPropertyUpdatedEvent(EXTENSIONVERSIONCLASS_REFERENCE),
-        new XObjectPropertyDeletedEvent(EXTENSIONVERSIONCLASS_REFERENCE));
+        EXTENSIONVERSION_REFERENCE), new XObjectPropertyUpdatedEvent(EXTENSIONVERSION_REFERENCE),
+        new XObjectPropertyDeletedEvent(EXTENSIONVERSION_REFERENCE));
 
     /**
      * Used to find last version.
@@ -110,9 +112,13 @@ public class ExtensionUpdaterListener implements EventListener
 
         if (!StringUtils.equals(lastVersion,
             extensionObject.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION))) {
-            extensionObject.setStringValue(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, lastVersion);
-
             try {
+                // FIXME: We can't save directly the provided document coming from the event
+                document = context.getWiki().getDocument(document, context);
+                extensionObject = document.getXObject(extensionObject.getReference());
+
+                extensionObject.setStringValue(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, lastVersion);
+
                 context.getWiki().saveDocument(document, "Update extension last version", context);
             } catch (XWikiException e) {
                 this.logger.error("Failed to update extension last version", e);

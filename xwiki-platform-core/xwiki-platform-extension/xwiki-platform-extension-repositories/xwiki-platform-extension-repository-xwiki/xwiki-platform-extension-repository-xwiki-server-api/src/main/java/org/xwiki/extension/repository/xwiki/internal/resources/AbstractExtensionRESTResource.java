@@ -37,6 +37,7 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionSummary;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersionSummary;
 import org.xwiki.extension.repository.xwiki.model.jaxb.Extensions;
+import org.xwiki.extension.repository.xwiki.model.jaxb.License;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ObjectFactory;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -229,8 +230,11 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setId((String) getValue(extensionObject, "id"));
         extension.setType((String) getValue(extensionObject, "type"));
 
+        License license = this.objectFactory.createLicense();
+        license.setName((String) getValue(extensionObject, "licenseName"));
+        extension.setLicense(license);
+
         extension.setDescription((String) getValue(extensionObject, "description"));
-        extension.setLicenseName((String) getValue(extensionObject, "licenseName"));
         extension.setName((String) getValue(extensionObject, "name"));
         extension.setWebsite((String) getValue(extensionObject, "website"));
 

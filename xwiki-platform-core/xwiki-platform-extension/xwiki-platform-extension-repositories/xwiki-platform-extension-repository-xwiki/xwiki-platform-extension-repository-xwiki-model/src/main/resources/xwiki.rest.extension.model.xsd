@@ -136,9 +136,9 @@
       <extension base="xwiki:ExtensionSummary">
         <sequence>
           <element name="description" type="string" minOccurs="0"></element>
-                    <element name="licenseName" type="string" minOccurs="0"></element>
+                    <element name="license" type="xwiki:License" minOccurs="0"></element>
                     <element name="website" type="string" minOccurs="0"></element>
-                    <element name="authors" type="string" minOccurs="0"
+          <element name="authors" type="string" minOccurs="0"
             maxOccurs="unbounded">
           </element>
           <element name="features" type="string" minOccurs="0"
@@ -147,5 +147,12 @@
         </sequence>
       </extension>
     </complexContent>
+  </complexType>
+
+  <complexType name="License">
+    <sequence>
+      <element name="name" type="string"></element>
+      <element name="content" type="string" minOccurs="0"></element>
+    </sequence>
   </complexType>
 </schema>

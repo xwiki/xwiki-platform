@@ -52,6 +52,9 @@ import org.xwiki.extension.ExtensionLicenseManager;
 @Singleton
 public class DefaultExtensionLicenseManager implements ExtensionLicenseManager, Initializable
 {
+    /**
+     * The logger to log.
+     */
     @Inject
     private Logger logger;
 

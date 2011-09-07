@@ -22,5 +22,5 @@ public interface XWikiRepositoryModel
 
     public final static String PROP_VERSION_VERSION = "version";
 
-    public final static String PROP_EXTENSION_LASTVERSION = "version";
+    public final static String PROP_EXTENSION_LASTVERSION = "lastVersion";
 }

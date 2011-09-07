@@ -57,8 +57,8 @@ public abstract class AbstractJob implements Job
         // Init execution context
         Execution execution;
         try {
-            ExecutionContextManager ecim = (ExecutionContextManager) Utils.getComponent(ExecutionContextManager.class);
-            execution = (Execution) Utils.getComponent(Execution.class);
+            ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
+            execution = Utils.getComponent(Execution.class);
 
             ExecutionContext ec = new ExecutionContext();
             // Bridge with old XWiki Context, required for old code.

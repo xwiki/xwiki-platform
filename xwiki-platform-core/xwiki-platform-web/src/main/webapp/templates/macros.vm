@@ -1736,8 +1736,14 @@ function (row, i, table) {
       #paginationResultsRange($parameters)
     #end
     #if($parameters.totalItems > 0)
-      #paginationControl($parameters)
-      #paginationPages($parameters)
+      #if($parameters.controlsAround == true)
+        #paginationControlLeft($parameters)
+        #paginationPages($parameters)
+        #paginationControlRight($parameters)
+      #else
+        #paginationControl($parameters)
+        #paginationPages($parameters)
+      #end
     #end
   </div>
 #end
@@ -1814,6 +1820,19 @@ function (row, i, table) {
  *#
 #macro(paginationControl $parameters)
   <span class="controlPagination">
+  #paginationControlLeft($parameters)
+  #paginationControlRight($parameters)
+  </span>
+#end
+#**
+ * Pagination : display prev link
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationControlLeft $parameters)
   #if($parameters.crtPage > 0)
     #set($prevPage = $parameters.crtPage - 1)
     #set($firstItem = $prevPage * $parameters.itemsPerPage)
@@ -1821,6 +1840,16 @@ function (row, i, table) {
   #else
     <span class="noPrevPagination"> </span>
   #end
+#end
+#**
+ * Pagination : display next link
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationControlRight $parameters)
   #if($parameters.crtPage < $parameters.lastPage)
     #set($nextPage = $parameters.crtPage + 1)
     #set($firstItem = $nextPage * $parameters.itemsPerPage)
@@ -1828,7 +1857,6 @@ function (row, i, table) {
   #else
     <span class="noNextPagination"> </span>
   #end
-  </span>
 #end
 #**
  * Pagination : message informing the user which items are being displayed on the current page (Results i - j of N)

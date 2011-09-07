@@ -392,6 +392,9 @@ var XWiki = (function(XWiki){
       if (this.options.align == 'left') {
         // Align the box on the left
         div.style.left = pos.left + "px";
+      } else if (this.options.align == "center") {
+        // Align the box to the center
+        div.style.left = pos.left + (this.fld.getWidth() - containerWidth - 2) / 2 + "px";
       } else {
         // Align the box on the right.
         // This has a visible effect only when the container width is not the same as the input width
@@ -478,7 +481,14 @@ var XWiki = (function(XWiki){
           sourceContainer.insert( sourceHeader );
           var classes = "sourceContent " + (this.options.unifiedLoader ? "" : "loading");
           sourceContainer.insert( new Element('div', {'class':classes}));
+
+          if (typeof source.before !== 'undefined') {
+            this.resultContainer.insert(source.before);
+          }
           this.resultContainer.insert(sourceContainer);
+          if (typeof source.after !== 'undefined') {
+            this.resultContainer.insert(source.after);
+          }
         }
       }
     } else {

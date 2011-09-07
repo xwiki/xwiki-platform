@@ -1,3 +1,4 @@
+org.xwiki.extension.internal.DefaultExtensionLicenseManager
 org.xwiki.extension.internal.DefaultExtensionManager
 org.xwiki.extension.internal.DefaultExtensionManagerConfiguration
 org.xwiki.extension.internal.DefaultVersionManager

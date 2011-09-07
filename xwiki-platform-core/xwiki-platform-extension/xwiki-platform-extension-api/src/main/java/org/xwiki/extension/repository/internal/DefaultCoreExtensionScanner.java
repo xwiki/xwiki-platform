@@ -150,9 +150,8 @@ public class DefaultCoreExtensionScanner
                 }
 
                 DefaultCoreExtension coreExtension =
-                    new DefaultCoreExtension(repository, descriptorUrl,
-                        new ExtensionId(groupId + ':' + mavenModel.getArtifactId(), version),
-                        packagingToType(mavenModel.getPackaging()));
+                    new DefaultCoreExtension(repository, descriptorUrl, new ExtensionId(groupId + ':'
+                        + mavenModel.getArtifactId(), version), packagingToType(mavenModel.getPackaging()));
 
                 extensions.put(coreExtension.getId().getId(), coreExtension);
                 coreArtefactIds.add(new Object[] {mavenModel.getArtifactId(), coreExtension});
@@ -187,25 +186,30 @@ public class DefaultCoreExtensionScanner
             Set<URL> urls = ClasspathHelper.forClassLoader();
 
             for (URL url : urls) {
-                String filename = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
+                try {
+                    String path = url.toURI().getPath();
+                    String filename = path.substring(path.lastIndexOf('/') + 1);
 
-                int extIndex = filename.lastIndexOf('.');
-                if (extIndex != -1) {
-                    filename = filename.substring(0, extIndex);
-                }
+                    int extIndex = filename.lastIndexOf('.');
+                    if (extIndex != -1) {
+                        filename = filename.substring(0, extIndex);
+                    }
 
-                int index;
-                if (!filename.endsWith(SNAPSHOTSUFFIX)) {
-                    index = filename.lastIndexOf('-');
-                } else {
-                    index = filename.lastIndexOf('-', filename.length() - SNAPSHOTSUFFIX.length());
-                }
+                    int index;
+                    if (!filename.endsWith(SNAPSHOTSUFFIX)) {
+                        index = filename.lastIndexOf('-');
+                    } else {
+                        index = filename.lastIndexOf('-', filename.length() - SNAPSHOTSUFFIX.length());
+                    }
 
-                if (index != -1) {
-                    String artefactname = filename.substring(0, index);
-                    String version = filename.substring(index + 1);
+                    if (index != -1) {
+                        String artefactname = filename.substring(0, index);
+                        String version = filename.substring(index + 1);
 
-                    artefacts.put(artefactname, new Object[] {version, url});
+                        artefacts.put(artefactname, new Object[] {version, url});
+                    }
+                } catch (Exception e) {
+                    LOGGER.warn("Failed to parse resource name [" + url + "]", e);
                 }
             }
 

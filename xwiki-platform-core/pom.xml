@@ -81,7 +81,7 @@
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-all</artifactId>
-        <version>1.8.1</version>
+        <version>1.8.2</version>
       </dependency>
       <!-- Jython engine -->
       <dependency>
@@ -361,6 +361,7 @@
                 <exclude>com/xpn/xwiki/plugin/activitystream/api/ActivityEvent</exclude>
                 <exclude>com/xpn/xwiki/plugin/activitystream/plugin/ActivityEvent</exclude>
                 <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
+                <exclude>com/xpn/xwiki/user/api/XWikiRightService</exclude>
               </excludes>
             </configuration>
           </plugin>

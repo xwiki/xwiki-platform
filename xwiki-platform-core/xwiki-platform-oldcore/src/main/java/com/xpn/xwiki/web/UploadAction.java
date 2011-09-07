@@ -20,9 +20,7 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,8 +30,10 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -75,6 +75,7 @@ public class UploadAction extends XWikiAction
                 XWikiException exp = (XWikiException) exception;
                 if (exp.getCode() == XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE) {
                     response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+                    ((VelocityContext) context.get("vcontext")).put("message", "core.action.upload.failure.maxSize");
                     context.put("message", "fileuploadislarge");
                     return true;
                 }
@@ -92,7 +93,7 @@ public class UploadAction extends XWikiAction
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
         Map<String, String> fileNames = new HashMap<String, String>();
         List<String> wrongFileNames = new ArrayList<String>();
-        List<String> failedFiles = new ArrayList<String>();
+        Map<String, String> failedFiles = new HashMap<String, String>();
         for (String fieldName : fileupload.getFileItemNames(context)) {
             try {
                 if (fieldName.startsWith(FILE_FIELD_NAME)) {
@@ -111,7 +112,7 @@ public class UploadAction extends XWikiAction
                 uploadAttachment(file.getValue(), file.getKey(), fileupload, doc, context);
             } catch (Exception ex) {
                 LOG.warn("Saving uploaded file failed", ex);
-                failedFiles.add(file.getKey());
+                failedFiles.put(file.getKey(), ExceptionUtils.getRootCauseMessage(ex));
             }
         }
 
@@ -127,6 +128,12 @@ public class UploadAction extends XWikiAction
             return false;
         }
         // Forward to the attachment page
+        if (failedFiles.size() > 0 || wrongFileNames.size() > 0) {
+            ((VelocityContext) context.get("vcontext")).put("message", "core.action.upload.failure");
+            ((VelocityContext) context.get("vcontext")).put("failedFiles", failedFiles);
+            ((VelocityContext) context.get("vcontext")).put("wrongFileNames", wrongFileNames);
+            return true;
+        }
         String redirect = fileupload.getFileItemAsString("xredirect", context);
         if (StringUtils.isEmpty(redirect)) {
             redirect = context.getDoc().getURL("attach", true, context);
@@ -276,6 +283,7 @@ public class UploadAction extends XWikiAction
             }
             return null;
         }
-        return "exception";
+        ((VelocityContext) context.get("vcontext")).put("viewer", "uploadfailure");
+        return "view";
     }
 }

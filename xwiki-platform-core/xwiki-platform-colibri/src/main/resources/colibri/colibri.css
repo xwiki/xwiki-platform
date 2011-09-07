@@ -706,16 +706,18 @@ div.buttonwrapper {
 
 .diff {
   overflow: auto;
-  white-space: normal;
+  white-space: pre-wrap;
 }
 
 .diffaddword {
   color: $theme.notificationSuccessColor;
+  background-color: rgba(0, 255, 0, 0.15);
 }
 
 .diffremoveword {
   color: $theme.notificationErrorColor;
   text-decoration: line-through;
+  background-color: rgba(255, 0, 0, 0.15);
 }
 
 /* --------------Information--------------*/

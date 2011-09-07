@@ -198,9 +198,9 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     public void loadFileList(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
-        loadFileList(xwiki.getXWikiPreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE, context),
-            (int) xwiki
-                .getXWikiPreferenceAsLong(UPLOAD_SIZETHRESHOLD_PARAMETER, UPLOAD_DEFAULT_SIZETHRESHOLD, context),
+        loadFileList(
+            xwiki.getSpacePreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE, context),
+            (int) xwiki.getSpacePreferenceAsLong(UPLOAD_SIZETHRESHOLD_PARAMETER, UPLOAD_DEFAULT_SIZETHRESHOLD, context),
             xwiki.Param("xwiki.upload.tempdir"), context);
     }
 

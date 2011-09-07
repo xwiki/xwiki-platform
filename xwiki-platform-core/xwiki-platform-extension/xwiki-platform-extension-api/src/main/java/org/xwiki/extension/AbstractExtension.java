@@ -59,6 +59,11 @@ public abstract class AbstractExtension implements Extension
     protected String name;
 
     /**
+     * @see #getLicense()
+     */
+    protected ExtensionLicense license;
+
+    /**
      * @see #getDescription()
      */
     protected String description;
@@ -112,7 +117,7 @@ public abstract class AbstractExtension implements Extension
         this(repository, extension.getId(), extension.getType());
 
         setFeatures(extension.getFeatures());
-        
+
         setDescription(extension.getDescription());
         setAuthors(extension.getAuthors());
         setWebsite(extension.getWebSite());
@@ -123,11 +128,7 @@ public abstract class AbstractExtension implements Extension
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getId()
-     */
+    @Override
     public ExtensionId getId()
     {
         return this.id;
@@ -142,11 +143,7 @@ public abstract class AbstractExtension implements Extension
         this.id = id;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getFeatures()
-     */
+    @Override
     public Collection<String> getFeatures()
     {
         return this.features;
@@ -189,11 +186,7 @@ public abstract class AbstractExtension implements Extension
         this.type = type;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getName()
-     */
+    @Override
     public String getName()
     {
         return this.name;
@@ -207,11 +200,21 @@ public abstract class AbstractExtension implements Extension
         this.name = name;
     }
 
+    @Override
+    public ExtensionLicense getLicense()
+    {
+        return this.license;
+    }
+
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getDescription()
+     * @param license the license of the extension
      */
+    public void setLicense(ExtensionLicense license)
+    {
+        this.license = license;
+    }
+
+    @Override
     public String getDescription()
     {
         return this.description;
@@ -225,11 +228,7 @@ public abstract class AbstractExtension implements Extension
         this.description = description;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getAuthors()
-     */
+    @Override
     public List<String> getAuthors()
     {
         return this.authors;
@@ -253,11 +252,7 @@ public abstract class AbstractExtension implements Extension
         this.authors.add(author);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getWebSite()
-     */
+    @Override
     public String getWebSite()
     {
         return this.website;
@@ -285,11 +280,7 @@ public abstract class AbstractExtension implements Extension
         this.dependencies.add(dependency);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getDependencies()
-     */
+    @Override
     public List< ? extends ExtensionDependency> getDependencies()
     {
         return this.dependencies != null ? Collections.unmodifiableList(this.dependencies) : Collections
@@ -305,11 +296,7 @@ public abstract class AbstractExtension implements Extension
         this.dependencies = new ArrayList<ExtensionDependency>(dependencies);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getRepository()
-     */
+    @Override
     public ExtensionRepository getRepository()
     {
         return this.repository;
@@ -324,21 +311,13 @@ public abstract class AbstractExtension implements Extension
         this.repository = repository;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getProperties()
-     */
+    @Override
     public Map<String, Object> getProperties()
     {
         return Collections.unmodifiableMap(this.properties);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getProperty(java.lang.String)
-     */
+    @Override
     public Object getProperty(String key)
     {
         return this.properties.get(key);
@@ -372,33 +351,18 @@ public abstract class AbstractExtension implements Extension
 
     // Object
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {
         return getId().toString();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
         return this == obj || (obj instanceof Extension && getId().equals(((Extension) obj).getId()));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode()
     {

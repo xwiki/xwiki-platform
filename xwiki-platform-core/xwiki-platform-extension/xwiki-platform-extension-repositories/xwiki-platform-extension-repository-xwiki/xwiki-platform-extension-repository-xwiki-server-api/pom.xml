@@ -33,10 +33,15 @@
   <name>XWiki Platform - Extension - Repository - XWiki server api</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Extension - Repository - XWiki server api</description>
-  <dependencies>   
+  <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-extension-repository-xwiki-model</artifactId>
+      <artifactId>xwiki-platform-extension-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>   
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-repository-xwiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

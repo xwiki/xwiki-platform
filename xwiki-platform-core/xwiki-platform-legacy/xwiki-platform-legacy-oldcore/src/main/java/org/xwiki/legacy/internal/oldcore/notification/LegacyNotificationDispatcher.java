@@ -37,8 +37,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
@@ -58,17 +58,13 @@ public class LegacyNotificationDispatcher implements EventListener
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getName()
     {
         return "LegacyNotificationDispatcher";
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Event> getEvents()
     {
         return new ArrayList<Event>()
@@ -97,15 +93,13 @@ public class LegacyNotificationDispatcher implements EventListener
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         XWikiDocument document = (XWikiDocument) source;
         XWikiDocument originalDocument = document.getOriginalDocument();
         XWikiContext context = (XWikiContext) data;
-
+        
         XWikiNotificationManager manager = getNotificationManager((XWikiContext) data);
 
         if (manager != null) {
@@ -129,6 +123,8 @@ public class LegacyNotificationDispatcher implements EventListener
             } else if (event instanceof ActionExecutingEvent) {
                 manager.preverify(document, ((ActionExecutingEvent) event).getActionName(), context);
             }
+        } else {
+            this.logger.error("Can't find old [XWikiNotificationManager] system");
         }
     }
 }

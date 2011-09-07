@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.xwiki.extension.repository.xwiki.internal;
+package org.xwiki.extension.repository.xwiki.internal.resources;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -39,8 +39,8 @@ import org.xwiki.query.QueryException;
 public class ExtensionsRESTResource extends AbstractExtensionRESTResource
 {
     @GET
-    public Extensions getExtensions(@QueryParam(Resources.QPARAM_SEARCH_START) @DefaultValue("0") Integer offset,
-        @QueryParam(Resources.QPARAM_SEARCH_NUMBER) @DefaultValue("-1") int number) throws QueryException
+    public Extensions getExtensions(@QueryParam(Resources.QPARAM_LIST_START) @DefaultValue("0") Integer offset,
+        @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number) throws QueryException
     {
         return getExtensionSummaries(createExtensionsSummariesQuery(null, null, offset, number, false));
     }

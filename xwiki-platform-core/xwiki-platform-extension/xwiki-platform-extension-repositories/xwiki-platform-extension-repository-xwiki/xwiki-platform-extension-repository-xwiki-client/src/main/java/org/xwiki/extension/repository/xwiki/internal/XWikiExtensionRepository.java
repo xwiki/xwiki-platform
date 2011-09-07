@@ -39,6 +39,7 @@ import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.SearchException;
 import org.xwiki.extension.repository.Searchable;
+import org.xwiki.extension.repository.xwiki.Resources;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.SearchResult;
 
@@ -49,11 +50,11 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
 {
     private XWikiExtensionRepositoryFactory repositoryFactory;
 
-    private final UriBuilder extensionUriBuider;
+    private final UriBuilder extensionVersionUriBuider;
 
-    private final UriBuilder extensionFileUriBuider;
+    private final UriBuilder extensionVersionFileUriBuider;
 
-    private final UriBuilder simplesearchUriBuider;
+    private final UriBuilder searchUriBuider;
 
     public XWikiExtensionRepository(ExtensionRepositoryId repositoryId,
         XWikiExtensionRepositoryFactory repositoryFactory) throws Exception
@@ -64,14 +65,14 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         this.repositoryFactory = repositoryFactory;
 
         // Uri builders
-        this.extensionUriBuider = createUriBuilder("/extension/{extensionId}/{extensionVersion}");
-        this.extensionFileUriBuider = createUriBuilder("/extension/{extensionId}/{extensionVersion}/file");
-        this.simplesearchUriBuider = createUriBuilder("/extensions/search/simple/{pattern}");
+        this.extensionVersionUriBuider = createUriBuilder(Resources.EXTENSION_VERSION);
+        this.extensionVersionFileUriBuider = createUriBuilder(Resources.EXTENSION_VERSION_FILE);
+        this.searchUriBuider = createUriBuilder(Resources.SEARCH);
     }
 
     public UriBuilder getExtensionFileUriBuider()
     {
-        return this.extensionFileUriBuider;
+        return this.extensionVersionFileUriBuider;
     }
 
     public InputStream getRESTResourceAsStream(UriBuilder builder, Object... values) throws ResolveException,
@@ -104,11 +105,12 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
 
     // ExtensionRepository
 
+    @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
         try {
             return new XWikiExtension(this, (ExtensionVersion) this.repositoryFactory.getUnmarshaller().unmarshal(
-                getRESTResourceAsStream(this.extensionUriBuider, extensionId.getId(), extensionId.getVersion())));
+                getRESTResourceAsStream(this.extensionVersionUriBuider, extensionId.getId(), extensionId.getVersion())));
         } catch (Exception e) {
             throw new ResolveException("Failed to create extension object for extension [" + extensionId + "]", e);
         }
@@ -126,21 +128,35 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         return UriBuilder.fromUri(getId().getURI()).path(path);
     }
 
+    @Override
     public boolean exists(ExtensionId extensionId)
     {
-        // TODO
-        return false;
+        // TODO: improve that with a real exists in the protocol itself
+
+        try {
+            resolve(extensionId);
+
+            return true;
+        } catch (ResolveException e) {
+            return false;
+        }
     }
 
     // Searchable
 
+    @Override
     public List<Extension> search(String pattern, int offset, int nb) throws SearchException
     {
+        UriBuilder builder = this.searchUriBuider.clone();
+
+        builder.queryParam(Resources.QPARAM_LIST_START, offset);
+        builder.queryParam(Resources.QPARAM_LIST_NUMBER, nb);
+
         SearchResult restExtensions;
         try {
             restExtensions =
                 (SearchResult) this.repositoryFactory.getUnmarshaller().unmarshal(
-                    getRESTResourceAsStream(this.simplesearchUriBuider, pattern));
+                    getRESTResourceAsStream(builder, pattern));
         } catch (Exception e) {
             throw new SearchException("Failed to search extensions based on pattern [" + pattern + "]", e);
         }

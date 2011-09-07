@@ -61,11 +61,6 @@ public class Resources
      */
     public final static String SEARCH = ENTRYPOINT + "/search";
 
-    /**
-     * Execute search query among versions of an extension.
-     */
-    public final static String SEARCH_FROM_ID = EXTENSION + "/search";
-
     // Query parameters
 
     /**
@@ -81,10 +76,10 @@ public class Resources
     /**
      * Offset from where the search start to return results.
      */
-    public final static String QPARAM_SEARCH_START = "start";
+    public final static String QPARAM_LIST_START = "start";
 
     /**
      * Maximum number of results.
      */
-    public final static String QPARAM_SEARCH_NUMBER = "number";
+    public final static String QPARAM_LIST_NUMBER = "number";
 }

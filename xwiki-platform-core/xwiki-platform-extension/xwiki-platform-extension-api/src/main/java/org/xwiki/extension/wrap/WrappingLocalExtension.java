@@ -42,51 +42,31 @@ public class WrappingLocalExtension<T extends LocalExtension> extends WrappingEx
 
     // LocalExtension
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.LocalExtension#getFile()
-     */
+    @Override
     public File getFile()
     {
         return getExtension().getFile();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.LocalExtension#isInstalled()
-     */
+    @Override
     public boolean isInstalled()
     {
         return getExtension().isInstalled();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.LocalExtension#isInstalled(java.lang.String)
-     */
+    @Override
     public boolean isInstalled(String namespace)
     {
         return getExtension().isInstalled(namespace);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.LocalExtension#isDependency()
-     */
+    @Override
     public boolean isDependency()
     {
         return getExtension().isDependency();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.LocalExtension#getNamespaces()
-     */
+    @Override
     public Collection<String> getNamespaces()
     {
         return getExtension().getNamespaces();

@@ -25,11 +25,18 @@ import java.io.InputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.xwiki.extension.AbstractExtension;
+import org.xwiki.extension.DefaultExtensionDependency;
+import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 
+/**
+ * XWiki Repository implementation of {@link Extension}.
+ * 
+ * @version $Id$
+ */
 public class XWikiExtension extends AbstractExtension
 {
     public XWikiExtension(XWikiExtensionRepository repository, ExtensionVersion extension)
@@ -43,7 +50,7 @@ public class XWikiExtension extends AbstractExtension
         setFeatures(extension.getFeatures());
 
         for (ExtensionDependency dependency : extension.getDependencies()) {
-            addDependency(new XWikiExtensionDependency(dependency));
+            addDependency(new DefaultExtensionDependency(dependency.getId(), dependency.getVersion()));
         }
     }
 
@@ -53,6 +60,7 @@ public class XWikiExtension extends AbstractExtension
         return (XWikiExtensionRepository) super.getRepository();
     }
 
+    @Override
     public void download(File file) throws ExtensionException
     {
         XWikiExtensionRepository repository = getRepository();

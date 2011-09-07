@@ -18,16 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.xwiki.extension.repository.xwiki.internal;
+package org.xwiki.extension.repository.xwiki.internal.resources;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.xwiki.Resources;
-import org.xwiki.extension.repository.xwiki.model.jaxb.SearchResult;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersions;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 
@@ -35,26 +36,23 @@ import org.xwiki.query.QueryException;
  * @version $Id$
  * @since 3.2M3
  */
-@Component("org.xwiki.extension.repository.xwiki.internal.SearchRESTResource")
-@Path(Resources.SEARCH)
-public class SearchRESTResource extends AbstractExtensionRESTResource
+@Component("org.xwiki.extension.repository.xwiki.internal.ExtensionVersionsRESTResource")
+@Path(Resources.EXTENSION_VERSIONS)
+public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
 {
     @GET
-    public SearchResult search(@QueryParam(Resources.QPARAM_SEARCH_QUERY) @DefaultValue("") String pattern,
-        @QueryParam(Resources.QPARAM_SEARCH_START) @DefaultValue("0") int offset,
-        @QueryParam(Resources.QPARAM_SEARCH_NUMBER) @DefaultValue("-1") int number) throws QueryException
-    {   
-        String where =
-            "extension.id like :pattern or extension.name like :pattern or extension.description like :pattern";
+    public ExtensionVersions getExtensionVersions(@PathParam("extensionId") String extensionId,
+        @QueryParam(Resources.QPARAM_LIST_START) @DefaultValue("-1") int offset,
+        @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number) throws QueryException
+    {
+        Query query = createExtensionsSummariesQuery(null, "extension.id = :extensionId", offset, number, true);
 
-        Query query = createExtensionsQuery(null, where, offset, number);
+        query.bindValue("extensionId", extensionId);
 
-        query.bindValue("pattern", '%' + pattern + '%');
+        ExtensionVersions extensions = this.objectFactory.createExtensionVersions();
 
-        SearchResult result = this.objectFactory.createSearchResult();
+        getExtensionSummaries(extensions.getExtensionVersionSummaries(), query);
 
-        getExtensions(result.getExtensions(), query);
-
-        return result;
+        return extensions;
     }
 }

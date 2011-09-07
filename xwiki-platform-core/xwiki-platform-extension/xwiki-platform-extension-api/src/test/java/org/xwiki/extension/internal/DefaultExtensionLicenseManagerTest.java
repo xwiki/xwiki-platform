@@ -19,35 +19,43 @@
  */
 package org.xwiki.extension.internal;
 
+import java.io.IOException;
+
 import junit.framework.Assert;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import org.xwiki.extension.ExtensionLicense;
+import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.test.AbstractComponentTestCase;
 
-public class DefaultVersionManagerTest extends AbstractComponentTestCase
+public class DefaultExtensionLicenseManagerTest extends AbstractComponentTestCase
 {
-    private VersionManager versionManager;
+    private ExtensionLicenseManager licenseManager;
 
     @Override
     public void setUp() throws Exception
     {
         super.setUp();
 
-        this.versionManager = getComponentManager().lookup(VersionManager.class);
+        this.licenseManager = getComponentManager().lookup(ExtensionLicenseManager.class);
     }
 
     @Test
-    public void testWithIntegers()
+    public void testGetLicenses()
     {
-        Assert.assertEquals(1, versionManager.compareVersions("1.1", "1.0"));
-        Assert.assertEquals(8, versionManager.compareVersions("1.10", "1.2"));
+        Assert.assertTrue(this.licenseManager.getLicenses().size() > 0);
     }
 
     @Test
-    public void testWithStrings()
+    public void testGetLicense() throws IOException
     {
-        Assert.assertEquals(8, versionManager.compareVersions("1.10-sometext", "1.2"));
-        Assert.assertEquals(1, versionManager.compareVersions("1.1-sometext", "1.1"));
-        Assert.assertEquals(67, versionManager.compareVersions("1.sometext", "1.0"));
+        ExtensionLicense license = this.licenseManager.getLicense("Apache License 2.0");
+
+        Assert.assertNotNull(license);
+        Assert.assertEquals("Apache License 2.0", license.getName());
+        Assert.assertEquals(
+            IOUtils.readLines(getClass().getResourceAsStream("/extension/licenses/Apache License 2.0.txt")),
+            license.getContent());
     }
 }

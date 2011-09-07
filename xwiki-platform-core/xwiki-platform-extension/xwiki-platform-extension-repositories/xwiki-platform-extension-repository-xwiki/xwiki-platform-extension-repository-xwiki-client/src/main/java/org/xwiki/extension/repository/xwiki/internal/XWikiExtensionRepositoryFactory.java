@@ -42,6 +42,7 @@ public class XWikiExtensionRepositoryFactory implements ExtensionRepositoryFacto
 
     protected Unmarshaller unmarshaller;
 
+    @Override
     public void initialize() throws InitializationException
     {
         try {
@@ -65,6 +66,7 @@ public class XWikiExtensionRepositoryFactory implements ExtensionRepositoryFacto
 
     // ExtensionRepositoryFactory
 
+    @Override
     public ExtensionRepository createRepository(ExtensionRepositoryId repositoryId) throws ExtensionRepositoryException
     {
         try {

@@ -18,19 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.xwiki.extension.repository.xwiki.internal;
+package org.xwiki.extension.repository.xwiki.internal.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.xwiki.Resources;
-import org.xwiki.extension.repository.xwiki.model.jaxb.Extension;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.XWikiException;
@@ -40,13 +38,13 @@ import com.xpn.xwiki.api.Document;
  * @version $Id$
  * @since 3.2M3
  */
-@Component("org.xwiki.extension.repository.xwiki.internal.ExtensionVersionFileRESTResource")
-@Path(Resources.EXTENSION_VERSION_FILE)
-public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResource
+@Component("org.xwiki.extension.repository.xwiki.internal.ExtensionVersionRESTResource")
+@Path(Resources.EXTENSION_VERSION)
+public class ExtensionVersionRESTResource extends AbstractExtensionRESTResource
 {
     @GET
-    public Response downloadExtension(@PathParam(Resources.PPARAM_EXTENSIONID) String extensionId,
-        @PathParam(Resources.PPARAM_EXTENSIONVERSION) String extensionVersion) throws XWikiException, QueryException
+    public ExtensionVersion getExtensionVersion(@PathParam("extensionId") String extensionId,
+        @PathParam("extensionVersion") String extensionVersion) throws XWikiException, QueryException
     {
         Document extensionDocument = getExtensionDocument(extensionId);
 
@@ -54,20 +52,6 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        Extension extension = createExtension(extensionDocument, extensionVersion);
-
-        com.xpn.xwiki.api.Attachment xwikiAttachment =
-            extensionDocument.getAttachment(extensionId + "-" + extensionVersion + "." + extension.getType());
-        if (xwikiAttachment == null) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
-
-        ResponseBuilder response = Response.ok();
-
-        response.type(xwikiAttachment.getMimeType());
-        response.entity(xwikiAttachment.getContent());
-        response.header("Content-Disposition", "attachment; filename=\"" + xwikiAttachment.getFilename() + "\"");
-
-        return response.build();
+        return createExtension(extensionDocument, extensionVersion);
     }
 }

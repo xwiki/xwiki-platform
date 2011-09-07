@@ -18,39 +18,43 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.xwiki.extension.repository.xwiki.internal;
+package org.xwiki.extension.repository.xwiki.internal.resources;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.QueryParam;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.xwiki.Resources;
-import org.xwiki.extension.repository.xwiki.model.jaxb.Extension;
+import org.xwiki.extension.repository.xwiki.model.jaxb.SearchResult;
+import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
 
 /**
  * @version $Id$
  * @since 3.2M3
  */
-@Component("org.xwiki.extension.repository.xwiki.internal.ExtensionRESTResource")
-@Path(Resources.EXTENSION)
-public class ExtensionRESTResource extends AbstractExtensionRESTResource
+@Component("org.xwiki.extension.repository.xwiki.internal.SearchRESTResource")
+@Path(Resources.SEARCH)
+public class SearchRESTResource extends AbstractExtensionRESTResource
 {
     @GET
-    public Extension getExtension(@PathParam("extensionId") String extensionId) throws XWikiException, QueryException
-    {
-        Document extensionDocument = getExtensionDocument(extensionId);
+    public SearchResult search(@QueryParam(Resources.QPARAM_SEARCH_QUERY) @DefaultValue("") String pattern,
+        @QueryParam(Resources.QPARAM_LIST_START) @DefaultValue("0") int offset,
+        @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number) throws QueryException
+    {   
+        String where =
+            "extension.id like :pattern or extension.name like :pattern or extension.description like :pattern";
 
-        if (extensionDocument.isNew()) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
+        Query query = createExtensionsQuery(null, where, offset, number);
 
-        return createExtension(extensionDocument, null);
+        query.bindValue("pattern", '%' + pattern + '%');
+
+        SearchResult result = this.objectFactory.createSearchResult();
+
+        getExtensions(result.getExtensions(), query);
+
+        return result;
     }
 }

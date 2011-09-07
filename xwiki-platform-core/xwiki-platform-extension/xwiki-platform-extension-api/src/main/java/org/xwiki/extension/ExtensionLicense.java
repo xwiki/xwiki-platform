@@ -17,37 +17,50 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.internal;
+package org.xwiki.extension;
 
-import junit.framework.Assert;
+import java.util.List;
 
-import org.junit.Test;
-import org.xwiki.test.AbstractComponentTestCase;
-
-public class DefaultVersionManagerTest extends AbstractComponentTestCase
+/**
+ * License of an extension.
+ * 
+ * @version $Id$
+ */
+public class ExtensionLicense
 {
-    private VersionManager versionManager;
+    /**
+     * @see #getName()
+     */
+    private String name;
 
-    @Override
-    public void setUp() throws Exception
+    /**
+     * @see #getContent()
+     */
+    private List<String> content;
+
+    /**
+     * @param name the name of the license
+     * @param content the content of the license
+     */
+    public ExtensionLicense(String name, List<String> content)
     {
-        super.setUp();
-
-        this.versionManager = getComponentManager().lookup(VersionManager.class);
+        this.name = name;
+        this.content = content;
     }
 
-    @Test
-    public void testWithIntegers()
+    /**
+     * @return the name of the license
+     */
+    public String getName()
     {
-        Assert.assertEquals(1, versionManager.compareVersions("1.1", "1.0"));
-        Assert.assertEquals(8, versionManager.compareVersions("1.10", "1.2"));
+        return this.name;
     }
 
-    @Test
-    public void testWithStrings()
+    /**
+     * @return the content of the license
+     */
+    public List<String> getContent()
     {
-        Assert.assertEquals(8, versionManager.compareVersions("1.10-sometext", "1.2"));
-        Assert.assertEquals(1, versionManager.compareVersions("1.1-sometext", "1.1"));
-        Assert.assertEquals(67, versionManager.compareVersions("1.sometext", "1.0"));
+        return this.content;
     }
 }

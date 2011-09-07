@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.xwiki.extension.repository.xwiki.internal;
+package org.xwiki.extension.repository.xwiki.internal.resources;
 
 import java.util.List;
 import java.util.Vector;
@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
+import org.xwiki.extension.repository.xwiki.internal.XWikiRepositoryModel;
 import org.xwiki.extension.repository.xwiki.model.jaxb.AbstractExtension;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionSummary;
@@ -56,12 +57,6 @@ import com.xpn.xwiki.objects.classes.ListClass;
  */
 public abstract class AbstractExtensionRESTResource extends XWikiResource implements Initializable
 {
-    protected final static String EXTENSION_CLASSNAME = "ExtensionCode.ExtensionClass";
-
-    protected final static String EXTENSIONVERSION_CLASSNAME = "ExtensionCode.ExtensionVersionClass";
-
-    protected final static String EXTENSIONDEPENDENCY_CLASSNAME = "ExtensionCode.ExtensionVersionClass";
-
     /**
      * The execution needed to get the annotation author from the context user.
      */
@@ -125,10 +120,12 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         // from
 
-        queryStr.append(" from Document doc, doc.object(" + EXTENSION_CLASSNAME + ") as extension");
+        queryStr
+            .append(" from Document doc, doc.object(" + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension");
 
         if (versions) {
-            queryStr.append(", doc.object(" + EXTENSIONVERSION_CLASSNAME + ") as extensionVersion");
+            queryStr
+                .append(", doc.object(" + XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME + ") as extensionVersion");
         }
 
         // where
@@ -158,7 +155,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     protected Document getExtensionDocument(String extensionId) throws XWikiException, QueryException
     {
         Query query =
-            this.queryManager.createQuery("from doc.object(" + EXTENSION_CLASSNAME
+            this.queryManager.createQuery("from doc.object(" + XWikiRepositoryModel.EXTENSION_CLASSNAME
                 + ") as extension where extension.id = :extensionId", Query.XWQL);
 
         query.bindValue("extensionId", extensionId);
@@ -174,7 +171,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
     protected com.xpn.xwiki.api.Object getExtensionObject(Document extensionDocument)
     {
-        return extensionDocument.getObject(EXTENSION_CLASSNAME);
+        return extensionDocument.getObject(XWikiRepositoryModel.EXTENSION_CLASSNAME);
     }
 
     protected com.xpn.xwiki.api.Object getExtensionObject(String extensionId, String extensionVersion)
@@ -186,7 +183,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     protected com.xpn.xwiki.api.Object getExtensionVersionObject(Document extensionDocument, String version)
     {
         if (version == null) {
-            Vector<com.xpn.xwiki.api.Object> objects = extensionDocument.getObjects(EXTENSIONVERSION_CLASSNAME);
+            Vector<com.xpn.xwiki.api.Object> objects =
+                extensionDocument.getObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME);
 
             if (objects.isEmpty()) {
                 return null;
@@ -195,7 +193,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             }
         }
 
-        return extensionDocument.getObject(EXTENSIONVERSION_CLASSNAME, "version", version, false);
+        return extensionDocument.getObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME, "version", version, false);
     }
 
     protected com.xpn.xwiki.api.Object getExtensionVersionObject(String extensionId, String version)
@@ -241,7 +239,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         if (extensionVersion != null) {
             for (com.xpn.xwiki.api.Object dependencyObject : extensionDocument.getObjects(
-                EXTENSIONDEPENDENCY_CLASSNAME, "extensionversion", version)) {
+                XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME, "extensionversion", version)) {
                 ExtensionDependency dependency = new ExtensionDependency();
                 dependency.setId((String) getValue(dependencyObject, "id"));
                 dependency.setVersion((String) getValue(dependencyObject, "version"));

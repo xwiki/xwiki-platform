@@ -48,55 +48,30 @@ public class WrappingJobStatus implements JobStatus
         this.status = status;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobStatus#getState()
-     */
     @Override
     public State getState()
     {
         return this.status.getState();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobStatus#getRequest()
-     */
     @Override
     public Request getRequest()
     {
         return this.status.getRequest();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobStatus#getLog()
-     */
     @Override
     public LogQueue getLog()
     {
         return this.status.getLog();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobStatus#getLog(org.xwiki.logging.LogLevel)
-     */
     @Override
     public List<LogEvent> getLog(LogLevel level)
     {
         return this.status.getLog(level);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobStatus#getProgress()
-     */
     @Override
     public JobProgress getProgress()
     {

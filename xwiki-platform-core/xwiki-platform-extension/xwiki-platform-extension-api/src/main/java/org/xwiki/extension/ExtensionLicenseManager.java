@@ -17,23 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.internal;
+package org.xwiki.extension;
 
-import org.xwiki.extension.AbstractExtensionDependency;
+import java.util.List;
+
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Default implementation of {@link org.xwiki.extension.ExtensionDependency}.
+ * Centralize known extension licenses.
  * 
  * @version $Id$
  */
-public class LocalExtensionDependency extends AbstractExtensionDependency
+@ComponentRole
+public interface ExtensionLicenseManager
 {
     /**
-     * @param id the id of the extension
-     * @param version the version of the extension
+     * @return the known licenses
      */
-    public LocalExtensionDependency(String id, String version)
-    {
-        super(id, version);
-    }
+    List<ExtensionLicense> getLicenses();
+
+    /**
+     * Get known license by its name.
+     * 
+     * @param name the name of the license
+     * @return the license
+     */
+    ExtensionLicense getLicense(String name);
+
+    /**
+     * Add new license.
+     * 
+     * @param license the license to add
+     */
+    void addLicense(ExtensionLicense license);
 }

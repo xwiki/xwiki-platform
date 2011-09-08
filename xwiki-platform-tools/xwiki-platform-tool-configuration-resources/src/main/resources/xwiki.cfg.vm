@@ -450,21 +450,6 @@ xwiki.authentication.ldap.trylocal=1
 # xwiki.authentication.ldap.password_field=userPassword
 
 #---------------------------------------
-# Cache
-# [DEPRECATED since 1.7M1: this way to configure cache provider is deprecated, you should use xwiki.properties instead.]
-#---------------------------------------
-
-#-# [Since 1.5M2]
-#-# The cache component implementation to use as "normal" (can be local or distributed depending on the implementation)
-#-# cache component.
-# xwiki.cache.cachefactory.hint=jbosscache
-
-#-# [Since 1.5M2]
-#-# The cache component to use as local cache component. 
-# xwiki.cache.cachefactory.local.hint=jbosscache/local
-
-
-#---------------------------------------
 # WYSIWYG Editor configuration
 #
 
@@ -546,9 +531,6 @@ xwiki.stats.default=0
 
 #-# It is also possible to choose a different stats service to record statistics separately from XWiki.
 # xwiki.stats.class=com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl
-
-#-# This parameter will activate the eXo Platform integration
-xwiki.exo=$xwikiCfgExo
 
 #-# GraphViz plugin configuration. The GraphViz plugin is not configured by default.
 #-# To enable it, add "com.xpn.xwiki.plugin.graphviz.GraphVizPlugin" to the list of plugins

@@ -26,6 +26,7 @@ import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.cache.api.internal.XWikiCacheServiceStub;
 import com.xpn.xwiki.cache.api.internal.XWikiCacheStub;
+import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 import java.io.UnsupportedEncodingException;
@@ -43,6 +44,8 @@ import org.xwiki.xml.XMLUtils;
 public privileged aspect XWikiCompatibilityAspect
 {
     private static Map XWiki.threadMap = new HashMap();
+
+    private XWikiNotificationManager XWiki.notificationManager;
 
     /**
      * Transform a text in a URL compatible text
@@ -280,5 +283,21 @@ public privileged aspect XWikiCompatibilityAspect
         result.append("</textarea>");
 
         return result.toString();
+    }
+
+    @Deprecated
+    public XWikiNotificationManager XWiki.getNotificationManager()
+    {
+        if (this.notificationManager == null) {
+          this.notificationManager = new XWikiNotificationManager();
+        }
+
+        return this.notificationManager;
+    }
+
+    @Deprecated
+    public void XWiki.setNotificationManager(XWikiNotificationManager notificationManager)
+    {
+        this.notificationManager = notificationManager;
     }
 }

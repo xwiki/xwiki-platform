@@ -43,7 +43,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.store.XWikiHibernateRecycleBinStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
@@ -82,7 +81,6 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         this.xwiki = new XWiki();
         getContext().setWiki(this.xwiki);
         this.xwiki.setConfig(new XWikiConfig());
-        this.xwiki.setNotificationManager(new XWikiNotificationManager());
 
         // mock a store that would also handle translations
         this.mockXWikiStore =

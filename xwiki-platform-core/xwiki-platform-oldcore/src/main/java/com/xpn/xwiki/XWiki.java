@@ -136,10 +136,6 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
-import com.xpn.xwiki.notify.XWikiActionRule;
-import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
-import com.xpn.xwiki.notify.XWikiNotificationManager;
-import com.xpn.xwiki.notify.XWikiPageNotification;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -246,9 +242,6 @@ public class XWiki implements EventListener
     private XWikiRenderingEngine renderingEngine;
 
     private XWikiPluginManager pluginManager;
-
-    @SuppressWarnings("deprecation")
-    private XWikiNotificationManager notificationManager;
 
     private XWikiAuthService authService;
 
@@ -761,9 +754,6 @@ public class XWiki implements EventListener
         setEngineContext(engine_context);
         context.setWiki(this);
 
-        // Create the notification manager
-        setNotificationManager(new XWikiNotificationManager());
-
         // Prepare the store
         setConfig(config);
 
@@ -827,9 +817,6 @@ public class XWiki implements EventListener
             initializeMandatoryClasses(context);
             getStatsService(context);
         }
-
-        // Add a notification for notifications
-        getNotificationManager().addGeneralRule(new XWikiActionRule(new XWikiPageNotification()));
 
         String ro = Param("xwiki.readonly", "no");
         this.isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
@@ -1404,22 +1391,13 @@ public class XWiki implements EventListener
 
             // Notify listeners about the document about to be created or updated
 
-            // First the legacy notification mechanism
-
-            // Then the new observation module
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
 
-            if (originalDocument.isNew()) {
-                getNotificationManager().preverify(doc, originalDocument,
-                    XWikiDocChangeNotificationInterface.EVENT_NEW, context);
-                if (om != null) {
+            if (om != null) {
+                if (originalDocument.isNew()) {
                     om.notify(new DocumentCreatingEvent(doc.getDocumentReference()), doc, context);
-                }
-            } else {
-                getNotificationManager().preverify(doc, originalDocument,
-                    XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
-                if (om != null) {
+                } else {
                     om.notify(new DocumentUpdatingEvent(doc.getDocumentReference()), doc, context);
                 }
             }
@@ -1442,16 +1420,10 @@ public class XWiki implements EventListener
                 // an XWikiDocument as source and an XWikiContext as data.
                 // The old version is made available using doc.getOriginalDocument()
 
-                if (originalDocument.isNew()) {
-                    getNotificationManager().verify(doc, originalDocument,
-                        XWikiDocChangeNotificationInterface.EVENT_NEW, context);
-                    if (om != null) {
+                if (om != null) {
+                    if (originalDocument.isNew()) {
                         om.notify(new DocumentCreatedEvent(doc.getDocumentReference()), doc, context);
-                    }
-                } else {
-                    getNotificationManager().verify(doc, originalDocument,
-                        XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
-                    if (om != null) {
+                    } else {
                         om.notify(new DocumentUpdatedEvent(doc.getDocumentReference()), doc, context);
                     }
                 }
@@ -2913,18 +2885,6 @@ public class XWiki implements EventListener
         this.version = version;
     }
 
-    @Deprecated
-    public XWikiNotificationManager getNotificationManager()
-    {
-        return this.notificationManager;
-    }
-
-    @Deprecated
-    public void setNotificationManager(XWikiNotificationManager notificationManager)
-    {
-        this.notificationManager = notificationManager;
-    }
-
     private void flushVirtualWikis(XWikiDocument doc)
     {
         List<BaseObject> bobjects = doc.getXObjects(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE);
@@ -4250,12 +4210,6 @@ public class XWiki implements EventListener
         ObservationManager om = Utils.getComponent(ObservationManager.class);
 
         // Inform notification mechanisms that a document is about to be deleted
-
-        // First the legacy notification mechanism
-        getNotificationManager().preverify(doc, new XWikiDocument(doc.getDocumentReference()),
-            XWikiDocChangeNotificationInterface.EVENT_DELETE, context);
-
-        // Then the new observation module
         // Note that for the moment the event being send is a bridge event, as we are still passing around
         // an XWikiDocument as source and an XWikiContext as data.
         om.notify(new DocumentDeletingEvent(doc.getDocumentReference()), new XWikiDocument(doc.getDocumentReference()),
@@ -4269,12 +4223,6 @@ public class XWiki implements EventListener
 
         try {
             // Inform notification mecanisms that a document has been deleted
-
-            // First the legacy notification mechanism
-            getNotificationManager().verify(new XWikiDocument(doc.getDocumentReference()), doc,
-                XWikiDocChangeNotificationInterface.EVENT_DELETE, context);
-
-            // Then the new observation module
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
             // The source document is a new empty XWikiDocument to follow

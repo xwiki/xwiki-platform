@@ -57,6 +57,11 @@ public interface Extension
     String getName();
 
     /**
+     * @return the license of the extension
+     */
+    ExtensionLicense getLicense();
+
+    /**
      * @return a description of the extension
      */
     String getDescription();

@@ -22,8 +22,8 @@ package com.xpn.xwiki.internal.observation.remote.converter;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
@@ -61,8 +61,8 @@ public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
      */
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
     {
-        if (localEvent.getEvent() instanceof ActionExecutionEvent) {
-            ActionExecutionEvent event = (ActionExecutionEvent) localEvent.getEvent();
+        if (localEvent.getEvent() instanceof ActionExecutedEvent) {
+            ActionExecutedEvent event = (ActionExecutedEvent) localEvent.getEvent();
 
             if (this.actions.contains(event.getActionName())) {
                 // fill the remote event
@@ -85,7 +85,7 @@ public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
      */
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
-        if (remoteEvent.getEvent() instanceof ActionExecutionEvent) {
+        if (remoteEvent.getEvent() instanceof ActionExecutedEvent) {
             // fill the local event
             XWikiContext context = unserializeXWikiContext(remoteEvent.getData());
 

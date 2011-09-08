@@ -23,9 +23,6 @@ package com.xpn.xwiki.objects;
 
 import org.dom4j.Element;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.merge.MergeResult;
-
 public interface PropertyInterface extends ElementInterface
 {
     int getId();

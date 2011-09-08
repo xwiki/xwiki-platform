@@ -34,13 +34,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.bridge.event.ActionExecutedEvent;
+import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.context.Execution;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -198,11 +199,24 @@ public abstract class XWikiAction extends Action
                 if (monitor != null) {
                     monitor.startTimer("prenotify");
                 }
+
+                // For the moment we're sending the XWiki context as the data, but this will be
+                // changed in the future, when the whole platform will be written using components
+                // and there won't be a need for the context.
                 try {
-                    xwiki.getNotificationManager().preverify(context.getDoc(), context.getAction(), context);
-                } catch (Throwable e) {
-                    LOG.error("Exception while pre-notifying", e);
+                    ObservationManager om = Utils.getComponent(ObservationManager.class);
+                    ActionExecutingEvent event = new ActionExecutingEvent(context.getAction());
+                    om.notify(event, context.getDoc(), context);
+                    if (event.isCanceled()) {
+                        // Action has been canceled
+                        // TODO: do somethin special ?
+                        return null;
+                    }
+                } catch (Throwable ex) {
+                    LOG.error("Cannot send action notifications for document [" + context.getDoc() + " using action ["
+                        + context.getAction() + "]", ex);
                 }
+
                 if (monitor != null) {
                     monitor.endTimer("prenotify");
                 }
@@ -297,21 +311,12 @@ public abstract class XWikiAction extends Action
                     monitor.startTimer("notify");
                 }
 
-                // Let's handle the notification and make sure it never fails
-                // This is the old notification mechanism. It is kept here because it is in a
-                // deprecation stage. It will be removed later.
-                try {
-                    xwiki.getNotificationManager().verify(context.getDoc(), context.getAction(), context);
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
-                // This is the new notification mechanism, implemented as a Plexus Component.
                 // For the moment we're sending the XWiki context as the data, but this will be
                 // changed in the future, when the whole platform will be written using components
                 // and there won't be a need for the context.
                 try {
                     ObservationManager om = Utils.getComponent(ObservationManager.class);
-                    om.notify(new ActionExecutionEvent(context.getAction()), context.getDoc(), context);
+                    om.notify(new ActionExecutedEvent(context.getAction()), context.getDoc(), context);
                 } catch (Throwable ex) {
                     LOG.error("Cannot send action notifications for document [" + docName + " using action ["
                         + context.getAction() + "]", ex);

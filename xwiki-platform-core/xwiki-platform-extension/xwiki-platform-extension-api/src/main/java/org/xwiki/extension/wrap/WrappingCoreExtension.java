@@ -20,21 +20,13 @@ public class WrappingCoreExtension<T extends CoreExtension> extends WrappingExte
         super(extension);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.CoreExtension#getURL()
-     */
+    @Override
     public URL getURL()
     {
         return getExtension().getURL();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.CoreExtension#isGuessed()
-     */
+    @Override
     public boolean isGuessed()
     {
         return getExtension().isGuessed();

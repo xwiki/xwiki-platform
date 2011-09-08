@@ -21,11 +21,17 @@ package org.xwiki.extension.internal;
 
 import java.util.regex.Pattern;
 
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 /**
  * Default implementation of {@link VersionManager}.
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class DefaultVersionManager implements VersionManager
 {
     /**

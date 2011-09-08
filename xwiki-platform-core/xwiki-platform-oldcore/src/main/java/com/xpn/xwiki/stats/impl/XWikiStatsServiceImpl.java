@@ -30,10 +30,10 @@ import java.util.Map;
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
@@ -75,9 +75,9 @@ public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
     private static final List<Event> EVENTS = new ArrayList<Event>()
     {
         {
-            add(new ActionExecutionEvent(ViewAction.VIEW_ACTION));
-            add(new ActionExecutionEvent(SaveAction.ACTION_NAME));
-            add(new ActionExecutionEvent(DownloadAction.ACTION_NAME));
+            add(new ActionExecutedEvent(ViewAction.VIEW_ACTION));
+            add(new ActionExecutedEvent(SaveAction.ACTION_NAME));
+            add(new ActionExecutedEvent(DownloadAction.ACTION_NAME));
         }
     };
 
@@ -163,7 +163,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
             return;
         }
 
-        ActionExecutionEvent actionEvent = (ActionExecutionEvent) event;
+        ActionExecutedEvent actionEvent = (ActionExecutedEvent) event;
         XWikiDocument document = (XWikiDocument) source;
         XWikiContext context = (XWikiContext) data;
 

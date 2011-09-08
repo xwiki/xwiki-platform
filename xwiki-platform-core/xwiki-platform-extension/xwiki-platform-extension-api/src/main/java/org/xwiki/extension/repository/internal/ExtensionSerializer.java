@@ -19,6 +19,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
@@ -162,7 +163,7 @@ public class ExtensionSerializer
                     Node dependencyIdNode = getNode(dependency, ELEMENT_ID);
                     Node dependencyVersionNode = getNode(dependency, ELEMENT_VERSION);
 
-                    localExtension.addDependency(new LocalExtensionDependency(dependencyIdNode.getTextContent(),
+                    localExtension.addDependency(new DefaultExtensionDependency(dependencyIdNode.getTextContent(),
                         dependencyVersionNode.getTextContent()));
                 }
             }

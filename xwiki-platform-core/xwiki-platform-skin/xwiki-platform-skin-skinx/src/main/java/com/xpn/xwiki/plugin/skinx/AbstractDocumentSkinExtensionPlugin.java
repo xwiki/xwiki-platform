@@ -81,7 +81,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     /**
      * Used to match events on "use" property.
      */
-    private final List<Event> events = new ArrayList<Event>(1);
+    private final List<Event> events = new ArrayList<Event>(3);
 
     /**
      * XWiki plugin constructor.

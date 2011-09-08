@@ -34,6 +34,10 @@ import java.net.URLStreamHandlerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.classloader.ExtendedURLStreamHandler;
 import org.xwiki.classloader.internal.protocol.jar.JarURLConnection.JarOpener;
 import org.xwiki.component.annotation.Component;
@@ -49,7 +53,9 @@ import edu.emory.mathcs.util.classloader.ResourceUtils;
  * @version $Id$
  * @since 2.0.1
  */
-@Component("jar")
+@Component
+@Named("jar")
+@Singleton
 public class JarURLStreamHandler extends URLStreamHandler implements ExtendedURLStreamHandler
 {
     /**
@@ -62,7 +68,7 @@ public class JarURLStreamHandler extends URLStreamHandler implements ExtendedURL
      * protocols even if they are not globally registered (the problems with global registration are
      * described at http://accu.org/index.php/journals/1434).
      */
-    @Requirement
+    @Inject
     private URLStreamHandlerFactory handlerFactory;
 
     /**

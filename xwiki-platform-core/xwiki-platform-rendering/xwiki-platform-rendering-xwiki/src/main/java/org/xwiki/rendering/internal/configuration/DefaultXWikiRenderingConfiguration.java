@@ -26,10 +26,10 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
@@ -42,6 +42,7 @@ import org.xwiki.rendering.transformation.Transformation;
  * @since 2.5M2
  */
 @Component
+@Singleton
 public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfiguration
 {
     /**
@@ -57,14 +58,14 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
     /**
      * Defines from where to read the rendering configuration data.
      */
-    @Requirement
+    @Inject
     private ConfigurationSource configuration;
 
     /**
      * Used to convert transformation component hints into {@link org.xwiki.rendering.transformation.Transformation}
      * objects.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
@@ -73,51 +74,31 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiRenderingConfiguration#getLinkLabelFormat()
-     */
+    @Override
     public String getLinkLabelFormat()
     {
         return this.configuration.getProperty(PREFIX + "linkLabelFormat", DEFAULT_LINK_LABEL_FORMAT);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiRenderingConfiguration#getImageWidthLimit()
-     */
+    @Override
     public int getImageWidthLimit()
     {
         return this.configuration.getProperty(PREFIX + "imageWidthLimit", -1);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiRenderingConfiguration#getImageHeightLimit()
-     */
+    @Override
     public int getImageHeightLimit()
     {
         return this.configuration.getProperty(PREFIX + "imageHeightLimit", -1);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiRenderingConfiguration#isImageDimensionsIncludedInImageURL()
-     */
+    @Override
     public boolean isImageDimensionsIncludedInImageURL()
     {
         return this.configuration.getProperty(PREFIX + "imageDimensionsIncludedInImageURL", true);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration#getInterWikiDefinitions()
-     */
+    @Override
     public Properties getInterWikiDefinitions()
     {
         return this.configuration.getProperty(PREFIX + "interWikiDefinitions", Properties.class);
@@ -125,9 +106,9 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getTransformations()
      * @since 2.6RC1
      */
+    @Override
     public List<Transformation> getTransformations()
     {
         List<Transformation> transformations = new ArrayList<Transformation>();

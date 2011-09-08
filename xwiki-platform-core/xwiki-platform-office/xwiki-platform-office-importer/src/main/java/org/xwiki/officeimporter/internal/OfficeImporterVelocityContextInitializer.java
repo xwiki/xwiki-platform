@@ -20,11 +20,12 @@
 package org.xwiki.officeimporter.internal;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.OfficeImporterVelocityBridge;
@@ -36,7 +37,9 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @version $Id$
  * @since 1.8M1
  */
-@Component("officeimporter")
+@Component
+@Named("officeimporter")
+@Singleton
 public class OfficeImporterVelocityContextInitializer implements VelocityContextInitializer
 {
     /**
@@ -47,7 +50,7 @@ public class OfficeImporterVelocityContextInitializer implements VelocityContext
     /**
      * Used to lookup other components.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
@@ -56,9 +59,7 @@ public class OfficeImporterVelocityContextInitializer implements VelocityContext
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void initialize(VelocityContext context)
     {
         try {

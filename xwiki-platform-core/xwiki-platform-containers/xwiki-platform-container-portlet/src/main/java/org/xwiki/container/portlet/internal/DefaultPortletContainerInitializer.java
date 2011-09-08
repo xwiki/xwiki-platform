@@ -20,10 +20,11 @@
  */
 package org.xwiki.container.portlet.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.portlet.PortletContext;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
@@ -41,23 +42,25 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 
 @Component
+@Singleton
 public class DefaultPortletContainerInitializer implements PortletContainerInitializer
 {
-    @Requirement
+    @Inject
     private ApplicationContextListenerManager applicationContextListenerManager;
 
-    @Requirement
+    @Inject
     private RequestInitializerManager requestInitializerManager;
 
-    @Requirement
+    @Inject
     private ExecutionContextManager executionContextManager;
 
-    @Requirement
+    @Inject
     private Container container;
 
-    @Requirement
+    @Inject
     private Execution execution;
 
+    @Override
     public void initializeApplicationContext(PortletContext portletContext)
     {
         ApplicationContext applicationContext = new PortletApplicationContext(portletContext);
@@ -65,6 +68,7 @@ public class DefaultPortletContainerInitializer implements PortletContainerIniti
         this.applicationContextListenerManager.initializeApplicationContext(applicationContext);
     }
 
+    @Override
     public void initializeRequest(javax.portlet.PortletRequest portletRequest, Object xwikiContext)
         throws PortletContainerException
     {
@@ -100,11 +104,13 @@ public class DefaultPortletContainerInitializer implements PortletContainerIniti
         }
     }
 
+    @Override
     public void initializeResponse(javax.portlet.PortletResponse portletResponse)
     {
         this.container.setResponse(new PortletResponse(portletResponse));
     }
 
+    @Override
     public void initializeSession(javax.portlet.PortletRequest portletRequest)
     {
         this.container.setSession(new PortletSession(portletRequest));

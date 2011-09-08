@@ -19,8 +19,11 @@
  */
 package org.xwiki.model.internal.reference;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
@@ -34,16 +37,16 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * @version $Id$
  * @since 3.0M1
  */
-@Component("explicit")
+@Component
+@Named("explicit")
+@Singleton
 public class ExplicitStringAttachmentReferenceResolver implements AttachmentReferenceResolver<String>
 {
-    @Requirement("explicit")
+    @Inject
+    @Named("explicit")
     private EntityReferenceResolver<String> entityReferenceResolver;
 
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.model.reference.AttachmentReferenceResolver#resolve
-     */
+    @Override
     public AttachmentReference resolve(String attachmentReferenceRepresentation, Object... parameters)
     {
         return new AttachmentReference(this.entityReferenceResolver.resolve(

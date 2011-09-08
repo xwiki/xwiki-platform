@@ -21,8 +21,10 @@ package org.xwiki.rendering.internal.transformation.macro;
 
 import java.util.Properties;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.transformation.macro.MacroTransformationConfiguration;
 
@@ -33,6 +35,7 @@ import org.xwiki.rendering.transformation.macro.MacroTransformationConfiguration
  * @since 2.6RC1
  */
 @Component
+@Singleton
 public class XWikiMacroTransformationConfiguration implements MacroTransformationConfiguration
 {
     /**
@@ -43,14 +46,10 @@ public class XWikiMacroTransformationConfiguration implements MacroTransformatio
     /**
      * Defines from where to read the rendering configuration data.
      */
-    @Requirement
+    @Inject
     private ConfigurationSource configuration;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see MacroTransformationConfiguration#getCategories()
-     */
+    @Override
     public Properties getCategories()
     {
         return this.configuration.getProperty(PREFIX + "categories", Properties.class);

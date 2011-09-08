@@ -23,6 +23,10 @@ import java.io.File;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.FilesystemAttachmentContent;
@@ -33,13 +37,11 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiDocument;
 import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.FileSaveTransactionRunnable;
 import org.xwiki.store.FileDeleteTransactionRunnable;
 import org.xwiki.store.StreamProvider;
 import org.xwiki.store.TransactionRunnable;
-
 
 /**
  * Filesystem based implementation of XWikiAttachmentStoreInterface.
@@ -47,13 +49,15 @@ import org.xwiki.store.TransactionRunnable;
  * @version $Id$
  * @since 3.0M2
  */
-@Component("file")
+@Component
+@Named("file")
+@Singleton
 public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
 {
     /**
      * Tools for getting files to store given content in.
      */
-    @Requirement
+    @Inject
     private FilesystemStoreTools fileTools;
 
     /**
@@ -198,12 +202,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.store.XWikiAttachmentStoreInterface#loadAttachmentContent(
-     *          XWikiAttachment, XWikiContext, boolean)
-     */
+    @Override
     public void loadAttachmentContent(final XWikiAttachment attachment,
                                       final XWikiContext context,
                                       final boolean bTransaction)
@@ -228,12 +227,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                                  + "to the filesystem using a script.");
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.store.XWikiAttachmentStoreInterface#deleteXWikiAttachment(
-     *          XWikiAttachment, XWikiContext, boolean)
-     */
+    @Override
     public void deleteXWikiAttachment(final XWikiAttachment attachment,
                                       final XWikiContext context,
                                       final boolean bTransaction)
@@ -242,12 +236,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         this.deleteXWikiAttachment(attachment, true, context, bTransaction);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.store.XWikiAttachmentStoreInterface#deleteXWikiAttachment(
-     *          XWikiAttachment, boolean, XWikiContext, boolean)
-     */
+    @Override
     public void deleteXWikiAttachment(final XWikiAttachment attachment,
                                       final boolean parentUpdate,
                                       final XWikiContext context,
@@ -296,12 +285,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     }
 
 
-    /**
-     * {@inheritDoc}
-     * This implementation does nothing.
-     *
-     * @see com.xpn.xwiki.store.XWikiAttachmentStoreInterface#cleanUp(XWikiContext)
-     */
+    @Override
     public void cleanUp(XWikiContext context)
     {
         // Do nothing.
@@ -445,11 +429,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             this.updateDocument = updateDocument;
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * @see TransactionRunnable#onRun()
-         */
+        @Override
         protected void onRun() throws Exception
         {
             // TODO: When the rest of storage is rewritten using TransactionRunnable,

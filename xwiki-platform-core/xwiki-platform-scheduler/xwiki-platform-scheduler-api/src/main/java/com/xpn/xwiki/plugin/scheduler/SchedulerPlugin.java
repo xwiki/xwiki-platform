@@ -645,8 +645,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         needsUpdate |= bclass.addTextAreaField("script", "Job Script", 60, 10);
         // make sure that the script field is of type pure text so that wysiwyg editor is never used for it
         TextAreaClass scriptField = (TextAreaClass) bclass.getField("script");
-        // get editor returns lowercase but the values are actually camelcase
-        if (scriptField.getEditor() != "puretext") {
+        // Note: getEditor() returns lowercase but the values are actually camelcase...
+        if (!scriptField.getEditor().equals("puretext")) {
             scriptField.setStringValue("editor", "PureText");
             needsUpdate = true;
         }
@@ -678,7 +678,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
         if (needsUpdate) {
             try {
-                xwiki.saveDocument(doc, context);
+                xwiki.saveDocument(doc, context.getMessageTool().get("xe.scheduler.updateJobClassComment"), true,
+                    context);
             } catch (XWikiException ex) {
                 throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_SAVE_JOB_CLASS,
                     "Error while saving " + SchedulerPlugin.XWIKI_JOB_CLASS + " class document in XWiki", ex);

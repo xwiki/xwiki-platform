@@ -20,6 +20,8 @@
  */
 package org.xwiki.bridge.event;
 
+import org.xwiki.observation.event.Event;
+
 /**
  * An event triggered whenever a client request (action) is processed, like <tt>/upload/</tt> or <tt>/view/</tt>. A
  * specific event corresponds to only one {@link #actionName action type}.
@@ -27,7 +29,7 @@ package org.xwiki.bridge.event;
  * @version $Id$
  * @since 3.2M3
  */
-public interface ActionExecutionEvent
+public interface ActionExecutionEvent extends Event
 {
     /**
      * Gets the name of the action causing this event.

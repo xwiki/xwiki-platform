@@ -205,7 +205,13 @@ public abstract class XWikiAction extends Action
                 // and there won't be a need for the context.
                 try {
                     ObservationManager om = Utils.getComponent(ObservationManager.class);
-                    om.notify(new ActionExecutingEvent(context.getAction()), context.getDoc(), context);
+                    ActionExecutingEvent event = new ActionExecutingEvent(context.getAction());
+                    om.notify(event, context.getDoc(), context);
+                    if (event.isCanceled()) {
+                        // Action has been canceled
+                        // TODO: do somethin special ?
+                        return null;
+                    }
                 } catch (Throwable ex) {
                     LOG.error("Cannot send action notifications for document [" + context.getDoc() + " using action ["
                         + context.getAction() + "]", ex);

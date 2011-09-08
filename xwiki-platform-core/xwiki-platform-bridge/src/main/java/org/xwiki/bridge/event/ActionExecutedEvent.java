@@ -20,10 +20,7 @@
  */
 package org.xwiki.bridge.event;
 
-import java.io.Serializable;
-
 import org.xwiki.observation.event.EndEvent;
-import org.xwiki.observation.event.Event;
 
 /**
  * An event triggered whenever a client request (action) is processed, like <tt>/upload/</tt> or <tt>/view/</tt>. A
@@ -33,19 +30,8 @@ import org.xwiki.observation.event.Event;
  * @since 3.2M3
  */
 // TODO: use the enumerated Action class when it's implemented
-public class ActionExecutedEvent implements Event, Serializable, EndEvent, ActionExecutionEvent
+public class ActionExecutedEvent extends AbstractActionExecutionEvent implements EndEvent
 {
-    /**
-     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
-     * changes.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * The name of the executed action.
-     */
-    private String actionName;
-
     /**
      * Match any {@link ActionExecutedEvent}.
      */
@@ -61,52 +47,6 @@ public class ActionExecutedEvent implements Event, Serializable, EndEvent, Actio
      */
     public ActionExecutedEvent(String actionName)
     {
-        this.actionName = actionName;
-    }
-
-    @Override
-    public String getActionName()
-    {
-        return this.actionName;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#hashCode()
-     */
-    @Override
-    public int hashCode()
-    {
-        return getActionName().hashCode();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#equals(Object)
-     */
-    @Override
-    public boolean equals(Object object)
-    {
-        if (object instanceof ActionExecutedEvent) {
-            return getActionName().equals(((ActionExecutedEvent) object).getActionName());
-        }
-        return getActionName().equals(object);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#matches(Object)
-     */
-    public boolean matches(Object otherEvent)
-    {
-        boolean isMatching = false;
-        if (this.getClass().isAssignableFrom(otherEvent.getClass())) {
-            ActionExecutedEvent actionEvent = (ActionExecutedEvent) otherEvent;
-            isMatching = getActionName().equals(actionEvent.getActionName());
-        }
-        return isMatching;
+        super(actionName);
     }
 }

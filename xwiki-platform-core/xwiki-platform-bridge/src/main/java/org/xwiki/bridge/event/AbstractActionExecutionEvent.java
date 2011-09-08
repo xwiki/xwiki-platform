@@ -20,18 +20,16 @@
  */
 package org.xwiki.bridge.event;
 
-import org.xwiki.observation.event.BeginEvent;
-import org.xwiki.observation.event.CancelableEvent;
+import java.io.Serializable;
 
 /**
- * An event triggered whenever a client request (action) is processed, like <tt>/upload/</tt> or <tt>/view/</tt>. A
- * specific event corresponds to only one {@link #actionName action type}.
+ * Base class for all action execution related events.
  * 
  * @version $Id$
  * @since 3.2M3
  */
 // TODO: use the enumerated Action class when it's implemented
-public class ActionExecutingEvent extends AbstractActionExecutionEvent implements CancelableEvent, BeginEvent
+public abstract class AbstractActionExecutionEvent implements Serializable, ActionExecutionEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -45,19 +43,9 @@ public class ActionExecutingEvent extends AbstractActionExecutionEvent implement
     private String actionName;
 
     /**
-     * Flag storing the state of this event.
+     * Match any {@link ActionExecutedEvent}.
      */
-    private boolean canceled;
-
-    /**
-     * The reason why the event was canceled.
-     */
-    private String reason;
-
-    /**
-     * Match any {@link ActionExecutingEvent}.
-     */
-    public ActionExecutingEvent()
+    public AbstractActionExecutionEvent()
     {
 
     }
@@ -65,9 +53,9 @@ public class ActionExecutingEvent extends AbstractActionExecutionEvent implement
     /**
      * Constructor initializing the action name of the event.
      * 
-     * @param actionName the name of the executed action
+     * @param actionName the name of the action
      */
-    public ActionExecutingEvent(String actionName)
+    public AbstractActionExecutionEvent(String actionName)
     {
         this.actionName = actionName;
     }
@@ -87,8 +75,8 @@ public class ActionExecutingEvent extends AbstractActionExecutionEvent implement
     @Override
     public boolean equals(Object object)
     {
-        if (object instanceof ActionExecutingEvent) {
-            return getActionName().equals(((ActionExecutingEvent) object).getActionName());
+        if (object instanceof ActionExecutedEvent) {
+            return getActionName().equals(((ActionExecutedEvent) object).getActionName());
         }
         return getActionName().equals(object);
     }
@@ -97,35 +85,10 @@ public class ActionExecutingEvent extends AbstractActionExecutionEvent implement
     public boolean matches(Object otherEvent)
     {
         boolean isMatching = false;
-        if (this.getClass().isAssignableFrom(otherEvent.getClass())) {
-            ActionExecutingEvent actionEvent = (ActionExecutingEvent) otherEvent;
-            isMatching = getActionName().equals(actionEvent.getActionName());
+        if (getClass().isAssignableFrom(otherEvent.getClass())) {
+            ActionExecutedEvent actionEvent = (ActionExecutedEvent) otherEvent;
+            isMatching = getActionName() == null || getActionName().equals(actionEvent.getActionName());
         }
         return isMatching;
-    }
-
-    @Override
-    public boolean isCanceled()
-    {
-        return this.canceled;
-    }
-
-    @Override
-    public void cancel()
-    {
-        this.canceled = true;
-    }
-
-    @Override
-    public void cancel(String reason)
-    {
-        this.canceled = true;
-        this.reason = reason;
-    }
-
-    @Override
-    public String getReason()
-    {
-        return this.reason;
     }
 }

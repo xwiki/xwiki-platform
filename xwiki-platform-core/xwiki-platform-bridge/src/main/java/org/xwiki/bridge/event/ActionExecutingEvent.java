@@ -34,17 +34,6 @@ import org.xwiki.observation.event.CancelableEvent;
 public class ActionExecutingEvent extends AbstractActionExecutionEvent implements CancelableEvent, BeginEvent
 {
     /**
-     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
-     * changes.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * The name of the executed action.
-     */
-    private String actionName;
-
-    /**
      * Flag storing the state of this event.
      */
     private boolean canceled;
@@ -69,39 +58,7 @@ public class ActionExecutingEvent extends AbstractActionExecutionEvent implement
      */
     public ActionExecutingEvent(String actionName)
     {
-        this.actionName = actionName;
-    }
-
-    @Override
-    public String getActionName()
-    {
-        return this.actionName;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return getActionName().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object object)
-    {
-        if (object instanceof ActionExecutingEvent) {
-            return getActionName().equals(((ActionExecutingEvent) object).getActionName());
-        }
-        return getActionName().equals(object);
-    }
-
-    @Override
-    public boolean matches(Object otherEvent)
-    {
-        boolean isMatching = false;
-        if (this.getClass().isAssignableFrom(otherEvent.getClass())) {
-            ActionExecutingEvent actionEvent = (ActionExecutingEvent) otherEvent;
-            isMatching = getActionName().equals(actionEvent.getActionName());
-        }
-        return isMatching;
+        super(actionName);
     }
 
     @Override

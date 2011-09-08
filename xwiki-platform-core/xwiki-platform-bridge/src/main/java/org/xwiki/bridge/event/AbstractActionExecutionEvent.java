@@ -86,7 +86,7 @@ public abstract class AbstractActionExecutionEvent implements Serializable, Acti
     {
         boolean isMatching = false;
         if (getClass().isAssignableFrom(otherEvent.getClass())) {
-            ActionExecutedEvent actionEvent = (ActionExecutedEvent) otherEvent;
+            ActionExecutionEvent actionEvent = (ActionExecutionEvent) otherEvent;
             isMatching = getActionName() == null || getActionName().equals(actionEvent.getActionName());
         }
         return isMatching;

@@ -103,16 +103,6 @@
     <when-property-is name="user.agent" value="gecko1_8" />
   </replace-with>
 
-  <!-- DOMImpl for widgets -->
-  <replace-with class="org.xwiki.gwt.user.client.internal.IEDOMImpl">
-    <when-type-is class="com.google.gwt.user.client.impl.DOMImpl" />
-    <any>
-      <when-property-is name="user.agent" value="ie6" />
-      <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
-    </any>
-  </replace-with>
-
   <!-- TextBoxImpl -->
   <replace-with class="org.xwiki.gwt.user.client.ui.internal.TextBoxImplIE6">
     <when-type-is class="com.google.gwt.user.client.ui.impl.TextBoxImpl" />

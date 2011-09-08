@@ -149,7 +149,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
 
         List<Block> result =
             this.boxMacro.execute(boxParameters, content == null ? StringUtils.EMPTY : content, context);
-        generaterEntries(result.get(0), feed, parameters, context);
+        generaterEntries(result.get(0), feed, parameters);
 
         return result;
     }
@@ -195,11 +195,10 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
      * @param parentBlock the parent Block to which the output is going to be added
      * @param feed the RSS Channel we retrieved via the Feed URL
      * @param parameters our parameter helper object
-     * @param context the macro's transformation context
      * @throws MacroExecutionException if the content cannot be rendered
      */
-    private void generaterEntries(Block parentBlock, SyndFeed feed, RssMacroParameters parameters,
-        MacroTransformationContext context) throws MacroExecutionException
+    private void generaterEntries(Block parentBlock, SyndFeed feed, RssMacroParameters parameters)
+        throws MacroExecutionException
     {
         int maxElements = parameters.getCount();
         int count = 0;

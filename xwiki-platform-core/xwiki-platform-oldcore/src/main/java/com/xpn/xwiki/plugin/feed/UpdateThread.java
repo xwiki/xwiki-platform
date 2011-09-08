@@ -167,11 +167,6 @@ public class UpdateThread extends AbstractXWikiRunnable
         this.nbLoadedFeedsErrors = nbLoadedFeedsErrors;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see {@link AbstractXWikiRunnable#runInternal()}
-     */
     @Override
     protected void runInternal()
     {

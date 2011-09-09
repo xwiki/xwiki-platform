@@ -5,7 +5,7 @@
 <language></language>
 <defaultLanguage></defaultLanguage>
 <translation>0</translation>
-<parent></parent>
+<parent>XWiki.WebHome</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
@@ -560,7 +560,7 @@ $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section
 	&lt;/dl&gt;
 	&lt;p&gt;
 		&lt;span class="buttonwrapper"&gt;
-			&lt;input type="submit" value="${msg.get('save')}" class="button /&gt;
+			&lt;input type="submit" value="${msg.get('save')}" class="button" /&gt;
 		&lt;/span&gt;
 	&lt;/p&gt;
 &lt;/form&gt;

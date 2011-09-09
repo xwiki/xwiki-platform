@@ -29,7 +29,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
@@ -271,7 +271,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     {
         PythonInterpreter interpreter = getPythonInterpreter();
 
-        if (StringUtils.isNotEmpty(language)) {
+        if (!StringUtils.isEmpty(language)) {
             interpreter.exec(MessageFormat.format(PY_LEXER_CREATE, language));
         } else {
             interpreter.exec(PY_LEXER_FIND);

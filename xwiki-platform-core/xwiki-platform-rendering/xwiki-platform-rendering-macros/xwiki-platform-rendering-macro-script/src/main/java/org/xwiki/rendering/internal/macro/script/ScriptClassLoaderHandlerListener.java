@@ -26,7 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.component.annotation.Component;
@@ -172,7 +172,7 @@ public class ScriptClassLoaderHandlerListener implements EventListener
             (ExtendedURLClassLoader) this.execution.getContext().getProperty(EXECUTION_CONTEXT_CLASSLOADER_KEY);
 
         if (cl == null) {
-            if (StringUtils.isNotEmpty(jarsParameterValue)) {
+            if (!StringUtils.isEmpty(jarsParameterValue)) {
                 cl = createOrExtendClassLoader(true, jarsParameterValue, parent);
             } else {
                 cl = this.attachmentClassLoaderFactory.createAttachmentClassLoader("", parent);

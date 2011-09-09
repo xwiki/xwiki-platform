@@ -23,7 +23,7 @@ package org.xwiki.rendering.macro.rss;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
@@ -31,145 +31,137 @@ import org.xwiki.rendering.macro.parameter.MacroParameterException;
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.rss.RssMacro} Macro.
  * 
- * @version $Id$contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
-    {
-        return this.contensContent()
+ * @version $Id$
+ * @since 1.8RC1
+ */
+public class RssMacroParameters
+{
+    /**
+     * The URL of the RSS feed.
+     */
+    private String feed;
+
+    /**
+     * If "true" displays the content of each feed in addition to the feed item link.
+     */
+    private boolean content;
+
+    /**
+     * The number of feed items to display.
+     */
+    private int count = 10;
+
+    /**
+     * If "true" and if the feed has an image, display it.
+     */
+    private boolean image;
+
+    /**
+     * The width of the enclosing box containing the RSS macro output.
+     */
+    private String width = StringUtils.EMPTY;
+
+    /**
+     * The RSS feed URL.
+     */
+    private URL feedURL;
+
+    /**
+     * @return the RSS feed URL.
+     */
+    public String getFeed()
+    {
+        return feed;
+    }
+
+    /**
+     * @param feed the RSS feed URL.
+     * @throws MacroParameterException if the feed URL is malformed.
+     */
+    @PropertyMandatory
+    @PropertyDescription("URL of the RSS feed")
+    public void setFeed(String feed) throws MacroParameterException
+    {
+        this.feed = feed;
+        try {
+            this.feedURL = new java.net.URL(feed);
+        } catch (MalformedURLException ex) {
+            throw new MacroParameterException("Malformed feed URL", ex);
+        }
+    }
+
+    /**
+     * @param image whether to display the feed's image.
+     */
+    @PropertyDescription("If the feeds has an image associated, display it?")
+    public void setImage(boolean image)
+    {
+        this.image = image;
+    }
+
+    /**
+     * @return whether to display the feed's image.
+     */
+    public boolean isImage()
+    {
+        return image;
+    }
+
+    /**
+     * @param width the width of the RSS box, that will dismiss potential CSS rules defining its default value.
+     */
+    @PropertyDescription("The width, in px or %, of the box containing the RSS output (default is 30%)")
+    public void setWidth(String width)
+    {
+        this.width = width;
+    }
+
+    /**
+     * @return the width of the RSS box, that will dismiss potential CSS rules defining its default value.
+     */
+    public String getWidth()
+    {
+        return this.width;
+    }
+
+    /**
+     * @param count the number of feed items to display.
+     */
+    @PropertyDescription("The maximum number of feed items to display on the page.")
+    public void setCount(int count)
+    {
+        this.count = count;
+    }
+
+    /**
+     * @return the number of feed items to display.
+     */
+    public int getCount()
+    {
+        return count;
+    }
+
+    /**
+     * @return the feed's URL
+     */
+    public URL getFeedURL()
+    {
+        return feedURL;
+    }
+
+    /**
+     * @param content if "true" displays the content of each feed in addition to the feed item link
+     */
+    @PropertyDescription("Display content for feed entries")
+    public void setContent(boolean content)
+    {
+        this.content = content;
+    }
+
+    /**
+     * @return true if the content of each feed should be displayed
+     */
+    public boolean isContent()
     {
         return this.content;
     }

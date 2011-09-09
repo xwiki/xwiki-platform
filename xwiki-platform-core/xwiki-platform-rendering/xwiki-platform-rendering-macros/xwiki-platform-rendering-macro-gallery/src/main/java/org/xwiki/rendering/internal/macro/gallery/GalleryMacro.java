@@ -46,7 +46,7 @@ import org.xwiki.skinx.SkinExtension;
 @Component
 @Named("gallery")
 @Singleton
-public class DefaultGalleryMacro extends AbstractMacro<Object>
+public class GalleryMacro extends AbstractMacro<Object>
 {
     /**
      * The description of the macro.
@@ -85,7 +85,7 @@ public class DefaultGalleryMacro extends AbstractMacro<Object>
     /**
      * Create and initialize the descriptor of the macro.
      */
-    public DefaultGalleryMacro()
+    public GalleryMacro()
     {
         super("Gallery", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION));
         setDefaultCategory(DEFAULT_CATEGORY_FORMATTING);

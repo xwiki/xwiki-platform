@@ -27,7 +27,6 @@ import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.formula.ImageData;

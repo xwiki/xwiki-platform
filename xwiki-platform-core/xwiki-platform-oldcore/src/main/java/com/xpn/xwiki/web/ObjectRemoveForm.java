@@ -21,14 +21,14 @@
 
 package com.xpn.xwiki.web;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ObjectRemoveForm extends ObjectAddForm
 {
     private int classId;
 
-    private static final Log LOG = LogFactory.getLog(ObjectRemoveForm.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ObjectRemoveForm.class);
 
     @Override
     public void readRequest()
@@ -38,7 +38,7 @@ public class ObjectRemoveForm extends ObjectAddForm
             setClassId(Integer.parseInt(getRequest().getParameter("classid")));
         } catch (Exception ex) {
             setClassId(-1);
-            LOG.warn("No or bad classid found while processing an objectremove request: "
+            LOGGER.warn("No or bad classid found while processing an objectremove request: "
                 + getRequest().getParameter("classid"));
         }
     }

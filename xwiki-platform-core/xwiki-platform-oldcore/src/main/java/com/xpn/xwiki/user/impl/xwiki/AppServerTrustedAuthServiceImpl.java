@@ -1,7 +1,7 @@
 package com.xpn.xwiki.user.impl.xwiki;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -15,7 +15,7 @@ import com.xpn.xwiki.user.api.XWikiUser;
  */
 public class AppServerTrustedAuthServiceImpl extends XWikiAuthServiceImpl
 {
-    private static final Log log = LogFactory.getLog(AppServerTrustedAuthServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppServerTrustedAuthServiceImpl.class);
 
     @Override
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
@@ -24,11 +24,11 @@ public class AppServerTrustedAuthServiceImpl extends XWikiAuthServiceImpl
         if ((user == null) || user.equals("")) {
             return super.checkAuth(context);
         } else {
-            if (log.isDebugEnabled())
-                log.debug("Launching create user for " + user);
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Launching create user for " + user);
             createUser(user, context);
-            if (log.isDebugEnabled())
-                log.debug("Create user done for " + user);
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Create user done for " + user);
             user = "XWiki." + user;
         }
         context.setUser(user);

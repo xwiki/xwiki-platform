@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -37,7 +37,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 public class XWikiPluginManager
 {
     /** Log helper for logging messages in this class. */
-    private static final Log LOG = LogFactory.getLog(XWikiPluginManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiPluginManager.class);
 
     private Vector<String> plugins = new Vector<String>();
 
@@ -67,8 +67,8 @@ public class XWikiPluginManager
     public void addPlugin(String name, String className, XWikiContext context)
     {
         if (this.pluginClassNames.contains(className)) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info(String.format("Skipping already registered plugin [%s]", name));
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info(String.format("Skipping already registered plugin [%s]", name));
             }
             return;
         }
@@ -91,7 +91,7 @@ public class XWikiPluginManager
             }
         } catch (Exception ex) {
             // Log an error but do not fail
-            LOG.error("Cannot initialize plugin [" + className + "]. This plugin will not be available.", ex);
+            LOGGER.error("Cannot initialize plugin [" + className + "]. This plugin will not be available.", ex);
         }
     }
 
@@ -178,7 +178,7 @@ public class XWikiPluginManager
             try {
                 plugin.flushCache(context);
             } catch (Exception e) {
-                LOG.error("Failed to flush cache in plugin [" + plugin.getClass() + "]", e);
+                LOGGER.error("Failed to flush cache in plugin [" + plugin.getClass() + "]", e);
             }
         }
     }
@@ -286,7 +286,7 @@ public class XWikiPluginManager
             try {
                 attach = plugin.downloadAttachment(attach, context);
             } catch (Exception ex) {
-                LOG.warn("downloadAttachment failed for plugin [" + plugin.getName() + "]: " + ex.getMessage());
+                LOGGER.warn("downloadAttachment failed for plugin [" + plugin.getName() + "]: " + ex.getMessage());
             }
         }
         return attach;

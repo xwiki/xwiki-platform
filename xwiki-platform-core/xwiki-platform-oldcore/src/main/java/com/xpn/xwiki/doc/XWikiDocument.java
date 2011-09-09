@@ -54,9 +54,9 @@ import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -3464,8 +3464,8 @@ public class XWikiDocument implements DocumentModelBridge
         setDocumentReference(document.getDocumentReference());
         setRCSVersion(document.getRCSVersion());
         setDocumentArchive(document.getDocumentArchive());
-        setAuthor(document.getAuthor());
-        setContentAuthor(document.getContentAuthor());
+        setAuthorReference(document.getAuthorReference());
+        setContentAuthorReference(document.getContentAuthorReference());
         setContent(document.getContent());
         setContentDirty(document.isContentDirty());
         setCreationDate(document.getCreationDate());
@@ -3484,7 +3484,7 @@ public class XWikiDocument implements DocumentModelBridge
         setStore(document.getStore());
         setTemplateDocumentReference(document.getTemplateDocumentReference());
         setParent(document.getParent());
-        setCreator(document.getCreator());
+        setCreatorReference(document.getCreatorReference());
         setDefaultLanguage(document.getDefaultLanguage());
         setDefaultTemplate(document.getDefaultTemplate());
         setValidationScript(document.getValidationScript());
@@ -3647,20 +3647,19 @@ public class XWikiDocument implements DocumentModelBridge
             return false;
         }
 
-        if (!getAuthor().equals(doc.getAuthor())) {
+        if (!ObjectUtils.equals(getAuthorReference(), doc.getAuthorReference())) {
             return false;
         }
 
-        if (!getContentAuthor().equals(doc.getContentAuthor())) {
+        if (!ObjectUtils.equals(getContentAuthorReference(), doc.getContentAuthorReference())) {
             return false;
         }
 
-        if ((getParentReference() != null && !getParentReference().equals(doc.getParentReference()))
-            || (getParentReference() == null && doc.getParentReference() != null)) {
+        if (!ObjectUtils.equals(getParentReference(), doc.getParentReference())) {
             return false;
         }
 
-        if (!getCreator().equals(doc.getCreator())) {
+        if (!ObjectUtils.equals(getCreatorReference(), doc.getCreatorReference())) {
             return false;
         }
 
@@ -3704,9 +3703,7 @@ public class XWikiDocument implements DocumentModelBridge
             return false;
         }
 
-        if ((getTemplateDocumentReference() != null && !getTemplateDocumentReference().equals(
-            doc.getTemplateDocumentReference()))
-            || (getTemplateDocumentReference() == null && doc.getTemplateDocumentReference() != null)) {
+        if (!ObjectUtils.equals(getTemplateDocumentReference(), doc.getTemplateDocumentReference())) {
             return false;
         }
 
@@ -3726,8 +3723,7 @@ public class XWikiDocument implements DocumentModelBridge
             return false;
         }
 
-        if ((getSyntaxId() != null && !getSyntaxId().equals(doc.getSyntaxId()))
-            || (getSyntaxId() == null && doc.getSyntaxId() != null)) {
+        if (!ObjectUtils.equals(getSyntax(), doc.getSyntax())) {
             return false;
         }
 
@@ -6396,7 +6392,7 @@ public class XWikiDocument implements DocumentModelBridge
             return false;
         }
 
-        return context.getUser().equals(getFullName());
+        return context.getUserReference().equals(getDocumentReference());
     }
 
     public void resetArchive(XWikiContext context) throws XWikiException

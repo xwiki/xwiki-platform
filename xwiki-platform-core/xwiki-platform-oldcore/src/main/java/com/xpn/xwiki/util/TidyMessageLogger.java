@@ -1,27 +1,23 @@
 package com.xpn.xwiki.util;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.w3c.tidy.TidyMessage;
-import org.w3c.tidy.TidyMessageListener;
 import org.w3c.tidy.TidyMessage.Level;
+import org.w3c.tidy.TidyMessageListener;
 
 /**
  * Utility class for logging JTidy messages.
  */
 public class TidyMessageLogger implements TidyMessageListener
 {
-    private final Log log;
+    private final Logger logger;
 
-    public TidyMessageLogger(Log log)
+    public TidyMessageLogger(Logger logger)
     {
-        this.log = log;
+        this.logger = logger;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see TidyMessageListener#messageReceived(TidyMessage)
-     */
+    @Override
     public void messageReceived(TidyMessage message)
     {
         String text =
@@ -29,13 +25,13 @@ public class TidyMessageLogger implements TidyMessageListener
                 + message.getMessage();
         Level level = message.getLevel();
         if (level.equals(Level.ERROR)) {
-            log.error(text);
+            this.logger.error(text);
         } else if (level.equals(Level.INFO)) {
-            log.info(text);
+            this.logger.info(text);
         } else if (level.equals(Level.SUMMARY)) {
-            log.info(text);
+            this.logger.info(text);
         } else if (level.equals(Level.WARNING)) {
-            log.warn(text);
+            this.logger.warn(text);
         }
     }
 }

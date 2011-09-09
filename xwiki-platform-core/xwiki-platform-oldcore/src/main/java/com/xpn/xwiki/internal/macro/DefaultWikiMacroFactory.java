@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -60,6 +61,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @since 2.0M2
  */
 @Component
+@Singleton
 public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConstants
 {
     /**

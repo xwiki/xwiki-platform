@@ -49,6 +49,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public class AttachMacro extends BaseLocaleMacro
 {
+    @Override
     public String getLocaleKey()
     {
         return "macro.attach";

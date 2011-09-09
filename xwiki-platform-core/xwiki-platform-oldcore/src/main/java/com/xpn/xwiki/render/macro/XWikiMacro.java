@@ -19,10 +19,10 @@
  *
  */
 
-
 package com.xpn.xwiki.render.macro;
 
 import org.radeox.macro.Macro;
 
-public interface XWikiMacro extends Macro {
+public interface XWikiMacro extends Macro
+{
 }

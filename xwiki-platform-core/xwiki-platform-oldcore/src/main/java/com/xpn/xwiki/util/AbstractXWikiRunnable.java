@@ -3,8 +3,8 @@ package com.xpn.xwiki.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
@@ -23,7 +23,7 @@ public abstract class AbstractXWikiRunnable implements Runnable
     /**
      * Logging tools.
      */
-    private static final Log LOG = LogFactory.getLog(AbstractXWikiRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractXWikiRunnable.class);
 
     private Map<String, Object> properties = new HashMap<String, Object>();
 
@@ -79,18 +79,14 @@ public abstract class AbstractXWikiRunnable implements Runnable
         ech.removeContext();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Runnable#run()
-     */
+    @Override
     public final void run()
     {
         try {
             // initialize execution context
             initExecutionContext();
         } catch (ExecutionContextException e) {
-            LOG.error("Failed to initialize execution context", e);
+            LOGGER.error("Failed to initialize execution context", e);
             return;
         }
 

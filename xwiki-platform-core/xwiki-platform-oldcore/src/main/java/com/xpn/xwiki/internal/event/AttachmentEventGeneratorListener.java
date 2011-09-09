@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
@@ -48,6 +49,7 @@ import com.xpn.xwiki.web.Utils;
  * @since 3.2M1
  */
 @Component
+@Singleton
 @Named("AttachmentEventGeneratorListener")
 public class AttachmentEventGeneratorListener implements EventListener
 {

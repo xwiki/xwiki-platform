@@ -21,19 +21,20 @@
 
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWikiContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.portlet.PortletURL;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
+import javax.portlet.PortletURL;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.xpn.xwiki.XWikiContext;
+
 public class XWikiPortletURLFactory extends XWikiServletURLFactory
 {
-    private static final Log LOG = LogFactory.getLog(XWikiPortletURLFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiPortletURLFactory.class);
 
     /**
      * {@inheritDoc}
@@ -86,8 +87,8 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory
                 purl.setParameter("action", action);
             }
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Generated URL is: " + purl.toString());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Generated URL is: " + purl.toString());
             }
 
             return new URL(serverURL, purl.toString());
@@ -108,8 +109,8 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory
         XWikiContext context)
     {
         try {
-            if (LOG.isDebugEnabled())
-                LOG.debug("Generating URL for: " + xwikidb + ":" + web + "." + name + " for action " + action
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Generating URL for: " + xwikidb + ":" + web + "." + name + " for action " + action
                     + " with querystring " + querystring + " and anchor " + anchor);
 
             XWikiResponse response = context.getResponse();
@@ -153,8 +154,8 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory
             purl.setParameter("topic", web + "." + name);
             purl.setParameter("action", action);
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Generated URL is: " + purl.toString());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Generated URL is: " + purl.toString());
             }
 
             return new URL(serverURL, purl.toString());
@@ -177,8 +178,8 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory
             return createURL(web, name, action, context);
 
         try {
-            if (LOG.isDebugEnabled())
-                LOG.debug("Generating Redirect URL for: " + web + "." + name + " for action " + action);
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Generating Redirect URL for: " + web + "." + name + " for action " + action);
 
             XWikiResponse response = context.getResponse();
             response.setRenderParameter("topic", web + "." + name);

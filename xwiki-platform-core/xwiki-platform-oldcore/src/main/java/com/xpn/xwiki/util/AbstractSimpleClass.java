@@ -5,25 +5,27 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * Class with {@link Object#equals(Object)}, {@link Object#hashCode()}
- *  and {@link Object#toString()} implemented via commons-lang builders.
- * Useful for extend simple POJO classes.
+ * Class with {@link Object#equals(Object)}, {@link Object#hashCode()} and {@link Object#toString()} implemented via
+ * commons-lang builders. Useful for extend simple POJO classes.
+ * 
  * @version $Id$
  * @since 1.2M1
  */
 public abstract class AbstractSimpleClass
 {
-    /** {@inheritDoc} */
+    @Override
     public boolean equals(Object obj)
     {
-        return EqualsBuilder.reflectionEquals(this, obj);        
+        return EqualsBuilder.reflectionEquals(this, obj);
     }
-    /** {@inheritDoc} */
+
+    @Override
     public int hashCode()
     {
         return HashCodeBuilder.reflectionHashCode(this);
     }
-    /** {@inheritDoc} */
+
+    @Override
     public String toString()
     {
         return ToStringBuilder.reflectionToString(this);

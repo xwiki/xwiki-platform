@@ -32,8 +32,8 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
@@ -53,7 +53,7 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
 public class PdfURLFactory extends XWikiServletURLFactory
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(PdfURLFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PdfURLFactory.class);
 
     /** Segment separator used in the collision-free key generation. */
     private static final String SEPARATOR = "/";
@@ -68,7 +68,7 @@ public class PdfURLFactory extends XWikiServletURLFactory
         try {
             return getURL(wiki, space, name, filename, null, context);
         } catch (Exception ex) {
-            LOG.warn("Failed to save image for PDF export", ex);
+            LOGGER.warn("Failed to save image for PDF export", ex);
             return super.createAttachmentURL(filename, space, name, action, null, wiki, context);
         }
     }
@@ -83,7 +83,7 @@ public class PdfURLFactory extends XWikiServletURLFactory
         try {
             return getURL(wiki, space, name, filename, revision, context);
         } catch (Exception ex) {
-            LOG.warn("Failed to save image for PDF export: " + ex.getMessage());
+            LOGGER.warn("Failed to save image for PDF export: " + ex.getMessage());
             return super.createAttachmentRevisionURL(filename, space, name, revision, wiki, context);
         }
     }
@@ -166,8 +166,11 @@ public class PdfURLFactory extends XWikiServletURLFactory
         String key = getAttachmentKey(space, name, filename, revision);
         if (!usedFiles.containsKey(key)) {
             File file = getTemporaryFile(key, context);
-            XWikiDocument doc = context.getWiki().getDocument(
-                new DocumentReference(StringUtils.defaultString(wiki, context.getDatabase()), space, name), context);
+            XWikiDocument doc =
+                context.getWiki()
+                    .getDocument(
+                        new DocumentReference(StringUtils.defaultString(wiki, context.getDatabase()), space, name),
+                        context);
             XWikiAttachment attachment = doc.getAttachment(filename);
             if (StringUtils.isNotEmpty(revision)) {
                 attachment = attachment.getAttachmentRevision(revision, context);
@@ -184,8 +187,8 @@ public class PdfURLFactory extends XWikiServletURLFactory
      * Copy a resource from the filesystem into a temporary file and map this resulting file to the requested resource
      * location.
      * 
-     * @param resourceName the name of the file to copy, possibly including a path to it, for example {@code
-     *        icons/silk/add.gif}
+     * @param resourceName the name of the file to copy, possibly including a path to it, for example
+     *            {@code icons/silk/add.gif}
      * @param key the collision-free identifier of the resource
      * @param usedFiles the mapping of resource keys to temporary files where to put the resulting temporary file
      * @param context the current request context

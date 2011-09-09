@@ -26,8 +26,8 @@ import java.io.OutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -51,7 +51,7 @@ import com.xpn.xwiki.web.XWikiResponse;
 public class GraphVizPlugin extends XWikiDefaultPlugin
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(com.xpn.xwiki.plugin.graphviz.GraphVizPlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(com.xpn.xwiki.plugin.graphviz.GraphVizPlugin.class);
 
     /** The default output format to use: PNG image. */
     private static final String DEFAULT_FORMAT = "png";
@@ -136,7 +136,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
         try {
             this.tempDir.mkdirs();
         } catch (Exception ex) {
-            LOG.warn("Failed to create temporary file", ex);
+            LOGGER.warn("Failed to create temporary file", ex);
         }
 
         this.dotPath = context.getWiki().Param("xwiki.plugin.graphviz.dotpath", DOT_ENGINE);
@@ -144,7 +144,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
             try {
                 File dfile = new File(this.dotPath);
                 if (!dfile.exists()) {
-                    LOG.error("Cannot find graphiz dot program at " + this.dotPath);
+                    LOGGER.error("Cannot find graphiz dot program at " + this.dotPath);
                 }
             } catch (Exception e) {
                 // Access restrictions, not important
@@ -156,7 +156,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
             try {
                 File dfile = new File(this.neatoPath);
                 if (!dfile.exists()) {
-                    LOG.error("Cannot find graphiz neato program at " + this.neatoPath);
+                    LOGGER.error("Cannot find graphiz neato program at " + this.neatoPath);
                 }
             } catch (Exception e) {
                 // Access restrictions, not important
@@ -350,11 +350,11 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
                 t.interrupt();
             } catch (InterruptedException ex) {
                 p.destroy();
-                LOG.error("Timeout while generating image from dot", ex);
+                LOGGER.error("Timeout while generating image from dot", ex);
             }
 
             if (exitValue != 0) {
-                LOG.error("Error while generating image from dot: "
+                LOGGER.error("Error while generating image from dot: "
                     + IOUtils.toString(p.getErrorStream(), XWiki.DEFAULT_ENCODING));
             }
         }

@@ -34,6 +34,7 @@ import org.radeox.macro.table.Table;
  */
 public class TableMacro extends BaseLocaleMacro
 {
+    @Override
     public String getLocaleKey()
     {
         return "macro.table";

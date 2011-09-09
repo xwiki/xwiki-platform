@@ -24,12 +24,12 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class XWikiBatcherStats
 {
-    private static final Log log = LogFactory.getLog(XWikiBatcherStats.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiBatcherStats.class);
 
     private List sqlList = new ArrayList();
 
@@ -148,10 +148,10 @@ public class XWikiBatcherStats
 
     public void logSQLList()
     {
-        if (log.isDebugEnabled()) {
-            log.debug("SQL: number of queries " + sqlList.size());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("SQL: number of queries " + sqlList.size());
             for (int i = 0; i < sqlList.size(); i++) {
-                log.debug("SQL: " + sqlList.get(i));
+                LOGGER.debug("SQL: " + sqlList.get(i));
             }
         }
     }

@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.inject.Inject;
+
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -23,7 +23,8 @@ import org.hibernate.jdbc.BorrowedConnectionProxy;
 import org.hibernate.jdbc.ConnectionManager;
 import org.hibernate.mapping.Table;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
-import org.xwiki.component.annotation.Requirement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
@@ -39,13 +40,13 @@ import com.xpn.xwiki.web.Utils;
 
 public class XWikiHibernateBaseStore implements Initializable
 {
-    private static final Log log = LogFactory.getLog(XWikiHibernateBaseStore.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateBaseStore.class);
 
     private Map<String, String> connections = new ConcurrentHashMap<String, String>();
 
     private int nbConnections = 0;
 
-    @Requirement
+    @Inject
     private HibernateSessionFactory sessionFactory;
 
     private String hibpath = "/WEB-INF/hibernate.cfg.xml";
@@ -67,7 +68,7 @@ public class XWikiHibernateBaseStore implements Initializable
     public XWikiHibernateBaseStore(XWiki xwiki, XWikiContext context)
     {
         String path = xwiki.Param("xwiki.store.hibernate.path", "/WEB-INF/hibernate.cfg.xml");
-        log.debug("Hibernate configuration file: [" + path + "]");
+        LOGGER.debug("Hibernate configuration file: [" + path + "]");
         setPath(path);
     }
 
@@ -90,9 +91,7 @@ public class XWikiHibernateBaseStore implements Initializable
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         Execution execution = (Execution) Utils.getComponent(Execution.class);
@@ -102,8 +101,6 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Allows to get the current hibernate config file path
-     * 
-     * @return
      */
     public String getPath()
     {
@@ -131,6 +128,7 @@ public class XWikiHibernateBaseStore implements Initializable
         } catch (Exception e) {
             productName = "Unknown";
         }
+
         return DatabaseProduct.toProduct(productName);
     }
 
@@ -160,7 +158,7 @@ public class XWikiHibernateBaseStore implements Initializable
             }
         }
         if (this.sessionFactory == null) {
-            this.sessionFactory = (HibernateSessionFactory) Utils.getComponent(HibernateSessionFactory.class);
+            this.sessionFactory = Utils.getComponent(HibernateSessionFactory.class);
         }
 
         setSessionFactory(getConfiguration().buildSessionFactory());
@@ -170,7 +168,6 @@ public class XWikiHibernateBaseStore implements Initializable
      * This get's the current session. This is set in beginTransaction
      * 
      * @param context
-     * @return
      */
     public Session getSession(XWikiContext context)
     {
@@ -183,6 +180,7 @@ public class XWikiHibernateBaseStore implements Initializable
         } catch (org.hibernate.SessionException ex) {
             session = null;
         }
+
         return session;
     }
 
@@ -205,7 +203,6 @@ public class XWikiHibernateBaseStore implements Initializable
      * Allows to get the current transaction from the context This is set in beginTransaction
      * 
      * @param context
-     * @return
      */
     public Transaction getTransaction(XWikiContext context)
     {
@@ -268,14 +265,14 @@ public class XWikiHibernateBaseStore implements Initializable
         // We don't update the schema if the XWiki hibernate config parameter says not to update
         if ((!force) && (context.getWiki() != null)
             && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
-            if (log.isDebugEnabled()) {
-                log.debug("Schema update deactivated for wiki [" + context.getDatabase() + "]");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Schema update deactivated for wiki [" + context.getDatabase() + "]");
             }
             return;
         }
 
-        if (log.isInfoEnabled()) {
-            log.info("Updating schema update for wiki [" + context.getDatabase() + "]...");
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Updating schema update for wiki [" + context.getDatabase() + "]...");
         }
 
         try {
@@ -308,8 +305,8 @@ public class XWikiHibernateBaseStore implements Initializable
 
             updateSchema(sql, context);
         } finally {
-            if (log.isInfoEnabled()) {
-                log.info("Schema update for wiki [" + context.getDatabase() + "] done");
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Schema update for wiki [" + context.getDatabase() + "] done");
             }
         }
     }
@@ -398,7 +395,6 @@ public class XWikiHibernateBaseStore implements Initializable
      * 
      * @param config
      * @param context
-     * @return
      * @throws HibernateException
      */
     public String[] getSchemaUpdateScript(Configuration config, XWikiContext context) throws HibernateException
@@ -437,8 +433,8 @@ public class XWikiHibernateBaseStore implements Initializable
             stmt = connection.createStatement();
             schemaSQL = config.generateSchemaUpdateScript(dialect, meta);
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error("Failed creating schema update script", e);
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Failed creating schema update script", e);
             }
         } finally {
             try {
@@ -487,15 +483,15 @@ public class XWikiHibernateBaseStore implements Initializable
             }
             for (int j = 0; j < createSQL.length; j++) {
                 sql = createSQL[j];
-                if (log.isDebugEnabled()) {
-                    log.debug("Update Schema sql: [" + sql + "]");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Update Schema sql: [" + sql + "]");
                 }
                 stmt.executeUpdate(sql);
             }
             connection.commit();
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error("Failed updating schema while executing query [" + sql + "]", e);
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Failed updating schema while executing query [" + sql + "]", e);
             }
         } finally {
             try {
@@ -593,8 +589,8 @@ public class XWikiHibernateBaseStore implements Initializable
     {
         if (isVirtual(context)) {
             try {
-                if (log.isDebugEnabled()) {
-                    log.debug("Switch database to: [" + context.getDatabase() + "]");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Switch database to: [" + context.getDatabase() + "]");
                 }
 
                 if (context.getDatabase() != null) {
@@ -659,8 +655,7 @@ public class XWikiHibernateBaseStore implements Initializable
         Dialect dialect = Dialect.getDialect(getConfiguration().getProperties());
 
         String closeQuote = String.valueOf(dialect.closeQuote());
-        String escapedSchema =
-            dialect.openQuote() + schema.replace(closeQuote, closeQuote + closeQuote) + closeQuote;
+        String escapedSchema = dialect.openQuote() + schema.replace(closeQuote, closeQuote + closeQuote) + closeQuote;
 
         return escapedSchema;
     }
@@ -669,7 +664,6 @@ public class XWikiHibernateBaseStore implements Initializable
      * Begins a transaction
      * 
      * @param context
-     * @return
      * @throws XWikiException
      */
     public boolean beginTransaction(XWikiContext context) throws XWikiException
@@ -682,7 +676,6 @@ public class XWikiHibernateBaseStore implements Initializable
      * 
      * @param withTransaction
      * @param context
-     * @return
      * @throws XWikiException
      */
     public boolean beginTransaction(boolean withTransaction, XWikiContext context) throws XWikiException
@@ -695,7 +688,6 @@ public class XWikiHibernateBaseStore implements Initializable
      * 
      * @param sfactory
      * @param context
-     * @return
      * @throws XWikiException
      */
     public boolean beginTransaction(SessionFactory sfactory, XWikiContext context) throws XWikiException
@@ -709,7 +701,6 @@ public class XWikiHibernateBaseStore implements Initializable
      * @param sfactory
      * @param withTransaction
      * @param context
-     * @return
      * @throws HibernateException
      * @throws XWikiException
      */
@@ -721,26 +712,26 @@ public class XWikiHibernateBaseStore implements Initializable
         Session session = getSession(context);
 
         if (((session == null) && (transaction != null)) || ((transaction == null) && (session != null))) {
-            if (log.isWarnEnabled()) {
-                log.warn("Incompatible session (" + session + ") and transaction (" + transaction + ") status");
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn("Incompatible session (" + session + ") and transaction (" + transaction + ") status");
             }
             // TODO: Fix this problem, don't ignore it!
             return false;
         }
 
         if (session != null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Taking session from context " + session);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Taking session from context " + session);
             }
-            if (log.isDebugEnabled()) {
-                log.debug("Taking transaction from context " + transaction);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Taking transaction from context " + transaction);
             }
             return false;
         }
 
         if (session == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Trying to get session from pool");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Trying to get session from pool");
             }
             if (sfactory == null) {
                 session = getSessionFactory().openSession();
@@ -748,23 +739,23 @@ public class XWikiHibernateBaseStore implements Initializable
                 session = sfactory.openSession();
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug("Taken session from pool " + session);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Taken session from pool " + session);
             }
 
-            if (log.isDebugEnabled()) {
+            if (LOGGER.isDebugEnabled()) {
                 addConnection(getRealConnection(session), context);
             }
 
             setSession(session, context);
             setDatabase(session, context);
 
-            if (log.isDebugEnabled()) {
-                log.debug("Trying to open transaction");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Trying to open transaction");
             }
             transaction = session.beginTransaction();
-            if (log.isDebugEnabled()) {
-                log.debug("Opened transaction " + transaction);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Opened transaction " + transaction);
             }
             setTransaction(transaction, context);
         }
@@ -787,11 +778,11 @@ public class XWikiHibernateBaseStore implements Initializable
             try {
                 // Keep some statistics about session and connections
                 if (this.connections.containsKey(connection.toString())) {
-                    log.info("Connection [" + connection.toString() + "] already in connection map for store "
+                    LOGGER.info("Connection [" + connection.toString() + "] already in connection map for store "
                         + this.toString());
                 } else {
                     String value = "";
-                    if (log.isDebugEnabled()) {
+                    if (LOGGER.isDebugEnabled()) {
                         // No need to fill in the logging stack trace if debug is not enabled.
                         XWikiException stackException = new XWikiException();
                         stackException.fillInStackTrace();
@@ -802,7 +793,7 @@ public class XWikiHibernateBaseStore implements Initializable
                 }
             } catch (Throwable e) {
                 // This should not happen
-                log.warn(e.getMessage(), e);
+                LOGGER.warn(e.getMessage(), e);
             }
         }
     }
@@ -822,11 +813,11 @@ public class XWikiHibernateBaseStore implements Initializable
                     this.connections.remove(connection.toString());
                     this.nbConnections--;
                 } else {
-                    log.info("Connection [" + connection.toString() + "] not in connection map");
+                    LOGGER.info("Connection [" + connection.toString() + "] not in connection map");
                 }
             } catch (Throwable e) {
                 // This should not happen
-                log.warn(e.getMessage(), e);
+                LOGGER.warn(e.getMessage(), e);
             }
         }
     }
@@ -864,8 +855,8 @@ public class XWikiHibernateBaseStore implements Initializable
                 // be aggressively closed by hibernate 3.1 and more
                 preCloseSession(session);
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Releasing hibernate transaction " + transaction);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Releasing hibernate transaction " + transaction);
                 }
                 if (commit) {
                     transaction.commit();
@@ -930,9 +921,9 @@ public class XWikiHibernateBaseStore implements Initializable
     private void preCloseSession(Session session) throws HibernateException
     {
         if (session != null) {
-            if (log.isDebugEnabled()) {
+            if (LOGGER.isDebugEnabled()) {
                 // Remove the connection from the list of active connections, used for debugging.
-                log.debug("Releasing hibernate session " + session);
+                LOGGER.debug("Releasing hibernate session " + session);
                 Connection connection = getRealConnection(session);
                 if ((connection != null)) {
                     removeConnection(connection);
@@ -941,7 +932,7 @@ public class XWikiHibernateBaseStore implements Initializable
         }
     }
 
-    /*
+    /**
      * Hack to get the real JDBC connection because hibernate 3.1 wraps the connection in a proxy and this creates a
      * memory leak
      */
@@ -970,8 +961,8 @@ public class XWikiHibernateBaseStore implements Initializable
         try {
             Session session = getSession(context);
             if (session != null) {
-                if (log.isWarnEnabled()) {
-                    log.warn("Cleanup of session was needed: " + session);
+                if (LOGGER.isWarnEnabled()) {
+                    LOGGER.warn("Cleanup of session was needed: " + session);
                 }
                 endTransaction(context, false);
             }
@@ -1095,8 +1086,8 @@ public class XWikiHibernateBaseStore implements Initializable
                     monitor.endTimer("hibernate");
                 }
             } catch (Exception e) {
-                if (log.isErrorEnabled()) {
-                    log.error("Exeption while close transaction", e);
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error("Exeption while close transaction", e);
                 }
             }
         }

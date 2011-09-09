@@ -22,6 +22,9 @@ package com.xpn.xwiki.internal.observation.remote.converter;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.event.Event;
@@ -40,7 +43,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 2.0M4
  */
-@Component("action")
+@Component
+@Singleton
+@Named("action")
 public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
 {
     /**
@@ -53,12 +58,7 @@ public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
         }
     };
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.LocalEventConverter#toRemote(org.xwiki.observation.remote.LocalEventData,
-     *      org.xwiki.observation.remote.RemoteEventData)
-     */
+    @Override
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
     {
         if (localEvent.getEvent() instanceof ActionExecutedEvent) {
@@ -77,12 +77,7 @@ public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.RemoteEventConverter#fromRemote(org.xwiki.observation.remote.RemoteEventData,
-     *      org.xwiki.observation.remote.LocalEventData)
-     */
+    @Override
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
         if (remoteEvent.getEvent() instanceof ActionExecutedEvent) {

@@ -1,7 +1,10 @@
 package com.xpn.xwiki.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextInitializer;
@@ -17,13 +20,15 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
  * @version $Id$
  * @since 2.0M3
  */
-@Component("XWikiStubContextInitializer")
+@Component
+@Singleton
+@Named("XWikiStubContextInitializer")
 public class XWikiStubContextInitializer implements ExecutionContextInitializer
 {
     /**
      * Generate stub XWikiContext.
      */
-    @Requirement
+    @Inject
     private XWikiStubContextProvider stubContextProvider;
 
     /**

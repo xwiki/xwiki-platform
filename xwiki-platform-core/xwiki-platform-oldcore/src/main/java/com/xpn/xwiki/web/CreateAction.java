@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -55,7 +55,7 @@ public class CreateAction extends XWikiAction
     /**
      * Log used to report exceptions.
      */
-    private static final Log LOG = LogFactory.getLog(CreateAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CreateAction.class);
 
     /**
      * The template provider class, to create documents from templates.
@@ -508,7 +508,7 @@ public class CreateAction extends XWikiAction
                 }
             }
         } catch (Exception e) {
-            LOG.warn("There was an error gettting the available templates for space " + space, e);
+            LOGGER.warn("There was an error gettting the available templates for space " + space, e);
         }
 
         return templates;

@@ -527,6 +527,7 @@ hXM4h3N4m+L/A2hc4Ov9lvelAAAAAElFTkSuQmCC
 	#end
 #end ##macro
 {{/velocity}}
+
 {{velocity}}
 #if ($doc.name != 'XWikiPreferences' &amp;&amp; $xcontext.action == 'view')
 $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=analytics')) 
@@ -543,7 +544,6 @@ $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section
 #else## !hasAdmin
 {{error}}$msg.get('needadminrights').{{/error}}
 #end##
-
 #displayAnalyticsStatus()
 
 {{html}}
@@ -565,6 +565,5 @@ $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section
 	&lt;/p&gt;
 &lt;/form&gt;
 {{/html}}
-
 
 {{/velocity}}</content></xwikidoc>

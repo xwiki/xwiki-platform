@@ -19,8 +19,10 @@
  */
 package org.xwiki.component.internal.embed;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.internal.ComponentManagerFactory;
 import org.xwiki.component.manager.ComponentManager;
@@ -34,19 +36,17 @@ import org.xwiki.component.manager.ComponentManager;
  * @since 2.1RC1
  */
 @Component
+@Singleton
 public class EmbeddableComponentManagerFactory implements ComponentManagerFactory
 {
     /**
      * The Root Component Manager used to get access to the set Component Event Manager that we
      * set by default for newly created Component Managers.
      */
-    @Requirement
+    @Inject
     private ComponentManager rootComponentManager;
 
-    /**
-     * {@inheritDoc}
-     * @see ComponentManagerFactory#createComponentManager(ComponentManager)
-     */
+    @Override
     public ComponentManager createComponentManager(ComponentManager parentComponentManager)
     {
         ComponentManager cm = new EmbeddableComponentManager();

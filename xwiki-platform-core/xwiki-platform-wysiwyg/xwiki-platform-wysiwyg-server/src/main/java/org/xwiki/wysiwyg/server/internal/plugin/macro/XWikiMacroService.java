@@ -26,10 +26,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroService;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.ParameterDescriptor;
@@ -42,12 +45,13 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.wysiwyg.server.plugin.macro.MacroDescriptorTranslator;
 
-
 /**
  * XWiki specific implementation of {@link MacroService}.
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class XWikiMacroService implements MacroService
 {
     /**
@@ -58,32 +62,28 @@ public class XWikiMacroService implements MacroService
     /**
      * The syntax factory used to create {@link Syntax} instances from string syntax identifiers.
      */
-    @Requirement
+    @Inject
     private SyntaxFactory syntaxFactory;
 
     /**
      * The macro manager used to retrieve macros.
      */
-    @Requirement
+    @Inject
     private MacroManager macroManager;
 
     /**
      * The macro category manager used to retrieve macro categories.
      */
-    @Requirement
+    @Inject
     private MacroCategoryManager categoryManager;
 
     /**
      * The component used to translate macro descriptors into the execution context language.
      */
-    @Requirement
+    @Inject
     private MacroDescriptorTranslator macroDescriptorTranslator;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MacroService#getMacroDescriptor(String, String)
-     */
+    @Override
     public MacroDescriptor getMacroDescriptor(String macroId, String syntaxId)
     {
         return macroDescriptorTranslator.translate(getUntranslatedMacroDescriptor(macroId, syntaxId));
@@ -183,11 +183,7 @@ public class XWikiMacroService implements MacroService
         return parameterType;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MacroService#getMacroDescriptors(String)
-     */
+    @Override
     public List<MacroDescriptor> getMacroDescriptors(String syntaxId)
     {
         try {

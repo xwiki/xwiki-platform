@@ -21,7 +21,6 @@ package org.xwiki.model.internal;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
@@ -32,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Get configuration data from the XWiki configuration using a {@link ConfigurationSource}. If no
@@ -46,6 +46,7 @@ import javax.inject.Inject;
  * @since 2.2M1
  */
 @Component
+@Singleton
 public class DefaultModelConfiguration implements ModelConfiguration
 {
     /**
@@ -67,7 +68,7 @@ public class DefaultModelConfiguration implements ModelConfiguration
      * We want to make sure this component can be loaded and used even if there's no ConfigurationSource available
      * in the system. This is why we lazy load the ConfigurationSource component.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
@@ -76,10 +77,7 @@ public class DefaultModelConfiguration implements ModelConfiguration
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.model.ModelConfiguration#getDefaultReferenceValue(org.xwiki.model.EntityType)
-     */
+    @Override
     public String getDefaultReferenceValue(EntityType type)
     {
         String name;

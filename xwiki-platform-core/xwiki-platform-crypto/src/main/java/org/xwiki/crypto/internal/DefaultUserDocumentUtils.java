@@ -19,13 +19,14 @@
  */
 package org.xwiki.crypto.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-
 
 /**
  * Default implementation of {@link UserDocumentUtils}.
@@ -34,25 +35,22 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * @since 2.5M1
  */
 @Component
+@Singleton
 public class DefaultUserDocumentUtils implements UserDocumentUtils
 {
     /** DocumentAccessBridge for getting the current user's document and URL. */
-    @Requirement
+    @Inject
     private DocumentAccessBridge bridge;
 
     /** Resolver which can make a DocumentReference out of a String. */
-    @Requirement
+    @Inject
     private DocumentReferenceResolver<String> resolver;
 
     /** Serializer to turn a document reference into a String which can be put in a certificate. */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> serializer;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.crypto.internal.UserDocumentUtils#getCurrentUser()
-     */
+    @Override
     public String getCurrentUser()
     {
         String localName = this.bridge.getCurrentUser();
@@ -60,11 +58,7 @@ public class DefaultUserDocumentUtils implements UserDocumentUtils
         return this.serializer.serialize(dr);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.crypto.internal.UserDocumentUtils#getUserDocURL(java.lang.String)
-     */
+    @Override
     public String getUserDocURL(final String userDocName)
     {
         DocumentReference dr = this.resolver.resolve(userDocName);

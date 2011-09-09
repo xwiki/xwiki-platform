@@ -24,8 +24,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import javax.inject.Inject;
+
 import org.apache.commons.configuration.Configuration;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.properties.ConverterManager;
 
@@ -44,7 +45,7 @@ public class CommonsConfigurationSource implements ConfigurationSource
     /**
      * Component used for performing type conversions.
      */
-    @Requirement
+    @Inject
     private ConverterManager converterManager;
 
     protected void setConfiguration(Configuration configuration)
@@ -52,33 +53,21 @@ public class CommonsConfigurationSource implements ConfigurationSource
         this.configuration = configuration;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigurationSource#getProperty(String, Object)
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String key, T defaultValue)
     {
         return getProperty(key, defaultValue, (Class<T>) defaultValue.getClass());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigurationSource#getProperty(String)
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String key)
     {
         return (T) this.configuration.getProperty(key);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigurationSource#getProperty(String, Class)
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String key, Class<T> valueClass)
     {
@@ -105,11 +94,7 @@ public class CommonsConfigurationSource implements ConfigurationSource
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigurationSource#getKeys()
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public List<String> getKeys()
     {
@@ -121,21 +106,13 @@ public class CommonsConfigurationSource implements ConfigurationSource
         return keysList;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigurationSource#containsKey(String)
-     */
+    @Override
     public boolean containsKey(String key)
     {
         return this.configuration.containsKey(key);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigurationSource#isEmpty()
-     */
+    @Override
     public boolean isEmpty()
     {
         return this.configuration.isEmpty();
@@ -149,5 +126,4 @@ public class CommonsConfigurationSource implements ConfigurationSource
         }
         return result;
     }
-
 }

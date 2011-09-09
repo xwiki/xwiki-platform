@@ -24,11 +24,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
@@ -55,6 +58,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class DefaultWikiService implements WikiService
 {
     /**
@@ -65,17 +70,17 @@ public class DefaultWikiService implements WikiService
     /**
      * The component used to access documents. This is temporary till XWiki model is moved into components.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /** Execution context handler, needed for accessing the XWikiContext. */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
      * The service used to create links.
      */
-    @Requirement
+    @Inject
     private LinkService linkService;
 
     /**
@@ -83,19 +88,19 @@ public class DefaultWikiService implements WikiService
      * The secret token is added to the query string of the upload URL and then checked in the upload action when files
      * are uploaded.
      */
-    @Requirement
+    @Inject
     private CSRFToken csrf;
 
     /**
      * The component used to resolve a string document reference.
      */
-    @Requirement
+    @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     /**
      * The component used to serialize an entity reference.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
@@ -112,21 +117,13 @@ public class DefaultWikiService implements WikiService
         return (XWikiContext) execution.getContext().getProperty("xwikicontext");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiService#isMultiWiki()
-     */
+    @Override
     public Boolean isMultiWiki()
     {
         return getXWikiContext().getWiki().isVirtualMode();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiService#getVirtualWikiNames()
-     */
+    @Override
     public List<String> getVirtualWikiNames()
     {
         List<String> virtualWikiNamesList = new ArrayList<String>();
@@ -143,11 +140,7 @@ public class DefaultWikiService implements WikiService
         return virtualWikiNamesList;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiService#getSpaceNames(String)
-     */
+    @Override
     public List<String> getSpaceNames(String wikiName)
     {
         List<String> spaceNamesList = new ArrayList<String>();
@@ -190,11 +183,7 @@ public class DefaultWikiService implements WikiService
         return blacklistedSpaces;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiService#getPageNames(String, String)
-     */
+    @Override
     public List<String> getPageNames(String wikiName, String spaceName)
     {
         String query = "where doc.space = ? order by doc.fullName asc";
@@ -206,11 +195,7 @@ public class DefaultWikiService implements WikiService
         return pagesNames;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiService#getRecentlyModifiedPages(int, int)
-     */
+    @Override
     public List<WikiPage> getRecentlyModifiedPages(String wikiName, int start, int count)
     {
         String query = "where doc.author = ? order by doc.date desc";
@@ -218,11 +203,7 @@ public class DefaultWikiService implements WikiService
         return getWikiPages(searchDocumentReferences(wikiName, query, parameters, start, count));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiService#getMatchingPages(String, int, int)
-     */
+    @Override
     public List<WikiPage> getMatchingPages(String wikiName, String keyword, int start, int count)
     {
         List<String> blackListedSpaces = getBlackListedSpaces();
@@ -315,22 +296,14 @@ public class DefaultWikiService implements WikiService
         return wikiPages;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiService#getEntityConfig(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference, ResourceReference)
-     */
+    @Override
     public EntityConfig getEntityConfig(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference origin,
         ResourceReference destination)
     {
         return linkService.getEntityConfig(origin, destination);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiService#getAttachment(org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference)
-     */
+    @Override
     public Attachment getAttachment(org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference attachmentReference)
     {
         XWikiContext context = getXWikiContext();
@@ -363,11 +336,7 @@ public class DefaultWikiService implements WikiService
         return attach;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiService#getImageAttachments(WikiPageReference)
-     */
+    @Override
     public List<Attachment> getImageAttachments(WikiPageReference reference)
     {
         List<Attachment> imageAttachments = new ArrayList<Attachment>();
@@ -380,11 +349,7 @@ public class DefaultWikiService implements WikiService
         return imageAttachments;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiService#getAttachments(WikiPageReference)
-     */
+    @Override
     public List<Attachment> getAttachments(WikiPageReference reference)
     {
         try {
@@ -408,11 +373,7 @@ public class DefaultWikiService implements WikiService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiService#getUploadURL(WikiPageReference)
-     */
+    @Override
     public String getUploadURL(WikiPageReference reference)
     {
         String queryString = "form_token=" + csrf.getToken();
@@ -420,11 +381,7 @@ public class DefaultWikiService implements WikiService
             null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiService#parseLinkReference(String, org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
-     */
+    @Override
     public ResourceReference parseLinkReference(String linkReference,
         org.xwiki.gwt.wysiwyg.client.wiki.EntityReference baseReference)
     {

@@ -23,8 +23,10 @@ import java.util.Properties;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 
 import org.xwiki.crypto.internal.Convert;
 import org.xwiki.crypto.internal.SerializationUtils;
@@ -33,7 +35,6 @@ import org.xwiki.crypto.passwd.PasswordCiphertext;
 import org.xwiki.crypto.passwd.KeyDerivationFunction;
 import org.xwiki.crypto.passwd.PasswordVerificationFunction;
 import org.xwiki.crypto.passwd.PasswordCryptoServiceConfiguration;
-
 
 /**
  * This class allows the user to encrypt and decrypt text and data using a password.
@@ -57,6 +58,7 @@ import org.xwiki.crypto.passwd.PasswordCryptoServiceConfiguration;
  * @since 2.5M1
  */
 @Component
+@Singleton
 public class DefaultPasswordCryptoService implements PasswordCryptoService
 {
     /** Text which indicates the beginning of password based ciphertext. */
@@ -66,14 +68,10 @@ public class DefaultPasswordCryptoService implements PasswordCryptoService
     private final String ciphertextFooter = "-----END PASSWORD CIPHERTEXT-----";
 
     /** For deciding which classes to use for cipher and key functions. */
-    @Requirement
+    @Inject
     private PasswordCryptoServiceConfiguration config;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.crypto.passwd.PasswordCryptoService#encryptText(java.lang.String, java.lang.String)
-     */
+    @Override
     public synchronized String encryptText(final String plaintext, final String password)
         throws GeneralSecurityException
     {
@@ -83,11 +81,7 @@ public class DefaultPasswordCryptoService implements PasswordCryptoService
                 + this.ciphertextFooter;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.crypto.passwd.PasswdCryptoService#decryptText(String, String)
-     */
+    @Override
     public synchronized String decryptText(final String base64Ciphertext, final String password)
         throws GeneralSecurityException
     {
@@ -99,11 +93,7 @@ public class DefaultPasswordCryptoService implements PasswordCryptoService
         return Convert.bytesToString(decrypted);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.crypto.passwd.PasswordCryptoService#encryptBytes(byte[], java.lang.String)
-     */
+    @Override
     public byte[] encryptBytes(byte[] message, String password) throws GeneralSecurityException
     {
         try {
@@ -128,11 +118,7 @@ public class DefaultPasswordCryptoService implements PasswordCryptoService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.crypto.passwd.PasswordCryptoService#decryptBytes(byte[], java.lang.String)
-     */
+    @Override
     public byte[] decryptBytes(byte[] rawCiphertext, String password) throws GeneralSecurityException
     {
         try {
@@ -147,13 +133,8 @@ public class DefaultPasswordCryptoService implements PasswordCryptoService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.crypto.passwd.PasswdCryptoService#protectPassword(String)
-     */
-    public String protectPassword(final String password)
-        throws GeneralSecurityException
+    @Override
+    public String protectPassword(final String password) throws GeneralSecurityException
     {
         try {
             final KeyDerivationFunction keyFunction = 
@@ -173,11 +154,7 @@ public class DefaultPasswordCryptoService implements PasswordCryptoService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.crypto.passwd.PasswdCryptoService#isPasswordCorrect(String, String)
-     */
+    @Override
     public boolean isPasswordCorrect(final String password, final String protectedPassword)
         throws GeneralSecurityException
     {

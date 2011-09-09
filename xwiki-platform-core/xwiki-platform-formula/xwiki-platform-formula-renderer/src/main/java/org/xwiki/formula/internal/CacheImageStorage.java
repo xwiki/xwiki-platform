@@ -19,6 +19,9 @@
  */
 package org.xwiki.formula.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
@@ -37,41 +40,32 @@ import org.xwiki.formula.ImageStorage;
  * @since 2.0M3
  */
 @Component
+@Singleton
 public class CacheImageStorage implements ImageStorage, Initializable
 {
     /**
      * Since this class implements a storage based on the {@link Cache} component, it needs to access the
      * {@link CacheManager cache manager} to obtain a valid cache.
      */
-    @Requirement
+    @Inject
     private CacheManager cacheManager;
 
     /** Cache used as the storage back-end. */
     private Cache<ImageData> cache;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ImageStorage#get(String)
-     */
+    @Override
     public ImageData get(String id)
     {
         return this.cache.get(id);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ImageStorage#put(String, ImageData)
-     */
+    @Override
     public void put(String id, ImageData data)
     {
         this.cache.set(id, data);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         CacheConfiguration configuration = new CacheConfiguration();

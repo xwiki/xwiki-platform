@@ -19,8 +19,10 @@
  */
 package org.xwiki.model.internal.reference;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.ObjectReference;
@@ -36,19 +38,16 @@ import org.xwiki.model.reference.ObjectReferenceResolver;
  * @since 2.3M1
  */
 @Component
+@Singleton
 public class DefaultStringObjectReferenceResolver implements ObjectReferenceResolver<String>
 {
     /**
      * The default entity resolver, used to delegate actual resolving of string representations.
      */
-    @Requirement
+    @Inject
     private EntityReferenceResolver<String> entityReferenceResolver;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ObjectReferenceResolver#resolve(Object) 
-     */
+    @Override
     public ObjectReference resolve(String objectReferenceRepresentation)
     {
         return new ObjectReference(entityReferenceResolver.resolve(objectReferenceRepresentation, EntityType.OBJECT));

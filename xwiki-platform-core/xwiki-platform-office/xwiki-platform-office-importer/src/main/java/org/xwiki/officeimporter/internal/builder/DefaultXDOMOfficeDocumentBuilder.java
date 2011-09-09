@@ -22,9 +22,12 @@ package org.xwiki.officeimporter.internal.builder;
 import java.io.InputStream;
 import java.io.StringReader;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.OfficeImporterException;
@@ -44,38 +47,36 @@ import org.xwiki.xml.html.HTMLUtils;
  * @since 2.1M1
  */
 @Component
+@Singleton
 public class DefaultXDOMOfficeDocumentBuilder implements XDOMOfficeDocumentBuilder
 {
     /**
      * Xhtml office document builder used internally.
      */
-    @Requirement
+    @Inject
     private XHTMLOfficeDocumentBuilder xhtmlOfficeDocumentBuilder;
 
     /**
      * XHTML/1.0 syntax parser used to build an XDOM from an XHTML input.
      */
-    @Requirement("xhtml/1.0")
+    @Inject
+    @Named("xhtml/1.0")
     private Parser xHtmlParser;
 
     /**
      * Component manager to be passed into XDOMOfficeDocument.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference,
         boolean filterStyles) throws OfficeImporterException
     {
         return build(xhtmlOfficeDocumentBuilder.build(officeFileStream, officeFileName, reference, filterStyles));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XDOMOfficeDocument build(XHTMLOfficeDocument xhtmlOfficeDocument) throws OfficeImporterException
     {
         Document xhtmlDoc = xhtmlOfficeDocument.getContentDocument();

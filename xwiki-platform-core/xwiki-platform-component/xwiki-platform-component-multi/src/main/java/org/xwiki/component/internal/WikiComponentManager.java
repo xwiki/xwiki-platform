@@ -19,9 +19,12 @@
  */
 package org.xwiki.component.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -34,25 +37,24 @@ import org.xwiki.component.phase.InitializationException;
  * @version $Id$
  * @since 2.1RC1
  */
-@Component("wiki")
+@Component
+@Named("wiki")
+@Singleton
 public class WikiComponentManager extends AbstractGenericComponentManager implements Initializable
 {
     /**
      * Used to access the current wiki in the Execution Context.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
     
     /**
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
-    @Requirement
+    @Inject
     private ComponentManager rootComponentManager;
 
-    /**
-     * {@inheritDoc}
-     * @see Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         // Set the parent to the Root Component Manager since if a component isn't found for a particular wiki
@@ -60,10 +62,6 @@ public class WikiComponentManager extends AbstractGenericComponentManager implem
         setInternalParent(this.rootComponentManager);
     }
 
-    /**
-     * {@inheritDoc}
-     * @see AbstractGenericComponentManager#getKey()
-     */
     @Override
     protected String getKey()
     {

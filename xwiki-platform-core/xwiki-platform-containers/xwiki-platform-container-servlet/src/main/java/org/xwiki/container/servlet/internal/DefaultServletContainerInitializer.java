@@ -55,7 +55,7 @@ import org.xwiki.url.XWikiURLFactory;
 @Singleton
 public class DefaultServletContainerInitializer implements ServletContainerInitializer
 {
-     // Implementation note: It's important that we don't use @Requirement annotations here
+     // Implementation note: It's important that we don't use @Inject annotations here
      // for RequestInitializerManager and ExecutionContextManager since we can have
      // RequestInitializer and ExecutionContextInitializer components which try to access
      // the Application Context in their initialize() method and we need it to be available 

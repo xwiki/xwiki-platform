@@ -22,10 +22,10 @@ package org.xwiki.container.internal;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
@@ -39,12 +39,13 @@ import org.xwiki.container.ApplicationContextListenerManager;
  * @since 1.9M2
  */
 @Component
+@Singleton
 public class DefaultApplicationContextListenerManager implements ApplicationContextListenerManager
 {
     /**
      * The {@link ComponentManager} used to lookup for all {@link ApplicationContextListener} components.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
@@ -53,9 +54,7 @@ public class DefaultApplicationContextListenerManager implements ApplicationCont
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void initializeApplicationContext(ApplicationContext applicationContext)
     {
         try {
@@ -69,9 +68,7 @@ public class DefaultApplicationContextListenerManager implements ApplicationCont
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void destroyApplicationContext(ApplicationContext applicationContext)
     {
         try {

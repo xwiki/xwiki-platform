@@ -63,11 +63,12 @@ import com.sun.syndication.feed.synd.SyndFeed;
 @Singleton
 public class RssMacro extends AbstractMacro<RssMacroParameters>
 {
-
     /**
      * The name of the CSS class attribute.
      */
     private static final String CLASS_ATTRIBUTE = "class";
+
+    private static final String FEED_CLASS_VALUE = "rssfeed";
 
     /**
      * The description of the macro.
@@ -131,25 +132,30 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
     public List<Block> execute(RssMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
+        List<Block> result;
         SyndFeed feed = this.romeFeedFactory.createFeed(parameters);
 
-        BoxMacroParameters boxParameters = new BoxMacroParameters();
-        boolean hasImage = parameters.isImage() && (feed.getImage() != null);
-        boxParameters.setCssClass("rssfeed");
+        if (parameters.isDecoration()) {
+            BoxMacroParameters boxParameters = new BoxMacroParameters();
+            boolean hasImage = parameters.isImage() && (feed.getImage() != null);
+            boxParameters.setCssClass(FEED_CLASS_VALUE);
 
-        if (StringUtils.isNotEmpty(parameters.getWidth())) {
-            boxParameters.setWidth(parameters.getWidth());
+            if (StringUtils.isNotEmpty(parameters.getWidth())) {
+                boxParameters.setWidth(parameters.getWidth());
+            }
+
+            boxParameters.setBlockTitle(generateBoxTitle("rsschanneltitle", feed));
+
+            if (hasImage) {
+                boxParameters.setImage(new ResourceReference(feed.getImage().getUrl(), ResourceType.URL));
+            }
+
+            result = this.boxMacro.execute(boxParameters, content == null ? StringUtils.EMPTY : content, context);
+        } else {
+            result = Arrays.<Block>asList(new GroupBlock(Collections.singletonMap(CLASS_ATTRIBUTE, FEED_CLASS_VALUE)));
         }
 
-        boxParameters.setBlockTitle(generateBoxTitle("rsschanneltitle", feed));
-
-        if (hasImage) {
-            boxParameters.setImage(new ResourceReference(feed.getImage().getUrl(), ResourceType.URL));
-        }
-
-        List<Block> result =
-            this.boxMacro.execute(boxParameters, content == null ? StringUtils.EMPTY : content, context);
-        generaterEntries(result.get(0), feed, parameters);
+        generateEntries(result.get(0), feed, parameters);
 
         return result;
     }
@@ -197,7 +203,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
      * @param parameters our parameter helper object
      * @throws MacroExecutionException if the content cannot be rendered
      */
-    private void generaterEntries(Block parentBlock, SyndFeed feed, RssMacroParameters parameters)
+    private void generateEntries(Block parentBlock, SyndFeed feed, RssMacroParameters parameters)
         throws MacroExecutionException
     {
         int maxElements = parameters.getCount();
@@ -210,11 +216,13 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             }
             SyndEntry entry = (SyndEntry) item;
 
-            ResourceReference titleResourceReference = new ResourceReference(entry.getLink(), ResourceType.URL);
-            Block titleBlock = new LinkBlock(parsePlainText(entry.getTitle()), titleResourceReference, true);
-            ParagraphBlock paragraphTitleBlock = new ParagraphBlock(Collections.singletonList(titleBlock));
-            paragraphTitleBlock.setParameter(CLASS_ATTRIBUTE, "rssitemtitle");
-            parentBlock.addChild(paragraphTitleBlock);
+            if (parameters.isDecoration()) {
+                ResourceReference titleResourceReference = new ResourceReference(entry.getLink(), ResourceType.URL);
+                Block titleBlock = new LinkBlock(parsePlainText(entry.getTitle()), titleResourceReference, true);
+                ParagraphBlock paragraphTitleBlock = new ParagraphBlock(Collections.singletonList(titleBlock));
+                paragraphTitleBlock.setParameter(CLASS_ATTRIBUTE, "rssitemtitle");
+                parentBlock.addChild(paragraphTitleBlock);
+            }
 
             if (parameters.isContent() && entry.getDescription() != null) {
                 // We are wrapping the feed entry content in a HTML macro, not considering what the declared content

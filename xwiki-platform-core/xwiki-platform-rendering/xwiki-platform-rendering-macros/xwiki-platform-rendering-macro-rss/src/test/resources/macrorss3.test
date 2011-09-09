@@ -1,0 +1,24 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{testrss feed="file://feed1.xml" content="true" count="2" decoration="false"/}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [testrss] [feed=file://feed1.xml|content=true|count=2|decoration=false]
+beginGroup [[class]=[rssfeed]]
+beginGroup [[class]=[rssitemdescription]]
+onRawText [How do Americans get ready to work with Russians aboard the International Space Station?] [xhtml/1.0]
+endGroup [[class]=[rssitemdescription]]
+beginGroup [[class]=[rssitemdescription]]
+onRawText [Sky watchers in Europe, Asia, and parts of Alaska and Canada.] [xhtml/1.0]
+endGroup [[class]=[rssitemdescription]]
+endGroup [[class]=[rssfeed]]
+endMacroMarkerStandalone [testrss] [feed=file://feed1.xml|content=true|count=2|decoration=false]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<div class="rssfeed"><div class="rssitemdescription">How do Americans get ready to work with Russians aboard the International Space Station?</div><div class="rssitemdescription">Sky watchers in Europe, Asia, and parts of Alaska and Canada.</div></div>

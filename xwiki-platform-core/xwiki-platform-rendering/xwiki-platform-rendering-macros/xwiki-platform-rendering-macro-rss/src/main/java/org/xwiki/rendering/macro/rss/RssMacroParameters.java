@@ -23,7 +23,7 @@ package org.xwiki.rendering.macro.rss;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;

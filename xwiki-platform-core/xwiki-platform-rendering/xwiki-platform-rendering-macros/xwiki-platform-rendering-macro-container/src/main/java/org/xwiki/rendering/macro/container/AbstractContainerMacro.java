@@ -26,7 +26,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
@@ -100,7 +100,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
         }
 
         // add the css class, if any, to the container root
-        if (!StringUtils.isEmpty(parameters.getCssClass())) {
+        if (StringUtils.isNotEmpty(parameters.getCssClass())) {
             containerRoot.setParameter(CLASS_ATTRIBUTE, parameters.getCssClass());
         }
 

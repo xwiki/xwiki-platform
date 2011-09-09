@@ -33,7 +33,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.classloader.ExtendedURLStreamHandler;
 import org.xwiki.classloader.URIClassLoader;
@@ -107,7 +107,7 @@ public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoade
     {
         // Parse the passed JAR URLs to tokenize it.
         Set<URI> uris = new LinkedHashSet<URI>();
-        if (!StringUtils.isEmpty(jarURLs)) {
+        if (StringUtils.isNotEmpty(jarURLs)) {
             StringTokenizer tokenizer = new StringTokenizer(jarURLs, ",");
             while (tokenizer.hasMoreElements()) {
                 String token = tokenizer.nextToken().trim();

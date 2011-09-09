@@ -28,7 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
@@ -137,7 +137,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
         boolean hasImage = parameters.isImage() && (feed.getImage() != null);
         boxParameters.setCssClass("rssfeed");
 
-        if (!StringUtils.isEmpty(parameters.getWidth())) {
+        if (StringUtils.isNotEmpty(parameters.getWidth())) {
             boxParameters.setWidth(parameters.getWidth());
         }
 

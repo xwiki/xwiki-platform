@@ -27,7 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -45,113 +45,172 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 /**
  * Highlight provided content depending of the content syntax.
  * 
- * @version $Id$
- * @since 1.7RC1
- */
-@Component
-@Named("code")
-@Singleton
-public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
-{
-    /**
-     * The description of the macro.
-     */
-    private static final String DESCRIPTION = "Highlights code snippets of various programming languages";
-
-    /**
-     * Used to indicate that content should not be highlighted.
-     */
-    private static final String LANGUAGE_NONE = "none";
-
-    /**
-     * The description of the macro content.
-     */
-    private static final String CONTENT_DESCRIPTION = "the content to highlight";
-
-    /**
-     * Used to parse content when language="none".
-     */
-    @Inject
-    @Named("plain/1.0")
-    private Parser plainTextParser;
-
-    /**
-     * Used to lookup highlight parsers.
-     */
-    @Inject
-    private ComponentManager componentManager;
-
-    /**
-     * The logger to log.
-     */
-    @Inject
-    private Logger logger;
-
-    /**
-     * Create and initialize the descriptor of the macro.
-     */
-    public CodeMacro()
-    {
-        super("Code", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), CodeMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_FORMATTING);
+ * @version $Id$der(content));
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.macro.box.DefaultBoxMacro#parseContent(org.xwiki.rendering.macro.box.BoxMacroParameters,
-     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
-    @Override
-    protected List<Block> parseContent(CodeMacroParameters parameters, String content,
-        MacroTransformationContext context) throws MacroExecutionException
-    {
-        List<Block> result;
-        try {
-            if (LANGUAGE_NONE.equalsIgnoreCase(parameters.getLanguage())) {
-                if (StringUtils.isEmpty(content)) {
-                    result = Collections.emptyList();
-                } else {
-                    result = this.plainTextParser.parse(new StringReader(content)).getChildren().get(0).getChildren();
-                }
-            } else {
-                result = highlight(parameters, content);
-            }
-        } catch (Exception e) {
-            throw new MacroExecutionException("Failed to highlight content", e);
-        }
-
-        return result;
+}uage(), new StringReader(content));
     }
-
-    /**
-     * Return a highlighted version of the provided content.
-     * 
-     * @param parameters the code macro parameters.
-     * @param content the content to highlight.
-     * @return the highlighted version of the provided content.
-     * @throws ParseException the highlight parser failed.
-     * @throws ComponentLookupException failed to find highlight parser for provided language.
-     */
-    protected List<Block> highlight(CodeMacroParameters parameters, String content) throws ParseException,
-        ComponentLookupException
-    {
-        HighlightParser parser;
-
-        if (parameters.getLanguage() != null) {
-            try {
-                parser = this.componentManager.lookup(HighlightParser.class, parameters.getLanguage());
-                return parser.highlight(parameters.getLanguage(), new StringReader(content));
-            } catch (ComponentLookupException e) {
-                this.logger.debug(
-                    "Can't find specific highlighting parser for language [" + parameters.getLanguage() + "]", e);
-            }
-        }
-
-        this.logger.debug("Trying the default highlighting parser");
-
-        parser = this.componentManager.lookup(HighlightParser.class, "default");
-
-        return parser.highlight(parameters.getLanguage(), new StringReader(content));
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
+    }
+}uage(), new StringReader(content));
     }
 }

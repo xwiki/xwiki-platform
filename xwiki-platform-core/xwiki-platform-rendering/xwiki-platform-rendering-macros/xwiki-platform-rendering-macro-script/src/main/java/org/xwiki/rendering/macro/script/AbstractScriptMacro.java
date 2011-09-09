@@ -26,7 +26,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.ObservationManager;
@@ -189,7 +189,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     {
         List<Block> result = Collections.emptyList();
 
-        if (!StringUtils.isEmpty(content)) {
+        if (StringUtils.isNotEmpty(content)) {
             try {
                 // send evaluation starts event
                 ScriptEvaluatingEvent event = new ScriptEvaluatingEvent(getDescriptor().getId().getId());

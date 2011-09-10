@@ -19,9 +19,9 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import junit.framework.Assert;
+import java.util.Random;
 
-import org.apache.commons.lang.math.RandomUtils;
+import junit.framework.Assert;
 
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
@@ -45,9 +45,10 @@ public class PropertyClassTest extends AbstractBridgedXWikiComponentTestCase
         two.setName("second");
 
         // Since the test might randomly succeed, run it several times to be safer.
+        Random random = new Random();
         for (int i = 0; i < 20; ++i) {
-            n1 = RandomUtils.nextInt();
-            n2 = RandomUtils.nextInt();
+            n1 = random.nextInt();
+            n2 = random.nextInt();
             one.setNumber(n1);
             two.setNumber(n2);
 

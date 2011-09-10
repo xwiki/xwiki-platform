@@ -21,7 +21,7 @@ package org.xwiki.query.xwql.internal;
 
 import static org.junit.Assert.fail;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JMock;

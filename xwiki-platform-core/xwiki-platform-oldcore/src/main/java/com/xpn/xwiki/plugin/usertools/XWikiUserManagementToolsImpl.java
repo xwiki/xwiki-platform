@@ -155,7 +155,7 @@ public class XWikiUserManagementToolsImpl extends XWikiDefaultPlugin implements 
     }
 
     private String getRandomPassword() {
-        return org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(8);
+        return org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(8);
     }
 
     private String prepareInvitationMessage(XWikiDocument doc, String name, String password, String email, 

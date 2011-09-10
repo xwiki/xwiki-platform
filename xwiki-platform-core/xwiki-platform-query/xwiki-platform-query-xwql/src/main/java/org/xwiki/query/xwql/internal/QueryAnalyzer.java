@@ -19,7 +19,7 @@
  */
 package org.xwiki.query.xwql.internal;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.query.jpql.analysis.DepthFirstAdapter;
 import org.xwiki.query.jpql.node.AAbstractSchemaName;
 import org.xwiki.query.jpql.node.APath;

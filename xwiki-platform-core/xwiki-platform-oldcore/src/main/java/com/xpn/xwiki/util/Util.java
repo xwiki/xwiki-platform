@@ -48,8 +48,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.oro.text.PatternCache;
 import org.apache.oro.text.PatternCacheLRU;
 import org.apache.oro.text.perl.Perl5Util;
@@ -568,7 +568,7 @@ public class Util
 
     public static boolean isAlphaNumeric(String text)
     {
-        return StringUtils.isAlphanumeric(text.replaceAll("-", "a").replaceAll("\\.", "a"));
+        return StringUtils.isAlphanumeric(text.replace('-', 'a').replace('.', 'a'));
     }
 
     public static String getName(String name)

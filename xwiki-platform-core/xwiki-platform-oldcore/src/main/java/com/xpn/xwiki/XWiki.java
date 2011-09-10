@@ -70,10 +70,9 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
 import org.apache.velocity.VelocityContext;
@@ -1827,7 +1826,7 @@ public class XWiki implements EventListener
                         SYSTEM_SPACE, "XWikiSkins"));
                 if (object != null) {
                     String content = object.getStringValue(template);
-                    if (!StringUtils.isBlank(content)) {
+                    if (StringUtils.isNotBlank(content)) {
                         // Let's use this template
                         // Use "" as namespace to register macros in global namespace. That way it
                         // can be used in a renderer content not parsed at the same level.
@@ -1841,7 +1840,7 @@ public class XWiki implements EventListener
                     // It's impossible to know the real attachemtn encoding, but let's assume that they respect the
                     // standard and use UTF-8 (which is required for the files located on the filesystem)
                     String content = IOUtils.toString(attachment.getContentInputStream(context), DEFAULT_ENCODING);
-                    if (!StringUtils.isBlank(content)) {
+                    if (StringUtils.isNotBlank(content)) {
                         // Let's use this template
                         // Use "" as namespace to register macros in global namespace. That way it
                         // can be used in a renderer content not parsed at the same level.
@@ -1989,7 +1988,7 @@ public class XWiki implements EventListener
                         SYSTEM_SPACE, "XWikiSkins"));
                 if (object != null) {
                     String content = object.getStringValue(filename);
-                    if (!StringUtils.isBlank(content)) {
+                    if (StringUtils.isNotBlank(content)) {
                         URL url =
                             urlf.createSkinURL(filename, doc.getSpace(), doc.getName(), doc.getDatabase(), context);
                         return urlf.getURL(url, context);
@@ -2954,6 +2953,7 @@ public class XWiki implements EventListener
      * @deprecated since 3.1M2 edit mode class should be used for this purpose, not the sheet class
      * @see #getEditModeClass(XWikiContext)
      */
+    @Deprecated
     public BaseClass getSheetClass(XWikiContext context) throws XWikiException
     {
         XWikiDocument doc =
@@ -4600,15 +4600,16 @@ public class XWiki implements EventListener
         // side effect of hidding hidden documents and no other workaround exists than directly using
         // XWikiStoreInterface#search directly
         String sql = "select distinct doc.fullName from XWikiDocument as doc";
+        List<String> parameters = new ArrayList<String>();
         if (space != null) {
-            // FIXME: escapeSql is not enough.
-            sql += " where doc.space = '" + StringEscapeUtils.escapeSql(space) + "'";
+            sql += " where doc.space = ?";
+            parameters.add(space);
         }
 
         if (clean) {
             try {
                 context.setDatabase(targetWiki);
-                List<String> list = getStore().search(sql, 0, 0, context);
+                List<String> list = getStore().search(sql, 0, 0, parameters, context);
                 if (LOGGER.isInfoEnabled()) {
                     LOGGER.info("Deleting " + list.size() + " documents from wiki " + targetWiki);
                 }
@@ -5357,7 +5358,7 @@ public class XWiki implements EventListener
                 LOGGER.info("Initializing AuthService...");
 
                 String authClass = Param("xwiki.authentication.authclass");
-                if (!StringUtils.isEmpty(authClass)) {
+                if (StringUtils.isNotEmpty(authClass)) {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("Using custom AuthClass " + authClass + ".");
                     }
@@ -6393,7 +6394,7 @@ public class XWiki implements EventListener
     public BaseClass getClass(String fullName, XWikiContext context) throws XWikiException
     {
         DocumentReference reference = null;
-        if (!StringUtils.isEmpty(fullName)) {
+        if (StringUtils.isNotEmpty(fullName)) {
             reference = this.currentMixedDocumentReferenceResolver.resolve(fullName);
         }
         return getXClass(reference, context);
@@ -6498,7 +6499,7 @@ public class XWiki implements EventListener
 
     public String getConvertingUserNameType(XWikiContext context)
     {
-        if (!StringUtils.isBlank(context.getWiki().getXWikiPreference("convertmail", context))) {
+        if (StringUtils.isNotBlank(context.getWiki().getXWikiPreference("convertmail", context))) {
             return context.getWiki().getXWikiPreference("convertmail", "0", context);
         }
 
@@ -7349,7 +7350,7 @@ public class XWiki implements EventListener
         flushVirtualWikis(doc.getOriginalDocument());
         flushVirtualWikis(doc);
     }
-    
+
     private void onPluginPreferenceEvent(Event event, XWikiDocument doc, XWikiContext context)
     {
         if (!isVirtualMode()) {

@@ -24,7 +24,7 @@ package com.xpn.xwiki.plugin.calendar;
 import java.util.Calendar;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class CalendarEvent
 {

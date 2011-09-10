@@ -26,7 +26,7 @@ import java.util.ResourceBundle;
 import javax.xml.xpath.XPathConstants;
 
 import org.apache.commons.collections.ListUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -325,7 +325,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
                         // Form contains an <input type="submit" /> element.
                         validForm = true;
                     } else if (getAttributeValue(input, ATTR_TYPE).equals("image")) {
-                        if (hasAttribute(input, ATTR_ALT) && !StringUtils.isEmpty(getAttributeValue(input, ATTR_ALT))) {
+                        if (hasAttribute(input, ATTR_ALT)
+                            && StringUtils.isNotEmpty(getAttributeValue(input, ATTR_ALT))) {
                             // Form contains an <input type="image" alt="action" /> element.
                             // See http://www.w3.org/TR/WCAG10-HTML-TECHS/#forms-graphical-buttons
                             validForm = true;
@@ -739,7 +740,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
             // Look for images in the link.
             boolean hasNonEmptyAlt = false;
             for (Node child : getChildren(link, ELEM_IMG)) {
-                if (!StringUtils.isEmpty(getAttributeValue(child, ATTR_ALT))) {
+                if (StringUtils.isNotEmpty(getAttributeValue(child, ATTR_ALT))) {
                     hasNonEmptyAlt = true;
                 }
             }

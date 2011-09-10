@@ -24,7 +24,7 @@ import com.xpn.xwiki.content.Link;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Parse document source content as typed by the user.

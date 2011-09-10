@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.doc.rcs;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.xpn.xwiki.util.AbstractSimpleClass;
 

@@ -42,7 +42,7 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public class IERangeTest extends DOMTestCase
+public class IEOldRangeTest extends DOMTestCase
 {
     /**
      * A range factory to be used in tests. It allows us to use deferred binding and load a IE specific implementation
@@ -122,16 +122,12 @@ public class IERangeTest extends DOMTestCase
     }
 
     /**
-     * IE specific implementation of {@link TestRangeFactory}.
+     * Specific implementation of {@link TestRangeFactory} for older IE versions (6, 7 and 8).
      */
     @SuppressWarnings("unused")
-    private static class IETestRangeFactory extends TestRangeFactory
+    private static class IEOldTestRangeFactory extends TestRangeFactory
     {
-        /**
-         * {@inheritDoc}
-         * 
-         * @see TestRangeFactory#createRange(Element, String)
-         */
+        @Override
         public Range createRange(Element container, String html)
         {
             container.xSetInnerHTML(html);
@@ -153,7 +149,7 @@ public class IERangeTest extends DOMTestCase
             // We cannot select the textRange because IE doesn't support collapsed selection in view mode (which is
             // somehow normal since you cannot have the caret in view mode). Instead we use a mock native selection
             // which returns our textRange like it has been selected.
-            return (new IESelection(MockNativeSelection.newInstance(textRange))).getRangeAt(0);
+            return (new IEOldSelection(MockNativeSelection.newInstance(textRange))).getRangeAt(0);
         }
     }
 

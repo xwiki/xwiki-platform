@@ -26,11 +26,11 @@ import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import com.google.gwt.dom.client.IFrameElement;
 
 /**
- * IE6-specific implementation of rich-text editing.
+ * Specific implementation of rich-text editing for older versions of the Internet Explorer browser (6, 7 and 8).
  * 
  * @version $Id$
  */
-public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6
+public class RichTextAreaImplIEOld extends com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6
 {
     /**
      * Flag indicating if the load event needs to be fired manually when the rich text area is attached to the document.
@@ -54,11 +54,7 @@ public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.Rich
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6#initElement()
-     */
+    @Override
     public native void initElement()
     /*-{
         var iframe = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
@@ -70,7 +66,7 @@ public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.Rich
         }
         if (!iframe[@org.xwiki.gwt.user.client.ui.rta.RichTextArea::INITIALIZING]) {
             if (iframe[@org.xwiki.gwt.user.client.ui.rta.RichTextArea::LOADED]
-                && iframe[@org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplIE6::FIRE_LOAD_EVENT_MANUALLY]) {
+                && iframe[@org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplIEOld::FIRE_LOAD_EVENT_MANUALLY]) {
                 // See #uninitElement() for the explanation.
                 iframe.fireEvent('onload');
             }
@@ -86,11 +82,6 @@ public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.Rich
         });
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6#setEnabledImpl(boolean)
-     */
     @Override
     protected void setEnabledImpl(boolean enabled)
     {
@@ -99,11 +90,6 @@ public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.Rich
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6#isEnabledImpl()
-     */
     @Override
     protected boolean isEnabledImpl()
     {
@@ -135,11 +121,7 @@ public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.Rich
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6#hookEvents()
-     */
+    @Override
     protected void hookEvents()
     {
         // JSNI doesn't support super.*
@@ -170,11 +152,7 @@ public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.Rich
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6#unhookEvents()
-     */
+    @Override
     protected void unhookEvents()
     {
         // Double click event is not caught by default.

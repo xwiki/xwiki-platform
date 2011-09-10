@@ -365,6 +365,8 @@
                 <exclude>com/xpn/xwiki/cache/api/XWikiCache</exclude>
                 <exclude>com/xpn/xwiki/cache/api/XWikiCacheNeedsRefreshException</exclude>
                 <exclude>com/xpn/xwiki/cache/api/XWikiCacheService</exclude>
+                <exclude>org/xwiki/gwt/dom/client/Style$IEFloatProperty</exclude>
+                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/submit/IESubmitPlugin</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -386,7 +388,7 @@
               <productionMode>true</productionMode>
               <style>DETAILED</style>
               <!-- HACK: We inject the GWT arguments in the out parameter because we have no other option. -->
-              <out>target/www-test -port 54321 -codeServerPort 12345 -userAgents gecko1_8</out>
+              <out>target/www-test -port 54321 -codeServerPort 12345</out>
             </configuration>
           </plugin>
         </plugins>

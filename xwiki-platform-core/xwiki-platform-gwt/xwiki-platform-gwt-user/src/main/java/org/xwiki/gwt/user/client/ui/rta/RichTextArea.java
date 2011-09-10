@@ -90,7 +90,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     /**
      * The JavaScript function used to retrieve the edited document.
      */
-    @SuppressWarnings("unused")
     private final JavaScriptObject documentGetter;
 
     /**

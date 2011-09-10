@@ -17,22 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.gwt.dom.client.internal.ie;
+package org.xwiki.gwt.user.client.ui.rta.internal;
 
-import org.xwiki.gwt.dom.client.Document;
-import org.xwiki.gwt.dom.client.Selection;
-import org.xwiki.gwt.dom.client.SelectionManager;
+import org.xwiki.gwt.dom.client.Event;
+import org.xwiki.gwt.dom.client.internal.ie.NativeSelection;
 
 /**
- * Implements {@link SelectionManager} for newer versions of Internet Explorer (9 and above).
+ * Adjusts the behavior of the rich text area in the older versions of the Internet Explorer browser (6, 7 and 8).
  * 
  * @version $Id$
  */
-public class IESelectionManager implements SelectionManager
+public class IEOldBehaviorAdjuster extends IEBehaviorAdjuster
 {
     @Override
-    public Selection getSelection(Document document)
+    public void onLoad(Event event)
     {
-        return new IESelection(document);
+        super.onLoad(event);
+        NativeSelection.ensureSelectionIsPreserved(getTextArea().getDocument());
     }
 }

@@ -32,13 +32,9 @@ import org.xwiki.gwt.dom.client.internal.ie.TextRange;
  * 
  * @version $Id$
  */
-public class DeleteExecutableImplIE extends DeleteExecutableImpl
+public class DeleteExecutableImplIEOld extends DeleteExecutableImpl
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DeleteExecutableImpl#deleteSelection(Selection)
-     */
+    @Override
     public boolean deleteSelection(Selection selection)
     {
         if (isControlSelection(selection)) {
@@ -72,7 +68,7 @@ public class DeleteExecutableImplIE extends DeleteExecutableImpl
      */
     private native boolean isControlSelection(Selection selection)
     /*-{
-        return selection.@org.xwiki.gwt.dom.client.internal.ie.IESelection::nativeSelection.type == 'Control';
+        return selection.@org.xwiki.gwt.dom.client.internal.ie.IEOldSelection::nativeSelection.type == 'Control';
     }-*/;
 
     /**
@@ -81,6 +77,6 @@ public class DeleteExecutableImplIE extends DeleteExecutableImpl
      */
     private native TextRange getTextRange(Selection selection)
     /*-{
-        return selection.@org.xwiki.gwt.dom.client.internal.ie.IESelection::nativeSelection.createRange();
+        return selection.@org.xwiki.gwt.dom.client.internal.ie.IEOldSelection::nativeSelection.createRange();
     }-*/;
 }

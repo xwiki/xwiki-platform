@@ -58,7 +58,6 @@
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
     </any>
   </replace-with>
 
@@ -67,12 +66,11 @@
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPlugin" />
   </replace-with>
 
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.submit.IESubmitPlugin">
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.submit.internal.IEOldSubmitPlugin">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPlugin" />
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
     </any>
   </replace-with>
 
@@ -85,7 +83,6 @@
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter" />
     <any>
       <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
     </any>
   </replace-with>
 
@@ -104,8 +101,12 @@
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
     </any>
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.list.internal.MozillaListBehaviorAdjuster">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster" />
+    <when-property-is name="user.agent" value="gecko1_8" />
   </replace-with>
 
   <!-- PasteFilter -->
@@ -118,12 +119,6 @@
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
     </any>
-  </replace-with>
-
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.list.internal.MozillaListBehaviorAdjuster">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster" />
-    <when-property-is name="user.agent" value="gecko1_8" />
   </replace-with>
 </module>

@@ -34,10 +34,14 @@
 
   <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IESelectionManager">
     <when-type-is class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager" />
+    <when-property-is name="user.agent" value="ie9" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IEOldSelectionManager">
+    <when-type-is class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager" />
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
     </any>
   </replace-with>
 
@@ -47,16 +51,25 @@
   </replace-with>
 
   <!-- DOMUtils -->
+  <replace-with class="org.xwiki.gwt.dom.client.DOMUtils">
+    <when-type-is class="org.xwiki.gwt.dom.client.DOMUtils" />
+  </replace-with>
+
   <replace-with class="org.xwiki.gwt.dom.client.internal.mozilla.MozillaDOMUtils">
     <when-type-is class="org.xwiki.gwt.dom.client.DOMUtils" />
+    <when-property-is name="user.agent" value="gecko1_8" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IEDOMUtils">
     <when-type-is class="org.xwiki.gwt.dom.client.DOMUtils" />
+    <when-property-is name="user.agent" value="ie9" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IEOldDOMUtils">
+    <when-type-is class="org.xwiki.gwt.dom.client.DOMUtils" />
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
     </any>
   </replace-with>
 
@@ -65,12 +78,12 @@
     <when-type-is class="org.xwiki.gwt.dom.client.internal.ie.IERangeTest.TestRangeFactory" />
   </replace-with>
 
-  <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IERangeTest.IETestRangeFactory">
+  <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IERangeTest.IEOldTestRangeFactory">
     <when-type-is class="org.xwiki.gwt.dom.client.internal.ie.IERangeTest.TestRangeFactory" />
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
+      <!-- ie9 implements the Selection & Range API -->
     </any>
   </replace-with>
 
@@ -79,12 +92,12 @@
     <when-type-is class="org.xwiki.gwt.dom.client.Style.FloatProperty" />
   </replace-with>
 
-  <replace-with class="org.xwiki.gwt.dom.client.Style.IEFloatProperty">
+  <replace-with class="org.xwiki.gwt.dom.client.Style.IEOldFloatProperty">
     <when-type-is class="org.xwiki.gwt.dom.client.Style.FloatProperty" />
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
+      <!-- ie9 supports cssFloat style property -->
     </any>
   </replace-with>
 </module>

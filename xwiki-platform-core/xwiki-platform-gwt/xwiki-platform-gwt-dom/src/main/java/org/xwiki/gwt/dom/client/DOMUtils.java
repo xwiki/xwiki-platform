@@ -39,7 +39,7 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public abstract class DOMUtils
+public class DOMUtils
 {
     /**
      * Common error message used when a particular node type is not supported by a method.
@@ -150,7 +150,17 @@ public abstract class DOMUtils
      * @param propertyName the script name of the CSS property whose value is returned.
      * @return the computed value of the specified CSS property for the given element.
      */
-    public abstract String getComputedStyleProperty(Element el, String propertyName);
+    public native String getComputedStyleProperty(Element element, String propertyName)
+    /*-{
+        var computedStyle = element.ownerDocument.defaultView.getComputedStyle(element, null);
+        if (computedStyle) {
+          // We force it to be a string because we treat it as a string in the java code.
+          return '' + computedStyle[propertyName];
+        } else {
+          // Computed style can be null if the element is not displayed.
+          return null;
+        }
+    }-*/;
 
     /**
      * @param node the node from where to begin the search for the next leaf.

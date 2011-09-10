@@ -17,36 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.gwt.wysiwyg.client.plugin.submit;
+package org.xwiki.gwt.user.client.ui.rta.internal;
 
-import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.IFrameElement;
 
 /**
- * Internet Explorer specific implementation of {@link SubmitPlugin}.
+ * Extends {@link ReloaderImpl} for older versions of the Internet Explorer browser (6, 7 and 8).
  * 
  * @version $Id$
  */
-public class IESubmitPlugin extends SubmitPlugin
+public class ReloaderImplIEOld extends ReloaderImpl
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SubmitPlugin#hookSubmitEvent(Element)
-     */
-    protected native void hookSubmitEvent(Element form)
-    /*-{
-        var handler = this.@org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPlugin::getSubmitHandler()();
-        form.attachEvent('onsubmit', handler);
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SubmitPlugin#unhookSubmitEvent(Element)
-     */
-    protected native void unhookSubmitEvent(Element form)
-    /*-{
-        var handler = this.@org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPlugin::getSubmitHandler()();
-        form.detachEvent('onsubmit', handler);
-    }-*/;
+    @Override
+    public void unloadIFrameElement(IFrameElement iFrame)
+    {
+        // IE doesn't unload the in-line frame when it is removed from the document.
+        ((Document) iFrame.getContentDocument()).open();
+        super.unloadIFrameElement(iFrame);
+    }
 }

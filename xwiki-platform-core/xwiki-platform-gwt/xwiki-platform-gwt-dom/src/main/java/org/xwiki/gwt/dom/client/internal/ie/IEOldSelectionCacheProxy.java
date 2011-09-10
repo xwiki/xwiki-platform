@@ -24,12 +24,12 @@ import org.xwiki.gwt.dom.client.JavaScriptObject;
 import org.xwiki.gwt.dom.client.Range;
 
 /**
- * Extends {@link IESelection} with the ability to cache returned ranges. The cache is invalidated when the underlying
- * native selection changes.
+ * Extends {@link IEOldSelection} with the ability to cache returned ranges. The cache is invalidated when the
+ * underlying native selection changes.
  * 
  * @version $Id$
  */
-public class IESelectionCacheProxy extends IESelection
+public class IEOldSelectionCacheProxy extends IEOldSelection
 {
     /**
      * The cached range.
@@ -39,7 +39,6 @@ public class IESelectionCacheProxy extends IESelection
     /**
      * The object notified when the selection changes.
      */
-    @SuppressWarnings("unused")
     private JavaScriptObject selectionChangeHandler;
 
     /**
@@ -47,17 +46,13 @@ public class IESelectionCacheProxy extends IESelection
      * 
      * @param nativeSelection the underlying native selection object to be used
      */
-    public IESelectionCacheProxy(NativeSelection nativeSelection)
+    public IEOldSelectionCacheProxy(NativeSelection nativeSelection)
     {
         super(nativeSelection);
         invalidateCacheOnSelectionChange(nativeSelection.getOwnerDocument());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see IESelection#getRangeAt(int)
-     */
+    @Override
     public Range getRangeAt(int index)
     {
         if (cachedRange == null) {
@@ -68,11 +63,7 @@ public class IESelectionCacheProxy extends IESelection
         return cachedRange;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see IESelection#removeAllRanges()
-     */
+    @Override
     public void removeAllRanges()
     {
         super.removeAllRanges();
@@ -84,16 +75,15 @@ public class IESelectionCacheProxy extends IESelection
     /**
      * @return the object notified when the selection changes
      */
-    @SuppressWarnings("unused")
     private native JavaScriptObject getSelectionChangeHandler()
     /*-{
-        if (!this.@org.xwiki.gwt.dom.client.internal.ie.IESelectionCacheProxy::selectionChangeHandler) {
+        if (!this.@org.xwiki.gwt.dom.client.internal.ie.IEOldSelectionCacheProxy::selectionChangeHandler) {
             var self = this;
-            this.@org.xwiki.gwt.dom.client.internal.ie.IESelectionCacheProxy::selectionChangeHandler = function() {
-                self.@org.xwiki.gwt.dom.client.internal.ie.IESelectionCacheProxy::invalidateCache()();
+            this.@org.xwiki.gwt.dom.client.internal.ie.IEOldSelectionCacheProxy::selectionChangeHandler = function() {
+                self.@org.xwiki.gwt.dom.client.internal.ie.IEOldSelectionCacheProxy::invalidateCache()();
             }
         }
-        return this.@org.xwiki.gwt.dom.client.internal.ie.IESelectionCacheProxy::selectionChangeHandler;
+        return this.@org.xwiki.gwt.dom.client.internal.ie.IEOldSelectionCacheProxy::selectionChangeHandler;
     }-*/;
 
     /**
@@ -103,7 +93,7 @@ public class IESelectionCacheProxy extends IESelection
      */
     private native void invalidateCacheOnSelectionChange(Document document)
     /*-{
-        var handler = this.@org.xwiki.gwt.dom.client.internal.ie.IESelectionCacheProxy::getSelectionChangeHandler()();
+        var handler = this.@org.xwiki.gwt.dom.client.internal.ie.IEOldSelectionCacheProxy::getSelectionChangeHandler()();
         document.attachEvent('onselectionchange', handler);
         // The selection change event is not triggered when we type and thus we are forced to catch key the down event.
         document.body.attachEvent('onkeydown', handler);
@@ -115,7 +105,7 @@ public class IESelectionCacheProxy extends IESelection
      */
     public native void release()
     /*-{
-        var handler = this.@org.xwiki.gwt.dom.client.internal.ie.IESelectionCacheProxy::getSelectionChangeHandler()();
+        var handler = this.@org.xwiki.gwt.dom.client.internal.ie.IEOldSelectionCacheProxy::getSelectionChangeHandler()();
         document.detachEvent('onselectionchange', handler);
         document.body.detachEvent('onkeydown', handler);
     }-*/;

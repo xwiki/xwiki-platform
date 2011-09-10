@@ -31,28 +31,7 @@ import com.google.gwt.dom.client.Node;
  */
 public class MozillaDOMUtils extends DOMUtils
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DOMUtils#getComputedStyleProperty(Element, String)
-     */
-    public native String getComputedStyleProperty(Element el, String propertyName)
-    /*-{
-        var computedStyle = el.ownerDocument.defaultView.getComputedStyle(el, null);
-        if (computedStyle) {
-          // We force it to be a string because we treat it as a string in the java code.
-          return '' + computedStyle[propertyName];
-        } else {
-          // Computed style can be null if the element is not displayed.
-          return null;
-        }
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DOMUtils#splitHTMLNode(Node, Node, int)
-     */
+    @Override
     public Node splitHTMLNode(Node parent, Node descendant, int offset)
     {
         // Save the length of the descendant before the split to be able to detect where the split took place.
@@ -88,11 +67,7 @@ public class MozillaDOMUtils extends DOMUtils
         return nextLevelSibling;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DOMUtils#ensureBlockIsEditable(Element)
-     */
+    @Override
     public void ensureBlockIsEditable(Element block)
     {
         if (block.canHaveChildren()) {

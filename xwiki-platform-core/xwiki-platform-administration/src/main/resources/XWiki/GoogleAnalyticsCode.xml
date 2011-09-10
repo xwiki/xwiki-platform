@@ -548,7 +548,6 @@ $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section
 
 {{html}}
 &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform half"&gt;
-	&lt;input type="hidden" name="action" value="save"/&gt;
 	&lt;dl&gt;
 		&lt;dt&gt;
 			&lt;label for="analytics_account"&gt;$!accountPropertyClass.prettyName&lt;/label&gt;
@@ -559,6 +558,7 @@ $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section
 		&lt;/dd&gt;
 	&lt;/dl&gt;
 	&lt;p&gt;
+		&lt;input type="hidden" name="action" value="save"/&gt;
 		&lt;span class="buttonwrapper"&gt;
 			&lt;input type="submit" value="${msg.get('save')}" class="button" /&gt;
 		&lt;/span&gt;

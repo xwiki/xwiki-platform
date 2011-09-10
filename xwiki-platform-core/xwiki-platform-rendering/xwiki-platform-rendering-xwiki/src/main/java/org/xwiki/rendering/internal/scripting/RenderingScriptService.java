@@ -116,6 +116,7 @@ public class RenderingScriptService implements ScriptService
      * @param block the block to render
      * @param outputSyntaxId the syntax in which to render the blocks
      * @return the string representing the passed blocks in the passed syntax or null if an error occurred
+     * @since 3.2M3
      */
     public String render(Block block, String outputSyntaxId)
     {

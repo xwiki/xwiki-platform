@@ -22,10 +22,10 @@ package com.xpn.xwiki.store.migration.hibernate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -43,7 +43,7 @@ import com.xpn.xwiki.store.migration.XWikiMigratorInterface;
 public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManager
 {
     /** logger */
-    protected static final Log LOG = LogFactory.getLog(XWikiHibernateMigrationManager.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateMigrationManager.class);
 
     /** {@inheritDoc} */
     public XWikiHibernateMigrationManager(XWikiContext context) throws XWikiException
@@ -60,13 +60,13 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
         return context.getWiki().getHibernateStore();
     }
 
-    /** {@inheritDoc} */
     @Override
     public XWikiDBVersion getDBVersion(XWikiContext context) throws XWikiException
     {
         XWikiDBVersion ver = getDBVersionFromConfig(context);
         return ver != null ? ver : getStore(context).executeRead(context, true, new HibernateCallback<XWikiDBVersion>()
         {
+            @Override
             public XWikiDBVersion doInHibernate(Session session) throws HibernateException
             {
                 XWikiDBVersion result = (XWikiDBVersion) session.createCriteria(XWikiDBVersion.class).uniqueResult();
@@ -75,12 +75,12 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
         });
     }
 
-    /** {@inheritDoc} */
     @Override
     protected void setDBVersion(final XWikiDBVersion version, XWikiContext context) throws XWikiException
     {
         getStore(context).executeWrite(context, true, new HibernateCallback<Object>()
         {
+            @Override
             public Object doInHibernate(Session session) throws HibernateException
             {
                 session.createQuery("delete from " + XWikiDBVersion.class.getName()).executeUpdate();
@@ -90,7 +90,6 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
         });
     }
 
-    /** {@inheritDoc} */
     @Override
     protected List<XWikiMigratorInterface> getAllMigrations(XWikiContext context) throws XWikiException
     {

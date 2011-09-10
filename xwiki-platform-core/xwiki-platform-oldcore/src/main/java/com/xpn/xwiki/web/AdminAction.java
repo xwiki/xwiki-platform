@@ -21,9 +21,9 @@
 
 package com.xpn.xwiki.web;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -38,7 +38,7 @@ import com.xpn.xwiki.doc.XWikiLock;
 public class AdminAction extends XWikiAction
 {
     /** The logger. */
-    private static final Log LOG = LogFactory.getLog(AdminAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminAction.class);
 
     /**
      * {@inheritDoc}
@@ -138,7 +138,7 @@ public class AdminAction extends XWikiAction
                 e.printStackTrace();
                 // Lock should never make XWiki fail
                 // But we should log any related information
-                LOG.error("Exception while setting up lock", e);
+                LOGGER.error("Exception while setting up lock", e);
             }
         }
 

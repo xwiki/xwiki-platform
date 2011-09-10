@@ -362,6 +362,9 @@
                 <exclude>com/xpn/xwiki/plugin/activitystream/plugin/ActivityEvent</exclude>
                 <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
                 <exclude>com/xpn/xwiki/user/api/XWikiRightService</exclude>
+                <exclude>com/xpn/xwiki/cache/api/XWikiCache</exclude>
+                <exclude>com/xpn/xwiki/cache/api/XWikiCacheNeedsRefreshException</exclude>
+                <exclude>com/xpn/xwiki/cache/api/XWikiCacheService</exclude>
               </excludes>
             </configuration>
           </plugin>

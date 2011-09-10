@@ -22,10 +22,13 @@ package com.xpn.xwiki.internal.macro;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jfree.util.Log;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -42,7 +45,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * 
  * @version $Id$
  */
-@Component("WikiMacroExecutionEventListener")
+@Component
+@Singleton
+@Named("WikiMacroExecutionEventListener")
 public class WikiMacroExecutionEventListener implements EventListener
 {
     /**
@@ -64,41 +69,28 @@ public class WikiMacroExecutionEventListener implements EventListener
     /**
      * Used to extract the {@link XWikiContext}.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
      * Used to get wiki macro document and context document.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
+    @Override
     public List<Event> getEvents()
     {
         return EVENTS;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-     *      java.lang.Object)
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         XWikiContext xwikiContext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");

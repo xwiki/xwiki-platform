@@ -41,8 +41,6 @@ import java.util.zip.ZipOutputStream;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.io.input.CloseShieldInputStream;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -50,6 +48,8 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryException;
@@ -77,7 +77,7 @@ public class Package
 
     public static final String DefaultPluginName = "package";
 
-    private static final Log LOG = LogFactory.getLog(Package.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Package.class);
 
     private String name = "My package";
 
@@ -268,7 +268,7 @@ public class Package
             }
             return true;
         } catch (ExcludeDocumentException e) {
-            LOG.info("Skip the document " + doc.getDocumentReference());
+            LOGGER.info("Skip the document " + doc.getDocumentReference());
 
             return false;
         }
@@ -422,7 +422,7 @@ public class Package
                     try {
                         doc = readFromXML(new CloseShieldInputStream(zis));
                     } catch (Throwable ex) {
-                        LOG.warn("Failed to parse document [" + entry.getName()
+                        LOGGER.warn("Failed to parse document [" + entry.getName()
                             + "] from XML during import, thus it will not be installed. " + "The error was: "
                             + ex.getMessage());
                         // It will be listed in the "failed documents" section after the import.
@@ -437,7 +437,7 @@ public class Package
                         this.filter(doc, context);
                         docsToLoad.add(doc);
                     } catch (ExcludeDocumentException e) {
-                        LOG.info("Skip the document '" + doc.getDocumentReference() + "'");
+                        LOGGER.info("Skip the document '" + doc.getDocumentReference() + "'");
                     }
                 }
             }
@@ -453,7 +453,7 @@ public class Package
                 if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(), description)) {
                     this.add(doc, context);
                 } else {
-                    LOG.warn("document " + doc.getDocumentReference() + " does not exist in package definition."
+                    LOGGER.warn("document " + doc.getDocumentReference() + " does not exist in package definition."
                         + " It will not be installed.");
                     // It will be listed in the "skipped documents" section after the
                     // import.
@@ -528,8 +528,8 @@ public class Package
 
     public int testInstall(boolean isAdmin, XWikiContext context)
     {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Package test install");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Package test install");
         }
 
         int result = DocumentInfo.INSTALL_IMPOSSIBLE;
@@ -548,8 +548,8 @@ public class Package
 
             return result;
         } finally {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Package test install result " + result);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Package test install result " + result);
             }
         }
     }
@@ -648,8 +648,8 @@ public class Package
 
         int result = DocumentInfo.INSTALL_OK;
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Package installing document " + doc.getFullName() + " " + doc.getLanguage());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Package installing document " + doc.getFullName() + " " + doc.getLanguage());
         }
 
         if (doc.getAction() == DocumentInfo.ACTION_SKIP) {
@@ -682,11 +682,11 @@ public class Package
                         // let's log the error but not stop
                         result = DocumentInfo.INSTALL_ERROR;
                         addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
-                        if (LOG.isErrorEnabled()) {
-                            LOG.error("Failed to delete document " + previousdoc.getDocumentReference());
+                        if (LOGGER.isErrorEnabled()) {
+                            LOGGER.error("Failed to delete document " + previousdoc.getDocumentReference());
                         }
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Failed to delete document " + previousdoc.getDocumentReference(), e);
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Failed to delete document " + previousdoc.getDocumentReference(), e);
                         }
                     }
                 }
@@ -762,8 +762,8 @@ public class Package
 
             } catch (XWikiException e) {
                 addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
-                if (LOG.isErrorEnabled()) {
-                    LOG.error("Failed to save document " + doc.getFullName(), e);
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error("Failed to save document " + doc.getFullName(), e);
                 }
                 result = DocumentInfo.INSTALL_ERROR;
             }
@@ -1082,7 +1082,7 @@ public class Package
             fos.flush();
             fos.close();
         } catch (ExcludeDocumentException e) {
-            LOG.info("Skip the document " + doc.getDocumentReference());
+            LOGGER.info("Skip the document " + doc.getDocumentReference());
         } catch (Exception e) {
             Object[] args = new Object[1];
             args[0] = doc.getDocumentReference();
@@ -1210,10 +1210,10 @@ public class Package
                                 + doc.getDocumentReference() + " does not exist in package definition");
                         }
                     } catch (ExcludeDocumentException e) {
-                        LOG.info("Skip the document '" + doc.getDocumentReference() + "'");
+                        LOGGER.info("Skip the document '" + doc.getDocumentReference() + "'");
                     }
                 } else if (!file.getName().equals(DefaultPackageFileName)) {
-                    LOG.info(file.getAbsolutePath() + " is not a valid wiki document");
+                    LOGGER.info(file.getAbsolutePath() + " is not a valid wiki document");
                 }
             }
         }
@@ -1249,7 +1249,7 @@ public class Package
             throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Error when reading the XML");
         }
 
-        LOG.info("Package read " + count + " documents");
+        LOGGER.info("Package read " + count + " documents");
 
         return "";
     }

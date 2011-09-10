@@ -118,7 +118,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         getContext().put("isInRenderingEngine", true);
 
         this.mockXWiki = mock(XWiki.class);
-        this.mockXWiki.stubs().method("Param").will(returnValue(null));
+        this.mockXWiki.stubs().method("Param").with(eq("xwiki.render.velocity.macrolist")).will(returnValue(""));
 
         this.mockXWikiRenderingEngine = mock(XWikiRenderingEngine.class);
 

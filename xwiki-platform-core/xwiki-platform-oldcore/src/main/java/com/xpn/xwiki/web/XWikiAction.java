@@ -27,13 +27,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.container.Container;
@@ -87,7 +87,7 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
  */
 public abstract class XWikiAction extends Action
 {
-    private static final Log LOG = LogFactory.getLog(XWikiAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAction.class);
 
     /**
      * Handle server requests.
@@ -213,8 +213,8 @@ public abstract class XWikiAction extends Action
                         return null;
                     }
                 } catch (Throwable ex) {
-                    LOG.error("Cannot send action notifications for document [" + context.getDoc() + " using action ["
-                        + context.getAction() + "]", ex);
+                    LOGGER.error("Cannot send action notifications for document [" + context.getDoc()
+                        + " using action [" + context.getAction() + "]", ex);
                 }
 
                 if (monitor != null) {
@@ -243,21 +243,21 @@ public abstract class XWikiAction extends Action
                 if (e instanceof IOException) {
                     e =
                         new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                        XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response",
-                        e);
+                            XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response",
+                            e);
                 }
 
                 if (!(e instanceof XWikiException)) {
                     e =
                         new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
-                        "Uncaught exception", e);
+                            "Uncaught exception", e);
                 }
 
                 try {
                     XWikiException xex = (XWikiException) e;
                     if (xex.getCode() == XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION) {
                         // Connection aborted, simply ignore this.
-                        LOG.error("Connection aborted");
+                        LOGGER.error("Connection aborted");
                         // We don't write any other message, as the connection is broken, anyway.
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
@@ -268,8 +268,8 @@ public abstract class XWikiAction extends Action
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND) {
                         context.put("message", "attachmentdoesnotexist");
-                        Utils.parseTemplate(context.getWiki().Param("xwiki.attachment_exception",
-                            "attachmentdoesnotexist"), context);
+                        Utils.parseTemplate(
+                            context.getWiki().Param("xwiki.attachment_exception", "attachmentdoesnotexist"), context);
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION) {
                         vcontext.put("message", context.getMessageTool().get("platform.core.invalidUrl"));
@@ -280,21 +280,22 @@ public abstract class XWikiAction extends Action
                         return null;
                     }
                     vcontext.put("exp", e);
-                    if (LOG.isWarnEnabled()) {
-                        LOG.warn("Uncaught exception: " + e.getMessage(), e);
+                    if (LOGGER.isWarnEnabled()) {
+                        LOGGER.warn("Uncaught exception: " + e.getMessage(), e);
                     }
-                    // If the request is an AJAX request, we don't return a whole HTML page, but just the exception inline.
+                    // If the request is an AJAX request, we don't return a whole HTML page, but just the exception
+                    // inline.
                     String exceptionTemplate = ajax ? "exceptioninline" : "exception";
                     Utils.parseTemplate(Utils.getPage(context.getRequest(), exceptionTemplate), context);
                     return null;
                 } catch (XWikiException ex) {
                     if (ex.getCode() == XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION) {
-                        LOG.error("Connection aborted");
+                        LOGGER.error("Connection aborted");
                     }
                 } catch (Exception e2) {
                     // I hope this never happens
-                    LOG.error("Uncaught exceptions (inner): ", e);
-                    LOG.error("Uncaught exceptions (outer): ", e2);
+                    LOGGER.error("Uncaught exceptions (inner): ", e);
+                    LOGGER.error("Uncaught exceptions (outer): ", e2);
                 }
                 return null;
             } finally {
@@ -318,7 +319,7 @@ public abstract class XWikiAction extends Action
                     ObservationManager om = Utils.getComponent(ObservationManager.class);
                     om.notify(new ActionExecutedEvent(context.getAction()), context.getDoc(), context);
                 } catch (Throwable ex) {
-                    LOG.error("Cannot send action notifications for document [" + docName + " using action ["
+                    LOGGER.error("Cannot send action notifications for document [" + docName + " using action ["
                         + context.getAction() + "]", ex);
                 }
 
@@ -530,9 +531,8 @@ public abstract class XWikiAction extends Action
     }
 
     /**
-     * Perform CSRF check and redirect to the resubmission page if needed.
-     * Throws an exception if the access should be denied, returns false if the check failed and
-     * the user will be redirected to a resubmission page.
+     * Perform CSRF check and redirect to the resubmission page if needed. Throws an exception if the access should be
+     * denied, returns false if the check failed and the user will be redirected to a resubmission page.
      * 
      * @param context current xwiki context containing the request
      * @return true if the check succeeded, false if resubmission is needed
@@ -549,8 +549,7 @@ public abstract class XWikiAction extends Action
             }
         } catch (XWikiException exception) {
             // too bad
-            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied, secret token verification failed", exception);
         }
         return true;

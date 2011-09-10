@@ -31,14 +31,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -61,7 +61,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 {
-    private static final Log LOG = LogFactory.getLog(XWikiAuthServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAuthServiceImpl.class);
 
     /**
      * Used to convert a string into a proper Document Name.
@@ -216,6 +216,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         }
     }
 
+    @Override
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
         // Debug time taken.
@@ -301,16 +302,16 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
             // Process logout (this only works with Forms)
             if (auth.processLogout(wrappedRequest, response, xwiki.getUrlPatternMatcher())) {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("User " + context.getUser() + " has been logged-out");
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("User " + context.getUser() + " has been logged-out");
                 }
                 wrappedRequest.setUserPrincipal(null);
                 return null;
             }
 
-            if (LOG.isInfoEnabled()) {
+            if (LOGGER.isInfoEnabled()) {
                 if (userName != null) {
-                    LOG.info("User " + userName + " is authentified");
+                    LOGGER.info("User " + userName + " is authentified");
                 }
             }
 
@@ -320,11 +321,11 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
             return new XWikiUser(userName);
         } catch (Exception e) {
-            LOG.error("Failed to authenticate", e);
+            LOGGER.error("Failed to authenticate", e);
 
             return null;
         } finally {
-            LOG.debug("XWikiAuthServiceImpl.checkAuth(XWikiContext) took " + (System.currentTimeMillis() - time)
+            LOGGER.debug("XWikiAuthServiceImpl.checkAuth(XWikiContext) took " + (System.currentTimeMillis() - time)
                 + " milliseconds to run.");
         }
     }
@@ -334,6 +335,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
      * 
      * @return null if the user is not authenticated properly
      */
+    @Override
     public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
         throws XWikiException
     {
@@ -360,9 +362,9 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             }
 
             Principal principal = wrappedRequest.getUserPrincipal();
-            if (LOG.isInfoEnabled()) {
+            if (LOGGER.isInfoEnabled()) {
                 if (principal != null) {
-                    LOG.info("User " + principal.getName() + " is authentified");
+                    LOGGER.info("User " + principal.getName() + " is authentified");
                 }
             }
 
@@ -372,7 +374,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
             return new XWikiUser(getContextUserName(principal, context));
         } catch (Exception e) {
-            LOG.error("Failed to authenticate", e);
+            LOGGER.error("Failed to authenticate", e);
 
             return null;
         }
@@ -396,6 +398,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         return contextUserName;
     }
 
+    @Override
     public void showLogin(XWikiContext context) throws XWikiException
     {
         try {
@@ -404,15 +407,11 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                     context.getResponse().getHttpServletResponse(), context);
             }
         } catch (IOException e) {
-            LOG.error("Unknown failure when calling showLogin", e);
+            LOGGER.error("Unknown failure when calling showLogin", e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAuthService#authenticate(String,String,XWikiContext)
-     */
+    @Override
     public Principal authenticate(String username, String password, XWikiContext context) throws XWikiException
     {
         /*
@@ -521,7 +520,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             }
 
         } else {
-            LOG.error("XWikiContext is null");
+            LOGGER.error("XWikiContext is null");
 
             return null;
         }
@@ -567,18 +566,18 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 result = new PasswordClass().getEquivalentPassword(stored, password).equals(stored);
             }
 
-            if (LOG.isDebugEnabled()) {
+            if (LOGGER.isDebugEnabled()) {
                 if (result) {
-                    LOG.debug("Password check for user " + username + " successful");
+                    LOGGER.debug("Password check for user " + username + " successful");
                 } else {
-                    LOG.debug("Password check for user " + username + " failed");
+                    LOGGER.debug("Password check for user " + username + " failed");
                 }
-                LOG.debug((System.currentTimeMillis() - time) + " milliseconds spent validating password.");
+                LOGGER.debug((System.currentTimeMillis() - time) + " milliseconds spent validating password.");
             }
 
             return result;
         } catch (Throwable e) {
-            LOG.error("Failed to check password", e);
+            LOGGER.error("Failed to check password", e);
 
             return false;
         }
@@ -610,8 +609,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     {
         String createuser = getParam("auth_createuser", context);
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Create user param is " + createuser);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Create user param is " + createuser);
         }
 
         if (createuser != null) {
@@ -619,20 +618,20 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             XWikiDocument userdoc =
                 context.getWiki().getDocument(new DocumentReference(context.getDatabase(), "XWiki", wikiname), context);
             if (userdoc.isNew()) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("User page does not exist for user " + user);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("User page does not exist for user " + user);
                 }
 
                 if ("empty".equals(createuser)) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Creating emptry user for user " + user);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Creating emptry user for user " + user);
                     }
 
                     context.getWiki().createEmptyUser(wikiname, "edit", context);
                 }
             } else {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("User page already exists for user " + user);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("User page already exists for user " + user);
                 }
             }
 

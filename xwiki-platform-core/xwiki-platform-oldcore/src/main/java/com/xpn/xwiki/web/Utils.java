@@ -37,9 +37,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.struts.upload.MultipartRequestWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
@@ -53,14 +53,14 @@ import com.xpn.xwiki.util.Util;
 
 public class Utils
 {
-    protected static final Log LOG = LogFactory.getLog(Utils.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
 
     /** A key that is used for placing a map of replaced (for protection) strings in the context. */
     private static final String PLACEHOLDERS_CONTEXT_KEY = Utils.class.getCanonicalName() + "_placeholders";
 
     /** Whether placeholders are enabled or not. */
-    private static final String PLACEHOLDERS_ENABLED_CONTEXT_KEY =
-        Utils.class.getCanonicalName() + "_placeholders_enabled";
+    private static final String PLACEHOLDERS_ENABLED_CONTEXT_KEY = Utils.class.getCanonicalName()
+        + "_placeholders_enabled";
 
     /**
      * The component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}. It is useful
@@ -156,8 +156,8 @@ public class Utils
             disablePlaceholders(context);
             content = context.getWiki().getPluginManager().endParsing(content.trim(), context);
         } catch (IOException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("IOException while evaluating template [" + template + "] from /templates/", e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("IOException while evaluating template [" + template + "] from /templates/", e);
             }
 
             // get Error template "This template does not exist
@@ -249,8 +249,8 @@ public class Utils
      * @param action the XWiki action to use for composing the default redirect URL ({@code view}, {@code edit}, etc)
      * @param queryString the query parameters to append to the fallback URL
      * @param redirectParameters list of request parameters to look for as the redirect destination; each of the
-     *        parameters is tried in the order they are passed, and the first one set to a non-empty value is returned,
-     *        if any
+     *            parameters is tried in the order they are passed, and the first one set to a non-empty value is
+     *            returned, if any
      * @return the destination URL, as specified in one of the {@code redirectParameters}, or computed using the current
      *         document and the specified action and query string
      */

@@ -26,8 +26,6 @@ import java.util.Iterator;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.api.engine.context.RenderContext;
 import org.radeox.engine.context.BaseInitialRenderContext;
@@ -35,6 +33,8 @@ import org.radeox.engine.context.BaseRenderContext;
 import org.radeox.filter.Filter;
 import org.radeox.filter.FilterPipe;
 import org.radeox.util.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -45,7 +45,7 @@ import com.xpn.xwiki.web.Utils;
 public class XWikiRadeoxRenderer implements XWikiRenderer
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(XWikiRadeoxRenderer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRadeoxRenderer.class);
 
     private boolean removePre = true;
 
@@ -92,9 +92,9 @@ public class XWikiRadeoxRenderer implements XWikiRenderer
             try {
                 Filter filter = (Filter) iterator.next();
                 fp.addFilter(filter);
-                LOG.debug("Radeox filter [" + filter.getClass().getName() + "] loaded");
+                LOGGER.debug("Radeox filter [" + filter.getClass().getName() + "] loaded");
             } catch (Exception e) {
-                LOG.error("Failed to load Radeox filter", e);
+                LOGGER.error("Failed to load Radeox filter", e);
             }
         }
 

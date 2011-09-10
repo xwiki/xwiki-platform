@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.radeox.api.engine.ImageRenderEngine;
 import org.radeox.api.engine.WikiRenderEngine;
 import org.radeox.api.engine.context.InitialRenderContext;
@@ -35,6 +33,8 @@ import org.radeox.engine.BaseRenderEngine;
 import org.radeox.filter.FilterPipe;
 import org.radeox.filter.context.BaseFilterContext;
 import org.radeox.filter.context.FilterContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -42,7 +42,7 @@ import com.xpn.xwiki.util.Util;
 
 public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRenderEngine, ImageRenderEngine
 {
-    private static final Log LOG = LogFactory.getLog(XWikiRadeoxRenderEngine.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRadeoxRenderEngine.class);
 
     private XWikiContext xwikiContext;
 
@@ -131,7 +131,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             doc.setFullName(noaccents(name));
             return getXWikiContext().getWiki().exists(doc.getFullName(), getXWikiContext());
         } catch (Exception e) {
-            LOG.error("Failed to check if a document exists", e);
+            LOGGER.error("Failed to check if a document exists", e);
 
             return false;
         } finally {
@@ -237,8 +237,8 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 links.add(docname);
             }
         } catch (Exception e) {
-            if (LOG.isErrorEnabled()) {
-                LOG.error("Error adding link to context", e);
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Error adding link to context", e);
             }
         }
     }

@@ -19,11 +19,13 @@
  */
 package com.xpn.xwiki.internal.cache.rendering;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.DocumentReference;
@@ -38,6 +40,7 @@ import com.xpn.xwiki.internal.cache.DocumentCache;
  * @since 2.4M1
  */
 @Component
+@Singleton
 public class DefaultRenderingCache implements RenderingCache, Initializable
 {
     /**
@@ -48,20 +51,16 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
     /**
      * Configuration of the rendering cache.
      */
-    @Requirement
+    @Inject
     private RenderingCacheConfiguration configuration;
 
     /**
      * Actually cache object.
      */
-    @Requirement
+    @Inject
     private DocumentCache<String> cache;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         if (this.configuration.isEnabled()) {
@@ -82,12 +81,7 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
 
     // cache
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.internal.cache.rendering.RenderingCache#getRenderedContent(org.xwiki.model.reference.DocumentReference,
-     *      java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public String getRenderedContent(DocumentReference documentReference, String source, XWikiContext context)
     {
         String renderedContent = null;
@@ -105,12 +99,7 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
         return renderedContent;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.internal.cache.rendering.RenderingCache#setRenderedContent(org.xwiki.model.reference.DocumentReference,
-     *      java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public void setRenderedContent(DocumentReference documentReference, String source, String renderedContent,
         XWikiContext context)
     {

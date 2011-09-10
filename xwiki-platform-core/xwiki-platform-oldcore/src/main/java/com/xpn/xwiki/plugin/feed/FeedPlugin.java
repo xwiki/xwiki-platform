@@ -35,8 +35,8 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -77,12 +77,12 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     private Map<String, UpdateThread> updateThreads = new HashMap<String, UpdateThread>();
 
     private Converter syntaxConverter;
-   
+
     /**
      * Log object to log messages in this class.
      */
-    private static final Log LOG = LogFactory.getLog(FeedPlugin.class);
-    
+    private static final Logger LOGGER = LoggerFactory.getLogger(FeedPlugin.class);
+
     public static class SyndEntryComparator implements Comparator<SyndEntry>
     {
         public int compare(SyndEntry entry1, SyndEntry entry2)
@@ -293,8 +293,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             feedFetcher.setUserAgent(context.getWiki().Param("xwiki.plugins.feed.useragent",
                 context.getWiki().getHttpUserAgent(context)));
             SyndFeed feed =
-                feedFetcher.retrieveFeed(feedURL, (int) context.getWiki().ParamAsLong("xwiki.plugins.feed.timeout",
-                    context.getWiki().getHttpTimeout(context)));
+                feedFetcher.retrieveFeed(
+                    feedURL,
+                    (int) context.getWiki().ParamAsLong("xwiki.plugins.feed.timeout",
+                        context.getWiki().getHttpTimeout(context)));
             return feed;
         } catch (Exception ex) {
             if (ignoreInvalidFeeds) {
@@ -470,9 +472,9 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     {
         return this.updateFeed("", feedname, feedurl, fullContent, oneDocPerEntry, force, space, context);
     }
-    
-    public int updateFeed(String feedDocumentName, String feedname, String feedurl, boolean fullContent, boolean oneDocPerEntry, boolean force,
-        String space, XWikiContext context)
+
+    public int updateFeed(String feedDocumentName, String feedname, String feedurl, boolean fullContent,
+        boolean oneDocPerEntry, boolean force, String space, XWikiContext context)
     {
         try {
             // Make sure we have this class
@@ -483,7 +485,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 if (feed.getImage() != null) {
                     context.put("feedimgurl", feed.getImage().getUrl());
                 }
-                return saveFeed(feedDocumentName, feedname, feedurl, feed, fullContent, oneDocPerEntry, force, space, context);
+                return saveFeed(feedDocumentName, feedname, feedurl, feed, fullContent, oneDocPerEntry, force, space,
+                    context);
             } else {
                 return 0;
             }
@@ -499,8 +502,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         return -1;
     }
 
-    private int saveFeed(String feedDocumentName, String feedname, String feedurl, SyndFeed feed, boolean fullContent, boolean oneDocPerEntry,
-        boolean force, String space, XWikiContext context) throws XWikiException
+    private int saveFeed(String feedDocumentName, String feedname, String feedurl, SyndFeed feed, boolean fullContent,
+        boolean oneDocPerEntry, boolean force, String space, XWikiContext context) throws XWikiException
     {
         XWikiDocument doc = null;
         Vector<BaseObject> objs = null;
@@ -535,9 +538,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                         // Set the feed document as parent of this feed entry
                         doc.setParent(feedDocumentName);
                     }
-                    if (!StringUtils.isBlank(context.getWiki().Param("xwiki.plugins.feed.creationDateIsPublicationDate"))) {
+                    if (!StringUtils.isBlank(context.getWiki()
+                        .Param("xwiki.plugins.feed.creationDateIsPublicationDate"))) {
                         // Set the creation date to the feed date if it exists, otherwise the current date
-                    	doc.setCreationDate((entry.getPublishedDate() == null) ? new Date() : entry.getPublishedDate());
+                        doc.setCreationDate((entry.getPublishedDate() == null) ? new Date() : entry.getPublishedDate());
                     }
                     if (StringUtils.isBlank(doc.getContent())) {
                         this.prepareFeedEntryDocument(doc, context);
@@ -752,7 +756,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             // If some day wiki syntax is supported in document titles, we might want to convert to wiki syntax instead.
             title = this.stripHtmlTags(entry.getTitle());
         } catch (ConversionException e) {
-            LOG.warn("Failed to strip HTML tags from entry title : " + e.getMessage());
+            LOGGER.warn("Failed to strip HTML tags from entry title : " + e.getMessage());
             // Nevermind, we will use the original title
             title = entry.getTitle();
         }
@@ -811,8 +815,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             if ((url != null) && (!url.trim().equals(""))) {
                 try {
                     String sfullContent = context.getWiki().getURLContent(url, context);
-                    obj.setLargeStringValue("fullContent", (sfullContent.length() > 65000) ? sfullContent.substring(0,
-                        65000) : sfullContent);
+                    obj.setLargeStringValue("fullContent",
+                        (sfullContent.length() > 65000) ? sfullContent.substring(0, 65000) : sfullContent);
                 } catch (Exception e) {
                     obj.setLargeStringValue("fullContent", "Exception while reading fullContent: " + e.getMessage());
                 }

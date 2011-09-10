@@ -17,32 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.store.migration;
+package org.xwiki.rendering.internal.scripting;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.test.AbstractComponentTestCase;
 
 /**
- * Interface for all migration managers.
- * 
+ * Unit tests for {@link RenderingScriptService}.
+ *
  * @version $Id$
+ * @since 3.2M3
  */
-public interface XWikiMigrationManagerInterface
+public class RenderingScriptServiceTest extends AbstractComponentTestCase
 {
-    /**
-     * @return data version
-     * @param context - used everywhere
-     * @xwikicfg xwiki.store.migration.version - override data version
-     * @throws XWikiException if any error
-     */
-    XWikiDBVersion getDBVersion(XWikiContext context) throws XWikiException;
+    private RenderingScriptService rss;
 
-    /**
-     * @param context - used everywhere
-     * @throws XWikiException if any error
-     * @xwikicfg xwiki.store.migration.forced - force run selected migrations and ignore all others
-     * @xwikicfg xwiki.store.migration.ignored - ignore selected migrations
-     * @throws XWikiException if any error
-     */
-    void startMigrations(XWikiContext context) throws XWikiException;
+    @Before
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        this.rss = (RenderingScriptService) getComponentManager().lookup(ScriptService.class, "rendering");
+    }
+    @Test
+    public void parseAndRender()
+    {
+        XDOM xdom = this.rss.parse("some [[TODO]] stuff", "plain/1.0");
+        Assert.assertEquals("some ~[~[TODO]] stuff", this.rss.render(xdom, "xwiki/2.0"));
+    }
 }

@@ -20,24 +20,26 @@
  */
 package com.xpn.xwiki.web;
 
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.VelocityContext;
 
 /**
  * @deprecated use {@link EditAction} with {@code editor=inline} in the query string instead since 3.2
  */
 @Deprecated
-public class InlineAction extends XWikiAction {
-    private static final Log log = LogFactory.getLog(InlineAction.class);
+public class InlineAction extends XWikiAction
+{
+    private static final Logger LOGGER = LoggerFactory.getLogger(InlineAction.class);
 
-    public String render(XWikiContext context) throws XWikiException {
-
+    public String render(XWikiContext context) throws XWikiException
+    {
         XWikiDocument doc = context.getDoc();
 
         synchronized (doc) {
@@ -80,7 +82,7 @@ public class InlineAction extends XWikiAction {
                 cdoc2.readFromTemplate(peform, context);
             }
 
-            doc2.readFromForm((EditForm)form, context);
+            doc2.readFromForm((EditForm) form, context);
 
             /* Setup a lock */
             try {
@@ -91,7 +93,7 @@ public class InlineAction extends XWikiAction {
                 e.printStackTrace();
                 // Lock should never make XWiki fail
                 // But we should log any related information
-                log.error("Exception while setting up lock", e);
+                LOGGER.error("Exception while setting up lock", e);
             }
         }
 

@@ -105,6 +105,7 @@ public class TableBuilder
             }
             lastToken = token;
         }
+
         return table;
     }
 }

@@ -22,6 +22,8 @@ package com.xpn.xwiki.store;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Singleton;
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -40,6 +42,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  */
 @Component
+@Singleton
 public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore implements XWikiRecycleBinStoreInterface
 {
     /**
@@ -59,15 +62,14 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void saveToRecycleBin(XWikiDocument doc, String deleter, Date date, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
         final XWikiDeletedDocument trashdoc = new XWikiDeletedDocument(doc, deleter, date, context);
         executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {
+            @Override
             public Object doInHibernate(Session session) throws HibernateException
             {
                 session.save(trashdoc);
@@ -76,14 +78,13 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDocument restoreFromRecycleBin(final XWikiDocument doc, final long index, final XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
         return executeRead(context, bTransaction, new HibernateCallback<XWikiDocument>()
         {
+            @Override
             public XWikiDocument doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 XWikiDeletedDocument trashdoc =
@@ -93,14 +94,13 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDeletedDocument getDeletedDocument(XWikiDocument doc, final long index, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
         return executeRead(context, bTransaction, new HibernateCallback<XWikiDeletedDocument>()
         {
+            @Override
             public XWikiDeletedDocument doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 return (XWikiDeletedDocument) session.get(XWikiDeletedDocument.class, Long.valueOf(index));
@@ -108,14 +108,13 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDeletedDocument[] getAllDeletedDocuments(final XWikiDocument doc, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
         return executeRead(context, bTransaction, new HibernateCallback<XWikiDeletedDocument[]>()
         {
+            @Override
             public XWikiDeletedDocument[] doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 Criteria c = session.createCriteria(XWikiDeletedDocument.class);
@@ -130,18 +129,17 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void deleteFromRecycleBin(XWikiDocument doc, final long index, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
         executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {
+            @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
-                session.createQuery("delete from " + XWikiDeletedDocument.class.getName() + " where id=?").setLong(0,
-                    index).executeUpdate();
+                session.createQuery("delete from " + XWikiDeletedDocument.class.getName() + " where id=?")
+                    .setLong(0, index).executeUpdate();
                 return null;
             }
         });

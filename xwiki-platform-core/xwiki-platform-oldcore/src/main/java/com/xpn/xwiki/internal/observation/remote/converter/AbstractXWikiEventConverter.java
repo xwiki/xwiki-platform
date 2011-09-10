@@ -26,10 +26,9 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.remote.converter.AbstractEventConverter;
 
 import com.xpn.xwiki.XWikiContext;
@@ -62,13 +61,13 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
     /**
      * Used to set some proper context informations.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
      * Generate stub XWikiContext.
      */
-    @Requirement
+    @Inject
     private XWikiStubContextProvider stubContextProvider;
 
     /**
@@ -124,10 +123,9 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
             xcontext.setDatabase((String) remoteDataMap.get(CONTEXT_WIKI));
             xcontext.setUser((String) remoteDataMap.get(CONTEXT_USER));
         } else {
-            this.logger.warn(
-                "Can't get a proper XWikiContext."
-                    + " It generally mean that the wiki has never been fully initialized,"
-                    + " i.e. has never been accesses at least once");
+            this.logger.warn("Can't get a proper XWikiContext."
+                + " It generally mean that the wiki has never been fully initialized,"
+                + " i.e. has never been accesses at least once");
         }
 
         return xcontext;

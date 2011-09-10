@@ -210,8 +210,7 @@ public class TextAreaClass extends StringClass
      *      java.lang.String, com.xpn.xwiki.objects.BaseCollection, com.xpn.xwiki.XWikiContext)
      */
     @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
-        XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         String contentType = getContentType();
         XWikiDocument doc = context.getDoc();
@@ -231,8 +230,8 @@ public class TextAreaClass extends StringClass
             StringBuffer result = new StringBuffer();
             super.displayView(result, name, prefix, object, context);
             if (doc != null) {
-                buffer.append(doc.getRenderedContent(result.toString(),
-                    getObjectDocumentSyntax(object, context).toIdString(), context));
+                buffer.append(doc.getRenderedContent(result.toString(), getObjectDocumentSyntax(object, context)
+                    .toIdString(), context));
             } else {
                 buffer.append(result);
             }
@@ -240,8 +239,8 @@ public class TextAreaClass extends StringClass
     }
 
     /**
-     * @return the syntax for the document to which the passed objects belongs to or the XWiki Syntax 1.0 if the
-     *         object document cannot be retrieved
+     * @return the syntax for the document to which the passed objects belongs to or the XWiki Syntax 1.0 if the object
+     *         document cannot be retrieved
      */
     private Syntax getObjectDocumentSyntax(BaseCollection object, XWikiContext context)
     {
@@ -255,7 +254,7 @@ public class TextAreaClass extends StringClass
             // current wiki).
             EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
                 Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
-            LOG.warn("Error while getting the syntax corresponding to object ["
+            LOGGER.warn("Error while getting the syntax corresponding to object ["
                 + compactWikiEntityReferenceSerializer.serialize(object.getDocumentReference())
                 + "]. Defaulting to using XWiki 1.0 syntax. Internal error [" + e.getMessage() + "]");
             syntax = Syntax.XWIKI_1_0;

@@ -250,7 +250,8 @@ public class ModelScriptService implements ScriptService
         try {
             EntityReferenceResolver<String> resolver =
                 this.componentManager.lookup(EntityReferenceResolver.class, hint);
-            return new ObjectPropertyReference(resolver.resolve(stringRepresentation, EntityType.OBJECT_PROPERTY, parameters));
+            return new ObjectPropertyReference(resolver.resolve(stringRepresentation, EntityType.OBJECT_PROPERTY,
+                parameters));
         } catch (ComponentLookupException e) {
             return null;
         }

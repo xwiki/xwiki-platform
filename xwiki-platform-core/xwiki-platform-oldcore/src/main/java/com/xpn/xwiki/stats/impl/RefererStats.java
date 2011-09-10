@@ -25,8 +25,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
 
@@ -40,7 +40,7 @@ public class RefererStats extends XWikiStats
     /**
      * Logging tools.
      */
-    private static final Log LOG = LogFactory.getLog(RefererStats.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RefererStats.class);
 
     /**
      * The properties of document statistics object.
@@ -104,8 +104,8 @@ public class RefererStats extends XWikiStats
         try {
             url = new URL(getReferer());
         } catch (MalformedURLException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Failed to construct URL from referer", e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Failed to construct URL from referer", e);
             }
         }
 

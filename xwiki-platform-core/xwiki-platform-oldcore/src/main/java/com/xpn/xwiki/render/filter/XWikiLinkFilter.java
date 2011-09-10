@@ -24,8 +24,6 @@ package com.xpn.xwiki.render.filter;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.radeox.api.engine.RenderEngine;
 import org.radeox.api.engine.WikiRenderEngine;
 import org.radeox.filter.context.FilterContext;
@@ -33,6 +31,8 @@ import org.radeox.filter.interwiki.InterWiki;
 import org.radeox.filter.regex.LocaleRegexTokenFilter;
 import org.radeox.util.Encoder;
 import org.radeox.util.StringBufferWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -45,7 +45,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public class XWikiLinkFilter extends LocaleRegexTokenFilter
 {
-    private static Log log = LogFactory.getLog(XWikiLinkFilter.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(XWikiLinkFilter.class);
 
     /**
      * The regular expression for detecting WikiLinks. Overwrite in subclass to support other link styles like
@@ -188,7 +188,7 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                                 interWiki.expand(writer, extSpace, href, text);
                             }
                         } catch (IOException e) {
-                            log.debug("InterWiki " + extSpace + " not found.");
+                            LOGGER.debug("InterWiki " + extSpace + " not found.");
                         }
                     } else {
                         buffer.append("&#91;<span class=\"error\">");

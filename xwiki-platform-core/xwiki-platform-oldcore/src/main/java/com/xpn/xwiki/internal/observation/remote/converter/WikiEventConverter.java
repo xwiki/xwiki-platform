@@ -23,6 +23,9 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
@@ -40,7 +43,9 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 2.0M3
  */
-@Component("wiki")
+@Component
+@Singleton
+@Named("wiki")
 public class WikiEventConverter extends AbstractXWikiEventConverter
 {
     /**
@@ -54,12 +59,7 @@ public class WikiEventConverter extends AbstractXWikiEventConverter
         }
     };
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.LocalEventConverter#toRemote(org.xwiki.observation.remote.LocalEventData,
-     *      org.xwiki.observation.remote.RemoteEventData)
-     */
+    @Override
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
     {
         if (this.events.contains(localEvent.getEvent().getClass())) {
@@ -74,12 +74,7 @@ public class WikiEventConverter extends AbstractXWikiEventConverter
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.RemoteEventConverter#fromRemote(org.xwiki.observation.remote.RemoteEventData,
-     *      org.xwiki.observation.remote.LocalEventData)
-     */
+    @Override
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
         if (this.events.contains(remoteEvent.getEvent().getClass())) {

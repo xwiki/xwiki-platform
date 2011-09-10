@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 
+import javax.inject.Singleton;
+
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -38,6 +40,7 @@ import com.xpn.xwiki.util.Util;
  */
 // TODO: This was coded by Artem. Find out why we need this as a component.
 @Component
+@Singleton
 public class DefaultHibernateSessionFactory implements HibernateSessionFactory
 {
     /**
@@ -48,18 +51,14 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
         private static final long serialVersionUID = 1L;
 
         /**
-         * Whether the Hibernate Configuration has alreayd been initialized or not. We do this so that the
-         * Hibernate {@link org.hibernate.cfg.Configuration#configure()} methods can be called several times in a
-         * row without causing some Duplicate Mapping errors, see our overridden
-         * {@link #getConfigurationInputStream(String)} below.
+         * Whether the Hibernate Configuration has alreayd been initialized or not. We do this so that the Hibernate
+         * {@link org.hibernate.cfg.Configuration#configure()} methods can be called several times in a row without
+         * causing some Duplicate Mapping errors, see our overridden {@link #getConfigurationInputStream(String)} below.
          */
         private boolean isConfigurationInitialized;
 
-        /**
-         * {@inheritDoc}
-         * @see org.hibernate.cfg.Configuration#configure()
-         */
-        @Override public Configuration configure() throws HibernateException
+        @Override
+        public Configuration configure() throws HibernateException
         {
             Configuration configuration;
             if (this.isConfigurationInitialized) {
@@ -71,11 +70,8 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
             return configuration;
         }
 
-        /**
-         * {@inheritDoc}
-         * @see org.hibernate.cfg.Configuration#configure(String) 
-         */
-        @Override public Configuration configure(String resource) throws HibernateException
+        @Override
+        public Configuration configure(String resource) throws HibernateException
         {
             Configuration configuration;
             if (this.isConfigurationInitialized) {
@@ -87,11 +83,8 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
             return configuration;
         }
 
-        /**
-         * {@inheritDoc}
-         * @see org.hibernate.cfg.Configuration#configure(java.net.URL)
-         */
-        @Override public Configuration configure(URL url) throws HibernateException
+        @Override
+        public Configuration configure(URL url) throws HibernateException
         {
             Configuration configuration;
             if (this.isConfigurationInitialized) {
@@ -103,11 +96,8 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
             return configuration;
         }
 
-        /**
-         * {@inheritDoc}
-         * @see org.hibernate.cfg.Configuration#configure(java.io.File) 
-         */
-        @Override public Configuration configure(File configFile) throws HibernateException
+        @Override
+        public Configuration configure(File configFile) throws HibernateException
         {
             Configuration configuration;
             if (this.isConfigurationInitialized) {
@@ -136,28 +126,19 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
      */
     private SessionFactory sessionFactory;
 
-    /**
-     * {@inheritDoc}
-     * @see HibernateSessionFactory#getConfiguration()
-     */
+    @Override
     public Configuration getConfiguration()
     {
         return this.configuration;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see HibernateSessionFactory#getSessionFactory()
-     */
+    @Override
     public SessionFactory getSessionFactory()
     {
         return this.sessionFactory;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see HibernateSessionFactory#setSessionFactory(SessionFactory)
-     */
+    @Override
     public void setSessionFactory(SessionFactory sessionFactory)
     {
         this.sessionFactory = sessionFactory;

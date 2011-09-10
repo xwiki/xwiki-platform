@@ -21,8 +21,8 @@ package org.xwiki.extension.repository.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -74,29 +74,16 @@ public class DefaultCoreExtensionScanner
     private static final String SNAPSHOTSUFFIX = "-SNAPSHOT";
 
     /**
-     * JBoss vfszip protocol.
-     */
-    private static final String PROTOCOL_VFSZIP = "vfszip:";
-
-    /**
-     * JBoss vfsfile protocol.
-     */
-    private static final String PROTOCOL_VFSFILE = "vfsfile:";
-
-    /**
-     * file protocol.
-     */
-    private static final String PROTOCOL_FILE = "file:";
-
-    /**
      * Scan classpath to find core extensions.
      * 
+     * @param repository the repository where to store found extensions
      * @return scan jar files in classpath to find core extensions
      */
     public Map<String, DefaultCoreExtension> loadExtensions(DefaultCoreExtensionRepository repository)
     {
         Set<URL> baseURLs = ClasspathHelper.forPackage(MAVENPACKAGE);
 
+        // FIXME: remove that as soon as possible
         baseURLs = filterURLs(baseURLs);
 
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
@@ -251,32 +238,27 @@ public class DefaultCoreExtensionScanner
     }
 
     /**
-     * JBoss returns URLs with the vfszip and vfsfile protocol for resources, and the org.reflections library doesn't
-     * recognize them. This is more a bug inside the reflections library, but we can write a small workaround for a
-     * quick fix on our side.
+     * Very nasty hack which unescape invalid characters from the {@link URL} path because
+     * {@link Reflections#Reflections(org.reflections.Configuration)} does not do it...
      * 
      * @param urls base URLs to modify
      * @return modified base URLs
      */
-    // TODO: remove when http://code.google.com/p/reflections/issues/detail?id=76 is fixed
+    // TODO: remove when http://code.google.com/p/reflections/issues/detail?id=87 is fixed
     private Set<URL> filterURLs(Set<URL> urls)
     {
         Set<URL> results = new HashSet<URL>(urls.size());
         for (URL url : urls) {
-            String cleanURL = url.toString();
-            // Fix JBoss URLs
-            if (url.getProtocol().startsWith(PROTOCOL_VFSZIP)) {
-                cleanURL = cleanURL.replaceFirst(PROTOCOL_VFSZIP, PROTOCOL_FILE);
-            } else if (url.getProtocol().startsWith(PROTOCOL_VFSFILE)) {
-                cleanURL = cleanURL.replaceFirst(PROTOCOL_VFSFILE, PROTOCOL_FILE);
-            }
-            cleanURL = cleanURL.replaceFirst("\\.jar/", ".jar!/");
             try {
-                results.add(new URL(cleanURL));
-            } catch (MalformedURLException ex) {
-                // Shouldn't happen, but we can't do more to fix this URL.
+                results.add(new URL(url.getProtocol(), url.getHost(), url.getPort(), URLDecoder.decode(url.getFile(),
+                    "UTF-8")));
+            } catch (Exception e) {
+                LOGGER.error("Failed to convert url [" + url + "]", e);
+
+                results.add(url);
             }
         }
+
         return results;
     }
 

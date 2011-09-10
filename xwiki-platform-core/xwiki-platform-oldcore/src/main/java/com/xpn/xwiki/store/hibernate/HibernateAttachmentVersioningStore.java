@@ -19,11 +19,11 @@
  */
 package com.xpn.xwiki.store.hibernate;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
@@ -43,7 +43,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore implements AttachmentVersioningStore
 {
     /** logger. */
-    private static final Log LOG = LogFactory.getLog(HibernateAttachmentVersioningStore.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateAttachmentVersioningStore.class);
 
     /**
      * @param context the current context.
@@ -62,9 +62,7 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiAttachmentArchive loadArchive(final XWikiAttachment attachment, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
@@ -73,6 +71,7 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
             archive.setAttachment(attachment);
             executeRead(context, bTransaction, new HibernateCallback<Object>()
             {
+                @Override
                 public Object doInHibernate(Session session) throws HibernateException
                 {
                     try {
@@ -86,21 +85,20 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
             attachment.setAttachment_archive(archive);
             return archive;
         } catch (Exception e) {
-            Object[] args = {attachment.getFilename(), attachment.getDoc().getFullName()};
+            Object[] args = {attachment.getFilename(), attachment.getDoc()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT,
                 "Exception while loading attachment archive {0} of document {1}", e, args);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void saveArchive(final XWikiAttachmentArchive archive, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
         executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {
+            @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 session.saveOrUpdate(archive);
@@ -109,15 +107,14 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void deleteArchive(final XWikiAttachment attachment, final XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
         try {
             executeWrite(context, bTransaction, new HibernateCallback<Object>()
             {
+                @Override
                 public Object doInHibernate(Session session) throws HibernateException, XWikiException
                 {
                     XWikiAttachmentArchive archive = new XWikiAttachmentArchive();
@@ -127,9 +124,9 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
                 }
             });
         } catch (Exception e) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(String.format("Error deleting attachment archive [%s] of doc [%s]", attachment.getFilename(),
-                    attachment.getDoc().getFullName()), e);
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn(String.format("Error deleting attachment archive [%s] of doc [%s]",
+                    attachment.getFilename(), attachment.getDoc().getFullName()), e);
             }
         }
     }

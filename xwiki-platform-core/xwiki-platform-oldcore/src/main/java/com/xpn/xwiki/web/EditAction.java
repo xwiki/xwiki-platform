@@ -22,9 +22,9 @@ package com.xpn.xwiki.web;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
@@ -35,7 +35,7 @@ import com.xpn.xwiki.doc.XWikiLock;
 
 public class EditAction extends XWikiAction
 {
-    private static final Log log = LogFactory.getLog(EditAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
 
     @Override
     public String render(XWikiContext context) throws XWikiException
@@ -158,8 +158,9 @@ public class EditAction extends XWikiAction
                 }
                 String sectionTitle = doc.getDocumentSection(sectionNumber).getSectionTitle();
                 if (titleFromRequest == null && StringUtils.isNotBlank(sectionTitle)) {
-                    sectionTitle = context.getMessageTool().get("core.editors.content.titleField.sectionEditingFormat",
-                        tdoc2.getRenderedTitle(Syntax.PLAIN_1_0, context), sectionNumber, sectionTitle);
+                    sectionTitle =
+                        context.getMessageTool().get("core.editors.content.titleField.sectionEditingFormat",
+                            tdoc2.getRenderedTitle(Syntax.PLAIN_1_0, context), sectionNumber, sectionTitle);
                     tdoc2.setTitle(sectionTitle);
                 }
             }
@@ -176,7 +177,7 @@ public class EditAction extends XWikiAction
                 e.printStackTrace();
                 // Lock should never make XWiki fail
                 // But we should log any related information
-                log.error("Exception while setting up lock", e);
+                LOGGER.error("Exception while setting up lock", e);
             }
         }
 

@@ -37,10 +37,6 @@ import groovy.lang.Writable;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
 
-import org.codehaus.groovy.control.CompilationFailedException;
-import org.codehaus.groovy.runtime.InvokerHelper;
-import org.xwiki.cache.DisposableCacheValue;
-
 import java.beans.Introspector;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -50,6 +46,10 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
 
+import org.codehaus.groovy.control.CompilationFailedException;
+import org.codehaus.groovy.runtime.InvokerHelper;
+import org.xwiki.cache.DisposableCacheValue;
+
 /**
  * This simple template engine uses JSP <% %> script and <%= %> expression syntax. It also lets you use normal groovy
  * expressions in the template text much like the new JSP EL functionality. The variable 'out' is bound to the writer
@@ -57,11 +57,7 @@ import java.util.Map;
  */
 public class XWikiSimpleTemplateEngine extends TemplateEngine
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see groovy.text.SimpleTemplateEngine#createTemplate(java.io.Reader)
-     */
+
     @Override
     public Template createTemplate(Reader reader) throws CompilationFailedException, IOException
     {
@@ -79,11 +75,7 @@ public class XWikiSimpleTemplateEngine extends TemplateEngine
 
         private Binding binding;
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @see org.xwiki.cache.DisposableCacheValue#dispose()
-         */
+        @Override
         public void dispose() throws Exception
         {
             if (this.script != null) {
@@ -227,21 +219,13 @@ public class XWikiSimpleTemplateEngine extends TemplateEngine
             sw.write(";out.print(\"");
         }
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @see groovy.text.Template#make()
-         */
+        @Override
         public Writable make()
         {
             return make(null);
         }
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @see groovy.text.Template#make(java.util.Map)
-         */
+        @Override
         public Writable make(final Map map)
         {
             return new Writable()
@@ -253,6 +237,7 @@ public class XWikiSimpleTemplateEngine extends TemplateEngine
                  * 
                  * @see groovy.lang.Writable#writeTo(java.io.Writer)
                  */
+                @Override
                 public Writer writeTo(Writer writer) throws IOException
                 {
                     Binding binding;

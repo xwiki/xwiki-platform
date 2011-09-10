@@ -24,11 +24,13 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.inject.Singleton;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
 
@@ -47,10 +49,11 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
  * @version $Id$
  */
 @Component
+@Singleton
 public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore implements XWikiVersioningStoreInterface
 {
     /** Logger. */
-    private static final Log LOG = LogFactory.getLog(XWikiHibernateVersioningStore.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateVersioningStore.class);
 
     /** Colon symbol. */
     private static final String COLON = ":";
@@ -99,9 +102,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         try {
@@ -125,9 +126,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         XWikiDocumentArchive archiveDoc = doc.getDocumentArchive();
@@ -161,9 +160,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void loadXWikiDocArchive(XWikiDocumentArchive archivedoc, boolean bTransaction, XWikiContext context)
         throws XWikiException
     {
@@ -178,14 +175,13 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void saveXWikiDocArchive(final XWikiDocumentArchive archivedoc, boolean bTransaction, XWikiContext context)
         throws XWikiException
     {
         executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {
+            @Override
             public Object doInHibernate(Session session) throws HibernateException
             {
                 for (XWikiRCSNodeInfo ni : archivedoc.getDeletedNodeInfo()) {
@@ -205,9 +201,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDocument loadXWikiDoc(XWikiDocument basedoc, String sversion, XWikiContext context)
         throws XWikiException
     {
@@ -231,14 +225,13 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         return doc;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void resetRCSArchive(final XWikiDocument doc, boolean bTransaction, final XWikiContext context)
         throws XWikiException
     {
         executeWrite(context, true, new HibernateCallback<Object>()
         {
+            @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
@@ -252,9 +245,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void updateXWikiDocArchive(XWikiDocument doc, boolean bTransaction, XWikiContext context)
         throws XWikiException
     {
@@ -273,7 +264,11 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     }
 
     /**
-     * {@inheritDoc}
+     * @param context the XWiki context
+     * @param id {@link XWikiRCSNodeContent#getId()}
+     * @param bTransaction should store to use old transaction(false) or create new (true)
+     * @return loaded rcs node content
+     * @throws XWikiException if any error
      */
     protected List<XWikiRCSNodeInfo> loadAllRCSNodeInfo(XWikiContext context, final long id, boolean bTransaction)
         throws XWikiException
@@ -281,28 +276,28 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         return executeRead(context, bTransaction, new HibernateCallback<List<XWikiRCSNodeInfo>>()
         {
             @SuppressWarnings("unchecked")
+            @Override
             public List<XWikiRCSNodeInfo> doInHibernate(Session session) throws HibernateException
             {
                 try {
-                    return session.createCriteria(XWikiRCSNodeInfo.class).add(
-                        Restrictions.eq("id.docId", Long.valueOf(id))).add(Restrictions.isNotNull("diff")).list();
+                    return session.createCriteria(XWikiRCSNodeInfo.class)
+                        .add(Restrictions.eq("id.docId", Long.valueOf(id))).add(Restrictions.isNotNull("diff")).list();
                 } catch (IllegalArgumentException ex) {
                     // This happens when the database has wrong values...
-                    LOG.warn("Invalid history for document " + id);
+                    LOGGER.warn("Invalid history for document " + id);
                     return Collections.emptyList();
                 }
             }
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiRCSNodeContent loadRCSNodeContent(final XWikiRCSNodeId id, boolean bTransaction, XWikiContext context)
         throws XWikiException
     {
         return executeRead(context, bTransaction, new HibernateCallback<XWikiRCSNodeContent>()
         {
+            @Override
             public XWikiRCSNodeContent doInHibernate(Session session) throws HibernateException
             {
                 XWikiRCSNodeContent content = new XWikiRCSNodeContent(id);
@@ -312,18 +307,17 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void deleteArchive(final XWikiDocument doc, boolean bTransaction, XWikiContext context)
         throws XWikiException
     {
         executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {
+            @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
-                session.createQuery("delete from " + XWikiRCSNodeInfo.class.getName() + " where id.docId=?").setLong(0,
-                    doc.getId()).executeUpdate();
+                session.createQuery("delete from " + XWikiRCSNodeInfo.class.getName() + " where id.docId=?")
+                    .setLong(0, doc.getId()).executeUpdate();
                 return null;
             }
         });

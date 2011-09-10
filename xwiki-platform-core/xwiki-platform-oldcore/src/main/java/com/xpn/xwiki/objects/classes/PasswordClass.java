@@ -24,9 +24,9 @@ package com.xpn.xwiki.objects.classes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ecs.xhtml.input;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -37,7 +37,7 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class PasswordClass extends StringClass
 {
-    protected static Log log = LogFactory.getLog(PasswordClass.class);
+    protected static Logger LOGGER = LoggerFactory.getLogger(PasswordClass.class);
 
     protected static final String DEFAULT_STORAGE = PasswordMetaClass.HASH;
 
@@ -80,15 +80,14 @@ public class PasswordClass extends StringClass
     }
 
     @Override
-    public void displayHidden(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         // Passwords cannot go through the preview interface, so we don't do something here..
     }
 
     @Override
-    public void displayView(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         ElementInterface prop = object.safeget(name);
         if (prop != null) {
@@ -97,8 +96,7 @@ public class PasswordClass extends StringClass
     }
 
     @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         input input = new input();
         ElementInterface prop = object.safeget(name);
@@ -220,12 +218,11 @@ public class PasswordClass extends StringClass
     public String getPasswordHash(String password, String algorithmName)
     {
         try {
-            log.debug("Hashing password");
+            LOGGER.debug("Hashing password");
             MessageDigest hashAlgorithm = MessageDigest.getInstance(algorithmName);
             hashAlgorithm.update(password.getBytes());
             byte[] digest = hashAlgorithm.digest();
-            StringBuffer sb =
-                new StringBuffer(HASH_IDENTIFIER + SEPARATOR + algorithmName + SEPARATOR);
+            StringBuffer sb = new StringBuffer(HASH_IDENTIFIER + SEPARATOR + algorithmName + SEPARATOR);
             for (int j = 0; j < digest.length; ++j) {
                 int b = digest[j] & 0xFF;
                 if (b < 0x10) {
@@ -235,10 +232,9 @@ public class PasswordClass extends StringClass
             }
             return sb.toString();
         } catch (NoSuchAlgorithmException ex) {
-            log.error("Wrong hash algorithm [" + algorithmName + "] in [" + getXClassReference() + "]",
-                ex);
+            LOGGER.error("Wrong hash algorithm [" + algorithmName + "] in [" + getXClassReference() + "]", ex);
         } catch (NullPointerException ex) {
-            log.error("Error hashing password", ex);
+            LOGGER.error("Error hashing password", ex);
         }
         return password;
     }

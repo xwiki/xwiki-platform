@@ -26,8 +26,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -39,12 +39,11 @@ import com.xpn.xwiki.util.Util;
 
 public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
-    private static final Log LOG = LogFactory.getLog(XWikiServletURLFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletURLFactory.class);
 
     /**
-     * This is the URL which was requested by the user
-     * possibly with the host modified if x-forwarded-host header is set or if xwiki.home parameter
-     * is set and we are viewing the main page.
+     * This is the URL which was requested by the user possibly with the host modified if x-forwarded-host header is set
+     * or if xwiki.home parameter is set and we are viewing the main page.
      */
     protected URL serverURL;
 
@@ -151,8 +150,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             try {
                 return new URL(surl);
             } catch (MalformedURLException e) {
-                LOG.warn("Could not create URL from xwiki.cfg xwiki.home parameter: " + surl
-                         + " Ignoring parameter.");
+                LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter: " + surl
+                    + " Ignoring parameter.");
             }
         }
         return null;
@@ -175,17 +174,16 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     /**
-     * Get the url of the server EG: http://www.xwiki.org/
-     * This function sometimes will return a URL with a trailing / and other times not.
-     * This is because the xwiki.home param is recommended to have a trailing / but this.serverURL
+     * Get the url of the server EG: http://www.xwiki.org/ This function sometimes will return a URL with a trailing /
+     * and other times not. This is because the xwiki.home param is recommended to have a trailing / but this.serverURL
      * never does.
-     *
-     * @param xwikidb the name of the database (subwiki) if null it is assumed to be the same as the wiki
-     *                which we are currently displaying.
-     * @param context the XWikiContext used to determine the current wiki and the value if the xwiki.home
-     *                parameter if needed as well as access the xwiki server document if in virtual mode.
-     * @return a URL containing the protocol, host, and port (if applicable) of the server to use for the
-     *         given database.
+     * 
+     * @param xwikidb the name of the database (subwiki) if null it is assumed to be the same as the wiki which we are
+     *            currently displaying.
+     * @param context the XWikiContext used to determine the current wiki and the value if the xwiki.home parameter if
+     *            needed as well as access the xwiki server document if in virtual mode.
+     * @return a URL containing the protocol, host, and port (if applicable) of the server to use for the given
+     *         database.
      */
     public URL getServerURL(String xwikidb, XWikiContext context) throws MalformedURLException
     {
@@ -433,8 +431,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                         querystring, xwikidb, context);
                 }
             } catch (XWikiException e) {
-                if (LOG.isErrorEnabled()) {
-                    LOG.error("Exception while trying to get attachment version !", e);
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error("Exception while trying to get attachment version !", e);
                 }
             }
         }

@@ -38,8 +38,8 @@ import org.xwiki.query.QueryExecutor;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.util.Util;
 
@@ -71,18 +71,13 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     @Inject
     private Execution execution;
 
-    /**
-     * {@inheritDoc}
-     * @see Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         this.sessionFactory.getConfiguration().addInputStream(Util.getResourceAsStream(this.mappingPath));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public <T> List<T> execute(final Query query) throws QueryException
     {
         String olddatabase = getContext().getDatabase();
@@ -114,9 +109,8 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
      */
     protected org.hibernate.Query createHibernateQuery(Session session, Query query)
     {
-        return query.isNamed()
-            ? session.getNamedQuery(query.getStatement())
-            : session.createQuery(query.getStatement());
+        return query.isNamed() ? session.getNamedQuery(query.getStatement()) : session
+            .createQuery(query.getStatement());
     }
 
     /**

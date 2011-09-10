@@ -51,11 +51,7 @@ import com.xpn.xwiki.XWikiContext;
 @Deprecated
 public class LinkMacro extends BaseLocaleMacro
 {
-    /**
-     * The name of the macro.
-     * 
-     * @see org.radeox.macro.BaseLocaleMacro#getLocaleKey()
-     */
+    @Override
     public String getLocaleKey()
     {
         return "macro.link";

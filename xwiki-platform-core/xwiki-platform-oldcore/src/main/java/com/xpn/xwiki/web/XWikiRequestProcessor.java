@@ -26,16 +26,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * 
  * @version $Id$
  */
 public class XWikiRequestProcessor extends org.apache.struts.action.RequestProcessor
 {
-    protected static final Log LOG = LogFactory.getLog(XWikiRequestProcessor.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiRequestProcessor.class);
 
     /**
      * {@inheritDoc}

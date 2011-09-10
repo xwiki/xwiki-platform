@@ -65,7 +65,7 @@ public interface XWikiStoreInterface
     List<DocumentReference> searchDocumentReferences(String wheresql, XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, com.xpn.xwiki.XWikiContext)} 
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, com.xpn.xwiki.XWikiContext)}
      */
     @Deprecated
     List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException;
@@ -123,13 +123,13 @@ public interface XWikiStoreInterface
      * @since 2.2M1
      */
     List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
-        List<?> parameterValues, XWikiContext context) throws XWikiException;
+        List< ? > parameterValues, XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, List, XWikiContext)}  
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, List, XWikiContext)}
      */
     @Deprecated
-    List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues,
+    List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List< ? > parameterValues,
         XWikiContext context) throws XWikiException;
 
     /**
@@ -138,14 +138,14 @@ public interface XWikiStoreInterface
      * @see #searchDocumentReferences(String, int, int, java.util.List, com.xpn.xwiki.XWikiContext)
      * @since 2.2M2
      */
-    List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List<?> parameterValues,
+    List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List< ? > parameterValues,
         XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, List, XWikiContext)}    
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, List, XWikiContext)}
      */
     @Deprecated
-    List<String> searchDocumentsNames(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
+    List<String> searchDocumentsNames(String parametrizedSqlClause, List< ? > parameterValues, XWikiContext context)
         throws XWikiException;
 
     /**
@@ -159,7 +159,8 @@ public interface XWikiStoreInterface
      * @param context The current request context.
      * @throws XWikiException if there was a problem executing the query.
      */
-    int countDocuments(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context) throws XWikiException;
+    int countDocuments(String parametrizedSqlClause, List< ? > parameterValues, XWikiContext context)
+        throws XWikiException;
 
     /**
      * Search documents in the storing system.
@@ -235,7 +236,7 @@ public interface XWikiStoreInterface
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start,
-        List<?> parameterValues, XWikiContext context) throws XWikiException;
+        List< ? > parameterValues, XWikiContext context) throws XWikiException;
 
     /**
      * Search documents in the storing system.
@@ -299,7 +300,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List<XWikiDocument> searchDocuments(String wheresql, List<?> parameterValues, XWikiContext context)
+    List<XWikiDocument> searchDocuments(String wheresql, List< ? > parameterValues, XWikiContext context)
         throws XWikiException;
 
     /**
@@ -324,7 +325,7 @@ public interface XWikiStoreInterface
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping, int nb,
-        int start, List<?> parameterValues, XWikiContext context) throws XWikiException;
+        int start, List< ? > parameterValues, XWikiContext context) throws XWikiException;
 
     /**
      * Search documents in the storing system.
@@ -344,8 +345,8 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List<?> parameterValues, XWikiContext context)
-        throws XWikiException;
+    List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List< ? > parameterValues,
+        XWikiContext context) throws XWikiException;
 
     /**
      * Search documents in the storing system.
@@ -370,7 +371,7 @@ public interface XWikiStoreInterface
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
-        boolean checkRight, int nb, int start, List<?> parameterValues, XWikiContext context) throws XWikiException;
+        boolean checkRight, int nb, int start, List< ? > parameterValues, XWikiContext context) throws XWikiException;
 
     XWikiLock loadLock(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
 
@@ -426,7 +427,8 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    <T> List<T> search(String sql, int nb, int start, List<?> parameterValues, XWikiContext context) throws XWikiException;
+    <T> List<T> search(String sql, int nb, int start, List< ? > parameterValues, XWikiContext context)
+        throws XWikiException;
 
     /**
      * Execute a reading request and return result.
@@ -440,7 +442,8 @@ public interface XWikiStoreInterface
      * @return a list of XWikiDocument.
      * @throws XWikiException in case of error while performing the query.
      */
-    <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context) throws XWikiException;
+    <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context)
+        throws XWikiException;
 
     /**
      * Execute a reading request with parameters and return result.
@@ -461,8 +464,8 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List<?> parameterValues, XWikiContext context)
-        throws XWikiException;
+    <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List< ? > parameterValues,
+        XWikiContext context) throws XWikiException;
 
     void cleanUp(XWikiContext context);
 

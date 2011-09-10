@@ -35,13 +35,17 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 
-public class StyleMacro extends BaseLocaleMacro {
-    public String getLocaleKey() {
+public class StyleMacro extends BaseLocaleMacro
+{
+    @Override
+    public String getLocaleKey()
+    {
         return "macro.style";
     }
 
-    public void execute(Writer writer, MacroParameter params)
-            throws IllegalArgumentException, IOException {
+    @Override
+    public void execute(Writer writer, MacroParameter params) throws IllegalArgumentException, IOException
+    {
         RenderContext context = params.getContext();
         RenderEngine engine = context.getRenderEngine();
         XWikiContext xcontext = ((XWikiRadeoxRenderEngine) engine).getXWikiContext();
@@ -70,7 +74,7 @@ public class StyleMacro extends BaseLocaleMacro {
 
         if ((!"none".equals(icon)) && (icon != null) && (!"".equals(icon.trim()))) {
             hasIcon = true;
-        } 
+        }
         // Get the target document
         XWikiDocument doc = null;
 
@@ -93,7 +97,7 @@ public class StyleMacro extends BaseLocaleMacro {
         }
 
         String path = "";
-        if (icon!=null) {
+        if (icon != null) {
             XWikiAttachment image = doc.getAttachment(icon);
             if (image != null) {
                 path = doc.getAttachmentURL(icon, "download", xcontext);

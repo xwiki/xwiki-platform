@@ -22,8 +22,11 @@ package com.xpn.xwiki.internal.cache.rendering;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
@@ -37,6 +40,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * @since 2.4M1
  */
 @Component
+@Singleton
 public class DefaultRenderingCacheConfiguration implements RenderingCacheConfiguration
 {
     /**
@@ -77,31 +81,34 @@ public class DefaultRenderingCacheConfiguration implements RenderingCacheConfigu
     /**
      * xwiki.properties file configurations.
      */
-    @Requirement("xwikiproperties")
+    @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource farmConfiguration;
 
     /**
      * Wiki configuration.
      */
-    @Requirement("wiki")
+    @Inject
+    @Named("wiki")
     private ConfigurationSource wikiConfiguration;
 
     /**
      * Used to serialize a document reference into a String.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> serializer;
 
     /**
      * Used to serialize a document reference into a String.
      */
-    @Requirement("compactwiki")
+    @Inject
+    @Named("compactwiki")
     private EntityReferenceSerializer<String> wikiSerializer;
 
     /**
      * USed to get the current wiki.
      */
-    @Requirement
+    @Inject
     private ModelContext modelContext;
 
     /**
@@ -109,11 +116,7 @@ public class DefaultRenderingCacheConfiguration implements RenderingCacheConfigu
      */
     private Pattern farmPattern;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.internal.cache.rendering.RenderingCacheConfiguration#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         return isFarmEnabled();
@@ -135,31 +138,19 @@ public class DefaultRenderingCacheConfiguration implements RenderingCacheConfigu
         return this.wikiConfiguration.getProperty(PROPNAME_ENABLED, true);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.internal.cache.rendering.RenderingCacheConfiguration#getDuration()
-     */
+    @Override
     public int getDuration()
     {
         return this.farmConfiguration.getProperty(PROPNAME_DURATION, PROPVALUE_DURATION);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.internal.cache.rendering.RenderingCacheConfiguration#getSize()
-     */
+    @Override
     public int getSize()
     {
         return this.farmConfiguration.getProperty(PROPNAME_SIZE, PROPVALUE_SIZE);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.internal.cache.rendering.RenderingCacheConfiguration#isCached(org.xwiki.model.reference.DocumentReference)
-     */
+    @Override
     public boolean isCached(DocumentReference documentReference)
     {
         if (documentReference != null && isFarmEnabled()) {
@@ -202,8 +193,8 @@ public class DefaultRenderingCacheConfiguration implements RenderingCacheConfigu
     {
         if (isWikiEnabled()
             && this.modelContext.getCurrentEntityReference() != null
-            && documentReference.getWikiReference().getName().equals(
-                this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName())) {
+            && documentReference.getWikiReference().getName()
+                .equals(this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName())) {
             Pattern pattern = getWikiPattern();
 
             if (pattern != null) {

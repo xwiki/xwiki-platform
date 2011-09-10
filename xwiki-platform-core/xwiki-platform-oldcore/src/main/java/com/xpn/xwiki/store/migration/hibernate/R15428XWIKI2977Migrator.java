@@ -20,7 +20,6 @@
 package com.xpn.xwiki.store.migration.hibernate;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,49 +41,40 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  */
 public class R15428XWIKI2977Migrator extends AbstractXWikiHibernateMigrator
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractXWikiHibernateMigrator#getName()
-     */
+    @Override
     public String getName()
     {
         return "R15428XWIKI2977";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.migration.hibernate.AbstractXWikiHibernateMigrator#getDescription()
-     */
+    @Override
     public String getDescription()
     {
         return "Add a GUID to existing objects when upgrading from pre-1.8M1.";
     }
 
-    /** {@inheritDoc} */
+    @Override
     public XWikiDBVersion getVersion()
     {
         return new XWikiDBVersion(15428);
     }
 
-    /** {@inheritDoc} */
     @Override
     public void migrate(XWikiHibernateMigrationManager manager, final XWikiContext context) throws XWikiException
     {
         // migrate data
         manager.getStore(context).executeWrite(context, true, new HibernateCallback<Object>()
         {
+            @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 Query q = session.createQuery("select o from BaseObject o where o.guid is null");
-                List lst = q.list();
+                List<BaseObject> lst = q.list();
                 if (lst.size() == 0) {
                     return null;
                 }
                 List<BaseObject> lst2 = new ArrayList<BaseObject>(lst.size());
-                for (Iterator it = lst.iterator(); it.hasNext();) {
-                    BaseObject o = (BaseObject) it.next();
+                for (BaseObject o : lst) {
                     o.setGuid(UUID.randomUUID().toString());
                     lst2.add(o);
                 }

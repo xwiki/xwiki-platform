@@ -31,9 +31,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -50,7 +50,7 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 public class UploadAction extends XWikiAction
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(UploadAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UploadAction.class);
 
     /** The prefix of the accepted file input field name. */
     private static final String FILE_FIELD_NAME = "filepath";
@@ -111,19 +111,19 @@ public class UploadAction extends XWikiAction
             try {
                 uploadAttachment(file.getValue(), file.getKey(), fileupload, doc, context);
             } catch (Exception ex) {
-                LOG.warn("Saving uploaded file failed", ex);
+                LOGGER.warn("Saving uploaded file failed", ex);
                 failedFiles.put(file.getKey(), ExceptionUtils.getRootCauseMessage(ex));
             }
         }
 
-        LOG.debug("Found files to upload: " + fileNames);
-        LOG.debug("Failed attachments: " + failedFiles);
-        LOG.debug("Wrong attachment names: " + wrongFileNames);
+        LOGGER.debug("Found files to upload: " + fileNames);
+        LOGGER.debug("Failed attachments: " + failedFiles);
+        LOGGER.debug("Wrong attachment names: " + wrongFileNames);
         if (ajax) {
             try {
                 response.getOutputStream().println("ok");
             } catch (IOException ex) {
-                LOG.error("Unhandled exception writing output:", ex);
+                LOGGER.error("Unhandled exception writing output:", ex);
             }
             return false;
         }
@@ -276,10 +276,10 @@ public class UploadAction extends XWikiAction
         boolean ajax = ((Boolean) context.get("ajax")).booleanValue();
         if (ajax) {
             try {
-                context.getResponse().getOutputStream().println(
-                    "error: " + context.getMessageTool().get((String) context.get("message")));
+                context.getResponse().getOutputStream()
+                    .println("error: " + context.getMessageTool().get((String) context.get("message")));
             } catch (IOException ex) {
-                LOG.error("Unhandled exception writing output:", ex);
+                LOGGER.error("Unhandled exception writing output:", ex);
             }
             return null;
         }

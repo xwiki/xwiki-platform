@@ -82,11 +82,7 @@ public abstract class AbstractStatsStoreItem implements XWikiStatsStoreItem
         this.context = (XWikiContext) context.clone();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreItem#store(java.util.List)
-     */
+    @Override
     public void store(List<XWikiStatsStoreItem> statsList)
     {
         ExecutionContext econtext = Utils.getComponent(Execution.class).getContext();

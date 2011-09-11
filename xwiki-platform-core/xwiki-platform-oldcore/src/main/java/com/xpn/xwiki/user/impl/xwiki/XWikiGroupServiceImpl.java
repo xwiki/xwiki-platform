@@ -28,8 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -574,7 +573,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         } else if (context.getWiki().getStore().getQueryManager().hasLanguage(Query.XPATH)) {
             // TODO : fully implement this methods for XPATH platform
             if ((matchFields != null && matchFields.length > 0) || withdetails) {
-                throw new NotImplementedException();
+                throw new UnsupportedOperationException(
+                    "The current storage engine does not support advanced group queries");
             }
 
             try {

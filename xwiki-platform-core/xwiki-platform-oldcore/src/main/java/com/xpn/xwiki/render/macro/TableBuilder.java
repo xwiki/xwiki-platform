@@ -20,7 +20,7 @@ package com.xpn.xwiki.render.macro;
 
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.radeox.macro.table.Table;
 
 /**

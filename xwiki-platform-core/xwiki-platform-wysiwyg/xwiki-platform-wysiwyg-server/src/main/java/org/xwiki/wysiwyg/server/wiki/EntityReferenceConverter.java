@@ -22,7 +22,7 @@ package org.xwiki.wysiwyg.server.wiki;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;

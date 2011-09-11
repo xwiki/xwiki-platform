@@ -33,9 +33,8 @@ import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -583,10 +582,10 @@ public final class StatsUtil
                 LOGGER.error("Failed to search visit object in the database from " + fieldName, e);
             }
         } else {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException("The current storage engine does not support querying statistics");
         }
         if (solist != null && solist.size() > 0) {
-            visitStats = (VisitStats) solist.get(0);
+            visitStats = solist.get(0);
         }
 
         return visitStats;

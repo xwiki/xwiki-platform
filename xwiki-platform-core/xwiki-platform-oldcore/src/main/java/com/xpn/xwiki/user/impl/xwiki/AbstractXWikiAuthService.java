@@ -21,7 +21,7 @@ package com.xpn.xwiki.user.impl.xwiki;
 
 import java.security.Principal;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.securityfilter.realm.SimplePrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

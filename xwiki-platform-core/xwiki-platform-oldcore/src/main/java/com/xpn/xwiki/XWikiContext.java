@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.map.LRUMap;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlrpc.server.XmlRpcServer;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
@@ -589,7 +589,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     public BaseClass getBaseClass(String name)
     {
         BaseClass baseClass = null;
-        if (!StringUtils.isEmpty(name)) {
+        if (StringUtils.isNotEmpty(name)) {
             baseClass = this.classCache.get(this.currentMixedDocumentReferenceResolver.resolve(name));
         }
         return baseClass;

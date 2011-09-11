@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
 
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;

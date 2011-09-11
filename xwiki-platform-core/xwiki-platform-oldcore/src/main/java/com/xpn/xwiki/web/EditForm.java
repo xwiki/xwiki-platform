@@ -24,7 +24,7 @@ package com.xpn.xwiki.web;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import com.xpn.xwiki.util.Util;
 

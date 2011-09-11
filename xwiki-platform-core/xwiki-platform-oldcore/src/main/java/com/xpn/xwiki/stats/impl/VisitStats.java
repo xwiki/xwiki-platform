@@ -23,7 +23,7 @@ package com.xpn.xwiki.stats.impl;
 
 import java.util.Date;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
 

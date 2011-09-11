@@ -30,7 +30,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.restlet.data.MediaType;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;

@@ -226,7 +226,7 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
         Assert.assertNotNull(xdom);
 
         List<ExpandedMacroBlock> macros =
-            xdom.getBlocks(new ClassBlockMatcher(ExpandedMacroBlock.class), Block.Axes.DESCENDANT);
+            xdom.getBlocks(new ClassBlockMatcher(ExpandedMacroBlock.class), Block.Axes.CHILD);
         Assert.assertEquals(1, macros.size());
         Assert.assertEquals("gallery", macros.get(0).getId());
         Assert.assertEquals(galleryContent, macros.get(0).getChildren().get(0));

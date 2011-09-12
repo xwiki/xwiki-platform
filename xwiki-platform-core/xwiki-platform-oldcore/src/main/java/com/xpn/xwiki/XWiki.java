@@ -6957,32 +6957,32 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
         // javax.servlet.context.tempdir (File)
         if (jsct != null && (jsct instanceof File)) {
-            workDir = (File) jsct;
-            if (workDir.isDirectory() && workDir.canWrite()) {
-                return workDir;
+            tempDir = (File) jsct;
+            if (tempDir.isDirectory() && tempDir.canWrite()) {
+                return tempDir;
             }
         }
 
         // javax.servlet.context.tempdir (String)
         if (jsct != null && (jsct instanceof String)) {
-            workDir = new File((String) jsct);
+            tempDir = new File((String) jsct);
 
-            if (workDir.isDirectory() && workDir.canWrite()) {
-                return workDir;
+            if (tempDir.isDirectory() && tempDir.canWrite()) {
+                return tempDir;
             }
         }
 
         // Let's make a tempdir in java.io.tmpdir
-        workDir = new File(System.getProperty("java.io.tmpdir"), "xwikiTemp");
+        tempDir = new File(System.getProperty("java.io.tmpdir"), "xwikiTemp");
 
-        if (workDir.exists()) {
-            workDir.deleteOnExit();
+        if (tempDir.exists()) {
+            tempDir.deleteOnExit();
         } else {
-            workDir.mkdir();
-            workDir.deleteOnExit();
+            tempDir.mkdir();
+            tempDir.deleteOnExit();
         }
 
-        return workDir;
+        return tempDir;
     }
 
     /**
@@ -7026,6 +7026,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                 workDir = new File(dirPath.replaceAll("\\s+$", ""));
                 if (workDir.exists()) {
                     if (workDir.isDirectory() && workDir.canWrite()) {
+                        System.out.println(workDir.getAbsolutePath());
+                        
                         return workDir;
                     }
                 } else {

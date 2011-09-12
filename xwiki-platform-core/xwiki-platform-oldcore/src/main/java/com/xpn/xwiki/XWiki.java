@@ -7000,8 +7000,6 @@ public class XWiki implements EventListener
                 workDir = new File(dirPath.replaceAll("\\s+$", ""));
                 if (workDir.exists()) {
                     if (workDir.isDirectory() && workDir.canWrite()) {
-                        System.out.println(workDir.getAbsolutePath());
-                        
                         return workDir;
                     }
                 } else {

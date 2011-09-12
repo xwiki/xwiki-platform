@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC
-  "-//Hibernate/Hibernate Mapping DTD//EN"
-  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+"-//Hibernate/Hibernate Mapping DTD//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
   <class name="com.xpn.xwiki.plugin.activitystream.impl.ActivityEventImpl" table="activitystream_events">
     <id name="eventId" type="string" unsaved-value="undefined">
-      <column name="ase_eventid" length="125" not-null="true" />
+      <column name="ase_eventid" length="255" not-null="true" />
       <generator class="assigned" />
     </id>
     <property name="requestId" type="string" column="ase_requestid" length="2000" />
@@ -29,8 +29,8 @@
     <property name="param5" type="string" column="ase_param5" length="2000" />
     <map name="parameters" table="activitystream_events_parameters" lazy="false">
       <key column="eventId"/>
-      <index column="name" type="string" length="125"/>
-      <element column="value" type="string" length="255"/>
+      <index column="name" type="string" length="255"/>
+      <element column="value" type="string" length="2000"/>
     </map>
   </class>
 </hibernate-mapping>

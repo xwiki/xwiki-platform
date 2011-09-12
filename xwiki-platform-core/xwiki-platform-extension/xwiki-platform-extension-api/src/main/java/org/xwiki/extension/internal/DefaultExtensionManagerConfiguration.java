@@ -35,6 +35,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.container.Container;
 import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 
@@ -47,21 +48,6 @@ import org.xwiki.extension.repository.ExtensionRepositoryId;
 @Singleton
 public class DefaultExtensionManagerConfiguration implements ExtensionManagerConfiguration
 {
-    /**
-     * The current user home path.
-     */
-    private static final String USERHOME = System.getProperty("user.home");
-
-    /**
-     * The xwiki home path.
-     */
-    private static final File XWIKIHOME = new File(USERHOME, ".xwiki");
-
-    /**
-     * The extension manage home path.
-     */
-    private static final File EXTENSIONSHOME = new File(XWIKIHOME, "extensions");
-
     /**
      * Used to parse repositories entries from the configuration.
      */
@@ -85,6 +71,12 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     @Inject
     private Logger logger;
 
+    /**
+     * Used to get work directory.
+     */
+    @Inject
+    private Container container;
+
     // Cache
 
     /**
@@ -97,14 +89,10 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
      */
     public File getHome()
     {
-        return EXTENSIONSHOME;
+        return this.container.getApplicationContext().getWorkDirectory();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.ExtensionManagerConfiguration#getLocalRepository()
-     */
+    @Override
     public File getLocalRepository()
     {
         if (this.localRepository == null) {
@@ -117,14 +105,12 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
             }
         }
 
+        System.out.println(this.localRepository.getAbsolutePath());
+        
         return this.localRepository;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.ExtensionManagerConfiguration#getRepositories()
-     */
+    @Override
     public List<ExtensionRepositoryId> getRepositories()
     {
         List<ExtensionRepositoryId> repositories = new ArrayList<ExtensionRepositoryId>();

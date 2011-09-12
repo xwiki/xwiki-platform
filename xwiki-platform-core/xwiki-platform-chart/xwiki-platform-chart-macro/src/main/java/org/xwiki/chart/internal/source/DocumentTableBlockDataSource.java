@@ -31,8 +31,10 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.parser.Parser;
 
@@ -100,7 +102,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
         }
         
         // Find the correct table block.
-        List<TableBlock> tableBlocks = xdom.getChildrenByType(TableBlock.class, true);
+        List<TableBlock> tableBlocks = xdom.getBlocks(new ClassBlockMatcher(TableBlock.class), Block.Axes.DESCENDANT);
         String tableId = macroParameters.get(TABLE);
         TableBlock result = null;
         if (null != tableId) {

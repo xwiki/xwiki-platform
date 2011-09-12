@@ -94,6 +94,7 @@ import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.MetaData;
@@ -1249,7 +1250,8 @@ public class XWikiDocument implements DocumentModelBridge
             if (is10Syntax()) {
                 title = getRenderedContentTitle10(context);
             } else {
-                List<HeaderBlock> blocks = getXDOM().getChildrenByType(HeaderBlock.class, true);
+                List<HeaderBlock> blocks =
+                    getXDOM().getBlocks(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
                 if (!blocks.isEmpty()) {
                     HeaderBlock header = blocks.get(0);
                     // Check the header depth after which we should return null if no header was found.
@@ -1353,7 +1355,8 @@ public class XWikiDocument implements DocumentModelBridge
             if (is10Syntax()) {
                 title = extractTitle10();
             } else {
-                List<HeaderBlock> blocks = getXDOM().getChildrenByType(HeaderBlock.class, true);
+                List<HeaderBlock> blocks =
+                    getXDOM().getBlocks(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
                 if (!blocks.isEmpty()) {
                     HeaderBlock header = blocks.get(0);
                     if (header.getLevel().compareTo(HeaderLevel.LEVEL2) <= 0) {
@@ -4699,7 +4702,8 @@ public class XWikiDocument implements DocumentModelBridge
             } else {
                 XDOM dom = getXDOM();
 
-                List<LinkBlock> linkBlocks = dom.getChildrenByType(LinkBlock.class, true);
+                List<LinkBlock> linkBlocks =
+                    dom.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
                 pageNames = new LinkedHashSet<String>(linkBlocks.size());
 
                 DocumentReference currentDocumentReference = getDocumentReference();
@@ -4903,8 +4907,9 @@ public class XWikiDocument implements DocumentModelBridge
             XDOM dom = getXDOM();
 
             List<String> result = new ArrayList<String>();
-            for (MacroBlock macroBlock : dom.getChildrenByType(MacroBlock.class, true)) {
-
+            List<MacroBlock> macroBlocks =
+                dom.getBlocks(new ClassBlockMatcher(MacroBlock.class), Block.Axes.DESCENDANT);
+            for (MacroBlock macroBlock : macroBlocks) {
                 // - Add each document pointed to by the include macro
                 // - Also add all the included pages found in the velocity macro when using the deprecated #include*
                 // macros
@@ -5898,7 +5903,8 @@ public class XWikiDocument implements DocumentModelBridge
         if (Utils.getComponentManager().hasComponent(BlockRenderer.class, getSyntax().toIdString())) {
             // Only support syntax for which a renderer is provided
             XDOM newDocumentXDOM = newDocument.getXDOM();
-            List<LinkBlock> linkBlockList = newDocumentXDOM.getChildrenByType(LinkBlock.class, true);
+            List<LinkBlock> linkBlockList =
+                newDocumentXDOM.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
 
             boolean modified = false;
             for (LinkBlock linkBlock : linkBlockList) {
@@ -5981,7 +5987,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         XDOM xdom = getXDOM();
 
-        List<LinkBlock> linkBlockList = xdom.getChildrenByType(LinkBlock.class, true);
+        List<LinkBlock> linkBlockList = xdom.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
 
         for (LinkBlock linkBlock : linkBlockList) {
             ResourceReference linkReference = linkBlock.getReference();
@@ -6929,7 +6935,8 @@ public class XWikiDocument implements DocumentModelBridge
         List<HeaderBlock> filteredHeaders = new ArrayList<HeaderBlock>();
 
         // get the headers
-        List<HeaderBlock> headers = getXDOM().getChildrenByType(HeaderBlock.class, true);
+        List<HeaderBlock> headers =
+            getXDOM().getBlocks(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
 
         // get the maximum header level
         int sectionDepth = 2;

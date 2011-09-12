@@ -28,10 +28,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
@@ -40,6 +40,7 @@ import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 
@@ -50,6 +51,7 @@ import org.xwiki.rendering.listener.reference.ResourceType;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultOfficeViewer extends AbstractOfficeViewer
 {
     /**
@@ -60,13 +62,13 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
     /**
      * Used to build XDOM documents from office documents.
      */
-    @Requirement
+    @Inject
     private XDOMOfficeDocumentBuilder documentBuilder;
 
     /**
      * Used to build XDOM documents from office presentations.
      */
-    @Requirement
+    @Inject
     private PresentationBuilder presentationBuilder;
 
     /**
@@ -105,7 +107,7 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
     {
         // Process all image blocks.
         Set<File> temporaryFiles = new HashSet<File>();
-        List<ImageBlock> imgBlocks = xdom.getChildrenByType(ImageBlock.class, true);
+        List<ImageBlock> imgBlocks = xdom.getBlocks(new ClassBlockMatcher(ImageBlock.class), Block.Axes.DESCENDANT);
         for (ImageBlock imgBlock : imgBlocks) {
             String imageReference = imgBlock.getReference().getReference();
 

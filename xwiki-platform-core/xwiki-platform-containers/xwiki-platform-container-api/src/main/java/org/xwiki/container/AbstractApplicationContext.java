@@ -43,7 +43,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext
     /**
      * The name of the property where to find work directory path.
      */
-    private static final String PROPERTY_WORKDIRECTORY = "container.workDirectory";
+    private static final String PROPERTY_WORKDIRECTORY = "container.persistentDirectory";
 
     /**
      * Use to lookup {@link ConfigurationSource} component.

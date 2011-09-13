@@ -40,7 +40,7 @@
 
 #-# [Since 3.2M3]
 #-# Directory used to store persistent data.
-# container.workDirectory=/var/local/xwiki
+# container.persistentDirectory=/var/local/xwiki/
 
 #-------------------------------------------------------------------------------------
 # Rendering
@@ -337,7 +337,7 @@
 #-------------------------------------------------------------------------------------
 
 #-# [Since 2.5]
-#-# Repositories to use when downloading extensions.
+#-# Repositories to use when searching and downloading extensions.
 #-# 
 #-# The format is <id>:<type>:<url> where
 #-# * id can be anything as long as there is only one
@@ -346,3 +346,10 @@
 #-# 
 #-# The default is:
 # extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
+
+#-# [Since 2.5]
+#-# The directory where extensions are stored after being downloaded.
+#-# 
+#-# The default is extension/repository in whatever is the general persistent directory.
+# extension.localRepository=extension/repository
+

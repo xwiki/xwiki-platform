@@ -402,7 +402,21 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         if (feedDocList != null) {
             for (int i = 0; i < feedDocList.size(); i++) {
                 String feedDocName = feedDocList.get(i);
-                total += updateFeeds(feedDocName, fullContent, oneDocPerEntry, force, space, context);
+                try {
+                    total += updateFeeds(feedDocName, fullContent, oneDocPerEntry, force, space, context);
+                } catch (XWikiException e) {
+                    // an exception occurred while updating feedDocName, don't fail completely, put the exception in the
+                    // context and then pass to the next feed
+                    @SuppressWarnings("unchecked")
+                    Map<String, Exception> map = (Map<String, Exception>) context.get("updateFeedError");
+                    if (map == null) {
+                        map = new HashMap<String, Exception>();
+                        context.put("updateFeedError", map);
+                    }
+                    map.put(feedDocName, e);
+                    // and log it
+                    LOGGER.error("Failed to update feeds in document " + feedDocName, e);
+                }
             }
         }
         return total;

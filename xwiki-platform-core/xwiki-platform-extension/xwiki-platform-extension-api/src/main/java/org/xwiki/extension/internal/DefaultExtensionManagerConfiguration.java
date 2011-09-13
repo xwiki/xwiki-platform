@@ -105,8 +105,6 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
             }
         }
 
-        System.out.println(this.localRepository.getAbsolutePath());
-        
         return this.localRepository;
     }
 

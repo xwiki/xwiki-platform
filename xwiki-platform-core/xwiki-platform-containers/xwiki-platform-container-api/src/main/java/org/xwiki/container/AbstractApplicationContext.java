@@ -41,9 +41,9 @@ public abstract class AbstractApplicationContext implements ApplicationContext
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractApplicationContext.class);
 
     /**
-     * The name of the property where to find work directory path.
+     * The name of the property where to find persistent directory path.
      */
-    private static final String PROPERTY_WORKDIRECTORY = "container.workDirectory";
+    private static final String PROPERTY_PERSISTENTDIRECTORY = "container.persistentDirectory";
 
     /**
      * Use to lookup {@link ConfigurationSource} component.
@@ -51,7 +51,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext
     private final ComponentManager componentManager;
 
     /**
-     * @see #getWorkDirectory()
+     * @see #getPermanentDirectory()
      */
     private File workDirectory;
 
@@ -66,7 +66,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext
     }
 
     @Override
-    public File getWorkDirectory()
+    public File getPermanentDirectory()
     {
         if (this.workDirectory == null) {
             try {
@@ -94,16 +94,16 @@ public abstract class AbstractApplicationContext implements ApplicationContext
 
         String workDirectoryName =
             this.componentManager.lookup(ConfigurationSource.class, "xwikiproperties").getProperty(
-                PROPERTY_WORKDIRECTORY);
+                PROPERTY_PERSISTENTDIRECTORY);
         if (workDirectoryName != null) {
             directory = new File(workDirectoryName);
             if (directory.exists()) {
                 if (!directory.isDirectory()) {
-                    LOGGER.error("{}: not a directory", directory.getAbsolutePath());
+                    LOGGER.error("[{}] is not a directory", directory.getAbsolutePath());
 
                     directory = null;
                 } else if (!directory.canWrite()) {
-                    LOGGER.error("{}: no write permission", directory.getAbsolutePath());
+                    LOGGER.error("You are not allowed to write in [{}]", directory.getAbsolutePath());
 
                     directory = null;
                 }

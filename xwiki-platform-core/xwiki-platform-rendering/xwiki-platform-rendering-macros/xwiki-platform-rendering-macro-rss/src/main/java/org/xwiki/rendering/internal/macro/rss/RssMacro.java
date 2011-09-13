@@ -216,13 +216,11 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             }
             SyndEntry entry = (SyndEntry) item;
 
-            if (parameters.isDecoration()) {
-                ResourceReference titleResourceReference = new ResourceReference(entry.getLink(), ResourceType.URL);
-                Block titleBlock = new LinkBlock(parsePlainText(entry.getTitle()), titleResourceReference, true);
-                ParagraphBlock paragraphTitleBlock = new ParagraphBlock(Collections.singletonList(titleBlock));
-                paragraphTitleBlock.setParameter(CLASS_ATTRIBUTE, "rssitemtitle");
-                parentBlock.addChild(paragraphTitleBlock);
-            }
+            ResourceReference titleResourceReference = new ResourceReference(entry.getLink(), ResourceType.URL);
+            Block titleBlock = new LinkBlock(parsePlainText(entry.getTitle()), titleResourceReference, true);
+            ParagraphBlock paragraphTitleBlock = new ParagraphBlock(Collections.singletonList(titleBlock));
+            paragraphTitleBlock.setParameter(CLASS_ATTRIBUTE, "rssitemtitle");
+            parentBlock.addChild(paragraphTitleBlock);
 
             if (parameters.isContent() && entry.getDescription() != null) {
                 // We are wrapping the feed entry content in a HTML macro, not considering what the declared content

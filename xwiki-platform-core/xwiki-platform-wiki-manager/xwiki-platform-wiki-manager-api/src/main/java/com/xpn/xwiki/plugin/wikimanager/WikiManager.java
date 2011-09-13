@@ -455,7 +455,8 @@ public final class WikiManager
                 createWikiDatabase(newWikiName, context, templateWikiName == null);
 
                 // Save new wiki descriptor document.
-                wikiSuperDocToSave.save(comment);
+                XWikiDocument wikiSuperXDocToSave = wikiSuperDocToSave.getDocument();
+                context.getWiki().saveDocument(wikiSuperXDocToSave, comment, context);
 
                 sucess = true;
 

@@ -46,5 +46,5 @@ public interface ApplicationContext
      * 
      * @return a {@link File} object pointing to the root folder of the work directory
      */
-    File getWorkDirectory();
+    File getPermanentDirectory();
 }

@@ -90,28 +90,28 @@ public abstract class AbstractApplicationContext implements ApplicationContext
      */
     private File getConfiguredWorkDirectory() throws ComponentLookupException
     {
-        File workDirectory = null;
+        File directory = null;
 
         String workDirectoryName =
             this.componentManager.lookup(ConfigurationSource.class, "xwikiproperties").getProperty(
                 PROPERTY_WORKDIRECTORY);
         if (workDirectoryName != null) {
-            workDirectory = new File(workDirectoryName);
-            if (workDirectory.exists()) {
-                if (!workDirectory.isDirectory()) {
-                    LOGGER.error("{}: not a directory", workDirectory.getAbsolutePath());
+            directory = new File(workDirectoryName);
+            if (directory.exists()) {
+                if (!directory.isDirectory()) {
+                    LOGGER.error("{}: not a directory", directory.getAbsolutePath());
 
-                    workDirectory = null;
-                } else if (!workDirectory.canWrite()) {
-                    LOGGER.error("{}: no write permission", workDirectory.getAbsolutePath());
+                    directory = null;
+                } else if (!directory.canWrite()) {
+                    LOGGER.error("{}: no write permission", directory.getAbsolutePath());
 
-                    workDirectory = null;
+                    directory = null;
                 }
             } else {
-                workDirectory.mkdirs();
+                directory.mkdirs();
             }
         }
 
-        return workDirectory;
+        return directory;
     }
 }

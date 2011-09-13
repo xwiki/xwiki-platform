@@ -58,7 +58,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 {
-    private static final Logger LOG = LoggerFactory.getLogger(XWikiCacheStore.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiCacheStore.class);
 
     private XWikiStoreInterface store;
 
@@ -274,12 +274,12 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     {
         String key = getKey(doc, context);
 
-        LOG.debug("Cache: begin for doc {} in cache", key);
+        LOGGER.debug("Cache: begin for doc {} in cache", key);
 
         // Make sure cache is initialized
         initCache(context);
 
-        LOG.debug("Cache: Trying to get doc {} from cache", key);
+        LOGGER.debug("Cache: Trying to get doc {} from cache", key);
 
         XWikiDocument cachedoc = getCache().get(key);
 
@@ -287,22 +287,22 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
             doc = cachedoc;
             doc.setFromCache(true);
 
-            LOG.debug("Cache: got doc {} from cache", key);
+            LOGGER.debug("Cache: got doc {} from cache", key);
         } else {
-            LOG.debug("Cache: Trying to get doc {} from persistent storage", key);
+            LOGGER.debug("Cache: Trying to get doc {} from persistent storage", key);
 
             doc = this.store.loadXWikiDoc(doc, context);
             doc.setStore(this.store);
 
-            LOG.debug("Cache: Got doc {} from storage", key);
+            LOGGER.debug("Cache: Got doc {} from storage", key);
 
             getCache().set(key, doc);
             getPageExistCache().set(key, new Boolean(!doc.isNew()));
 
-            LOG.debug("Cache: put doc {} in cache", key);
+            LOGGER.debug("Cache: put doc {} in cache", key);
         }
 
-        LOG.debug("Cache: end for doc {} in cache", key);
+        LOGGER.debug("Cache: end for doc {} in cache", key);
 
         return doc;
     }

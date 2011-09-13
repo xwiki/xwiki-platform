@@ -220,7 +220,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         XDOM includedContent = document.getXDOM();
 
         if (section != null) {
-            HeaderBlock headerBlock = (HeaderBlock) includedContent.getFirstBlock(
+            HeaderBlock headerBlock = includedContent.getFirstBlock(
                 new CompositeBlockMatcher(new ClassBlockMatcher(HeaderBlock.class), new BlockMatcher() {
                     public boolean match(Block block)
                     {
@@ -294,7 +294,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         DocumentReference result;
 
         MetaDataBlock metaDataBlock =
-            (MetaDataBlock) block.getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE), Block.Axes.ANCESTOR);
+            block.getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE), Block.Axes.ANCESTOR);
 
         // If no Source MetaData was found resolve against the current document as a failsafe solution.
         if (metaDataBlock == null) {

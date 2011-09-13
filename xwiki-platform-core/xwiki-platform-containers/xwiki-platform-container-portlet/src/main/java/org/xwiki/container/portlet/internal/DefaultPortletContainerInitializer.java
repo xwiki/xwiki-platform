@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import javax.portlet.PortletContext;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
@@ -60,10 +61,13 @@ public class DefaultPortletContainerInitializer implements PortletContainerIniti
     @Inject
     private Execution execution;
 
+    @Inject
+    private ComponentManager componentManager;
+
     @Override
     public void initializeApplicationContext(PortletContext portletContext)
     {
-        ApplicationContext applicationContext = new PortletApplicationContext(portletContext);
+        ApplicationContext applicationContext = new PortletApplicationContext(portletContext, this.componentManager);
         this.container.setApplicationContext(applicationContext);
         this.applicationContextListenerManager.initializeApplicationContext(applicationContext);
     }

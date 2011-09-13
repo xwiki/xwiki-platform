@@ -596,7 +596,7 @@ xwiki.plugin.image.cache.capacity=30
 
 #-# Temporary directory where XWiki can put files (during export and upload, for example).
 # xwiki.temp.dir=/tmp/xwiki
-#-# XWiki work directory
+#-# XWiki work directory. If not set temporary directory is used.
 # xwiki.work.dir=/usr/local/xwiki
 
 $!xwikiCfgAdditionalProperties

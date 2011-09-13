@@ -43,11 +43,7 @@ public class XWikiServletContextListener implements ServletContextListener
     /** The component manager used to lookup other components. */
     private ComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
-     */
+    @Override
     public void contextInitialized(ServletContextEvent servletContextEvent)
     {
         // Initializes the Embeddable Component Manager
@@ -98,11 +94,7 @@ public class XWikiServletContextListener implements ServletContextListener
             org.xwiki.component.manager.ComponentManager.class.getName(), this.componentManager);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
-     */
+    @Override
     public void contextDestroyed(ServletContextEvent sce)
     {
         // Send an Observation event to signal the XWiki application is stopped. This allows components who need to do

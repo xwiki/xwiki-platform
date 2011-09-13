@@ -27,14 +27,17 @@ import java.net.URL;
 
 import javax.portlet.PortletContext;
 
-import org.xwiki.container.ApplicationContext;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.container.AbstractApplicationContext;
 
-public class PortletApplicationContext implements ApplicationContext
+public class PortletApplicationContext extends AbstractApplicationContext
 {
     private PortletContext portletContext;
 
-    public PortletApplicationContext(PortletContext portletContext)
+    public PortletApplicationContext(PortletContext portletContext, ComponentManager componentManager)
     {
+        super(componentManager);
+
         this.portletContext = portletContext;
     }
 
@@ -43,34 +46,23 @@ public class PortletApplicationContext implements ApplicationContext
         return this.portletContext;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.container.ApplicationContext#getResourceAsStream(String)
-     */
+    @Override
     public InputStream getResourceAsStream(String resourceName)
     {
         return getPortletContext().getResourceAsStream(resourceName);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.container.ApplicationContext#getResource(String)
-     */
+    @Override
     public URL getResource(String resourceName) throws MalformedURLException
     {
         return getPortletContext().getResource(resourceName);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.container.ApplicationContext#getTemporaryDirectory()
-     */
+    @Override
     public File getTemporaryDirectory()
     {
         // Section PLT.10.3 from the Portlet 1.0 specification says that this should be available.
+        // FIXME: why is this using a servlet specifications variable name ? Is that really valid for a portlet ?
         return (File) this.portletContext.getAttribute("javax.servlet.context.tempdir");
     }
 }

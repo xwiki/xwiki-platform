@@ -43,6 +43,7 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ExpandedMacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
@@ -224,7 +225,8 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
         }
         Assert.assertNotNull(xdom);
 
-        List<ExpandedMacroBlock> macros = xdom.getChildrenByType(ExpandedMacroBlock.class, false);
+        List<ExpandedMacroBlock> macros =
+            xdom.getBlocks(new ClassBlockMatcher(ExpandedMacroBlock.class), Block.Axes.CHILD);
         Assert.assertEquals(1, macros.size());
         Assert.assertEquals("gallery", macros.get(0).getId());
         Assert.assertEquals(galleryContent, macros.get(0).getChildren().get(0));

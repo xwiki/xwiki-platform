@@ -368,6 +368,7 @@
                 <exclude>org/xwiki/gwt/dom/client/Style$IEFloatProperty</exclude>
                 <exclude>org/xwiki/gwt/wysiwyg/client/plugin/submit/IESubmitPlugin</exclude>
                 <exclude>org/xwiki/container/ApplicationContext</exclude>
+                <exclude>org/xwiki/container/portlet/PortletApplicationContext</exclude>
               </excludes>
             </configuration>
           </plugin>

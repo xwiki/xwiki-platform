@@ -5,7 +5,7 @@
 <hibernate-mapping>
   <class name="com.xpn.xwiki.plugin.activitystream.impl.ActivityEventImpl" table="activitystream_events">
     <id name="eventId" type="string" unsaved-value="undefined">
-      <column name="ase_eventid" length="255" not-null="true" />
+      <column name="ase_eventid" length="48" not-null="true" />
       <generator class="assigned" />
     </id>
     <property name="requestId" type="string" column="ase_requestid" length="2000" />

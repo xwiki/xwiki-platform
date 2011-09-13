@@ -51,7 +51,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext
     private final ComponentManager componentManager;
 
     /**
-     * @see #getWorkDirectory()
+     * @see #getPermanentDirectory()
      */
     private File workDirectory;
 
@@ -66,7 +66,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext
     }
 
     @Override
-    public File getWorkDirectory()
+    public File getPermanentDirectory()
     {
         if (this.workDirectory == null) {
             try {
@@ -99,11 +99,11 @@ public abstract class AbstractApplicationContext implements ApplicationContext
             directory = new File(workDirectoryName);
             if (directory.exists()) {
                 if (!directory.isDirectory()) {
-                    LOGGER.error("{}: not a directory", directory.getAbsolutePath());
+                    LOGGER.error("[{}] is not a directory", directory.getAbsolutePath());
 
                     directory = null;
                 } else if (!directory.canWrite()) {
-                    LOGGER.error("{}: no write permission", directory.getAbsolutePath());
+                    LOGGER.error("You are not allowed to write in [{}]", directory.getAbsolutePath());
 
                     directory = null;
                 }

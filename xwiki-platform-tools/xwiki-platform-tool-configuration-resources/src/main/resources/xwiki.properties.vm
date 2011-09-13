@@ -39,7 +39,7 @@
 #-------------------------------------------------------------------------------------
 
 #-# [Since 3.2M3]
-#-# Directory used to store persisted datas.
+#-# Directory used to store persistent data.
 # container.workDirectory=/var/local/xwiki
 
 #-------------------------------------------------------------------------------------

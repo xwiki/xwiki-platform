@@ -54,7 +54,7 @@ public class TestApplicationContext implements ApplicationContext
     }
 
     @Override
-    public File getWorkDirectory()
+    public File getPermanentDirectory()
     {
         throw new UnsupportedOperationException("This method is not implemented for this test class.");
     }

@@ -89,7 +89,7 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
      */
     public File getHome()
     {
-        return this.container.getApplicationContext().getWorkDirectory();
+        return this.container.getApplicationContext().getPermanentDirectory();
     }
 
     @Override

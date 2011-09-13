@@ -72,23 +72,24 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
 
         // setup mock
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockDocumentAccessBridge).hasProgrammingRights(); will(returnValue(true));
-            }
-        });
+        getMockery().checking(new Expectations() {{
+            allowing(mockDocumentAccessBridge).hasProgrammingRights(); will(returnValue(true));
+        }});
     }
 
     @Test
     public void testInstallAndUninstallExtension() throws Throwable
     {
+        // /////////////////////////////////////////////////////////////////////
+        // install
+        // /////////////////////////////////////////////////////////////////////
         // actual test
         LocalExtension localExtension = install(this.testArtifactId);
 
         Assert.assertNotNull(localExtension);
         Assert.assertNotNull(localExtension.getFile());
         Assert.assertTrue(localExtension.getFile().exists());
+        Assert.assertTrue(localExtension.isInstalled(null));
 
         getComponentManager().lookup(TestComponent.class);
 
@@ -113,8 +114,13 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
 
         Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension("feature", null));
 
-        uninstall(this.testArtifactId);
+        // /////////////////////////////////////////////////////////////////////
+        // uninstall
+        // /////////////////////////////////////////////////////////////////////
 
+        localExtension = uninstall(this.testArtifactId);
+        
+        Assert.assertFalse(localExtension.isInstalled(null));
         Assert.assertNull(this.localExtensionRepository.getInstalledExtension(this.testArtifactId.getId(), null));
 
         try {
@@ -123,5 +129,13 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
         } catch (ComponentLookupException expected) {
             // expected
         }
+
+        // /////////////////////////////////////////////////////////////////////
+        // install extension that has just been uninstalled
+        // /////////////////////////////////////////////////////////////////////
+
+        localExtension = install(this.testArtifactId);
+
+        Assert.assertTrue(localExtension.isInstalled(null));
     }
 }

@@ -69,7 +69,7 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
         return (LocalExtension) this.localExtensionRepository.resolve(extensionId);
     }
 
-    protected void uninstall(ExtensionId extensionId) throws Throwable
+    protected LocalExtension uninstall(ExtensionId extensionId) throws Throwable
     {
         UninstallRequest uninstallRequest = new UninstallRequest();
         uninstallRequest.addExtension(extensionId);
@@ -79,5 +79,7 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
         if (!errors.isEmpty()) {
             throw errors.get(0).getThrowable();
         }
+
+        return (LocalExtension) this.localExtensionRepository.resolve(extensionId);
     }
 }

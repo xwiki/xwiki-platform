@@ -41,9 +41,9 @@ public abstract class AbstractApplicationContext implements ApplicationContext
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractApplicationContext.class);
 
     /**
-     * The name of the property where to find work directory path.
+     * The name of the property where to find persistent directory path.
      */
-    private static final String PROPERTY_WORKDIRECTORY = "container.persistentDirectory";
+    private static final String PROPERTY_PERSISTENTDIRECTORY = "container.persistentDirectory";
 
     /**
      * Use to lookup {@link ConfigurationSource} component.
@@ -94,7 +94,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext
 
         String workDirectoryName =
             this.componentManager.lookup(ConfigurationSource.class, "xwikiproperties").getProperty(
-                PROPERTY_WORKDIRECTORY);
+                PROPERTY_PERSISTENTDIRECTORY);
         if (workDirectoryName != null) {
             directory = new File(workDirectoryName);
             if (directory.exists()) {

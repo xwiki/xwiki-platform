@@ -369,6 +369,7 @@
                 <exclude>org/xwiki/gwt/wysiwyg/client/plugin/submit/IESubmitPlugin</exclude>
                 <exclude>org/xwiki/container/ApplicationContext</exclude>
                 <exclude>org/xwiki/container/portlet/PortletApplicationContext</exclude>
+                <exclude>org/xwiki/container/servlet/ServletApplicationContext</exclude>
               </excludes>
             </configuration>
           </plugin>

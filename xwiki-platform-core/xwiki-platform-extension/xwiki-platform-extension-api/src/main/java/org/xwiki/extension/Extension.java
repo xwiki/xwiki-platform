@@ -59,7 +59,7 @@ public interface Extension
     /**
      * @return the license of the extension
      */
-    ExtensionLicense getLicense();
+    Collection<ExtensionLicense> getLicenses();
 
     /**
      * @return a description of the extension

@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1284039567000</creationDate>
-<date>1314707690000</date>
-<contentUpdateDate>1314707690000</contentUpdateDate>
+<date>1316018460000</date>
+<contentUpdateDate>1316018460000</contentUpdateDate>
 <version>1.1</version>
 <title>Extension Manager</title>
 <template></template>
@@ -456,6 +456,40 @@ This application is experimental, use it at your own risk.
   #if (!$request.extensionid || $request.extensionid == '' || !$request.extensionversion || $request.extensionversion == '')
     {{error}}You have to provide both extension id and version.{{/error}}
   #else
+    #set($extension = $extensionManager.resolve($request.extensionid, $request.extensionversion, $extensionwiki))
+    ; Id
+    : {{{$extension.id.id}}}
+    ; Version
+    : {{{$extension.id.version}}}
+    ; Type
+    : {{{$extension.type}}}
+    ; Features
+    : #if (!$extension.features.empty){{{$extension.features}}}#else//No feature//#end
+
+    ; Name
+    : #if ($extension.name){{{$!extension.name}}}#else{{{$extension.id.id}}}#end
+
+    ; Description
+    : #if ($extension.description){{{$extension.description}}}#else//No description//#end
+
+    ; Website
+    : #if ($extension.website)$extension.website#else//No website//#end
+
+    ; Licenses
+    : #if (!$extension.licenses.empty){{{$extension.licenses}}}#else//No license//#end
+
+    ; Authors
+    : #if (!$extension.authors.empty){{{$extension.authors}}}#else//No author//#end
+
+    ; Repository
+    : $extension.repository.id
+
+    #foreach($propertyEntry in $extension.properties.entrySet())
+      ; $propertyEntry.key
+      : $propertyEntry.value
+    #end
+
+    ; Dependencies:
     #macro(resolveExtension $extensionid $extensionversion $extensionlevel)
       #set($extension = $extensionManager.resolve($extensionid, $extensionversion, $extensionwiki))
       #if (!$extension)
@@ -463,8 +497,24 @@ This application is experimental, use it at your own risk.
         {{error}}Failed to resolve extension with id $extensionid and version $extensionversion: $lasterror.message{{/error}}
       #else
         #set($extensionclass = "${extension.class}")
-        #foreach($index in [1..$extensionlevel])*#end #if($extensionclass.endsWith('CoreExtension'))**C**#elseif($extensionclass.endsWith('LocalExtension'))**I**#else**R**#end $extension.id.id ($extension.type) ($extension.id.version#if($extensionversion != $extension.id.version) was $extensionversion#end)
-        #resolveExtensionDependencies($extension)
+        #foreach($index in [1..$extensionlevel])*#end ##
+        #if ($extensionclass.endsWith('CoreExtension'))
+          **C** ##
+        #elseif ($extensionclass.endsWith('LocalExtension'))
+          #if ($extension.isInstalled($extensionwiki))
+            **I** ##
+          #else
+            **L** ##
+            #set($continueResolve = true)
+          #end
+        #else
+          **R** ##
+          #set($continueResolve = true)
+        #end
+        $extension.id.id ($extension.type) ($extension.id.version#if($extensionversion != $extension.id.version) was $extensionversion#end)
+        #if ($continueResolve)
+          #resolveExtensionDependencies($extension)
+        #end
       #end
     #end
     #macro(resolveExtensionDependencies $extension $extensionlevel)
@@ -474,9 +524,10 @@ This application is experimental, use it at your own risk.
       #end
       #set($extensionlevel = $extensionlevel - 1)
     #end
-    #resolveExtension($request.extensionid, $request.extensionversion, 1)
+    #resolveExtensionDependencies($extension, 0)
 
     **C**: core extension
+    **L**: not installed local extension
     **I**: installed extension
     **R**: remote extension
   #end
@@ -644,10 +695,10 @@ This application is experimental, use it at your own risk.
 #if ($extensions.isEmpty())
   {{info}}No extension installed.{{/info}}##
 #else
-  |=Id|=Version|=Type#if($xwiki.isVirtualMode())|=Wikis#end#if ($hasProgramming)|=Actions#end
+  |=Id|=Version|=Type|=Dependency#if($xwiki.isVirtualMode())|=Wikis#end#if ($hasProgramming)|=Actions#end
 
   #foreach($extension in $extensions)
-  |$extension.id.id|$extension.id.version|$extension.type#if ($xwiki.isVirtualMode())
+  |$extension.id.id|$extension.id.version|$extension.type|$extension.dependency#if ($xwiki.isVirtualMode())
           |#if($extension.namespaces)
             $extension.namespaces##
           #else
@@ -666,6 +717,21 @@ This application is experimental, use it at your own risk.
           {{/html}}##
         #end
 
+#end
+#end
+{{/velocity}}
+
+
+{{velocity}}
+= Local extensions
+
+#set($extensions = $extensionManager.getLocalExtensions())
+#if ($extensions.isEmpty())
+  {{info}}No extension in the local repository.{{/info}}##
+#else
+  |=Id|=Version|=Type
+  #foreach($extension in $extensions)
+  |(%title="$extension.file.absolutePath"%)$extension.id.id|$extension.id.version|$extension.type
 #end
 #end
 {{/velocity}}

@@ -63,4 +63,10 @@ public class ExtensionLicense
     {
         return this.content;
     }
+
+    @Override
+    public String toString()
+    {
+        return getName();
+    }
 }

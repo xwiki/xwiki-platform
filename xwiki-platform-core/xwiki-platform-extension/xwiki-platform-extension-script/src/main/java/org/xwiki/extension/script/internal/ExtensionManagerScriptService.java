@@ -199,6 +199,11 @@ public class ExtensionManagerScriptService implements ScriptService
         return wrapExtensions(this.coreExtensionRepository.getCoreExtensions());
     }
 
+    public Collection<LocalExtension> getLocalExtensions()
+    {
+        return wrapExtensions(this.localExtensionRepository.getLocalExtensions());
+    }
+
     public CoreExtension getCoreExtension(String id)
     {
         return wrapExtension(this.coreExtensionRepository.getCoreExtension(id));

@@ -87,9 +87,9 @@ public class WrappingExtension<T extends Extension> implements Extension
     }
 
     @Override
-    public ExtensionLicense getLicense()
+    public Collection<ExtensionLicense> getLicenses()
     {
-        return getExtension().getLicense();
+        return getExtension().getLicenses();
     }
 
     @Override

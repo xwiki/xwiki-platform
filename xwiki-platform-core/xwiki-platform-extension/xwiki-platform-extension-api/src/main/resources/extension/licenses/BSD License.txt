@@ -1,3 +1,4 @@
+.alias=BSD
 Copyright (c) <year>, <copyright holder>
 All rights reserved.
 

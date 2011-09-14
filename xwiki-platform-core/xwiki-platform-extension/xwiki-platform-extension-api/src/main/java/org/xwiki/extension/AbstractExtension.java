@@ -34,7 +34,7 @@ import org.xwiki.extension.repository.ExtensionRepository;
 /**
  * Base class for {@link Extension} implementations.
  * 
- * @version $Id$
+ * @version $Id: 22eb0461789e73cf2cdaa0d4792631949f29df96 $
  */
 public abstract class AbstractExtension implements Extension
 {
@@ -59,9 +59,9 @@ public abstract class AbstractExtension implements Extension
     protected String name;
 
     /**
-     * @see #getLicense()
+     * @see #getLicenses()
      */
-    protected ExtensionLicense license;
+    protected List<ExtensionLicense> licenses = new ArrayList<ExtensionLicense>();
 
     /**
      * @see #getDescription()
@@ -197,17 +197,27 @@ public abstract class AbstractExtension implements Extension
     }
 
     @Override
-    public ExtensionLicense getLicense()
+    public Collection<ExtensionLicense> getLicenses()
     {
-        return this.license;
+        return this.licenses;
     }
 
     /**
-     * @param license the license of the extension
+     * @param licenses the licenses of the extension
      */
-    public void setLicense(ExtensionLicense license)
+    public void setLicense(Collection<ExtensionLicense> licenses)
     {
-        this.license = license;
+        this.licenses = new ArrayList<ExtensionLicense>(licenses);
+    }
+
+    /**
+     * Add a new license to the extension.
+     * 
+     * @param license a license
+     */
+    public void addLicense(ExtensionLicense license)
+    {
+        this.licenses.add(license);
     }
 
     @Override
@@ -231,9 +241,9 @@ public abstract class AbstractExtension implements Extension
     }
 
     /**
-     * @param authors the extension authors
+     * @param authors the authors of the extension
      */
-    public void setAuthors(List<String> authors)
+    public void setAuthors(Collection<String> authors)
     {
         this.authors = new ArrayList<String>(authors);
     }
@@ -287,7 +297,7 @@ public abstract class AbstractExtension implements Extension
      * @param dependencies the dependencies of the extension
      * @see #getDependencies()
      */
-    public void setDependencies(List< ? extends ExtensionDependency> dependencies)
+    public void setDependencies(Collection< ? extends ExtensionDependency> dependencies)
     {
         this.dependencies = new ArrayList<ExtensionDependency>(dependencies);
     }

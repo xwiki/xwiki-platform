@@ -21,6 +21,7 @@ package org.xwiki.extension.internal;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,16 @@ import org.xwiki.extension.ExtensionLicenseManager;
 public class DefaultExtensionLicenseManager implements ExtensionLicenseManager, Initializable
 {
     /**
+     * The prefix used to mark license name alias.
+     */
+    private static final String ALIAS_PREFIX = ".alias=";
+
+    /**
+     * The package where license files are located.
+     */
+    private static final String LICENSE_PACKAGE = "extension.licenses";
+
+    /**
      * The logger to log.
      */
     @Inject
@@ -68,15 +79,16 @@ public class DefaultExtensionLicenseManager implements ExtensionLicenseManager, 
     {
         Reflections reflections =
             new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner())
-                .setUrls(ClasspathHelper.forPackage(""))
-                .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix("extension.licenses"))));
+                .setUrls(ClasspathHelper.forPackage(LICENSE_PACKAGE))
+                .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(LICENSE_PACKAGE))));
 
         for (String licenseFile : reflections.getResources(Pattern.compile(".*\\.txt"))) {
             URL licenseUrl = getClass().getClassLoader().getResource(licenseFile);
 
             try {
                 // Get name
-                String path = licenseUrl.toURI().getPath();
+                // Note that getResources produce unescaped URLs
+                String path = URLDecoder.decode(licenseUrl.getPath(), "UTF-8");
                 String name = path.substring(path.lastIndexOf('/') + 1);
                 name = name.substring(0, name.length() - ".txt".length());
 
@@ -85,7 +97,22 @@ public class DefaultExtensionLicenseManager implements ExtensionLicenseManager, 
                 try {
                     List<String> content = IOUtils.readLines(is);
 
-                    this.licenses.put(name, new ExtensionLicense(name, content));
+                    List<String> aliases = new ArrayList<String>();
+                    aliases.add(name);
+
+                    for (String line : content) {
+                        if (!line.startsWith(ALIAS_PREFIX)) {
+                            break;
+                        }
+
+                        aliases.add(line.substring(ALIAS_PREFIX.length()));
+                    }
+
+                    content = content.subList(aliases.size() - 1, content.size());
+
+                    for (String alias : aliases) {
+                        this.licenses.put(alias, new ExtensionLicense(name, content));
+                    }
                 } finally {
                     is.close();
                 }

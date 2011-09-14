@@ -29,6 +29,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Developer;
+import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.aether.RepositorySystem;
@@ -39,6 +40,8 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionLicense;
+import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
 import org.xwiki.properties.ConverterManager;
 
@@ -59,7 +62,7 @@ public class AetherExtension extends AbstractExtension
     private Model mavenModel;
 
     public AetherExtension(ExtensionId id, Model mavenModel, AetherExtensionRepository repository,
-        PlexusComponentManager mavenComponentManager, ConverterManager converter)
+        PlexusComponentManager mavenComponentManager, ConverterManager converter, ExtensionLicenseManager licenseManager)
     {
         // See bundle as jar packages since bundle are actually store as jar files
         super(repository, id, mavenModel.getPackaging().equals("bundle") ? "jar" : mavenModel.getPackaging());
@@ -74,13 +77,16 @@ public class AetherExtension extends AbstractExtension
         }
         setWebsite(this.mavenModel.getUrl());
 
+        // licenses
+        for (License license : this.mavenModel.getLicenses()) {
+            addLicense(findLicenseByName(license.getName(), licenseManager));
+        }
+
         // features
         String featuresString = this.mavenModel.getProperties().getProperty(MPKEY_FEATURES);
         if (StringUtils.isNotBlank(featuresString)) {
             setFeatures(converter.<Collection<String>> convert(List.class, featuresString));
         }
-
-        // TODO: parse features list
 
         // dependencies
         for (Dependency mavenDependency : this.mavenModel.getDependencies()) {
@@ -94,6 +100,13 @@ public class AetherExtension extends AbstractExtension
         // custom properties
         putProperty(PKEY_GROUPID, this.mavenModel.getGroupId());
         putProperty(PKEY_ARTIFACTID, this.mavenModel.getArtifactId());
+    }
+
+    private ExtensionLicense findLicenseByName(String name, ExtensionLicenseManager licenseManager)
+    {
+        ExtensionLicense license = licenseManager.getLicense(name);
+
+        return license != null ? license : new ExtensionLicense(name, null);
     }
 
     // IDEA
@@ -113,11 +126,7 @@ public class AetherExtension extends AbstractExtension
         return this.suggested;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#download(java.io.File)
-     */
+    @Override
     public void download(File file) throws ExtensionException
     {
         RepositorySystem repositorySystem;

@@ -23,6 +23,6 @@ public abstract class AbstractExtensionRepository implements ExtensionRepository
     @Override
     public ExtensionRepositoryId getId()
     {
-        return id;
+        return this.id;
     }
 }

@@ -21,8 +21,6 @@ package org.xwiki.extension.repository.aether.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.List;
 
 import org.apache.maven.model.Model;
 import org.sonatype.aether.RepositorySystemSession;
@@ -34,16 +32,15 @@ import org.sonatype.aether.resolution.ArtifactDescriptorResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.ResolveException;
-import org.xwiki.extension.repository.ExtensionRepository;
+import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
 import org.xwiki.properties.ConverterManager;
 
-public class AetherExtensionRepository implements ExtensionRepository
+public class AetherExtensionRepository extends AbstractExtensionRepository
 {
-    private ExtensionRepositoryId repositoryId;
-
     private PlexusComponentManager plexusComponentManager;
 
     private RepositorySystemSession session;
@@ -56,10 +53,13 @@ public class AetherExtensionRepository implements ExtensionRepository
 
     private ConverterManager converter;
 
+    private ExtensionLicenseManager licenseManager;
+
     public AetherExtensionRepository(ExtensionRepositoryId repositoryId, RepositorySystemSession session,
-        PlexusComponentManager mavenComponentManager, ConverterManager converter) throws Exception
+        PlexusComponentManager mavenComponentManager, ConverterManager converter, ExtensionLicenseManager licenseManager)
+        throws Exception
     {
-        this.repositoryId = repositoryId;
+        super(repositoryId);
 
         this.plexusComponentManager = mavenComponentManager;
 
@@ -70,6 +70,7 @@ public class AetherExtensionRepository implements ExtensionRepository
         this.remoteRepository = new RemoteRepository(repositoryId.getId(), "default", repositoryId.getURI().toString());
 
         this.converter = converter;
+        this.licenseManager = licenseManager;
 
         // FIXME: not very nice
         // * use a private method of a library we don't control is not the nicest thing...
@@ -81,23 +82,7 @@ public class AetherExtensionRepository implements ExtensionRepository
         this.loadPomMethod.setAccessible(true);
     }
 
-    public ExtensionRepositoryId getId()
-    {
-        return this.repositoryId;
-    }
-
-    public int countExtensions()
-    {
-        // TODO
-        return 0;
-    }
-
-    public List<Extension> getExtensions(int nb, int offset)
-    {
-        // TODO
-        return Collections.emptyList();
-    }
-
+    @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
         Model model;
@@ -107,7 +92,8 @@ public class AetherExtensionRepository implements ExtensionRepository
             throw new ResolveException("Failed to resolve extension [" + extensionId + "] descriptor", e);
         }
 
-        return new AetherExtension(extensionId, model, this, this.plexusComponentManager, this.converter);
+        return new AetherExtension(extensionId, model, this, this.plexusComponentManager, this.converter,
+            this.licenseManager);
     }
 
     private Model loadPom(RepositorySystemSession session, ExtensionId extensionId) throws IllegalArgumentException,
@@ -125,6 +111,7 @@ public class AetherExtensionRepository implements ExtensionRepository
             artifactDescriptorRequest, artifactDescriptorResult);
     }
 
+    @Override
     public boolean exists(ExtensionId extensionId)
     {
         // TODO

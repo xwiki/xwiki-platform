@@ -306,12 +306,12 @@ public class Context extends Api
     }
 
     /**
-     * Returns the document reference for the profile page of the current user which made the request. If there's no
-     * currently logged in user in XWiki then the returned reference is for <i>XWiki.XWikiGuest</i> which represents any
-     * anonymous user. The returned reference can always be considered an absolute document reference, meaning that
+     * Returns the document reference for the profile page of the current user which made the request. The returned
+     * reference can always be considered an absolute document reference, meaning that
      * <code>getUserReference().getWikiReference().getName()</code> will always return the name of the user's wiki.
      * 
-     * @return The document reference for the current user which made the request.
+     * @return The document reference for the current logged in user which made the request or <code>null</code> if
+     *         there is no currently logged in user (anonymous/guest user).
      */
     public DocumentReference getUserReference()
     {

@@ -64,12 +64,7 @@ public class DefaultExtensionHandlerManager implements ExtensionHandlerManager
         return this.componentManager.lookup(ExtensionHandler.class, localExtension.getType().toString().toLowerCase());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.handler.ExtensionHandlerManager#install(org.xwiki.extension.LocalExtension,
-     *      java.lang.String)
-     */
+    @Override
     public void install(LocalExtension localExtension, String namespace) throws InstallException
     {
         ExtensionHandler extensionHandler;
@@ -89,12 +84,7 @@ public class DefaultExtensionHandlerManager implements ExtensionHandlerManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.handler.ExtensionHandlerManager#uninstall(org.xwiki.extension.LocalExtension,
-     *      java.lang.String)
-     */
+    @Override
     public void uninstall(LocalExtension localExtension, String namespace) throws UninstallException
     {
         try {
@@ -107,12 +97,7 @@ public class DefaultExtensionHandlerManager implements ExtensionHandlerManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.handler.ExtensionHandlerManager#upgrade(org.xwiki.extension.LocalExtension,
-     *      org.xwiki.extension.LocalExtension, java.lang.String)
-     */
+    @Override
     public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace)
         throws InstallException
     {

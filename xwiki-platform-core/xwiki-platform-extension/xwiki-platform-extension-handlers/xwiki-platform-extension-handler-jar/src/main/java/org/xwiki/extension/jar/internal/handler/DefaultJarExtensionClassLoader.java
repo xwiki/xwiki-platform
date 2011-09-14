@@ -32,6 +32,7 @@ public class DefaultJarExtensionClassLoader implements JarExtensionClassLoader
 
     private Map<String, ExtensionURLClassLoader> wikiClassLoaderMap = new HashMap<String, ExtensionURLClassLoader>();
 
+    @Override
     public ExtensionURLClassLoader getURLClassLoader(String namespace, boolean create)
     {
         if (this.rootClassLoader == null && create) {

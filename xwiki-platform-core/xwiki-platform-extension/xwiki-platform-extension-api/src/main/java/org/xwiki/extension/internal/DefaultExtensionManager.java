@@ -78,11 +78,7 @@ public class DefaultExtensionManager implements ExtensionManager, Initializable
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         // Load extension repositories
@@ -97,11 +93,7 @@ public class DefaultExtensionManager implements ExtensionManager, Initializable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.ExtensionManager#resolveExtension(org.xwiki.extension.ExtensionId, java.lang.String)
-     */
+    @Override
     public Extension resolveExtension(ExtensionId extensionId, String namespace) throws ResolveException
     {
         Extension extension = null;

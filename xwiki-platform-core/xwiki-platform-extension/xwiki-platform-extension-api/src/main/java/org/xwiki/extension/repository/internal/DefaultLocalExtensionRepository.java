@@ -117,11 +117,7 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
     private Map<String, Map<String, DefaultInstalledExtension>> installedExtensions =
         new ConcurrentHashMap<String, Map<String, DefaultInstalledExtension>>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         this.storage = new ExtensionStorage(this, this.configuration.getLocalRepository());
@@ -421,11 +417,7 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
 
     // Repository
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.ExtensionRepository#resolve(org.xwiki.extension.ExtensionId)
-     */
+    @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
         LocalExtension localExtension = this.extensions.get(extensionId);
@@ -437,21 +429,13 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
         return localExtension;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.ExtensionRepository#exists(org.xwiki.extension.ExtensionId)
-     */
+    @Override
     public boolean exists(ExtensionId extensionId)
     {
         return this.extensions.containsKey(extensionId);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.ExtensionRepository#getId()
-     */
+    @Override
     public ExtensionRepositoryId getId()
     {
         return this.repositoryId;
@@ -459,21 +443,13 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
 
     // LocalRepository
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.LocalExtensionRepository#getLocalExtensions()
-     */
+    @Override
     public Collection<LocalExtension> getLocalExtensions()
     {
         return Collections.<LocalExtension> unmodifiableCollection(this.extensions.values());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.LocalExtensionRepository#getInstalledExtensions(java.lang.String)
-     */
+    @Override
     public List<LocalExtension> getInstalledExtensions(String namespace)
     {
         List<LocalExtension> result = new ArrayList<LocalExtension>(extensions.size());
@@ -486,11 +462,7 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.LocalExtensionRepository#getInstalledExtensions()
-     */
+    @Override
     public List<LocalExtension> getInstalledExtensions()
     {
         List<LocalExtension> result = new ArrayList<LocalExtension>(this.extensions.size());
@@ -503,12 +475,7 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.LocalExtensionRepository#getInstalledExtension(java.lang.String,
-     *      java.lang.String)
-     */
+    @Override
     public LocalExtension getInstalledExtension(String feature, String namespace)
     {
         DefaultInstalledExtension installedExtension = getInstalledExtensionFromCache(feature, namespace);
@@ -524,44 +491,31 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
      * Create a new local extension from a remote extension.
      * 
      * @param extension the extension to copy
-     * @param dependency indicate if the extension is installed as dependency
      * @return the new local extension
      */
-    private DefaultLocalExtension createExtension(Extension extension, boolean dependency)
+    private DefaultLocalExtension createExtension(Extension extension)
     {
         DefaultLocalExtension localExtension = new DefaultLocalExtension(this, extension);
-
-        localExtension.setDependency(dependency);
 
         localExtension.setFile(this.storage.getExtensionFile(localExtension.getId(), localExtension.getType()));
 
         return localExtension;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.LocalExtensionRepository#countExtensions()
-     */
+    @Override
     public int countExtensions()
     {
         return this.extensions.size();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.LocalExtensionRepository#storeExtension(org.xwiki.extension.Extension,
-     *      boolean)
-     */
-    public LocalExtension storeExtension(Extension extension, boolean dependency)
-        throws LocalExtensionRepositoryException
+    @Override
+    public LocalExtension storeExtension(Extension extension) throws LocalExtensionRepositoryException
     {
         DefaultLocalExtension localExtension = this.extensions.get(extension.getId());
 
         if (localExtension == null) {
             try {
-                localExtension = createExtension(extension, dependency);
+                localExtension = createExtension(extension);
 
                 // Store extension in the local repository
                 extension.download(localExtension.getFile());
@@ -596,28 +550,22 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
         this.storage.removeExtension(localExtension);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.LocalExtensionRepository#installExtension(org.xwiki.extension.LocalExtension,
-     *      java.lang.String)
-     */
     @Override
-    public void installExtension(LocalExtension extension, String namespace) throws InstallException
+    public void installExtension(LocalExtension extension, String namespace, boolean dependency)
+        throws InstallException
     {
         DefaultLocalExtension localExtension = this.extensions.get(extension.getId());
 
         if (localExtension != null) {
+            if (dependency || localExtension.getProperty(LocalExtension.PKEY_DEPENDENCY) == null) {
+                localExtension.setDependency(dependency);
+            }
+
             installLocalExtension(localExtension, namespace);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.LocalExtensionRepository#uninstallExtension(org.xwiki.extension.LocalExtension,
-     *      java.lang.String)
-     */
+    @Override
     public void uninstallExtension(LocalExtension localExtension, String namespace) throws UninstallException
     {
         LocalExtension existingExtension = getInstalledExtension(localExtension.getId().getId(), namespace);
@@ -627,12 +575,7 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.LocalExtensionRepository#getBackwardDependencies(java.lang.String,
-     *      java.lang.String)
-     */
+    @Override
     public Collection<LocalExtension> getBackwardDependencies(String feature, String namespace) throws ResolveException
     {
         if (getInstalledExtension(feature, namespace) == null) {
@@ -655,11 +598,7 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
         return Collections.<LocalExtension> emptyList();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.LocalExtensionRepository#getBackwardDependencies(org.xwiki.extension.ExtensionId)
-     */
+    @Override
     public Map<String, Collection<LocalExtension>> getBackwardDependencies(ExtensionId extensionId)
         throws ResolveException
     {

@@ -69,31 +69,19 @@ public abstract class AbstractJob<R extends Request> implements Job
      */
     protected DefaultJobStatus<R> status;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.Job#getStatus()
-     */
+    @Override
     public JobStatus getStatus()
     {
         return this.status;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.Job#getRequest()
-     */
+    @Override
     public R getRequest()
     {
         return this.status.getRequest();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.Job#start(org.xwiki.extension.job.Request)
-     */
+    @Override
     public void start(Request request)
     {
         this.status = new DefaultJobStatus<R>((R) request, getId(), this.observationManager, this.loggerManager);
@@ -107,7 +95,7 @@ public abstract class AbstractJob<R extends Request> implements Job
         } finally {
             this.status.stopListening();
 
-            this.status.setState(JobStatus.State.FINISHED);   
+            this.status.setState(JobStatus.State.FINISHED);
         }
     }
 

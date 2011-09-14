@@ -75,6 +75,7 @@ public class ExtensionStorage
         if (this.rootFolder.exists()) {
             FilenameFilter descriptorFilter = new FilenameFilter()
             {
+                @Override
                 public boolean accept(File dir, String name)
                 {
                     return name.endsWith(".xed");
@@ -128,7 +129,7 @@ public class ExtensionStorage
             try {
                 fis.close();
             } catch (IOException e) {
-                // TODO: log something
+                LOGGER.error("Failed to close stream for file [" + descriptor + "]", e);
             }
         }
     }

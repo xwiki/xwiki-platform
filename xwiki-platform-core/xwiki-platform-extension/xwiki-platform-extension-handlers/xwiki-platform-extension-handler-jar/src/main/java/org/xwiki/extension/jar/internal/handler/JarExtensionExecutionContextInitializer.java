@@ -42,11 +42,7 @@ public class JarExtensionExecutionContextInitializer implements ExecutionContext
     @Inject
     private ModelContext modelContext;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.context.ExecutionContextInitializer#initialize(org.xwiki.context.ExecutionContext)
-     */
+    @Override
     public void initialize(ExecutionContext context) throws ExecutionContextException
     {
         String currentWikiId = null;

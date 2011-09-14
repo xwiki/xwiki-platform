@@ -131,31 +131,19 @@ public class DefaultJobStatus<R extends Request> implements JobStatus
         this.state = state;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobStatus#getRequest()
-     */
+    @Override
     public R getRequest()
     {
         return this.request;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobStatus#getLog()
-     */
+    @Override
     public LogQueue getLog()
     {
         return this.logs;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobStatus#getLog(org.xwiki.logging.LogLevel)
-     */
+    @Override
     public List<LogEvent> getLog(LogLevel level)
     {
         List<LogEvent> levelLogs = new ArrayList<LogEvent>();
@@ -169,11 +157,7 @@ public class DefaultJobStatus<R extends Request> implements JobStatus
         return levelLogs;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobStatus#getProgress()
-     */
+    @Override
     public JobProgress getProgress()
     {
         return this.progress;

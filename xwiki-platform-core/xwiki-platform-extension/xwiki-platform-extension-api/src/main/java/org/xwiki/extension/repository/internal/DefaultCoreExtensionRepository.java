@@ -67,11 +67,7 @@ public class DefaultCoreExtensionRepository extends AbstractExtensionRepository 
         super(new ExtensionRepositoryId("core", "xwiki-core", null));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         DefaultCoreExtensionScanner scanner = new DefaultCoreExtensionScanner();
@@ -84,11 +80,7 @@ public class DefaultCoreExtensionRepository extends AbstractExtensionRepository 
 
     // Repository
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.ExtensionRepository#resolve(org.xwiki.extension.ExtensionId)
-     */
+    @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
         Extension extension = getCoreExtension(extensionId.getId());
@@ -101,11 +93,7 @@ public class DefaultCoreExtensionRepository extends AbstractExtensionRepository 
         return extension;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.ExtensionRepository#exists(org.xwiki.extension.ExtensionId)
-     */
+    @Override
     public boolean exists(ExtensionId extensionId)
     {
         Extension extension = getCoreExtension(extensionId.getId());
@@ -118,11 +106,7 @@ public class DefaultCoreExtensionRepository extends AbstractExtensionRepository 
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.CoreExtensionRepository#exists(java.lang.String)
-     */
+    @Override
     public boolean exists(String id)
     {
         return this.extensions.containsKey(id);
@@ -130,31 +114,19 @@ public class DefaultCoreExtensionRepository extends AbstractExtensionRepository 
 
     // CoreExtensionRepository
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.CoreExtensionRepository#countExtensions()
-     */
+    @Override
     public int countExtensions()
     {
         return this.extensions.size();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.extension.repository.CoreExtensionRepository#getCoreExtensions()
-     */
+    @Override
     public Collection<CoreExtension> getCoreExtensions()
     {
         return new ArrayList<CoreExtension>(this.extensions.values());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.CoreExtensionRepository#getCoreExtension(java.lang.String)
-     */
+    @Override
     public CoreExtension getCoreExtension(String id)
     {
         return this.extensions.get(id);

@@ -40,12 +40,7 @@ public abstract class AbstractExtensionHandler implements ExtensionHandler
     @Inject
     protected Logger logger;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.handler.ExtensionHandler#upgrade(org.xwiki.extension.LocalExtension,
-     *      org.xwiki.extension.LocalExtension, java.lang.String)
-     */
+    @Override
     public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace)
         throws InstallException
     {

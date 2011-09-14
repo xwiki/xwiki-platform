@@ -167,11 +167,7 @@ public abstract class AbstractExtension implements Extension
         this.features.add(feature);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getType()
-     */
+    @Override
     public String getType()
     {
         return this.type;

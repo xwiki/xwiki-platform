@@ -50,7 +50,7 @@ import org.xwiki.extension.repository.LocalExtensionRepositoryException;
  * This task is taking care of discovering automatically if the extension need to be upgraded instead of installed. It
  * also generated related events.
  * 
- * @version $Id: d63f73610e17a4dbd044a626f43c8eb753059a6e $
+ * @version $Id$
  */
 @Component
 @Named("install")

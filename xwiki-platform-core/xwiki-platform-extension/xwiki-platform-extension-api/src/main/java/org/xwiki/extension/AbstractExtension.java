@@ -34,7 +34,7 @@ import org.xwiki.extension.repository.ExtensionRepository;
 /**
  * Base class for {@link Extension} implementations.
  * 
- * @version $Id: 22eb0461789e73cf2cdaa0d4792631949f29df96 $
+ * @version $Id$
  */
 public abstract class AbstractExtension implements Extension
 {

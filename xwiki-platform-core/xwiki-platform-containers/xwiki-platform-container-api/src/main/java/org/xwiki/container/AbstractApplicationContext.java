@@ -41,7 +41,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractApplicationContext.class);
 
     /**
-     * The name of the property where to find persistent directory path.
+     * The name of the property for configuring the persistent directory path.
      */
     private static final String PROPERTY_PERSISTENTDIRECTORY = "container.persistentDirectory";
 
@@ -53,7 +53,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext
     /**
      * @see #getPermanentDirectory()
      */
-    private File workDirectory;
+    private File permanentDirectory;
 
     /**
      * @param componentManager use to lookup {@link ConfigurationSource} component. Can't directly get the
@@ -68,43 +68,42 @@ public abstract class AbstractApplicationContext implements ApplicationContext
     @Override
     public File getPermanentDirectory()
     {
-        if (this.workDirectory == null) {
+        if (this.permanentDirectory == null) {
             try {
-                this.workDirectory = getConfiguredWorkDirectory();
+                this.permanentDirectory = getConfiguredPermanentDirectory();
             } catch (Exception e) {
-                LOGGER.error("Failed to get configured work directory", e);
+                LOGGER.error("Failed to get configured permanent directory", e);
             }
 
-            if (this.workDirectory == null) {
+            if (this.permanentDirectory == null) {
                 // Only choice left
-                this.workDirectory = getTemporaryDirectory();
+                this.permanentDirectory = getTemporaryDirectory();
             }
         }
 
-        return this.workDirectory;
+        return this.permanentDirectory;
     }
 
     /**
-     * @return the work directory indicated in configuration, null if none is configured or if it's invalid
+     * @return the directory indicated in configuration, null if none is configured or if it's invalid
      * @throws ComponentLookupException error when trying to lookup {@link ConfigurationSource} component
      */
-    private File getConfiguredWorkDirectory() throws ComponentLookupException
+    private File getConfiguredPermanentDirectory() throws ComponentLookupException
     {
         File directory = null;
 
-        String workDirectoryName =
-            this.componentManager.lookup(ConfigurationSource.class, "xwikiproperties").getProperty(
-                PROPERTY_PERSISTENTDIRECTORY);
-        if (workDirectoryName != null) {
-            directory = new File(workDirectoryName);
+        String directoryName = this.componentManager.lookup(ConfigurationSource.class, "xwikiproperties").getProperty(
+            PROPERTY_PERSISTENTDIRECTORY);
+        if (directoryName != null) {
+            directory = new File(directoryName);
             if (directory.exists()) {
                 if (!directory.isDirectory()) {
-                    LOGGER.error("[{}] is not a directory", directory.getAbsolutePath());
-
+                    LOGGER.error("Configured permanent storage directory [{}] is not a directory",
+                        directory.getAbsolutePath());
                     directory = null;
                 } else if (!directory.canWrite()) {
-                    LOGGER.error("You are not allowed to write in [{}]", directory.getAbsolutePath());
-
+                    LOGGER.error("Configured permanent storage directory [{}] is not writable",
+                        directory.getAbsolutePath());
                     directory = null;
                 }
             } else {

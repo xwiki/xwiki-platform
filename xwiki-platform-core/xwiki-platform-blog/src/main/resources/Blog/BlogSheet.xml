@@ -31,7 +31,8 @@
 ##
 ##
 #showBlogInfo($doc)
-#if($xcontext.action != 'edit')
+## Keep testing the inline action for backward compatibility with older blog posts.
+#if($xcontext.action != 'edit' &amp;&amp; $xcontext.action != 'inline')
   #printBlog($doc)
 #end
 {{/html}}

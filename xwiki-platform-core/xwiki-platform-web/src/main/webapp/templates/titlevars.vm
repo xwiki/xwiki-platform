@@ -1,7 +1,7 @@
 ## ----------------------------------------------------------------------------
-## Compute the title by using the set title if defined (either by the document
-## itself or by one of its inline sheets) or extract it from the content,
-## taking into account the new title handling introduced in XWiki Platform 2.0.
+## Compute the title by using the set title if defined or extract it from the
+## content, taking into account the new title handling introduced in XWiki
+## Platform 2.0.
 ##
 ## Prerequisite: Have the $renderedContent variable defined before calling
 ##               this template.
@@ -18,25 +18,8 @@
 ## ensure we don't break existing documents that have not yet migrated to the
 ## new way.
 ## ----------------------------------------------------------------------------------
-#set($titleIsSpecified = $tdoc.title.length() > 0)
-#if ($inlineSheetReferences)
-  ## Inline sheets can control the displayed title. Look for the first sheet that specifies a title.
-  #foreach($sheetReference in $inlineSheetReferences)
-    #set($sheet = $xwiki.getDocument($sheetReference).translatedDocument)
-    #if ($sheet.title.length() > 0)
-      #set($titleIsSpecified = true)
-      ## Honor the syntax if it's passed in the request.
-      #set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
-      #set($titleToDisplay = $services.sheet.renderTitle($tdoc, $sheet, $outputSyntax))
-      #break
-    #end
-  #end
-#end
-#if (!$titleToDisplay)
-  ## If the title is not specified by a sheet then use the document title.
-  #set ($titleToDisplay = $tdoc.displayTitle)
-#end
-#if (!$titleIsSpecified || $xwiki.isTitleInCompatibilityMode())
+#set ($titleToDisplay = $tdoc.displayTitle)
+#if ($tdoc.title.length() == 0 || $xwiki.isTitleInCompatibilityMode())
   ## Look for first H1-H6 either in lowercase or uppercase
   #set ($regexResult = $regextool.find($renderedContent, "<([hH][1-6]).*?>(?:<span>)?(.*?)(?:</span>)?</[hH][1-6]>"))
   #if (!$regexResult.isEmpty() && $regexResult.get(2).group.equals($titleToDisplay))
@@ -53,6 +36,6 @@
 #end
 ## If the title comes from a heading in the content, special XML characters are already escaped.
 ## If the title comes from the title field or from the document name it must be manually escaped for security.
-#if ($titleIsSpecified || $tdoc.name == $titleToDisplay)
+#if ("$!{tdoc.title}" != '' || $tdoc.name == $titleToDisplay)
   #set ($titleToDisplay = $escapetool.xml($titleToDisplay))
 #end

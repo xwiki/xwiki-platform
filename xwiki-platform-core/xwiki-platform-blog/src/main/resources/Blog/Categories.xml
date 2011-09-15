@@ -129,7 +129,7 @@
 <customDisplay></customDisplay>
 <disabled>0</disabled>
 <name>action</name>
-<number>3</number>
+<number>2</number>
 <picker>0</picker>
 <prettyName>Action</prettyName>
 <size>30</size>
@@ -138,27 +138,6 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </action>
-<display>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>display</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Display</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<sort>none</sort>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values>inline|page</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</display>
 </class>
 <name>Blog.Categories</name>
 <number>0</number>
@@ -166,9 +145,6 @@
 <guid>4d291d76-09cc-4503-8674-368e00d3dd9f</guid>
 <property>
 <action>view</action>
-</property>
-<property>
-<display>inline</display>
 </property>
 </object>
 <content>{{include document="Blog.CategoriesCode"/}}

@@ -9,24 +9,12 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
     #template("editmenu.vm")
   </div>
 <div id="mainContentArea">
-## $pageSheetReference might have been initialized in edit.vm
-#if (!$pageSheetReference)
-  #set($pageSheetReference = $services.sheet.getPageSheet($tdoc, $context.action))
-#end
-#if($pageSheetReference)
-  ## Page sheet rendering.
-  #applySheet($pageSheetReference)
-#else
-## In-line sheet rendering.
 #template("hierarchy.vm")
 #template('editmeta.vm')
 ## ----------------------------------------------------------------------------
 ## Compute title to display and modify rendered content accordingly.
 ## ----------------------------------------------------------------------------
-#if (!$inlineSheetReferences)
-  #set($inlineSheetReferences = $services.sheet.getInlineSheets($tdoc, $context.action))
-#end
-#set ($renderedContent = "#applySheets($inlineSheetReferences)")
+#set ($renderedContent = $cdoc.getRenderedContent())
 #template("titlevars.vm")
 ## ----------------------------
 ## Display the title
@@ -78,6 +66,5 @@ $renderedContent
 </form>
 #template("textarea_wysiwyg.vm")
 #end ## can edit
-#end ## in-line sheet rendering
 </div> ## mainContentArea
 </div> ## main

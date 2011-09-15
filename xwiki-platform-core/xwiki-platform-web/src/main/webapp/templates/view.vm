@@ -19,24 +19,17 @@
     #template("contentmenu.vm")
     </div>
   #end
-  #set($pageSheetReference = $services.sheet.getPageSheet($tdoc, $context.action))
-  #if($pageSheetReference && $viewer == 'content')
-    <div id="mainContentArea">
-      #applySheet($pageSheetReference)
-    </div>
+  <div id="mainContentArea">
+  #template("hierarchy.vm")
+  #if($viewer == 'content')
+    #template("contentview.vm")
   #else
-    <div id="mainContentArea">
-    #template("hierarchy.vm")
-    #if($viewer == 'content')
-      #template("contentview.vm")
-    #else
-      #template("${viewer}.vm")
-    #end
-    <div class="clearfloats"></div>
-    </div>## mainContentArea
-    #if($viewer == 'content' && $displayDocExtra)
-      #template("docextra.vm")
-    #end
+    #template("${viewer}.vm")
+  #end
+  <div class="clearfloats"></div>
+  </div>## mainContentArea
+  #if($viewer == 'content' && $displayDocExtra)
+    #template("docextra.vm")
   #end
   </div>## main
   #template("endpage.vm")

@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +32,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Developer;
+import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -41,8 +48,12 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionLicense;
+import org.xwiki.extension.ExtensionLicenseManager;
+import org.xwiki.properties.ConverterManager;
 
 import com.google.common.base.Predicates;
 
@@ -51,13 +62,10 @@ import com.google.common.base.Predicates;
  * 
  * @version $Id$
  */
-public class DefaultCoreExtensionScanner
+@Component
+@Singleton
+public class DefaultCoreExtensionScanner implements CoreExtensionScanner
 {
-    /**
-     * Logging tool.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCoreExtensionScanner.class);
-
     /**
      * The package containing maven informations in a jar file.
      */
@@ -74,21 +82,34 @@ public class DefaultCoreExtensionScanner
     private static final String SNAPSHOTSUFFIX = "-SNAPSHOT";
 
     /**
-     * Scan classpath to find core extensions.
-     * 
-     * @param repository the repository where to store found extensions
-     * @return scan jar files in classpath to find core extensions
+     * The logger to log.
      */
+    @Inject
+    private Logger logger;
+
+    /**
+     * Used to parse some custom properties.
+     */
+    @Inject
+    private ConverterManager converter;
+
+    /**
+     * Used to find proper {@link ExtensionLicense}.
+     */
+    @Inject
+    private ExtensionLicenseManager licenseManager;
+
+    @Override
     public Map<String, DefaultCoreExtension> loadExtensions(DefaultCoreExtensionRepository repository)
     {
-        Set<URL> baseURLs = ClasspathHelper.forPackage(MAVENPACKAGE);
+        Set<URL> mavenURLs = ClasspathHelper.forPackage(MAVENPACKAGE);
 
         // FIXME: remove that as soon as possible
-        baseURLs = filterURLs(baseURLs);
+        mavenURLs = filterURLs(mavenURLs);
 
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.setScanners(new ResourcesScanner());
-        configurationBuilder.setUrls(baseURLs);
+        configurationBuilder.setUrls(mavenURLs);
         configurationBuilder.filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(MAVENPACKAGE)));
 
         Reflections reflections = new Reflections(configurationBuilder);
@@ -112,7 +133,8 @@ public class DefaultCoreExtensionScanner
                 String version = mavenModel.getVersion();
                 String groupId = mavenModel.getGroupId();
 
-                // TODO: download parents and resolve pom.xml properties using aether
+                // TODO: download parents and resolve pom.xml properties using aether ? could be pretty expensive for
+                // the init
                 if (version == null || groupId == null) {
                     Parent parent = mavenModel.getParent();
 
@@ -136,9 +158,45 @@ public class DefaultCoreExtensionScanner
                     }
                 }
 
+                String extensionURLStr = descriptorUrl.toString();
+                extensionURLStr = extensionURLStr.substring(0, descriptorUrl.toString().indexOf(MAVENPACKAGE.replace('.', '/')));
+                URL extensionURL = new URL(extensionURLStr);
+
                 DefaultCoreExtension coreExtension =
-                    new DefaultCoreExtension(repository, descriptorUrl, new ExtensionId(groupId + ':'
+                    new DefaultCoreExtension(repository, extensionURL, new ExtensionId(groupId + ':'
                         + mavenModel.getArtifactId(), version), packagingToType(mavenModel.getPackaging()));
+
+                coreExtension.setName(mavenModel.getName());
+                coreExtension.setDescription(mavenModel.getDescription());
+                for (Developer developer : mavenModel.getDevelopers()) {
+                    coreExtension.addAuthor(developer.getId());
+                }
+                coreExtension.setWebsite(mavenModel.getUrl());
+
+                // licenses
+                for (License license : mavenModel.getLicenses()) {
+                    coreExtension.addLicense(getExtensionLicense(license));
+                }
+
+                // features
+                String featuresString = mavenModel.getProperties().getProperty("xwiki.extension.features");
+                if (StringUtils.isNotBlank(featuresString)) {
+                    coreExtension.setFeatures(this.converter.<Collection<String>> convert(List.class, featuresString));
+                }
+
+                // dependencies
+                for (Dependency mavenDependency : mavenModel.getDependencies()) {
+                    if (!mavenDependency.isOptional()
+                        && (mavenDependency.getScope() == null || mavenDependency.getScope().equals("compile") || mavenDependency
+                            .getScope().equals("runtime"))) {
+                        coreExtension.addDependency(new DefaultExtensionDependency(mavenDependency.getGroupId() + ':'
+                            + mavenDependency.getArtifactId(), mavenDependency.getVersion()));
+                    }
+                }
+
+                // custom properties
+                coreExtension.putProperty("maven.groupId", groupId);
+                coreExtension.putProperty("maven.artifactId", mavenModel.getArtifactId());
 
                 extensions.put(coreExtension.getId().getId(), coreExtension);
                 coreArtefactIds.add(new Object[] {mavenModel.getArtifactId(), coreExtension});
@@ -156,14 +214,14 @@ public class DefaultCoreExtensionScanner
                     dependencies.add(dependency);
                 }
             } catch (Exception e) {
-                LOGGER.warn("Failed to parse descriptor [" + descriptorUrl
+                this.logger.warn("Failed to parse descriptor [" + descriptorUrl
                     + "], it will be ignored and not found in core extensions.", e);
             } finally {
                 try {
                     descriptorStream.close();
                 } catch (IOException e) {
                     // Should not happen
-                    LOGGER.error("Failed to close descriptor stream [" + descriptorUrl + "]", e);
+                    this.logger.error("Failed to close descriptor stream [" + descriptorUrl + "]", e);
                 }
             }
 
@@ -196,7 +254,7 @@ public class DefaultCoreExtensionScanner
                         artefacts.put(artefactname, new Object[] {version, url});
                     }
                 } catch (Exception e) {
-                    LOGGER.warn("Failed to parse resource name [" + url + "]", e);
+                    this.logger.warn("Failed to parse resource name [" + url + "]", e);
                 }
             }
 
@@ -230,11 +288,23 @@ public class DefaultCoreExtensionScanner
                     }
                 }
             } catch (Exception e) {
-                LOGGER.warn("Failed to guess extra information about some extensions", e);
+                this.logger.warn("Failed to guess extra information about some extensions", e);
             }
         }
 
         return extensions;
+    }
+
+    // TODO: download custom licenses content
+    private ExtensionLicense getExtensionLicense(License license)
+    {
+        if (license.getName() == null) {
+            return new ExtensionLicense("noname", null);
+        }
+
+        ExtensionLicense extensionLicense = this.licenseManager.getLicense(license.getName());
+
+        return extensionLicense != null ? extensionLicense : new ExtensionLicense(license.getName(), null);
     }
 
     /**
@@ -253,7 +323,7 @@ public class DefaultCoreExtensionScanner
                 results.add(new URL(url.getProtocol(), url.getHost(), url.getPort(), URLDecoder.decode(url.getFile(),
                     "UTF-8")));
             } catch (Exception e) {
-                LOGGER.error("Failed to convert url [" + url + "]", e);
+                this.logger.error("Failed to convert url [" + url + "]", e);
 
                 results.add(url);
             }

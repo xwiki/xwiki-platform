@@ -21,7 +21,13 @@ package org.xwiki.extension.repository.aether.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Developer;
+import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
@@ -32,6 +38,7 @@ import org.sonatype.aether.resolution.ArtifactDescriptorResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionLicense;
 import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
@@ -92,8 +99,50 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
             throw new ResolveException("Failed to resolve extension [" + extensionId + "] descriptor", e);
         }
 
-        return new AetherExtension(extensionId, model, this, this.plexusComponentManager, this.converter,
-            this.licenseManager);
+        AetherExtension extension =
+            new AetherExtension(extensionId, model, this, this.plexusComponentManager, this.converter,
+                this.licenseManager);
+
+        extension.setName(model.getName());
+        extension.setDescription(model.getDescription());
+        for (Developer developer : model.getDevelopers()) {
+            extension.addAuthor(developer.getId());
+        }
+        extension.setWebsite(model.getUrl());
+
+        // licenses
+        for (License license : model.getLicenses()) {
+            extension.addLicense(getExtensionLicense(license, licenseManager));
+        }
+
+        // features
+        String featuresString = model.getProperties().getProperty(AetherExtension.MPKEY_FEATURES);
+        if (StringUtils.isNotBlank(featuresString)) {
+            extension.setFeatures(converter.<Collection<String>> convert(List.class, featuresString));
+        }
+
+        // dependencies
+        for (Dependency mavenDependency : model.getDependencies()) {
+            if (!mavenDependency.isOptional()
+                && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime"))) {
+                extension.addDependency(new AetherExtensionDependency(mavenDependency.getGroupId(), mavenDependency
+                    .getArtifactId(), mavenDependency.getVersion()));
+            }
+        }
+
+        return extension;
+    }
+
+    // TODO: download custom licenses content
+    private ExtensionLicense getExtensionLicense(License license, ExtensionLicenseManager licenseManager)
+    {
+        if (license.getName() == null) {
+            return new ExtensionLicense("noname", null);
+        }
+
+        ExtensionLicense extensionLicense = licenseManager.getLicense(license.getName());
+
+        return extensionLicense != null ? extensionLicense : new ExtensionLicense(license.getName(), null);
     }
 
     private Model loadPom(RepositorySystemSession session, ExtensionId extensionId) throws IllegalArgumentException,

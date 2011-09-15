@@ -60,6 +60,12 @@ public class DefaultCoreExtensionRepository extends AbstractExtensionRepository 
     private Logger logger;
 
     /**
+     * Used to scan jars to find extensions.
+     */
+    @Inject
+    private CoreExtensionScanner scanner;
+
+    /**
      * Default constructor.
      */
     public DefaultCoreExtensionRepository()
@@ -70,9 +76,8 @@ public class DefaultCoreExtensionRepository extends AbstractExtensionRepository 
     @Override
     public void initialize() throws InitializationException
     {
-        DefaultCoreExtensionScanner scanner = new DefaultCoreExtensionScanner();
         try {
-            this.extensions = scanner.loadExtensions(this);
+            this.extensions = this.scanner.loadExtensions(this);
         } catch (Exception e) {
             this.logger.warn("Failed to load core extensions", e);
         }

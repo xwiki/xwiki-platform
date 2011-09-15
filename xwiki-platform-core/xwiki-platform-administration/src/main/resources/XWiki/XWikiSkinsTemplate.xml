@@ -194,4 +194,4 @@
 <viewheader.vm></viewheader.vm>
 </property>
 </object>
-<content>{{include document="XWiki.XWikiSkinsSheet"/}}</content></xwikidoc>
+<content></content></xwikidoc>

@@ -14,7 +14,7 @@
 <date>1167576476000</date>
 <contentUpdateDate>1167576476000</contentUpdateDate>
 <version>1.1</version>
-<title>$msg.get("xe.admin.skin")</title>
+<title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -194,4 +194,4 @@
 <viewheader.vm></viewheader.vm>
 </property>
 </object>
-<content>{{include document="XWiki.XWikiSkinsSheet"/}}</content></xwikidoc>
+<content></content></xwikidoc>

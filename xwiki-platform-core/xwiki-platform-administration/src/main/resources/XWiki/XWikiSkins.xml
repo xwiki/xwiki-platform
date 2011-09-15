@@ -161,4 +161,4 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </viewheader.vm>
 </class>
-<content>{{include document="XWiki.ClassSheet" /}}</content></xwikidoc>
+<content></content></xwikidoc>

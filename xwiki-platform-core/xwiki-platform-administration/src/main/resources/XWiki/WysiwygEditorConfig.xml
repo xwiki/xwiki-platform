@@ -14,7 +14,7 @@
 <date>1300272295000</date>
 <contentUpdateDate>1300272295000</contentUpdateDate>
 <version>1.1</version>
-<title>$msg.get('wysiwyg.config.title')</title>
+<title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -587,4 +587,4 @@ HL2ph7uN448AAAAASUVORK5CYII=
 <toolBar>bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | paste</toolBar>
 </property>
 </object>
-<content>{{include document="XWiki.WysiwygEditorConfigSheet"/}}</content></xwikidoc>
+<content></content></xwikidoc>

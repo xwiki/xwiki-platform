@@ -206,4 +206,4 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </toolBar>
 </class>
-<content>{{include document="ClassSheet"/}}</content></xwikidoc>
+<content></content></xwikidoc>

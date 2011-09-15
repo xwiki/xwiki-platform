@@ -530,4 +530,4 @@
 <validkey></validkey>
 </property>
 </object>
-<content>{{include document="XWiki.XWikiUserSheet"/}}</content></xwikidoc>
+<content></content></xwikidoc>

@@ -274,4 +274,4 @@
 <toolBar>bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | paste</toolBar>
 </property>
 </object>
-<content>{{include document="XWiki.WysiwygEditorConfigSheet"/}}</content></xwikidoc>
+<content></content></xwikidoc>

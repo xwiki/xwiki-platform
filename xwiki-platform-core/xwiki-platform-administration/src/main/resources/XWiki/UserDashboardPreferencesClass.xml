@@ -46,4 +46,4 @@
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </displayOnMainPage>
 </class>
-<content>{{include document="XWiki.ClassSheet"/}}</content></xwikidoc>
+<content></content></xwikidoc>

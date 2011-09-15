@@ -19,16 +19,22 @@
  */
 package org.xwiki.extension.test;
 
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.descriptor.DefaultComponentDependency;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.CoreExtensionRepository;
+import org.xwiki.extension.repository.internal.CoreExtensionScanner;
 import org.xwiki.extension.repository.internal.DefaultCoreExtension;
 import org.xwiki.extension.repository.internal.DefaultCoreExtensionRepository;
 
 @Component
+@Singleton
 public class ConfigurableDefaultCoreExtensionRepository extends DefaultCoreExtensionRepository
 {
     public static void register(ComponentManager componentManager) throws ComponentRepositoryException
@@ -37,6 +43,17 @@ public class ConfigurableDefaultCoreExtensionRepository extends DefaultCoreExten
             new DefaultComponentDescriptor<CoreExtensionRepository>();
         componentDescriptor.setImplementation(ConfigurableDefaultCoreExtensionRepository.class);
         componentDescriptor.setRole(CoreExtensionRepository.class);
+        
+        DefaultComponentDependency<CoreExtensionScanner> scanner = new DefaultComponentDependency<CoreExtensionScanner>();
+        scanner.setName("scanner");
+        scanner.setRole(CoreExtensionScanner.class);
+        componentDescriptor.addComponentDependency(scanner);
+        
+        DefaultComponentDependency<Logger> logger = new DefaultComponentDependency<Logger>();
+        logger.setName("logger");
+        logger.setRole(Logger.class);
+        logger.setMappingType(Logger.class);
+        componentDescriptor.addComponentDependency(logger);
 
         componentManager.registerComponent(componentDescriptor);
     }
@@ -48,6 +65,6 @@ public class ConfigurableDefaultCoreExtensionRepository extends DefaultCoreExten
 
     public void addExtensions(String id, String version)
     {
-        this.extensions.put(id, new DefaultCoreExtension(null,  null, new ExtensionId(id, version), "unknown"));
+        this.extensions.put(id, new DefaultCoreExtension(null, null, new ExtensionId(id, version), "unknown"));
     }
 }

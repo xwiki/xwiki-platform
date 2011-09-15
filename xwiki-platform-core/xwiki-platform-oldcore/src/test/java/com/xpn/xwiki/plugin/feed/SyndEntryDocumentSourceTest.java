@@ -29,6 +29,7 @@ import java.util.Map;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -107,6 +108,17 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         getContext().getWiki().getConfig().setProperty("xwiki.render.velocity.macrolist", "");
 
         source = new SyndEntryDocumentSource();
+    }
+
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        // Setup display configuration.
+        Mock mockDisplayConfiguration = registerMockComponent(DisplayConfiguration.class);
+        mockDisplayConfiguration.stubs().method("getDocumentDisplayerHint").will(returnValue("default"));
+        mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(2));
     }
 
     private void mockUp() throws Exception

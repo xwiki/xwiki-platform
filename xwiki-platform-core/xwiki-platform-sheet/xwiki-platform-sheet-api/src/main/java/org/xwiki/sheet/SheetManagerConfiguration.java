@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * {@link SheetManager} configuration.
  * 
  * @version $Id$
+ * @since 3.2M3
  */
 @ComponentRole
 public interface SheetManagerConfiguration

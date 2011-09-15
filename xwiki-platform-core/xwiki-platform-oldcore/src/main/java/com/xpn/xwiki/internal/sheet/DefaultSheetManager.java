@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.sheet.internal;
+package com.xpn.xwiki.internal.sheet;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,7 +27,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -46,6 +46,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Default {@link SheetManager} implementation.
  * 
  * @version $Id$
+ * @since 3.2M3
  */
 @Component
 public class DefaultSheetManager implements SheetManager
@@ -90,7 +91,7 @@ public class DefaultSheetManager implements SheetManager
     private SheetManagerConfiguration configuration;
 
     @Override
-    public List<DocumentReference> getSheets(DocumentModelBridge document, String action, SheetDisplay display)
+    public List<DocumentReference> getSheets(DocumentModelBridge document, String action)
     {
         DocumentReference documentReference = document.getDocumentReference();
 
@@ -98,13 +99,13 @@ public class DefaultSheetManager implements SheetManager
         String sheetStringRef = getXWikiContext().getRequest().getParameter(SHEET_PROPERTY);
         if (sheetStringRef != null) {
             DocumentReference sheetReference = documentReferenceResolver.resolve(sheetStringRef, documentReference);
-            if (matchSheet(sheetReference, action, display)) {
+            if (matchSheet(sheetReference, action)) {
                 return Collections.singletonList(sheetReference);
             }
         }
 
         // (2) Look for custom sheets.
-        List<DocumentReference> sheets = new ArrayList<DocumentReference>(getCustomSheets(document, action, display));
+        List<DocumentReference> sheets = new ArrayList<DocumentReference>(getCustomSheets(document, action));
         if (!sheets.isEmpty()) {
             return sheets;
         }
@@ -112,7 +113,7 @@ public class DefaultSheetManager implements SheetManager
         // (3) Look for class sheets.
         for (DocumentReference classReference : getDocument(document).getXObjects().keySet()) {
             DocumentReference sheetReference = getClassSheet(classReference, action);
-            if (sheetReference != null && matchSheet(sheetReference, null, display)) {
+            if (sheetReference != null && matchSheet(sheetReference, null)) {
                 sheets.add(sheetReference);
             }
         }
@@ -122,7 +123,7 @@ public class DefaultSheetManager implements SheetManager
         if (sheets.isEmpty() && holdsClassDefinition(document)) {
             DocumentReference defaultClassSheet =
                 documentReferenceResolver.resolve(configuration.getDefaultClassSheet(), documentReference);
-            if (matchSheet(defaultClassSheet, action, display)) {
+            if (matchSheet(defaultClassSheet, action)) {
                 sheets.add(defaultClassSheet);
             }
         }
@@ -150,7 +151,7 @@ public class DefaultSheetManager implements SheetManager
             for (BaseObject classSheetBindingObject : classSheetBindingObjects) {
                 String sheetStringRef = classSheetBindingObject.getStringValue(SHEET_PROPERTY);
                 DocumentReference sheetReference = documentReferenceResolver.resolve(sheetStringRef, classReference);
-                if (matchSheet(sheetReference, action, null)) {
+                if (matchSheet(sheetReference, action)) {
                     return sheetReference;
                 }
             }
@@ -167,13 +168,13 @@ public class DefaultSheetManager implements SheetManager
 
         // (3) Follow naming convention: <ClassName>Sheet
         sheetReference.setName(className + "Sheet");
-        if (matchSheet(sheetReference, action, null)) {
+        if (matchSheet(sheetReference, action)) {
             return sheetReference;
         }
 
         // (4) Fall-back on default class sheet bindings.
         sheetReference = getDefaultClassSheet(classReference);
-        if (sheetReference != null && matchSheet(sheetReference, action, null)) {
+        if (sheetReference != null && matchSheet(sheetReference, action)) {
             return sheetReference;
         }
 
@@ -192,11 +193,10 @@ public class DefaultSheetManager implements SheetManager
     /**
      * @param document the document where to look for sheet references
      * @param action the action for which to retrieve the sheets
-     * @param display the expected value of the sheet display
-     * @return the list of sheets that are referenced by the given document and which satisfy the constraints (action
-     *         and display)
+     * @return the list of sheets that are referenced by the given document and which are associated with the specified
+     *         action
      */
-    private List<DocumentReference> getCustomSheets(DocumentModelBridge document, String action, SheetDisplay display)
+    private List<DocumentReference> getCustomSheets(DocumentModelBridge document, String action)
     {
         String wikiName = document.getDocumentReference().getWikiReference().getName();
         DocumentReference docSheetBindingReference =
@@ -212,7 +212,7 @@ public class DefaultSheetManager implements SheetManager
             String sheetStringRef = docSheetBindingObject.getStringValue(SHEET_PROPERTY);
             DocumentReference sheetReference =
                 documentReferenceResolver.resolve(sheetStringRef, document.getDocumentReference());
-            if (matchSheet(sheetReference, action, display)) {
+            if (matchSheet(sheetReference, action)) {
                 sheets.add(sheetReference);
             }
         }
@@ -222,11 +222,10 @@ public class DefaultSheetManager implements SheetManager
     /**
      * @param sheetReference specifies the sheet that is matched
      * @param action the expected value of the action sheet property
-     * @param display the expected value of the display sheet property
      * @return {@code true} if the given document reference points to a sheet that matches the action and display
      *         constraints
      */
-    private boolean matchSheet(DocumentReference sheetReference, String action, SheetDisplay display)
+    private boolean matchSheet(DocumentReference sheetReference, String action)
     {
         XWikiContext context = getXWikiContext();
         if (!context.getWiki().exists(sheetReference, context)) {
@@ -244,22 +243,7 @@ public class DefaultSheetManager implements SheetManager
         }
         BaseObject sheetObject = sheetDocument.getXObject(sheetClassReference);
 
-        return matchesDisplay(sheetObject, display) && matchesAction(sheetObject, action);
-    }
-
-    /**
-     * @param sheetObject the object describing the sheet
-     * @param expectedDisplay the expected value of the {@code display} property
-     * @return {@code true} if the display property of the given sheet object matches the given value, {@code false}
-     *         otherwise
-     */
-    private boolean matchesDisplay(BaseObject sheetObject, SheetDisplay expectedDisplay)
-    {
-        // We assume the display is in-line if the sheet object is not present (is null).
-        // We assume any display value is good if the expected value is not specified (is null).
-        return expectedDisplay == null
-            || (sheetObject == null ? expectedDisplay == SheetDisplay.INLINE : expectedDisplay.toString()
-                .equalsIgnoreCase(sheetObject.getStringValue("display")));
+        return matchesAction(sheetObject, action);
     }
 
     /**

@@ -29,42 +29,30 @@ import org.xwiki.model.reference.DocumentReference;
  * The interface used to manage document and class sheets.
  * 
  * @version $Id$
+ * @since 3.2M3
  */
 @ComponentRole
 public interface SheetManager
 {
     /**
-     * The possible values for the {@code display} sheet property.
-     */
-    static enum SheetDisplay
-    {
-        /**
-         * The sheet outputs most of the generated HTML page.
-         */
-        PAGE,
-
-        /**
-         * The sheet output is aggregated inside the content area of the generated HTML page.
-         */
-        INLINE
-    }
-
-    /**
+     * Returns the list of sheets associated with a XWiki document.
+     * <p>
      * Note: We can't use a document reference because the document might have unsaved objects. The create forms usually
      * render an unsaved document that has some objects attached.
      * 
-     * @param document the document that is being rendered
-     * @param action the action taken on the rendered document ('view', 'edit' etc.)
-     * @param display where the sheet output will be placed
-     * @return the list of sheets that match the specified document, action and display
+     * @param document a XWiki document
+     * @param action the action for which to retrieve the list of sheets ('view', 'edit' etc.)
+     * @return the list of sheets associated with the given document and the specified action
      */
-    List<DocumentReference> getSheets(DocumentModelBridge document, String action, SheetDisplay display);
+    List<DocumentReference> getSheets(DocumentModelBridge document, String action);
 
     /**
+     * Returns the sheet associated with a XWiki class.
+     * 
      * @param classReference a reference to a XWiki class
      * @param action the action for which to retrieve the sheet
-     * @return a sheet that can be used to render objects of the specified class for the specified action, {@code null}
-     *         is no proper sheet is found
+     * @return a sheet that can be used to display objects of the specified class for the specified action, {@code null}
+     *         is no corresponding sheet is found
      */
     DocumentReference getClassSheet(DocumentReference classReference, String action);
 }

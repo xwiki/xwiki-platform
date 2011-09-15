@@ -33,6 +33,7 @@ import org.xwiki.sheet.SheetManagerConfiguration;
  * The default configuration.
  * 
  * @version $Id$
+ * @since 3.2M3
  */
 @Component
 public class DefaultSheetManagerConfiguration implements SheetManagerConfiguration, Initializable

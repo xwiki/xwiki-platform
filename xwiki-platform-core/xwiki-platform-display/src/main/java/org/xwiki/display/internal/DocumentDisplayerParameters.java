@@ -25,7 +25,7 @@ package org.xwiki.display.internal;
  * @version $Id$
  * @since 3.2M3
  */
-public class DocumentDisplayerParameters
+public class DocumentDisplayerParameters implements Cloneable
 {
     /**
      * The id of the document section to display. E.g. "HSectionTitle".
@@ -176,5 +176,24 @@ public class DocumentDisplayerParameters
     public void setContentTranslated(boolean contentTranslated)
     {
         this.contentTranslated = contentTranslated;
+    }
+
+    @Override
+    public DocumentDisplayerParameters clone()
+    {
+        DocumentDisplayerParameters clone;
+        try {
+            clone = (DocumentDisplayerParameters) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // Should never happen.
+            throw new RuntimeException("Failed to clone object", e);
+        }
+        clone.setContentTransformed(contentTransformed);
+        clone.setContentTranslated(contentTranslated);
+        clone.setExecutionContextIsolated(executionContextIsolated);
+        clone.setSectionId(sectionId);
+        clone.setTitleDisplayed(titleDisplayed);
+        clone.setTransformationContextIsolated(transformationContextIsolated);
+        return clone;
     }
 }

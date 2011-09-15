@@ -32,7 +32,8 @@
   <artifactId>xwiki-platform-display</artifactId>
   <name>XWiki Platform - Display</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Display</description>
+  <description>Provides APIs to display XWiki entities (documents, objects, etc.). You can use for instance the
+    DocumentDisplayer to display the title and the content of XWiki documents.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

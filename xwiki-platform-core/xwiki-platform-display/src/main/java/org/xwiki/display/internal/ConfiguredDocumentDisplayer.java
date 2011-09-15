@@ -21,6 +21,7 @@ package org.xwiki.display.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ import org.xwiki.rendering.block.XDOM;
  */
 @Component
 @Named("configured")
+@Singleton
 public class ConfiguredDocumentDisplayer implements DocumentDisplayer
 {
     /**

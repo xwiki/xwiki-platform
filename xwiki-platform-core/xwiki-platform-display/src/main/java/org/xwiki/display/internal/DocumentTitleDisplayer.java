@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ import org.xwiki.rendering.transformation.TransformationManager;
  */
 @Component
 @Named("title")
+@Singleton
 public class DocumentTitleDisplayer extends AbstractDocumentTitleDisplayer
 {
     /**

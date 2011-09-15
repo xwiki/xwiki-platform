@@ -57,7 +57,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
 
     /**
      * The key used to store on the XWiki context map the stack trace for the
-     * {@link #extractTitleFromContent(DocumentModelBridge)} method.
+     * {@link #extractTitleFromContent(org.xwiki.bridge.DocumentModelBridge, DocumentDisplayerParameters)} method.
      */
     private static final String EXTRACT_TITLE_STACK_TRACE_KEY = "internal.extractTitleFromContentStackTrace";
 

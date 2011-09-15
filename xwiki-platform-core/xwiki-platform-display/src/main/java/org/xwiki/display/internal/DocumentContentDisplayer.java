@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,7 @@ import org.xwiki.velocity.VelocityManager;
  */
 @Component
 @Named("content")
+@Singleton
 public class DocumentContentDisplayer implements DocumentDisplayer
 {
     /**

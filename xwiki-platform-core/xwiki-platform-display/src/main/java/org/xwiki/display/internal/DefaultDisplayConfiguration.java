@@ -20,6 +20,7 @@
 package org.xwiki.display.internal;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
@@ -31,6 +32,7 @@ import org.xwiki.configuration.ConfigurationSource;
  * @since 3.2M3
  */
 @Component
+@Singleton
 public class DefaultDisplayConfiguration implements DisplayConfiguration
 {
     /**

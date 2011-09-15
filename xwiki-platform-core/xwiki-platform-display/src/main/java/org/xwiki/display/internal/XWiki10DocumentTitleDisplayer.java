@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
@@ -36,6 +37,7 @@ import org.xwiki.rendering.block.XDOM;
  */
 @Component
 @Named("title/xwiki/1.0")
+@Singleton
 public class XWiki10DocumentTitleDisplayer extends DocumentTitleDisplayer
 {
     /**

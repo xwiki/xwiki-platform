@@ -21,6 +21,7 @@ package org.xwiki.display.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
@@ -35,6 +36,7 @@ import org.xwiki.rendering.block.XDOM;
  * @since 3.2M3
  */
 @Component
+@Singleton
 public class DefaultDocumentDisplayer implements DocumentDisplayer
 {
     /**

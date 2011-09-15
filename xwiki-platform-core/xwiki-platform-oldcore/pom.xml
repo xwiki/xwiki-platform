@@ -576,6 +576,11 @@
       <artifactId>xwiki-platform-url-container</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-display</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Used by com.xpn.xwiki.web.CommentAction -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

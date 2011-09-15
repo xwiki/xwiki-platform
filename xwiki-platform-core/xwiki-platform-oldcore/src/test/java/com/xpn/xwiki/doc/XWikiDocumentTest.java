@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,12 +35,18 @@ import java.util.Vector;
 import junit.framework.Assert;
 
 import org.jmock.Mock;
+import org.jmock.core.Invocation;
+import org.jmock.core.stub.CustomStub;
+import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -91,6 +98,12 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     private Mock mockXWikiRightService;
 
+    private Mock mockVelocityEngine;
+
+    private Mock mockDisplayConfiguration;
+
+    private CustomStub velocityEngineEvaluateStub;
+
     private BaseClass baseClass;
 
     private BaseObject baseObject;
@@ -118,7 +131,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         getContext().put("isInRenderingEngine", true);
 
         this.mockXWiki = mock(XWiki.class);
-        this.mockXWiki.stubs().method("Param").with(eq("xwiki.render.velocity.macrolist")).will(returnValue(""));
 
         this.mockXWikiRenderingEngine = mock(XWikiRenderingEngine.class);
 
@@ -172,6 +184,37 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStoreInterface.stubs().method("search").will(returnValue(new ArrayList<XWikiDocument>()));
     }
 
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        // Setup display configuration.
+        this.mockDisplayConfiguration = registerMockComponent(DisplayConfiguration.class);
+        this.mockDisplayConfiguration.stubs().method("getDocumentDisplayerHint").will(returnValue("default"));
+        this.mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(2));
+
+        // Setup the mock Velocity engine.
+        Mock mockVelocityManager = registerMockComponent(VelocityManager.class);
+        this.mockVelocityEngine = mock(VelocityEngine.class);
+        mockVelocityManager.stubs().method("getVelocityContext").will(returnValue(null));
+        mockVelocityManager.stubs().method("getVelocityEngine").will(returnValue(this.mockVelocityEngine.proxy()));
+        velocityEngineEvaluateStub = new CustomStub("Implements VelocityEngine.evaluate")
+        {
+            public Object invoke(Invocation invocation) throws Throwable
+            {
+                // Output the given text without changes.
+                StringWriter writer = (StringWriter) invocation.parameterValues.get(1);
+                String text = (String) invocation.parameterValues.get(3);
+                writer.append(text);
+                return true;
+            }
+        };
+        this.mockVelocityEngine.stubs().method("evaluate").will(velocityEngineEvaluateStub);
+        this.mockVelocityEngine.stubs().method("startedUsingMacroNamespace");
+        this.mockVelocityEngine.stubs().method("stoppedUsingMacroNamespace");
+    }
+
     public void testDeprecatedConstructors()
     {
         DocumentReference defaultReference = new DocumentReference("xwiki", "Main", "WebHome");
@@ -214,8 +257,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         this.document.setContent("Some content");
         this.document.setTitle("Title");
-        this.mockXWikiRenderingEngine.expects(once()).method("interpretText").with(eq("Title"), ANYTHING, ANYTHING)
-            .will(returnValue("Title"));
+        this.mockVelocityEngine.expects(once()).method("evaluate").with(null, ANYTHING, ANYTHING, eq("Title"))
+            .will(velocityEngineEvaluateStub);
 
         assertEquals("Title", this.document.getDisplayTitle(getContext()));
     }
@@ -223,8 +266,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testGetDisplayWhenNoTitleButSectionExists()
     {
         this.document.setContent("Some content\n1 Title");
-        this.mockXWikiRenderingEngine.expects(once()).method("interpretText").with(eq("Title"), ANYTHING, ANYTHING)
-            .will(returnValue("Title"));
+        this.mockVelocityEngine.expects(once()).method("evaluate").with(null, ANYTHING, ANYTHING, eq("Title"))
+            .will(velocityEngineEvaluateStub);
 
         assertEquals("Title", this.document.getDisplayTitle(getContext()));
     }
@@ -234,7 +277,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setContent("=== level3");
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
-        this.mockXWiki.stubs().method("ParamAsLong").will(returnValue(3L));
+        // Overwrite the title heading depth.
+        this.mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(3));
 
         assertEquals("level3", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
     }
@@ -243,8 +287,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         this.document.setContent("=== level3");
         this.document.setSyntax(Syntax.XWIKI_2_0);
-
-        this.mockXWiki.stubs().method("ParamAsLong").will(returnValue(2L));
 
         assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
     }
@@ -256,8 +298,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         this.document.setContent("Some content");
         this.document.setTitle("some content that generate a velocity error");
-        this.mockXWikiRenderingEngine.expects(once()).method("interpretText")
-            .will(returnValue("... blah blah ... <div id=\"xwikierror105\" ... blah blah ..."));
+        this.mockVelocityEngine.expects(once()).method("evaluate")
+            .will(throwException(new XWikiVelocityException("message")));
 
         assertEquals("Page", this.document.getDisplayTitle(getContext()));
     }
@@ -854,8 +896,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testDisplayTemplate10()
     {
         this.mockXWiki.stubs().method("getCurrentContentSyntaxId").will(returnValue("xwiki/1.0"));
-        this.mockXWiki.stubs().method("getSkin").will(returnValue("colibri"));
-        this.mockXWiki.stubs().method("getSkinFile").will(returnValue(""));
 
         getContext().put("isInRenderingEngine", false);
 
@@ -873,8 +913,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testDisplayTemplate20()
     {
         this.mockXWiki.stubs().method("getCurrentContentSyntaxId").will(returnValue("xwiki/2.0"));
-        this.mockXWiki.stubs().method("getSkin").will(returnValue("colibri"));
-        this.mockXWiki.stubs().method("getSkinFile").will(returnValue(""));
 
         getContext().put("isInRenderingEngine", false);
 
@@ -913,7 +951,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setContent("*bold*");
         this.document.setSyntax(Syntax.XWIKI_1_0);
 
-        this.mockXWikiRenderingEngine.expects(once()).method("renderDocument").will(returnValue("<b>bold</b>"));
+        this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("*bold*"), ANYTHING, ANYTHING)
+            .will(returnValue("<b>bold</b>"));
 
         assertEquals("<b>bold</b>", this.document.getRenderedContent(getContext()));
 
@@ -924,7 +963,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("fr"));
         this.mockXWikiStoreInterface.stubs().method("loadXWikiDoc").will(returnValue(this.translatedDocument));
-        this.mockXWikiRenderingEngine.expects(once()).method("renderDocument").will(returnValue("<i>italic</i>"));
+        this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("~italic~"), ANYTHING, ANYTHING)
+            .will(returnValue("<i>italic</i>"));
 
         assertEquals("<i>italic</i>", this.document.getRenderedContent(getContext()));
     }

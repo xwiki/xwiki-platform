@@ -11,6 +11,8 @@ com.xpn.xwiki.internal.event.AttachmentEventGeneratorListener
 com.xpn.xwiki.internal.event.CommentEventGeneratorListener
 com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener
 com.xpn.xwiki.internal.event.XObjectEventGeneratorListener
+com.xpn.xwiki.internal.display.scripting.DisplayScriptService
+com.xpn.xwiki.internal.display.XWiki10DocumentContentDisplayer
 com.xpn.xwiki.internal.macro.CoreWikiMacroBindingInitializer
 com.xpn.xwiki.internal.macro.DefaultWikiMacroFactory
 com.xpn.xwiki.internal.macro.DefaultWikiMacroInitializer

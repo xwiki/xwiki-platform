@@ -43,7 +43,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -78,6 +77,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.display.internal.DocumentDisplayer;
+import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -111,9 +112,7 @@ import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -174,7 +173,11 @@ public class XWikiDocument implements DocumentModelBridge
         Pattern
             .compile("</?+(html|img|a|i|br?|embed|script|form|input|textarea|object|font|li|[dou]l|table|center|hr|p) ?([^>]*+)>");
 
-    /** Regex for finding the first level 1 or 2 heading in the document title, to be used as the document title. */
+    /**
+     * Regex for finding the first level 1 or 2 heading in the document title, to be used as the document title.
+     * @deprecated since 3.2M3
+     **/
+    @Deprecated
     private static final Pattern HEADING_PATTERN_10 = Pattern.compile("^\\s*+1(?:\\.1)?\\s++(.++)$", Pattern.MULTILINE);
 
     private String title;
@@ -432,16 +435,14 @@ public class XWikiDocument implements DocumentModelBridge
         EntityReferenceSerializer.class, "local");
 
     /**
-     * Used to emulate an inline parsing.
-     */
-    private ParserUtils parserUtils = new ParserUtils();
-
-    /**
      * Used to create proper {@link Syntax} objects.
      */
     private SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
 
     private RenderingCache renderingCache = Utils.getComponent(RenderingCache.class);
+
+    /** Used to display the title and the content of this document. */
+    private DocumentDisplayer documentDisplayer = Utils.getComponent(DocumentDisplayer.class, "configured");
 
     /**
      * @since 2.2M1
@@ -817,79 +818,14 @@ public class XWikiDocument implements DocumentModelBridge
 
         String renderedContent = this.renderingCache.getRenderedContent(getDocumentReference(), content, context);
 
-        String documentName =
-            this.defaultEntityReferenceSerializer.serialize(isolateVelocityMacros ? getDocumentReference() : context
-                .getDoc().getDocumentReference());
-
         if (renderedContent == null) {
-            Object isInRenderingEngine = context.get("isInRenderingEngine");
-
-            // Mark that we're starting to use the current document as a macro namespace
-            if (isolateVelocityMacros && (isInRenderingEngine == null || isInRenderingEngine == Boolean.FALSE)) {
-                try {
-                    Utils.getComponent(VelocityManager.class).getVelocityEngine()
-                        .startedUsingMacroNamespace(documentName);
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Started using velocity macro namespace [" + documentName + "]");
-                    }
-                } catch (XWikiVelocityException e) {
-                    // Failed to get the Velocity Engine and this to clear Velocity Macro cache. Log this as a warning
-                    // but continue since it's not absolutely critical.
-                    LOGGER.warn("Failed to notify Velocity Macro cache for the [" + documentName
-                        + "] namespace. Reason = [" + e.getMessage() + "]");
-                }
-            }
-
-            try {
-                // This tells display() methods that we are inside the rendering engine and thus
-                // that they can return wiki syntax and not HTML syntax (which is needed when
-                // outside the rendering engine, i.e. when we're inside templates using only
-                // Velocity for example).
-                context.put("isInRenderingEngine", true);
-
-                // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
-                if (is10Syntax()) {
-                    renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
-                } else {
-                    TransformationContext txContext = new TransformationContext();
-                    txContext.setSyntax(getSyntax());
-                    txContext.setId(documentName);
-                    renderedContent = performSyntaxConversion(content, documentName, targetSyntax, txContext);
-                }
-
-                this.renderingCache.setRenderedContent(getDocumentReference(), content, renderedContent, context);
-            } finally {
-                if (isInRenderingEngine != null) {
-                    context.put("isInRenderingEngine", isInRenderingEngine);
-                } else {
-                    context.remove("isInRenderingEngine");
-                }
-
-                // Since we configure Velocity to have local macros (i.e. macros visible only to the local context),
-                // since Velocity caches the velocity macros in a local cache (we use key which is the absolute
-                // document reference) and since documents can include other documents or panels, we need to make sure
-                // we empty the local Velocity macro cache at the end of the rendering for the document as otherwise the
-                // local Velocity macro caches will keep growing as users create new pages.
-                //
-                // Note that we check if we are in the rendering engine as this cleanup must be done only once after the
-                // document has been rendered but this method can be called recursively. We know it's the initial entry
-                // point when isInRenderingEngine is false...
-                if (isolateVelocityMacros && (isInRenderingEngine == null || isInRenderingEngine == Boolean.FALSE)) {
-                    try {
-                        Utils.getComponent(VelocityManager.class).getVelocityEngine()
-                            .stoppedUsingMacroNamespace(documentName);
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Stopped using velocity macro namespace [" + documentName + "]");
-                        }
-                    } catch (XWikiVelocityException e) {
-                        // Failed to get the Velocity Engine and this to clear Velocity Macro cache. Log this as a
-                        // warning
-                        // but continue since it's not absolutely critical.
-                        LOGGER.warn("Failed to notify Velocity Macro cache for the [" + documentName
-                            + "] namespace. Reason = [" + e.getMessage() + "]");
-                    }
-                }
-            }
+            DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+            parameters.setTransformationContextIsolated(isolateVelocityMacros);
+            // Render the translated content (matching the current language) using this document's syntax.
+            parameters.setContentTranslated(true);
+            XDOM contentXDOM = this.documentDisplayer.display(this, parameters);
+            renderedContent = renderXDOM(contentXDOM, targetSyntax);
+            this.renderingCache.setRenderedContent(getDocumentReference(), content, renderedContent, context);
         }
 
         return renderedContent;
@@ -923,50 +859,28 @@ public class XWikiDocument implements DocumentModelBridge
     {
         String result = this.renderingCache.getRenderedContent(getDocumentReference(), text, context);
 
-        String documentName = this.defaultEntityReferenceSerializer.serialize(getDocumentReference());
-
         if (result == null) {
-            Map<String, Object> backup = new HashMap<String, Object>();
-            Object isInRenderingEngine = context.get("isInRenderingEngine");
+            Map<String, Object> backup = null;
             try {
-                backupContext(backup, context);
-                setAsContextDoc(context);
-
-                // Mark that we're starting to use the current document as a macro namespace
-                if (isInRenderingEngine == null || isInRenderingEngine == Boolean.FALSE) {
-                    try {
-                        Utils.getComponent(VelocityManager.class).getVelocityEngine()
-                            .startedUsingMacroNamespace(documentName);
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Started using velocity macro namespace [" + documentName + "]");
-                        }
-                    } catch (XWikiVelocityException e) {
-                        // Failed to get the Velocity Engine and this to clear Velocity Macro cache. Log this as a
-                        // warning
-                        // but continue since it's not absolutely critical.
-                        LOGGER.warn("Failed to notify Velocity Macro cache for the [" + documentName
-                            + "] namespace. Reason = [" + e.getMessage() + "]");
-                    }
+                // We have to render the given text in the context of this document. Check if this document is already
+                // on the context (same Java object reference). We don't check if the document references are equal
+                // because this document can have temporary changes that are not present on the context document even if
+                // it has the same document reference.
+                if (context.getDoc() != this) {
+                    backup = new HashMap<String, Object>();
+                    backupContext(backup, context);
+                    setAsContextDoc(context);
                 }
 
-                // This tells display() methods that we are inside the rendering engine and thus
-                // that they can return wiki syntax and not HTML syntax (which is needed when
-                // outside the rendering engine, i.e. when we're inside templates using only
-                // Velocity for example).
-                context.put("isInRenderingEngine", true);
+                // Reuse this document's reference so that the Velocity macro name-space is computed based on it.
+                XWikiDocument fakeDocument = new XWikiDocument(getDocumentReference());
+                fakeDocument.setSyntax(this.syntaxFactory.createSyntaxFromIdString(sourceSyntaxId));
+                fakeDocument.setContent(text);
 
-                // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
-                if (is10Syntax(sourceSyntaxId)) {
-                    result = context.getWiki().getRenderingEngine().renderText(text, this, context);
-                } else {
-                    SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
-                    TransformationContext txContext = new TransformationContext();
-                    txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(sourceSyntaxId));
-                    txContext.setId(documentName);
-                    result =
-                        performSyntaxConversion(text, documentName,
-                            syntaxFactory.createSyntaxFromIdString(targetSyntaxId), txContext);
-                }
+                DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+                parameters.setTransformationContextIsolated(true);
+                XDOM contentXDOM = this.documentDisplayer.display(fakeDocument, parameters);
+                result = renderXDOM(contentXDOM, this.syntaxFactory.createSyntaxFromIdString(targetSyntaxId));
 
                 this.renderingCache.setRenderedContent(getDocumentReference(), text, result, context);
             } catch (Exception e) {
@@ -975,36 +889,8 @@ public class XWikiDocument implements DocumentModelBridge
                 LOGGER.warn("Failed to render content [" + text + "]", e);
                 result = "";
             } finally {
-                restoreContext(backup, context);
-                if (isInRenderingEngine != null) {
-                    context.put("isInRenderingEngine", isInRenderingEngine);
-                } else {
-                    context.remove("isInRenderingEngine");
-                }
-
-                // Since we configure Velocity to have local macros (i.e. macros visible only to the local context),
-                // since Velocity caches the velocity macros in a local cache (we use key which is the absolute
-                // document reference) and since documents can include other documents or panels, we need to make sure
-                // we empty the local Velocity macro cache at the end of the rendering for the document as otherwise the
-                // local Velocity macro caches will keep growing as users create new pages.
-                //
-                // Note that we check if we are in the rendering engine as this cleanup must be done only once after the
-                // document has been rendered but this method can be called recursively. We know it's the initial entry
-                // point when isInRenderingEngine is false...
-                if (isInRenderingEngine == null || isInRenderingEngine == Boolean.FALSE) {
-                    try {
-                        Utils.getComponent(VelocityManager.class).getVelocityEngine()
-                            .stoppedUsingMacroNamespace(documentName);
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Stopped using velocity macro namespace [" + documentName + "]");
-                        }
-                    } catch (XWikiVelocityException e) {
-                        // Failed to get the Velocity Engine and this to clear Velocity Macro cache. Log this as a
-                        // warning
-                        // but continue since it's not absolutely critical.
-                        LOGGER.warn("Failed to notify Velocity Macro cache for the [" + documentName
-                            + "] namespace. Reason = [" + e.getMessage() + "]");
-                    }
+                if (backup != null) {
+                    restoreContext(backup, context);
                 }
             }
         }
@@ -1187,182 +1073,31 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * The first found first or second level header content is rendered with
-     * {@link com.xpn.xwiki.render.XWikiRenderingEngine#interpretText(String, XWikiDocument, XWikiContext)}.
+     * Get the rendered version of the document title. If the title is not specified then an attempt is made to extract
+     * the title from the document content. If this fails then the document name is used as title. The Velocity code
+     * from the title is evaluated if the title is specified or if it is extracted from the document content.
      * 
+     * @param outputSyntax the syntax to render to; this is not taken into account for XWiki 1.0 syntax
      * @param context the XWiki context
-     * @return the rendered version of the found header content. Empty string if not can be found.
-     */
-    private String getRenderedContentTitle10(XWikiContext context)
-    {
-        // 1) Check if the user has provided a title
-        String title = extractTitle10();
-
-        // 3) Last if a title has been found renders it as it can contain macros, velocity code,
-        // groovy, etc.
-        if (title.length() > 0) {
-            // Only needed for xwiki 1.0 syntax, for other syntaxes it's already rendered in #extractTitle
-            // This will not completely work for scripting code in title referencing variables
-            // defined elsewhere. In that case it'll only work if those variables have been
-            // parsed and put in the corresponding scripting context. This will not work for
-            // breadcrumbs for example.
-            title = context.getWiki().getRenderingEngine().interpretText(title, this, context);
-        }
-
-        return title;
-    }
-
-    /**
-     * Get the rendered version of the first or second level first found header content in the document content.
-     * <ul>
-     * <li>xwiki/1.0: the first found first or second level header content is rendered with
-     * {@link com.xpn.xwiki.render.XWikiRenderingEngine#interpretText(String, XWikiDocument, XWikiContext)}</li>
-     * <li>xwiki/2.0: the first found first or second level content is executed and rendered with renderer for the
-     * provided syntax</li>
-     * </ul>
-     * 
-     * @param outputSyntax the syntax to render to. This is not taken into account for xwiki/1.0 syntax.
-     * @param context the XWiki context
-     * @return the rendered version of the title. null or empty (when xwiki/1.0 syntax) string if none can be found
-     * @throws XWikiException failed to render content
-     */
-    private String getRenderedContentTitle(Syntax outputSyntax, XWikiContext context) throws XWikiException
-    {
-        String title = null;
-
-        // Protect against cycles. For example that cold happen with a call to getRenderedTitle on current document from
-        // a script in the first heading block title
-        @SuppressWarnings("unchecked")
-        Stack<DocumentReference> stackTrace =
-            (Stack<DocumentReference>) context.get("internal.getRenderedContentTitleStackTrace");
-        if (stackTrace == null) {
-            stackTrace = new Stack<DocumentReference>();
-            context.put("internal.getRenderedContentTitleStackTrace", stackTrace);
-        } else if (stackTrace.contains(getDocumentReference())) {
-            // TODO: generate an error message instead ?
-            return null;
-        }
-        stackTrace.push(getDocumentReference());
-
-        try {
-            // Extract and render the document title
-
-            if (is10Syntax()) {
-                title = getRenderedContentTitle10(context);
-            } else {
-                List<HeaderBlock> blocks =
-                    getXDOM().getBlocks(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
-                if (!blocks.isEmpty()) {
-                    HeaderBlock header = blocks.get(0);
-                    // Check the header depth after which we should return null if no header was found.
-                    int titleHeaderDepth = (int) context.getWiki().ParamAsLong("xwiki.title.headerdepth", 2);
-                    if (header.getLevel().getAsInt() <= titleHeaderDepth) {
-                        XDOM headerXDOM = new XDOM(Collections.<Block> singletonList(header));
-
-                        // Transform
-                        try {
-                            TransformationContext txContext = new TransformationContext(headerXDOM, getSyntax());
-                            Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM,
-                                txContext);
-                        } catch (TransformationException e) {
-                            // An error happened during one of the transformations. Since the error has been logged
-                            // continue
-                            // TODO: We should have a visual clue for the user in the future to let him know something
-                            // didn't work as expected.
-                        }
-
-                        // Render
-                        Block headerBlock = headerXDOM.getChildren().get(0);
-                        if (headerBlock instanceof HeaderBlock) {
-                            title = renderXDOM(new XDOM(headerBlock.getChildren()), outputSyntax);
-                        }
-                    }
-                }
-            }
-        } finally {
-            stackTrace.pop();
-        }
-
-        return title;
-    }
-
-    /**
-     * Renders the specified title in the context of this document. First the Velocity code is evaluated and then, if
-     * the output syntax is not HTML-compatible, the result is converted to the output syntax.
-     * 
-     * @param title the title to render
-     * @param outputSyntax the output syntax
-     * @param context the XWiki context
-     * @return the result of rendering the given title in the context of this document
-     * @throws XWikiException if rendering the title fails
-     */
-    public String getRenderedTitle(String title, Syntax outputSyntax, XWikiContext context) throws XWikiException
-    {
-        String renderedTitle = context.getWiki().getRenderingEngine().interpretText(title, this, context);
-
-        // TODO: Since interpretText() never throws an exception it's hard to know if there's been an error. Right now
-        // interpretText() returns some HTML when there's an error, so we need to check the returned result for some
-        // marker to decide if an error has occurred... Fix this by refactoring the whole system used for Velocity
-        // evaluation.
-        if (renderedTitle.contains("<div id=\"xwikierror")) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
-                XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Failed to evaluate the title.");
-        }
-
-        if (!outputSyntax.equals(Syntax.HTML_4_01) && !outputSyntax.equals(Syntax.XHTML_1_0)) {
-            XDOM xdom = parseContent(Syntax.HTML_4_01.toIdString(), renderedTitle);
-            this.parserUtils.removeTopLevelParagraph(xdom.getChildren());
-            renderedTitle = renderXDOM(xdom, outputSyntax);
-        }
-
-        return renderedTitle;
-    }
-
-    /**
-     * Get the rendered version of the title of the document.
-     * <ul>
-     * <li>if document <code>title</code> field is not empty: it's returned after a call to
-     * {@link com.xpn.xwiki.render.XWikiRenderingEngine#interpretText(String, XWikiDocument, XWikiContext)}</li>
-     * <li>if document <code>title</code> field is empty: see {@link #getRenderedContentTitle(Syntax, XWikiContext)}</li>
-     * <li>if after the two first step the title is still empty, the page name is returned</li>
-     * </ul>
-     * 
-     * @param outputSyntax the syntax to render to. This is not taken into account for xwiki/1.0 syntax.
-     * @param context the XWiki context
-     * @return the rendered version of the title
+     * @return the rendered version of the document title
      */
     public String getRenderedTitle(Syntax outputSyntax, XWikiContext context)
     {
-        // 1) Check if the user has provided a title
-        String title = getTitle();
-
-        if (!StringUtils.isEmpty(title)) {
-            try {
-                return getRenderedTitle(title, outputSyntax, context);
-            } catch (Exception e) {
-                LOGGER.warn(
-                    "Failed to interpret title of document ["
-                        + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
-            }
-        }
-
+        DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+        parameters.setTitleDisplayed(true);
+        parameters.setExecutionContextIsolated(true);
+        XDOM titleXDOM = this.documentDisplayer.display(this, parameters);
         try {
-            // 2) If not, then try to extract the title from the first document section title
-            title = getRenderedContentTitle(outputSyntax, context);
-        } catch (Exception e) {
-            LOGGER.warn(
-                "Failed to extract title from content of document ["
-                    + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
+            return renderXDOM(titleXDOM, outputSyntax);
+        } catch (XWikiException e) {
+            throw new RuntimeException(e);
         }
-
-        // 3) No title has been found, return the page name as the title
-        if (StringUtils.isEmpty(title)) {
-            title = getDocumentReference().getName();
-        }
-
-        return title;
     }
 
+    /**
+     * @deprecated since 3.2M3, use {@link #getRenderedTitle(Syntax, XWikiContext)} instead
+     */
+    @Deprecated
     public String extractTitle()
     {
         String title = "";
@@ -1399,8 +1134,9 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * @return the first level 1 or level 1.1 title text in the document's content or "" if none are found
-     * @todo this method has nothing to do in this class and should be moved elsewhere
+     * @deprecated since 3.2M3
      */
+    @Deprecated
     private String extractTitle10()
     {
         String content = getContent();

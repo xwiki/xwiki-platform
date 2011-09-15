@@ -293,7 +293,6 @@
     <module>xwiki-platform-refactoring</module>
     <module>xwiki-platform-rendering</module>
     <module>xwiki-platform-rest</module>
-    <module>xwiki-platform-s5</module>
     <module>xwiki-platform-scheduler</module>
     <module>xwiki-platform-search</module>
     <module>xwiki-platform-selenium</module>

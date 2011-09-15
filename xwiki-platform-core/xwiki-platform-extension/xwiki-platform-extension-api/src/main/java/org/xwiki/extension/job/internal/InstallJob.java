@@ -179,7 +179,9 @@ public class InstallJob extends AbstractJob<InstallRequest>
             }
         }
 
-        return installExtension(previousExtension, extensionId, dependency, namespace);
+        LocalExtension installedExtension = installExtension(previousExtension, extensionId, dependency, namespace);
+
+        return installedExtension;
     }
 
     // TODO: support version range
@@ -307,9 +309,7 @@ public class InstallJob extends AbstractJob<InstallRequest>
             if (extension instanceof LocalExtension) {
                 localExtension = (LocalExtension) extension;
             } else {
-                localExtension =
-                    this.localExtensionRepository.storeExtension(extension, previousExtension != null
-                        ? previousExtension.isDependency() : dependency);
+                localExtension = this.localExtensionRepository.storeExtension(extension);
             }
 
             notifyStepPropress();
@@ -323,17 +323,23 @@ public class InstallJob extends AbstractJob<InstallRequest>
                     this.logger.error("Failed to uninstall extension [" + previousExtension + "]", e);
                 }
 
-                this.localExtensionRepository.installExtension(localExtension, namespace);
+                this.localExtensionRepository.installExtension(localExtension, namespace, dependency);
 
                 this.observationManager.notify(new ExtensionUpgradedEvent(localExtension.getId()), localExtension,
                     previousExtension);
             } else {
                 this.extensionHandlerManager.install(localExtension, namespace);
 
-                this.localExtensionRepository.installExtension(localExtension, namespace);
+                this.localExtensionRepository.installExtension(localExtension, namespace, dependency);
 
                 this.observationManager.notify(new ExtensionInstalledEvent(localExtension.getId()), localExtension,
                     previousExtension);
+            }
+
+            if (namespace != null) {
+                this.logger.info("Successfully installed extension [{}] on namespace [{}]", localExtension, namespace);
+            } else {
+                this.logger.info("Successfully installed extension [{}]", localExtension);
             }
 
             return localExtension;

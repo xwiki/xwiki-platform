@@ -39,11 +39,7 @@ public class DefaultVersionManager implements VersionManager
      */
     private static final Pattern SEPARATORS = Pattern.compile("[\\.-]");
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.internal.VersionManager#compareVersions(java.lang.String, java.lang.String)
-     */
+    @Override
     public int compareVersions(String version1, String version2)
     {
         String[] elements1 = SEPARATORS.split(version1);

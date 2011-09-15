@@ -1,3 +1,6 @@
+.alias=LGPL
+.alias=LGPL 3
+.alias=GNU Lesser General Public License Version 3
                    GNU LESSER GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 

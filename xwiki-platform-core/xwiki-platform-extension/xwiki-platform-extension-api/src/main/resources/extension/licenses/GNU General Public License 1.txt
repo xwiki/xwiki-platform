@@ -1,3 +1,5 @@
+.alias=GPL 1
+.alias=GNU General Public License Version 1
                     GNU GENERAL PUBLIC LICENSE
                      Version 1, February 1989
 

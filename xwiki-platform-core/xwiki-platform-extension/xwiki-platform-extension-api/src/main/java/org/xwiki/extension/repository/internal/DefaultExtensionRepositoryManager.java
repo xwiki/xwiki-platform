@@ -69,11 +69,7 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
      */
     private Map<String, ExtensionRepository> repositories = new ConcurrentHashMap<String, ExtensionRepository>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.ExtensionRepositoryManager#addRepository(org.xwiki.extension.repository.ExtensionRepositoryId)
-     */
+    @Override
     public ExtensionRepository addRepository(ExtensionRepositoryId repositoryId) throws ExtensionRepositoryException
     {
         ExtensionRepository repository;
@@ -92,41 +88,25 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
         return repository;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.ExtensionRepositoryManager#addRepository(org.xwiki.extension.repository.ExtensionRepository)
-     */
+    @Override
     public void addRepository(ExtensionRepository repository)
     {
         this.repositories.put(repository.getId().getId(), repository);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.ExtensionRepositoryManager#removeRepository(java.lang.String)
-     */
+    @Override
     public void removeRepository(String repositoryId)
     {
         this.repositories.remove(repositoryId);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.ExtensionRepositoryManager#getRepository(java.lang.String)
-     */
+    @Override
     public ExtensionRepository getRepository(String repositoryId)
     {
         return this.repositories.get(repositoryId);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.ExtensionRepositoryManager#resolve(org.xwiki.extension.ExtensionId)
-     */
+    @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
         Extension artifact = null;
@@ -146,11 +126,7 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
         throw new ResolveException(MessageFormat.format("Could not find extension [{0}]", extensionId));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.ExtensionRepositoryManager#search(java.lang.String, int, int)
-     */
+    @Override
     public List<Extension> search(String pattern, int offset, int nb)
     {
         List<Extension> extensions = new ArrayList<Extension>(nb > 0 ? nb : 0);

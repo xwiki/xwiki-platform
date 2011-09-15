@@ -20,13 +20,9 @@ public abstract class AbstractExtensionRepository implements ExtensionRepository
         this.id = new ExtensionRepositoryId(id.getId(), id.getType(), id.getURI());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.ExtensionRepository#getId()
-     */
+    @Override
     public ExtensionRepositoryId getId()
     {
-        return id;
+        return this.id;
     }
 }

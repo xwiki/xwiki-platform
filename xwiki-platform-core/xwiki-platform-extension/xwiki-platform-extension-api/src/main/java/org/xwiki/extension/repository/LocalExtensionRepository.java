@@ -73,11 +73,10 @@ public interface LocalExtensionRepository extends ExtensionRepository
      * Store provided extension (generally a remote extension) in the local repository.
      * 
      * @param extension the extension to store
-     * @param dependency indicate if the extension is stored as a dependency of another one
      * @return the new local extension
      * @throws LocalExtensionRepositoryException error when trying store provided extension in the local repository
      */
-    LocalExtension storeExtension(Extension extension, boolean dependency) throws LocalExtensionRepositoryException;
+    LocalExtension storeExtension(Extension extension) throws LocalExtensionRepositoryException;
 
     /**
      * Remove extension from local repository.
@@ -92,9 +91,10 @@ public interface LocalExtensionRepository extends ExtensionRepository
      * 
      * @param extension the extension to install
      * @param namespace the namespace in which the extension is installed
+     * @param dependency indicate if the extension is stored as a dependency of another one
      * @throws InstallException error when trying to install provided extension
      */
-    void installExtension(LocalExtension extension, String namespace) throws InstallException;
+    void installExtension(LocalExtension extension, String namespace, boolean dependency) throws InstallException;
 
     /**
      * Indicate that the provided extension is uninstalled from provided namespace.

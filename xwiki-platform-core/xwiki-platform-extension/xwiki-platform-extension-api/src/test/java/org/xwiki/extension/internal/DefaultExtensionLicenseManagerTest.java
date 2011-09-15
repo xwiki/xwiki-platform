@@ -20,6 +20,7 @@
 package org.xwiki.extension.internal;
 
 import java.io.IOException;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -52,10 +53,18 @@ public class DefaultExtensionLicenseManagerTest extends AbstractComponentTestCas
     {
         ExtensionLicense license = this.licenseManager.getLicense("Apache License 2.0");
 
+        List<String> content =
+            IOUtils.readLines(getClass().getResourceAsStream("/extension/licenses/Apache License 2.0.txt"));
+        content = content.subList(1, content.size());
+
         Assert.assertNotNull(license);
         Assert.assertEquals("Apache License 2.0", license.getName());
-        Assert.assertEquals(
-            IOUtils.readLines(getClass().getResourceAsStream("/extension/licenses/Apache License 2.0.txt")),
-            license.getContent());
+        Assert.assertEquals(content, license.getContent());
+
+        license = this.licenseManager.getLicense("ASL");
+
+        Assert.assertNotNull(license);
+        Assert.assertEquals("Apache License 2.0", license.getName());
+        Assert.assertEquals(content, license.getContent());
     }
 }

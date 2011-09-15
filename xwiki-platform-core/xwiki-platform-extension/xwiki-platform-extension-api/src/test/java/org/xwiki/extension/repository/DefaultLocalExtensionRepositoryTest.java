@@ -21,7 +21,6 @@ package org.xwiki.extension.repository;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
@@ -44,7 +43,7 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
 
     private ConfigurableDefaultCoreExtensionRepository coreRepository;
 
-    @Before
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();
@@ -129,7 +128,7 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
 
         // store
 
-        this.localExtensionRepository.storeExtension(extension, false);
+        this.localExtensionRepository.storeExtension(extension);
 
         LocalExtension localExtension = (LocalExtension) this.localExtensionRepository.resolve(this.remoteExtensionId);
 
@@ -140,7 +139,7 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
 
         this.coreRepository.addExtensions("coreextension", "version");
         
-        this.localExtensionRepository.installExtension(localExtension, null);
+        this.localExtensionRepository.installExtension(localExtension, null, false);
 
         Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(this.remoteExtensionId.getId(), null));
         Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension("feature", null));

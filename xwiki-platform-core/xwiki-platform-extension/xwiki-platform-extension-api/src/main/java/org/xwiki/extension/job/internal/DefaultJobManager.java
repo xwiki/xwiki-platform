@@ -26,11 +26,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.job.InstallRequest;
-import org.xwiki.extension.job.JobStatus;
-import org.xwiki.extension.job.Request;
 import org.xwiki.extension.job.Job;
 import org.xwiki.extension.job.JobException;
 import org.xwiki.extension.job.JobManager;
+import org.xwiki.extension.job.JobStatus;
+import org.xwiki.extension.job.Request;
 import org.xwiki.extension.job.UninstallRequest;
 
 /**
@@ -53,41 +53,25 @@ public class DefaultJobManager implements JobManager
      */
     private Job currentJob;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobManager#getCurrentJob()
-     */
+    @Override
     public Job getCurrentJob()
     {
         return this.currentJob;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobManager#install(org.xwiki.extension.job.InstallRequest)
-     */
+    @Override
     public Job install(InstallRequest request) throws JobException
     {
         return executeJob("install", request);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobManager#uninstall(org.xwiki.extension.job.UninstallRequest)
-     */
+    @Override
     public Job uninstall(UninstallRequest request) throws JobException
     {
         return executeJob("uninstall", request);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobManager#executeJob(java.lang.String, org.xwiki.extension.job.Request)
-     */
+    @Override
     public synchronized Job executeJob(String taskId, Request request) throws JobException
     {
         if (this.currentJob != null && this.currentJob.getStatus().getState() != JobStatus.State.FINISHED) {

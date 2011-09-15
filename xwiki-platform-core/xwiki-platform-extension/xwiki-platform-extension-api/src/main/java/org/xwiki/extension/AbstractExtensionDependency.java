@@ -27,11 +27,7 @@ public abstract class AbstractExtensionDependency implements ExtensionDependency
         this.version = version;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.ExtensionDependency#getId()
-     */
+    @Override
     public String getId()
     {
         return this.id;
@@ -46,11 +42,7 @@ public abstract class AbstractExtensionDependency implements ExtensionDependency
         this.id = id;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.ExtensionDependency#getVersion()
-     */
+    @Override
     public String getVersion()
     {
         return this.version;

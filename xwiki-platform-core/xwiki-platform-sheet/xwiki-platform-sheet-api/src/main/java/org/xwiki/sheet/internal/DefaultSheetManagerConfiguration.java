@@ -22,6 +22,7 @@ package org.xwiki.sheet.internal;
 import java.util.Properties;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -36,6 +37,7 @@ import org.xwiki.sheet.SheetManagerConfiguration;
  * @since 3.2M3
  */
 @Component
+@Singleton
 public class DefaultSheetManagerConfiguration implements SheetManagerConfiguration, Initializable
 {
     /** Prefix for configuration keys for the sheet manager. */

@@ -1,4 +1,5 @@
 .alias=BSD
+.aslias=Berkeley Software Distribution (BSD) License
 Copyright (c) <year>, <copyright holder>
 All rights reserved.
 

@@ -111,7 +111,7 @@ public class DefaultExtensionLicenseManager implements ExtensionLicenseManager, 
                     content = content.subList(aliases.size() - 1, content.size());
 
                     for (String alias : aliases) {
-                        this.licenses.put(alias, new ExtensionLicense(name, content));
+                        this.licenses.put(alias.toLowerCase(), new ExtensionLicense(name, content));
                     }
                 } finally {
                     is.close();
@@ -131,12 +131,12 @@ public class DefaultExtensionLicenseManager implements ExtensionLicenseManager, 
     @Override
     public ExtensionLicense getLicense(String name)
     {
-        return this.licenses.get(name);
+        return this.licenses.get(name.toLowerCase());
     }
 
     @Override
     public void addLicense(ExtensionLicense license)
     {
-        this.licenses.put(license.getName(), license);
+        this.licenses.put(license.getName().toLowerCase(), license);
     }
 }

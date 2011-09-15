@@ -46,7 +46,7 @@ public class DefaultCoreExtensionRepositoryTest extends AbstractComponentTestCas
     {
         super.registerComponents();
 
-        ConfigurableDefaultCoreExtensionRepository.register(getComponentManager());
+        registerComponent(ConfigurableDefaultCoreExtensionRepository.class);
     }
 
     /**

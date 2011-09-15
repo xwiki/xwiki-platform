@@ -70,7 +70,7 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     {
         super.registerComponents();
 
-        ConfigurableDefaultCoreExtensionRepository.register(getComponentManager());
+        registerComponent(ConfigurableDefaultCoreExtensionRepository.class);
     }
 
     @Test
@@ -138,7 +138,7 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
         // install
 
         this.coreRepository.addExtensions("coreextension", "version");
-        
+
         this.localExtensionRepository.installExtension(localExtension, null, false);
 
         Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(this.remoteExtensionId.getId(), null));

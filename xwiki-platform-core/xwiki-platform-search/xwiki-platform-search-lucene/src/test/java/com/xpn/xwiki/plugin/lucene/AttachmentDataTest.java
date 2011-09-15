@@ -22,6 +22,8 @@ package com.xpn.xwiki.plugin.lucene;
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jmock.Mock;
+import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiException;
@@ -57,6 +59,17 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
         this.document.getAttachmentList().add(this.attachment);
 
         this.attachmentData = new AttachmentData(this.attachment, getContext(), false);
+    }
+
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        // Setup display configuration.
+        Mock mockDisplayConfiguration = registerMockComponent(DisplayConfiguration.class);
+        mockDisplayConfiguration.stubs().method("getDocumentDisplayerHint").will(returnValue("default"));
+        mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(2));
     }
 
     private void assertGetFullText(String expect, String filename) throws XWikiException, IOException

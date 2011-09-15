@@ -81,7 +81,7 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), extension.getRepository().getId().getId());
         Assert.assertEquals("description", extension.getDescription());
         Assert.assertEquals("http://website", extension.getWebSite());
-        Assert.assertEquals(Arrays.asList("feature1", "feature2"), new ArrayList<String>(extension.getFeatures()));
+        Assert.assertEquals(Arrays.asList("groupid1:feature1", "groupid2:feature2"), new ArrayList<String>(extension.getFeatures()));
 
         ExtensionDependency dependency = extension.getDependencies().get(0);
         Assert.assertEquals(this.dependencyExtensionId.getId(), dependency.getId());

@@ -258,7 +258,6 @@
     <module>xwiki-platform-action</module>
     <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
-    <module>xwiki-platform-adwords</module>
     <module>xwiki-platform-albatross</module>
     <module>xwiki-platform-alexa</module>
     <module>xwiki-platform-annotations</module>
@@ -346,7 +345,6 @@
                 <exclude>org/xwiki/bridge/DocumentNameFactory</exclude>
                 <exclude>org/xwiki/bridge/DocumentNameSerializer</exclude>
                 <exclude>com/xpn/xwiki/plugin/wikimanager/WikiManager</exclude>
-                <exclude>com/xpn/xwiki/plugin/adwords/AdWordsPluginApi</exclude>
                 <exclude>com/xpn/xwiki/plugin/alexa/AlexaPluginApi</exclude>
                 <excludes>com/xpn/xwiki/api/Api</excludes>
                 <excludes>com/xpn/xwiki/api/Context</excludes>

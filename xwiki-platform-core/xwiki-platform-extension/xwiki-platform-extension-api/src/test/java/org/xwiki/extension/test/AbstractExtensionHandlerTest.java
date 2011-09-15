@@ -52,7 +52,7 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
     {
         super.registerComponents();
 
-        ConfigurableDefaultCoreExtensionRepository.register(getComponentManager());
+        registerComponent(ConfigurableDefaultCoreExtensionRepository.class);
     }
 
     protected LocalExtension install(ExtensionId extensionId) throws Throwable

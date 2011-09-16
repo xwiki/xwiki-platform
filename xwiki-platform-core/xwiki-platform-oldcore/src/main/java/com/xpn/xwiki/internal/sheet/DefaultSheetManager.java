@@ -41,7 +41,6 @@ import org.xwiki.sheet.SheetManager;
 import org.xwiki.sheet.SheetManagerConfiguration;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -83,7 +82,7 @@ public class DefaultSheetManager implements SheetManager
     private Logger logger;
 
     /**
-     * Execution context handler, needed for accessing the XWikiContext.
+     * Execution context handler.
      */
     @Inject
     private Execution execution;
@@ -117,8 +116,8 @@ public class DefaultSheetManager implements SheetManager
     {
         DocumentReference documentReference = document.getDocumentReference();
 
-        // (1) Check if there is a sheet specified for the current request.
-        String sheetStringRef = getXWikiContext().getRequest().getParameter(SHEET_PROPERTY);
+        // (1) Check if there is a sheet specified for the current execution context.
+        String sheetStringRef = (String) execution.getContext().getProperty(SHEET_PROPERTY);
         if (sheetStringRef != null) {
             DocumentReference sheetReference = documentReferenceResolver.resolve(sheetStringRef, documentReference);
             if (matchSheet(sheetReference, action)) {
@@ -210,15 +209,6 @@ public class DefaultSheetManager implements SheetManager
             }
         }
         return sheetReferences;
-    }
-
-    /**
-     * @return the XWiki context
-     * @deprecated avoid using this method; try using the document access bridge instead
-     */
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
     }
 
     /**

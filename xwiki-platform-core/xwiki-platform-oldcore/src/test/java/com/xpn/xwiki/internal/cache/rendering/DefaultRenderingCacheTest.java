@@ -21,8 +21,8 @@ package com.xpn.xwiki.internal.cache.rendering;
 
 import java.util.Collections;
 
-import org.jmock.Mock;
-import org.junit.Before;
+import org.jmock.Expectations;
+import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.model.reference.DocumentReference;
@@ -31,7 +31,7 @@ import org.xwiki.test.MockConfigurationSource;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
  * Unit test for {@link DefaultRenderingCache}.
@@ -39,15 +39,15 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  * @version $Id$
  * @since 2.4M1
  */
-public class DefaultRenderingCacheTest extends AbstractBridgedXWikiComponentTestCase
+public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
 {
-    private Mock mockXWiki;
+    private XWiki mockXWiki;
 
     private XWikiDocument document;
 
     private RenderingCache renderingCache;
 
-    @Before
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();
@@ -55,13 +55,14 @@ public class DefaultRenderingCacheTest extends AbstractBridgedXWikiComponentTest
         this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         this.document.setOriginalDocument(this.document.clone());
 
-        this.mockXWiki = mock(XWiki.class);
-        getContext().setWiki((XWiki) this.mockXWiki.proxy());
-
-        this.mockXWiki.stubs().method("getDocument").with(eq(this.document.getDocumentReference()), ANYTHING).will(
-            returnValue(this.document));
+        this.mockXWiki = getMockery().mock(XWiki.class);
+        getContext().setWiki(this.mockXWiki);
 
         this.renderingCache = getComponentManager().lookup(RenderingCache.class);
+        
+        getMockery().checking(new Expectations() {{
+            allowing(mockXWiki).getDocument(document.getDocumentReference(), getContext()); will(returnValue(document));
+        }});
     }
 
     @Override
@@ -77,19 +78,19 @@ public class DefaultRenderingCacheTest extends AbstractBridgedXWikiComponentTest
     {
         MockConfigurationSource source = getConfigurationSource();
 
-        source.setProperty("core.renderingcache.documents", Collections.singletonList(this.document
-            .getPrefixedFullName()));
+        source.setProperty("core.renderingcache.documents",
+            Collections.singletonList(this.document.getPrefixedFullName()));
 
         this.renderingCache.setRenderedContent(this.document.getDocumentReference(), "source", "renderedContent",
             getContext());
 
-        assertEquals("renderedContent", this.renderingCache.getRenderedContent(this.document.getDocumentReference(),
-            "source", getContext()));
+        Assert.assertEquals("renderedContent",
+            this.renderingCache.getRenderedContent(this.document.getDocumentReference(), "source", getContext()));
 
         getComponentManager().lookup(ObservationManager.class).notify(
             new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document, getContext());
 
-        assertNull("renderedContent", this.renderingCache.getRenderedContent(this.document.getDocumentReference(),
-            "source", getContext()));
+        Assert.assertNull("renderedContent",
+            this.renderingCache.getRenderedContent(this.document.getDocumentReference(), "source", getContext()));
     }
 }

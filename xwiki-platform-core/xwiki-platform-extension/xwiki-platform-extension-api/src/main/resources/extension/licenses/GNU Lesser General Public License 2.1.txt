@@ -1,5 +1,6 @@
 .alias=LGPL 2.1
 .alias=GNU Lesser General Public License Version 2.1
+.alias=LGPL v2.1
                   GNU LESSER GENERAL PUBLIC LICENSE
                        Version 2.1, February 1999
 

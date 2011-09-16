@@ -188,7 +188,7 @@ public class DefaultPasswordCryptoServiceConfiguration implements PasswordCrypto
                 return Class.forName(value).asSubclass(mustExtend);
             }
         } catch (Exception e) {
-            this.logger.info("Unable to read configuration for [" + configurationKey + "] using default.");
+            this.logger.info("Unable to read configuration for [{}] using default.", configurationKey);
         }
         return defaultOut.asSubclass(mustExtend);
     }

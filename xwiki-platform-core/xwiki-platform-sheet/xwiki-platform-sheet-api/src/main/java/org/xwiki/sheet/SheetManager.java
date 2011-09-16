@@ -38,21 +38,31 @@ public interface SheetManager
      * Returns the list of sheets associated with a XWiki document.
      * <p>
      * Note: We can't use a document reference because the document might have unsaved objects. The create forms usually
-     * render an unsaved document that has some objects attached.
+     * display an unsaved document that has some objects attached.
+     * <p>
+     * If this method fails for some reason to retrieve the sheets it shound't throw an exception but return an empty
+     * list and log an appropriate warning message instead.
      * 
      * @param document a XWiki document
-     * @param action the action for which to retrieve the list of sheets ('view', 'edit' etc.)
-     * @return the list of sheets associated with the given document and the specified action
+     * @param action the action for which to retrieve the list of sheets ('view', 'edit' etc.); you can pass
+     *            {@code null} or an empty string as a substitute for any action
+     * @return the list of sheets associated with the given document and the specified action; these are sheets designed
+     *         to be displayed when the specified action is performed on the given document (e.g. view sheets, edit
+     *         sheets etc.)
      */
     List<DocumentReference> getSheets(DocumentModelBridge document, String action);
 
     /**
-     * Returns the sheet associated with a XWiki class.
+     * Returns the list of sheets associated with a XWiki class.
+     * <p>
+     * If this method fails for some reason to retrieve the sheets it shound't throw an exception but return an empty
+     * list and log an appropriate warning message instead.
      * 
      * @param classReference a reference to a XWiki class
-     * @param action the action for which to retrieve the sheet
-     * @return a sheet that can be used to display objects of the specified class for the specified action, {@code null}
-     *         is no corresponding sheet is found
+     * @param action the action for which to retrieve the list of sheets ('view', 'edit' etc.); you can pass
+     *            {@code null} or an empty string as a substitute for any action
+     * @return the list of sheets associated with the specified class and action; these are sheets designed to be
+     *         displayed when the specified action is performed on a document that has an object of the specified class
      */
-    DocumentReference getClassSheet(DocumentReference classReference, String action);
+    List<DocumentReference> getClassSheets(DocumentReference classReference, String action);
 }

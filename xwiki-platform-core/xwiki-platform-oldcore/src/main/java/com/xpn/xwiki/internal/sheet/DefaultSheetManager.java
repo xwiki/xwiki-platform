@@ -29,17 +29,19 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.sheet.SheetManager;
 import org.xwiki.sheet.SheetManagerConfiguration;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -75,6 +77,12 @@ public class DefaultSheetManager implements SheetManager
     private static final String SHEET_PROPERTY = "sheet";
 
     /**
+     * The object used to log message.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * Execution context handler, needed for accessing the XWikiContext.
      */
     @Inject
@@ -87,10 +95,22 @@ public class DefaultSheetManager implements SheetManager
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     /**
+     * The component used to serialize entity references.
+     */
+    @Inject
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    /**
      * The component used to access the configuration parameters.
      */
     @Inject
     private SheetManagerConfiguration configuration;
+
+    /**
+     * The bridge to the old XWiki core API.
+     */
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
 
     @Override
     public List<DocumentReference> getSheets(DocumentModelBridge document, String action)
@@ -114,10 +134,7 @@ public class DefaultSheetManager implements SheetManager
 
         // (3) Look for class sheets.
         for (DocumentReference classReference : getDocument(document).getXObjects().keySet()) {
-            DocumentReference sheetReference = getClassSheet(classReference, action);
-            if (sheetReference != null && matchSheet(sheetReference, null)) {
-                sheets.add(sheetReference);
-            }
+            sheets.addAll(getClassSheets(classReference, action));
         }
 
         // (4) If the specified document holds a class definition and it doesn't have any sheets (neither included nor
@@ -134,29 +151,12 @@ public class DefaultSheetManager implements SheetManager
     }
 
     @Override
-    public DocumentReference getClassSheet(DocumentReference classReference, String action)
+    public List<DocumentReference> getClassSheets(DocumentReference classReference, String action)
     {
-        XWikiContext context = getXWikiContext();
-
         // (1) Look for explicitly bound sheets.
-        String wikiName = classReference.getWikiReference().getName();
-        DocumentReference classSheetBindingReference =
-            new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, CLASS_SHEET_BINDING);
-        XWikiDocument classDocument;
-        try {
-            classDocument = context.getWiki().getDocument(classReference, context);
-        } catch (XWikiException e) {
-            throw new RuntimeException(e);
-        }
-        List<BaseObject> classSheetBindingObjects = classDocument.getXObjects(classSheetBindingReference);
-        if (classSheetBindingObjects != null) {
-            for (BaseObject classSheetBindingObject : classSheetBindingObjects) {
-                String sheetStringRef = classSheetBindingObject.getStringValue(SHEET_PROPERTY);
-                DocumentReference sheetReference = documentReferenceResolver.resolve(sheetStringRef, classReference);
-                if (matchSheet(sheetReference, action)) {
-                    return sheetReference;
-                }
-            }
+        List<DocumentReference> sheetReferences = getExplicitlyBoundClassSheets(classReference, action);
+        if (!sheetReferences.isEmpty()) {
+            return sheetReferences;
         }
 
         // (2) Follow naming convention: <ClassName><ActionName>Sheet
@@ -164,23 +164,52 @@ public class DefaultSheetManager implements SheetManager
         DocumentReference sheetReference = new DocumentReference(classReference.clone());
         String actionName = action == null ? "" : StringUtils.capitalize(action);
         sheetReference.setName(String.format("%s%sSheet", className, actionName));
-        if (context.getWiki().exists(sheetReference, context)) {
-            return sheetReference;
-        }
+        if (!documentAccessBridge.exists(sheetReference)) {
 
-        // (3) Follow naming convention: <ClassName>Sheet
-        sheetReference.setName(className + "Sheet");
-        if (matchSheet(sheetReference, action)) {
-            return sheetReference;
-        }
+            // (3) Follow naming convention: <ClassName>Sheet
+            sheetReference.setName(className + "Sheet");
+            if (!matchSheet(sheetReference, action)) {
 
-        // (4) Fall-back on default class sheet bindings.
-        sheetReference = getDefaultClassSheet(classReference);
-        if (sheetReference != null && matchSheet(sheetReference, action)) {
-            return sheetReference;
+                // (4) Fall-back on default class sheet bindings.
+                sheetReference = getDefaultClassSheet(classReference);
+                if (sheetReference == null || !matchSheet(sheetReference, action)) {
+                    return Collections.emptyList();
+                }
+            }
         }
+        return Collections.singletonList(sheetReference);
+    }
 
-        return null;
+    /**
+     * @param classReference a references to a XWiki class
+     * @param action the action for which to retrieve the sheets
+     * @return the list of sheets explicitly bound to the specified class for the specified action
+     */
+    private List<DocumentReference> getExplicitlyBoundClassSheets(DocumentReference classReference, String action)
+    {
+        String wikiName = classReference.getWikiReference().getName();
+        DocumentReference classSheetBindingReference =
+            new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, CLASS_SHEET_BINDING);
+        DocumentModelBridge classDocument;
+        try {
+            classDocument = documentAccessBridge.getDocument(classReference);
+        } catch (Exception e) {
+            String classStringReference = defaultEntityReferenceSerializer.serialize(classReference);
+            logger.warn("Failed to get class sheets for [{}]. Reason: [{}]", classStringReference, e.getMessage());
+            return Collections.emptyList();
+        }
+        List<DocumentReference> sheetReferences = new ArrayList<DocumentReference>();
+        List<BaseObject> classSheetBindingObjects = getDocument(classDocument).getXObjects(classSheetBindingReference);
+        if (classSheetBindingObjects != null) {
+            for (BaseObject classSheetBindingObject : classSheetBindingObjects) {
+                String sheetStringRef = classSheetBindingObject.getStringValue(SHEET_PROPERTY);
+                DocumentReference sheetReference = documentReferenceResolver.resolve(sheetStringRef, classReference);
+                if (matchSheet(sheetReference, action)) {
+                    sheetReferences.add(sheetReference);
+                }
+            }
+        }
+        return sheetReferences;
     }
 
     /**
@@ -229,21 +258,22 @@ public class DefaultSheetManager implements SheetManager
      */
     private boolean matchSheet(DocumentReference sheetReference, String action)
     {
-        XWikiContext context = getXWikiContext();
-        if (!context.getWiki().exists(sheetReference, context)) {
+        if (!documentAccessBridge.exists(sheetReference)) {
             return false;
         }
 
         String wikiName = sheetReference.getWikiReference().getName();
         DocumentReference sheetClassReference = new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, SHEET_CLASS);
 
-        XWikiDocument sheetDocument;
+        DocumentModelBridge sheetDocument;
         try {
-            sheetDocument = context.getWiki().getDocument(sheetReference, context);
-        } catch (XWikiException e) {
-            throw new RuntimeException(e);
+            sheetDocument = documentAccessBridge.getDocument(sheetReference);
+        } catch (Exception e) {
+            String sheetStringReference = defaultEntityReferenceSerializer.serialize(sheetReference);
+            logger.warn("Failed to access sheet [{}]. Reason: [{}]", sheetStringReference, e.getMessage());
+            return false;
         }
-        BaseObject sheetObject = sheetDocument.getXObject(sheetClassReference);
+        BaseObject sheetObject = getDocument(sheetDocument).getXObject(sheetClassReference);
 
         return matchesAction(sheetObject, action);
     }

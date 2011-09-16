@@ -59,10 +59,14 @@ public class SheetScriptService implements ScriptService
     private DocumentAccessBridge documentAccessBridge;
 
     /**
+     * Returns the list of sheets associated with a XWiki document.
+     * 
      * @param document the document for which to retrieve the sheets
      * @param action the action for which to retrieve the sheets ('view', 'edit' etc.)
-     * @return the list of sheets available for the specified document on the specified action; multiple sheets can be
-     *         aggregated and displayed in the content area of the generated HTML page
+     * @return the list of sheets available for the specified document on the specified action; these are sheets
+     *         designed to be displayed when the specified action is performed on the given document; only the sheets
+     *         that the current user has the right to view are returned; if the current user doesn't have the right to
+     *         view the given document then an empty list is returned
      */
     public List<DocumentReference> getSheets(Document document, String action)
     {
@@ -74,19 +78,22 @@ public class SheetScriptService implements ScriptService
     }
 
     /**
+     * Returns the list of sheets associated with a XWiki class.
+     * 
      * @param classReference a reference to a document holding a class definition
-     * @param action the action for which to retrieve the sheet
-     * @return a sheet that can be used to render object of the specified class, for the specified action
+     * @param action the action for which to retrieve the sheets ('view', 'edit' etc.)
+     * @return the list of sheets available for the specified class and action; these are sheets designed to be
+     *         displayed when the specified action is performed on a document that has an object of the specified class;
+     *         only the sheets that the current user has the right to view are returned; if the current user doesn't
+     *         have the right to view the specified class then an empty list is returned
      */
-    public DocumentReference getClassSheet(DocumentReference classReference, String action)
+    public List<DocumentReference> getClassSheets(DocumentReference classReference, String action)
     {
         if (documentAccessBridge.isDocumentViewable(classReference)) {
-            DocumentReference sheetReference = sheetManager.getClassSheet(classReference, action);
-            if (sheetReference != null && documentAccessBridge.isDocumentViewable(sheetReference)) {
-                return sheetReference;
-            }
+            return filterViewable(sheetManager.getClassSheets(classReference, action));
+        } else {
+            return Collections.emptyList();
         }
-        return null;
     }
 
     /**

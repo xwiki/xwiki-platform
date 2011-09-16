@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -49,6 +50,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @since 3.2M3
  */
 @Component
+@Singleton
 public class DefaultSheetManager implements SheetManager
 {
     /**
@@ -119,7 +121,7 @@ public class DefaultSheetManager implements SheetManager
         }
 
         // (4) If the specified document holds a class definition and it doesn't have any sheets (neither included nor
-        // binded) then use the default class sheet.
+        // bound) then use the default class sheet.
         if (sheets.isEmpty() && holdsClassDefinition(document)) {
             DocumentReference defaultClassSheet =
                 documentReferenceResolver.resolve(configuration.getDefaultClassSheet(), documentReference);
@@ -136,7 +138,7 @@ public class DefaultSheetManager implements SheetManager
     {
         XWikiContext context = getXWikiContext();
 
-        // (1) Look for explicitly binded sheets.
+        // (1) Look for explicitly bound sheets.
         String wikiName = classReference.getWikiReference().getName();
         DocumentReference classSheetBindingReference =
             new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, CLASS_SHEET_BINDING);

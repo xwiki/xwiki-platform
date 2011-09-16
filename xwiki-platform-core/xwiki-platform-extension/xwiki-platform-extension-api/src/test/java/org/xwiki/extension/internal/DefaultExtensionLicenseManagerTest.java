@@ -55,7 +55,7 @@ public class DefaultExtensionLicenseManagerTest extends AbstractComponentTestCas
 
         List<String> content =
             IOUtils.readLines(getClass().getResourceAsStream("/extension/licenses/Apache License 2.0.txt"));
-        content = content.subList(1, content.size());
+        content = content.subList(2, content.size());
 
         Assert.assertNotNull(license);
         Assert.assertEquals("Apache License 2.0", license.getName());

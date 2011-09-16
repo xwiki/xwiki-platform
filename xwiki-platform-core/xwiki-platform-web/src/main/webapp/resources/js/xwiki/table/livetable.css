@@ -355,7 +355,6 @@ div.tipfilters div.splitted {
 
 /* <Compatibility> */
 /* This section contains rules for backward compatibility with the deprecated (since 1.9M2) ASSTable */
-/* TODO move the users and groups related styles in toucan/albatross skin files */
 div.xwiki-livetable-pagination-content {
   background: url("$xwiki.getSkinFile('icons/silk/page_white_copy.gif')") no-repeat;
   padding-left: 20px;

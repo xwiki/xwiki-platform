@@ -25,11 +25,11 @@ public class XWikiGWTAppConstants {
     public static final String XWIKI_DEFAULT_BASE_URL = "/xwiki";
     public static final String XWIKI_DEFAULT_SERVICE = "/XWikiService";
     public static final String XWIKI_DEFAULT_ACTION_PATH = "bin";
-    public static final String XWIKI_DEFAULT_SKIN = "albatross";
+    public static final String XWIKI_DEFAULT_SKIN = "colibri";
     public static final String XWIKI_DEFAULT_TRANSLATIONS_PAGE = "XWiki.Translations";
     public static final String XWIKI_DEFAULT_CSS_PREFIX = "xwikigwt";
     public static final String XWIKI_DEFAULT_LOCALE = "en";
 
     // Loading constants
-    public static final String LOADING_ICON_SPINNER = "icons/spinner.gif";
+    public static final String LOADING_ICON_SPINNER = "icons/xwiki/spinner.gif";
 }

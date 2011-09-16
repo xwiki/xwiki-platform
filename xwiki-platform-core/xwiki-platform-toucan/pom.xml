@@ -32,25 +32,11 @@
   <artifactId>xwiki-platform-toucan</artifactId>
   <name>XWiki Platform - Toucan</name>
   <packaging>pom</packaging>
-  <description>
-    Toucan Skin. It is based on Albatross and requires that Albatross be set as the base skin
-    in xwiki.cfg to work.
-  </description>
+  <description>Toucan Skin, providing a rounded, striped look in several color variations.</description>
   <properties>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
-  <dependencies>
-    <!-- Toucan skin requires the Albatross Skin v1.1 or greater at runtime -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-albatross</artifactId>
-      <!-- Lock albatross version because it isn't developed anymore. -->
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-      <type>zip</type>
-    </dependency>
-  </dependencies>
   <build>
     <plugins>
       <plugin>

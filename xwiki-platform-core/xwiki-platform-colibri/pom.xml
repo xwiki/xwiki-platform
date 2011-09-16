@@ -32,24 +32,11 @@
   <artifactId>xwiki-platform-colibri</artifactId>
   <name>XWiki Platform - Colibri</name>
   <packaging>pom</packaging>
-  <description>
-    Colibri Skin. It is based on Toucan and requires that Albatross be set as the base skin
-    in xwiki.cfg to work.
-  </description>
+  <description>Colibri Skin, providing a lightweight, customizable look, easily themed using Color Themes.</description>
   <properties>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
-  <dependencies>
-    <!-- Toucan skin requires the Albatross Skin v1.1 or greater at runtime -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-albatross</artifactId>
-      <version>${project.version}</version>
-      <type>zip</type>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
   <build>
     <plugins>
       <plugin>

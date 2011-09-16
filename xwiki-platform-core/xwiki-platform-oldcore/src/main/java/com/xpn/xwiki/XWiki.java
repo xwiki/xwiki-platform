@@ -2134,7 +2134,7 @@ public class XWiki implements EventListener
     {
         String defaultbaseskin = Param("xwiki.defaultbaseskin", "");
         if (defaultbaseskin.equals("")) {
-            defaultbaseskin = Param("xwiki.defaultskin", "albatross");
+            defaultbaseskin = Param("xwiki.defaultskin", "colibri");
         }
         return defaultbaseskin;
     }

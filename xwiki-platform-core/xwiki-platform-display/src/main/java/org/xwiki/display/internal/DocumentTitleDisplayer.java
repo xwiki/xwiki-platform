@@ -26,8 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
@@ -50,11 +48,6 @@ import org.xwiki.rendering.transformation.TransformationManager;
 @Singleton
 public class DocumentTitleDisplayer extends AbstractDocumentTitleDisplayer
 {
-    /**
-     * The object used for logging.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentTitleDisplayer.class);
-
     /**
      * The component used to perform the rendering transformations on the title extracted from the document content.
      */
@@ -86,7 +79,7 @@ public class DocumentTitleDisplayer extends AbstractDocumentTitleDisplayer
                         return new XDOM(headingBlock.getChildren());
                     }
                 } catch (TransformationException e) {
-                    LOGGER.warn("Failed to extract title from document content.");
+                    getLogger().warn("Failed to extract title from document content.");
                 }
             }
         }

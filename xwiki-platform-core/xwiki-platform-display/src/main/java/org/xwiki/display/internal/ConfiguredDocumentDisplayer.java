@@ -24,7 +24,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -32,7 +31,9 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.XDOM;
 
 /**
- * The configured {@link DocumentDisplayer}.
+ * This is just a wrapper for the document displayer specified in the configuration. If there is no
+ * {@link DocumentDisplayer} component registered with the {@link DisplayConfiguration#getDocumentDisplayerHint()} hint
+ * then the default document displayer is used instead.
  * 
  * @version $Id$
  * @since 3.2M3
@@ -45,7 +46,8 @@ public class ConfiguredDocumentDisplayer implements DocumentDisplayer
     /**
      * The object used for logging.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConfiguredDocumentDisplayer.class);
+    @Inject
+    private Logger logger;
 
     /**
      * The display configuration.
@@ -85,8 +87,8 @@ public class ConfiguredDocumentDisplayer implements DocumentDisplayer
         try {
             return componentManager.lookup(DocumentDisplayer.class, documentDisplayerHint);
         } catch (ComponentLookupException e) {
-            String format = "Failed to lookup document displayer with hint [%s]. Using default document displayer.";
-            LOGGER.warn(String.format(format, documentDisplayerHint));
+            logger.warn("Failed to lookup document displayer with hint [{}]. Using default document displayer.",
+                documentDisplayerHint);
             try {
                 return componentManager.lookup(DocumentDisplayer.class);
             } catch (ComponentLookupException ex) {

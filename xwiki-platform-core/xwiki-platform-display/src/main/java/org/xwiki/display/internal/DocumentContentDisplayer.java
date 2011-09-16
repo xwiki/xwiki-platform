@@ -28,7 +28,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
@@ -59,15 +58,16 @@ import org.xwiki.velocity.VelocityManager;
 public class DocumentContentDisplayer implements DocumentDisplayer
 {
     /**
-     * The object used for logging.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentContentDisplayer.class);
-
-    /**
      * The context property which indicates if the current code was called from a template (only Velocity execution) or
      * from a wiki page (wiki syntax rendering).
      */
     private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
+
+    /**
+     * The object used for logging.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * The component used to serialize entity references.
@@ -168,14 +168,14 @@ public class DocumentContentDisplayer implements DocumentDisplayer
             try {
                 // Mark that we're starting to use a different Velocity macro name-space.
                 velocityManager.getVelocityEngine().startedUsingMacroNamespace(nameSpace);
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Started using velocity macro namespace [" + nameSpace + "]");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Started using velocity macro namespace [{}].", nameSpace);
                 }
             } catch (Exception e) {
                 // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but
                 // continue since it's not absolutely critical.
-                String format = "Failed to notify Velocity Macro cache for opening the [%s] namespace. Reason = [%s]";
-                LOGGER.warn(String.format(format, nameSpace, e.getMessage()));
+                logger.warn("Failed to notify Velocity Macro cache for opening the [{}] namespace. Reason = [{}]",
+                    nameSpace, e.getMessage());
             }
         }
     }
@@ -196,14 +196,14 @@ public class DocumentContentDisplayer implements DocumentDisplayer
         if (transformationContextIsolated && (isInRenderingEngine == null || isInRenderingEngine == Boolean.FALSE)) {
             try {
                 velocityManager.getVelocityEngine().stoppedUsingMacroNamespace(nameSpace);
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Stopped using velocity macro namespace [" + nameSpace + "]");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Stopped using velocity macro namespace [{}].", nameSpace);
                 }
             } catch (Exception e) {
                 // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but
                 // continue since it's not absolutely critical.
-                String format = "Failed to notify Velocity Macro cache for closing the [%s] namespace. Reason = [%s]";
-                LOGGER.warn(String.format(format, nameSpace, e.getMessage()));
+                logger.warn("Failed to notify Velocity Macro cache for closing the [{}] namespace. Reason = [{}]",
+                    nameSpace, e.getMessage());
             }
         }
     }

@@ -22,6 +22,7 @@ package com.xpn.xwiki.internal.display;
 import java.util.Collections;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
@@ -44,6 +45,7 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
  */
 @Component
 @Named("content/xwiki/1.0")
+@Singleton
 public class XWiki10DocumentContentDisplayer extends DocumentContentDisplayer
 {
     @Override

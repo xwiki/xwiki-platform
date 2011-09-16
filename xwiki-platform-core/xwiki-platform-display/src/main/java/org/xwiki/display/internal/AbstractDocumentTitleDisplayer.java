@@ -30,7 +30,6 @@ import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
@@ -51,15 +50,16 @@ import org.xwiki.velocity.VelocityManager;
 public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplayer
 {
     /**
-     * The object used for logging.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDocumentTitleDisplayer.class);
-
-    /**
      * The key used to store on the XWiki context map the stack trace for the
      * {@link #extractTitleFromContent(org.xwiki.bridge.DocumentModelBridge, DocumentDisplayerParameters)} method.
      */
     private static final String EXTRACT_TITLE_STACK_TRACE_KEY = "internal.extractTitleFromContentStackTrace";
+
+    /**
+     * The object used for logging.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * The component used to parse the rendered title into an XDOM.
@@ -107,7 +107,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
                 return parseXDOM(evaluateTitle(document.getTitle(), document.getDocumentReference(), parameters));
             } catch (Exception e) {
                 String reference = defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
-                LOGGER.warn(String.format("Failed to interpret title of document [%s]", reference), e);
+                logger.warn("Failed to interpret title of document [{}].", reference);
             }
         }
 
@@ -119,7 +119,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
             }
         } catch (Exception e) {
             String reference = defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
-            LOGGER.warn(String.format("Failed to extract title from content of document [%s]", reference), e);
+            logger.warn("Failed to extract title from content of document [{}].", reference);
         }
 
         // 3. No title has been found. Use the document name as title.
@@ -226,4 +226,12 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
      */
     protected abstract XDOM extractTitleFromContent(DocumentModelBridge document,
         DocumentDisplayerParameters parameters);
+
+    /**
+     * @return the object used for logging
+     */
+    protected Logger getLogger()
+    {
+        return logger;
+    }
 }

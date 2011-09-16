@@ -25,10 +25,10 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
@@ -55,10 +55,12 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  */
 @Component
 @Named("sheet")
+@Singleton
 public class SheetDocumentDisplayer implements DocumentDisplayer
 {
     /** Logging helper object. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SheetDocumentDisplayer.class);
+    @Inject
+    private Logger logger;
 
     /**
      * The document displayer used to display the sheets.
@@ -101,7 +103,7 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
                         return applySheet(document, sheetReference, parameters);
                     } catch (Exception e) {
                         String sheetStringReference = defaultEntityReferenceSerializer.serialize(sheetReference);
-                        LOGGER.warn(String.format("Failed to apply sheet [%s].", sheetStringReference), e);
+                        logger.warn("Failed to apply sheet [{}].", sheetStringReference, e);
                     }
                 }
             }
@@ -149,7 +151,7 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
             return documentDisplayer.display(document, parameters);
         }
 
-        if (programmingRightsConflic(document, sheet)) {
+        if (programmingRightsConflict(document, sheet)) {
             // FIXME: If the displayed document and the sheet don't have the same programming rights then we preserve
             // the programming rights of the sheet by rendering it as if the author of the displayed document is the
             // author of the sheet.
@@ -164,7 +166,7 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
      * @param sheet a sheet
      * @return {@code true} if the sheet and the document have different programming rights.
      */
-    private boolean programmingRightsConflic(DocumentModelBridge document, DocumentModelBridge sheet)
+    private boolean programmingRightsConflict(DocumentModelBridge document, DocumentModelBridge sheet)
     {
         XWikiContext context = getXWikiContext();
         XWikiRightService rightsService = context.getWiki().getRightService();

@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -44,6 +45,7 @@ import com.xpn.xwiki.api.Document;
  */
 @Component
 @Named("sheet")
+@Singleton
 public class SheetScriptService implements ScriptService
 {
     /**

@@ -23,9 +23,9 @@ import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
@@ -52,10 +52,12 @@ import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
  */
 @Component
 @Named("display")
+@Singleton
 public class DisplayScriptService implements ScriptService
 {
     /** Logging helper object. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DisplayScriptService.class);
+    @Inject
+    private Logger logger;
 
     /**
      * The component used to display documents.
@@ -95,7 +97,7 @@ public class DisplayScriptService implements ScriptService
         try {
             return renderXDOM(documentDisplayer.display(getDocument(document), parameters), outputSyntax);
         } catch (Exception e) {
-            LOGGER.warn(String.format("Failed to display document [%s]", document.getPrefixedFullName()), e);
+            logger.warn("Failed to display document [{}].", document.getPrefixedFullName(), e);
             return null;
         }
     }
@@ -132,8 +134,7 @@ public class DisplayScriptService implements ScriptService
         try {
             content = document.getTranslatedContent();
         } catch (XWikiException e) {
-            String format = "Failed to get the translated content of document [%s]";
-            LOGGER.warn(String.format(format, document.getPrefixedFullName()), e);
+            logger.warn("Failed to get the translated content of document [{}].", document.getPrefixedFullName(), e);
             return null;
         }
         String renderedContent = renderingCache.getRenderedContent(document.getDocumentReference(), content, context);

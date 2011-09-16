@@ -28,7 +28,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Request;
 import org.xwiki.container.RequestInitializer;
 import org.xwiki.container.RequestInitializerException;
-import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.context.Execution;
 
 /**
@@ -57,11 +56,9 @@ public class SheetRequestInitializer implements RequestInitializer
     @Override
     public void initialize(Request request) throws RequestInitializerException
     {
-        if (request instanceof ServletRequest) {
-            String sheet = ((ServletRequest) request).getHttpServletRequest().getParameter(SHEET_PROPERTY_NAME);
-            if (!StringUtils.isEmpty(sheet)) {
-                execution.getContext().setProperty(SHEET_PROPERTY_NAME, sheet);
-            }
+        String sheet = (String) request.getProperty(SHEET_PROPERTY_NAME);
+        if (!StringUtils.isEmpty(sheet)) {
+            execution.getContext().setProperty(SHEET_PROPERTY_NAME, sheet);
         }
     }
 }

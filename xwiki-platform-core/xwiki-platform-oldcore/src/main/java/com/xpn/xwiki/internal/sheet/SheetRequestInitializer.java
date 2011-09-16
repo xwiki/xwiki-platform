@@ -28,9 +28,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Request;
 import org.xwiki.container.RequestInitializer;
 import org.xwiki.container.RequestInitializerException;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.context.Execution;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Takes the sheet parameter from the request and puts it on the execution context to be used by the sheet manager.
@@ -50,7 +49,7 @@ public class SheetRequestInitializer implements RequestInitializer
     private static final String SHEET_PROPERTY_NAME = "sheet";
 
     /**
-     * Execution context handler, needed for accessing the XWikiContext.
+     * Execution context handler.
      */
     @Inject
     private Execution execution;
@@ -58,10 +57,11 @@ public class SheetRequestInitializer implements RequestInitializer
     @Override
     public void initialize(Request request) throws RequestInitializerException
     {
-        XWikiContext xwikiContext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
-        String sheet = xwikiContext.getRequest().getParameter(SHEET_PROPERTY_NAME);
-        if (!StringUtils.isEmpty(sheet)) {
-            execution.getContext().setProperty(SHEET_PROPERTY_NAME, sheet);
+        if (request instanceof ServletRequest) {
+            String sheet = ((ServletRequest) request).getHttpServletRequest().getParameter(SHEET_PROPERTY_NAME);
+            if (!StringUtils.isEmpty(sheet)) {
+                execution.getContext().setProperty(SHEET_PROPERTY_NAME, sheet);
+            }
         }
     }
 }

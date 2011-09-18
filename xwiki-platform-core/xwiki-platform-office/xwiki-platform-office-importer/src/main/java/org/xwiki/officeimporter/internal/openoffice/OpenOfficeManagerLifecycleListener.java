@@ -23,10 +23,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
@@ -42,19 +43,21 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
  * @version $Id$
  * @since 2.0M1
  */
-@Component("oomanager")
+@Component
+@Named("oomanager")
+@Singleton
 public class OpenOfficeManagerLifecycleListener implements EventListener
 {
     /**
      * The {@link OpenOfficeConfiguration} component.
      */
-    @Requirement
+    @Inject
     private OpenOfficeConfiguration ooConfig;
 
     /**
      * The {@link OpenOfficeManager} component.
      */
-    @Requirement
+    @Inject
     private OpenOfficeManager ooManager;
 
     /**

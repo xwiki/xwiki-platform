@@ -19,6 +19,10 @@
  */
 package org.xwiki.officeimporter.internal.openoffice;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -32,7 +36,9 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @version $Id$
  * @since 1.9RC1
  */
-@Component("ooconfig")
+@Component
+@Named("ooconfig")
+@Singleton
 public class OpenOfficeConfigurationVelocityContextInitializer implements VelocityContextInitializer
 {
     /**
@@ -43,7 +49,7 @@ public class OpenOfficeConfigurationVelocityContextInitializer implements Veloci
     /**
      * The {@link OpenOfficeConfiguration} component.
      */
-    @Requirement
+    @Inject
     private OpenOfficeConfiguration ooConfig;
 
     /**

@@ -20,16 +20,21 @@
  */
 package com.xpn.xwiki.render;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.velocity.VelocityContextInitializer;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.apache.velocity.VelocityContext;
 
-@Component("xwiki")
+@Component
+@Named("xwiki")
+@Singleton
 public class XWikiVelocityContextInitializer implements VelocityContextInitializer
 {
-    @Requirement
+    @Inject
     private Execution execution;
 
     public void initialize(VelocityContext context)

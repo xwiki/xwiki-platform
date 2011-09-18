@@ -19,8 +19,11 @@
  */
 package org.xwiki.query.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutorManager;
@@ -31,13 +34,16 @@ import org.xwiki.query.QueryExecutorManager;
  *
  * @version $Id$
  */
-@Component("secure")
+@Component
+@Named("secure")
+@Singleton
 public class SecureQueryManager extends AbstractQueryManager
 {
     /**
      * {@link QueryExecutorManager} for execute Queries.
      */
-    @Requirement("secure")
+    @Inject
+    @Named("secure")
     protected QueryExecutorManager queryExecutorManager;
 
     /**

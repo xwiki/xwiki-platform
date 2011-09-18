@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.InputStream;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.artofsolving.jodconverter.OfficeDocumentConverter;
 import org.artofsolving.jodconverter.document.JsonDocumentFormatRegistry;
@@ -31,7 +32,6 @@ import org.artofsolving.jodconverter.office.ExternalOfficeManagerConfiguration;
 import org.artofsolving.jodconverter.office.OfficeManager;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.container.Container;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
@@ -45,6 +45,7 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
  * @since 1.8RC3
  */
 @Component
+@Singleton
 public class DefaultOpenOfficeManager implements OpenOfficeManager
 {
     /**
@@ -55,13 +56,13 @@ public class DefaultOpenOfficeManager implements OpenOfficeManager
     /**
      * The {@link OpenOfficeConfiguration} component.
      */
-    @Requirement
+    @Inject
     private OpenOfficeConfiguration conf;
 
     /**
      * Used to query global temporary working directory.
      */
-    @Requirement
+    @Inject
     private Container container;
 
     /**

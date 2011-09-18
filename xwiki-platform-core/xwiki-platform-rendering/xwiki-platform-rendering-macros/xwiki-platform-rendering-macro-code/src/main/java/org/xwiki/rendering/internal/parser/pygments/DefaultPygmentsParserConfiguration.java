@@ -19,6 +19,9 @@
  */
 package org.xwiki.rendering.internal.parser.pygments;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
@@ -30,6 +33,7 @@ import org.xwiki.configuration.ConfigurationSource;
  * @since 2.0M1
  */
 @Component
+@Singleton
 public class DefaultPygmentsParserConfiguration implements PygmentsParserConfiguration
 {
     /**
@@ -40,14 +44,10 @@ public class DefaultPygmentsParserConfiguration implements PygmentsParserConfigu
     /**
      * Defines from where to read the Pygments configuration data.
      */
-    @Requirement
+    @Inject
     private ConfigurationSource configuration;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PygmentsParserConfiguration#getFilter()
-     */
+    @Override
     public String getStyle()
     {
         return this.configuration.getProperty(PREFIX + "style", String.class);

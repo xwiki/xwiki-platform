@@ -22,8 +22,10 @@ package org.xwiki.jira;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 
@@ -43,6 +45,12 @@ import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactor
 @Named("jira")
 public class JiraScriptService implements ScriptService
 {
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
     /**
      * Note that the password will be passed in clear over the network to the remote JIRA instance. Thus, only use this
      * method when connecting over HTTPS.
@@ -75,14 +83,15 @@ public class JiraScriptService implements ScriptService
      */
     private JiraRestClient getJiraRestClient(String jiraURL, AuthenticationHandler authenticationHandler)
     {
-        JerseyJiraRestClientFactory factory = new JerseyJiraRestClientFactory();
-        URI jiraServerUri = null;
+        JiraRestClient restClient;
         try {
-            jiraServerUri = new URI(jiraURL);
+            JerseyJiraRestClientFactory factory = new JerseyJiraRestClientFactory();
+            URI jiraServerUri = new URI(jiraURL);
+            restClient = factory.create(jiraServerUri, authenticationHandler);
         } catch (URISyntaxException e) {
-            throw new RuntimeException("Invalid URL [" + jiraURL + "]", e);
+            this.logger.warn("Invalid JIRA URL [{}]", jiraURL);
+            restClient = null;
         }
-        JiraRestClient restClient = factory.create(jiraServerUri, authenticationHandler);
         return restClient;
     }
 }

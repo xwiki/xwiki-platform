@@ -24,7 +24,7 @@
 <hidden>false</hidden>
 <object>
 <class>
-<name>XWiki.SheetClass</name>
+<name>XWiki.EditModeClass</name>
 <customClass></customClass>
 <customMapping></customMapping>
 <defaultViewSheet></defaultViewSheet>
@@ -43,8 +43,8 @@
 </class>
 <name>XWiki.SchedulerJobSheet</name>
 <number>0</number>
-<className>XWiki.SheetClass</className>
-<guid>fc835417-d3d3-4d13-b519-57d2ec39df52</guid>
+<className>XWiki.EditModeClass</className>
+<guid>3b53199c-0ee8-476f-b7cd-43fc857b391c</guid>
 <property>
 <defaultEditMode>inline</defaultEditMode>
 </property>

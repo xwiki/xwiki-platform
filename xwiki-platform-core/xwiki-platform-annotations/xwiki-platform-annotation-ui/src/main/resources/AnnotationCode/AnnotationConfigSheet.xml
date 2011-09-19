@@ -25,7 +25,7 @@
 <hidden>false</hidden>
 <object>
 <class>
-<name>XWiki.SheetClass</name>
+<name>XWiki.EditModeClass</name>
 <customClass></customClass>
 <customMapping></customMapping>
 <defaultViewSheet></defaultViewSheet>
@@ -44,8 +44,8 @@
 </class>
 <name>AnnotationCode.AnnotationConfigSheet</name>
 <number>0</number>
-<className>XWiki.SheetClass</className>
-<guid>86ce47df-7f95-4132-b273-5349bf160d8a</guid>
+<className>XWiki.EditModeClass</className>
+<guid>7d030ed4-622c-4843-981e-5b82a077fd53</guid>
 <property>
 <defaultEditMode>inline</defaultEditMode>
 </property>

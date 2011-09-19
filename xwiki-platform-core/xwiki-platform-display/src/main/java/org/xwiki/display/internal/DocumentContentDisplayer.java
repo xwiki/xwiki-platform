@@ -168,9 +168,7 @@ public class DocumentContentDisplayer implements DocumentDisplayer
             try {
                 // Mark that we're starting to use a different Velocity macro name-space.
                 velocityManager.getVelocityEngine().startedUsingMacroNamespace(nameSpace);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Started using velocity macro namespace [{}].", nameSpace);
-                }
+                logger.debug("Started using velocity macro namespace [{}].", nameSpace);
             } catch (Exception e) {
                 // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but
                 // continue since it's not absolutely critical.
@@ -196,9 +194,7 @@ public class DocumentContentDisplayer implements DocumentDisplayer
         if (transformationContextIsolated && (isInRenderingEngine == null || isInRenderingEngine == Boolean.FALSE)) {
             try {
                 velocityManager.getVelocityEngine().stoppedUsingMacroNamespace(nameSpace);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Stopped using velocity macro namespace [{}].", nameSpace);
-                }
+                logger.debug("Stopped using velocity macro namespace [{}].", nameSpace);
             } catch (Exception e) {
                 // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but
                 // continue since it's not absolutely critical.

@@ -49,5 +49,13 @@ public class DefaultVersionManagerTest extends AbstractComponentTestCase
         Assert.assertEquals(8, versionManager.compareVersions("1.10-sometext", "1.2"));
         Assert.assertEquals(1, versionManager.compareVersions("1.1-sometext", "1.1"));
         Assert.assertEquals(67, versionManager.compareVersions("1.sometext", "1.0"));
+        Assert.assertEquals(66, versionManager.compareVersions("sometext", "1.0"));
+    }
+    
+    @Test
+    public void testWithNull()
+    {
+        Assert.assertEquals(1, versionManager.compareVersions("sometext", null));
+        Assert.assertEquals(-1, versionManager.compareVersions(null, "sometext"));
     }
 }

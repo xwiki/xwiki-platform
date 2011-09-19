@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1284039567000</creationDate>
-<date>1316018460000</date>
-<contentUpdateDate>1316018460000</contentUpdateDate>
+<date>1316456474000</date>
+<contentUpdateDate>1316456474000</contentUpdateDate>
 <version>1.1</version>
 <title>Extension Manager</title>
 <template></template>
@@ -457,79 +457,88 @@ This application is experimental, use it at your own risk.
     {{error}}You have to provide both extension id and version.{{/error}}
   #else
     #set($extension = $extensionManager.resolve($request.extensionid, $request.extensionversion, $extensionwiki))
-    ; Id
-    : {{{$extension.id.id}}}
-    ; Version
-    : {{{$extension.id.version}}}
-    ; Type
-    : {{{$extension.type}}}
-    ; Features
-    : #if (!$extension.features.empty){{{$extension.features}}}#else//No feature//#end
+    #set($lasterror = $extensionManager.lastError)
+    #if ($lasterror)
+      {{error}}
+        Can't resolve extension with id $request.extensionid and version $request.extensionversion: #printThrowable($lasterror)
+      {{/error}}
+    #else
+      ; Id
+      : {{{$extension.id.id}}}
+      ; Version
+      : {{{$extension.id.version}}}
+      ; Type
+      : {{{$extension.type}}}
+      ; Features
+      : #if (!$extension.features.empty){{{$extension.features}}}#else//No feature//#end
 
-    ; Name
-    : #if ($extension.name){{{$!extension.name}}}#else{{{$extension.id.id}}}#end
+      ; Name
+      : #if ($extension.name){{{$!extension.name}}}#else{{{$extension.id.id}}}#end
 
-    ; Description
-    : #if ($extension.description){{{$extension.description}}}#else//No description//#end
+      ; Description
+      : #if ($extension.description){{{$extension.description}}}#else//No description//#end
 
-    ; Website
-    : #if ($extension.website)$extension.website#else//No website//#end
+      ; Website
+      : #if ($extension.website)$extension.website#else//No website//#end
 
-    ; Licenses
-    : #if (!$extension.licenses.empty){{{$extension.licenses}}}#else//No license//#end
+      ; Licenses
+      : #if (!$extension.licenses.empty){{{$extension.licenses}}}#else//No license//#end
 
-    ; Authors
-    : #if (!$extension.authors.empty){{{$extension.authors}}}#else//No author//#end
+      ; Authors
+      : #if (!$extension.authors.empty){{{$extension.authors}}}#else//No author//#end
 
-    ; Repository
-    : $extension.repository.id
+      ; Repository
+      : $extension.repository.id
 
-    #foreach($propertyEntry in $extension.properties.entrySet())
-      ; $propertyEntry.key
-      : $propertyEntry.value
-    #end
+      #foreach($propertyEntry in $extension.properties.entrySet())
+        ; $propertyEntry.key
+        : $propertyEntry.value
+      #end
 
-    ; Dependencies:
-    #macro(resolveExtension $extensionid $extensionversion $extensionlevel)
-      #set($extension = $extensionManager.resolve($extensionid, $extensionversion, $extensionwiki))
-      #if (!$extension)
-        #set($lasterror = $extensionManager.lastError)
-        {{error}}Failed to resolve extension with id $extensionid and version $extensionversion: $lasterror.message{{/error}}
-      #else
-        #set($extensionclass = "${extension.class}")
-        #foreach($index in [1..$extensionlevel])*#end ##
-        #if ($extensionclass.endsWith('CoreExtension'))
-          **C** ##
-        #elseif ($extensionclass.endsWith('LocalExtension'))
-          #if ($extension.isInstalled($extensionwiki))
-            **I** ##
+      ; Dependencies:
+      #macro(resolveExtension $extensionid $extensionversion $extensionlevel)
+        #set($extension = $extensionManager.resolve($extensionid, $extensionversion, $extensionwiki))
+        #if (!$extension)
+          #set($lasterror = $extensionManager.lastError)
+          {{error}}
+            Failed to resolve extension with id $extensionid and version $extensionversion: #printThrowable($lasterror)
+          {{/error}}
+        #else
+          #set($extensionclass = "${extension.class}")
+          #foreach($index in [1..$extensionlevel])*#end ##
+          #if ($extensionclass.endsWith('CoreExtension'))
+            **C** ##
+          #elseif ($extensionclass.endsWith('LocalExtension'))
+            #if ($extension.isInstalled($extensionwiki))
+              **I** ##
+            #else
+              **L** ##
+              #set($continueResolve = true)
+            #end
           #else
-            **L** ##
+            **R** ##
             #set($continueResolve = true)
           #end
-        #else
-          **R** ##
-          #set($continueResolve = true)
-        #end
-        $extension.id.id ($extension.type) ($extension.id.version#if($extensionversion != $extension.id.version) was $extensionversion#end)
-        #if ($continueResolve)
-          #resolveExtensionDependencies($extension)
+          $extension.id.id ($extension.type) ($extension.id.version#if($extensionversion != $extension.id.version) was $extensionversion#end)
+          #if ($continueResolve)
+            #resolveExtensionDependencies($extension)
+          #end
         #end
       #end
-    #end
-    #macro(resolveExtensionDependencies $extension $extensionlevel)
-      #set($extensionlevel = $extensionlevel + 1)
-      #foreach ($dependency in $extension.dependencies)
-        #resolveExtension($dependency.id, $dependency.version, $extensionlevel)
+      #macro(resolveExtensionDependencies $extension $extensionlevel)
+        #set($extensionlevel = $extensionlevel + 1)
+        #foreach ($dependency in $extension.dependencies)
+          #resolveExtension($dependency.id, $dependency.version, $extensionlevel)
+        #end
+        #set($extensionlevel = $extensionlevel - 1)
       #end
-      #set($extensionlevel = $extensionlevel - 1)
-    #end
-    #resolveExtensionDependencies($extension, 0)
+      #resolveExtensionDependencies($extension, 0)
 
-    **C**: core extension
-    **L**: not installed local extension
-    **I**: installed extension
-    **R**: remote extension
+      **C**: core extension
+      **L**: not installed local extension
+      **I**: installed extension
+      **R**: remote extension
+    #end
   #end
 #elseif($request.actioninstall)
   = Install
@@ -552,16 +561,19 @@ This application is experimental, use it at your own risk.
     #macro(prepareInstall $extensionid $extensionversion $extensionsToInstall $extensionsToUpgrade $extensionsSuggested, $coreExtensionsConflicts)
       #set($extension = $extensionManager.resolve($extensionid, $extensionversion, $extensionwiki))
       #set($extensionclass = "${extension.class}")
-      #if (!$extensionclass.endsWith('CoreExtension') &amp;&amp; !$extensionclass.endsWith('LocalExtension'))
-        #if ($extensionManager.getInstalledExtension($extensionid, $extensionwiki))
-          #set($extensionsToUpgrade[$extension.id] = $extension)
-        #else
-          #set($extensionsToInstall[$extension.id] = $extension)
+      #if (!$extensionclass.endsWith('CoreExtension'))
+        #if (!$extension.isInstalled($extensionwiki))
+          #set($installedExtension = $extensionManager.getInstalledExtension($extensionid, $extensionwiki))
+          #if ($installedExtension &amp;&amp; $versionManager.compareVersions($installedExtension.id.version, $extensionversion) &gt; 0)
+            #set($extensionsToUpgrade[$extension.id] = $extension)
+          #else
+            #set($extensionsToInstall[$extension.id] = $extension)
+          #end
+          #prepareInstallDependencies($extension, $extensionsToInstall, $extensionsToUpgrade, $extensionsSuggested)
         #end
-      #elseif ($extensionclass.endsWith('CoreExtension') &amp;&amp; $versionManager.compareVersions($extensionversion, $extension.id.version) &gt; 0)
+      #elseif ($versionManager.compareVersions($extensionversion, $extension.id.version) &gt; 0)
         #set($coreExtensionsConflicts[$extension.id] = [$extension, $extensionversion])
       #end
-      #prepareInstallDependencies($extension, $extensionsToInstall, $extensionsToUpgrade, $extensionsSuggested)
     #end
     #macro(prepareInstallDependencies $extension $extensionsToInstall $extensionsToUpgrade $extensionsSuggested, $coreExtensionsConflicts)
       #foreach ($dependency in $extension.dependencies)

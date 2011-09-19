@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -129,37 +128,12 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
                 MavenXpp3Reader reader = new MavenXpp3Reader();
                 Model mavenModel = reader.read(descriptorStream);
 
-                Properties properties = mavenModel.getProperties();
-                String version = mavenModel.getVersion();
-                String groupId = mavenModel.getGroupId();
-
-                // TODO: download parents and resolve pom.xml properties using aether ? could be pretty expensive for
-                // the init
-                if (version == null || groupId == null) {
-                    Parent parent = mavenModel.getParent();
-
-                    if (groupId == null) {
-                        groupId = parent.getGroupId();
-                    }
-
-                    if (version == null) {
-                        version = parent.getVersion();
-                    }
-
-                    if (version == null) {
-                        version = UNKNOWN;
-                    }
-                    if (groupId == null) {
-                        groupId = UNKNOWN;
-                    }
-                } else {
-                    if (version.startsWith("$")) {
-                        version = properties.getProperty(version.substring(2, version.length() - 1));
-                    }
-                }
+                String version = resolveVersion(mavenModel.getVersion(), mavenModel);
+                String groupId = resolveGroupId(mavenModel.getGroupId(), mavenModel);
 
                 String extensionURLStr = descriptorUrl.toString();
-                extensionURLStr = extensionURLStr.substring(0, descriptorUrl.toString().indexOf(MAVENPACKAGE.replace('.', '/')));
+                extensionURLStr =
+                    extensionURLStr.substring(0, descriptorUrl.toString().indexOf(MAVENPACKAGE.replace('.', '/')));
                 URL extensionURL = new URL(extensionURLStr);
 
                 DefaultCoreExtension coreExtension =
@@ -189,8 +163,10 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
                     if (!mavenDependency.isOptional()
                         && (mavenDependency.getScope() == null || mavenDependency.getScope().equals("compile") || mavenDependency
                             .getScope().equals("runtime"))) {
-                        coreExtension.addDependency(new DefaultExtensionDependency(mavenDependency.getGroupId() + ':'
-                            + mavenDependency.getArtifactId(), mavenDependency.getVersion()));
+                        coreExtension.addDependency(new DefaultExtensionDependency(resolveGroupId(
+                            mavenDependency.getGroupId(), mavenModel)
+                            + ':' + mavenDependency.getArtifactId(), resolveVersion(mavenDependency.getVersion(),
+                            mavenModel)));
                     }
                 }
 
@@ -293,6 +269,67 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
         }
 
         return extensions;
+    }
+
+    private String resolveVersion(String modelVersion, Model mavenModel)
+    {
+        String version = modelVersion;
+
+        // TODO: download parents and resolve pom.xml properties using aether ? could be pretty expensive for
+        // the init
+        if (version == null) {
+            Parent parent = mavenModel.getParent();
+
+            if (parent != null) {
+                version = parent.getVersion();
+            }
+        } else if (version.startsWith("$")) {
+            String propertyName = version.substring(2, version.length() - 1);
+
+            if (propertyName.equals("project.version") || propertyName.equals("pom.version")
+                || propertyName.equals("version")) {
+                version = resolveVersion(mavenModel.getVersion(), mavenModel);
+            } else {
+                String value = mavenModel.getProperties().getProperty(propertyName);
+                if (value != null) {
+                    version = value;
+                }
+            }
+        }
+
+        if (version == null) {
+            version = UNKNOWN;
+        }
+
+        return version;
+    }
+
+    private String resolveGroupId(String modelVersion, Model mavenModel)
+    {
+        String groupId = mavenModel.getGroupId();
+
+        // TODO: download parents and resolve pom.xml properties using aether ? could be pretty expensive for
+        // the init
+        if (groupId == null) {
+            Parent parent = mavenModel.getParent();
+
+            if (parent != null) {
+                groupId = parent.getGroupId();
+            }
+
+            if (groupId == null) {
+                groupId = UNKNOWN;
+            }
+        } else if (groupId.startsWith("$")) {
+            String propertyName = groupId.substring(2, groupId.length() - 1);
+
+            String value = mavenModel.getProperties().getProperty(propertyName);
+            if (value != null) {
+                propertyName = value;
+            }
+        }
+
+        return groupId;
     }
 
     // TODO: download custom licenses content

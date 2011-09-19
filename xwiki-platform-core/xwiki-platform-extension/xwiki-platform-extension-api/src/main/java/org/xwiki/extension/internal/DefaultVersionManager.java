@@ -42,6 +42,12 @@ public class DefaultVersionManager implements VersionManager
     @Override
     public int compareVersions(String version1, String version2)
     {
+        if (version1 == null) {
+            return -1;
+        } else if (version2 == null) {
+            return 1;
+        }
+
         String[] elements1 = SEPARATORS.split(version1);
         String[] elements2 = SEPARATORS.split(version2);
 

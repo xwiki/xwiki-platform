@@ -31,6 +31,8 @@ import org.xwiki.script.service.ScriptService;
 
 import com.atlassian.jira.rest.client.AuthenticationHandler;
 import com.atlassian.jira.rest.client.JiraRestClient;
+import com.atlassian.jira.rest.client.NullProgressMonitor;
+import com.atlassian.jira.rest.client.ProgressMonitor;
 import com.atlassian.jira.rest.client.auth.AnonymousAuthenticationHandler;
 import com.atlassian.jira.rest.client.auth.BasicHttpAuthenticationHandler;
 import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactory;
@@ -74,6 +76,17 @@ public class JiraScriptService implements ScriptService
     public JiraRestClient getJiraRestClient(String jiraURL)
     {
         return getJiraRestClient(jiraURL, new AnonymousAuthenticationHandler());
+    }
+
+    /**
+     * Since all JRJC APIs require to be passed a {@link ProgressMonitor} this method makes it easy to get one
+     * (especially useful from Velocity scripts since they can't do any new).
+     *
+     * @return a {@link ProgressMonitor} that doesn't do anything
+     */
+    public ProgressMonitor getNullProgressMonitor()
+    {
+        return new NullProgressMonitor();
     }
 
     /**

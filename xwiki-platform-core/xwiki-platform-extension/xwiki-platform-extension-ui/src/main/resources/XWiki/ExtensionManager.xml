@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1284039567000</creationDate>
-<date>1316456474000</date>
-<contentUpdateDate>1316456474000</contentUpdateDate>
+<date>1316532065000</date>
+<contentUpdateDate>1316532065000</contentUpdateDate>
 <version>1.1</version>
 <title>Extension Manager</title>
 <template></template>
@@ -456,7 +456,7 @@ This application is experimental, use it at your own risk.
   #if (!$request.extensionid || $request.extensionid == '' || !$request.extensionversion || $request.extensionversion == '')
     {{error}}You have to provide both extension id and version.{{/error}}
   #else
-    #set($extension = $extensionManager.resolve($request.extensionid, $request.extensionversion, $extensionwiki))
+    #set($extension = $extensionManager.resolve($request.extensionid, $request.extensionversion))
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
       {{error}}
@@ -497,7 +497,7 @@ This application is experimental, use it at your own risk.
 
       ; Dependencies:
       #macro(resolveExtension $extensionid $extensionversion $extensionlevel)
-        #set($extension = $extensionManager.resolve($extensionid, $extensionversion, $extensionwiki))
+        #set($extension = $extensionManager.resolve($extensionid, $extensionversion))
         #if (!$extension)
           #set($lasterror = $extensionManager.lastError)
           {{error}}
@@ -508,9 +508,11 @@ This application is experimental, use it at your own risk.
           #foreach($index in [1..$extensionlevel])*#end ##
           #if ($extensionclass.endsWith('CoreExtension'))
             **C** ##
+            #set($continueResolve = false)
           #elseif ($extensionclass.endsWith('LocalExtension'))
             #if ($extension.isInstalled($extensionwiki))
               **I** ##
+              #set($continueResolve = false)
             #else
               **L** ##
               #set($continueResolve = true)
@@ -559,7 +561,7 @@ This application is experimental, use it at your own risk.
     #end
   #else
     #macro(prepareInstall $extensionid $extensionversion $extensionsToInstall $extensionsToUpgrade $extensionsSuggested, $coreExtensionsConflicts)
-      #set($extension = $extensionManager.resolve($extensionid, $extensionversion, $extensionwiki))
+      #set($extension = $extensionManager.resolve($extensionid, $extensionversion))
       #set($extensionclass = "${extension.class}")
       #if (!$extensionclass.endsWith('CoreExtension'))
         #if (!$extension.isInstalled($extensionwiki))

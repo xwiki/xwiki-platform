@@ -94,16 +94,16 @@ public class DefaultExtensionManager implements ExtensionManager, Initializable
     }
 
     @Override
-    public Extension resolveExtension(ExtensionId extensionId, String namespace) throws ResolveException
+    public Extension resolveExtension(ExtensionId extensionId) throws ResolveException
     {
         Extension extension = null;
 
         extension = this.coreExtensionRepository.getCoreExtension(extensionId.getId());
 
         if (extension == null) {
-            extension = this.localExtensionRepository.getInstalledExtension(extensionId.getId(), namespace);
-
-            if (extension == null || !extension.getId().getVersion().equals(extensionId.getVersion())) {
+            try {
+                extension = this.localExtensionRepository.resolve(extensionId);
+            } catch (ResolveException e) {
                 extension = this.repositoryManager.resolve(extensionId);
             }
         }

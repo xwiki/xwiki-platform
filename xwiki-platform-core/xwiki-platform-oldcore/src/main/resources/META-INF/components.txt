@@ -37,7 +37,9 @@ com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverte
 com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
 com.xpn.xwiki.internal.sheet.scripting.SheetScriptService
+com.xpn.xwiki.internal.sheet.ClassSheetBinder
 com.xpn.xwiki.internal.sheet.DefaultSheetManager
+com.xpn.xwiki.internal.sheet.DocumentSheetBinder
 com.xpn.xwiki.internal.sheet.SheetDocumentDisplayer
 com.xpn.xwiki.internal.sheet.SheetRequestInitializer
 com.xpn.xwiki.render.DefaultVelocityManager

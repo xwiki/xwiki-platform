@@ -304,9 +304,9 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
         return version;
     }
 
-    private String resolveGroupId(String modelVersion, Model mavenModel)
+    private String resolveGroupId(String modelGroupId, Model mavenModel)
     {
-        String groupId = mavenModel.getGroupId();
+        String groupId = modelGroupId;
 
         // TODO: download parents and resolve pom.xml properties using aether ? could be pretty expensive for
         // the init

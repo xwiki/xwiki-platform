@@ -41,6 +41,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.sheet.SheetManager;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
@@ -120,9 +121,18 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
      */
     private boolean isSheetExpected(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {
-        return parameters.isContentTransformed()
-            && (parameters.isExecutionContextIsolated() || document.getDocumentReference().equals(
-                documentAccessBridge.getCurrentDocumentReference()));
+        try {
+            // We test if the default edit mode is "edit" to ensure backward compatibility with older XWiki applications
+            // that don't use the new sheet system (they most probably use "inline" as the default edit mode).
+            return parameters.isContentTransformed()
+                && (parameters.isExecutionContextIsolated() || document.getDocumentReference().equals(
+                    documentAccessBridge.getCurrentDocumentReference()))
+                && "edit".equals(((XWikiDocument) document).getDefaultEditMode(getXWikiContext()));
+        } catch (XWikiException e) {
+            logger.warn("Failed to get the default edit mode for [{}].",
+                defaultEntityReferenceSerializer.serialize(document.getDocumentReference()));
+            return false;
+        }
     }
 
     /**

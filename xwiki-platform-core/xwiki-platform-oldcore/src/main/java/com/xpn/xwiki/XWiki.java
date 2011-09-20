@@ -114,6 +114,7 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.sheet.SheetBinder;
 import org.xwiki.url.XWikiEntityURL;
 import org.xwiki.url.standard.XWikiURLBuilder;
 import org.xwiki.xml.XMLUtils;
@@ -846,6 +847,7 @@ public class XWiki implements EventListener
         getCommentsClass(context);
         getSkinClass(context);
         getGlobalRightsClass(context);
+        getSheetClass(context);
         getEditModeClass(context);
 
         try {
@@ -2940,12 +2942,53 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Verify if the <code>XWiki.SheetClass</code> page exists and that it contains all the required configuration
+     * properties to make the sheet feature work properly. If some properties are missing they are created and saved in
+     * the database. SheetClass is used to a page as a sheet. When a page is tagged as a sheet and that page is included
+     * in another page using the include macro then editing it triggers automatic inline edition (for XWiki Syntax 2.0
+     * only - for XWiki Syntax 1.0 automatic inline edition is triggered using #includeForm).
+     * 
+     * @param context the XWiki Context
+     * @return the SheetClass Base Class object containing the properties
+     * @throws XWikiException if an error happens during the save to the database
+     * @deprecated since 3.1M2 edit mode class should be used for this purpose, not the sheet class
+     * @see #getEditModeClass(XWikiContext)
+     */
+    public BaseClass getSheetClass(XWikiContext context) throws XWikiException
+    {
+        XWikiDocument doc =
+            getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "SheetClass"), context);
+        boolean needsUpdate = doc.isNew();
+
+        BaseClass bclass = doc.getXClass();
+        if (context.get("initdone") != null) {
+            return bclass;
+        }
+
+        // Note: Ideally we don't want a special field in the sheet class but XWiki classes must have at
+        // least one field or they're not saved. Thus we are introducing a "defaultEditMode" which will
+        // tell what edit mode to use. If empty it'll default to "inline".
+        needsUpdate |= bclass.addTextField("defaultEditMode", "Default Edit Mode", 15);
+
+        if (doc.isNew()) {
+            needsUpdate |= setClassDocumentFields(doc, "XWiki Sheet Class");
+            doc.setContent(doc.getContent() + "\n\nClass that should be used to recognize sheet pages.");
+        }
+
+        if (needsUpdate) {
+            saveDocument(doc, context);
+        }
+        return bclass;
+    }
+
+    /**
      * Verify if the {@code XWiki.EditModeClass} page exists and that it contains all the required configuration
      * properties to make the edit mode feature work properly. If some properties are missing they are created and saved
      * in the database. EditModeClass is used to specify the default edit mode of a page. It can also be used to mark a
      * page as a sheet. When a page is marked as a sheet and that page is included in another page using the include
      * macro then editing it triggers automatic inline edition (for XWiki Syntax 2.0 only - for XWiki Syntax 1.0
-     * automatic inline edition is triggered using #includeForm).
+     * automatic inline edition is triggered using #includeForm). It replaces and enhances the SheetClass mechanism (see
+     * {@link #getSheetClass(XWikiContext)}).
      * 
      * @param context the XWiki Context
      * @return the EditModeClass Base Class object containing the properties
@@ -3023,6 +3066,13 @@ public class XWiki implements EventListener
         needsUpdate |= bclass.addTextField("phone", "Phone", 30);
         needsUpdate |= bclass.addTextAreaField("address", "Address", 40, 3);
         needsUpdate |= setClassDocumentFields(doc, "XWiki User Class");
+
+        // Use XWikiUserSheet to display documents having XWikiUsers objects if no other class sheet is specified.
+        SheetBinder classSheetBinder = Utils.getComponent(SheetBinder.class, "class");
+        if (classSheetBinder.getSheets(doc).isEmpty()) {
+            DocumentReference sheet = new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiUserSheet");
+            needsUpdate |= classSheetBinder.bind(doc, sheet);
+        }
 
         if (needsUpdate) {
             saveDocument(doc, context);
@@ -3188,7 +3238,23 @@ public class XWiki implements EventListener
             needsUpdate = true;
         }
 
+        SheetBinder documentSheetBinder = Utils.getComponent(SheetBinder.class, "document");
+        boolean hasDocumentSheets = documentSheetBinder.getSheets(doc).isEmpty();
+
         needsUpdate |= setClassDocumentFields(doc, "XWiki Preferences");
+
+        // Don't use ClassSheet to display XWikiPreferences unless explicitly set.
+        if (!hasDocumentSheets) {
+            DocumentReference sheet = new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "ClassSheet");
+            needsUpdate |= documentSheetBinder.unbind(doc, sheet);
+        }
+
+        // Use AdminSheet to display documents having XWikiPreferences objects if no other class sheet is specified.
+        SheetBinder classSheetBinder = Utils.getComponent(SheetBinder.class, "class");
+        if (classSheetBinder.getSheets(doc).isEmpty()) {
+            DocumentReference sheet = new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "AdminSheet");
+            needsUpdate |= classSheetBinder.bind(doc, sheet);
+        }
 
         if (needsUpdate) {
             saveDocument(doc, context);
@@ -3210,6 +3276,13 @@ public class XWiki implements EventListener
 
         needsUpdate |= bclass.addTextField("member", "Member", 30);
         needsUpdate |= setClassDocumentFields(doc, "XWiki Group Class");
+
+        // Use XWikiGroupSheet to display documents having XWikiGroups objects if no other class sheet is specified.
+        SheetBinder classSheetBinder = Utils.getComponent(SheetBinder.class, "class");
+        if (classSheetBinder.getSheets(doc).isEmpty()) {
+            DocumentReference sheet = new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiGroupSheet");
+            needsUpdate |= classSheetBinder.bind(doc, sheet);
+        }
 
         if (needsUpdate) {
             saveDocument(doc, context);
@@ -3334,6 +3407,13 @@ public class XWiki implements EventListener
         needsUpdate |= bclass.addTemplateField("view.vm", "View");
         needsUpdate |= bclass.addTemplateField("edit.vm", "Edit");
         needsUpdate |= setClassDocumentFields(doc, "XWiki Skin Class");
+
+        // Use XWikiSkinsSheet to display documents having XWikiSkins objects if no other class sheet is specified.
+        SheetBinder classSheetBinder = Utils.getComponent(SheetBinder.class, "class");
+        if (classSheetBinder.getSheets(doc).isEmpty()) {
+            DocumentReference sheet = new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiSkinsSheet");
+            needsUpdate |= classSheetBinder.bind(doc, sheet);
+        }
 
         if (needsUpdate) {
             saveDocument(doc, context);
@@ -7169,6 +7249,14 @@ public class XWiki implements EventListener
         if (StringUtils.isBlank(doc.getTitle())) {
             needsUpdate = true;
             doc.setTitle(title);
+        }
+
+        // Use ClassSheet to display the class document if no other sheet is explicitly specified.
+        SheetBinder documentSheetBinder = Utils.getComponent(SheetBinder.class, "document");
+        if (documentSheetBinder.getSheets(doc).isEmpty()) {
+            String wikiName = doc.getDocumentReference().getWikiReference().getName();
+            DocumentReference sheet = new DocumentReference(wikiName, SYSTEM_SPACE, "ClassSheet");
+            needsUpdate |= documentSheetBinder.bind(doc, sheet);
         }
 
         return needsUpdate;

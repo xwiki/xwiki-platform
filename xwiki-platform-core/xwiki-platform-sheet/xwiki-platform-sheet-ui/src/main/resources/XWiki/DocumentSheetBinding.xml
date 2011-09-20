@@ -45,4 +45,4 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </sheet>
 </class>
-<content>This class is used to apply a custom sheet to a document. See also [[XWiki.SheetClass]].</content></xwikidoc>
+<content>This class is used to apply a custom sheet to a document. See also [[SheetDescriptorClass]].</content></xwikidoc>

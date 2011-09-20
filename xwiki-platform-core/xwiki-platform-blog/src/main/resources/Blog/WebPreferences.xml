@@ -1140,5 +1140,5 @@
 <webcopyright></webcopyright>
 </property>
 </object>
-<content>{{include document="XWiki.AdminSheet"/}}</content>
+<content></content>
 </xwikidoc>

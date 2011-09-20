@@ -25,7 +25,7 @@
 <hidden>true</hidden>
 <object>
 <class>
-<name>XWiki.SheetClass</name>
+<name>XWiki.SheetDescriptorClass</name>
 <customClass></customClass>
 <customMapping></customMapping>
 <defaultViewSheet></defaultViewSheet>
@@ -37,7 +37,7 @@
 <customDisplay></customDisplay>
 <disabled>0</disabled>
 <name>action</name>
-<number>2</number>
+<number>1</number>
 <picker>0</picker>
 <prettyName>Action</prettyName>
 <size>30</size>
@@ -49,8 +49,8 @@
 </class>
 <name>Blog.CategorySheet</name>
 <number>0</number>
-<className>XWiki.SheetClass</className>
-<guid>a0c19db1-addb-4599-855e-55696c51eecd</guid>
+<className>XWiki.SheetDescriptorClass</className>
+<guid>e04cbd1d-a504-4e3e-9ddd-4d2bdcdac1b0</guid>
 <property>
 <action>view</action>
 </property>

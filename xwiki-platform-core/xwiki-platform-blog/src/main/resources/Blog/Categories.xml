@@ -112,12 +112,12 @@
 <className>XWiki.DocumentSheetBinding</className>
 <guid>7a373890-940d-4ba1-9a3a-78449bfb7483</guid>
 <property>
-<sheet>Blog.Categories</sheet>
+<sheet></sheet>
 </property>
 </object>
 <object>
 <class>
-<name>XWiki.SheetClass</name>
+<name>XWiki.SheetDescriptorClass</name>
 <customClass></customClass>
 <customMapping></customMapping>
 <defaultViewSheet></defaultViewSheet>
@@ -129,7 +129,7 @@
 <customDisplay></customDisplay>
 <disabled>0</disabled>
 <name>action</name>
-<number>2</number>
+<number>1</number>
 <picker>0</picker>
 <prettyName>Action</prettyName>
 <size>30</size>
@@ -141,8 +141,8 @@
 </class>
 <name>Blog.Categories</name>
 <number>0</number>
-<className>XWiki.SheetClass</className>
-<guid>4d291d76-09cc-4503-8674-368e00d3dd9f</guid>
+<className>XWiki.SheetDescriptorClass</className>
+<guid>eb043d8b-ba7d-4b37-ab55-5d490f53818f</guid>
 <property>
 <action>view</action>
 </property>

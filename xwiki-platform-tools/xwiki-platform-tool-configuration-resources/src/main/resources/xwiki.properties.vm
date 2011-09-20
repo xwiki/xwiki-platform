@@ -40,7 +40,11 @@
 
 #-# [Since 3.2M3]
 #-# Directory used to store persistent data.
+#if ($xwikiPropertiesContainerPersistentDirectory)
+container.persistentDirectory=$xwikiContainerPersistentDirectory
+#else
 # container.persistentDirectory=/var/local/xwiki/
+#end
 
 #-------------------------------------------------------------------------------------
 # Rendering

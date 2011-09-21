@@ -575,6 +575,10 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
 #if ($isMyProfile)
   #set ($discard = $categories.add(['network', $msg.get('platform.core.profile.category.network'), 'XWiki.XWikiUserNetworkSheet', 'icons/silk/group.gif']))
 #end
+#set ($userWorkspaceSheet = 'WorkspaceManager.UserWorkspaceSheet')
+#if ($xcontext.isMainWiki() &amp;&amp; $xwiki.exists($userWorkspaceSheet))
+  #set ($discard = $categories.add(['workspaces', $msg.get('workspacemanager.profile.category.workspaces'), $userWorkspaceSheet, 'icons/silk/chart_organisation.gif']))
+#end
 #if ($isMyProfile)
   #set ($discard = $categories.add(['dashboard', $msg.get('platform.core.profile.category.dashboard'), 'XWiki.XWikiUserDashboardSheet', 'icons/silk/application_view_tile.gif']))
 #end

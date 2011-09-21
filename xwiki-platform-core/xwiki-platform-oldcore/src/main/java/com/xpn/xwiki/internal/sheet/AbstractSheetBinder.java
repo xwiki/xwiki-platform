@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -69,10 +70,17 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     /**
-     * The component used to serialize entity references.
+     * The component used to serialize entity references as absolute string references.
      */
     @Inject
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    /**
+     * The component used to serialize entity references as relative string references.
+     */
+    @Inject
+    @Named("compact")
+    private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     /**
      * Execution context handler, needed for accessing the XWikiContext.
@@ -153,15 +161,16 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
                 }
             }
         }
-        String sheetStringReference =
-            defaultEntityReferenceSerializer.serialize(sheetReference, document.getDocumentReference());
+        String relativeSheetStringReference =
+            compactEntityReferenceSerializer.serialize(sheetReference, document.getDocumentReference());
         try {
             BaseObject sheetBindingObject =
                 ((XWikiDocument) document).newXObject(sheetBindingClassReference, getXWikiContext());
-            sheetBindingObject.setStringValue(SHEET_PROPERTY, sheetStringReference);
+            sheetBindingObject.setStringValue(SHEET_PROPERTY, relativeSheetStringReference);
         } catch (XWikiException e) {
-            logger.warn("Failed to bind sheet [{}] to document [{}].", sheetStringReference,
-                defaultEntityReferenceSerializer.serialize(document.getDocumentReference()));
+            String docStringReference = defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
+            String sheetStringReference = defaultEntityReferenceSerializer.serialize(sheetReference);
+            logger.warn("Failed to bind sheet [{}] to document [{}].", sheetStringReference, docStringReference);
             return false;
         }
         return true;

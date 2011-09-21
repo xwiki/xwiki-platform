@@ -53,13 +53,13 @@ public class EditAction extends XWikiAction
             hasTranslation = true;
         }
 
-        // we need to clone so that nothing happens in memory
+        // We have to clone the context document because it is cached and the changes we are going to make are valid
+        // only for the duration of the current request.
         doc = doc.clone();
         context.put("doc", doc);
         vcontext.put("doc", doc.newDocument(context));
 
         synchronized (doc) {
-            XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
             EditForm peform = (EditForm) form;
             String parent = peform.getParent();
             if (parent != null) {
@@ -104,28 +104,27 @@ public class EditAction extends XWikiAction
                 languagetoedit = "";
             }
 
+            XWikiDocument tdoc;
             if (languagetoedit.equals("")) {
-                // In this case the created document is going to be the default document
+                // In this case the created document is going to be the default document.
                 tdoc = doc;
-                context.put("tdoc", doc);
-                vcontext.put("tdoc", vcontext.get("doc"));
                 if (doc.isNew()) {
                     doc.setDefaultLanguage(language);
                     doc.setLanguage("");
                 }
+            } else if ((!hasTranslation) && context.getWiki().isMultiLingual(context)) {
+                // If the translated doc object is the same as the doc object this means the translated doc did not
+                // exists so we need to create it.
+                tdoc = new XWikiDocument(doc.getDocumentReference());
+                tdoc.setLanguage(languagetoedit);
+                tdoc.setContent(doc.getContent());
+                tdoc.setSyntax(doc.getSyntax());
+                tdoc.setAuthorReference(context.getUserReference());
+                tdoc.setStore(doc.getStore());
             } else {
-                // If the translated doc object is the same as the doc object
-                // this means the translated doc did not exists so we need to create it
-                if ((!hasTranslation) && context.getWiki().isMultiLingual(context)) {
-                    tdoc = new XWikiDocument(doc.getDocumentReference());
-                    tdoc.setLanguage(languagetoedit);
-                    tdoc.setContent(doc.getContent());
-                    tdoc.setSyntax(doc.getSyntax());
-                    tdoc.setAuthorReference(context.getUserReference());
-                    tdoc.setStore(doc.getStore());
-                    context.put("tdoc", tdoc);
-                    vcontext.put("tdoc", tdoc.newDocument(context));
-                }
+                // Edit existing translation. Clone the translated document object to be sure that the changes we are
+                // going to make will last only for the duration of the current request.
+                tdoc = ((XWikiDocument) context.get("tdoc")).clone();
             }
 
             // Check for edit section
@@ -137,9 +136,8 @@ public class EditAction extends XWikiAction
             }
             vcontext.put("sectionNumber", new Integer(sectionNumber));
 
-            XWikiDocument tdoc2 = tdoc.clone();
             try {
-                tdoc2.readFromTemplate(peform, context);
+                tdoc.readFromTemplate(peform, context);
             } catch (XWikiException e) {
                 if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
                     context.put("exception", e);
@@ -147,25 +145,31 @@ public class EditAction extends XWikiAction
                 }
             }
             if (contentFromRequest != null) {
-                tdoc2.setContent(contentFromRequest);
+                tdoc.setContent(contentFromRequest);
             }
             if (titleFromRequest != null) {
-                tdoc2.setTitle(titleFromRequest);
+                tdoc.setTitle(titleFromRequest);
             }
             if (StringUtils.isNotEmpty(sectionContent)) {
                 if (contentFromRequest == null) {
-                    tdoc2.setContent(sectionContent);
+                    tdoc.setContent(sectionContent);
                 }
                 String sectionTitle = doc.getDocumentSection(sectionNumber).getSectionTitle();
                 if (titleFromRequest == null && StringUtils.isNotBlank(sectionTitle)) {
                     sectionTitle =
                         context.getMessageTool().get("core.editors.content.titleField.sectionEditingFormat",
-                            tdoc2.getRenderedTitle(Syntax.PLAIN_1_0, context), sectionNumber, sectionTitle);
-                    tdoc2.setTitle(sectionTitle);
+                            tdoc.getRenderedTitle(Syntax.PLAIN_1_0, context), sectionNumber, sectionTitle);
+                    tdoc.setTitle(sectionTitle);
                 }
             }
-            context.put("tdoc", tdoc2);
-            vcontext.put("tdoc", tdoc2.newDocument(context));
+
+            context.put("tdoc", tdoc);
+            vcontext.put("tdoc", tdoc.newDocument(context));
+            // XWiki applications that were previously using the inline action might still expect the cdoc (content
+            // document) to be properly set on the context. Expose tdoc (translated document) as cdoc for backward
+            // compatibility.
+            context.put("cdoc", context.get("tdoc"));
+            vcontext.put("cdoc", vcontext.get("tdoc"));
 
             /* Setup a lock */
             try {

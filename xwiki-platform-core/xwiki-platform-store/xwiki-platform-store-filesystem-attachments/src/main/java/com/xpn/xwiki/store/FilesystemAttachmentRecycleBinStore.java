@@ -31,6 +31,10 @@ import java.io.IOException;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.DeletedFilesystemAttachment;
 import com.xpn.xwiki.doc.FilesystemAttachmentContent;
@@ -40,7 +44,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.store.FileDeleteTransactionRunnable;
@@ -57,30 +60,36 @@ import org.xwiki.store.StartableTransactionRunnable;
  * @version $Id$
  * @since 3.0M3
  */
-@Component("file")
+@Component
+@Named("file")
+@Singleton
 public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBinStore, Initializable
 {
     /** Some utilities for getting attachment files, locks, and backup files. */
-    @Requirement
+    @Inject
     private FilesystemStoreTools fileTools;
 
     /** A serializer for the archive metadata. */
-    @Requirement("attachment-list-meta/1.0")
+    @Inject
+    @Named("attachment-list-meta/1.0")
     private Serializer<List<XWikiAttachment>, List<XWikiAttachment>> versionSerializer;
 
     /** Used to parse and serialize deleted attachment metadata when loading and storing. */
-    @Requirement("deleted-attachment-meta/1.0")
+    @Inject
+    @Named("deleted-attachment-meta/1.0")
     private Serializer<DeletedAttachment, MutableDeletedFilesystemAttachment> deletedAttachmentSerializer;
 
     /**
      * This is needed in order to be able to map the database ids given by the
      * user to meaningful paths to deleted attachments.
      */
-    @Requirement("deleted-attachment-id-mappings/1.0")
+    @Inject
+    @Named("deleted-attachment-id-mappings/1.0")
     private Serializer<Map<Long, String>, Map<Long, String>> attachmentIdMappingSerializer;
 
     /** Used to store the versions of the deleted attachment. */
-    @Requirement("file")
+    @Inject
+    @Named("file")
     private AttachmentVersioningStore attachmentVersionStore;
 
     /**
@@ -98,6 +107,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
      *
      * @throws InitializationException if the mapping file cannot be parsed.
      */
+    @Override
     public void initialize() throws InitializationException
     {
         // make sure we have a FilesystemAttachmentVersioningStore.
@@ -117,11 +127,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see AttachmentRecycleBinStore#saveToRecycleBin(XWikiAttachment, String, Date, XWikiContext, boolean)
-     */
+    @Override
     public void saveToRecycleBin(final XWikiAttachment attachment,
                                  final String deleter,
                                  final Date deleteDate,
@@ -205,6 +211,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
      *
      * @see AttachmentRecycleBinStore#restoreFromRecycleBin(XWikiAttachment, long, XWikiContext, boolean)
      */
+    @Override
     public XWikiAttachment restoreFromRecycleBin(final XWikiAttachment attachment,
                                                  final long index,
                                                  final XWikiContext context,
@@ -221,6 +228,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
      *
      * @see AttachmentRecycleBinStore#getDeletedAttachment(long, XWikiContext, boolean)
      */
+    @Override
     public DeletedAttachment getDeletedAttachment(final long index,
                                                   final XWikiContext context,
                                                   final boolean bTransaction) throws XWikiException
@@ -247,6 +255,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
      *
      * @see AttachmentRecycleBinStore#getAllDeletedAttachments(XWikiAttachment, XWikiContext, boolean)
      */
+    @Override
     public List<DeletedAttachment> getAllDeletedAttachments(final XWikiAttachment attachment,
                                                             final XWikiContext context,
                                                             final boolean bTransaction)
@@ -293,6 +302,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
      *
      * @see AttachmentRecycleBinStore#getAllDeletedAttachments(XWikiDocument, XWikiContext, boolean)
      */
+    @Override
     public List<DeletedAttachment> getAllDeletedAttachments(final XWikiDocument doc,
                                                             final XWikiContext context,
                                                             final boolean bTransaction)
@@ -339,6 +349,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
      *
      * @see AttachmentRecycleBinStore#deleteFromRecycleBin(long, XWikiContext, boolean)
      */
+    @Override
     public void deleteFromRecycleBin(final long index,
                                      final XWikiContext context,
                                      final boolean bTransaction)
@@ -448,11 +459,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
         /** A static reference to a singleton instance of the comparator. */
         public static final Comparator<Date> INSTANCE = new NewestFirstDateComparitor();
 
-        /**
-         * {@inheritDoc}
-         *
-         * @see java.util.Comparator#compare(T, T)
-         */
+        @Override
         public int compare(final Date d1, final Date d2)
         {
             return d2.compareTo(d1);

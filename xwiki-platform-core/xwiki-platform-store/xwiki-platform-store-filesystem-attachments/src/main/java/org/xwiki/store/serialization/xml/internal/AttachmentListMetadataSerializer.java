@@ -16,20 +16,21 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package org.xwiki.store.serialization.xml.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import com.xpn.xwiki.doc.XWikiAttachment;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.Element;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.store.serialization.xml.XMLSerializer;
 
 /**
@@ -47,7 +48,9 @@ import org.xwiki.store.serialization.xml.XMLSerializer;
  * @version $Id$
  * @since 3.0M2
  */
-@Component("attachment-list-meta/1.0")
+@Component
+@Named("attachment-list-meta/1.0")
+@Singleton
 public class AttachmentListMetadataSerializer
     extends AbstractXMLSerializer<List<XWikiAttachment>, List<XWikiAttachment>>
 {
@@ -61,7 +64,8 @@ public class AttachmentListMetadataSerializer
     private static final String THIS_SERIALIZER = "attachment-list-meta/1.0";
 
     /** Needed to serialize/parse the individual attachments. */
-    @Requirement("attachment-meta/1.0")
+    @Inject
+    @Named("attachment-meta/1.0")
     private XMLSerializer<XWikiAttachment, XWikiAttachment> attachSerializer;
 
     /** Default constructor. For component manager. */
@@ -82,11 +86,7 @@ public class AttachmentListMetadataSerializer
         this.attachSerializer = attachSerializer;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see AbstractXMLSerializer#parse(Element)
-     */
+    @Override
     public List<XWikiAttachment> parse(final Element docel) throws IOException
     {
         if (!ROOT_ELEMENT_NAME.equals(docel.getName())) {
@@ -103,11 +103,7 @@ public class AttachmentListMetadataSerializer
         return attachments;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see AbstractXMLSerializer#serialize(T, XMLWriter)
-     */
+    @Override
     public void serialize(final List<XWikiAttachment> attachments,
                           final XMLWriter writer)
         throws IOException

@@ -30,13 +30,15 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.XWikiContext;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.store.locks.LockProvider;
 
 /**
@@ -47,6 +49,7 @@ import org.xwiki.store.locks.LockProvider;
  * @since 3.0M2
  */
 @Component
+@Singleton
 public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initializable
 {
     /** The name of the directory in the work directory where the hirearchy will be stored. */
@@ -86,13 +89,14 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     private static final String TEMP_FILE_SUFFIX = "~tmp";
 
     /** Serializer used for obtaining a safe file path from a document reference. */
-    @Requirement("path")
+    @Inject
+    @Named("path")
     private EntityReferenceSerializer<String> pathSerializer;
 
     /**
      * We need to get the XWiki object in order to get the work directory.
      */
-    @Requirement
+    @Inject
     private Execution exec;
 
     /** A means of acquiring locks for attachments. */
@@ -124,7 +128,7 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     {
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void initialize()
     {
         final XWikiContext context = ((XWikiContext) this.exec.getContext().getProperty("xwikicontext"));
@@ -158,31 +162,19 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see FilesystemStoreTools#getBackupFile(File)
-     */
+    @Override
     public File getBackupFile(final File storageFile)
     {
         return new File(storageFile.getAbsolutePath() + BACKUP_FILE_SUFFIX);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see FilesystemStoreTools#getTempFile(File)
-     */
+    @Override
     public File getTempFile(final File storageFile)
     {
         return new File(storageFile.getAbsolutePath() + TEMP_FILE_SUFFIX);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see FilesystemStoreTools#getDeletedAttachmentFileProvider(XWikiAttachment, Date)
-     */
+    @Override
     public DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(final XWikiAttachment attachment,
                                                                           final Date deleteDate)
     {
@@ -190,11 +182,7 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
             this.getDeletedAttachmentDir(attachment, deleteDate), attachment.getFilename());
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see FilesystemStoreTools#getDeletedAttachmentFileProvider(String)
-     */
+    @Override
     public DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(final String pathToDirectory)
     {
         final File attachDir = new File(this.storageDir, this.getStorageLocationPath());
@@ -202,11 +190,7 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
             attachDir, getFilenameFromDeletedAttachmentDirectory(attachDir));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see FilesystemStoreTools#deletedAttachmentsForDocument(DocumentReference)
-     */
+    @Override
     public Map<String, Map<Date, DeletedAttachmentFileProvider>>
     deletedAttachmentsForDocument(final DocumentReference docRef)
     {
@@ -254,31 +238,19 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
         return new Date(time);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see FilesystemStoreTools#getStorageLocationPath()
-     */
+    @Override
     public String getStorageLocationPath()
     {
         return this.storageDir.getAbsolutePath();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see FilesystemStoreTools#getGlobalFile(String)
-     */
+    @Override
     public File getGlobalFile(final String name)
     {
         return new File(this.storageDir, "~GLOBAL_" + GenericFileUtils.getURLEncoded(name));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see FilesystemStoreTools#getAttachmentFileProvider(XWikiAttachment)
-     */
+    @Override
     public AttachmentFileProvider getAttachmentFileProvider(final XWikiAttachment attachment)
     {
         return new DefaultAttachmentFileProvider(this.getAttachmentDir(attachment),
@@ -356,11 +328,7 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     }
 
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see FilesystemStoreTools#getLockForFile(File)
-     */
+    @Override
     public ReadWriteLock getLockForFile(final File toLock)
     {
         return this.lockProvider.getLock(toLock);

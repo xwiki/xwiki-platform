@@ -26,6 +26,10 @@ import java.io.IOException;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.FilesystemAttachmentContent;
@@ -33,12 +37,10 @@ import com.xpn.xwiki.doc.ListAttachmentArchive;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
 import org.xwiki.store.serialization.Serializer;
 import org.xwiki.store.StartableTransactionRunnable;
-
 
 /**
  * Filesystem based AttachmentVersioningStore implementation.
@@ -46,18 +48,21 @@ import org.xwiki.store.StartableTransactionRunnable;
  * @version $Id$
  * @since 3.0M2
  */
-@Component("file")
+@Component
+@Named("file")
+@Singleton
 public class FilesystemAttachmentVersioningStore implements AttachmentVersioningStore
 {
     /** To put in an exception message if the document name or filename cannot be determined. */
     private static final String UNKNOWN_NAME = "UNKNOWN";
 
     /** Tools for getting files to store given content in. */
-    @Requirement
+    @Inject
     private FilesystemStoreTools fileTools;
 
     /** A serializer for the list of attachment metdata. */
-    @Requirement("attachment-list-meta/1.0")
+    @Inject
+    @Named("attachment-list-meta/1.0")
     private Serializer<List<XWikiAttachment>, List<XWikiAttachment>> metaSerializer;
 
     /**
@@ -79,11 +84,7 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
     {
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see AttachmentVersioningStore#loadArchive(XWikiAttachment, XWikiContext, boolean)
-     */
+    @Override
     public XWikiAttachmentArchive loadArchive(final XWikiAttachment attachment,
                                               final XWikiContext context,
                                               final boolean bTransaction)
@@ -160,6 +161,7 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
      *
      * @see AttachmentVersioningStore#saveArchive(XWikiAttachmentArchive, XWikiContext, boolean)
      */
+    @Override
     public void saveArchive(final XWikiAttachmentArchive archive,
                             final XWikiContext context,
                             final boolean bTransaction)
@@ -212,6 +214,7 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
      *
      * @see AttachmentVersioningStore#deleteArchive(XWikiAttachment, XWikiContext, boolean)
      */
+    @Override
     public void deleteArchive(final XWikiAttachment attachment,
                               final XWikiContext context,
                               final boolean bTransaction)
@@ -257,5 +260,4 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
         return new AttachmentArchiveDeleteRunnable(
             archive, this.fileTools, this.fileTools.getAttachmentFileProvider(archive.getAttachment()));
     }
-
 }

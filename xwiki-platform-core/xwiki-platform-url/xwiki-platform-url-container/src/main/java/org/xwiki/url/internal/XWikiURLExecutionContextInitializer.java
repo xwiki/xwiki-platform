@@ -19,8 +19,11 @@
  */
 package org.xwiki.url.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
 import org.xwiki.context.ExecutionContext;
@@ -33,18 +36,18 @@ import org.xwiki.context.ExecutionContextInitializer;
  * @version $Id$
  * @since 3.0M3
  */
-@Component("xwikiurl")
+@Component
+@Named("xwikiurl")
+@Singleton
 public class XWikiURLExecutionContextInitializer implements ExecutionContextInitializer
 {
     /**
      * Used to get access to the Request.
      */
-    @Requirement
+    @Inject
     private Container container;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void initialize(ExecutionContext context) throws ExecutionContextException
     {
         // If there's no Request don't set the XWiki URL in the Execution Context

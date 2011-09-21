@@ -16,13 +16,15 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package org.xwiki.store.serialization.xml.internal;
 
 import java.io.IOException;
 import java.util.Date;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.DeletedFilesystemAttachment;
@@ -30,7 +32,6 @@ import com.xpn.xwiki.doc.MutableDeletedFilesystemAttachment;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.store.serialization.xml.XMLSerializer;
 
 /**
@@ -39,7 +40,9 @@ import org.xwiki.store.serialization.xml.XMLSerializer;
  * @version $Id$
  * @since 3.0M3
  */
-@Component("deleted-attachment-meta/1.0")
+@Component
+@Named("deleted-attachment-meta/1.0")
+@Singleton
 public class DeletedAttachmentMetadataSerializer
     extends AbstractXMLSerializer<DeletedFilesystemAttachment, MutableDeletedFilesystemAttachment>
 {
@@ -62,14 +65,11 @@ public class DeletedAttachmentMetadataSerializer
     private static final String ATTACHMENT = "attachment";
 
     /** Needed to serialize/parse the deleted attachment metadata. */
-    @Requirement("attachment-meta/1.0")
+    @Inject
+    @Named("attachment-meta/1.0")
     private XMLSerializer<XWikiAttachment, XWikiAttachment> attachSerializer;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractXMLSerializer#parse(Element)
-     */
+    @Override
     public MutableDeletedFilesystemAttachment parse(final Element docel) throws IOException
     {
         if (!ROOT_ELEMENT_NAME.equals(docel.getName())) {
@@ -91,11 +91,7 @@ public class DeletedAttachmentMetadataSerializer
         return out;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractXMLSerializer#serialize(T, XMLWriter)
-     */
+    @Override
     public void serialize(final DeletedFilesystemAttachment delAttach, final XMLWriter writer)
         throws IOException
     {

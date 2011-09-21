@@ -27,11 +27,13 @@ import java.util.Random;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
+import org.apache.lucene.util.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
@@ -252,10 +254,8 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     {
         while (true) {
             try {
-                IndexWriter w =
-                    new IndexWriter(this.directory, this.analyzer, create, IndexWriter.MaxFieldLength.LIMITED);
-                w.setUseCompoundFile(true);
-
+                IndexWriterConfig cfg = new IndexWriterConfig(Version.LUCENE_34, this.analyzer);
+                IndexWriter w = new IndexWriter(this.directory, cfg);
                 return w;
             } catch (LockObtainFailedException e) {
                 try {
@@ -279,7 +279,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         data.addDataToLuceneDocument(luceneDoc, context);
 
         // collecting all the fields for using up in search
-        for (Field field : (List<Field>) luceneDoc.getFields()) {
+        for (Fieldable field : luceneDoc.getFields()) {
             if (!fields.contains(field.name())) {
                 fields.add(field.name());
             }

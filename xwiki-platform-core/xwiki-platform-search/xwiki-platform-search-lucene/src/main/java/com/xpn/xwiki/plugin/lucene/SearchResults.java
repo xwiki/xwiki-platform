@@ -22,7 +22,10 @@ package com.xpn.xwiki.plugin.lucene;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.TopDocsCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,21 +46,25 @@ public class SearchResults extends Api
 {
     private final XWiki xwiki;
 
-    private final Hits hits;
+    private final Searcher searcher;
+
+    private final TopDocsCollector< ? extends ScoreDoc> results;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchResults.class);
 
     private List<SearchResult> relevantResults;
 
     /**
-     * @param hits Lucene search results
+     * @param results Lucene search results
      * @param xwiki xwiki instance for access rights checking
      */
-    public SearchResults(Hits hits, XWiki xwiki, XWikiContext context)
+    SearchResults(TopDocsCollector< ? extends ScoreDoc> results, Searcher searcher, XWiki xwiki,
+        XWikiContext context)
     {
         super(context);
 
-        this.hits = hits;
+        this.results = results;
+        this.searcher = searcher;
         this.xwiki = xwiki;
     }
 
@@ -65,11 +72,12 @@ public class SearchResults extends Api
     {
         if (this.relevantResults == null) {
             this.relevantResults = new ArrayList<SearchResult>();
-            final int hitcount = this.hits.length();
+            TopDocs docs = this.results.topDocs();
 
-            for (int i = 0; i < hitcount; i++) {
+            for (int i = 0; i < docs.scoreDocs.length; i++) {
                 try {
-                    SearchResult result = new SearchResult(this.hits.doc(i), this.hits.score(i), this.xwiki);
+                    SearchResult result =
+                        new SearchResult(this.searcher.doc(docs.scoreDocs[i].doc), docs.scoreDocs[i].score, this.xwiki);
 
                     String pageName = null;
                     if (result.isWikiContent()) {
@@ -172,14 +180,14 @@ public class SearchResults extends Api
         List<SearchResult> relResults = this.relevantResults;
         if (relResults == null) {
             relResults = new ArrayList<SearchResult>();
-            final int hitcount = this.hits.length();
-
+            TopDocs docs = this.results.topDocs();
             String database = this.context.getDatabase();
             try {
-                for (int i = 0; i < hitcount; i++) {
+                for (int i = 0; i < docs.scoreDocs.length; i++) {
                     SearchResult result = null;
                     try {
-                        result = new SearchResult(this.hits.doc(i), this.hits.score(i), this.xwiki);
+                        result = new SearchResult(this.searcher.doc(docs.scoreDocs[i].doc), docs.scoreDocs[i].score,
+                            this.xwiki);
 
                         this.context.setDatabase(result.getWiki());
 
@@ -235,6 +243,6 @@ public class SearchResults extends Api
      */
     public int getTotalHitcount()
     {
-        return this.hits.length();
+        return this.results.getTotalHits();
     }
 }

@@ -31,20 +31,24 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MultiSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocsCollector;
+import org.apache.lucene.search.TopFieldCollector;
+import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
@@ -365,11 +369,17 @@ public class LucenePlugin extends XWikiDefaultPlugin
         Query q = buildQuery(query, virtualWikiNames, languages);
 
         // Perform the actual search
-        Hits hits = (sort == null) ? searcher.search(q) : searcher.search(q, sort);
-        LOGGER.debug("query [{}] returned {} hits", q, hits.length());
+        TopDocsCollector< ? extends ScoreDoc> results;
+        if (sort != null) {
+            results = TopFieldCollector.create(sort, 1000, true, true, false, false);
+        } else {
+            results = TopScoreDocCollector.create(1000, false);
+        }
+        searcher.search(q, results);
+        LOGGER.debug("query [{}] returned {} hits", q, results.getTotalHits());
 
         // Transform the raw Lucene search results into XWiki-aware results
-        return new SearchResults(hits, new com.xpn.xwiki.api.XWiki(context.getWiki(), context), context);
+        return new SearchResults(results, searcher, new com.xpn.xwiki.api.XWiki(context.getWiki(), context), context);
     }
 
     /**
@@ -384,11 +394,9 @@ public class LucenePlugin extends XWikiDefaultPlugin
     {
         SortField sort = null;
         if (!StringUtils.isEmpty(sortField)) {
-            if (sortField.startsWith("-")) {
-                sort = new SortField(sortField.substring(1), true);
-            } else {
-                sort = new SortField(sortField);
-            }
+            // For the moment assuming everything is a String is enough, since we don't usually want to sort documents
+            // on numerical object properties.
+            sort = new SortField(StringUtils.removeStart(sortField, "-"), SortField.STRING, sortField.startsWith("-"));
         }
 
         return sort;
@@ -410,7 +418,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
         if (query.startsWith("PROP ")) {
             String property = query.substring(0, query.indexOf(":"));
             query = query.substring(query.indexOf(":") + 1, query.length());
-            QueryParser qp = new QueryParser(Version.LUCENE_29, property, this.analyzer);
+            QueryParser qp = new QueryParser(Version.LUCENE_34, property, this.analyzer);
             parsedQuery = qp.parse(query);
             bQuery.add(parsedQuery, BooleanClause.Occur.MUST);
         } else if (query.startsWith("MULTI ")) {
@@ -421,10 +429,10 @@ public class LucenePlugin extends XWikiDefaultPlugin
             for (int i = 0; i < flags.length; i++) {
                 flags[i] = BooleanClause.Occur.SHOULD;
             }
-            parsedQuery = MultiFieldQueryParser.parse(Version.LUCENE_29, query, fields, flags, this.analyzer);
+            parsedQuery = MultiFieldQueryParser.parse(Version.LUCENE_34, query, fields, flags, this.analyzer);
             bQuery.add(parsedQuery, BooleanClause.Occur.MUST);
         } else {
-            QueryParser qp = new QueryParser(Version.LUCENE_29, "ft", this.analyzer);
+            QueryParser qp = new QueryParser(Version.LUCENE_34, "ft", this.analyzer);
             parsedQuery = qp.parse(query);
             bQuery.add(parsedQuery, BooleanClause.Occur.MUST);
         }
@@ -535,13 +543,17 @@ public class LucenePlugin extends XWikiDefaultPlugin
         super.init(context);
 
         try {
-            this.analyzer =
-                (Analyzer) Class.forName(context.getWiki().Param(PROP_ANALYZER, DEFAULT_ANALYZER)).newInstance();
+            @SuppressWarnings("unchecked")
+            Class< ? extends Analyzer> clazz =
+                (Class< ? extends Analyzer>) Class.forName(context.getWiki().Param(PROP_ANALYZER, DEFAULT_ANALYZER));
+            this.analyzer = clazz.getConstructor(Version.class).newInstance(Version.LUCENE_34);
         } catch (Exception e) {
             LOGGER.error("Error instantiating analyzer: {}", e.getMessage());
             LOGGER.warn("Using default analyzer class: " + DEFAULT_ANALYZER);
             try {
-                this.analyzer = (Analyzer) Class.forName(DEFAULT_ANALYZER).newInstance();
+                @SuppressWarnings("unchecked")
+                Class< ? extends Analyzer> clazz = (Class< ? extends Analyzer>) Class.forName(DEFAULT_ANALYZER);
+                this.analyzer = clazz.getConstructor(Version.class).newInstance(Version.LUCENE_34);
             } catch (Exception e1) {
                 throw new RuntimeException("Instantiation of default analyzer " + DEFAULT_ANALYZER + " failed", e1);
             }
@@ -630,16 +642,18 @@ public class LucenePlugin extends XWikiDefaultPlugin
     {
         String[] dirs = StringUtils.split(indexDirs, ",");
         List<IndexSearcher> searchersList = new ArrayList<IndexSearcher>();
+        IndexWriterConfig cfg = new IndexWriterConfig(Version.LUCENE_34, this.analyzer);
         for (String dir : dirs) {
+            Directory d = FSDirectory.open(new File(dir));
             while (true) {
                 try {
-                    if (!IndexReader.indexExists(dir)) {
+                    if (!IndexReader.indexExists(d)) {
                         // If there's no index there, create an empty one; otherwise the reader
                         // constructor will throw an exception and fail to initialize
-                        new IndexWriter(dir, this.analyzer).close();
+                        new IndexWriter(d, cfg).close();
                     }
 
-                    searchersList.add(new IndexSearcher(dir, true));
+                    searchersList.add(new IndexSearcher(d, true));
                     break;
                 } catch (CorruptIndexException e) {
                     handleCorruptIndex(context);

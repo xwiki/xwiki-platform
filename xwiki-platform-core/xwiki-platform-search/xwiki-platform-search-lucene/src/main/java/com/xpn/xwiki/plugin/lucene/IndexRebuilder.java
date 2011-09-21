@@ -444,7 +444,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         try {
             searcher = new IndexSearcher(directory, true);
         } catch (Exception e) {
-            LOGGER.error("Faild to create IndexSearcher for Lucen index [{}]", directory, e);
+            LOGGER.error("Faild to create IndexSearcher for Lucene index [{}]", directory, e);
         }
 
         return searcher;

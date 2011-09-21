@@ -358,6 +358,7 @@
                 <exclude>com/xpn/xwiki/cache/api/XWikiCache</exclude>
                 <exclude>com/xpn/xwiki/cache/api/XWikiCacheNeedsRefreshException</exclude>
                 <exclude>com/xpn/xwiki/cache/api/XWikiCacheService</exclude>
+                <exclude>com/xpn/xwiki/plugin/lucene/SearchResults</exclude>
                 <exclude>org/xwiki/gwt/dom/client/Style$IEFloatProperty</exclude>
                 <exclude>org/xwiki/gwt/wysiwyg/client/plugin/submit/IESubmitPlugin</exclude>
                 <exclude>org/xwiki/container/ApplicationContext</exclude>

@@ -1,2 +1,4 @@
 @import "$xwiki.getSkinFile('css/microformats.css')";
 @import "$xwiki.getSkinFile('colibri.css', true)#if ("$!{request.colorTheme}" != '')?colorTheme=${request.colorTheme}#end";
+#set ($workspaceManagerStyleDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'Style'))
+@import "$xwiki.getURL($workspaceManagerStyleDocumentReference, 'ssx', '')";

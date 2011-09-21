@@ -22,11 +22,11 @@ package com.xpn.xwiki.plugin.lucene;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -43,7 +43,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public abstract class AbstractDocumentData extends AbstractIndexData
 {
-    private static final Log LOG = LogFactory.getLog(AbstractDocumentData.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDocumentData.class);
 
     private String version;
 
@@ -90,13 +90,12 @@ public abstract class AbstractDocumentData extends AbstractIndexData
      * </ul>
      * 
      * @param luceneDoc if not null, this controls which translated version of the content will be indexed. If null, the
-     *            content in the default language will be used.
+     *        content in the default language will be used.
      */
+    @Override
     public void addDataToLuceneDocument(Document luceneDoc, XWikiContext context) throws XWikiException
     {
-        /*
-         * XXX Is it not possible to obtain the right translation directly?
-         */
+        // FIXME Is it not possible to obtain the right translation directly?
         XWikiDocument doc = context.getWiki().getDocument(getDocumentReference(), context);
 
         if (getLanguage() != null && !getLanguage().equals("")) {
@@ -153,13 +152,14 @@ public abstract class AbstractDocumentData extends AbstractIndexData
                 luceneDoc.add(new Field(IndexFields.FULLTEXT, ft, Field.Store.NO, Field.Index.ANALYZED));
             }
         } catch (Exception e) {
-            LOG.error("Error extracting fulltext for document [" + this + "]", e);
+            LOGGER.error("Error extracting fulltext for document [{}]", this.toString(), e);
         }
     }
 
     /**
      * @return string unique to this document across all languages and virtual wikis
      */
+    @Override
     public String getId()
     {
         StringBuilder retval = new StringBuilder();
@@ -171,6 +171,7 @@ public abstract class AbstractDocumentData extends AbstractIndexData
         return retval.toString();
     }
 
+    @Override
     public Term getTerm()
     {
         return new Term(IndexFields.DOCUMENT_ID, getId());
@@ -179,6 +180,7 @@ public abstract class AbstractDocumentData extends AbstractIndexData
     /**
      * @return String of documentName, documentWeb, author and creator
      */
+    @Override
     public String getFullText(XWikiDocument doc, XWikiContext context)
     {
         StringBuilder sb = new StringBuilder();
@@ -188,6 +190,7 @@ public abstract class AbstractDocumentData extends AbstractIndexData
         return sb.toString();
     }
 
+    @Override
     protected void getFullText(StringBuilder sb, XWikiDocument doc, XWikiContext context)
     {
         sb.append(getDocumentName()).append(" ").append(getDocumentSpace());
@@ -243,21 +246,25 @@ public abstract class AbstractDocumentData extends AbstractIndexData
         return (DocumentReference) getEntityReference();
     }
 
+    @Override
     public String getDocumentName()
     {
         return getEntityName(EntityType.DOCUMENT);
     }
 
+    @Override
     public String getDocumentSpace()
     {
         return getEntityName(EntityType.SPACE);
     }
 
+    @Override
     public String getWiki()
     {
         return getEntityName(EntityType.WIKI);
     }
 
+    @Override
     public String getDocumentFullName()
     {
         return (String) Utils.getComponent(EntityReferenceSerializer.class, "local").serialize(getEntityReference());
@@ -288,6 +295,7 @@ public abstract class AbstractDocumentData extends AbstractIndexData
         this.creator = creator;
     }
 
+    @Override
     public String getFullName()
     {
         return (String) Utils.getComponent(EntityReferenceSerializer.class).serialize(getEntityReference());
@@ -309,6 +317,7 @@ public abstract class AbstractDocumentData extends AbstractIndexData
 
     // Object
 
+    @Override
     public String toString()
     {
         return getId();

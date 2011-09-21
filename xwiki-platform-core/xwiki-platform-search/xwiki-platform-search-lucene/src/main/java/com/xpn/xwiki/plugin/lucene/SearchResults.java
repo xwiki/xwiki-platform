@@ -22,9 +22,9 @@ package com.xpn.xwiki.plugin.lucene;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.search.Hits;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
@@ -45,7 +45,7 @@ public class SearchResults extends Api
 
     private final Hits hits;
 
-    private static final Log LOG = LogFactory.getLog(SearchResults.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchResults.class);
 
     private List<SearchResult> relevantResults;
 
@@ -81,7 +81,7 @@ public class SearchResults extends Api
                         }
                     }
                 } catch (Exception e) {
-                    LOG.error("Error getting search result", e);
+                    LOGGER.error("Error getting search result", e);
                 }
             }
         }
@@ -193,11 +193,12 @@ public class SearchResults extends Api
                                 relResults.add(result);
                             }
                             resultcount++;
-                            if (resultcount == listEndIndex)
+                            if (resultcount == listEndIndex) {
                                 return relResults;
+                            }
                         }
                     } catch (Exception e) {
-                        LOG.error("error getting search result", e);
+                        LOGGER.error("error getting search result", e);
                     }
                 }
             } finally {

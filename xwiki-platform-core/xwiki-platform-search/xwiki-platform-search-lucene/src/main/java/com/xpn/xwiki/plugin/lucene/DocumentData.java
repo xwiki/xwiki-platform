@@ -22,8 +22,6 @@ package com.xpn.xwiki.plugin.lucene;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 
@@ -45,8 +43,6 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
  */
 public class DocumentData extends AbstractDocumentData
 {
-    private static final Log LOG = LogFactory.getLog(DocumentData.class);
-
     public DocumentData(final XWikiDocument doc, final XWikiContext context, final boolean deleted)
     {
         super(LucenePlugin.DOCTYPE_WIKIPAGE, doc, context, deleted);
@@ -61,6 +57,7 @@ public class DocumentData extends AbstractDocumentData
      * @return a string containing the result of {@link AbstractIndexData#getFullText} plus the full text content of
      *         this document (in the given language)
      */
+    @Override
     protected void getFullText(StringBuilder sb, XWikiDocument doc, XWikiContext context)
     {
         super.getFullText(sb, doc, context);

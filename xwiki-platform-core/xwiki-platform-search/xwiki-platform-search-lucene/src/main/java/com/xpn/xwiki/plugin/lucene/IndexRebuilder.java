@@ -20,15 +20,12 @@
 package com.xpn.xwiki.plugin.lucene;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -37,6 +34,8 @@ import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -84,7 +83,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
     /**
      * Logging helper.
      */
-    private static final Log LOG = LogFactory.getLog(IndexRebuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IndexRebuilder.class);
 
     /**
      * Amount of time (milliseconds) to sleep while waiting for the indexing queue to empty.
@@ -138,7 +137,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         XWikiContext context)
     {
         if (this.rebuildInProgress) {
-            LOG.warn("Cannot launch rebuild because a build is in progress");
+            LOGGER.warn("Cannot launch rebuild because another rebuild is in progress");
 
             return LucenePluginApi.REBUILD_IN_PROGRESS;
         } else {
@@ -171,7 +170,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
     @Override
     protected void runInternal()
     {
-        LOG.debug("Starting lucene index rebuild");
+        LOGGER.debug("Starting lucene index rebuild");
         XWikiContext context = null;
         try {
             // The context must be cloned, as otherwise setDatabase() might affect the response to
@@ -208,9 +207,9 @@ public class IndexRebuilder extends AbstractXWikiRunnable
 
             rebuildIndex(context);
         } catch (InterruptedException e) {
-            LOG.warn("The thread has been interrupted", e);
+            LOGGER.warn("The index rebuilder thread has been interrupted");
         } catch (Exception e) {
-            LOG.error("Error in lucene rebuild thread", e);
+            LOGGER.error("Error in lucene rebuild thread: {}", e.getMessage(), e);
         } finally {
             this.rebuildInProgress = false;
 
@@ -219,7 +218,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             }
         }
 
-        LOG.debug("Lucene index rebuild done");
+        LOGGER.debug("Lucene index rebuild done");
     }
 
     /**
@@ -240,10 +239,10 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             XWiki xwiki = context.getWiki();
             if (xwiki.isVirtualMode()) {
                 wikiServers = findWikiServers(context);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("found " + wikiServers.size() + " virtual wikis:");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("found [{}] virtual wikis:", wikiServers.size());
                     for (String wikiName : wikiServers) {
-                        LOG.debug(wikiName);
+                        LOGGER.debug(wikiName);
                     }
                 }
             } else {
@@ -274,7 +273,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
      */
     protected int indexWiki(String wikiName, XWikiContext context) throws InterruptedException
     {
-        LOG.info("Reading content of wiki " + wikiName);
+        LOGGER.info("Reading content of wiki [{}]", wikiName);
 
         // Number of index entries processed
         int retval = 0;
@@ -302,8 +301,8 @@ public class IndexRebuilder extends AbstractXWikiRunnable
 
                 retval = indexDocuments(wikiName, documents, searcher, context);
             } catch (XWikiException e) {
-                LOG.warn(MessageFormat.format("Error getting document names for wiki [{0}] and filter [{1}].",
-                    wikiName, this.hqlFilter), e);
+                LOGGER.warn("Error getting document names for wiki [{}] and filter [{}]: {}.",
+                    new Object[] {wikiName, this.hqlFilter, e.getMessage()});
 
                 return -1;
             } finally {
@@ -311,7 +310,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                     try {
                         searcher.close();
                     } catch (IOException e) {
-                        LOG.error("Failed to close searcher", e);
+                        LOGGER.error("Failed to close searcher", e);
                     }
                 }
             }
@@ -336,7 +335,8 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                 try {
                     retval += addTranslationOfDocument(documentReference, language, context);
                 } catch (XWikiException e) {
-                    LOG.error("Error fetching document [" + documentReference + "] for language [" + language + "]", e);
+                    LOGGER.error("Error fetching document [{}] for language [{}]",
+                        new Object[] {documentReference, language, e});
 
                     return retval;
                 }
@@ -393,7 +393,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                 retval.add(context.getMainXWiki());
             }
         } catch (Exception e) {
-            LOG.error("Error getting list of wiki servers!", e);
+            LOGGER.error("Error getting list of wiki servers!", e);
         }
 
         return retval;
@@ -431,7 +431,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
 
             exists = topDocs.totalHits == 1;
         } catch (IOException e) {
-            LOG.error("Faild to search for page [" + documentReference + "] in Lucene index", e);
+            LOGGER.error("Faild to search for page [{}] in Lucene index", documentReference, e);
         }
 
         return exists;
@@ -444,7 +444,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         try {
             searcher = new IndexSearcher(directory, true);
         } catch (Exception e) {
-            LOG.error("Faild to create IndexSearcher for Lucen index [" + directory + "]", e);
+            LOGGER.error("Faild to create IndexSearcher for Lucen index [{}]", directory, e);
         }
 
         return searcher;

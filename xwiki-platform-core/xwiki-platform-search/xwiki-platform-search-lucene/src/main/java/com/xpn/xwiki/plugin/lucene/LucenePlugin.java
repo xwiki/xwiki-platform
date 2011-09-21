@@ -27,8 +27,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
@@ -50,6 +48,8 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.ObservationManager;
 
@@ -68,10 +68,12 @@ import com.xpn.xwiki.web.Utils;
  * relevance), filter by one or several languages, and search in one, several or all virtual wikis.
  * 
  * @version $Id$
+ * @deprecated the plugin technology is deprecated
  */
+@Deprecated
 public class LucenePlugin extends XWikiDefaultPlugin
 {
-    private static final Log LOG = LogFactory.getLog(LucenePlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LucenePlugin.class);
 
     public static final String DOCTYPE_WIKIPAGE = "wikipage";
 
@@ -124,14 +126,27 @@ public class LucenePlugin extends XWikiDefaultPlugin
         super(name, className, context);
     }
 
+    @Override
+    public String getName()
+    {
+        return "lucene";
+    }
+
+    @Override
+    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
+    {
+        return new LucenePluginApi((LucenePlugin) plugin, context);
+    }
+
     /**
      * {@inheritDoc}
      * 
      * @see java.lang.Object#finalize()
      */
+    @Override
     protected void finalize() throws Throwable
     {
-        LOG.error("Lucene plugin will exit !");
+        LOGGER.error("Lucene plugin will exit!");
 
         if (this.indexUpdater != null) {
             this.indexUpdater.doExit();
@@ -159,7 +174,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
      * @param query The base query, using the query engine supported by Lucene.
      * @param myIndexDirs Comma separated list of directories containing the lucene indexes to search.
      * @param languages Comma separated list of language codes to search in, may be <tt>null</tt> or empty to search all
-     *            languages.
+     *        languages.
      * @param context The context of the request.
      * @return The list of search results.
      * @throws Exception If the index directories cannot be read, or the query is invalid.
@@ -180,10 +195,10 @@ public class LucenePlugin extends XWikiDefaultPlugin
      * 
      * @param query The base query, using the query engine supported by Lucene.
      * @param sortFields A list of fields to sort results by. For each field, if the name starts with '-', then that
-     *            field (excluding the -) is used for reverse sorting. If <tt>null</tt> or empty, sort by hit score.
+     *        field (excluding the -) is used for reverse sorting. If <tt>null</tt> or empty, sort by hit score.
      * @param myIndexDirs Comma separated list of directories containing the lucene indexes to search.
      * @param languages Comma separated list of language codes to search in, may be <tt>null</tt> or empty to search all
-     *            languages.
+     *        languages.
      * @param context The context of the request.
      * @return The list of search results.
      * @throws Exception If the index directories cannot be read, or the query is invalid.
@@ -205,10 +220,10 @@ public class LucenePlugin extends XWikiDefaultPlugin
      * 
      * @param query The base query, using the query engine supported by Lucene.
      * @param sortField The name of a field to sort results by. If the name starts with '-', then the field (excluding
-     *            the -) is used for reverse sorting. If <tt>null</tt> or empty, sort by hit score.
+     *        the -) is used for reverse sorting. If <tt>null</tt> or empty, sort by hit score.
      * @param myIndexDirs Comma separated list of directories containing the lucene indexes to search.
      * @param languages Comma separated list of language codes to search in, may be <tt>null</tt> or empty to search all
-     *            languages.
+     *        languages.
      * @param context The context of the request.
      * @return The list of search results.
      * @throws Exception If the index directories cannot be read, or the query is invalid.
@@ -228,11 +243,11 @@ public class LucenePlugin extends XWikiDefaultPlugin
      * 
      * @param query The base query, using the query engine supported by Lucene.
      * @param sortField The name of a field to sort results by. If the name starts with '-', then the field (excluding
-     *            the -) is used for reverse sorting. If <tt>null</tt> or empty, sort by hit score.
+     *        the -) is used for reverse sorting. If <tt>null</tt> or empty, sort by hit score.
      * @param virtualWikiNames Comma separated list of virtual wiki names to search in, may be <tt>null</tt> to search
-     *            all virtual wikis.
+     *        all virtual wikis.
      * @param languages Comma separated list of language codes to search in, may be <tt>null</tt> or empty to search all
-     *            languages.
+     *        languages.
      * @return The list of search results.
      * @param context The context of the request.
      * @throws Exception If the index directories cannot be read, or the query is invalid.
@@ -248,11 +263,11 @@ public class LucenePlugin extends XWikiDefaultPlugin
      * 
      * @param query The base query, using the query engine supported by Lucene.
      * @param sortField The name of a field to sort results by. If the name starts with '-', then the field (excluding
-     *            the -) is used for reverse sorting. If <tt>null</tt> or empty, sort by hit score.
+     *        the -) is used for reverse sorting. If <tt>null</tt> or empty, sort by hit score.
      * @param virtualWikiNames Comma separated list of virtual wiki names to search in, may be <tt>null</tt> to search
-     *            all virtual wikis.
+     *        all virtual wikis.
      * @param languages Comma separated list of language codes to search in, may be <tt>null</tt> or empty to search all
-     *            languages.
+     *        languages.
      * @return The list of search results.
      * @param context The context of the request.
      * @throws Exception If the index directories cannot be read, or the query is invalid.
@@ -268,11 +283,11 @@ public class LucenePlugin extends XWikiDefaultPlugin
      * 
      * @param query The base query, using the query engine supported by Lucene.
      * @param sortField The name of a field to sort results by. If the name starts with '-', then the field (excluding
-     *            the -) is used for reverse sorting. If <tt>null</tt> or empty, sort by hit score.
+     *        the -) is used for reverse sorting. If <tt>null</tt> or empty, sort by hit score.
      * @param virtualWikiNames Comma separated list of virtual wiki names to search in, may be <tt>null</tt> to search
-     *            all virtual wikis.
+     *        all virtual wikis.
      * @param languages Comma separated list of language codes to search in, may be <tt>null</tt> or empty to search all
-     *            languages.
+     *        languages.
      * @param indexes List of Lucene indexes (searchers) to search.
      * @param context The context of the request.
      * @return The list of search results.
@@ -293,11 +308,11 @@ public class LucenePlugin extends XWikiDefaultPlugin
      * 
      * @param query The base query, using the query engine supported by Lucene.
      * @param sortFields A list of fields to sort results by. For each field, if the name starts with '-', then that
-     *            field (excluding the -) is used for reverse sorting. If <tt>null</tt> or empty, sort by hit score.
+     *        field (excluding the -) is used for reverse sorting. If <tt>null</tt> or empty, sort by hit score.
      * @param virtualWikiNames Comma separated list of virtual wiki names to search in, may be <tt>null</tt> to search
-     *            all virtual wikis.
+     *        all virtual wikis.
      * @param languages Comma separated list of language codes to search in, may be <tt>null</tt> or empty to search all
-     *            languages.
+     *        languages.
      * @param indexes List of Lucene indexes (searchers) to search.
      * @param context The context of the request.
      * @return The list of search results.
@@ -318,7 +333,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
             int prevLength = -1;
             while (prevLength != sorts.length) {
                 prevLength = sorts.length;
-                sorts = (SortField[]) ArrayUtils.removeElement(sorts, null);
+                sorts = ArrayUtils.removeElement(sorts, null);
             }
         }
 
@@ -332,9 +347,9 @@ public class LucenePlugin extends XWikiDefaultPlugin
      * @param query The base query, using the query engine supported by Lucene.
      * @param sort A Lucene sort object, can contain one or more sort criterias. If <tt>null</tt>, sort by hit score.
      * @param virtualWikiNames Comma separated list of virtual wiki names to search in, may be <tt>null</tt> to search
-     *            all virtual wikis.
+     *        all virtual wikis.
      * @param languages Comma separated list of language codes to search in, may be <tt>null</tt> or empty to search all
-     *            languages.
+     *        languages.
      * @param indexes List of Lucene indexes (searchers) to search.
      * @param context The context of the request.
      * @return The list of search results.
@@ -351,9 +366,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
 
         // Perform the actual search
         Hits hits = (sort == null) ? searcher.search(q) : searcher.search(q, sort);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("query " + q + " returned " + hits.length() + " hits");
-        }
+        LOGGER.debug("query [{}] returned {} hits", q, hits.length());
 
         // Transform the raw Lucene search results into XWiki-aware results
         return new SearchResults(hits, new com.xpn.xwiki.api.XWiki(context.getWiki(), context), context);
@@ -364,7 +377,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
      * (excluding the leading -) will be used for reverse sorting.
      * 
      * @param sortField The name of the field to sort by. If <tt>null</tt>, return a <tt>null</tt> SortField. If starts
-     *            with '-', then return a SortField that does a reverse sort on the field.
+     *        with '-', then return a SortField that does a reverse sort on the field.
      * @return A SortFiled that sorts on the given field, or <tt>null</tt>.
      */
     private SortField getSortField(String sortField)
@@ -397,7 +410,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
         if (query.startsWith("PROP ")) {
             String property = query.substring(0, query.indexOf(":"));
             query = query.substring(query.indexOf(":") + 1, query.length());
-            QueryParser qp = new QueryParser(Version.LUCENE_29, property, analyzer);
+            QueryParser qp = new QueryParser(Version.LUCENE_29, property, this.analyzer);
             parsedQuery = qp.parse(query);
             bQuery.add(parsedQuery, BooleanClause.Occur.MUST);
         } else if (query.startsWith("MULTI ")) {
@@ -408,10 +421,10 @@ public class LucenePlugin extends XWikiDefaultPlugin
             for (int i = 0; i < flags.length; i++) {
                 flags[i] = BooleanClause.Occur.SHOULD;
             }
-            parsedQuery = MultiFieldQueryParser.parse(Version.LUCENE_29, query, fields, flags, analyzer);
+            parsedQuery = MultiFieldQueryParser.parse(Version.LUCENE_29, query, fields, flags, this.analyzer);
             bQuery.add(parsedQuery, BooleanClause.Occur.MUST);
         } else {
-            QueryParser qp = new QueryParser(Version.LUCENE_29, "ft", analyzer);
+            QueryParser qp = new QueryParser(Version.LUCENE_29, "ft", this.analyzer);
             parsedQuery = qp.parse(query);
             bQuery.add(parsedQuery, BooleanClause.Occur.MUST);
         }
@@ -447,11 +460,10 @@ public class LucenePlugin extends XWikiDefaultPlugin
         return new TermQuery(new Term(fieldname, valueArray[0]));
     }
 
+    @Override
     public synchronized void init(XWikiContext context)
     {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Lucene plugin: in init");
-        }
+        LOGGER.debug("Lucene plugin: in init");
 
         this.indexDirs = context.getWiki().Param(PROP_INDEX_DIR);
         if (StringUtils.isEmpty(this.indexDirs)) {
@@ -468,7 +480,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
             }
             directory = FSDirectory.open(f);
         } catch (IOException e) {
-            LOG.error("Failed to open the index directory: ", e);
+            LOGGER.error("Failed to open the index directory: ", e);
             throw new RuntimeException(e);
         }
 
@@ -481,7 +493,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
         try {
             indexingInterval = 1000 * (int) context.getWiki().ParamAsLong(PROP_INDEXING_INTERVAL, 30);
         } catch (NumberFormatException e) {
-            LOG.warn("Invalid indexing interval in configuration.");
+            LOGGER.warn("Invalid indexing interval in configuration.");
             indexingInterval = 30000;
         }
 
@@ -489,7 +501,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
         try {
             maxQueueSize = (int) context.getWiki().ParamAsLong(LucenePlugin.PROP_MAX_QUEUE_SIZE, 1000);
         } catch (NumberFormatException e) {
-            LOG.warn("Invalid max queue size in configuration.");
+            LOGGER.warn("Invalid max queue size in configuration.");
             maxQueueSize = 1000;
         }
 
@@ -506,13 +518,13 @@ public class LucenePlugin extends XWikiDefaultPlugin
         try {
             needInitialRebuild = !IndexReader.indexExists(directory);
         } catch (IOException e) {
-            LOG.warn("Failed to check if index exists: " + e);
+            LOGGER.warn("Failed to check if index exists: {}", e.getMessage());
         }
 
         IndexRebuilder indexRebuilder = new IndexRebuilder(indexUpdater, context);
         if (needInitialRebuild) {
             indexRebuilder.startRebuildIndex(context);
-            LOG.info("Launched initial lucene indexing");
+            LOGGER.info("Launched initial lucene indexing");
         }
 
         init(indexUpdater, indexRebuilder, context);
@@ -526,8 +538,8 @@ public class LucenePlugin extends XWikiDefaultPlugin
             this.analyzer =
                 (Analyzer) Class.forName(context.getWiki().Param(PROP_ANALYZER, DEFAULT_ANALYZER)).newInstance();
         } catch (Exception e) {
-            LOG.error("Error instantiating analyzer : ", e);
-            LOG.warn("Using default analyzer class: " + DEFAULT_ANALYZER);
+            LOGGER.error("Error instantiating analyzer: {}", e.getMessage());
+            LOGGER.warn("Using default analyzer class: " + DEFAULT_ANALYZER);
             try {
                 this.analyzer = (Analyzer) Class.forName(DEFAULT_ANALYZER).newInstance();
             } catch (Exception e1) {
@@ -535,9 +547,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
             }
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Assigning index updater: " + indexUpdater);
-        }
+        LOGGER.debug("Assigning index updater: {}", indexUpdater);
 
         if (this.indexDirs == null) {
             this.indexDirs = context.getWiki().Param(PROP_INDEX_DIR);
@@ -563,7 +573,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
             observationManager.addListener(indexUpdater);
         }
 
-        LOG.debug("Lucene plugin initialized.");
+        LOGGER.debug("Lucene plugin initialized.");
     }
 
     /**
@@ -571,13 +581,13 @@ public class LucenePlugin extends XWikiDefaultPlugin
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#flushCache(com.xpn.xwiki.XWikiContext)
      */
+    @Override
     public void flushCache(XWikiContext context)
     {
         // take care of crappy code calling #flushCache with no context...
         if (context == null) {
-            context =
-                (XWikiContext) Utils.getComponent(Execution.class).getContext()
-                    .getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+            context = (XWikiContext) Utils.getComponent(Execution.class).getContext()
+                .getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
         }
 
         if (this.indexUpdater != null) {
@@ -590,7 +600,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
                 // wait for the thread to finish
                 this.indexUpdaterThread.join();
             } catch (InterruptedException ex) {
-                LOG.warn("Error while waiting for indexUpdaterThread to die.", ex);
+                LOGGER.warn("Error while waiting for indexUpdaterThread to die.", ex);
             }
 
             this.indexUpdater = null;
@@ -602,22 +612,12 @@ public class LucenePlugin extends XWikiDefaultPlugin
         try {
             closeSearchers(this.searchers);
         } catch (IOException e) {
-            LOG.warn("Cannot close searchers", e);
+            LOGGER.warn("Cannot close searchers: {}", e.getMessage());
         }
 
         this.analyzer = null;
 
         init(context);
-    }
-
-    public String getName()
-    {
-        return "lucene";
-    }
-
-    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
-    {
-        return new LucenePluginApi((LucenePlugin) plugin, context);
     }
 
     /**
@@ -659,7 +659,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
             closeSearchers(this.searchers);
             this.searchers = createSearchers(this.indexDirs, context);
         } catch (Exception e) {
-            LOG.error("Error opening searchers for index dirs " + context.getWiki().Param(PROP_INDEX_DIR), e);
+            LOGGER.error("Error opening searchers for index dirs [{}]", context.getWiki().Param(PROP_INDEX_DIR), e);
             throw new RuntimeException("Error opening searchers for index dirs "
                 + context.getWiki().Param(PROP_INDEX_DIR), e);
         }

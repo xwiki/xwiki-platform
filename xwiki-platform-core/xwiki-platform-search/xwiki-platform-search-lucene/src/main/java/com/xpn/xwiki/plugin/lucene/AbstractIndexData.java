@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
 import org.xwiki.model.EntityType;
@@ -38,8 +36,6 @@ import com.xpn.xwiki.web.Utils;
  */
 public abstract class AbstractIndexData
 {
-    private static final Log LOG = LogFactory.getLog(AbstractIndexData.class);
-
     private String type;
 
     private boolean deleted;
@@ -76,7 +72,7 @@ public abstract class AbstractIndexData
      * </ul>
      * 
      * @param luceneDoc if not null, this controls which translated version of the content will be indexed. If null, the
-     *            content in the default language will be used.
+     *        content in the default language will be used.
      */
     public void addDataToLuceneDocument(Document luceneDoc, XWikiContext context) throws XWikiException
     {
@@ -172,6 +168,7 @@ public abstract class AbstractIndexData
 
     // Object
 
+    @Override
     public String toString()
     {
         return getId();

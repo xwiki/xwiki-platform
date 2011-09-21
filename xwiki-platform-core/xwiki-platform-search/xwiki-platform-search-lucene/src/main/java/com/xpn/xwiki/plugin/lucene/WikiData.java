@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.Term;
 import org.xwiki.model.reference.WikiReference;
 
@@ -35,8 +33,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class WikiData extends AbstractIndexData
 {
-    private static final Log LOG = LogFactory.getLog(WikiData.class);
-
     public WikiData(WikiReference wikiReference, boolean deleted)
     {
         super(null, wikiReference, deleted);

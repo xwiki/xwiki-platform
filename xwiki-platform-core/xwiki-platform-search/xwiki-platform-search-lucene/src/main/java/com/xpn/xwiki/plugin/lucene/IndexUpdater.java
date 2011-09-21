@@ -25,8 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -34,6 +32,8 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -62,7 +62,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     /**
      * Logging helper.
      */
-    private static final Log LOG = LogFactory.getLog(IndexUpdater.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IndexUpdater.class);
 
     private static final String NAME = "lucene";
 
@@ -148,6 +148,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
      * 
      * @see java.lang.Runnable#run()
      */
+    @Override
     protected void runInternal()
     {
         getContext().setDatabase(getContext().getMainXWiki());
@@ -175,7 +176,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
             try {
                 Thread.sleep(sleepInterval);
             } catch (InterruptedException e) {
-                LOG.warn("Error while sleeping", e);
+                LOGGER.warn("Error while sleeping", e);
             }
         }
     }
@@ -186,13 +187,9 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     private void updateIndex()
     {
         if (this.queue.isEmpty()) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("IndexUpdater: queue empty, nothing to do");
-            }
+            LOGGER.debug("IndexUpdater: queue empty, nothing to do");
         } else {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("IndexUpdater: documents in queue, start indexing");
-            }
+            LOGGER.debug("IndexUpdater: documents in queue, start indexing");
 
             XWikiContext context = getContext();
             context.getWiki().getStore().cleanUp(context);
@@ -209,7 +206,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                         this.plugin.handleCorruptIndex(context);
                     }
                 } catch (IOException e) {
-                    LOG.error("Failed to open index", e);
+                    LOGGER.error("Failed to open index", e);
 
                     throw new RuntimeException(e);
                 }
@@ -229,15 +226,13 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
                         ++nb;
                     } catch (Throwable e) {
-                        LOG.error("error indexing document " + data, e);
+                        LOGGER.error("error indexing document [{}]", data, e);
                     }
                 }
 
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("indexed " + nb + " docs to lucene index");
-                }
+                LOGGER.info("indexed [{}] docs to lucene index", nb);
             } catch (Exception e) {
-                LOG.error("error indexing documents", e);
+                LOGGER.error("error indexing documents", e);
             } finally {
                 context.getWiki().getStore().cleanUp(context);
 
@@ -245,7 +240,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                     writer.optimize();
                     writer.close();
                 } catch (IOException e) {
-                    LOG.warn("Failed to close writer.", e);
+                    LOGGER.warn("Failed to close writer.", e);
                 }
             }
 
@@ -266,9 +261,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                 try {
                     int s = new Random().nextInt(1000);
 
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("failed to acquire lock, retrying in " + s + "ms ...");
-                    }
+                    LOGGER.debug("failed to acquire lock, retrying in {}ms ...", s);
 
                     Thread.sleep(s);
                 } catch (InterruptedException e0) {
@@ -280,9 +273,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     private void addToIndex(IndexWriter writer, AbstractIndexData data, XWikiContext context) throws IOException,
         XWikiException
     {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("addToIndex: " + data);
-        }
+        LOGGER.debug("addToIndex: [{}]", data);
 
         Document luceneDoc = new Document();
         data.addDataToLuceneDocument(luceneDoc, context);
@@ -300,9 +291,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     private void removeFromIndex(IndexWriter writer, AbstractIndexData data, XWikiContext context)
         throws CorruptIndexException, IOException
     {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("removeFromIndex: " + data);
-        }
+        LOGGER.debug("removeFromIndex: [{}]", data);
 
         writer.deleteDocuments(data.getTerm());
     }
@@ -317,14 +306,12 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     public void cleanIndex()
     {
-        if (LOG.isInfoEnabled()) {
-            LOG.info("trying to clear index for rebuilding");
-        }
+        LOGGER.info("trying to clear index for rebuilding");
 
         try {
             openWriter(true).close();
         } catch (IOException e) {
-            LOG.error("Failed to clean index", e);
+            LOGGER.error("Failed to clean index", e);
         }
     }
 
@@ -338,8 +325,10 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         if (attachment != null && context != null) {
             this.queue.add(new AttachmentData(attachment, context, deleted));
         } else {
-            LOG.error("Invalid parameters given to " + (deleted ? "deleted" : "add") + " attachment ["
-                + attachment.getFilename() + "] of document [" + attachment.getDoc().getDocumentReference() + "]");
+            LOGGER.error("Invalid parameters given to {} attachment [{}] of document [{}]", new Object[] {
+                deleted ? "deleted" : "added",
+                attachment == null ? null : attachment.getFilename(),
+                attachment == null || attachment.getDoc() == null ? null : attachment.getDoc().getDocumentReference()});
         }
     }
 
@@ -348,8 +337,8 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         if (document != null && attachmentName != null && context != null) {
             this.queue.add(new AttachmentData(document, attachmentName, context, deleted));
         } else {
-            LOG.error("Invalid parameters given to " + (deleted ? "deleted" : "add") + " attachment [" + attachmentName
-                + "] of document [" + document.getDocumentReference() + "]");
+            LOGGER.error("Invalid parameters given to {} attachment [{}] of document [{}]",
+                new Object[] {(deleted ? "deleted" : "added"), attachmentName, document});
         }
     }
 
@@ -358,7 +347,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         if (wikiId != null) {
             this.queue.add(new WikiData(new WikiReference(wikiId), deleted));
         } else {
-            LOG.error("Invalid parameters given to " + (deleted ? "deleted" : "add") + " wiki [" + wikiId + "]");
+            LOGGER.error("Invalid parameters given to {} wiki [{}]", (deleted ? "deleted" : "added"), wikiId);
         }
     }
 
@@ -372,8 +361,8 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
             try {
                 queueAttachment(attachment, context, false);
             } catch (Exception e) {
-                LOG.error("Failed to retrieve attachment [" + attachment.getFilename() + "] of document [" + document
-                    + "]", e);
+                LOGGER.error("Failed to retrieve attachment [{}] of document [{}]",
+                    new Object[] {attachment.getFilename(), document, e});
             }
         }
 
@@ -424,7 +413,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                 addWiki((String) source, true);
             }
         } catch (Exception e) {
-            LOG.error("error in notify", e);
+            LOGGER.error("error in notify", e);
         }
     }
 
@@ -448,7 +437,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
             n = w.numDocs();
             w.close();
         } catch (IOException e) {
-            LOG.error("Failed to get the number of documents in Lucene index writer", e);
+            LOGGER.error("Failed to get the number of documents in Lucene index writer", e);
         }
 
         return n;

@@ -19,12 +19,12 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -39,7 +39,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class AttachmentData extends AbstractDocumentData
 {
-    private static final Log LOG = LogFactory.getLog(AttachmentData.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AttachmentData.class);
 
     private int size;
 
@@ -62,12 +62,13 @@ public class AttachmentData extends AbstractDocumentData
         setFilename(filename);
     }
 
+    @Override
     public void addDataToLuceneDocument(Document luceneDoc, XWikiContext context) throws XWikiException
     {
         super.addDataToLuceneDocument(luceneDoc, context);
 
         if (this.filename != null) {
-            luceneDoc.add(new Field(IndexFields.FILENAME, filename, Field.Store.YES, Field.Index.ANALYZED));
+            luceneDoc.add(new Field(IndexFields.FILENAME, this.filename, Field.Store.YES, Field.Index.ANALYZED));
         }
     }
 
@@ -108,6 +109,7 @@ public class AttachmentData extends AbstractDocumentData
      * 
      * @see AbstractIndexData#getId()
      */
+    @Override
     public String getId()
     {
         return new StringBuffer(super.getId()).append(".file.").append(this.filename).toString();
@@ -144,8 +146,7 @@ public class AttachmentData extends AbstractDocumentData
         try {
             XWikiAttachment att = doc.getAttachment(this.filename);
 
-            LOG.debug("Start parsing attachement [" + this.filename + "] in document [" + doc.getDocumentReference()
-                + "]");
+            LOGGER.debug("Start parsing attachement [{}] in document [{}]", this.filename, doc.getDocumentReference());
 
             Tika tika = new Tika();
 
@@ -153,10 +154,9 @@ public class AttachmentData extends AbstractDocumentData
             metadata.set(Metadata.RESOURCE_NAME_KEY, this.filename);
 
             contentText = this.filename + " " + tika.parseToString(att.getContentInputStream(context), metadata);
-        } catch (Throwable e) {
-            LOG.warn(
-                "error getting content of attachment [" + this.filename + "] for document ["
-                    + doc.getDocumentReference() + "]", e);
+        } catch (Throwable ex) {
+            LOGGER.warn("error getting content of attachment [{}] for document [{}]",
+                new Object[] {this.filename, doc.getDocumentReference(), ex});
         }
 
         return contentText;

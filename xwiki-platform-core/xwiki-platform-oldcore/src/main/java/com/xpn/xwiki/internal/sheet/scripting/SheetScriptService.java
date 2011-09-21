@@ -21,7 +21,6 @@ package com.xpn.xwiki.internal.sheet.scripting;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -33,12 +32,13 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.sheet.SheetBinder;
 import org.xwiki.sheet.SheetManager;
 
 import com.xpn.xwiki.api.Document;
 
 /**
- * Exposes {@link SheetManager} to Velocity scripts.
+ * Exposes {@link SheetManager} and {@link SheetBinder} to Velocity scripts.
  * 
  * @version $Id$
  * @since 3.2M3
@@ -55,6 +55,20 @@ public class SheetScriptService implements ScriptService
     private SheetManager sheetManager;
 
     /**
+     * The component used to manage the class sheet bindings.
+     */
+    @Inject
+    @Named("class")
+    private SheetBinder classSheetBinder;
+
+    /**
+     * The component used to manage the document sheet bindings.
+     */
+    @Inject
+    @Named("document")
+    private SheetBinder documentSheetBinder;
+
+    /**
      * The component used to check access rights on sheets.
      */
     @Inject
@@ -67,35 +81,99 @@ public class SheetScriptService implements ScriptService
      * @param action the action for which to retrieve the sheets ('view', 'edit' etc.)
      * @return the list of sheets available for the specified document on the specified action; these are sheets
      *         designed to be displayed when the specified action is performed on the given document; only the sheets
-     *         that the current user has the right to view are returned; if the current user doesn't have the right to
-     *         view the given document then an empty list is returned
+     *         that the current user has the right to view are returned
      */
     public List<DocumentReference> getSheets(Document document, String action)
     {
-        if (documentAccessBridge.isDocumentViewable(document.getDocumentReference())) {
-            return filterViewable(sheetManager.getSheets(getDocument(document), action));
-        } else {
-            return Collections.emptyList();
-        }
+        return filterViewable(sheetManager.getSheets(getDocument(document), action));
     }
 
     /**
-     * Returns the list of sheets associated with a XWiki class.
+     * Retrieves the list of sheets explicitly bound to a XWiki class.
      * 
-     * @param classReference a reference to a document holding a class definition
-     * @param action the action for which to retrieve the sheets ('view', 'edit' etc.)
-     * @return the list of sheets available for the specified class and action; these are sheets designed to be
-     *         displayed when the specified action is performed on a document that has an object of the specified class;
-     *         only the sheets that the current user has the right to view are returned; if the current user doesn't
-     *         have the right to view the specified class then an empty list is returned
+     * @param classDocument a document holding a class definition
+     * @return the list of sheets explicitly bound to the given class; these are sheets designed to be applied to
+     *         documents that have objects of the given class; only the sheets that the current user has the right to
+     *         view are returned
      */
-    public List<DocumentReference> getClassSheets(DocumentReference classReference, String action)
+    public List<DocumentReference> getClassSheets(Document classDocument)
     {
-        if (documentAccessBridge.isDocumentViewable(classReference)) {
-            return filterViewable(sheetManager.getClassSheets(classReference, action));
-        } else {
-            return Collections.emptyList();
-        }
+        return filterViewable(classSheetBinder.getSheets(getDocument(classDocument)));
+    }
+
+    /**
+     * Binds a sheet to a XWiki class. Changes are not persisted until the class document is saved.
+     * 
+     * @param classDocument a document holding a class definition
+     * @param sheetReference a reference to a sheet
+     * @return {@code true} if the sheet was successfully bound, {@code false} otherwise
+     */
+    public boolean bindClassSheet(Document classDocument, DocumentReference sheetReference)
+    {
+        return classSheetBinder.bind(getDocument(classDocument), sheetReference);
+    }
+
+    /**
+     * Removes the binding between a XWiki class and a sheet. Changes are not persisted until the class document is
+     * saved.
+     * 
+     * @param classDocument a document holding a class definition
+     * @param sheetReference a reference to a sheet
+     * @return {@code true} if the sheet was successfully unbound, {@code false} otherwise
+     */
+    public boolean unbindClassSheet(Document classDocument, DocumentReference sheetReference)
+    {
+        return classSheetBinder.unbind(getDocument(classDocument), sheetReference);
+    }
+
+    /**
+     * Retrieves the list of sheets explicitly bound to a XWiki document.
+     * 
+     * @param document a XWiki document
+     * @return the list of sheets explicitly bound to the given document; only the sheets that the current user has the
+     *         right to view are returned
+     */
+    public List<DocumentReference> getDocumentSheets(Document document)
+    {
+        return filterViewable(documentSheetBinder.getSheets(getDocument(document)));
+    }
+
+    /**
+     * Binds a sheet to a XWiki document. Changes are not persisted until the document is saved.
+     * 
+     * @param document a XWiki document
+     * @param sheetReference a reference to a sheet
+     * @return {@code true} if the sheet was successfully bound, {@code false} otherwise
+     */
+    public boolean bindDocumentSheet(Document document, DocumentReference sheetReference)
+    {
+        return documentSheetBinder.bind(getDocument(document), sheetReference);
+    }
+
+    /**
+     * Removes the binding between a XWiki document and a sheet. Changes are not persisted until the document is saved.
+     * 
+     * @param document a XWiki document
+     * @param sheetReference a reference to a sheet
+     * @return {@code true} if the sheet was successfully unbound, {@code false} otherwise
+     */
+    public boolean unbindDocumentSheet(Document document, DocumentReference sheetReference)
+    {
+        return documentSheetBinder.unbind(getDocument(document), sheetReference);
+    }
+
+    /**
+     * Retrieves the list of documents that have explicitly bound the specified sheet.
+     * 
+     * @param sheetReference a reference to a sheet
+     * @return the list of documents that have the specified sheet explicitly bound
+     */
+    public List<DocumentReference> getDocuments(DocumentReference sheetReference)
+    {
+        List<DocumentReference> documents = new ArrayList<DocumentReference>();
+        documents.addAll(documentSheetBinder.getDocuments(sheetReference));
+        documents.addAll(classSheetBinder.getDocuments(sheetReference));
+        return filterViewable(documents);
     }
 
     /**

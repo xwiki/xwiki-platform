@@ -128,8 +128,14 @@ public class DefaultSheetManager implements SheetManager
         return sheets;
     }
 
-    @Override
-    public List<DocumentReference> getClassSheets(DocumentReference classReference, String action)
+    /**
+     * @param classReference a reference to a XWiki class
+     * @param action the action for which to retrieve the class sheets
+     * @return the list of sheets bound to the specified class and matching the specified action; these are sheets
+     *         designed to be displayed when the specified action is performed on a document holding an object of the
+     *         specified class
+     */
+    private List<DocumentReference> getClassSheets(DocumentReference classReference, String action)
     {
         DocumentModelBridge classDocument;
         try {

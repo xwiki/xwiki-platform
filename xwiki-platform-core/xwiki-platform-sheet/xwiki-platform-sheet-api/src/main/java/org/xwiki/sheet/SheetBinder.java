@@ -45,6 +45,16 @@ public interface SheetBinder
     List<DocumentReference> getSheets(DocumentModelBridge document);
 
     /**
+     * Retrieves the list of XWiki documents explicitly bound to a given sheet. This method doesn't perform any checks
+     * on the specified sheet: it may not even exist or it may not be viewable by the current user. This method simply
+     * returns the list of documents that explicitly declare they're using the specified sheet.
+     * 
+     * @param sheetReference a reference to a sheet
+     * @return the list of XWiki documents explicitly bound to the specified sheet.
+     */
+    List<DocumentReference> getDocuments(DocumentReference sheetReference);
+
+    /**
      * Binds a sheet to a XWiki document. This method doesn't perform any checks on the specified sheet. The sheet may
      * not even exist or may not be viewable by all users. The changes are not persisted until the document is saved.
      * 

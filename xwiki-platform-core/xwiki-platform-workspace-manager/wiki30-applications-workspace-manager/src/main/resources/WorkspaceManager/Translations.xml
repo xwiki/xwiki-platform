@@ -27,7 +27,9 @@ workspacemanager.pluginnotenabled=The Workspace Manager java component is not in
 workspacemanager.template.install.success=Workspace template has been successfully installed.
 workspacemanager.template.install.error=Error installing workspace template. {0}
 workspacemanager.template.install.error.missingattachment=Error installing the workspace template. The file "{0}" is not attached to the document [[{1}>>{1}]]. Please re-import the [[{1}>>{1}]] document from the Workspaces Application XAR.
-workspacemanager.template.install.notallowed=Admin rights are required to complete the workspace template installation. Please login as Admin to complete the installation.
+workspacemanager.translations.install.success=Workspace Manager translations have been successfully installed.
+workspacemanager.searchSuggestions.install.success=Workspace search suggestions have been successfully installed.
+workspacemanager.install.notallowed=Admin rights are required to complete the Workspace Manager installation. Please login as Admin to complete the installation.
 
 # LABELS
 workspacemanager.createworkspace=Create a new workspace
@@ -53,6 +55,13 @@ workspacemanager.browse._actions.viewInvitation=View Invitation
 workspacemanager.browse._actions.cancelJoinRequest=Cancel Request
 workspacemanager.browse._actions.leave=Leave
 workspacemanager.browse._actions.delete=Delete
+workspacemanager.menu.create=Workspace
+workspacemanager.menu.mainwiki.admin=Administer Main Wiki
+workspacemanager.menu.workspace.mainWiki=Main Wiki
+workspacemanager.menu.workspace.index=Workspace Directory
+workspacemanager.menu.workspace.delete=Delete
+workspacemanager.menu.user.workspaces=Workspaces
+workspacemanager.profile.category.workspaces=Workspaces
 
 # MESSAGES
 workspacemanager.wikiname.error.wikialreadyexists=A workspace with this identifier already exists
@@ -78,4 +87,10 @@ workspacemanager.doc.createwiki.desc.description=A brief description of the work
 workspacemanager.doc.createwiki.desc.owner=A user who will have all the rights on the workspace.
 workspacemanager.doc.createwiki.members=The users that can participate in the workspace.\n\
 Tip: Use CTRL+Click to select multiple users.
-workspacemanager.prop.workspace.membershipType.hint=The way users can join this workspace.</content></xwikidoc>
+workspacemanager.prop.workspace.membershipType.hint=The way users can join this workspace.
+
+## Group sheet. To be removed once it gets into platform.
+xe.admin.groups.comment=About
+xe.admin.groups.tags=Tags
+xe.admin.groups._actions.follow=Follow
+xe.admin.groups._actions.unfollow=Unfollow</content></xwikidoc>

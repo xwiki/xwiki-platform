@@ -24,10 +24,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
@@ -60,7 +61,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
  * @version $Id:$
  */
 @Component
-public class DefaultWorkspaceManager extends AbstractLogEnabled implements WorkspaceManager, Initializable
+public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
 {
     /** Admin right. */
     private static final String RIGHT_ADMIN = "admin";
@@ -78,12 +79,15 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
     private static final String WORKSPACE_MEMBERSHIP_TYPE_DEFAULT = "open";
 
     /** Execution context. */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /** Observation manager needed to fire events. */
-    @Requirement
+    @Inject
     private ObservationManager observationManager;
+
+    @Inject
+    private Logger logger;
 
     /** Internal wiki manager tookit required to overcome the rights checking of the API. */
     private WikiManager wikiManagerInternal;
@@ -149,6 +153,11 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
             return false;
         }
 
+        /* Check if it already exists. */
+        if (isWorkspace(workspaceName)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -159,6 +168,10 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
      */
     public boolean canEditWorkspace(String userName, String workspaceName)
     {
+        if (!isWorkspace(workspaceName)) {
+            return false;
+        }
+
         XWikiContext deprecatedContext = getXWikiContext();
 
         try {
@@ -191,6 +204,10 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
      */
     public boolean canDeleteWorkspace(String userName, String workspaceName)
     {
+        if (!isWorkspace(workspaceName)) {
+            return false;
+        }
+
         XWikiContext deprecatedContext = getXWikiContext();
 
         try {
@@ -238,8 +255,8 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
 
         String comment = String.format("Created new workspace '%s'", workspaceName);
         XWikiServer result =
-            LocalWikiManager.createNewWikiFromTemplate(newWikiXObjectDocument, "workspacetemplate", true, comment,
-                deprecatedContext);
+            this.wikiManagerInternal.createNewWikiFromTemplate(newWikiXObjectDocument, "workspacetemplate", true,
+                comment, deprecatedContext);
 
         /*
          * Use the XWiki.XWikiAllGroup of the new wiki and add the owner as a member and the XWiki.XWikiAdminGroup of
@@ -283,7 +300,7 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
             // LOG.error("Failed to update group service cache", e);
             // }
         } catch (Exception e) {
-            getLogger().error("Failed to add owner to workspace group.", e);
+            logger.error("Failed to add owner to workspace group.", e);
             // FIXME: throw new WorkspaceManagerException(message, e);
         } finally {
             deprecatedContext.setDatabase(currentWikiName);
@@ -423,14 +440,19 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
         }
     }
 
-    public Workspace getWorkspace(String workspaceId) throws WorkspaceManagerException
+    public Workspace getWorkspace(String workspaceName) throws WorkspaceManagerException
     {
         XWikiContext deprecatedContext = getXWikiContext();
         XWiki xwiki = deprecatedContext.getWiki();
+        
+        /* Main wiki can not be a workspace. */
+        if (deprecatedContext.getMainXWiki().equals(workspaceName)) {
+            return null;
+        }
 
         Workspace result = null;
         try {
-            Wiki wikiDocument = wikiManagerInternal.getWikiFromName(workspaceId, deprecatedContext);
+            Wiki wikiDocument = wikiManagerInternal.getWikiFromName(workspaceName, deprecatedContext);
             if (wikiDocument == null || wikiDocument.isNew()) {
                 return null;
             }
@@ -438,7 +460,7 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
             XWikiServer wikiDescriptor = wikiDocument.getFirstWikiAlias();
             if (wikiDescriptor == null || wikiDescriptor.isNew()) {
                 throw new WorkspaceManagerException(messageTool.get(WorkspaceManagerMessageTool.ERROR_WORKSPACEINVALID,
-                    Arrays.asList(workspaceId)));
+                    Arrays.asList(workspaceName)));
             }
 
             BaseObject workspaceObject = getWorkspaceObject(wikiDocument);
@@ -447,19 +469,18 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
             }
 
             DocumentReference groupReference =
-                new DocumentReference(workspaceId, Workspace.WORKSPACE_GROUP_SPACE, Workspace.WORKSPACE_GROUP_PAGE);
+                new DocumentReference(workspaceName, Workspace.WORKSPACE_GROUP_SPACE, Workspace.WORKSPACE_GROUP_PAGE);
             XWikiDocument groupDocument = xwiki.getDocument(groupReference, deprecatedContext);
             if (groupDocument == null || groupDocument.isNew()) {
                 throw new WorkspaceManagerException(messageTool.get(WorkspaceManagerMessageTool.ERROR_WORKSPACEINVALID,
-                    Arrays.asList(workspaceId)));
+                    Arrays.asList(workspaceName)));
             }
 
             result = new DefaultWorkspace(wikiDocument, wikiDescriptor, new Document(groupDocument, deprecatedContext));
         } catch (Exception e) {
             logAndThrowException(
-                messageTool.get(WorkspaceManagerMessageTool.ERROR_WORKSPACEGET,
-                    Arrays.asList(workspaceId, e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage())),
-                e);
+                messageTool.get(WorkspaceManagerMessageTool.ERROR_WORKSPACEGET, Arrays.asList(workspaceName,
+                    e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage())), e);
         }
 
         return result;
@@ -480,7 +501,7 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
                     }
                 } catch (Exception e) {
                     /* Log and skip. */
-                    getLogger().warn(
+                    logger.warn(
                         messageTool.get(WorkspaceManagerMessageTool.LOG_WORKSPACEINVALID,
                             Arrays.asList(wiki.getWikiName())), e);
                     continue;
@@ -521,7 +542,21 @@ public class DefaultWorkspaceManager extends AbstractLogEnabled implements Works
      */
     private void logAndThrowException(String message, Exception e) throws WorkspaceManagerException
     {
-        getLogger().error(message, e);
+        logger.error(message, e);
         throw new WorkspaceManagerException(message, e);
+    }
+
+    public boolean isWorkspace(String workspaceName)
+    {
+        try {
+            Workspace workspace = getWorkspace(workspaceName);
+            if (workspace != null) {
+                return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return false;
     }
 }

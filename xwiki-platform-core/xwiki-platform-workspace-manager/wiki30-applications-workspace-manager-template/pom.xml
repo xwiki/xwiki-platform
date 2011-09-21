@@ -97,11 +97,12 @@
                     <include>XWiki/XWikiPreferences.xml</include>
                   </includes>
                   <stylesheet>src/main/build/transformation/register.xsl
-              </stylesheet>
+                  </stylesheet>
                   <parameters>
                     <parameter>
                       <name>translations</name>
-                      <value>xwiki:WorkspaceManager.TemplateTranslations,
+                      <value>xwiki:WorkspaceManager.Translations,
+                        xwiki:WorkspaceManager.TemplateTranslations,
                         XWiki.RtI18N</value>
                     </parameter>
                     <parameter>
@@ -130,7 +131,7 @@
                     <include>XWiki/XWikiPreferences.xml</include>
                   </includes>
                   <stylesheet>src/main/build/transformation/register-panel.xsl
-              </stylesheet>
+                  </stylesheet>
                   <parameters>
                     <parameter>
                       <name>panel</name>
@@ -158,7 +159,7 @@
                     <include>XWiki/SearchSuggestConfig.xml</include>
                   </includes>
                   <stylesheet>src/main/build/transformation/register-workspace-search.xsl
-              </stylesheet>
+                  </stylesheet>
                 </transformationSet>
               </transformationSets>
             </configuration>
@@ -181,7 +182,7 @@
                     <include>**/**.xml</include>
                   </includes>
                   <stylesheet>src/main/build/transformation/override-page-creator-and-author.xsl
-              </stylesheet>
+                  </stylesheet>
                   <parameters>
                     <parameter>
                       <name>creatorAndAuthor</name>
@@ -209,12 +210,13 @@
                     <include>XWiki/XWikiAllGroup.xml</include>
                   </includes>
                   <stylesheet>src/main/build/transformation/remove-local-admin-from-groups.xsl
-              </stylesheet>
+                  </stylesheet>
                 </transformationSet>
               </transformationSets>
             </configuration>
           </execution>
-          <!-- Set initial rights for the entire workspace to registered users. -->
+          <!-- Set initial rights for the entire workspace to registered 
+            users. -->
           <execution>
             <id>set-rights-for-workspace-registered</id>
             <phase>process-resources</phase>
@@ -230,7 +232,7 @@
                     <include>XWiki/XWikiPreferences.xml</include>
                   </includes>
                   <stylesheet>src/main/build/transformation/add-global-right.xsl
-              </stylesheet>
+                  </stylesheet>
                   <parameters>
                     <parameter>
                       <name>objectName</name>
@@ -265,7 +267,7 @@
                     <include>Panels/WebPreferences.xml</include>
                   </includes>
                   <stylesheet>src/main/build/transformation/add-global-right.xsl
-              </stylesheet>
+                  </stylesheet>
                   <parameters>
                     <parameter>
                       <name>objectName</name>
@@ -284,7 +286,8 @@
               </transformationSets>
             </configuration>
           </execution>
-          <!-- Set initial rights for displaying panels properly to registered users. -->
+          <!-- Set initial rights for displaying panels properly to registered 
+            users. -->
           <execution>
             <id>set-rights-for-panels-registered</id>
             <phase>process-resources</phase>
@@ -300,7 +303,7 @@
                     <include>Panels/WebPreferences.xml</include>
                   </includes>
                   <stylesheet>src/main/build/transformation/add-global-right.xsl
-              </stylesheet>
+                  </stylesheet>
                   <parameters>
                     <parameter>
                       <name>objectName</name>
@@ -319,7 +322,8 @@
               </transformationSets>
             </configuration>
           </execution>
-          <!-- Set initial rights for displaying color themes properly to guests. -->
+          <!-- Set initial rights for displaying color themes properly to 
+            guests. -->
           <execution>
             <id>set-rights-for-color-themes-guests</id>
             <phase>process-resources</phase>
@@ -335,7 +339,7 @@
                     <include>ColorThemes/WebPreferences.xml</include>
                   </includes>
                   <stylesheet>src/main/build/transformation/add-global-right.xsl
-              </stylesheet>
+                  </stylesheet>
                   <parameters>
                     <parameter>
                       <name>objectName</name>
@@ -354,7 +358,8 @@
               </transformationSets>
             </configuration>
           </execution>
-          <!-- Set initial rights for displaying color themes properly to registered users. -->
+          <!-- Set initial rights for displaying color themes properly to 
+            registered users. -->
           <execution>
             <id>set-rights-for-color-themes-registered</id>
             <phase>process-resources</phase>
@@ -370,7 +375,7 @@
                     <include>ColorThemes/WebPreferences.xml</include>
                   </includes>
                   <stylesheet>src/main/build/transformation/add-global-right.xsl
-              </stylesheet>
+                  </stylesheet>
                   <parameters>
                     <parameter>
                       <name>objectName</name>
@@ -391,7 +396,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <!-- TODO: Find icons for the new sections. -->
       <!-- Attach section icon for the WorkspaceUsers administration section. -->
 <!--       <plugin> -->

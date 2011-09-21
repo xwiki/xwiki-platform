@@ -272,4 +272,9 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
 
         return result;
     }
+    
+    /** @see org.xwiki.contrib.wiki30.WorkspaceManager#isWorkspace(String) **/
+    public boolean isWorkspace(String workspaceName) {
+        return workspaceManager.isWorkspace(workspaceName);
+    }
 }

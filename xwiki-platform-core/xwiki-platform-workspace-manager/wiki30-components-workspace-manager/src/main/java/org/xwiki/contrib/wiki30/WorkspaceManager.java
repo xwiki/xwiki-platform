@@ -100,4 +100,10 @@ public interface WorkspaceManager
      * @throws WorkspaceManagerException if problems occur.
      */
     public List<Workspace> getWorkspaces() throws WorkspaceManagerException;
+    
+    /**
+     * @param workspaceName name of the workspace to check.
+     * @return true if a workspace with the given name exists, false otherwise.
+     */
+    public boolean isWorkspace(String workspaceName);
 }

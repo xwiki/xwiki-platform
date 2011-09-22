@@ -52,4 +52,22 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            org/xwiki/url/internal/standard/EntityXWikiURLBuilder.java,
+            org/xwiki/url/internal/standard/StandardXWikiURLFactory.java,
+            org/xwiki/url/standard/HostResolver.java,
+            org/xwiki/url/standard/StandardURLConfiguration.java,
+            org/xwiki/url/standard/XWikiURLBuilder.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

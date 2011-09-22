@@ -54,4 +54,13 @@
     <module>xwiki-platform-tools</module>
     <module>xwiki-platform-core</module>
   </modules>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

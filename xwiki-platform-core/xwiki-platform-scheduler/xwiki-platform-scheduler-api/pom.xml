@@ -58,4 +58,26 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            com/xpn/xwiki/plugin/scheduler/AbstractJob.java,
+            com/xpn/xwiki/plugin/scheduler/GroovyJob.java,
+            com/xpn/xwiki/plugin/scheduler/JobState.java,
+            com/xpn/xwiki/plugin/scheduler/SchedulerPlugin.java,
+            com/xpn/xwiki/plugin/scheduler/SchedulerPluginApi.java,
+            com/xpn/xwiki/plugin/scheduler/SchedulerPluginException.java,
+            com/xpn/xwiki/plugin/scheduler/StatusListener.java,
+            com/xpn/xwiki/plugin/scheduler/XWikiServletRequestStub.java,
+            com/xpn/xwiki/plugin/scheduler/XWikiServletResponseStub.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

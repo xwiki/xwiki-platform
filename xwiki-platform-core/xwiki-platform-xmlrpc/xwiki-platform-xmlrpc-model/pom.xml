@@ -58,4 +58,27 @@
       </exclusions>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            org/xwiki/xmlrpc/model/Utils.java,
+            org/xwiki/xmlrpc/model/XWikiClass.java,
+            org/xwiki/xmlrpc/model/XWikiClassSummary.java,
+            org/xwiki/xmlrpc/model/XWikiExtendedId.java,
+            org/xwiki/xmlrpc/model/XWikiObject.java,
+            org/xwiki/xmlrpc/model/XWikiObjectSummary.java,
+            org/xwiki/xmlrpc/model/XWikiPage.java,
+            org/xwiki/xmlrpc/model/XWikiPageHistorySummary.java,
+            org/xwiki/xmlrpc/model/XWikiPageSummary.java,
+            org/xwiki/xmlrpc/XWikiXmlRpcApi.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -368,62 +368,10 @@
       <artifactId>avalon-framework-impl</artifactId>
       <version>4.3.1</version>
     </dependency>
-    <!-- fop depends on batik 1.7, but the batik folks did not release the rasterizer module
-         for this version, which we need. Since the 1.6 and 1.7 releases are fairly compatible,
-         but use different groupId names, we can use all the modules from 1.7, and exclude all
-         the 1.6 dependencies pulled by the rasterizer, until we can depend on a clean 1.7
-         rasterizer module.
-         See https://issues.apache.org/bugzilla/show_bug.cgi?id=45020 -->
     <dependency>
-      <groupId>batik</groupId>
+      <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-rasterizer</artifactId>
-      <version>1.6</version>
-      <exclusions>
-        <exclusion>
-          <groupId>batik</groupId>
-          <artifactId>batik-awt-util</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>batik</groupId>
-          <artifactId>batik-bridge</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>batik</groupId>
-          <artifactId>batik-css</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>batik</groupId>
-          <artifactId>batik-dom</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>batik</groupId>
-          <artifactId>batik-gvt</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>batik</groupId>
-          <artifactId>batik-parser</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>batik</groupId>
-          <artifactId>batik-script</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>batik</groupId>
-          <artifactId>batik-svg-dom</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>batik</groupId>
-          <artifactId>batik-transcoder</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>batik</groupId>
-          <artifactId>batik-util</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>batik</groupId>
-          <artifactId>batik-xml</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>1.7</version>
     </dependency>
     <!-- fop gets us batik but not batik-codec and we need this one for SVGPlugin -->
     <dependency>

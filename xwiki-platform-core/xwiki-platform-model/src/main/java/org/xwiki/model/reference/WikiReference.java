@@ -23,7 +23,7 @@ import org.xwiki.model.EntityType;
 
 /**
  * Represents a reference to a wiki (wiki name). This is the topmost reference and it doesn't have a parent reference.
- * 
+ *
  * @version $Id$
  * @since 2.2M1
  */
@@ -33,13 +33,17 @@ public class WikiReference extends EntityReference
      * Special constructor that transforms a generic entity reference into a {@link WikiReference}. It checks the
      * validity of the passed reference (ie correct type).
      *
-     * @exception IllegalArgumentException if the passed reference is not a valid wiki reference
+     * @param reference the raw reference to build this wiki reference from
+     * @throws IllegalArgumentException if the passed reference is not a valid wiki reference
      */
     public WikiReference(EntityReference reference)
     {
-        super(reference.getName(), reference.getType());    
+        super(reference.getName(), reference.getType());
     }
 
+    /**
+     * @param wikiName the name of the wiki referenced
+     */
     public WikiReference(String wikiName)
     {
         super(wikiName, EntityType.WIKI);
@@ -47,13 +51,14 @@ public class WikiReference extends EntityReference
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Overridden in order to verify the validity of the passed type.
+     * </p>
      *
-     * Overridden in order to verify the validity of the passed type
-     *
-     * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
-     * @exception IllegalArgumentException if the passed type is not a wiki type
+     * @throws IllegalArgumentException if the passed type is not a wiki type
      */
-    @Override public void setType(EntityType type)
+    @Override
+    public void setType(EntityType type)
     {
         if (type != EntityType.WIKI) {
             throw new IllegalArgumentException("Invalid type [" + type + "] for a wiki reference");

@@ -67,7 +67,6 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-            org/xwiki/model/internal/DefaultModelConfiguration.java,
             org/xwiki/model/internal/reference/AbstractReferenceEntityReferenceResolver.java,
             org/xwiki/model/internal/reference/AbstractStringEntityReferenceResolver.java,
             org/xwiki/model/internal/reference/DefaultEntityReferenceValueProvider.java,
@@ -91,8 +90,7 @@
             org/xwiki/model/reference/InvalidEntityReferenceException.java,
             org/xwiki/model/reference/ObjectReference.java,
             org/xwiki/model/reference/RegexEntityReference.java,
-            org/xwiki/model/reference/SpaceReference.java,
-            org/xwiki/model/reference/WikiReference.java
+            org/xwiki/model/reference/SpaceReference.java
           </excludes>
         </configuration>
       </plugin>

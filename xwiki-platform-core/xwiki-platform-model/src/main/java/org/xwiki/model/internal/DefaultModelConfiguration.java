@@ -19,6 +19,12 @@
  */
 package org.xwiki.model.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -26,12 +32,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * Get configuration data from the XWiki configuration using a {@link ConfigurationSource}. If no
@@ -54,15 +54,21 @@ public class DefaultModelConfiguration implements ModelConfiguration
      */
     private static final String PREFIX = "model.";
 
-    private static final Map<EntityType, String> DEFAULT_VALUES = new HashMap<EntityType, String>() {{
-        put(EntityType.WIKI, "xwiki");
-        put(EntityType.SPACE, "Main");
-        put(EntityType.DOCUMENT, "WebHome");
-        put(EntityType.ATTACHMENT, "filename");
-        put(EntityType.OBJECT, "object");
-        put(EntityType.OBJECT_PROPERTY, "property");
-        put(EntityType.CLASS_PROPERTY, "property");
-    }};
+    /**
+     * Default values for all the Entity types, see {@link #getDefaultReferenceValue(org.xwiki.model.EntityType)}.
+     */
+    private static final Map<EntityType, String> DEFAULT_VALUES = new HashMap<EntityType, String>()
+    {
+        {
+            put(EntityType.WIKI, "xwiki");
+            put(EntityType.SPACE, "Main");
+            put(EntityType.DOCUMENT, "WebHome");
+            put(EntityType.ATTACHMENT, "filename");
+            put(EntityType.OBJECT, "object");
+            put(EntityType.OBJECT_PROPERTY, "property");
+            put(EntityType.CLASS_PROPERTY, get(EntityType.OBJECT_PROPERTY));
+        }
+    };
 
     /**
      * We want to make sure this component can be loaded and used even if there's no ConfigurationSource available

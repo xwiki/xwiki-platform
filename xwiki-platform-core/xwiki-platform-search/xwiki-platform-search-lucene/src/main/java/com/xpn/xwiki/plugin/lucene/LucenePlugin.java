@@ -432,8 +432,19 @@ public class LucenePlugin extends XWikiDefaultPlugin
             parsedQuery = MultiFieldQueryParser.parse(Version.LUCENE_34, query, fields, flags, this.analyzer);
             bQuery.add(parsedQuery, BooleanClause.Occur.MUST);
         } else {
-            QueryParser qp = new QueryParser(Version.LUCENE_34, "ft", this.analyzer);
-            parsedQuery = qp.parse(query);
+            String[] fields = new String[] {
+                IndexFields.FULLTEXT, IndexFields.DOCUMENT_TITLE,
+                IndexFields.DOCUMENT_NAME, IndexFields.FILENAME};
+            BooleanClause.Occur[] flags = new BooleanClause.Occur[fields.length];
+            for (int i = 0; i < flags.length; i++) {
+                flags[i] = BooleanClause.Occur.SHOULD;
+            }
+            QueryParser parser = new MultiFieldQueryParser(Version.LUCENE_34, fields, this.analyzer);
+            parsedQuery = parser.parse(query);
+            // Since the sub-queries are OR-ed, each sub-query score is normally divided by the number of sub-queries,
+            // which would cause extra-small scores whenever there's a hit on only one sub-query;
+            // compensate this by boosting the whole outer query
+            parsedQuery.setBoost(fields.length);
             bQuery.add(parsedQuery, BooleanClause.Occur.MUST);
         }
 

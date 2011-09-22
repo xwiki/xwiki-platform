@@ -28,6 +28,7 @@
   ## clean="false" due to bug #XWIKI-4122 - the &lt;legend&gt; element is dropped.
   {{html clean="false"}}
   &lt;form id="$section.toLowerCase()" method="post" action="$xwiki.getURL($currentDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()" class="xform half"&gt;
+    #set($obj = $doc.getObject('XWiki.XWikiPreferences'))
     #foreach ($item in $legend)
       #set ($fields = $params.get($item))
       &lt;fieldset class="$item"&gt;

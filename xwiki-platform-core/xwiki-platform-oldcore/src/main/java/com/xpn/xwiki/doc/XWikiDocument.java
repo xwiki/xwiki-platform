@@ -814,7 +814,8 @@ public class XWikiDocument implements DocumentModelBridge
         // document's context. For example this is true for the Admin page, see
         // http://jira.xwiki.org/jira/browse/XWIKI-4274 for more details.
 
-        String content = getTranslatedContent(context);
+        XWikiDocument tdoc = getTranslatedDocument(context);
+        String content = tdoc.getContent();
 
         String renderedContent = this.renderingCache.getRenderedContent(getDocumentReference(), content, context);
 
@@ -822,7 +823,7 @@ public class XWikiDocument implements DocumentModelBridge
             DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
             parameters.setTransformationContextIsolated(isolateVelocityMacros);
             // Render the translated content (matching the current language) using this document's syntax.
-            parameters.setContentTranslated(true);
+            parameters.setContentTranslated(tdoc != this);
             XDOM contentXDOM = this.documentDisplayer.display(this, parameters);
             renderedContent = renderXDOM(contentXDOM, targetSyntax);
             this.renderingCache.setRenderedContent(getDocumentReference(), content, renderedContent, context);

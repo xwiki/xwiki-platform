@@ -303,6 +303,9 @@ public class DocumentContentDisplayer implements DocumentDisplayer
     {
         try {
             DocumentModelBridge translatedDocument = documentAccessBridge.getDocument(document.getDocumentReference());
+            // FIXME: This is not a reliable way to determine if the language of the given document matches the context
+            // language. For instance the given document can have "en" language set while the translated document
+            // returned by the document access bridge can have "" or "default" language set.
             if (!document.getRealLanguage().equals(translatedDocument.getRealLanguage())) {
                 // The language of the given document doesn't match the context language. Use the translated content.
                 if (document.getSyntax().equals(translatedDocument.getSyntax())) {

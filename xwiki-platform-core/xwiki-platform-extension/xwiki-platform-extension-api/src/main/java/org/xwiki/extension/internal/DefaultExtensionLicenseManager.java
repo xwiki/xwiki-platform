@@ -20,11 +20,14 @@
 package org.xwiki.extension.internal;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
@@ -77,9 +80,13 @@ public class DefaultExtensionLicenseManager implements ExtensionLicenseManager, 
     @Override
     public void initialize() throws InitializationException
     {
+        Set<URL> licenseURLs = ClasspathHelper.forPackage(LICENSE_PACKAGE);
+
+        // FIXME: remove that as soon as possible
+        licenseURLs = filterURLs(licenseURLs);
+
         Reflections reflections =
-            new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner())
-                .setUrls(ClasspathHelper.forPackage(LICENSE_PACKAGE))
+            new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner()).setUrls(licenseURLs)
                 .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(LICENSE_PACKAGE))));
 
         for (String licenseFile : reflections.getResources(Pattern.compile(".*\\.txt"))) {
@@ -87,8 +94,7 @@ public class DefaultExtensionLicenseManager implements ExtensionLicenseManager, 
 
             try {
                 // Get name
-                // Note that getResources produce unescaped URLs
-                String path = URLDecoder.decode(licenseUrl.getPath(), "UTF-8");
+                String path = decode(licenseUrl.getPath());
                 String name = path.substring(path.lastIndexOf('/') + 1);
                 name = name.substring(0, name.length() - ".txt".length());
 
@@ -120,6 +126,42 @@ public class DefaultExtensionLicenseManager implements ExtensionLicenseManager, 
                 this.logger.error("Failed to load license file at [" + licenseUrl + "]", e);
             }
         }
+    }
+
+    /**
+     * Very nasty hack which unescape invalid characters from the {@link URL} path because
+     * {@link Reflections#Reflections(org.reflections.Configuration)} does not do it...
+     * 
+     * @param urls base URLs to modify
+     * @return modified base URLs
+     */
+    // TODO: remove when http://code.google.com/p/reflections/issues/detail?id=87 is fixed
+    private Set<URL> filterURLs(Set<URL> urls)
+    {
+        Set<URL> results = new HashSet<URL>(urls.size());
+        for (URL url : urls) {
+            try {
+                results.add(new URL(url.getProtocol(), url.getHost(), url.getPort(), decode(url.getFile())));
+            } catch (Exception e) {
+                this.logger.error("Failed to convert url [" + url + "]", e);
+
+                results.add(url);
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Decode URL path.
+     * 
+     * @param path the URL path
+     * @return the decoded path
+     * @throws UnsupportedEncodingException error when unescaping provided path
+     */
+    private String decode(String path) throws UnsupportedEncodingException
+    {
+        return URLDecoder.decode(path, "UTF-8");
     }
 
     @Override

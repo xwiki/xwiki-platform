@@ -21,10 +21,11 @@ package com.xpn.xwiki.store;
 
 import java.io.InputStream;
 
+import org.xwiki.store.StreamProvider;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
-import org.xwiki.store.StreamProvider;
 
 /**
  * A stream provider based on the content of an attachment.
@@ -35,10 +36,14 @@ import org.xwiki.store.StreamProvider;
  */
 public class AttachmentContentStreamProvider implements StreamProvider
 {
-    /** The attachment to save content of. */
+    /**
+     * The attachment to save content of.
+     */
     private final XWikiAttachment attachment;
 
-    /** The XWikiContext for getting the content of the attachment. */
+    /**
+     * The XWikiContext for getting the content of the attachment.
+     */
     private final XWikiContext context;
 
     /**
@@ -46,20 +51,16 @@ public class AttachmentContentStreamProvider implements StreamProvider
      *
      * @param attachment the attachment whose content should become the stream.
      * @param context the XWikiContext needed to get the content from the attachment
-     *                using {@link XWikiAttachment#getContentInputStream(XWikiContext)}
+     * using {@link XWikiAttachment#getContentInputStream(XWikiContext)}
      */
     public AttachmentContentStreamProvider(final XWikiAttachment attachment,
-                                           final XWikiContext context)
+        final XWikiContext context)
     {
         this.attachment = attachment;
         this.context = context;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see StreamProvider#getStream()
-     */
+    @Override
     public InputStream getStream() throws XWikiException
     {
         return this.attachment.getContentInputStream(this.context);

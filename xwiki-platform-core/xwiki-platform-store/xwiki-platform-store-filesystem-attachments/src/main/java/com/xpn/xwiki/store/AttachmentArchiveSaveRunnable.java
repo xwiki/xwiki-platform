@@ -23,25 +23,25 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.store.FileSaveTransactionRunnable;
+import org.xwiki.store.StartableTransactionRunnable;
+import org.xwiki.store.StreamProvider;
+import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
+import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.serialization.SerializationStreamProvider;
+import org.xwiki.store.serialization.Serializer;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import org.suigeneris.jrcs.rcs.Version;
-import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
-import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
-import org.xwiki.store.serialization.Serializer;
-import org.xwiki.store.StartableTransactionRunnable;
-import org.xwiki.store.FileSaveTransactionRunnable;
-import org.xwiki.store.StreamProvider;
-import org.xwiki.store.serialization.SerializationStreamProvider;
-
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 
 /**
  * A TransactionRunnable for saving attachment archives.
  * It uses a chain of FileSaveTransactionRunnable so the attachment will either be saved or fail
  * safely, it should not hang in a halfway state.
- * 
+ *
  * @version $Id$
  * @since 3.0M2
  */
@@ -52,20 +52,20 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
      *
      * @param archive the attachment archive to save.
      * @param fileTools a set of tools for getting the file corrisponding to each version of the
-     *                  attachment content and the file for the meta data, as well as temporary
-     *                  and backup files corrisponding to each. Also for getting locks.
+     * attachment content and the file for the meta data, as well as temporary
+     * and backup files corrisponding to each. Also for getting locks.
      * @param provider the means to get the files to store each version of the attachment.
      * @param serializer an attachment list metadata serializer for serializing the metadata of each
-     *                   version of the attachment.
+     * version of the attachment.
      * @param context the XWikiContext used to get the revisions of the attachment.
      * @throws XWikiException if it is unable to get a revision of an attachment using archive.getRevision()
      */
     public AttachmentArchiveSaveRunnable(final XWikiAttachmentArchive archive,
-                                         final FilesystemStoreTools fileTools,
-                                         final AttachmentFileProvider provider,
-                                         final Serializer<List<XWikiAttachment>,
-                                                          List<XWikiAttachment>> serializer,
-                                         final XWikiContext context)
+        final FilesystemStoreTools fileTools,
+        final AttachmentFileProvider provider,
+        final Serializer<List<XWikiAttachment>,
+            List<XWikiAttachment>> serializer,
+        final XWikiContext context)
         throws XWikiException
     {
         if (archive.getVersions().length == 0 && archive.getAttachment() != null) {
@@ -106,13 +106,13 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
      * @param saveHere the location to save the data.
      */
     private void addSaver(final StreamProvider provider,
-                          final FilesystemStoreTools fileTools,
-                          final File saveHere)
+        final FilesystemStoreTools fileTools,
+        final File saveHere)
     {
         new FileSaveTransactionRunnable(saveHere,
-                                        fileTools.getTempFile(saveHere),
-                                        fileTools.getBackupFile(saveHere),
-                                        fileTools.getLockForFile(saveHere),
-                                        provider).runIn(this);
+            fileTools.getTempFile(saveHere),
+            fileTools.getBackupFile(saveHere),
+            fileTools.getLockForFile(saveHere),
+            provider).runIn(this);
     }
 }

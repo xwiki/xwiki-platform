@@ -17,27 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.store.serialization;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.xwiki.store.StreamProvider;
 
 /**
  * A stream provider which provides a stream from serializing an object.
- * 
- * @version $Id$
+ *
  * @param <R> The class of object which the serializer can serialize (what it requires).
+ * @version $Id$
  * @since 3.0M3
  */
 public class SerializationStreamProvider<R> implements StreamProvider
 {
-    /** The serializer for converting the list of attachments into a stream of metadata. */
+    /**
+     * The serializer for converting the list of attachments into a stream of metadata.
+     */
     private final Serializer<R, ?> serializer;
 
-    /** The list of attachments to get the stream of metadata from. */
+    /**
+     * The list of attachments to get the stream of metadata from.
+     */
     private final R toSerialize;
 
     /**
@@ -47,7 +50,7 @@ public class SerializationStreamProvider<R> implements StreamProvider
      * @param toSerialize the object to serialize.
      */
     public SerializationStreamProvider(final Serializer<R, ?> serializer,
-                                       final R toSerialize)
+        final R toSerialize)
     {
         this.serializer = serializer;
         this.toSerialize = toSerialize;

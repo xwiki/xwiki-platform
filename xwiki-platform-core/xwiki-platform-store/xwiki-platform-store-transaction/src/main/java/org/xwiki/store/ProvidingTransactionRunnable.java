@@ -19,7 +19,6 @@
  */
 package org.xwiki.store;
 
-
 /**
  * A special type of TransactionRunnable which guarentees to provide state to the TransactionRunnables
  * which are run inside of it. It can also provide them with data.

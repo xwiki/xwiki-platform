@@ -16,25 +16,22 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.doc;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 
-
 /**
  * The content of an attachment. This implementation is based on a file on the filesystem.
- * This implementation is immutable and is only created by the 
+ * This implementation is immutable and is only created by the
  * {@link com.xpn.xwiki.store.FilesystemAttachmentStore}.
  *
  * @version $Id$
@@ -42,10 +39,14 @@ import org.apache.commons.io.input.AutoCloseInputStream;
  */
 public class FilesystemAttachmentContent extends XWikiAttachmentContent
 {
-    /** The underlying storage mechanism. */
+    /**
+     * The underlying storage mechanism.
+     */
     private final File storageFile;
 
-    /** A lock which is locked when the attachment content is being read. */
+    /**
+     * A lock which is locked when the attachment content is being read.
+     */
     private final ReadWriteLock lock;
 
     /**
@@ -56,8 +57,8 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
      * @param lock this will be locked for reading when the attachment file is being read.
      */
     public FilesystemAttachmentContent(final File storage,
-                                       final XWikiAttachment attachment,
-                                       final ReadWriteLock lock)
+        final XWikiAttachment attachment,
+        final ReadWriteLock lock)
     {
         // TODO This will cause a new FileItem to be created in XWikiAttachmentContent
         // but it is the only constructor available. This should be fixed in XAC.
@@ -67,22 +68,13 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
         this.lock = lock;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.XWikiAttachmentContent#clone()
-     */
     @Override
     public FilesystemAttachmentContent clone()
     {
         return new FilesystemAttachmentContent(this.storageFile, this.getAttachment(), this.lock);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.XWikiAttachmentContent#getContent()
-     */
+    @Override
     @Deprecated
     public byte[] getContent()
     {
@@ -96,11 +88,7 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.XWikiAttachmentContent#getContentInputStream()
-     */
+    @Override
     public InputStream getContentInputStream()
     {
         /** An InputStream which locks a lock while it is being read. */
@@ -143,11 +131,7 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.XWikiAttachmentContent#setContent(InputStream is)
-     */
+    @Override
     public void setContent(final InputStream is) throws IOException
     {
         // This should be immutable but XWikiAttachment calls this when an attachment is being
@@ -158,11 +142,7 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
         this.getAttachment().setContent(is);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.XWikiAttachmentContent#getSize()
-     */
+    @Override
     public int getSize()
     {
         long size = this.storageFile.length();

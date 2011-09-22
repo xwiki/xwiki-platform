@@ -19,10 +19,10 @@
  */
 package com.xpn.xwiki.store;
 
+import org.xwiki.store.RootTransactionRunnable;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-
-import org.xwiki.store.RootTransactionRunnable;
 
 /**
  * A Transaction based on XWikiHibernateStore.
@@ -34,10 +34,14 @@ import org.xwiki.store.RootTransactionRunnable;
  */
 public class XWikiHibernateTransaction extends RootTransactionRunnable implements HibernateTransaction
 {
-    /** The storage engine. */
+    /**
+     * The storage engine.
+     */
     private final XWikiHibernateBaseStore store;
 
-    /** The XWikiContext associated with the request which started this Transaction. */
+    /**
+     * The XWikiContext associated with the request which started this Transaction.
+     */
     private final XWikiContext context;
 
     /**
@@ -58,11 +62,7 @@ public class XWikiHibernateTransaction extends RootTransactionRunnable implement
         this.context = context;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see RootTransactionRunnable#begin()
-     */
+    @Override
     public void onPreRun() throws XWikiException
     {
         this.store.checkHibernate(this.context);
@@ -70,21 +70,18 @@ public class XWikiHibernateTransaction extends RootTransactionRunnable implement
 
     /**
      * {@inheritDoc}
+     * <p>
      * onRun() is guaranteed to be run in the root runnable first.
      * onPreRun should run before the transaction is opened.
-     *
-     * @see RootTransactionRunnable#begin()
+     * </p>
      */
+    @Override
     public void onRun() throws XWikiException
     {
         this.shouldCloseTransaction = this.store.beginTransaction(this.context);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see RootTransactionRunnable#onCommit()
-     */
+    @Override
     public void onCommit()
     {
         if (this.shouldCloseTransaction) {
@@ -92,11 +89,7 @@ public class XWikiHibernateTransaction extends RootTransactionRunnable implement
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see RootTransactionRunnable#onRollback()
-     */
+    @Override
     public void onRollback()
     {
         if (this.shouldCloseTransaction) {

@@ -19,9 +19,7 @@
  */
 package org.xwiki.store.locks.preemptive.internal;
 
-import java.io.File;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,7 +36,9 @@ public class PreemptiveLockTest
 
     private int bobState;
 
-    /** Prove that the lock is mutually exclusive. */
+    /**
+     * Prove that the lock is mutually exclusive.
+     */
     @Test
     public void lockingTest()
     {
@@ -46,7 +46,8 @@ public class PreemptiveLockTest
         final Lock lockX = provider.getLock("X").writeLock();
 
         // Alice
-        new Thread(new SleepyRunnable() {
+        new Thread(new SleepyRunnable()
+        {
             public void run()
             {
                 lockX.lock();
@@ -63,7 +64,8 @@ public class PreemptiveLockTest
         }).start();
 
         // Bob
-        new Thread(new SleepyRunnable() {
+        new Thread(new SleepyRunnable()
+        {
             public void run()
             {
                 lockX.lock();
@@ -79,7 +81,7 @@ public class PreemptiveLockTest
         }).start();
     }
 
-    @Test(expected=IllegalMonitorStateException.class)
+    @Test(expected = IllegalMonitorStateException.class)
     public void unlockWithoutLockTest()
     {
         final PreemptiveLockProvider provider = new PreemptiveLockProvider();
@@ -93,7 +95,8 @@ public class PreemptiveLockTest
         final PreemptiveLockProvider provider = new PreemptiveLockProvider();
         final Lock lockX = provider.getLock("X").writeLock();
 
-        new Thread(new SleepyRunnable() {
+        new Thread(new SleepyRunnable()
+        {
             public void run()
             {
                 lockX.lock();
@@ -136,7 +139,8 @@ public class PreemptiveLockTest
         final Lock lockX = provider.getLock("X").writeLock();
         final Lock lockY = provider.getLock("Y").writeLock();
 
-        new Thread(new SleepyRunnable() {
+        new Thread(new SleepyRunnable()
+        {
             public void run()
             {
                 lockX.lock();
@@ -200,7 +204,8 @@ public class PreemptiveLockTest
             synchronized (o) {
                 try {
                     o.wait();
-                } catch (Exception e) { }
+                } catch (Exception e) {
+                }
             }
         }
     }

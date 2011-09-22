@@ -19,26 +19,27 @@
  */
 package com.xpn.xwiki.store;
 
-import java.util.List;
 import java.io.File;
+import java.util.List;
 
+import org.xwiki.store.FileSaveTransactionRunnable;
+import org.xwiki.store.StartableTransactionRunnable;
+import org.xwiki.store.StreamProvider;
+import org.xwiki.store.filesystem.internal.DeletedAttachmentFileProvider;
+import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.serialization.SerializationStreamProvider;
+import org.xwiki.store.serialization.Serializer;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.DeletedFilesystemAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import org.xwiki.store.FileSaveTransactionRunnable;
-import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
-import org.xwiki.store.filesystem.internal.DeletedAttachmentFileProvider;
-import org.xwiki.store.serialization.SerializationStreamProvider;
-import org.xwiki.store.serialization.Serializer;
-import org.xwiki.store.StartableTransactionRunnable;
-import org.xwiki.store.StreamProvider;
 
 /**
  * A TransactionRunnable for saving deleted attachments.
- * 
+ *
  * @version $Id$
  * @since 3.0M3
  */
@@ -72,21 +73,21 @@ class SaveTrashAttachmentRunnable extends StartableTransactionRunnable
         final XWikiAttachmentArchive archive = attachment.loadArchive(context);
         if (archive == null) {
             throw new NullPointerException("Failed to load attachment archive, "
-                                           + "loadArchive() returned null");
+                + "loadArchive() returned null");
         }
 
         // Save the archive for the deleted attachment.
         new AttachmentArchiveSaveRunnable(archive,
-                                          fileTools,
-                                          provider,
-                                          versionSerializer,
-                                          context).runIn(this);
+            fileTools,
+            provider,
+            versionSerializer,
+            context).runIn(this);
 
         // Save the attachment's content.
         final StreamProvider contentProvider = new AttachmentContentStreamProvider(attachment, context);
         this.addSaver(contentProvider,
-                      fileTools,
-                      provider.getAttachmentContentFile());
+            fileTools,
+            provider.getAttachmentContentFile());
     }
 
     /**
@@ -98,13 +99,13 @@ class SaveTrashAttachmentRunnable extends StartableTransactionRunnable
      * @param saveHere the location to save the data.
      */
     private void addSaver(final StreamProvider provider,
-                          final FilesystemStoreTools fileTools,
-                          final File saveHere)
+        final FilesystemStoreTools fileTools,
+        final File saveHere)
     {
         new FileSaveTransactionRunnable(saveHere,
-                                        fileTools.getTempFile(saveHere),
-                                        fileTools.getBackupFile(saveHere),
-                                        fileTools.getLockForFile(saveHere),
-                                        provider).runIn(this);
+            fileTools.getTempFile(saveHere),
+            fileTools.getBackupFile(saveHere),
+            fileTools.getLockForFile(saveHere),
+            provider).runIn(this);
     }
 }

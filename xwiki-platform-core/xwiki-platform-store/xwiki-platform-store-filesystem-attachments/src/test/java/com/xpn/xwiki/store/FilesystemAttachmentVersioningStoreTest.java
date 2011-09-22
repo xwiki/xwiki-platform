@@ -19,36 +19,33 @@
  */
 package com.xpn.xwiki.store;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.IOException;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
-import org.xwiki.model.internal.reference.PathStringEntityReferenceSerializer;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
-import org.xwiki.store.filesystem.internal.DefaultFilesystemStoreTools;
-import org.xwiki.store.serialization.xml.internal.AttachmentListMetadataSerializer;
-import org.xwiki.store.serialization.xml.internal.AttachmentMetadataSerializer;
-import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentContent;
-import com.xpn.xwiki.doc.XWikiAttachmentArchive;
-import com.xpn.xwiki.doc.ListAttachmentArchive;
-import com.xpn.xwiki.web.Utils;
-
-import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.store.locks.preemptive.internal.PreemptiveLockProvider;
-
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.internal.reference.PathStringEntityReferenceSerializer;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
+import org.xwiki.store.filesystem.internal.DefaultFilesystemStoreTools;
+import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.locks.preemptive.internal.PreemptiveLockProvider;
+import org.xwiki.store.serialization.xml.internal.AttachmentListMetadataSerializer;
+import org.xwiki.store.serialization.xml.internal.AttachmentMetadataSerializer;
+import org.xwiki.test.AbstractMockingComponentTestCase;
 
-import org.apache.commons.io.IOUtils;
-
+import com.xpn.xwiki.doc.ListAttachmentArchive;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+import com.xpn.xwiki.doc.XWikiAttachmentContent;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Tests for FilesystemAttachmentVersioningStore.
@@ -79,8 +76,8 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractMockingComp
 
         this.fileTools =
             new DefaultFilesystemStoreTools(new PathStringEntityReferenceSerializer(),
-                                            storageLocation,
-                                            new PreemptiveLockProvider());
+                storageLocation,
+                new PreemptiveLockProvider());
         final AttachmentListMetadataSerializer serializer =
             new AttachmentListMetadataSerializer(new AttachmentMetadataSerializer());
         this.versionStore = new FilesystemAttachmentVersioningStore(this.fileTools, serializer);
@@ -213,26 +210,26 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractMockingComp
 
     private static class StringAttachmentContent extends XWikiAttachmentContent
     {
-         private final String content;
+        private final String content;
 
-         public StringAttachmentContent(final String content)
-         {
-             this.content = content;
-         }
+        public StringAttachmentContent(final String content)
+        {
+            this.content = content;
+        }
 
-         public InputStream getContentInputStream()
-         {
-             return new ByteArrayInputStream(this.content.getBytes());
-         }
+        public InputStream getContentInputStream()
+        {
+            return new ByteArrayInputStream(this.content.getBytes());
+        }
 
-         public boolean isContentDirty()
-         {
-             return true;
-         }
+        public boolean isContentDirty()
+        {
+            return true;
+        }
 
-         public StringAttachmentContent clone()
-         {
-             return this;
-         }
+        public StringAttachmentContent clone()
+        {
+            return this;
+        }
     }
 }

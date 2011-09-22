@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.doc;
 
 import java.io.ByteArrayInputStream;
@@ -44,7 +42,9 @@ import com.xpn.xwiki.XWikiException;
  */
 public class ListAttachmentArchive extends XWikiAttachmentArchive
 {
-    /** Generic message to put in any exception which occurs in this class. */
+    /**
+     * Generic message to put in any exception which occurs in this class.
+     */
     private static final String GENERIC_EXCEPTION_MESSAGE =
         "Exception while manipulating the archive for attachment {0}";
 
@@ -55,7 +55,9 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     private static final String NOT_IMPLEMENTED_MESSAGE =
         "This function is not available in this implementation.";
 
-    /** The attachment which this is an archive of. */
+    /**
+     * The attachment which this is an archive of.
+     */
     private XWikiAttachment attachment;
 
     /**
@@ -79,7 +81,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
      * Create a new instance of ListAttachmentArchive from a list of attachments.
      *
      * @param revisions a List of XWikiAttachment revisions to put in this archive.
-     *                  All revisions are the same attachment and thus must have the same ID.
+     * All revisions are the same attachment and thus must have the same ID.
      */
     public ListAttachmentArchive(final List<XWikiAttachment> revisions)
     {
@@ -98,9 +100,9 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
         for (XWikiAttachment attach : revisions) {
             if (attach.getId() != id) {
                 throw new IllegalArgumentException("Attachment " + attach.getFilename() + " has a "
-                                                   + "different ID than the first attachment ( "
-                                                   + firstAttachName + " ) so they cannot all be "
-                                                   + "revisions of the same attachment.");
+                    + "different ID than the first attachment ( "
+                    + firstAttachName + " ) so they cannot all be "
+                    + "revisions of the same attachment.");
             }
             attach.setAttachment_archive(this);
         }
@@ -109,11 +111,6 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
         this.attachment = this.revisions.get(revisions.size() - 1);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#clone()
-     */
     @Override
     public Object clone()
     {
@@ -147,22 +144,14 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.XWikiAttachmentArchive#getRCSArchive()
-     */
+    @Override
     @Deprecated
     public Archive getRCSArchive()
     {
         throw new RuntimeException(NOT_IMPLEMENTED_MESSAGE);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.XWikiAttachmentArchive#setRCSArchive(Archive)
-     */
+    @Override
     @Deprecated
     public void setRCSArchive(final Archive rcsArchive)
     {
@@ -175,7 +164,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
      * @param context the XWikiContext for the request.
      * @return this archive in JRCS format.
      * @throws Exception if something goes wrong while serializing the attachment to XML or inserting it
-     *                   into the RCS archive.
+     * into the RCS archive.
      */
     private Archive toRCS(final XWikiContext context) throws Exception
     {
@@ -197,7 +186,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     /**
      * @param rcsArchive the RCS archive to import.
      * @throws Exception if getting a revision from the RCS archive
-     *                   or deserializing an attachment from XML fails
+     * or deserializing an attachment from XML fails
      */
     private void fromRCS(final Archive rcsArchive) throws Exception
     {
@@ -239,11 +228,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
         return new byte[0];
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.XWikiAttachmentArchive#getArchive(XWikiContext)
-     */
+    @Override
     public byte[] getArchive(final XWikiContext context) throws XWikiException
     {
         try {
@@ -259,11 +244,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.XWikiAttachmentArchive#setArchive(byte[])
-     */
+    @Override
     public void setArchive(final byte[] data) throws XWikiException
     {
         this.revisions.clear();
@@ -285,11 +266,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.XWikiAttachmentArchive#updateArchive(byte[], XWikiContext)
-     */
+    @Override
     public void updateArchive(final byte[] data, final XWikiContext context)
     {
         this.update();
@@ -310,31 +287,19 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
         this.revisions.add(clone);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.XWikiAttachmentArchive#getAttachment()
-     */
+    @Override
     public XWikiAttachment getAttachment()
     {
         return this.attachment;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.XWikiAttachmentArchive#setAttachment(XWikiAttachment)
-     */
+    @Override
     public void setAttachment(final XWikiAttachment attachment)
     {
         this.attachment = attachment;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.XWikiAttachmentArchive#getVersions()
-     */
+    @Override
     public Version[] getVersions()
     {
         final Version[] versions = new Version[this.revisions.size()];
@@ -347,14 +312,10 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
         return versions;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.XWikiAttachmentArchive#getRevision(XWikiAttachment, String, XWikiContext)
-     */
+    @Override
     public XWikiAttachment getRevision(final XWikiAttachment attachment,
-                                       final String rev,
-                                       final XWikiContext context)
+        final String rev,
+        final XWikiContext context)
     {
         if (rev == null) {
             return null;
@@ -381,15 +342,13 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
      */
     private static class XWikiAttachmentVersionComparitor implements Comparator<XWikiAttachment>
     {
-        /** A single instance to use instead of constructing one each time. */
+        /**
+         * A single instance to use instead of constructing one each time.
+         */
         public static final XWikiAttachmentVersionComparitor INSTANCE =
             new XWikiAttachmentVersionComparitor();
 
-        /**
-         * {@inheritDoc}
-         *
-         * @see Comparator#compare(T, T)
-         */
+        @Override
         public int compare(final XWikiAttachment a, final XWikiAttachment b)
         {
             return a.getRCSVersion().compareTo(b.getRCSVersion());

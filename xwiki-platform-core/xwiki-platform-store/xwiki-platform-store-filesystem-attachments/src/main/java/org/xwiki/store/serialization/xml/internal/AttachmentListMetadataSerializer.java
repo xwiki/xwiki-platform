@@ -27,11 +27,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
-import org.dom4j.dom.DOMElement;
 import org.dom4j.Element;
+import org.dom4j.dom.DOMElement;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.store.serialization.xml.XMLSerializer;
+
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
  * A serializer for saving the metadata from a list of XWikiAttachments.
@@ -54,21 +55,31 @@ import org.xwiki.store.serialization.xml.XMLSerializer;
 public class AttachmentListMetadataSerializer
     extends AbstractXMLSerializer<List<XWikiAttachment>, List<XWikiAttachment>>
 {
-    /** The root element for serialized element. */
+    /**
+     * The root element for serialized element.
+     */
     private static final String ROOT_ELEMENT_NAME = "attachment-list";
 
-    /** Root node paramter which must be present in order to attempt parsing. */
+    /**
+     * Root node paramter which must be present in order to attempt parsing.
+     */
     private static final String SERIALIZER_PARAM = "serializer";
 
-    /** Value of SERIALIZER_PARAM must be this in order to continue parsing. */
+    /**
+     * Value of SERIALIZER_PARAM must be this in order to continue parsing.
+     */
     private static final String THIS_SERIALIZER = "attachment-list-meta/1.0";
 
-    /** Needed to serialize/parse the individual attachments. */
+    /**
+     * Needed to serialize/parse the individual attachments.
+     */
     @Inject
     @Named("attachment-meta/1.0")
     private XMLSerializer<XWikiAttachment, XWikiAttachment> attachSerializer;
 
-    /** Default constructor. For component manager. */
+    /**
+     * Default constructor. For component manager.
+     */
     public AttachmentListMetadataSerializer()
     {
         // Do nothing.
@@ -94,7 +105,7 @@ public class AttachmentListMetadataSerializer
         }
         if (!THIS_SERIALIZER.equals(docel.attribute(SERIALIZER_PARAM).getValue())) {
             throw new IOException("Cannot parse this attachment archive metadata, it was saved with a "
-                                  + "different serializer.");
+                + "different serializer.");
         }
         final List<XWikiAttachment> attachments = new ArrayList<XWikiAttachment>(docel.elements().size());
         for (Element attach : ((List<Element>) docel.elements())) {
@@ -105,7 +116,7 @@ public class AttachmentListMetadataSerializer
 
     @Override
     public void serialize(final List<XWikiAttachment> attachments,
-                          final XMLWriter writer)
+        final XMLWriter writer)
         throws IOException
     {
         final Element docel = new DOMElement(ROOT_ELEMENT_NAME);

@@ -16,18 +16,18 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.doc;
 
 import java.util.Date;
 
-import com.xpn.xwiki.XWikiContext;
 import org.xwiki.model.reference.DocumentReference;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * A mutable version of a DeletedFilesystemAttachment, passed around and populated while loading.
- * 
+ *
  * @version $Id$
  * @since 3.0M3
  */
@@ -58,81 +58,49 @@ public class MutableDeletedFilesystemAttachment extends DeletedFilesystemAttachm
         return out;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.DeletedFilesystemAttachment#setId(long)
-     */
+    @Override
     public void setId(long id)
     {
         super.setId(id);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.DeletedFilesystemAttachment#setDocId(long)
-     */
+    @Override
     public void setDocId(long docId)
     {
         super.setId(docId);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.DeletedFilesystemAttachment#setDocName(String)
-     */
+    @Override
     public void setDocName(String docName)
     {
         super.setDocName(docName);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.DeletedFilesystemAttachment#setDocumentReference(DocumentReference)
-     */
+    @Override
     public void setDocumentReference(final DocumentReference docReference)
     {
         super.setDocumentReference(docReference);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.DeletedFilesystemAttachment#setFilename(String)
-     */
+    @Override
     public void setFilename(String filename)
     {
         super.setFilename(filename);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.DeletedFilesystemAttachment#setDate(Date)
-     */
+    @Override
     public void setDate(Date date)
     {
         super.setDate(date);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.DeletedFilesystemAttachment#setDeleter(String)
-     */
+    @Override
     public void setDeleter(String deleter)
     {
         super.setDeleter(deleter);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.DeletedFilesystemAttachment#setAttachment(XWikiAttachment, XWikiContext)
-     */
+    @Override
     public void setAttachment(XWikiAttachment attachment, XWikiContext context)
     {
         super.setAttachment(attachment, context);

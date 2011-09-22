@@ -39,6 +39,6 @@ public class RootTransactionRunnable<T> extends StartableTransactionRunnable<T>
     public <U extends T> TransactionRunnable<U> runIn(final TransactionRunnable<U> parentRunnable)
     {
         throw new IllegalArgumentException("A RootTransactionRunnable cannot safely be runIn() any other "
-                                           + "TransactionRunnable.");
+            + "TransactionRunnable.");
     }
 }

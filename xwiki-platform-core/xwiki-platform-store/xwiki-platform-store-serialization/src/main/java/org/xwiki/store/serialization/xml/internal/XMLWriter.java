@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.store.serialization.xml.internal;
 
@@ -51,19 +50,25 @@ import org.dom4j.io.OutputFormat;
  * New writeDocumentStart/End function also ensure proper starting and
  * ending of the document it self.
  * </p>
- * 
+ *
  * @version $Id$
  * @since 3.0M2
  */
 public class XMLWriter extends org.dom4j.io.XMLWriter
 {
-    /** Number of characters wide base64 content will be. */
+    /**
+     * Number of characters wide base64 content will be.
+     */
     private static final int BASE64_WIDTH = 80;
 
-    /** Platform dependent line seperator. */
+    /**
+     * Platform dependent line seperator.
+     */
     private static final byte[] NEWLINE;
 
-    /** If the last character written is this then it is safe to indent the next tag. */
+    /**
+     * If the last character written is this then it is safe to indent the next tag.
+     */
     private static final char CLOSE_ANGLE_BRACKET = '>';
 
     /**
@@ -79,13 +84,15 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      */
     private OutputStream out;
 
-    /** The underlying writer which is not cast to Writer. */
+    /**
+     * The underlying writer which is not cast to Writer.
+     */
     private LastCharWriter lcWriter;
 
     /** True if the last thing written was content from an InputStream and 
-    private boolean indentUnsafe;
+     private boolean indentUnsafe;
 
-    /** Need to catch this exception so this has to be done in an initializer block. */
+     /** Need to catch this exception so this has to be done in an initializer block. */
     static {
         try {
             NEWLINE = System.getProperty("line.separator").getBytes("UTF-8");
@@ -96,7 +103,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
 
     /**
      * Default constructor used by <code>{@link DOMXMLWriter}</code>.
-     * 
+     *
      * @see DOMXMLWriter
      */
     protected XMLWriter()
@@ -111,10 +118,10 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * Note that the writer is buffered and only a call to flush() or writeDocuemntEnd()
      * will ensure the output has been fully written to the <code>{@link OutputStream}</code>.
      * </p>
-     * 
+     *
      * @param out an <code>{@link OutputStream}</code> where to output the XML produced.
      * @param format an <code>{@link OutputFormat}</code> defining the encoding that
-     *               should be used and esthetics of the produced XML.
+     * should be used and esthetics of the produced XML.
      * @throws UnsupportedEncodingException the requested encoding is unsupported.
      */
     public XMLWriter(final OutputStream out, final OutputFormat format)
@@ -126,13 +133,12 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
         this.out = out;
     }
 
-
     /**
      * Write the <code>{@link Document}</code> declaration, and its <code>{@link DocumentType}</code>
      * if available to the output stream.
-     * 
+     *
      * @param doc <code>{@link Document}</code> to be started, may specify a
-     *            <code>{@link DocumentType}</code>.
+     * <code>{@link DocumentType}</code>.
      * @throws IOException a problem occurs during writing
      */
     public void writeDocumentStart(final Document doc) throws IOException
@@ -151,7 +157,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * terminate the current document.
      * Also flush the writer to ensure the whole document has been written to the
      * <code>{@link OutputStream}</code>.
-     * 
+     *
      * @param doc <code>{@link Document}</code> to be end, actually unused.
      * @throws IOException a problem occurs during writing.
      */
@@ -172,10 +178,10 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * Note that proper decoding/encoding will occurs during this operation,
      * converting the encoding of the Reader into the encoding of the Writer.
      * </p>
-     * 
+     *
      * @param element <code>{@link Element}</code> to output.
-     * @param rd <code>{@link Reader}</code> that will be fully read and transfered 
-     *           into the element content.
+     * @param rd <code>{@link Reader}</code> that will be fully read and transfered
+     * into the element content.
      * @throws IOException a problem occurs during reading or writing.
      */
     public void write(final Element element, final Reader rd) throws IOException
@@ -193,10 +199,10 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * Note that no decoding/encoding of the InputStream will be ensured during this operation.
      * The byte content is transfered untouched.
      * </p>
-     * 
+     *
      * @param element <code>{@link Element}</code> to output.
      * @param is <code>{@link InputStream}</code> that will be fully read and transfered into
-     *           the element content.
+     * the element content.
      * @throws IOException a problem occurs during reading or writing.
      */
     public void write(final Element element, final InputStream is) throws IOException
@@ -214,10 +220,10 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * Writes the <code>{@link Element}</code>, including its <code>{@link
      * Attribute}</code>s, using the
      * <code>{@link InputStream}</code> encoded in Base64 for its content.
-     * 
+     *
      * @param element <code>{@link Element}</code> to output.
-     * @param is <code>{@link InputStream}</code> that will be fully read and encoded 
-     *           in Base64 into the element content.
+     * @param is <code>{@link InputStream}</code> that will be fully read and encoded
+     * in Base64 into the element content.
      * @throws IOException a problem occurs during reading or writing.
      */
     public void writeBase64(final Element element, final InputStream is) throws IOException
@@ -244,7 +250,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * <p>
      * Compared to the DOM4J implementation, this function keeps track of opened elements.
      * </p>
-     * 
+     *
      * @param element <code>{@link Element}</code> to output.
      * @throws IOException a problem occurs during writing.
      * @see org.dom4j.io.XMLWriter#writeOpen(org.dom4j.Element)
@@ -268,7 +274,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * element including the one that is requested to be closed. Also writes a newline and
      * indents the closing element if required and if the last thing written was not a string.
      * </p>
-     * 
+     *
      * @param element <code>{@link Element}</code> to output.
      * @throws IOException a problem occurs during writing.
      * @see org.dom4j.io.XMLWriter#writeClose(org.dom4j.Element)
@@ -289,10 +295,14 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
         super.writeClose(this.parent.pop());
     }
 
-    /** An OutputStream which allows you to get the last byte which was written to it. */
+    /**
+     * An OutputStream which allows you to get the last byte which was written to it.
+     */
     private static class LastCharWriter extends FilterWriter
     {
-        /** The last byte written to the stream. */
+        /**
+         * The last byte written to the stream.
+         */
         private char lastChar;
 
         /**
@@ -343,7 +353,9 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
             this.lastChar = (char) oneChar;
         }
 
-        /** @return the last character written. */
+        /**
+         * @return the last character written.
+         */
         public char getLastChar()
         {
             return lastChar;

@@ -16,22 +16,18 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package org.xwiki.store.serialization.xml.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Date;
-import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
-import org.apache.commons.io.IOUtils;
 
 /**
  * Tests for AttachmentMetadataSerializer
@@ -71,12 +67,12 @@ public class AttachmentMetadataSerializerTest
         Assert.assertEquals("Attachment1 had wrong author", "me", attach.getAuthor());
         Assert.assertEquals("Attachment1 had wrong version", "1.1", attach.getVersion());
         Assert.assertEquals("Attachment1 had wrong comment",
-                            attach.getComment(),
-                            "something whitty");
+            attach.getComment(),
+            "something whitty");
         // We drop milliseconds for consistency with the database so last 3 digits are 0.
         Assert.assertEquals("Attachment1 had wrong date.",
-                            attach.getDate().getTime() + "",
-                            "1293045632000");
+            attach.getDate().getTime() + "",
+            "1293045632000");
     }
 
     @Test

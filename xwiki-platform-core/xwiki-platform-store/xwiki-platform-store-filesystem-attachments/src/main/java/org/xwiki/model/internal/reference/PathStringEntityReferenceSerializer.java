@@ -28,9 +28,9 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
- * Generate a string representation of an entity reference (eg "Wiki:Space.Page" for a 
+ * Generate a string representation of an entity reference (eg "Wiki:Space.Page" for a
  * document reference in the "wiki" Wiki, the "space" Space and the "page" Page).
- * 
+ *
  * @version $Id$
  * @since 3.0M2
  */
@@ -39,7 +39,7 @@ public class PathStringEntityReferenceSerializer implements EntityReferenceSeria
 {
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference, Object...)
      */
     public String serialize(EntityReference reference, Object... parameters)
@@ -53,9 +53,9 @@ public class PathStringEntityReferenceSerializer implements EntityReferenceSeria
         // While we still have children and they're not the children of the reference to serialize
         while (currentReference != null && currentReference != reference.getChild()) {
             serializeEntityReference(currentReference,
-                                     representation,
-                                     (currentReference == reference),
-                                     parameters);
+                representation,
+                (currentReference == reference),
+                parameters);
             currentReference = currentReference.getChild();
         }
         return representation.toString();
@@ -64,7 +64,7 @@ public class PathStringEntityReferenceSerializer implements EntityReferenceSeria
     /**
      * Add a segment to the path. All non-URL compatible characters are escaped in the URL-escape format
      * (%NN). If this is not the last segment in the reference, append a file separator at the end.
-     * 
+     *
      * @param currentReference the current reference segment to append
      * @param representation the output, where the segment is appended
      * @param isLastReference is this the last reference segment; if not, append a path separator to the end

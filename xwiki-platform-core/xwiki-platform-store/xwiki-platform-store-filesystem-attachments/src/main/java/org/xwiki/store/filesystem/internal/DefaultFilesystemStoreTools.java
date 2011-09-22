@@ -19,27 +19,27 @@
  */
 package org.xwiki.store.filesystem.internal;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.io.File;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.Map;
-
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.XWikiContext;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.context.Execution;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.DocumentReference;
+import java.util.concurrent.locks.ReadWriteLock;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.store.locks.LockProvider;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Default tools for getting files to store data in the filesystem.
@@ -52,7 +52,9 @@ import org.xwiki.store.locks.LockProvider;
 @Singleton
 public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initializable
 {
-    /** The name of the directory in the work directory where the hirearchy will be stored. */
+    /**
+     * The name of the directory in the work directory where the hirearchy will be stored.
+     */
     private static final String STORAGE_DIR_NAME = "storage";
 
     /**
@@ -62,10 +64,14 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
      */
     private static final String DOCUMENT_DIR_NAME = "~this";
 
-    /** The directory within each document's directory where the document's attachments are stored. */
+    /**
+     * The directory within each document's directory where the document's attachments are stored.
+     */
     private static final String ATTACHMENT_DIR_NAME = "attachments";
 
-    /** The directory within each document's directory for attachments which have been deleted. */
+    /**
+     * The directory within each document's directory for attachments which have been deleted.
+     */
     private static final String DELETED_ATTACHMENT_DIR_NAME = "deleted-attachments";
 
     /**
@@ -88,7 +94,9 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
      */
     private static final String TEMP_FILE_SUFFIX = "~tmp";
 
-    /** Serializer used for obtaining a safe file path from a document reference. */
+    /**
+     * Serializer used for obtaining a safe file path from a document reference.
+     */
     @Inject
     @Named("path")
     private EntityReferenceSerializer<String> pathSerializer;
@@ -99,11 +107,15 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     @Inject
     private Execution exec;
 
-    /** A means of acquiring locks for attachments. */
+    /**
+     * A means of acquiring locks for attachments.
+     */
     @Inject
     private LockProvider lockProvider;
 
-    /** This is the directory where all of the attachments will stored. */
+    /**
+     * This is the directory where all of the attachments will stored.
+     */
     private File storageDir;
 
     /**
@@ -112,18 +124,20 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
      * @param pathSerializer an EntityReferenceSerializer for generating file paths.
      * @param storageDir the directory to store the content in.
      * @param lockProvider a means of getting locks for making sure
-     *                     only one thread accesses an attachment at a time.
+     * only one thread accesses an attachment at a time.
      */
     public DefaultFilesystemStoreTools(final EntityReferenceSerializer<String> pathSerializer,
-                                       final File storageDir,
-                                       final LockProvider lockProvider)
+        final File storageDir,
+        final LockProvider lockProvider)
     {
         this.pathSerializer = pathSerializer;
         this.storageDir = storageDir;
         this.lockProvider = lockProvider;
     }
 
-    /** Constructor for component manager. */
+    /**
+     * Constructor for component manager.
+     */
     public DefaultFilesystemStoreTools()
     {
     }
@@ -176,7 +190,7 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
 
     @Override
     public DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(final XWikiAttachment attachment,
-                                                                          final Date deleteDate)
+        final Date deleteDate)
     {
         return new DefaultDeletedAttachmentFileProvider(
             this.getDeletedAttachmentDir(attachment, deleteDate), attachment.getFilename());
@@ -209,8 +223,8 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
                 out.put(currentName, new HashMap<Date, DeletedAttachmentFileProvider>());
             }
             out.get(currentName).put(getDeleteDateFromDeletedAttachmentDirectory(file),
-                                     new DefaultDeletedAttachmentFileProvider(file,
-                                         getFilenameFromDeletedAttachmentDirectory(file)));
+                new DefaultDeletedAttachmentFileProvider(file,
+                    getFilenameFromDeletedAttachmentDirectory(file)));
         }
         return out;
     }
@@ -254,7 +268,7 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     public AttachmentFileProvider getAttachmentFileProvider(final XWikiAttachment attachment)
     {
         return new DefaultAttachmentFileProvider(this.getAttachmentDir(attachment),
-                                                 attachment.getFilename());
+            attachment.getFilename());
     }
 
     /**
@@ -269,11 +283,11 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
         final XWikiDocument doc = attachment.getDoc();
         if (doc == null) {
             throw new NullPointerException("Could not store attachment because it is not "
-                                           + "associated with a document.");
+                + "associated with a document.");
         }
         final File docDir = getDocumentDir(doc.getDocumentReference(),
-                                           this.storageDir,
-                                           this.pathSerializer);
+            this.storageDir,
+            this.pathSerializer);
         final File attachmentsDir = new File(docDir, ATTACHMENT_DIR_NAME);
         return new File(attachmentsDir, GenericFileUtils.getURLEncoded(attachment.getFilename()));
     }
@@ -289,16 +303,16 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
      * @return a directory which will be repeatable only with the same inputs.
      */
     private File getDeletedAttachmentDir(final XWikiAttachment attachment,
-                                         final Date deleteDate)
+        final Date deleteDate)
     {
         final XWikiDocument doc = attachment.getDoc();
         if (doc == null) {
             throw new NullPointerException("Could not store deleted attachment because "
-                                           + "it is not attached to any document.");
+                + "it is not attached to any document.");
         }
         final File docDir = getDocumentDir(doc.getDocumentReference(),
-                                           this.storageDir,
-                                           this.pathSerializer);
+            this.storageDir,
+            this.pathSerializer);
         final File deletedAttachmentsDir = new File(docDir, DELETED_ATTACHMENT_DIR_NAME);
         final String fileName =
             attachment.getFilename() + DELETED_ATTACHMENT_NAME_SEPARATOR + deleteDate.getTime();
@@ -315,18 +329,17 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
      * @param docRef the DocumentReference for the document to get the directory for.
      * @param storageDir the directory to place the directory hirearcy for attachments in.
      * @param pathSerializer an EntityReferenceSerializer which will make a directory path from an
-     *                       an EntityReference.
+     * an EntityReference.
      * @return a file path corresponding to the attachment location; each segment in the path is
      *         URL-encoded in order to be safe.
      */
     private static File getDocumentDir(final DocumentReference docRef,
-                                       final File storageDir,
-                                       final EntityReferenceSerializer<String> pathSerializer)
+        final File storageDir,
+        final EntityReferenceSerializer<String> pathSerializer)
     {
         final File path = new File(storageDir, pathSerializer.serialize(docRef));
         return new File(path, DOCUMENT_DIR_NAME);
     }
-
 
     @Override
     public ReadWriteLock getLockForFile(final File toLock)

@@ -19,52 +19,47 @@
  */
 package com.xpn.xwiki.store;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xwiki.model.internal.reference.PathStringEntityReferenceSerializer;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
-import org.xwiki.store.filesystem.internal.DefaultFilesystemStoreTools;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentContent;
-import com.xpn.xwiki.doc.FilesystemAttachmentContent;
-import com.xpn.xwiki.doc.XWikiAttachmentArchive;
-import com.xpn.xwiki.doc.XWikiDocument;
-
+import org.apache.commons.io.IOUtils;
+import org.hibernate.Session;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.api.Invocation;
+import org.jmock.integration.junit4.JMock;
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.lib.action.CustomAction;
+import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.junit.Test;
-
-import org.hibernate.Session;
-
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JMock;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.jmock.lib.legacy.ClassImposteriser;
-import org.jmock.lib.action.CustomAction;
-import org.jmock.api.Invocation;
-
-import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.junit.runner.RunWith;
+import org.xwiki.model.internal.reference.PathStringEntityReferenceSerializer;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.store.filesystem.internal.DefaultFilesystemStoreTools;
+import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.locks.preemptive.internal.PreemptiveLockProvider;
+import org.xwiki.test.AbstractMockingComponentTestCase;
 
-import org.apache.commons.io.IOUtils;
-
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.FilesystemAttachmentContent;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+import com.xpn.xwiki.doc.XWikiAttachmentContent;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Tests for FilesystemAttachmentStore.
@@ -103,10 +98,14 @@ public class FilesystemAttachmentStoreTest extends AbstractMockingComponentTestC
 
     private XWikiDocument doc;
 
-    /** The file which will hold content for this attachment. */
+    /**
+     * The file which will hold content for this attachment.
+     */
     private File storeFile;
 
-    /** The dir in /tmp/ which we use as our sandbox. */
+    /**
+     * The dir in /tmp/ which we use as our sandbox.
+     */
     private File storageLocation;
 
     static {
@@ -128,7 +127,7 @@ public class FilesystemAttachmentStoreTest extends AbstractMockingComponentTestC
         final XWiki mockXWiki = this.jmockContext.mock(XWiki.class);
         this.mockHibernate = this.jmockContext.mock(XWikiHibernateStore.class);
         final XWikiAttachmentContent mockDirtyContent =
-           this.jmockContext.mock(XWikiAttachmentContent.class);
+            this.jmockContext.mock(XWikiAttachmentContent.class);
         this.mockAttachVersionStore = this.jmockContext.mock(AttachmentVersioningStore.class);
         this.mockArchive = this.jmockContext.mock(XWikiAttachmentArchive.class);
         this.mockHibernateSession = this.jmockContext.mock(Session.class);
@@ -163,8 +162,8 @@ public class FilesystemAttachmentStoreTest extends AbstractMockingComponentTestC
 
         this.fileTools =
             new DefaultFilesystemStoreTools(new PathStringEntityReferenceSerializer(),
-                                            storageLocation,
-                                            new PreemptiveLockProvider());
+                storageLocation,
+                new PreemptiveLockProvider());
 
         this.attachStore = new FilesystemAttachmentStore(fileTools);
         this.storeFile =
@@ -193,8 +192,8 @@ public class FilesystemAttachmentStoreTest extends AbstractMockingComponentTestC
         is.close();
         byte[] array = os.toByteArray();
         Assert.assertEquals("The attachment file contained the wrong content",
-                            HELLO,
-                            new String(array, "UTF-8"));
+            HELLO,
+            new String(array, "UTF-8"));
     }
 
     @Test
@@ -207,25 +206,26 @@ public class FilesystemAttachmentStoreTest extends AbstractMockingComponentTestC
 
         this.jmockContext.checking(new Expectations() {{
             oneOf(mockAttach).setAttachment_content(with(any(FilesystemAttachmentContent.class)));
-                will(new CustomAction("Check to make sure the attachment content is correct.") {
-                    public Object invoke(final Invocation invoc)
-                    {
-                        final FilesystemAttachmentContent content =
-                            (FilesystemAttachmentContent) invoc.getParameter(0);
+            will(new CustomAction("Check to make sure the attachment content is correct.")
+            {
+                public Object invoke(final Invocation invoc)
+                {
+                    final FilesystemAttachmentContent content =
+                        (FilesystemAttachmentContent) invoc.getParameter(0);
 
-                        try {
-                            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            IOUtils.copy(content.getContentInputStream(), baos);
+                    try {
+                        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        IOUtils.copy(content.getContentInputStream(), baos);
 
-                            final String output = new String(baos.toByteArray(), "UTF-8");
+                        final String output = new String(baos.toByteArray(), "UTF-8");
 
-                            Assert.assertEquals("Not the same attachment content.", HELLO, output);
-                            return null;
-                        } catch (IOException e) {
-                            throw new RuntimeException("Exception getting attachment content.", e);
-                        }
+                        Assert.assertEquals("Not the same attachment content.", HELLO, output);
+                        return null;
+                    } catch (IOException e) {
+                        throw new RuntimeException("Exception getting attachment content.", e);
                     }
-                });
+                }
+            });
         }});
 
         this.attachStore.loadAttachmentContent(this.mockAttach, this.mockContext, false);
@@ -256,15 +256,16 @@ public class FilesystemAttachmentStoreTest extends AbstractMockingComponentTestC
             oneOf(mockAttachVersionStore).deleteArchive(mockAttach, mockContext, false);
             exactly(2).of(mockHibernateSession).delete(with(anything()));
             oneOf(mockHibernate).saveXWikiDoc(doc, mockContext, false);
-                will(new CustomAction("Make sure the attachment has been removed from the list.") {
-                    public Object invoke(final Invocation invoc)
-                    {
-                        final XWikiDocument document = (XWikiDocument) invoc.getParameter(0);
-                        Assert.assertTrue("Attachment was not removed from the list.",
-                                          document.getAttachmentList().size() == 0);
-                        return null;
-                    }
-                });
+            will(new CustomAction("Make sure the attachment has been removed from the list.")
+            {
+                public Object invoke(final Invocation invoc)
+                {
+                    final XWikiDocument document = (XWikiDocument) invoc.getParameter(0);
+                    Assert.assertTrue("Attachment was not removed from the list.",
+                        document.getAttachmentList().size() == 0);
+                    return null;
+                }
+            });
         }});
         this.createFile();
 

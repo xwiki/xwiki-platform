@@ -16,21 +16,17 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package org.xwiki.store.serialization.xml.internal;
 
-import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Element;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xwiki.store.serialization.xml.XMLSerializer;
 
 /**
  * Tests to make sure AbstractXMLSerializer faithfuly parses and serializes content.

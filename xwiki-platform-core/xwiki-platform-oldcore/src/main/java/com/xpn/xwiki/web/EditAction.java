@@ -104,17 +104,17 @@ public class EditAction extends XWikiAction
                 languagetoedit = "";
             }
 
+            // Initialize the translated document.
             XWikiDocument tdoc;
             if (languagetoedit.equals("")) {
-                // In this case the created document is going to be the default document.
+                // Edit the default document translation (default language).
                 tdoc = doc;
                 if (doc.isNew()) {
                     doc.setDefaultLanguage(language);
                     doc.setLanguage("");
                 }
             } else if ((!hasTranslation) && context.getWiki().isMultiLingual(context)) {
-                // If the translated doc object is the same as the doc object this means the translated doc did not
-                // exists so we need to create it.
+                // Edit a new translation.
                 tdoc = new XWikiDocument(doc.getDocumentReference());
                 tdoc.setLanguage(languagetoedit);
                 tdoc.setContent(doc.getContent());
@@ -122,21 +122,17 @@ public class EditAction extends XWikiAction
                 tdoc.setAuthorReference(context.getUserReference());
                 tdoc.setStore(doc.getStore());
             } else {
-                // Edit existing translation. Clone the translated document object to be sure that the changes we are
+                // Edit an existing translation. Clone the translated document object to be sure that the changes we are
                 // going to make will last only for the duration of the current request.
                 tdoc = ((XWikiDocument) context.get("tdoc")).clone();
             }
 
-            // Check for edit section
-            String sectionContent = "";
-            int sectionNumber = 0;
-            if (request.getParameter("section") != null && xwiki.hasSectionEdit(context)) {
-                sectionNumber = NumberUtils.toInt(request.getParameter("section"));
-                sectionContent = tdoc.getContentOfSection(sectionNumber);
-            }
-            vcontext.put("sectionNumber", new Integer(sectionNumber));
+            // Check if section editing is enabled and if a section is specified.
+            int sectionNumber = xwiki.hasSectionEdit(context) ? NumberUtils.toInt(request.getParameter("section")) : 0;
+            vcontext.put("sectionNumber", sectionNumber);
 
             try {
+                // Try to update the edited document based on the template specified on the request.
                 tdoc.readFromTemplate(peform, context);
             } catch (XWikiException e) {
                 if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
@@ -144,29 +140,33 @@ public class EditAction extends XWikiAction
                     return "docalreadyexists";
                 }
             }
+
+            // Update the edited content.
             if (contentFromRequest != null) {
                 tdoc.setContent(contentFromRequest);
+            } else if (sectionNumber > 0) {
+                tdoc.setContent(tdoc.getContentOfSection(sectionNumber));
             }
+
+            // Update the edited title.
             if (titleFromRequest != null) {
                 tdoc.setTitle(titleFromRequest);
-            }
-            if (StringUtils.isNotEmpty(sectionContent)) {
-                if (contentFromRequest == null) {
-                    tdoc.setContent(sectionContent);
-                }
-                String sectionTitle = doc.getDocumentSection(sectionNumber).getSectionTitle();
-                if (titleFromRequest == null && StringUtils.isNotBlank(sectionTitle)) {
-                    sectionTitle =
-                        context.getMessageTool().get("core.editors.content.titleField.sectionEditingFormat",
-                            tdoc.getRenderedTitle(Syntax.PLAIN_1_0, context), sectionNumber, sectionTitle);
-                    tdoc.setTitle(sectionTitle);
+            } else if (sectionNumber > 0) {
+                // The edited content is either the content of the specified section or the content provided on the
+                // request. We assume the content provided on the request is meant to overwrite the specified section.
+                // In both cases the document content is currently having one section, so we can take its title.
+                String sectionTitle = tdoc.getDocumentSection(1).getSectionTitle();
+                if (StringUtils.isNotBlank(sectionTitle)) {
+                    tdoc.setTitle(context.getMessageTool().get("core.editors.content.titleField.sectionEditingFormat",
+                        tdoc.getRenderedTitle(Syntax.PLAIN_1_0, context), sectionNumber, sectionTitle));
                 }
             }
 
+            // Expose the translated document on the XWiki context and the Velocity context.
             context.put("tdoc", tdoc);
             vcontext.put("tdoc", tdoc.newDocument(context));
             // XWiki applications that were previously using the inline action might still expect the cdoc (content
-            // document) to be properly set on the context. Expose tdoc (translated document) as cdoc for backward
+            // document) to be properly set on the context. Expose tdoc (translated document) also as cdoc for backward
             // compatibility.
             context.put("cdoc", context.get("tdoc"));
             vcontext.put("cdoc", vcontext.get("tdoc"));

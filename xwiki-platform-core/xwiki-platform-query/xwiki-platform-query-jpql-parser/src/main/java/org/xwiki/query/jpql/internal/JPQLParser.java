@@ -26,8 +26,20 @@ import org.xwiki.query.jpql.lexer.Lexer;
 import org.xwiki.query.jpql.node.Start;
 import org.xwiki.query.jpql.parser.Parser;
 
+/**
+ * JPQL Parser.
+ *
+ * @version $Id$
+ */
 public class JPQLParser
 {
+    /**
+     * Parse JPQL content passed as parameter.
+     *
+     * @param stmt the statement containing the JPQL content to parse
+     * @return the parsed result as an AST tree
+     * @throws Exception in case of a parsing error
+     */
     public Start parse(String stmt) throws Exception
     {
         Parser p = new Parser(new Lexer(new PushbackReader(new StringReader(stmt))));

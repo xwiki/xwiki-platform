@@ -41,7 +41,7 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 ##
 <form id="inline" method="post" action="$doc.getURL("preview")">
 <div>
-<div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL("inline")"/></div>
+<input type="hidden" name="xcontinue" value="$doc.getURL($doc.getDefaultEditMode(), 'editor=inline')"/>
 ## CSRF prevention
 <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
 ## This input is used by the full screen widget: it stores the selector of the maximized element, so that the full screen can be restored when coming back from preview.

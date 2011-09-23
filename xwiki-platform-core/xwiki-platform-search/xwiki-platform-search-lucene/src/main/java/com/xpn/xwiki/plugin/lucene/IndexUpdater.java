@@ -31,6 +31,7 @@ import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.util.Version;
@@ -255,6 +256,9 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         while (true) {
             try {
                 IndexWriterConfig cfg = new IndexWriterConfig(Version.LUCENE_34, this.analyzer);
+                if (create) {
+                    cfg.setOpenMode(OpenMode.CREATE);
+                }
                 IndexWriter w = new IndexWriter(this.directory, cfg);
                 return w;
             } catch (LockObtainFailedException e) {

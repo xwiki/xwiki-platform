@@ -16,12 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- * 
- * 
- * Originally written by Dawid Kurzyniec and released to the public domain, as explained
- * at http://creativecommons.org/licenses/publicdomain
- * 
- * Source: http://dcl.mathcs.emory.edu/php/loadPage.php?content=util/features.html#classloading
  */
 package org.xwiki.classloader.internal.protocol.jar;
 

@@ -47,7 +47,8 @@
   ## clean="false" due to bug #XWIKI-4122 - the &lt;legend&gt; element is dropped.
   {{html clean="false"}}
   &lt;form id="$section.toLowerCase()" method="post" action="$xwiki.getURL($currentDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()" class="xform half"&gt;
-    #set($obj = $doc.getObject('XWiki.XWikiPreferences'))
+    #set($prefsClassName = 'XWiki.XWikiPreferences')
+    #set($obj = $doc.getObject($prefsClassName))
     #foreach ($item in $legend)
       #set ($fields = $params.get($item))
       &lt;fieldset class="$item"&gt;
@@ -65,7 +66,7 @@
           #set ($title = $!prop.prettyName)
         #end
         &lt;dt&gt;
-        &lt;label #if($prop)for="${prefsclassname}_${obj.number}_${prop.name}"#end class="$field"&gt;$title
+        &lt;label #if($prop)for="${prefsClassName}_${obj.number}_${prop.name}"#end class="$field"&gt;$title
         #if($field == 'skin')
           #set ($skin = $xwiki.skin)
           &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($skin)"#if ($skin.indexOf('.') &lt; 0) class="hidden"#end&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
@@ -103,7 +104,7 @@
       &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
       &lt;input type="hidden" name="xcontinue" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
       &lt;input type="hidden" name="xredirect" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
-      &lt;input type="hidden" name="classname" value="XWiki.XWikiPreferences" /&gt;
+      &lt;input type="hidden" name="classname" value="$prefsClassName" /&gt;
     &lt;/div&gt;
     &lt;div class="bottombuttons"&gt;
       &lt;p class="admin-buttons"&gt;

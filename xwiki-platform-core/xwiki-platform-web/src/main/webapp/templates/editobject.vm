@@ -15,7 +15,7 @@
  *#
 #macro(displayObject $obj $class $props $firstfield)
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}" class="xobject">
-  <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_title" class="xobject-title"><h3>#cleanClassname(${class.name}) ${obj.number}#if ($firstfield): $!{escapetool.xml($doc.display($firstfield, $obj))}#end
+  <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_title" class="xobject-title"><h3>#cleanClassname(${class.name}) ${obj.number}#if ($firstfield): $!{escapetool.xml($doc.display($firstfield, 'view', $obj))}#end
     <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$msg.get('core.editors.object.removeObject.tooltip')">$msg.get('core.editors.object.removeObject')</a>
     #if (!$hasCustomObject) <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$msg.get('core.editors.object.editSingleObject.tooltip')">$msg.get('core.editors.object.editSingleObject')</a> #end
   </h3></div>

@@ -61,7 +61,7 @@
 #-# [Since 3.2M3]
 #-# Directory used to store persistent data.
 #if ($xwikiPropertiesContainerPersistentDirectory)
-container.persistentDirectory=$xwikiContainerPersistentDirectory
+container.persistentDirectory=$xwikiPropertiesContainerPersistentDirectory
 #else
 # container.persistentDirectory=/var/local/xwiki/
 #end

@@ -71,6 +71,12 @@ echo Logs are in the $PRGDIR/xwiki.log file
 # Ensure the logs directory exists as otherwise Jetty reports an error
 mkdir -p $JETTY_HOME/logs 2>/dev/null
 
+# Ensure the work directory exists so that Jetty uses it for its temporary files.
+mkdir -p $JETTY_HOME/work 2>/dev/null
+
+# Ensure the data directory exists so that XWiki can use it for storing permanent data
+mkdir -p data 2>/dev/null
+
 # Specify port on which HTTP requests will be handled
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.port=$JETTY_PORT"
 

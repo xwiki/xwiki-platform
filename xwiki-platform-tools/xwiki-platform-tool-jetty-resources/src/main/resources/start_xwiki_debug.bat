@@ -38,6 +38,15 @@ if "%2"=="profiler" (
   set JAVA_TOOL_OPTIONS=-agentlib:yjpagent
 )
 
+REM Ensure the logs directory exists as otherwise Jetty reports an error
+if not exist %JETTY_HOME%\logs mkdir %JETTY_HOME%\logs
+
+REM Ensure the work directory exists so that Jetty uses it for its temporary files.
+if not exist %JETTY_HOME%\work mkdir %JETTY_HOME%\work
+
+REM Ensure the data directory exists so that XWiki can use it for storing permanent data.
+if not exist data mkdir data
+
 REM Specify port on which HTTP requests will be handled
 set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.port=%JETTY_PORT%
 

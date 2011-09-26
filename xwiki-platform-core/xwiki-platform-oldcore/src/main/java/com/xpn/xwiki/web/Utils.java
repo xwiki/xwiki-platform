@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
@@ -689,6 +690,20 @@ public class Utils
         }
 
         return components;
+    }
+
+    /**
+     * Helper method for obtaining a valid xcontext from the execution context.
+     * 
+     * @return the current context or {@code null} if the execution context is not yet initialized
+     */
+    public static XWikiContext getContext()
+    {
+        ExecutionContext ec = getComponent(Execution.class).getContext();
+        if (ec == null) {
+            return null;
+        }
+        return (XWikiContext) ec.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 
     /**

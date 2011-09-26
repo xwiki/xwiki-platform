@@ -128,8 +128,8 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
                 MavenXpp3Reader reader = new MavenXpp3Reader();
                 Model mavenModel = reader.read(descriptorStream);
 
-                String version = resolveVersion(mavenModel.getVersion(), mavenModel);
-                String groupId = resolveGroupId(mavenModel.getGroupId(), mavenModel);
+                String version = resolveVersion(mavenModel.getVersion(), mavenModel, false);
+                String groupId = resolveGroupId(mavenModel.getGroupId(), mavenModel, false);
 
                 String extensionURLStr = descriptorUrl.toString();
                 extensionURLStr =
@@ -164,9 +164,9 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
                         && (mavenDependency.getScope() == null || mavenDependency.getScope().equals("compile") || mavenDependency
                             .getScope().equals("runtime"))) {
                         coreExtension.addDependency(new DefaultExtensionDependency(resolveGroupId(
-                            mavenDependency.getGroupId(), mavenModel)
+                            mavenDependency.getGroupId(), mavenModel, true)
                             + ':' + mavenDependency.getArtifactId(), resolveVersion(mavenDependency.getVersion(),
-                            mavenModel)));
+                            mavenModel, true)));
                     }
                 }
 
@@ -271,24 +271,26 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
         return extensions;
     }
 
-    private String resolveVersion(String modelVersion, Model mavenModel)
+    private String resolveVersion(String modelVersion, Model mavenModel, boolean dependency)
     {
         String version = modelVersion;
 
         // TODO: download parents and resolve pom.xml properties using aether ? could be pretty expensive for
         // the init
         if (version == null) {
-            Parent parent = mavenModel.getParent();
+            if (!dependency) {
+                Parent parent = mavenModel.getParent();
 
-            if (parent != null) {
-                version = parent.getVersion();
+                if (parent != null) {
+                    version = parent.getVersion();
+                }
             }
         } else if (version.startsWith("$")) {
             String propertyName = version.substring(2, version.length() - 1);
 
             if (propertyName.equals("project.version") || propertyName.equals("pom.version")
                 || propertyName.equals("version")) {
-                version = resolveVersion(mavenModel.getVersion(), mavenModel);
+                version = resolveVersion(mavenModel.getVersion(), mavenModel, false);
             } else {
                 String value = mavenModel.getProperties().getProperty(propertyName);
                 if (value != null) {
@@ -304,29 +306,31 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
         return version;
     }
 
-    private String resolveGroupId(String modelGroupId, Model mavenModel)
+    private String resolveGroupId(String modelGroupId, Model mavenModel, boolean dependency)
     {
         String groupId = modelGroupId;
 
         // TODO: download parents and resolve pom.xml properties using aether ? could be pretty expensive for
         // the init
         if (groupId == null) {
-            Parent parent = mavenModel.getParent();
+            if (!dependency) {
+                Parent parent = mavenModel.getParent();
 
-            if (parent != null) {
-                groupId = parent.getGroupId();
-            }
-
-            if (groupId == null) {
-                groupId = UNKNOWN;
+                if (parent != null) {
+                    groupId = parent.getGroupId();
+                }
             }
         } else if (groupId.startsWith("$")) {
             String propertyName = groupId.substring(2, groupId.length() - 1);
 
             String value = mavenModel.getProperties().getProperty(propertyName);
             if (value != null) {
-                propertyName = value;
+                groupId = value;
             }
+        }
+
+        if (groupId == null) {
+            groupId = UNKNOWN;
         }
 
         return groupId;

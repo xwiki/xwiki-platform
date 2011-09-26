@@ -11,15 +11,15 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1284039567000</creationDate>
-<date>1316532065000</date>
-<contentUpdateDate>1316532065000</contentUpdateDate>
-<version>1.1</version>
+<date>1317049033000</date>
+<contentUpdateDate>1317049033000</contentUpdateDate>
+<version>2.71</version>
 <title>Extension Manager</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>false</minorEdit>
+<minorEdit>true</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden><attachment>
 <filename>icon.png</filename>
@@ -488,7 +488,7 @@ This application is experimental, use it at your own risk.
       : #if (!$extension.authors.empty){{{$extension.authors}}}#else//No author//#end
 
       ; Repository
-      : $extension.repository.id
+      : $extension.repository.id.id#if($extension.repository.id.uRI) ([[$extension.repository.id.uRI]])#end
 
       #foreach($propertyEntry in $extension.properties.entrySet())
         ; $propertyEntry.key

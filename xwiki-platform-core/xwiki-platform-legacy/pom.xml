@@ -36,7 +36,7 @@
   <properties>
     <!-- We don't really care about checkstyle in legacy -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-    <!-- The there is a place where no API should be broken it's legacy -->
+    <!-- This is a place where no API should be broken it's legacy -->
     <!-- TODO: But this project is new so it should be enabled when 3.2 final is released -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>

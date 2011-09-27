@@ -365,6 +365,7 @@
                 <exclude>org/xwiki/container/portlet/PortletApplicationContext</exclude>
                 <exclude>org/xwiki/container/servlet/ServletApplicationContext</exclude>
                 <exclude>org/xwiki/container/Request</exclude>
+                <exclude>com/xpn/xwiki/plugin/tag/TagPlugin</exclude>
               </excludes>
             </configuration>
           </plugin>

@@ -41,6 +41,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * 
  * @version $Id$
  */
+@Deprecated
 public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
 {
     public class TestListener implements XWikiDocChangeNotificationInterface

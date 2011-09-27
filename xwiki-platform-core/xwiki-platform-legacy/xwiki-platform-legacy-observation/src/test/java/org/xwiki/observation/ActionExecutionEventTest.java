@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.Event;
 
+@Deprecated
 public class ActionExecutionEventTest
 {
     @Test

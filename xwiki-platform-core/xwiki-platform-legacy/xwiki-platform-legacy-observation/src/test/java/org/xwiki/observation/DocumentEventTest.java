@@ -29,6 +29,7 @@ import org.xwiki.observation.event.filter.RegexEventFilter;
  * 
  * @version $Id$
  */
+@Deprecated
 public class DocumentEventTest
 {
     @Test

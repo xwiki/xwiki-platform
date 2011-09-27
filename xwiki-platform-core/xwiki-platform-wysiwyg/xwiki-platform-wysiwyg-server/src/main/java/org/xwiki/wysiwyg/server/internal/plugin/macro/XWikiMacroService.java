@@ -30,8 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroService;
@@ -55,9 +54,10 @@ import org.xwiki.wysiwyg.server.plugin.macro.MacroDescriptorTranslator;
 public class XWikiMacroService implements MacroService
 {
     /**
-     * Default XWiki logger to report errors correctly.
+     * Logger.
      */
-    private static final Log LOG = LogFactory.getLog(XWikiMacroService.class);
+    @Inject
+    private Logger logger;
 
     /**
      * The syntax factory used to create {@link Syntax} instances from string syntax identifiers.
@@ -130,7 +130,7 @@ public class XWikiMacroService implements MacroService
 
             return result;
         } catch (Exception e) {
-            LOG.error("Exception while retrieving macro descriptor.", e);
+            this.logger.error("Exception while retrieving macro descriptor.", e);
             throw new RuntimeException(e.getLocalizedMessage());
         }
     }
@@ -207,8 +207,7 @@ public class XWikiMacroService implements MacroService
 
             return descriptors;
         } catch (Exception e) {
-            LOG.error(String
-                .format("Exception while retrieving the list of macro descriptors for syntax %s.", syntaxId), e);
+            this.logger.error("Exception while retrieving the list of macro descriptors for syntax [{}].", syntaxId, e);
             throw new RuntimeException(e.getLocalizedMessage());
         }
     }

@@ -28,8 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -63,9 +62,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class DefaultWikiService implements WikiService
 {
     /**
-     * Default XWiki logger to report errors correctly.
+     * Logger.
      */
-    private static final Log LOG = LogFactory.getLog(DefaultWikiService.class);
+    @Inject
+    private Logger logger;
 
     /**
      * The component used to access documents. This is temporary till XWiki model is moved into components.
@@ -135,7 +135,7 @@ public class DefaultWikiService implements WikiService
             }
             Collections.sort(virtualWikiNamesList);
         } catch (XWikiException e) {
-            LOG.error(e.getLocalizedMessage(), e);
+            this.logger.error(e.getLocalizedMessage(), e);
         }
         return virtualWikiNamesList;
     }
@@ -154,7 +154,7 @@ public class DefaultWikiService implements WikiService
             spaceNamesList.removeAll(getBlackListedSpaces());
             Collections.sort(spaceNamesList);
         } catch (XWikiException e) {
-            LOG.error(e.getLocalizedMessage(), e);
+            this.logger.error(e.getLocalizedMessage(), e);
         } finally {
             if (wikiName != null) {
                 getXWikiContext().setDatabase(database);
@@ -245,7 +245,7 @@ public class DefaultWikiService implements WikiService
             }
             return context.getWiki().getStore().searchDocumentReferences(query, count, start, parameters, context);
         } catch (XWikiException e) {
-            LOG.error(e.getLocalizedMessage(), e);
+            this.logger.error(e.getLocalizedMessage(), e);
             throw new RuntimeException("Failed to search XWiki pages.", e);
         } finally {
             if (wikiName != null) {
@@ -290,7 +290,7 @@ public class DefaultWikiService implements WikiService
                 wikiPage.setUrl(document.getURL("view", context));
                 wikiPages.add(wikiPage);
             } catch (XWikiException e) {
-                LOG.warn("Failed to load document " + documentReference, e);
+                this.logger.warn("Failed to load document [{}]", documentReference, e);
             }
         }
         return wikiPages;
@@ -315,15 +315,16 @@ public class DefaultWikiService implements WikiService
         try {
             doc = context.getWiki().getDocument(documentReference, context);
         } catch (XWikiException e) {
-            LOG.error("Failed to get attachment: there was a problem with getting the document on the server.", e);
+            this.logger.error(
+                "Failed to get attachment: there was a problem with getting the document on the server.", e);
             return null;
         }
         if (doc.isNew()) {
-            LOG.warn(String.format("Failed to get attachment: %s document doesn't exist.", documentReference));
+            this.logger.warn("Failed to get attachment: [{}] document doesn't exist.", documentReference);
             return null;
         }
         if (doc.getAttachment(cleanedFileName) == null) {
-            LOG.warn(String.format("Failed to get attachment: %s not found.", cleanedFileName));
+            this.logger.warn("Failed to get attachment: [{}] not found.", cleanedFileName);
             return null;
         }
 
@@ -368,7 +369,7 @@ public class DefaultWikiService implements WikiService
             }
             return attachments;
         } catch (XWikiException e) {
-            LOG.error(e.getLocalizedMessage(), e);
+            this.logger.error(e.getLocalizedMessage(), e);
             throw new RuntimeException("Failed to retrieve the list of attachments.", e);
         }
     }

@@ -23,8 +23,11 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.w3c.dom.Document;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
@@ -35,19 +38,17 @@ import org.xwiki.xml.html.filter.HTMLFilter;
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class DefaultHTMLCleaner implements HTMLCleaner
 {
     /**
      * The component used to clean the HTML.
      */
-    @Requirement
+    @Inject
     private org.xwiki.xml.html.HTMLCleaner cleaner;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLCleaner#clean(String)
-     */
+    @Override
     public String clean(String dirtyHTML)
     {
         // We have to remove or replace the HTML elements that were added by the WYSIWYG editor only for internal

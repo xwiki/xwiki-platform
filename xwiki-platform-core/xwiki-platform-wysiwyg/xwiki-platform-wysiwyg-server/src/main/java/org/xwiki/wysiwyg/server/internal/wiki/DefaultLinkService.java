@@ -19,8 +19,12 @@
  */
 package org.xwiki.wysiwyg.server.internal.wiki;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.URIReference;
 import org.xwiki.model.EntityType;
@@ -36,36 +40,40 @@ import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 import org.xwiki.wysiwyg.server.wiki.EntityReferenceConverter;
 import org.xwiki.wysiwyg.server.wiki.LinkService;
 
-
 /**
  * The service used to create links.
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class DefaultLinkService implements LinkService
 {
     /**
      * The component used to access documents. This is temporary till XWiki model is moved into components.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * The component used to serialize XWiki document references.
      */
-    @Requirement("compact")
+    @Inject
+    @Named("compact")
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * The component used to resolve an entity reference relative to another entity reference.
      */
-    @Requirement("explicit/reference")
+    @Inject
+    @Named("explicit/reference")
     private EntityReferenceResolver<EntityReference> explicitReferenceEntityReferenceResolver;
 
     /**
      * The component used to resolve a string entity reference relative to another entity reference.
      */
-    @Requirement("explicit")
+    @Inject
+    @Named("explicit")
     private EntityReferenceResolver<String> explicitStringEntityReferenceResolver;
 
     /**
@@ -74,7 +82,8 @@ public class DefaultLinkService implements LinkService
      * Note: The link reference syntax is independent of the syntax of the edited document. The current hint should be
      * replaced with a generic one to avoid confusion.
      */
-    @Requirement("xhtmlmarker")
+    @Inject
+    @Named("xhtmlmarker")
     private ResourceReferenceSerializer linkReferenceSerializer;
 
     /**
@@ -83,7 +92,8 @@ public class DefaultLinkService implements LinkService
      * Note: The link reference syntax is independent of the syntax of the edited document. The current hint should be
      * replaced with a generic one to avoid confusion.
      */
-    @Requirement("xhtmlmarker")
+    @Inject
+    @Named("xhtmlmarker")
     private ResourceReferenceParser linkReferenceParser;
 
     /**
@@ -91,12 +101,7 @@ public class DefaultLinkService implements LinkService
      */
     private final EntityReferenceConverter entityReferenceConverter = new EntityReferenceConverter();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LinkService#getEntityConfig(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference,
-     *      org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference)
-     */
+    @Override
     public EntityConfig getEntityConfig(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference origin,
         org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference destination)
     {
@@ -156,11 +161,7 @@ public class DefaultLinkService implements LinkService
         return linkReferenceSerializer.serialize(linkReference);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LinkService#parseLinkReference(String, org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
-     */
+    @Override
     public org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference parseLinkReference(String linkReferenceAsString,
         org.xwiki.gwt.wysiwyg.client.wiki.EntityReference baseReference)
     {

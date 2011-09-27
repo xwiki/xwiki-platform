@@ -25,12 +25,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.gwt.wysiwyg.client.plugin.importer.ImportService;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
@@ -44,46 +46,48 @@ import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
 
-
 /**
  * XWiki specific implementation of {@link ImportService}.
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class XWikiImportService implements ImportService
 {
-    /**
-     * Default XWiki logger to report errors correctly.
-     */
-    private static final Log LOG = LogFactory.getLog(XWikiImportService.class);
-
     /**
      * File extensions corresponding to slide presentations.
      */
     private static final List<String> PRESENTATION_FORMAT_EXTENSIONS = Arrays.asList("ppt", "pptx", "odp");
 
     /**
+     * Logger.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * The component manager. We need it because we have to access some components dynamically.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
      * The component used to access the content of the office attachments.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * The component used to convert office presentations to XDOM.
      */
-    @Requirement
+    @Inject
     private PresentationBuilder presentationBuilder;
 
     /**
      * The component used to convert office text documents to XDOM.
      */
-    @Requirement
+    @Inject
     private XDOMOfficeDocumentBuilder documentBuilder;
 
     /**
@@ -91,11 +95,7 @@ public class XWikiImportService implements ImportService
      */
     private final EntityReferenceConverter entityReferenceConverter = new EntityReferenceConverter();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ImportService#cleanOfficeHTML(String, String, Map)
-     */
+    @Override
     public String cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams)
     {
         try {
@@ -106,16 +106,12 @@ public class XWikiImportService implements ImportService
             HTMLUtils.stripHTMLEnvelope(cleanedDocument);
             return HTMLUtils.toString(cleanedDocument, true, true);
         } catch (Exception e) {
-            LOG.error("Exception while cleaning office HTML content.", e);
+            this.logger.error("Exception while cleaning office HTML content.", e);
             throw new RuntimeException(e.getLocalizedMessage());
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ImportService#officeToXHTML(Attachment, Map)
-     */
+    @Override
     public String officeToXHTML(Attachment attachment, Map<String, String> cleaningParams)
     {
         org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference clientAttachmentReference =
@@ -123,7 +119,8 @@ public class XWikiImportService implements ImportService
         try {
             return importAttachment(entityReferenceConverter.convert(clientAttachmentReference), cleaningParams);
         } catch (Exception e) {
-            LOG.error("Exception while importing office document: " + clientAttachmentReference.getFileName(), e);
+            this.logger.error("Exception while importing office document [{}]",
+                clientAttachmentReference.getFileName(), e);
             throw new RuntimeException(e.getLocalizedMessage());
         }
     }

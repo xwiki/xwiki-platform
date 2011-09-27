@@ -84,11 +84,7 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorScriptService#isSyntaxSupported(String)
-     */
+    @Override
     public boolean isSyntaxSupported(String syntaxId)
     {
         try {
@@ -100,11 +96,7 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorScriptService#parseAndRender(String, String)
-     */
+    @Override
     public String parseAndRender(String html, String syntax)
     {
         // Save the value of the "is in rendering engine" context property.
@@ -130,11 +122,7 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorScriptService#toAnnotatedXHTML(String, String)
-     */
+    @Override
     public String toAnnotatedXHTML(String source, String syntaxId)
     {
         // Save the value of the "is in rendering engine" context property.
@@ -160,11 +148,7 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorScriptService#getConfig()
-     */
+    @Override
     public WysiwygEditorConfiguration getConfig()
     {
         return this.editorConfiguration;

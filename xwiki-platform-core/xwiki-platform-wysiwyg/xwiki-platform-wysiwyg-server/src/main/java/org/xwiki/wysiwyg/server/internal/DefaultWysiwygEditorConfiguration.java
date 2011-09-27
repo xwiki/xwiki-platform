@@ -19,10 +19,12 @@
  */
 package org.xwiki.wysiwyg.server.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -36,6 +38,7 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfiguration
 {
     /**
@@ -46,17 +49,17 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
     /**
      * The component used to access documents. This is temporary till XWiki model is moved into components.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * The component used to get a reference to the current wiki.
      */
-    @Requirement
+    @Inject
     private ModelContext modelContext;
 
     /** Execution context handler, needed for accessing the XWikiContext. */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
@@ -89,124 +92,76 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
         return ((XWikiContext) execution.getContext().getProperty("xwikicontext")).getMainXWiki();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorConfiguration#areExternalImagesAllowed()
-     */
+    @Override
     public Boolean areExternalImagesAllowed()
     {
         Integer externalImages = (Integer) getProperty("externalImages");
         return externalImages == null ? null : ONE.equals(externalImages);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorConfiguration#getColorPalette()
-     */
+    @Override
     public String getColorPalette()
     {
         return (String) getProperty("colorPalette");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorConfiguration#getColorsPerRow()
-     */
+    @Override
     public Integer getColorsPerRow()
     {
         return (Integer) getProperty("colorsPerRow");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorConfiguration#getFontNames()
-     */
+    @Override
     public String getFontNames()
     {
         return (String) getProperty("fontNames");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorConfiguration#getFontSizes()
-     */
+    @Override
     public String getFontSizes()
     {
         return (String) getProperty("fontSizes");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorConfiguration#getMenuBar()
-     */
+    @Override
     public String getMenuBar()
     {
         return (String) getProperty("menuBar");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorConfiguration#getPlugins()
-     */
+    @Override
     public String getPlugins()
     {
         return (String) getProperty("plugins");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorConfiguration#getStyleNames()
-     */
+    @Override
     public String getStyleNames()
     {
         return (String) getProperty("styleNames");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorConfiguration#getToolBar()
-     */
+    @Override
     public String getToolBar()
     {
         return (String) getProperty("toolBar");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorConfiguration#isAttachmentSelectionLimited()
-     */
+    @Override
     public Boolean isAttachmentSelectionLimited()
     {
         Integer attachmentSelectionLimited = (Integer) getProperty("attachmentSelectionLimited");
         return attachmentSelectionLimited == null ? null : ONE.equals(attachmentSelectionLimited);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorConfiguration#isImageSelectionLimited()
-     */
+    @Override
     public Boolean isImageSelectionLimited()
     {
         Integer imageSelectionLimited = (Integer) getProperty("imageSelectionLimited");
         return imageSelectionLimited == null ? null : ONE.equals(imageSelectionLimited);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorConfiguration#isSourceEditorEnabled()
-     */
+    @Override
     public Boolean isSourceEditorEnabled()
     {
         Integer sourceEditorEnabled = (Integer) getProperty("sourceEditorEnabled");

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.2-milestone-3</version>
   </parent>
   <artifactId>xwiki-platform-legacy-oldcore</artifactId>
   <name>XWiki Platform - Legacy - Old Core</name>
@@ -93,7 +93,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore></ignore>
+                    <ignore />
                   </action>
                 </pluginExecution>
                 <pluginExecution>
@@ -106,7 +106,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore></ignore>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
@@ -148,7 +148,7 @@
             <configuration>
               <target>
                 <concat destfile="${project.build.directory}/classes/META-INF/components.txt" append="true">
-                  <filelist dir="${basedir}/src/main/resources/META-INF/" files="components.txt"/>
+                  <filelist dir="${basedir}/src/main/resources/META-INF/" files="components.txt" />
                 </concat>
               </target>
             </configuration>

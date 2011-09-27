@@ -23,9 +23,9 @@ import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.xpath.XPathAPI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
@@ -43,7 +43,7 @@ public class NestedAnchorsFilter implements HTMLFilter
     /**
      * Default XWiki logger to report errors correctly.
      */
-    private static final Log LOG = LogFactory.getLog(NestedAnchorsFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmptyAttributeFilter.class);
 
     /**
      * {@inheritDoc}
@@ -58,7 +58,7 @@ public class NestedAnchorsFilter implements HTMLFilter
                 unwrap(nestedAnchor);
             }
         } catch (TransformerException e) {
-            LOG.error("Exception while filtering nested anchors.", e);
+            LOGGER.error("Exception while filtering nested anchors.", e);
         }
     }
 

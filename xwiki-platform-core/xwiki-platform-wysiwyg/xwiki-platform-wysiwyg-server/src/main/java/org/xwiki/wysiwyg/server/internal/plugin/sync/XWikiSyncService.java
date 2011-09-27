@@ -25,8 +25,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
@@ -49,9 +48,10 @@ import org.xwiki.wysiwyg.server.plugin.sync.SyncEngine;
 public class XWikiSyncService implements SyncService
 {
     /**
-     * Default XWiki logger to report errors correctly.
+     * Logger.
      */
-    private static final Log LOG = LogFactory.getLog(XWikiSyncService.class);
+    @Inject
+    private Logger logger;
 
     /**
      * The object used to synchronize the content edited by multiple users when the real time feature of the editor is
@@ -94,7 +94,7 @@ public class XWikiSyncService implements SyncService
             }
             return syncEngine.sync(syncStatus, revision, version);
         } catch (Exception e) {
-            LOG.error("Exception while synchronizing edited content.", e);
+            this.logger.error("Exception while synchronizing edited content.", e);
             throw new RuntimeException(e.getLocalizedMessage(), e);
         }
     }

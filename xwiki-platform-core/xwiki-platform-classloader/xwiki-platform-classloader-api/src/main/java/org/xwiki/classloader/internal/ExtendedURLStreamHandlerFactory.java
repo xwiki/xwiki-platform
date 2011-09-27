@@ -22,9 +22,11 @@ package org.xwiki.classloader.internal;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.classloader.ExtendedURLStreamHandler;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 
@@ -35,18 +37,16 @@ import org.xwiki.component.manager.ComponentManager;
  * @since 2.0.1
  */
 @Component(roles={URLStreamHandlerFactory.class})
+@Singleton
 public class ExtendedURLStreamHandlerFactory implements URLStreamHandlerFactory
 {
     /**
      * To dynamically lookup stream handler components. 
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
     
-    /**
-     * {@inheritDoc}
-     * @see URLStreamHandlerFactory#createURLStreamHandler(String)
-     */
+    @Override
     public URLStreamHandler createURLStreamHandler(String protocol)
     {
         ExtendedURLStreamHandler result;

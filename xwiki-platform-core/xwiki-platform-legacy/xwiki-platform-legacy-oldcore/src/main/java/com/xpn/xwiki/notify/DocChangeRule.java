@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.notify;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -28,7 +28,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Deprecated
 public class DocChangeRule implements XWikiNotificationRule
 {
-    protected static final Log LOG = LogFactory.getLog(DocChangeRule.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(DocChangeRule.class);
 
     private XWikiDocChangeNotificationInterface target;
 
@@ -78,8 +78,8 @@ public class DocChangeRule implements XWikiNotificationRule
             getTarget().notify(this, newdoc, olddoc, XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
         } catch (Exception e) {
             // protect from bad listeners
-            LOG.error("Fail to notify target [" + getTarget() + "] for event [" + this + ", newdoc=" + newdoc
-                + ", olddoc=" + olddoc + "]", e);
+            LOGGER.error("Failed to notify target [{}] for event [{}], newdoc = [{}], olddoc = [{}]",
+                new Object[] {getTarget(), this, newdoc, olddoc, e});
         }
     }
 
@@ -99,8 +99,8 @@ public class DocChangeRule implements XWikiNotificationRule
             getTarget().notify(this, newdoc, olddoc, XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
         } catch (Exception e) {
             // protect from bad listeners
-            LOG.error("Fail to notify target [" + getTarget() + "] for pre event [" + this + ", newdoc=" + newdoc
-                + ", olddoc=" + olddoc + "]", e);
+            LOGGER.error("Failed to notify target [{}] for pre event [{}], newdoc = [{}], olddoc = [{}]",
+                new Object[] {getTarget(), this, newdoc, olddoc, e});
         }
     }
 

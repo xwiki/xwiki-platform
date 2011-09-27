@@ -24,12 +24,12 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Deprecated
 public class XWikiPageNotification implements XWikiActionNotificationInterface {
-    private static final Log log = LogFactory.getLog(XWikiPageNotification.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiPageNotification.class);
 
     public void notify(XWikiNotificationRule rule, XWikiDocument doc, String action, XWikiContext context) {
         try {
@@ -46,8 +46,8 @@ public class XWikiPageNotification implements XWikiActionNotificationInterface {
             }
         } catch (Throwable e) {
             XWikiException e2 = new XWikiException(XWikiException.MODULE_XWIKI_NOTIFICATION, XWikiException.ERROR_XWIKI_NOTIFICATION, "Error executing notifications", e);
-            if (log.isErrorEnabled())
-                log.error(e2.getFullMessage());
+            if (LOGGER.isErrorEnabled())
+                LOGGER.error(e2.getFullMessage());
         }
     }
 
@@ -63,8 +63,8 @@ public class XWikiPageNotification implements XWikiActionNotificationInterface {
         } catch (Throwable e) {
             Object[] args = { page };
             XWikiException e2 = new XWikiException(XWikiException.MODULE_XWIKI_GROOVY, XWikiException.ERROR_XWIKI_GROOVY_EXECUTION_FAILED, "Error parsing groovy notification for page {0}", e, args);
-            if (log.isErrorEnabled())
-                log.error(e2.getFullMessage());
+            if (LOGGER.isErrorEnabled())
+                LOGGER.error(e2.getFullMessage());
         }
     }
 }

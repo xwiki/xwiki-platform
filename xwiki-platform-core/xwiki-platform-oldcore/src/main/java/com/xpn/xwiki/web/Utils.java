@@ -706,7 +706,7 @@ public class Utils
     public static XWikiContext getContext()
     {
         ExecutionContext ec = getComponent(Execution.class).getContext();
-        return ec == null ? null : (XWikiContext) ec.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        return (XWikiContext) ec.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 
     /**

@@ -27,7 +27,6 @@ import javax.inject.Named;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.velocity.VelocityContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
@@ -53,8 +52,7 @@ public class MessageToolVelocityContextInitializer implements VelocityContextIni
     @Override
     public void initialize(VelocityContext context)
     {
-        ExecutionContext ec = execution.getContext();
-        XWikiContext xcontext = ec == null ? null : (XWikiContext) ec.getProperty("xwikicontext");
+        XWikiContext xcontext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
         if (xcontext == null || xcontext.getWiki() == null) {
             // Nothing we can do yet, incomplete context
             return;

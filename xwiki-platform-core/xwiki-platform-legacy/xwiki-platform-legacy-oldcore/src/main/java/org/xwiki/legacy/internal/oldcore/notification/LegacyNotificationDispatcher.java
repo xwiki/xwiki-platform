@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.ActionExecutedEvent;
@@ -44,12 +46,16 @@ import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
 
 /**
- * An event listener that forwards received events to their corresponding legacy events. This allows depreciated events
- * to continue be supported.
+ * An event listener that forwards received events to their corresponding legacy events. This allows deprecated events
+ * to continue to be supported.
  * 
  * @version $Id$
+ * @deprecated since old events shouldn't be used anymore (they're deprecated themselves)
  */
-@Component("LegacyNotificationDispatcher")
+@Component
+@Named("LegacyNotificationDispatcher")
+@Singleton
+@Deprecated
 public class LegacyNotificationDispatcher implements EventListener
 {
     /**

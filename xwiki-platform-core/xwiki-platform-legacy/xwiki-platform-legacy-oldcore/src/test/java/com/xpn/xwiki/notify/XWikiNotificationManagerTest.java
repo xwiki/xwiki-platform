@@ -29,6 +29,7 @@ import junit.framework.TestCase;
  * 
  * @version $Id$
  */
+@Deprecated
 public class XWikiNotificationManagerTest extends TestCase
 {
     private XWikiNotificationManager notificationManager;

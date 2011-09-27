@@ -39,6 +39,7 @@ import org.xwiki.model.reference.DocumentReference;
  * and the other one for <tt>verify(olddoc, newdoc, context)</tt>; some tests cases might be duplicated by the
  * symmetric call in another test function.
  */
+@Deprecated
 public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCase
     implements XWikiDocChangeNotificationInterface
 {

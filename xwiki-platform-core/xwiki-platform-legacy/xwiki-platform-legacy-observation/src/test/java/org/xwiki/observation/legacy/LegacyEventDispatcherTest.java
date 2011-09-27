@@ -40,6 +40,7 @@ import org.xwiki.observation.event.FilterableEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 import org.xwiki.test.AbstractComponentTestCase;
 
+@Deprecated
 public class LegacyEventDispatcherTest extends AbstractComponentTestCase
 {
     private Event receivedEvent;

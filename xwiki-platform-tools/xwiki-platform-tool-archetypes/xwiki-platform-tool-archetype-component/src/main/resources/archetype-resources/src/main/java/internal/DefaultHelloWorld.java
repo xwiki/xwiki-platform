@@ -22,18 +22,18 @@ package ${packageName}.internal;
 import ${packageName}.HelloWorld;
 import org.xwiki.component.annotation.Component;
 
+import javax.inject.Singleton;
+
 /**
  * Implementation of a <tt>HelloWorld</tt> component.
  *
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultHelloWorld implements HelloWorld
 {
-    /**
-     * {@inheritDoc}
-     * @see HelloWorld#sayHello()
-     */
+    @Override
     public String sayHello()
     {
         return "Hello";

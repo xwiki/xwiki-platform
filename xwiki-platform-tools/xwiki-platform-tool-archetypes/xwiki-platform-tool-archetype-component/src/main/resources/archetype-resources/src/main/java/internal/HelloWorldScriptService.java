@@ -20,20 +20,25 @@
 package ${packageName}.internal;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.script.service.ScriptService;
 
 import ${package}.HelloWorld;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Make the HelloWorld API available to scripting.
  *
  * @version $Id$
  */
-@Component("hello")
+@Component
+@Named("hello")
+@Singleton
 public class HelloWorldScriptService implements ScriptService
 {
-    @Requirement
+    @Inject
     private HelloWorld helloWorld;
 
     public String greet()

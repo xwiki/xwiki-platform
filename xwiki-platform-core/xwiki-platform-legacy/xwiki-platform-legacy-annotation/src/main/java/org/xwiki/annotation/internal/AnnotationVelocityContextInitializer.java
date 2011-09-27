@@ -34,8 +34,10 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * 
  * @version $Id$
  * @since 2.3M1
+ * @deprecated starting with 3.0RC1 use directly the Annotation Script Service from scripts
  */
 @Component("annotations")
+@Deprecated
 public class AnnotationVelocityContextInitializer implements VelocityContextInitializer
 {
     /**
@@ -60,11 +62,7 @@ public class AnnotationVelocityContextInitializer implements VelocityContextInit
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.velocity.VelocityContextInitializer#initialize(org.apache.velocity.VelocityContext)
-     */
+    @Override
     public void initialize(VelocityContext context)
     {
         try {

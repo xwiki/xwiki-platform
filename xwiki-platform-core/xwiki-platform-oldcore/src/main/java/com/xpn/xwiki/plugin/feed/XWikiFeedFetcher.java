@@ -121,8 +121,6 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher
         if (feedUrl == null) {
             throw new IllegalArgumentException("null is not a valid URL");
         }
-        // TODO Fix this
-        //System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
         HttpClient client = new HttpClient();
         if (timeout != 0) {
             client.getParams().setSoTimeout(timeout);

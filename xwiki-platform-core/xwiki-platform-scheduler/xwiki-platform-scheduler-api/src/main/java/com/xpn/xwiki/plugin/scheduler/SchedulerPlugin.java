@@ -26,8 +26,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -35,6 +33,8 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptServiceManager;
 
@@ -62,7 +62,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     /**
      * Log object to log messages in this class.
      */
-    private static final Log LOG = LogFactory.getLog(SchedulerPlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerPlugin.class);
 
     /**
      * Fullname of the XWiki Scheduler Job Class representing a job that can be scheduled by this plugin.
@@ -100,7 +100,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                 try {
                     wikiServers = context.getWiki().getVirtualWikisDatabaseNames(context);
                 } catch (Exception e) {
-                    LOG.error("error getting list of wiki servers!", e);
+                    LOGGER.error("error getting list of wiki servers!", e);
                     wikiServers = new ArrayList<String>();
                 }
             } else {
@@ -119,7 +119,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                     try {
                         updateSchedulerJobClass(context);
                     } catch (Exception e) {
-                        LOG.error("Failed to update scheduler job class for in wiki [" + wikiName + "]", e);
+                        LOGGER.error("Failed to update scheduler job class for in wiki [{}]", wikiName, e);
 
                         // Removing the wiki from the list since it will be impossible start jobs for it
                         wikiServers.remove(wikiName);
@@ -150,9 +150,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                 context.setDatabase(initialDb);
             }
         } catch (SchedulerException e) {
-            LOG.error("Failed to start the scheduler", e);
+            LOGGER.error("Failed to start the scheduler", e);
         } catch (SchedulerPluginException e) {
-            LOG.error("Failed to initialize the scheduler", e);
+            LOGGER.error("Failed to initialize the scheduler", e);
         }
 
         super.init(context);
@@ -297,13 +297,12 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                         this.pauseJob(jobObj, context);
                     }
                 } catch (Exception e) {
-                    LOG.error(
-                        "Failed to restore job with in document [" + docName + "] and wiki [" + context.getDatabase()
-                            + "]", e);
+                    LOGGER.error("Failed to restore job with in document [{}] and wiki [{}]",
+                        new Object[] {docName, context.getDatabase()}, e);
                 }
             }
         } catch (Exception e) {
-            LOG.error("Failed to restore existing scheduler jobs in wiki [" + context.getDatabase() + "]", e);
+            LOGGER.error("Failed to restore existing scheduler jobs in wiki [{}]", context.getDatabase(), e);
         }
     }
 
@@ -359,14 +358,14 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                     break;
                 case Trigger.STATE_NORMAL:
                     if (getTrigger(object, context).compareTo(trigger) != 0) {
-                        LOG.debug("Reschedule Job : " + object.getStringValue("jobName"));
+                        LOGGER.debug("Reschedule Job: [{}]", object.getStringValue("jobName"));
                     }
                     getScheduler().rescheduleJob(trigger.getName(), trigger.getGroup(), trigger);
                     break;
                 case Trigger.STATE_NONE:
-                    LOG.debug("Schedule Job : " + object.getStringValue("jobName"));
+                    LOGGER.debug("Schedule Job: [{}]", object.getStringValue("jobName"));
                     getScheduler().scheduleJob(trigger);
-                    LOG.info("XWiki Job Status :" + object.getStringValue("status"));
+                    LOGGER.info("XWiki Job Status: [{}]", object.getStringValue("status"));
                     if (object.getStringValue("status").equals("Paused")) {
                         getScheduler().pauseJob(xjob, Scheduler.DEFAULT_GROUP);
                         saveStatus("Paused", object, context);
@@ -375,7 +374,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                     }
                     break;
                 default:
-                    LOG.debug("Schedule Job : " + object.getStringValue("jobName"));
+                    LOGGER.debug("Schedule Job: [{}]", object.getStringValue("jobName"));
                     getScheduler().scheduleJob(trigger);
                     saveStatus("Normal", object, context);
                     break;

@@ -19,14 +19,14 @@
  */
 package com.xpn.xwiki.plugin.scheduler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerListener;
 import org.quartz.Trigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @version $Id$
@@ -36,14 +36,14 @@ public class StatusListener implements SchedulerListener, JobListener
     /**
      * Log4j logger that records events for this class
      */
-    private static final Log LOG = LogFactory.getLog(StatusListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StatusListener.class);
 
     /**
      * {@inheritDoc}
      */
     public void jobScheduled(Trigger trigger)
     {
-        LOG.info("Task '" + trigger.getJobName() + "' scheduled");
+        LOGGER.info("Task [{}] scheduled", trigger.getJobName());
     }
 
     /**
@@ -51,7 +51,7 @@ public class StatusListener implements SchedulerListener, JobListener
      */
     public void jobUnscheduled(String name, String group)
     {
-        LOG.info("Task '" + name + "' unscheduled");
+        LOGGER.info("Task [{}] unscheduled", name);
     }
 
     /**
@@ -80,7 +80,7 @@ public class StatusListener implements SchedulerListener, JobListener
      */
     public void jobsPaused(String name, String group)
     {
-        LOG.info("Task '" + name + "' paused");
+        LOGGER.info("Task [{}] paused", name);
     }
 
     /**
@@ -88,7 +88,7 @@ public class StatusListener implements SchedulerListener, JobListener
      */
     public void jobsResumed(String name, String group)
     {
-        LOG.info("Task '" + name + "' resumed");
+        LOGGER.info("Task [{}] resumed", name);
     }
 
     /**
@@ -96,7 +96,7 @@ public class StatusListener implements SchedulerListener, JobListener
      */
     public void schedulerError(String message, SchedulerException error)
     {
-        LOG.error(message, error);
+        LOGGER.error(message, error);
     }
 
     /**
@@ -104,7 +104,7 @@ public class StatusListener implements SchedulerListener, JobListener
      */
     public void schedulerShutdown()
     {
-        LOG.warn("Scheduler is shutting down");
+        LOGGER.warn("Scheduler is shutting down");
     }
 
     /**
@@ -120,7 +120,7 @@ public class StatusListener implements SchedulerListener, JobListener
      */
     public void jobToBeExecuted(JobExecutionContext context)
     {
-        LOG.info("Task '" + context.getJobDetail().getName() + "' is about to be executed");
+        LOGGER.info("Task [{}] is about to be executed", context.getJobDetail().getName());
     }
 
     /**
@@ -135,6 +135,6 @@ public class StatusListener implements SchedulerListener, JobListener
      */
     public void jobWasExecuted(JobExecutionContext context, JobExecutionException e)
     {
-        LOG.info("Task '" + context.getJobDetail().getName() + "' executed : " + e);
+        LOGGER.info("Task [{}] executed: ", context.getJobDetail().getName(), e);
     }
 }

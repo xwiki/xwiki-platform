@@ -17,30 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wysiwyg.server.internal.filter.http;
+package org.xwiki.wysiwyg.server.internal.cleaner;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.wysiwyg.server.filter.MutableServletRequest;
-import org.xwiki.wysiwyg.server.filter.MutableServletRequestFactory;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * {@link MutableServletRequestFactory} implementation for the HTTP protocol.
+ * Interface used to tag WYSIWYG editor specific HTML cleaning filters.
  * 
  * @version $Id$
  */
-@Component(hints = {"HTTP/1.1", "HTTP/1.0" })
-public class MutableHttpServletRequestFactory implements MutableServletRequestFactory
+@ComponentRole
+public interface HTMLFilter extends org.xwiki.xml.html.filter.HTMLFilter
 {
-    @Override
-    public synchronized MutableServletRequest newInstance(ServletRequest request)
-    {
-        if (request instanceof HttpServletRequest) {
-            return new MutableHttpServletRequest((HttpServletRequest) request);
-        } else {
-            throw new IllegalArgumentException("Expecting HttpServletRequest!");
-        }
-    }
 }

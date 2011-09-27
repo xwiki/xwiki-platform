@@ -21,16 +21,18 @@ package org.xwiki.wysiwyg.server.internal.cleaner;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.xml.transform.TransformerException;
 
 import org.apache.xpath.XPathAPI;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xwiki.xml.html.filter.HTMLFilter;
+import org.xwiki.component.annotation.Component;
 
 /**
  * Removes nested anchors. Since anchors in anchors are not valid in XHTML and the parser does not accept them, we use
@@ -38,16 +40,18 @@ import org.xwiki.xml.html.filter.HTMLFilter;
  * 
  * @version $Id$
  */
+@Component(roles = { HTMLFilter.class })
+@Named("nestedAnchors")
+@Singleton
 public class NestedAnchorsFilter implements HTMLFilter
 {
     /**
-     * Default XWiki logger to report errors correctly.
+     * Logger.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmptyAttributeFilter.class);
+    @Inject
+    private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void filter(Document document, Map<String, String> parameters)
     {
         try {
@@ -58,7 +62,7 @@ public class NestedAnchorsFilter implements HTMLFilter
                 unwrap(nestedAnchor);
             }
         } catch (TransformerException e) {
-            LOGGER.error("Exception while filtering nested anchors.", e);
+            logger.error("Exception while filtering nested anchors.", e);
         }
     }
 
@@ -78,9 +82,9 @@ public class NestedAnchorsFilter implements HTMLFilter
             return;
         }
         DocumentFragment children = element.getOwnerDocument().createDocumentFragment();
-        while (element.hasChildNodes()) {            
+        while (element.hasChildNodes()) {
             children.appendChild(element.getChildNodes().item(0));
-        }            
+        }
         parent.replaceChild(children, element);
     }
 }

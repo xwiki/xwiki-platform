@@ -74,20 +74,12 @@ public class ConversionFilter implements Filter
      */
     private static final String CONVERSION_ERRORS = "com.xpn.xwiki.wysiwyg.server.converter.errors";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Filter#destroy()
-     */
+    @Override
     public void destroy()
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
-     */
+    @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
         ServletException
     {
@@ -153,11 +145,7 @@ public class ConversionFilter implements Filter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Filter#init(FilterConfig)
-     */
+    @Override
     public void init(FilterConfig config) throws ServletException
     {
     }

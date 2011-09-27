@@ -19,14 +19,14 @@
  */
 package org.xwiki.wysiwyg.server.internal.cleaner;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.lang.reflect.Method;
+
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
@@ -60,14 +60,9 @@ public class ComponentManagerTestSetup extends TestSetup
 
     public void addComponentDescriptor(ComponentDescriptor< ? > componentDescriptor)
     {
-        this.componentDescriptors.add(componentDescriptor);    
+        this.componentDescriptors.add(componentDescriptor);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.extensions.TestDecorator#getTest()
-     */
     @Override
     public TestSuite getTest()
     {
@@ -84,11 +79,6 @@ public class ComponentManagerTestSetup extends TestSetup
         return this.initializer.getComponentManager();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.extensions.TestSetup#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {
@@ -112,11 +102,6 @@ public class ComponentManagerTestSetup extends TestSetup
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.extensions.TestSetup#tearDown()
-     */
     @Override
     protected void tearDown() throws Exception
     {

@@ -31,7 +31,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
-import org.xwiki.xml.html.filter.HTMLFilter;
 
 /**
  * Default HTML cleaner for the WYSIWYG editor's output.
@@ -48,6 +47,12 @@ public class DefaultHTMLCleaner implements HTMLCleaner
     @Inject
     private org.xwiki.xml.html.HTMLCleaner cleaner;
 
+    /**
+     * The list of WYSIWYG editor specific HTML cleaning filters.
+     */
+    @Inject
+    private List<HTMLFilter> specificFilters;
+
     @Override
     public String clean(String dirtyHTML)
     {
@@ -57,12 +62,8 @@ public class DefaultHTMLCleaner implements HTMLCleaner
         // client side because the editor is a widget that can be used independently inside or outside an HTML form and
         // thus it doesn't know when its current value is submitted.
         HTMLCleanerConfiguration config = cleaner.getDefaultConfiguration();
-        List<HTMLFilter> filters = new ArrayList<HTMLFilter>();
-        filters.add(new LineBreakFilter());
-        filters.add(new EmptyLineFilter());
-        filters.add(new StandAloneMacroFilter());
-        filters.add(new EmptyAttributeFilter());
-        filters.add(new NestedAnchorsFilter());
+        List<org.xwiki.xml.html.filter.HTMLFilter> filters = new ArrayList<org.xwiki.xml.html.filter.HTMLFilter>();
+        filters.addAll(specificFilters);
         filters.addAll(config.getFilters());
         config.setFilters(filters);
 

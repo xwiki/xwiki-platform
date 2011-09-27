@@ -21,15 +21,17 @@ package org.xwiki.wysiwyg.server.internal.cleaner;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.xml.transform.TransformerException;
 
 import org.apache.xpath.XPathAPI;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-import org.xwiki.xml.html.filter.HTMLFilter;
+import org.xwiki.component.annotation.Component;
 
 /**
  * Removes attributes with no value. Precisely, elements like {@code <span style="" title="Title">text</span>} are
@@ -37,18 +39,18 @@ import org.xwiki.xml.html.filter.HTMLFilter;
  * 
  * @version $Id$
  */
+@Component(roles = { HTMLFilter.class })
+@Named("emptyAttribute")
+@Singleton
 public class EmptyAttributeFilter implements HTMLFilter
 {
     /**
-     * Default XWiki logger to report errors correctly.
+     * Logger.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmptyAttributeFilter.class);
+    @Inject
+    private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLFilter#filter(Document, Map)
-     */
+    @Override
     public void filter(Document document, Map<String, String> parameters)
     {
         try {
@@ -58,7 +60,7 @@ public class EmptyAttributeFilter implements HTMLFilter
                 emptyAttribute.getOwnerElement().removeAttributeNode(emptyAttribute);
             }
         } catch (TransformerException e) {
-            LOGGER.error("Exception while filtering empty attributes.", e);
+            logger.error("Exception while filtering empty attributes.", e);
         }
     }
 }

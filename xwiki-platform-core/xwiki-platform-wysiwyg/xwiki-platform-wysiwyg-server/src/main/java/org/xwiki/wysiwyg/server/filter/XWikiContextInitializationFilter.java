@@ -61,21 +61,13 @@ public class XWikiContextInitializationFilter implements Filter
      */
     private int mode;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Filter#destroy()
-     */
+    @Override
     public void destroy()
     {
         filterConfig = null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
-     */
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
         ServletException
     {
@@ -92,11 +84,7 @@ public class XWikiContextInitializationFilter implements Filter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Filter#init(FilterConfig)
-     */
+    @Override
     public void init(FilterConfig filterConfig) throws ServletException
     {
         this.filterConfig = filterConfig;

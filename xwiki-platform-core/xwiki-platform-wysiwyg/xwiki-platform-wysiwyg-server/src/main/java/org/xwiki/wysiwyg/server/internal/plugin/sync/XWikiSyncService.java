@@ -110,7 +110,7 @@ public class XWikiSyncService implements SyncService
         Map<String, Object> backupObjects = new HashMap<String, Object>();
         try {
             docAccessBridge.pushDocumentInContext(backupObjects, docModelBridge.getDocumentReference());
-            return htmlConverter.toHTML(docModelBridge.getContent(), docModelBridge.getSyntaxId());
+            return htmlConverter.toHTML(docModelBridge.getContent(), docModelBridge.getSyntax().toIdString());
         } finally {
             // Restore the context after the conversion.
             docAccessBridge.popDocumentFromContext(backupObjects);

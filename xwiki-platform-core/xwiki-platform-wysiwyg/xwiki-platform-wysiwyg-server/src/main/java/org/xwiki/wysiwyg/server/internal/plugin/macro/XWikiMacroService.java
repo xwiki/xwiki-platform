@@ -150,7 +150,7 @@ public class XWikiMacroService implements MacroService
         // See XWIKI-4558 (Add macro parameter display name support to wiki macros).
         result.setName(StringUtils.isBlank(descriptor.getName()) ? descriptor.getId() : descriptor.getName());
         result.setDescription(descriptor.getDescription());
-        result.setType(createMacroParameterType(descriptor.getType()));
+        result.setType(createMacroParameterType(descriptor.getParameterType().getClass()));
         Object defaultValue = descriptor.getDefaultValue();
         if (defaultValue != null) {
             result.setDefaultValue(String.valueOf(defaultValue));

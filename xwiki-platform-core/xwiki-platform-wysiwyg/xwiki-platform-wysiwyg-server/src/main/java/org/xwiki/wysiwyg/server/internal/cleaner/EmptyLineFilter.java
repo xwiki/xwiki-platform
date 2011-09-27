@@ -23,10 +23,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xwiki.xml.html.filter.HTMLFilter;
+import org.xwiki.component.annotation.Component;
 
 /**
  * Converts empty paragraphs to empty lines. Precisely, converts all {@code <p>
@@ -34,13 +37,12 @@ import org.xwiki.xml.html.filter.HTMLFilter;
  * 
  * @version $Id$
  */
+@Component(roles = {HTMLFilter.class })
+@Named("emptyLine")
+@Singleton
 public class EmptyLineFilter implements HTMLFilter
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLFilter#filter(Document, Map)
-     */
+    @Override
     public void filter(Document document, Map<String, String> parameters)
     {
         NodeList paragraphs = document.getElementsByTagName("p");

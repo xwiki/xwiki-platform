@@ -93,9 +93,7 @@
         <configuration>
           <!-- New code should follow checkstyle rules. -->
           <excludes>
-            org/xwiki/wysiwyg/server/internal/plugin/sync/DefaultSyncEngine.java,
             org/xwiki/wysiwyg/server/internal/plugin/sync/DefaultSyncEngineTest.java,
-            org/xwiki/wysiwyg/server/internal/wiki/DefaultWikiService.java,
             org/xwiki/wysiwyg/server/internal/cleaner/ComponentManagerTestSetup.java
           </excludes>
         </configuration>

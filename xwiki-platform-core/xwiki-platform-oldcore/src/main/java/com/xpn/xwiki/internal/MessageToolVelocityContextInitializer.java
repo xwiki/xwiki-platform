@@ -21,19 +21,22 @@ package com.xpn.xwiki.internal;
 
 import groovy.lang.Singleton;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.velocity.VelocityContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * Puts the {@code $msg} variable in the context.
  * 
  * @version $Id$
+ * @since 3.2M3
  */
 @Component
 @Named("messagetool")
@@ -43,10 +46,15 @@ public class MessageToolVelocityContextInitializer implements VelocityContextIni
     /** The key under which the message tool should be found. */
     private static final String CONTEXT_KEY = "msg";
 
+    /** The component used to access the XWiki context. */
+    @Inject
+    private Execution execution;
+
     @Override
     public void initialize(VelocityContext context)
     {
-        XWikiContext xcontext = Utils.getContext();
+        ExecutionContext ec = execution.getContext();
+        XWikiContext xcontext = ec == null ? null : (XWikiContext) ec.getProperty("xwikicontext");
         if (xcontext == null || xcontext.getWiki() == null) {
             // Nothing we can do yet, incomplete context
             return;

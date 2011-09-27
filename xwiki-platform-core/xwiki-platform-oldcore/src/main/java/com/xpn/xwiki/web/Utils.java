@@ -694,16 +694,19 @@ public class Utils
 
     /**
      * Helper method for obtaining a valid xcontext from the execution context.
+     * <p>
+     * NOTE: Don't use this method to access the XWiki context in a component because
+     * {@link #setComponentManager(ComponentManager)} is not called when running component unit tests. You have to take
+     * the XWiki context yourself from the injected Execution when inside a component. This method should be used only
+     * by non-component code.
      * 
      * @return the current context or {@code null} if the execution context is not yet initialized
+     * @since 3.2M3
      */
     public static XWikiContext getContext()
     {
         ExecutionContext ec = getComponent(Execution.class).getContext();
-        if (ec == null) {
-            return null;
-        }
-        return (XWikiContext) ec.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        return ec == null ? null : (XWikiContext) ec.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 
     /**

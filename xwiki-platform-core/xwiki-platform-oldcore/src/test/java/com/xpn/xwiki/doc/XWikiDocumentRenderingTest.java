@@ -134,6 +134,8 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.mockXWiki.stubs().method("getDocument").will(returnValue(this.document));
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
         this.mockXWiki.stubs().method("exists").will(returnValue(false));
+        // Called from MessageToolVelocityContextInitializer.
+        this.mockXWiki.stubs().method("prepareResources");
         // The next 3 stubs are needed to properly initialize the Velocity engine.
         this.mockXWiki.stubs().method("getSkin").will(returnValue("default"));
         this.mockXWiki.stubs().method("getSkinFile").will(returnValue(null));

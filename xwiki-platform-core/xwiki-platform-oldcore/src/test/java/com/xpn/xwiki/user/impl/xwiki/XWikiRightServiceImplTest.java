@@ -86,6 +86,8 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
                         (String) invocation.parameterValues.get(0), "WebPreferences"));
                 }
             });
+        // Called from MessageToolVelocityContextInitializer.
+        this.mockXWiki.stubs().method("prepareResources");
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
 

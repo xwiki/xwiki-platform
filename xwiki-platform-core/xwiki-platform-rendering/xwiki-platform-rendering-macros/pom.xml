@@ -78,8 +78,12 @@
               <rules>
                 <bannedDependencies>
                   <excludes>
-                    <exclude>org.xwiki.rendering:xwiki-rendering-macro-html</exclude>
+                    <exclude>org.xwiki.rendering:xwiki-rendering-macro-html:*:jar:*</exclude>
                   </excludes>
+                  <message>
+We need to be able to turn off the HTML Macro and still have a working system.
+Thus it is forbidden to depend on the HTML Macro.
+                   </message>
                 </bannedDependencies>
               </rules>
             </configuration>

@@ -1,20 +1,42 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Verify inline mode for Velocity macro
+.# Verify Velocity macros are shared between different 2.0 macros of the same content
 .#-----------------------------------------------------
-= hello {{velocity}}world{{/velocity}}
+{{velocity}}
+#set($somevar = "some var value")
+$somevar
+{{/velocity}}
+
+{{velocity}}
+$somevar
+{{/velocity}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginSection
-beginHeader [1, Hhello]
-onWord [hello]
+beginMacroMarkerStandalone [velocity] [] [#set($somevar = "some var value")
+$somevar]
+beginParagraph
+onWord [some]
 onSpace
-beginMacroMarkerInline [velocity] [] [world]
-onWord [world]
-endMacroMarkerInline [velocity] [] [world]
-endHeader [1, Hhello]
-endSection
+onWord [var]
+onSpace
+onWord [value]
+endParagraph
+endMacroMarkerStandalone [velocity] [] [#set($somevar = "some var value")
+$somevar]
+beginMacroMarkerStandalone [velocity] [] [$somevar]
+beginParagraph
+onWord [some]
+onSpace
+onWord [var]
+onSpace
+onWord [value]
+endParagraph
+endMacroMarkerStandalone [velocity] [] [$somevar]
 endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p>some var value</p><p>some var value</p>

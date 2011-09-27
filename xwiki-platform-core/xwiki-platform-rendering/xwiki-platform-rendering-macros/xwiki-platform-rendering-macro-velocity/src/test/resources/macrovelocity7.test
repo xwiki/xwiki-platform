@@ -1,37 +1,31 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Verify filter option is taken into acount
+.# Verify filter option is taken into account
 .#-----------------------------------------------------
 {{velocity}}
-  Some text
-{{/velocity}}
-
-{{velocity filter="none"}}
-  Some text
+## some comment
+#if (true)
+  text
+#end
 {{/velocity}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [velocity] [] [  Some text]
+beginMacroMarkerStandalone [velocity] [] [## some comment
+#if (true)
+  text
+#end]
 beginParagraph
-onWord [Some]
-onSpace
 onWord [text]
 endParagraph
-endMacroMarkerStandalone [velocity] [] [  Some text]
-beginMacroMarkerStandalone [velocity] [filter=none] [  Some text]
-beginParagraph
-onSpace
-onSpace
-onWord [Some]
-onSpace
-onWord [text]
-endParagraph
-endMacroMarkerStandalone [velocity] [filter=none] [  Some text]
+endMacroMarkerStandalone [velocity] [] [## some comment
+#if (true)
+  text
+#end]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>Some text</p><p>&nbsp;&nbsp;Some text</p>
+<p>text</p>

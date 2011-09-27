@@ -1,42 +1,51 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Verify Velocity macros are shared between different 2.0 macros of the same content
+.# Verify Velocity variables are shared between different 2.0 macros of the same content
 .#-----------------------------------------------------
 {{velocity}}
-#set($somevar = "some var value")
-$somevar
+#macro(somemacro)
+"macro content"
+#end
+
+#somemacro()
 {{/velocity}}
 
 {{velocity}}
-$somevar
+#somemacro()
 {{/velocity}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [velocity] [] [#set($somevar = "some var value")
-$somevar]
+beginMacroMarkerStandalone [velocity] [] [#macro(somemacro)
+"macro content"
+#end
+
+#somemacro()]
 beginParagraph
-onWord [some]
+onSpecialSymbol ["]
+onWord [macro]
 onSpace
-onWord [var]
-onSpace
-onWord [value]
+onWord [content]
+onSpecialSymbol ["]
 endParagraph
-endMacroMarkerStandalone [velocity] [] [#set($somevar = "some var value")
-$somevar]
-beginMacroMarkerStandalone [velocity] [] [$somevar]
+endMacroMarkerStandalone [velocity] [] [#macro(somemacro)
+"macro content"
+#end
+
+#somemacro()]
+beginMacroMarkerStandalone [velocity] [] [#somemacro()]
 beginParagraph
-onWord [some]
+onSpecialSymbol ["]
+onWord [macro]
 onSpace
-onWord [var]
-onSpace
-onWord [value]
+onWord [content]
+onSpecialSymbol ["]
 endParagraph
-endMacroMarkerStandalone [velocity] [] [$somevar]
+endMacroMarkerStandalone [velocity] [] [#somemacro()]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>some var value</p><p>some var value</p>
+<p>"macro content"</p><p>"macro content"</p>

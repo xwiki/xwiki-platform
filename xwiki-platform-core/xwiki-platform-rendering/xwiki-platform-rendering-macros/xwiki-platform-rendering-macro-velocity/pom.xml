@@ -52,12 +52,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-html</artifactId>
-      <version>${rendering.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
       <version>${project.version}</version>
@@ -90,16 +84,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      <!-- Since we currently need the HTML macro for testing the Velocity macro we need to ensure that the
-           enforcer plugin doesn't make the build fail. Note that it would be nice if the enforcer plugin
-           could support banned dependencies for a given scope. -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <configuration>
-          <fail>false</fail>
-        </configuration>
       </plugin>
     </plugins>
   </build>

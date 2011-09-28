@@ -20,13 +20,10 @@
 package org.xwiki.wysiwyg.server.internal.wiki;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
@@ -36,8 +33,6 @@ import org.xwiki.gwt.wysiwyg.client.wiki.WikiPage;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiService;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -52,12 +47,6 @@ import org.xwiki.wysiwyg.server.wiki.LinkService;
  */
 public abstract class AbstractWikiService implements WikiService
 {
-    /**
-     * Logger.
-     */
-    @Inject
-    protected Logger logger;
-
     /**
      * The object used to convert between client and server entity reference.
      */
@@ -92,21 +81,28 @@ public abstract class AbstractWikiService implements WikiService
     @Override
     public List<String> getPageNames(String wikiName, String spaceName)
     {
-        String query = "where doc.space = ? order by doc.fullName asc";
-        List<String> parameters = Collections.singletonList(spaceName);
+        String statement =
+            "select distinct doc.space, doc.name from XWikiDocument as doc where doc.space = :space "
+                + "order by doc.space, doc.name";
+        Query query = createHQLQuery(statement);
+        query.setWiki(wikiName).bindValue("space", spaceName);
         List<String> pagesNames = new ArrayList<String>();
-        for (DocumentReference documentReference : searchDocumentReferences(wikiName, query, parameters, 0, 0)) {
+        for (DocumentReference documentReference : searchDocumentReferences(query)) {
             pagesNames.add(documentReference.getName());
         }
         return pagesNames;
     }
 
     @Override
-    public List<WikiPage> getRecentlyModifiedPages(String wikiName, int start, int count)
+    public List<WikiPage> getRecentlyModifiedPages(String wikiName, int offset, int limit)
     {
-        String query = "where doc.author = ? order by doc.date desc";
-        List<String> parameters = Collections.singletonList(getCurrentUserRelativeTo(wikiName));
-        return getWikiPages(searchDocumentReferences(wikiName, query, parameters, start, count));
+        String statement =
+            "select distinct doc.space, doc.name, doc.date from XWikiDocument as doc where doc.author = :author "
+                + "order by doc.date desc, doc.space, doc.name";
+        Query query = createHQLQuery(statement);
+        query.setWiki(wikiName).setOffset(offset).setLimit(limit);
+        query.bindValue("author", getCurrentUserRelativeTo(wikiName));
+        return getWikiPages(searchDocumentReferences(query));
     }
 
     /**
@@ -116,23 +112,46 @@ public abstract class AbstractWikiService implements WikiService
     protected abstract String getCurrentUserRelativeTo(String wikiName);
 
     @Override
-    public List<WikiPage> getMatchingPages(String wikiName, String keyword, int start, int count)
+    public List<WikiPage> getMatchingPages(String wikiName, String keyword, int offset, int limit)
     {
+        StringBuilder statement = new StringBuilder();
+        statement.append("select distinct doc.space, doc.name from XWikiDocument as doc where ");
         List<String> blackListedSpaces = getBlackListedSpaces();
-        String notInBlackListedSpaces = "";
-        if (blackListedSpaces.size() > 0) {
-            notInBlackListedSpaces =
-                "doc.web not in (?" + StringUtils.repeat(",?", blackListedSpaces.size() - 1) + ") and ";
+        if (!blackListedSpaces.isEmpty()) {
+            // Would have been nice to use a list parameter but the underlying implementation of the query module
+            // doesn't support it so we have to compute the in(..) filter manually.
+            for (int i = 0; i < blackListedSpaces.size(); i++) {
+                statement.append(i == 0 ? "doc.space not in (" : ",");
+                statement.append(":bSpace").append(i);
+            }
+            statement.append(") and ");
         }
-        String query =
-            "where " + notInBlackListedSpaces + "(lower(doc.title) like '%'||?||'%' or"
-                + " lower(doc.fullName) like '%'||?||'%')" + " order by doc.fullName asc";
-        List<String> parameters = new ArrayList<String>(blackListedSpaces);
-        // Add twice the keyword, once for the document title and once for the document name.
-        parameters.add(keyword.toLowerCase());
-        parameters.add(keyword.toLowerCase());
+        statement.append("(lower(doc.title) like '%'||:keyword||'%' or lower(doc.fullName) like '%'||:keyword||'%')");
+        statement.append(" order by doc.space, doc.name");
 
-        return getWikiPages(searchDocumentReferences(wikiName, query, parameters, start, count));
+        Query query = createHQLQuery(statement.toString());
+        query.setWiki(wikiName).setOffset(offset).setLimit(limit);
+        query.bindValue("keyword", keyword.toLowerCase());
+        for (int i = 0; i < blackListedSpaces.size(); i++) {
+            query.bindValue("bSpace" + i, blackListedSpaces.get(i));
+        }
+
+        return getWikiPages(searchDocumentReferences(query));
+    }
+
+    /**
+     * Creates a new HQL query. Converts {@link QueryException} to a {@link RuntimeException}.
+     * 
+     * @param statement the query statement
+     * @return the created query
+     */
+    private Query createHQLQuery(String statement)
+    {
+        try {
+            return queryManager.createQuery(statement, Query.HQL);
+        } catch (QueryException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -154,34 +173,23 @@ public abstract class AbstractWikiService implements WikiService
     protected abstract List<WikiPage> getWikiPages(List<DocumentReference> documentReferences);
 
     /**
-     * Searches documents in the specified wiki.
+     * Executes the given query and converts the result to a list of document references. The first two columns in each
+     * result row must be the document space and name respectively.
      * 
-     * @param wikiName the wiki where to search for documents
-     * @param whereSql the WHERE clause of the select HQL query
-     * @param parameters the query parameters
-     * @param offset the position in the result set where to start
-     * @param limit the maximum number of documents to retrieve
-     * @return the documents from the specified wiki that match the given query
+     * @param query the query to be executed
+     * @return the list of document references matching the result of executing the given query
      */
-    @SuppressWarnings("unchecked")
-    private List<DocumentReference> searchDocumentReferences(String wikiName, String whereSql, List< ? > parameters,
-        int offset, int limit)
+    private List<DocumentReference> searchDocumentReferences(Query query)
     {
         try {
-            String statement = "select distinct doc.space, doc.name from XWikiDocument as doc " + whereSql;
-            Query query = queryManager.createQuery(statement, Query.HQL);
-            query.setWiki(wikiName).setOffset(offset).setLimit(limit);
-            query.bindValues((List<Object>) parameters);
             List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
-            List<String[]> results = query.execute();
-            for (String[] result : results) {
-                documentReferences.add(new DocumentReference(result[1], new SpaceReference(result[0],
-                    new WikiReference(wikiName))));
+            List<Object[]> results = query.execute();
+            for (Object[] result : results) {
+                documentReferences.add(new DocumentReference(query.getWiki(), (String) result[0], (String) result[1]));
             }
             return documentReferences;
         } catch (QueryException e) {
-            this.logger.error(e.getLocalizedMessage(), e);
-            throw new RuntimeException("Failed to search XWiki pages.", e);
+            throw new RuntimeException(e);
         }
     }
 

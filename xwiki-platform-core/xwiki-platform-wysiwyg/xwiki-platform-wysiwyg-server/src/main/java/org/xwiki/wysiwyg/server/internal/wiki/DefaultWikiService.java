@@ -24,8 +24,10 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
@@ -51,15 +53,22 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class DefaultWikiService extends AbstractWikiService
 {
+    /**
+     * Logger.
+     */
+    @Inject
+    protected Logger logger;
+
     /** Execution context handler, needed for accessing the XWikiContext. */
     @Inject
     private Execution execution;
 
     /**
-     * The component used to serialize an entity reference.
+     * The component used to serialize an entity reference relative to another entity reference.
      */
     @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
+    @Named("compact")
+    private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     /**
      * @return the XWiki context
@@ -133,7 +142,8 @@ public class DefaultWikiService extends AbstractWikiService
     @Override
     protected String getCurrentUserRelativeTo(String wikiName)
     {
-        return entityReferenceSerializer.serialize(getXWikiContext().getUserReference(), new WikiReference(wikiName));
+        return compactEntityReferenceSerializer.serialize(getXWikiContext().getUserReference(), new WikiReference(
+            wikiName));
     }
 
     @Override

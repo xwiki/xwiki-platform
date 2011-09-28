@@ -69,13 +69,16 @@ public class AbstractPackager
         ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
         Execution execution = Utils.getComponent(Execution.class);
         try {
-            ExecutionContext ec = new ExecutionContext();
+            // Make sure we set Execution Context in the Execution component before we call the initialization
+            // so that we don't get any NPE if some initializer code asks to get the Execution Context. This
+            // happens for example with the Velocity Execution Context initializer which in turns calls the Velocity
+            // Context initializers and some of them look inside the Execution Context.
+            execution.setContext(new ExecutionContext());
 
             // Bridge with old XWiki Context, required for old code.
-            ec.setProperty("xwikicontext", context);
+            execution.getContext().setProperty("xwikicontext", context);
 
-            ecim.initialize(ec);
-            execution.setContext(ec);
+            ecim.initialize(execution.getContext());
         } catch (ExecutionContextException e) {
             throw new Exception("Failed to initialize Execution Context.", e);
         }

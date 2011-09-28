@@ -41,11 +41,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public abstract class AbstractJob implements Job
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
-     */
+    @Override
     public final void execute(JobExecutionContext jobContext) throws JobExecutionException
     {
         JobDataMap data = jobContext.getJobDetail().getJobDataMap();
@@ -60,12 +56,16 @@ public abstract class AbstractJob implements Job
             ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
             execution = Utils.getComponent(Execution.class);
 
-            ExecutionContext ec = new ExecutionContext();
-            // Bridge with old XWiki Context, required for old code.
-            ec.setProperty("xwikicontext", xwikiContext);
+            // Make sure we set Execution Context in the Execution component before we call the initialization
+            // so that we don't get any NPE if some initializer code asks to get the Execution Context. This
+            // happens for example with the Velocity Execution Context initializer which in turns calls the Velocity
+            // Context initializers and some of them look inside the Execution Context.
+            execution.setContext(new ExecutionContext());
 
-            ecim.initialize(ec);
-            execution.setContext(ec);
+            // Bridge with old XWiki Context, required for old code.
+            execution.getContext().setProperty("xwikicontext", xwikiContext);
+
+            ecim.initialize(execution.getContext());
         } catch (ExecutionContextException e) {
             throw new JobExecutionException("Fail to initialize execution context", e);
         }

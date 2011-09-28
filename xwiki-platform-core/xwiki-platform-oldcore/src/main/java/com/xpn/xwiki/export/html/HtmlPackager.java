@@ -237,18 +237,16 @@ public class HtmlPackager
             XWikiContext renderContext = (XWikiContext) context.clone();
             renderContext.put("action", "view");
 
-            ExecutionContext ec = new ExecutionContext();
-
-            // Bridge with old XWiki Context, required for old code.
-            ec.setProperty("xwikicontext", renderContext);
-
-            ecim.initialize(ec);
-
             // Push a clean new Execution Context since we don't want the main Execution Context to be used for
             // rendering the HTML pages to export. It's cleaner to isolate it as we do. Note that the new
             // Execution Context automatically gets initialized with a new Velocity Context by
             // the VelocityRequestInitializer class.
-            execution.pushContext(ec);
+            execution.pushContext(new ExecutionContext());
+
+            // Bridge with old XWiki Context, required for old code.
+            execution.getContext().setProperty("xwikicontext", renderContext);
+
+            ecim.initialize(execution.getContext());
 
             VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
 

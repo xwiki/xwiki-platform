@@ -104,13 +104,14 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
         ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
         Execution execution = Utils.getComponent(Execution.class);
         try {
-            ExecutionContext ec = new ExecutionContext();
+            // Set the EC in the Execution component so that any Execution Context Initializer can be injected the
+            // Execution component.
+            execution.setContext(new ExecutionContext());
 
             // Bridge with old XWiki Context, required for old code.
-            ec.setProperty("xwikicontext", context);
+            execution.getContext().setProperty("xwikicontext", context);
 
-            ecim.initialize(ec);
-            execution.setContext(ec);
+            ecim.initialize(execution.getContext());
         } catch (ExecutionContextException e) {
             throw new MojoExecutionException("Failed to initialize Execution Context.", e);
         }

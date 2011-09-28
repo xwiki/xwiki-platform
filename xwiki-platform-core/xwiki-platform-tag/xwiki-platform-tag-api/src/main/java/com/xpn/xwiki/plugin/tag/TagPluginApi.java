@@ -40,7 +40,7 @@ import com.xpn.xwiki.plugin.PluginApi;
 public class TagPluginApi extends PluginApi<TagPlugin>
 {
     /** Logging helper object. */
-    public static final Logger LOGGER = LoggerFactory.getLogger(TagPluginApi.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TagPluginApi.class);
 
     /** The required access level for modifying document tags. */
     private static final String TAG_ACCESS_RIGHT = "edit";

@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.skinx;
 
 import java.io.UnsupportedEncodingException;
@@ -29,8 +28,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
@@ -59,7 +58,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin
 {
     /** Log object to log messages in this class. */
-    private static final Log LOG = LogFactory.getLog(AbstractSkinExtensionPlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSkinExtensionPlugin.class);
 
     /** The name of the context key for the list of pulled extensions. */
     protected final String contextKey = this.getClass().getCanonicalName();
@@ -133,9 +132,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin
      */
     public void use(String resource, XWikiContext context)
     {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Using [%s] as [%s] extension", resource, this.getName()));
-        }
+        LOGGER.debug("Using [{}] as [{}] extension", resource, this.getName());
         getPulledResources(context).add(resource);
         // In case a previous call added some parameters, remove them, since the last call for a resource always
         // discards previous ones.

@@ -26,8 +26,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -46,7 +46,7 @@ final class GlobalSearch
     /**
      * The logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(GlobalSearch.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearch.class);
 
     /**
      * Hql "select" keyword.

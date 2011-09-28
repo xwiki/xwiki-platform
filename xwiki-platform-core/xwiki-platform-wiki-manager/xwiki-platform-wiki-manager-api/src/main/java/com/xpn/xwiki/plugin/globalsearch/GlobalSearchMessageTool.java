@@ -51,12 +51,12 @@ public class GlobalSearchMessageTool extends XWikiPluginMessageTool
     public static final String ERROR_DOCUMENTTRANSLATIONS = "globalsearch.plugin.error.documenttranslations";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when trying to search documents.
+     * Used as log message when trying to search documents.
      */
     public static final String LOG_SEARCHDOCUMENTS = "globalsearch.plugin.log.searchdocuments";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when trying to get document from name.
+     * Used as log message when trying to get document from name.
      */
     public static final String LOG_GETDOCUMENTFROMNAME = "globalsearch.plugin.log.getdocumentfromname";
 

@@ -23,8 +23,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.observation.ObservationManager;
 
@@ -49,7 +49,7 @@ public class Wiki extends Document
     /**
      * The logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(Wiki.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(Wiki.class);
 
     /**
      * Create instance of wiki descriptor.
@@ -93,7 +93,7 @@ public class Wiki extends Document
                 try {
                     this.context.getWiki().getStore().deleteWiki(wikiName, this.context);
                 } catch (XWikiException e) {
-                    LOG.error("Failed to delete wiki from database", e);
+                    LOGGER.error("Failed to delete wiki from database", e);
                 }
             } else {
                 throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, WikiManagerMessageTool

@@ -17,17 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.wikimanager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.globalsearch.GlobalSearchPlugin;
 import com.xpn.xwiki.plugin.globalsearch.GlobalSearchPluginApi;
 import com.xpn.xwiki.XWikiContext;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Entry point of the Wiki Manager plugin.
@@ -46,7 +45,7 @@ public class WikiManagerPlugin extends XWikiDefaultPlugin
     /**
      * The logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(WikiManagerPlugin.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(WikiManagerPlugin.class);
 
     // ////////////////////////////////////////////////////////////////////////////
 

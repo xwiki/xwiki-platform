@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.wikimanager;
 
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
@@ -35,8 +34,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * API for managing wikis (create wiki, delete wiki, create wiki from template, etc).
@@ -59,7 +58,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
     /**
      * Logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(WikiManagerPluginApi.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(WikiManagerPluginApi.class);
 
     /**
      * The default WikiManager managed exception.
@@ -134,7 +133,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
      */
     private void error(String errorMessage, XWikiException e)
     {
-        LOG.debug(errorMessage, e);
+        LOGGER.debug(errorMessage, e);
 
         this.context.put(CONTEXT_LASTERRORCODE, Integer.valueOf(e.getCode()));
         this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));

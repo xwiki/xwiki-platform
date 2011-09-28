@@ -24,8 +24,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -57,7 +57,7 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
     /**
      * Logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(GlobalSearchPluginApi.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchPluginApi.class);
 
     /**
      * The plugin internationalization service.
@@ -95,7 +95,7 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
      */
     public void logError(String errorMessage, XWikiException e)
     {
-        LOG.error(errorMessage, e);
+        LOGGER.error(errorMessage, e);
 
         context.put(CONTEXT_LASTERRORCODE, Integer.valueOf(e.getCode()));
         context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));

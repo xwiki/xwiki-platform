@@ -365,7 +365,12 @@
                 <exclude>org/xwiki/container/portlet/PortletApplicationContext</exclude>
                 <exclude>org/xwiki/container/servlet/ServletApplicationContext</exclude>
                 <exclude>org/xwiki/container/Request</exclude>
-                <exclude>com/xpn/xwiki/plugin/tag/TagPlugin</exclude>
+                <exclude>com/xpn/xwiki/plugin/tag/TagPlugin</exclude> <!-- LOGGER change -->
+                <exclude>com/xpn/xwiki/plugin/globalsearch/GlobalSearchPlugin</exclude> <!-- LOGGER change -->
+                <exclude>com/xpn/xwiki/plugin/globalsearch/GlobalSearchPluginApi</exclude> <!-- LOGGER change -->
+                <exclude>com/xpn/xwiki/plugin/wikimanager/WikiManagerPlugin</exclude> <!-- LOGGER change -->
+                <exclude>com/xpn/xwiki/plugin/wikimanager/WikiManagerPluginApi</exclude> <!-- LOGGER change -->
+                <exclude>com/xpn/xwiki/plugin/wikimanager/doc/Wiki</exclude> <!-- LOGGER change -->
               </excludes>
             </configuration>
           </plugin>

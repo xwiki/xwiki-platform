@@ -79,15 +79,15 @@ public abstract class AbstractXWikiRunnable implements Runnable
         ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
         Execution execution = Utils.getComponent(Execution.class);
 
-        ExecutionContext ec = new ExecutionContext();
+        // Set the EC in the Execution component so that any Execution Context Initializer can be injected the
+        // Execution component.
+        execution.setContext(new ExecutionContext());
 
-        ecim.initialize(ec);
+        ecim.initialize(execution.getContext());
 
-        ec.setProperties(this.properties);
+        execution.getContext().setProperties(this.properties);
 
-        execution.setContext(ec);
-
-        return ec;
+        return execution.getContext();
     }
 
     protected void cleanupExecutionContext()

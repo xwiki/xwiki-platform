@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.web;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.web.sx.AbstractSxAction;
 import com.xpn.xwiki.web.sx.Extension;
@@ -40,7 +40,7 @@ public class JsxAction extends AbstractSxAction
     public static final JsExtension JSX = new JsExtension();
 
     /** Logging helper. */
-    private static final Log LOG = LogFactory.getLog(JsxAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsxAction.class);
 
     /**
      * {@inheritDoc}
@@ -53,12 +53,9 @@ public class JsxAction extends AbstractSxAction
         return JSX;
     }
 
-    /**
-     * @return the logging object for this class.
-     */
     @Override
-    protected Log getLog()
+    protected Logger getLogger()
     {
-        return LOG;
+        return LOGGER;
     }
 }

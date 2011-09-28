@@ -30,8 +30,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.RegexEntityReference;
@@ -66,7 +66,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     /**
      * Log helper for logging messages in this class.
      */
-    private static final Log LOG = LogFactory.getLog(AbstractDocumentSkinExtensionPlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDocumentSkinExtensionPlugin.class);
 
     /**
      * The name of the field that indicates whether an extension should always be used, or only when explicitly pulled.
@@ -196,24 +196,19 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                             extensions.add(extension);
                         }
                     } catch (XWikiException e1) {
-                        LOG.error("Error while adding skin extension [" + extension
-                            + "] as always used. It will be ignored.", e1);
+                        LOGGER.error("Error while adding skin extension [{}] as always used. It will be ignored.",
+                            extension, e1);
                     }
                 }
                 this.alwaysUsedExtensions.put(currentWiki, extensions);
                 return extensions;
             } catch (XWikiException e) {
-                LOG.error("Error while retrieving always used JS extensions", e);
+                LOGGER.error("Error while retrieving always used JS extensions", e);
                 return Collections.emptySet();
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.skinx.AbstractSkinExtensionPlugin#hasPageExtensions(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public boolean hasPageExtensions(XWikiContext context)
     {
@@ -301,7 +296,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             }
             return bclass;
         } catch (Exception ex) {
-            LOG.error("Cannot initialize skin extension class [" + getExtensionClassName() + "]", ex);
+            LOGGER.error("Cannot initialize skin extension class [{}]", getExtensionClassName(), ex);
         }
         return null;
     }

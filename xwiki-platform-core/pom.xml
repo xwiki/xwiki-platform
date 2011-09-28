@@ -218,31 +218,6 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>enforce-jcl-log4j-isolation</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <bannedDependencies>
-                  <searchTransitive>false</searchTransitive>
-                  <excludes>
-                    <!-- Ensure we don't depend on commons logging/log4j since we want all logging to be done through
-                         SLF4J -->
-                    <exclude>commons-logging:commons-logging</exclude>
-                    <exclude>log4j:log4j</exclude>
-                  </excludes>
-                </bannedDependencies>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
     <!-- Needed to add support for the XAR packaging -->
     <extensions>

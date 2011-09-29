@@ -37,7 +37,7 @@ public class XWikiUser
     @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.class, "currentmixed");
-    
+
     private String user;
 
     private boolean main;
@@ -57,7 +57,7 @@ public class XWikiUser
     {
         return user;
     }
-    
+
     private DocumentReference getUserReference(XWikiContext context)
     {
         return this.currentMixedDocumentReferenceResolver.resolve(getUser());
@@ -73,8 +73,7 @@ public class XWikiUser
      * 
      * @param groupName The group to check.
      * @param context The current {@link XWikiContext context}.
-     * @return <tt>true</tt> if the user does belong to the specified group, false otherwise or if
-     *         an exception occurs.
+     * @return <tt>true</tt> if the user does belong to the specified group, false otherwise or if an exception occurs.
      * @throws XWikiException If an error occurs when checking the groups.
      * @since Platform-1.3
      */
@@ -82,11 +81,12 @@ public class XWikiUser
     {
         if (!StringUtils.isEmpty(getUser())) {
             XWikiGroupService groupService = context.getWiki().getGroupService(context);
-            
+
             DocumentReference groupReference = this.currentMixedDocumentReferenceResolver.resolve(groupName);
-            
-            Collection<DocumentReference> groups = groupService.getAllGroupsReferencesForMember(getUserReference(context), 0, 0, context);
-            
+
+            Collection<DocumentReference> groups =
+                groupService.getAllGroupsReferencesForMember(getUserReference(context), 0, 0, context);
+
             if (groups.contains(groupReference)) {
                 return true;
             }
@@ -104,9 +104,28 @@ public class XWikiUser
     {
         this.main = main;
     }
-    
+
+    @Override
     public String toString()
     {
         return getUser();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (super.equals(obj)) {
+            return true;
+        }
+
+        boolean equals;
+        if (obj instanceof XWikiUser) {
+            XWikiUser otherUser = (XWikiUser) obj;
+            equals = otherUser.main == this.main && user.equals(otherUser.user);
+        } else {
+            equals = false;
+        }
+
+        return equals;
     }
 }

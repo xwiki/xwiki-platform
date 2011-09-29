@@ -31,7 +31,6 @@ import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.AbstractComponentTestCase;
 
 public abstract class AbstractExtensionHandlerTest extends AbstractComponentTestCase
@@ -41,8 +40,6 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
     private RepositoryUtil repositoryUtil;
 
     private JobManager jobManager;
-
-    private ObservationManager observation;
 
     @Before
     @Override
@@ -58,12 +55,6 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
 
         this.jobManager = getComponentManager().lookup(JobManager.class);
         this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class);
-        this.observation = getComponentManager().lookup(ObservationManager.class);
-    }
-
-    public ObservationManager getObservation()
-    {
-        return this.observation;
     }
 
     @Override

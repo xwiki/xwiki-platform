@@ -19,9 +19,11 @@
  */
 package org.xwiki.extension.test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.URLEncoder;
 
 import org.xwiki.extension.Extension;
@@ -32,39 +34,44 @@ import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.internal.DefaultLocalExtension;
 import org.xwiki.extension.repository.internal.ExtensionSerializer;
 
-public class ResourceExtensionRepository implements ExtensionRepository
+public class FileExtensionRepository implements ExtensionRepository
 {
     private ExtensionSerializer extensionSerializer;
 
     private ExtensionRepositoryId repositoryId;
 
-    private ClassLoader classLoader;
+    private File directory;
 
-    private String baseResource;
-
-    public ResourceExtensionRepository(ClassLoader classLoader, String baseResource)
+    public FileExtensionRepository(File directory)
     {
         this.extensionSerializer = new ExtensionSerializer();
 
-        this.repositoryId = new ExtensionRepositoryId("test-resources", "resources", null);
+        this.repositoryId = new ExtensionRepositoryId("test-file", "file", null);
 
-        this.classLoader = classLoader;
-        this.baseResource = baseResource;
+        this.directory = directory;
     }
 
-    InputStream getResourceAsStream(ExtensionId extensionId, String type) throws UnsupportedEncodingException
+    public File getDirectory()
     {
-        return this.classLoader.getResourceAsStream(getEncodedPath(extensionId, type));
+        return this.directory;
     }
 
-    URL getResource(ExtensionId extensionId, String type) throws UnsupportedEncodingException
+    InputStream getFileAsStream(ExtensionId extensionId, String type) throws FileNotFoundException,
+        UnsupportedEncodingException
     {
-        return this.classLoader.getResource(getEncodedPath(extensionId, type));
+        return new FileInputStream(getFile(extensionId, type));
+    }
+
+    public File getFile(ExtensionId extensionId, String type) throws UnsupportedEncodingException
+    {
+        File extensionFile = new File(this.directory, getEncodedPath(extensionId, type));
+
+        return extensionFile;
     }
 
     String getEncodedPath(ExtensionId extensionId, String type) throws UnsupportedEncodingException
     {
-        return this.baseResource + URLEncoder.encode(getPathSuffix(extensionId, type), "UTF-8");
+        return URLEncoder.encode(getPathSuffix(extensionId, type), "UTF-8");
     }
 
     String getPathSuffix(ExtensionId extensionId, String type)
@@ -81,8 +88,8 @@ public class ResourceExtensionRepository implements ExtensionRepository
     {
         InputStream descriptor;
         try {
-            descriptor = getResourceAsStream(extensionId, "xed");
-        } catch (UnsupportedEncodingException e) {
+            descriptor = getFileAsStream(extensionId, "xed");
+        } catch (Exception e) {
             throw new ResolveException("Invalid extension id [" + extensionId + "]", e);
         }
 
@@ -93,7 +100,7 @@ public class ResourceExtensionRepository implements ExtensionRepository
         try {
             DefaultLocalExtension localExtension = this.extensionSerializer.loadDescriptor(null, descriptor);
 
-            return new ResourceExtension(this, localExtension);
+            return new FileExtension(this, localExtension);
         } catch (Exception e) {
             throw new ResolveException("Failed to parse descriptor for extension [" + extensionId + "]", e);
         }
@@ -102,8 +109,8 @@ public class ResourceExtensionRepository implements ExtensionRepository
     public boolean exists(ExtensionId extensionId)
     {
         try {
-            return getResource(extensionId, "xed") != null;
-        } catch (UnsupportedEncodingException e) {
+            return getFile(extensionId, "xed").exists();
+        } catch (Exception e) {
             return false;
         }
     }

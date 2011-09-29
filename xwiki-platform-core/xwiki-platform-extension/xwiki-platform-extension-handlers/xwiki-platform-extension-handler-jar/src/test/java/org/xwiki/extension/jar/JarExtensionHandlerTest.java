@@ -19,7 +19,9 @@
  */
 package org.xwiki.extension.jar;
 
+
 import java.util.Collections;
+import java.util.jar.JarEntry;
 
 import junit.framework.Assert;
 
@@ -39,7 +41,9 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.test.TestComponent;
+
+import packagefile.jarextension.TestComponent;
+
 
 public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
 {
@@ -110,7 +114,7 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
         context.setCurrentMacroBlock(macroBlock);
 
         getComponentManager().lookup(ExecutionContextInitializer.class, "jarextension").initialize(null);
-        groovyMacro.execute(parameters, "new org.xwiki.test.DefaultTestComponent()", context);
+        groovyMacro.execute(parameters, "new packagefile.testextension.DefaultTestComponent()", context);
 
         Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension("feature", null));
 

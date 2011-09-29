@@ -88,7 +88,7 @@
 #elseif($xaction == 'add')
   #addTag($request.tag)
 #else ## display
-  $xwiki.ssfx.use('uicomponents/viewers/tags.css', true)##
+  $xwiki.ssfx.use('uicomponents/viewers/tags.css', {'forceSkinAction': true, 'colorTheme': "$!{themeDocFullName}"})##
   $xwiki.jsfx.use('uicomponents/viewers/tags.js', true)##
   <div class="doc-tags" id="${tagsId}">
   #if($xwiki.tag)

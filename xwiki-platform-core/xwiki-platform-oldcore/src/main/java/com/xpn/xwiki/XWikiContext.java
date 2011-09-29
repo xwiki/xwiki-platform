@@ -356,7 +356,8 @@ public class XWikiContext extends Hashtable<Object, Object>
             remove(USERREFERENCE_KEY);
         } else {
             this.userReference = new DocumentReference(userReference);
-            put(USER_KEY, getUser());
+            boolean ismain = isMainWiki(this.userReference.getWikiReference().getName());
+            put(USER_KEY, new XWikiUser(getUser(), ismain));
             put(USERREFERENCE_KEY, this.userReference);
         }
     }
@@ -434,6 +435,11 @@ public class XWikiContext extends Hashtable<Object, Object>
     @Deprecated
     public XWikiUser getXWikiUser()
     {
+        if (this.userReference != null) {
+            boolean ismain = isMainWiki(this.userReference.getWikiReference().getName());
+            return new XWikiUser(getUser(), ismain);
+        }
+
         return (XWikiUser) get(USER_KEY);
     }
 

@@ -79,8 +79,7 @@ public class AbstractPackager
         } catch (ExecutionContextException e) {
             throw new Exception("Failed to initialize Execution Context.", e);
         }
-        
-        context.setUser("XWiki.superadmin");
+
         context.setDatabase(databaseName);
         context.setMainXWiki(databaseName);
 
@@ -110,6 +109,8 @@ public class AbstractPackager
         config.put("xwiki.backlinks", "1");
 
         new XWiki(config, context, null, true);
+
+        context.setUserReference(new DocumentReference("xwiki", "XWiki", "superadmin"));
 
         try {
             context.setURLFactory(new XWikiServletURLFactory(new URL("http://localhost:8080"), "xwiki/", "bin/"));

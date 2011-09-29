@@ -362,13 +362,18 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated use {@link #setUserReference(DocumentReference)} instead
+     * @deprecated since 3.1M1 use {@link #setUserReference(DocumentReference)} instead
      */
     @Deprecated
     public void setUser(String user, boolean main)
     {
         if (user == null) {
             setUserReference(null);
+        } else if (user.endsWith(XWikiRightService.GUEST_USER_FULLNAME) || user.equals(XWikiRightService.GUEST_USER)) {
+            setUserReference(null);
+            // retro-compatibilty hack: some code does not give the same meaning to null XWikiUser and XWikiUser
+            // containing guest user
+            put(USER_KEY, new XWikiUser(user, main));
         } else {
             setUserReference(resolveUserReference(user));
         }
@@ -384,7 +389,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated use {@link #setUserReference(DocumentReference)} instead
+     * @deprecated since 3.1M1 use {@link #setUserReference(DocumentReference)} instead
      */
     @Deprecated
     public void setUser(String user)
@@ -393,7 +398,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @return use {@link #getUserReference()} instead
+     * @deprecated since use {@link #getUserReference()} instead
      */
     @Deprecated
     public String getUser()
@@ -411,7 +416,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @return use {@link #getUserReference()} instead
+     * @deprecated since 3.1M1 use {@link #getUserReference()} instead
      */
     @Deprecated
     public String getLocalUser()
@@ -424,17 +429,12 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @return use {@link #getUserReference()} instead
+     * @deprecated since 3.1M1 use {@link #getUserReference()} instead
      */
     @Deprecated
     public XWikiUser getXWikiUser()
     {
-        if (this.userReference != null) {
-            boolean ismain = isMainWiki(this.userReference.getWikiReference().getName());
-            return new XWikiUser(getUser(), ismain);
-        } else {
-            return null;
-        }
+        return (XWikiUser) get(USER_KEY);
     }
 
     public String getLanguage()

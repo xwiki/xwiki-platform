@@ -398,7 +398,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since use {@link #getUserReference()} instead
+     * @deprecated since 3.1M1 use {@link #getUserReference()} instead
      */
     @Deprecated
     public String getUser()

@@ -126,7 +126,9 @@ public class ExtensionPackager
 
             try {
                 for (Vfs.File resourceFile : Vfs.fromURL(new URL(descriptorFolderURL)).getFiles()) {
-                    addZipEntry(classPackageFolder, resourceFile, zos, type);
+                    if (!resourceFile.getRelativePath().equals(PACKAGEFILE_DESCRIPTOR)) {
+                        addZipEntry(classPackageFolder, resourceFile, zos, type);
+                    }
                 }
             } finally {
                 zos.close();

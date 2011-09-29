@@ -819,6 +819,10 @@ public class XWikiRightServiceImpl implements XWikiRightService
     private boolean isSuperAdminOrProgramming(String name, String resourceKey, String accessLevel, boolean user,
         XWikiContext context) throws XWikiException
     {
+        if (name == null) {
+            return false;
+        }
+
         String database = context.getDatabase();
         boolean allow;
 

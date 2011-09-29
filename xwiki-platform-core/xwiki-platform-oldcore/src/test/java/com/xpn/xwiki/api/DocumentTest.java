@@ -129,6 +129,8 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
                                            ANYTHING).will(returnValue(false));
 
         final Mock mockXWiki = mock(XWiki.class);
+        mockXWiki.stubs().method("isVirtualMode")
+        .will(returnValue(false));
         mockXWiki.stubs().method("getRightService")
             .will(returnValue((XWikiRightService)mockRightService.proxy()));
         mockXWiki.expects(once()).method("saveDocument").with(ANYTHING, ANYTHING, ANYTHING, ANYTHING)

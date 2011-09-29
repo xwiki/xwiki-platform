@@ -19,6 +19,7 @@
  */
 package org.xwiki.wysiwyg.server.internal.plugin.macro;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,7 +31,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroService;
@@ -53,12 +53,6 @@ import org.xwiki.wysiwyg.server.plugin.macro.MacroDescriptorTranslator;
 @Singleton
 public class XWikiMacroService implements MacroService
 {
-    /**
-     * Logger.
-     */
-    @Inject
-    private Logger logger;
-
     /**
      * The syntax factory used to create {@link Syntax} instances from string syntax identifiers.
      */
@@ -130,8 +124,7 @@ public class XWikiMacroService implements MacroService
 
             return result;
         } catch (Exception e) {
-            this.logger.error("Exception while retrieving macro descriptor.", e);
-            throw new RuntimeException(e.getLocalizedMessage());
+            throw new RuntimeException("Exception while retrieving macro descriptor.", e);
         }
     }
 
@@ -150,7 +143,7 @@ public class XWikiMacroService implements MacroService
         // See XWIKI-4558 (Add macro parameter display name support to wiki macros).
         result.setName(StringUtils.isBlank(descriptor.getName()) ? descriptor.getId() : descriptor.getName());
         result.setDescription(descriptor.getDescription());
-        result.setType(createMacroParameterType(descriptor.getParameterType().getClass()));
+        result.setType(createMacroParameterType(descriptor.getParameterType()));
         Object defaultValue = descriptor.getDefaultValue();
         if (defaultValue != null) {
             result.setDefaultValue(String.valueOf(defaultValue));
@@ -160,25 +153,28 @@ public class XWikiMacroService implements MacroService
     }
 
     /**
-     * NOTE: We can't send a {@link Class} instance to the client side because GWT can't serialize it so we have to
+     * NOTE: We can't send a {@link Type} instance to the client side because GWT can't serialize it so we have to
      * convert it to a {@link ParameterType} instance.
      * 
-     * @param parameterClass a {@link Class} that defines the values a macro parameter can have
-     * @return the parameter type associated with the given {@link Class} instance
+     * @param type the type that defines the values a macro parameter can have
+     * @return the parameter type associated with the given type
      */
-    private ParameterType createMacroParameterType(Class< ? > parameterClass)
+    private ParameterType createMacroParameterType(Type type)
     {
         ParameterType parameterType = new ParameterType();
-        parameterType.setName(parameterClass.getName());
-        if (parameterClass.isEnum()) {
-            Object[] parameterClassConstants = parameterClass.getEnumConstants();
-            Map<String, String> parameterTypeConstants = new LinkedHashMap<String, String>();
-            for (int i = 0; i < parameterClassConstants.length; i++) {
-                String constant = String.valueOf(parameterClassConstants[i]);
-                // We leave the constant unlocalized for now.
-                parameterTypeConstants.put(constant, constant);
+        if (type instanceof Class) {
+            Class< ? > parameterClass = (Class< ? >) type;
+            parameterType.setName(parameterClass.getName());
+            if (parameterClass.isEnum()) {
+                Object[] parameterClassConstants = parameterClass.getEnumConstants();
+                Map<String, String> parameterTypeConstants = new LinkedHashMap<String, String>();
+                for (int i = 0; i < parameterClassConstants.length; i++) {
+                    String constant = String.valueOf(parameterClassConstants[i]);
+                    // We leave the constant unlocalized for now.
+                    parameterTypeConstants.put(constant, constant);
+                }
+                parameterType.setEnumConstants(parameterTypeConstants);
             }
-            parameterType.setEnumConstants(parameterTypeConstants);
         }
         return parameterType;
     }
@@ -207,8 +203,8 @@ public class XWikiMacroService implements MacroService
 
             return descriptors;
         } catch (Exception e) {
-            this.logger.error("Exception while retrieving the list of macro descriptors for syntax [{}].", syntaxId, e);
-            throw new RuntimeException(e.getLocalizedMessage());
+            throw new RuntimeException("Exception while retrieving the list of macro descriptors for syntax ["
+                + syntaxId + "].", e);
         }
     }
 }

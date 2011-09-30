@@ -305,45 +305,47 @@
             <configuration>
               <excludes>
                 <exclude>**/internal/**</exclude>
-                <exclude>**/test/**</exclude>
                 <!-- To be removed when we release 3.2 -->
-                <exclude>com/xpn/xwiki/plugin/lucene/IndexRebuilder</exclude>
-                <exclude>org/xwiki/bridge/AttachmentNameFactory</exclude>
-                <exclude>org/xwiki/bridge/AttachmentNameSerializer</exclude>
-                <exclude>org/xwiki/bridge/DocumentNameFactory</exclude>
-                <exclude>org/xwiki/bridge/DocumentNameSerializer</exclude>
-                <exclude>com/xpn/xwiki/plugin/wikimanager/WikiManager</exclude>
-                <excludes>com/xpn/xwiki/api/Api</excludes>
-                <excludes>com/xpn/xwiki/api/Context</excludes>
-                <excludes>com/xpn/xwiki/api/Document</excludes>
-                <excludes>com/xpn/xwiki/api/StatsService</excludes>
-                <excludes>com/xpn/xwiki/api/StatsServiceCompatibilityAspect</excludes>
-                <excludes>com/xpn/xwiki/api/XWiki</excludes>
-                <excludes>com/xpn/xwiki/api/XWikiCompatibilityAspect</excludes>
-                <excludes>compatibility/com/xpn/xwiki/api/ApiCompatibilityAspect</excludes>
-                <excludes>compatibility/com/xpn/xwiki/api/ContextCompatibilityAspect</excludes>
-                <excludes>compatibility/com/xpn/xwiki/api/DocumentCompatibilityAspect</excludes>
-                <exclude>org/xwiki/eventstream/Event</exclude>
-                <exclude>com/xpn/xwiki/plugin/activitystream/api/ActivityEvent</exclude>
-                <exclude>com/xpn/xwiki/plugin/activitystream/plugin/ActivityEvent</exclude>
-                <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
-                <exclude>com/xpn/xwiki/user/api/XWikiRightService</exclude>
-                <exclude>com/xpn/xwiki/cache/api/XWikiCache</exclude>
-                <exclude>com/xpn/xwiki/cache/api/XWikiCacheNeedsRefreshException</exclude>
-                <exclude>com/xpn/xwiki/cache/api/XWikiCacheService</exclude>
-                <exclude>com/xpn/xwiki/plugin/lucene/SearchResults</exclude>
                 <exclude>org/xwiki/gwt/dom/client/Style$IEFloatProperty</exclude>
                 <exclude>org/xwiki/gwt/wysiwyg/client/plugin/submit/IESubmitPlugin</exclude>
+                <exclude>com/xpn/xwiki/plugin/lucene/IndexRebuilder</exclude>
+                <exclude>com/xpn/xwiki/plugin/lucene/SearchResults</exclude>
+                <!-- LOGGER change -->
+                <exclude>com/xpn/xwiki/plugin/globalsearch/GlobalSearchPlugin</exclude>
+                <exclude>com/xpn/xwiki/plugin/globalsearch/GlobalSearchPluginApi</exclude>
+                <exclude>com/xpn/xwiki/plugin/tag/TagPlugin</exclude>
+                <exclude>com/xpn/xwiki/plugin/wikimanager/WikiManager</exclude>
+                <exclude>com/xpn/xwiki/plugin/wikimanager/WikiManagerPlugin</exclude>
+                <exclude>com/xpn/xwiki/plugin/wikimanager/WikiManagerPluginApi</exclude>
+                <exclude>com/xpn/xwiki/plugin/wikimanager/doc/Wiki</exclude>
+                <!-- New methods -->
+                <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
                 <exclude>org/xwiki/container/ApplicationContext</exclude>
                 <exclude>org/xwiki/container/portlet/PortletApplicationContext</exclude>
                 <exclude>org/xwiki/container/servlet/ServletApplicationContext</exclude>
                 <exclude>org/xwiki/container/Request</exclude>
-                <exclude>com/xpn/xwiki/plugin/tag/TagPlugin</exclude> <!-- LOGGER change -->
-                <exclude>com/xpn/xwiki/plugin/globalsearch/GlobalSearchPlugin</exclude> <!-- LOGGER change -->
-                <exclude>com/xpn/xwiki/plugin/globalsearch/GlobalSearchPluginApi</exclude> <!-- LOGGER change -->
-                <exclude>com/xpn/xwiki/plugin/wikimanager/WikiManagerPlugin</exclude> <!-- LOGGER change -->
-                <exclude>com/xpn/xwiki/plugin/wikimanager/WikiManagerPluginApi</exclude> <!-- LOGGER change -->
-                <exclude>com/xpn/xwiki/plugin/wikimanager/doc/Wiki</exclude> <!-- LOGGER change -->
+                <exclude>org/xwiki/eventstream/Event</exclude>
+                <exclude>com/xpn/xwiki/plugin/activitystream/api/ActivityEvent</exclude>
+                <exclude>com/xpn/xwiki/plugin/activitystream/plugin/ActivityEvent</exclude>
+                <exclude>com/xpn/xwiki/user/api/XWikiRightService</exclude>
+                <!-- Moved to legacy -->
+                <exclude>org/xwiki/bridge/AttachmentNameFactory</exclude>
+                <exclude>org/xwiki/bridge/AttachmentNameSerializer</exclude>
+                <exclude>org/xwiki/bridge/DocumentNameFactory</exclude>
+                <exclude>org/xwiki/bridge/DocumentNameSerializer</exclude>
+                <exclude>com/xpn/xwiki/api/Api</exclude>
+                <exclude>com/xpn/xwiki/api/Context</exclude>
+                <exclude>com/xpn/xwiki/api/Document</exclude>
+                <exclude>com/xpn/xwiki/api/StatsService</exclude>
+                <exclude>com/xpn/xwiki/api/StatsServiceCompatibilityAspect</exclude>
+                <exclude>com/xpn/xwiki/api/XWiki</exclude>
+                <exclude>com/xpn/xwiki/api/XWikiCompatibilityAspect</exclude>
+                <exclude>com/xpn/xwiki/cache/api/XWikiCache</exclude>
+                <exclude>com/xpn/xwiki/cache/api/XWikiCacheNeedsRefreshException</exclude>
+                <exclude>com/xpn/xwiki/cache/api/XWikiCacheService</exclude>
+                <exclude>compatibility/com/xpn/xwiki/api/ApiCompatibilityAspect</excludes>
+                <exclude>compatibility/com/xpn/xwiki/api/ContextCompatibilityAspect</exclude>
+                <exclude>compatibility/com/xpn/xwiki/api/DocumentCompatibilityAspect</exclude>
               </excludes>
             </configuration>
           </plugin>

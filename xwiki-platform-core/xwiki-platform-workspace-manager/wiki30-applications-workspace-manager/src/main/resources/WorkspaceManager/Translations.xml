@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>WorkspaceManager</web>
+<name>Translations</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>WorkspaceManager.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1293832800000</creationDate>
+<date>1307189790000</date>
+<contentUpdateDate>1307189790000</contentUpdateDate>
+<version>1.1</version>
+<title>Translations</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content># Workspace Manager translation page
+workspacemanager.pluginnotenabled=The Workspace Manager java component is not installed. This page will not work properly. Make sure that the file 'wiki30-components-workspace-manager-&lt;version&gt;.jar' is present under the 'webapps/xwiki/WEB-INF/lib/' folder.
+workspacemanager.template.install.success=Workspace template has been successfully installed.
+workspacemanager.template.install.error=Error installing workspace template. {0}
+workspacemanager.template.install.error.missingattachment=Error installing the workspace template. The file "{0}" is not attached to the document [[{1}>>{1}]]. Please re-import the [[{1}>>{1}]] document from the Workspaces Application XAR.
+workspacemanager.translations.install.success=Workspace Manager translations have been successfully installed.
+workspacemanager.searchSuggestions.install.success=Workspace search suggestions have been successfully installed.
+workspacemanager.install.notallowed=Admin rights are required to complete the Workspace Manager installation. Please login as Admin to complete the installation.
+
+# LABELS
+workspacemanager.createworkspace=Create a new workspace
+workspacemanager.members=MEMBERS
+workspacemanager.title.createwiki.wikiname=Workspace identifier
+workspacemanager.title.createwiki.desc=Workspace description
+workspacemanager.title.createwiki.members=Initial workspace members
+workspacemanager.title.join=Join Workspace
+workspacemanager.title.leave=Leave Workspace "{0}"
+workspacemanager.title.leave.empty=Leave Workspace
+workspacemanager.title.delete=Delete Workspace "{0}"
+workspacemanager.title.delete.empty=Delete Workspace
+workspacemanager.browse=Browse Workspaces
+workspacemanager.browse.emptyvalue=N/A
+workspacemanager.browse.wikiprettyname=Name
+workspacemanager.browse.description=Description
+workspacemanager.browse.owner=Owner
+workspacemanager.browse.membershipType=Membership Type
+workspacemanager.browse._actions=Actions
+workspacemanager.browse._actions.join=Join
+workspacemanager.browse._actions.requestJoin=Request Join
+workspacemanager.browse._actions.viewInvitation=View Invitation
+workspacemanager.browse._actions.cancelJoinRequest=Cancel Request
+workspacemanager.browse._actions.leave=Leave
+workspacemanager.browse._actions.delete=Delete
+workspacemanager.menu.create=Workspace
+workspacemanager.menu.mainwiki.admin=Administer Main Wiki
+workspacemanager.menu.workspace.mainWiki=Main Wiki
+workspacemanager.menu.workspace.index=Workspace Directory
+workspacemanager.menu.workspace.delete=Delete
+workspacemanager.menu.user.workspaces=Workspaces
+workspacemanager.profile.category.workspaces=Workspaces
+
+# MESSAGES
+workspacemanager.wikiname.error.wikialreadyexists=A workspace with this identifier already exists
+workspacemanager.wikiprettyname.error.empty=Pretty name must not be empty
+workspacemanager.successcreatewiki=Your workspace \"{0}\" has been created. You can access it at the following address: {1}
+workspacemanager.errorcreatewiki=Workspace \"{0}\" creation failed: {1}.
+workspacemanager.errorcreatewiki.ERROR_WM_WIKIALREADYEXISTS=This workspace \"{0}\" already exist. Please choose another name.
+workspacemanager.install.translations=The translations page has been automatically registered in XWiki's preferences.
+workspacemanager.error.workspacedoesnotexist=Workspace [{0}] does not exist
+
+# PROPERTIES
+workspacemanager.prop.wiki.wikiname=Workspace Identifier
+workspacemanager.prop.wiki.wikiprettyname=Pretty Name
+workspacemanager.prop.wiki.description=Description
+workspacemanager.prop.wiki.server=Alias
+workspacemanager.prop.wiki.owner=Owner
+workspacemanager.prop.workspace.membershipType.label=Membership Type
+
+# DOCUMENTATION
+workspacemanager.doc.createwiki.wikiname=The unique identifier of the new workspace.
+workspacemanager.doc.createwiki.desc.wikiprettyname=The display name of the workspace.
+workspacemanager.doc.createwiki.desc.description=A brief description of the workspace and its purpose.
+workspacemanager.doc.createwiki.desc.owner=A user who will have all the rights on the workspace.
+workspacemanager.doc.createwiki.members=The users that can participate in the workspace.\n\
+Tip: Use CTRL+Click to select multiple users.
+workspacemanager.prop.workspace.membershipType.hint=The way users can join this workspace.
+
+## Group sheet. To be removed once it gets into platform.
+xe.admin.groups.comment=About
+xe.admin.groups.tags=Tags
+xe.admin.groups._actions.follow=Follow
+xe.admin.groups._actions.unfollow=Unfollow</content></xwikidoc>

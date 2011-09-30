@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>WorkspaceManager</web>
+<name>WorkspacesSuggestLuceneService</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>WorkspaceManager.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1303307456000</creationDate>
+<date>1303313050000</date>
+<contentUpdateDate>1303313050000</contentUpdateDate>
+<version>1.1</version>
+<title>Workspace Lucene Suggestion Service</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>true</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+#set($query = "$!request.query")
+#set($input = "$!request.input")
+#set($nb = "$!request.nb")
+#if($nb != '')
+  #set($nb = $util.parseInt($nb) + 1)
+#else
+  #set($nb = 6)
+#end
+#if($query != '' &amp;&amp; $input != '')
+  #set($query = $query.replaceAll('__INPUT__', $input))
+  #set($discard = $response.setContentType("text/xml"))
+  &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+  #set($rawresults = $xwiki.lucene.getSearchResults($query, $util.null))
+  #set($results = $rawresults.getResults("0", "$nb"))
+  &lt;results&gt;
+    #foreach($item in $results)
+      #set($itemfullname = "${item.wiki}:${item.space}.${item.name}")
+      #set($itemWikiDocument = $xwiki.wikimanager.getWikiFromDocumentName($itemfullname))
+      #set($itemWikiDescriptor = $itemWikiDocument.firstWikiAlias)
+      #set($name = $itemWikiDescriptor.wikiprettyname)
+      #set($url = $itemWikiDescriptor.homePageUrl)
+      &lt;rs id="$url" info="${escapetool.xml(${itemWikiDescriptor.wikiName})}:${escapetool.xml($itemWikiDescriptor.homePage)}"&gt;$escapetool.xml($name)&lt;/rs&gt;
+    #end
+  &lt;/results&gt;
+#else
+{{info}}
+This service allows to retrieve search results for the suggest UI component.
+Examples:
+* [[$doc.getExternalURL('get', 'outputSyntax=plain&amp;query=__INPUT__*&amp;input=test')]]
+{{/info}}
+#end
+{{/velocity}}
+</content></xwikidoc>

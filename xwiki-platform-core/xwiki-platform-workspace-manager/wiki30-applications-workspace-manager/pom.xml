@@ -1,0 +1,85 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.contrib.wiki30</groupId>
+    <artifactId>wiki30-social</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>wiki30-applications-workspace-manager</artifactId>
+  <packaging>xar</packaging>
+
+  <name>Wiki3.0 - Workspaces - Application</name>
+  <description>XWiki application that manages workspaces.</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.contrib.wiki30</groupId>
+      <artifactId>wiki30-components-workspace-manager</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-manager-api</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>wiki30-applications-workspace-manager-template</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <!-- Step 1: Download workspace template xar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- <phase>generate-sources</phase> -->
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xwiki.contrib.wiki30</groupId>
+                  <artifactId>wiki30-applications-workspace-manager-template</artifactId>
+                  <version>${project.version}</version>
+                  <type>xar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/template</outputDirectory>
+                  <destFileName>workspace-template.xar</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Step 2: Attach template xar to WikiManager install page -->
+      <plugin>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>process-resources</phase>
+            <id>attach-template-xar</id>
+            <goals>
+              <goal>attach</goal>
+            </goals>
+            <configuration>
+              <file>${project.build.directory}/template/workspace-template.xar</file>
+              <sourceDocument>${basedir}/src/main/resources/WorkspaceManager/Install.xml</sourceDocument>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

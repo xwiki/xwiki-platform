@@ -1169,6 +1169,7 @@ body.exportbody #editPanels.panels,
 }
 
 #editPanels.panels .panel {
+    background: transparent;
     margin: 0;
     width: 210px;
     padding: 0;
@@ -2101,8 +2102,8 @@ html > body .panels {
     color: #000;
     width: 190px;
     display: block;
-    padding: 0;
-    background-color: transparent;
+    padding: 0 0 17px;
+    background: transparent url("$xwiki.getSkinFile('images/panel-v.png')") -190px bottom no-repeat;
 }
 
 #leftPanels .panel, #leftPanels .fakepanel {
@@ -2123,7 +2124,7 @@ html > body .panels {
     font-size: 0.85em;
     line-height: 1.6em;
     font-weight: normal;
-    padding: 0 15px 20px 15px;
+    padding: 6px 15px 3px;
 }
 
 div.xwikipanelcontents div.warningmessage,
@@ -2143,13 +2144,12 @@ h1.xwikipaneltitle {
     margin: 0;
     font-size: 1.1em;
     letter-spacing: -1px;
-    line-height: 30px;
-    padding: 0 20px 0 15px;
+    line-height: 1.4em;
+    padding: 10px 20px 0 15px;
     text-align: center;
     color: #333;
-    height: 30px;
     background-image: url( images/panel-v.png );
-    background-position: 0px -100px;
+    background-position: 0px 0;
     background-repeat: no-repeat;
     cursor: pointer;
 }
@@ -2166,7 +2166,7 @@ h1.xwikipaneltitle.hidden {
 }
 
 .collapsed h1.xwikipaneltitle {
-    height: 38px;
+    min-height: 8px;
     background-image: url( images/panel-v.png );
     background-position: top left;
     background-repeat: no-repeat;
@@ -2174,8 +2174,8 @@ h1.xwikipaneltitle.hidden {
 
 .xwikipanelcontents {
     background-image: url( images/panel-v.png );
-    background-position: bottom left;
-    background-repeat: no-repeat;
+    background-position: -570px 0;
+    background-repeat: repeat-y;
 }
 
 .xwikipanelcontents a {
@@ -2289,7 +2289,7 @@ span.panelitem {
 }
 
 .collapsed h1.xwikipaneltitle {
-    background-position: top right;
+    background-position: -380px 0;
 }
 
 #editPanels .EditModes .xwikipanelcontents ul {

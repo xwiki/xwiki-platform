@@ -40,6 +40,11 @@ import org.reflections.vfs.Vfs;
 
 import com.google.common.base.Predicates;
 
+/**
+ * Generate package based on information found in <code>packagefile.properties</code> files from the resources.
+ * 
+ * @version $Id$
+ */
 public class ExtensionPackager
 {
     public static final String PACKAGEFILE_PACKAGE = "packagefile";
@@ -70,6 +75,10 @@ public class ExtensionPackager
 
     public void generateExtension(String classPackageFolder, URL descriptorUrl) throws IOException
     {
+        String descriptorUrlStr = descriptorUrl.toString();
+        String descriptorFolderURL =
+            descriptorUrlStr.substring(0, descriptorUrlStr.length() - PACKAGEFILE_DESCRIPTOR.length());
+
         InputStream descriptorStream = descriptorUrl.openStream();
 
         Properties descriptorProperties = new Properties();
@@ -81,7 +90,8 @@ public class ExtensionPackager
         }
         String id = descriptorProperties.getProperty("id");
         if (id == null) {
-            id = "test";
+            id = descriptorFolderURL.substring(0, descriptorFolderURL.length() - 1);
+            id = id.substring(id.lastIndexOf('/') + 1);
         }
         String version = descriptorProperties.getProperty("version");
         if (version == null) {
@@ -108,10 +118,6 @@ public class ExtensionPackager
         }
 
         // generate
-
-        String descriptorUrlStr = descriptorUrl.toString();
-        String descriptorFolderURL =
-            descriptorUrlStr.substring(0, descriptorUrlStr.length() - PACKAGEFILE_DESCRIPTOR.length());
 
         FileOutputStream fos = new FileOutputStream(packageFile);
         try {

@@ -21,8 +21,6 @@ package org.xwiki.extension.jar;
 
 import junit.framework.Assert;
 
-import org.jmock.Expectations;
-import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.ExecutionContextInitializer;
@@ -49,7 +47,6 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
         registerMockComponent(AttachmentReferenceResolver.class, "current");
     }
 
-    @Before
     @Override
     public void setUp() throws Exception
     {

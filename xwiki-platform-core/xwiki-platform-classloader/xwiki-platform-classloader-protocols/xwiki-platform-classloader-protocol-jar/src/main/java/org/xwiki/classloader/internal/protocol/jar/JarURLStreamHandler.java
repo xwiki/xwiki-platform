@@ -35,7 +35,6 @@ import javax.inject.Singleton;
 import org.xwiki.classloader.ExtendedURLStreamHandler;
 import org.xwiki.classloader.internal.protocol.jar.JarURLConnection.JarOpener;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 
 import edu.emory.mathcs.util.classloader.ResourceUtils;
 
@@ -72,21 +71,12 @@ public class JarURLStreamHandler extends URLStreamHandler implements ExtendedURL
     private static final Pattern ABSOLUTE_JAR_URL_PATTERN =
         Pattern.compile("jar:(.*)!(/(?:.*/)?)((?:[^/#]+)?)((?:#.*)?)");
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ExtendedURLStreamHandler#getProtocol()
-     */
+    @Override
     public String getProtocol()
     {
         return "jar";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see URLStreamHandler#openConnection(URL)
-     */
     @Override
     public URLConnection openConnection(URL url) throws IOException
     {

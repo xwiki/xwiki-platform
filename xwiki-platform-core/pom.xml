@@ -343,7 +343,7 @@
                 <exclude>com/xpn/xwiki/cache/api/XWikiCache</exclude>
                 <exclude>com/xpn/xwiki/cache/api/XWikiCacheNeedsRefreshException</exclude>
                 <exclude>com/xpn/xwiki/cache/api/XWikiCacheService</exclude>
-                <exclude>compatibility/com/xpn/xwiki/api/ApiCompatibilityAspect</excludes>
+                <exclude>compatibility/com/xpn/xwiki/api/ApiCompatibilityAspect</exclude>
                 <exclude>compatibility/com/xpn/xwiki/api/ContextCompatibilityAspect</exclude>
                 <exclude>compatibility/com/xpn/xwiki/api/DocumentCompatibilityAspect</exclude>
               </excludes>

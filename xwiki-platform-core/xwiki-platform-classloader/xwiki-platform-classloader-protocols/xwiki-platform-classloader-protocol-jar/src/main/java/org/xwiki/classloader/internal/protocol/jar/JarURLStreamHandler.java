@@ -52,6 +52,23 @@ import edu.emory.mathcs.util.classloader.ResourceUtils;
 public class JarURLStreamHandler extends URLStreamHandler implements ExtendedURLStreamHandler
 {
     /**
+     * Used to parse the string representation of a {@code URL} into a {@code URL} using the format:
+     * "jar:" + url + "!" + /<path>/ + <file>? + "#"<anchor>?
+     */
+    private static final Pattern ABSOLUTE_JAR_URL_PATTERN =
+        Pattern.compile("jar:(.*)!(/(?:.*/)?)((?:[^/#]+)?)((?:#.*)?)");
+
+    /**
+     * The JAR protocol name.
+     */
+    private static final String JAR_PROTOCOL = "jar";
+
+    /**
+     * Separator for JAR in a URL.
+     */
+    private static final String JAR_PROTOCOL_SEPARATOR = "!";
+
+    /**
      * The actual logic to load JARs and cache them on the local filesystem.
      */
     private JarOpener opener = new JarProxy();
@@ -64,17 +81,10 @@ public class JarURLStreamHandler extends URLStreamHandler implements ExtendedURL
     @Inject
     private URLStreamHandlerFactory handlerFactory;
 
-    /**
-     * Used to parse the string representation of a {@code URL} into a {@code URL} using the format:
-     * "jar:" + url + "!" + /<path>/ + <file>? + "#"<anchor>?
-     */
-    private static final Pattern ABSOLUTE_JAR_URL_PATTERN =
-        Pattern.compile("jar:(.*)!(/(?:.*/)?)((?:[^/#]+)?)((?:#.*)?)");
-
     @Override
     public String getProtocol()
     {
-        return "jar";
+        return JAR_PROTOCOL;
     }
 
     @Override
@@ -95,8 +105,8 @@ public class JarURLStreamHandler extends URLStreamHandler implements ExtendedURL
     @Override
     protected void parseURL(URL u, String spec, int start, int limit)
     {
-        Matcher matcher;
-        if ((matcher = ABSOLUTE_JAR_URL_PATTERN.matcher(spec)).matches()) {
+        Matcher matcher = ABSOLUTE_JAR_URL_PATTERN.matcher(spec);
+        if (matcher.matches()) {
             // spec is an absolute URL
             String base = matcher.group(1);
             try {
@@ -113,27 +123,30 @@ public class JarURLStreamHandler extends URLStreamHandler implements ExtendedURL
             } else {
                 ref = ref.substring(1);
             }
-            setURL(u, "jar", "", -1, "", "", base + "!" + path, null, ref);
-        } else if ((matcher = ABSOLUTE_JAR_URL_PATTERN.matcher(u.toString())).matches()) {
-            String ref = spec.substring(limit);
-            if (ref.length() == 0) {
-                ref = null;
-            } else {
-                ref = ref.substring(1);
-            }
-            spec = spec.substring(start, limit);
-            String base = matcher.group(1);
-            String path;
-            if (spec.length() > 0 && spec.charAt(0) == '/') {
-                path = spec;
-            } else {
-                String cxtDir = matcher.group(2);
-                path = cxtDir + spec;
-            }
-            path = ResourceUtils.canonizePath(path);
-            setURL(u, "jar", "", -1, "", "", base + "!" + path, null, ref);
+            setURL(u, JAR_PROTOCOL, "", -1, "", "", base + JAR_PROTOCOL_SEPARATOR + path, null, ref);
         } else {
-            throw new IllegalArgumentException("Neither URL nor the spec are valid JAR urls");
+            matcher = ABSOLUTE_JAR_URL_PATTERN.matcher(u.toString());
+            if (matcher.matches()) {
+                String ref = spec.substring(limit);
+                if (ref.length() == 0) {
+                    ref = null;
+                } else {
+                    ref = ref.substring(1);
+                }
+                String newSpec = spec.substring(start, limit);
+                String base = matcher.group(1);
+                String path;
+                if (newSpec.length() > 0 && newSpec.charAt(0) == '/') {
+                    path = newSpec;
+                } else {
+                    String cxtDir = matcher.group(2);
+                    path = cxtDir + newSpec;
+                }
+                path = ResourceUtils.canonizePath(path);
+                setURL(u, JAR_PROTOCOL, "", -1, "", "", base + JAR_PROTOCOL_SEPARATOR + path, null, ref);
+            } else {
+                throw new IllegalArgumentException("Neither URL nor the spec are valid JAR URLs");
+            }
         }
     }
 }

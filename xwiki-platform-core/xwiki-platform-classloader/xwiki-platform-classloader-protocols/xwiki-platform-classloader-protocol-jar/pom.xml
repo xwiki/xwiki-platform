@@ -49,8 +49,7 @@
         <configuration>
           <excludes>
             org/xwiki/classloader/internal/protocol/jar/JarProxy.java,
-            org/xwiki/classloader/internal/protocol/jar/JarURLConnection.java,
-            org/xwiki/classloader/internal/protocol/jar/JarURLStreamHandler.java
+            org/xwiki/classloader/internal/protocol/jar/JarURLConnection.java
           </excludes>
         </configuration>
       </plugin>

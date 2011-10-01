@@ -36,7 +36,7 @@
   #set($discard = $response.setContentType("text/xml"))
   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
   #set($rawresults = $xwiki.lucene.getSearchResults($query, '', $xcontext.database, $util.null))
-  #set($results = $rawresults.getResults("0", "$nb"))
+  #set($results = $rawresults.getResults("1", "$nb"))
   &lt;results&gt;
     #foreach($item in $results)
       #set($itemfullname = "${item.wiki}:${item.space}.${item.name}")

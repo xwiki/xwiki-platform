@@ -43,6 +43,14 @@ import edu.emory.mathcs.util.classloader.ResourceUtils;
  * using a URL Stream Handler Factory for handling nested protocols (the protocol inside the "jar" protocol, for
  * example: {@code jar:http://...} or {@code jar:attachmentjar://...}, etc).
  * 
+ * <p>
+ * Originally written by Dawid Kurzyniec and released to the public domain, as explained
+ * at http://creativecommons.org/licenses/publicdomain
+ * </p>
+ * <p>
+ * Source: http://dcl.mathcs.emory.edu/php/loadPage.php?content=util/features.html#classloading
+ * </p>
+ *
  * @version $Id$
  * @since 2.0.1
  */

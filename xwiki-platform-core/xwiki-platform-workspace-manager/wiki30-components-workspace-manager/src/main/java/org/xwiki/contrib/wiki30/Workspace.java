@@ -27,7 +27,7 @@ import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 /**
  * TODO DOCUMENT ME!
  * 
- * @version $Id:$
+ * @version $Id$
  */
 public interface Workspace
 {

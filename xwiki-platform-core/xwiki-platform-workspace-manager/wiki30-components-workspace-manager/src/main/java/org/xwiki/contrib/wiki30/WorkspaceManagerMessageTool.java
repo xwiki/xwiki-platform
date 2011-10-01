@@ -27,7 +27,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 /**
  * TODO DOCUMENT ME!
  * 
- * @version $Id:$
+ * @version $Id$
  */
 public class WorkspaceManagerMessageTool extends XWikiMessageTool
 {

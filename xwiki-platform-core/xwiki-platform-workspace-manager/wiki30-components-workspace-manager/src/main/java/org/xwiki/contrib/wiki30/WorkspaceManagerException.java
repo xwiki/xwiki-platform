@@ -22,7 +22,7 @@ package org.xwiki.contrib.wiki30;
 /**
  * TODO DOCUMENT ME!
  * 
- * @version $Id:$
+ * @version $Id$
  */
 public class WorkspaceManagerException extends Exception
 {

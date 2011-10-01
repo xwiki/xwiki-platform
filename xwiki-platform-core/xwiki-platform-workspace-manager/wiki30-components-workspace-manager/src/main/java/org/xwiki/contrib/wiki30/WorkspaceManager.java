@@ -30,7 +30,7 @@ import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 /**
  * Component in charge of creating and managing workspaces.
  * 
- * @version $Id:$
+ * @version $Id$
  */
 @ComponentRole
 public interface WorkspaceManager

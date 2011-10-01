@@ -40,7 +40,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 /**
  * Makes the WorkspaceManager API available to scripting.
  * 
- * @version $Id:$
+ * @version $Id$
  */
 @Component("workspaceManager")
 public class WorkspaceManagerScriptService extends AbstractLogEnabled implements ScriptService

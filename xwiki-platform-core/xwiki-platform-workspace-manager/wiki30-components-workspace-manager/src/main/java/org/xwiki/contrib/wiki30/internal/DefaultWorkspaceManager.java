@@ -58,7 +58,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 /**
  * Implementation of a <tt>WorkspaceManager</tt> component.
  * 
- * @version $Id:$
+ * @version $Id$
  */
 @Component
 public class DefaultWorkspaceManager implements WorkspaceManager, Initializable

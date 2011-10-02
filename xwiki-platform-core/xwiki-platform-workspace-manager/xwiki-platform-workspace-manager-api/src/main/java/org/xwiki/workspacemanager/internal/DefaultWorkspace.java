@@ -17,27 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.wiki30.internal;
+package org.xwiki.workspacemanager.internal;
 
-import org.xwiki.contrib.wiki30.Workspace;
+import org.xwiki.workspacemanager.Workspace;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 
 /**
- * TODO DOCUMENT ME!
+ * Default implementation.
  * 
  * @version $Id$
  */
 public class DefaultWorkspace implements Workspace
 {
+    /** @see Workspace#getWikiDocument() */
     private Wiki wikiDocument;
 
+    /** @see Workspace#getWikiDescriptor() */
     private XWikiServer wikiDescriptor;
 
+    /** @see Workspace#getGroupDocument() */
     private Document groupDocument;
 
+    /**
+     * @param wikiDocument The wiki document descriptor.
+     * @param wikiDescriptor XWikiServerClass object acting as wiki descriptor contained in the wiki document.
+     * @param groupDocument The group document that defines user membership to the workspace.
+     */
     public DefaultWorkspace(Wiki wikiDocument, XWikiServer wikiDescriptor, Document groupDocument)
     {
         this.wikiDocument = wikiDocument;
@@ -45,34 +53,21 @@ public class DefaultWorkspace implements Workspace
         this.groupDocument = groupDocument;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.contrib.wiki30.Workspace#getWikiDocument()
-     */
+    @Override
     public Wiki getWikiDocument()
     {
         return wikiDocument;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.contrib.wiki30.Workspace#getWikiDescriptor()
-     */
+    @Override
     public XWikiServer getWikiDescriptor()
     {
         return wikiDescriptor;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.contrib.wiki30.Workspace#getGroupDocument()
-     */
+    @Override
     public Document getGroupDocument()
     {
         return groupDocument;
     }
-
 }

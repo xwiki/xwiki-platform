@@ -17,27 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.wiki30;
+package org.xwiki.workspacemanager;
 
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 
 /**
- * TODO DOCUMENT ME!
+ * Provides some methods to access workspace parameters.
  * 
  * @version $Id$
  */
 public interface Workspace
 {
-    static final String WORKSPACE_GROUP_SPACE = "XWiki";
+    /** Default workspace group space. */
+    String WORKSPACE_GROUP_SPACE = "XWiki";
 
-    static final String WORKSPACE_GROUP_PAGE = "XWikiAllGroup";
+    /** Default workspace group page. */
+    String WORKSPACE_GROUP_PAGE = "XWikiAllGroup";
 
+    /** @return The wiki document descriptor. */
     Wiki getWikiDocument();
 
+    /** @return XWikiServerClass object acting as wiki descriptor contained in the wiki document. */
     XWikiServer getWikiDescriptor();
 
+    /** @return The group document that defines user membership to the workspace. */
     Document getGroupDocument();
 }

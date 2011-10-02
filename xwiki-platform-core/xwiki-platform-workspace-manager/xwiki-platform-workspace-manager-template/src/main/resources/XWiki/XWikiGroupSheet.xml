@@ -310,7 +310,8 @@ $xwiki.jsx.use('XWiki.XWikiGroupSheet')
 {{/velocity}}
 
 {{velocity}}
-#if($xcontext.action == 'inline' &amp;&amp; $hasEditGroupRight)
+## Keep testing the inline action for backward compatibility with existing groups.
+#if(($xcontext.action == 'edit' || $xcontext.action == 'inline') &amp;&amp; $hasEditGroupRight)
 {{html}}
   &lt;div id="addNewMember"&gt;
     &lt;table&gt;
@@ -462,7 +463,7 @@ $xwiki.jsx.use('XWiki.XWikiGroupSheet')
 #end
 #if (!$isGuest)
   #set ($temp = $columns.add('_actions'))
-  #if ($xcontext.action == 'inline' &amp;&amp; $hasDeleteGroupRight)
+  #if (($xcontext.action == 'edit' || $xcontext.action == 'inline') &amp;&amp; $hasDeleteGroupRight)
     #set ($temp = $columnOptions.put('_actions', {
         'actions': ['delete'],
         'actionCallbacks': {'delete': 'table.deleteRow(i);'},

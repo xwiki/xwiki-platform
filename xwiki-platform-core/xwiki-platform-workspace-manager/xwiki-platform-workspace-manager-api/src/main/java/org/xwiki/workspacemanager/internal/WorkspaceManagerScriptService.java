@@ -17,18 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.wiki30.internal;
+package org.xwiki.workspacemanager.internal;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
-import org.xwiki.contrib.wiki30.Workspace;
-import org.xwiki.contrib.wiki30.WorkspaceManager;
-import org.xwiki.contrib.wiki30.WorkspaceManagerException;
+import org.xwiki.model.internal.scripting.ModelScriptService;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.workspacemanager.Workspace;
+import org.xwiki.workspacemanager.WorkspaceManager;
+import org.xwiki.workspacemanager.WorkspaceManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -43,7 +47,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * @version $Id$
  */
 @Component("workspaceManager")
-public class WorkspaceManagerScriptService extends AbstractLogEnabled implements ScriptService
+public class WorkspaceManagerScriptService implements ScriptService
 {
     /** Field name of the last error code inserted in context. */
     public static final String CONTEXT_LASTERRORCODE = "lasterrorcode";
@@ -51,39 +55,67 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
     /** Field name of the last API exception inserted in context. */
     public static final String CONTEXT_LASTEXCEPTION = "lastexception";
 
-    @Requirement
+    /** Workspace Manager wrapped component. */
+    @Inject
     private WorkspaceManager workspaceManager;
 
     /** Execution context. */
-    @Requirement
+    @Inject
     private Execution execution;
 
-    public WorkspaceManager getManager()
+    /** Logging tool. */
+    @Inject
+    private Logger logger;
+
+    /** ModelScriptService component. */
+    @Inject
+    @Named("model")
+    private ScriptService modelScriptService;
+
+    /** @return The wrapped component. */
+    WorkspaceManager getManager()
     {
         return workspaceManager;
     }
 
-    /** @see org.xwiki.contrib.wiki30.WorkspaceManager#canCreateWorkspace(java.lang.String, java.lang.String) */
+    /**
+     * @param userName the user to check.
+     * @param workspaceName the workspace name to check.
+     * @return true if the it's possible for the specified user to create the speicified workspace.
+     */
     public boolean canCreateWorkspace(String userName, String workspaceName)
     {
         return workspaceManager.canCreateWorkspace(getPrefixedUserName(userName), workspaceName);
     }
 
-    /** @see org.xwiki.contrib.wiki30.WorkspaceManager#canEditWorkspace(java.lang.String, java.lang.String) */
+    /**
+     * @param userName the user to check.
+     * @param workspaceName the workspace name to check.
+     * @return true if the it's possible for the specified user to edit the specified workspace.
+     */
     public boolean canEditWorkspace(String userName, String workspaceName)
     {
         return workspaceManager.canEditWorkspace(getPrefixedUserName(userName), workspaceName);
     }
 
-    /** @see org.xwiki.contrib.wiki30.WorkspaceManager#canDeleteWorkspace(java.lang.String, java.lang.String) */
+    /**
+     * @param userName the user to check.
+     * @param workspaceName the workspace name to check.
+     * @return true if the it's possible for the specified user to delete the specified workspace.
+     */
     public boolean canDeleteWorkspace(String userName, String workspaceName)
     {
         return workspaceManager.canDeleteWorkspace(getPrefixedUserName(userName), workspaceName);
     }
 
     /**
-     * @see org.xwiki.contrib.wiki30.WorkspaceManager#createWorkspace(java.lang.String, java.lang.String,
-     *      com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer)
+     * Creates a new workspace from a wiki descriptor.
+     * 
+     * @param workspaceName name of the new workspace.
+     * @param newWikiXObjectDocument a new (in-memory) wiki descriptor document from which the new wiki descriptor
+     *            document will be created. This method will take care of saving the document.
+     * @return XWikiExceptionApi.ERROR_NOERROR if everything goes well, otherwise, an error code will be returned
+     *         instead.
      */
     public int createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument)
     {
@@ -116,7 +148,10 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
         return returncode;
     }
 
-    /** @see org.xwiki.contrib.wiki30.WorkspaceManager#deleteWorkspace(java.lang.String) */
+    /**
+     * @param workspaceName name of the workspace to delete.
+     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination.
+     */
     public void deleteWorkspace(String workspaceName)
     {
         try {
@@ -143,8 +178,10 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
     }
 
     /**
-     * @see org.xwiki.contrib.wiki30.WorkspaceManager#editWorkspace(java.lang.String,
-     *      com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer)
+     * @param workspaceName name of the workspace to edit.
+     * @param modifiedWikiXObjectDocument an in-memory modified wiki descriptor document. This method will take care of
+     *            saving the changes.
+     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination.
      */
     public void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument)
     {
@@ -172,22 +209,19 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
 
     /**
      * @param userName a wiki name prefixed or un-prefixed user name.
-     * @return always the a wiki name prefixed user name or {@link XWikiRightService#GUEST_USER_FULLNAME} if the guest user name was given. 
+     * @return always the a wiki name prefixed user name or {@link XWikiRightService#GUEST_USER_FULLNAME} if the guest
+     *         user name was given.
      */
     private String getPrefixedUserName(String userName)
     {
-        XWikiContext deprecatedContext = getXWikiContext();
-
         if (XWikiRightService.GUEST_USER_FULLNAME.equals(userName)) {
             return userName;
         }
-        
-        String result = userName;
-        if (!result.startsWith(String.format("%s:", deprecatedContext.getMainXWiki())) && !result.startsWith(String.format("%s:", deprecatedContext.getDatabase()))) {
-            result = String.format("%s:%s", deprecatedContext.getDatabase(), result);
-        }
 
-        return result;
+        DocumentReference userReference = ((ModelScriptService) modelScriptService).resolveDocument(userName);
+        String prefixedUserName = ((ModelScriptService) modelScriptService).serialize(userReference);
+
+        return prefixedUserName;
     }
 
     /** @return the deprecated xwiki context used to manipulate xwiki objects */
@@ -206,7 +240,7 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
      */
     private void error(String errorMessage, XWikiException e)
     {
-        getLogger().error(errorMessage, e);
+        logger.error(errorMessage, e);
 
         XWikiContext deprecatedContext = getXWikiContext();
 
@@ -223,12 +257,13 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
      */
     private void error(String errorMessage, Exception e)
     {
-        if (errorMessage == null) {
-            errorMessage = e.getMessage();
+        String errorMessageToLog = errorMessage;
+        if (errorMessageToLog == null) {
+            errorMessageToLog = e.getMessage();
         }
 
         /* Log exception. */
-        getLogger().error(errorMessage, e);
+        logger.error(errorMessageToLog, e);
 
         /* Store exception in context. */
         XWikiContext deprecatedContext = getXWikiContext();
@@ -247,7 +282,13 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
         error(null, e);
     }
 
-    /** @see org.xwiki.contrib.wiki30.WorkspaceManager#getWorkspace(String) */
+    /**
+     * Retrieves a workspace by name.
+     * 
+     * @param workspaceId name (ID) of the workspace.
+     * @return the requested workspace or null if it does not exist.
+     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination.
+     */
     public Workspace getWorkspace(String workspaceId)
     {
         Workspace result = null;
@@ -260,7 +301,13 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
         return result;
     }
 
-    /** @see org.xwiki.contrib.wiki30.WorkspaceManager#getWorkspaces() */
+    /**
+     * Get the list of all workspaces. It basically gets all wikis that have a {@code WorkspaceManager.WorkspaceClass}
+     * object in their {@code XWikiServer<wikiName>} page.
+     * 
+     * @return list of available workspaces.
+     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination.
+     */
     public List<Workspace> getWorkspaces()
     {
         List<Workspace> result = null;
@@ -272,9 +319,13 @@ public class WorkspaceManagerScriptService extends AbstractLogEnabled implements
 
         return result;
     }
-    
-    /** @see org.xwiki.contrib.wiki30.WorkspaceManager#isWorkspace(String) **/
-    public boolean isWorkspace(String workspaceName) {
+
+    /**
+     * @param workspaceName name of the workspace to check.
+     * @return true if a workspace with the given name exists, false otherwise.
+     */
+    public boolean isWorkspace(String workspaceName)
+    {
         return workspaceManager.isWorkspace(workspaceName);
     }
 }

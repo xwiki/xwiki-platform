@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.wiki30;
+package org.xwiki.workspacemanager;
 
 import java.util.ResourceBundle;
 
@@ -25,7 +25,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
- * TODO DOCUMENT ME!
+ * Helps with translating error messages.
  * 
  * @version $Id$
  */
@@ -55,6 +55,10 @@ public class WorkspaceManagerMessageTool extends XWikiMessageTool
     /** Used as logging message when skipping an invalid workspace. */
     public static final String LOG_WORKSPACEINVALID = "workspacemanager.log.workspaceinvalid";
 
+    /**
+     * @param context The {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for loading
+     *            documents.
+     */
     public WorkspaceManagerMessageTool(XWikiContext context)
     {
         super(ResourceBundle.getBundle("workspacemanager" + "/ApplicationResources"), context);

@@ -17,14 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.wiki30;
+package org.xwiki.workspacemanager;
 
 import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.wikimanager.WikiManager;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 
 /**
@@ -38,7 +37,7 @@ public interface WorkspaceManager
     /**
      * @param userName the user to check.
      * @param workspaceName the workspace name to check.
-     * @return true if the it's possible to create a workspace in this context.
+     * @return true if the it's possible for the specified user to create the speicified workspace.
      */
     boolean canCreateWorkspace(String userName, String workspaceName);
 
@@ -63,15 +62,13 @@ public interface WorkspaceManager
      * @param newWikiXObjectDocument a new (in-memory) wiki descriptor document from which the new wiki descriptor
      *            document will be created. This method will take care of saving the document.
      * @return {@link XWikiServer} descriptor for the newly created workspace.
-     * @throws XWikiException
-     * @see {@link WikiManager#createNewWikiFromTemplate(XWikiServer, String, boolean, String, com.xpn.xwiki.XWikiContext)}
+     * @throws XWikiException if problems occur.
      */
     XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument) throws XWikiException;
 
     /**
      * @param workspaceName name of the workspace to delete.
      * @throws WorkspaceManagerException if problems occur.
-     * @see {@link WikiManager#deleteWiki(String, boolean, com.xpn.xwiki.XWikiContext)}
      */
     void deleteWorkspace(String workspaceName) throws WorkspaceManagerException;
 
@@ -99,11 +96,11 @@ public interface WorkspaceManager
      * @return list of available workspaces.
      * @throws WorkspaceManagerException if problems occur.
      */
-    public List<Workspace> getWorkspaces() throws WorkspaceManagerException;
-    
+    List<Workspace> getWorkspaces() throws WorkspaceManagerException;
+
     /**
      * @param workspaceName name of the workspace to check.
      * @return true if a workspace with the given name exists, false otherwise.
      */
-    public boolean isWorkspace(String workspaceName);
+    boolean isWorkspace(String workspaceName);
 }

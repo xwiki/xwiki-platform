@@ -2,20 +2,157 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.contrib.wiki30</groupId>
-    <artifactId>wiki30</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-core</artifactId>
+    <version>3.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>wiki30-social</artifactId>
+  <artifactId>xwiki-platform-workspace-manager</artifactId>
   <packaging>pom</packaging>
 
-  <name>Wiki3.0 - Social Extension</name>
-  <description>XWiki extensions that enhance social interaction between XWiki users.</description>
+  <name>XWiki Platform - Workspace Manager - Parent POM</name>
 
   <modules>
-    <module>wiki30-applications-workspace-manager</module>
-    <module>wiki30-applications-workspace-manager-template</module>
-    <module>wiki30-components-workspace-manager</module>
+    <module>xwiki-platform-workspace-manager-api</module>
+    <module>xwiki-platform-workspace-manager-template</module>
+    <module>xwiki-platform-workspace-manager-ui</module>
   </modules>
+
+  <properties>
+    <enterprise.version>${project.version}</enterprise.version>
+    <commons.version>${project.version}</commons.version>
+    <platform.version>${project.version}</platform.version>
+    <!-- <manager.version>${project.version}</manager.version> -->
+    <!-- <rendering.version>${project.version}</rendering.version> -->
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- XWiki Documents/Applications -->
+      <dependency>
+        <groupId>org.xwiki.enterprise</groupId>
+        <artifactId>xwiki-enterprise-wiki</artifactId>
+        <version>${enterprise.version}</version>
+        <type>xar</type>
+      </dependency>
+
+      <!-- XWiki Plugins -->
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-wiki-manager-api</artifactId>
+        <version>${platform.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-wiki-manager-ui</artifactId>
+        <version>${platform.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-application-manager-api</artifactId>
+        <version>${platform.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-application-manager-ui</artifactId>
+        <version>${platform.version}</version>
+        <type>xar</type>
+      </dependency>
+
+      <!-- XWiki Core -->
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-oldcore</artifactId>
+        <version>${platform.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-component-api</artifactId>
+        <version>${commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-component-default</artifactId>
+        <version>${commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-script</artifactId>
+        <version>${commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-test</artifactId>
+        <version>${commons.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
+          <version>${platform.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+          <version>${commons.version}</version>
+          <configuration>
+            <excludes>
+              <!-- Exclude license stuff or any other META-INF items from 
+                xars. -->
+              <exclude>**/META-INF/**</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <configuration>
+            <!-- It seems that, once we upgraded to 3.2-SNAPSHOT, we have 
+              to explicitly overwrite existing resources thant might already exist in the 
+              destination folder when being copied with the resources-plugin. -->
+            <overwrite>true</overwrite>
+          </configuration>
+        </plugin>
+
+        <!-- Bugfix for the fact that ${project.version} as defined in org.xwiki.commons:xwiki-commons -->
+        <!-- is now resolved to 1.0-SNAPSHOT -->
+        <!-- <plugin> -->
+        <!-- <groupId>org.apache.maven.plugins</groupId> -->
+        <!-- <artifactId>maven-remote-resources-plugin</artifactId> -->
+        <!-- <executions> -->
+        <!-- <execution> -->
+        <!-- <id>xwiki-license-resources</id> -->
+        <!-- <goals> -->
+        <!-- <goal>process</goal> -->
+        <!-- </goals> -->
+        <!-- <configuration> -->
+        <!-- <resourceBundles> -->
+        <!-- <resourceBundle>org.xwiki.commons:xwiki-commons-tool-license-resources:${commons.version}</resourceBundle> -->
+        <!-- </resourceBundles> -->
+        <!-- </configuration> -->
+        <!-- </execution> -->
+        <!-- </executions> -->
+        <!-- </plugin> -->
+
+      </plugins>
+    </pluginManagement>
+
+    <!-- XAR packaging support. -->
+    <extensions>
+      <extension>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
+        <version>${commons.version}</version>
+      </extension>
+    </extensions>
+
+  </build>
+
 </project>

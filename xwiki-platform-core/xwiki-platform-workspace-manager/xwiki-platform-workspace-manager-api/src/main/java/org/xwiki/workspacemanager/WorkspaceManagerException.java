@@ -17,20 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.wiki30;
+package org.xwiki.workspacemanager;
 
 /**
- * TODO DOCUMENT ME!
+ * Exceptions thrown by the WorkspaceManager API.
  * 
  * @version $Id$
  */
 public class WorkspaceManagerException extends Exception
 {
+    /** Serializable UID. */
+    private static final long serialVersionUID = -7490442041971008340L;
+
+    /**
+     * @param message The exception's message.
+     */
     public WorkspaceManagerException(String message)
     {
         this(message, null);
     }
 
+    /**
+     * @param message The exception's message.
+     * @param exception The cause of this exception.
+     */
     public WorkspaceManagerException(String message, Throwable exception)
     {
         super(message, exception);

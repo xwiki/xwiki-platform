@@ -2,18 +2,16 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.contrib.wiki30</groupId>
-    <artifactId>wiki30-social</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-workspace-manager</artifactId>
+    <version>3.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>wiki30-applications-workspace-manager-template
-  </artifactId>
+  <artifactId>xwiki-platform-workspace-manager-template</artifactId>
   <packaging>xar</packaging>
 
-  <name>Wiki3.0 - Workspaces - Application - Workspace Template</name>
-  <description>Template workspace to be used when creating a new
-    workspace.</description>
+  <name>XWiki Platform - Workspace Manager - Workspace Template</name>
+  <description>Template workspace to be used when creating a new workspace.</description>
 
   <dependencies>
     <dependency>
@@ -24,12 +22,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-application-manager-ui</artifactId>
-      <type>xar</type>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>rt-application</artifactId>
-      <version>${project.version}</version>
       <type>xar</type>
     </dependency>
   </dependencies>
@@ -102,12 +94,7 @@
                     <parameter>
                       <name>translations</name>
                       <value>xwiki:WorkspaceManager.Translations,
-                        xwiki:WorkspaceManager.TemplateTranslations,
-                        XWiki.RtI18N</value>
-                    </parameter>
-                    <parameter>
-                      <name>skin</name>
-                      <value>XWiki.RtSkin</value>
+                        xwiki:WorkspaceManager.TemplateTranslations</value>
                     </parameter>
                   </parameters>
                 </transformationSet>

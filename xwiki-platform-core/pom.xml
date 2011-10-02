@@ -284,6 +284,7 @@
     <module>xwiki-platform-web</module>
     <module>xwiki-platform-webdav</module>
     <module>xwiki-platform-wiki-manager</module>
+    <module>xwiki-platform-workspace-manager</module>
     <module>xwiki-platform-wysiwyg</module>
     <module>xwiki-platform-xml</module>
     <module>xwiki-platform-xmlrpc</module>

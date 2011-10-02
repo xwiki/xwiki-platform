@@ -3183,6 +3183,21 @@ document.observe('xwiki:dom:loaded', function() {
 ])
 
 ##
+## Make some adjustments in case this is a workspace
+##
+#if ($services.workspaceManager.isWorkspace($xcontext.database))
+  #foreach ($category in $adminMenu)
+    #if ($category.id == 'configuration')
+      $category.children.add(0, {'id' : 'XWiki.ManageWorkspace'})
+    #elseif ($category.id == 'usersgroups')
+      $category.children.remove({'id' : 'Users'})
+      $category.children.remove({'id' : 'Registration'})
+      $category.children.add(0, {'id' : 'XWiki.WorkspaceUsers'})
+    #end
+  #end
+#end
+
+##
 ## Fill in the list of custom applications to configure
 ##
 #findCustomSectionsToConfigure($adminMenu)

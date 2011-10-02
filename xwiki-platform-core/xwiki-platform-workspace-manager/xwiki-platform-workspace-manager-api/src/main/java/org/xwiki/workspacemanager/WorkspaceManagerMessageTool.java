@@ -56,8 +56,8 @@ public class WorkspaceManagerMessageTool extends XWikiMessageTool
     public static final String LOG_WORKSPACEINVALID = "workspacemanager.log.workspaceinvalid";
 
     /**
-     * @param context The {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for loading
-     *            documents.
+     * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for loading
+     *            documents
      */
     public WorkspaceManagerMessageTool(XWikiContext context)
     {

@@ -42,9 +42,9 @@ public class DefaultWorkspace implements Workspace
     private Document groupDocument;
 
     /**
-     * @param wikiDocument The wiki document descriptor.
-     * @param wikiDescriptor XWikiServerClass object acting as wiki descriptor contained in the wiki document.
-     * @param groupDocument The group document that defines user membership to the workspace.
+     * @param wikiDocument the wiki document descriptor
+     * @param wikiDescriptor the XWikiServerClass object acting as wiki descriptor contained in the wiki document
+     * @param groupDocument the group document that defines user membership to the workspace
      */
     public DefaultWorkspace(Wiki wikiDocument, XWikiServer wikiDescriptor, Document groupDocument)
     {

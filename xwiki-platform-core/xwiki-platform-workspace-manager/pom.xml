@@ -20,10 +20,6 @@
 
   <properties>
     <enterprise.version>${project.version}</enterprise.version>
-    <commons.version>${project.version}</commons.version>
-    <platform.version>${project.version}</platform.version>
-    <!-- <manager.version>${project.version}</manager.version> -->
-    <!-- <rendering.version>${project.version}</rendering.version> -->
   </properties>
 
   <dependencyManagement>
@@ -40,22 +36,22 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-wiki-manager-api</artifactId>
-        <version>${platform.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-wiki-manager-ui</artifactId>
-        <version>${platform.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-application-manager-api</artifactId>
-        <version>${platform.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-application-manager-ui</artifactId>
-        <version>${platform.version}</version>
+        <version>${project.version}</version>
         <type>xar</type>
       </dependency>
 
@@ -63,7 +59,7 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-oldcore</artifactId>
-        <version>${platform.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.commons</groupId>
@@ -88,13 +84,14 @@
     </dependencies>
   </dependencyManagement>
 
+  <description>Parent POM for the Workspace Manager feature.</description>
   <build>
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
-          <version>${platform.version}</version>
+          <version>${project.version}</version>
         </plugin>
 
         <plugin>
@@ -121,37 +118,8 @@
           </configuration>
         </plugin>
 
-        <!-- Bugfix for the fact that ${project.version} as defined in org.xwiki.commons:xwiki-commons -->
-        <!-- is now resolved to 1.0-SNAPSHOT -->
-        <!-- <plugin> -->
-        <!-- <groupId>org.apache.maven.plugins</groupId> -->
-        <!-- <artifactId>maven-remote-resources-plugin</artifactId> -->
-        <!-- <executions> -->
-        <!-- <execution> -->
-        <!-- <id>xwiki-license-resources</id> -->
-        <!-- <goals> -->
-        <!-- <goal>process</goal> -->
-        <!-- </goals> -->
-        <!-- <configuration> -->
-        <!-- <resourceBundles> -->
-        <!-- <resourceBundle>org.xwiki.commons:xwiki-commons-tool-license-resources:${commons.version}</resourceBundle> -->
-        <!-- </resourceBundles> -->
-        <!-- </configuration> -->
-        <!-- </execution> -->
-        <!-- </executions> -->
-        <!-- </plugin> -->
-
       </plugins>
     </pluginManagement>
-
-    <!-- XAR packaging support. -->
-    <extensions>
-      <extension>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
-        <version>${commons.version}</version>
-      </extension>
-    </extensions>
 
   </build>
 

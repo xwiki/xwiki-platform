@@ -126,7 +126,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
      * usage, with the current context. Caching the plugin API instance would mean caching the context and that caused
      * problems.
      * 
-     * @return Wrapped wiki manager plugin.
+     * @return the wrapped wiki manager plugin
      */
     private WikiManagerPluginApi getWikiManager()
     {
@@ -189,8 +189,8 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
                     deprecatedContext);
         } catch (Exception e) {
             if (logger.isErrorEnabled()) {
-                logger.error(String.format("Failed to check if user %s can edit workspace %s. Assuming false.",
-                    userName, workspaceName), e);
+                logger.error("Failed to check if user [{}] can edit workspace [{}]. Assuming false.", new String[] {
+                userName, workspaceName}, e);
             }
 
             return false;
@@ -220,8 +220,8 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
                     mainWikiPreferencesDocumentName, deprecatedContext));
         } catch (Exception e) {
             if (logger.isErrorEnabled()) {
-                logger.error(String.format("Failed to check if user %s can delete workspace %s. Assuming false.",
-                    userName, workspaceName), e);
+                logger.error("Failed to check if user [{}] can delete workspace [{}]. Assuming false.", new String[] {
+                userName, workspaceName}, e);
             }
 
             return false;
@@ -258,7 +258,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         try {
             initializeOwner(workspaceName, workspaceOwner, comment, deprecatedContext);
         } catch (Exception e) {
-            logger.error(String.format("Failed to add owner to workspace group for workspace %s.", workspaceName), e);
+            logger.error("Failed to add owner to workspace group for workspace [{}].", workspaceName, e);
         }
 
         /* Add workspace marker object. */
@@ -267,7 +267,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         try {
             initializeMarker(wikiDocument, comment, deprecatedContext);
         } catch (Exception e) {
-            logger.error(String.format("Failed to add workspace marker for workspace %s.", workspaceName), e);
+            logger.error("Failed to add workspace marker for workspace [{}].", workspaceName, e);
         }
 
         /* TODO: Launch workspace created event. */
@@ -279,11 +279,11 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
      * Initialize a newly created workspace by explicitly adding its owner in the XWikiAllGroup and XWikiAdminGroup
      * local groups.
      * 
-     * @param workspaceName The workspace to initialize.
-     * @param workspaceOwner The owner user name to be used in the process.
-     * @param comment The comment used when saving the group documents.
-     * @param deprecatedContext The XWikiContext instance to use.
-     * @throws XWikiException if problems occur.
+     * @param workspaceName the workspace to initialize
+     * @param workspaceOwner the owner user name to be used in the process
+     * @param comment the comment used when saving the group documents
+     * @param deprecatedContext the XWikiContext instance to use
+     * @throws XWikiException if problems occur
      */
     private static void initializeOwner(String workspaceName, String workspaceOwner, String comment,
         XWikiContext deprecatedContext) throws XWikiException
@@ -297,7 +297,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
 
             /* Add user as workspace member. */
             DocumentReference workspaceGroupReference =
-                new DocumentReference(workspaceName, XWIKI_SPACE, "XWikiAllGroup");
+                new DocumentReference(workspaceName, Workspace.WORKSPACE_GROUP_SPACE, Workspace.WORKSPACE_GROUP_PAGE);
             XWikiDocument workspaceGroupDocument = wiki.getDocument(workspaceGroupReference, deprecatedContext);
 
             BaseObject workspaceGroupObject = workspaceGroupDocument.newXObject(groupClassReference, deprecatedContext);
@@ -330,10 +330,10 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     }
 
     /**
-     * @param wikiDocument The wiki descriptor document to initialize.
-     * @param comment The comment used when saving the wiki descriptor document.
-     * @param deprecatedContext The XWikiContext instance to use.
-     * @throws XWikiException if problems occur.
+     * @param wikiDocument the wiki descriptor document to initialize
+     * @param comment the comment used when saving the wiki descriptor document
+     * @param deprecatedContext the XWikiContext instance to use
+     * @throws XWikiException if problems occur
      */
     private static void initializeMarker(XWikiDocument wikiDocument, String comment, XWikiContext deprecatedContext)
         throws XWikiException
@@ -439,9 +439,9 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     /**
      * Update the contents of an object using the contents of another. Objects must be of the same class.
      * 
-     * @param source object that provides the new contents to update with.
-     * @param destination object that is to be updated.
-     * @throws WorkspaceManagerException if objects' classes differ.
+     * @param source object that provides the new contents to update with
+     * @param destination object that is to be updated
+     * @throws WorkspaceManagerException if objects' classes differ
      */
     private void updateObject(BaseObject source, BaseObject destination) throws WorkspaceManagerException
     {
@@ -535,10 +535,10 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     }
 
     /**
-     * @param wikiDocument the wiki descriptor document.
-     * @return The WorkspaceClass object contained by the wiki document, if it is a workspace, <code>null</code>
-     *         otherwise.
-     * @throws XWikiException if problems occur.
+     * @param wikiDocument the wiki descriptor document
+     * @return the WorkspaceClass object contained by the wiki document, if it is a workspace, <code>null</code>
+     *         otherwise
+     * @throws XWikiException if problems occur
      */
     private BaseObject getWorkspaceObject(Wiki wikiDocument) throws XWikiException
     {
@@ -557,9 +557,9 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     /**
      * Utility method to log and throw a {@link WorkspaceManagerException} wrapping a given exception.
      * 
-     * @param message the error message to log.
-     * @param e the exception to log and wrap in the thrown {@link WorkspaceManagerException}.
-     * @throws WorkspaceManagerException when called.
+     * @param message the error message to log
+     * @param e the exception to log and wrap in the thrown {@link WorkspaceManagerException}
+     * @throws WorkspaceManagerException when called
      */
     private void logAndThrowException(String message, Exception e) throws WorkspaceManagerException
     {

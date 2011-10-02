@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -46,7 +47,9 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * 
  * @version $Id$
  */
-@Component("workspaceManager")
+@Component
+@Named("workspaceManager")
+@Singleton
 public class WorkspaceManagerScriptService implements ScriptService
 {
     /** Field name of the last error code inserted in context. */
@@ -72,16 +75,16 @@ public class WorkspaceManagerScriptService implements ScriptService
     @Named("model")
     private ScriptService modelScriptService;
 
-    /** @return The wrapped component. */
+    /** @return the wrapped component */
     WorkspaceManager getManager()
     {
         return workspaceManager;
     }
 
     /**
-     * @param userName the user to check.
-     * @param workspaceName the workspace name to check.
-     * @return true if the it's possible for the specified user to create the speicified workspace.
+     * @param userName the user to check
+     * @param workspaceName the workspace name to check
+     * @return true if the it's possible for the specified user to create the speicified workspace
      */
     public boolean canCreateWorkspace(String userName, String workspaceName)
     {
@@ -89,9 +92,9 @@ public class WorkspaceManagerScriptService implements ScriptService
     }
 
     /**
-     * @param userName the user to check.
-     * @param workspaceName the workspace name to check.
-     * @return true if the it's possible for the specified user to edit the specified workspace.
+     * @param userName the user to check
+     * @param workspaceName the workspace name to check
+     * @return true if the it's possible for the specified user to edit the specified workspace
      */
     public boolean canEditWorkspace(String userName, String workspaceName)
     {
@@ -99,9 +102,9 @@ public class WorkspaceManagerScriptService implements ScriptService
     }
 
     /**
-     * @param userName the user to check.
-     * @param workspaceName the workspace name to check.
-     * @return true if the it's possible for the specified user to delete the specified workspace.
+     * @param userName the user to check
+     * @param workspaceName the workspace name to check
+     * @return true if the it's possible for the specified user to delete the specified workspace
      */
     public boolean canDeleteWorkspace(String userName, String workspaceName)
     {
@@ -111,11 +114,11 @@ public class WorkspaceManagerScriptService implements ScriptService
     /**
      * Creates a new workspace from a wiki descriptor.
      * 
-     * @param workspaceName name of the new workspace.
+     * @param workspaceName name of the new workspace
      * @param newWikiXObjectDocument a new (in-memory) wiki descriptor document from which the new wiki descriptor
      *            document will be created. This method will take care of saving the document.
      * @return XWikiExceptionApi.ERROR_NOERROR if everything goes well, otherwise, an error code will be returned
-     *         instead.
+     *         instead
      */
     public int createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument)
     {
@@ -149,8 +152,8 @@ public class WorkspaceManagerScriptService implements ScriptService
     }
 
     /**
-     * @param workspaceName name of the workspace to delete.
-     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination.
+     * @param workspaceName name of the workspace to delete
+     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination
      */
     public void deleteWorkspace(String workspaceName)
     {
@@ -178,10 +181,10 @@ public class WorkspaceManagerScriptService implements ScriptService
     }
 
     /**
-     * @param workspaceName name of the workspace to edit.
+     * @param workspaceName name of the workspace to edit
      * @param modifiedWikiXObjectDocument an in-memory modified wiki descriptor document. This method will take care of
-     *            saving the changes.
-     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination.
+     *            saving the changes
+     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination
      */
     public void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument)
     {
@@ -208,9 +211,9 @@ public class WorkspaceManagerScriptService implements ScriptService
     }
 
     /**
-     * @param userName a wiki name prefixed or un-prefixed user name.
-     * @return always the a wiki name prefixed user name or {@link XWikiRightService#GUEST_USER_FULLNAME} if the guest
-     *         user name was given.
+     * @param userName a prefixed or un-prefixed user name
+     * @return an always prefixed user name or {@link XWikiRightService#GUEST_USER_FULLNAME} if the guest user name was
+     *         given
      */
     private String getPrefixedUserName(String userName)
     {
@@ -233,10 +236,10 @@ public class WorkspaceManagerScriptService implements ScriptService
     /**
      * Log error and store details in the context.
      * 
-     * @param errorMessage error message.
-     * @param e the caught exception.
+     * @param errorMessage error message
+     * @param e the caught exception
      * @deprecated stop using {@link XWikiException}, put exception in context under {@link #CONTEXT_LASTEXCEPTION} key
-     *             instead.
+     *             instead
      */
     private void error(String errorMessage, XWikiException e)
     {
@@ -251,8 +254,8 @@ public class WorkspaceManagerScriptService implements ScriptService
     /**
      * Log exception and store it in the context.
      * 
-     * @param errorMessage error message.
-     * @param e the caught exception.
+     * @param errorMessage error message
+     * @param e the caught exception
      * @see #CONTEXT_LASTEXCEPTION
      */
     private void error(String errorMessage, Exception e)
@@ -274,7 +277,7 @@ public class WorkspaceManagerScriptService implements ScriptService
      * Log exception and store it in the context. The logged message is the exception's message. This allows the
      * underlying component to define it's messages and removes duplication.
      * 
-     * @param e the caught exception.
+     * @param e the caught exception
      * @see #CONTEXT_LASTEXCEPTION
      */
     private void error(Exception e)
@@ -285,9 +288,9 @@ public class WorkspaceManagerScriptService implements ScriptService
     /**
      * Retrieves a workspace by name.
      * 
-     * @param workspaceId name (ID) of the workspace.
-     * @return the requested workspace or null if it does not exist.
-     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination.
+     * @param workspaceId name (ID) of the workspace
+     * @return the requested workspace or null if it does not exist
+     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination
      */
     public Workspace getWorkspace(String workspaceId)
     {
@@ -305,8 +308,8 @@ public class WorkspaceManagerScriptService implements ScriptService
      * Get the list of all workspaces. It basically gets all wikis that have a {@code WorkspaceManager.WorkspaceClass}
      * object in their {@code XWikiServer<wikiName>} page.
      * 
-     * @return list of available workspaces.
-     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination.
+     * @return list of available workspaces
+     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination
      */
     public List<Workspace> getWorkspaces()
     {
@@ -321,8 +324,8 @@ public class WorkspaceManagerScriptService implements ScriptService
     }
 
     /**
-     * @param workspaceName name of the workspace to check.
-     * @return true if a workspace with the given name exists, false otherwise.
+     * @param workspaceName name of the workspace to check
+     * @return true if a workspace with the given name exists, false otherwise
      */
     public boolean isWorkspace(String workspaceName)
     {

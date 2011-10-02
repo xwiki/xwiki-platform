@@ -36,12 +36,12 @@ public interface Workspace
     /** Default workspace group page. */
     String WORKSPACE_GROUP_PAGE = "XWikiAllGroup";
 
-    /** @return The wiki document descriptor. */
+    /** @return the wiki document descriptor */
     Wiki getWikiDocument();
 
-    /** @return XWikiServerClass object acting as wiki descriptor contained in the wiki document. */
+    /** @return the XWikiServerClass object acting as wiki descriptor contained in the wiki document */
     XWikiServer getWikiDescriptor();
 
-    /** @return The group document that defines user membership to the workspace. */
+    /** @return the group document that defines user membership to the workspace */
     Document getGroupDocument();
 }

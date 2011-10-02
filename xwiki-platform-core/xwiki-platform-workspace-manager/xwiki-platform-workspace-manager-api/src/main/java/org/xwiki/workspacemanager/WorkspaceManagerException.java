@@ -30,7 +30,7 @@ public class WorkspaceManagerException extends Exception
     private static final long serialVersionUID = -7490442041971008340L;
 
     /**
-     * @param message The exception's message.
+     * @param message the exception's message
      */
     public WorkspaceManagerException(String message)
     {
@@ -38,8 +38,8 @@ public class WorkspaceManagerException extends Exception
     }
 
     /**
-     * @param message The exception's message.
-     * @param exception The cause of this exception.
+     * @param message the exception's message
+     * @param exception the cause of this exception
      */
     public WorkspaceManagerException(String message, Throwable exception)
     {

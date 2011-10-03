@@ -3185,7 +3185,7 @@ document.observe('xwiki:dom:loaded', function() {
 ##
 ## Make some adjustments in case this is a workspace
 ##
-#if ($services.workspaceManager.isWorkspace($xcontext.database))
+#if ($services.workspace.isWorkspace($xcontext.database))
   #foreach ($category in $adminMenu)
     #if ($category.id == 'configuration')
       $category.children.add(0, {'id' : 'XWiki.ManageWorkspace'})

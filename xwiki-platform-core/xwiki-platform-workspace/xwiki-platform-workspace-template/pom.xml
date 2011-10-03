@@ -1,0 +1,413 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-workspace</artifactId>
+    <version>3.2-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>xwiki-platform-workspace-template</artifactId>
+  <packaging>xar</packaging>
+
+  <name>XWiki Platform - Workspace - Template</name>
+  <description>Template workspace to be used when creating a new workspace.</description>
+
+  <properties>
+    <enterprise.version>${project.version}</enterprise.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.enterprise</groupId>
+      <artifactId>xwiki-enterprise-wiki</artifactId>
+      <version>${enterprise.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-application-manager-ui</artifactId>
+      <type>xar</type>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <executions>
+          <!-- Unpack XE xar so that we can transform XWiki.XWikiPreferences -->
+          <execution>
+            <id>unxar-xwiki-enterprise-wiki</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unxar</goal>
+            </goals>
+            <configuration>
+              <artifactId>xwiki-enterprise-wiki</artifactId>
+              <groupId>org.xwiki.enterprise</groupId>
+              <outputDirectory>${project.build.outputDirectory}
+              </outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+        <!-- XAR/UnXAR everything, excluding some pages that need to be excluded 
+          for the workspace template -->
+        <configuration>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+          <excludes>
+            <exclude>**/META-INF/**</exclude>
+            <!-- Disable local user registration. -->
+            <exclude>**/XWiki/AdminRegistrationSheet.xml</exclude>
+            <exclude>**/XWiki/RegistrationConfig.xml</exclude>
+            <exclude>**/XWiki/RegistrationHelp.xml</exclude>
+            <!-- Disable local user management. -->
+            <exclude>**/XWiki/AdminUsersSheet.xml</exclude>
+            <!-- Disable local admin. -->
+            <exclude>**/XWiki/Admin.xml</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+
+      <!-- Update XWiki pages to register certain extensions or set default 
+        values. -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>xml-maven-plugin</artifactId>
+        <executions>
+          <!-- Update XWiki.XWikiPreferences page and register skin + translations -->
+          <execution>
+            <id>register-skin-and-translations</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformationSets>
+                <transformationSet>
+                  <dir>${project.build.outputDirectory}</dir>
+                  <outputDir>${project.build.outputDirectory}</outputDir>
+                  <includes>
+                    <include>XWiki/XWikiPreferences.xml</include>
+                  </includes>
+                  <stylesheet>src/main/build/transformation/register.xsl
+                  </stylesheet>
+                  <parameters>
+                    <parameter>
+                      <name>translations</name>
+                      <value>xwiki:WorkspaceManager.Translations,
+                        xwiki:WorkspaceManager.TemplateTranslations</value>
+                    </parameter>
+                  </parameters>
+                </transformationSet>
+              </transformationSets>
+            </configuration>
+          </execution>
+          <!-- Update XWiki.XWikiPreferences page and enable the workspace 
+            information panel. -->
+          <execution>
+            <id>register-panel</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformationSets>
+                <transformationSet>
+                  <dir>${project.build.outputDirectory}</dir>
+                  <outputDir>${project.build.outputDirectory}</outputDir>
+                  <includes>
+                    <include>XWiki/XWikiPreferences.xml</include>
+                  </includes>
+                  <stylesheet>src/main/build/transformation/register-panel.xsl
+                  </stylesheet>
+                  <parameters>
+                    <parameter>
+                      <name>panel</name>
+                      <value>Panels.WorkspaceInformationPanel</value>
+                    </parameter>
+                  </parameters>
+                </transformationSet>
+              </transformationSets>
+            </configuration>
+          </execution>
+          <!-- Extend XWiki.SearchSuggestConfig to show Workspaces as search 
+            suggestions. -->
+          <execution>
+            <id>register-workspace-search-extension</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformationSets>
+                <transformationSet>
+                  <dir>${project.build.outputDirectory}</dir>
+                  <outputDir>${project.build.outputDirectory}</outputDir>
+                  <includes>
+                    <include>XWiki/SearchSuggestConfig.xml</include>
+                  </includes>
+                  <stylesheet>src/main/build/transformation/register-workspace-search.xsl
+                  </stylesheet>
+                </transformationSet>
+              </transformationSets>
+            </configuration>
+          </execution>
+          <!-- WORKAROUND for http://jira.xwiki.org/jira/browse/XWIKI-6261 -->
+          <!-- Override the author of each page to be xwiki:XWiki.Admin. -->
+          <!-- TODO: Remove this when XWiki-6261 is fixed -->
+          <execution>
+            <id>override-page-author-and-modifier</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformationSets>
+                <transformationSet>
+                  <dir>${project.build.outputDirectory}</dir>
+                  <outputDir>${project.build.outputDirectory}</outputDir>
+                  <includes>
+                    <include>**/**.xml</include>
+                  </includes>
+                  <stylesheet>src/main/build/transformation/override-page-creator-and-author.xsl
+                  </stylesheet>
+                  <parameters>
+                    <parameter>
+                      <name>creatorAndAuthor</name>
+                      <value>xwiki:XWiki.Admin</value>
+                    </parameter>
+                  </parameters>
+                </transformationSet>
+              </transformationSets>
+            </configuration>
+          </execution>
+          <!-- Remove the local admin from XWikiAllGroup and XWikiAdminGroup. -->
+          <execution>
+            <id>remove-local-admin-from-groups</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformationSets>
+                <transformationSet>
+                  <dir>${project.build.outputDirectory}</dir>
+                  <outputDir>${project.build.outputDirectory}</outputDir>
+                  <includes>
+                    <include>XWiki/XWikiAdminGroup.xml</include>
+                    <include>XWiki/XWikiAllGroup.xml</include>
+                  </includes>
+                  <stylesheet>src/main/build/transformation/remove-local-admin-from-groups.xsl
+                  </stylesheet>
+                </transformationSet>
+              </transformationSets>
+            </configuration>
+          </execution>
+          <!-- Set initial rights for the entire workspace to registered 
+            users. -->
+          <execution>
+            <id>set-rights-for-workspace-registered</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformationSets>
+                <transformationSet>
+                  <dir>${project.build.outputDirectory}</dir>
+                  <outputDir>${project.build.outputDirectory}</outputDir>
+                  <includes>
+                    <include>XWiki/XWikiPreferences.xml</include>
+                  </includes>
+                  <stylesheet>src/main/build/transformation/add-global-right.xsl
+                  </stylesheet>
+                  <parameters>
+                    <parameter>
+                      <name>objectName</name>
+                      <value>XWiki.XWikiPreferences</value>
+                    </parameter>
+                    <parameter>
+                      <name>groups</name>
+                      <value>xwiki:XWiki.XWikiAllGroup</value>
+                    </parameter>
+                    <parameter>
+                      <name>levels</name>
+                      <value>view</value>
+                    </parameter>
+                  </parameters>
+                </transformationSet>
+              </transformationSets>
+            </configuration>
+          </execution>
+          <!-- Set initial rights for displaying panels properly to guests. -->
+          <execution>
+            <id>set-rights-for-panels-guests</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformationSets>
+                <transformationSet>
+                  <dir>${project.build.outputDirectory}</dir>
+                  <outputDir>${project.build.outputDirectory}</outputDir>
+                  <includes>
+                    <include>Panels/WebPreferences.xml</include>
+                  </includes>
+                  <stylesheet>src/main/build/transformation/add-global-right.xsl
+                  </stylesheet>
+                  <parameters>
+                    <parameter>
+                      <name>objectName</name>
+                      <value>Panels.WebPreferences</value>
+                    </parameter>
+                    <parameter>
+                      <name>users</name>
+                      <value>XWiki.XWikiGuest</value>
+                    </parameter>
+                    <parameter>
+                      <name>levels</name>
+                      <value>view</value>
+                    </parameter>
+                  </parameters>
+                </transformationSet>
+              </transformationSets>
+            </configuration>
+          </execution>
+          <!-- Set initial rights for displaying panels properly to registered 
+            users. -->
+          <execution>
+            <id>set-rights-for-panels-registered</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformationSets>
+                <transformationSet>
+                  <dir>${project.build.outputDirectory}</dir>
+                  <outputDir>${project.build.outputDirectory}</outputDir>
+                  <includes>
+                    <include>Panels/WebPreferences.xml</include>
+                  </includes>
+                  <stylesheet>src/main/build/transformation/add-global-right.xsl
+                  </stylesheet>
+                  <parameters>
+                    <parameter>
+                      <name>objectName</name>
+                      <value>Panels.WebPreferences</value>
+                    </parameter>
+                    <parameter>
+                      <name>groups</name>
+                      <value>xwiki:XWiki.XWikiAllGroup</value>
+                    </parameter>
+                    <parameter>
+                      <name>levels</name>
+                      <value>view</value>
+                    </parameter>
+                  </parameters>
+                </transformationSet>
+              </transformationSets>
+            </configuration>
+          </execution>
+          <!-- Set initial rights for displaying color themes properly to 
+            guests. -->
+          <execution>
+            <id>set-rights-for-color-themes-guests</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformationSets>
+                <transformationSet>
+                  <dir>${project.build.outputDirectory}</dir>
+                  <outputDir>${project.build.outputDirectory}</outputDir>
+                  <includes>
+                    <include>ColorThemes/WebPreferences.xml</include>
+                  </includes>
+                  <stylesheet>src/main/build/transformation/add-global-right.xsl
+                  </stylesheet>
+                  <parameters>
+                    <parameter>
+                      <name>objectName</name>
+                      <value>ColorThemes.WebPreferences</value>
+                    </parameter>
+                    <parameter>
+                      <name>users</name>
+                      <value>XWiki.XWikiGuest</value>
+                    </parameter>
+                    <parameter>
+                      <name>levels</name>
+                      <value>view</value>
+                    </parameter>
+                  </parameters>
+                </transformationSet>
+              </transformationSets>
+            </configuration>
+          </execution>
+          <!-- Set initial rights for displaying color themes properly to 
+            registered users. -->
+          <execution>
+            <id>set-rights-for-color-themes-registered</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformationSets>
+                <transformationSet>
+                  <dir>${project.build.outputDirectory}</dir>
+                  <outputDir>${project.build.outputDirectory}</outputDir>
+                  <includes>
+                    <include>ColorThemes/WebPreferences.xml</include>
+                  </includes>
+                  <stylesheet>src/main/build/transformation/add-global-right.xsl
+                  </stylesheet>
+                  <parameters>
+                    <parameter>
+                      <name>objectName</name>
+                      <value>ColorThemes.WebPreferences</value>
+                    </parameter>
+                    <parameter>
+                      <name>groups</name>
+                      <value>xwiki:XWiki.XWikiAllGroup</value>
+                    </parameter>
+                    <parameter>
+                      <name>levels</name>
+                      <value>view</value>
+                    </parameter>
+                  </parameters>
+                </transformationSet>
+              </transformationSets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- TODO: Find icons for the new sections. -->
+      <!-- Attach section icon for the WorkspaceUsers administration section. -->
+      <!-- <plugin> -->
+      <!-- <groupId>org.xwiki.platform</groupId> -->
+      <!-- <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId> -->
+      <!-- <executions> -->
+      <!-- <execution> -->
+      <!-- <phase>process-resources</phase> -->
+      <!-- <id>attach-section-icon</id> -->
+      <!-- <goals> -->
+      <!-- <goal>attach</goal> -->
+      <!-- </goals> -->
+      <!-- <configuration> -->
+      <!-- <file>${basedir}/src/main/resources/icon.png</file> -->
+      <!-- <sourceDocument>${basedir}/src/main/resources/XWiki/WorkspaceUsers.xml</sourceDocument> -->
+      <!-- </configuration> -->
+      <!-- </execution> -->
+      <!-- </executions> -->
+      <!-- </plugin> -->
+    </plugins>
+  </build>
+</project>

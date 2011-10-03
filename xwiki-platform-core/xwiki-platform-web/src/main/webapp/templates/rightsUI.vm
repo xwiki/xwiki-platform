@@ -85,7 +85,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
             <tr class="userorgroups-header">
               ## Groups/Users switch
               <th scope="col" class="usersorgroupsnames">
-                #set ($isWorkspace = $services.workspaceManager.isWorkspace($xcontext.database))
+                #set ($isWorkspace = $services.workspace.isWorkspace($xcontext.database))
                 <label for="uorgg" class="hidden">$msg.get('rightsmanager.groups')</label>
                 <input type="radio" id="uorgg" name="uorg" value="groups"
                   onclick="if(!$('unregistered').hasClassName('hidden'))

@@ -167,7 +167,6 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.store.migration.AbstractXWikiMigrationManager;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -787,23 +786,6 @@ public class XWiki implements EventListener
                 Param("xwiki.store.attachment.recyclebin.hint","hibernate")));
         }
 
-        // Run migrations
-        if ("1".equals(Param("xwiki.store.migration", "0"))) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Running storage migrations");
-            }
-            AbstractXWikiMigrationManager manager =
-                (AbstractXWikiMigrationManager) createClassFromConfig("xwiki.store.migration.manager.class",
-                    "com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager", context);
-            manager.startMigrations(context);
-            if ("1".equals(Param("xwiki.store.migration.exitAfterEnd", "0"))) {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("Exiting because xwiki.store.migration.exitAfterEnd is set");
-                }
-                System.exit(0);
-            }
-        }
-
         resetRenderingEngine(context);
 
         // Prepare the Plugin Engine
@@ -930,10 +912,6 @@ public class XWiki implements EventListener
             synchronized (wikiName) {
                 if (!wikiList.contains(wikiName)) {
                     wikiList.add(wikiName);
-                    XWikiHibernateStore store = getHibernateStore();
-                    if (store != null) {
-                        store.updateSchema(context, force);
-                    }
 
                     // Make sure these classes exists
                     if (initClasses) {

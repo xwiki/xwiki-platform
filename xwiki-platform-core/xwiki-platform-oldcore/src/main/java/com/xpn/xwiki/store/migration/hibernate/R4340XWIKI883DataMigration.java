@@ -17,36 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package com.xpn.xwiki.store.migration.hibernate;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.xwiki.component.annotation.Component;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
+import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
- * Migration for XWIKI-883: global access preferences cannot be updated
+ * Migration for XWIKI-883: global access preferences cannot be updated.
  * 
  * @version $Id$
  */
-public class R4340XWIKI883Migrator extends AbstractXWikiHibernateMigrator
+@Component
+@Named("R4340XWIKI883")
+public class R4340XWIKI883DataMigration extends AbstractHibernateDataMigration
 {
-    @Override
-    public String getName()
-    {
-        return "R4340XWIKI883";
-    }
-
     @Override
     public String getDescription()
     {
@@ -60,16 +60,18 @@ public class R4340XWIKI883Migrator extends AbstractXWikiHibernateMigrator
     }
 
     @Override
-    public void migrate(XWikiHibernateMigrationManager manager, XWikiContext context) throws XWikiException
+    public void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        manager.getStore(context).executeWrite(context, true, new HibernateCallback()
+        getStore().executeWrite(getXWikiContext(), true, new HibernateCallback<Object>()
         {
             @Override
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Query q =
                     session
-                        .createQuery("select s from BaseObject o, StringProperty s where o.className like 'XWiki.XWiki%Rights' and o.id=s.id and (s.name='users' or s.name='groups')");
+                        .createQuery(
+                            "select s from BaseObject o, StringProperty s where o.className like 'XWiki.XWiki%Rights'"
+                            + " and o.id=s.id and (s.name='users' or s.name='groups')");
                 List lst = q.list();
                 if (lst.size() == 0) {
                     return null;

@@ -19,45 +19,44 @@
  */
 package com.xpn.xwiki.store.migration;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Interface for migrators which migrate data. New migrators should named like "R"+vernum+issuenumber+"Migrator" for
- * prevent collisions.
- * 
+ * Interface for data migration.
+ * New data migration should be named like "R"+vernum+issuenumber+"DataMigration" to prevent collisions.
  * @version $Id$
+ * @since 3.4M1
  */
-public interface XWikiMigratorInterface
+@ComponentRole
+public interface DataMigration
 {
     /**
-     * @return the migrator name. For example "R4340XWIKI883".
+     * @return the data migration hint. For example "R4340XWIKI883".
      */
     String getName();
 
     /**
-     * @return a description of what the migrator does
+     * @return a description of what the data migration does
      */
     String getDescription();
 
     /**
-     * @return data version which need migration. before you commit stuff which needs migration, you need write migrator
-     *         with version = current svn revision number.
+     * @return data version which need migration. 
+     * before you commit stuff which needs migration,
+     *  you need write data migration with version = current release number (i.e 32000 for release 3.2).
      */
     XWikiDBVersion getVersion();
 
     /**
      * Run migration.
-     * 
-     * @param manager the manager which run migration. used for access to store system.
-     * @param context used everywhere
-     * @throws XWikiException if any error
+     * @throws DataMigrationException if any error
      */
-    void migrate(XWikiMigrationManagerInterface manager, XWikiContext context) throws XWikiException;
+    void migrate() throws DataMigrationException;
 
     /**
-     * @param startupVersion the database version when the migration process starts (before any migrator is applied).
-     *            This is useful for migrator which need to run only when the database is in a certain version.
+     * @param startupVersion the database version when the migration process starts (before any
+     *        dataMigration is applied). This is useful for data migration which need to run only when the
+     *        database is in a certain version.
      * @return true if the migration should be executed or false otherwise
      */
     boolean shouldExecute(XWikiDBVersion startupVersion);

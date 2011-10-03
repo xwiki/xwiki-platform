@@ -17,32 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package com.xpn.xwiki.store.migration;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-
 /**
- * Interface for all migration managers.
- * 
+ * Exception issued by the data migration components when an access is attempted on a database that have
+ * not been migrated to the latest version.
+ *
  * @version $Id$
+ * @since 3.4M1
  */
-public interface XWikiMigrationManagerInterface
+public class MigrationRequiredException extends Exception
 {
     /**
-     * @return data version
-     * @param context - used everywhere
-     * @xwikicfg xwiki.store.migration.version - override data version
-     * @throws XWikiException if any error
+     * Serialization id.
      */
-    XWikiDBVersion getDBVersion(XWikiContext context) throws XWikiException;
+    private static final long serialVersionUID = 1L;
 
     /**
-     * @param context - used everywhere
-     * @throws XWikiException if any error
-     * @xwikicfg xwiki.store.migration.forced - force run selected migrations and ignore all others
-     * @xwikicfg xwiki.store.migration.ignored - ignore selected migrations
-     * @throws XWikiException if any error
+     * Build a simple exception with a message.
+     * @param s message
      */
-    void startMigrations(XWikiContext context) throws XWikiException;
+    public MigrationRequiredException(String s)
+    {
+        super(s);
+    }
 }

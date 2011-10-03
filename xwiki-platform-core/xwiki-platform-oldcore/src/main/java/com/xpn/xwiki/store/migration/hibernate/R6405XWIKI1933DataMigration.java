@@ -17,34 +17,44 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package com.xpn.xwiki.store.migration.hibernate;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import javax.inject.Named;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
-import com.xpn.xwiki.store.migration.XWikiMigrationManagerInterface;
-import com.xpn.xwiki.store.migration.XWikiMigratorInterface;
 
 /**
- * Template for migrators of hibernate store
+ * Migration for XWIKI1933: Editing users fails.
  * 
- * @see XWikiMigratorInterface
+ * Note: This data migration should only be executed if the R4340XWIKI833 one has already been executed
+ * during a previous migration (i.e. if the database is in version >= 4340). This is because it
+ * fixes a bug that cause the previous data migration to have only been executed in the main wiki, and
+ * there was some code that inserted wrong data after the migration.
+ * 
  * @version $Id$
  */
-public abstract class AbstractXWikiHibernateMigrator implements XWikiMigratorInterface
+@Component
+@Named("R6405XWIKI1933")
+public class R6405XWIKI1933DataMigration extends R4340XWIKI883DataMigration
 {
     @Override
-    public void migrate(XWikiMigrationManagerInterface manager, XWikiContext context) throws XWikiException
+    public String getDescription()
     {
-        migrate((XWikiHibernateMigrationManager) manager, context);
+        return "See http://jira.xwiki.org/jira/browse/XWIKI-1933";
+    }
+
+    @Override
+    public XWikiDBVersion getVersion()
+    {
+        return new XWikiDBVersion(6405);
     }
 
     @Override
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
-        return true;
+        return (startupVersion.getVersion() >= 4340);
     }
-
-    /** @see XWikiMigratorInterface#migrate(XWikiMigrationManagerInterface,XWikiContext) */
-    public abstract void migrate(XWikiHibernateMigrationManager manager, XWikiContext context) throws XWikiException;
 }

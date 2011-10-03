@@ -17,17 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package com.xpn.xwiki.store.migration.hibernate;
 
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.inject.Named;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.xwiki.component.annotation.Component;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
+import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
@@ -40,14 +44,10 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * @since 1.3M2
  * @since 1.2.2
  */
-public class R7350XWIKI2079Migrator extends AbstractXWikiHibernateMigrator
+@Component
+@Named("R7345XWIKI2079")
+public class R7350XWIKI2079DataMigration extends AbstractHibernateDataMigration
 {
-    @Override
-    public String getName()
-    {
-        return "R7345XWIKI2079";
-    }
-
     @Override
     public String getDescription()
     {
@@ -61,9 +61,9 @@ public class R7350XWIKI2079Migrator extends AbstractXWikiHibernateMigrator
     }
 
     @Override
-    public void migrate(XWikiHibernateMigrationManager manager, final XWikiContext context) throws XWikiException
+    public void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        manager.getStore(context).executeWrite(context, true, new HibernateCallback<Object>()
+        getStore().executeWrite(getXWikiContext(), true, new HibernateCallback<Object>()
         {
             @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException

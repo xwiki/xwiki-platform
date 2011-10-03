@@ -20,9 +20,9 @@
 package com.xpn.xwiki.store.migration;
 
 /**
- * This entity is store xwiki's data version in database. Used for migrations. Data version is svn revision number from
- * which data need migration. Immutable.
- * 
+ * This entity is store xwiki's data version in database. Used for migrations.
+ * Data version is svn revision number from which data need migration.
+ * Immutable.
  * @version $Id$
  */
 public class XWikiDBVersion implements Comparable<XWikiDBVersion>
@@ -56,7 +56,10 @@ public class XWikiDBVersion implements Comparable<XWikiDBVersion>
     @Override
     public int compareTo(XWikiDBVersion o)
     {
-        return Integer.valueOf(getVersion()).compareTo(Integer.valueOf(o.getVersion()));
+        if (o == null) {
+            return -1;
+        }
+        return Integer.valueOf(getVersion()).compareTo(o.getVersion());
     }
 
     @Override

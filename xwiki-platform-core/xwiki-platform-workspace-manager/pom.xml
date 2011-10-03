@@ -14,24 +14,11 @@
 
   <modules>
     <module>xwiki-platform-workspace-manager-api</module>
-    <module>xwiki-platform-workspace-manager-template</module>
     <module>xwiki-platform-workspace-manager-ui</module>
   </modules>
 
-  <properties>
-    <enterprise.version>${project.version}</enterprise.version>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
-      <!-- XWiki Documents/Applications -->
-      <dependency>
-        <groupId>org.xwiki.enterprise</groupId>
-        <artifactId>xwiki-enterprise-wiki</artifactId>
-        <version>${enterprise.version}</version>
-        <type>xar</type>
-      </dependency>
-
       <!-- XWiki Plugins -->
       <dependency>
         <groupId>org.xwiki.platform</groupId>

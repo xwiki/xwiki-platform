@@ -13,10 +13,15 @@
   <name>XWiki Platform - Workspace Manager - Workspace Template</name>
   <description>Template workspace to be used when creating a new workspace.</description>
 
+  <properties>
+    <enterprise.version>${project.version}</enterprise.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.xwiki.enterprise</groupId>
       <artifactId>xwiki-enterprise-wiki</artifactId>
+      <version>${enterprise.version}</version>
       <type>xar</type>
     </dependency>
     <dependency>
@@ -386,23 +391,23 @@
 
       <!-- TODO: Find icons for the new sections. -->
       <!-- Attach section icon for the WorkspaceUsers administration section. -->
-<!--       <plugin> -->
-<!--         <groupId>org.xwiki.platform</groupId> -->
-<!--         <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId> -->
-<!--         <executions> -->
-<!--           <execution> -->
-<!--             <phase>process-resources</phase> -->
-<!--             <id>attach-section-icon</id> -->
-<!--             <goals> -->
-<!--               <goal>attach</goal> -->
-<!--             </goals> -->
-<!--             <configuration> -->
-<!--               <file>${basedir}/src/main/resources/icon.png</file> -->
-<!--               <sourceDocument>${basedir}/src/main/resources/XWiki/WorkspaceUsers.xml</sourceDocument> -->
-<!--             </configuration> -->
-<!--           </execution> -->
-<!--         </executions> -->
-<!--       </plugin> -->
+      <!-- <plugin> -->
+      <!-- <groupId>org.xwiki.platform</groupId> -->
+      <!-- <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId> -->
+      <!-- <executions> -->
+      <!-- <execution> -->
+      <!-- <phase>process-resources</phase> -->
+      <!-- <id>attach-section-icon</id> -->
+      <!-- <goals> -->
+      <!-- <goal>attach</goal> -->
+      <!-- </goals> -->
+      <!-- <configuration> -->
+      <!-- <file>${basedir}/src/main/resources/icon.png</file> -->
+      <!-- <sourceDocument>${basedir}/src/main/resources/XWiki/WorkspaceUsers.xml</sourceDocument> -->
+      <!-- </configuration> -->
+      <!-- </execution> -->
+      <!-- </executions> -->
+      <!-- </plugin> -->
     </plugins>
   </build>
 </project>

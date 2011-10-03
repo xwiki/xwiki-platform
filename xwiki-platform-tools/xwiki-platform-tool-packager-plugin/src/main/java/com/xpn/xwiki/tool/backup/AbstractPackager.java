@@ -62,41 +62,36 @@ public class AbstractPackager
         Utils.setComponentManager(ecm);
 
         // We need to initialize the Component Manager so that the components can be looked up
-        XWikiContext context = new XWikiContext();
-        context.put(ComponentManager.class.getName(), ecm);
+        XWikiContext xcontext = new XWikiContext();
+        xcontext.put(ComponentManager.class.getName(), ecm);
 
         // Initialize the Container fields (request, response, session).
         ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
-        Execution execution = Utils.getComponent(Execution.class);
         try {
-            // Make sure we set Execution Context in the Execution component before we call the initialization
-            // so that we don't get any NPE if some initializer code asks to get the Execution Context. This
-            // happens for example with the Velocity Execution Context initializer which in turns calls the Velocity
-            // Context initializers and some of them look inside the Execution Context.
-            execution.setContext(new ExecutionContext());
+            ExecutionContext econtext = new ExecutionContext();
 
             // Bridge with old XWiki Context, required for old code.
-            execution.getContext().setProperty("xwikicontext", context);
+            econtext.setProperty("xwikicontext", xcontext);
 
-            ecim.initialize(execution.getContext());
+            ecim.initialize(econtext);
         } catch (ExecutionContextException e) {
             throw new Exception("Failed to initialize Execution Context.", e);
         }
 
-        context.setDatabase(databaseName);
-        context.setMainXWiki(databaseName);
+        xcontext.setDatabase(databaseName);
+        xcontext.setMainXWiki(databaseName);
 
         // Use a dummy Request even in daemon mode so that XWiki's initialization can create a Servlet URL Factory.
-        context.setRequest(new XWikiServletRequestStub());
+        xcontext.setRequest(new XWikiServletRequestStub());
 
         // Use a dummy URL so that XWiki's initialization can create a Servlet URL Factory. We could also have
         // registered a custom XWikiURLFactory against XWikiURLFactoryService but it's more work.
-        context.setURL(new URL("http://localhost/xwiki/bin/DummyAction/DumySpace/DummyPage"));
+        xcontext.setURL(new URL("http://localhost/xwiki/bin/DummyAction/DumySpace/DummyPage"));
 
         // Set a dummy Document in the context to act as the current document since when a document containing
         // objects is imported it'll generate Object diff events and the algorithm to compute an object diff
         // currently requires rendering object properties, which requires a current document in the context.
-        context.setDoc(new XWikiDocument(new DocumentReference(databaseName, "dummySpace", "dummyPage")));
+        xcontext.setDoc(new XWikiDocument(new DocumentReference(databaseName, "dummySpace", "dummyPage")));
 
         XWikiConfig config = new XWikiConfig();
         config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
@@ -111,12 +106,12 @@ public class AbstractPackager
         // Enable backlinks so that when documents are imported their backlinks will be saved too
         config.put("xwiki.backlinks", "1");
 
-        new XWiki(config, context, null, true);
+        new XWiki(config, xcontext, null, true);
 
-        context.setUserReference(new DocumentReference("xwiki", "XWiki", "superadmin"));
+        xcontext.setUserReference(new DocumentReference("xwiki", "XWiki", "superadmin"));
 
         try {
-            context.setURLFactory(new XWikiServletURLFactory(new URL("http://localhost:8080"), "xwiki/", "bin/"));
+            xcontext.setURLFactory(new XWikiServletURLFactory(new URL("http://localhost:8080"), "xwiki/", "bin/"));
         } catch (MalformedURLException e) {
             // TODO: Remove that way of creating exceptions in XWiki as it's a real plain and
             // doesn't work with external code.
@@ -124,6 +119,6 @@ public class AbstractPackager
                 "Failed to set up URL Factory", e);
         }
 
-        return context;
+        return xcontext;
     }
 }

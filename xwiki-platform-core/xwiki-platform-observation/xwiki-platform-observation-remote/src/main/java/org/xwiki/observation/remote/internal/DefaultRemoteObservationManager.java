@@ -212,7 +212,6 @@ public class DefaultRemoteObservationManager implements RemoteObservationManager
     {
         if (this.execution.getContext() == null) {
             ExecutionContext context = new ExecutionContext();
-            this.execution.setContext(context);
 
             try {
                 this.executionContextManager.initialize(context);

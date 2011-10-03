@@ -56,16 +56,12 @@ public abstract class AbstractJob implements Job
             ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
             execution = Utils.getComponent(Execution.class);
 
-            // Make sure we set Execution Context in the Execution component before we call the initialization
-            // so that we don't get any NPE if some initializer code asks to get the Execution Context. This
-            // happens for example with the Velocity Execution Context initializer which in turns calls the Velocity
-            // Context initializers and some of them look inside the Execution Context.
-            execution.setContext(new ExecutionContext());
+            ExecutionContext context = new ExecutionContext();
 
             // Bridge with old XWiki Context, required for old code.
-            execution.getContext().setProperty("xwikicontext", xwikiContext);
+            context.setProperty("xwikicontext", xwikiContext);
 
-            ecim.initialize(execution.getContext());
+            ecim.initialize(context);
         } catch (ExecutionContextException e) {
             throw new JobExecutionException("Fail to initialize execution context", e);
         }

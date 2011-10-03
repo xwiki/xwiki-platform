@@ -19,26 +19,25 @@
  */
 package com.xpn.xwiki.tool.backup;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiConfig;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiServletRequestStub;
-import com.xpn.xwiki.web.XWikiServletURLFactory;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.DocumentReference;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiServletRequestStub;
+import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 /**
  * Common code for importing and exporting.

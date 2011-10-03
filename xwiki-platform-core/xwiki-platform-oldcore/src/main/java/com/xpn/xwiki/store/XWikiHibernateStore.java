@@ -36,6 +36,7 @@ import java.util.StringTokenizer;
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -109,6 +110,7 @@ import com.xpn.xwiki.web.Utils;
  * @version $Id$
  */
 @Component
+@Named("hibernate")
 @Singleton
 public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWikiStoreInterface
 {

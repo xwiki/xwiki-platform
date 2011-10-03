@@ -75,18 +75,18 @@ xwiki.tags=1
 #-# one of the storages, implement the appropriate interface and declare it in a components.xml file (using a role-hint
 #-# other than 'default') and put its hint here.
 #
-#-# The main (documents) storage.
-# xwiki.store.main.hint=default
-#-# The attachment storage.
-# xwiki.store.attachment.hint=default
-#-# The document versioning storage.
-# xwiki.store.versioning.hint=default
-#-# The attachment versioning storage. Use 'void' to disable attachment versioning.
-# xwiki.store.attachment.versioning.hint=default
-#-# The document recycle bin storage.
-# xwiki.store.recyclebin.hint=default
-#-# The attachment recycle bin storage.
-# xwiki.store.attachment.recyclebin.hint=default
+#-# The main (documents) storage. [Since 3.3M1] default is hibernate.
+# xwiki.store.main.hint=hibernate
+#-# The attachment storage. [Since 3.3M1] default is hibernate.
+# xwiki.store.attachment.hint=hibernate
+#-# The document versioning storage. [Since 3.3M1] default is hibernate.
+# xwiki.store.versioning.hint=hibernate
+#-# The attachment versioning storage. Use 'void' to disable attachment versioning. [Since 3.3M1] default is hibernate.
+# xwiki.store.attachment.versioning.hint=hibernate
+#-# The document recycle bin storage. [Since 3.3M1] default is hibernate.
+# xwiki.store.recyclebin.hint=hibernate
+#-# The attachment recycle bin storage. [Since 3.3M1] default is hibernate.
+# xwiki.store.attachment.recyclebin.hint=hibernate
 
 #-# Whether the document recycle bin feature is activated or not
 # xwiki.recyclebin=1

@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.store.hibernate;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
@@ -40,6 +43,8 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
  * @since 1.4M2
  */
 @Component
+@Named("hibernate")
+@Singleton
 public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore implements AttachmentVersioningStore
 {
     /** logger. */

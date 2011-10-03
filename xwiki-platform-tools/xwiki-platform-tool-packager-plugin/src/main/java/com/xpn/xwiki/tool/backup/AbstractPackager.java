@@ -44,7 +44,7 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
  * 
  * @version $Id$
  */
-public class AbstractPackager
+public abstract class AbstractPackager
 {
     /**
      * @param databaseName some database name (TODO: find out what this name is really)

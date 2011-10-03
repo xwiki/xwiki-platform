@@ -51,11 +51,7 @@ public class ExportMojo extends AbstractMojo
      */
     private File exportDirectory;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.apache.maven.plugin.AbstractMojo#execute()
-     */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
         // Ensure that the export directory exists before performing the export

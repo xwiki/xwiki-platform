@@ -90,4 +90,10 @@ public abstract class AbstractActionExecutionEvent implements Serializable, Acti
         }
         return isMatching;
     }
+
+    @Override
+    public String toString()
+    {
+        return getClass() + " (" + getActionName() + ")";
+    }
 }

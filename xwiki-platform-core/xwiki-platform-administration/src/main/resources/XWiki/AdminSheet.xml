@@ -3175,7 +3175,7 @@ document.observe('xwiki:dom:loaded', function() {
   #set ($categoriesToRemove = [])
   #foreach ($category in $adminMenu)
     #set ($sectionsToRemove = [])
-    #foreach ($section on $category.children)
+    #foreach ($section in $category.children)
       #if (!$section.perSpace)
         #set ($discard = $sectionsToRemove.add($section))
       #end

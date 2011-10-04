@@ -168,16 +168,19 @@
     ##
     ## If getDocument returns null, then warn the user that they don't have view access to that application.
     #if (!$app)
-!      #set ($discard = $appsUserCannotView.add($appName))
+      #set ($discard = $appsUserCannotView.add($appName))
     #end
     ##
     #foreach ($configurableObject in $app.getObjects($nameOfThisDocument))
       #set ($displayInSection = $app.getValue('displayInSection', $configurableObject))
       ##
+      ## If there is no section specified in the object, just skip it
+      #if ("$!{displayInSection}" == '')
+        ## Skip, bad object
       ## If there is no section for this configurable or if the section cannot be edited, then check if the
       ## application can be edited by the current user, if so then we display the icon from the current app and
       ## don't display any message to tell the user they can't edit that section.
-      #if ($sectionsByName.containsKey($displayInSection))
+      #elseif ($sectionsByName.containsKey($displayInSection))
         #set ($appSection = $sectionsByName.get($displayInSection))
         #set ($appSection.configurable = true)
         #set ($newSection = false)

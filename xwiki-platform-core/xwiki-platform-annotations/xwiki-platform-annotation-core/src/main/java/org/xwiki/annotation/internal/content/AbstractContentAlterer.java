@@ -31,11 +31,7 @@ import org.xwiki.annotation.content.ContentAlterer;
  */
 public abstract class AbstractContentAlterer implements ContentAlterer
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.content.ContentAlterer#alter(org.xwiki.annotation.content.AlteredContent)
-     */
+    @Override
     public AlteredContent alter(final AlteredContent alteredContent)
     {
         final AlteredContent ac = alter(alteredContent.getContent().toString());

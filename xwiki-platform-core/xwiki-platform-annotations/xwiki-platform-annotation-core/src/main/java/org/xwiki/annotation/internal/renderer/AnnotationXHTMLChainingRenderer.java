@@ -82,11 +82,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         return annotationsMarkerPrinter;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#getXHTMLWikiPrinter()
-     */
     @Override
     protected XHTMLWikiPrinter getXHTMLWikiPrinter()
     {
@@ -102,11 +97,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
             AnnotationGeneratorChainingListener.class);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.QueueListener#onWord(java.lang.String)
-     */
     @Override
     public void onWord(String word)
     {
@@ -121,11 +111,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#onSpace()
-     */
     @Override
     public void onSpace()
     {
@@ -133,11 +118,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.onSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.QueueListener#onSpecialSymbol(char)
-     */
     @Override
     public void onSpecialSymbol(char symbol)
     {
@@ -152,11 +132,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.QueueListener#onVerbatim(java.lang.String, boolean, java.util.Map)
-     */
     @Override
     public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
@@ -188,11 +163,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.QueueListener#onRawText(java.lang.String, org.xwiki.rendering.syntax.Syntax)
-     */
     @Override
     public void onRawText(String text, Syntax syntax)
     {
@@ -231,9 +201,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endLink(
-     *      org.xwiki.rendering.listener.reference.ResourceReference , boolean, java.util.Map)
      * @since 2.5RC1
      */
     @Override
@@ -243,11 +210,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endLink(reference, isFreeStandingURI, parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#endDefinitionDescription()
-     */
     @Override
     public void endDefinitionDescription()
     {
@@ -255,11 +217,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endDefinitionDescription();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#endDefinitionList(java.util.Map)
-     */
     @Override
     public void endDefinitionList(Map<String, String> parameters)
     {
@@ -267,11 +224,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endDefinitionList(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#endDefinitionTerm()
-     */
     @Override
     public void endDefinitionTerm()
     {
@@ -281,8 +233,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument(MetaData)
      * @since 3.0M2
      */
     @Override
@@ -292,12 +242,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endDocument(metaData);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer
-     *      #endFormat(org.xwiki.rendering.listener.Format, java.util.Map)
-     */
     @Override
     public void endFormat(Format format, Map<String, String> parameters)
     {
@@ -305,11 +249,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endFormat(format, parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#endGroup(java.util.Map)
-     */
     @Override
     public void endGroup(Map<String, String> parameters)
     {
@@ -317,12 +256,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endGroup(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer
-     *      #endHeader(org.xwiki.rendering.listener.HeaderLevel, java.lang.String, java.util.Map)
-     */
     @Override
     public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
@@ -330,12 +263,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endHeader(level, id, parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer
-     *      #endList(org.xwiki.rendering.listener.ListType, java.util.Map)
-     */
     @Override
     public void endList(ListType listType, Map<String, String> parameters)
     {
@@ -343,11 +270,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endList(listType, parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#endListItem()
-     */
     @Override
     public void endListItem()
     {
@@ -355,11 +277,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endListItem();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#endParagraph(java.util.Map)
-     */
     @Override
     public void endParagraph(Map<String, String> parameters)
     {
@@ -367,11 +284,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endParagraph(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#endQuotation(java.util.Map)
-     */
     @Override
     public void endQuotation(Map<String, String> parameters)
     {
@@ -379,11 +291,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endQuotation(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endQuotationLine()
-     */
     @Override
     public void endQuotationLine()
     {
@@ -391,11 +298,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endQuotationLine();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endSection(java.util.Map)
-     */
     @Override
     public void endSection(Map<String, String> parameters)
     {
@@ -403,11 +305,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endSection(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#endTable(java.util.Map)
-     */
     @Override
     public void endTable(Map<String, String> parameters)
     {
@@ -415,11 +312,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endTable(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#endTableCell(java.util.Map)
-     */
     @Override
     public void endTableCell(Map<String, String> parameters)
     {
@@ -427,11 +319,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endTableCell(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#endTableHeadCell(java.util.Map)
-     */
     @Override
     public void endTableHeadCell(Map<String, String> parameters)
     {
@@ -439,11 +326,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endTableHeadCell(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#endTableRow(java.util.Map)
-     */
     @Override
     public void endTableRow(Map<String, String> parameters)
     {
@@ -451,11 +333,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.endTableRow(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#beginDefinitionDescription()
-     */
     @Override
     public void beginDefinitionDescription()
     {
@@ -463,11 +340,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.beginDefinitionDescription();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#beginDefinitionList(java.util.Map)
-     */
     @Override
     public void beginDefinitionList(Map<String, String> parameters)
     {
@@ -475,11 +347,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.beginDefinitionList(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#beginDefinitionTerm()
-     */
     @Override
     public void beginDefinitionTerm()
     {
@@ -487,12 +354,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.beginDefinitionTerm();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer
-     *      #beginFormat(org.xwiki.rendering.listener.Format, java.util.Map)
-     */
     @Override
     public void beginFormat(Format format, Map<String, String> parameters)
     {
@@ -500,11 +361,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.beginFormat(format, parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#beginGroup(java.util.Map)
-     */
     @Override
     public void beginGroup(Map<String, String> parameters)
     {
@@ -512,12 +368,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.beginGroup(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer
-     *      #beginHeader(org.xwiki.rendering.listener.HeaderLevel, java.lang.String, java.util.Map)
-     */
     @Override
     public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
@@ -527,9 +377,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer
-     *      #beginLink(org.xwiki.rendering.listener.Link, boolean, java.util.Map)
      * @since 2.5RC1
      */
     @Override
@@ -539,12 +386,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.beginLink(reference, isFreeStandingURI, parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer
-     *      #beginList(org.xwiki.rendering.listener.ListType, java.util.Map)
-     */
     @Override
     public void beginList(ListType listType, Map<String, String> parameters)
     {
@@ -552,11 +393,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.beginList(listType, parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#beginListItem()
-     */
     @Override
     public void beginListItem()
     {
@@ -564,11 +400,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.beginListItem();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#beginParagraph(java.util.Map)
-     */
     @Override
     public void beginParagraph(Map<String, String> parameters)
     {
@@ -576,11 +407,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.beginParagraph(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#beginQuotation(java.util.Map)
-     */
     @Override
     public void beginQuotation(Map<String, String> parameters)
     {
@@ -588,11 +414,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.beginQuotation(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#beginQuotationLine()
-     */
     @Override
     public void beginQuotationLine()
     {
@@ -600,11 +421,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.beginQuotationLine();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginSection(java.util.Map)
-     */
     @Override
     public void beginSection(Map<String, String> parameters)
     {
@@ -612,11 +428,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.beginSection(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#beginTable(java.util.Map)
-     */
     @Override
     public void beginTable(Map<String, String> parameters)
     {
@@ -624,11 +435,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.beginTable(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#beginTableCell(java.util.Map)
-     */
     @Override
     public void beginTableCell(Map<String, String> parameters)
     {
@@ -636,11 +442,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.beginTableCell(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#beginTableHeadCell(java.util.Map)
-     */
     @Override
     public void beginTableHeadCell(Map<String, String> parameters)
     {
@@ -648,11 +449,6 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
         super.beginTableHeadCell(parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#beginTableRow(java.util.Map)
-     */
     @Override
     public void beginTableRow(Map<String, String> parameters)
     {

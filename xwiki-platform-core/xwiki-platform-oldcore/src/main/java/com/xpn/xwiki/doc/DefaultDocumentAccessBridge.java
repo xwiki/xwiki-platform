@@ -1027,7 +1027,14 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public void pushDocumentInContext(Map<String, Object> backupObjects, String documentReference) throws Exception
     {
         XWikiContext xcontext = getContext();
+
+        // Backup current context state
         XWikiDocument.backupContext(backupObjects, xcontext);
+
+        // Make sure to get the current XWikiContext after ExcutionContext clone
+        xcontext = getContext();
+
+        // Change context document
         xcontext.getWiki().getDocument(documentReference, xcontext).setAsContextDoc(xcontext);
     }
 
@@ -1040,7 +1047,14 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         throws Exception
     {
         XWikiContext xcontext = getContext();
+
+        // Backup current context state
         XWikiDocument.backupContext(backupObjects, xcontext);
+
+        // Make sure to get the current XWikiContext after ExcutionContext clone
+        xcontext = getContext();
+
+        // Change context document
         xcontext.getWiki().getDocument(documentReference, xcontext).setAsContextDoc(xcontext);
     }
 

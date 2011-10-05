@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>XAppResources</web>
 <name>Translations</name>
@@ -24,30 +23,31 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language sv generated from http://www.l10n.xwiki.org
+#Wed Oct 05 19:18:57 CEST 2011
 xapp.action.exportnonrecurse=Exportera (ej rekursivt)
 xapp.action.exportrecurse=Exportera
 xapp.action.reloadapp=Ladda om
-xapp.answer.deleteapp.msg=\u00C4r du s\u00E4ker p\u00E5 att du vill radera applikationen "{0}"?
+xapp.answer.deleteapp.msg=Är du säker på att du vill radera applikationen "{0}"?
 xapp.answer.deleteapp.title=Radera applikation "{0}"
 xapp.answer.exportapp.recursive=Rekursivt
 xapp.answer.exportapp.title=Exportera applikation "{0}"
 xapp.answer.exportapp.withdetails=Med historik
 xapp.appmanager=Applikationshanterare
 xapp.appname=Applikationsnamn
-xapp.availablefilestoimport=Filer tillg\u00E4ngliga f\u00F6r import
+xapp.availablefilestoimport=Filer tillgängliga för import
 xapp.createapplication=Skapa ny applikation
 xapp.description=Beskrivning
 xapp.docname=Dokumentnamn
-xapp.errorcreateapp=Ett fel uppstod d\u00E5 applikationen "{0}" skulle skapas (felkod "{1}").
-xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=En applikationen med namnet "{0}" finns redan.  V\u00E4lj ett annat namn.
-xapp.errordeleteapp=Ett fel uppstod d\u00E5 applikationen "{0}" skulle raderas (felkod "{1}").
-xapp.errorexportapp=Ett fel uppstod d\u00E5 applikationen "{0}" skulle exporteras (felkod "{1}").
+xapp.errorcreateapp=Ett fel uppstod då applikationen "{0}" skulle skapas (felkod "{1}").
+xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=En applikationen med namnet "{0}" finns redan.  Välj ett annat namn.
+xapp.errordeleteapp=Ett fel uppstod då applikationen "{0}" skulle raderas (felkod "{1}").
+xapp.errorexportapp=Ett fel uppstod då applikationen "{0}" skulle exporteras (felkod "{1}").
 xapp.errorimportapp=Ett fel uppstod vid importeringen av applikationspaketet "{0}" (felkod "{1}").
-xapp.errorreloadapp=Ett fel uppstod d\u00E5 applikationen "{0}" skulle laddas om (felkod "{1}").
+xapp.errorreloadapp=Ett fel uppstod då applikationen "{0}" skulle laddas om (felkod "{1}").
 xapp.legend.application=Applikation
 xapp.legend.validate=Validera
-xapp.pluginnotenabled=Pluginen f\u00F6r applikationshanteraren \u00E4r ej aktiverad.  Den h\u00E4r sidan kommer ej att fungera som den skall. Kontrollera att "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" finns med i listan f\u00F6r parametern xwiki.plugins i filen xwiki.cfg.
-xapp.successcreateapp=Applikationen "{0}" har skapats.  Du kan komma \u00E5t den p\u00E5 [{1}].
+xapp.pluginnotenabled=Pluginen för applikationshanteraren är ej aktiverad.  Den här sidan kommer ej att fungera som den skall. Kontrollera att "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" finns med i listan för parametern xwiki.plugins i filen xwiki.cfg.
+xapp.successcreateapp=Applikationen "{0}" har skapats.  Du kan komma åt den på [{1}].
 xapp.successdeleteapp=Radering av applikationen "{0}" lyckades.
 xapp.successexportapp=Export av applikationen "{0}" lyckades.
 xapp.successimportapp=Importen av applikationspaketet "{0}" lyckades.

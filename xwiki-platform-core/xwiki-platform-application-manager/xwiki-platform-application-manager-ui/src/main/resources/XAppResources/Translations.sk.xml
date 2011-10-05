@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>XAppResources</web>
 <name>Translations</name>
@@ -24,4 +23,5 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
+#Wed Oct 05 19:18:56 CEST 2011
 </content></xwikidoc>

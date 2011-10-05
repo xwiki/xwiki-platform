@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>XAppResources</web>
 <name>Translations</name>
@@ -24,33 +23,34 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language nl generated from http://www.l10n.xwiki.org
-xapp.action.exportnonrecurse=Eksport\u0113t (nerekurs\u012Bvi)
-xapp.action.exportrecurse=Eksport\u0113t
-xapp.action.reloadapp=P\u0101rl\u0101d\u0113t
-xapp.answer.deleteapp.msg=Vai tie\u0161\u0101m v\u0113laties dz\u0113st lietotni "{0}"?
-xapp.answer.deleteapp.title=Dz\u0113st lietotni "{0}"
-xapp.answer.exportapp.recursive=Rekurs\u012Bvi
-xapp.answer.exportapp.title=Eksport\u0113t lietotni "{0}"
-xapp.answer.exportapp.withdetails=Ar v\u0113sturi
-xapp.appmanager=Lietot\u0146u p\u0101rvaldnieks
+#Wed Oct 05 19:18:50 CEST 2011
+xapp.action.exportnonrecurse=Eksportēt (nerekursīvi)
+xapp.action.exportrecurse=Eksportēt
+xapp.action.reloadapp=Pārlādēt
+xapp.answer.deleteapp.msg=Vai tiešām vēlaties dzēst lietotni "{0}"?
+xapp.answer.deleteapp.title=Dzēst lietotni "{0}"
+xapp.answer.exportapp.recursive=Rekursīvi
+xapp.answer.exportapp.title=Eksportēt lietotni "{0}"
+xapp.answer.exportapp.withdetails=Ar vēsturi
+xapp.appmanager=Lietotņu pārvaldnieks
 xapp.appname=Lietotnes nosaukums
-xapp.availablefilestoimport=Import\u0113\u0161anai pieejamie faili
+xapp.availablefilestoimport=Importēšanai pieejamie faili
 xapp.createapplication=Izveidot jaunu lietotni
 xapp.description=Apraksts
 xapp.docname=Dokumenta nosaukums
-xapp.errorcreateapp=Veidojot lietotni "{0}" rad\u0101s k\u013C\u016Bda (kods "{1}").
-xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=Lietotne "{0}" jau past\u0101v. Izv\u0113lieties citu nosaukumu.
-xapp.errordeleteapp=Dz\u0113\u0161ot lietotni "{0}" rad\u0101s k\u013C\u016Bda (kods "{1}").
-xapp.errorexportapp=Eksport\u0113jot lietotni "{0}" rad\u0101s k\u013C\u016Bda (kods "{1}").
-xapp.errorimportapp=Import\u0113jot lietotni "{0}" rad\u0101s k\u013C\u016Bda (kods "{1}").
-xapp.errorreloadapp=P\u0101rl\u0101d\u0113jot lietotni "{0}" rad\u0101s k\u013C\u016Bda (kods "{1}").
+xapp.errorcreateapp=Veidojot lietotni "{0}" radās kļūda (kods "{1}").
+xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=Lietotne "{0}" jau pastāv. Izvēlieties citu nosaukumu.
+xapp.errordeleteapp=Dzēšot lietotni "{0}" radās kļūda (kods "{1}").
+xapp.errorexportapp=Eksportējot lietotni "{0}" radās kļūda (kods "{1}").
+xapp.errorimportapp=Importējot lietotni "{0}" radās kļūda (kods "{1}").
+xapp.errorreloadapp=Pārlādējot lietotni "{0}" radās kļūda (kods "{1}").
 xapp.legend.application=Lietotne
-xapp.legend.validate=P\u0101rbaud\u012Bt
-xapp.pluginnotenabled=Lietot\u0146u p\u0101rvaldnieka spraudnis nav iesp\u0113jots. P\u0101rliecinieties, ka xwiki.cfg fail\u0101 parametram xwiki.plugins ir nor\u0101d\u012Bts "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin"
-xapp.successcreateapp=Lietotne "{0}" ir izveidota. J\u016Bs varat to izmantot [{1}]. 
-xapp.successdeleteapp=Lietotnes "{0}" dz\u0113\u0161ana ir vieksm\u012Bga.
-xapp.successexportapp=Lietotnes "{0}" eksport\u0113\u0161ana ir vieksm\u012Bga.
-xapp.successimportapp=Lietotnes "{0}" import\u0113\u0161ana ir vieksm\u012Bga.
-xapp.successreloadapp=Lietotnes "{0}" p\u0101rl\u0101d\u0113\u0161ana ir vieksm\u012Bga.
-xapp.totalnumberofapp=Kop\u0113jais lietot\u0146us skaits
+xapp.legend.validate=Pārbaudīt
+xapp.pluginnotenabled=Lietotņu pārvaldnieka spraudnis nav iespējots. Pārliecinieties, ka xwiki.cfg failā parametram xwiki.plugins ir norādīts "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin"
+xapp.successcreateapp=Lietotne "{0}" ir izveidota. Jūs varat to izmantot [{1}].
+xapp.successdeleteapp=Lietotnes "{0}" dzēšana ir vieksmīga.
+xapp.successexportapp=Lietotnes "{0}" eksportēšana ir vieksmīga.
+xapp.successimportapp=Lietotnes "{0}" importēšana ir vieksmīga.
+xapp.successreloadapp=Lietotnes "{0}" pārlādēšana ir vieksmīga.
+xapp.totalnumberofapp=Kopējais lietotņus skaits
 </content></xwikidoc>

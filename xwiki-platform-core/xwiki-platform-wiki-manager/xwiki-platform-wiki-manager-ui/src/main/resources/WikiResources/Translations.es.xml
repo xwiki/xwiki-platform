@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>WikiResources</web>
 <name>Translations</name>
@@ -24,10 +23,11 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language es generated from http://www.l10n.xwiki.org
+#Wed Oct 05 19:01:47 CEST 2011
 XWiki.XWikiServerClass_visibility_private=Privada
 XWiki.XWikiServerClass_visibility_public=Publica
-error.ERROR_XWIKI_ACCESS_DENIED=No tiene privilegios para realizar esta acci\u00F3n.
-wikimanager.action.createwiki.hidedoc=Ocultar documentaci\u00F3n
+error.ERROR_XWIKI_ACCESS_DENIED=No tiene privilegios para realizar esta acción.
+wikimanager.action.createwiki.hidedoc=Ocultar documentación
 wikimanager.action.createwiki.nonstepbystep=Cambiar a vista normal
 wikimanager.action.createwiki.showdoc=Mostrar documentacion
 wikimanager.action.createwiki.stepbystep=Cambiar a vista de asistente
@@ -37,29 +37,29 @@ wikimanager.action.settemplate.false=Desmarcar
 wikimanager.action.settemplate.true=Marcar
 wikimanager.action.settings=Ajustes
 wikimanager.admins=Administradores
-wikimanager.answer.deletewiki.msg=\u00BFEst\u00E1 seguro(a) de que quiere borrar el wiki "{0}"?
+wikimanager.answer.deletewiki.msg=¿Está seguro(a) de que quiere borrar el wiki "{0}"?
 wikimanager.answer.deletewiki.title=Borrar wiki
 wikimanager.createwiki=Crear nuevo wiki
 wikimanager.defaultdatetimeformat=dd 'de' MMMM yyyy 'a las' HH\:mm
-wikimanager.doc.createwiki.datafrom=Cuando se crea un nuevo wiki se obtiene por defecto un wiki vac\u00EDo. Puede usar una plantilla y/o paquetes XAR como origen del contenido del nuevo wiki.
-wikimanager.doc.createwiki.datafrom.package=Entonces el fichero XAR adjuntado ser\u00E1 importado al nuevo wiki. Para a\u00F1adir m\u00E1s paquetes a la lista adjunte m\u00E1s ficheros XAR a esta p\u00E1gina.
-wikimanager.doc.createwiki.datafrom.template=Primero, el contenido de la plantilla wiki ser\u00E1 copiado a la nueva wiki. Puede convertir cualquier wiki en plantilla marcando la propiedad ~~Plantilla~~ en [la p\u00E1gina principal de Wiki Manager&gt;WikiManager.WebHome] o en la p\u00E1gina de descripci\u00F3n del wiki.
-wikimanager.doc.createwiki.desc=Cambie todas las propiedades de su wiki aqu\u00ED. Todas estas propiedades pueden cambiarse en cualquier momento en la p\u00E1gina de descripci\u00F3n del wiki.
-wikimanager.doc.createwiki.desc.description=Una breve descripci\u00F3n del wiki.
-wikimanager.doc.createwiki.desc.homepage=P\u00E1gina principal del wiki.
+wikimanager.doc.createwiki.datafrom=Cuando se crea un nuevo wiki se obtiene por defecto un wiki vacío. Puede usar una plantilla y/o paquetes XAR como origen del contenido del nuevo wiki.
+wikimanager.doc.createwiki.datafrom.package=Entonces el fichero XAR adjuntado será importado al nuevo wiki. Para añadir más paquetes a la lista adjunte más ficheros XAR a esta página.
+wikimanager.doc.createwiki.datafrom.template=Primero, el contenido de la plantilla wiki será copiado a la nueva wiki. Puede convertir cualquier wiki en plantilla marcando la propiedad ~~Plantilla~~ en [la página principal de Wiki Manager&gt;WikiManager.WebHome] o en la página de descripción del wiki.
+wikimanager.doc.createwiki.desc=Cambie todas las propiedades de su wiki aquí. Todas estas propiedades pueden cambiarse en cualquier momento en la página de descripción del wiki.
+wikimanager.doc.createwiki.desc.description=Una breve descripción del wiki.
+wikimanager.doc.createwiki.desc.homepage=Página principal del wiki.
 wikimanager.doc.createwiki.desc.iswikitemplate=Indica si el wiki puede usarse como plantilla al crear una nueva wiki.
-wikimanager.doc.createwiki.desc.owner=Un usuario global que tendr\u00E1 privilegios totales sobre el wiki.
+wikimanager.doc.createwiki.desc.owner=Un usuario global que tendrá privilegios totales sobre el wiki.
 wikimanager.doc.createwiki.desc.secure=Si se marcar, todas las URLs externas generados empezaran con ~~https~~.
 wikimanager.doc.createwiki.desc.server=El alias para acceder al wiki.
-wikimanager.doc.createwiki.desc.server.creation=El alias utilizado para acceder al wiki. El sufijo actual para los alias es ~~{0}~~. Para cambiarlo edite esta p\u00E1gina wiki y busque "$ALIASSUFFIX" en la secci\u00F3n TOOLS.&lt;br/&gt;Puede a\u00F1adir m\u00E1s alias posteriormente en la p\u00E1gina de descripci\u00F3n del wiki.
+wikimanager.doc.createwiki.desc.server.creation=El alias utilizado para acceder al wiki. El sufijo actual para los alias es ~~{0}~~. Para cambiarlo edite esta página wiki y busque "$ALIASSUFFIX" en la sección TOOLS.&lt;br/&gt;Puede añadir más alias posteriormente en la página de descripción del wiki.
 wikimanager.doc.createwiki.desc.wikiprettyname=El nombre del wiki.
-wikimanager.doc.createwiki.intro=Crear un nuevo wiki. Crear\u00E1 un nuevo documento de descripci\u00F3n del wiki en el wiki principal y su base de datos o esquema asociado dependiendo del motor de bases de datos utilizado.
-wikimanager.doc.createwiki.members=Por defecto un nuevo wiki es independiente, esto es, quitando a los administradores ning\u00FAn usuario global tendr\u00E1 acceso a ellos. Aqu\u00ED puede decidir quer usuarios y grupos globales tendr\u00E1n acceso al nuevo wiki.
+wikimanager.doc.createwiki.intro=Crear un nuevo wiki. Creará un nuevo documento de descripción del wiki en el wiki principal y su base de datos o esquema asociado dependiendo del motor de bases de datos utilizado.
+wikimanager.doc.createwiki.members=Por defecto un nuevo wiki es independiente, esto es, quitando a los administradores ningún usuario global tendrá acceso a ellos. Aquí puede decidir quer usuarios y grupos globales tendrán acceso al nuevo wiki.
 wikimanager.doc.createwiki.members.administrators=Otorgar privilegio "admin", que significa todos los privilegios, a los usuarios y grupos indicados.
 wikimanager.doc.createwiki.members.readers=Otorgar privilegio "read" a los usuarios y grupos indicados.
 wikimanager.doc.createwiki.members.writers=Otorgar privilegio "write" a los usuarios y grupos indicados.
-wikimanager.doc.createwiki.summary=Est\u00E1 a punto de crear un nuevo wiki con estos ajustes. Asegurese que son correctos. Puede pinchar en Anterior para acceder a las p\u00E1ginas anteriores y modificarlos.
-wikimanager.doc.createwiki.wikiname=Escoja un identificador para su wiki. Ser\u00E1 usaro\:\n* como nombre de la base de datos en el motor de base de datos usado por XWiki.\n* para apuntar p\u00E1ginas del wiki desde otros wikis con la sintaxis "identificadorwiki\:Espacio.Nombre".\n* para generar el nombre de la p\u00E1gina de descripci\u00F3n en el wiki principal (~~XWiki.XWikiServer*Identificadorwiki*~~). El identificador wiki debe contener s\u00F3lo caracteres alfanum\u00E9ricos en min\u00FAsculas (0-9, a-z).
+wikimanager.doc.createwiki.summary=Está a punto de crear un nuevo wiki con estos ajustes. Asegurese que son correctos. Puede pinchar en Anterior para acceder a las páginas anteriores y modificarlos.
+wikimanager.doc.createwiki.wikiname=Escoja un identificador para su wiki. Será usaro\:\n* como nombre de la base de datos en el motor de base de datos usado por XWiki.\n* para apuntar páginas del wiki desde otros wikis con la sintaxis "identificadorwiki\:Espacio.Nombre".\n* para generar el nombre de la página de descripción en el wiki principal (~~XWiki.XWikiServer*Identificadorwiki*~~). El identificador wiki debe contener sólo caracteres alfanuméricos en minúsculas (0-9, a-z).
 wikimanager.erroraliasalreadynotexists=El alias de wiki "{0}" ya existe.
 wikimanager.erroraliasdoesnotexists=El alias de wiki "{0}" no existe.
 wikimanager.errorcreatewiki=Fallo al crear el wiki "{0}"\: {1}.
@@ -76,52 +76,52 @@ wikimanager.listwikiactionsmembers=Miembros
 wikimanager.listwikiactionspref=Pref
 wikimanager.listwikiactionsrights=Privilegios
 wikimanager.listwikiadmin=Admin
-wikimanager.listwikicreation=Creaci\u00F3n
+wikimanager.listwikicreation=Creación
 wikimanager.listwikidomains=Nombres de dominio
 wikimanager.listwikiempty=No hay wikis abiertos.
 wikimanager.listwikiname=Nombre
 wikimanager.listwikirank=Rango
 wikimanager.listwikistate=Estado
 wikimanager.listwikitemplate=Plantilla wiki
-wikimanager.notinvirtualmode=Este wiki no est\u00E1 configurado en modo virtual. Esto significa que usted s\u00F3lo puede acceder al wiki principal. Asegurese de que tiene &lt;tt&gt;xwiki.virtual\=1&lt;/tt&gt; wn wl fichero &lt;tt&gt;xwiki.cfg&lt;/tt&gt;.
-wikimanager.pluginnotenabled=El plugin de Wiki Manager no est\u00E1 habilitado. Est\u00E1 p\u00E1gina no funcionar\u00E1 correctamente. Asegurese que &lt;tt&gt;com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin&lt;/tt&gt; aparece en la lista de &lt;tt&gt;xwiki.plugins&lt;/tt&gt; en el fichero &lt;tt&gt;xwiki.cfg&lt;/tt&gt;.
-wikimanager.prop.alias.description=Descripci\u00F3n
-wikimanager.prop.alias.homepage=P\u00E1gina de inicio
+wikimanager.notinvirtualmode=Este wiki no está configurado en modo virtual. Esto significa que usted sólo puede acceder al wiki principal. Asegurese de que tiene &lt;tt&gt;xwiki.virtual\=1&lt;/tt&gt; wn wl fichero &lt;tt&gt;xwiki.cfg&lt;/tt&gt;.
+wikimanager.pluginnotenabled=El plugin de Wiki Manager no está habilitado. Está página no funcionará correctamente. Asegurese que &lt;tt&gt;com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin&lt;/tt&gt; aparece en la lista de &lt;tt&gt;xwiki.plugins&lt;/tt&gt; en el fichero &lt;tt&gt;xwiki.cfg&lt;/tt&gt;.
+wikimanager.prop.alias.description=Descripción
+wikimanager.prop.alias.homepage=Página de inicio
 wikimanager.prop.alias.server=Alias
-wikimanager.prop.wiki.description=Descripci\u00F3n
-wikimanager.prop.wiki.homepage=P\u00E1gina de inicio
+wikimanager.prop.wiki.description=Descripción
+wikimanager.prop.wiki.homepage=Página de inicio
 wikimanager.prop.wiki.iswikitemplate=Plantilla wiki
 wikimanager.prop.wiki.language=Idioma
-wikimanager.prop.wiki.owner=Due\u00F1o
+wikimanager.prop.wiki.owner=Dueño
 wikimanager.prop.wiki.secure=Seguro (SSL)
 wikimanager.prop.wiki.server=Alias
 wikimanager.prop.wiki.visibility=Visibilidad
 wikimanager.prop.wiki.wikiname=Identificador de wiki
 wikimanager.prop.wiki.wikiprettyname=Nombre
 wikimanager.readers=Lectores
-wikimanager.successcreatewiki=Su wiki "{0}" ha sido creado. Puede acceder a \u00E9l en la siguiente direcci\u00F3n\: [{1}].
+wikimanager.successcreatewiki=Su wiki "{0}" ha sido creado. Puede acceder a él en la siguiente dirección\: [{1}].
 wikimanager.successdeletewiki=Wiki "{0}" borrado.
 wikimanager.successsettemplate=Se ha cambiado la visibilidad del wiki "{0}" a "{1}".
 wikimanager.title.createnewalias=Crear nuevo alias
 wikimanager.title.createwiki.datafrom=Crear wiki desde
-wikimanager.title.createwiki.desc=Drecipci\u00F3n del wiki
-wikimanager.title.createwiki.intro=Introducci\u00F3n
+wikimanager.title.createwiki.desc=Drecipción del wiki
+wikimanager.title.createwiki.intro=Introducción
 wikimanager.title.createwiki.members=Miembros globales iniciales
 wikimanager.title.createwiki.summary=Resumen
 wikimanager.title.createwiki.wikiname=Identificador wiki
 wikimanager.title.viewaliases=Ver alias
 wikimanager.title.wikisettings=Propiedades del wiki
-wikimanager.totalnumberofwiki=N\u00FAmero total de wikis
-wikimanager.widget.lastcreatedwikis.title=\u00DAltimos wikis creados
+wikimanager.totalnumberofwiki=Número total de wikis
+wikimanager.widget.lastcreatedwikis.title=Últimos wikis creados
 wikimanager.widget.lastmodifications.title=Modificaciones recientes
 wikimanager.widget.mylastmodifications.title=Mis modifiaciones recientes
 wikimanager.widget.userwikisadmin.title=Wikis que administra
-wikimanager.widget.userwikisowner.title=Wikis de las que es due\u00F1o
+wikimanager.widget.userwikisowner.title=Wikis de las que es dueño
 wikimanager.widget.userwikisuser.title=Wikis que ve
 wikimanager.wikimanager=Wiki Manager
-wikimanager.wikiname.error.alreadyused=Este identificador ya est\u00E1 en uso
+wikimanager.wikiname.error.alreadyused=Este identificador ya está en uso
 wikimanager.wikiname.error.databasealreadyexists=Ya existe una base de datos con ese identificador
-wikimanager.wikiname.error.empty=El identificador no puede estar vac\u00EDo
+wikimanager.wikiname.error.empty=El identificador no puede estar vacío
 wikimanager.wikiname.error.wikialreadyexists=Ya existe un wiki con este identificador
 wikimanager.wikiname.force=Forzar
 wikimanager.wikiname.info.valid=Puede usar este nombre como nuevo identificador de wiki

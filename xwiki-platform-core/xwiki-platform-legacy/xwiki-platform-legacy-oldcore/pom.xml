@@ -93,7 +93,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore></ignore>
+                    <ignore />
                   </action>
                 </pluginExecution>
                 <pluginExecution>
@@ -106,7 +106,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore></ignore>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
@@ -148,7 +148,7 @@
             <configuration>
               <target>
                 <concat destfile="${project.build.directory}/classes/META-INF/components.txt" append="true">
-                  <filelist dir="${basedir}/src/main/resources/META-INF/" files="components.txt"/>
+                  <filelist dir="${basedir}/src/main/resources/META-INF/" files="components.txt" />
                 </concat>
               </target>
             </configuration>

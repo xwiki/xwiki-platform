@@ -34,7 +34,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Extension - Repository - Aether</description>
   <properties>
-    <aether.version>1.12</aether.version>
+    <aether.version>1.13</aether.version>
     <maven.version>3.0.3</maven.version>
   </properties>
   <dependencies>

@@ -141,7 +141,7 @@
 <parse>1</parse>
 </property>
 <property>
-<use>onDemand</use>
+<use>always</use>
 </property>
 </object>
 <content></content></xwikidoc>

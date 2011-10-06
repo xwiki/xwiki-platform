@@ -95,21 +95,13 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
         setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(ContextMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {

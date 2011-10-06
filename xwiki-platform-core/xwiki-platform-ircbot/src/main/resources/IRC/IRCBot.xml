@@ -764,6 +764,7 @@ import com.xpn.xwiki.doc.*
 import com.xpn.xwiki.*
 import org.jibble.pircbot.*
 import org.xwiki.context.*
+import org.xwiki.bridge.event.*
 
 class IRCBot extends PircBot
 {
@@ -1001,7 +1002,7 @@ class IRCEventListener implements EventListener
 
     List&lt;Event&gt; getEvents()
     {
-        return Arrays.asList(new DocumentUpdateEvent())
+        return Arrays.asList(new DocumentUpdatedEvent(), new DocumentDeletedEvent(), new DocumentCreatedEvent())
     }
 
     void onEvent(Event event, Object source, Object data)
@@ -1017,11 +1018,17 @@ class IRCEventListener implements EventListener
         if (shell.evaluate(onEventValidationScript)) {
             def author = source.author
             def comment = source.comment
-            if (source.isNew()) {
+            def url = source.getExternalURL("view", data)
+            if (event instanceof DocumentDeletedEvent) {
                 author = context.user
                 comment = "deleted document"
+            } else if (event instanceof DocumentCreatedEvent) {
+                comment = "created document - ${comment}"
+            } else {
+                // Compute diff URL
+                url = source.getExternalURL("view", "viewer=changes&amp;rev2=${source.getVersion()}", data)
             }
-            bot.sendMessage(bot.getChannels()[0], "${source.fullName} was modified by ${author} ${comment ? "(${comment})" : ""} - ${source.getExternalURL("view", data)}")
+            bot.sendMessage(bot.getChannels()[0], "${source.fullName} was modified by ${author} ${comment ? "(${comment})" : ""} - ${url}")
         }
     }
 }

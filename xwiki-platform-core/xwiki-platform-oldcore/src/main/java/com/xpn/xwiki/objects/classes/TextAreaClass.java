@@ -21,6 +21,8 @@ package com.xpn.xwiki.objects.classes;
 
 import org.apache.ecs.xhtml.textarea;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -34,6 +36,8 @@ import com.xpn.xwiki.web.Utils;
 
 public class TextAreaClass extends StringClass
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TextAreaClass.class);
+
     public TextAreaClass(PropertyMetaClass wclass)
     {
         super("textarea", "Text Area", wclass);

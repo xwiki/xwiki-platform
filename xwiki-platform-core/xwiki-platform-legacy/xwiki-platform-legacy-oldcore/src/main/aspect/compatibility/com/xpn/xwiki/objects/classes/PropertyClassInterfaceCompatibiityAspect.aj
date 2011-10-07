@@ -17,30 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.objects.classes;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ecs.xhtml.input;
+
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.ObjectInterface;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
 
-public interface PropertyClassInterface extends ObjectInterface
+
+/**
+ * Add a backward compatibility layer to the {@link com.xpn.xwiki.objects.classes.PropertyClassInterface} class.
+ * 
+ * @version $Id$
+ */
+public aspect PropertyClassInterfaceCompatibiityAspect
 {
-    public String toString(BaseProperty property);
-
-    public BaseProperty fromString(String value);
-
-    public BaseProperty fromValue(Object value);
-
-    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object,
+    public void PropertyClassInterface.displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria,
         XWikiContext context);
-
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
-
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
-
-    public BaseProperty newProperty();
-
-    public void flushCache();
 }

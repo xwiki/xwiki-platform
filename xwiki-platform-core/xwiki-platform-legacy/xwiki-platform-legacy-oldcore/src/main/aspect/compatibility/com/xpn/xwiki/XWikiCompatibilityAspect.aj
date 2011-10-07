@@ -20,21 +20,29 @@
  */
 package com.xpn.xwiki;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.xml.XMLUtils;
+
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.cache.api.internal.XWikiCacheServiceStub;
 import com.xpn.xwiki.cache.api.internal.XWikiCacheStub;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.plugin.query.QueryPlugin;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.web.XWikiMessageTool;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.xwiki.xml.XMLUtils;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWiki} class.
@@ -299,5 +307,142 @@ public privileged aspect XWikiCompatibilityAspect
     public void XWiki.setNotificationManager(XWikiNotificationManager notificationManager)
     {
         this.notificationManager = notificationManager;
+    }
+    
+    @Deprecated
+    public String XWiki.displaySearch(String fieldname, String className, XWikiCriteria criteria, XWikiContext context)
+        throws XWikiException
+    {
+        return displaySearch(fieldname, className, "", criteria, context);
+    }
+
+    @Deprecated
+    public String XWiki.displaySearch(String fieldname, String className, XWikiContext context) throws XWikiException
+    {
+        return displaySearch(fieldname, className, "", new XWikiCriteria(), context);
+    }
+
+    @Deprecated
+    public String XWiki.displaySearch(String fieldname, String className, String prefix, XWikiCriteria criteria,
+        XWikiContext context) throws XWikiException
+    {
+        BaseClass bclass = getDocument(className, context).getXClass();
+        PropertyClass pclass = (PropertyClass) bclass.get(fieldname);
+        if (criteria == null) {
+            criteria = new XWikiCriteria();
+        }
+
+        if (pclass == null) {
+            return "";
+        } else {
+            return pclass.displaySearch(fieldname, prefix + className + "_", criteria, context);
+        }
+    }
+
+    @Deprecated
+    public String XWiki.displaySearchColumns(String className, XWikiQuery query, XWikiContext context) throws XWikiException
+    {
+        return displaySearchColumns(className, "", query, context);
+    }
+
+    @Deprecated
+    public String XWiki.displaySearchColumns(String className, String prefix, XWikiQuery query, XWikiContext context)
+        throws XWikiException
+    {
+        BaseClass bclass = getDocument(className, context).getXClass();
+
+        if (query == null) {
+            query = new XWikiQuery();
+        }
+
+        return bclass.displaySearchColumns(className + "_" + prefix, query, context);
+    }
+
+    @Deprecated
+    public String XWiki.displaySearchOrder(String className, XWikiQuery query, XWikiContext context) throws XWikiException
+    {
+        return displaySearchOrder(className, "", query, context);
+    }
+
+    @Deprecated
+    public String XWiki.displaySearchOrder(String className, String prefix, XWikiQuery query, XWikiContext context)
+        throws XWikiException
+    {
+        BaseClass bclass = getDocument(className, context).getXClass();
+
+        if (query == null) {
+            query = new XWikiQuery();
+        }
+
+        return bclass.displaySearchOrder(className + "_" + prefix, query, context);
+    }
+
+    @Deprecated
+    public <T> List<T> XWiki.search(XWikiQuery query, XWikiContext context) throws XWikiException
+    {
+        QueryPlugin qp = (QueryPlugin) getPlugin("query", context);
+        if (qp == null) {
+            return null;
+        }
+
+        return qp.search(query);
+    }
+
+    @Deprecated
+    public XWikiQuery XWiki.createQueryFromRequest(String className, XWikiContext context) throws XWikiException
+    {
+        return new XWikiQuery(context.getRequest(), className, context);
+    }
+
+    @Deprecated
+    public String XWiki.searchAsTable(XWikiQuery query, XWikiContext context) throws XWikiException
+    {
+        QueryPlugin qp = (QueryPlugin) getPlugin("query", context);
+        if (qp == null) {
+            return null;
+        }
+
+        List<String> list = qp.search(query);
+        String result = "{table}\r\n";
+        List<String> headerColumns = new ArrayList<String>();
+        List<String> displayProperties = query.getDisplayProperties();
+        for (String propname : displayProperties) {
+            PropertyClass pclass = getPropertyClassFromName(propname, context);
+            if (pclass != null) {
+                headerColumns.add(pclass.getPrettyName());
+            } else {
+                if (propname.startsWith("doc.")) {
+                    propname = propname.substring(4);
+                    headerColumns.add(XWikiDocument.getInternalPropertyName(propname, context));
+                } else {
+                    headerColumns.add(propname);
+                }
+
+            }
+        }
+
+        result += StringUtils.join(headerColumns.toArray(), " | ") + "\r\n";
+        for (String docname : list) {
+            List<String> rowColumns = new ArrayList<String>();
+            XWikiDocument doc = getDocument(docname, context);
+            for (String propname : displayProperties) {
+                PropertyClass pclass = getPropertyClassFromName(propname, context);
+                if (pclass == null) {
+                    if (propname.startsWith("doc.")) {
+                        propname = propname.substring(4);
+                    }
+                    String value = doc.getInternalProperty(propname);
+                    rowColumns.add((value == null) ? " " : value);
+                } else {
+                    BaseObject bobj = doc.getObject(pclass.getObject().getName());
+                    rowColumns.add(doc.display(pclass.getName(), "view", bobj, context));
+                }
+            }
+            result += StringUtils.join(rowColumns.toArray(), " | ") + "\r\n";
+        }
+
+        result += "{table}\r\n";
+
+        return result;
     }
 }

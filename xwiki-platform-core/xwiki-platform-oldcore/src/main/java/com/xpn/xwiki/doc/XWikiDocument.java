@@ -147,7 +147,6 @@ import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -4732,11 +4731,6 @@ public class XWikiDocument implements DocumentModelBridge
     public String displayHidden(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context)
     {
         return (pclass == null) ? "" : pclass.displayHidden(pclass.getName(), prefix, object, context);
-    }
-
-    public String displaySearch(PropertyClass pclass, String prefix, XWikiCriteria criteria, XWikiContext context)
-    {
-        return (pclass == null) ? "" : pclass.displaySearch(pclass.getName(), prefix, criteria, context);
     }
 
     public XWikiAttachment getAttachment(String filename)

@@ -47,7 +47,7 @@ public class XWikiQuery extends XWikiCriteria
 
     public XWikiQuery()
     {
-        super();
+        
     }
 
     public XWikiQuery(XWikiRequest request, String className, XWikiContext context) throws XWikiException

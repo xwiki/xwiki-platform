@@ -35,5 +35,4 @@ public privileged aspect PluginApiAspect
     {
         return this.plugin;
     }
-
 }

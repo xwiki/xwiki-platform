@@ -28,6 +28,8 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -35,10 +37,14 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.plugin.query.QueryPlugin;
 
 public class DBListClass extends ListClass
 {
+    /**
+     * Logging helper object.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DBListClass.class);
+
     protected static final String DEFAULT_QUERY = "select doc.name from XWikiDocument doc where 1 = 0";
 
     private List<ListItem> cachedDBList;
@@ -95,13 +101,9 @@ public class DBListClass extends ListClass
                 list = new ArrayList<ListItem>();
             } else {
                 try {
-                    if ((xwiki.getHibernateStore() != null) && (!query.startsWith("/"))) {
-                        list = makeList(xwiki.search(query, context));
-                    } else {
-                        list = makeList(((QueryPlugin) xwiki.getPlugin("query", context)).xpath(query).list());
-                    }
+                    list = makeList(xwiki.search(query, context));
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("Failed to get the list", e);
                     list = new ArrayList<ListItem>();
                 }
             }

@@ -28,6 +28,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.doc.XWikiDocument} class.
@@ -124,5 +126,11 @@ public aspect XWikiDocumentCompatibilityAspect
     public String XWikiDocument.getRenderedContent(String text, XWikiContext context)
     {
         return getRenderedContent(text, Syntax.XWIKI_1_0.toIdString(), context);
+    }
+
+    @Deprecated
+    public String XWikiDocument.displaySearch(PropertyClass pclass, String prefix, XWikiCriteria criteria, XWikiContext context)
+    {
+        return (pclass == null) ? "" : pclass.displaySearch(pclass.getName(), prefix, criteria, context);
     }
 }

@@ -20,16 +20,23 @@
  */
 package com.xpn.xwiki.api;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.xwiki.xml.XMLUtils;
 
-import com.xpn.xwiki.api.XWiki;
-import com.xpn.xwiki.api.Util;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
-
-import java.io.IOException;
-import java.awt.image.BufferedImage;
-import java.util.*;
+import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.api.XWiki} class.
@@ -678,4 +685,154 @@ public privileged aspect XWikiCompatibilityAspect
     {
         return this.xwiki.getHTMLArea(content, getXWikiContext());
     }
+    
+
+    /**
+     * API to display a select box for the list of available field for a specific class This field data can then be used
+     * to generate an XWiki Query showing a table with the relevant data
+     * 
+     * @param className XWiki Class Name to display the list of columns for
+     * @param query Query to pre-select the currently selected columns
+     * @return text of the select field
+     * @throws XWikiException exception is a failure occured
+     */
+    @Deprecated
+    public String XWiki.displaySearchColumns(String className, XWikiQuery query) throws XWikiException
+    {
+        return this.xwiki.displaySearchColumns(className, "", query, getXWikiContext());
+    }
+
+    /**
+     * API to display a select box for the list of available field for a specific class, optionally adding a prefix This
+     * field data can then be used to generate an XWiki Query showing a table with the relevant data
+     * 
+     * @param className XWiki Class Name to display the list of columns for
+     * @param prefix Prefix to add to the field name
+     * @param query Query to pre-select the currently selected columns
+     * @return text of the select field
+     * @throws XWikiException exception is a failure occured
+     */
+    @Deprecated
+    public String XWiki.displaySearchColumns(String className, String prefix, XWikiQuery query) throws XWikiException
+    {
+        return this.xwiki.displaySearchColumns(className, prefix, query, getXWikiContext());
+    }
+
+    /**
+     * API to display a select box for the list of available field for a specific class This field data can then be used
+     * to generate the order element of an XWiki Query showing a table with the relevant data
+     * 
+     * @param className XWiki Class Name to display the list of columns for
+     * @param query Query to pre-select the currently selected columns
+     * @return text of the select field
+     * @throws XWikiException exception is a failure occured
+     */
+    @Deprecated
+    public String XWiki.displaySearchOrder(String className, XWikiQuery query) throws XWikiException
+    {
+        return this.xwiki.displaySearchOrder(className, "", query, getXWikiContext());
+    }
+
+    /**
+     * API to display a select box for the list of available field for a specific class, optionally adding a prefix This
+     * field data can then be used to generate the order element of an XWiki Query showing a table with the relevant
+     * data
+     * 
+     * @param className XWiki Class Name to display the list of columns for
+     * @param prefix Prefix to add to the field name
+     * @param query Query to pre-select the currently selected columns
+     * @return text of the select field
+     * @throws XWikiException exception is a failure occured
+     */
+    @Deprecated
+    public String XWiki.displaySearchOrder(String className, String prefix, XWikiQuery query) throws XWikiException
+    {
+        return this.xwiki.displaySearchOrder(className, prefix, query, getXWikiContext());
+    }
+
+    /**
+     * API to run a search from an XWikiQuery Object An XWikiQuery object can be created from a request using the
+     * createQueryFromRequest function
+     * 
+     * @param query query to run the search for
+     * @return A list of document names matching the query
+     * @throws XWikiException exception is a failure occured
+     */
+    public <T> List<T> XWiki.search(XWikiQuery query) throws XWikiException
+    {
+        return this.xwiki.search(query, getXWikiContext());
+    }
+
+    /**
+     * API to create a query from a request Object The request object is the result of a form created from the
+     * displaySearch() and displaySearchColumns() functions
+     * 
+     * @param className class name to create the query from
+     * @return an XWikiQuery object matching the selected values in the request object
+     * @throws XWikiException exception is a failure occured
+     */
+    public XWikiQuery XWiki.createQueryFromRequest(String className) throws XWikiException
+    {
+        return this.xwiki.createQueryFromRequest(className, getXWikiContext());
+    }
+
+    /**
+     * API to run a search from an XWikiQuery Object and display it as a HTML table An XWikiQuery object can be created
+     * from a request using the createQueryFromRequest function
+     * 
+     * @param query query to run the search for
+     * @return An HTML table showing the result
+     * @throws XWikiException exception is a failure occured
+     */
+    public String XWiki.searchAsTable(XWikiQuery query) throws XWikiException
+    {
+        return this.xwiki.searchAsTable(query, getXWikiContext());
+    }
+
+    /**
+     * API to display a field in search mode for a specific class with preselected values This field data can then be
+     * used to generate an XWiki Query showing a table with the relevant data
+     * 
+     * @param fieldname field name in the class
+     * @param className class name to display the field from
+     * @param criteria XWikiCriteria object (usually the XWikiQuery object) to take the preselected values from
+     * @return text of the select field
+     * @throws XWikiException exception is a failure occured
+     */
+    public String XWiki.displaySearch(String fieldname, String className, XWikiCriteria criteria) throws XWikiException
+    {
+        return this.xwiki.displaySearch(fieldname, className, criteria, getXWikiContext());
+    }
+
+    /**
+     * API to display a field in search mode for a specific class with preselected values, optionally adding a prefix to
+     * the field name This field data can then be used to generate an XWiki Query showing a table with the relevant data
+     * 
+     * @param fieldname field name in the class
+     * @param className class name to display the field from
+     * @param prefix prefix to add to the field name
+     * @param criteria XWikiCriteria object (usually the XWikiQuery object) to take the preselected values from
+     * @return text of the select field
+     * @throws XWikiException exception is a failure occured
+     */
+    public String XWiki.displaySearch(String fieldname, String className, String prefix, XWikiCriteria criteria)
+        throws XWikiException
+    {
+        return this.xwiki.displaySearch(fieldname, className, prefix, criteria, getXWikiContext());
+    }
+
+    /**
+     * API to display a field in search mode for a specific class without preselected values This field data can then be
+     * used to generate an XWiki Query showing a table with the relevant data
+     * 
+     * @param fieldname field name in the class
+     * @param className class name to display the field from
+     * @return text of the select field
+     * @throws XWikiException exception is a failure occured
+     */
+    public String XWiki.displaySearch(String fieldname, String className) throws XWikiException
+    {
+        return this.xwiki.displaySearch(fieldname, className, getXWikiContext());
+    }
+
 }

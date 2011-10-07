@@ -71,7 +71,7 @@ import com.xpn.xwiki.web.Utils;
 public abstract class BaseCollection<R extends EntityReference> extends BaseElement<R> implements ObjectInterface,
     Cloneable
 {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(BaseCollection.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseCollection.class);
 
     /**
      * The meaning of this reference fields depends on the element represented. Examples:

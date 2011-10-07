@@ -127,21 +127,13 @@ public class JBossCacheCache<T> extends AbstractCache<T>
         return this.cachedObjects.remove(key);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#remove(java.lang.String)
-     */
+    @Override
     public void remove(String key)
     {
         this.cache.removeNode(Fqn.fromRelativeElements(ROOT_FQN, key));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#set(java.lang.String, java.lang.Object)
-     */
+    @Override
     public void set(String key, T obj)
     {
         this.cache.put(Fqn.fromRelativeElements(ROOT_FQN, key), DATA_KEY, obj);
@@ -149,31 +141,18 @@ public class JBossCacheCache<T> extends AbstractCache<T>
         pushDisposableCacheValue(key, obj);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#get(java.lang.String)
-     */
+    @Override
     public T get(String key)
     {
         return this.cache.get(Fqn.fromRelativeElements(ROOT_FQN, key), DATA_KEY);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#removeAll()
-     */
+    @Override
     public void removeAll()
     {
         this.cache.removeNode(ROOT_FQN);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.util.AbstractCache#dispose()
-     */
     @Override
     public void dispose()
     {

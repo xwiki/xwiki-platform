@@ -57,31 +57,19 @@ public class JBossCacheCacheEntry<T> implements CacheEntry<T>
         this.data = data;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheEntry#getCache()
-     */
+    @Override
     public Cache<T> getCache()
     {
         return cache;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheEntry#getValue()
-     */
+    @Override
     public T getValue()
     {
         return this.data;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheEntry#getKey()
-     */
+    @Override
     public String getKey()
     {
         return this.key;

@@ -19,40 +19,52 @@
  */
 package com.xpn.xwiki.plugin.query;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.jcr.NamespaceException;
+
 import org.apache.jackrabbit.core.SearchManager;
 import org.apache.jackrabbit.name.AbstractNamespaceResolver;
 import org.apache.jackrabbit.name.QName;
 
-import javax.jcr.NamespaceException;
-import java.util.HashMap;
-import java.util.Map;
-
 /** XWiki NamespaceResolver for JackRabbits. Singleton */
-public class XWikiNamespaceResolver extends AbstractNamespaceResolver {
+public class XWikiNamespaceResolver extends AbstractNamespaceResolver
+{
     static Map prefixToURI = new HashMap();
+
     static Map uriToPrefix = new HashMap();
-    public static final String
-    	NS_XWIKI_PROPERTY_PREFFIX = "xp",
-    	NS_XWIKI_PROPERTY_URI = "http://www.xwiki.org/property",
-    	NS_DOC_PREFFIX = "doc",
-    	NS_DOC_URI = "XWikiDocument",
-    	NS_OBJ_PREFFIX = "obj",
-    	NS_OBJ_URI = "BaseObject",
-    	NS_XWIKI_PREFFIX	= "xwiki",
-    	NS_XWIKI_URI		= "http://www.xwiki.org/";
-    private static void addnamespace(String pref, String uri) {
-    	prefixToURI.put(pref, uri);
-    	uriToPrefix.put(uri, pref);
+
+    public static final String NS_XWIKI_PROPERTY_PREFFIX = "xp";
+
+    public static final String NS_XWIKI_PROPERTY_URI = "http://www.xwiki.org/property";
+
+    public static final String NS_DOC_PREFFIX = "doc";
+
+    public static final String NS_DOC_URI = "XWikiDocument";
+
+    public static final String NS_OBJ_PREFFIX = "obj";
+
+    public static final String NS_OBJ_URI = "BaseObject";
+
+    public static final String NS_XWIKI_PREFFIX = "xwiki";
+
+    public static final String NS_XWIKI_URI = "http://www.xwiki.org/";
+
+    private static void addnamespace(String pref, String uri)
+    {
+        prefixToURI.put(pref, uri);
+        uriToPrefix.put(uri, pref);
     }
 
     static {
         // default namespace (if no prefix is specified)
-    	addnamespace(QName.NS_EMPTY_PREFIX, QName.NS_DEFAULT_URI);
+        addnamespace(QName.NS_EMPTY_PREFIX, QName.NS_DEFAULT_URI);
         // declare the predefined mappings
         // rep:
-    	addnamespace(QName.NS_REP_PREFIX, QName.NS_REP_URI);
+        addnamespace(QName.NS_REP_PREFIX, QName.NS_REP_URI);
         // jcr:
-    	addnamespace(QName.NS_JCR_PREFIX, QName.NS_JCR_URI);
+        addnamespace(QName.NS_JCR_PREFIX, QName.NS_JCR_URI);
         // nt:
         addnamespace(QName.NS_NT_PREFIX, QName.NS_NT_URI);
         // mix:
@@ -65,31 +77,37 @@ public class XWikiNamespaceResolver extends AbstractNamespaceResolver {
         addnamespace("fn", SearchManager.NS_FN_URI);
         // xs:
         addnamespace("xs", SearchManager.NS_XS_URI);
-        
+
         // XWiki namespaces
         addnamespace(NS_XWIKI_PROPERTY_PREFFIX, NS_XWIKI_PROPERTY_URI);
-        addnamespace(NS_DOC_PREFFIX, NS_DOC_URI);   // XXX: hibernate-specific
-        addnamespace(NS_OBJ_PREFFIX, NS_OBJ_URI);   // XXX: hibernate-specific
+        addnamespace(NS_DOC_PREFFIX, NS_DOC_URI); // XXX: hibernate-specific
+        addnamespace(NS_OBJ_PREFFIX, NS_OBJ_URI); // XXX: hibernate-specific
         addnamespace(NS_XWIKI_PREFFIX, NS_XWIKI_URI);
-        //addnamespace(NS_XWIKI_PROPERTY_PREFFIX, NS_XWIKI_PROPERTY_URI);
+        // addnamespace(NS_XWIKI_PROPERTY_PREFFIX, NS_XWIKI_PROPERTY_URI);
     }
-	
-	public String getURI(String prefix) throws NamespaceException {
-		if (!prefixToURI.containsKey(prefix)) {
+
+    public String getURI(String prefix) throws NamespaceException
+    {
+        if (!prefixToURI.containsKey(prefix)) {
             throw new NamespaceException(prefix + ": is not a registered namespace prefix.");
         }
         return (String) prefixToURI.get(prefix);
-	}
-	public String getPrefix(String uri) throws NamespaceException {
-		if (!uriToPrefix.containsKey(uri)) {
+    }
+
+    public String getPrefix(String uri) throws NamespaceException
+    {
+        if (!uriToPrefix.containsKey(uri)) {
             throw new NamespaceException(uri + ": is not a registered namespace uri.");
         }
         return (String) uriToPrefix.get(uri);
-	}
-	private static XWikiNamespaceResolver _instance;
-	public static XWikiNamespaceResolver getInstance() {
-		if (_instance==null)
-			_instance = new XWikiNamespaceResolver();
-		return _instance;
-	}
+    }
+
+    private static XWikiNamespaceResolver _instance;
+
+    public static XWikiNamespaceResolver getInstance()
+    {
+        if (_instance == null)
+            _instance = new XWikiNamespaceResolver();
+        return _instance;
+    }
 }

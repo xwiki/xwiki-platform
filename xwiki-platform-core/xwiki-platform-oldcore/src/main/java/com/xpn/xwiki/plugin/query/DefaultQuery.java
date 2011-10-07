@@ -19,49 +19,81 @@
  */
 package com.xpn.xwiki.plugin.query;
 
+import java.util.List;
+
+import org.apache.jackrabbit.core.query.QueryRootNode;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import org.apache.jackrabbit.core.query.QueryRootNode;
 
-import java.util.List;
+public class DefaultQuery implements IQuery
+{
+    protected IQueryFactory _queryFactory;
 
-public class DefaultQuery implements IQuery {
-	protected IQueryFactory _queryFactory;
-	protected QueryRootNode _querytree;
-	
-	public DefaultQuery(QueryRootNode tree, IQueryFactory qf) {
-		_querytree = tree;
-		_queryFactory = qf;
-	}
-	
-	public List list() throws XWikiException {
-		return null;
-	}
+    protected QueryRootNode _querytree;
 
-    public String getNativeQuery() {
+    public DefaultQuery(QueryRootNode tree, IQueryFactory qf)
+    {
+        _querytree = tree;
+        _queryFactory = qf;
+    }
+
+    public List list() throws XWikiException
+    {
         return null;
     }
 
-    protected int _fetchSize=-1;
-	protected int _firstResult=-1;
-	protected boolean _isdistinct=false;
-	public IQuery setMaxResults(int fs)		{ _fetchSize = fs; return this; }
-	public IQuery setFirstResult(int fr)	{ _firstResult = fr; return this; }	
-	public IQuery setDistinct(boolean d)	{ _isdistinct = d; return this; }
-	
-	protected XWikiContext getContext() {
-		return _queryFactory.getContext();
-	}
-	protected XWikiStoreInterface getStore() {
-		return _queryFactory.getStore();
-	}
-	protected QueryRootNode getQueryTree() { return _querytree; }
-	
-	public String toString() {
-		try {
-			return list().toString();
-		} catch (XWikiException e) {}
-		return "";
-	}
+    public String getNativeQuery()
+    {
+        return null;
+    }
+
+    protected int _fetchSize = -1;
+
+    protected int _firstResult = -1;
+
+    protected boolean _isdistinct = false;
+
+    public IQuery setMaxResults(int fs)
+    {
+        _fetchSize = fs;
+        return this;
+    }
+
+    public IQuery setFirstResult(int fr)
+    {
+        _firstResult = fr;
+        return this;
+    }
+
+    public IQuery setDistinct(boolean d)
+    {
+        _isdistinct = d;
+        return this;
+    }
+
+    protected XWikiContext getContext()
+    {
+        return _queryFactory.getContext();
+    }
+
+    protected XWikiStoreInterface getStore()
+    {
+        return _queryFactory.getStore();
+    }
+
+    protected QueryRootNode getQueryTree()
+    {
+        return _querytree;
+    }
+
+    public String toString()
+    {
+        try {
+            return list().toString();
+        } catch (XWikiException e) {
+        }
+        return "";
+    }
 }

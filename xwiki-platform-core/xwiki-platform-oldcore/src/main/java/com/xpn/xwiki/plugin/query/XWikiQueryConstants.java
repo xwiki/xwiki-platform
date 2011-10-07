@@ -21,43 +21,59 @@ package com.xpn.xwiki.plugin.query;
 
 import org.apache.jackrabbit.core.query.QueryConstants;
 
-public class XWikiQueryConstants implements QueryConstants {
-	public static boolean isGeneralComparisonType(int op) {
-		return op == OPERATION_EQ_GENERAL
-		|| op == OPERATION_NE_GENERAL
-		|| op == OPERATION_LT_GENERAL
-		|| op == OPERATION_GT_GENERAL
-		|| op == OPERATION_GE_GENERAL
-		|| op == OPERATION_LE_GENERAL;
-	}
-	public static boolean isValueComparisonType(int op) {
-		return op == OPERATION_EQ_VALUE
-		|| op == OPERATION_NE_VALUE
-		|| op == OPERATION_LT_VALUE
-		|| op == OPERATION_GT_VALUE
-		|| op == OPERATION_GE_VALUE
-		|| op == OPERATION_LE_VALUE;
-	}
-	public static String getHqlOperation(int op) {
-		switch (op) {
-		case OPERATION_EQ_VALUE:	return "=";
-		case OPERATION_EQ_GENERAL:	return "=";
-		case OPERATION_NE_VALUE:	return "<>";
-		case OPERATION_NE_GENERAL:	return "<>";
-		case OPERATION_LT_VALUE:	return "<";
-		case OPERATION_LT_GENERAL:	return "<";
-		case OPERATION_GT_VALUE:	return ">";
-		case OPERATION_GT_GENERAL:	return ">";
-		case OPERATION_GE_VALUE:	return ">=";
-		case OPERATION_GE_GENERAL:	return ">=";
-		case OPERATION_LE_VALUE:	return "<=";
-		case OPERATION_LE_GENERAL:	return "<=";
-		case OPERATION_LIKE:		return " like ";
-		case OPERATION_BETWEEN:		return " between ";	// not 1.0 standart
-		case OPERATION_IN:			return " in ";		// not 1.0 standart
-		case OPERATION_NULL:		return " is null ";
-		case OPERATION_NOT_NULL:	return " is not null ";
-		default: return null;
-		}
-	}
+public class XWikiQueryConstants implements QueryConstants
+{
+    public static boolean isGeneralComparisonType(int op)
+    {
+        return op == OPERATION_EQ_GENERAL || op == OPERATION_NE_GENERAL || op == OPERATION_LT_GENERAL
+            || op == OPERATION_GT_GENERAL || op == OPERATION_GE_GENERAL || op == OPERATION_LE_GENERAL;
+    }
+
+    public static boolean isValueComparisonType(int op)
+    {
+        return op == OPERATION_EQ_VALUE || op == OPERATION_NE_VALUE || op == OPERATION_LT_VALUE
+            || op == OPERATION_GT_VALUE || op == OPERATION_GE_VALUE || op == OPERATION_LE_VALUE;
+    }
+
+    public static String getHqlOperation(int op)
+    {
+        switch (op) {
+            case OPERATION_EQ_VALUE:
+                return "=";
+            case OPERATION_EQ_GENERAL:
+                return "=";
+            case OPERATION_NE_VALUE:
+                return "<>";
+            case OPERATION_NE_GENERAL:
+                return "<>";
+            case OPERATION_LT_VALUE:
+                return "<";
+            case OPERATION_LT_GENERAL:
+                return "<";
+            case OPERATION_GT_VALUE:
+                return ">";
+            case OPERATION_GT_GENERAL:
+                return ">";
+            case OPERATION_GE_VALUE:
+                return ">=";
+            case OPERATION_GE_GENERAL:
+                return ">=";
+            case OPERATION_LE_VALUE:
+                return "<=";
+            case OPERATION_LE_GENERAL:
+                return "<=";
+            case OPERATION_LIKE:
+                return " like ";
+            case OPERATION_BETWEEN:
+                return " between "; // not 1.0 standart
+            case OPERATION_IN:
+                return " in "; // not 1.0 standart
+            case OPERATION_NULL:
+                return " is null ";
+            case OPERATION_NOT_NULL:
+                return " is not null ";
+            default:
+                return null;
+        }
+    }
 }

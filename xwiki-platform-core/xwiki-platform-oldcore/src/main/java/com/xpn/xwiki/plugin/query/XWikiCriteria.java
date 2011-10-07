@@ -19,9 +19,13 @@
  */
 package com.xpn.xwiki.plugin.query;
 
-import com.xpn.xwiki.util.Util;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import java.util.*;
+import com.xpn.xwiki.util.Util;
 
 public class XWikiCriteria
 {

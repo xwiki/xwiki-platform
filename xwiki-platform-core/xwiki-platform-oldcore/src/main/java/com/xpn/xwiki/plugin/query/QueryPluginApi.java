@@ -25,13 +25,19 @@ import javax.jcr.query.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.query.internal.QueryManagerScriptService;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
-/** Api for QueryPlugin */
+/**
+ * Api for QueryPlugin.
+ * 
+ * @deprecated use {@link QueryManagerScriptService} instead
+ */
+@Deprecated
 public class QueryPluginApi extends Api implements IQueryFactory
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryPluginApi.class);

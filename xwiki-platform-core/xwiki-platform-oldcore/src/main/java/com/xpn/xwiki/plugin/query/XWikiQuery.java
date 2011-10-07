@@ -50,8 +50,7 @@ public class XWikiQuery extends XWikiCriteria
         super();
     }
 
-    public XWikiQuery(XWikiRequest request, String className, XWikiContext context)
-        throws XWikiException
+    public XWikiQuery(XWikiRequest request, String className, XWikiContext context) throws XWikiException
     {
         super();
         String[] columns = request.getParameterValues(className + "_" + "searchcolumns");

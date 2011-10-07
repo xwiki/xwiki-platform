@@ -27,53 +27,74 @@ import javax.jcr.ValueFactory;
 import javax.jcr.query.InvalidQueryException;
 
 /** AbstractFactory interface for XWiki Queries */
-public interface IQueryFactory {
-    /** create xpath query
-     * @throws XWikiException */
+public interface IQueryFactory
+{
+    /**
+     * create xpath query
+     * 
+     * @throws XWikiException
+     */
     IQuery xpath(String q) throws XWikiException;
 
-    /** create JCRSQL query
-     * unsupported for now */
+    /**
+     * create JCRSQL query unsupported for now
+     */
     IQuery ql(String q) throws XWikiException;
 
-    /** create query for docs
-     * @param docname - full document name (web/name | web.name). name may consist xpath []-selection. if any (name|web) - *
+    /**
+     * create query for docs
+     * 
+     * @param docname - full document name (web/name | web.name). name may consist xpath []-selection. if any (name|web)
+     *            - *
      * @param prop - return properties, separated by comma, property start with @, if null - return document
-     * @param order - properties for sort, separated by ','; order: ascending/descending after prop. name, or +/- before. if null - not sort
+     * @param order - properties for sort, separated by ','; order: ascending/descending after prop. name, or +/-
+     *            before. if null - not sort
      * @throws InvalidQueryException
-     * */
+     */
     IQuery getDocs(String docname, String prop, String order) throws XWikiException;
 
-    /** create query for child documents
+    /**
+     * create query for child documents
+     * 
      * @throws InvalidQueryException
      * @param web,docname must be without templates & [] select
-     * @see getDocs */
+     * @see getDocs
+     */
     IQuery getChildDocs(String docname, String prop, String order) throws XWikiException;
 
-    /** create query for attachments
+    /**
+     * create query for attachments
+     * 
      * @param attachname - name of attachment, may be *, *[]
      * @see getDocs
      * @throws InvalidQueryException
      */
     IQuery getAttachment(String docname, String attachname, String order) throws XWikiException;
 
-    /** create query for objects
-     * @param oclass - full name of object class (web/name | web.name).  if any(name|web) - *
+    /**
+     * create query for objects
+     * 
+     * @param oclass - full name of object class (web/name | web.name). if any(name|web) - *
      * @param prop. for flex-attributes use @xp:propname
      * @see getDocs
      * @throws InvalidQueryException
      */
     IQuery getObjects(String docname, String oclass, String prop, String order) throws XWikiException;
 
-    /** Returns ValueFactory for creating correct jcr values
-     * @return javax.jcr.ValueFactory */
+    /**
+     * Returns ValueFactory for creating correct jcr values
+     * 
+     * @return javax.jcr.ValueFactory
+     */
     ValueFactory getValueFactory();
 
     XWikiContext getContext();
+
     XWikiStoreInterface getStore();
 
     /**
      * Generates an XPath query from a XWikiQuery Object
+     * 
      * @param query
      * @return query xpath string
      */

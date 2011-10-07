@@ -41,7 +41,9 @@ import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
-/** Plugin for Query API */
+/** 
+ * Plugin for Query API 
+ */
 public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryPlugin.class);
@@ -51,6 +53,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory
     public QueryPlugin(String name, String className, XWikiContext context) throws XWikiException
     {
         super(name, className, context);
+
         this.context = context;
     }
 
@@ -128,7 +131,9 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory
         return false;
     }
 
-    /** Translate query string to query tree */
+    /**
+     * Translate query string to query tree.
+     */
     protected QueryRootNode parse(String query, String language) throws InvalidQueryException
     {
         if (query == null)
@@ -138,7 +143,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory
     }
 
     /**
-     * create xpath query
+     * Create xpath query.
      * 
      * @throws XWikiException
      * @deprecated This version si buggy since it use the initial context of the plugin and not the current context
@@ -164,7 +169,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory
     }
 
     /**
-     * create JCRSQL query unsupported for now
+     * Create JCRSQL query unsupported for now.
      * 
      * @throws XWikiException
      * @deprecated This version si buggy since it use the initial context of the plugin and not the current context
@@ -190,7 +195,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory
     }
 
     /**
-     * create query for docs
+     * Create query for docs.
      * 
      * @param web, docname - document.space & .name. it may consist xpath []-selection. if any - *
      * @param prop - return property, start with @, if null - return document
@@ -212,7 +217,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory
     }
 
     /**
-     * create query for child documents
+     * Create query for child documents.
      * 
      * @param web,docname must be without templates & [] select
      * @throws XWikiException
@@ -232,7 +237,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory
     }
 
     /**
-     * create query for attachments
+     * Create query for attachments.
      * 
      * @param attachname - name of attachment, may be *, *[]
      * @throws XWikiException
@@ -252,7 +257,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory
     }
 
     /**
-     * create query for objects
+     * Create query for objects.
      * 
      * @param oweb, oclass - object web & class. if any - *
      * @param prop. for flex-attributes use f:flexname
@@ -402,7 +407,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory
         return xwql;
     }
 
-    /*
+    /**
      * @deprecated This version si buggy since it use the initial context of the plugin and not the current context
      */
     @Deprecated

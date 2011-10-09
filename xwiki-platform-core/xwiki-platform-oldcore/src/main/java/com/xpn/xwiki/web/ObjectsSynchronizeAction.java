@@ -70,6 +70,9 @@ public class ObjectsSynchronizeAction extends XWikiAction
             }
         }
 
+        // Set the new author
+        doc.setAuthorReference(context.getUserReference());
+
         xwiki.saveDocument(doc, context.getMessageTool().get("core.model.xobject.synchronizeObjects.versionSummary"),
             true, context);
 

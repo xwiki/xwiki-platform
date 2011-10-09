@@ -145,7 +145,7 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
      * http://jira.xwiki.org/jira/browse/XWIKI-5907
      * </p>
      *
-     * @param timeToLive the number of ms to cache the content
+     * @param timeToLive the number of seconds to cache the content
      * @param maxEntries the maximum number of entries in the cache (Least Recently Used entries are ejected)
      * @return the matching cache (a new cache is created if no existing one is found)
      * @throws MacroExecutionException in case we fail to create the new cache

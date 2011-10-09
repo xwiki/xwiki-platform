@@ -187,12 +187,12 @@ public class CacheMacroTest extends AbstractComponentTestCase
 
         params.setId("id");
         params.setMaxEntries(10);
-        params.setTimeToLive(500);
+        params.setTimeToLive(100);
         List<Block> result1 = this.cacheMacro.execute(params, "content1", context);
 
         // Execute a second time with different content but with different time to live param. This means another
         // cache will be used and thus the first cached content won't be returned.
-        params.setTimeToLive(600);
+        params.setTimeToLive(200);
         List<Block> result2 = this.cacheMacro.execute(params, "content2", context);
         Assert.assertFalse(result2.equals(result1));
     }
@@ -205,7 +205,7 @@ public class CacheMacroTest extends AbstractComponentTestCase
 
         params.setId("id");
         params.setMaxEntries(10);
-        params.setTimeToLive(500);
+        params.setTimeToLive(100);
         List<Block> result1 = this.cacheMacro.execute(params, "content1", context);
 
         // Execute a second time with different content but with different time to live param. This means another

@@ -65,7 +65,7 @@ public class CacheMacroParameters
     }
 
     /**
-     * @return the number of ms to cache the content
+     * @return the number of seconds to cache the content
      */
     public int getTimeToLive()
     {
@@ -75,7 +75,7 @@ public class CacheMacroParameters
     /**
      * @param timeToLive refer to {@link #getTimeToLive()}
      */
-    @PropertyDescription("the number of ms to cache the content")
+    @PropertyDescription("the number of seconds to cache the content")
     public void setTimeToLive(int timeToLive)
     {
         this.timeToLive = timeToLive;

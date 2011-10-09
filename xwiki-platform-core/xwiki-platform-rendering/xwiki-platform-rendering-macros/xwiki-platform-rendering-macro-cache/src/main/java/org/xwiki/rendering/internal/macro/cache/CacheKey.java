@@ -50,7 +50,7 @@ public class CacheKey
     }
 
     /**
-     * @return the number of ms to cache the content
+     * @return the number of seconds to cache the content
      */
     public int getTimeToLive()
     {

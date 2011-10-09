@@ -76,7 +76,7 @@ public class EntryEvictionConfiguration extends HashMap<String, Object>
     /**
      * @param mode the ordering/storing algorithm used by the cache.
      */
-    public void setAlgotithm(Algorithm mode)
+    public void setAlgorithm(Algorithm mode)
     {
         this.mode = mode;
     }

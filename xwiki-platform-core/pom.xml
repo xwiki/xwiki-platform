@@ -307,6 +307,7 @@
               <excludes>
                 <exclude>**/internal/**</exclude>
                 <!-- To be removed when we release 3.3 -->
+                <exclude>org/xwiki/cache/eviction/EntryEvictionConfiguration</exclude>
               </excludes>
             </configuration>
           </plugin>

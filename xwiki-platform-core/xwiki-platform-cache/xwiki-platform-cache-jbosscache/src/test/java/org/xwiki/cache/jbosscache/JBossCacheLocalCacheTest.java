@@ -25,11 +25,6 @@ public class JBossCacheLocalCacheTest extends AbstractGenericTestCache
 {
     public JBossCacheLocalCacheTest()
     {
-        this("jbosscache/local");
-    }
-
-    protected JBossCacheLocalCacheTest(String roleHint)
-    {
-        super(roleHint);
+        super("jbosscache/local");
     }
 }

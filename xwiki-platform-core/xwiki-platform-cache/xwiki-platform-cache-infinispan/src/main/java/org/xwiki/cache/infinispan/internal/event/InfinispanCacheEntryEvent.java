@@ -17,26 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.cache.oscache.internal;
+package org.xwiki.cache.infinispan.internal.event;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
+import org.xwiki.cache.CacheEntry;
+import org.xwiki.cache.infinispan.internal.InfinispanCache;
+import org.xwiki.cache.infinispan.internal.InfinispanCacheEntry;
 
 /**
- * Implements {@link org.xwiki.cache.CacheFactory} based on OSCache.
+ * Implements {@link org.xwiki.cache.event.CacheEntryEvent} based on Infinispan.
  * 
+ * @param <T> the class of the data stored in the cache.
  * @version $Id$
+ * @since 3.3M1
  */
-@Component
-@Named("oscache/local")
-@Singleton
-public class LocalOSCacheCacheFactory extends AbstractOSCacheCacheFactory
+public class InfinispanCacheEntryEvent<T> extends InfinispanCacheEvent<T> implements
+    org.xwiki.cache.event.CacheEntryEvent<T>
 {
-    @Override
-    protected String getDefaultPropsId()
+    /**
+     * The cache entry associated with the event.
+     */
+    private InfinispanCacheEntry<T> entry;
+
+    /**
+     * @param entry the cache entry associated with the event.
+     */
+    public InfinispanCacheEntryEvent(InfinispanCacheEntry<T> entry)
     {
-        return "default-local";
+        super((InfinispanCache<T>) entry.getCache());
+
+        this.entry = entry;
+    }
+
+    @Override
+    public CacheEntry<T> getEntry()
+    {
+        return entry;
     }
 }

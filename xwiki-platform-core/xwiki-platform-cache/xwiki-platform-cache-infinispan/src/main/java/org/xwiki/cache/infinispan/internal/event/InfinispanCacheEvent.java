@@ -17,14 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.cache.oscache;
+package org.xwiki.cache.infinispan.internal.event;
 
-import org.xwiki.cache.tests.AbstractEvictionGenericTestCache;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.event.CacheEvent;
+import org.xwiki.cache.infinispan.internal.InfinispanCache;
 
-public class OSCacheLocalCacheTest extends AbstractEvictionGenericTestCache
+/**
+ * Implements {@link CacheEvent} based on OSCache.
+ * 
+ * @param <T> the class of the data stored in the cache.
+ * @version $Id$
+ * @since 3.3M1
+ */
+public class InfinispanCacheEvent<T> implements CacheEvent<T>
 {
-    public OSCacheLocalCacheTest()
+    /**
+     * The cache which generated this event.
+     */
+    private InfinispanCache<T> cache;
+
+    /**
+     * @param cache the cache which generated this event.
+     */
+    public InfinispanCacheEvent(InfinispanCache<T> cache)
     {
-        super("oscache/local");
+        this.cache = cache;
+    }
+
+    @Override
+    public Cache<T> getCache()
+    {
+        return cache;
     }
 }

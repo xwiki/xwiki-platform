@@ -95,7 +95,7 @@
         <artifactId>jfreechart</artifactId>
         <version>1.0.13</version>
       </dependency>
-      <!-- Used on remote objervatoin and also by JBossCache (even if it does not really use it) -->
+      <!-- Used on remote observation and also by JBossCache (even if it does not really use it) -->
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>

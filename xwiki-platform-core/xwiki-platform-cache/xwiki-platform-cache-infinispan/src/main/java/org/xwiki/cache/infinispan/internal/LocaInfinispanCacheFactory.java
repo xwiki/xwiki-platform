@@ -17,26 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.cache.oscache.internal;
+package org.xwiki.cache.infinispan.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
 
 /**
- * Implements {@link org.xwiki.cache.CacheFactory} based on OSCache.
+ * Implements {@link org.xwiki.cache.CacheFactory} based on Infinispan.
  * 
  * @version $Id$
+ * @since 3.3M1
  */
 @Component
-@Named("oscache/local")
+@Named("infinispan/local")
 @Singleton
-public class LocalOSCacheCacheFactory extends AbstractOSCacheCacheFactory
+@Deprecated
+public class LocaInfinispanCacheFactory implements CacheFactory
 {
+    /**
+     * Don't do anything special and redirect to standard Infinispan implementation instead.
+     */
+    @Inject
+    @Named("infinispan")
+    private CacheFactory infinispanCacheFactory;
+
     @Override
-    protected String getDefaultPropsId()
+    public <T> Cache<T> newCache(CacheConfiguration config) throws CacheException
     {
-        return "default-local";
+        return this.infinispanCacheFactory.newCache(config);
     }
 }

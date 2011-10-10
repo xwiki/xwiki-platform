@@ -66,9 +66,6 @@ public abstract class AbstractTestCache extends AbstractComponentTestCase
         this.roleHint = roleHint;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void registerComponents() throws Exception
     {

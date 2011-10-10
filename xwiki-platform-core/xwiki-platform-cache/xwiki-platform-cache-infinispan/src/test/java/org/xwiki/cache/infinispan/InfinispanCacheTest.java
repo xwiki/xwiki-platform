@@ -17,14 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.cache.oscache;
+package org.xwiki.cache.infinispan;
 
 import org.xwiki.cache.tests.AbstractEvictionGenericTestCache;
+import org.xwiki.cache.tests.AbstractGenericTestCache;
 
-public class OSCacheLocalCacheTest extends AbstractEvictionGenericTestCache
+public class InfinispanCacheTest extends AbstractEvictionGenericTestCache
 {
-    public OSCacheLocalCacheTest()
+    public InfinispanCacheTest()
     {
-        super("oscache/local");
+        super("infinispan");
     }
 }

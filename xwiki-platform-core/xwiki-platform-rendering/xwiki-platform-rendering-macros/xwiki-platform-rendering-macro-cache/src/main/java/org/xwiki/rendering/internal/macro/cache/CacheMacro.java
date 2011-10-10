@@ -19,9 +19,9 @@
  */
 package org.xwiki.rendering.internal.macro.cache;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -88,7 +88,7 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
      * Map of all caches. There's one cache per timeToLive/maxEntry combination since currently we cannot set these
      * configuration values at the cache entry level but only for the whole cache.
      */
-    private Map<CacheKey, Cache<List<Block>>> contentCacheMap = new HashMap<CacheKey, Cache<List<Block>>>();
+    private Map<CacheKey, Cache<List<Block>>> contentCacheMap = new ConcurrentHashMap<CacheKey, Cache<List<Block>>>();
 
     /**
      * Create and initialize the descriptor of the macro.

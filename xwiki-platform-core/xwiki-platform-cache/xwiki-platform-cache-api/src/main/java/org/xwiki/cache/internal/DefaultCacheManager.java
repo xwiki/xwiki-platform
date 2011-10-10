@@ -55,21 +55,13 @@ public class DefaultCacheManager implements CacheManager
     @Inject
     private CacheManagerConfiguration configuration;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheManager#getCacheFactory()
-     */
+    @Override
     public CacheFactory getCacheFactory() throws ComponentLookupException
     {
         return getCacheFactory(this.configuration.getDefaultCache());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheManager#getLocalCacheFactory()
-     */
+    @Override
     public CacheFactory getLocalCacheFactory() throws ComponentLookupException
     {
         return getCacheFactory(this.configuration.getDefaultLocalCache());
@@ -87,21 +79,13 @@ public class DefaultCacheManager implements CacheManager
         return this.componentManager.lookup(CacheFactory.class, cacheHint);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheManager#createNewCache(org.xwiki.cache.config.CacheConfiguration)
-     */
+    @Override
     public <T> Cache<T> createNewCache(CacheConfiguration config) throws CacheException
     {
         return createNewCache(config, this.configuration.getDefaultCache());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheManager#createNewLocalCache(org.xwiki.cache.config.CacheConfiguration)
-     */
+    @Override
     public <T> Cache<T> createNewLocalCache(CacheConfiguration config) throws CacheException
     {
         return createNewCache(config, this.configuration.getDefaultLocalCache());

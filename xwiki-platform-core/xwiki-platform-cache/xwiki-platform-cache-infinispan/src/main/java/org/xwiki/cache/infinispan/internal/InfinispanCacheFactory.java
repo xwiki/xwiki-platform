@@ -28,16 +28,15 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.infinispan.config.Configuration;
-import org.infinispan.eviction.EvictionStrategy;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.slf4j.Logger;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.cache.eviction.EntryEvictionConfiguration;
-import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.container.Container;
@@ -56,19 +55,24 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
     /**
      * The folder containing Infinispan properties files.
      */
-    private static final String DEFAULT_CONFIGURATION_FILE = "/WEB-INF/cache/infinispan/default.xml";
-
-    /**
-     * The container used to access configuration files.
-     */
-    @Inject
-    private Container container;
+    private static final String DEFAULT_CONFIGURATION_FILE = "/WEB-INF/cache/infinispan/config.xml";
 
     /**
      * The logger to log.
      */
     @Inject
     private Logger logger;
+
+    /**
+     * Used to lookup the container.
+     */
+    @Inject
+    private ComponentManager componentManager;
+
+    /**
+     * Optional container used to access configuration files.
+     */
+    private Container container;
 
     /**
      * The original default configuration (generally coming from the configuration file).
@@ -104,6 +108,14 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
         // save the real default configuration to be able to restore it
 
         this.defaultConfiguration = this.cacheManager.getDefaultConfiguration().clone();
+
+        // container
+
+        try {
+            this.container = this.componentManager.lookup(Container.class);
+        } catch (ComponentLookupException e) {
+            this.logger.debug("Can't find any Container", e);
+        }
     }
 
     /**
@@ -125,35 +137,22 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
     @Override
     public <T> org.xwiki.cache.Cache<T> newCache(CacheConfiguration configuration) throws CacheException
     {
+        String cacheName = configuration.getConfigurationId();
+        if (cacheName == null) {
+            // Infinispan require a name for the cache
+            cacheName = UUID.randomUUID().toString();
+        }
+        configuration.setConfigurationId(cacheName);
+
         // set custom configuration
 
-        EntryEvictionConfiguration eec =
-            (EntryEvictionConfiguration) configuration.get(EntryEvictionConfiguration.CONFIGURATIONID);
+        InfinispanConfigurationLoader loader = new InfinispanConfigurationLoader(configuration);
 
-        boolean configChanged = false;
-        if (eec != null && eec.getAlgorithm() == EntryEvictionConfiguration.Algorithm.LRU) {
-            Configuration isDefaultConfiguration = this.cacheManager.getDefaultConfiguration();
-            if (eec.containsKey(LRUEvictionConfiguration.MAXENTRIES_ID)) {
-                isDefaultConfiguration.fluent().eviction().strategy(EvictionStrategy.LRU)
-                    .maxEntries(((Number) eec.get(LRUEvictionConfiguration.MAXENTRIES_ID)).intValue());
-                configChanged = true;
-            }
-
-            if (eec.getTimeToLive() > 0) {
-                isDefaultConfiguration.fluent().expiration().maxIdle(eec.getTimeToLive() * 1000L);
-                configChanged = true;
-            }
-        }
+        boolean configChanged = loader.customize(this.cacheManager.getDefaultConfiguration());
 
         // create cache
 
         try {
-            String cacheName = configuration.getConfigurationId();
-            if (cacheName == null) {
-                // Infinispan require a name for the cache
-                cacheName = UUID.randomUUID().toString();
-            }
-
             return new InfinispanCache<T>(this.cacheManager.<String, T> getCache(cacheName), configuration);
         } finally {
             // restore default configuration

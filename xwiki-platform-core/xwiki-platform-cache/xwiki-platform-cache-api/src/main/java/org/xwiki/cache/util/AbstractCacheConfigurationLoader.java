@@ -43,7 +43,7 @@ public abstract class AbstractCacheConfigurationLoader
     /**
      * The default configuration identifier used to load cache configuration file.
      */
-    private String defaultPropsId = "default";
+    private String defaultPropsId;
 
     /**
      * @param configuration the XWiki cache API configuration.

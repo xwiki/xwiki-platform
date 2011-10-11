@@ -163,13 +163,13 @@ container.persistentDirectory=$xwikiPropertiesContainerPersistentDirectory
 
 #-# [Since 1.7M1]
 #-# The standard cache component implementation to use (can be local or distributed depending on the implementation).
-#-# The default standard cache implementation is JBoss Cache.
-# cache.defaultCache=jbosscache
+#-# The default standard cache implementation is Infinispan.
+# cache.defaultCache=infinispan
 
 #-# [Since 1.7M1]
 #-# The local cache implementation to use.
-#-# The default local cache implementation is JBoss Cache.
-# cache.defaultLocalCache=jbosscache/local
+#-# The default local cache implementation is Infinispan.
+# cache.defaultLocalCache=infinispan/local
 
 #-------------------------------------------------------------------------------------
 # Settings for the OpenOffice server instance consumed by the OfficeImporter component

@@ -44,12 +44,12 @@ public class DefaultCacheManagerConfiguration implements CacheManagerConfigurati
     /**
      * The default cache implementation.
      */
-    private static final String DEFAULT_CACHE_HINT = "jbosscache";
+    private static final String DEFAULT_CACHE_HINT = "infinispan";
 
     /**
      * The default local cache implementation.
      */
-    private static final String DEFAULT_LOCALCACHE_HINT = "jbosscache/local";
+    private static final String DEFAULT_LOCALCACHE_HINT = "infinispan/local";
 
     /**
      * We read the cache configuration data only from the XWiki configuration file. We don't look for cache

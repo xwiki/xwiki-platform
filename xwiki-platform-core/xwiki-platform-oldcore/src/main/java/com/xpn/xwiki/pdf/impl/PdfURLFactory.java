@@ -165,6 +165,7 @@ public class PdfURLFactory extends XWikiServletURLFactory
         String key = getAttachmentKey(space, name, filename, revision);
         if (!usedFiles.containsKey(key)) {
             File file = getTemporaryFile(key, context);
+            LOGGER.debug("Temporary PDF export file [{}]", file.toString());
             XWikiDocument doc =
                 context.getWiki()
                     .getDocument(
@@ -293,6 +294,13 @@ public class PdfURLFactory extends XWikiServletURLFactory
     private File getTemporaryFile(String key, XWikiContext context) throws IOException
     {
         File tempdir = (File) context.get("pdfexportdir");
-        return File.createTempFile("pdf", "." + FilenameUtils.getExtension(key), tempdir);
+        String prefix = "pdf";
+        String suffix = "." + FilenameUtils.getExtension(key);
+        try {
+            return File.createTempFile(prefix, suffix, tempdir);
+        } catch (IOException e) {
+            throw new IOException("Failed to create temporary PDF export file with prefix [" + prefix + "], suffix ["
+                + suffix + "] in directory [" + tempdir + "]", e);
+        }
     }
 }

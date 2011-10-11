@@ -19,7 +19,6 @@
  */
 package org.xwiki.cache.infinispan.internal;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -32,7 +31,6 @@ import org.infinispan.notifications.cachelistener.annotation.CacheEntryRemoved;
 import org.infinispan.notifications.cachelistener.event.CacheEntriesEvictedEvent;
 import org.infinispan.notifications.cachelistener.event.CacheEntryModifiedEvent;
 import org.infinispan.notifications.cachelistener.event.CacheEntryRemovedEvent;
-import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.infinispan.internal.event.InfinispanCacheEntryEvent;
 import org.xwiki.cache.util.AbstractCache;
@@ -53,12 +51,6 @@ public class InfinispanCache<T> extends AbstractCache<T>
     private Cache<String, T> cache;
 
     /**
-     * Only store object implementing {@link DisposableCacheValue} objects to be able to dispose them when evicted.
-     * Note: can't find how to get the value to be able to destroy it when eviction event is raised.
-     */
-    private Map<String, T> cachedObjects = new HashMap<String, T>();
-
-    /**
      * The state of the node before modification.
      */
     private ConcurrentMap<String, T> preEventData = new ConcurrentHashMap<String, T>();
@@ -74,26 +66,6 @@ public class InfinispanCache<T> extends AbstractCache<T>
         this.cache.addListener(this);
     }
 
-    /**
-     * @param key the key used to access the value in the cache.
-     * @param obj the value stored in the cache.
-     */
-    private void pushDisposableCacheValue(String key, T obj)
-    {
-        if (obj instanceof DisposableCacheValue) {
-            this.cachedObjects.put(key, obj);
-        }
-    }
-
-    /**
-     * @param key the key used to access the value in the cache.
-     * @return the value to store in the cache, or null if no value is found.
-     */
-    private T popDisposableCacheValue(String key)
-    {
-        return this.cachedObjects.remove(key);
-    }
-
     @Override
     public void remove(String key)
     {
@@ -104,8 +76,6 @@ public class InfinispanCache<T> extends AbstractCache<T>
     public void set(String key, T obj)
     {
         this.cache.put(key, obj);
-
-        pushDisposableCacheValue(key, obj);
     }
 
     @Override
@@ -209,7 +179,6 @@ public class InfinispanCache<T> extends AbstractCache<T>
 
         if (previousValue != null) {
             if (previousValue != value) {
-                popDisposableCacheValue(key);
                 disposeCacheValue(previousValue);
             }
 
@@ -227,14 +196,8 @@ public class InfinispanCache<T> extends AbstractCache<T>
      */
     private void cacheEntryRemoved(String key, T value)
     {
-        T obj = popDisposableCacheValue(key);
-
-        if (obj == null) {
-            obj = value;
-        }
-
         InfinispanCacheEntryEvent<T> event =
-            new InfinispanCacheEntryEvent<T>(new InfinispanCacheEntry<T>(this, key, obj));
+            new InfinispanCacheEntryEvent<T>(new InfinispanCacheEntry<T>(this, key, value));
 
         sendEntryRemovedEvent(event);
     }

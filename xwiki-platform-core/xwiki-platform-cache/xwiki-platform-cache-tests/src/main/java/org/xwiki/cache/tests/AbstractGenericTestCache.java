@@ -161,4 +161,22 @@ public abstract class AbstractGenericTestCache extends AbstractTestCache
         Assert.assertEquals(KEY, eventListener.getRemovedEvent().getEntry().getKey());
         Assert.assertEquals(VALUE2, eventListener.getRemovedEvent().getEntry().getValue());
     }
+    
+    /**
+     * Validate that two different caches are really different.
+     * 
+     * @throws Exception error.
+     */
+    @Test
+    public void testSeveralCaches() throws Exception
+    {
+        CacheFactory factory = getCacheFactory();
+
+        Cache<Object> cache = factory.newCache(new CacheConfiguration());
+        Cache<Object> cache2 = factory.newCache(new CacheConfiguration());
+
+        cache.set(KEY, VALUE);
+        
+        Assert.assertNull(cache2.get(KEY));
+    }
 }

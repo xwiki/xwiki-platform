@@ -146,7 +146,7 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
         CacheConfiguration mappingCacheConfiguration = (CacheConfiguration) cacheConfiguration.clone();
         mappingCacheConfiguration.setConfigurationId(cacheConfiguration.getConfigurationId() + ".mapping");
 
-        this.mappingCache = this.cacheManager.createNewCache(cacheConfiguration);
+        this.mappingCache = this.cacheManager.createNewCache(mappingCacheConfiguration);
 
         this.observationManager.addListener(this.listener);
     }

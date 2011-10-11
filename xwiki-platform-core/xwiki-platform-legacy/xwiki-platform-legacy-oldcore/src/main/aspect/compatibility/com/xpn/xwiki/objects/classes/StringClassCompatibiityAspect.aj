@@ -19,22 +19,14 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
-import org.apache.ecs.xhtml.option;
-import org.apache.ecs.xhtml.select;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
-import com.xpn.xwiki.web.XWikiMessageTool;
 
 
 /**
@@ -44,7 +36,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
  */
 public aspect StringClassCompatibiityAspect
 {
-    @Override
+    @Deprecated
     public void StringClass.displaySearch(StringBuffer buffer, String name, String prefix,
         XWikiCriteria criteria, XWikiContext context)
     {
@@ -61,7 +53,7 @@ public aspect StringClassCompatibiityAspect
         buffer.append(input.toString());
     }
 
-    @Override
+    @Deprecated
     public void StringClass.makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
     {
         String value = (String) map.get(prefix);
@@ -91,7 +83,7 @@ public aspect StringClassCompatibiityAspect
         }
     }
 
-    @Override
+    @Deprecated
     public void StringClass.fromSearchMap(XWikiQuery query, Map<String, String[]> map)
     {
         String[] data = map.get("");

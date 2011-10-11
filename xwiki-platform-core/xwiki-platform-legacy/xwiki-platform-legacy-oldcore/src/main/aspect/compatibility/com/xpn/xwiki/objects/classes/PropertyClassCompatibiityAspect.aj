@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ecs.xhtml.input;
+import org.hibernate.annotations.common.reflection.XClass;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
@@ -36,7 +37,7 @@ import com.xpn.xwiki.plugin.query.XWikiQuery;
  */
 public aspect PropertyClassCompatibiityAspect
 {
-
+    @Deprecated
     public void PropertyClass.displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria,
         XWikiContext context)
     {
@@ -53,6 +54,7 @@ public aspect PropertyClassCompatibiityAspect
         buffer.append(input.toString());
     }
 
+    @Deprecated
     public String PropertyClass.displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
@@ -60,17 +62,19 @@ public aspect PropertyClassCompatibiityAspect
         return buffer.toString();
     }
 
+    @Deprecated
     public String PropertyClass.displaySearch(String name, XWikiCriteria criteria, XWikiContext context)
     {
         return displaySearch(name, "", criteria, context);
     }
 
+    @Deprecated
     public void PropertyClass.makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
     {
     }
 
+    @Deprecated
     public void PropertyClass.fromSearchMap(XWikiQuery query, Map<String, String[]> map)
     {
     }
-
 }

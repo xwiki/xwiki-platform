@@ -19,14 +19,8 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.ecs.xhtml.input;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
 
 
 /**
@@ -34,8 +28,9 @@ import com.xpn.xwiki.plugin.query.XWikiQuery;
  * 
  * @version $Id$
  */
-public aspect PropertyClassInterfaceCompatibiityAspect
+public abstract aspect PropertyClassInterfaceCompatibiityAspect
 {
-    public void PropertyClassInterface.displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria,
+    @Deprecated
+    public abstract void PropertyClassInterface.displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria,
         XWikiContext context);
 }

@@ -35,13 +35,13 @@ import com.xpn.xwiki.plugin.query.XWikiQuery;
 
 
 /**
- * Add a backward compatibility layer to the {@link com.xpn.xwiki.objects.classes.Boolean} class.
+ * Add a backward compatibility layer to the {@link com.xpn.xwiki.objects.classes.BooleanClass} class.
  * 
  * @version $Id$
  */
-public aspect BooleanClassCompatibiityAspect
+public privileged aspect BooleanClassCompatibiityAspect
 {
-    @Override
+    @Deprecated
     public String BooleanClass.displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         if (getDisplayType().equals("input")) {
@@ -53,6 +53,7 @@ public aspect BooleanClassCompatibiityAspect
         }
     }
 
+    @Deprecated
     public String BooleanClass.displaySelectSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         select select = new select(prefix + name, 1);
@@ -83,6 +84,7 @@ public aspect BooleanClassCompatibiityAspect
         return select.toString();
     }
 
+    @Deprecated
     public String BooleanClass.displayCheckboxSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
@@ -101,7 +103,7 @@ public aspect BooleanClassCompatibiityAspect
         return buffer.toString();
     }
 
-    @Override
+    @Deprecated
     public void BooleanClass.makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
     {
         Object values = map.get(prefix);
@@ -121,7 +123,7 @@ public aspect BooleanClassCompatibiityAspect
     }
 
 
-    @Override
+    @Deprecated
     public void BooleanClass.fromSearchMap(XWikiQuery query, Map<String, String[]> map)
     {
         String[] data = map.get("");

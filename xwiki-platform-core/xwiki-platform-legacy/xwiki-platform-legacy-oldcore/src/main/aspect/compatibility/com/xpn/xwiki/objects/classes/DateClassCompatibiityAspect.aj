@@ -19,16 +19,10 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
-import org.apache.ecs.xhtml.option;
-import org.apache.ecs.xhtml.select;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.DateProperty;
@@ -44,8 +38,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
  */
 public aspect DateClassCompatibiityAspect
 {
-
-    @Override
+    @Deprecated
     public void DateClass.displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria,
         XWikiContext context)
     {
@@ -83,7 +76,7 @@ public aspect DateClassCompatibiityAspect
         buffer.append(input2.toString());
     }
 
-    @Override
+    @Deprecated
     public void DateClass.fromSearchMap(XWikiQuery query, Map<String, String[]> map)
     {
         String[] data = map.get("");

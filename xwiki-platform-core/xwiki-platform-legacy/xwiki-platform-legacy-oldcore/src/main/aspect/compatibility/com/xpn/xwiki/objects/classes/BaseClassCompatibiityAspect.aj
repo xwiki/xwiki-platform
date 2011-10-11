@@ -44,6 +44,7 @@ import com.xpn.xwiki.plugin.query.XWikiQuery;
  */
 public aspect BaseClassCompatibiityAspect
 {
+    @Deprecated
     public String BaseClass.makeQuery(XWikiCriteria query)
     {
         List<String> criteriaList = new ArrayList<String>();
@@ -58,6 +59,7 @@ public aspect BaseClassCompatibiityAspect
         return StringUtils.join(criteriaList.toArray(), " and ");
     }
 
+    @Deprecated
     public String BaseClass.displaySearchColumns(String prefix, XWikiQuery query, XWikiContext context)
     {
         select select = new select(prefix + "searchcolumns", 5);
@@ -91,6 +93,7 @@ public aspect BaseClassCompatibiityAspect
         return select.toString();
     }
 
+    @Deprecated
     public String BaseClass.displaySearchOrder(String prefix, XWikiQuery query, XWikiContext context)
     {
         select select = new select(prefix + "searchorder", 5);

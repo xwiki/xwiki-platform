@@ -53,15 +53,6 @@
       <version>0.4.2</version>
     </dependency>
 
-    <!-- Version 1.1 of jackrabbit core needs to be uploaded to central repository. In addition there was a  POM
-         issue in version 1.0.1, see http://jira.codehaus.org/browse/MEV-453 -->
-    <!-- TODO: Version 1.4.2 is published in the central repo, can we use that? -->
-    <dependency>
-      <groupId>org.apache.jackrabbit</groupId>
-      <artifactId>jackrabbit-core</artifactId>
-      <version>1.1-xwiki</version>
-    </dependency>
-
     <!-- We need to find what version of the googleapi we're using and get that to the central repository if the
          license allows it -->
     <dependency>
@@ -69,25 +60,6 @@
       <artifactId>googleapi</artifactId>
       <version>UNKNOWN</version>
       <classifier>xwiki</classifier>
-    </dependency>
-
-    <!-- There's no release of Graffito yet (http://incubator.apache.org/graffito/jcr-mapping/index.html) -->
-    <dependency>
-      <groupId>org.apache.portals</groupId>
-      <artifactId>graffito-jcr-mapping</artifactId>
-      <version>1.0-a1-amelentev-dev</version>
-    </dependency>
-
-    <!-- VMA: I'm not sure if we have the right to distribute this jar. It's not on the central repository because
-         of licensing issues. -->
-    <!-- Sergiu: No, we cannot redistribute it. And we definitely shouldn't put it in our repo.
-         We can redistribute version 1.1, but we should make users approve their License Agreement.
-         Can we drop this completely? Why is it needed? -->
-    <!-- TODO: Version 1.1 is available, should we upgrade? -->
-    <dependency>
-      <groupId>javax.transaction</groupId>
-      <artifactId>jta</artifactId>
-      <version>1.0.1B</version>
     </dependency>
 
     <dependency>
@@ -99,13 +71,6 @@
     <dependency>
       <groupId>jfree</groupId>
       <artifactId>jfreechart</artifactId>
-    </dependency>
-
-    <!-- See http://jira.codehaus.org/browse/MEV-488 -->
-    <dependency>
-      <groupId>javax.jcr</groupId>
-      <artifactId>jcr</artifactId>
-      <version>1.0</version>
     </dependency>
 
     <!-- We need to create a JIRA issue on the Maven project to upload these artifacts -->

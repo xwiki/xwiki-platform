@@ -19,19 +19,12 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
-import org.apache.ecs.xhtml.option;
-import org.apache.ecs.xhtml.select;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.web.XWikiMessageTool;
@@ -44,7 +37,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
  */
 public aspect NumberClassCompatibiityAspect
 {
-    @Override
+    @Deprecated
     public void NumberClass.displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria,
         XWikiContext context)
     {
@@ -77,7 +70,7 @@ public aspect NumberClassCompatibiityAspect
         buffer.append(input2.toString());
     }
 
-    @Override
+    @Deprecated
     public void NumberClass.makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
     {
         Number value = (Number) map.get(prefix);
@@ -99,7 +92,7 @@ public aspect NumberClassCompatibiityAspect
         }
     }
 
-    @Override
+    @Deprecated
     public void NumberClass.fromSearchMap(XWikiQuery query, Map<String, String[]> map)
     {
         String data[] = map.get("");

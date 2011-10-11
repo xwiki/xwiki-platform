@@ -2772,17 +2772,34 @@ public class XWikiDocument implements DocumentModelBridge
                     result.append("{/pre}");
                 }
             } else if (type.equals("search")) {
-                // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
-                // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
-                // escaping. For example for a textarea check the TextAreaClass class.
-                if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
-                    result.append("{pre}");
+                // Backward compatibility
+
+                // Check if the method has been injected using aspects
+                Method searchMethod = null;
+                for (Method method : pclass.getClass().getMethods()) {
+                    if (method.getName().equals("displaySearch") && method.getParameterTypes().length == 5) {
+                        searchMethod = method;
+                        break;
+                    }
                 }
-                prefix =
-                    this.localEntityReferenceSerializer.serialize(obj.getXClass(context).getDocumentReference()) + "_";
-                pclass.displaySearch(result, fieldname, prefix, (XWikiCriteria) context.get("query"), context);
-                if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
-                    result.append("{/pre}");
+
+                if (searchMethod != null) {
+                    // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
+                    // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does
+                    // the
+                    // escaping. For example for a textarea check the TextAreaClass class.
+                    if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
+                        result.append("{pre}");
+                    }
+                    prefix =
+                        this.localEntityReferenceSerializer.serialize(obj.getXClass(context).getDocumentReference())
+                            + "_";
+                    searchMethod.invoke(pclass, result, fieldname, prefix, context.get("query"), context);
+                    if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
+                        result.append("{/pre}");
+                    }
+                } else {
+                    pclass.displayView(result, fieldname, prefix, obj, context);
                 }
             } else {
                 pclass.displayView(result, fieldname, prefix, obj, context);

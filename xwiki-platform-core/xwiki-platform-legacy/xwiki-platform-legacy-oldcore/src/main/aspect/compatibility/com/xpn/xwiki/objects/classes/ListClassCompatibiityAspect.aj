@@ -46,7 +46,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 public aspect ListClassCompatibiityAspect
 {
 
-    @Override
+    @Deprecated
     public String ListClass.displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         if (getDisplayType().equals("input")) {
@@ -58,7 +58,8 @@ public aspect ListClassCompatibiityAspect
         }
     }
 
-    protected String ListClass.displayRadioSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
+    @Deprecated
+    public String ListClass.displayRadioSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
         List<String> list = getList(context);
@@ -90,7 +91,8 @@ public aspect ListClassCompatibiityAspect
         return buffer.toString();
     }
 
-    protected String ListClass.displaySelectSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
+    @Deprecated
+    public String ListClass.displaySelectSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         select select = new select(prefix + name, 1);
         select.setMultiple(true);
@@ -124,7 +126,7 @@ public aspect ListClassCompatibiityAspect
         return select.toString();
     }
 
-    @Override
+    @Deprecated
     public void ListClass.makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
     {
         Object values = map.get(prefix);
@@ -154,7 +156,7 @@ public aspect ListClassCompatibiityAspect
         return;
     }
 
-    @Override
+    @Deprecated
     public void ListClass.fromSearchMap(XWikiQuery query, Map<String, String[]> map)
     {
         String[] data = map.get("");

@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.plugin.query;
 
+@Deprecated
 public class OrderClause
 {
     public final static int ASC = 1;

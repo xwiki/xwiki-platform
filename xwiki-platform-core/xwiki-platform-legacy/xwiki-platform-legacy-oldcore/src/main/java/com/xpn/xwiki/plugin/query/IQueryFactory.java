@@ -27,6 +27,7 @@ import javax.jcr.ValueFactory;
 import javax.jcr.query.InvalidQueryException;
 
 /** AbstractFactory interface for XWiki Queries */
+@Deprecated
 public interface IQueryFactory
 {
     /**

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.plugin.query;
 
 /** StringBuffer with Separator */
+@Deprecated
 public class SepStringBuffer
 {
     final String _separator;

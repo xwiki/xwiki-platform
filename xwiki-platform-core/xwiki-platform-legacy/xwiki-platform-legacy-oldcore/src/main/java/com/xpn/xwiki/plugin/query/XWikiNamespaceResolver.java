@@ -29,6 +29,7 @@ import org.apache.jackrabbit.name.AbstractNamespaceResolver;
 import org.apache.jackrabbit.name.QName;
 
 /** XWiki NamespaceResolver for JackRabbits. Singleton */
+@Deprecated
 public class XWikiNamespaceResolver extends AbstractNamespaceResolver
 {
     static Map prefixToURI = new HashMap();

@@ -24,6 +24,7 @@ import java.util.List;
 import com.xpn.xwiki.XWikiException;
 
 /** XWiki Query interface */
+@Deprecated
 public interface IQuery
 {
     public List list() throws XWikiException;

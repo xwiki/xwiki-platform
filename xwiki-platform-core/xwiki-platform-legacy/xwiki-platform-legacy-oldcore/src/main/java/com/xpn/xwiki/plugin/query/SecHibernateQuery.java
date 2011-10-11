@@ -38,6 +38,7 @@ import com.xpn.xwiki.plugin.query.HibernateQuery.XWikiHibernateQueryTranslator.O
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /** Security version of HibernateQuery */
+@Deprecated
 public class SecHibernateQuery extends HibernateQuery
 {
     public SecHibernateQuery(QueryRootNode tree, IQueryFactory qf)

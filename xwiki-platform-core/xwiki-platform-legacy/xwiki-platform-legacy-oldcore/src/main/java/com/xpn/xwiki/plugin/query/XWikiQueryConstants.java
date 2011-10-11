@@ -21,6 +21,7 @@ package com.xpn.xwiki.plugin.query;
 
 import org.apache.jackrabbit.core.query.QueryConstants;
 
+@Deprecated
 public class XWikiQueryConstants implements QueryConstants
 {
     public static boolean isGeneralComparisonType(int op)

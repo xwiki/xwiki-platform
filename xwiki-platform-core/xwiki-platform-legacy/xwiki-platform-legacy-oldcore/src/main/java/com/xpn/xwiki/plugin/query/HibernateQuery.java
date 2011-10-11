@@ -65,6 +65,7 @@ import com.xpn.xwiki.util.Util;
  * 
  * @version $Id$
  */
+@Deprecated
 public class HibernateQuery extends DefaultQuery
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateQuery.class);

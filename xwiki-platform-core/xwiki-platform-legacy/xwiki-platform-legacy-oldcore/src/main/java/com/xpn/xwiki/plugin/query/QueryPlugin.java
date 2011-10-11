@@ -41,9 +41,10 @@ import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
-/** 
- * Plugin for Query API 
+/**
+ * Plugin for Query API
  */
+@Deprecated
 public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryPlugin.class);
@@ -371,7 +372,15 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory
         String className = (String) classes.toArray()[0];
         BaseClass bclass = context.getWiki().getClass(className, context);
         xwqlfrom.append("doc.object(" + className + ") as obj");
-        String where = bclass.makeQuery(query);
+
+        String where;
+        try {
+            where = (String) BaseClass.class.getMethod("makeQuery", XWikiCriteria.class).invoke(bclass, query);
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to excute PropertyClass#fromSearchMap", e);
+        }
+
         if (!where.equals("")) {
             xwqlwhere.append(where);
         }

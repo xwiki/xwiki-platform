@@ -27,6 +27,7 @@ import java.util.Set;
 
 import com.xpn.xwiki.util.Util;
 
+@Deprecated
 public class XWikiCriteria
 {
     protected Map<String, Object> params = new HashMap<String, Object>();

@@ -308,6 +308,8 @@
                 <exclude>**/internal/**</exclude>
                 <!-- To be removed when we release 3.3 -->
                 <exclude>org/xwiki/cache/eviction/EntryEvictionConfiguration</exclude>
+                <!-- Moved to Legacy -->
+                <exclude>com/xpn/xwiki/api/XWiki</exclude>
               </excludes>
             </configuration>
           </plugin>

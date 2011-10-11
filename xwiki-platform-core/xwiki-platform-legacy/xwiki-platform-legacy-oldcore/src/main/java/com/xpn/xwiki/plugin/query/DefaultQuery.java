@@ -27,6 +27,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
+@Deprecated
 public class DefaultQuery implements IQuery
 {
     protected IQueryFactory _queryFactory;

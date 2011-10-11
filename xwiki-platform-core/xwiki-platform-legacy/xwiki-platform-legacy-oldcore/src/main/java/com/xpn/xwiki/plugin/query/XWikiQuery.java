@@ -33,6 +33,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiRequest;
 
+@Deprecated
 public class XWikiQuery extends XWikiCriteria
 {
     protected boolean distinct = false;
@@ -47,12 +48,11 @@ public class XWikiQuery extends XWikiCriteria
 
     public XWikiQuery()
     {
-        
+
     }
 
     public XWikiQuery(XWikiRequest request, String className, XWikiContext context) throws XWikiException
     {
-        super();
         String[] columns = request.getParameterValues(className + "_" + "searchcolumns");
         setDisplayProperties(columns);
         String[] order = request.getParameterValues(className + "_" + "searchorder");
@@ -63,7 +63,13 @@ public class XWikiQuery extends XWikiCriteria
         while (propid.hasNext()) {
             String propname = (String) propid.next();
             Map<String, String[]> map = Util.getObject(request, className + "_" + propname);
-            ((PropertyClass) (bclass.get(propname))).fromSearchMap(this, map);
+            try {
+                PropertyClass.class.getMethod("fromSearchMap", XWikiQuery.class, Map.class).invoke(
+                    bclass.get(propname), this, map);
+            } catch (Exception e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Failed to excute PropertyClass#fromSearchMap", e);
+            }
         }
     }
 

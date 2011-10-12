@@ -231,7 +231,7 @@ public class WatchListStore implements EventListener
             doc = context.getWiki().getDocument(WATCHLIST_CLASS, context);
         } catch (Exception e) {
             doc = new XWikiDocument();
-            String[] spaceAndName = WATCHLIST_CLASS.split(SPACE_PAGE_SEP);
+            String[] spaceAndName = StringUtils.split(WATCHLIST_CLASS, SPACE_PAGE_SEP);
             doc.setSpace(spaceAndName[0]);
             doc.setName(spaceAndName[1]);
             needsUpdate = true;
@@ -404,7 +404,7 @@ public class WatchListStore implements EventListener
         if (StringUtils.isBlank(watchedItems)) {
             return elements;
         }
-        elements.addAll(Arrays.asList(watchedItems.split(WATCHLIST_ELEMENT_SEP)));
+        elements.addAll(Arrays.asList(StringUtils.split(watchedItems, WATCHLIST_ELEMENT_SEP)));
         return elements;
     }
 

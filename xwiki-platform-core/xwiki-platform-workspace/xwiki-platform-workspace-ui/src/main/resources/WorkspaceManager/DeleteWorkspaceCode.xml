@@ -45,10 +45,10 @@
   #set ($workspace = $WorkspaceManager.getWorkspace($workspaceId))
   ##
   #if (!$workspace)
-    #if (!$xcontext.lastexception)
+    #if (!$WorkspaceManager.lastException)
       {{error}}The workspace '$workspaceId' does not exist.{{/error}}
     #else
-      #printException($xcontext.lastexception)
+      #printException($WorkspaceManager.lastException)
     #end
   #else
     #set ($currentUser = "${xcontext.mainWikiName}:${xcontext.user}")
@@ -69,8 +69,8 @@
         {{/box}}
       #else
         #set ($temp = $WorkspaceManager.deleteWorkspace($workspaceId))
-        #if ($xcontext.lastexception)
-          #printException($xcontext.lastexception)
+        #if ($WorkspaceManager.lastException)
+          #printException($WorkspaceManager.lastException)
         #else
           ## FIXME: replace with a success macro when it will be available.
           {{box image="icon:tick"}}The user [[$currentUser]] successfully deleted the workspace ${workspaceName}.{{/box}}

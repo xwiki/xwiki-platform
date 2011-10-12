@@ -113,7 +113,7 @@
         #set ($needsAdminRights = true)
       #else
 
-        {{error}}$msg.get('workspacemanager.template.install.error', [$context.lastexception]){{/error}}
+        {{error}}$msg.get('workspacemanager.template.install.error', [$services.workspace.lastException]){{/error}}
       #end
     #else
 

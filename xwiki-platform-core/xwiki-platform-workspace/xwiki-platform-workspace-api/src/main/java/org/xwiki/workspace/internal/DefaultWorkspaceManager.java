@@ -41,7 +41,6 @@ import org.xwiki.workspace.WorkspaceManagerMessageTool;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseElement;
@@ -237,17 +236,24 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     }
 
     @Override
-    public XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument) throws XWikiException
+    public XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument)
+        throws WorkspaceManagerException
     {
         XWikiContext deprecatedContext = getXWikiContext();
 
-        /* Create new wiki. */
-        newWikiXObjectDocument.setWikiName(workspaceName);
-
         String comment = String.format("Created new workspace '%s'", workspaceName);
-        XWikiServer result =
-            this.wikiManagerInternal.createNewWikiFromTemplate(newWikiXObjectDocument, "workspacetemplate", true,
-                comment, deprecatedContext);
+
+        /* Create new wiki. */
+        XWikiServer result = null;
+        try {
+            newWikiXObjectDocument.setWikiName(workspaceName);
+
+            result =
+                this.wikiManagerInternal.createNewWikiFromTemplate(newWikiXObjectDocument, "workspacetemplate", true,
+                    comment, deprecatedContext);
+        } catch (Exception e) {
+            logAndThrowException(String.format("Failed to create workspace [%s]", workspaceName), e);
+        }
 
         /*
          * Use the XWiki.XWikiAllGroup of the new wiki to add the owner as a member and the XWiki.XWikiAdminGroup of the
@@ -283,10 +289,10 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
      * @param workspaceOwner the owner user name to be used in the process
      * @param comment the comment used when saving the group documents
      * @param deprecatedContext the XWikiContext instance to use
-     * @throws XWikiException if problems occur
+     * @throws Exception if problems occur
      */
     private static void initializeOwner(String workspaceName, String workspaceOwner, String comment,
-        XWikiContext deprecatedContext) throws XWikiException
+        XWikiContext deprecatedContext) throws Exception
     {
         String currentWikiName = deprecatedContext.getDatabase();
         try {
@@ -333,10 +339,10 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
      * @param wikiDocument the wiki descriptor document to initialize
      * @param comment the comment used when saving the wiki descriptor document
      * @param deprecatedContext the XWikiContext instance to use
-     * @throws XWikiException if problems occur
+     * @throws Exception if problems occur
      */
     private static void initializeMarker(XWikiDocument wikiDocument, String comment, XWikiContext deprecatedContext)
-        throws XWikiException
+        throws Exception
     {
         String mainWikiName = deprecatedContext.getMainXWiki();
         DocumentReference workspaceClassReference =
@@ -431,7 +437,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
          */
         try {
             xwiki.saveDocument(coreWikiDocument, "Workspace edited", true, deprecatedContext);
-        } catch (XWikiException e) {
+        } catch (Exception e) {
             throw new WorkspaceManagerException("Failed to save modifications.", e);
         }
     }
@@ -538,9 +544,9 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
      * @param wikiDocument the wiki descriptor document
      * @return the WorkspaceClass object contained by the wiki document, if it is a workspace, <code>null</code>
      *         otherwise
-     * @throws XWikiException if problems occur
+     * @throws Exception if problems occur
      */
-    private BaseObject getWorkspaceObject(Wiki wikiDocument) throws XWikiException
+    private BaseObject getWorkspaceObject(Wiki wikiDocument) throws Exception
     {
         XWikiContext deprecatedContext = getXWikiContext();
         XWiki xwiki = deprecatedContext.getWiki();

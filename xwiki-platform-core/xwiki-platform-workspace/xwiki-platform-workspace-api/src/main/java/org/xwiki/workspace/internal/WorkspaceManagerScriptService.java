@@ -36,9 +36,6 @@ import org.xwiki.workspace.WorkspaceManager;
 import org.xwiki.workspace.WorkspaceManagerException;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
-import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
@@ -52,9 +49,6 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 @Singleton
 public class WorkspaceManagerScriptService implements ScriptService
 {
-    /** Field name of the last error code inserted in context. */
-    public static final String CONTEXT_LASTERRORCODE = "lasterrorcode";
-
     /** Field name of the last API exception inserted in context. */
     public static final String CONTEXT_LASTEXCEPTION = "lastexception";
 
@@ -117,46 +111,42 @@ public class WorkspaceManagerScriptService implements ScriptService
      * @param workspaceName name of the new workspace
      * @param newWikiXObjectDocument a new (in-memory) wiki descriptor document from which the new wiki descriptor
      *            document will be created. This method will take care of saving the document.
-     * @return XWikiExceptionApi.ERROR_NOERROR if everything goes well, otherwise, an error code will be returned
-     *         instead
+     * @see {@link #getLastException()} to check for abnormal method termination
      */
-    public int createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument)
+    public void createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument)
     {
-        int returncode = XWikiExceptionApi.ERROR_NOERROR;
+        clearException();
 
         try {
             if (!canCreateWorkspace(getXWikiContext().getUser(), workspaceName)) {
-                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, String.format(
-                    "Access denied to create the workspace '%s'", workspaceName));
+                throw new WorkspaceManagerException(String.format("Access denied to create the workspace [%s]",
+                    workspaceName));
             }
 
             /* Avoid "traps" by making sure the page from where this is executed has PR. */
             if (!getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
-                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, String.format(
-                    "The page requires programming rights in order to create the workspace '%s'", workspaceName));
+                throw new WorkspaceManagerException(String.format(
+                    "The page requires programming rights in order to create the workspace [%s]", workspaceName));
             }
 
             if (workspaceName == null || workspaceName.trim().equals("")) {
-                throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKINAMEFORBIDDEN, String.format(
-                    "Workspace name '%s' is invalid.", workspaceName));
+                throw new WorkspaceManagerException(String.format("Workspace name [%s] is invalid", workspaceName));
             }
 
             this.workspaceManager.createWorkspace(workspaceName, newWikiXObjectDocument);
-        } catch (XWikiException e) {
-            error(String.format("Failed to create workspace '%s'.", workspaceName), e);
-
-            returncode = e.getCode();
+        } catch (Exception e) {
+            error(String.format("Failed to create workspace [%s]", workspaceName), e);
         }
-
-        return returncode;
     }
 
     /**
      * @param workspaceName name of the workspace to delete
-     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination
+     * @see {@link #getLastException()} to check for abnormal method termination
      */
     public void deleteWorkspace(String workspaceName)
     {
+        clearException();
+
         try {
             /* Get prefixed current user. */
             String currentUser = getPrefixedUserName(getXWikiContext().getUser());
@@ -164,13 +154,13 @@ public class WorkspaceManagerScriptService implements ScriptService
             /* Check rights. */
             if (!canDeleteWorkspace(currentUser, workspaceName)) {
                 throw new WorkspaceManagerException(String.format(
-                    "Access denied for user '%s' to delete the workspace '%s'", currentUser, workspaceName));
+                    "Access denied for user [%s] to delete the workspace [%s]", currentUser, workspaceName));
             }
 
             /* Avoid "traps" by making sure the page from where this is executed has PR. */
             if (!getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
                 throw new WorkspaceManagerException(String.format(
-                    "The page requires programming rights in order to delete the workspace '%s'", workspaceName));
+                    "The page requires programming rights in order to delete the workspace [%s]", workspaceName));
             }
 
             /* Delegate call. */
@@ -184,10 +174,12 @@ public class WorkspaceManagerScriptService implements ScriptService
      * @param workspaceName name of the workspace to edit
      * @param modifiedWikiXObjectDocument an in-memory modified wiki descriptor document. This method will take care of
      *            saving the changes
-     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination
+     * @see {@link #getLastException()} to check for abnormal method termination
      */
     public void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument)
     {
+        clearException();
+
         try {
             String currentUser = getPrefixedUserName(getXWikiContext().getUser());
 
@@ -234,24 +226,6 @@ public class WorkspaceManagerScriptService implements ScriptService
     }
 
     /**
-     * Log error and store details in the context.
-     * 
-     * @param errorMessage error message
-     * @param e the caught exception
-     * @deprecated stop using {@link XWikiException}, put exception in context under {@link #CONTEXT_LASTEXCEPTION} key
-     *             instead
-     */
-    private void error(String errorMessage, XWikiException e)
-    {
-        logger.error(errorMessage, e);
-
-        XWikiContext deprecatedContext = getXWikiContext();
-
-        deprecatedContext.put(CONTEXT_LASTERRORCODE, Integer.valueOf(e.getCode()));
-        deprecatedContext.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, deprecatedContext));
-    }
-
-    /**
      * Log exception and store it in the context.
      * 
      * @param errorMessage error message
@@ -269,8 +243,7 @@ public class WorkspaceManagerScriptService implements ScriptService
         logger.error(errorMessageToLog, e);
 
         /* Store exception in context. */
-        XWikiContext deprecatedContext = getXWikiContext();
-        deprecatedContext.put(CONTEXT_LASTEXCEPTION, e);
+        this.execution.getContext().setProperty(CONTEXT_LASTEXCEPTION, e);
     }
 
     /**
@@ -286,11 +259,27 @@ public class WorkspaceManagerScriptService implements ScriptService
     }
 
     /**
+     * Clear the last exception from the context. #see {@link #CONTEXT_LASTEXCEPTION}
+     */
+    private void clearException()
+    {
+        this.execution.getContext().setProperty(CONTEXT_LASTEXCEPTION, null);
+    }
+
+    /**
+     * @return the last exception thrown by a previous method call; {@code null} if no exception was recently thrown.
+     */
+    public Exception getLastException()
+    {
+        return (Exception) this.execution.getContext().getProperty(CONTEXT_LASTEXCEPTION);
+    }
+
+    /**
      * Retrieves a workspace by name.
      * 
      * @param workspaceId name (ID) of the workspace
      * @return the requested workspace or null if it does not exist
-     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination
+     * @see {@link #getLastException()} to check for abnormal method termination
      */
     public Workspace getWorkspace(String workspaceId)
     {

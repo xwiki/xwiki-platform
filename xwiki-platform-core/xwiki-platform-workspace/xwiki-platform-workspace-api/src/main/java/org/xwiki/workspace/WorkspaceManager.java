@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 
 /**
@@ -62,9 +61,10 @@ public interface WorkspaceManager
      * @param newWikiXObjectDocument a new (in-memory) wiki descriptor document from which the new wiki descriptor
      *            document will be created. This method will take care of saving the document.
      * @return {@link XWikiServer} descriptor for the newly created workspace
-     * @throws XWikiException if problems occur
+     * @throws WorkspaceManagerException if problems occur
      */
-    XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument) throws XWikiException;
+    XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument)
+        throws WorkspaceManagerException;
 
     /**
      * @param workspaceName name of the workspace to delete

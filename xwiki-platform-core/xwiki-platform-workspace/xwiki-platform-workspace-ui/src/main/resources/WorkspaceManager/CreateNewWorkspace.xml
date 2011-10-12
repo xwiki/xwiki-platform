@@ -19,7 +19,7 @@
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>true</minorEdit>
+<minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>false</hidden>
 <object>
@@ -290,7 +290,6 @@ function prettyNameChanged()
 #end
 ############################################################################################
 ## TOOLS
-#set ($Exception = $WikiManager.DefaultException)
 #set ($ALIASSUFFIX = "")
 ##
 ############################################################################################
@@ -331,9 +330,9 @@ function prettyNameChanged()
 #############################################################################
 ##
 #if ($action &amp;&amp; $action == "create")
-  #set ($result = $WorkspaceManager.createWorkspace($wikiname, $wikidocument))
+  #set ($discard = $WorkspaceManager.createWorkspace($wikiname, $wikidocument))
   ##
-  #if ($result == $Exception.ERROR_NOERROR)
+  #if ("$!WorkspaceManager.lastException" == '')
     ## Add members.
     #if ("$!members" != '' &amp;&amp; $members.size() &gt; 0)
       #set ($WorkspaceManager = $services.workspace)
@@ -353,11 +352,7 @@ function prettyNameChanged()
     ## Redirect to the new workspace's homepage.
     #set($temp = $response.sendRedirect("$wikidocument.getHomePageUrl()"))
   #else
-    #if ($result == $Exception.ERROR_WM_WIKIALREADYEXISTS)
-      #error($msg.get("workspacemanager.errorcreatewiki.ERROR_WM_WIKIALREADYEXISTS", [$wikiname, $result]))
-    #else
-      #error($msg.get("workspacemanager.errorcreatewiki", [$wikiname, $xcontext.lastexception]))
-    #end
+    #error($msg.get("workspacemanager.errorcreatewiki", [$wikiname, $WorkspaceManager.lastException]))
   #end
 #end
 ##

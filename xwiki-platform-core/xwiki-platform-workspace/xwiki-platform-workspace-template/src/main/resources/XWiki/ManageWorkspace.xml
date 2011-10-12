@@ -33,12 +33,12 @@
 ##
 #set ($workspace = $WorkspaceManager.getWorkspace($workspaceId))
 #if (!$workspace)
-  #if (!$xcontext.lastexception)
+  #if (!$WorkspaceManager.lastException)
     {{error}}The workspace '$workspaceId' does not exist.{{/error}}
-  #elseif("${xcontext.lastexception.message}" != '')
-    {{error}}$xcontext.lastexception.message{{/error}}
+  #elseif("$!{$WorkspaceManager.lastException.message}" != '')
+    {{error}}$WorkspaceManager.lastException.message{{/error}}
   #else
-    {{error}}$xcontext.lastexception.class{{/error}}
+    {{error}}$WorkspaceManager.lastException.class{{/error}}
   #end
 #else
   #set ($wikiDocument = $workspace.wikiDocument)

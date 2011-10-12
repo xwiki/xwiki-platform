@@ -63,6 +63,9 @@ public class InfinispanCache<T> extends AbstractCache<T>
     {
         this.cache = cache;
         
+        // make sure the cache is started
+        this.cache.start();
+
         this.cache.addListener(this);
     }
 

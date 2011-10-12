@@ -20,11 +20,11 @@
 package org.xwiki.workspace;
 
 /**
- * Exceptions thrown by the WorkspaceManager API.
+ * Exceptions thrown by the Workspace API.
  * 
  * @version $Id$
  */
-public class WorkspaceManagerException extends Exception
+public class WorkspaceException extends Exception
 {
     /** Serializable UID. */
     private static final long serialVersionUID = -7490442041971008340L;
@@ -32,7 +32,7 @@ public class WorkspaceManagerException extends Exception
     /**
      * @param message the exception's message
      */
-    public WorkspaceManagerException(String message)
+    public WorkspaceException(String message)
     {
         this(message, null);
     }
@@ -41,7 +41,7 @@ public class WorkspaceManagerException extends Exception
      * @param message the exception's message
      * @param exception the cause of this exception
      */
-    public WorkspaceManagerException(String message, Throwable exception)
+    public WorkspaceException(String message, Throwable exception)
     {
         super(message, exception);
     }

@@ -61,42 +61,42 @@ public interface WorkspaceManager
      * @param newWikiXObjectDocument a new (in-memory) wiki descriptor document from which the new wiki descriptor
      *            document will be created. This method will take care of saving the document.
      * @return {@link XWikiServer} descriptor for the newly created workspace
-     * @throws WorkspaceManagerException if problems occur
+     * @throws WorkspaceException if problems occur
      */
     XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument)
-        throws WorkspaceManagerException;
+        throws WorkspaceException;
 
     /**
      * @param workspaceName name of the workspace to delete
-     * @throws WorkspaceManagerException if problems occur
+     * @throws WorkspaceException if problems occur
      */
-    void deleteWorkspace(String workspaceName) throws WorkspaceManagerException;
+    void deleteWorkspace(String workspaceName) throws WorkspaceException;
 
     /**
      * @param workspaceName name of the workspace to edit
      * @param modifiedWikiXObjectDocument an in-memory modified wiki descriptor document. This method will take care of
      *            saving the changes.
-     * @throws WorkspaceManagerException if problems occur
+     * @throws WorkspaceException if problems occur
      */
-    void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument) throws WorkspaceManagerException;
+    void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument) throws WorkspaceException;
 
     /**
      * Retrieves a workspace by name.
      * 
      * @param workspaceName name (ID) of the workspace
      * @return the requested workspace or null if it does not exist
-     * @throws WorkspaceManagerException if problems occur
+     * @throws WorkspaceException if problems occur
      */
-    Workspace getWorkspace(String workspaceName) throws WorkspaceManagerException;
+    Workspace getWorkspace(String workspaceName) throws WorkspaceException;
 
     /**
      * Get the list of all workspaces. It basically gets all wikis that have a {@code WorkspaceManager.WorkspaceClass}
      * object in their {@code XWikiServer<wikiName>} page.
      * 
      * @return list of available workspaces
-     * @throws WorkspaceManagerException if problems occur
+     * @throws WorkspaceException if problems occur
      */
-    List<Workspace> getWorkspaces() throws WorkspaceManagerException;
+    List<Workspace> getWorkspaces() throws WorkspaceException;
 
     /**
      * @param workspaceName name of the workspace to check

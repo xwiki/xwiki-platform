@@ -36,7 +36,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.workspace.Workspace;
 import org.xwiki.workspace.WorkspaceManager;
-import org.xwiki.workspace.WorkspaceManagerException;
+import org.xwiki.workspace.WorkspaceException;
 import org.xwiki.workspace.WorkspaceManagerMessageTool;
 
 import com.xpn.xwiki.XWiki;
@@ -237,7 +237,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
 
     @Override
     public XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument)
-        throws WorkspaceManagerException
+        throws WorkspaceException
     {
         XWikiContext deprecatedContext = getXWikiContext();
 
@@ -362,11 +362,11 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     }
 
     @Override
-    public void deleteWorkspace(String workspaceName) throws WorkspaceManagerException
+    public void deleteWorkspace(String workspaceName) throws WorkspaceException
     {
         Workspace workspace = getWorkspace(workspaceName);
         if (workspace == null) {
-            throw new WorkspaceManagerException(String.format("Workspace '%s' does not exist", workspaceName));
+            throw new WorkspaceException(String.format("Workspace '%s' does not exist", workspaceName));
         }
 
         XWikiContext deprecatedContext = getXWikiContext();
@@ -382,14 +382,14 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
             observationManager.notify(new WikiDeletedEvent(workspaceName), workspaceName, deprecatedContext);
             xwiki.getVirtualWikiList().remove(workspaceName);
         } catch (Exception e) {
-            throw new WorkspaceManagerException(
+            throw new WorkspaceException(
                 String.format("Failed to delete wiki '%s' from database", workspaceName), e);
         }
 
         try {
             xwiki.deleteDocument(workspace.getWikiDescriptor().getDocument(), false, deprecatedContext);
         } catch (Exception e) {
-            throw new WorkspaceManagerException(String.format("Failed to delete wiki descriptor for workspace '%s'",
+            throw new WorkspaceException(String.format("Failed to delete wiki descriptor for workspace '%s'",
                 workspace), e);
         }
 
@@ -397,7 +397,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
 
     @Override
     public void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument)
-        throws WorkspaceManagerException
+        throws WorkspaceException
     {
         Workspace workspace = getWorkspace(workspaceName);
 
@@ -438,7 +438,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         try {
             xwiki.saveDocument(coreWikiDocument, "Workspace edited", true, deprecatedContext);
         } catch (Exception e) {
-            throw new WorkspaceManagerException("Failed to save modifications.", e);
+            throw new WorkspaceException("Failed to save modifications.", e);
         }
     }
 
@@ -447,12 +447,12 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
      * 
      * @param source object that provides the new contents to update with
      * @param destination object that is to be updated
-     * @throws WorkspaceManagerException if objects' classes differ
+     * @throws WorkspaceException if objects' classes differ
      */
-    private void updateObject(BaseObject source, BaseObject destination) throws WorkspaceManagerException
+    private void updateObject(BaseObject source, BaseObject destination) throws WorkspaceException
     {
         if (!source.getXClassReference().equals(destination.getXClassReference())) {
-            throw new WorkspaceManagerException(String.format("Objects classes are not equal: %s vs %s", source
+            throw new WorkspaceException(String.format("Objects classes are not equal: %s vs %s", source
                 .getXClassReference().toString(), destination.getXClassReference().toString()));
         }
 
@@ -464,7 +464,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     }
 
     @Override
-    public Workspace getWorkspace(String workspaceName) throws WorkspaceManagerException
+    public Workspace getWorkspace(String workspaceName) throws WorkspaceException
     {
         XWikiContext deprecatedContext = getXWikiContext();
         XWiki xwiki = deprecatedContext.getWiki();
@@ -483,7 +483,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
 
             XWikiServer wikiDescriptor = wikiDocument.getFirstWikiAlias();
             if (wikiDescriptor == null || wikiDescriptor.isNew()) {
-                throw new WorkspaceManagerException(messageTool.get(WorkspaceManagerMessageTool.ERROR_WORKSPACEINVALID,
+                throw new WorkspaceException(messageTool.get(WorkspaceManagerMessageTool.ERROR_WORKSPACEINVALID,
                     Arrays.asList(workspaceName)));
             }
 
@@ -495,7 +495,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
             DocumentReference groupReference =
                 new DocumentReference(workspaceName, Workspace.WORKSPACE_GROUP_SPACE, Workspace.WORKSPACE_GROUP_PAGE);
             if (!xwiki.exists(groupReference, deprecatedContext)) {
-                throw new WorkspaceManagerException(messageTool.get(WorkspaceManagerMessageTool.ERROR_WORKSPACEINVALID,
+                throw new WorkspaceException(messageTool.get(WorkspaceManagerMessageTool.ERROR_WORKSPACEINVALID,
                     Arrays.asList(workspaceName)));
             }
 
@@ -512,7 +512,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     }
 
     @Override
-    public List<Workspace> getWorkspaces() throws WorkspaceManagerException
+    public List<Workspace> getWorkspaces() throws WorkspaceException
     {
         List<Workspace> result = new ArrayList<Workspace>();
 
@@ -561,16 +561,16 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     }
 
     /**
-     * Utility method to log and throw a {@link WorkspaceManagerException} wrapping a given exception.
+     * Utility method to log and throw a {@link WorkspaceException} wrapping a given exception.
      * 
      * @param message the error message to log
-     * @param e the exception to log and wrap in the thrown {@link WorkspaceManagerException}
-     * @throws WorkspaceManagerException when called
+     * @param e the exception to log and wrap in the thrown {@link WorkspaceException}
+     * @throws WorkspaceException when called
      */
-    private void logAndThrowException(String message, Exception e) throws WorkspaceManagerException
+    private void logAndThrowException(String message, Exception e) throws WorkspaceException
     {
         logger.error(message, e);
-        throw new WorkspaceManagerException(message, e);
+        throw new WorkspaceException(message, e);
     }
 
     @Override

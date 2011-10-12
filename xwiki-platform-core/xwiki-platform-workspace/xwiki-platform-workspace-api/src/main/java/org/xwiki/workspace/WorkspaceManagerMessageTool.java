@@ -31,25 +31,25 @@ import com.xpn.xwiki.web.XWikiMessageTool;
  */
 public class WorkspaceManagerMessageTool extends XWikiMessageTool
 {
-    /** Used as {@link WorkspaceManagerException} message when failing to get a workspace. */
+    /** Used as {@link WorkspaceException} message when failing to get a workspace. */
     public static final String ERROR_WORKSPACEGET = "workspacemanager.error.workspaceget";
 
-    /** Used as {@link WorkspaceManagerException} message when failing to get all workspaces. */
+    /** Used as {@link WorkspaceException} message when failing to get all workspaces. */
     public static final String ERROR_WORKSPACEGETALL = "workspacemanager.error.workspacegetall";
 
     /**
-     * Used as {@link WorkspaceManagerException} message when a requested workspace ID points to an entity that is not a
+     * Used as {@link WorkspaceException} message when a requested workspace ID points to an entity that is not a
      * workspace.
      */
     public static final String ERROR_NOTAWORKSPACE = "workspacemanager.error.notaworkspace";
 
     /**
-     * Used as {@link WorkspaceManagerException} message when a requested workspace is invalid (no XWikiServerClass or
+     * Used as {@link WorkspaceException} message when a requested workspace is invalid (no XWikiServerClass or
      * WorkspaceClass object in the wiki document).
      */
     public static final String ERROR_WORKSPACEINVALID = "workspacemanager.error.workspaceinvalid";
 
-    /** Used as {@link WorkspaceManagerException} message when trying to get a workspace which does not exists. */
+    /** Used as {@link WorkspaceException} message when trying to get a workspace which does not exists. */
     public static final String ERROR_WORKSPACEDOESNOTEXIST = "workspacemanager.error.workspacedoesnotexist";
 
     /** Used as logging message when skipping an invalid workspace. */

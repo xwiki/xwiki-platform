@@ -33,7 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.workspace.Workspace;
 import org.xwiki.workspace.WorkspaceManager;
-import org.xwiki.workspace.WorkspaceManagerException;
+import org.xwiki.workspace.WorkspaceException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
@@ -119,18 +119,18 @@ public class WorkspaceManagerScriptService implements ScriptService
 
         try {
             if (!canCreateWorkspace(getXWikiContext().getUser(), workspaceName)) {
-                throw new WorkspaceManagerException(String.format("Access denied to create the workspace [%s]",
+                throw new WorkspaceException(String.format("Access denied to create the workspace [%s]",
                     workspaceName));
             }
 
             /* Avoid "traps" by making sure the page from where this is executed has PR. */
             if (!getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
-                throw new WorkspaceManagerException(String.format(
+                throw new WorkspaceException(String.format(
                     "The page requires programming rights in order to create the workspace [%s]", workspaceName));
             }
 
             if (workspaceName == null || workspaceName.trim().equals("")) {
-                throw new WorkspaceManagerException(String.format("Workspace name [%s] is invalid", workspaceName));
+                throw new WorkspaceException(String.format("Workspace name [%s] is invalid", workspaceName));
             }
 
             this.workspaceManager.createWorkspace(workspaceName, newWikiXObjectDocument);
@@ -153,13 +153,13 @@ public class WorkspaceManagerScriptService implements ScriptService
 
             /* Check rights. */
             if (!canDeleteWorkspace(currentUser, workspaceName)) {
-                throw new WorkspaceManagerException(String.format(
+                throw new WorkspaceException(String.format(
                     "Access denied for user [%s] to delete the workspace [%s]", currentUser, workspaceName));
             }
 
             /* Avoid "traps" by making sure the page from where this is executed has PR. */
             if (!getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
-                throw new WorkspaceManagerException(String.format(
+                throw new WorkspaceException(String.format(
                     "The page requires programming rights in order to delete the workspace [%s]", workspaceName));
             }
 
@@ -185,13 +185,13 @@ public class WorkspaceManagerScriptService implements ScriptService
 
             /* Check rights. */
             if (!canEditWorkspace(currentUser, workspaceName)) {
-                throw new WorkspaceManagerException(String.format(
+                throw new WorkspaceException(String.format(
                     "Access denied for user '%s' to edit the workspace '%s'", currentUser, workspaceName));
             }
 
             /* Avoid "traps" by making sure the page from where this is executed has PR. */
             if (!getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
-                throw new WorkspaceManagerException(String.format(
+                throw new WorkspaceException(String.format(
                     "The page requires programming rights in order to edit the workspace '%s'", workspaceName));
             }
 

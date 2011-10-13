@@ -21,7 +21,7 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -90,9 +90,9 @@ public class UploadAction extends XWikiAction
 
         // The document is saved for each attachment in the group.
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
-        Map<String, String> fileNames = new HashMap<String, String>();
+        Map<String, String> fileNames = new LinkedHashMap<String, String>();
         List<String> wrongFileNames = new ArrayList<String>();
-        Map<String, String> failedFiles = new HashMap<String, String>();
+        Map<String, String> failedFiles = new LinkedHashMap<String, String>();
         for (String fieldName : fileupload.getFileItemNames(context)) {
             try {
                 if (fieldName.startsWith(FILE_FIELD_NAME)) {

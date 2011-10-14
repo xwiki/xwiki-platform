@@ -3,4 +3,5 @@
 500:org.xwiki.rendering.internal.wiki.XWikiWikiModel
 500:org.xwiki.rendering.internal.renderer.XWikiAttachmentURILabelGenerator
 500:org.xwiki.rendering.internal.transformation.macro.XWikiMacroTransformationConfiguration
+500:org.xwiki.rendering.internal.transformation.icon.XWikiIconTransformationConfiguration
 org.xwiki.rendering.internal.scripting.RenderingScriptService

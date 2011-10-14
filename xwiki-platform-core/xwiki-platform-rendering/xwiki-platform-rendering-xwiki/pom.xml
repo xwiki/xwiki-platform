@@ -50,6 +50,11 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-transformation-icon</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
       <!-- For parsing the CSS from the style attribute. -->
       <groupId>net.sourceforge.cssparser</groupId>
       <artifactId>cssparser</artifactId>

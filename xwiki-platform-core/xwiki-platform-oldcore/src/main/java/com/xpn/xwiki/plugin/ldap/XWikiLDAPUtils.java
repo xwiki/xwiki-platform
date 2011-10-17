@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jfree.util.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
@@ -446,7 +445,7 @@ public class XWikiLDAPUtils
                     memberMap.put(ldapEntry.getDN().toLowerCase(), uid.toLowerCase());
                 }
             } else {
-                Log.debug("Probably a organization unit or a search");
+                LOGGER.debug("Probably a organization unit or a search");
             }
         }
 
@@ -479,7 +478,7 @@ public class XWikiLDAPUtils
         try {
             result = searchGroupsMembers(fixedDN);
         } catch (LDAPException e) {
-            Log.debug("Failed to search for [" + fixedDN + "]", e);
+            LOGGER.debug("Failed to search for [" + fixedDN + "]", e);
 
             return false;
         }
@@ -504,7 +503,7 @@ public class XWikiLDAPUtils
 
                         isGroup |= getGroupMembers(memberMap, subgroups, resultEntry, context);
                     } catch (LDAPException e) {
-                        Log.debug("Failed to get group mambers", e);
+                        LOGGER.debug("Failed to get group members", e);
                     }
                 }
             }

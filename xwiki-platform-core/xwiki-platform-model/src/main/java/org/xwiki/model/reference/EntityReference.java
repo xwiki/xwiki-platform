@@ -24,10 +24,6 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.xwiki.model.EntityType;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * Represents a reference to an Entity (Document, Attachment, Space, Wiki, etc).
@@ -42,12 +38,6 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * changes.
      */
     private static final long serialVersionUID = 1L;
-
-    /**
-     * Parameter key for specifying the Locale of the referenced Entity.
-     * @see #getLocale() 
-     */
-    private static final String LOCALE_PARAMETER_KEY = "language";
     
     private String name;
 
@@ -56,11 +46,6 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     private EntityReference child;
 
     private EntityType type;
-
-    /**
-     * @see #getParameter(String)
-     */
-    private Map<String, Object> parameters = new HashMap<String, Object>();
 
     public EntityReference(String name, EntityType type)
     {
@@ -149,26 +134,22 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         return reference;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString()
     {
-        StringBuilder builder = new StringBuilder();
-        builder.append("name = [").append(getName()).append("]");
-        builder.append(", type = [").append(getType()).append("]");
-        builder.append(", parent = [").append(getParent()).append("]");
-        builder.append(", parameters = [");
-        Iterator<Map.Entry<String, Object>> it = this.parameters.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Object> parameter = it.next();
-            builder.append("[").append(parameter.getKey()).append("] = [").append(parameter.getValue()).append("]");
-            if (it.hasNext()) {
-                builder.append(", ");
-            }
-        }
-        builder.append((']'));
-        return builder.toString();
+        return "name = [" + getName() + "], type = [" + getType() + "], parent = [" + getParent() + "]";
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see java.lang.Object#equals(Object) 
+     */
     @Override
     public boolean equals(Object obj)
     {
@@ -184,22 +165,17 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
                     && (entityReference.getParent() == null ? getParent() == null : entityReference.getParent().equals(
                         getParent()))
                     && (entityReference.getType() == null ? getType() == null : entityReference.getType().equals(
-                        getType()));
-
-            // Iterate over all parameters
-            equals = equals && (this.parameters.size() == entityReference.parameters.size());
-            if (equals) {
-                for (Map.Entry<String, Object> parameter : this.parameters.entrySet()) {
-                    equals = equals
-                        && (parameter.getValue() == null ? entityReference.getParameter(parameter.getKey()) == null :
-                            parameter.getValue().equals(entityReference.getParameter(parameter.getKey())));
-                }
-            }
+                        getType())); 
         }
 
         return equals;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see Object#hashCode() 
+     */
     @Override
     public int hashCode()
     {
@@ -211,8 +187,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      *
      * @see Object#clone() 
      */
-    @Override
-    public EntityReference clone()
+    @Override public EntityReference clone()
     {
         EntityReference reference;
         try {
@@ -226,57 +201,15 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         if (getParent() != null) {
             reference.setParent(getParent().clone());
         }
-        reference.parameters = new HashMap<String, Object>(this.parameters);
-
         return reference;
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     * @see Comparable#compareTo(Object)
+     */
     public int compareTo(EntityReference reference)
     {
         return new CompareToBuilder().append(toString(), reference.toString()).toComparison();
-    }
-
-    /**
-     * @param key the key for the parameter value to add
-     * @param value the parameter value to add
-     * @see #getParameter(String)
-     */
-    public void addParameter(String key, Object value)
-    {
-        this.parameters.put(key, value);
-    }
-
-    /**
-     * @param key the key for which to return the parameter value
-     * @return the parameter corresponding to the passed key or null if no such parameter exist (typical parameters can
-     *         be for example the version of the referenced Entity or the language of the referenced Entity). Since
-     *         those parameters are optional it's up to the code using this Entity Reference to check if the parameter
-     *         exists
-     */
-    public Object getParameter(String key)
-    {
-        return this.parameters.get(key);
-    }
-
-    /**
-     * @return the Locale of the referenced Entity or null if no such information is available
-     */
-    public Locale getLocale()
-    {
-        Locale result = null;
-        Object value = getParameter(LOCALE_PARAMETER_KEY);
-        if (Locale.class.isAssignableFrom(value.getClass())) {
-            result = (Locale) value;
-        }
-        return result;
-    }
-
-    /**
-     * @param locale see {@link #getLocale()}
-     */
-    public void setLocale(Locale locale)
-    {
-        addParameter(LOCALE_PARAMETER_KEY, locale);
     }
 }

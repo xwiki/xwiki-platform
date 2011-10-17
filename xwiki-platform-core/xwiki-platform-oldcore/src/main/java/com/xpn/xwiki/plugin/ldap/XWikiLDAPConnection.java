@@ -345,7 +345,7 @@ public class XWikiLDAPConnection
      *            </ul>
      * @return a result stream. LDAPConnection#abandon should be called when it's not needed anymore.
      * @throws LDAPException error when searching
-     * @since 3.1M1
+     * @since 3.3M1
      */
     public LDAPSearchResults search(String baseDN, String filter, String[] attr, int ldapScope) throws LDAPException
     {

@@ -406,6 +406,7 @@ public class XWikiLDAPUtils
      * @param context the XWiki context.
      * @return whether the groupDN is actually a group.
      * @throws LDAPException error when parsing the provided LDAP entry
+     * @since 3.3M1
      */
     public boolean getGroupMembers(Map<String, String> memberMap, List<String> subgroups, LDAPEntry ldapEntry,
         XWikiContext context) throws LDAPException

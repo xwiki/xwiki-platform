@@ -386,6 +386,9 @@ xwiki.authentication.ldap.port=389
 xwiki.authentication.ldap.bind_DN=cn={0},department=USER,department=INFORMATIK,department=1230,o=MP
 xwiki.authentication.ldap.bind_pass={1}
 
+#-# The Base DN used in LDAP searches
+xwiki.authentication.ldap.base_DN=
+
 #-# LDAP query to search the user in the LDAP database (in case a static admin user is provided in
 #-# xwiki.authentication.ldap.bind_DN)
 #-# {0} is replaced with the user uid field name and {1} with the user name
@@ -399,9 +402,6 @@ xwiki.authentication.ldap.bind_pass={1}
 #-# [Since 1.5RC1, XWikiLDAPAuthServiceImpl]
 #-# Only users not member of the following group can autheticate
 # xwiki.authentication.ldap.exclude_group=cn=admin,ou=groups,o=MegaNova,c=US
-
-#-# The Base DN used in LDAP searches
-xwiki.authentication.ldap.base_DN=
 
 #-# Specifies the LDAP attribute containing the identifier to be used as the XWiki name
 #-# The default is cn
@@ -427,7 +427,8 @@ xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email
 # xwiki.authentication.ldap.update_user=1
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
-#-# Mapps XWiki groups to LDAP groups, separator is "|"
+#-# Mapps XWiki groups to LDAP groups, separator is "|". Both groups and organisation units are supported.
+#-# Here is an example:
 # xwiki.authentication.ldap.group_mapping=XWiki.XWikiAdminGroup=cn=AdminRole,ou=groups,o=MegaNova,c=US|\
 #                                         XWiki.Organisation=cn=testers,ou=groups,o=MegaNova,c=US
 

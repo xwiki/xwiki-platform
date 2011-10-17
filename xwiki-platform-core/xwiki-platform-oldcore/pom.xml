@@ -902,6 +902,8 @@
               **/plugin/graphviz/GraphVizMacro.java,
               <!-- XWiki LDAP Utils has a fan out complexity of 21 that needs to be investigated and refactored. -->
               **/plugin/ldap/XWikiLDAPUtils.java,
+              <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
+              **/plugin/ldap/XWikiLDAPConnection.java,
               **/plugin/mail/MailPluginApi.java,
               **/plugin/mail/MailPlugin.java,
               **/plugin/packaging/DocumentFilter.java,

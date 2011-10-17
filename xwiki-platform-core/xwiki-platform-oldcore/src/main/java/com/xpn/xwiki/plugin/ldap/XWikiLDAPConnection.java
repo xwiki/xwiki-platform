@@ -21,11 +21,11 @@ package com.xpn.xwiki.plugin.ldap;
 
 import java.io.UnsupportedEncodingException;
 import java.security.Security;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -273,12 +273,17 @@ public class XWikiLDAPConnection
     }
 
     /**
-     * Execute a LDAP search query.
+     * Execute a LDAP search query and return the first entry.
      * 
-     * @param baseDN the root DN where to search.
+     * @param baseDN the root DN from where to search.
      * @param filter the LDAP filter.
      * @param attr the attributes names of values to return.
-     * @param ldapScope {@link LDAPConnection#SCOPE_SUB} oder {@link LDAPConnection#SCOPE_BASE}.
+     * @param ldapScope the scope of the entries to search. The following are the valid options:
+     *            <ul>
+     *            <li>SCOPE_BASE - searches only the base DN
+     *            <li>SCOPE_ONE - searches only entries under the base DN
+     *            <li>SCOPE_SUB - searches the base DN and all entries within its subtree
+     *            </ul>
      * @return the found LDAP attributes.
      */
     public List<XWikiLDAPSearchAttribute> searchLDAP(String baseDN, String filter, String[] attr, int ldapScope)
@@ -287,16 +292,9 @@ public class XWikiLDAPConnection
 
         LDAPSearchResults searchResults = null;
 
-        if (LOGGER.isDebugEnabled()) {
-            String message =
-                MessageFormat.format("LDAP search: baseDN=[{0}] query=[{1}] attr=[{2}] ldapScope=[{3}]", baseDN,
-                    filter, attr != null ? Arrays.asList(attr) : null, ldapScope);
-            LOGGER.debug(message);
-        }
-
         try {
             // filter return all attributes return attrs and values time out value
-            searchResults = this.connection.search(baseDN, ldapScope, filter, attr, false);
+            searchResults = search(baseDN, filter, attr, ldapScope);
 
             if (!searchResults.hasMore()) {
                 return null;
@@ -336,6 +334,30 @@ public class XWikiLDAPConnection
     }
 
     /**
+     * @param baseDN the root DN from where to search.
+     * @param filter filter the LDAP filter
+     * @param attr the attributes names of values to return
+     * @param ldapScope the scope of the entries to search. The following are the valid options:
+     *            <ul>
+     *            <li>SCOPE_BASE - searches only the base DN
+     *            <li>SCOPE_ONE - searches only entries under the base DN
+     *            <li>SCOPE_SUB - searches the base DN and all entries within its subtree
+     *            </ul>
+     * @return a result stream. LDAPConnection#abandon should be called when it's not needed anymore.
+     * @throws LDAPException error when searching
+     * @since 3.1M1
+     */
+    public LDAPSearchResults search(String baseDN, String filter, String[] attr, int ldapScope) throws LDAPException
+    {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("LDAP search: baseDN=[{0}] query=[{1}] attr=[{2}] ldapScope=[{3}]", new Object[] {baseDN,
+                filter, attr != null ? Arrays.asList(attr) : null, ldapScope});
+        }
+
+        return this.connection.search(baseDN, ldapScope, filter, attr, false);
+    }
+
+    /**
      * Fill provided <code>searchAttributeList</code> with provided LDAP attributes.
      * 
      * @param searchAttributeList the XWiki attributes.
@@ -344,8 +366,7 @@ public class XWikiLDAPConnection
     protected void ldapToXWikiAttribute(List<XWikiLDAPSearchAttribute> searchAttributeList,
         LDAPAttributeSet attributeSet)
     {
-        for (Object attributeItem : attributeSet) {
-            LDAPAttribute attribute = (LDAPAttribute) attributeItem;
+        for (LDAPAttribute attribute : (Set<LDAPAttribute>) attributeSet) {
             String attributeName = attribute.getName();
 
             if (LOGGER.isDebugEnabled()) {

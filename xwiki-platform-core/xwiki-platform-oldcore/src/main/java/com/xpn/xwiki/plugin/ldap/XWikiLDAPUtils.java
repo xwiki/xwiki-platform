@@ -22,11 +22,13 @@ package com.xpn.xwiki.plugin.ldap;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jfree.util.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
@@ -37,7 +39,11 @@ import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 
+import com.novell.ldap.LDAPAttribute;
 import com.novell.ldap.LDAPConnection;
+import com.novell.ldap.LDAPEntry;
+import com.novell.ldap.LDAPException;
+import com.novell.ldap.LDAPSearchResults;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -233,8 +239,9 @@ public class XWikiLDAPUtils
     {
         Cache<Map<String, String>> cache;
 
-        String cacheKey = getUidAttributeName() + "." + this.connection.getConnection().getHost() + ":"
-            + this.connection.getConnection().getPort();
+        String cacheKey =
+            getUidAttributeName() + "." + this.connection.getConnection().getHost() + ":"
+                + this.connection.getConnection().getPort();
 
         Map<String, Cache<Map<String, String>>> cacheMap;
 
@@ -268,19 +275,22 @@ public class XWikiLDAPUtils
      * 
      * @param groupDN the group to retrieve the members of and scan for subgroups.
      * @return the LDAP search result.
+     * @throws LDAPException failed to execute LDAP query
      */
-    private List<XWikiLDAPSearchAttribute> searchGroupsMembers(String groupDN)
+    private LDAPSearchResults searchGroupsMembers(String groupDN) throws LDAPException
     {
         String[] attrs = new String[2 + getGroupMemberFields().size()];
 
         int i = 0;
         attrs[i++] = LDAP_OBJECTCLASS;
-        attrs[i++] = getUidAttributeName();
         for (String groupMember : getGroupMemberFields()) {
             attrs[i++] = groupMember;
         }
 
-        return getConnection().searchLDAP(groupDN, null, attrs, LDAPConnection.SCOPE_BASE);
+        // in case it's a organization unit get the users ids
+        attrs[i++] = getUidAttributeName();
+
+        return getConnection().search(groupDN, null, attrs, LDAPConnection.SCOPE_SUB);
     }
 
     /**
@@ -304,6 +314,33 @@ public class XWikiLDAPUtils
                 // we check for subgroups recursive call to scan all subgroups and identify members
                 // and their uid
                 getGroupMembers(member, memberMap, subgroups, context);
+            }
+        }
+    }
+
+    /**
+     * Extract group's members from provided LDAP search result.
+     * 
+     * @param ldapEntry the LDAP search result.
+     * @param memberMap the result: maps DN to member id.
+     * @param subgroups return all the subgroups identified.
+     * @param context the XWiki context.
+     * @throws LDAPException error when parsing provided LDAP entry
+     */
+    private void getGroupMembers(LDAPEntry ldapEntry, Map<String, String> memberMap, List<String> subgroups,
+        XWikiContext context) throws LDAPException
+    {
+        for (String memberField : getGroupMemberFields()) {
+            LDAPAttribute attribute = ldapEntry.getAttribute(memberField);
+            if (attribute != null) {
+                Enumeration<String> values = attribute.getStringValues();
+                while (values.hasMoreElements()) {
+                    String member = values.nextElement();
+
+                    // we check for subgroups recursive call to scan all subgroups and identify members
+                    // and their uid
+                    getGroupMembers(member, memberMap, subgroups, context);
+                }
             }
         }
     }
@@ -363,6 +400,62 @@ public class XWikiLDAPUtils
      * Get all members of a given group based on the groupDN. If the group contains subgroups get these members as well.
      * Retrieve an identifier for each member.
      * 
+     * @param memberMap the result: maps DN to member id.
+     * @param subgroups all the subgroups identified.
+     * @param ldapEntry the ldap entry returned by a search members found in LDAP search.
+     * @param context the XWiki context.
+     * @return whether the groupDN is actually a group.
+     * @throws LDAPException error when parsing the provided LDAP entry
+     */
+    public boolean getGroupMembers(Map<String, String> memberMap, List<String> subgroups, LDAPEntry ldapEntry,
+        XWikiContext context) throws LDAPException
+    {
+        boolean isGroup = false;
+
+        // Check if the entry is a group
+
+        LDAPAttribute classAttribute = ldapEntry.getAttribute(LDAP_OBJECTCLASS);
+        if (classAttribute != null) {
+            Enumeration<String> values = classAttribute.getStringValues();
+            Collection<String> groupClasses = getGroupClasses();
+            while (values.hasMoreElements()) {
+                String value = values.nextElement();
+                if (groupClasses.contains(value.toLowerCase())) {
+                    isGroup = true;
+                }
+            }
+        }
+
+        // Get members or user id if it's a user
+
+        if (isGroup) {
+            // remember this group
+            if (subgroups != null) {
+                subgroups.add(ldapEntry.getDN());
+            }
+
+            getGroupMembers(ldapEntry, memberMap, subgroups, context);
+        } else {
+            LDAPAttribute uidAttribute = ldapEntry.getAttribute(getUidAttributeName());
+
+            if (uidAttribute != null) {
+                String uid = uidAttribute.getStringValue();
+
+                if (!memberMap.containsKey(ldapEntry.getDN())) {
+                    memberMap.put(ldapEntry.getDN().toLowerCase(), uid.toLowerCase());
+                }
+            } else {
+                Log.debug("Probably a organization unit or a search");
+            }
+        }
+
+        return isGroup;
+    }
+
+    /**
+     * Get all members of a given group based on the groupDN. If the group contains subgroups get these members as well.
+     * Retrieve an identifier for each member.
+     * 
      * @param groupDN the group to retrieve the members of and scan for subgroups. If <code>groupDN</code> is a user DN
      *            or UID, it is added to the <code>memberMap</code> and it will return false.
      * @param memberMap the result: maps DN to member id.
@@ -376,25 +469,50 @@ public class XWikiLDAPUtils
         boolean isGroup = false;
         String fixedDN = groupDN;
 
-        // break out if there is a look of groups
+        // break out if there is a loop of groups
         if (subgroups != null && subgroups.contains(fixedDN)) {
             return true;
         }
 
-        List<XWikiLDAPSearchAttribute> searchAttributeList = searchGroupsMembers(fixedDN);
+        LDAPSearchResults result;
+        try {
+            result = searchGroupsMembers(fixedDN);
+        } catch (LDAPException e) {
+            Log.debug("Failed to search for [" + fixedDN + "]", e);
 
-        if (searchAttributeList == null) {
-            // maybe groupDN is a UID so trying to search for it
-            searchAttributeList =
-                searchUserAttributesByUid(fixedDN, new String[] {LDAP_FIELD_DN, getUidAttributeName()});
-
-            if (searchAttributeList != null && !searchAttributeList.isEmpty()) {
-                fixedDN = searchAttributeList.get(0).value;
-            }
+            return false;
         }
 
-        if (searchAttributeList != null) {
-            isGroup = getGroupMembers(fixedDN, memberMap, subgroups, searchAttributeList, context);
+        try {
+            if (!result.hasMore()) {
+                // maybe groupDN is a UID so trying to search for it
+                List<XWikiLDAPSearchAttribute> searchAttributeList =
+                    searchUserAttributesByUid(fixedDN, new String[] {LDAP_FIELD_DN, getUidAttributeName()});
+
+                if (searchAttributeList != null && !searchAttributeList.isEmpty()) {
+                    fixedDN = searchAttributeList.get(0).value;
+                }
+
+                if (searchAttributeList != null) {
+                    isGroup = getGroupMembers(fixedDN, memberMap, subgroups, searchAttributeList, context);
+                }
+            } else {
+                while (result.hasMore()) {
+                    try {
+                        LDAPEntry resultEntry = result.next();
+
+                        isGroup |= getGroupMembers(memberMap, subgroups, resultEntry, context);
+                    } catch (LDAPException e) {
+                        Log.debug("Failed to get group mambers", e);
+                    }
+                }
+            }
+        } finally {
+            try {
+                getConnection().getConnection().abandon(result);
+            } catch (LDAPException e) {
+                LOGGER.debug("LDAP Search clean up failed", e);
+            }
         }
 
         return isGroup;
@@ -422,20 +540,16 @@ public class XWikiLDAPUtils
                 if (groupMembers == null) {
                     Map<String, String> members = new HashMap<String, String>();
 
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Retrieving Members of the group: " + groupDN);
-                    }
+                    LOGGER.debug("Retrieving Members of the group: " + groupDN);
 
-                    boolean isGroup = getGroupMembers(groupDN, members, new ArrayList<String>(), context);
+                    getGroupMembers(groupDN, members, new ArrayList<String>(), context);
 
-                    if (isGroup) {
+                    if (!members.isEmpty()) {
                         groupMembers = members;
                         cache.set(groupDN, groupMembers);
                     }
                 } else {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Found cache entry for group [" + groupDN + "]");
-                    }
+                    LOGGER.debug("Found cache entry for group [" + groupDN + "]");
                 }
             }
         } catch (CacheException e) {
@@ -583,9 +697,11 @@ public class XWikiLDAPUtils
     public List<XWikiLDAPSearchAttribute> searchUserAttributesByUid(String uid, String[] attributeNameTable)
     {
         // search for the user in LDAP
-        String filter = MessageFormat.format(this.userSearchFormatString, new Object[] {
-            XWikiLDAPConnection.escapeLDAPSearchFilter(this.uidAttributeName),
-            XWikiLDAPConnection.escapeLDAPSearchFilter(uid)});
+        String filter =
+            MessageFormat.format(
+                this.userSearchFormatString,
+                new Object[] {XWikiLDAPConnection.escapeLDAPSearchFilter(this.uidAttributeName),
+                XWikiLDAPConnection.escapeLDAPSearchFilter(uid)});
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Searching for the user in LDAP: user:" + uid + " base:" + this.baseDN + " query:" + filter
@@ -640,8 +756,9 @@ public class XWikiLDAPUtils
             // get attributes from LDAP if we don't already have them
             if (searchAttributeList == null) {
                 // didn't get attributes before, so do it now
-                searchAttributeList = this.getConnection().searchLDAP(ldapDn, null, getAttributeNameTable(context),
-                    LDAPConnection.SCOPE_BASE);
+                searchAttributeList =
+                    this.getConnection().searchLDAP(ldapDn, null, getAttributeNameTable(context),
+                        LDAPConnection.SCOPE_BASE);
             }
 
             if (searchAttributeList == null) {
@@ -744,9 +861,8 @@ public class XWikiLDAPUtils
      * @param context the XWiki context.
      * @throws XWikiException error when creating XWiki user.
      */
-    protected void createUserFromLDAP(XWikiDocument userProfile,
-        List<XWikiLDAPSearchAttribute> searchAttributes, String ldapDN, String ldapUid, XWikiContext context)
-        throws XWikiException
+    protected void createUserFromLDAP(XWikiDocument userProfile, List<XWikiLDAPSearchAttribute> searchAttributes,
+        String ldapDN, String ldapUid, XWikiContext context) throws XWikiException
     {
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
@@ -878,12 +994,13 @@ public class XWikiLDAPUtils
             context.getWiki().saveDocument(groupDoc, context);
 
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(MessageFormat.format("Finished adding user {0} to xwiki group {1}",
-                    xwikiUserName, groupName));
+                LOGGER.debug(MessageFormat.format("Finished adding user {0} to xwiki group {1}", xwikiUserName,
+                    groupName));
             }
 
         } catch (Exception e) {
-            LOGGER.error(MessageFormat.format("Failed to add a user [{0}] to a group [{1}]", xwikiUserName, groupName), e);
+            LOGGER.error(MessageFormat.format("Failed to add a user [{0}] to a group [{1}]", xwikiUserName, groupName),
+                e);
         }
     }
 
@@ -929,8 +1046,9 @@ public class XWikiLDAPUtils
         LDAPProfileXClass ldapXClass = new LDAPProfileXClass(context);
 
         // Try default profile name (generally in the cache)
-        XWikiDocument userProfile = context.getWiki().getDocument(
-            new DocumentReference(context.getDatabase(), XWIKI_USER_SPACE, validXWikiUserName), context);
+        XWikiDocument userProfile =
+            context.getWiki().getDocument(
+                new DocumentReference(context.getDatabase(), XWIKI_USER_SPACE, validXWikiUserName), context);
 
         if (!ldapUid.equalsIgnoreCase(ldapXClass.getUid(userProfile))) {
             // Search for existing profile with provided uid

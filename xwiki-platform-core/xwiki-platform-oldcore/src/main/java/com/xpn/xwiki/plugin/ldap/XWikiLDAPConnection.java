@@ -350,7 +350,7 @@ public class XWikiLDAPConnection
     public LDAPSearchResults search(String baseDN, String filter, String[] attr, int ldapScope) throws LDAPException
     {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("LDAP search: baseDN=[{0}] query=[{1}] attr=[{2}] ldapScope=[{3}]", new Object[] {baseDN,
+            LOGGER.debug("LDAP search: baseDN=[{}] query=[{}] attr=[{}] ldapScope=[{}]", new Object[] {baseDN,
                 filter, attr != null ? Arrays.asList(attr) : null, ldapScope});
         }
 

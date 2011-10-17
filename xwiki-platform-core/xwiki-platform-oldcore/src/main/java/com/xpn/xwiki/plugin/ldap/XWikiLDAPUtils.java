@@ -484,7 +484,18 @@ public class XWikiLDAPUtils
         }
 
         try {
-            if (!result.hasMore()) {
+            LDAPEntry resultEntry = null;
+            // For some weird reason result.hasMore() is always true before the first call to next() even if nothing is
+            // found
+            if (result.hasMore()) {
+                try {
+                    resultEntry = result.next();
+                } catch (LDAPException e) {
+                    LOGGER.debug("Failed to get group members", e);
+                }
+            }
+
+            if (resultEntry == null) {
                 // maybe groupDN is a UID so trying to search for it
                 List<XWikiLDAPSearchAttribute> searchAttributeList =
                     searchUserAttributesByUid(fixedDN, new String[] {LDAP_FIELD_DN, getUidAttributeName()});
@@ -497,15 +508,15 @@ public class XWikiLDAPUtils
                     isGroup = getGroupMembers(fixedDN, memberMap, subgroups, searchAttributeList, context);
                 }
             } else {
-                while (result.hasMore()) {
+                do {
                     try {
-                        LDAPEntry resultEntry = result.next();
-
                         isGroup |= getGroupMembers(memberMap, subgroups, resultEntry, context);
+
+                        resultEntry = result.hasMore() ? result.next() : null;
                     } catch (LDAPException e) {
                         LOGGER.debug("Failed to get group members", e);
                     }
-                }
+                } while (resultEntry != null);
             }
         } finally {
             try {
@@ -556,7 +567,7 @@ public class XWikiLDAPUtils
             LOGGER.error("Unknown error with cache", e);
         }
 
-            LOGGER.debug("Found group [{}] members [{}]", groupDN, groupMembers);
+        LOGGER.debug("Found group [{}] members [{}]", groupDN, groupMembers);
 
         return groupMembers;
     }
@@ -699,7 +710,7 @@ public class XWikiLDAPUtils
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Searching for the user in LDAP: user [{}] base [{}] query [{}] uid [{}]", new Object[] {uid,
-                this.baseDN, filter, this.uidAttributeName});
+            this.baseDN, filter, this.uidAttributeName});
         }
 
         return this.connection.searchLDAP(this.baseDN, filter, attributeNameTable, LDAPConnection.SCOPE_SUB);

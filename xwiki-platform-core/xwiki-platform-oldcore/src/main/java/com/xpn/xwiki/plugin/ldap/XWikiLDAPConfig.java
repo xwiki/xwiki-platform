@@ -343,9 +343,13 @@ public final class XWikiLDAPConfig
         return groupMappings;
     }
 
+    /**
+     * @param mapping the mapping to parse
+     * @param groupMappings the map to add parsed group mapping to
+     */
     private void addGroupMapping(String mapping, Map<String, Set<String>> groupMappings)
     {
-        int splitIndex = mapping.indexOf("=");
+        int splitIndex = mapping.indexOf('=');
 
         if (splitIndex < 1) {
             LOGGER.error("Error parsing ldap_group_mapping attribute [{}]", mapping);

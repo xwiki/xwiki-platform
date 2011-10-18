@@ -1094,20 +1094,22 @@ public class XWikiLDAPUtils
             // Get document representing group
             XWikiDocument groupDoc = context.getWiki().getDocument(groupName, context);
 
-            // Add a member object to document
-            BaseObject memberObj = groupDoc.newXObject(groupClass.getDocumentReference(), context);
-            Map<String, String> map = new HashMap<String, String>();
-            map.put(XWIKI_GROUP_MEMBERFIELD, xwikiUserName);
-            groupClass.fromMap(map, memberObj);
+            synchronized (groupDoc) {
+                // Add a member object to document
+                BaseObject memberObj = groupDoc.newXObject(groupClass.getDocumentReference(), context);
+                Map<String, String> map = new HashMap<String, String>();
+                map.put(XWIKI_GROUP_MEMBERFIELD, xwikiUserName);
+                groupClass.fromMap(map, memberObj);
 
-            // If the document is new, set its content
-            if (groupDoc.isNew()) {
-                groupDoc.setSyntax(Syntax.XWIKI_2_0);
-                groupDoc.setContent("{{include document='XWiki.XWikiGroupSheet' /}}");
+                // If the document is new, set its content
+                if (groupDoc.isNew()) {
+                    groupDoc.setSyntax(Syntax.XWIKI_2_0);
+                    groupDoc.setContent("{{include document='XWiki.XWikiGroupSheet' /}}");
+                }
+
+                // Save modifications
+                context.getWiki().saveDocument(groupDoc, context);
             }
-
-            // Save modifications
-            context.getWiki().saveDocument(groupDoc, context);
 
             LOGGER.debug("Finished adding user [{}] to xwiki group [{}]", xwikiUserName, groupName);
         } catch (Exception e) {
@@ -1131,13 +1133,15 @@ public class XWikiLDAPUtils
             // Get the XWiki document holding the objects comprising the group membership list
             XWikiDocument groupDoc = context.getWiki().getDocument(groupName, context);
 
-            // Get and remove the specific group membership object for the user
-            BaseObject groupObj =
-                groupDoc.getXObject(groupClass.getDocumentReference(), XWIKI_GROUP_MEMBERFIELD, xwikiUserName);
-            groupDoc.removeXObject(groupObj);
+            synchronized (groupDoc) {
+                // Get and remove the specific group membership object for the user
+                BaseObject groupObj =
+                    groupDoc.getXObject(groupClass.getDocumentReference(), XWIKI_GROUP_MEMBERFIELD, xwikiUserName);
+                groupDoc.removeXObject(groupObj);
 
-            // Save modifications
-            context.getWiki().saveDocument(groupDoc, context);
+                // Save modifications
+                context.getWiki().saveDocument(groupDoc, context);
+            }
         } catch (Exception e) {
             LOGGER.error("Failed to remove a user from a group " + xwikiUserName + " group: " + groupName, e);
         }

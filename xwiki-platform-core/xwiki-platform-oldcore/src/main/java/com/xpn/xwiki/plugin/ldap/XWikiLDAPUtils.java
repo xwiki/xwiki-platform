@@ -44,6 +44,7 @@ import com.novell.ldap.LDAPDN;
 import com.novell.ldap.LDAPEntry;
 import com.novell.ldap.LDAPException;
 import com.novell.ldap.LDAPSearchResults;
+import com.novell.ldap.rfc2251.RfcFilter;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -277,7 +278,7 @@ public class XWikiLDAPUtils
      * @return the LDAP search result.
      * @throws LDAPException failed to execute LDAP query
      */
-    private LDAPSearchResults searchGroupsMembers(String groupDN) throws LDAPException
+    private LDAPSearchResults searchGroupsMembersByDN(String groupDN) throws LDAPException
     {
         String[] attrs = new String[2 + getGroupMemberFields().size()];
 
@@ -291,6 +292,29 @@ public class XWikiLDAPUtils
         attrs[i++] = getUidAttributeName();
 
         return getConnection().search(groupDN, null, attrs, LDAPConnection.SCOPE_SUB);
+    }
+
+    /**
+     * Execute LDAP query to get all group's members.
+     * 
+     * @param filter the LDAP filter to search with.
+     * @return the LDAP search result.
+     * @throws LDAPException failed to execute LDAP query
+     */
+    private LDAPSearchResults searchGroupsMembersByFilter(String filter) throws LDAPException
+    {
+        String[] attrs = new String[2 + getGroupMemberFields().size()];
+
+        int i = 0;
+        attrs[i++] = LDAP_OBJECTCLASS;
+        for (String groupMember : getGroupMemberFields()) {
+            attrs[i++] = groupMember;
+        }
+
+        // in case it's a organization unit get the users ids
+        attrs[i++] = getUidAttributeName();
+
+        return getConnection().search(getBaseDN(), filter, attrs, LDAPConnection.SCOPE_SUB);
     }
 
     /**
@@ -480,15 +504,22 @@ public class XWikiLDAPUtils
         }
 
         if (!isGroup && nbMembers == memberMap.size()) {
-            // Probably not a DN, lets try as user or group id
-            LOGGER.debug("Looks like [{}] is not a DN lets try as a user or group id", userOrGroup);
+            // Probably not a DN, lets try as filter or id
+            LOGGER.debug("Looks like [{}] is not a DN, lets try filter or id", userOrGroup);
 
-            List<XWikiLDAPSearchAttribute> searchAttributeList =
-                searchUserAttributesByUid(userOrGroup, new String[] {LDAP_FIELD_DN, getUidAttributeName()});
+            try {
+                // Test if it's valid LDAP filter syntax
+                new RfcFilter(userOrGroup);
+                isGroup = getGroupMembersFromFilter(userOrGroup, memberMap, subgroups, context);
+            } catch (LDAPException e) {
+                // Not a valid filter, try as uid
+                List<XWikiLDAPSearchAttribute> searchAttributeList =
+                    searchUserAttributesByUid(userOrGroup, new String[] {LDAP_FIELD_DN, getUidAttributeName()});
 
-            if (searchAttributeList != null && !searchAttributeList.isEmpty()) {
-                String dn = searchAttributeList.get(0).value;
-                isGroup = getGroupMembers(dn, memberMap, subgroups, searchAttributeList, context);
+                if (searchAttributeList != null && !searchAttributeList.isEmpty()) {
+                    String dn = searchAttributeList.get(0).value;
+                    isGroup = getGroupMembers(dn, memberMap, subgroups, searchAttributeList, context);
+                }
             }
         }
 
@@ -517,9 +548,48 @@ public class XWikiLDAPUtils
 
         LDAPSearchResults result;
         try {
-            result = searchGroupsMembers(userOrGroupDN);
+            result = searchGroupsMembersByDN(userOrGroupDN);
         } catch (LDAPException e) {
             LOGGER.debug("Failed to search for [{}]", userOrGroupDN, e);
+
+            return false;
+        }
+
+        try {
+            isGroup = getGroupMembersSearchResult(result, memberMap, subgroups, context);
+        } finally {
+            if (result.hasMore()) {
+                try {
+                    getConnection().getConnection().abandon(result);
+                } catch (LDAPException e) {
+                    LOGGER.debug("LDAP Search clean up failed", e);
+                }
+            }
+        }
+
+        return isGroup;
+    }
+
+    /**
+     * Get all members of a given group based on the groupDN. If the group contains subgroups get these members as well.
+     * Retrieve an identifier for each member.
+     * 
+     * @param filter the LDAP filter to search with.
+     * @param memberMap the result: maps DN to member id.
+     * @param subgroups all the subgroups identified.
+     * @param context the XWiki context.
+     * @return whether the provided DN is actually a group or not.
+     */
+    public boolean getGroupMembersFromFilter(String filter, Map<String, String> memberMap, List<String> subgroups,
+        XWikiContext context)
+    {
+        boolean isGroup = false;
+
+        LDAPSearchResults result;
+        try {
+            result = searchGroupsMembersByFilter(filter);
+        } catch (LDAPException e) {
+            LOGGER.debug("Failed to search for [{}]", filter, e);
 
             return false;
         }
@@ -602,7 +672,7 @@ public class XWikiLDAPUtils
                 if (groupMembers == null) {
                     Map<String, String> members = new HashMap<String, String>();
 
-                    LOGGER.debug("Retrieving Members of the group: {}", groupDN);
+                    LOGGER.debug("Retrieving Members of the group [{}]", groupDN);
 
                     boolean isGroup = getGroupMembers(groupDN, members, new ArrayList<String>(), context);
 
@@ -611,7 +681,7 @@ public class XWikiLDAPUtils
                         cache.set(groupDN, groupMembers);
                     }
                 } else {
-                    LOGGER.debug("Found cache entry for group [" + groupDN + "]");
+                    LOGGER.debug("Found cache entry for group [{}]", groupDN);
                 }
             }
         } catch (CacheException e) {

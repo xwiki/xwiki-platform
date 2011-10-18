@@ -314,36 +314,58 @@ public final class XWikiLDAPConfig
         String param = getLDAPParam("ldap_group_mapping", "", context);
 
         if (param.trim().length() > 0) {
-            String[] mappingTable = param.split("\\|");
+            char[] buffer = param.trim().toCharArray();
+            boolean escaped = false;
+            StringBuilder mapping = new StringBuilder(param.length());
+            for (int i = 0; i < buffer.length; ++i) {
+                char c = buffer[i];
 
-            for (int i = 0; i < mappingTable.length; ++i) {
-                String mapping = mappingTable[i].trim();
-
-                int splitIndex = mapping.indexOf('=');
-
-                if (splitIndex < 1) {
-                    LOGGER.error("Error parsing ldap_group_mapping attribute: " + mapping);
+                if (escaped) {
+                    mapping.append(c);
+                    escaped = false;
                 } else {
-                    String xwikigroup = mapping.substring(0, splitIndex);
-                    String ldapgroup = mapping.substring(splitIndex + 1);
-
-                    Set<String> ldapGroups = groupMappings.get(xwikigroup);
-
-                    if (ldapGroups == null) {
-                        ldapGroups = new HashSet<String>();
-                        groupMappings.put(xwikigroup, ldapGroups);
-                    }
-
-                    ldapGroups.add(ldapgroup);
-
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Groupmapping found: " + xwikigroup + " " + ldapGroups);
+                    if (c == '\\') {
+                        escaped = true;
+                    } else if (c == '|') {
+                        addGroupMapping(mapping.toString(), groupMappings);
+                        mapping.setLength(0);
+                    } else {
+                        mapping.append(c);
                     }
                 }
+            }
+
+            if (mapping.length() > 0) {
+                addGroupMapping(mapping.toString(), groupMappings);
             }
         }
 
         return groupMappings;
+    }
+
+    private void addGroupMapping(String mapping, Map<String, Set<String>> groupMappings)
+    {
+        int splitIndex = mapping.indexOf("=");
+
+        if (splitIndex < 1) {
+            LOGGER.error("Error parsing ldap_group_mapping attribute [{}]", mapping);
+        } else {
+            String xwikigroup = mapping.substring(0, splitIndex);
+            String ldapgroup = mapping.substring(splitIndex + 1);
+
+            Set<String> ldapGroups = groupMappings.get(xwikigroup);
+
+            if (ldapGroups == null) {
+                ldapGroups = new HashSet<String>();
+                groupMappings.put(xwikigroup, ldapGroups);
+            }
+
+            ldapGroups.add(ldapgroup);
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Groupmapping found [{}] [{}]", xwikigroup, ldapGroups);
+            }
+        }
     }
 
     /**

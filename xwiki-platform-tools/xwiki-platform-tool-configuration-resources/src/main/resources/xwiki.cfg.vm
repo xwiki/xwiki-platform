@@ -427,10 +427,16 @@ xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email
 # xwiki.authentication.ldap.update_user=1
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
-#-# Mapps XWiki groups to LDAP groups, separator is "|". Both groups and organisation units are supported.
+#-# Maps XWiki groups to LDAP groups, separator is "|". The following kind of groups are supported:
+#-# * LDAP static groups (users/subgroups are listed statically in the group object)
+#-# * [Since 3.3M1] LDAP organization units (users/subgroups are sub object of the provided organization unit)
+#-# * [Since 3.3M1] LDAP filter (users/groups are object found in a search with the provided filter),
+#-#   | character in the filter need to be escaped with backslash (\).
+#-#
 #-# Here is an example:
-# xwiki.authentication.ldap.group_mapping=XWiki.XWikiAdminGroup=cn=AdminRole,ou=groups,o=MegaNova,c=US|\
-#                                         XWiki.Organisation=cn=testers,ou=groups,o=MegaNova,c=US
+# xwiki.authentication.ldap.group_mapping=XWiki.XWikiAdminGroup=cn=AdminRole,ou=groups,o=domain,c=com|\
+#                                         XWiki.LDAPUsers=ou=groups,o=domain,c=com|\
+#                                         XWiki.Organisation=(cn=testers)
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# Time in s after which the list of members in a group is refreshed from LDAP

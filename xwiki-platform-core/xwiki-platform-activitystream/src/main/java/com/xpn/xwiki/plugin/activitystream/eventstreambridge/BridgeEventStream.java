@@ -156,6 +156,8 @@ public class BridgeEventStream implements EventStream
         for (Map.Entry<Integer, Object> entry : query.getPositionalParameters().entrySet()) {
             q.bindValue(entry.getKey(), entry.getValue());
         }
+        q.setLimit(query.getLimit());
+        q.setOffset(query.getOffset());
         List<ActivityEvent> events = q.execute();
         return convertActivitiesToEvents(events);
     }

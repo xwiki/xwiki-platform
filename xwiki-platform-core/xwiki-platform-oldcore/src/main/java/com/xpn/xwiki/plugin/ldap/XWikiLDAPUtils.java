@@ -74,7 +74,7 @@ public class XWikiLDAPUtils
     /**
      * The name of the LDAP groups cache.
      */
-    private static final String CACHE_NAME_GROUPS = "groups";
+    private static final String CACHE_NAME_GROUPS = "ldap.groups";
 
     /**
      * The name of the XWiki group member field.

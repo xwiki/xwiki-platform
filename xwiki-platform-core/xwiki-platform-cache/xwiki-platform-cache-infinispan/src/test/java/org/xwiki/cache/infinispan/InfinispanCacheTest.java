@@ -20,7 +20,6 @@
 package org.xwiki.cache.infinispan;
 
 import org.xwiki.cache.tests.AbstractEvictionGenericTestCache;
-import org.xwiki.cache.tests.AbstractGenericTestCache;
 
 public class InfinispanCacheTest extends AbstractEvictionGenericTestCache
 {

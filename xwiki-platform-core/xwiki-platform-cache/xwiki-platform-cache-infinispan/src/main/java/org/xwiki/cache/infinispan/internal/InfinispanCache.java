@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.infinispan.Cache;
+import org.infinispan.lifecycle.ComponentStatus;
 import org.infinispan.notifications.Listener;
 import org.infinispan.notifications.cachelistener.annotation.CacheEntriesEvicted;
 import org.infinispan.notifications.cachelistener.annotation.CacheEntryModified;
@@ -62,9 +63,11 @@ public class InfinispanCache<T> extends AbstractCache<T>
     InfinispanCache(Cache<String, T> cache, CacheConfiguration configuration)
     {
         this.cache = cache;
-        
+
         // make sure the cache is started
-        this.cache.start();
+        if (this.cache.getStatus() != ComponentStatus.RUNNING) {
+            this.cache.start();
+        }
 
         this.cache.addListener(this);
     }

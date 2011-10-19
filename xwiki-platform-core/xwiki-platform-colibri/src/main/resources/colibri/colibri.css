@@ -1957,6 +1957,12 @@ ol.footnotes {
   width: 300px;
 }
 
+/* This rule is for allowing the RSS macro to use all width available when inserted as a gadget in a dashboard
+but still maintain the 300 px width when used as a Macro from the WYSIWYG Editor */
+.column .rssfeed {
+  width: auto;
+}
+
 .rssfeed .rsschanneltitle {
   background-color: $theme.highlightColor;
   font-weight: 700;

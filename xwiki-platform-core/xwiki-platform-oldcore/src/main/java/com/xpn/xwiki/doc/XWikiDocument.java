@@ -2035,7 +2035,8 @@ public class XWikiDocument implements DocumentModelBridge
     {
         if (reference.getType() == EntityType.DOCUMENT) {
             // class reference
-            return getXObjects(this.currentReferenceDocumentReferenceResolver.resolve(reference));
+            return getXObjects(this.currentReferenceDocumentReferenceResolver
+                .resolve(reference, getDocumentReference()));
         }
 
         return Collections.emptyList();
@@ -2081,15 +2082,15 @@ public class XWikiDocument implements DocumentModelBridge
     {
         if (reference.getType() == EntityType.DOCUMENT) {
             // class reference
-            return getXObject(this.currentReferenceDocumentReferenceResolver.resolve(reference));
+            return getXObject(this.currentReferenceDocumentReferenceResolver.resolve(reference, getDocumentReference()));
         } else if (reference.getType() == EntityType.OBJECT) {
             // object reference
-            return getXObject(this.currentReferenceObjectReferenceResolver.resolve(reference));
+            return getXObject(this.currentReferenceObjectReferenceResolver.resolve(reference, getDocumentReference()));
         }
 
         return null;
     }
-    
+
     /**
      * @since 2.2M1
      */

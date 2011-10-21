@@ -51,7 +51,7 @@ public abstract class AbstractCacheConfigurationLoader
      */
     public AbstractCacheConfigurationLoader(CacheConfiguration configuration, String defaultPropsId)
     {
-        this.configuration = configuration;
+        this.configuration = (CacheConfiguration) configuration.clone();
         this.defaultPropsId = defaultPropsId;
     }
 

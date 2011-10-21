@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.infinispan.Cache;
-import org.infinispan.lifecycle.ComponentStatus;
+import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.notifications.Listener;
 import org.infinispan.notifications.cachelistener.annotation.CacheEntriesEvicted;
 import org.infinispan.notifications.cachelistener.annotation.CacheEntryModified;
@@ -57,17 +57,18 @@ public class InfinispanCache<T> extends AbstractCache<T>
     private ConcurrentMap<String, T> preEventData = new ConcurrentHashMap<String, T>();
 
     /**
-     * @param cache the Infinispan cache
+     * The Infinispan cache manager.
+     */
+    private EmbeddedCacheManager cacheManager;
+
+    /**
+     * @param cacheManager the Infinispan cache manager
      * @param configuration the XWiki Cache configuration
      */
-    InfinispanCache(Cache<String, T> cache, CacheConfiguration configuration)
+    InfinispanCache(EmbeddedCacheManager cacheManager, CacheConfiguration configuration)
     {
-        this.cache = cache;
-
-        // make sure the cache is started
-        if (this.cache.getStatus() != ComponentStatus.RUNNING) {
-            this.cache.start();
-        }
+        this.cacheManager = cacheManager;
+        this.cache = cacheManager.<String, T> getCache(configuration.getConfigurationId());
 
         this.cache.addListener(this);
     }
@@ -101,7 +102,7 @@ public class InfinispanCache<T> extends AbstractCache<T>
     {
         super.dispose();
 
-        this.cache.stop();
+        this.cacheManager.removeCache(this.cache.getName());
     }
 
     // ////////////////////////////////////////////////////////////////

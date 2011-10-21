@@ -153,7 +153,7 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
         // create cache
 
         try {
-            return new InfinispanCache<T>(this.cacheManager.<String, T> getCache(cacheName), configuration);
+            return new InfinispanCache<T>(this.cacheManager, loader.getCacheConfiguration());
         } finally {
             // restore default configuration
             if (configChanged) {

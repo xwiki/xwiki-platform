@@ -48,9 +48,16 @@ public class DefaultStringObjectPropertyReferenceResolver implements ObjectPrope
     private EntityReferenceResolver<String> entityReferenceResolver;
 
     @Override
+    public ObjectPropertyReference resolve(String propertyReferenceRepresentation, Object... parameters)
+    {
+        return new ObjectPropertyReference(this.entityReferenceResolver.resolve(propertyReferenceRepresentation,
+            EntityType.OBJECT_PROPERTY, parameters));
+    }
+
+    @Override
     public ObjectPropertyReference resolve(String propertyReferenceRepresentation)
     {
-        return new ObjectPropertyReference(entityReferenceResolver.resolve(propertyReferenceRepresentation,
+        return new ObjectPropertyReference(this.entityReferenceResolver.resolve(propertyReferenceRepresentation,
             EntityType.OBJECT_PROPERTY));
     }
 }

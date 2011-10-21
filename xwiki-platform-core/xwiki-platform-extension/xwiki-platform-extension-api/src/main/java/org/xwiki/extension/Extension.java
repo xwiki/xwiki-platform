@@ -62,6 +62,11 @@ public interface Extension
     Collection<ExtensionLicense> getLicenses();
 
     /**
+     * @return a short description of the extension
+     */
+    String getSummary();
+    
+    /**
      * @return a description of the extension
      */
     String getDescription();

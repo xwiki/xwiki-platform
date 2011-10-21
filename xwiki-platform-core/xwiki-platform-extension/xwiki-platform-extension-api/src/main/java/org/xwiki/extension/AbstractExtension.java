@@ -64,6 +64,11 @@ public abstract class AbstractExtension implements Extension
     protected List<ExtensionLicense> licenses = new ArrayList<ExtensionLicense>();
 
     /**
+     * @see #getSummary()
+     */
+    protected String summary;
+
+    /**
      * @see #getDescription()
      */
     protected String description;
@@ -218,6 +223,20 @@ public abstract class AbstractExtension implements Extension
     public void addLicense(ExtensionLicense license)
     {
         this.licenses.add(license);
+    }
+
+    @Override
+    public String getSummary()
+    {
+        return this.summary;
+    }
+
+    /**
+     * @param summary a short description of the extension
+     */
+    public void setSummary(String summary)
+    {
+        this.summary = summary;
     }
 
     @Override

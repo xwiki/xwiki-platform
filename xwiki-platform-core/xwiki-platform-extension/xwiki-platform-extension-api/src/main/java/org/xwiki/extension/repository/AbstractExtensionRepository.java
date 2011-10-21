@@ -19,6 +19,9 @@
  */
 package org.xwiki.extension.repository;
 
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ResolveException;
+
 /**
  * Base class for {@link ExtensionRepository} implementations.
  * 
@@ -37,6 +40,21 @@ public abstract class AbstractExtensionRepository implements ExtensionRepository
     public AbstractExtensionRepository(ExtensionRepositoryId id)
     {
         this.id = new ExtensionRepositoryId(id.getId(), id.getType(), id.getURI());
+    }
+
+    @Override
+    public boolean exists(ExtensionId extensionId)
+    {
+        boolean exists;
+
+        try {
+            resolve(extensionId);
+            exists = true;
+        } catch (ResolveException e) {
+            exists = false;
+        }
+
+        return exists;
     }
 
     @Override

@@ -93,6 +93,12 @@ public class WrappingExtension<T extends Extension> implements Extension
     }
 
     @Override
+    public String getSummary()
+    {
+        return getExtension().getSummary();
+    }
+
+    @Override
     public String getDescription()
     {
         return getExtension().getDescription();

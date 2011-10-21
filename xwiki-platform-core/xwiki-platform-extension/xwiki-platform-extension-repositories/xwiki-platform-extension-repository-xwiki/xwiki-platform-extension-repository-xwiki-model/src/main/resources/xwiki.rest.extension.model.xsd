@@ -135,9 +135,10 @@
     <complexContent>
       <extension base="xwiki:ExtensionSummary">
         <sequence>
+          <element name="summary" type="string" minOccurs="0"></element>
           <element name="description" type="string" minOccurs="0"></element>
-                    <element name="license" type="xwiki:License" minOccurs="0"></element>
-                    <element name="website" type="string" minOccurs="0"></element>
+          <element name="license" type="xwiki:License" minOccurs="0"></element>
+          <element name="website" type="string" minOccurs="0"></element>
           <element name="authors" type="string" minOccurs="0"
             maxOccurs="unbounded">
           </element>

@@ -62,6 +62,8 @@ public class ExtensionSerializer
 
     private static final String ELEMENT_NAME = "name";
 
+    private static final String ELEMENT_SUMMARY = "summary";
+
     private static final String ELEMENT_DESCRIPTION = "description";
 
     private static final String ELEMENT_WEBSITE = "website";
@@ -135,6 +137,10 @@ public class ExtensionSerializer
         Node nameNode = getNode(extensionElement, ELEMENT_NAME);
         if (nameNode != null) {
             localExtension.setName(nameNode.getTextContent());
+        }
+        Node summaryNode = getNode(extensionElement, ELEMENT_SUMMARY);
+        if (summaryNode != null) {
+            localExtension.setSummary(summaryNode.getTextContent());
         }
         Node descriptionNode = getNode(extensionElement, ELEMENT_DESCRIPTION);
         if (descriptionNode != null) {
@@ -244,6 +250,7 @@ public class ExtensionSerializer
         addElement(document, extensionElement, ELEMENT_TYPE, extension.getType());
         addElement(document, extensionElement, ELEMENT_DEPENDENCY, String.valueOf(extension.isDependency()));
         addElement(document, extensionElement, ELEMENT_NAME, extension.getName());
+        addElement(document, extensionElement, ELEMENT_SUMMARY, extension.getSummary());
         addElement(document, extensionElement, ELEMENT_DESCRIPTION, extension.getDescription());
         addElement(document, extensionElement, ELEMENT_WEBSITE, extension.getWebSite());
         addCollection(document, extensionElement, extension.getAuthors(), ELEMENT_AAUTHOR, ELEMENT_AUTHORS);

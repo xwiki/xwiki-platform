@@ -24,11 +24,13 @@ import org.xwiki.model.reference.EntityReference;
 
 public interface XWikiRepositoryModel
 {
+    // References
+
     public final static String EXTENSION_CLASSNAME = "ExtensionCode.ExtensionClass";
 
     public final static String EXTENSIONVERSION_CLASSNAME = "ExtensionCode.ExtensionVersionClass";
 
-    public final static String EXTENSIONDEPENDENCY_CLASSNAME = "ExtensionCode.ExtensionVersionClass";
+    public final static String EXTENSIONDEPENDENCY_CLASSNAME = "ExtensionCode.ExtensionDependencyClass";
 
     public final static EntityReference EXTENSION_CLASSREFERENCE = new EntityReference("ExtensionClass",
         EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
@@ -39,7 +41,37 @@ public interface XWikiRepositoryModel
     public final static EntityReference EXTENSIONDEPENDENCY_CLASSREFERENCE = new EntityReference(
         "ExtensionDependencyClass", EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
 
+    // Properties
+
+    public final static String PROP_EXTENSION_ID = "id";
+
+    public static final String PROP_EXTENSION_TYPE = "type";
+
+    public static final String PROP_EXTENSION_LICENSENAME = "licenseName";
+
+    public static final String PROP_EXTENSION_SUMMARY = "summary";
+
+    public static final String PROP_EXTENSION_DESCRIPTION = "description";
+
+    public static final String PROP_EXTENSION_NAME = "name";
+
+    public static final String PROP_EXTENSION_WEBSITE = "website";
+
+    public static final String PROP_EXTENSION_AUTHORS = "authors";
+
+    public static final String PROP_EXTENSION_FEATURES = "features";
+
     public final static String PROP_VERSION_VERSION = "version";
 
+    public static final String PROP_DEPENDENCY_EXTENSIONVERSION = "extensionVersion";
+
+    public static final String PROP_DEPENDENCY_ID = "id";
+
+    public static final String PROP_DEPENDENCY_VERSION = "version";
+
+    // Consolidation
+
     public final static String PROP_EXTENSION_LASTVERSION = "lastVersion";
+
+    public final static String PROP_EXTENSION_VALIDEXTENSION = "validExtension";
 }

@@ -83,7 +83,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         String select =
             "extension.id, extension.type, extension.name"
-                + ", extension.description, extension.website, extension.authors, extension.features"
+                + ", extension.summary, extension.description, extension.website, extension.authors, extension.features"
                 + ", extensionVersion.version";
 
         if (where != null) {
@@ -224,29 +224,30 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             }
 
             extension = extensionVersion = this.objectFactory.createExtensionVersion();
-            extensionVersion.setVersion((String) getValue(extensionVersionObject, "version"));
+            extensionVersion.setVersion((String) getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_VERSION));
         }
 
-        extension.setId((String) getValue(extensionObject, "id"));
-        extension.setType((String) getValue(extensionObject, "type"));
+        extension.setId((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ID));
+        extension.setType((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE));
 
         License license = this.objectFactory.createLicense();
-        license.setName((String) getValue(extensionObject, "licenseName"));
+        license.setName((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME));
         extension.setLicense(license);
 
-        extension.setDescription((String) getValue(extensionObject, "description"));
-        extension.setName((String) getValue(extensionObject, "name"));
-        extension.setWebsite((String) getValue(extensionObject, "website"));
+        extension.setSummary((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));
+        extension.setDescription((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION));
+        extension.setName((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_NAME));
+        extension.setWebsite((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE));
 
-        extension.getAuthors().addAll((List<String>) getValue(extensionObject, "authors"));
-        extension.getFeatures().addAll((List<String>) getValue(extensionObject, "features"));
+        extension.getAuthors().addAll((List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS));
+        extension.getFeatures().addAll((List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_FEATURES));
 
         if (extensionVersion != null) {
             for (com.xpn.xwiki.api.Object dependencyObject : extensionDocument.getObjects(
-                XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME, "extensionversion", version)) {
+                XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME, XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, version)) {
                 ExtensionDependency dependency = new ExtensionDependency();
-                dependency.setId((String) getValue(dependencyObject, "id"));
-                dependency.setVersion((String) getValue(dependencyObject, "version"));
+                dependency.setId((String) getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_ID));
+                dependency.setVersion((String) getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_VERSION));
 
                 extensionVersion.getDependencies().add(dependency);
             }
@@ -281,11 +282,12 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setType((String) entry[1]);
         extension.setName((String) entry[2]);
         extension.setVersion((String) entry[3]);
-        extension.setDescription((String) entry[4]);
-        extension.setWebsite((String) entry[5]);
+        extension.setSummary((String) entry[4]);
+        extension.setDescription((String) entry[5]);
+        extension.setWebsite((String) entry[6]);
 
-        extension.getAuthors().addAll(ListClass.getListFromString((String) entry[6], "|", false));
-        extension.getFeatures().addAll(ListClass.getListFromString((String) entry[7], "|", false));
+        extension.getAuthors().addAll(ListClass.getListFromString((String) entry[7], "|", false));
+        extension.getFeatures().addAll(ListClass.getListFromString((String) entry[8], "|", false));
 
         // TODO: add support for
         // * dependencies
@@ -336,6 +338,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
     protected XWikiContext getXWikiContext()
     {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 }

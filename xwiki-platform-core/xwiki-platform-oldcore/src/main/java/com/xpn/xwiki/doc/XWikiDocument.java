@@ -87,6 +87,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.ObjectReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
@@ -432,6 +433,13 @@ public class XWikiDocument implements DocumentModelBridge
     @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.class, "local");
+
+    /**
+     * Used to normalize references.
+     */
+    @SuppressWarnings("unchecked")
+    private ObjectReferenceResolver<EntityReference> currentReferenceObjectReferenceResolver = Utils.getComponent(
+        ObjectReferenceResolver.class, "current/reference");
 
     /**
      * Used to create proper {@link Syntax} objects.
@@ -2021,6 +2029,19 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * @since 3.3M1
+     */
+    public List<BaseObject> getXObjects(EntityReference reference)
+    {
+        if (reference.getType() == EntityType.DOCUMENT) {
+            // class reference
+            return getXObjects(this.currentReferenceDocumentReferenceResolver.resolve(reference));
+        }
+
+        return Collections.emptyList();
+    }
+
+    /**
      * @deprecated since 2.2M1 use {@link #getXObjects(DocumentReference)} instead
      */
     @Deprecated
@@ -2053,6 +2074,22 @@ public class XWikiDocument implements DocumentModelBridge
         setXObjects(resolveClassReference(className), new ArrayList<BaseObject>(objects));
     }
 
+    /**
+     * @since 3.3M1
+     */
+    public BaseObject getXObject(EntityReference reference)
+    {
+        if (reference.getType() == EntityType.DOCUMENT) {
+            // class reference
+            return getXObject(this.currentReferenceDocumentReferenceResolver.resolve(reference));
+        } else if (reference.getType() == EntityType.OBJECT) {
+            // object reference
+            return getXObject(this.currentReferenceObjectReferenceResolver.resolve(reference));
+        }
+
+        return null;
+    }
+    
     /**
      * @since 2.2M1
      */

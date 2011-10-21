@@ -40,6 +40,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -145,8 +146,10 @@ public class XWikiResource implements XWikiRestComponent, Initializable
 
         objectFactory = new ObjectFactory();
 
-        logger.log(Level.FINE, String.format("Resource %s initialized. Serving user: '%s'\n", getClass().getName(),
-            Utils.getXWikiUser(componentManager)));
+        logger.log(
+            Level.FINE,
+            String.format("Resource %s initialized. Serving user: '%s'\n", getClass().getName(),
+                Utils.getXWikiUser(componentManager)));
     }
 
     /**
@@ -209,7 +212,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
                     XWikiDocument xwikiDocument =
                         new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
                     xwikiDocument.setLanguage(language);
-                    doc = new Document(xwikiDocument, Utils.getXWikiContext(componentManager));
+                    doc = new Document(xwikiDocument, getXWikiContext());
 
                     existed = false;
                 }
@@ -246,4 +249,13 @@ public class XWikiResource implements XWikiRestComponent, Initializable
         return this.getClass().getAnnotation(Path.class).value();
     }
 
+    /**
+     * Retrieve the XWiki context from the current execution context.
+     * 
+     * @return the XWiki context
+     */
+    protected XWikiContext getXWikiContext()
+    {
+        return Utils.getXWikiContext(this.componentManager);
+    }
 }

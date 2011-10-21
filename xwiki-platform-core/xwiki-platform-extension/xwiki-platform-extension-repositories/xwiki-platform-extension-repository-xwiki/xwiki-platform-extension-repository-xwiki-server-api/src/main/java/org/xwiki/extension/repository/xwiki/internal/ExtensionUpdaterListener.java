@@ -29,6 +29,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.internal.VersionManager;
 import org.xwiki.model.EntityType;
@@ -44,6 +46,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -64,7 +67,8 @@ public class ExtensionUpdaterListener implements EventListener
      */
     private static final List<Event> EVENTS = Arrays.<Event> asList(new XObjectPropertyAddedEvent(
         EXTENSIONVERSION_REFERENCE), new XObjectPropertyUpdatedEvent(EXTENSIONVERSION_REFERENCE),
-        new XObjectPropertyDeletedEvent(EXTENSIONVERSION_REFERENCE));
+        new XObjectPropertyDeletedEvent(EXTENSIONVERSION_REFERENCE), new DocumentCreatedEvent(),
+        new DocumentUpdatedEvent());
 
     /**
      * Used to find last version.
@@ -103,6 +107,54 @@ public class ExtensionUpdaterListener implements EventListener
         XWikiDocument document = (XWikiDocument) source;
         XWikiContext context = (XWikiContext) data;
 
+        if (event instanceof XObjectPropertyEvent) {
+            updateLastVersion(document, context);
+        } else {
+            validateExtension(document, context);
+        }
+    }
+
+    private void validateExtension(XWikiDocument document, XWikiContext context)
+    {
+        BaseObject extension = document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+
+        if (extension != null) {
+            boolean valid = !StringUtils.isBlank(extension.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_ID));
+            if (valid) {
+                int nbVersions = 0;
+                for (BaseObject extensionVersion : document.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE)) {
+                    if (extensionVersion != null) {
+                        valid &=
+                            !StringUtils.isBlank(extensionVersion
+                                .getStringValue(XWikiRepositoryModel.PROP_VERSION_VERSION));
+
+                        ++nbVersions;
+                    }
+                }
+
+                valid &= nbVersions > 0;
+            }
+
+            int currentValue = extension.getIntValue(XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, 0);
+
+            if ((currentValue == 1) != valid) {
+                try {
+                    // FIXME: We can't save directly the provided document coming from the event
+                    document = context.getWiki().getDocument(document, context);
+                    extension = document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+
+                    extension.setIntValue(XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, valid ? 1 : 0);
+
+                    context.getWiki().saveDocument(document, "Validate extension", context);
+                } catch (XWikiException e) {
+                    this.logger.error("Failed to validate extension [{}]", document, e);
+                }
+            }
+        }
+    }
+
+    private void updateLastVersion(XWikiDocument document, XWikiContext context)
+    {
         String lastVersion = findLastVersion(document);
 
         DocumentReference extensionClassReference =
@@ -121,7 +173,7 @@ public class ExtensionUpdaterListener implements EventListener
 
                 context.getWiki().saveDocument(document, "Update extension last version", context);
             } catch (XWikiException e) {
-                this.logger.error("Failed to update extension last version", e);
+                this.logger.error("Failed to update extension [{}] last version", document, e);
             }
         }
     }

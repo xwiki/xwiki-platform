@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.restlet.data.MediaType;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
@@ -48,7 +49,9 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.SearchResult;
  */
 public class XWikiExtensionRepository extends AbstractExtensionRepository implements Searchable
 {
-    private XWikiExtensionRepositoryFactory repositoryFactory;
+    private final XWikiExtensionRepositoryFactory repositoryFactory;
+
+    private final ExtensionLicenseManager licenseManager;
 
     private final UriBuilder extensionVersionUriBuider;
 
@@ -57,12 +60,13 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
     private final UriBuilder searchUriBuider;
 
     public XWikiExtensionRepository(ExtensionRepositoryId repositoryId,
-        XWikiExtensionRepositoryFactory repositoryFactory) throws Exception
+        XWikiExtensionRepositoryFactory repositoryFactory, ExtensionLicenseManager licenseManager) throws Exception
     {
         super(repositoryId.getURI().getPath().endsWith("/") ? new ExtensionRepositoryId(repositoryId.getId(),
             repositoryId.getType(), new URI(StringUtils.chop(repositoryId.getURI().toString()))) : repositoryId);
 
         this.repositoryFactory = repositoryFactory;
+        this.licenseManager = licenseManager;
 
         // Uri builders
         this.extensionVersionUriBuider = createUriBuilder(Resources.EXTENSION_VERSION);
@@ -109,8 +113,10 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
         try {
-            return new XWikiExtension(this, (ExtensionVersion) this.repositoryFactory.getUnmarshaller().unmarshal(
-                getRESTResourceAsStream(this.extensionVersionUriBuider, extensionId.getId(), extensionId.getVersion())));
+            return new XWikiExtension(this,
+                (ExtensionVersion) this.repositoryFactory.getUnmarshaller().unmarshal(
+                    getRESTResourceAsStream(this.extensionVersionUriBuider, extensionId.getId(),
+                        extensionId.getVersion())), this.licenseManager);
         } catch (Exception e) {
             throw new ResolveException("Failed to create extension object for extension [" + extensionId + "]", e);
         }
@@ -126,20 +132,6 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
     private UriBuilder createUriBuilder(String path)
     {
         return UriBuilder.fromUri(getId().getURI()).path(path);
-    }
-
-    @Override
-    public boolean exists(ExtensionId extensionId)
-    {
-        // TODO: improve that with a real exists in the protocol itself
-
-        try {
-            resolve(extensionId);
-
-            return true;
-        } catch (ResolveException e) {
-            return false;
-        }
     }
 
     // Searchable
@@ -163,7 +155,7 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
 
         List<Extension> extensions = new ArrayList<Extension>(restExtensions.getExtensions().size());
         for (ExtensionVersion restExtension : restExtensions.getExtensions()) {
-            extensions.add(new XWikiExtension(this, restExtension));
+            extensions.add(new XWikiExtension(this, restExtension, this.licenseManager));
         }
 
         return extensions;

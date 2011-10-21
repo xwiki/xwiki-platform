@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.repository.xwiki.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.xml.bind.JAXBContext;
@@ -28,6 +29,7 @@ import javax.xml.bind.Unmarshaller;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryException;
 import org.xwiki.extension.repository.ExtensionRepositoryFactory;
@@ -38,9 +40,12 @@ import org.xwiki.extension.repository.ExtensionRepositoryId;
 @Named("xwiki")
 public class XWikiExtensionRepositoryFactory implements ExtensionRepositoryFactory, Initializable
 {
-    protected Marshaller marshaller;
+    @Inject
+    private ExtensionLicenseManager licenseManager;
 
-    protected Unmarshaller unmarshaller;
+    private Marshaller marshaller;
+
+    private Unmarshaller unmarshaller;
 
     @Override
     public void initialize() throws InitializationException
@@ -56,12 +61,12 @@ public class XWikiExtensionRepositoryFactory implements ExtensionRepositoryFacto
 
     public Marshaller getMarshaller()
     {
-        return marshaller;
+        return this.marshaller;
     }
 
     public Unmarshaller getUnmarshaller()
     {
-        return unmarshaller;
+        return this.unmarshaller;
     }
 
     // ExtensionRepositoryFactory
@@ -70,7 +75,7 @@ public class XWikiExtensionRepositoryFactory implements ExtensionRepositoryFacto
     public ExtensionRepository createRepository(ExtensionRepositoryId repositoryId) throws ExtensionRepositoryException
     {
         try {
-            return new XWikiExtensionRepository(repositoryId, this);
+            return new XWikiExtensionRepository(repositoryId, this, this.licenseManager);
         } catch (Exception e) {
             throw new ExtensionRepositoryException("Failed to create repository [" + repositoryId + "]", e);
         }

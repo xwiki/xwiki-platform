@@ -99,9 +99,7 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
             throw new ResolveException("Failed to resolve extension [" + extensionId + "] descriptor", e);
         }
 
-        AetherExtension extension =
-            new AetherExtension(extensionId, model, this, this.plexusComponentManager, this.converter,
-                this.licenseManager);
+        AetherExtension extension = new AetherExtension(extensionId, model, this, this.plexusComponentManager);
 
         extension.setName(model.getName());
         extension.setDescription(model.getDescription());
@@ -112,7 +110,7 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
 
         // licenses
         for (License license : model.getLicenses()) {
-            extension.addLicense(getExtensionLicense(license, licenseManager));
+            extension.addLicense(getExtensionLicense(license));
         }
 
         // features
@@ -134,13 +132,13 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
     }
 
     // TODO: download custom licenses content
-    private ExtensionLicense getExtensionLicense(License license, ExtensionLicenseManager licenseManager)
+    private ExtensionLicense getExtensionLicense(License license)
     {
         if (license.getName() == null) {
             return new ExtensionLicense("noname", null);
         }
 
-        ExtensionLicense extensionLicense = licenseManager.getLicense(license.getName());
+        ExtensionLicense extensionLicense = this.licenseManager.getLicense(license.getName());
 
         return extensionLicense != null ? extensionLicense : new ExtensionLicense(license.getName(), null);
     }
@@ -160,20 +158,13 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
             artifactDescriptorRequest, artifactDescriptorResult);
     }
 
-    @Override
-    public boolean exists(ExtensionId extensionId)
-    {
-        // TODO
-        return false;
-    }
-
     public RepositorySystemSession getSession()
     {
-        return session;
+        return this.session;
     }
 
     public RemoteRepository getRemoteRepository()
     {
-        return remoteRepository;
+        return this.remoteRepository;
     }
 }

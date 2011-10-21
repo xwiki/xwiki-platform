@@ -44,6 +44,9 @@ import org.xwiki.model.reference.ObjectReferenceResolver;
 @Singleton
 public class CurrentReferenceObjectReferenceResolver implements ObjectReferenceResolver<EntityReference>
 {
+    /**
+     * Used to actually resolve the provided entity references.
+     */
     @Inject
     @Named("current/reference")
     private EntityReferenceResolver<EntityReference> entityReferenceResolver;

@@ -3977,7 +3977,7 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 }
 
 .rssfeed p.rsschanneltitle {
-  margin-bottom: 10px;
+  margin: 0;
   border-bottom: 1px solid #DDD;
   padding: 5px;
   background-color: #F4F9FE;
@@ -3987,11 +3987,12 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 }
 
 .rssfeed p.rsschanneltitle span a img {
-  margin-left:5px;
+  margin-left: 5px;
+  vertical-align: middle;
 }
 
-.rssfeed .rssitem {
-  padding: 5px;
+.rssfeed .rssitem, .rssfeed .rssitemtitle, .rssfeed .rssitemdescription {
+  padding: 0 5px;
 }
 
 .errormessage, .warningmessage, .infomessage, .plainmessage {

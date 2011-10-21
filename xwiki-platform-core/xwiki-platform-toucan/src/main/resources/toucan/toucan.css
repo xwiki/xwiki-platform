@@ -3972,6 +3972,10 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
   background-color: white;
 }
 
+.column .rssfeed {
+  width: auto;
+}
+
 .rssfeed p.rsschanneltitle {
   margin-bottom: 10px;
   border-bottom: 1px solid #DDD;

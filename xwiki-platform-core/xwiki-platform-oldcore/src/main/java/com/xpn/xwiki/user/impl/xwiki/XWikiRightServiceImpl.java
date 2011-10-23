@@ -779,7 +779,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             // should be allowed.
             if (!allow_found) {
                 // Should these rights be denied only if no deny rights were found?
-                if (accessLevel.equals("register") || accessLevel.equals("delete") || accessLevel.equals("admin")) {
+                if (accessLevel.equals("register") || accessLevel.equals("delete")) {
                     logDeny(userOrGroupName, entityReference, accessLevel, "global level (" + accessLevel
                         + " right must be explicit)");
 

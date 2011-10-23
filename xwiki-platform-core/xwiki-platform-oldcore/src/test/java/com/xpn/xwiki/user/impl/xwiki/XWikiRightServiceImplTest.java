@@ -546,6 +546,13 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
         final XWikiDocument preferences = new XWikiDocument(new DocumentReference("wiki", "XWiki", "XWikiPreference"));
 
+        BaseObject preferencesObject = new BaseObject();
+        preferencesObject.setClassName("XWiki.XWikiGlobalRights");
+        preferencesObject.setStringValue("levels", "admin");
+        preferencesObject.setIntValue("allow", 0);
+        preferencesObject.setStringValue("users", "xwiki:XWiki.UserA");
+        preferences.addXObject(preferencesObject);
+
         this.mockXWiki.stubs().method("getDocument").with(eq("wiki:Space.WebPreferences"), ANYTHING)
             .will(returnValue(
                  new XWikiDocument(new DocumentReference("wiki",
@@ -589,7 +596,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         assertTrue( "Other documents named XWikiPreferences should be unaffected.",
                     rightService.hasAccessLevel("edit", "xwiki:XWiki.UserA", "wiki:Space.XWikiPreferences", getContext()));
 
-        BaseObject preferencesObject = new BaseObject();
+        preferencesObject = new BaseObject();
         preferencesObject.setClassName("XWiki.XWikiGlobalRights");
         preferencesObject.setStringValue("levels", "edit");
         preferencesObject.setIntValue("allow", 1);

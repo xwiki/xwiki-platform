@@ -595,6 +595,16 @@ public class XWikiRightServiceImpl implements XWikiRightService
         try {
             currentdoc = currentdoc == null ? context.getWiki().getDocument(entityReference, context) : currentdoc;
 
+            if (accessLevel.equals("edit") && 
+                (currentdoc.getName().equals("WebPreferences") ||
+                 (currentdoc.getWeb().equals("XWiki") &&
+                  currentdoc.getName().equals("XWikiPreferences")))) {
+                // Since edit rights on these documents would be sufficient for a user to elevate himself to
+                // admin or even programmer, we will instead check for admin access on these documents.
+                // See http://jira.xwiki.org/browse/XWIKI-6987 and http://jira.xwiki.org/browse/XWIKI-2184.
+                accessLevel = "admin";
+            }
+
             // We need to make sure we are in the context of the document which rights is being checked
             context.setDatabase(currentdoc.getDatabase());
 
@@ -767,7 +777,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             // should be allowed.
             if (!allow_found) {
                 // Should these rights be denied only if no deny rights were found?
-                if (accessLevel.equals("register") || accessLevel.equals("delete")) {
+                if (accessLevel.equals("register") || accessLevel.equals("delete") || accessLevel.equals("admin")) {
                     logDeny(userOrGroupName, entityReference, accessLevel, "global level (" + accessLevel
                         + " right must be explicit)");
 

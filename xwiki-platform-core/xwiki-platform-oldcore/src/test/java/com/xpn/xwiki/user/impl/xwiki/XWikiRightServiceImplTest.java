@@ -516,4 +516,99 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         assertTrue("Should allow delete rights for page creator",
             this.rightService.hasAccessLevel("delete", this.user.getFullName(), doc.getFullName(), true, getContext()));
     }
+
+    /**
+     * Verify that edit rights is not sufficient for editing
+     * *.WebPreferences and XWiki.XWikiPreferences, since that can be
+     * used to elevate the privileges to admin.
+     */
+    public void testEditRightsOnWebPreferencesDocuments() throws Exception
+    {
+
+        this.mockGroupService.stubs().method("getAllGroupsReferencesForMember")
+            .with(ANYTHING, ANYTHING, ANYTHING, ANYTHING).will(
+                  returnValue(Collections.emptyList()));
+
+        this.user = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user"));
+        this.user.setNew(false);
+        getContext().setDatabase(this.user.getWikiName());
+        BaseObject userObject = new BaseObject();
+        userObject.setClassName("XWiki.XWikiUser");
+        this.user.addXObject(userObject);
+        this.mockXWiki.stubs().method("getDocument").with(eq(this.user.getPrefixedFullName()), ANYTHING).will(
+            returnValue(this.user));
+
+        getContext().setDatabase(this.user.getWikiName());
+        final XWikiDocument doc = new XWikiDocument(new DocumentReference("wiki", "Space", "Document"));
+
+        this.mockXWiki.stubs().method("getDocument").with(eq(doc.getPrefixedFullName()), ANYTHING).will(
+            returnValue(doc));
+
+        final XWikiDocument preferences = new XWikiDocument(new DocumentReference("wiki", "XWiki", "XWikiPreference"));
+
+        this.mockXWiki.stubs().method("getDocument").with(eq("wiki:Space.WebPreferences"), ANYTHING)
+            .will(returnValue(
+                 new XWikiDocument(new DocumentReference("wiki",
+                     "Space", "WebPreferences"))));
+
+        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
+            new CustomStub("Implements XWiki.getDocument")
+            {
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    if (!getContext().getDatabase().equals("wiki")) {
+                        new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreference"));
+                    }
+
+                    return preferences;
+                }
+            });
+
+        assertFalse( "Programming rights have not been configured.",
+            rightService.hasAccessLevel("programming", "xwiki:XWiki.UserA", "wiki:Space.WebPreferences", getContext()));
+
+        assertFalse( "Admin rights have not been configured.",
+            rightService.hasAccessLevel("admin", "xwiki:XWiki.UserA", "wiki:Space.WebPreferences", getContext()));
+
+        assertFalse( "Shouldn't allow edit rights by default on WebPreferences documents.",
+            rightService.hasAccessLevel("edit", "xwiki:XWiki.UserA", "wiki:Space.WebPreferences", getContext()));
+
+        BaseObject preferencesObject = new BaseObject();
+        preferencesObject.setClassName("XWiki.XWikiGlobalRights");
+        preferencesObject.setStringValue("levels", "edit");
+        preferencesObject.setIntValue("allow", 1);
+        preferencesObject.setStringValue("users", "xwiki:XWiki.UserA");
+        preferences.addXObject(preferencesObject);
+
+        assertTrue( "Edit rights have been configured.",
+                    rightService.hasAccessLevel("edit", "xwiki:XWiki.UserA", "wiki:Space.Document", getContext()));
+
+        assertFalse( "No admin rights have been configured.",
+                    rightService.hasAccessLevel("admin", "xwiki:XWiki.UserA", "wiki:Space.Document", getContext()));
+
+        assertFalse( "Edit rights should be denied WebPreferences document for non-admin users.",
+                    rightService.hasAccessLevel("edit", "xwiki:XWiki.UserA", "wiki:Space.WebPreferences", getContext()));
+
+        preferencesObject = new BaseObject();
+        preferencesObject.setClassName("XWiki.XWikiGlobalRights");
+        preferencesObject.setStringValue("levels", "admin");
+        preferencesObject.setIntValue("allow", 1);
+        preferencesObject.setStringValue("users", "xwiki:XWiki.UserA");
+        preferences.addXObject(preferencesObject);
+
+        assertTrue( "Admin rights have been configured.",
+                    rightService.hasAccessLevel("admin", "xwiki:XWiki.UserA", "wiki:Space.Document", getContext()));
+
+        assertTrue( "Edit rights should be granted WebPreferences document for admin users.",
+                    rightService.hasAccessLevel("edit", "xwiki:XWiki.UserA", "wiki:Space.WebPreferences", getContext()));
+
+    }
+
+    /*    public void testEditRightsOnXWikiPreferencesDocument() throws Exception
+    {
+        assertFalse( "Shouldn't allow edit rights by default on XWiki.XWikiPreferences documents.",
+                     rightService.hasAccessLevel("edit", "xwiki:XWiki.UserA", "XWiki.XWikiPreferences", getContext()));
+
+                     }*/
+
 }

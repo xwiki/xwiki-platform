@@ -12,13 +12,13 @@
   ## panels on the side, header, etc).
   #set($syntaxType = $outputSyntax.type.toIdString())
   #if (($syntaxType == "xhtml") || ($syntaxType == "html"))
-    #set ($renderedContent = $cdoc.getRenderedContent($outputSyntax))
+    #set ($renderedContent = $tdoc.getRenderedContent($outputSyntax))
   #else
     ## Make sure to print correctly the result when it's not HTML
-    #set ($renderedContent = "<pre>$escapetool.html($cdoc.getRenderedContent($outputSyntax))</pre>")
+    #set ($renderedContent = "<pre>$escapetool.html($tdoc.getRenderedContent($outputSyntax))</pre>")
   #end
 #else
-  #set ($renderedContent = $cdoc.getRenderedContent())
+  #set ($renderedContent = $tdoc.getRenderedContent())
 #end
 ## ----------------------------------------------------------------------------
 ## Compute title to display and modify rendered content accordingly.

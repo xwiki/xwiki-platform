@@ -595,10 +595,12 @@ public class XWikiRightServiceImpl implements XWikiRightService
         try {
             currentdoc = currentdoc == null ? context.getWiki().getDocument(entityReference, context) : currentdoc;
 
-            if (accessLevel.equals("edit") && 
-                (currentdoc.getName().equals("WebPreferences") ||
-                 (currentdoc.getWeb().equals("XWiki") &&
-                  currentdoc.getName().equals("XWikiPreferences")))) {
+            DocumentReference docReference = currentdoc.getDocumentReference();
+
+            if (accessLevel.equals("edit") &&
+                (docReference.getName().equals("WebPreferences") ||
+                 (docReference.getLastSpaceReference().getName().equals("XWiki") &&
+                  docReference.getName().equals("XWikiPreferences")))) {
                 // Since edit rights on these documents would be sufficient for a user to elevate himself to
                 // admin or even programmer, we will instead check for admin access on these documents.
                 // See http://jira.xwiki.org/browse/XWIKI-6987 and http://jira.xwiki.org/browse/XWIKI-2184.

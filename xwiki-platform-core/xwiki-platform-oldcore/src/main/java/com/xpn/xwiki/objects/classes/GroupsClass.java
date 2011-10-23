@@ -91,7 +91,9 @@ public class GroupsClass extends ListClass
     @Override
     public BaseProperty newProperty()
     {
-        return new LargeStringProperty();
+        BaseProperty property = new LargeStringProperty();
+        property.setName(getName());
+        return property;
     }
 
     @Override

@@ -82,7 +82,9 @@ public class LevelsClass extends ListClass
     @Override
     public BaseProperty newProperty()
     {
-        return new StringProperty();
+        BaseProperty property = new StringProperty();
+        property.setName(getName());
+        return property;
     }
 
     @Override

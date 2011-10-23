@@ -17,12 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.store;
+package org.xwiki.store.legacy.store.internal;
 
-import org.xwiki.store.RootTransactionRunnable;
-
+import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import org.xwiki.store.RootTransactionRunnable;
 
 /**
  * A Transaction based on XWikiHibernateStore.

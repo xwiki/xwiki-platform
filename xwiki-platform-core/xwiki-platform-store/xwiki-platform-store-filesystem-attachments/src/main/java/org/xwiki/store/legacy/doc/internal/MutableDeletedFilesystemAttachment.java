@@ -17,13 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.doc;
+package org.xwiki.store.legacy.doc.internal;
 
 import java.util.Date;
 
-import org.xwiki.model.reference.DocumentReference;
-
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.XWikiContext;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * A mutable version of a DeletedFilesystemAttachment, passed around and populated while loading.
@@ -45,7 +45,7 @@ public class MutableDeletedFilesystemAttachment extends DeletedFilesystemAttachm
      */
     public DeletedFilesystemAttachment getImmutable()
     {
-        final DeletedFilesystemAttachment out = new DeletedFilesystemAttachment();
+        final MutableDeletedFilesystemAttachment out = new MutableDeletedFilesystemAttachment();
         out.setId(this.getId());
         out.setDocId(this.getDocId());
         out.setDocName(this.getDocName());

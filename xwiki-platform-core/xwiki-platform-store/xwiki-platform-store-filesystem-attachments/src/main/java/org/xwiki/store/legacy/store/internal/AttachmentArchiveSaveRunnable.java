@@ -17,12 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.store;
+package org.xwiki.store.legacy.store.internal;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.store.FileSaveTransactionRunnable;
 import org.xwiki.store.StartableTransactionRunnable;
@@ -31,11 +35,6 @@ import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.serialization.SerializationStreamProvider;
 import org.xwiki.store.serialization.Serializer;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 
 /**
  * A TransactionRunnable for saving attachment archives.

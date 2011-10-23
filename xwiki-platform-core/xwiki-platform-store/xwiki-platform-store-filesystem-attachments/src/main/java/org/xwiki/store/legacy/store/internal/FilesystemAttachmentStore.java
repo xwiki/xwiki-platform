@@ -17,32 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.store;
+package org.xwiki.store.legacy.store.internal;
 
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.hibernate.Session;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.store.FileDeleteTransactionRunnable;
-import org.xwiki.store.FileSaveTransactionRunnable;
-import org.xwiki.store.StreamProvider;
-import org.xwiki.store.TransactionRunnable;
-import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.FilesystemAttachmentContent;
-import com.xpn.xwiki.doc.ListAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.AttachmentVersioningStore;
+import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import org.hibernate.Session;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.store.FileDeleteTransactionRunnable;
+import org.xwiki.store.FileSaveTransactionRunnable;
+import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
+import org.xwiki.store.legacy.doc.internal.ListAttachmentArchive;
+import org.xwiki.store.StreamProvider;
+import org.xwiki.store.TransactionRunnable;
 
 /**
  * Filesystem based implementation of XWikiAttachmentStoreInterface.

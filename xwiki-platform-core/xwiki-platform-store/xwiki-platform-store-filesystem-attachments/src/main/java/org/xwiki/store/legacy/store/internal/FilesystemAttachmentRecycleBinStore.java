@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.store;
+package org.xwiki.store.legacy.store.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,29 +31,29 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 
+import com.xpn.xwiki.doc.DeletedAttachment;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.AttachmentRecycleBinStore;
+import com.xpn.xwiki.store.AttachmentVersioningStore;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.store.FileDeleteTransactionRunnable;
 import org.xwiki.store.FileSaveTransactionRunnable;
-import org.xwiki.store.StartableTransactionRunnable;
 import org.xwiki.store.filesystem.internal.DeletedAttachmentFileProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
-import org.xwiki.store.serialization.SerializationStreamProvider;
+import org.xwiki.store.legacy.doc.internal.DeletedFilesystemAttachment;
+import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
+import org.xwiki.store.legacy.doc.internal.MutableDeletedFilesystemAttachment;
 import org.xwiki.store.serialization.Serializer;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.DeletedAttachment;
-import com.xpn.xwiki.doc.DeletedFilesystemAttachment;
-import com.xpn.xwiki.doc.FilesystemAttachmentContent;
-import com.xpn.xwiki.doc.MutableDeletedFilesystemAttachment;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
+import org.xwiki.store.serialization.SerializationStreamProvider;
+import org.xwiki.store.StartableTransactionRunnable;
 
 /**
  * Realization of {@link AttachmentRecycleBinStore} for filesystem storage.
@@ -159,7 +159,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
         final String path =
             absolutePath.substring(absolutePath.indexOf(this.fileTools.getStorageLocationPath()));
         final Long id = Long.valueOf(dfa.getId());
-        new StartableTransactionRunnable()
+        (new StartableTransactionRunnable()
         {
             public void onRun()
             {
@@ -170,7 +170,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
             {
                 pathById.remove(id);
             }
-        } .runIn(tr);
+        }).runIn(tr);
 
         // Need to save the updated map right away in case the power goes out or something.
         new FileSaveTransactionRunnable(
@@ -401,7 +401,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
         final String path = deletedAttachDir.getAbsolutePath();
         for (final Long id : pathById.keySet()) {
             if (pathById.get(id).endsWith(path)) {
-                new StartableTransactionRunnable()
+                (new StartableTransactionRunnable()
                 {
                     public void onRun()
                     {
@@ -412,7 +412,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
                     {
                         pathById.put(id, path);
                     }
-                }.runIn(out);
+                }).runIn(out);
                 break;
             }
         }

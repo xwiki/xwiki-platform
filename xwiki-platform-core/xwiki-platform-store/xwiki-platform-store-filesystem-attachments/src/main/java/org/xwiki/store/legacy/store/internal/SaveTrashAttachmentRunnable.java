@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.store;
+package org.xwiki.store.legacy.store.internal;
 
 import java.io.File;
 import java.util.List;
@@ -33,7 +33,7 @@ import org.xwiki.store.serialization.Serializer;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
-import com.xpn.xwiki.doc.DeletedFilesystemAttachment;
+import org.xwiki.store.legacy.doc.internal.DeletedFilesystemAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 

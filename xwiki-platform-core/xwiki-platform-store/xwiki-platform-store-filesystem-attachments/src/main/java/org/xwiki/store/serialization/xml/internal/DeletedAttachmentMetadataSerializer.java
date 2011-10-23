@@ -22,18 +22,16 @@ package org.xwiki.store.serialization.xml.internal;
 import java.io.IOException;
 import java.util.Date;
 
+import com.xpn.xwiki.doc.XWikiAttachment;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.store.legacy.doc.internal.DeletedFilesystemAttachment;
+import org.xwiki.store.legacy.doc.internal.MutableDeletedFilesystemAttachment;
 import org.xwiki.store.serialization.xml.XMLSerializer;
-
-import com.xpn.xwiki.doc.DeletedFilesystemAttachment;
-import com.xpn.xwiki.doc.MutableDeletedFilesystemAttachment;
-import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
  * A serializer for saving the metadata from a deleted XWikiAttachment.

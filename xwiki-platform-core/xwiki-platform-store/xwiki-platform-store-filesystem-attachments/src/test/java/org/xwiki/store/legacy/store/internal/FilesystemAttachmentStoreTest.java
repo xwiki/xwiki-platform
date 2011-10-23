@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.store;
+package org.xwiki.store.legacy.store.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,6 +31,16 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+import com.xpn.xwiki.doc.XWikiAttachmentContent;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.AttachmentVersioningStore;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import org.apache.commons.io.IOUtils;
 import org.hibernate.Session;
 import org.jmock.Expectations;
@@ -51,15 +61,6 @@ import org.xwiki.store.filesystem.internal.DefaultFilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.locks.preemptive.internal.PreemptiveLockProvider;
 import org.xwiki.test.AbstractMockingComponentTestCase;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.FilesystemAttachmentContent;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentArchive;
-import com.xpn.xwiki.doc.XWikiAttachmentContent;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * Tests for FilesystemAttachmentStore.

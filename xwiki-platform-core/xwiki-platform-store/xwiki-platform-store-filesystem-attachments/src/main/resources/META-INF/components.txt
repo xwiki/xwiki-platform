@@ -1,7 +1,7 @@
 org.xwiki.model.internal.reference.PathStringEntityReferenceSerializer
-com.xpn.xwiki.store.FilesystemAttachmentStore
-com.xpn.xwiki.store.FilesystemAttachmentVersioningStore
-com.xpn.xwiki.store.FilesystemAttachmentRecycleBinStore
+org.xwiki.store.legacy.store.internal.FilesystemAttachmentStore
+org.xwiki.store.legacy.store.internal.FilesystemAttachmentVersioningStore
+org.xwiki.store.legacy.store.internal.FilesystemAttachmentRecycleBinStore
 org.xwiki.store.filesystem.internal.DefaultFilesystemStoreTools
 org.xwiki.store.serialization.xml.internal.DeletedAttachmentMetadataSerializer
 org.xwiki.store.serialization.xml.internal.DeletedAttachmentIdMappingSerializer

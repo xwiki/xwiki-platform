@@ -17,14 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.doc;
+package org.xwiki.store.legacy.doc.internal;
 
 import java.util.Date;
 
-import org.xwiki.model.reference.DocumentReference;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.DeletedAttachment;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+import com.xpn.xwiki.doc.XWikiAttachmentContent;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Filesystem based Archive of deleted attachment,

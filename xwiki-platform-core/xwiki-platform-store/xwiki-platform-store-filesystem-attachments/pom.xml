@@ -125,8 +125,8 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-            <!-- This is excluded because of a fan out violation. TODO: FIX! -->
-            **/com/xpn/xwiki/store/FilesystemAttachmentRecycleBinStore.java
+            <!-- Fan-out violation in an implementation of a legacy interface. -->
+            **/legacy/store/internal/FilesystemAttachmentRecycleBinStore.java
           </excludes>
         </configuration>
       </plugin>

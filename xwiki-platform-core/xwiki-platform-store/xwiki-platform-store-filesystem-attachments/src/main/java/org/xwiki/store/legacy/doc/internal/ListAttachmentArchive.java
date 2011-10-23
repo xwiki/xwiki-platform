@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.doc;
+package org.xwiki.store.legacy.doc.internal;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -26,13 +26,14 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.rcs.impl.Node;
 import org.suigeneris.jrcs.util.ToString;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 
 /**
  * Implementation of an archive for XWikiAttachment based on a simple list of XWikiAttachments.

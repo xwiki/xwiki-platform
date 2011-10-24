@@ -25,6 +25,8 @@ import java.util.Vector;
 
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.phase.Initializable;
@@ -46,6 +48,7 @@ import org.xwiki.rest.XWikiResource;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.Property;
 import com.xpn.xwiki.objects.classes.ListClass;
@@ -175,8 +178,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         return extensionDocument.getObject(XWikiRepositoryModel.EXTENSION_CLASSNAME);
     }
 
-    protected com.xpn.xwiki.api.Object getExtensionObject(String extensionId, String extensionVersion)
-        throws XWikiException, QueryException
+    protected com.xpn.xwiki.api.Object getExtensionObject(String extensionId) throws XWikiException, QueryException
     {
         return getExtensionObject(getExtensionDocument(extensionId));
     }
@@ -224,7 +226,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             }
 
             extension = extensionVersion = this.objectFactory.createExtensionVersion();
-            extensionVersion.setVersion((String) getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_VERSION));
+            extensionVersion.setVersion((String) getValue(extensionVersionObject,
+                XWikiRepositoryModel.PROP_VERSION_VERSION));
         }
 
         extension.setId((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ID));
@@ -239,15 +242,19 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setName((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_NAME));
         extension.setWebsite((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE));
 
-        extension.getAuthors().addAll((List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS));
-        extension.getFeatures().addAll((List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_FEATURES));
+        extension.getAuthors().addAll(
+            (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS));
+        extension.getFeatures().addAll(
+            (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_FEATURES));
 
         if (extensionVersion != null) {
             for (com.xpn.xwiki.api.Object dependencyObject : extensionDocument.getObjects(
-                XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME, XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, version)) {
+                XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME,
+                XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, version)) {
                 ExtensionDependency dependency = new ExtensionDependency();
                 dependency.setId((String) getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_ID));
-                dependency.setVersion((String) getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_VERSION));
+                dependency
+                    .setVersion((String) getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_VERSION));
 
                 extensionVersion.getDependencies().add(dependency);
             }
@@ -339,5 +346,20 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     protected XWikiContext getXWikiContext()
     {
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+    }
+
+    protected ResponseBuilder getAttachmentResponse(Attachment xwikiAttachment) throws XWikiException
+    {
+        if (xwikiAttachment == null) {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
+
+        ResponseBuilder response = Response.ok();
+
+        response.type(xwikiAttachment.getMimeType());
+        response.entity(xwikiAttachment.getContent());
+        response.header("Content-Disposition", "attachment; filename=\"" + xwikiAttachment.getFilename() + "\"");
+
+        return response;
     }
 }

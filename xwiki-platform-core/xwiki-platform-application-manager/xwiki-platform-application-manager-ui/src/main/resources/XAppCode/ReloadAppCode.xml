@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>XAppCode</web>
 <name>ReloadAppCode</name>
@@ -19,8 +18,10 @@
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment></comment>
+<comment>Imported from XAR</comment>
 <minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
 <content>#if($action &amp;&amp; $action == "reload")
   #set($result = $AppManager.reloadApplication($appname))
   #if ($result == $Exception.ERROR_NOERROR)

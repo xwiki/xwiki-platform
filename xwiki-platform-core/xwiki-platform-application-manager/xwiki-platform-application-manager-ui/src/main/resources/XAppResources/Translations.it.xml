@@ -18,12 +18,11 @@
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment></comment>
+<comment>Imported from XAR</comment>
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language it generated from http://www.l10n.xwiki.org
-#Wed Oct 05 19:18:47 CEST 2011
 xapp.action.exportnonrecurse=Esporta (non ricorsivamente)
 xapp.action.exportrecurse=Esporta
 xapp.action.reloadapp=Ricarica
@@ -39,15 +38,15 @@ xapp.createapplication=Crea una nuova applicazione
 xapp.description=Descrizione
 xapp.docname=Nome documento
 xapp.errorcreateapp=Errore durante la creazione dell''applicazione "{0}" (codice "{1}").
-xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=L''applicazione "{0}" esiste già. Scegliere un altro nome.
+xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=L''applicazione "{0}" esiste gi\u00E0. Scegliere un altro nome.
 xapp.errordeleteapp=Errore durante l''eliminazione dell''applicazione "{0}" (codice "{1}").
 xapp.errorexportapp=Errore durante l''esportazione dell''applicazione "{0}" (codice "{1}").
 xapp.errorimportapp=Errore durante l''importazione del pacchetto dell''applicazione "{0}" (codice "{1}")
 xapp.errorreloadapp=Errore durante il ricaricamento dell''applicazione "{0}" (codice "{1}").
 xapp.legend.application=Applicazione
 xapp.legend.validate=Validazione
-xapp.pluginnotenabled=Il plugin Application Manager non è abilitato. Questa pagina non funzionerà correttamente. Assicurarsi che "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" sia elencato tra i parametri di xwiki.plugins nel file xwiki.cfg.
-xapp.successcreateapp=È stata creata l''applicazione "{0}". Vi si può accedere tramite [{1}].
+xapp.pluginnotenabled=Il plugin Application Manager non \u00E8 abilitato. Questa pagina non funzioner\u00E0 correttamente. Assicurarsi che "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" sia elencato tra i parametri di xwiki.plugins nel file xwiki.cfg.  
+xapp.successcreateapp=\u00C8 stata creata l''applicazione "{0}". Vi si pu\u00F2 accedere tramite [{1}].
 xapp.successdeleteapp=Eliminazione dell''applicazione "{0}" riuscita.
 xapp.successexportapp=Esportazione dell''applicazione "{0}" riuscita.
 xapp.successimportapp=Importazione del pacchetto dell''applicazione "{0}" riuscita.

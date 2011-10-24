@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>XAppClasses</web>
 <name>XWikiApplicationClass</name>
@@ -12,15 +11,17 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1192211384000</creationDate>
-<date>1200775298000</date>
-<contentUpdateDate>1205423816000</contentUpdateDate>
+<date>1312816344000</date>
+<contentUpdateDate>1312816344000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment></comment>
+<comment>Imported from XAR</comment>
 <minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
 <class>
 <name>XAppClasses.XWikiApplicationClass</name>
 <customClass></customClass>
@@ -31,6 +32,7 @@
 <nameField></nameField>
 <validationScript></validationScript>
 <appauthors>
+<disabled>0</disabled>
 <name>appauthors</name>
 <number>10</number>
 <prettyName>Authors</prettyName>
@@ -41,6 +43,7 @@
 <applications>
 <cache>0</cache>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <displayType>input</displayType>
 <multiSelect>1</multiSelect>
 <name>applications</name>
@@ -61,6 +64,7 @@
 </applications>
 <appname>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <name>appname</name>
 <number>1</number>
 <prettyName>Application Name</prettyName>
@@ -72,6 +76,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </appname>
 <appprettyname>
+<disabled>0</disabled>
 <name>appprettyname</name>
 <number>12</number>
 <prettyName>Application Pretty Name</prettyName>
@@ -81,6 +86,7 @@
 </appprettyname>
 <appversion>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <name>appversion</name>
 <number>3</number>
 <prettyName>Application Version</prettyName>
@@ -94,6 +100,7 @@
 <dependencies>
 <cache>0</cache>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <displayType>input</displayType>
 <multiSelect>1</multiSelect>
 <name>dependencies</name>
@@ -115,6 +122,7 @@
 <description>
 <contenttype>FullyRenderedText</contenttype>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <editor>---</editor>
 <name>description</name>
 <number>2</number>
@@ -130,6 +138,7 @@
 <docstoinclude>
 <cache>0</cache>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <displayType>input</displayType>
 <multiSelect>1</multiSelect>
 <name>docstoinclude</name>
@@ -151,6 +160,7 @@
 <docstolink>
 <cache>0</cache>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <displayType>input</displayType>
 <multiSelect>1</multiSelect>
 <name>docstolink</name>
@@ -172,6 +182,7 @@
 <documents>
 <cache>0</cache>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <displayType>input</displayType>
 <multiSelect>1</multiSelect>
 <name>documents</name>
@@ -191,6 +202,7 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </documents>
 <license>
+<disabled>0</disabled>
 <name>license</name>
 <number>11</number>
 <prettyName>License</prettyName>
@@ -201,6 +213,7 @@
 <translationdocs>
 <cache>0</cache>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <displayType>input</displayType>
 <multiSelect>1</multiSelect>
 <name>translationdocs</name>

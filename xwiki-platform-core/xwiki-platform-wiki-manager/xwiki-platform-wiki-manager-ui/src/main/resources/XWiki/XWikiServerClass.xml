@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>XWiki</web>
 <name>XWikiServerClass</name>
@@ -12,16 +11,17 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1187881140000</creationDate>
-<date>1213885467000</date>
-<contentUpdateDate>1213885467000</contentUpdateDate>
-<version>1.1</version>
+<date>1312816343000</date>
+<contentUpdateDate>1312816343000</contentUpdateDate>
+<version>2.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment></comment>
+<comment>Imported from XAR</comment>
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
 <class>
 <name>XWiki.XWikiServerClass</name>
 <customClass></customClass>
@@ -34,6 +34,7 @@
 <description>
 <contenttype>FullyRenderedText</contenttype>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <editor>---</editor>
 <name>description</name>
 <number>2</number>
@@ -49,6 +50,7 @@
 </description>
 <homepage>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <name>homepage</name>
 <number>8</number>
 <picker>0</picker>
@@ -63,6 +65,7 @@
 <iswikitemplate>
 <customDisplay></customDisplay>
 <defaultValue>0</defaultValue>
+<disabled>0</disabled>
 <displayFormType>select</displayFormType>
 <displayType>checkbox</displayType>
 <name>iswikitemplate</name>
@@ -77,6 +80,7 @@
 <language>
 <cache>0</cache>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>language</name>
@@ -98,6 +102,7 @@
 <owner>
 <cache>0</cache>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>owner</name>
@@ -119,6 +124,7 @@
 <secure>
 <customDisplay></customDisplay>
 <defaultValue>0</defaultValue>
+<disabled>0</disabled>
 <displayFormType>select</displayFormType>
 <displayType>checkbox</displayType>
 <name>secure</name>
@@ -132,6 +138,7 @@
 </secure>
 <server>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <name>server</name>
 <number>3</number>
 <picker>0</picker>
@@ -146,6 +153,7 @@
 <state>
 <cache>0</cache>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>state</name>
@@ -167,6 +175,7 @@
 <visibility>
 <cache>0</cache>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>visibility</name>
@@ -187,6 +196,7 @@
 </visibility>
 <wikiprettyname>
 <customDisplay></customDisplay>
+<disabled>0</disabled>
 <name>wikiprettyname</name>
 <number>9</number>
 <picker>0</picker>

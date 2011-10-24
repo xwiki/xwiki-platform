@@ -18,10 +18,9 @@
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment></comment>
+<comment>Imported from XAR</comment>
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language cs generated from http://www.l10n.xwiki.org
-#Wed Oct 05 19:18:38 CEST 2011
 </content></xwikidoc>

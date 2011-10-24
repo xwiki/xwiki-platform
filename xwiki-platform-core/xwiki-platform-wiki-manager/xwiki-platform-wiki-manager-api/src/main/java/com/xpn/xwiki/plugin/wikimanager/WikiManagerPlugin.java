@@ -66,29 +66,18 @@ public class WikiManagerPlugin extends XWikiDefaultPlugin
         super(PLUGIN_NAME, className, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public void init(XWikiContext context)
     {
         super.init(context);
 
-        searchPlugin = context.getWiki().getPlugin(GlobalSearchPlugin.PLUGIN_NAME, context);
-        if (searchPlugin == null) {
-            searchPlugin =
+        this.searchPlugin = context.getWiki().getPlugin(GlobalSearchPlugin.PLUGIN_NAME, context);
+        if (this.searchPlugin == null) {
+            this.searchPlugin =
                 new GlobalSearchPlugin(GlobalSearchPlugin.PLUGIN_NAME, GlobalSearchPlugin.class.getName(), context);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface,
-     *      com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public com.xpn.xwiki.api.Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {

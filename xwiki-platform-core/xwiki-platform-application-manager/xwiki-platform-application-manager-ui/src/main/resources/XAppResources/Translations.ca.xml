@@ -18,39 +18,38 @@
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment></comment>
+<comment>Imported from XAR</comment>
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language ca generated from http://www.l10n.xwiki.org
-#Wed Oct 05 19:18:36 CEST 2011
 xapp.action.exportnonrecurse=Exportar (sense recursivitat)
 xapp.action.exportrecurse=Exportar
 xapp.action.reloadapp=Recarregar
-xapp.answer.deleteapp.msg=Esteu segurs que desitgeu eliminar l''aplicació “{0}”?
-xapp.answer.deleteapp.title=Eliminar l''aplicació "{0}"
+xapp.answer.deleteapp.msg=Esteu segurs que desitgeu eliminar l''aplicaci\u00F3 \u201C{0}\u201D?
+xapp.answer.deleteapp.title=Eliminar l''aplicaci\u00F3 "{0}"
 xapp.answer.exportapp.recursive=Recursiu
-xapp.answer.exportapp.title=Exportar l''aplicació "{0}"
-xapp.answer.exportapp.withdetails=Amb històric
+xapp.answer.exportapp.title=Exportar l''aplicaci\u00F3 "{0}"
+xapp.answer.exportapp.withdetails=Amb hist\u00F2ric
 xapp.appmanager=Gestor d'aplicacions
-xapp.appname=Nom de l'aplicació
+xapp.appname=Nom de l'aplicaci\u00F3
 xapp.availablefilestoimport=Fitxers disponibles per a importar
-xapp.createapplication=Crear nova aplicació
-xapp.description=Descripció
+xapp.createapplication=Crear nova aplicaci\u00F3
+xapp.description=Descripci\u00F3
 xapp.docname=Nom del document
-xapp.errorcreateapp=S''ha produït un error mentre es creava l''aplicació "{0}" (codi "{1}").
-xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=L''aplicació "{0}" ja existeix. Trieu un altre nom.
-xapp.errordeleteapp=S''ha produït un error mentre s''eliminava l''aplicació "{0}" (codi "{1}").
-xapp.errorexportapp=S''ha produït un error mentre s''exportava l''aplicació "{0}" (codi "{1}").
-xapp.errorimportapp=S''ha produït un error mentre s''importava el paquet de l''aplicació "{0}" (codi "{1}").
-xapp.errorreloadapp=S''ha produït un error mentre es recarregava l''aplicació "{0}" (codi "{1}").
-xapp.legend.application=Aplicació
+xapp.errorcreateapp=S''ha produ\u00EFt un error mentre es creava l''aplicaci\u00F3 "{0}" (codi "{1}").  
+xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=L''aplicaci\u00F3 "{0}" ja existeix. Trieu un altre nom.  
+xapp.errordeleteapp=S''ha produ\u00EFt un error mentre s''eliminava l''aplicaci\u00F3 "{0}" (codi "{1}").  
+xapp.errorexportapp=S''ha produ\u00EFt un error mentre s''exportava l''aplicaci\u00F3 "{0}" (codi "{1}").  
+xapp.errorimportapp=S''ha produ\u00EFt un error mentre s''importava el paquet de l''aplicaci\u00F3 "{0}" (codi "{1}").  
+xapp.errorreloadapp=S''ha produ\u00EFt un error mentre es recarregava l''aplicaci\u00F3 "{0}" (codi "{1}").  
+xapp.legend.application=Aplicaci\u00F3
 xapp.legend.validate=Validar
-xapp.pluginnotenabled=L'extensió del gestor d'aplicacions no està habilitat. Aquesta pàgina no funcionarà correctament. Assegureu-vos que "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" estigui llistat al paràmetre xwiki.plugins en el fitxer xwiki.cfg.
-xapp.successcreateapp=L''aplicació "{0}" ha estat creada. Podeu accedir-hi a [{1}].
-xapp.successdeleteapp=Acció d''eliminar l''aplicació "{0}" amb vistiplau.
-xapp.successexportapp=Acció d''exportar l''aplicació "{0}" amb vistiplau.
-xapp.successimportapp=Acció d''importar el paquet de l''aplicació "{0}" amb vistiplau.
-xapp.successreloadapp=Acció de recarregar l''aplicació "{0}" amb vistiplau.
+xapp.pluginnotenabled=L'extensi\u00F3 del gestor d'aplicacions no est\u00E0 habilitat. Aquesta p\u00E0gina no funcionar\u00E0 correctament. Assegureu-vos que "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" estigui llistat al par\u00E0metre xwiki.plugins en el fitxer xwiki.cfg.
+xapp.successcreateapp=L''aplicaci\u00F3 "{0}" ha estat creada. Podeu accedir-hi a [{1}].  
+xapp.successdeleteapp=Acci\u00F3 d''eliminar l''aplicaci\u00F3 "{0}" amb vistiplau.  
+xapp.successexportapp=Acci\u00F3 d''exportar l''aplicaci\u00F3 "{0}" amb vistiplau.  
+xapp.successimportapp=Acci\u00F3 d''importar el paquet de l''aplicaci\u00F3 "{0}" amb vistiplau.  
+xapp.successreloadapp=Acci\u00F3 de recarregar l''aplicaci\u00F3 "{0}" amb vistiplau.  
 xapp.totalnumberofapp=Nombre total d'aplicacions
 </content></xwikidoc>

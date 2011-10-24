@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1312816151000</creationDate>
-<date>1319447090000</date>
-<contentUpdateDate>1319447090000</contentUpdateDate>
+<date>1319453835000</date>
+<contentUpdateDate>1319453835000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -48,6 +48,137 @@
 <guid>d46f1a2c-2119-4547-9cde-d2341243f2d1</guid>
 <property>
 <defaultEditMode></defaultEditMode>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>ExtensionCode.ExtensionClassSheet</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>81c75796-1c78-4bf7-a8e0-a6575384e796</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>#template('colorThemeInit.vm')
+
+.box, div.floatinginfobox {
+  background-color: #fafafa;
+}
+
+.box.floatinginfobox {
+  margin-top: 0;
+}
+
+.extensionSummary {
+  background-color: $theme.backgroundSecondaryColor;
+  border: 1px dotted $theme.borderColor;
+  padding: 5px;
+  display: block;
+}
+
+.errormessage, .warningmessage, .infomessage, .plainmessage {
+  background-color: $theme.backgroundSecondaryColor;
+}
+
+.main .extensionInfo {
+  margin: 0;
+}
+
+.label {
+  font-size: 0.85em;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.toc .label {
+  display: block;
+  margin-top: 1.1em;
+  padding: 0 1em;
+}
+
+.toc ul {
+  margin-top: 0;
+}</code>
+</property>
+<property>
+<name>Extension CSS</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>always</use>
 </property>
 </object>
 <content>{{velocity output="false"}}
@@ -160,16 +291,8 @@
     |Title|{{html}}&lt;input type="text" name="title" size="75" value="$escapetool.xml($doc.getName())" /&gt;{{/html}}
     |Type|$doc.display("type")
     |Summary|$doc.display("summary")
-    |Bundled With|$doc.display("bundledWith")
-    |Supported by the XWiki Development Team|$doc.display("supported")
-    |Contributors(((
-(Only specify if not supported by the XWiki Development Team
-Separate different contributors with commas)
-)))|$doc.display("contributors")
-    |License(((
-(Only specify if not supported by the XWiki Development Team)
-)))|$doc.display("license")
-    |Compatibility|$doc.display("compatibility")
+    |Authors|$doc.display("authors")
+    |License|$doc.display("licenseName")
     |Source|$doc.display("source")
     |Display Icon Location(((
 (Syntax: #set($comment = '##')${comment}icon:{{html}}&lt;a href="http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png" target="_blank"&gt;icon name&lt;/a&gt;{{/html}}${comment})

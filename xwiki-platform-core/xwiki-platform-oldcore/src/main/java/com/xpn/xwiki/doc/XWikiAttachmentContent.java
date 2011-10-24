@@ -56,6 +56,7 @@ public class XWikiAttachmentContent implements Cloneable
     {
         this.file = original.file;
         this.attachment = original.attachment;
+        this.isContentDirty = original.isContentDirty;
     }
 
     /**

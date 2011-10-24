@@ -3426,7 +3426,10 @@ public class XWikiDocument implements DocumentModelBridge
             XWikiAttachment newattachment = (XWikiAttachment) attachment.clone();
             newattachment.setDoc(this);
 
-            // TODO: Why must attachment content must be set dirty --cjdelisle
+            // We need to set the content of the attachment to be dirty because the dirty bit
+            // is used to signal that there is a reason to save the attachment and while the
+            // old attachment has already been saved so there is not, the copy has not been
+            // saved so it should be.
             if (newattachment.getAttachment_content() != null) {
                 newattachment.getAttachment_content().setContentDirty(true);
             }

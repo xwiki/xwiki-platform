@@ -71,6 +71,9 @@
 .controlPagination a.prevPagination:hover, .controlPagination a.nextPagination:hover {
   cursor: pointer;
 }
+.controlPagination a.noPrevPagination:hover, .controlPagination a.noNextPagination:hover {
+  cursor: default;
+}
 .controlPagination a.prevPagination {
   background-position: left top;
 }

@@ -722,6 +722,36 @@ var LiveTablePagination = Class.create({
              elem.insert(self.createPageLink(pages, false));
         });
       }
+      if (currentPage <= 1) {
+        this.pagesNodes.each(function(item) {
+          var prevPage = item.up().previous('.controlPagination').down('.prevPagination');
+          if (prevPage) {
+            prevPage.addClassName('noPrevPagination').removeClassName('prevPagination');
+          }
+        });
+      } else {
+        this.pagesNodes.each(function(item) {
+          var prevPage = item.up().previous('.controlPagination').down('.noPrevPagination');
+          if (prevPage) {
+            prevPage.addClassName('prevPagination').removeClassName('noPrevPagination');
+          }
+        });
+      }
+      if (currentPage >= pages) {
+        this.pagesNodes.each(function(item) {
+          var nextPage = item.up().previous('.controlPagination').down('.nextPagination');
+          if (nextPage) {
+            nextPage.addClassName('noNextPagination').removeClassName('nextPagination');
+          }
+        });
+      } else {
+        this.pagesNodes.each(function(item) {
+          var nextPage = item.up().previous('.controlPagination').down('.noNextPagination');
+          if (nextPage) {
+            nextPage.addClassName('nextPagination').removeClassName('noNextPagination');
+          }
+        });
+      }
     },
     createPageLink:function(page, selected) {
         var pageSpan = new Element("a", {'class':'pagenumber', 'href':'#'}).update(page);

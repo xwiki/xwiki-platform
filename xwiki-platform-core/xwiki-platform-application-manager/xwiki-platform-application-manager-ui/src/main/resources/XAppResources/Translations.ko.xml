@@ -18,9 +18,10 @@
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment>Imported from XAR</comment>
+<comment></comment>
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language ko generated from http://www.l10n.xwiki.org
+#Mon Oct 24 18:49:22 CEST 2011
 </content></xwikidoc>

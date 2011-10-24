@@ -18,38 +18,39 @@
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment>Imported from XAR</comment>
+<comment></comment>
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language es generated from http://www.l10n.xwiki.org
+#Mon Oct 24 18:49:16 CEST 2011
 xapp.action.exportnonrecurse=Exportar (no recursivo)
 xapp.action.exportrecurse=Exportar
 xapp.action.reloadapp=Recargar
-xapp.answer.deleteapp.msg=\u00BFEst\u00E1 seguro(a) que quiere borrar la apliaci\u00F3n "{0}"?
-xapp.answer.deleteapp.title=Borrar aplicaci\u00F3n "{0}"
+xapp.answer.deleteapp.msg=¿Está seguro(a) que quiere borrar la apliación "{0}"?
+xapp.answer.deleteapp.title=Borrar aplicación "{0}"
 xapp.answer.exportapp.recursive=Recursiva
-xapp.answer.exportapp.title=Exportar aplicaci\u00F3n "{0}"
+xapp.answer.exportapp.title=Exportar aplicación "{0}"
 xapp.answer.exportapp.withdetails=Con historial
 xapp.appmanager=Administrador de aplicaciones
-xapp.appname=Nombre de aplicaci\u00F3n
+xapp.appname=Nombre de aplicación
 xapp.availablefilestoimport=Ficheros disponibles para importar
-xapp.createapplication=Crear nueva aplicaci\u00F3n
-xapp.description=Descripci\u00F3n
+xapp.createapplication=Crear nueva aplicación
+xapp.description=Descripción
 xapp.docname=Nombre del documento
-xapp.errorcreateapp=Se ha producido un error creando la aplicaci\u00F3n "{0}" (c\u00F3digo "{1}").
-xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=Ya existe la aplicaci\u00F3n "{0}". Escoja otro nombre.
-xapp.errordeleteapp=Se ha producido un error borrando la aplicaci\u00F3n "{0}" (c\u00F3digo "{1}").
-xapp.errorexportapp=Se ha producido un error exportando la aplicaci\u00F3n "{0}" (c\u00F3digo "{1}").
-xapp.errorimportapp=Se ha producido un error importando el paquete de aplicaci\u00F3n "{0}" (c\u00F3digo "{1}").
-xapp.errorreloadapp=Se ha producido un error recargando la aplicaci\u00F3n "{0}" (c\u00F3digo "{1}").
-xapp.legend.application=Aplicaci\u00F3n
+xapp.errorcreateapp=Se ha producido un error creando la aplicación "{0}" (código "{1}").
+xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=Ya existe la aplicación "{0}". Escoja otro nombre.
+xapp.errordeleteapp=Se ha producido un error borrando la aplicación "{0}" (código "{1}").
+xapp.errorexportapp=Se ha producido un error exportando la aplicación "{0}" (código "{1}").
+xapp.errorimportapp=Se ha producido un error importando el paquete de aplicación "{0}" (código "{1}").
+xapp.errorreloadapp=Se ha producido un error recargando la aplicación "{0}" (código "{1}").
+xapp.legend.application=Aplicación
 xapp.legend.validate=Validar
 xapp.pluginnotenabled=El plugin APplication Manager no esta habilitado. Asegurese que &lt;tt&gt;com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin&lt;/tt&gt; aparece en la lista de &lt;tt&gt;xwiki.plugins&lt;/tt&gt; en el fichero 
-xapp.successcreateapp=Creada la aplicaci\u00F3n "{0}". Puede acceder a ella en [{1}].
-xapp.successdeleteapp=Se ha borrado la aplicaci\u00F3n "{0}" con \u00E9xito.
-xapp.successexportapp=Se ha exportado la aplicaci\u00F3n "{0}" con \u00E9xito.
-xapp.successimportapp=Se ha importado el paquete de aplicaci\u00F3n "{0}" con \u00E9xito.
-xapp.successreloadapp=Se ha recargado la aplicaci\u00F3n "{0}" con \u00E9xito.
-xapp.totalnumberofapp=N\u00FAmero total de aplicaciones
+xapp.successcreateapp=Creada la aplicación "{0}". Puede acceder a ella en [{1}].
+xapp.successdeleteapp=Se ha borrado la aplicación "{0}" con éxito.
+xapp.successexportapp=Se ha exportado la aplicación "{0}" con éxito.
+xapp.successimportapp=Se ha importado el paquete de aplicación "{0}" con éxito.
+xapp.successreloadapp=Se ha recargado la aplicación "{0}" con éxito.
+xapp.totalnumberofapp=Número total de aplicaciones
 </content></xwikidoc>

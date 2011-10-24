@@ -34,7 +34,7 @@ import org.xwiki.test.AbstractComponentTestCase;
  * @version $Id$
  * @since 2.2M1
  */
-public class CompactWikiEntityReferenceSerializerTest extends AbstractComponentTestCase
+public class CompactWikiStringEntityReferenceSerializerTest extends AbstractComponentTestCase
 {
     private EntityReferenceSerializer<EntityReference> serializer;
 

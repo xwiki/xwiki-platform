@@ -20,7 +20,6 @@
 package com.xpn.xwiki.internal.model.reference;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
@@ -29,19 +28,18 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
- * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver}.
+ * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CompactStringEntityReferenceSerializer}.
  * 
  * @version $Id$
- * @since 2.2M1
  */
-public class CompactEntityReferenceSerializerTest extends AbstractBridgedXWikiComponentTestCase
+public class CompactStringEntityReferenceSerializerTest extends AbstractBridgedComponentTestCase
 {
     private EntityReferenceSerializer<EntityReference> serializer;
 
-    @Before
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();
@@ -145,6 +143,7 @@ public class CompactEntityReferenceSerializerTest extends AbstractBridgedXWikiCo
 
         getContext().setDatabase("wiki");
         getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
-        Assert.assertEquals("space.page", this.serializer.serialize(reference, new EntityReference("otherspace", EntityType.SPACE)));
+        Assert.assertEquals("space.page",
+            this.serializer.serialize(reference, new EntityReference("otherspace", EntityType.SPACE)));
     }
 }

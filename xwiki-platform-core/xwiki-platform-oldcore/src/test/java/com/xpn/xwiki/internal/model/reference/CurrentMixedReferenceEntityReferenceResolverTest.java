@@ -19,22 +19,22 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+
 /**
  * Unit tests for {@link CurrentMixedReferenceEntityReferenceResolver}.
- *
+ * 
  * @version $Id$
- * @since 2.3M1
  */
-public class CurrentMixedReferenceEntityReferenceResolverTest extends AbstractBridgedXWikiComponentTestCase
+public class CurrentMixedReferenceEntityReferenceResolverTest extends AbstractBridgedComponentTestCase
 {
     private static final String CURRENT_WIKI = "currentwiki";
 
@@ -44,7 +44,7 @@ public class CurrentMixedReferenceEntityReferenceResolverTest extends AbstractBr
 
     private EntityReferenceResolver<EntityReference> resolver;
 
-    @Before
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();
@@ -52,14 +52,14 @@ public class CurrentMixedReferenceEntityReferenceResolverTest extends AbstractBr
         this.resolver = getComponentManager().lookup(EntityReferenceResolver.class, "currentmixed/reference");
     }
 
-    @org.junit.Test
+    @Test
     public void testResolveAttachmentReferenceWhenMissingParentsAndContextDocument()
     {
         getContext().setDatabase(CURRENT_WIKI);
         getContext().setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)));
 
         EntityReference reference =
-                resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
+            resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
 
         Assert.assertEquals("WebHome", reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());

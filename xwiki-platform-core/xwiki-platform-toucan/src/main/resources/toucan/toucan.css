@@ -410,10 +410,10 @@ table td {
 
 /* special formatting of a wiki table */
 .mceContentBody table,
-    .main table {
-    font-size: 1em;
-    border-color: #e5eff8;
-    margin: 1em 0;
+.main table {
+  font-size: 1em;
+  border-collapse: collapse;
+  margin: 1em 0 1em 1px;
 }
 
 .mceContentBody caption,
@@ -427,8 +427,11 @@ table td {
 }
 
 .mceContentBody table tr td,
-    .main table tr td {
-    vertical-align: middle;
+.main table tr td {
+  border: 1px solid #CCC;
+  color: #444;
+  padding: 3px 4px;
+  vertical-align: middle;
 }
 
 .mceContentBody table tr td em,
@@ -442,25 +445,17 @@ table td {
     background: #f7fbff
 }
 
-.mceContentBody td,
-    .main td {
-    color: #4e6172;
-    border-color: #e5eff8;
-    padding: 3px 4px;
-    border-width: 1px;
-    border-style: solid;
-}
-
 .mceContentBody tr.table-head td,
-    .main th {
-    border-color: #e5eff8;
-    padding: .3em 0.5em;
-    background: #f4f9fe;
-    text-align: center;
-    font: bold 1.2em / 1.4em Arial, Helvetica, sans-serif;
-    color: #66a3d3;
-    border-width: 1px;
-    border-style: solid;
+.main th {
+  background: #EEE;
+  border-color: #CCC;
+  border-style: solid;
+  border-width: 3px 1px;
+  padding: .3em .5em;
+  text-align: center;
+  font: bold 1em Arial, Helvetica, sans-serif;
+  line-height: 1em;
+  color: #888;
 }
 
 table.xwikilogintable th {

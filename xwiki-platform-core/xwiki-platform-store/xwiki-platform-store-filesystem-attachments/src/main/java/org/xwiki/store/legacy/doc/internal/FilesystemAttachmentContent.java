@@ -23,13 +23,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
+import org.xwiki.store.UnexpectedException;
 
 /**
  * The content of an attachment. This implementation is based on a file on the filesystem.
@@ -47,33 +46,23 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     private final File storageFile;
 
     /**
-     * A lock which is locked when the attachment content is being read.
-     */
-    private final ReadWriteLock lock;
-
-    /**
      * The Constructor.
      *
      * @param storage the file where the data is stored.
      * @param attachment the attachment to associate this content with.
-     * @param lock this will be locked for reading when the attachment file is being read.
      */
-    public FilesystemAttachmentContent(final File storage,
-        final XWikiAttachment attachment,
-        final ReadWriteLock lock)
+    public FilesystemAttachmentContent(final File storage, final XWikiAttachment attachment)
     {
         // TODO This will cause a new FileItem to be created in XWikiAttachmentContent
         // but it is the only constructor available. This should be fixed in XAC.
         super(attachment);
-
         this.storageFile = storage;
-        this.lock = lock;
     }
 
     @Override
     public FilesystemAttachmentContent clone()
     {
-        return new FilesystemAttachmentContent(this.storageFile, this.getAttachment(), this.lock);
+        return new FilesystemAttachmentContent(this.storageFile, this.getAttachment());
     }
 
     @Override
@@ -93,43 +82,10 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     @Override
     public InputStream getContentInputStream()
     {
-        /** An InputStream which locks a lock while it is being read. */
-        final class LockingFileInputStream extends FileInputStream
-        {
-            /** The lock to lock while reading the file. */
-            private Lock lock;
-
-            /**
-             * The Constructor.
-             *
-             * @param toRead the file for this stream to read.
-             * @param lock the lock to lock on creation of the stream and unlock when it is closed.
-             * @throws IOException if the extended FileInputStream throws one.
-             */
-            public LockingFileInputStream(final File toRead, final Lock lock) throws IOException
-            {
-                super(toRead);
-                this.lock = lock;
-                lock.lock();
-            }
-
-            /** {@inheritDoc} */
-            public void close() throws IOException
-            {
-                // Make sure this only happens once.
-                if (this.lock != null) {
-                    super.close();
-                    this.lock.unlock();
-                    this.lock = null;
-                }
-            }
-        }
-
         try {
-            return new AutoCloseInputStream(
-                new LockingFileInputStream(this.storageFile, this.lock.readLock()));
+            return new AutoCloseInputStream(new FileInputStream(this.storageFile));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to get InputStream", e);
+            throw new UnexpectedException("Failed to get InputStream", e);
         }
     }
 

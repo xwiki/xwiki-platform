@@ -451,10 +451,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
 
         final File contentFile = provider.getAttachmentContentFile();
         final XWikiAttachment attachment = delAttach.getAttachment();
-        attachment.setAttachment_content(
-            new FilesystemAttachmentContent(contentFile,
-                attachment,
-                this.fileTools.getLockForFile(contentFile)));
+        attachment.setAttachment_content(new FilesystemAttachmentContent(contentFile, attachment));
 
         attachment.setAttachment_archive(
             ((FilesystemAttachmentVersioningStore) this.attachmentVersionStore)

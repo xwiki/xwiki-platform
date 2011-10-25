@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>ExtensionCode</web>
-<name>ExtensionClassSheet</name>
+<name>ExtensionSheet</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
@@ -42,10 +42,10 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </defaultEditMode>
 </class>
-<name>ExtensionCode.ExtensionClassSheet</name>
+<name>ExtensionCode.ExtensionSheet</name>
 <number>0</number>
 <className>XWiki.SheetClass</className>
-<guid>d46f1a2c-2119-4547-9cde-d2341243f2d1</guid>
+<guid>433d9016-169c-4522-99d2-c09d9711e7d5</guid>
 <property>
 <defaultEditMode></defaultEditMode>
 </property>
@@ -122,10 +122,10 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </use>
 </class>
-<name>ExtensionCode.ExtensionClassSheet</name>
+<name>ExtensionCode.ExtensionSheet</name>
 <number>0</number>
 <className>XWiki.StyleSheetExtension</className>
-<guid>81c75796-1c78-4bf7-a8e0-a6575384e796</guid>
+<guid>a11d8ef9-3862-4e83-81de-38c743abf3fe</guid>
 <property>
 <cache>long</cache>
 </property>

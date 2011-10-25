@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>ExtensionCode</web>
-<name>ExtensionTypeClassTemplate</name>
+<name>ExtensionTypeTemplate</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1319444073000</creationDate>
-<date>1319447064000</date>
-<contentUpdateDate>1319447064000</contentUpdateDate>
+<date>1319551531000</date>
+<contentUpdateDate>1319551531000</contentUpdateDate>
 <version>1.1</version>
 <title>ExtensionTypeClass Template</title>
 <template></template>
@@ -71,10 +71,10 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
 </class>
-<name>ExtensionCode.ExtensionTypeClassTemplate</name>
+<name>ExtensionCode.ExtensionTypeTemplate</name>
 <number>0</number>
 <className>ExtensionCode.ExtensionTypeClass</className>
-<guid>cfba1f18-bbac-4ccb-9c9a-91b23be2c2b1</guid>
+<guid>18ca0dd6-e6f0-4483-a805-ca80ca8f35af</guid>
 <property>
 <description></description>
 </property>
@@ -88,4 +88,4 @@
 <name></name>
 </property>
 </object>
-<content>{{include document="ExtensionCode.ExtensionTypeClassSheet"/}}</content></xwikidoc>
+<content>{{include document="ExtensionCode.ExtensionTypeSheet"/}}</content></xwikidoc>

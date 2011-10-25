@@ -587,8 +587,8 @@ public class Utils
         try {
             if (request instanceof MultipartRequestWrapper) {
                 fileupload = new FileUploadPlugin("fileupload", "fileupload", context);
-                fileupload.loadFileList(context);
                 context.put("fileuploadplugin", fileupload);
+                fileupload.loadFileList(context);
                 MultipartRequestWrapper mpreq = (MultipartRequestWrapper) request;
                 List<FileItem> fileItems = fileupload.getFileItems(context);
                 for (FileItem item : fileItems) {
@@ -604,7 +604,7 @@ public class Utils
                 && (((XWikiException) e).getCode() == XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE)) {
                 context.put("exception", e);
             } else {
-                e.printStackTrace();
+                LOGGER.error("Failed to process MultiPart request", e);
             }
         }
         return fileupload;

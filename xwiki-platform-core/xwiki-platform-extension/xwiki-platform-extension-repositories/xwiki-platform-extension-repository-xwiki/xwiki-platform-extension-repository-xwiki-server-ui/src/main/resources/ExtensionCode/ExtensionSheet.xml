@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1312816151000</creationDate>
-<date>1319453835000</date>
-<contentUpdateDate>1319453835000</contentUpdateDate>
+<date>1319557196000</date>
+<contentUpdateDate>1319557196000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -286,9 +286,21 @@
     {{toc/}}
 
     = Summary =
+    #if ($doc.new)
+      #if ($request.id)
+        $extension.set('id', $request.id)##
+        $extension.set('name', $request.id)##
+      #else
+        $extension.set('id', $doc.name)##
+        $extension.set('name', $doc.name)##
+      #end
+      $extension.set('authors', $xwiki.getUserName($xcontext.user, false))##
+    #end
 
     (% class="extension" %)
-    |Title|{{html}}&lt;input type="text" name="title" size="75" value="$escapetool.xml($doc.getName())" /&gt;{{/html}}
+    |Id|$doc.display("id")
+    |Name|$doc.display("name")
+    |Title|{{html}}&lt;input type="text" name="title" size="75" value="$escapetool.xml($doc.name)" /&gt;{{/html}}
     |Type|$doc.display("type")
     |Summary|$doc.display("summary")
     |Authors|$doc.display("authors")

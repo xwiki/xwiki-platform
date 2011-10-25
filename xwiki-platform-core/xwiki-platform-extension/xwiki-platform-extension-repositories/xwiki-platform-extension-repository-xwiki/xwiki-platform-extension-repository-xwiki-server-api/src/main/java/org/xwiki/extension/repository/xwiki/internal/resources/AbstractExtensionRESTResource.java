@@ -139,10 +139,12 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             queryStr.append(from);
         }
 
+        queryStr.append(" where ");
         if (where != null) {
-            queryStr.append(" where ");
             queryStr.append(where);
+            queryStr.append(" and ");
         }
+        queryStr.append("extension." + XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION + " = 1");
 
         Query query = this.queryManager.createQuery(queryStr.toString(), Query.XWQL);
 

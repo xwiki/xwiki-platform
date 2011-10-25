@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
-<web>Extensions</web>
+<web>Extension</web>
 <name>WebHome</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1304962886000</creationDate>
-<date>1319551653000</date>
-<contentUpdateDate>1319551653000</contentUpdateDate>
+<date>1319555977000</date>
+<contentUpdateDate>1319555977000</contentUpdateDate>
 <version>1.1</version>
 <title>Extensions</title>
 <template></template>
@@ -25,7 +25,7 @@
 <content>{{velocity output="false"}}
 ## If this page is called with createExtension=true then create a new page using the ExtensionTemplate template
 #if ($request.createExtension == "true")
-  $response.sendRedirect($xwiki.getURL("Extensions.${request.name}", "inline", "$!{request.queryString}&amp;title=${request.name}"))
+  $response.sendRedirect($xwiki.getURL("Extension.${request.name}", "inline", "$!{request.queryString}&amp;title=${request.name}"))
 #end
 {{/velocity}}
 
@@ -37,8 +37,8 @@ Search Extension...
 {{velocity}}
 {{html}}
 &lt;form action="$xwiki.getURL("ExtensionCode.ExtensionSearch")"&gt;
-  &lt;input type="hidden" name="space" value="Extensions" /&gt;
-  &lt;input type="text" name="text" value="extension name..." size="25" class="withTip" /&gt;
+  &lt;input type="hidden" name="space" value="Extension" /&gt;
+  &lt;input type="text" name="text" value="extension id..." size="25" class="withTip" /&gt;
   &lt;span class="buttonwrapper"&gt;
     &lt;input class="button" type="submit" value="Search" /&gt;
   &lt;/span&gt;
@@ -58,10 +58,10 @@ Contribute Extension...
   You need first to &lt;a href="${escapetool.xml($xwiki.getURL("Main.WebHome", "login", "xredirect=$doc.externalURL"))}"&gt;log in&lt;/a&gt; or &lt;a href="${escapetool.xml($xwiki.getURL("xwiki:Main.WebHome", "register", "xredirect=$doc.externalURL"))}"&gt;register&lt;/a&gt;.
 #else
 &lt;form action="" id="newextension"&gt;
-  &lt;input type="hidden" name="parent" value="Extensions.WebHome" /&gt;
+  &lt;input type="hidden" name="parent" value="Extension.WebHome" /&gt;
   &lt;input type="hidden" name="template" value="ExtensionCode.ExtensionTemplate" /&gt;
   &lt;input type="hidden" name="createExtension" value="true" /&gt;
-  &lt;input class="withTip" type="text" name="name" value="extension name..."  size="25"/&gt;
+  &lt;input class="withTip" type="text" name="id" value="extension id..."  size="25"/&gt;
   &lt;span class="buttonwrapper"&gt;
     &lt;input class="button" type="submit" value="Add" /&gt;
   &lt;/span&gt;
@@ -95,7 +95,7 @@ Contribute Extension...
    "defaultOrder":"desc",
    "translationPrefix" : "extension.repository.",
    "rowCount": 30,
-   "extraParams" : 'space=Extensions'
+   "extraParams" : 'space=Extension'
 })
 #livetable("extensions" $columns $columnsProperties $options)
 

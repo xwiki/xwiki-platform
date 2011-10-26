@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>ApplicationWithinMinutes</web>
+<name>ClassSheetGenerator</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>ApplicationWithinMinutes.WebHome</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1319614909000</creationDate>
+<date>1319622530000</date>
+<contentUpdateDate>1319622530000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity filter="none"}}
+{{{##
+{{velocity}}
+{{html wiki="true"}}
+${escapetool.h}set(${escapetool.d}discard = ${escapetool.d}doc.use('$doc.fullName'))
+${escapetool.h}${escapetool.h} We don't have access to the form element to set the CSS class for the vertical form layout standard.
+(% class="xform half" %)
+(((
+#foreach($property in $doc.getxWikiClass().properties)
+  ; &lt;label for="${doc.fullName}_0_$property.name"&gt;${escapetool.d}doc.displayPrettyName('$property.name', false, false)&lt;/label&gt;${escapetool.h}${escapetool.h}
+    (% class="xHint" %)${escapetool.d}msg.get('$!property.hint')
+  : ${escapetool.d}doc.display('$property.name')
+#end
+)))
+{{/html}}
+{{/velocity}}##
+}}}
+{{/velocity}}</content></xwikidoc>

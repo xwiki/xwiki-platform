@@ -36,7 +36,7 @@ import org.xwiki.query.QueryException;
  * @version $Id$
  * @since 3.2M3
  */
-@Component("org.xwiki.extension.repository.xwiki.internal.ExtensionVersionsRESTResource")
+@Component("org.xwiki.extension.repository.xwiki.internal.resources.ExtensionVersionsRESTResource")
 @Path(Resources.EXTENSION_VERSIONS)
 public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
 {

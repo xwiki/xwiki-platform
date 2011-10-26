@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1312816151000</creationDate>
-<date>1319557196000</date>
-<contentUpdateDate>1319557196000</contentUpdateDate>
+<date>1319622287000</date>
+<contentUpdateDate>1319622287000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -321,14 +321,29 @@
       $doc.display("description")
     #end
 
-    ## Only display instructions if a download exists or if there's a non empty extra instructions
-    #set($extraInstallation = $doc.getValue("installation"))
     = Prerequisites &amp; Installation Instructions =
 
-    #if ("$!{extensionTypeObject.installation}" != '')
-      $extensionTypeObject.installation
+    #if ($context.action != 'view')
+      ; Custom installation only
+      : $extension.customInstallationOnly
     #end
-    #if ("$!extraInstallation" != '')
+    ##
+    ## Standard installation
+    #if ($context.action != 'view')
+      == Standard installation instructions
+
+    #end
+    #if ($context.action != 'view' || ($extension.getProperty('customInstallationOnly').value == 0 &amp;&amp; "$!{extensionTypeObject.getProperty('installation').value}" != ''))
+      $extensionTypeObject.display('installation', 'view')
+    #end
+    ##
+    ## Extra installation
+    #if ($context.action != 'view')
+      == Custom installation instructions
+
+    #end
+    #set($extraInstallation = $doc.getValue("installation"))
+    #if ("$!extraInstallation" != '' || $context.action != 'view')
       $extension.installation
     #end
 

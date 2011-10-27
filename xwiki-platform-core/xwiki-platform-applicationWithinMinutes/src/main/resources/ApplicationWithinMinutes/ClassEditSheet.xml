@@ -402,7 +402,7 @@ XWiki.FormField = Class.create({
         configIcon.observe('click', this._onConfigure.bindAsEventListener(this));
         this.container.down('.toolBox').insert({top: configIcon});
       }
-      document.fire('xwiki:class:displayProperty', {container: this.container});
+      document.fire('xwiki:class:displayProperty', {container: this.container, 'new': !!response});
     }
   },
   _injectHTML : function(html) {
@@ -464,11 +464,14 @@ XWiki.FormField = Class.create({
 XWiki.FormFieldNameManager = Class.create({
   initialize : function() {
     // Generate a unique field name when a new field is dragged from the palette to the form canvas.
-    document.observe('xwiki:class:displayProperty', this._generateFieldName.bind(this));
+    document.observe('xwiki:class:displayProperty', this._maybeGenerateFieldName.bind(this));
     // Rename the field configuration property ids/names when a field is renamed. This is needed for AJAX Save &amp; Continue.
     document.observe('xwiki:document:saved', this._maybeRenameFields.bind(this));
   },
-  _generateFieldName : function(event) {
+  _maybeGenerateFieldName : function(event) {
+    if (!event.memo['new']) {
+      return;
+    }
     var container = event.memo.container;
     var nameInput = this._getNameInput(container);
     var counter = 1;
@@ -521,12 +524,10 @@ XWiki.FormFieldNameManager = Class.create({
  */
 XWiki.FormFieldPrettyNameManager = Class.create({
   initialize : function() {
-    document.observe('xwiki:class:displayProperty', function(event) {
-      this._enhancePrettyName(event.memo.container);
-    }.bind(this));
-    $('fields').select('li').each(this._enhancePrettyName.bind(this));
+    document.observe('xwiki:class:displayProperty', this._onDisplayProperty.bindAsEventListener(this));
   },
-  _enhancePrettyName : function(container) {
+  _onDisplayProperty : function(event) {
+    var container = event.memo.container;
     var prettyNameInput, inputs = container.select("input");
     for(var i = 0; i &lt; inputs.length; i++) {
       var input = inputs[i];
@@ -566,15 +567,13 @@ XWiki.FormFieldPrettyNameManager = Class.create({
  */
 XWiki.FormFieldDefaultValueManager = Class.create({
   initialize : function() {
-    document.observe('xwiki:class:displayProperty', function(event) {
-      this._enhanceDefaultValue(event.memo.container);
-    }.bind(this));
-    $('fields').select('li').each(this._enhanceDefaultValue.bind(this));
+    document.observe('xwiki:class:displayProperty', this._onDisplayProperty.bindAsEventListener(this));
 
     // We need to listen to save event to rename the default value inputs to match the new field name.
     document.observe('xwiki:class:save', this._onSave.bind(this));
   },
-  _enhanceDefaultValue : function(container) {
+  _onDisplayProperty : function(event) {
+    var container = event.memo.container;
     var fieldName = this._getFieldName(container);
     container.select('input[type=text]', 'textarea').each(function(input) {
       if (input.name.endsWith('_0_' + fieldName)) {
@@ -626,13 +625,10 @@ XWiki.FormFieldDefaultValueManager = Class.create({
  */
 XWiki.FormFieldHintManager = Class.create({
   initialize : function() {
-    document.observe('xwiki:class:displayProperty', function(event) {
-      this._enhanceHint(event.memo.container);
-    }.bind(this));
-    $('fields').select('li').each(this._enhanceHint.bind(this));
+    document.observe('xwiki:class:displayProperty', this._onDisplayProperty.bindAsEventListener(this));
   },
-  _enhanceHint : function(container) {
-    var prettyNameLabel = container.down('.field-viewer').down('label');
+  _onDisplayProperty : function(event) {
+    var prettyNameLabel = event.memo.container.down('.field-viewer').down('label');
     var hintInput = new Element('input', {type:'text', 'class': 'xHint', title:'Hint'});
     prettyNameLabel.insert({after: hintInput});
     // Enhance the hint input.
@@ -646,13 +642,10 @@ XWiki.FormFieldHintManager = Class.create({
  */
 XWiki.FormFieldRequiredManager = Class.create({
   initialize : function() {
-    document.observe('xwiki:class:displayProperty', function(event) {
-      this._enhanceRequired(event.memo.container);
-    }.bind(this));
-    $('fields').select('li').each(this._enhanceRequired.bind(this));
+    document.observe('xwiki:class:displayProperty', this._onDisplayProperty.bindAsEventListener(this));
   },
-  _enhanceRequired : function(container) {
-    var prettyNameLabel = container.down('.field-viewer').down('label');
+  _onDisplayProperty : function(event) {
+    var prettyNameLabel = event.memo.container.down('.field-viewer').down('label');
     var wrapper = new Element('div', {'class': 'labelLine'});
     prettyNameLabel.insert({before: wrapper});
     wrapper.insert(prettyNameLabel);
@@ -802,16 +795,16 @@ return XWiki;
       }
     }.bindAsEventListener(window));
 
-    // Make the palette and the canvas live.
-    new XWiki.FormFieldPalette('palette');
-    new XWiki.FormCanvas('canvas');
-
-    // Enhance some of the field properties.
+    // Be prepared to enhance some of the field properties.
     new XWiki.FormFieldNameManager();
     new XWiki.FormFieldPrettyNameManager();
     new XWiki.FormFieldHintManager();
     new XWiki.FormFieldDefaultValueManager();
     new XWiki.FormFieldRequiredManager();
+
+    // Make the palette and the canvas live.
+    new XWiki.FormFieldPalette('palette');
+    new XWiki.FormCanvas('canvas');
 
     return true;
   }

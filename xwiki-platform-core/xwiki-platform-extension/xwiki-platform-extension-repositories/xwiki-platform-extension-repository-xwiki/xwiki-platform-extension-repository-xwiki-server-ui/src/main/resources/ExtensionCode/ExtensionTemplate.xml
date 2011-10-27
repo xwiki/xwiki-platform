@@ -53,6 +53,20 @@
 <values></values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </authors>
+<customInstallationOnly>
+<customDisplay></customDisplay>
+<defaultValue>0</defaultValue>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType></displayType>
+<name>customInstallationOnly</name>
+<number>15</number>
+<prettyName>Only Custom Installation instructions</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</customInstallationOnly>
 <description>
 <customDisplay></customDisplay>
 <disabled>0</disabled>

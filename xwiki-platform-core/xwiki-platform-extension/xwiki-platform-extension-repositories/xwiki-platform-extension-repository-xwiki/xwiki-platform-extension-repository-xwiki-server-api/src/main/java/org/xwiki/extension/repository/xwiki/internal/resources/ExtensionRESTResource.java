@@ -38,7 +38,7 @@ import com.xpn.xwiki.api.Document;
  * @version $Id$
  * @since 3.2M3
  */
-@Component("org.xwiki.extension.repository.xwiki.internal.ExtensionRESTResource")
+@Component("org.xwiki.extension.repository.xwiki.internal.resources.ExtensionRESTResource")
 @Path(Resources.EXTENSION)
 public class ExtensionRESTResource extends AbstractExtensionRESTResource
 {

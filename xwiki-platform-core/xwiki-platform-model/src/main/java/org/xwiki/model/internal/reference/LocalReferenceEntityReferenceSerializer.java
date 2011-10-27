@@ -46,20 +46,18 @@ public class LocalReferenceEntityReferenceSerializer implements EntityReferenceS
     public EntityReference serialize(EntityReference reference, Object... parameters)
     {
         EntityReference newReference = null;
-        EntityReference currentNewReference = null;
+        EntityReference parent = null;
         for (EntityReference currentReference = reference; currentReference != null; currentReference =
             currentReference.getParent()) {
             if (currentReference.getType() == EntityType.WIKI) {
                 return newReference;
             }
 
-            if (currentNewReference != null) {
-                currentNewReference.setParent(new EntityReference(currentReference.getName(), currentReference
-                    .getType()));
-                currentNewReference = currentNewReference.getParent();
+            parent = new EntityReference(currentReference.getName(),currentReference.getType());
+            if (newReference != null) {
+                newReference = new EntityReference(newReference, null, parent);
             } else {
-                newReference = new EntityReference(currentReference.getName(), currentReference.getType());
-                currentNewReference = newReference;
+                newReference = parent;
             }
         }
 

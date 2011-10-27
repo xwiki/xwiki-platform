@@ -34,6 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -87,11 +88,10 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         DocumentReference reference = getDocumentReference();
 
         if (reference != null) {
-            // Make sure to not modify a reference that could comes from somewhere else
-            reference = new DocumentReference(reference);
             EntityReference relativeReference = this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
-            reference.getLastSpaceReference().setName(relativeReference.extractReference(EntityType.SPACE).getName());
-            reference.setName(relativeReference.extractReference(EntityType.DOCUMENT).getName());
+            reference = new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
+                new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(),
+                    reference.getParent().getParent()));
         } else {
             reference = this.currentMixedDocumentReferenceResolver.resolve(name);
         }

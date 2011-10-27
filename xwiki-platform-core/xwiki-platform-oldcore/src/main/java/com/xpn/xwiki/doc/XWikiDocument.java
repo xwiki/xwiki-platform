@@ -88,6 +88,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.ObjectReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
@@ -499,28 +500,19 @@ public class XWikiDocument implements DocumentModelBridge
         // Build an entity reference that will serve as a current context reference against which to resolve if the
         // passed name doesn't contain a space.
         EntityReference contextReference = null;
-        if (!StringUtils.isEmpty(space)) {
-            contextReference = new EntityReference(space, EntityType.SPACE);
-            if (!StringUtils.isEmpty(wiki)) {
-                contextReference.setParent(new WikiReference(wiki));
-            }
-        } else if (!StringUtils.isEmpty(wiki)) {
+        if (!StringUtils.isEmpty(wiki)) {
             contextReference = new WikiReference(wiki);
         }
-
-        DocumentReference reference;
-        if (contextReference != null) {
-            reference = this.currentDocumentReferenceResolver.resolve(name, contextReference);
-            // Replace the resolved wiki by the passed wiki if not empty/null
-            if (!StringUtils.isEmpty(wiki)) {
-                reference.setWikiReference(new WikiReference(wiki));
+        if (!StringUtils.isEmpty(space)) {
+            if (contextReference != null) {
+                contextReference = new SpaceReference(space, contextReference);
+            } else {
+                // SpaceReference is invalid without a valid parent
+                contextReference = new EntityReference(space, EntityType.SPACE);
             }
-        } else {
-            // Both the wiki and space params are empty/null, thus don't use a context reference.
-            reference = this.currentDocumentReferenceResolver.resolve(name);
         }
 
-        init(reference);
+        init(this.currentDocumentReferenceResolver.resolve(name, contextReference));
     }
 
     public XWikiStoreInterface getStore(XWikiContext context)
@@ -610,7 +602,9 @@ public class XWikiDocument implements DocumentModelBridge
     public void setSpace(String space)
     {
         if (space != null) {
-            getDocumentReference().getLastSpaceReference().setName(space);
+            DocumentReference reference = getDocumentReference();
+            this.documentReference = new DocumentReference(new EntityReference(reference,
+                new SpaceReference(space, reference.getLastSpaceReference().getParent())));
 
             // Clean the absolute parent reference cache to rebuild it next time getParentReference is called.
             this.parentReferenceCache = null;
@@ -931,7 +925,10 @@ public class XWikiDocument implements DocumentModelBridge
     public void setName(String name)
     {
         if (name != null) {
-            getDocumentReference().setName(name);
+            DocumentReference reference = getDocumentReference();
+            // TODO: ensure that other parameters are copied properly
+            this.documentReference = new DocumentReference(name, new SpaceReference(reference.getParent()),
+                reference.getLocale());
 
             // Clean the absolute parent reference cache to rebuild it next time getParentReference is called.
             this.parentReferenceCache = null;
@@ -5159,10 +5156,15 @@ public class XWikiDocument implements DocumentModelBridge
     public void setDatabase(String database)
     {
         if (database != null) {
-            getDocumentReference().getWikiReference().setName(database);
+            DocumentReference reference = getDocumentReference();
+            WikiReference wiki = reference.getWikiReference();
+            WikiReference newWiki = new WikiReference(database);
+            if( !newWiki.equals(wiki) ) {
+                this.documentReference = new DocumentReference(new EntityReference(reference, wiki, newWiki));
 
-            // Clean the absolute parent reference cache to rebuild it next time getParentReference is called.
-            this.parentReferenceCache = null;
+                // Clean the absolute parent reference cache to rebuild it next time getParentReference is called.
+                this.parentReferenceCache = null;
+            }
         }
     }
 

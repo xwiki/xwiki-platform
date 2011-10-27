@@ -73,9 +73,9 @@ public abstract class AbstractReferenceEntityReferenceResolver implements Entity
             // reference.
             if (type.ordinal() > referenceToResolve.getType().ordinal()) {
                 normalizedReference =
-                    new EntityReference(resolveDefaultValue(type, parameters), type, referenceToResolve.clone());
+                    new EntityReference(resolveDefaultValue(type, parameters), type, referenceToResolve);
             } else {
-                normalizedReference = referenceToResolve.clone();
+                normalizedReference = referenceToResolve  ;
             }
         }
 
@@ -89,17 +89,21 @@ public abstract class AbstractReferenceEntityReferenceResolver implements Entity
                 EntityReference newReference =
                     new EntityReference(resolveDefaultValue(types.get(0), parameters), types.get(0), reference
                         .getParent());
-                reference.setParent(newReference);
+                normalizedReference = new EntityReference(normalizedReference,reference.getParent(),newReference);
+                reference = newReference;
             } else if (reference.getParent() == null && !types.isEmpty()) {
                 // The top reference isn't the allowed top level reference, add a parent reference
                 EntityReference newReference =
                     new EntityReference(resolveDefaultValue(types.get(0), parameters), types.get(0));
-                reference.setParent(newReference);
+                normalizedReference = new EntityReference(normalizedReference,null,newReference);
+                reference = newReference;
             } else if (reference.getParent() != null && types.isEmpty()) {
-                // There's a parent but not of the correct type... it means the reference is invalid
+                // There's a parent but no one is allowed
                 throw new InvalidEntityReferenceException("Invalid reference [" + referenceToResolve + "]");
+            } else {
+                // Parent is ok, check next
+                reference = reference.getParent();
             }
-            reference = reference.getParent();
         }
 
         if (referenceToResolve != null) {

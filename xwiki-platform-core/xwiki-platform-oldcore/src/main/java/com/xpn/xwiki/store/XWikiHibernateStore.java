@@ -441,7 +441,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
             doc.setStore(this);
             // Make sure the database name is stored
-            doc.getDocumentReference().setWikiReference(new WikiReference(context.getDatabase()));
+            doc.setDatabase(context.getDatabase());
 
             if (bTransaction) {
                 checkHibernate(context);

@@ -19,15 +19,14 @@
  */
 package org.xwiki.model.reference;
 
-import junit.framework.Assert;
-import org.junit.Test;
-import org.xwiki.model.EntityType;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+
+import org.junit.Test;
+import org.xwiki.model.EntityType;
+
+import junit.framework.Assert;
 
 /**
  * Unit tests for {@link EntityReference}.
@@ -56,17 +55,6 @@ public class EntityReferenceTest
             new EntityReference("space", EntityType.SPACE,
                 new EntityReference("wiki", EntityType.WIKI)));
         Assert.assertEquals(new EntityReference("wiki", EntityType.WIKI), reference.getRoot());
-    }
-
-    @Test
-    public void testGetChild()
-    {
-        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT,
-            new EntityReference("space", EntityType.SPACE,
-                new EntityReference("wiki", EntityType.WIKI)));
-        Assert.assertNull(reference.getChild());
-        Assert.assertEquals(reference, reference.getParent().getChild());
-        Assert.assertEquals(reference, reference.getParent().getParent().getChild().getChild());
     }
 
     @Test
@@ -133,20 +121,6 @@ public class EntityReferenceTest
         EntityReference reference6 = new EntityReference("page", EntityType.DOCUMENT, null);
         Assert.assertFalse(reference1.hashCode() == reference6.hashCode());
         Assert.assertEquals(reference6.hashCode(), new EntityReference("page", EntityType.DOCUMENT, null).hashCode());
-    }
-
-    @Test
-    public void testClone()
-    {
-        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT,
-            new EntityReference("space", EntityType.SPACE,
-                new EntityReference("wiki", EntityType.WIKI)));
-        EntityReference clonedReference = reference.clone();
-
-        Assert.assertNotSame(reference, clonedReference);
-        Assert.assertNotSame(reference.getParent(), clonedReference.getParent());
-        Assert.assertNotSame(reference.getParent().getParent(), clonedReference.getParent().getParent());
-        Assert.assertEquals(reference, clonedReference);
     }
 
     @Test

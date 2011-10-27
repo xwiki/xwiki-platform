@@ -4649,9 +4649,12 @@ public class XWiki implements EventListener
             WikiReference targetWikiReference = new WikiReference(targetWiki);
             for (String docname : list) {
                 DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
-                sourceDocumentReference.setWikiReference(sourceWikiReference);
-                DocumentReference targetDocumentReference = new DocumentReference(sourceDocumentReference.clone());
-                targetDocumentReference.setWikiReference(targetWikiReference);
+                sourceDocumentReference = new DocumentReference(
+                    new EntityReference(sourceDocumentReference, sourceDocumentReference.getWikiReference(),
+                        sourceWikiReference));
+                DocumentReference targetDocumentReference = new DocumentReference(
+                    new EntityReference(sourceDocumentReference, sourceDocumentReference.getWikiReference(),
+                        targetWikiReference));
                 copyDocument(sourceDocumentReference, targetDocumentReference, language, context);
                 nb++;
             }

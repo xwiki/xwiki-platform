@@ -19,13 +19,13 @@
  */
 package org.xwiki.model.reference;
 
-import org.junit.Test;
-
-import junit.framework.Assert;
-import org.xwiki.model.EntityType;
-
 import java.util.Arrays;
 import java.util.List;
+
+import org.junit.Test;
+import org.xwiki.model.EntityType;
+
+import junit.framework.Assert;
 
 /**
  * Unit tests for {@link org.xwiki.model.reference.DocumentReference}.
@@ -91,10 +91,6 @@ public class DocumentReferenceTest
         // Verify that create a new reference based on an existing one doesn't modify the existing one in any manner.
         new DocumentReference(
             reference.getWikiReference().getName(), reference.getLastSpaceReference().getName(), reference.getName());
-
-        // Verify parent/child relationships
-        Assert.assertSame(reference, reference.getParent().getChild());
-        Assert.assertSame(spaceReference, reference.getParent().getParent().getChild());
     }
 
     @Test
@@ -102,14 +98,6 @@ public class DocumentReferenceTest
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
         Assert.assertEquals(new WikiReference("wiki"), reference.getWikiReference());
-    }
-
-    @Test
-    public void testSetWikiReference()
-    {
-        DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        reference.setWikiReference(new WikiReference("newwiki"));
-        Assert.assertEquals(new DocumentReference("newwiki", "space", "page"), reference);
     }
 
     @Test

@@ -77,7 +77,7 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
         if (value == null) {
             String mainWiki = getMainWiki();
             if (!StringUtils.equals(currentWiki, mainWiki)) {
-                configDocumentReference.getWikiReference().setName(mainWiki);
+                configDocumentReference = new DocumentReference(mainWiki, "XWiki", "WysiwygEditorConfig");
                 value = documentAccessBridge.getProperty(configDocumentReference, configClassReference, propertyName);
             }
         }

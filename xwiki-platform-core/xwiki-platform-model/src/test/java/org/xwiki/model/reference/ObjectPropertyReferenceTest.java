@@ -19,11 +19,11 @@
  */
 package org.xwiki.model.reference;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import org.junit.Test;
 import org.xwiki.model.EntityType;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Unit test for the Property reference ({@link ObjectPropertyReference}).
@@ -43,9 +43,8 @@ public class ObjectPropertyReferenceTest
             new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY,
                 new EntityReference("Object", EntityType.OBJECT, new EntityReference("Page", EntityType.DOCUMENT,
                     new EntityReference("Space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI))))));
-        assertEquals(reference, new ObjectPropertyReference("wiki", "Space", "Page", "Object", "property"));
-        assertEquals(reference, new ObjectPropertyReference("property", new ObjectReference("wiki", "Space", "Page",
-            "Object")));
+        assertEquals(reference, new ObjectPropertyReference("property", new ObjectReference("Object",
+            new DocumentReference("wiki", "Space", "Page"))));
     }
 
     @Test

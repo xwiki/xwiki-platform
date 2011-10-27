@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.QueryManager;
@@ -1494,12 +1495,16 @@ public class XWiki extends Api
     {
         DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
         if (!StringUtils.isEmpty(sourceWiki)) {
-            sourceDocumentReference.setWikiReference(new WikiReference(sourceWiki));
+            sourceDocumentReference = new DocumentReference(
+                new EntityReference(sourceDocumentReference, sourceDocumentReference.getWikiReference(),
+                    new WikiReference(sourceWiki)));
         }
 
         DocumentReference targetDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(targetdocname);
         if (!StringUtils.isEmpty(targetWiki)) {
-            targetDocumentReference.setWikiReference(new WikiReference(targetWiki));
+            targetDocumentReference = new DocumentReference(
+                new EntityReference(targetDocumentReference, targetDocumentReference.getWikiReference(),
+                    new WikiReference(targetWiki)));
         }
 
         return this.copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset, force);

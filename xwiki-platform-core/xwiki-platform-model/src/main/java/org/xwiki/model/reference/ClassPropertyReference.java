@@ -37,7 +37,7 @@ public class ClassPropertyReference extends EntityReference
      */
     public ClassPropertyReference(EntityReference reference)
     {
-        super(reference.getName(), reference.getType(), reference.getParent());
+        super(reference);
     }
 
     /**
@@ -52,18 +52,6 @@ public class ClassPropertyReference extends EntityReference
     }
 
     /**
-     * @param wiki the wiki of the document where the parent class of this property is
-     * @param space the space of the document where the parent class of this property is
-     * @param page the document where the parent class of this property is
-     * @param objectName the name of the parent class of this property
-     * @param propertyName the name of the property to refer to
-     */
-    public ClassPropertyReference(String wiki, String space, String page, String propertyName)
-    {
-        this(propertyName, new DocumentReference(wiki, space, page));
-    }
-
-    /**
      * {@inheritDoc}
      * <p>
      * Overridden to check the type to be a property type.
@@ -71,7 +59,7 @@ public class ClassPropertyReference extends EntityReference
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      */
     @Override
-    public void setType(EntityType type)
+    protected void setType(EntityType type)
     {
         if (type != EntityType.CLASS_PROPERTY) {
             throw new IllegalArgumentException("Invalid type [" + type + "] for an class property reference");
@@ -88,7 +76,7 @@ public class ClassPropertyReference extends EntityReference
      * @see org.xwiki.model.reference.EntityReference#setParent(org.xwiki.model.reference.EntityReference)
      */
     @Override
-    public void setParent(EntityReference parent)
+    protected void setParent(EntityReference parent)
     {
         if (parent == null || parent.getType() != EntityType.DOCUMENT) {
             throw new IllegalArgumentException("Invalid parent reference [" + parent + "] for an class property "

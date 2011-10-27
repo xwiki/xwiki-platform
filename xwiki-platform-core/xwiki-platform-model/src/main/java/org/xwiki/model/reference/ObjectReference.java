@@ -37,18 +37,7 @@ public class ObjectReference extends EntityReference
      */
     public ObjectReference(EntityReference reference)
     {
-        super(reference.getName(), reference.getType(), reference.getParent());
-    }
-
-    /**
-     * @param wiki wiki where the parent document of the object is
-     * @param space space where the parent document of the object is
-     * @param document parent document of the object
-     * @param objectName the name of the object
-     */
-    public ObjectReference(String wiki, String space, String document, String objectName)
-    {
-        this(objectName, new DocumentReference(wiki, space, document));
+        super(reference);
     }
 
     /**
@@ -67,7 +56,7 @@ public class ObjectReference extends EntityReference
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      */
     @Override
-    public void setType(EntityType type)
+    protected void setType(EntityType type)
     {
         if (type != EntityType.OBJECT) {
             throw new IllegalArgumentException("Invalid type [" + type + "] for an object reference");
@@ -83,7 +72,7 @@ public class ObjectReference extends EntityReference
      * @see org.xwiki.model.reference.EntityReference#setParent(org.xwiki.model.reference.EntityReference)
      */
     @Override
-    public void setParent(EntityReference parent)
+    protected void setParent(EntityReference parent)
     {
         if (parent == null || parent.getType() != EntityType.DOCUMENT) {
             throw new IllegalArgumentException("Invalid parent reference [" + parent + "] for an object reference");

@@ -101,7 +101,6 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
         }
 
         EntityReference reference = null;
-        EntityReference lastReference = null;
         char[] separatorsForType = SEPARATORS.get(type);
         EntityType[] entityTypesForType = ENTITYTYPES.get(type);
 
@@ -119,12 +118,10 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
 
             if (name != null) {
                 EntityReference newReference = new EntityReference(name, entityTypesForType[i]);
-                if (lastReference != null) {
-                    lastReference.setParent(newReference);
-                }
-                lastReference = newReference;
-                if (reference == null) {
-                    reference = lastReference;
+                if (reference != null) {
+                    reference = new EntityReference(reference, null, newReference);
+                } else {
+                    reference = newReference;
                 }
             }
         }
@@ -139,10 +136,9 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
 
         if (name != null) {
             EntityReference newReference = new EntityReference(name, entityTypesForType[separatorsForType.length]);
-            if (lastReference != null) {
-                lastReference.setParent(newReference);
-            }
-            if (reference == null) {
+            if (reference != null) {
+                reference = new EntityReference(reference, null, newReference);
+            } else {
                 reference = newReference;
             }
         }

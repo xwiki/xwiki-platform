@@ -37,7 +37,7 @@ public class ObjectPropertyReference extends EntityReference
      */
     public ObjectPropertyReference(EntityReference reference)
     {
-        super(reference.getName(), reference.getType(), reference.getParent());
+        super(reference);
     }
 
     /**
@@ -52,25 +52,13 @@ public class ObjectPropertyReference extends EntityReference
     }
 
     /**
-     * @param wiki the wiki of the document where the parent object of this property is
-     * @param space the space of the document where the parent object of this property is
-     * @param page the document where the parent object of this property is
-     * @param objectName the name of the parent object of this property
-     * @param propertyName the name of the property to refer to
-     */
-    public ObjectPropertyReference(String wiki, String space, String page, String objectName, String propertyName)
-    {
-        this(propertyName, new ObjectReference(wiki, space, page, objectName));
-    }
-
-    /**
      * {@inheritDoc} <br />
      * Overridden to check the type to be a property type.
      * 
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      */
     @Override
-    public void setType(EntityType type)
+    protected void setType(EntityType type)
     {
         if (type != EntityType.OBJECT_PROPERTY) {
             throw new IllegalArgumentException("Invalid type [" + type + "] for an object property reference");
@@ -86,7 +74,7 @@ public class ObjectPropertyReference extends EntityReference
      * @see org.xwiki.model.reference.EntityReference#setParent(org.xwiki.model.reference.EntityReference)
      */
     @Override
-    public void setParent(EntityReference parent)
+    protected void setParent(EntityReference parent)
     {
         if (parent == null || parent.getType() != EntityType.OBJECT) {
             throw new IllegalArgumentException("Invalid parent reference [" + parent + "] for an object property "

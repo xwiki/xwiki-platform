@@ -58,7 +58,7 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
         // In addition an entity reference isn't printed only if all parent references are not printed either,
         // otherwise print it. For example "wiki:page" isn't allowed for a Document Reference.
 
-        if (currentReference.getChild() == null || isLastReference || representation.length() > 0) {
+        if (isLastReference || representation.length() > 0) {
             shouldPrint = true;
         } else {
             String defaultName = resolveDefaultValue(currentReference.getType(), parameters);

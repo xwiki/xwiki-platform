@@ -31,21 +31,26 @@ public class SpaceReference extends EntityReference
 {
     /**
      * Special constructor that transforms a generic entity reference into a {@link SpaceReference}. It checks the
-     * validity of the passed reference (ie correct type and correct parent).
+     * validity of the passed reference (ie correct type).
      *
      * @exception IllegalArgumentException if the passed reference is not a valid space reference
      */
     public SpaceReference(EntityReference reference)
     {
-        super(reference.getName(), reference.getType(), reference.getParent());
+        super(reference);
+    }
+
+    public SpaceReference(String spaceName, WikiReference parent)
+    {
+        this(spaceName, (EntityReference) parent);
     }
 
     public SpaceReference(String spaceName, SpaceReference parent)
     {
-        super(spaceName, EntityType.SPACE, parent);
+        this(spaceName, (EntityReference) parent);
     }
 
-    public SpaceReference(String spaceName, WikiReference parent)
+    public SpaceReference(String spaceName, EntityReference parent)
     {
         super(spaceName, EntityType.SPACE, parent);
     }
@@ -59,8 +64,14 @@ public class SpaceReference extends EntityReference
      * @exception IllegalArgumentException if the passed parent is not a valid space reference parent (ie either
      *            a space reference or a wiki reference)
      */
-    @Override public void setParent(EntityReference parent)
+    @Override
+    protected void setParent(EntityReference parent)
     {
+        if( parent instanceof SpaceReference || parent instanceof WikiReference) {
+            super.setParent(parent);
+            return;
+        }
+
         if (parent == null || (parent.getType() != EntityType.SPACE && parent.getType() != EntityType.WIKI)) {
             throw new IllegalArgumentException("Invalid parent reference [" + parent + "] for a space reference");
         }
@@ -80,7 +91,8 @@ public class SpaceReference extends EntityReference
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      * @exception IllegalArgumentException if the passed type is not a space type
      */
-    @Override public void setType(EntityType type)
+    @Override
+    protected void setType(EntityType type)
     {
         if (type != EntityType.SPACE) {
             throw new IllegalArgumentException("Invalid type [" + type + "] for a space reference");

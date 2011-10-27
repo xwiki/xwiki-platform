@@ -38,7 +38,7 @@ public class AttachmentReference extends EntityReference
      */
     public AttachmentReference(EntityReference reference)
     {
-        super(reference.getName(), reference.getType(), reference.getParent());
+        super(reference);
     }
 
     public AttachmentReference(String fileName, DocumentReference parent)
@@ -55,7 +55,8 @@ public class AttachmentReference extends EntityReference
      * @exception IllegalArgumentException if the passed parent is not a valid attachment reference parent (ie an
      *            attachment reference)
      */
-    @Override public void setParent(EntityReference parent)
+    @Override
+    protected void setParent(EntityReference parent)
     {
         if (parent == null || parent.getType() != EntityType.DOCUMENT) {
             throw new IllegalArgumentException("Invalid parent reference [" + parent + "] for an attachment reference");
@@ -72,7 +73,8 @@ public class AttachmentReference extends EntityReference
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      * @exception IllegalArgumentException if the passed type is not an attachment type
      */
-    @Override public void setType(EntityType type)
+    @Override
+    protected void setType(EntityType type)
     {
         if (type != EntityType.ATTACHMENT) {
             throw new IllegalArgumentException("Invalid type [" + type + "] for an attachment reference");

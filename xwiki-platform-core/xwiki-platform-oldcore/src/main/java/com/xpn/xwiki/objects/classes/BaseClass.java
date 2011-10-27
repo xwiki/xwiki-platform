@@ -40,6 +40,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -143,9 +144,9 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (reference != null) {
                 EntityReference relativeReference =
                     this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
-                reference.getLastSpaceReference().setName(
-                    relativeReference.extractReference(EntityType.SPACE).getName());
-                reference.setName(relativeReference.extractReference(EntityType.DOCUMENT).getName());
+                reference = new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
+                    new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(),
+                         reference.getParent().getParent()));
             } else {
                 reference = this.currentMixedDocumentReferenceResolver.resolve(name);
             }

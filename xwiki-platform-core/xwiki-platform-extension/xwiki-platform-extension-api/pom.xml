@@ -82,7 +82,7 @@
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
-      <version>0.9.5</version>
+      <version>0.9.6</version>
       <exclusions>
         <!-- Useless for what we use in reflections -->
         <exclusion>

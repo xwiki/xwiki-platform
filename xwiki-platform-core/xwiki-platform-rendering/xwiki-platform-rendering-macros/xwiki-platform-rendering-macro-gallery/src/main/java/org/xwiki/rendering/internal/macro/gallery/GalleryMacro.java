@@ -30,8 +30,8 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
-import org.xwiki.rendering.internal.macro.MacroContentParser;
 import org.xwiki.rendering.macro.AbstractMacro;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -91,11 +91,7 @@ public class GalleryMacro extends AbstractMacro<Object>
         setDefaultCategory(DEFAULT_CATEGORY_FORMATTING);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacro#execute(Object, String, MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -106,18 +102,14 @@ public class GalleryMacro extends AbstractMacro<Object>
 
             Block galleryBlock = new GroupBlock(Collections.singletonMap("class", "gallery"));
             // Don't execute transformations explicitly. They'll be executed on the generated content later on.
-            galleryBlock.addChildren(this.contentParser.parse(content, context, false, false));
+            galleryBlock.addChildren(this.contentParser.parse(content, context, false, false).getChildren());
             return Collections.singletonList(galleryBlock);
         } else {
             return Collections.emptyList();
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacro#supportsInlineMode()
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return false;

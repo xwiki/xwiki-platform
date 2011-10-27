@@ -34,8 +34,8 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.internal.macro.MacroContentParser;
 import org.xwiki.rendering.macro.AbstractMacro;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.cache.CacheMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -129,7 +129,7 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
             // Run the parser for the syntax on the content
             // We run the current transformation on the cache macro content. We need to do this since we want to cache
             // the XDOM resulting from the execution of Macros because that's where lengthy processing happens.
-            result = this.contentParser.parse(content, context, true, context.isInline());
+            result = this.contentParser.parse(content, context, true, context.isInline()).getChildren();
             contentCache.set(cacheKey, result);
         }
 

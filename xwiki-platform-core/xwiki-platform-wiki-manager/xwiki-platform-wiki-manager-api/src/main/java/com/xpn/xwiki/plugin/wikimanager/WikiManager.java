@@ -30,6 +30,7 @@ import org.xwiki.bridge.event.WikiCreateFailedEvent;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -266,7 +267,7 @@ public final class WikiManager
 
         // Get applications manger
         ApplicationManagerPluginApi appmanager =
-            (ApplicationManagerPluginApi) context.getWiki().getPluginApi(ApplicationManagerPlugin.PLUGIN_NAME, context);
+            (ApplicationManagerPluginApi) Utils.getComponent(ScriptService.class, ApplicationManagerPlugin.PLUGIN_NAME);
 
         if (appmanager == null) {
             return null;

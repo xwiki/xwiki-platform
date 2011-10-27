@@ -20,17 +20,22 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<archetype>
-  <id>xwiki-archetype-component</id>
-  <sources>
-    <source>src/main/java/HelloWorld.java</source>
-    <source>src/main/java/internal/DefaultHelloWorld.java</source>
-    <source>src/main/java/internal/HelloWorldScriptService.java</source>
-  </sources>
-  <testSources>
-    <source>src/test/java/HelloWorldTest.java</source>
-  </testSources>
-  <resources>
-    <resource>src/main/resources/META-INF/components.txt</resource>
-  </resources>
-</archetype>
+<archetype-descriptor xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd"
+    name="XWiki Macro Archetype" partial="false">
+  <fileSets>
+    <fileSet filtered="true" packaged="true">
+      <directory>src/main/java</directory>
+    </fileSet>
+    <fileSet filtered="true">
+      <directory>src/main/resources</directory>
+    </fileSet>
+    <fileSet filtered="true" packaged="true">
+      <directory>src/test/java</directory>
+    </fileSet>
+    <fileSet filtered="true">
+      <directory>src/test/resources</directory>
+    </fileSet>
+  </fileSets>
+</archetype-descriptor>

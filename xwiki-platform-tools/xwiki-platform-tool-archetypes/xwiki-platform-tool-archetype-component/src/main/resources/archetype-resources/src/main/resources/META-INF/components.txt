@@ -1,2 +1,2 @@
-${packageName}.internal.DefaultHelloWorld
-${packageName}.internal.HelloWorldScriptService
+${package}.internal.DefaultHelloWorld
+${package}.internal.HelloWorldScriptService

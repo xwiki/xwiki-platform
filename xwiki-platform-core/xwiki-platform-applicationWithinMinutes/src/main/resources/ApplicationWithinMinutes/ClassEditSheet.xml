@@ -162,10 +162,8 @@ XWiki.InputWithTitle = Class.create({
     this.input.observe('focus', this._onFocus.bindAsEventListener(this));
     this.input.observe('blur', this._onBlur.bind(this));
 
-    var form = this.input.up('form');
-    if (form) {
-      form.observe('submit', this._onSubmit.bind(this));
-    }
+    // We have to listen to the save event because 'Save &amp; Continue' doesn't trigger a form submit event.
+    document.observe('xwiki:class:save', this._onSave.bind(this));
 
     this._onBlur();
   },
@@ -181,7 +179,7 @@ XWiki.InputWithTitle = Class.create({
       this.input.value = this.input.title;
     }
   },
-  _onSubmit : function() {
+  _onSave : function() {
     this._onFocus();
     this._onBlur.bind(this).defer();
   }
@@ -265,6 +263,13 @@ XWiki.ToggleSelect = Class.create({
     this.switcher.firstChild.nodeValue = this.select.options[this.select.selectedIndex].text;
   }
 });
+
+// Allow widgets to catch the save event before the form is submitted when the 'Save &amp; Continue' button is clicked. We
+// need this hack because the 'Save &amp; Continue' handler from actionbuttons.js is added right after the page is loaded,
+// before any other code can register its own listener.
+document.observe('xwiki:actions:save', function(event) {
+  document.fire('xwiki:class:save', {originalEvent: event});
+}.bindAsEventListener(window));
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));</code>
@@ -566,8 +571,8 @@ XWiki.FormFieldDefaultValueManager = Class.create({
     }.bind(this));
     $('fields').select('li').each(this._enhanceDefaultValue.bind(this));
 
-    // We need to listen to submit event to rename the default value inputs to match the new field name.
-    $('fields').up('form').observe('submit', this._onSubmit.bind(this));
+    // We need to listen to save event to rename the default value inputs to match the new field name.
+    document.observe('xwiki:class:save', this._onSave.bind(this));
   },
   _enhanceDefaultValue : function(container) {
     var fieldName = this._getFieldName(container);
@@ -589,7 +594,7 @@ XWiki.FormFieldDefaultValueManager = Class.create({
       }
     }
   },
-  _onSubmit : function() {
+  _onSave : function() {
     $('fields').select('li').each(this._maybeRenameDefaultValue.bind(this));
   },
   _maybeRenameDefaultValue : function(container) {
@@ -769,6 +774,9 @@ return XWiki;
 (function() {
   function init() {
     var form = $('inline');
+    if (!form) {
+      return false;
+    }
     // Let the sheet handle the form submit.
     form.action = '';
 
@@ -776,14 +784,23 @@ return XWiki;
     form.addClassName('xform');
 
     // Remove the preview button.
-    form.select("input[name='action_preview']")[0].up().remove();
-
-    // Hide the Save &amp; Continue button until we find a way to properly submit the form
-    form.select("input[name='action_saveandcontinue']")[0].up().hide();
+    form.down("input[name='action_preview']").up().remove();
 
     // Rename the save buttons.
-    form.select("input[name='action_save']")[0].name = 'xaction_save';
-    form.select("input[name='action_saveandcontinue']")[0].name = 'xaction_saveandcontinue';
+    form.down("input[name='action_save']").name = 'xaction_save';
+    form.down("input[name='action_saveandcontinue']").name = 'xaction_saveandcontinue';
+
+    // Make sure the 'Save &amp; Continue' button is submitted when clicked.
+    document.observe('xwiki:class:save', function(event) {
+      event = event.memo.originalEvent;
+      if (event.memo['continue']) {
+        var submitButton = event.memo.originalEvent.element();
+        submitButton.insert({after: new Element('input', {type: 'hidden', 'name': submitButton.name})});
+        (function () {
+          submitButton.next().remove();
+        }).defer();
+      }
+    }.bindAsEventListener(window));
 
     // Make the palette and the canvas live.
     new XWiki.FormFieldPalette('palette');
@@ -1591,14 +1608,22 @@ return XWiki;
     #updateAndSaveClass()
     #updateAndSaveTemplate()
     #updateAndSaveSheet()
+  #else
+    #set($errorMessage = 'Invalid CSRF token!')
+  #end
+  #if($action == 'save')
     #if($errorMessage)
       {{error}}{{html}}$errorMessage{{/html}}{{/error}}
-    #elseif($action == 'save')
+    #else
       ## Redirect to view mode.
       $response.sendRedirect($doc.getURL())
     #end
   #else
-    {{error}}Invalid CSRF token!{{/error}}
+    #if($errorMessage)
+      $response.sendError(400, $errorMessage)
+    #else
+      $response.setStatus(204)
+    #end
   #end
 #end
 {{/velocity}}

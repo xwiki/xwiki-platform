@@ -27,7 +27,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.internal.macro.MacroContentParser;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.container.AbstractContainerMacro;
 import org.xwiki.rendering.macro.container.ContainerMacroParameters;
@@ -79,29 +79,16 @@ public class ContainerMacro extends AbstractContainerMacro<ContainerMacroParamet
             ContainerMacroParameters.class);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.container.AbstractContainerMacro
-     *      #getContent(org.xwiki.rendering.macro.container.ContainerMacroParameters, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
     @Override
     protected List<Block> getContent(ContainerMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
     {
-        return this.contentParser.parse(content, context, false, false);
+        return this.contentParser.parse(content, context, false, false).getChildren();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#getPriority()
-     */
     @Override
     public int getPriority()
     {
         return 750;
     }
-
 }

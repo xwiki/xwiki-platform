@@ -103,9 +103,6 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
     {
         Set<URL> mavenURLs = ClasspathHelper.forPackage(MAVENPACKAGE);
 
-        // FIXME: remove that as soon as possible
-        mavenURLs = filterURLs(mavenURLs);
-
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.setScanners(new ResourcesScanner());
         configurationBuilder.setUrls(mavenURLs);
@@ -346,31 +343,6 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
         ExtensionLicense extensionLicense = this.licenseManager.getLicense(license.getName());
 
         return extensionLicense != null ? extensionLicense : new ExtensionLicense(license.getName(), null);
-    }
-
-    /**
-     * Very nasty hack which unescape invalid characters from the {@link URL} path because
-     * {@link Reflections#Reflections(org.reflections.Configuration)} does not do it...
-     * 
-     * @param urls base URLs to modify
-     * @return modified base URLs
-     */
-    // TODO: remove when http://code.google.com/p/reflections/issues/detail?id=87 is fixed
-    private Set<URL> filterURLs(Set<URL> urls)
-    {
-        Set<URL> results = new HashSet<URL>(urls.size());
-        for (URL url : urls) {
-            try {
-                results.add(new URL(url.getProtocol(), url.getHost(), url.getPort(), URLDecoder.decode(url.getFile(),
-                    "UTF-8")));
-            } catch (Exception e) {
-                this.logger.error("Failed to convert url [" + url + "]", e);
-
-                results.add(url);
-            }
-        }
-
-        return results;
     }
 
     /**

@@ -24,7 +24,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -82,9 +81,6 @@ public class DefaultExtensionLicenseManager implements ExtensionLicenseManager, 
     {
         Set<URL> licenseURLs = ClasspathHelper.forPackage(LICENSE_PACKAGE);
 
-        // FIXME: remove that as soon as possible
-        licenseURLs = filterURLs(licenseURLs);
-
         Reflections reflections =
             new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner()).setUrls(licenseURLs)
                 .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(LICENSE_PACKAGE))));
@@ -126,30 +122,6 @@ public class DefaultExtensionLicenseManager implements ExtensionLicenseManager, 
                 this.logger.error("Failed to load license file at [" + licenseUrl + "]", e);
             }
         }
-    }
-
-    /**
-     * Very nasty hack which unescape invalid characters from the {@link URL} path because
-     * {@link Reflections#Reflections(org.reflections.Configuration)} does not do it...
-     * 
-     * @param urls base URLs to modify
-     * @return modified base URLs
-     */
-    // TODO: remove when http://code.google.com/p/reflections/issues/detail?id=87 is fixed
-    private Set<URL> filterURLs(Set<URL> urls)
-    {
-        Set<URL> results = new HashSet<URL>(urls.size());
-        for (URL url : urls) {
-            try {
-                results.add(new URL(url.getProtocol(), url.getHost(), url.getPort(), decode(url.getFile())));
-            } catch (Exception e) {
-                this.logger.error("Failed to convert url [" + url + "]", e);
-
-                results.add(url);
-            }
-        }
-
-        return results;
     }
 
     /**

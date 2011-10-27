@@ -27,8 +27,6 @@ import org.xwiki.test.annotation.MockingRequirement;
 
 /**
  * Tests for the {@link HelloWorld} component.
- *
- * @version $Id$
  */
 public class HelloWorldTest extends AbstractMockingComponentTestCase
 {

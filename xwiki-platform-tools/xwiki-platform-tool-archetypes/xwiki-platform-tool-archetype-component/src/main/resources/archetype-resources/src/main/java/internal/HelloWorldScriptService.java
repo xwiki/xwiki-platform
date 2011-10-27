@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package ${packageName}.internal;
+package ${package}.internal;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
@@ -30,8 +30,6 @@ import javax.inject.Singleton;
 
 /**
  * Make the HelloWorld API available to scripting.
- *
- * @version $Id$
  */
 @Component
 @Named("hello")

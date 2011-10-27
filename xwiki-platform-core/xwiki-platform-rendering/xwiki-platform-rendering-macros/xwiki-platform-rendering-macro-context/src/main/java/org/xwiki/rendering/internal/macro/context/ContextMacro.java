@@ -34,9 +34,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MetaDataBlock;
-import org.xwiki.rendering.internal.macro.MacroContentParser;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.AbstractMacro;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.context.ContextMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -128,7 +128,7 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
                         + "context document provided [" + parameters.getDocument() + "] has programming rights.");
                 }
 
-                result = this.contentParser.parse(content, context, true, false);
+                result = this.contentParser.parse(content, context, true, false).getChildren();
 
             } finally {
                 this.documentAccessBridge.popDocumentFromContext(backupObjects);

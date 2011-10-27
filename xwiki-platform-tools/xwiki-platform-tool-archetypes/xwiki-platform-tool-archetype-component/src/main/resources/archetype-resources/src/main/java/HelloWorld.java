@@ -17,14 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package ${packageName};
+package ${package};
 
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * Interface (aka Role) of the Component
- * 
- * @version $Id$
  */
 @ComponentRole
 public interface HelloWorld

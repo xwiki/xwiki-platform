@@ -32,8 +32,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.internal.macro.MacroContentParser;
 import org.xwiki.rendering.macro.AbstractMacro;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.parser.ParseException;
@@ -179,11 +179,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
         return this.componentManager;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -325,6 +321,6 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     protected List<Block> parseSourceSyntax(String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return this.contentParser.parse(content, context, false, false);
+        return this.contentParser.parse(content, context, false, false).getChildren();
     }
 }

@@ -554,7 +554,8 @@ XWiki.FormFieldPrettyNameManager = Class.create({
     // Replace the preview label with the pretty name input.
     var previewLabel = container.down('.field-viewer').down('label');
     previewLabel.writeAttribute('for', '');
-    previewLabel.update(prettyNameInput);
+    previewLabel.removeChild(previewLabel.lastChild);
+    previewLabel.insert(prettyNameInput);
     // Enhance the pretty name input.
     new XWiki.InputWithTitle(prettyNameInput);
     prettyNameInput.addClassName('inherit');
@@ -1048,11 +1049,6 @@ return XWiki;
   width: 33%;
 }
 
-#options input[type=checkbox] {
-  margin: 0;
-  vertical-align: middle;
-}
-
 #options .warningmessage {
   border: 0 none;
   font-size: 0.8em;
@@ -1331,9 +1327,9 @@ return XWiki;
   #end
   {{html wiki="true"}}
   (% id="options" %)
-  ; &lt;label for="updateClassTemplate"&gt;&lt;input type="checkbox" id="updateClassTemplate" name="updateClassTemplate" checked="checked" /&gt; Update class template&lt;/label&gt;
+  ; &lt;label for="updateClassTemplate"&gt;&lt;input type="checkbox" id="updateClassTemplate" name="updateClassTemplate" checked="checked" /&gt;Update class template&lt;/label&gt;
   : (% class="xHint" %)Save the default field values in the class template ([[$templateName]]).
-  ; &lt;label for="updateClassSheet"&gt;&lt;input type="checkbox" id="updateClassSheet" name="updateClassSheet" #if($sheetName)checked="checked" #{else}disabled="disabled" #end/&gt; Update class sheet&lt;/label&gt;
+  ; &lt;label for="updateClassSheet"&gt;&lt;input type="checkbox" id="updateClassSheet" name="updateClassSheet" #if($sheetName)checked="checked" #{else}disabled="disabled" #end/&gt;Update class sheet&lt;/label&gt;
   : #if($sheetName)
       (% class="xHint" %)Recreate the sheet used to display and edit objects of this class ([[$sheetName]]).
     #else
@@ -1369,8 +1365,7 @@ return XWiki;
   ## Note that we can't simply call display on the template document because $field could be a new field that hasn't
   ## been added to the class yet (so the object from the template doesn't have this field yet).
   (% class="field-viewer" %)
-  ; {{html}}&lt;label for="${doc.fullName}_0_$field.name"&gt;$escapetool.xml($field.prettyName)&lt;/label&gt;{{/html}}
-  : {{html}}$doc.displayEdit($field, "${doc.fullName}_0_", $templateDoc.getObject($doc.fullName, true)){{/html}}
+  #displayFieldProperty($field "${doc.fullName}_0_" $templateDoc.getObject($doc.fullName, true))
 
   #set($propertyNames = ['name', 'prettyName', 'number', 'required', 'hint'])
   #set($formFieldObj = $formFieldDoc.getObject('ApplicationWithinMinutes.FormFieldClass'))
@@ -1381,12 +1376,7 @@ return XWiki;
   #foreach($propertyName in $propertyNames)
     #set($propertyDefinition = $field.xWikiClass.get($propertyName))
     #if($propertyDefinition)
-      #if($propertyDefinition.type.indexOf('Boolean') != -1)
-        ; {{html}}&lt;label for="${field.name}_$propertyName"&gt;$doc.displayEdit($propertyDefinition, "${field.name}_", $field) $escapetool.xml($propertyDefinition.prettyName)&lt;/label&gt;{{/html}}
-      #else
-        ; {{html}}&lt;label for="${field.name}_$propertyName"&gt;$escapetool.xml($propertyDefinition.prettyName)&lt;/label&gt;{{/html}}
-        : {{html}}$doc.displayEdit($propertyDefinition, "${field.name}_", $field){{/html}}
-      #end
+      #displayFieldProperty($propertyDefinition "${field.name}_" $field)
     #end
   #end
 #end
@@ -1396,6 +1386,19 @@ return XWiki;
  *#
 #macro(displayFieldMetaData $field)
   &lt;input type="hidden" id="type_$field.name" name="type_$field.name" value="$field.classType" /&gt;
+#end
+
+#**
+ * Displays a configuration property of a class field. This macro can also be used to display a property of an object.
+ *#
+#macro(displayFieldProperty $property $prefix $field)
+  #set($displayFormType = $property.getProperty('displayFormType'))
+  #if($property.type.indexOf('Boolean') != -1 &amp;&amp; (!$displayFormType || $displayFormType.value == 'checkbox'))
+    ; {{html clean="false"}}&lt;label for="$!{prefix}$property.name"&gt;$doc.displayEdit($property, $prefix, $field)$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}
+  #else
+    ; {{html}}&lt;label for="${prefix}$property.name"&gt;$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}
+    : {{html clean="false"}}$doc.displayEdit($property, $prefix, $field){{/html}}
+  #end
 #end
 
 #**
@@ -1424,6 +1427,7 @@ return XWiki;
   $xwiki.jsfx.use('js/scriptaculous/dragdrop.js')##
   $xwiki.jsx.use('ApplicationWithinMinutes.ClassEditSheet')##
   $xwiki.ssx.use('ApplicationWithinMinutes.ClassEditSheet')##
+  $xwiki.ssx.use('ApplicationWithinMinutes.ClassSheetGenerator')##
   #displayFieldPalette()
   #displayFieldCanvas()
   #displayClassOptions()

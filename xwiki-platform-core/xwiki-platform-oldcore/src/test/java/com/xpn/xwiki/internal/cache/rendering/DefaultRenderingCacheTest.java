@@ -20,6 +20,8 @@
 package com.xpn.xwiki.internal.cache.rendering;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
@@ -32,6 +34,7 @@ import org.xwiki.test.MockConfigurationSource;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.web.XWikiServletRequestStub;
 
 /**
  * Unit test for {@link DefaultRenderingCache}.
@@ -47,6 +50,12 @@ public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
 
     private RenderingCache renderingCache;
 
+    private XWikiServletRequestStub mockRequest;
+
+    private Map<String, String> parameters = new HashMap<String, String>();
+
+    private String refresh;
+
     @Override
     public void setUp() throws Exception
     {
@@ -58,11 +67,18 @@ public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
         this.mockXWiki = getMockery().mock(XWiki.class);
         getContext().setWiki(this.mockXWiki);
 
+        this.mockRequest = getMockery().mock(XWikiServletRequestStub.class);
+        getContext().setRequest(this.mockRequest);
+
         this.renderingCache = getComponentManager().lookup(RenderingCache.class);
-        
+
+        // @formatter:off
         getMockery().checking(new Expectations() {{
             allowing(mockXWiki).getDocument(document.getDocumentReference(), getContext()); will(returnValue(document));
+            allowing(mockRequest).getParameterMap(); will(returnValue(parameters));
+            allowing(mockRequest).getParameter("refresh"); will(returnValue(refresh));
         }});
+        //@formatter:on
     }
 
     @Override
@@ -87,10 +103,20 @@ public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("renderedContent",
             this.renderingCache.getRenderedContent(this.document.getDocumentReference(), "source", getContext()));
 
+        this.parameters.put("param", "value");
+        
+        Assert.assertNull(this.renderingCache.getRenderedContent(this.document.getDocumentReference(), "source",
+            getContext()));
+
+        this.parameters.remove("param");
+
+        Assert.assertEquals("renderedContent",
+            this.renderingCache.getRenderedContent(this.document.getDocumentReference(), "source", getContext()));
+        
         getComponentManager().lookup(ObservationManager.class).notify(
             new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document, getContext());
 
-        Assert.assertNull("renderedContent",
-            this.renderingCache.getRenderedContent(this.document.getDocumentReference(), "source", getContext()));
+        Assert.assertNull(this.renderingCache.getRenderedContent(this.document.getDocumentReference(), "source",
+            getContext()));
     }
 }

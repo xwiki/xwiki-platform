@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.internal.cache.rendering;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -92,7 +95,7 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
             if (!"1".equals(refresh)) {
                 renderedContent =
                     this.cache.get(documentReference, source, getAction(context), context.getLanguage(),
-                        getQueryString(context));
+                        getRequestParameters(context));
             }
         }
 
@@ -105,7 +108,7 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
     {
         if (this.configuration.isCached(documentReference)) {
             this.cache.set(renderedContent, documentReference, source, getAction(context), context.getLanguage(),
-                getQueryString(context));
+                getRequestParameters(context));
         }
     }
 
@@ -121,17 +124,27 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
     }
 
     /**
-     * Extract action information from the context.
+     * Exact action information from the context.
      * 
      * @param context the XWiki context
-     * @return the current query string
+     * @return the current request parameters
      */
-    private String getQueryString(XWikiContext context)
+    private String getRequestParameters(XWikiContext context)
     {
-        String queryString =
-            context.getRequest() != null && context.getRequest().getQueryString() != null ? context.getRequest()
-                .getQueryString() : "";
+        if (context.getRequest() != null) {
+            Map<String, String> parameters = context.getRequest().getParameterMap();
 
-        return queryString.replaceAll("\\&?refresh=1", "");
+            if (parameters != null) {
+                if (parameters.containsKey("refresh")) {
+                    parameters = new HashMap<String, String>(parameters);
+
+                    parameters.remove("refresh");
+                }
+
+                return parameters.toString();
+            }
+        }
+
+        return "";
     }
 }

@@ -59,7 +59,14 @@
 #-------------------------------------------------------------------------------------
 
 #-# [Since 3.2M3]
-#-# Directory used to store persistent data.
+#-# Directory used to store persistent data. XWiki need to have the right to write in this folder and it should never be deleted.
+#-# For example Extension Manager use this property if extension.localRepository is not set.
+#-# 
+#-# You can put:
+#-# * an absolute path
+#-# * a relative path but make sure you know from where XWiki is running
+#-#
+#-# If not set it container temporary directory is used.
 #if ($xwikiPropertiesContainerPersistentDirectory)
 container.persistentDirectory=$xwikiPropertiesContainerPersistentDirectory
 #else
@@ -71,12 +78,12 @@ container.persistentDirectory=$xwikiPropertiesContainerPersistentDirectory
 #-------------------------------------------------------------------------------------
 
 #-# [Since 1.8RC2]
-#-# Specifies how links labels are displayed when the user doesn't specify the label explicitely.
+#-# Specifies how links labels are displayed when the user doesn't specify the label explicitly.
 #-# Valid values:
 #-#   %w: wiki name
 #-#   %s: space name
 #-#   %p: page name
-#-#   %P: page name with spaces between camel case words, i.e. "My Page" iff the page name is "MyPage"
+#-#   %P: page name with spaces between camel case words, i.e. "My Page" if the page name is "MyPage"
 #-#   %t: page title
 #-#
 #-# Note that if the page title is empty or not defined then it defaults to %p. This is also the case
@@ -95,7 +102,7 @@ container.persistentDirectory=$xwikiPropertiesContainerPersistentDirectory
 # rendering.macroCategories = script:My Other Category
 
 #-# [Since 2.5M2]
-#-# Sepecifies whether the image dimensions should be extracted from the image parameters and included in the image URL
+#-# Specify whether the image dimensions should be extracted from the image parameters and included in the image URL
 #-# or not. When image dimensions are included in the image URL the image can be resized on the server side before being
 #-# downloaded, improving thus the page loading speed.
 #-#
@@ -207,7 +214,7 @@ container.persistentDirectory=$xwikiPropertiesContainerPersistentDirectory
 # openoffice.maxTasksPerProcess=50
 
 #-# [Since 1.8RC3]
-#-# Timeout for conversion tasks (in miliseconds) (serverType:0 only).
+#-# Timeout for conversion tasks (in milliseconds) (serverType:0 only).
 #-# Default value is 30 seconds
 # openoffice.taskExecutionTimeout=30000
 
@@ -262,7 +269,7 @@ container.persistentDirectory=$xwikiPropertiesContainerPersistentDirectory
 #-# The implementation of network adapter to use.
 #-# The default is jgroups.
 #-#
-#-# By default obnly jgroups is provided. To add one implements NetworkAdaptor componenet interface. The identifier provided in the configuration is matched with the component role hint.
+#-# By default only jgroups is provided. To add one implements NetworkAdaptor component interface. The identifier provided in the configuration is matched with the component role hint.
 #-# Example: observation.remote.networkadapter = jgroups
 
 #-------------------------------------------------------------------------------------
@@ -366,7 +373,7 @@ container.persistentDirectory=$xwikiPropertiesContainerPersistentDirectory
 #-# The format is <id>:<type>:<url> where
 #-# * id can be anything as long as there is only one
 #-# * type is the type of the repository (maven, xwiki, etc.)
-#-# * url is thee URL or the root of the repository
+#-# * url is the URL or the root of the repository
 #-# 
 #-# The default is:
 # extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public

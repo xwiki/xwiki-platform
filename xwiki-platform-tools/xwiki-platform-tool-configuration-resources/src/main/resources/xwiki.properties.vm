@@ -68,7 +68,7 @@
 #-# You can set:
 #-# * an absolute path (recommended)
 #-# * a relative path but in this case the directory will be relative to where the XWiki server is started and thus
-#-#   the user under which XWiki is started will need write permissions in the current directory
+#-#   the user under which XWiki is started will need write permissions for the current directory
 #-#
 #-# If not specified, the Servlet container's temporary directory is used. This is absolutely not recommended and you
 #-# should specify a value.

@@ -62,7 +62,7 @@
 #-# The directory used to store persistent data (data that should persist across server restarts). This is an
 #-# important directory containing important data and thus it should never be deleted (it should be backupped along
 #-# with the dabatase).
-#-# For example this where the Extension Manager stores downloaded extensions if the extension.localRepository
+#-# For example this is where the Extension Manager stores downloaded extensions if the extension.localRepository
 #-# property isn't configured.
 #-#
 #-# You can set:

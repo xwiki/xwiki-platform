@@ -59,14 +59,19 @@
 #-------------------------------------------------------------------------------------
 
 #-# [Since 3.2M3]
-#-# Directory used to store persistent data. XWiki need to have the right to write in this folder and it should never be deleted.
-#-# For example Extension Manager use this property if extension.localRepository is not set.
-#-# 
-#-# You can put:
-#-# * an absolute path
-#-# * a relative path but make sure you know from where XWiki is running
+#-# The directory used to store persistent data (data that should persist across server restarts). This is an
+#-# important directory containing important data and thus it should never be deleted (it should be backupped along
+#-# with the dabatase).
+#-# For example this where the Extension Manager stores downloaded extensions if the extension.localRepository
+#-# property isn't configured.
 #-#
-#-# If not set it container temporary directory is used.
+#-# You can set:
+#-# * an absolute path (recommended)
+#-# * a relative path but in this case the directory will be relative to where the XWiki server is started and thus
+#-#   the user under which XWiki is started will need write permissions in the current directory
+#-#
+#-# If not specified, the Servlet container's temporary directory is used. This is absolutely not recommended and you
+#-# should specify a value.
 #if ($xwikiPropertiesContainerPersistentDirectory)
 container.persistentDirectory=$xwikiPropertiesContainerPersistentDirectory
 #else

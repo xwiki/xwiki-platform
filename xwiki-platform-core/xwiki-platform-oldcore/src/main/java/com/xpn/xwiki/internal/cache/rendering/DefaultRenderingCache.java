@@ -52,6 +52,11 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
     private static final String NAME = "core.renderingcache";
 
     /**
+     * The name of the parameter used to force cache refresh.
+     */
+    private static final String PARAMETER_REFRESH = "refresh";
+
+    /**
      * Configuration of the rendering cache.
      */
     @Inject
@@ -90,7 +95,8 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
         String renderedContent = null;
 
         if (this.configuration.isCached(documentReference)) {
-            String refresh = context.getRequest() != null ? context.getRequest().getParameter("refresh") : null;
+            String refresh =
+                context.getRequest() != null ? context.getRequest().getParameter(PARAMETER_REFRESH) : null;
 
             if (!"1".equals(refresh)) {
                 renderedContent =
@@ -135,10 +141,10 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
             Map<String, String> parameters = context.getRequest().getParameterMap();
 
             if (parameters != null) {
-                if (parameters.containsKey("refresh")) {
+                if (parameters.containsKey(PARAMETER_REFRESH)) {
                     parameters = new HashMap<String, String>(parameters);
 
-                    parameters.remove("refresh");
+                    parameters.remove(PARAMETER_REFRESH);
                 }
 
                 return parameters.toString();

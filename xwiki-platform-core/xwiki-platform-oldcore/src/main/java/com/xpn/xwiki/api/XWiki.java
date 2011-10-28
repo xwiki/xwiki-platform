@@ -1495,16 +1495,14 @@ public class XWiki extends Api
     {
         DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
         if (!StringUtils.isEmpty(sourceWiki)) {
-            sourceDocumentReference = new DocumentReference(
-                new EntityReference(sourceDocumentReference, sourceDocumentReference.getWikiReference(),
-                    new WikiReference(sourceWiki)));
+            sourceDocumentReference = new DocumentReference(sourceDocumentReference,
+                sourceDocumentReference.getWikiReference(), new WikiReference(sourceWiki));
         }
 
         DocumentReference targetDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(targetdocname);
         if (!StringUtils.isEmpty(targetWiki)) {
-            targetDocumentReference = new DocumentReference(
-                new EntityReference(targetDocumentReference, targetDocumentReference.getWikiReference(),
-                    new WikiReference(targetWiki)));
+            targetDocumentReference = new DocumentReference(targetDocumentReference,
+                targetDocumentReference.getWikiReference(), new WikiReference(targetWiki));
         }
 
         return this.copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset, force);

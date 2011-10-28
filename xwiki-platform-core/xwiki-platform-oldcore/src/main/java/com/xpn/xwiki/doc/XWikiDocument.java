@@ -500,19 +500,17 @@ public class XWikiDocument implements DocumentModelBridge
         // Build an entity reference that will serve as a current context reference against which to resolve if the
         // passed name doesn't contain a space.
         EntityReference contextReference = null;
-        if (!StringUtils.isEmpty(wiki)) {
-            contextReference = new WikiReference(wiki);
-        }
         if (!StringUtils.isEmpty(space)) {
-            if (contextReference != null) {
-                contextReference = new SpaceReference(space, contextReference);
-            } else {
-                // SpaceReference is invalid without a valid parent
-                contextReference = new EntityReference(space, EntityType.SPACE);
-            }
+            contextReference = new EntityReference(space, EntityType.SPACE);
         }
 
-        init(this.currentDocumentReferenceResolver.resolve(name, contextReference));
+        DocumentReference reference = this.currentDocumentReferenceResolver.resolve(name, contextReference);
+
+        if (!StringUtils.isEmpty(wiki)) {
+            reference = new DocumentReference(reference, reference.getWikiReference(), new WikiReference(wiki));
+        }
+
+        init(reference);
     }
 
     public XWikiStoreInterface getStore(XWikiContext context)
@@ -5160,7 +5158,7 @@ public class XWikiDocument implements DocumentModelBridge
             WikiReference wiki = reference.getWikiReference();
             WikiReference newWiki = new WikiReference(database);
             if( !newWiki.equals(wiki) ) {
-                this.documentReference = new DocumentReference(new EntityReference(reference, wiki, newWiki));
+                this.documentReference = new DocumentReference(reference, wiki, newWiki);
 
                 // Clean the absolute parent reference cache to rebuild it next time getParentReference is called.
                 this.parentReferenceCache = null;

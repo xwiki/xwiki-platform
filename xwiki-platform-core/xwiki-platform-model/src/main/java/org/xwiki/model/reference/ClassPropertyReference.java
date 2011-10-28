@@ -41,6 +41,19 @@ public class ClassPropertyReference extends EntityReference
     }
 
     /**
+     * Clone an ClassPropertyReference, but replace one of the parent in the chain by a new one
+     *
+     * @param reference the reference that is cloned
+     * @param oldReference the old parent that will be replaced
+     * @param newReference the new parent that will replace oldReference in the chain
+     * @since 3.3M1
+     */
+    public ClassPropertyReference(EntityReference reference, EntityReference oldReference, EntityReference newReference)
+    {
+        super(reference, oldReference, newReference);
+    }
+
+    /**
      * Builds a property reference for the passed property in the passed object.
      * 
      * @param propertyName the name of the property to create reference for

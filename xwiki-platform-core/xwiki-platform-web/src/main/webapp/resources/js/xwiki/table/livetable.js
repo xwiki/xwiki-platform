@@ -724,6 +724,9 @@ var LiveTablePagination = Class.create({
       }
       if (currentPage <= 1) {
         this.pagesNodes.each(function(item) {
+          if (!item.up().previous('.controlPagination')) {
+            return;
+          }
           var prevPage = item.up().previous('.controlPagination').down('.prevPagination');
           if (prevPage) {
             prevPage.addClassName('noPrevPagination').removeClassName('prevPagination');
@@ -731,6 +734,9 @@ var LiveTablePagination = Class.create({
         });
       } else {
         this.pagesNodes.each(function(item) {
+          if (!item.up().previous('.controlPagination')) {
+            return;
+          }
           var prevPage = item.up().previous('.controlPagination').down('.noPrevPagination');
           if (prevPage) {
             prevPage.addClassName('prevPagination').removeClassName('noPrevPagination');
@@ -739,6 +745,9 @@ var LiveTablePagination = Class.create({
       }
       if (currentPage >= pages) {
         this.pagesNodes.each(function(item) {
+          if (!item.up().previous('.controlPagination')) {
+            return;
+          }
           var nextPage = item.up().previous('.controlPagination').down('.nextPagination');
           if (nextPage) {
             nextPage.addClassName('noNextPagination').removeClassName('nextPagination');
@@ -746,6 +755,9 @@ var LiveTablePagination = Class.create({
         });
       } else {
         this.pagesNodes.each(function(item) {
+          if (!item.up().previous('.controlPagination')) {
+            return;
+          }
           var nextPage = item.up().previous('.controlPagination').down('.noNextPagination');
           if (nextPage) {
             nextPage.addClassName('nextPagination').removeClassName('noNextPagination');

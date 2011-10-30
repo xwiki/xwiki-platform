@@ -40,7 +40,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.CompositeBlockMatcher;
-import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;

@@ -125,10 +125,6 @@ public class DocumentContentDisplayer implements DocumentDisplayer
             XDOM result =
                 parameters.isExecutionContextIsolated() ? displayInIsolatedExecutionContext(document, nameSpace,
                     parameters) : display(document, nameSpace, parameters);
-
-            // Set the source meta data so that relative links/images are resolved correctly at render time.
-            result.getMetaData().addMetaData(MetaData.SOURCE, nameSpace);
-
             return result;
         } finally {
             // Since we configure Velocity to have local macros (i.e. macros visible only to the local context), since

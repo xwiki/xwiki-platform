@@ -34,7 +34,6 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Tools - Parent POM</description>
   <modules>
-    <module>xwiki-platform-tool-archetypes</module>
     <module>xwiki-platform-tool-configuration-resources</module>
     <module>xwiki-platform-tool-jetty-resources</module>
     <module>xwiki-platform-tool-packager-plugin</module>

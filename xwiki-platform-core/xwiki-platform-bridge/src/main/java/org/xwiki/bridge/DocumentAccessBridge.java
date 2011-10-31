@@ -26,6 +26,8 @@ import java.util.Map;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
@@ -266,6 +268,18 @@ public interface DocumentAccessBridge
     String getDocumentContent(String documentReference, String language) throws Exception;
 
     /**
+     * Get the number of the first object that has a property that match the expectation. 
+     * 
+     * @param documentReference the reference of the document to look for objects into
+     * @param classReference the reference of the class to look objects of
+     * @param parameterName the name of the parameter to check the value for
+     * @param valueToMatch the value to match for this parameter
+     * @return the number of the first matching object, or -1 if none found
+     */
+    int getObjectNumber(DocumentReference documentReference, DocumentReference classReference,
+        String parameterName, String valueToMatch);
+    
+    /**
      * Retrieves the value for an object property.
      * 
      * @param documentReference the reference of the document to access
@@ -291,6 +305,27 @@ public interface DocumentAccessBridge
     Object getProperty(String documentReference, String className, String propertyName);
 
     /**
+     * Retrieves the value for an object property.
+     * 
+     * @param objectReference the reference of the object to access
+     * @param propertyName The name of the property to retrieve.
+     * @return the property value or null if it doesn't exist or an error occurred while looking for the property (the
+     *         document doesn't exist for example)
+     * @since 3.2M3
+     */
+    Object getProperty(ObjectReference objectReference, String propertyName);
+
+    /**
+     * Retrieves the value for an object property.
+     * 
+     * @param objectPropertyReference the reference of the property to access
+     * @return the property value or null if it doesn't exist or an error occurred while looking for the property (the
+     *         document doesn't exist for example)
+     * @since 3.2M3
+     */
+    Object getProperty(ObjectPropertyReference objectPropertyReference);
+    
+    /**
      * Retrieves the value for an object property, from the first object of the given class.
      * 
      * @param documentReference the reference of the document to access
@@ -302,6 +337,20 @@ public interface DocumentAccessBridge
      */
     Object getProperty(DocumentReference documentReference, DocumentReference classReference, String propertyName);
 
+    /**
+     * Retrieves the value for an object property, from the Nth object of the given class.
+     * 
+     * @param documentReference the reference of the document to access
+     * @param classReference the reference to the XWiki Class
+     * @param objectNumber the number of the object to get the property for
+     * @param propertyName The name of the property to retrieve.
+     * @return the property value or null if it doesn't exist or an error occurred while looking for the property (the
+     *         document doesn't exist for example)
+     * @since 3.2M3
+     */
+    Object getProperty(DocumentReference documentReference, DocumentReference classReference, int objectNumber,
+        String propertyName);
+    
     /**
      * Retrieves the value for an object property, from the first object of any class that has a property with that
      * name.

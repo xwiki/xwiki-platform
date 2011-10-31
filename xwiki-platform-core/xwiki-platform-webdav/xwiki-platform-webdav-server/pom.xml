@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-webdav</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-webdav-server</artifactId>
   <packaging>jar</packaging>
@@ -40,8 +40,8 @@
       <artifactId>servlet-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
@@ -59,4 +59,35 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            com/xpn/xwiki/plugin/webdav/resources/domain/DavPage.java,
+            com/xpn/xwiki/plugin/webdav/resources/domain/DavTempFile.java,
+            com/xpn/xwiki/plugin/webdav/resources/domain/DavWikiFile.java,
+            com/xpn/xwiki/plugin/webdav/resources/partial/AbstractDavResource.java,
+            com/xpn/xwiki/plugin/webdav/resources/views/attachments/AttachmentsByFirstLettersSubView.java,
+            com/xpn/xwiki/plugin/webdav/resources/views/attachments/AttachmentsBySpaceNameSubView.java,
+            com/xpn/xwiki/plugin/webdav/resources/views/attachments/AttachmentsView.java,
+            com/xpn/xwiki/plugin/webdav/resources/views/OrphansView.java,
+            com/xpn/xwiki/plugin/webdav/resources/views/pages/PagesByFirstLettersSubView.java,
+            com/xpn/xwiki/plugin/webdav/resources/views/pages/PagesBySpaceNameSubView.java,
+            com/xpn/xwiki/plugin/webdav/resources/views/pages/PagesView.java,
+            com/xpn/xwiki/plugin/webdav/resources/views/RootView.java,
+            com/xpn/xwiki/plugin/webdav/resources/views/WhatsnewView.java,
+            com/xpn/xwiki/plugin/webdav/resources/XWikiDavResource.java,
+            com/xpn/xwiki/plugin/webdav/utils/XWikiDavContext.java,
+            com/xpn/xwiki/plugin/webdav/utils/XWikiDavResourceFactory.java,
+            com/xpn/xwiki/plugin/webdav/utils/XWikiDavUserStorage.java,
+            com/xpn/xwiki/plugin/webdav/XWikiDavServlet.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

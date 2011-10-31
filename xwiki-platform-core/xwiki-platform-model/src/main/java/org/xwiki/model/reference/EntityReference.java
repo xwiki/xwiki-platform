@@ -19,8 +19,8 @@
  */
 package org.xwiki.model.reference;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.CompareToBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.xwiki.model.EntityType;
 
 import java.io.Serializable;

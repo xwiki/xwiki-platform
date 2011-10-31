@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension-repositories</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-repository-xwiki</artifactId>
   <name>XWiki Platform - Extension - Repository - XWiki</name>
@@ -35,7 +35,8 @@
   <description>XWiki Platform - Extension - Repository - XWiki</description>
   <modules>
     <module>xwiki-platform-extension-repository-xwiki-model</module>
-    <module>xwiki-platform-extension-repository-xwiki-client</module>
+    <module>xwiki-platform-extension-repository-xwiki-api</module>
+    <module>xwiki-platform-extension-repository-xwiki-handler</module>
     <module>xwiki-platform-extension-repository-xwiki-server-api</module>
     <module>xwiki-platform-extension-repository-xwiki-server-ui</module>
   </modules>

@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>WorkspaceUsers</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1304114838000</creationDate>
+<date>1307710513000</date>
+<contentUpdateDate>1307710513000</contentUpdateDate>
+<version>1.1</version>
+<title>Workspace Users</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.WorkspaceUsers</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>22d44dd4-dd1f-41ff-ad2f-00cf192b2346</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>#inputContainer {
+  display: inline-block;
+  width: 99%;
+}
+
+#messageContainer textarea {
+  margin-top: 0;
+}
+
+#candidates {
+  padding-left: 4px;
+}
+
+.candidate {
+  display: inline-block;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.candidateAvatar {
+  display: inline;
+  float: left;
+  margin-left: 11px;
+  margin-right: 11px;
+}
+
+.candidateDetails {
+  display: block;
+  float: left;
+  width: 83%;
+  padding-left: 4px;
+}
+
+.reviewerComment {
+  display: inline-block;
+  width: 49%;
+}
+
+.reviewerComment textarea {
+  width: 100%;
+}
+
+.reviewerPrivateComment {
+  display: inline-block;
+  width: 49%;
+}
+
+.reviewerPrivateComment textarea {
+  width: 100%;
+}</code>
+</property>
+<property>
+<name>Style extension</name>
+</property>
+<property>
+<parse>0</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<content>{{velocity output="false"}}
+#set($mainwk = $xcontext.isMainWiki())
+$xwiki.jsfx.use('js/xwiki/usersandgroups/usersandgroups.js', true)
+$xwiki.ssfx.use('js/xwiki/usersandgroups/usersandgroups.css')
+$xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
+$xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
+$xwiki.ssx.use('XWiki.WorkspaceUsers')
+
+## Use the XWikiAllGroup as the group target
+#set($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
+
+#macro(hasGroupRight $right $hasGroupRight)
+  #set($result = false)
+  #if($!xwiki.hasAccessLevel("$!right", $xcontext.user, $groupDoc.fullName) &amp;&amp; $groupDoc.getObject('XWiki.XWikiGroups', false))
+    #set($result = true)
+  #end
+  #set($hasGroupRight = $util.null)
+  #setVariable("$hasGroupRight" $result)
+#end
+#hasGroupRight('edit' $hasEditGroupRight)
+#hasGroupRight('delete' $hasDeleteGroupRight)
+##
+##
+{{/velocity}}
+
+{{velocity}}
+#set ($candidateClass = 'WorkspaceCandidateMemberClass')
+#set ($xwikiGroupsClass = 'XWiki.XWikiGroups')
+#set ($messageStream = $services.messageStream)
+#set ($wikiDescriptor = $services.workspace.getWorkspace($xcontext.database).wikiDescriptor)
+#set ($workspacePrettyName = $wikiDescriptor.wikiPrettyName)
+#if ("$!workspacePrettyName" == '')
+  #set ($workspacePrettyName = $xcontext.database)
+#end
+#set ($workspaceUrl = $wikiDescriptor.homePageUrl)
+##
+#if ($hasAdmin &amp;&amp; ($request.acceptUser || $request.rejectUser))
+  ## Handle a candidate members's request.
+  ##
+  #set ($candidateNumber = $util.parseInt("$!{request.candidateNumber}"))
+  #set ($candidateMember = $groupDoc.getObject($candidateClass, $candidateNumber))
+  #if ($candidateMember &amp;&amp; $candidateMember.getProperty('status').getValue() == 'pending')
+    ## Common values.
+    #set ($temp = $candidateMember.set('reviewer', "$xcontext.user"))
+    #set ($temp = $candidateMember.set('resolutionDate', $datetool.date))
+    #set ($temp = $candidateMember.set('reviewerComment', "$!{request.reviewerComment}"))
+    #set ($temp = $candidateMember.set('reviewerPrivateComment', "$!{request.reviewerPrivateComment}"))
+    ## Specific values.
+    #if ($request.acceptUser)
+      #set ($temp = $candidateMember.set('status', 'accepted'))
+      ## Add user to group, if not already added, and notify user.
+      #set ($existingUserObject = $groupDoc.getObject($xwikiGroupsClass, 'member', $candidateMember.userName))
+      #if (!$existingUserObject)
+        #set ($newUserObject = $groupDoc.newObject($xwikiGroupsClass))
+        #set ($temp = $newUserObject.set('member', $candidateMember.userName))
+      #end
+      #set ($notificationMessage = "Your request to join the workspace '${workspacePrettyName}' has been accepted.")
+    #elseif ($request.rejectUser)
+      #set ($temp = $candidateMember.set('status', 'rejected'))
+      #set ($notificationMessage = "Your request to join the workspace '${workspacePrettyName}' has been rejected.")
+    #end
+    ## Save changes.
+    #set ($temp = $groupDoc.save("Handled candidate $candidateNumber ($candidateMember.userName)", true))
+    ## Notify the user.
+    #if ("$!{request.reviewerComment}" != '')
+      ## FIXME: remplace newline with ${escapetool.newline} when upgrading velocity-tools to 2.0 (in xwiki3.1+?)
+      #set ($notificationMessage = "${notificationMessage}
+Comment: ${request.reviewerComment}")
+    #end
+    #set ($userDocumentReference = $services.model.resolveDocument($candidateMember.userName))
+    #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
+    #if ($request.acceptUser)
+      {{info}}Request accepted successfully.{{/info}}
+    #else
+      {{info}}Request rejected successfully.{{/info}}
+    #end
+  #end
+#elseif($hasAdmin &amp;&amp; $request.inviteUser)
+  ## Handle inviting a user.
+  ##
+  #set ($userName = $request.userName)
+  #set ($message = $request.message)
+  #set ($okToInvite = "$!{userName}" != '')
+  ##
+  #if ($okToInvite)
+    #set ($isMember = ("$!{groupDoc.getObject($xwikiGroupsClass, 'member', $userName)}" != ''))
+    #if ($isMember)
+      #set ($okToInvite = false)
+      {{error}}The user is already a member of the workspace.{{/error}}
+    #end
+  #end
+  ##
+  #if ($okToInvite)
+    #set ($candidateMembers = $groupDoc.getObjects($candidateClass, 'userName', $userName))
+    #set ($requestExists = false)
+    #set ($invitationExists = false)
+    #foreach ($candidateMember in $candidateMembers)
+      #if ($candidateMember.getProperty('status').getValue() == 'pending')
+        #if ($candidateMember.getProperty('type').getValue() == 'request')
+          #set ($requestExists = true)
+          {{error}}The user already has a pending request. Please respond to the request instead.{{/error}}
+        #else
+          #set ($invitationExists = true)
+          {{error}}The user already has a pending invitation.{{/error}}
+        #end
+        #set ($okToInvite = false)
+        ## Stop here.
+        #break
+      #end
+    #end
+  #end
+  ##
+  #if ($okToInvite)
+    #set ($newInvitationObject = $groupDoc.newObject($candidateClass))
+    #set ($temp = $newInvitationObject.set('status', 'pending'))
+    #set ($temp = $newInvitationObject.set('type', 'invitation'))
+    #set ($temp = $newInvitationObject.set('reviewer', "$xcontext.user"))
+    #set ($temp = $newInvitationObject.set('resolutionDate', $datetool.date))
+    #set ($temp = $newInvitationObject.set('reviewerComment', "$!message"))
+    #set ($temp = $newInvitationObject.set('userName', $userName))
+    ##set ($temp = $newInvitationObject.set('reviewerPrivateComment', "$!{request.reviewerPrivateComment}"))
+    ## Save the invitation.
+    #set ($temp = $groupDoc.save("User '${userName}' has been invited to join the workspace.", true))
+    ## Notify the user.
+    #set ($notificationMessage = "You have been invited to join the workspace '${workspacePrettyName}'.")
+    #if ("$!message" != '')
+      ## FIXME: remplace newline with ${escapetool.newline} when upgrading velocity-tools to 2.0 (in xwiki3.1+?)
+      #set ($notificationMessage = "$notificationMessage
+Comment: $message")
+    #end
+    #set ($userDocumentReference = $services.model.resolveDocument($userName))
+    #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
+    {{info}}User invited successfuly.{{/info}}
+  #end
+#elseif ($hasAdmin &amp;&amp; $request.cancelInvitation)
+  ##
+  ## Handle canceling an invitation.
+  #set ($candidateNumber = $util.parseInt("$!{request.candidateNumber}"))
+  #set ($candidateMember = $groupDoc.getObject($candidateClass, $candidateNumber))
+  #if ($candidateMember &amp;&amp; $candidateMember.getProperty('status').getValue() == 'pending')
+    ## Remove the invitation
+    #set ($temp = $groupDoc.removeObject($candidateMember))
+    ## Save changes.
+    #set ($temp = $groupDoc.save("Canceled invitation $candidateNumber ($candidateMember.userName)", true))
+    ## Notify the user.
+    #set ($notificationMessage = "Your invitation has been canceled and is no longer valid.")
+    #set ($userDocumentReference = $services.model.resolveDocument($candidateMember.userName))
+    #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
+    {{info}}Invitation canceled successfuly.{{/info}}
+  #end
+#end
+
+##
+## In the original sheet, this was displayed only when in inline edit mode. 
+#if($hasEditGroupRight)
+{{html}}
+&lt;form id='inviteUserForm' class='xform half'&gt;
+&lt;h2&gt;$msg.get('workspacemanager.member.add')&lt;/h2&gt;
+  &lt;dl&gt;
+    &lt;div id='inputContainer'&gt;
+      &lt;div id='userNameContainer'&gt;
+        &lt;dt&gt;
+          &lt;label for='userName'&gt;User name&lt;/label&gt;
+          &lt;div class='xHint'&gt;The name of the user to add to the workspace.&lt;/div&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;input id='userSuggest' type='text' size='30' name='userName' autocomplete='off' /&gt;
+          &lt;span id='errMsg' class='xErrorMsg'&gt;&lt;/span&gt;
+        &lt;/dd&gt;
+      &lt;/div&gt;
+      &lt;div id='messageContainer'&gt;
+        &lt;dt&gt;
+          &lt;label for='message'&gt;Message&lt;/label&gt;
+          &lt;div class='xHint'&gt;The message to send to the user.&lt;/div&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;textarea name='message' /&gt;
+        &lt;/dd&gt;
+      &lt;/div&gt;
+      &lt;div class='clearfloats'&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;br/&gt;
+    &lt;div id='addInviteButtonContainer'&gt;
+      &lt;span class='buttonwrapper'&gt;
+        &lt;input id='addNewUser' type='button' class='button' name='addUser' value="$msg.get('xe.admin.groups.addUser.submit')"/&gt;
+      &lt;/span&gt;
+      &lt;span class='buttonwrapper'&gt;
+        &lt;input id='inviteUserButton' type='submit' class='button' name='inviteUser' value='Invite'/&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/dl&gt;
+  &lt;input type='hidden' name='editor' value='globaladmin'/&gt;
+  &lt;input type='hidden' name='section' value='XWiki.WorkspaceUsers'/&gt;
+&lt;/form&gt;
+  ##
+  ##
+  &lt;script type="text/javascript"&gt;
+    // &lt;![CDATA[
+      if (typeof XWiki == "undefined") {
+        var XWiki = {}; 
+      }
+      Object.extend(XWiki, {
+        groupmanager : {
+          /*
+          ** Initialize Group Manager javascript widgets (called on document load).
+          */
+          userSuggest: null,
+
+          groupSuggest: null,
+
+          init: function() {
+              /* Initialize everything also in view mode */
+              this.initSuggestWidget();
+              this.initAddNewMemberWidget();
+          },
+          initSuggestWidget: function() {
+            if ($('userSuggest')) {
+              $('userSuggest').observe('focus', this.createSuggest.bind(this, $('userSuggest'), 'user', true));
+            } 
+          },
+          initAddNewMemberWidget: function() {
+            if ($('addNewUser')) {
+              $('addNewUser').observe('click', this.addNewMember.bind(this, 'user', $('userSuggest')));
+            }
+          },
+          createSuggest: function(input, uorg, suggestObj) {
+            // Clear the errors
+            $('errMsg').innerHTML = "";
+            suggesturl = "${doc.getURL('view', 'xpage=uorgsuggest&amp;classname=XWiki.XWikiUsers')}";
+            suggesturl += "&amp;uorg=user&amp;wiki=global" + "&amp;";
+            icon = "$xwiki.getSkinFile('icons/silk/user.gif')";
+
+            return new XWiki.widgets.Suggest(input, { script: suggesturl, varname:'input', icon:icon });
+          },
+          addNewMember: function(uorg, input) {
+            if (input) {
+              var url = "${groupDoc.getURL()}?xpage=adduorg&amp;uorg=" + encodeURIComponent(uorg) + "&amp;name=" + encodeURIComponent(input.value) + "&amp;form_token=$!{escapetool.url($services.csrf.getToken())}";
+              new Ajax.Request(url, {
+                method: 'get',
+                onSuccess: function(transport) {
+                  $('userSuggest').value = "";
+                  var nr = parseInt(transport.responseText);
+                  if (nr == 0) {
+                    if (uorg == "user") {
+                      $('errMsg').innerHTML = "$msg.get('xe.admin.groups.addUser.duplicate')";
+                    } 
+                  } else {
+                    var end = editgrouptable.limit;
+                    var start = editgrouptable.lastOffset;
+                    editgrouptable.clearCache();
+                    if (start &lt; 1) {
+                      start = 1;
+                    }
+                    editgrouptable.getRows(start, end, start, end);
+                  }
+                }
+              });
+            }
+          }
+        }
+      });
+      XWiki.groupmanager.init();
+    // ]]&gt;
+  &lt;/script&gt;
+{{/html}}
+#end
+
+{{html}}
+  &lt;div class='xform'&gt;
+    &lt;h2&gt;Existing users&lt;/h2&gt;
+  &lt;/div&gt;
+{{/html}}
+#set($columnOptions = {
+  "member" : {'link': 'auto', 'type': 'text'},
+  '_avatar' : { 'type' : 'none', 'link' : 'field', 'html' : 'true', 'sortable' : false },
+  "_actions" : {
+    'actions': ['delete'],
+    'actionCallbacks': {'delete': 'table.deleteRow(i);'},
+    'ajaxActions': {'delete': true}
+   }
+})
+#if($hasDeleteGroupRight)
+  #set($columns = ['_avatar', 'member', '_actions'])
+#else
+  #set($columns = ['_avatar', 'member'])
+#end
+##
+#livetable('groupusers', $columns, $columnOptions, {'url' : "${groupDoc.getURL('view', 'xpage=getgroupmembers')}", 'translationPrefix' : 'xe.admin.groups.', 'javascriptName' : 'editgrouptable'})
+##
+{{html}}
+&lt;div id='candidates' class='xform'&gt;
+&lt;h2&gt;Candidates&lt;/h2&gt;
+&lt;div class='xHint'&gt;Users which have requested or which have been invited to join the workspace.&lt;/div&gt;
+#set ($candidateMembers = $groupDoc.getObjects($candidateClass))
+#foreach ($candidateMember in $candidateMembers)
+  #set ($userFullName = $candidateMember.userName)
+  #set ($userURL = $xwiki.getURL($userFullName))
+  #set ($userComment = $candidateMember.getProperty('userComment').getValue())
+  #set ($status = $candidateMember.getProperty('status').getValue())
+  #set ($type = $candidateMember.getProperty('type').getValue())
+&lt;div class='candidate'&gt;
+  &lt;div class='candidateAvatar'&gt;&lt;a href="$userURL"&gt;#mediumUserAvatar("$!{userFullName}")&lt;/a&gt;&lt;/div&gt;
+  &lt;div class='candidateDetails'&gt;
+    &lt;form class='xformInline'&gt;
+      &lt;div class='candidateNameAndComment'&gt;
+        $xwiki.getUserName($candidateMember.userName)#if("$!userComment" != ''): &lt;span class='candidateCommentSpan'&gt;$userComment&lt;/span&gt;#end
+      &lt;/div&gt;
+      &lt;div class='date xHint'&gt;
+        $candidateMember.date
+      &lt;/div&gt;
+      &lt;div class='candidateStatus'&gt;
+        &lt;label&gt;Status:&lt;/label&gt; $candidateMember.status
+      &lt;/div&gt;
+      &lt;div class='candidateType'&gt;
+        &lt;label&gt;Type:&lt;/label&gt; $candidateMember.type
+      &lt;/div&gt;
+      #if ($status != 'pending' || $type == 'invitation')
+      &lt;div class='reviewer'&gt;
+        &lt;label&gt;Admin:&lt;/label&gt; $xwiki.getUserName($candidateMember.reviewer)
+      &lt;/div&gt;
+      #end
+      &lt;div class='reviewerComment'&gt;
+        &lt;label&gt;
+            Admin's Message:
+        &lt;/label&gt; 
+        #if($status == 'pending' &amp;&amp; $type == 'request')
+          &lt;textarea name='reviewerComment'/&gt;
+        #else
+          &lt;span class='reviewerCommentSpan'&gt;$!{candidateMember.getProperty('reviewerComment').getValue()}&lt;/span&gt;
+        #end
+      &lt;/div&gt;
+      &lt;div class='reviewerPrivateComment'&gt;
+        &lt;label&gt;Private Comment:&lt;/label&gt;
+        #if($status == 'pending' &amp;&amp; $type == 'request')
+          &lt;textarea name='reviewerPrivateComment'/&gt;
+        #else
+          &lt;span class='reviewerPrivateCommentSpan'&gt;$!{candidateMember.getProperty('reviewerPrivateComment').getValue()}&lt;/span&gt;
+        #end
+      &lt;/div&gt;
+      &lt;div class='date xHint'&gt;
+        $candidateMember.resolutionDate
+      &lt;/div&gt;
+      &lt;div class='reviewerActions'&gt;
+        #if ($status == 'pending' &amp;&amp; $type == 'request')
+        &lt;span class='buttonwrapper acceptUserButton'&gt;
+          &lt;input type='submit' class='button' value='Accept' name='acceptUser'/&gt;
+        &lt;/span&gt;
+        &lt;/span class='buttonwrapper rejectUserButton'&gt;
+          &lt;input type='submit' class='button secondary' value='Reject' name='rejectUser'/&gt;
+        &lt;/span&gt;
+        #end
+        #if ($status == 'pending' &amp;&amp; $type == 'invitation')
+        &lt;/span class='buttonwrapper cancelInvitationButton'&gt;
+          &lt;input type='submit' class='button' value='Cancel Invitation' name='cancelInvitation'/&gt;
+        &lt;/span&gt;
+        #end
+      &lt;/div&gt;
+      &lt;input type='hidden' name='candidateNumber' value='$candidateMember.number'/&gt;
+      &lt;input type='hidden' name='editor' value='globaladmin'/&gt;
+      &lt;input type='hidden' name='section' value='XWiki.WorkspaceUsers'/&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+  &lt;div class='clearfloats'&gt;&lt;/div&gt;
+&lt;/div&gt;
+#end
+&lt;/div&gt;
+{{/html}}
+{{/velocity}}</content></xwikidoc>

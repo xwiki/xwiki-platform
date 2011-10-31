@@ -28,29 +28,26 @@ import org.xwiki.gwt.wysiwyg.client.diff.Revision;
 import org.xwiki.gwt.wysiwyg.client.diff.ToString;
 import org.xwiki.gwt.wysiwyg.client.plugin.sync.SyncResult;
 import org.xwiki.gwt.wysiwyg.client.plugin.sync.SyncStatus;
-import org.xwiki.wysiwyg.server.internal.plugin.sync.DefaultSyncEngine;
+import org.xwiki.test.AbstractComponentTestCase;
 import org.xwiki.wysiwyg.server.plugin.sync.SyncEngine;
 
-
 /**
- * Unit tests for the synchronization code.
+ * Unit tests for {@link DefaultSyncEngine}.
  * 
  * @version $Id$
  */
-public class DefaultSyncEngineTest
+public class DefaultSyncEngineTest extends AbstractComponentTestCase
 {
     /**
      * The synchronization engine.
      */
     private SyncEngine syncEngine;
 
-    /**
-     * {@inheritDoc}
-     */
     @Before
+    @Override
     public void setUp() throws Exception
     {
-        this.syncEngine = new DefaultSyncEngine();
+        this.syncEngine = getComponentManager().lookup(SyncEngine.class);
     }
 
     @Test

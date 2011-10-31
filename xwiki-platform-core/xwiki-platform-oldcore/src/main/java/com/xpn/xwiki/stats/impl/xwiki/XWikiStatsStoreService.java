@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.stats.impl.xwiki;
 
 import java.util.ArrayList;
@@ -28,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -51,7 +49,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
     /**
      * Logging tools.
      */
-    private static final Log LOG = LogFactory.getLog(XWikiStatsStoreService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiStatsStoreService.class);
 
     /**
      * The queue containing the statistics to store.
@@ -100,17 +98,12 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
             this.thread.join();
             this.thread = null;
         } catch (InterruptedException e) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("Thread join has been interrupted", e);
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn("Thread join has been interrupted", e);
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.util.AbstractXWikiRunnable#runInternal()
-     */
     @Override
     public void runInternal()
     {
@@ -119,12 +112,12 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
                 register();
             }
         } catch (InterruptedException e) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("Statistics storing thread has been interrupted.", e);
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn("Statistics storing thread has been interrupted.", e);
             }
         } catch (StopStatsStoreException e) {
-            if (LOG.isInfoEnabled()) {
-                LOG.warn("Statistics storing thread received stop order.", e);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.warn("Statistics storing thread received stop order.", e);
             }
         }
     }
@@ -182,7 +175,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
         try {
             this.queue.put(statsRegisterItem);
         } catch (InterruptedException e) {
-            LOG.error("Statistics storage thread has been interrupted", e);
+            LOGGER.error("Statistics storage thread has been interrupted", e);
         }
     }
 
@@ -270,8 +263,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
     {
         String referer = StatsUtil.getReferer(context);
         if ((referer != null) && (!referer.equals(""))) {
-            add(new RefererStatsStoreItem(doc.getFullName(), new Date(), StatsUtil.PeriodType.MONTH, referer,
-                context));
+            add(new RefererStatsStoreItem(doc.getFullName(), new Date(), StatsUtil.PeriodType.MONTH, referer, context));
         }
     }
 }
@@ -283,21 +275,13 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
  */
 class StopStatsRegisterObject implements XWikiStatsStoreItem
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreItem#getId()
-     */
+    @Override
     public String getId()
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreItem#store(java.util.List)
-     */
+    @Override
     public void store(List<XWikiStatsStoreItem> register)
     {
     }

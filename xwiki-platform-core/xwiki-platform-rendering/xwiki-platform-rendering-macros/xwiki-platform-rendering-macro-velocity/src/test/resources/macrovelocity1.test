@@ -2,118 +2,30 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-{{velocity}}{{html wiki="true"}}
-<div>
-  #set ($name = "John")
-  #set ($list = ['one', 'two'])
-  <h1>Hello $name</h1>
-  <table>
-    #foreach ($item in $list)
-      <tr>
-        <td>
-          * item
-
-        </td>
-      </tr>
-    #end
-  </table>
-</div>
-{{/html}}{{/velocity}}
+{{velocity}}
+#set ($list = ['one', 'two'])
+#foreach ($item in $list)
+* $item
+#end
+{{/velocity}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [velocity] [] [{{html wiki="true"}}
-<div>
-  #set ($name = "John")
-  #set ($list = ['one', 'two'])
-  <h1>Hello $name</h1>
-  <table>
-    #foreach ($item in $list)
-      <tr>
-        <td>
-          * item
-
-        </td>
-      </tr>
-    #end
-  </table>
-</div>
-{{/html}}]
-beginMacroMarkerStandalone [html] [wiki=true] [<div>
-<h1>Hello John</h1>
-<table>
-<tr>
-<td>
-* item
-
-</td>
-</tr>
-<tr>
-<td>
-* item
-
-</td>
-</tr>
-</table>
-</div>]
-onRawText [<div>
-<h1>Hello John</h1>
-
-
-
-
-
-
-
-<table><tbody><tr><td><ul><li>item</li></ul></td></tr><tr><td><ul><li>item</li></ul></td></tr></tbody></table>
-</div>] [xhtml/1.0]
-endMacroMarkerStandalone [html] [wiki=true] [<div>
-<h1>Hello John</h1>
-<table>
-<tr>
-<td>
-* item
-
-</td>
-</tr>
-<tr>
-<td>
-* item
-
-</td>
-</tr>
-</table>
-</div>]
-endMacroMarkerStandalone [velocity] [] [{{html wiki="true"}}
-<div>
-  #set ($name = "John")
-  #set ($list = ['one', 'two'])
-  <h1>Hello $name</h1>
-  <table>
-    #foreach ($item in $list)
-      <tr>
-        <td>
-          * item
-
-        </td>
-      </tr>
-    #end
-  </table>
-</div>
-{{/html}}]
+beginMacroMarkerStandalone [velocity] [] [#set ($list = ['one', 'two'])
+#foreach ($item in $list)
+* $item
+#end]
+beginList [BULLETED]
+beginListItem
+onWord [one]
+endListItem
+beginListItem
+onWord [two]
+endListItem
+endList [BULLETED]
+endMacroMarkerStandalone [velocity] [] [#set ($list = ['one', 'two'])
+#foreach ($item in $list)
+* $item
+#end]
 endDocument
-.#-----------------------------------------------------
-.expect|xhtml/1.0
-.#-----------------------------------------------------
-<div>
-<h1>Hello John</h1>
-
-
-
-
-
-
-
-<table><tbody><tr><td><ul><li>item</li></ul></td></tr><tr><td><ul><li>item</li></ul></td></tr></tbody></table>
-</div>

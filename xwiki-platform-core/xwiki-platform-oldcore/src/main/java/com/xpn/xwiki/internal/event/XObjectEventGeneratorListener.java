@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
@@ -47,6 +48,7 @@ import com.xpn.xwiki.web.Utils;
  * @since 3.2M1
  */
 @Component
+@Singleton
 @Named("XObjectEventGeneratorListener")
 public class XObjectEventGeneratorListener implements EventListener
 {

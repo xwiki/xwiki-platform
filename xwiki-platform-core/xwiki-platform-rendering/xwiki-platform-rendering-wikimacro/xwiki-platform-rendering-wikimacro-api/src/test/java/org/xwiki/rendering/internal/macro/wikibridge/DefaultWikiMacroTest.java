@@ -189,7 +189,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.
         Assert
             .assertEquals("<h1 id=\"Hheading\"><span>heading</span></h1>"
-                + "<ul><li><span class=\"wikilink\"><a href=\"url\">heading</a></span></li></ul>",
+                + "<ul><li><span class=\"wikilink\"><a href=\"#Hheading\">heading</a></span></li></ul>",
                 printer.toString());
     }
 

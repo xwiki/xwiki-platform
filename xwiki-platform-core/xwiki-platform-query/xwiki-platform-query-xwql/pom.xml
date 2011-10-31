@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-query</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-query-xwql</artifactId>
   <name>XWiki Platform - Query - XWQL</name>
@@ -54,8 +54,32 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            org/xwiki/query/xwql/internal/AliasGenerator.java,
+            org/xwiki/query/xwql/internal/hql/ObjectPrinter.java,
+            org/xwiki/query/xwql/internal/hql/Printer.java,
+            org/xwiki/query/xwql/internal/hql/PropertyPrinter.java,
+            org/xwiki/query/xwql/internal/hql/TreePrinter.java,
+            org/xwiki/query/xwql/internal/hql/XWQLtoHQLTranslator.java,
+            org/xwiki/query/xwql/internal/InvalidQueryException.java,
+            org/xwiki/query/xwql/internal/QueryAnalyzer.java,
+            org/xwiki/query/xwql/internal/QueryContext.java,
+            org/xwiki/query/xwql/internal/QueryTranslator.java,
+            org/xwiki/query/xwql/internal/XWQLQueryExecutor.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

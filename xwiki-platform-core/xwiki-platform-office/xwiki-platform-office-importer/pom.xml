@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-office</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-office-importer</artifactId>
   <name>XWiki Platform - Office - Importer</name>
@@ -81,7 +81,7 @@
           * a fix for http://jira.xwiki.org/jira/browse/XWIKI-5979
           * a fix for http://jira.xwiki.org/jira/browse/XWIKI-6583
       -->
-      <version>3.0-beta-3-xwiki-20110510</version>
+      <version>3.0-beta-4-xwiki-20110822</version>
     </dependency>
     <dependency>
       <!--

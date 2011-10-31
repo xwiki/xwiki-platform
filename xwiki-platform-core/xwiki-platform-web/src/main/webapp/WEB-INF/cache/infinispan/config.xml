@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ JBoss, Home of Professional Open Source
+  ~ Copyright 2010 Red Hat Inc. and/or its affiliates and other
+  ~ contributors as indicated by the @author tags. All rights reserved.
+  ~ See the copyright.txt in the distribution for a full listing of
+  ~ individual contributors.
+  ~
+  ~ This is free software; you can redistribute it and/or modify it
+  ~ under the terms of the GNU Lesser General Public License as
+  ~ published by the Free Software Foundation; either version 2.1 of
+  ~ the License, or (at your option) any later version.
+  ~
+  ~ This software is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  ~ Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public
+  ~ License along with this software; if not, write to the Free
+  ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  -->
+
+<infinispan
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="urn:infinispan:config:5.1 http://www.infinispan.org/schemas/infinispan-config-5.1.xsd"
+      xmlns="urn:infinispan:config:5.1">
+
+   <!--
+      ******************************************************************************************************************
+
+      This is a sample Infinispan configuration XML file.  Sensible defaults are always used if elements are left
+      out.  For example, have a look at "minimal.xml" which ships in this same distribution.
+
+      This file considers some popular configurations, some commented out, with references to documentation and
+      further reading.
+
+      A summary of the format of this XML file and all available options can be see online:
+
+         http://docs.jboss.org/infinispan/5.0/apidocs/config.html
+
+      ******************************************************************************************************************
+   -->
+
+   <!--
+      ******************************************************************************************************************
+
+      System-wide global settings, which are shared across all caches managed by the same EmbeddedCacheManager
+
+      ******************************************************************************************************************
+   -->
+
+   <global>
+
+      <!--
+         The asynchronous listener executor is only useful if you have asynchronous listeners attached.  See
+
+            http://community.jboss.org/wiki/ListenersandNotifications
+
+          for more details.
+      -->
+      <!--
+      <asyncListenerExecutor factory="org.infinispan.executors.DefaultExecutorFactory">
+         <properties>
+            <property name="maxThreads" value="5"/>
+            <property name="threadNamePrefix" value="AsyncListenerThread"/>
+         </properties>
+      </asyncListenerExecutor>
+      -->
+
+      <!--
+         Useful if you have eviction enabled and wish to customize the executor used by the eviction process.
+
+            http://community.jboss.org/wiki/Eviction
+      -->
+      <!--
+      <evictionScheduledExecutor factory="org.infinispan.executors.DefaultScheduledExecutorFactory">
+         <properties>
+            <property name="threadNamePrefix" value="EvictionThread"/>
+         </properties>
+      </evictionScheduledExecutor>
+      -->
+
+      <!--
+         Useful if you have enabled a Replication Queue and wish to fine tune the scheduled thread that flushes
+         such batch RPCs.  See
+
+            http://community.jboss.org/wiki/AsynchronousOptions#Replication_Queue
+      -->
+      <!--
+      <replicationQueueScheduledExecutor factory="org.infinispan.executors.DefaultScheduledExecutorFactory">
+         <properties>
+            <property name="threadNamePrefix" value="ReplicationQueueThread"/>
+         </properties>
+      </replicationQueueScheduledExecutor>
+      -->
+
+      <!--
+         Enables collection of global JMX statistics, and allows you to customize the JMX domain name under which
+         MBeans are registered.
+      -->
+      <!-- 
+      <globalJmxStatistics 
+            enabled="true" 
+            jmxDomain="org.infinispan" 
+            cacheManagerName="SampleCacheManager"/>
+      -->
+
+      <!--
+         Used to customize the marshaller used to serialize objects and deserialize byte streams.  Also allows you to
+         specify custom advancedExternalizers for custom user types.
+
+         See:
+
+            http://community.jboss.org/wiki/Marshalling
+            http://community.jboss.org/wiki/PluggingInfinispanWithUserDefinedExternalizers
+       -->
+      <!--<serialization marshallerClass="org.infinispan.marshall.VersionAwareMarshaller" version="1.0">-->
+
+      <!--<advancedExternalizers>-->
+      <!-- AdvancedExternalizer defined as inner static class, with id set via XML configuration -->
+      <!--<advancedExternalizer id="1234" externalizerClass="org.infinispan.marshall.AdvancedExternalizerTestt$IdViaConfigObj$AdvancedExternalizer"/>-->
+      <!-- AdvancedExternalizer defined as inner static class, with id set via annotation -->
+      <!--<advancedExternalizer externalizerClass="org.infinispan.marshall.AdvancedExternalizerTestt$IdViaAnnotationObj$AdvancedExternalizer"/>-->
+      <!-- AdvancedExternalizer defined as inner static class, with id set both via XML config and annotation -->
+      <!--<advancedExternalizer id="3456" externalizerClass="org.infinispan.marshall.AdvancedExternalizerTestt$IdViaBothObj$AdvancedExternalizer"/>-->
+      <!--</advancedExternalizers>-->
+      <!--</serialization>-->
+
+      <!--
+         Used to register JVM shutdown hooks.
+         hookBehavior: DEFAULT, REGISTER, DONT_REGISTER
+      -->
+      <!-- <shutdown hookBehavior="DEFAULT"/> -->
+   </global>
+
+   <!--
+      ******************************************************************************************************************
+      Default "template" settings, used to create the default cache as well as inherited by all other named caches
+      ******************************************************************************************************************
+   -->
+
+   <default>
+      <eviction 
+         maxEntries="10000"
+         strategy="LRU"
+      />
+   
+      <!--
+         Tunes the locking and concurrency characteristics of the cache.
+
+         See:
+
+            http://community.jboss.org/wiki/LockingandConcurrency
+      -->
+      <!--
+      <locking
+         isolationLevel="READ_COMMITTED"
+         lockAcquisitionTimeout="20000"
+         writeSkewCheck="false"
+         concurrencyLevel="5000"
+         useLockStriping="false"
+      />
+      -->
+
+      <!--
+         Used to register a transaction manager and participate in JTA and XA transactions.
+
+         See:
+
+            http://community.jboss.org/wiki/Infinispantransactions
+      -->
+      <!--
+      <transaction
+            transactionManagerLookupClass="org.infinispan.transaction.lookup.GenericTransactionManagerLookup"
+            syncRollbackPhase="false"
+            syncCommitPhase="false"
+            useEagerLocking="false"
+            eagerLockSingleNode="false"
+            cacheStopTimeout="30000" />
+      -->
+      <!--
+         Enables deadlock detection.  See:
+
+         http://community.jboss.org/wiki/Infinispantransactions#deadlock
+
+      -->
+      <!--<deadlockDetection enabled="true" spinDuration="1000"/>-->
+
+
+      <!--
+         Used to register JMX statistics in any available MBean server
+      -->
+      <!--
+      <jmxStatistics enabled="true"/>
+      -->
+
+      <!--
+         Used to control whether objects stored in Infinispan nodes are primarily stored as rehydrated Objects or as
+         raw byte arrays.  See:
+
+         http://community.jboss.org/wiki/Marshalling#Lazy_Deserialization
+      -->
+      <!--<storeAsBinary enabled="true"/>-->
+
+      <!--
+         Used to enable invocation batching and allow the use of Cache.startBatch()/endBatch() methods.
+
+         http://community.jboss.org/wiki/Batching
+      -->
+      <!--<invocationBatching enabled="true"/>-->
+
+   </default>
+
+
+   <!--
+      ******************************************************************************************************************
+
+      Individually configured "named" caches. Note that any of the elements appearing in a namedCache section can also
+      appear in the default section as a template.
+
+      ******************************************************************************************************************
+   -->
+
+   <!-- Image plugin cache -->
+   <namedCache name="xwiki.plugin.image">
+      <loaders passivation="true">
+         <loader class="org.infinispan.loaders.file.FileCacheStore">
+           <!-- Let XWiki cache module set the proper location -->
+         </loader>
+      </loaders>
+   </namedCache>
+
+   <!-- Equation plugin cache -->
+   <namedCache name="xwiki.plugin.equation">
+      <loaders passivation="true">
+         <loader class="org.infinispan.loaders.file.FileCacheStore">
+           <!-- Let XWiki cache module set the proper location -->
+         </loader>
+      </loaders>
+   </namedCache>
+
+   <!--
+      A cache configured with eviction.
+
+      Expiration wakeUpInterval defines the interval between successive runs
+      to purge expired entries from memory and any cache stores.
+
+      See:
+
+         http://community.jboss.org/wiki/Eviction
+         http://community.jboss.org/wiki/EvictionExamples
+   -->
+   <!--
+   <namedCache name="evictionCache">
+      <eviction
+         maxEntries="5000"
+         strategy="FIFO"
+      />
+      <expiration
+         wakeUpInterval="500"
+         lifespan="60000"
+         maxIdle="1000"
+      />
+   </namedCache>
+   -->
+
+   <!--
+      A persistent cache that stores state on the file system using either write-through or write-behind.
+
+      If passivation is enabled, state is offloaded to the cache loaders _only_ when evicted from memory, giving you
+      the effect of paging to disk.  Similarly, when the state is accessed again, it is removed from the cache loader
+      and loaded into memory.
+
+      If "preload" is true, all keys are loaded from the cache loader into memory upon starting the cache.
+
+      Multiple cache loaders - chaining - is also supported.
+
+      Write-through versus write-behind is controlled via the <async /> element
+
+      See:
+
+         http://community.jboss.org/wiki/CacheLoaders
+         http://community.jboss.org/wiki/Write-ThroughAndWrite-BehindCaching
+   -->
+   <!--
+   <namedCache name="writeThroughToFile">
+      <loaders
+         passivation="false"
+         shared="false"
+         preload="false">
+
+         <loader
+            class="org.infinispan.loaders.file.FileCacheStore"
+            fetchPersistentState="false"
+            purgeOnStartup="false">
+
+            <properties>
+               <property name="location" value="${java.io.tmpdir}"/>
+            </properties>
+
+         </loader>
+      </loaders>
+   </namedCache>
+   -->
+
+   <!--
+      A cache where data can be evicted if not used after some time, or if it exceeds certain capacity.
+      As shown in this example, passivation can be configured so that whenever data is removed due
+      eviction/expiration, this is in turn stored in a backend cache store. Afterwards, when data is
+      requested, the cache store will be checked and data will be activated and brought back to memory 
+   -->
+   <!--
+   <namedCache name="evictionAndPassivationCache">
+      <eviction 
+         maxEntries="5000"
+         strategy="LIRS"
+      />
+      <expiration
+         wakeUpInterval="500"
+         lifespan="60000"
+         maxIdle="1000"
+      />
+
+      <loaders passivation="true">
+         <loader class="org.infinispan.loaders.file.FileCacheStore">
+            <properties>
+               <property name="location" value="${java.io.tmpdir}"/>
+            </properties>
+         </loader>
+      </loaders>
+   </namedCache>
+   -->
+
+   <!-- 
+      A write behind cache is one where data is stored in a backend store in a separate process, making cache
+      calls return very fast while at the same time persisting data permanently. This type of caches are
+      particularly interesting for stores with high latency such as cloud based store, or very remote databases. 
+
+      See:
+         http://docs.jboss.org/infinispan/4.2/apidocs/org/infinispan/loaders/cloud/CloudCacheStoreConfig.html        
+   -->
+   <!--
+   <namedCache name="writeBehindToCloudCache">
+      <loaders passivation="false" shared="false" preload="true">
+         <loader class="org.infinispan.loaders.cloud.CloudCacheStore"
+                 fetchPersistentState="false"
+                 ignoreModifications="false"
+                 purgeOnStartup="false">
+            <properties>
+               <property name="identity" value="${ec2.access_key}"/>
+               <property name="password" value="${ec2.access_secret}"/>
+               <property name="bucketPrefix" value="${ec2.bucket}"/>
+               <property name="requestTimeout" value="20000"/>
+               <property name="cloudService" value="s3"/>
+               <property name="secure" value="true"/>
+               <property name="compress" value="true"/>
+            </properties>
+            <async
+               enabled="true"
+               flushLockTimeout="15000"
+               threadPoolSize="10"
+            />
+         </loader>
+      </loaders>
+   </namedCache>
+   -->
+
+   <!--
+      A cache making use of custom interceptors, to add custom behavior to each cache invocation.  All custom
+      interceptors need to extend org.jboss.cache.interceptors.base.CommandInterceptor
+
+      See:
+         http://community.jboss.org/wiki/InfinispanCustomInterceptors
+   -->
+   <!--
+   <namedCache name="cacheWithCustomInterceptors">
+      <customInterceptors>
+         <interceptor position="first" class="com.mycompany.CustomInterceptor1">
+            <property name="com.mycompany.attributeOne" value="value1" />
+            <property name="com.mycompany.attributeTwo" value="value2" />
+         </interceptor>
+         <interceptor
+            position="last"
+            class="com.mycompany.CustomInterceptor2"
+         />
+         <interceptor
+            index="3"
+            class="com.mycompany.CustomInterceptor1"
+         />
+         <interceptor
+            before="org.infinispanpan.interceptors.CallInterceptor"
+            class="com.mycompany.CustomInterceptor2"
+         />
+         <interceptor
+            after="org.infinispanpan.interceptors.CallInterceptor"
+            class="com.mycompany.CustomInterceptor1"
+         />
+      </customInterceptors>
+   </namedCache>
+   -->
+
+</infinispan>

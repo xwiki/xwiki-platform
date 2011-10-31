@@ -16,22 +16,19 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package org.xwiki.store.serialization.xml.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
-import org.apache.commons.io.IOUtils;
 
 /**
  * Tests for AttachmentListMetadataSerializer
@@ -99,21 +96,21 @@ public class AttachmentListMetadataSerializerTest
         Assert.assertEquals("Attachment3 had wrong version", "1.3", attachList.get(2).getVersion());
 
         Assert.assertEquals("Attachment1 had wrong comment",
-                            attachList.get(0).getComment(),
-                            "something whitty");
+            attachList.get(0).getComment(),
+            "something whitty");
         Assert.assertEquals("Attachment2 had wrong comment", "a comment", attachList.get(1).getComment());
         Assert.assertEquals("Attachment3 had wrong comment", "i saved it", attachList.get(2).getComment());
 
         // We drop milliseconds for consistency with the database so last 3 digits are 0.
         Assert.assertEquals("Attachment1 had wrong date.",
-                            attachList.get(0).getDate().getTime() + "",
-                            "1293045632000");
+            attachList.get(0).getDate().getTime() + "",
+            "1293045632000");
         Assert.assertEquals("Attachment2 had wrong date.",
-                            attachList.get(1).getDate().getTime() + "",
-                            "1293789456000");
+            attachList.get(1).getDate().getTime() + "",
+            "1293789456000");
         Assert.assertEquals("Attachment3 had wrong date.",
-                            attachList.get(2).getDate().getTime() + "",
-                            "1293012345000");
+            attachList.get(2).getDate().getTime() + "",
+            "1293012345000");
     }
 
     @Test

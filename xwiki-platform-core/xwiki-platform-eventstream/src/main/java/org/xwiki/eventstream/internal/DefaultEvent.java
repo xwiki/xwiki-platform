@@ -16,13 +16,15 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.eventstream.internal;
 
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
@@ -92,6 +94,9 @@ public class DefaultEvent implements Event
     /** @see #getBody() */
     private String body;
 
+    /** @see #getParameters() */
+    private Map<String, String> parameters;
+    
     /**
      * {@inheritDoc}
      * 
@@ -467,6 +472,28 @@ public class DefaultEvent implements Event
         this.documentTitle = title;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Event#getParameters()
+     */
+    public Map<String, String> getParameters()
+    {
+        return this.parameters == null ? Collections.<String, String> emptyMap()
+            : Collections.unmodifiableMap(this.parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Event#setParameters(Map)
+     * @see #getParameters()
+     */
+    public void setParameters(Map<String, String> parameters)
+    {
+        this.parameters = new HashMap<String, String>(parameters);
+    }
+    
     /**
      * {@inheritDoc}
      */

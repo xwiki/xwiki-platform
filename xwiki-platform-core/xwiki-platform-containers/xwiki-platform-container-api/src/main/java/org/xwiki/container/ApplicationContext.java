@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.container;
 
@@ -39,4 +38,12 @@ public interface ApplicationContext
      * @return a {@link File} object pointing to a directory that the application can use for storing temporary files
      */
     File getTemporaryDirectory();
+
+    /**
+     * Gets the root directory which the container must provide for storing persisting data. The content of this
+     * directory will remained unchanged after a restart of the container.
+     * 
+     * @return a {@link File} object pointing to the root folder of the work directory
+     */
+    File getPermanentDirectory();
 }

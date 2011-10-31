@@ -63,24 +63,38 @@ public interface LocalExtensionRepository extends ExtensionRepository
     Collection<LocalExtension> getInstalledExtensions(String namespace);
 
     /**
-     * @param extensionId the extension unique identifier, version is not needed since a namespace can contain only one
-     *            version of an extension
+     * @param feature the extension id or provided feature (virtual extension)
      * @param namespace the namespace where the extension is installed
      * @return the extension, null if none could be found
      */
-    LocalExtension getInstalledExtension(String extensionId, String namespace);
+    LocalExtension getInstalledExtension(String feature, String namespace);
 
     /**
-     * Put provided extension (generally a remote extension) in the local repository or increment the namespaces in
-     * which the extension is installed if already in the local repository.
+     * Store provided extension (generally a remote extension) in the local repository.
+     * 
+     * @param extension the extension to store
+     * @return the new local extension
+     * @throws LocalExtensionRepositoryException error when trying store provided extension in the local repository
+     */
+    LocalExtension storeExtension(Extension extension) throws LocalExtensionRepositoryException;
+
+    /**
+     * Remove extension from local repository.
+     * 
+     * @param extension the extension to remove
+     * @throws ResolveException error when trying to find provided extension
+     */
+    void removeExtension(LocalExtension extension) throws ResolveException;
+
+    /**
+     * Indicate that the provided extension is installed in the provided namespace.
      * 
      * @param extension the extension to install
-     * @param dependency indicate of the extension is installed as a dependency of another one
-     * @param namespace the namespace where the extension is being installed
-     * @return the new local extension
-     * @throws InstallException error when trying install provided extension in the local repository
+     * @param namespace the namespace in which the extension is installed
+     * @param dependency indicate if the extension is stored as a dependency of another one
+     * @throws InstallException error when trying to install provided extension
      */
-    LocalExtension installExtension(Extension extension, boolean dependency, String namespace) throws InstallException;
+    void installExtension(LocalExtension extension, String namespace, boolean dependency) throws InstallException;
 
     /**
      * Indicate that the provided extension is uninstalled from provided namespace.
@@ -99,12 +113,12 @@ public interface LocalExtensionRepository extends ExtensionRepository
      * Only look at the backward dependencies in the provided namespace. To get dependencies of a root extension
      * (namespace=null) use {@link #getBackwardDependencies(ExtensionId)} instead.
      * 
-     * @param extensionId the extension unique identifier
+     * @param feature the extension unique identifier
      * @param namespace the namespace where to search for backward dependencies
      * @return the backward dependencies, an empty collection of none could be found
      * @throws ResolveException error when searching for backward dependencies
      */
-    Collection<LocalExtension> getBackwardDependencies(String extensionId, String namespace) throws ResolveException;
+    Collection<LocalExtension> getBackwardDependencies(String feature, String namespace) throws ResolveException;
 
     /**
      * Get all backward dependencies by namespace for the provided installed extension.

@@ -21,8 +21,11 @@ package org.xwiki.rendering.internal.macro.dashboard;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.MacroBlock;
@@ -41,7 +44,9 @@ import org.xwiki.rendering.syntax.Syntax;
  * @version $Id$
  * @since 3.0rc1
  */
-@Component("edit")
+@Component
+@Named("edit")
+@Singleton
 public class EditableGadgetRenderer extends DefaultGadgetRenderer
 {
     /**
@@ -53,7 +58,8 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
     /**
      * The macro content renderer, to render the macro as annotated XHTML to be editable.
      */
-    @Requirement("annotatedxhtml/1.0")
+    @Inject
+    @Named("annotatedxhtml/1.0")
     protected BlockRenderer gadgetContentRenderer;
 
     /**
@@ -97,12 +103,6 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
         return metadataBlock;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.macro.dashboard.DefaultGadgetRenderer
-     *      #decorateGadget(org.xwiki.rendering.macro.dashboard.Gadget)
-     */
     @Override
     public List<Block> decorateGadget(Gadget gadget)
     {

@@ -35,6 +35,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
         #set($prefix=$listtool.get($fragments, 0))
         #set($suffix=$listtool.get($fragments, 1))
         #set($davUrl="$prefix$webdavSignature$suffix")
+        #set ($davUrl = $davUrl.replace('+', '%20'))
         <a title="$msg.get('core.viewers.attachments.webdavEdit.title')" class="editlink hidden" href="$davUrl" onclick="if(XWiki && XWiki.WebDAV){XWiki.WebDAV.davEdit('$davUrl')}; return false;">$msg.get('core.viewers.attachments.webdavEdit')</a>
       #end
     #end ## hasEdit

@@ -20,28 +20,27 @@
 package com.xpn.xwiki.internal.model.reference;
 
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
  * Unit tests for {@link CurrentMixedStringDocumentReferenceResolver}.
- *
+ * 
  * @version $Id$
- * @since 2.2M1
  */
-public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractBridgedXWikiComponentTestCase
+public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractBridgedComponentTestCase
 {
     private static final String CURRENT_SPACE = "currentspace";
 
     private EntityReferenceResolver<String> resolver;
-    
-    @Before
+
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();
@@ -49,7 +48,7 @@ public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractBri
         this.resolver = getComponentManager().lookup(EntityReferenceResolver.class, "currentmixed");
     }
 
-    @org.junit.Test
+    @Test
     public void testResolveDocumentReferenceWhenContextDocument() throws Exception
     {
         getContext().setDoc(new XWikiDocument(new DocumentReference("not used", CURRENT_SPACE, "notused")));
@@ -62,7 +61,7 @@ public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractBri
         Assert.assertEquals("WebHome", reference.getName());
     }
 
-    @org.junit.Test
+    @Test
     public void testResolveDocumentReferenceForDefaultWikiWhenNoContextDocument() throws Exception
     {
         getContext().setDatabase("currentwiki");
@@ -72,7 +71,7 @@ public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractBri
         // Make sure the resolved wiki is the current wiki and not the wiki from the current document (since that
         // doc isn't set).
         Assert.assertEquals("currentwiki", reference.extractReference(EntityType.WIKI).getName());
-        
+
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.getName());
     }

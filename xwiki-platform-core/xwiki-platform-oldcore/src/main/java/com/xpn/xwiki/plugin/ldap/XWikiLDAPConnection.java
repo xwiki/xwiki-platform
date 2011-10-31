@@ -16,21 +16,20 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.plugin.ldap;
 
 import java.io.UnsupportedEncodingException;
 import java.security.Security;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.novell.ldap.LDAPAttribute;
 import com.novell.ldap.LDAPAttributeSet;
@@ -55,7 +54,7 @@ public class XWikiLDAPConnection
     /**
      * Logging tool.
      */
-    private static final Log LOG = LogFactory.getLog(XWikiLDAPConnection.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiLDAPConnection.class);
 
     /**
      * The LDAP connection.
@@ -95,9 +94,7 @@ public class XWikiLDAPConnection
         if ("1".equals(config.getLDAPParam("ldap_ssl", "0", context))) {
             String keyStore = config.getLDAPParam("ldap_ssl.keystore", "", context);
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Connecting to LDAP using SSL");
-            }
+            LOGGER.debug("Connecting to LDAP using SSL");
 
             bind = open(ldapHost, ldapPort, bindDN, bindPassword, keyStore, true, context);
         } else {
@@ -187,9 +184,7 @@ public class XWikiLDAPConnection
      */
     private void connect(String ldapHost, int port) throws LDAPException
     {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Connection to LDAP server [" + ldapHost + ":" + port + "]");
-        }
+        LOGGER.debug("Connection to LDAP server [{}:{}]", ldapHost, port);
 
         // connect to the server
         this.connection.connect(ldapHost, port);
@@ -205,9 +200,7 @@ public class XWikiLDAPConnection
      */
     public void bind(String loginDN, String password) throws UnsupportedEncodingException, LDAPException
     {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Binding to LDAP server with credentials login=[" + loginDN + "]");
-        }
+        LOGGER.debug("Binding to LDAP server with credentials login=[{}]", loginDN);
 
         // authenticate to the server
         this.connection.bind(LDAPConnection.LDAP_V3, loginDN, password.getBytes("UTF8"));
@@ -223,9 +216,7 @@ public class XWikiLDAPConnection
                 this.connection.disconnect();
             }
         } catch (LDAPException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("LDAP close failed.", e);
-            }
+            LOGGER.debug("LDAP close failed.", e);
         }
     }
 
@@ -256,17 +247,11 @@ public class XWikiLDAPConnection
             return this.connection.compare(userDN, attribute);
         } catch (LDAPException e) {
             if (e.getResultCode() == LDAPException.NO_SUCH_OBJECT) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Unable to locate user_dn:" + userDN, e);
-                }
+                LOGGER.debug("Unable to locate user_dn [{}]", userDN, e);
             } else if (e.getResultCode() == LDAPException.NO_SUCH_ATTRIBUTE) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Unable to verify password because userPassword attribute not found.", e);
-                }
+                LOGGER.debug("Unable to verify password because userPassword attribute not found.", e);
             } else {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Unable to verify password", e);
-                }
+                LOGGER.debug("Unable to verify password", e);
             }
         }
 
@@ -274,12 +259,17 @@ public class XWikiLDAPConnection
     }
 
     /**
-     * Execute a LDAP search query.
+     * Execute a LDAP search query and return the first entry.
      * 
-     * @param baseDN the root DN where to search.
+     * @param baseDN the root DN from where to search.
      * @param filter the LDAP filter.
      * @param attr the attributes names of values to return.
-     * @param ldapScope {@link LDAPConnection#SCOPE_SUB} oder {@link LDAPConnection#SCOPE_BASE}.
+     * @param ldapScope the scope of the entries to search. The following are the valid options:
+     *            <ul>
+     *            <li>SCOPE_BASE - searches only the base DN
+     *            <li>SCOPE_ONE - searches only entries under the base DN
+     *            <li>SCOPE_SUB - searches the base DN and all entries within its subtree
+     *            </ul>
      * @return the found LDAP attributes.
      */
     public List<XWikiLDAPSearchAttribute> searchLDAP(String baseDN, String filter, String[] attr, int ldapScope)
@@ -288,14 +278,9 @@ public class XWikiLDAPConnection
 
         LDAPSearchResults searchResults = null;
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(MessageFormat.format("LDAP search: baseDN=[{0}] query=[{1}] attr=[{2}] ldapScope=[{3}]", baseDN,
-                filter, attr != null ? Arrays.asList(attr) : null, ldapScope));
-        }
-
         try {
             // filter return all attributes return attrs and values time out value
-            searchResults = this.connection.search(baseDN, ldapScope, filter, attr, false);
+            searchResults = search(baseDN, filter, attr, ldapScope);
 
             if (!searchResults.hasMore()) {
                 return null;
@@ -312,26 +297,44 @@ public class XWikiLDAPConnection
 
             ldapToXWikiAttribute(searchAttributeList, attributeSet);
         } catch (LDAPException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("LDAP Search failed", e);
-            }
+            LOGGER.debug("LDAP Search failed", e);
         } finally {
             if (searchResults != null) {
                 try {
                     this.connection.abandon(searchResults);
                 } catch (LDAPException e) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("LDAP Search clean up failed", e);
-                    }
+                    LOGGER.debug("LDAP Search clean up failed", e);
                 }
             }
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("LDAP search found attributes: " + searchAttributeList);
-        }
+        LOGGER.debug("LDAP search found attributes [{}]", searchAttributeList);
 
         return searchAttributeList;
+    }
+
+    /**
+     * @param baseDN the root DN from where to search.
+     * @param filter filter the LDAP filter
+     * @param attr the attributes names of values to return
+     * @param ldapScope the scope of the entries to search. The following are the valid options:
+     *            <ul>
+     *            <li>SCOPE_BASE - searches only the base DN
+     *            <li>SCOPE_ONE - searches only entries under the base DN
+     *            <li>SCOPE_SUB - searches the base DN and all entries within its subtree
+     *            </ul>
+     * @return a result stream. LDAPConnection#abandon should be called when it's not needed anymore.
+     * @throws LDAPException error when searching
+     * @since 3.3M1
+     */
+    public LDAPSearchResults search(String baseDN, String filter, String[] attr, int ldapScope) throws LDAPException
+    {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("LDAP search: baseDN=[{}] query=[{}] attr=[{}] ldapScope=[{}]", new Object[] {baseDN, filter,
+                attr != null ? Arrays.asList(attr) : null, ldapScope});
+        }
+
+        return this.connection.search(baseDN, ldapScope, filter, attr, false);
     }
 
     /**
@@ -343,13 +346,10 @@ public class XWikiLDAPConnection
     protected void ldapToXWikiAttribute(List<XWikiLDAPSearchAttribute> searchAttributeList,
         LDAPAttributeSet attributeSet)
     {
-        for (Object attributeItem : attributeSet) {
-            LDAPAttribute attribute = (LDAPAttribute) attributeItem;
+        for (LDAPAttribute attribute : (Set<LDAPAttribute>) attributeSet) {
             String attributeName = attribute.getName();
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("  - values for attribute \"" + attributeName + "\"");
-            }
+            LOGGER.debug("  - values for attribute [{}]", attributeName);
 
             Enumeration<String> allValues = attribute.getStringValues();
 
@@ -357,9 +357,7 @@ public class XWikiLDAPConnection
                 while (allValues.hasMoreElements()) {
                     String value = allValues.nextElement();
 
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("    |- [" + value + "]");
-                    }
+                    LOGGER.debug("    |- [{}]", value);
 
                     searchAttributeList.add(new XWikiLDAPSearchAttribute(attributeName, value));
                 }
@@ -378,7 +376,7 @@ public class XWikiLDAPConnection
      */
     public static String escapeLDAPDNValue(String value)
     {
-        return LDAPDN.escapeRDN("key=" + value).substring(4);
+        return StringUtils.isBlank(value) ? value : LDAPDN.escapeRDN("key=" + value).substring(4);
     }
 
     /**

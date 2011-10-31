@@ -31,18 +31,19 @@ import org.sonatype.aether.util.DefaultRepositorySystemSession;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryException;
 import org.xwiki.extension.repository.ExtensionRepositoryFactory;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.aether.internal.configuration.AetherConfiguration;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
+import org.xwiki.properties.ConverterManager;
 
 @Component
 @Singleton
 @Named("maven")
-public class AetherExtensionRepositoryFactory implements ExtensionRepositoryFactory,
-    Initializable
+public class AetherExtensionRepositoryFactory implements ExtensionRepositoryFactory, Initializable
 {
     @Inject
     private PlexusComponentManager aetherComponentManager;
@@ -50,8 +51,15 @@ public class AetherExtensionRepositoryFactory implements ExtensionRepositoryFact
     @Inject
     private AetherConfiguration aetherConfiguration;
 
+    @Inject
+    private ConverterManager converterManager;
+
+    @Inject
+    private ExtensionLicenseManager licenseManager;
+
     private DefaultRepositorySystemSession session;
 
+    @Override
     public void initialize() throws InitializationException
     {
         RepositorySystem repositorySystem;
@@ -69,10 +77,12 @@ public class AetherExtensionRepositoryFactory implements ExtensionRepositoryFact
         this.session.setIgnoreInvalidArtifactDescriptor(false);
     }
 
+    @Override
     public ExtensionRepository createRepository(ExtensionRepositoryId repositoryId) throws ExtensionRepositoryException
     {
         try {
-            return new AetherExtensionRepository(repositoryId, this.session, this.aetherComponentManager);
+            return new AetherExtensionRepository(repositoryId, this.session, this.aetherComponentManager,
+                this.converterManager, this.licenseManager);
         } catch (Exception e) {
             throw new ExtensionRepositoryException("Failed to create repository [" + repositoryId + "]", e);
         }

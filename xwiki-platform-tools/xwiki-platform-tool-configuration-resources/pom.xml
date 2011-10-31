@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-configuration-resources</artifactId>
   <name>XWiki Platform - Tools - XWiki Configuration Resources</name>
@@ -50,6 +50,21 @@
          </execution>
        </executions>
      </plugin>
+      <!-- Add specific excludes for this module for license checks -->
+      <plugin>
+        <groupId>com.mycila.maven-license-plugin</groupId>
+        <artifactId>maven-license-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- Exclude Velocity generated files ending with "vm" since they end with vm but their contents are not
+                 Velocity templates and the license plugin would validate their licenses against the vm style.
+                 TODO: use native extensions instead of "*.vm" -->
+            <exclude>**/*.cfg.xml.vm</exclude>
+            <exclude>**/*.properties.vm</exclude>
+            <exclude>**/*.cfg.vm</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

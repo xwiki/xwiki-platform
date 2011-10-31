@@ -28,6 +28,7 @@ import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -133,7 +134,12 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.mockXWiki.stubs().method("getDocument").will(returnValue(this.document));
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
         this.mockXWiki.stubs().method("exists").will(returnValue(false));
-        this.mockXWiki.stubs().method("ParamAsLong").will(returnValue(2L));
+        // Called from MessageToolVelocityContextInitializer.
+        this.mockXWiki.stubs().method("prepareResources");
+        // The next 3 stubs are needed to properly initialize the Velocity engine.
+        this.mockXWiki.stubs().method("getSkin").will(returnValue("default"));
+        this.mockXWiki.stubs().method("getSkinFile").will(returnValue(null));
+        this.mockXWiki.stubs().method("Param").with(eq("xwiki.render.velocity.macrolist")).will(returnValue(""));
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
 
@@ -157,6 +163,17 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.baseObject.setIntValue("boolean", 1);
         this.baseObject.setIntValue("int", 42);
         this.baseObject.setStringListValue("stringlist", Arrays.asList("VALUE1", "VALUE2"));
+    }
+
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        // Setup display configuration.
+        Mock mockDisplayConfiguration = registerMockComponent(DisplayConfiguration.class);
+        mockDisplayConfiguration.stubs().method("getDocumentDisplayerHint").will(returnValue("default"));
+        mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(2));
     }
 
     public void testCurrentDocumentVariableIsInjectedBeforeRendering() throws XWikiException

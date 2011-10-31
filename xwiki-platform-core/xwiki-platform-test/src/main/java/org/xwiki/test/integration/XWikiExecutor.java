@@ -83,6 +83,8 @@ public class XWikiExecutor
 
     private List<Environment.Variable> env = new ArrayList<Environment.Variable>();
 
+    private String opts;
+
     /**
      * Was XWiki server already started. We don't try to stop it if it was already started.
      */
@@ -157,6 +159,11 @@ public class XWikiExecutor
         this.env.add(variable);
     }
 
+    public void setOpts(String opts)
+    {
+        this.opts = opts;
+    }
+
     public void start() throws Exception
     {
         System.out.println("Starting XWiki server start");
@@ -195,6 +202,13 @@ public class XWikiExecutor
             execTask.setDir(new File(getExecutionDirectory()));
             for (Environment.Variable variable : this.env) {
                 execTask.addEnv(variable);
+            }
+
+            if (this.opts != null) {
+                Environment.Variable optsVariable = new Environment.Variable();
+                optsVariable.setKey("XWIKI_OPTS");
+                optsVariable.setValue(this.opts);
+                execTask.addEnv(optsVariable);
             }
 
             String startCommand = START_COMMAND;

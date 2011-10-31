@@ -43,7 +43,7 @@ import com.xpn.xwiki.XWikiException;
  * Wrapper for the annotation service functions to be exposed to scripting contexts.
  * 
  * @version $Id$
- * @since 3.0-RC1
+ * @since 3.0RC1
  */
 @Component
 @Named("annotations")

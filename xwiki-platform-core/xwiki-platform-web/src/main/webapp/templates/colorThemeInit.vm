@@ -8,65 +8,65 @@
 ###
 ## Initialization of the theme with the defaults
 ## All keys must match the ColorThemeClass properties
-#set($theme = $util.hashMap)
-#set($discard = $theme.put('pageBackgroundColor', '#DDDDDD'))
-#set($discard = $theme.put('pageHeaderBackgroundColor', '#FFFFFF'))
-#set($discard = $theme.put('pageContentBackgroundColor', '#FFFFFF'))
-#set($discard = $theme.put('textColor', '#000000'))
-#set($discard = $theme.put('textPrimaryColor', '#888888'))
-#set($discard = $theme.put('textSecondaryColor', '#b3b3b3'))
-#set($discard = $theme.put('titleColor', '#888888'))
-#set($discard = $theme.put('borderColor', '#CCCCCC'))
-#set($discard = $theme.put('linkColor', '#0089DC'))
-#set($discard = $theme.put('highlightColor', '#FFFFDD'))
-#set($discard = $theme.put('menuBackgroundColor', '#CCCCCC'))
-#set($discard = $theme.put('menuLinkColor', '#FFFFFF'))
-#set($discard = $theme.put('menuSelectedEntryBackgroundColor', '#EFEFEF'))
-#set($discard = $theme.put('menuSelectedEntryLinkColor', '#888888'))
-#set($discard = $theme.put('menuAddEntryBackgroundColor', '#4D9244'))
-#set($discard = $theme.put('menuAddEntryLinkColor', '#FFFFFF'))
-#set($discard = $theme.put('panelBackgroundColor', '#FFFFFF'))
-#set($discard = $theme.put('panelHeaderBackgroundColor', '#FFFFFF'))
-#set($discard = $theme.put('panelHeaderTextColor', '#888888'))
-#set($discard = $theme.put('panelTextColor', '#000000'))
-#set($discard = $theme.put('panelCollapsedBackgroundColor', '#CCCCCC'))
-#set($discard = $theme.put('panelCollapsedTextColor', '#FFFFFF'))
-#set($discard = $theme.put('buttonPrimaryBackgroundColor', '#0089DC'))
-#set($discard = $theme.put('buttonPrimaryTextColor', '#FFFFFF'))
-#set($discard = $theme.put('buttonSecondaryBackgroundColor', '#FFFFFF'))
-#set($discard = $theme.put('buttonSecondaryTextColor', '#0089DC'))
-#set($discard = $theme.put('backgroundSecondaryColor', '#EFEFEF'))
-#set($discard = $theme.put('notificationInfoColor', '#336699'))
-#set($discard = $theme.put('notificationSuccessColor', '#008000'))
-#set($discard = $theme.put('notificationWarningColor', '#D09000'))
-#set($discard = $theme.put('notificationErrorColor', '#CC3333'))
+#set ($theme = {'pageBackgroundColor': '#DDDDDD',
+  'pageHeaderBackgroundColor'        : '#FFFFFF',
+  'pageContentBackgroundColor'       : '#FFFFFF',
+  'textColor'                        : '#000000',
+  'textPrimaryColor'                 : '#888888',
+  'textSecondaryColor'               : '#b3b3b3',
+  'titleColor'                       : '#888888',
+  'borderColor'                      : '#CCCCCC',
+  'linkColor'                        : '#0089DC',
+  'highlightColor'                   : '#FFFFDD',
+  'menuBackgroundColor'              : '#CCCCCC',
+  'menuLinkColor'                    : '#FFFFFF',
+  'menuSelectedEntryBackgroundColor' : '#EFEFEF',
+  'menuSelectedEntryLinkColor'       : '#888888',
+  'menuAddEntryBackgroundColor'      : '#4D9244',
+  'menuAddEntryLinkColor'            : '#FFFFFF',
+  'panelBackgroundColor'             : '#FFFFFF',
+  'panelHeaderBackgroundColor'       : '#FFFFFF',
+  'panelHeaderTextColor'             : '#888888',
+  'panelTextColor'                   : '#000000',
+  'panelCollapsedBackgroundColor'    : '#CCCCCC',
+  'panelCollapsedTextColor'          : '#FFFFFF',
+  'buttonPrimaryBackgroundColor'     : '#0089DC',
+  'buttonPrimaryTextColor'           : '#FFFFFF',
+  'buttonSecondaryBackgroundColor'   : '#FFFFFF',
+  'buttonSecondaryTextColor'         : '#0089DC',
+  'backgroundSecondaryColor'         : '#EFEFEF',
+  'notificationInfoColor'            : '#336699',
+  'notificationSuccessColor'         : '#008000',
+  'notificationWarningColor'         : '#D09000',
+  'notificationErrorColor'           : '#CC3333'
+})
 ##
 ## Overwrite with the values set in the custom theme
-#if(!$themeObj)
+#if (!$themeObj)
   ## First, try to take the theme from the request URL
-  #set($themeDocFullName = "$!{request.colorTheme}")
+  #set ($themeDocFullName = "$!{request.colorTheme}")
   ## Second, try to take the theme from the preferences (user, space, wiki)
-  #if($themeDocFullName == '')
-    #set($themeDocFullName = "$!xwiki.getUserPreference('colorTheme')")
+  #if ($themeDocFullName == '')
+    #set ($themeDocFullName = "$!xwiki.getUserPreference('colorTheme')")
   #end
   ## Last, just use the default theme
-  #if($themeDocFullName == '')
-    #set($themeDocFullName = 'ColorThemes.DefaultColorTheme')
+  #if ($themeDocFullName == '')
+    #set ($themeDocFullName = 'ColorThemes.DefaultColorTheme')
   #end
-  #set($themeDoc = $xwiki.getDocument($themeDocFullName))
-  #set($themeObj = $themeDoc.getObject('ColorThemes.ColorThemeClass', true))
+  #set ($themeDoc = $xwiki.getDocument($themeDocFullName))
+  #set ($themeObj = $themeDoc.getObject('ColorThemes.ColorThemeClass', true))
 #end
-#if("$!themeObj" != '')
-  #foreach($prop in $themeObj.properties)
+#if ("$!themeObj" != '')
+  #foreach ($prop in $themeObj.properties)
      ## Simple validation of the color values.
-     #if(!$prop.name.endsWith('Color') || $prop.value.matches('transparent|#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6}'))
-       #set($discard = $theme.put($prop.name, $prop.value))
+     #if (!$prop.name.endsWith('Color') || $prop.value.matches('transparent|#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6}'))
+       #set ($discard = $theme.put($prop.name, $prop.value))
      #end
-     #if($prop.name.endsWith('Image'))
-       #if("$!prop.value" != '')
-         #set($discard = $theme.put($prop.name, "url(${themeDoc.getAttachmentURL($prop.value)})"))
+     #if ($prop.name.endsWith('Image'))
+       #if ("$!prop.value" != '')
+         #set ($discard = $theme.put($prop.name, "url(${themeDoc.getAttachmentURL($prop.value)})"))
        #else
-         #set($discard = $theme.put($prop.name, ''))
+         #set ($discard = $theme.put($prop.name, ''))
        #end
      #end
   #end

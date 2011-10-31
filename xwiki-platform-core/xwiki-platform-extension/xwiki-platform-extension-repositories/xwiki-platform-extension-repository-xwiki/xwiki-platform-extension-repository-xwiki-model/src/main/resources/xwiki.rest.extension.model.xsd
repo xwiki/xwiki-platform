@@ -22,34 +22,138 @@
 -->
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.org"
   xmlns:xwiki="http://www.xwiki.org" elementFormDefault="qualified">
-    <complexType name="Extension">
-    	<sequence>
-    		<element name="id" type="string" maxOccurs="1" minOccurs="1"></element>
-    		<element name="version" type="string" maxOccurs="1" minOccurs="1"></element>
-            <element name="type" type="string" maxOccurs="1" minOccurs="1"></element>
-            <element name="name" type="string" maxOccurs="1" minOccurs="0"></element>
-            <element name="description" type="string" maxOccurs="1" minOccurs="0"></element>
-    		<element name="website" type="string" maxOccurs="1" minOccurs="0"></element>
-            <element name="authors" type="string" maxOccurs="unbounded" minOccurs="0"></element>
-            <element name="dependencies" type="xwiki:ExtensionDependency" maxOccurs="unbounded" minOccurs="0"></element>
-    	</sequence>
-    </complexType>
-    
-    <complexType name="ExtensionDependency">
-    	<sequence>
-    		<element name="id" type="string" maxOccurs="1" minOccurs="1"></element>
-    		<element name="version" type="string" maxOccurs="1" minOccurs="1"></element>
-    	</sequence>
-    </complexType>
-    
-    <element name="extension" type="xwiki:Extension"></element>
 
-    <element name="extensions">
+  <complexType name="Extension">
+    <complexContent>
+      <extension base="xwiki:AbstractExtension">
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="ExtensionDependency">
+    <sequence>
+      <element name="id" type="string" maxOccurs="1" minOccurs="1"></element>
+      <element name="version" type="string" maxOccurs="1"
+        minOccurs="1"></element>
+    </sequence>
+  </complexType>
+
+  <element name="extension" type="xwiki:Extension"></element>
+
+
+  <complexType name="ExtensionVersion">
+    <complexContent>
+      <extension base="xwiki:AbstractExtension">
+        <sequence>
+          <element name="version" type="string"></element>
+          <element name="dependencies" type="xwiki:ExtensionDependency" minOccurs="0" maxOccurs="unbounded"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+
+  <element name="extensionVersion" type="xwiki:ExtensionVersion"></element>
+
+
+  <complexType name="ExtensionSummary">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="id" type="string"></element>
+          <element name="name" type="string"></element>
+          <element name="type" type="string"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+
+  <complexType name="ExtensionVersionSummary">
+    <complexContent>
+      <extension base="xwiki:ExtensionSummary">
+        <sequence>
+          <element name="version" type="string"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <element name="extensions">
     <complexType>
-      <sequence>
-        <element name="extension" type="xwiki:Extension"
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <element name="extensionSummary" type="xwiki:ExtensionSummary"
               minOccurs="0" maxOccurs="unbounded"></element>
-      </sequence>
+          </sequence>
+        </extension>
+      </complexContent>
     </complexType>
   </element>
+    
+  <element name="extensionVersions">
+    <complexType>
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <element name="extensionVersionSummary" type="xwiki:ExtensionVersionSummary"
+              minOccurs="0" maxOccurs="unbounded"></element>
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+
+  <complexType name="Link">
+    <attribute name="href" type="string"></attribute>
+    <attribute name="rel" type="string"></attribute>
+    <attribute name="type" type="string"></attribute>
+    <attribute name="hrefLang" type="string"></attribute>
+  </complexType>
+
+  <complexType name="LinkCollection">
+    <sequence>
+      <element name="link" type="xwiki:Link" minOccurs="0" maxOccurs="unbounded"></element>
+    </sequence>
+  </complexType>
+
+  <element name="searchResult">
+    <complexType>
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <element name="extensions" type="xwiki:ExtensionVersion"
+              minOccurs="0" maxOccurs="unbounded"></element>
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+
+  <complexType name="AbstractExtension">
+    <complexContent>
+      <extension base="xwiki:ExtensionSummary">
+        <sequence>
+          <element name="summary" type="string" minOccurs="0"></element>
+          <element name="description" type="string" minOccurs="0"></element>
+          <element name="license" type="xwiki:License" minOccurs="0"></element>
+          <element name="website" type="string" minOccurs="0"></element>
+          <element name="authors" type="string" minOccurs="0"
+            maxOccurs="unbounded">
+          </element>
+          <element name="features" type="string" minOccurs="0"
+            maxOccurs="unbounded">
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="License">
+    <sequence>
+      <element name="name" type="string"></element>
+      <element name="content" type="string" minOccurs="0"></element>
+    </sequence>
+  </complexType>
 </schema>

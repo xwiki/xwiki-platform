@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>Panels</web>
+<name>WorkspaceInformationPanel</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Panels.WebHome</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1303410076000</creationDate>
+<date>1303424637000</date>
+<contentUpdateDate>1303424637000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>Panels.PanelClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<category>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>category</name>
+<number>5</number>
+<prettyName>Category</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>Information|Navigation|Tools|Administration|Other</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</category>
+<content>
+<disabled>0</disabled>
+<editor>Text</editor>
+<name>content</name>
+<number>4</number>
+<prettyName>Content</prettyName>
+<rows>25</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<description>
+<disabled>0</disabled>
+<editor>Text</editor>
+<name>description</name>
+<number>3</number>
+<prettyName>Description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<type>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>type</name>
+<number>2</number>
+<prettyName>Panel type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>view|edit</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
+</class>
+<name>Panels.WorkspaceInformationPanel</name>
+<number>0</number>
+<className>Panels.PanelClass</className>
+<guid>7fabd475-d8b1-4491-a2f4-0042652659db</guid>
+<property>
+<category>Information</category>
+</property>
+<property>
+<content>#panelheader($msg.get('workspacemanager.panel.title'))
+#set ($currentWiki = $xcontext.database)
+#set ($currentUser = "#if($xcontext.isMainWiki())${xcontext.mainWikiName}:${xcontext.user}#{else}${xcontext.user}#end")
+#set ($WorkspaceManager = $services.workspace)
+##
+## TODO: use a dependency check macro.
+##
+#set ($workspace = $WorkspaceManager.getWorkspace($currentWiki))
+#if (!$workspace)
+  #error("The current wiki is not a workspace.")
+#else
+  #set($wikiDescriptor = $workspace.wikiDescriptor)
+  *Name*\\
+  $wikiDescriptor.wikiPrettyName\\
+  #set ($workspaceDescription = $wikiDescriptor.description)
+  #if ("$!workspaceDescription" != '')
+    *Description*\\
+    $workspaceDescription\\
+  #end
+  ----
+  ## Join/Leave
+  #set ($hasOwner = ($wikiDescriptor.owner.equals($currentUser)))
+  #if ($isGuest)
+    To join this workspace you need to be logged in.
+  #else    
+    #set ($workspaceGroupDocument = $workspace.groupDocument)
+    #set ($groupsClass = "$currentWiki:XWiki.XWikiGroups")
+    #set ($currentUserGroupObject = $workspaceGroupDocument.getObject($groupsClass, 'member', $currentUser))
+    #set ($hasJoin = ("$!currentUserGroupObject" == ''))
+    #if ($hasJoin)
+      #set ($joinPageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'JoinWorkspaceCode'))
+      #set ($joinUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiPrettyName}"))
+      #set ($membershipType = $wikiDescriptor.getObject('WorkspaceManager.WorkspaceClass').getProperty('membershipType').getValue())
+      #if ($membershipType != 'invite')
+        &lt;span class='buttonwrapper'&gt;&lt;a href="$joinUrl" class='button'&gt;Join Workspace&lt;a/&gt;&lt;/span&gt;
+      #else
+        This workspace is invite only.
+      #end
+    #elseif (!$hasOwner)
+      #set ($leavePageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'LeaveWorkspaceCode'))
+      #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiPrettyName}"))
+      &lt;span class='buttonwrapper'&gt;&lt;a href="$leaveUrl" class='button'&gt;Leave Workspace&lt;a/&gt;&lt;/span&gt;
+    #else
+      You are the owner.
+    #end
+  #end
+  ----
+  *Members*\\
+  #set ($workspaceGroupDocument = $workspace.groupDocument)
+  #set ($workspaceGroupMemberObjects = $workspaceGroupDocument.getObjects('XWiki.XWikiGroups'))
+  #foreach($workspaceGroupMemberObject in $workspaceGroupMemberObjects)
+    #set ($user = $workspaceGroupDocument.getValue('member', $workspaceGroupMemberObject))
+    #if ("$!user" != '')
+      #if ("$!user" != 'XWiki.XWikiGuest')
+        &lt;a href="$xwiki.getURL($user)"&gt;#smallUserAvatar("$user")&lt;/a&gt;
+      #else
+        #smallUserAvatar("$user")
+      #end  
+    #end
+  #end
+#end
+#panelfooter()</content>
+</property>
+<property>
+<description>Provides information about the current workspace.</description>
+</property>
+<property>
+<name>Workspace Information</name>
+</property>
+<property>
+<type>view</type>
+</property>
+</object>
+<content>#includeForm("Panels.PanelSheet")</content></xwikidoc>

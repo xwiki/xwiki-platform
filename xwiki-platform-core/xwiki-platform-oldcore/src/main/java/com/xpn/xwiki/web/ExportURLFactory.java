@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.web;
 
 import java.io.File;
@@ -14,9 +33,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -35,7 +54,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
     /**
      * Logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(ExportURLFactory.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(ExportURLFactory.class);
 
     /** The encoding to use when reading text resources from the filesystem and when sending css/javascript responses. */
     private static final String ENCODING = "UTF-8";
@@ -150,7 +169,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             return new URL(newpath.toString());
         } catch (Exception e) {
-            LOG.error("Failed to create skin URL", e);
+            LOGGER.error("Failed to create skin URL", e);
         }
 
         return super.createSkinURL(filename, skin, context);
@@ -216,7 +235,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             skinURL = new URL(newpath.toString());
         } catch (Exception e) {
-            LOG.error("Failed to create skin URL", e);
+            LOGGER.error("Failed to create skin URL", e);
         }
 
         return skinURL;
@@ -270,7 +289,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             return new URL(newpath.toString());
         } catch (Exception e) {
-            LOG.error("Failed to create skin URL", e);
+            LOGGER.error("Failed to create skin URL", e);
         }
 
         return super.createResourceURL(filename, forceSkinAction, context);
@@ -312,7 +331,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 return new URL(newpath.toString());
             }
         } catch (Exception e) {
-            LOG.error("Failed to create page URL", e);
+            LOGGER.error("Failed to create page URL", e);
         }
 
         return super.createURL(web, name, action, querystring, anchor, xwikidb, context);
@@ -340,8 +359,8 @@ public class ExportURLFactory extends XWikiServletURLFactory
         File file = new File(this.exportDir, path);
         if (!file.exists()) {
             XWikiDocument doc =
-                    context.getWiki().getDocument(
-                        db + XWikiDocument.DB_SPACE_SEP + space + XWikiDocument.SPACE_NAME_SEP + name, context);
+                context.getWiki().getDocument(
+                    db + XWikiDocument.DB_SPACE_SEP + space + XWikiDocument.SPACE_NAME_SEP + name, context);
             XWikiAttachment attachment = doc.getAttachment(filename);
             FileOutputStream fos = new FileOutputStream(file);
             IOUtils.copy(attachment.getContentInputStream(context), fos);
@@ -364,7 +383,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         try {
             return createAttachmentURL(filename, web, name, xwikidb, context);
         } catch (Exception e) {
-            LOG.error("Failed to create attachment URL", e);
+            LOGGER.error("Failed to create attachment URL", e);
 
             return super.createAttachmentURL(filename, web, name, action, null, xwikidb, context);
         }
@@ -383,7 +402,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         try {
             return createAttachmentURL(filename, web, name, xwikidb, context);
         } catch (Exception e) {
-            LOG.error("Failed to create attachment URL", e);
+            LOGGER.error("Failed to create attachment URL", e);
 
             return super.createAttachmentRevisionURL(filename, web, name, revision, xwikidb, context);
         }

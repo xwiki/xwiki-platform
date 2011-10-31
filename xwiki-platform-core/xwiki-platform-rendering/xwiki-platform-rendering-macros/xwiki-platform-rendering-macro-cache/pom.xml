@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-cache</artifactId>
   <name>XWiki Platform - Rendering - Macro - Cache</name>
@@ -38,9 +38,11 @@
       <artifactId>xwiki-platform-cache-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-cache-jbosscache</artifactId>
+      <artifactId>xwiki-platform-cache-infinispan</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

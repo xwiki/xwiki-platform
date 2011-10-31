@@ -1,0 +1,112 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-core</artifactId>
+    <version>3.3-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>xwiki-platform-workspace</artifactId>
+  <packaging>pom</packaging>
+
+  <name>XWiki Platform - Workspace - Parent POM</name>
+
+  <modules>
+    <module>xwiki-platform-workspace-api</module>
+    <module>xwiki-platform-workspace-ui</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- XWiki Plugins -->
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-wiki-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-wiki-manager-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-application-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-application-manager-ui</artifactId>
+        <version>${project.version}</version>
+        <type>xar</type>
+      </dependency>
+
+      <!-- XWiki Core -->
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-oldcore</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-component-api</artifactId>
+        <version>${commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-component-default</artifactId>
+        <version>${commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-script</artifactId>
+        <version>${commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-test</artifactId>
+        <version>${commons.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <description>Parent POM for the Workspace feature.</description>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
+          <version>${project.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+          <version>${commons.version}</version>
+          <configuration>
+            <excludes>
+              <!-- Exclude license stuff or any other META-INF items from 
+                xars. -->
+              <exclude>**/META-INF/**</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <configuration>
+            <!-- It seems that, once we upgraded to 3.2-SNAPSHOT, we have 
+              to explicitly overwrite existing resources thant might already exist in the 
+              destination folder when being copied with the resources-plugin. -->
+            <overwrite>true</overwrite>
+          </configuration>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
+
+  </build>
+
+</project>

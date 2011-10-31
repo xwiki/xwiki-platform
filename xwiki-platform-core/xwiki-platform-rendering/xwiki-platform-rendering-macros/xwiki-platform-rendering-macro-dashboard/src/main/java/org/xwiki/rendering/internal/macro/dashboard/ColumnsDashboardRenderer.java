@@ -24,8 +24,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
@@ -109,7 +112,9 @@ class ColumnGadget extends Gadget
  * @version $Id$
  * @since 3.0M3
  */
-@Component("columns")
+@Component
+@Named("columns")
+@Singleton
 public class ColumnsDashboardRenderer implements DashboardRenderer
 {
     /**
@@ -125,7 +130,7 @@ public class ColumnsDashboardRenderer implements DashboardRenderer
     /**
      * The component manager, to inject to the {@link BlocksContainerMacro}.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**

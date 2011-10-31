@@ -16,9 +16,10 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.container;
+
+import java.util.List;
 
 public interface Request
 {
@@ -28,8 +29,13 @@ public interface Request
     public static final String XWIKI_URL = "xwikiurl";
 
     void setProperty(String key, Object value);
-    
+
     Object getProperty(String key);
-    
+
+    /**
+     * @since 3.2M3
+     */
+    List<Object> getProperties(String key);
+
     void removeProperty(String key);
 }

@@ -97,8 +97,8 @@
           #end
 ##         &lt;/div&gt;
       &lt;/div&gt; ## end &lt;div class="itemDescription"&gt;
-      #if($isScored)
-        #set($resval = $itemDoc.score * 100)
+      #if ($isScored)
+        #set ($resval = $mathtool.min($mathtool.mul($itemDoc.score, 100), 100))
         ##*********************************************************##
         ## Relevance                                               ##
         ##*********************************************************##

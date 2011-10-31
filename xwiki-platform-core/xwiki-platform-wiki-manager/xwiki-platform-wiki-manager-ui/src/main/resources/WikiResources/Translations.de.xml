@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>WikiResources</web>
 <name>Translations</name>
@@ -24,51 +23,52 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language de generated from http://www.l10n.xwiki.org
+#Mon Oct 24 18:52:24 CEST 2011
 XWiki.XWikiServerClass_visibility_private=Privat
-XWiki.XWikiServerClass_visibility_public=\u00D6ffentlich
-error.ERROR_XWIKI_ACCESS_DENIED=Sie sind nicht berechtigt diese Aktion auszuf\u00FChren.
+XWiki.XWikiServerClass_visibility_public=Öffentlich
+error.ERROR_XWIKI_ACCESS_DENIED=Sie sind nicht berechtigt diese Aktion auszuführen.
 wikimanager.action.createwiki.hidedoc=Dokumentation ausblenden
 wikimanager.action.createwiki.nonstepbystep=In den normalen Anzeigemodus wechseln
 wikimanager.action.createwiki.showdoc=Dokumentation einblenden
 wikimanager.action.createwiki.stepbystep=In den Assistentenanzeigemodus wechseln
 wikimanager.action.next=Weiter
-wikimanager.action.previous=Zur\u00FCck
+wikimanager.action.previous=Zurück
 wikimanager.action.settemplate.false=Deselektieren
 wikimanager.action.settemplate.true=Setzen
-wikimanager.action.settings=R\u00FCcksetzen
+wikimanager.action.settings=Rücksetzen
 wikimanager.admins=Administratoren
-wikimanager.answer.deletewiki.msg=Sind sie sicher, dass sie Wiki "{0}\u201C l\u00F6schen wollen?
-wikimanager.answer.deletewiki.title=Wiki l\u00F6schen
+wikimanager.answer.deletewiki.msg=Sind sie sicher, dass sie Wiki "{0}“ löschen wollen?
+wikimanager.answer.deletewiki.title=Wiki löschen
 wikimanager.createwiki=Neues Wiki erstellen
 wikimanager.defaultdatetimeformat=yyyy MMMM dd 'um' HH\:mm
-wikimanager.doc.createwiki.datafrom=Beim erstellen eines neuen Wikis wird standardm\u00E4\u00DFig ein leeres Wiki angelegt. Sie k\u00F6nnen ein Wiki-Template und/oder XAR-Packete als initiale Quelle f\u00FCr ein neues Wiki verwenden.
-wikimanager.doc.createwiki.datafrom.package=Danach wird das angeh\u00E4ngte XAR-File in das neue Wiki importiert. Um weitere Pakete hinzuzuf\u00FCgen, k\u00F6nnen Sie die XAR-Files an diese Seite anh\u00E4ngen.
-wikimanager.doc.createwiki.datafrom.template=Zuerst wird der Inhalt des Wiki-Templates in das neue Wiki kopiert. Sie k\u00F6nnen jedes Wiki zu einem Template machen, in dem Sie die ~~Template~~ Eigenschaft auf der [Wiki Manager Startseite&gt;WikiManager.WebHome] oder in der Wiki-Eigenschaftsseite setzen.
-wikimanager.doc.createwiki.desc=Hier legen sie die Eigenschaften des neuen Wikis fest. Alle Eigenschaften k\u00F6nnen nachtr\u00E4glich \u00FCber die Eigenschafts-Seite des Wikis jederzeit ge\u00E4ndert werden.
+wikimanager.doc.createwiki.datafrom=Beim erstellen eines neuen Wikis wird standardmäßig ein leeres Wiki angelegt. Sie können ein Wiki-Template und/oder XAR-Packete als initiale Quelle für ein neues Wiki verwenden.
+wikimanager.doc.createwiki.datafrom.package=Danach wird das angehängte XAR-File in das neue Wiki importiert. Um weitere Pakete hinzuzufügen, können Sie die XAR-Files an diese Seite anhängen.
+wikimanager.doc.createwiki.datafrom.template=Zuerst wird der Inhalt des Wiki-Templates in das neue Wiki kopiert. Sie können jedes Wiki zu einem Template machen, in dem Sie die ~~Template~~ Eigenschaft auf der [Wiki Manager Startseite&gt;WikiManager.WebHome] oder in der Wiki-Eigenschaftsseite setzen.
+wikimanager.doc.createwiki.desc=Hier legen sie die Eigenschaften des neuen Wikis fest. Alle Eigenschaften können nachträglich über die Eigenschafts-Seite des Wikis jederzeit geändert werden.
 wikimanager.doc.createwiki.desc.description=Kurzbeschreibung des Wikis
 wikimanager.doc.createwiki.desc.homepage=Die Startseite des Wikis
-wikimanager.doc.createwiki.desc.iswikitemplate=Zeigt, ob dieses Wiki als Vorlage f\u00FCr das Erstellen neuer Wikis verwendet werden kann.
-wikimanager.doc.createwiki.desc.owner=Globaler User mit Adminrechten f\u00FCr dieses Wiki.
+wikimanager.doc.createwiki.desc.iswikitemplate=Zeigt, ob dieses Wiki als Vorlage für das Erstellen neuer Wikis verwendet werden kann.
+wikimanager.doc.createwiki.desc.owner=Globaler User mit Adminrechten für dieses Wiki.
 wikimanager.doc.createwiki.desc.secure=Wenn diese Eigenschaft gesetzt ist, beginnen alle externen URLs dieses Wikis mit ~~https~~.
-wikimanager.doc.createwiki.desc.server=Alias \u00FCber den dieses Wiki angesprochen werden kann.
-wikimanager.doc.createwiki.desc.server.creation=Alias \u00FCber den dieses Wiki angesprochen werden kann. Der momentane Alias ist ~~{0}~~. Um den Alias zu \u00E4ndern editieren Sie diese Wiki-Seite und suchen Sie nach dem "$ALIASSUFFIX" im TOOLS-Bereich.&lt;br/&gt;\u00DCber die Wiki-Eigenschaftsseite k\u00F6nnen Sie sp\u00E4ter weitere Alias hinzuf\u00FCgen.
+wikimanager.doc.createwiki.desc.server=Alias über den dieses Wiki angesprochen werden kann.
+wikimanager.doc.createwiki.desc.server.creation=Alias über den dieses Wiki angesprochen werden kann. Der momentane Alias ist ~~{0}~~. Um den Alias zu ändern editieren Sie diese Wiki-Seite und suchen Sie nach dem "$ALIASSUFFIX" im TOOLS-Bereich.&lt;br/&gt;Über die Wiki-Eigenschaftsseite können Sie später weitere Alias hinzufügen.
 wikimanager.doc.createwiki.desc.wikiprettyname=Der Anzeigename dieses Wikis
-wikimanager.doc.createwiki.intro=Neues Wiki erstellen. Erstellt die Wiki-Eigenschaftsseite im Hauptwiki und die zugeh\u00F6rige Datenbank bzw. das Datenbankshema abh\u00E4ngig vom verwendeten Datenbanksystem.
-wikimanager.doc.createwiki.members=Standardm\u00E4\u00DFig ist das neue Wiki unabh\u00E4ngig vom Hauptwiki. Das bedeutet, dass au\u00DFer dem Administrator kein globaler Benutzer Zugriff auf das Wiki hat. Hier k\u00F6nnen Sie festlegen, Welche globalen Benutzer und Gruppen Zugriff auf das neue Wiki haben.
+wikimanager.doc.createwiki.intro=Neues Wiki erstellen. Erstellt die Wiki-Eigenschaftsseite im Hauptwiki und die zugehörige Datenbank bzw. das Datenbankshema abhängig vom verwendeten Datenbanksystem.
+wikimanager.doc.createwiki.members=Standardmäßig ist das neue Wiki unabhängig vom Hauptwiki. Das bedeutet, dass außer dem Administrator kein globaler Benutzer Zugriff auf das Wiki hat. Hier können Sie festlegen, Welche globalen Benutzer und Gruppen Zugriff auf das neue Wiki haben.
 wikimanager.doc.createwiki.members.administrators=Erteilt "Admin"-Rechte d.h. alle angegebenen Benutzer und Gruppen erhalten volle Zugriffsrechte.
 wikimanager.doc.createwiki.members.readers=Erteilt "Lese"- und "Kommentar"-Rechte an die angegebenen Benutzer und Gruppen.
 wikimanager.doc.createwiki.members.writers=Erteilt "Schreib"-, "Lese"- und "Kommentar"-Rechte an alle angegebenen Benutzer und Gruppen.
-wikimanager.doc.createwiki.summary=Sie sind dabei ein neues Wiki mit folgenden Vorgaben zu erstellen. Stellen Sie sicher, dass die Vorgaben richtig sind. Durch Klick auf "Zur\u00FCck" k\u00F6nnen sie zur vorigen Seite zur\u00FCck und die Vorgaben \u00E4ndern.
-wikimanager.doc.createwiki.wikiname=W\u00E4hlen Sie einen eindeutigen Namen f\u00FCr Ihr Wiki. Dieser wird wie folgt verwendet\: \n* als Datenbankname im in f\u00FCr XWiki eingesetzten Datenbanksystem. \n* um die Seiten dieses Wikis mit "EindeutigerName\:Space\:Name" aus einem anderen Wiki anzusprechen. \n* als Name unter dem die Wiki-Eigenschaftsseite im Hauptwiki angelegt wird (~~XWiki.XWikiServer*EindeutigerName*~~). \nDer Eindeutige Name darf nur aus kleingeschriebenen alphanumerischen Zeichen bestehen (0-9, a-z) 
+wikimanager.doc.createwiki.summary=Sie sind dabei ein neues Wiki mit folgenden Vorgaben zu erstellen. Stellen Sie sicher, dass die Vorgaben richtig sind. Durch Klick auf "Zurück" können sie zur vorigen Seite zurück und die Vorgaben ändern.
+wikimanager.doc.createwiki.wikiname=Wählen Sie einen eindeutigen Namen für Ihr Wiki. Dieser wird wie folgt verwendet\: \n* als Datenbankname im in für XWiki eingesetzten Datenbanksystem. \n* um die Seiten dieses Wikis mit "EindeutigerName\:Space\:Name" aus einem anderen Wiki anzusprechen. \n* als Name unter dem die Wiki-Eigenschaftsseite im Hauptwiki angelegt wird (~~XWiki.XWikiServer*EindeutigerName*~~). \nDer Eindeutige Name darf nur aus kleingeschriebenen alphanumerischen Zeichen bestehen (0-9, a-z) 
 wikimanager.erroraliasalreadynotexists=Wiki-Alias "{0}" existiert bereits.
 wikimanager.erroraliasdoesnotexists=Wiki-Alias "{0}" existiert nicht.
 wikimanager.errorcreatewiki=Erstellen von Wiki "{0}" fehlgeschlagen\: {1}
-wikimanager.errorcreatewiki.ERROR_WM_WIKIALREADYEXISTS=Wiki "{0}" existiert bereits. Bitte w\u00E4hlen Sie einen anderen Namen.
-wikimanager.errordeletewiki=L\u00F6schen von Wiki \u201C{0}\u201C fehlgeschlagen\: {1}.
-wikimanager.errorsettemplate=\u00C4ndern der Template-Eigenschaften von Wiki "{0}" fehlgeschlagen\: {1}
+wikimanager.errorcreatewiki.ERROR_WM_WIKIALREADYEXISTS=Wiki "{0}" existiert bereits. Bitte wählen Sie einen anderen Namen.
+wikimanager.errordeletewiki=Löschen von Wiki “{0}“ fehlgeschlagen\: {1}.
+wikimanager.errorsettemplate=Ändern der Template-Eigenschaften von Wiki "{0}" fehlgeschlagen\: {1}
 wikimanager.legend.members=Mitglieder
 wikimanager.legend.sources=Neues Wiki erstellen von
-wikimanager.legend.validate=Pr\u00FCfen
+wikimanager.legend.validate=Prüfen
 wikimanager.legend.wiki=Wiki
 wikimanager.listwikiactions=Aktionen
 wikimanager.listwikiactionsgroups=Gruppen
@@ -84,8 +84,8 @@ wikimanager.listwikiname=Name
 wikimanager.listwikirank=Rang
 wikimanager.listwikistate=Status
 wikimanager.listwikitemplate=Wiki-Template
-wikimanager.notinvirtualmode=Das Wiki ist nicht im virtuellen Modus. Das bedeutet Sie k\u00F6nnen nur das Hauptwiki erreichen. Stellen Sie sicher dass die Eigenschaft &lt;tt&gt;xwiki.virtual\=1&lt;/tt&gt; im &lt;tt&gt;xwiki.cfg&lt;/tt&gt;-File gesetzt ist. 
-wikimanager.pluginnotenabled=Das Wiki-Manager-Plugin ist nicht aktiviert. Diese Seite wird nicht ordnungsgem\u00E4\u00DF funktioniern. Stellen Sie sicher, dass das &lt;tt&gt;com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin&lt;/tt&gt; im &lt;tt&gt;xwiki.plugins&lt;/tt&gt;-Parameter im &lt;tt&gt;xwiki.cfg&lt;/tt&gt;-File aufgef\u00FChrt ist.
+wikimanager.notinvirtualmode=Das Wiki ist nicht im virtuellen Modus. Das bedeutet Sie können nur das Hauptwiki erreichen. Stellen Sie sicher dass die Eigenschaft &lt;tt&gt;xwiki.virtual\=1&lt;/tt&gt; im &lt;tt&gt;xwiki.cfg&lt;/tt&gt;-File gesetzt ist. 
+wikimanager.pluginnotenabled=Das Wiki-Manager-Plugin ist nicht aktiviert. Diese Seite wird nicht ordnungsgemäß funktioniern. Stellen Sie sicher, dass das &lt;tt&gt;com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin&lt;/tt&gt; im &lt;tt&gt;xwiki.plugins&lt;/tt&gt;-Parameter im &lt;tt&gt;xwiki.cfg&lt;/tt&gt;-File aufgeführt ist.
 wikimanager.prop.alias.description=Beschreibung
 wikimanager.prop.alias.homepage=Startseite
 wikimanager.prop.alias.server=Alias
@@ -100,9 +100,9 @@ wikimanager.prop.wiki.visibility=Sichtbar
 wikimanager.prop.wiki.wikiname=Eindeutiger Name
 wikimanager.prop.wiki.wikiprettyname=Anzeigename
 wikimanager.readers=Benutzer
-wikimanager.successcreatewiki=Wiki "{0}" wurde erstellt. Sie k\u00F6nnen es \u00FCber die folgende Adresse erreichen\: [{1}].
-wikimanager.successdeletewiki=Wiki \u201C{0}" gel\u00F6scht.
-wikimanager.successsettemplate=Sichtbarkeit von Wiki "{0}" auf "{1}" ge\u00E4ndert.
+wikimanager.successcreatewiki=Wiki "{0}" wurde erstellt. Sie können es über die folgende Adresse erreichen\: [{1}].
+wikimanager.successdeletewiki=Wiki “{0}" gelöscht.
+wikimanager.successsettemplate=Sichtbarkeit von Wiki "{0}" auf "{1}" geändert.
 wikimanager.title.createnewalias=Neuen Alias erstellen.
 wikimanager.title.createwiki.datafrom=Wiki erstellen aus
 wikimanager.title.createwiki.desc=Wiki-Beschreibung
@@ -114,20 +114,20 @@ wikimanager.title.viewaliases=Zeige Alias
 wikimanager.title.wikisettings=Wiki-Eigenschaften
 wikimanager.totalnumberofwiki=Gesamtanzahl an Wikis
 wikimanager.widget.lastcreatedwikis.title=Zuletzt erstelle Wikis
-wikimanager.widget.lastmodifications.title=Letzte \u00C4nderungen
-wikimanager.widget.mylastmodifications.title=Meine letzten \u00C4nderungen
+wikimanager.widget.lastmodifications.title=Letzte Änderungen
+wikimanager.widget.mylastmodifications.title=Meine letzten Änderungen
 wikimanager.widget.userwikisadmin.title=Administrierte Wikis
 wikimanager.widget.userwikisowner.title=Eigene Wikis
-wikimanager.widget.userwikisuser.title=Verf\u00FCgbare Wikis
+wikimanager.widget.userwikisuser.title=Verfügbare Wikis
 wikimanager.wikimanager=Wiki-Manager
 wikimanager.wikiname.error.alreadyused=Dieser Name wurde bereits verwendet
 wikimanager.wikiname.error.databasealreadyexists=Eine Datenbank mit diesem Namen existiert bereits
 wikimanager.wikiname.error.empty=Es muss ein Name angegeben werden
 wikimanager.wikiname.error.wikialreadyexists=Ein Wiki mit diesem Namen existiert bereits
 wikimanager.wikiname.force=Erzwingen
-wikimanager.wikiname.info.valid=Sie k\u00F6nnen diesen Namen als neuen eindeutigen Namen verwenden
-wikimanager.wikinameneeded=Ein Name f\u00FCr das Wiki ist notwendig
-wikimanager.wikipackage=Von Packet (angeh\u00E4ngter Datei)
+wikimanager.wikiname.info.valid=Sie können diesen Namen als neuen eindeutigen Namen verwenden
+wikimanager.wikinameneeded=Ein Name für das Wiki ist notwendig
+wikimanager.wikipackage=Von Packet (angehängter Datei)
 wikimanager.wikitemplate=Vom Wiki-Template
 wikimanager.writers=Editoren
 </content></xwikidoc>

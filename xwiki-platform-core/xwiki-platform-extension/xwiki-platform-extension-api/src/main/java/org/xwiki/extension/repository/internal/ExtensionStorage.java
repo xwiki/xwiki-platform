@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.extension.repository.internal;
 
 import java.io.File;
@@ -75,6 +94,7 @@ public class ExtensionStorage
         if (this.rootFolder.exists()) {
             FilenameFilter descriptorFilter = new FilenameFilter()
             {
+                @Override
                 public boolean accept(File dir, String name)
                 {
                     return name.endsWith(".xed");
@@ -84,7 +104,7 @@ public class ExtensionStorage
             for (File child : this.rootFolder.listFiles(descriptorFilter)) {
                 if (!child.isDirectory()) {
                     try {
-                        LocalExtension localExtension = loadDescriptor(child);
+                        DefaultLocalExtension localExtension = loadDescriptor(child);
 
                         repository.addLocalExtension(localExtension);
                     } catch (Exception e) {
@@ -104,7 +124,7 @@ public class ExtensionStorage
      * @return the extension descriptor
      * @throws InvalidExtensionException error when trying to load extension descriptor
      */
-    private LocalExtension loadDescriptor(File descriptor) throws InvalidExtensionException
+    private DefaultLocalExtension loadDescriptor(File descriptor) throws InvalidExtensionException
     {
         FileInputStream fis;
         try {
@@ -128,7 +148,7 @@ public class ExtensionStorage
             try {
                 fis.close();
             } catch (IOException e) {
-                // TODO: log something
+                LOGGER.error("Failed to close stream for file [" + descriptor + "]", e);
             }
         }
     }
@@ -190,5 +210,16 @@ public class ExtensionStorage
 
             return fileName;
         }
+    }
+
+    /**
+     * Remove extension from storage.
+     * 
+     * @param extension extension to remove
+     */
+    protected void removeExtension(LocalExtension extension)
+    {
+        getExtensionFile(extension.getId(), extension.getType()).delete();
+        getDescriptorFile(extension.getId()).delete();
     }
 }

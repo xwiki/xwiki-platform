@@ -6,7 +6,7 @@
 <div>
 $msg.get("doclockedby") $xwiki.getUserName($doc.getLockingUser()).
 <br />
-<a href="javascript:window.lb.lbLoadForm('$doc.getURL("inline", "$!request.getQueryString()&force=1")')">$msg.get("forcelock")</a>
+<a href="javascript:window.lb.lbLoadForm('$doc.getURL("edit", "$!request.getQueryString()&force=1")')">$msg.get("forcelock")</a>
 </div>
 #else
 <div class="clear">

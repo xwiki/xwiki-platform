@@ -232,7 +232,7 @@ editors.AutoSave = Class.create({
 });
 
 function init() {
-  return new editor.AutoSave();
+  return new editors.AutoSave();
 }
 
 // When the document is loaded, create the Autosave control

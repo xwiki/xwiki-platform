@@ -58,11 +58,7 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         // Register the Commons Properties Configuration, looking for a xwiki.properties file

@@ -22,11 +22,13 @@ package org.xwiki.wysiwyg.server.internal.plugin.sync;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.gwt.wysiwyg.client.diff.Revision;
 import org.xwiki.gwt.wysiwyg.client.plugin.sync.SyncResult;
@@ -36,50 +38,47 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.wysiwyg.server.plugin.sync.SyncEngine;
 
-
-
 /**
  * XWiki specific implementation of {@link SyncService}.
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class XWikiSyncService implements SyncService
 {
     /**
-     * Default XWiki logger to report errors correctly.
+     * Logger.
      */
-    private static final Log LOG = LogFactory.getLog(XWikiSyncService.class);
+    @Inject
+    private Logger logger;
 
     /**
      * The object used to synchronize the content edited by multiple users when the real time feature of the editor is
      * activated.
      */
-    @Requirement
+    @Inject
     private SyncEngine syncEngine;
 
     /**
      * The component used to push the edited document on the context before converting its content to XHTML.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge docAccessBridge;
 
     /**
      * The component used to parse document references.
      */
-    @Requirement
+    @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     /**
      * The component used to convert the content of the edited page from source syntax to XHTML.
      */
-    @Requirement
+    @Inject
     private HTMLConverter htmlConverter;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SyncService#syncEditorContent(Revision, String, int, boolean)
-     */
+    @Override
     public synchronized SyncResult syncEditorContent(Revision revision, String pageName, int version, boolean syncReset)
     {
         try {
@@ -95,7 +94,7 @@ public class XWikiSyncService implements SyncService
             }
             return syncEngine.sync(syncStatus, revision, version);
         } catch (Exception e) {
-            LOG.error("Exception while synchronizing edited content.", e);
+            this.logger.error("Exception while synchronizing edited content.", e);
             throw new RuntimeException(e.getLocalizedMessage(), e);
         }
     }
@@ -111,7 +110,7 @@ public class XWikiSyncService implements SyncService
         Map<String, Object> backupObjects = new HashMap<String, Object>();
         try {
             docAccessBridge.pushDocumentInContext(backupObjects, docModelBridge.getDocumentReference());
-            return htmlConverter.toHTML(docModelBridge.getContent(), docModelBridge.getSyntaxId());
+            return htmlConverter.toHTML(docModelBridge.getContent(), docModelBridge.getSyntax().toIdString());
         } finally {
             // Restore the context after the conversion.
             docAccessBridge.popDocumentFromContext(backupObjects);

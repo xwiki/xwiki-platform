@@ -21,7 +21,9 @@ package com.xpn.xwiki.plugin.lucene;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jmock.Mock;
+import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiException;
@@ -59,6 +61,17 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
         this.attachmentData = new AttachmentData(this.attachment, getContext(), false);
     }
 
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        // Setup display configuration.
+        Mock mockDisplayConfiguration = registerMockComponent(DisplayConfiguration.class);
+        mockDisplayConfiguration.stubs().method("getDocumentDisplayerHint").will(returnValue("default"));
+        mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(2));
+    }
+
     private void assertGetFullText(String expect, String filename) throws XWikiException, IOException
     {
         this.attachment.setFilename(filename);
@@ -66,51 +79,38 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
 
         this.attachmentData.setFilename(filename);
 
-        String fulllText = this.attachmentData.getFullText(this.document, getContext());
+        String fullText = this.attachmentData.getFullText(this.document, getContext());
 
-        StringBuffer sb = new StringBuffer();
-        sb.append(this.document.getName()).append(" ").append(this.document.getSpace());
-        
-        if (!StringUtils.isEmpty(this.document.getAuthor())) {
-            sb.append(" ").append(this.document.getAuthor());
-        }
-
-        if (!StringUtils.isEmpty(this.document.getCreator())) {
-            sb.append(" ").append(this.document.getCreator());
-        }
-
-        sb.append(" ").append(expect);
-
-        assertEquals(sb.toString(), fulllText);
+        assertEquals("Wrong attachment content indexed", expect, fullText);
     }
 
     public void testGetFullTextFromTxt() throws XWikiException, IOException
     {
-        assertGetFullText("txt.txt text content\n", "txt.txt");
+        assertGetFullText("text content\n", "txt.txt");
     }
 
     public void testGetFullTextFromMSOffice97() throws XWikiException, IOException
     {
-        assertGetFullText("msoffice97.doc MS Office 97 content\n\n", "msoffice97.doc");
+        assertGetFullText("ms office 97 content\n\n", "msoffice97.doc");
     }
 
     public void testGetFullTextFromOpenXML() throws XWikiException, IOException
     {
-        assertGetFullText("openxml.docx OpenXML content\n", "openxml.docx");
+        assertGetFullText("openxml content\n", "openxml.docx");
     }
 
     public void testGetFullTextFromOpenDocument() throws XWikiException, IOException
     {
-        assertGetFullText("opendocument.odt OpenDocument content\n", "opendocument.odt");
+        assertGetFullText("opendocument content\n", "opendocument.odt");
     }
 
     public void testGetFullTextFromPDF() throws XWikiException, IOException
     {
-        assertGetFullText("pdf.pdf PDF content\n\n", "pdf.pdf");
+        assertGetFullText("pdf content\n\n", "pdf.pdf");
     }
 
     public void testGetFullTextFromZIP() throws XWikiException, IOException
     {
-        assertGetFullText("zip.zip zip.txt\nzip content\n\n\n\n", "zip.zip");
+        assertGetFullText("zip.txt\nzip content\n\n\n\n", "zip.zip");
     }
 }

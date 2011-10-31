@@ -19,9 +19,12 @@
  */
 package org.xwiki.component.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -34,25 +37,25 @@ import org.xwiki.component.phase.InitializationException;
  * @version $Id$
  * @since 2.1RC1
  */
-@Component("user")
+@Component
+@Named("user")
+@Singleton
 public class UserComponentManager extends AbstractGenericComponentManager implements Initializable
 {
     /**
      * Used to access the current user in the Execution Context.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
-    @Requirement("wiki")
+    @Inject
+    @Named("wiki")
     private ComponentManager wikiComponentManager;
-    
-    /**
-     * {@inheritDoc}
-     * @see Initializable#initialize()
-     */
+
+    @Override
     public void initialize() throws InitializationException
     {
         // Set the parent to the Wiki Component Manager since if a component isn't found for a particular user

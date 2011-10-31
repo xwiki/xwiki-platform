@@ -22,9 +22,11 @@ package org.xwiki.rendering.internal.macro.wikibridge;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -46,25 +48,26 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
  * @since 2.0M2
  */
 @Component
+@Singleton
 public class DefaultWikiMacroManager implements WikiMacroManager
 {
     /**
      * The Root {@link ComponentManager}, used to look up specific component manager for registering Wiki Macros against
      * the proper one (depending on the Macro visibility).
      */
-    @Requirement
+    @Inject
     private ComponentManager rootComponentManager;
 
     /**
      * The {@link DocumentAccessBridge} component.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge bridge;
 
     /**
      * The {@link ModelContext} component.
      */
-    @Requirement
+    @Inject
     private ModelContext modelContext;
 
     /**
@@ -132,10 +135,9 @@ public class DefaultWikiMacroManager implements WikiMacroManager
 
     /**
      * {@inheritDoc}
-     * 
-     * @see WikiMacroManager#hasWikiMacro(org.xwiki.model.reference.DocumentReference)
      * @since 2.2M1
      */
+    @Override
     public boolean hasWikiMacro(DocumentReference documentReference)
     {
         return (null != this.wikiMacroMap.get(documentReference));
@@ -143,10 +145,9 @@ public class DefaultWikiMacroManager implements WikiMacroManager
 
     /**
      * {@inheritDoc}
-     * 
-     * @see WikiMacroManager#registerWikiMacro(org.xwiki.model.reference.DocumentReference , WikiMacro)
      * @since 2.2M1
      */
+    @Override
     public void registerWikiMacro(DocumentReference documentReference, WikiMacro wikiMacro)
         throws InsufficientPrivilegesException, WikiMacroException
     {
@@ -176,10 +177,9 @@ public class DefaultWikiMacroManager implements WikiMacroManager
 
     /**
      * {@inheritDoc}
-     * 
-     * @see WikiMacroManager#unregisterWikiMacro(org.xwiki.model.reference.DocumentReference)
      * @since 2.2M1
      */
+    @Override
     public void unregisterWikiMacro(DocumentReference documentReference) throws WikiMacroException
     {
         WikiMacroData macroData = this.wikiMacroMap.get(documentReference);

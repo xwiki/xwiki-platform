@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.user.impl.LDAP;
 
 import java.io.UnsupportedEncodingException;
@@ -27,9 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.securityfilter.realm.SimplePrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.novell.ldap.LDAPException;
 import com.xpn.xwiki.XWikiContext;
@@ -69,19 +67,13 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
     /**
      * Logging tool.
      */
-    private static final Log LOG = LogFactory.getLog(XWikiLDAPAuthServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiLDAPAuthServiceImpl.class);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl#authenticate(java.lang.String, java.lang.String,
-     *      com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public Principal authenticate(String login, String password, XWikiContext context) throws XWikiException
     {
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("Starting LDAP authentication");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Starting LDAP authentication");
         }
 
         /*
@@ -93,8 +85,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         if (login == null) {
             // If we can't find the username field then we are probably on the login screen
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("The provided user is null."
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("The provided user is null."
                     + " We don't try to authenticate, it probably means the user is in non logged mode.");
             }
 
@@ -105,8 +97,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         if (login.equals("")) {
             context.put("message", "nousername");
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("LDAP authentication failed: login empty");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("LDAP authentication failed: login empty");
             }
 
             return null;
@@ -116,8 +108,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         if ((password == null) || (password.trim().equals(""))) {
             context.put("message", "nopassword");
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("LDAP authentication failed: password null or empty");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("LDAP authentication failed: password null or empty");
             }
 
             return null;
@@ -141,11 +133,11 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             principal = xwikiAuthenticate(login, password, context);
         }
 
-        if (LOG.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             if (principal != null) {
-                LOG.debug("LDAP authentication succeed with principal [" + principal.getName() + "]");
+                LOGGER.debug("LDAP authentication succeed with principal [" + principal.getName() + "]");
             } else {
-                LOG.debug("LDAP authentication failed for user [" + login + "]");
+                LOGGER.debug("LDAP authentication failed for user [" + login + "]");
             }
         }
 
@@ -190,8 +182,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             principal = ldapAuthenticateInContext(ldapUid, validXWikiUserName, password, context, true);
         } catch (Exception e) {
             // continue
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Local LDAP authentication failed.", e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Local LDAP authentication failed.", e);
             }
         }
 
@@ -205,8 +197,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                     principal = ldapAuthenticateInContext(ldapUid, validXWikiUserName, password, context, false);
                 } catch (Exception e) {
                     // continue
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Global LDAP authentication failed.", e);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Global LDAP authentication failed.", e);
                     }
                 }
             } finally {
@@ -236,8 +228,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         String trylocal = config.getLDAPParam("ldap_trylocal", "0", context);
 
         if ("1".equals(trylocal)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Trying authentication against XWiki DB");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Trying authentication against XWiki DB");
             }
 
             principal = super.authenticate(ldapUid, ldapPassword, context);
@@ -299,8 +291,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         // ////////////////////////////////////////////////////////////////////
 
         if (!config.isLDAPEnabled(context)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("LDAP authentication failed: LDAP not activ");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("LDAP authentication failed: LDAP not activ");
             }
 
             return principal;
@@ -329,8 +321,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         String filterGroupDN = config.getLDAPParam("ldap_user_group", "", context);
 
         if (filterGroupDN.length() > 0) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Checking if the user belongs to the user group: " + filterGroupDN);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Checking if the user belongs to the user group: " + filterGroupDN);
             }
 
             ldapDn = ldapUtils.isUidInGroup(ldapUid, filterGroupDN, context);
@@ -348,8 +340,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         String excludeGroupDN = config.getLDAPParam("ldap_exclude_group", "", context);
 
         if (excludeGroupDN.length() > 0) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Checking if the user does not belongs to the exclude group: " + excludeGroupDN);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Checking if the user does not belongs to the exclude group: " + excludeGroupDN);
             }
 
             if (ldapUtils.isUidInGroup(ldapUid, excludeGroupDN, context) != null) {
@@ -393,7 +385,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         if ("1".equals(config.getLDAPParam("ldap_validate_password", "0", context))) {
             String passwordField = config.getLDAPParam("ldap_password_field", "userPassword", context);
             if (!connector.checkPassword(ldapDn, password, passwordField)) {
-                LOG.debug("Password comparison failed, are you really sure you need validate_password ?"
+                LOGGER.debug("Password comparison failed, are you really sure you need validate_password ?"
                     + " If you don't enable it, it does not mean user credentials are not validated."
                     + " The goal of this property is to bypass standard LDAP bind"
                     + " which is usually bad unless you really know what you do.");
@@ -437,7 +429,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         try {
             syncGroupsMembership(userProfile.getFullName(), ldapDn, isNewUser, ldapUtils, context);
         } catch (XWikiException e) {
-            LOG.error("Failed to synchronise user's groups membership", e);
+            LOGGER.error("Failed to synchronise user's groups membership", e);
         }
 
         return principal;

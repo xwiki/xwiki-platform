@@ -106,58 +106,57 @@ public class ApplicationManagerMessageTool extends XWikiPluginMessageTool
     public static final String ERROR_APPDOESNOTEXISTS = "applicationmanager.plugin.error.applicationdoesnotexists";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when application creation failed.
+     * Used as log message when application creation failed.
      */
     public static final String LOG_CREATEAPP = "applicationmanager.plugin.log.createapplication";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when application delete failed.
+     * Used as log message when application delete failed.
      */
     public static final String LOG_DELETEAPP = "applicationmanager.plugin.log.deleteapplication";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when getting all application descriptors failed.
+     * Used as log message when getting all application descriptors failed.
      */
     public static final String LOG_GETALLAPPS = "applicationmanager.plugin.log.getallapplications";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when getting application descriptor failed.
+     * Used as log message when getting application descriptor failed.
      */
     public static final String LOG_GETAPP = "applicationmanager.plugin.log.getapplication";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when exporting application failed.
+     * Used as log message when exporting application failed.
      */
     public static final String LOG_EXPORTAPP = "applicationmanager.plugin.log.exportapplication";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when importing application failed.
+     * Used as log message when importing application failed.
      */
     public static final String LOG_IMPORTAPP = "applicationmanager.plugin.log.importapplication";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when reloading application failed.
+     * Used as log message when reloading application failed.
      */
     public static final String LOG_RELOADAPP = "applicationmanager.plugin.log.reloadapplication";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when reloading all applications failed.
+     * Used as log message when reloading all applications failed.
      */
     public static final String LOG_REALOADALLAPPS = "applicationmanager.plugin.log.realoadallapplications";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when automatically updating application translations
-     * informations failed.
+     * Used as log message when automatically updating application translations information failed.
      */
     public static final String LOG_AUTOUPDATETRANSLATIONS = "applicationmanager.plugin.log.autoupdatetranslations";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when refreshing all applications translations pages.
+     * Used as log message when refreshing all applications translations pages.
      */
     public static final String LOG_REFRESHALLTRANSLATIONS = "applicationmanager.plugin.log.refreshalltranslations";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when getting wiki root application failed.
+     * Used as log message when getting wiki root application failed.
      */
     public static final String LOG_GETROOTAPP = "applicationmanager.plugin.log.getrootapplication";
 

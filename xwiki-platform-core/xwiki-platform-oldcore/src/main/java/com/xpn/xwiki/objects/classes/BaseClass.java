@@ -21,18 +21,14 @@ package com.xpn.xwiki.objects.classes;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.ecs.xhtml.option;
-import org.apache.ecs.xhtml.select;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -47,7 +43,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.CollisionException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
@@ -59,9 +54,6 @@ import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.plugin.query.OrderClause;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.web.Utils;
@@ -1136,89 +1128,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public void setNameField(String nameField)
     {
         this.nameField = nameField;
-    }
-
-    public String makeQuery(XWikiCriteria query)
-    {
-        List<String> criteriaList = new ArrayList<String>();
-        for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
-            String name = property.getName();
-            Map<String, Object> map = query.getParameters(getName() + "_" + name);
-            if (map.size() > 0) {
-                property.makeQuery(map, "", query, criteriaList);
-            }
-        }
-
-        return StringUtils.join(criteriaList.toArray(), " and ");
-    }
-
-    public String displaySearchColumns(String prefix, XWikiQuery query, XWikiContext context)
-    {
-        select select = new select(prefix + "searchcolumns", 5);
-        select.setMultiple(true);
-        select.setName(prefix + "searchcolumns");
-        select.setID(prefix + "searchcolumns");
-
-        List<String> list = Arrays.asList(getPropertyNames());
-        Map<String, String> prettynamesmap = new HashMap<String, String>();
-        for (int i = 0; i < list.size(); i++) {
-            String propname = list.get(i);
-            list.set(i, prefix + propname);
-            prettynamesmap.put(prefix + propname, ((PropertyClass) get(propname)).getPrettyName());
-        }
-
-        List<String> selectlist = query.getDisplayProperties();
-
-        // Add options from Set
-        for (Iterator<String> it = list.iterator(); it.hasNext();) {
-            String value = it.next().toString();
-            String displayValue = prettynamesmap.get(value);
-            option option = new option(displayValue, displayValue);
-            option.addElement(displayValue);
-            option.setValue(value);
-            if (selectlist.contains(value)) {
-                option.setSelected(true);
-            }
-            select.addElement(option);
-        }
-
-        return select.toString();
-    }
-
-    public String displaySearchOrder(String prefix, XWikiQuery query, XWikiContext context)
-    {
-        select select = new select(prefix + "searchorder", 5);
-        select.setMultiple(true);
-        select.setName(prefix + "searchorder");
-        select.setID(prefix + "searchorder");
-
-        List<String> list = Arrays.asList(getPropertyNames());
-        Map<String, String> prettynamesmap = new HashMap<String, String>();
-        for (int i = 0; i < list.size(); i++) {
-            String propname = list.get(i);
-            list.set(i, prefix + propname);
-            prettynamesmap.put(prefix + propname, ((PropertyClass) get(propname)).getPrettyName());
-        }
-
-        OrderClause order = null;
-        if ((query != null) && (query.getOrderProperties() != null) && (query.getOrderProperties().size() > 0)) {
-            order = query.getOrderProperties().get(0);
-        }
-
-        // Add options from Set
-        for (Iterator<String> it = list.iterator(); it.hasNext();) {
-            String value = it.next().toString();
-            String displayValue = prettynamesmap.get(value);
-            option option = new option(displayValue, displayValue);
-            option.addElement(displayValue);
-            option.setValue(value);
-            if ((order != null) && (value.equals(order.getProperty()))) {
-                option.setSelected(true);
-            }
-            select.addElement(option);
-        }
-
-        return select.toString();
     }
 
     public void setValidationScript(String validationScript)

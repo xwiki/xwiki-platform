@@ -15,7 +15,7 @@
 <date>1227676277000</date>
 <contentUpdateDate>1227676277000</contentUpdateDate>
 <version>1.1</version>
-<title>$doc.getValue("title")</title>
+<title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -138,5 +138,4 @@
 <title>The Wiki Blog</title>
 </property>
 </object>
-<content>{{include document="Blog.BlogSheet"/}}</content>
-</xwikidoc>
+<content></content></xwikidoc>

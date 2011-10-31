@@ -1,12 +1,33 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.store;
 
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.inject.Singleton;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWiki;
@@ -17,9 +38,10 @@ import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
+@Singleton
 public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore implements XWikiAttachmentStoreInterface
 {
-    private static final Log log = LogFactory.getLog(XWikiHibernateAttachmentStore.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateAttachmentStore.class);
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
@@ -64,12 +86,14 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     {
     }
 
+    @Override
     public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
         saveAttachmentContent(attachment, true, context, bTransaction);
     }
 
+    @Override
     public void saveAttachmentContent(XWikiAttachment attachment, boolean parentUpdate, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
@@ -101,8 +125,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     attachment.loadArchive(context);
                 }
                 // The archive has been updated in XWikiHibernateStore.saveAttachment()
-                context.getWiki().getAttachmentVersioningStore().saveArchive(attachment.getAttachment_archive(),
-                    context, false);
+                context.getWiki().getAttachmentVersioningStore()
+                    .saveArchive(attachment.getAttachment_archive(), context, false);
 
                 if (parentUpdate) {
                     context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, true);
@@ -131,6 +155,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
     }
 
+    @Override
     public void saveAttachmentsContent(List<XWikiAttachment> attachments, XWikiDocument doc, boolean bParentUpdate,
         XWikiContext context, boolean bTransaction) throws XWikiException
     {
@@ -164,6 +189,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
     }
 
+    @Override
     public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
@@ -181,8 +207,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     context.setDatabase(attachdb);
                 }
                 XWikiAttachmentContent content = new XWikiAttachmentContent(attachment);
-                attachment.setAttachment_content(content);
                 session.load(content, new Long(content.getId()));
+                attachment.setAttachment_content(content);
 
                 // Hibernate calls setContent which causes isContentDirty to be true. This is not what we want.
                 content.setContentDirty(false);
@@ -209,12 +235,14 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
         }
     }
 
+    @Override
     public void deleteXWikiAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
         deleteXWikiAttachment(attachment, true, context, bTransaction);
     }
 
+    @Override
     public void deleteXWikiAttachment(XWikiAttachment attachment, boolean parentUpdate, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
@@ -239,14 +267,14 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     try {
                         session.delete(attachment.getAttachment_content());
                     } catch (Exception e) {
-                        if (log.isWarnEnabled()) {
-                            log.warn("Error deleting attachment content " + attachment.getFilename() + " of doc "
+                        if (LOGGER.isWarnEnabled()) {
+                            LOGGER.warn("Error deleting attachment content " + attachment.getFilename() + " of doc "
                                 + attachment.getDoc().getFullName());
                         }
                     }
                 } catch (Exception e) {
-                    if (log.isWarnEnabled()) {
-                        log.warn("Error loading attachment content when deleting attachment "
+                    if (LOGGER.isWarnEnabled()) {
+                        LOGGER.warn("Error loading attachment content when deleting attachment "
                             + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
                     }
                 }
@@ -256,8 +284,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 try {
                     session.delete(attachment);
                 } catch (Exception e) {
-                    if (log.isWarnEnabled()) {
-                        log.warn("Error deleting attachment meta data " + attachment.getFilename() + " of doc "
+                    if (LOGGER.isWarnEnabled()) {
+                        LOGGER.warn("Error deleting attachment meta data " + attachment.getFilename() + " of doc "
                             + attachment.getDoc().getFullName());
                     }
                 }
@@ -279,8 +307,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, false);
                 }
             } catch (Exception e) {
-                if (log.isWarnEnabled()) {
-                    log.warn("Error updating document when deleting attachment " + attachment.getFilename()
+                if (LOGGER.isWarnEnabled()) {
+                    LOGGER.warn("Error updating document when deleting attachment " + attachment.getFilename()
                         + " of doc " + attachment.getDoc().getFullName());
                 }
             }

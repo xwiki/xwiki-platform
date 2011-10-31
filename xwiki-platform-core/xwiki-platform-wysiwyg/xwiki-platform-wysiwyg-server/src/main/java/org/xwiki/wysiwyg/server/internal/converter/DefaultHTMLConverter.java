@@ -21,9 +21,12 @@ package org.xwiki.wysiwyg.server.internal.converter;
 
 import java.io.StringReader;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xwiki.component.annotation.Requirement;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
@@ -45,35 +48,40 @@ import org.xwiki.rendering.transformation.TransformationContext;
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class DefaultHTMLConverter implements HTMLConverter
 {
     /**
-     * Default XWiki logger to report errors correctly.
+     * Logger.
      */
-    private static final Log LOG = LogFactory.getLog(DefaultHTMLConverter.class);
+    @Inject
+    private Logger logger;
 
     /**
      * The component used to clean the HTML before the conversion.
      */
-    @Requirement()
+    @Inject
     private HTMLCleaner htmlCleaner;
 
     /**
      * The component used to parse the XHTML obtained after cleaning.
      */
-    @Requirement("xhtml/1.0")
+    @Inject
+    @Named("xhtml/1.0")
     private Parser xhtmlParser;
 
     /**
      * The component used to parse the XHTML obtained after cleaning, when transformations are not executed.
      */
-    @Requirement("xhtml/1.0")
+    @Inject
+    @Named("xhtml/1.0")
     private StreamParser xhtmlStreamParser;
 
     /**
      * The component used to create syntax instances from syntax identifiers.
      */
-    @Requirement
+    @Inject
     private SyntaxFactory syntaxFactory;
 
     /**
@@ -83,29 +91,28 @@ public class DefaultHTMLConverter implements HTMLConverter
      * editor. We should use the transformation manager once generic transformation markers are implemented in the
      * rendering module and the WYSIWYG editor supports them.
      * 
-     * @see XWIKI-3260: Add markers to modified XDOM by Transformations/Macros
+     * @see <a href="http://jira.xwiki.org/browse/XRENDERING-78">XWIKI-3260: Add markers to modified XDOM by
+     * Transformations/Macros</a>
      */
-    @Requirement("macro")
+    @Inject
+    @Named("macro")
     private Transformation macroTransformation;
 
     /**
      * The component used to render a XDOM to XHTML.
      */
-    @Requirement("annotatedxhtml/1.0")
+    @Inject
+    @Named("annotatedxhtml/1.0")
     private BlockRenderer xhtmlRenderer;
 
     /**
      * The component manager. We need it because we have to access some components dynamically based on the input
      * syntax.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLConverter#fromHTML(String, String)
-     */
+    @Override
     public String fromHTML(String dirtyHTML, String syntaxId)
     {
         try {
@@ -120,16 +127,12 @@ public class DefaultHTMLConverter implements HTMLConverter
 
             return printer.toString();
         } catch (Exception e) {
-            LOG.error(e.getLocalizedMessage(), e);
+            this.logger.error(e.getLocalizedMessage(), e);
             throw new RuntimeException("Exception while parsing HTML", e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLConverter#toHTML(String, String)
-     */
+    @Override
     public String toHTML(String source, String syntaxId)
     {
         try {
@@ -149,16 +152,12 @@ public class DefaultHTMLConverter implements HTMLConverter
 
             return printer.toString();
         } catch (Exception e) {
-            LOG.error(e.getLocalizedMessage(), e);
+            this.logger.error(e.getLocalizedMessage(), e);
             throw new RuntimeException("Exception while rendering HTML", e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLConverter#parseAndRender(String, String)
-     */
+    @Override
     public String parseAndRender(String dirtyHTML, String syntaxId)
     {
         try {
@@ -186,7 +185,7 @@ public class DefaultHTMLConverter implements HTMLConverter
 
             return printer.toString();
         } catch (Exception e) {
-            LOG.error(e.getLocalizedMessage(), e);
+            this.logger.error(e.getLocalizedMessage(), e);
             throw new RuntimeException("Exception while refreshing HTML", e);
         }
     }

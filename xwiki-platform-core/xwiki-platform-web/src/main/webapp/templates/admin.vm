@@ -39,26 +39,12 @@
 ##-------------------------------------------------
 #template("startpage.vm")
 ##-------------------------------------------------
-## Include AdminSheet and XWikiPreferences obj.
+## Include XWikiPreferences object
 ##-------------------------------------------------
-#if ($doc.syntax.toIdString() == 'xwiki/1.0')
-  #set ($include = '#includeForm("XWiki.AdminSheet")')
-#else
-  #set ($include = '{{include document="XWiki.AdminSheet"/}}')
-#end
-#if ($doc.fullName == 'XWiki.XWikiPreferences' || $doc.name == 'WebPreferences')
-  #if ($doc.getContent().indexOf('XWiki.AdminSheet') < 0)
-    #set ($discard = $doc.setContent($include))
-    #set ($needsupdate = true)
-  #end
-  #set ($obj = $doc.getObject('XWiki.XWikiPreferences'))
-  #set ($prefsclassname = 'XWiki.XWikiPreferences')
-  #set ($class = $xwiki.getDocument($prefsclassname).xWikiClass)
-  #if (!$obj)
-    #set ($obj = $doc.newObject($prefsclassname))
-    #set ($needsupdate = true)
-  #end
-  #if ($needsupdate)
+#set ($prefsClassName = 'XWiki.XWikiPreferences')
+#if ($doc.fullName == $prefsClassName || $doc.name == 'WebPreferences')
+  #if (!$doc.getObject($prefsClassName))
+    #set ($discard = $doc.newObject($prefsClassName))
     $!doc.setParent("${doc.space}.WebHome")
     #set ($discard = $doc.save())
   #end
@@ -87,11 +73,10 @@
     #set ($importaction = $doc.getURL('import'))
     #if ($xwiki.searchDocuments('1=1').size() < 40)
       ## Less than 40 pages in the wiki, probably a fresh install (16/07/08 : XWiki creates 21 pages at startup)
-      #set ($rawVersion = $xwiki.getVersion())
       #set ($URLhost = 'http://maven.xwiki.org')
       #set ($URLgroup = 'org/xwiki/enterprise')
       #set ($URLartifact = 'xwiki-enterprise-wiki')
-      #set ($URLversion = $rawVersion.substring(0, $rawVersion.lastIndexOf('.')))
+      #set ($URLversion = $xwiki.getVersion())
       #if ($URLversion.endsWith('-SNAPSHOT'))
         #set ($URL = "${URLhost}/snapshots/${URLgroup}/${URLartifact}/$URLversion/")
       #else

@@ -29,10 +29,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.runtime.InvokerHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
@@ -57,17 +57,13 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
 {
-    private static final Log LOG = LogFactory.getLog(XWikiGroovyRenderer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiGroovyRenderer.class);
 
     private Cache<Template> cache;
 
     private Cache<CachedGroovyClass> classCache;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.XWikiRenderer#flushCache()
-     */
+    @Override
     public void flushCache()
     {
         if (this.cache != null) {
@@ -178,11 +174,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiInterpreter#interpret(String,XWikiDocument,XWikiContext)
-     */
+    @Override
     public String interpret(String content, XWikiDocument contextdoc, XWikiContext context)
     {
         return render(content, contextdoc, contextdoc, context);
@@ -220,8 +212,10 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
             String title;
             String text;
 
-            XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
-                XWikiException.ERROR_XWIKI_RENDERING_GROOVY_EXCEPTION, "Error while parsing groovy page {0}", e, args);
+            XWikiException xe =
+                new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
+                    XWikiException.ERROR_XWIKI_RENDERING_GROOVY_EXCEPTION, "Error while parsing groovy page {0}", e,
+                    args);
             title = xe.getMessage();
             text = XMLUtils.escape(xe.getFullMessage());
 
@@ -233,12 +227,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.XWikiRenderer#render(java.lang.String, com.xpn.xwiki.doc.XWikiDocument,
-     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public String render(String content, XWikiDocument contentdoc, XWikiDocument contextdoc, XWikiContext context)
     {
         if (content.indexOf("<%") == -1) {
@@ -333,19 +322,14 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
                 XWikiDocument doc = context.getWiki().getDocument(inclDocName, context);
                 result.append(doc.getContent());
             } catch (XWikiException e) {
-                if (LOG.isErrorEnabled()) {
-                    LOG.error("Impossible to load groovy macros doc " + inclDocName);
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error("Impossible to load groovy macros doc " + inclDocName);
                 }
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.XWikiRenderer#convertSingleLine(java.lang.String, java.lang.String, java.lang.String,
-     *      com.xpn.xwiki.render.XWikiVirtualMacro, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public String convertSingleLine(String macroname, String param, String allcontent, XWikiVirtualMacro macro,
         XWikiContext context)
     {
@@ -355,12 +339,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
         return result.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.XWikiRenderer#convertMultiLine(java.lang.String, java.lang.String, java.lang.String,
-     *      java.lang.String, com.xpn.xwiki.render.XWikiVirtualMacro, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public String convertMultiLine(String macroname, String param, String data, String allcontent,
         XWikiVirtualMacro macro, XWikiContext context)
     {
@@ -409,11 +388,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
             return this.cl;
         }
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @see org.xwiki.cache.DisposableCacheValue#dispose()
-         */
+        @Override
         public void dispose() throws Exception
         {
             if (this.cl != null) {

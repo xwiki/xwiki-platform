@@ -11,15 +11,15 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1284039567000</creationDate>
-<date>1305186885000</date>
-<contentUpdateDate>1305186885000</contentUpdateDate>
-<version>1.1</version>
+<date>1317049033000</date>
+<contentUpdateDate>1317049033000</contentUpdateDate>
+<version>2.71</version>
 <title>Extension Manager</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>false</minorEdit>
+<minorEdit>true</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden><attachment>
 <filename>icon.png</filename>
@@ -355,6 +355,29 @@ This application is experimental, use it at your own risk.
 #if ($request.extensionwiki &amp;&amp; $request.extensionwiki.trim() != '')
   #set($extensionwiki = $request.extensionwiki)
 #end
+
+#macro(printThrowable $throwable)
+  $throwable.class: #if(!$throwable.message)null#else$throwable.message#end
+
+  #foreach($stackTraceElement in $throwable.stackTrace)
+    ~    at $stackTraceElement
+  #end
+  #if ($throwable.cause)
+    Caused by: #printThrowable($throwable.cause)
+  #end
+#end
+
+#macro(printJobLog $job)
+  #foreach($log in $installJob.status.log)
+    #set($logLevel = $log.level.toString().toLowerCase())
+    {{$logLevel}}
+      $log.formattedMessage
+      #if ($log.throwable)
+        #printThrowable($log.throwable)
+      #end
+    {{/$logLevel}}
+  #end
+#end
 {{/velocity}}
 
 {{velocity}}
@@ -430,32 +453,94 @@ This application is experimental, use it at your own risk.
 #if ($request.actionresolve)
   = Resolve
 
-  #if (!$request.extensionid || !$request.extensionversion)
+  #if (!$request.extensionid || $request.extensionid == '' || !$request.extensionversion || $request.extensionversion == '')
     {{error}}You have to provide both extension id and version.{{/error}}
   #else
-    #macro(resolveExtension $extensionid $extensionversion $extensionlevel)
-      #set($extension = $extensionManager.resolve($extensionid, $extensionversion, $extensionwiki))
-      #if (!$extension)
-        #set($lasterror = $extensionManager.lastError)
-        {{error}}Failed to resolve extension with id $extensionid and version $extensionversion: $lasterror.message{{/error}}
-      #else
-        #set($extensionclass = "${extension.class}")
-        #foreach($index in [1..$extensionlevel])*#end #if($extensionclass.endsWith('CoreExtension'))**C**#elseif($extensionclass.endsWith('LocalExtension'))**I**#else**R**#end $extension.id.id ($extension.type) ($extension.id.version#if($extensionversion != $extension.id.version) was $extensionversion#end)
-        #resolveExtensionDependencies($extension)
-      #end
-    #end
-    #macro(resolveExtensionDependencies $extension $extensionlevel)
-      #set($extensionlevel = $extensionlevel + 1)
-      #foreach ($dependency in $extension.dependencies)
-        #resolveExtension($dependency.id, $dependency.version, $extensionlevel)
-      #end
-      #set($extensionlevel = $extensionlevel - 1)
-    #end
-    #resolveExtension($request.extensionid, $request.extensionversion, 1)
+    #set($extension = $extensionManager.resolve($request.extensionid, $request.extensionversion))
+    #set($lasterror = $extensionManager.lastError)
+    #if ($lasterror)
+      {{error}}
+        Can't resolve extension with id $request.extensionid and version $request.extensionversion: #printThrowable($lasterror)
+      {{/error}}
+    #else
+      ; Id
+      : {{{$extension.id.id}}}
+      ; Version
+      : {{{$extension.id.version}}}
+      ; Type
+      : {{{$extension.type}}}
+      ; Features
+      : #if (!$extension.features.empty){{{$extension.features}}}#else//No feature//#end
 
-    **C**: core extension
-    **I**: installed extension
-    **R**: remote extension
+      ; Name
+      : #if ($extension.name){{{$!extension.name}}}#else{{{$extension.id.id}}}#end
+
+      ; Description
+      : #if ($extension.description){{{$extension.description}}}#else//No description//#end
+
+      ; Website
+      : #if ($extension.website)$extension.website#else//No website//#end
+
+      ; Licenses
+      : #if (!$extension.licenses.empty){{{$extension.licenses}}}#else//No license//#end
+
+      ; Authors
+      : #if (!$extension.authors.empty){{{$extension.authors}}}#else//No author//#end
+
+      ; Repository
+      : $extension.repository.id.id#if($extension.repository.id.uRI) ([[$extension.repository.id.uRI]])#end
+
+      #foreach($propertyEntry in $extension.properties.entrySet())
+        ; $propertyEntry.key
+        : $propertyEntry.value
+      #end
+
+      ; Dependencies:
+      #macro(resolveExtension $extensionid $extensionversion $extensionlevel)
+        #set($extension = $extensionManager.resolve($extensionid, $extensionversion))
+        #if (!$extension)
+          #set($lasterror = $extensionManager.lastError)
+          {{error}}
+            Failed to resolve extension with id $extensionid and version $extensionversion: #printThrowable($lasterror)
+          {{/error}}
+        #else
+          #set($extensionclass = "${extension.class}")
+          #foreach($index in [1..$extensionlevel])*#end ##
+          #if ($extensionclass.endsWith('CoreExtension'))
+            **C** ##
+            #set($continueResolve = false)
+          #elseif ($extensionclass.endsWith('LocalExtension'))
+            #if ($extension.isInstalled($extensionwiki))
+              **I** ##
+              #set($continueResolve = false)
+            #else
+              **L** ##
+              #set($continueResolve = true)
+            #end
+          #else
+            **R** ##
+            #set($continueResolve = true)
+          #end
+          $extension.id.id ($extension.type) ($extension.id.version#if($extensionversion != $extension.id.version) was $extensionversion#end)
+          #if ($continueResolve)
+            #resolveExtensionDependencies($extension)
+          #end
+        #end
+      #end
+      #macro(resolveExtensionDependencies $extension $extensionlevel)
+        #set($extensionlevel = $extensionlevel + 1)
+        #foreach ($dependency in $extension.dependencies)
+          #resolveExtension($dependency.id, $dependency.version, $extensionlevel)
+        #end
+        #set($extensionlevel = $extensionlevel - 1)
+      #end
+      #resolveExtensionDependencies($extension, 0)
+
+      **C**: core extension
+      **L**: not installed local extension
+      **I**: installed extension
+      **R**: remote extension
+    #end
   #end
 #elseif($request.actioninstall)
   = Install
@@ -463,29 +548,34 @@ This application is experimental, use it at your own risk.
   #if (!$request.extensionid || !$request.extensionversion)
     {{error}}You have to provide both extension id and version.{{/error}}
   #elseif ($request.confirm)
-    #set($extension = $extensionManager.install($request.extensionid, $request.extensionversion, $extensionwiki))
+    #set($installJob = $extensionManager.install($request.extensionid, $request.extensionversion, $extensionwiki))
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
-      {{error}}Failed to install extension with id $request.extensionid and version $request.extensionversion#if($extensionwiki) on wiki $extensionwiki#end: $lasterror.message{{/error}}
-    #elseif ($extension.exceptions)
-      {{error}}Failed to install extension with id $request.extensionid and version $request.extensionversion#if($extensionwiki) on wiki $extensionwiki#end: $extension.exceptions[0].message{{/error}}
+      {{error}}
+        Failed to install extension with id $request.extensionid and version $request.extensionversion#if($extensionwiki) on wiki $extensionwiki#end: #printThrowable($lasterror)
+      {{/error}}
     #else
-      {{info}}Extension with id $request.extensionid and version $request.extensionversion has been installed#if($extensionwiki) on wiki $extensionwiki#end.{{/info}} 
+      {{box}}
+        #printJobLog($installJob)
+      {{/box}}
     #end
   #else
     #macro(prepareInstall $extensionid $extensionversion $extensionsToInstall $extensionsToUpgrade $extensionsSuggested, $coreExtensionsConflicts)
-      #set($extension = $extensionManager.resolve($extensionid, $extensionversion, $extensionwiki))
+      #set($extension = $extensionManager.resolve($extensionid, $extensionversion))
       #set($extensionclass = "${extension.class}")
-      #if (!$extensionclass.endsWith('CoreExtension') &amp;&amp; !$extensionclass.endsWith('LocalExtension'))
-        #if ($extensionManager.getInstalledExtension($extensionid, $extensionwiki))
-          #set($extensionsToUpgrade[$extension.id] = $extension)
-        #else
-          #set($extensionsToInstall[$extension.id] = $extension)
+      #if (!$extensionclass.endsWith('CoreExtension'))
+        #if (!$extension.isInstalled($extensionwiki))
+          #set($installedExtension = $extensionManager.getInstalledExtension($extensionid, $extensionwiki))
+          #if ($installedExtension &amp;&amp; $versionManager.compareVersions($installedExtension.id.version, $extensionversion) &gt; 0)
+            #set($extensionsToUpgrade[$extension.id] = $extension)
+          #else
+            #set($extensionsToInstall[$extension.id] = $extension)
+          #end
+          #prepareInstallDependencies($extension, $extensionsToInstall, $extensionsToUpgrade, $extensionsSuggested)
         #end
-      #elseif ($extensionclass.endsWith('CoreExtension') &amp;&amp; $versionManager.compareVersions($extensionversion, $extension.id.version) &gt; 0)
+      #elseif ($versionManager.compareVersions($extensionversion, $extension.id.version) &gt; 0)
         #set($coreExtensionsConflicts[$extension.id] = [$extension, $extensionversion])
       #end
-      #prepareInstallDependencies($extension, $extensionsToInstall, $extensionsToUpgrade, $extensionsSuggested)
     #end
     #macro(prepareInstallDependencies $extension $extensionsToInstall $extensionsToUpgrade $extensionsSuggested, $coreExtensionsConflicts)
       #foreach ($dependency in $extension.dependencies)
@@ -525,31 +615,31 @@ This application is experimental, use it at your own risk.
 
       #end
       #if (!$coreExtensionsConflicts.isEmpty())
-        {{warning}}
+        {{error}}
           Conflict with core extensions:
           #foreach ($conflict in $coreExtensionsConflicts.values())
             * extension **$conflict.get(0).id.id** is needed in version **$conflict.get(1)** but core extension has version **$conflict.get(0).id.version**
           #end
-
-          Are you sure you want to install ?
-        {{/warning}}
+        {{/error}}
 
       #end
-      {{html}}
-      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform"&gt;
-        &lt;div&gt;
-          &lt;input name="extensionid" value="${escapetool.xml($request.extensionid)}" type="hidden" /&gt;
-          &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;
-          #if ($extensionwiki)
-            &lt;input name="extensionwiki" value="$extensionwiki" type="hidden" /&gt;
-          #end
-          &lt;input name="actioninstall" type="hidden" /&gt;
-          &lt;p&gt;
-            &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
-          &lt;/p&gt;
-        &lt;/div&gt;
-      &lt;/form&gt;
-      {{/html}}
+      #if ($coreExtensionsConflicts.isEmpty())
+        {{html}}
+        &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform"&gt;
+          &lt;div&gt;
+            &lt;input name="extensionid" value="${escapetool.xml($request.extensionid)}" type="hidden" /&gt;
+            &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;
+            #if ($extensionwiki)
+              &lt;input name="extensionwiki" value="$extensionwiki" type="hidden" /&gt;
+            #end
+            &lt;input name="actioninstall" type="hidden" /&gt;
+            &lt;p&gt;
+              &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/form&gt;
+        {{/html}}
+      #end
     #end
   #end
 #elseif($request.actionuninstall)
@@ -558,14 +648,16 @@ This application is experimental, use it at your own risk.
   #if (!$request.extensionid || !$request.extensionversion)
     {{error}}You have to provide both extension id and version.{{/error}}
   #elseif($request.confirm)
-    #set($extension = $extensionManager.uninstall($request.extensionid, $request.extensionversion))
+    #set($uninstallJob = $extensionManager.uninstall($request.extensionid, $request.extensionversion))
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
-      {{error}}Failed to uninstall extension with id $request.extensionid and version $request.extensionversion: $lasterror.message{{/error}}
-    #elseif ($extension.exceptions)
-      {{error}}Failed to uninstall extension with id $request.extensionid and version $request.extensionversion: $extension.exceptions[0].message{{/error}}
+      {{error}}
+        Failed to uninstall extension with id $request.extensionid and version $request.extensionversion: #printThrowable($lasterror)
+      {{/error}}
     #else
-      {{info}}Extension with id $request.extensionid and version $request.extensionversion has been uninstalled.{{/info}} 
+      {{box}}
+        #printJobLog($uninstallJob)
+      {{/box}}
     #end
   #else
     #macro(prepareUninstall $extensionid $extensionversion $extensionsToUninstall)
@@ -617,10 +709,10 @@ This application is experimental, use it at your own risk.
 #if ($extensions.isEmpty())
   {{info}}No extension installed.{{/info}}##
 #else
-  |=Id|=Version|=Type#if($xwiki.isVirtualMode())|=Wikis#end#if ($hasProgramming)|=Actions#end
+  |=Id|=Version|=Type|=Dependency#if($xwiki.isVirtualMode())|=Wikis#end#if ($hasProgramming)|=Actions#end
 
   #foreach($extension in $extensions)
-  |$extension.id.id|$extension.id.version|$extension.type#if ($xwiki.isVirtualMode())
+  |$extension.id.id|$extension.id.version|$extension.type|$extension.dependency#if ($xwiki.isVirtualMode())
           |#if($extension.namespaces)
             $extension.namespaces##
           #else
@@ -639,6 +731,21 @@ This application is experimental, use it at your own risk.
           {{/html}}##
         #end
 
+#end
+#end
+{{/velocity}}
+
+
+{{velocity}}
+= Local extensions
+
+#set($extensions = $extensionManager.getLocalExtensions())
+#if ($extensions.isEmpty())
+  {{info}}No extension in the local repository.{{/info}}##
+#else
+  |=Id|=Version|=Type
+  #foreach($extension in $extensions)
+  |(%title="$extension.file.absolutePath"%)$extension.id.id|$extension.id.version|$extension.type
 #end
 #end
 {{/velocity}}

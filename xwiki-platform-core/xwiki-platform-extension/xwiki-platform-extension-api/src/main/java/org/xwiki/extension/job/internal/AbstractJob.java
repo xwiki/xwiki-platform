@@ -29,6 +29,7 @@ import org.xwiki.extension.job.PopLevelProgressEvent;
 import org.xwiki.extension.job.PushLevelProgressEvent;
 import org.xwiki.extension.job.Request;
 import org.xwiki.extension.job.StepProgressEvent;
+import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
 
 /**
@@ -52,6 +53,12 @@ public abstract class AbstractJob<R extends Request> implements Job
     protected ObservationManager observationManager;
 
     /**
+     * Used to isolate job related log.
+     */
+    @Inject
+    protected LoggerManager loggerManager;
+
+    /**
      * The logger to log.
      */
     @Inject
@@ -62,34 +69,22 @@ public abstract class AbstractJob<R extends Request> implements Job
      */
     protected DefaultJobStatus<R> status;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.Job#getStatus()
-     */
+    @Override
     public JobStatus getStatus()
     {
         return this.status;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.Job#getRequest()
-     */
+    @Override
     public R getRequest()
     {
         return this.status.getRequest();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.Job#start(org.xwiki.extension.job.Request)
-     */
+    @Override
     public void start(Request request)
     {
-        this.status = new DefaultJobStatus<R>((R) request, getId(), this.observationManager);
+        this.status = new DefaultJobStatus<R>((R) request, getId(), this.observationManager, this.loggerManager);
 
         this.status.startListening();
 
@@ -97,11 +92,11 @@ public abstract class AbstractJob<R extends Request> implements Job
             start();
         } catch (Exception e) {
             logger.error("Failed to start job", e);
+        } finally {
+            this.status.stopListening();
+
+            this.status.setState(JobStatus.State.FINISHED);
         }
-
-        this.status.stopListening();
-
-        this.status.setState(JobStatus.State.FINISHED);
     }
 
     /**

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>WikiResources</web>
 <name>Translations</name>
@@ -24,21 +23,22 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
-XWiki.XWikiServerClass_visibility_private=Priv\u0101ts
+#Mon Oct 24 18:52:32 CEST 2011
+XWiki.XWikiServerClass_visibility_private=Privāts
 XWiki.XWikiServerClass_visibility_public=Publisks
-error.ERROR_XWIKI_ACCESS_DENIED=Jums nav ties\u012Bbu veikt \u0161o darb\u012Bbu
-wikimanager.action.createwiki.hidedoc=Sl\u0113pt dokument\u0101ciju
-wikimanager.action.createwiki.nonstepbystep=P\u0101sl\u0113gt uz norm\u0101lo izskatu
-wikimanager.action.createwiki.showdoc=R\u0101d\u012Bt dokument\u0101ciju
-wikimanager.action.createwiki.stepbystep=P\u0101rsl\u0113gt uz ved\u0146a izskatu
-wikimanager.action.next=T\u0101l\u0101k
-wikimanager.action.previous=Atpaka\u013C
-wikimanager.action.settemplate.false=Atstat\u012Bt
-wikimanager.action.settemplate.true=Iestat\u012Bt
-wikimanager.action.settings=Iestat\u012Bjumi
+error.ERROR_XWIKI_ACCESS_DENIED=Jums nav tiesību veikt šo darbību
+wikimanager.action.createwiki.hidedoc=Slēpt dokumentāciju
+wikimanager.action.createwiki.nonstepbystep=Pāslēgt uz normālo izskatu
+wikimanager.action.createwiki.showdoc=Rādīt dokumentāciju
+wikimanager.action.createwiki.stepbystep=Pārslēgt uz vedņa izskatu
+wikimanager.action.next=Tālāk
+wikimanager.action.previous=Atpakaļ
+wikimanager.action.settemplate.false=Atstatīt
+wikimanager.action.settemplate.true=Iestatīt
+wikimanager.action.settings=Iestatījumi
 wikimanager.admins=Administratori
-wikimanager.answer.deletewiki.msg=Vai tie\u0161\u0101m v\u0113laties dz\u0113st viki "{0}"?
-wikimanager.answer.deletewiki.title=Dz\u0113st viki
+wikimanager.answer.deletewiki.msg=Vai tiešām vēlaties dzēst viki "{0}"?
+wikimanager.answer.deletewiki.title=Dzēst viki
 wikimanager.createwiki=Izveidot viki
 wikimanager.defaultdatetimeformat=dd.MM.yyyy HH\:mm 
 </content></xwikidoc>

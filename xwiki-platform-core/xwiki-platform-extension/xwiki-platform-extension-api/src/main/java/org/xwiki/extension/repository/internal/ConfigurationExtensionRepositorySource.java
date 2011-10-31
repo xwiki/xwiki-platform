@@ -44,13 +44,9 @@ public class ConfigurationExtensionRepositorySource implements ExtensionReposito
     @Inject
     private ExtensionManagerConfiguration configuration;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.ExtensionRepositorySource#getExtensionRepositories()
-     */
+    @Override
     public List<ExtensionRepositoryId> getExtensionRepositories()
     {
-        return configuration.getRepositories();
+        return this.configuration.getRepositories();
     }
 }

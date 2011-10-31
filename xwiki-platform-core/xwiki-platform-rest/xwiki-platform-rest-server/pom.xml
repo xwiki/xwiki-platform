@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rest</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rest-server</artifactId>
   <packaging>jar</packaging>
@@ -83,11 +83,91 @@
       <version>3.0</version>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <id>maven-restlet</id>
-      <name>Public online Restlet repository</name>
-      <url>http://maven.restlet.org</url>
-    </repository>
-  </repositories>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            org/xwiki/rest/ComponentsObjectFactory.java,
+            org/xwiki/rest/Constants.java,
+            org/xwiki/rest/DomainObjectFactory.java,
+            org/xwiki/rest/exceptions/QueryExceptionMapper.java,
+            org/xwiki/rest/exceptions/XWikiExceptionMapper.java,
+            org/xwiki/rest/RangeIterable.java,
+            org/xwiki/rest/Relations.java,
+            org/xwiki/rest/representations/comments/FormUrlEncodedCommentReader.java,
+            org/xwiki/rest/representations/comments/TextPlainCommentReader.java,
+            org/xwiki/rest/representations/objects/FormUrlEncodedObjectReader.java,
+            org/xwiki/rest/representations/objects/FormUrlEncodedPropertyReader.java,
+            org/xwiki/rest/representations/objects/TextPlainPropertyReader.java,
+            org/xwiki/rest/representations/pages/FormUrlEncodedPageReader.java,
+            org/xwiki/rest/representations/pages/TextPlainPageReader.java,
+            org/xwiki/rest/representations/tags/FormUrlEncodedTagsReader.java,
+            org/xwiki/rest/representations/tags/TextPlainTagsReader.java,
+            org/xwiki/rest/representations/TextPlainReader.java,
+            org/xwiki/rest/resources/attachments/AttachmentAtPageVersionResource.java,
+            org/xwiki/rest/resources/attachments/AttachmentHistoryResource.java,
+            org/xwiki/rest/resources/attachments/AttachmentResource.java,
+            org/xwiki/rest/resources/attachments/AttachmentsAtPageVersionResource.java,
+            org/xwiki/rest/resources/attachments/AttachmentsResource.java,
+            org/xwiki/rest/resources/attachments/AttachmentVersionResource.java,
+            org/xwiki/rest/resources/BaseAttachmentsResource.java,
+            org/xwiki/rest/resources/BaseSearchResult.java,
+            org/xwiki/rest/resources/BrowserAuthenticationResource.java,
+            org/xwiki/rest/resources/classes/ClassesResource.java,
+            org/xwiki/rest/resources/classes/ClassPropertiesResource.java,
+            org/xwiki/rest/resources/classes/ClassPropertyResource.java,
+            org/xwiki/rest/resources/classes/ClassResource.java,
+            org/xwiki/rest/resources/comments/CommentResource.java,
+            org/xwiki/rest/resources/comments/CommentsResource.java,
+            org/xwiki/rest/resources/comments/CommentsVersionResource.java,
+            org/xwiki/rest/resources/comments/CommentVersionResource.java,
+            org/xwiki/rest/resources/ModificationsResource.java,
+            org/xwiki/rest/resources/objects/AllObjectsForClassNameResource.java,
+            org/xwiki/rest/resources/objects/BaseObjectsResource.java,
+            org/xwiki/rest/resources/objects/ObjectAtPageVersionResource.java,
+            org/xwiki/rest/resources/objects/ObjectPropertiesAtPageVersionResource.java,
+            org/xwiki/rest/resources/objects/ObjectPropertiesResource.java,
+            org/xwiki/rest/resources/objects/ObjectPropertyAtPageVersionResource.java,
+            org/xwiki/rest/resources/objects/ObjectPropertyResource.java,
+            org/xwiki/rest/resources/objects/ObjectResource.java,
+            org/xwiki/rest/resources/objects/ObjectsAtPageVersionResource.java,
+            org/xwiki/rest/resources/objects/ObjectsForClassNameResource.java,
+            org/xwiki/rest/resources/objects/ObjectsResource.java,
+            org/xwiki/rest/resources/pages/ModifiablePageResource.java,
+            org/xwiki/rest/resources/pages/PageChildrenResource.java,
+            org/xwiki/rest/resources/pages/PageHistoryResource.java,
+            org/xwiki/rest/resources/pages/PageResource.java,
+            org/xwiki/rest/resources/pages/PagesResource.java,
+            org/xwiki/rest/resources/pages/PageTagsResource.java,
+            org/xwiki/rest/resources/pages/PageTranslationHistoryResource.java,
+            org/xwiki/rest/resources/pages/PageTranslationResource.java,
+            org/xwiki/rest/resources/pages/PageTranslationsResource.java,
+            org/xwiki/rest/resources/pages/PageTranslationVersionResource.java,
+            org/xwiki/rest/resources/pages/PageVersionResource.java,
+            org/xwiki/rest/resources/RootResource.java,
+            org/xwiki/rest/resources/spaces/SpaceAttachmentsResource.java,
+            org/xwiki/rest/resources/spaces/SpaceResource.java,
+            org/xwiki/rest/resources/spaces/SpaceSearchResource.java,
+            org/xwiki/rest/resources/spaces/SpacesResource.java,
+            org/xwiki/rest/resources/SyntaxesResource.java,
+            org/xwiki/rest/resources/tags/PagesForTagsResource.java,
+            org/xwiki/rest/resources/tags/TagsResource.java,
+            org/xwiki/rest/resources/wikis/WikiAttachmentsResource.java,
+            org/xwiki/rest/resources/wikis/WikiPagesResource.java,
+            org/xwiki/rest/resources/wikis/WikiSearchResource.java,
+            org/xwiki/rest/resources/wikis/WikisResource.java,
+            org/xwiki/rest/Utils.java,
+            org/xwiki/rest/XWikiAuthentication.java,
+            org/xwiki/rest/XWikiJaxRsApplication.java,
+            org/xwiki/rest/XWikiResource.java,
+            org/xwiki/rest/XWikiRestletServlet.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

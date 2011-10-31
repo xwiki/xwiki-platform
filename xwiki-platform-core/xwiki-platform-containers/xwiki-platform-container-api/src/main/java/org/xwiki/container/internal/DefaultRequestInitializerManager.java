@@ -19,8 +19,10 @@
  */
 package org.xwiki.container.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Request;
@@ -35,19 +37,17 @@ import org.xwiki.container.RequestInitializerManager;
  * @see org.xwiki.container.RequestInitializerManager
  */
 @Component
+@Singleton
 public class DefaultRequestInitializerManager implements RequestInitializerManager
 {
     /**
      * The component manager we used to find all components implementing the
      * {@link org.xwiki.container.RequestInitializer} role.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.container.RequestInitializerManager#initializeRequest(Request)
-     */
+    @Override
     public void initializeRequest(Request request) throws RequestInitializerException
     {
         // Find all request interceptors and call them to initialize the Request

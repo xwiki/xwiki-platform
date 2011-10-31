@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>WorkspaceManager</web>
+<name>WorkspaceActivityServiceCode</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1303500243000</creationDate>
+<date>1303821332000</date>
+<contentUpdateDate>1303821332000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>true</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+#set ($parameterName = 'workspaceName')
+#set ($workspaceNames = $request.getParameterValues($parameterName))
+#if ("$!workspaceNames" == '' || $workspaceNames.size() == 0)
+  Generates an activity stream for the given workspace(s).
+
+  {{error}}Parameter **$parameterName** needs to be specified. Multiple values accepted.{{/error}}
+#else
+  #set ($wikiNames = "")
+  #foreach ($workspaceName in $workspaceNames)
+    #if ("$!workspaceName" != '')
+      #set ($wikiNames = "$workspaceName, $wikiNames")
+    #end
+  #end
+  = Activity of workspace#if($workspaceNames.size()&gt;1)s#end $wikiNames.replaceAll(',\s$','')=
+  {{activity wikis="$wikiNames"}}
+#end
+{{/velocity}}</content></xwikidoc>

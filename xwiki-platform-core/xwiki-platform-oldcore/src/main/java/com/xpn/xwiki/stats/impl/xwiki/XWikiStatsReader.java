@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.stats.impl.xwiki;
 
 import java.text.MessageFormat;
@@ -32,9 +30,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
@@ -48,8 +46,8 @@ import com.xpn.xwiki.criteria.impl.Scope;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.stats.impl.RefererStats;
 import com.xpn.xwiki.stats.impl.StatsUtil;
-import com.xpn.xwiki.stats.impl.VisitStats;
 import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
+import com.xpn.xwiki.stats.impl.VisitStats;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.web.DownloadAction;
 import com.xpn.xwiki.web.SaveAction;
@@ -67,13 +65,13 @@ public class XWikiStatsReader
     /**
      * Logging tool.
      */
-    private static final Log LOG = LogFactory.getLog(XWikiStatsReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiStatsReader.class);
 
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    private EntityReferenceSerializer<String> compactwikiEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
+    private EntityReferenceSerializer<String> compactwikiEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.class, "compactwiki");
 
     /**
      * Return the statistics action stored.
@@ -416,7 +414,7 @@ public class XWikiStatsReader
                 paramList.add(this.compactwikiEntityReferenceSerializer.serialize(user));
             }
         } catch (Exception e) {
-            LOG.error("Faild to get filter users list", e);
+            LOGGER.error("Faild to get filter users list", e);
         }
 
         if (userListWhere.length() > 0) {
@@ -479,7 +477,7 @@ public class XWikiStatsReader
                 Collections.reverse(visiStatList);
             }
         } catch (XWikiException e) {
-            LOG.error("Faild to search for vist statistics", e);
+            LOGGER.error("Faild to search for vist statistics", e);
 
             visiStatList = Collections.emptyList();
         }

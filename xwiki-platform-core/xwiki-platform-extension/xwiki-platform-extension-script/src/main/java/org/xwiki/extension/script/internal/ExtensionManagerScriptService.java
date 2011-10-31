@@ -138,14 +138,14 @@ public class ExtensionManagerScriptService implements ScriptService
         this.execution.getContext().setProperty(EXTENSIONERROR_KEY, e);
     }
 
-    public Extension resolve(String id, String version, String namespace)
+    public Extension resolve(String id, String version)
     {
         setError(null);
 
         Extension extension;
 
         try {
-            extension = wrapExtension(this.extensionManager.resolveExtension(new ExtensionId(id, version), namespace));
+            extension = wrapExtension(this.extensionManager.resolveExtension(new ExtensionId(id, version)));
         } catch (Exception e) {
             setError(e);
 
@@ -197,6 +197,11 @@ public class ExtensionManagerScriptService implements ScriptService
     public Collection<CoreExtension> getCoreExtensions()
     {
         return wrapExtensions(this.coreExtensionRepository.getCoreExtensions());
+    }
+
+    public Collection<LocalExtension> getLocalExtensions()
+    {
+        return wrapExtensions(this.localExtensionRepository.getLocalExtensions());
     }
 
     public CoreExtension getCoreExtension(String id)

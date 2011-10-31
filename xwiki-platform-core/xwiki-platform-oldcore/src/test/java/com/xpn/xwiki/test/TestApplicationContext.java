@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.container.ApplicationContext;
 
 /**
@@ -35,32 +35,26 @@ import org.xwiki.container.ApplicationContext;
  */
 public class TestApplicationContext implements ApplicationContext
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.container.ApplicationContext#getResource(String)
-     */
+    @Override
     public URL getResource(String resourceName) throws MalformedURLException
     {
         return getClass().getClassLoader().getResource(StringUtils.removeStart(resourceName, "/"));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.container.ApplicationContext#getResourceAsStream(String)
-     */
+    @Override
     public InputStream getResourceAsStream(String resourceName)
     {
         return getClass().getResourceAsStream(StringUtils.removeStart(resourceName, "/"));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.container.ApplicationContext#getTemporaryDirectory()
-     */
+    @Override
     public File getTemporaryDirectory()
+    {
+        throw new UnsupportedOperationException("This method is not implemented for this test class.");
+    }
+
+    @Override
+    public File getPermanentDirectory()
     {
         throw new UnsupportedOperationException("This method is not implemented for this test class.");
     }

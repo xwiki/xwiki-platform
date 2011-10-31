@@ -19,9 +19,8 @@
  */
 package org.xwiki.url.internal.standard;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -32,20 +31,24 @@ import org.xwiki.url.standard.XWikiURLBuilder;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 /**
  * @version $Id$
  * @since 2.3M1
  */
-@Component("entity")
+@Component
+@Named("entity")
+@Singleton
 public class EntityXWikiURLBuilder implements XWikiURLBuilder
 {
-    @Requirement("default/reference")
+    @Inject
+    @Named("default/reference")
     private EntityReferenceResolver<EntityReference> defaultReferenceEntityReferenceResolver;
     
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.url.standard.XWikiURLBuilder#build(org.xwiki.model.reference.WikiReference, java.util.List)
-     */
+    @Override
     public XWikiURL build(WikiReference wikiReference, List<String> pathSegments)
     {
         XWikiEntityURL entityURL;

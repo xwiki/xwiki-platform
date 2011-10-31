@@ -21,8 +21,10 @@ package org.xwiki.model.internal;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
@@ -37,6 +39,7 @@ import org.xwiki.model.reference.WikiReference;
  * @since 2.2M1
  */
 @Component
+@Singleton
 public class DefaultModelContext implements ModelContext
 {
     /**
@@ -53,14 +56,10 @@ public class DefaultModelContext implements ModelContext
      * The Execution Context from which we get the old XWiki Context from which we get the current Model Reference
      * Objects.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.model.ModelContext#getCurrentEntityReference()
-     */
+    @Override
     public EntityReference getCurrentEntityReference()
     {
         WikiReference result = null;
@@ -84,11 +83,7 @@ public class DefaultModelContext implements ModelContext
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.model.ModelContext#setCurrentEntityReference(org.xwiki.model.reference.EntityReference)
-     */
+    @Override
     public void setCurrentEntityReference(EntityReference entityReference)
     {
         // TODO: This is bridge to the old XWiki Context since we currently don't store the current entity in the

@@ -51,11 +51,7 @@ public class ImportMojo extends AbstractMojo
      */
     private File sourceDirectory;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.apache.maven.plugin.AbstractMojo#execute()
-     */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
         Importer importer = new Importer();

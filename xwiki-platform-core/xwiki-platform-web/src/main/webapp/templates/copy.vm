@@ -145,12 +145,7 @@
         <span class="xHint">$msg.get('core.copy.targetspace.hint')</span>
       </dt>
       <dd>
-        <select id="targetSpaceName" name="targetSpaceName">
-          #set ($spaces = $xwiki.getSpaces())
-          #foreach ($space in $spaces)
-            <option #if ($space == $doc.space) selected="selected" #end>$!{escapetool.xml($space)}</option>
-          #end
-        </select>
+        <input type="text" name="targetSpaceName" id="targetSpaceName" size="60" class="suggestSpaces" value="$!{escapetool.xml($doc.space)}"/>
       </dd>
       ##------------------
       ## Page Target field

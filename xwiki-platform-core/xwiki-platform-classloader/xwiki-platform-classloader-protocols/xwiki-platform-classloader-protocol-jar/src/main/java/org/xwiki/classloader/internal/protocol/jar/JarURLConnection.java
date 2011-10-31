@@ -16,12 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- * 
- * 
- * Originally written by Dawid Kurzyniec and released to the public domain, as explained
- * at http://creativecommons.org/licenses/publicdomain
- * 
- * Source: http://dcl.mathcs.emory.edu/php/loadPage.php?content=util/features.html#classloading
  */
 package org.xwiki.classloader.internal.protocol.jar;
 
@@ -44,6 +38,14 @@ import java.util.jar.Manifest;
  * protocol>://<path to jar file>!<path inside jar file>}. Note that we don't extend the JDK's JarURLConnection since it
  * doesn't know how to use a custom URL Stream Handler Factory to handle custom protocols.
  * 
+ * <p>
+ * Originally written by Dawid Kurzyniec and released to the public domain, as explained
+ * at http://creativecommons.org/licenses/publicdomain
+ * </p>
+ * <p>
+ * Source: http://dcl.mathcs.emory.edu/php/loadPage.php?content=util/features.html#classloading
+ * </p>
+ *
  * @version $Id$
  * @since 2.0.1
  */

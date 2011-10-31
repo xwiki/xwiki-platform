@@ -24,10 +24,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -44,19 +45,21 @@ import com.xpn.xwiki.internal.event.XARImportedEvent;
  * 
  * @version $Id$
  */
-@Component("register-macros-on-import")
+@Component
+@Singleton
+@Named("register-macros-on-import")
 public class RegisterMacrosOnImportListener implements EventListener
 {
     /**
      * The macro initializer used to register the wiki macros.
      */
-    @Requirement
+    @Inject
     private WikiMacroInitializer macroInitializer;
 
     /**
      * The execution used to get the xwiki context, to reset the context grouplist cache.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
@@ -70,33 +73,19 @@ public class RegisterMacrosOnImportListener implements EventListener
      */
     private final List<Event> eventsList = new ArrayList<Event>(Arrays.asList(new XARImportedEvent()));
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
+    @Override
     public List<Event> getEvents()
     {
         return eventsList;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return "RegisterMacrosOnImportListener";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-     *      java.lang.Object)
-     */
-    @SuppressWarnings("unchecked")
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         // when import is done, re-register macros in the current wiki

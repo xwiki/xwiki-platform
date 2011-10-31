@@ -21,8 +21,8 @@ package com.xpn.xwiki.plugin.lucene;
 
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -66,7 +66,7 @@ public class SearchResult
 
     private String creator;
 
-    private static final Log LOG = LogFactory.getLog(SearchResult.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchResult.class);
 
     /**
      * @todo add fallback for unknown index field names (read values into a map accessible from search results page)
@@ -100,7 +100,8 @@ public class SearchResult
                     this.url = document.getAttachmentURL(this.filename, "download");
                 }
             } catch (XWikiException e) {
-                LOG.error("error retrieving url for attachment [" + this.filename + "] of document [" + fullDocName + "]", e);
+                LOGGER.error("error retrieving url for attachment [{}] of document [{}]",
+                    new Object[] {this.filename, fullDocName, e});
             }
         } else {
             this.objects = doc.getValues("object");

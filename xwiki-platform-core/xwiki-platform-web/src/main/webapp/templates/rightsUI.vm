@@ -85,10 +85,30 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
             <tr class="userorgroups-header">
               ## Groups/Users switch
               <th scope="col" class="usersorgroupsnames">
+                #set ($isWorkspace = $services.workspace.isWorkspace($xcontext.database))
                 <label for="uorgg" class="hidden">$msg.get('rightsmanager.groups')</label>
-                <input type="radio" id="uorgg" name="uorg" value="groups" onclick="if(!$('unregistered').hasClassName('hidden')) $('unregistered').addClassName('hidden');" checked="checked" />$msg.get('rightsmanager.groups')&nbsp;&nbsp;
+                <input type="radio" id="uorgg" name="uorg" value="groups"
+                  onclick="if(!$('unregistered').hasClassName('hidden'))
+                             $('unregistered').addClassName('hidden');
+                         #if ($isWorkspace)
+                           ## Unhide scope selection and automatically select the old index.
+                           if($('usersandgroupstable-filters-scope').hasClassName('hidden')) {
+                             $('usersandgroupstable-filters-scope').removeClassName('hidden');
+                             $('wiki').options[groupScopeIndex].selected=true;
+                           }
+                         #end" checked="checked" />$msg.get('rightsmanager.groups')&nbsp;&nbsp;
                 <label for="uorgu" class="hidden">$msg.get('rightsmanager.users')</label>
-                <input type="radio" id="uorgu" name="uorg" value="users" onclick="if($('unregistered').hasClassName('hidden')) $('unregistered').removeClassName('hidden');" />$msg.get('rightsmanager.users')
+                <input type="radio" id="uorgu" name="uorg" value="users" 
+                  onclick="if($('unregistered').hasClassName('hidden'))
+                             $('unregistered').removeClassName('hidden');
+                         #if ($isWorkspace)
+                           ## Hide scope selection and automatically select global scope.
+                           if(!$('usersandgroupstable-filters-scope').hasClassName('hidden')) {
+                             $('usersandgroupstable-filters-scope').addClassName('hidden');
+                             groupScopeIndex = $('wiki').selectedIndex;
+                             $('wiki').options[1].selected=true;
+                           }
+                         #end" />$msg.get('rightsmanager.users')
               </th>
               ## Column headers for each configurable access right
               #foreach ($i in [0..$maxlevel])
@@ -107,12 +127,14 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
               <td><label for="name">$msg.get('rightsmanager.searchfilter')</label><input id="name" name="name" type="text"/>
                 #if(!$xcontext.isMainWiki()) #set($mainwk = false) #else #set($mainwk = true) #end
                 #if(!$mainwk) ## display the combobox only in a local wiki
-                  <label for="wiki">$msg.get('rightsmanager.searchscope')</label>
-                  <select name="wiki" style="margin-left:10px;">
-                    <option value="local" selected="selected">$msg.get('rightsmanager.local')</option>
-                    <option value="global">$msg.get('rightsmanager.global')</option>
-                    <option value="both">$msg.get('rightsmanager.both')</option>
-                  </select>
+                  <div id="usersandgroupstable-filters-scope">
+                    <label for="wiki">$msg.get('rightsmanager.searchscope')</label>
+                    <select id="wiki" name="wiki" style="margin-left:10px;">
+                      <option value="local" selected="selected">$msg.get('rightsmanager.local')</option>
+                      <option value="global">$msg.get('rightsmanager.global')</option>
+                      <option value="both">$msg.get('rightsmanager.both')</option>
+                    </select>
+                  </div>
                 #else
                   <input type="hidden" name="wiki" value="local"/>
                 #end
@@ -177,8 +199,27 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     <script type="text/javascript">
     //<![CDATA[
 (function() {
+  function hideScopeForUsers() {
+    if ($('uorgu').checked) {
+      // Hide scope filter.
+      $('usersandgroupstable-filters-scope').addClassName('hidden');
+      // Default to global.
+      $('wiki').options[1].selected=true;
+      
+      return true;
+    } 
+    
+    return false;
+  }
+  
   function startup() {
     if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
+    
+    #if ($isWorkspace)
+      window.groupScopeIndex = 0;
+      hideScopeForUsers() || Event.observe(window, 'load', hideScopeForUsers);
+    #end
+
       window.activeRights = [#foreach($i in [0..$maxlevel])"$levelsRights.get($i)",#end];
       window.saveUrl = "$saveUrl";
       saveUrl.replace(/&amp;/g, "&");

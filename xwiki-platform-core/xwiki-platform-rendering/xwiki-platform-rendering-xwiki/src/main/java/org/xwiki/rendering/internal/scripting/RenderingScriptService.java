@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.scripting;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +30,13 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 
@@ -83,5 +89,45 @@ public class RenderingScriptService implements ScriptService
         }
 
         return syntaxes;
+    }
+
+    /**
+     * Parses a text written in the passed syntax.
+     *
+     * @param text the text to parse
+     * @param syntaxId the id of the syntax in which the text is written in
+     * @return the XDOM representing the AST of the parsed text or null if an error occurred
+     * @since 3.2M3
+     */
+    public XDOM parse(String text, String syntaxId)
+    {
+        XDOM result;
+        try {
+            result = this.componentManager.lookup(Parser.class, syntaxId).parse(new StringReader(text));
+        } catch (Exception e) {
+            result = null;
+        }
+        return result;
+    }
+
+    /**
+     * Render a list of Blocks into the passed syntax.
+     *
+     * @param block the block to render
+     * @param outputSyntaxId the syntax in which to render the blocks
+     * @return the string representing the passed blocks in the passed syntax or null if an error occurred
+     * @since 3.2M3
+     */
+    public String render(Block block, String outputSyntaxId)
+    {
+        String result;
+        WikiPrinter printer = new DefaultWikiPrinter();
+        try {
+            this.componentManager.lookup(BlockRenderer.class, outputSyntaxId).render(block, printer);
+            result = printer.toString();
+        } catch (Exception e) {
+            result = null;
+        }
+        return result;
     }
 }

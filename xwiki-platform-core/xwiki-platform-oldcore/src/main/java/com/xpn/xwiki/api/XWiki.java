@@ -25,8 +25,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
@@ -43,8 +43,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.meta.MetaClass;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Programming;
@@ -145,7 +143,8 @@ public class XWiki extends Api
      * Loads an Document from the database. Rights are checked before sending back the document.
      * 
      * @param fullName the full name of the XWiki document to be loaded
-     * @return a Document object or null if it is not accessible
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved,
+     *         you can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      */
     public Document getDocument(String fullName) throws XWikiException
@@ -168,7 +167,8 @@ public class XWiki extends Api
      * Loads an Document from the database. Rights are checked before sending back the document.
      * 
      * @param reference the reference of the XWiki document to be loaded
-     * @return a Document object or null if it is not accessible
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved,
+     *         you can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      * @since 2.3M1
      */
@@ -194,7 +194,8 @@ public class XWiki extends Api
      * the currently executing script before sending back the loaded document.
      * 
      * @param fullName the full name of the XWiki document to be loaded
-     * @return a Document object or null if it is not accessible
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved,
+     *         you can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      * @since 2.3M2
      */
@@ -219,7 +220,8 @@ public class XWiki extends Api
      * the currently executing script before sending back the loaded document.
      * 
      * @param reference the reference of the XWiki document to be loaded
-     * @return a Document object or null if it is not accessible
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved,
+     *         you can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      * @since 2.3M2
      */
@@ -399,7 +401,8 @@ public class XWiki extends Api
      * 
      * @param space Space to use in case no space is defined in the provided <code>fullname</code>
      * @param fullname the full name or relative name of the document to load
-     * @return a Document object or null if it is not accessible
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved,
+     *         you can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      */
     public Document getDocument(String space, String fullname) throws XWikiException
@@ -895,7 +898,7 @@ public class XWiki extends Api
      * exist or is empty, the space preference "skin" is looked up If this parameter does not exist or is empty, the
      * XWiki preference "skin" is looked up If this parameter does not exist or is empty, the xwiki.cfg parameter
      * xwiki.defaultskin is looked up If this parameter does not exist or is empty, the xwiki.cfg parameter
-     * xwiki.defaultbaseskin is looked up If this parameter does not exist or is empty, the skin is "albatross"
+     * xwiki.defaultbaseskin is looked up If this parameter does not exist or is empty, the skin is "colibri"
      * 
      * @return The current skin for this request and user
      */
@@ -907,7 +910,7 @@ public class XWiki extends Api
     /**
      * API to retrieve the current skin for this request and user. Each skin has a skin it is based on. If not the base
      * skin is the xwiki.cfg parameter "xwiki.defaultbaseskin". If this parameter does not exist or is empty, the base
-     * skin is "albatross".
+     * skin is "colibri".
      * 
      * @return The current baseskin for this request and user
      */
@@ -2530,150 +2533,6 @@ public class XWiki extends Api
     public String convertUsername(String username)
     {
         return this.xwiki.convertUsername(username, getXWikiContext());
-    }
-
-    /**
-     * API to display a select box for the list of available field for a specific class This field data can then be used
-     * to generate an XWiki Query showing a table with the relevant data
-     * 
-     * @param className XWiki Class Name to display the list of columns for
-     * @param query Query to pre-select the currently selected columns
-     * @return text of the select field
-     * @throws XWikiException exception is a failure occured
-     */
-    public String displaySearchColumns(String className, XWikiQuery query) throws XWikiException
-    {
-        return this.xwiki.displaySearchColumns(className, "", query, getXWikiContext());
-    }
-
-    /**
-     * API to display a select box for the list of available field for a specific class, optionally adding a prefix This
-     * field data can then be used to generate an XWiki Query showing a table with the relevant data
-     * 
-     * @param className XWiki Class Name to display the list of columns for
-     * @param prefix Prefix to add to the field name
-     * @param query Query to pre-select the currently selected columns
-     * @return text of the select field
-     * @throws XWikiException exception is a failure occured
-     */
-    public String displaySearchColumns(String className, String prefix, XWikiQuery query) throws XWikiException
-    {
-        return this.xwiki.displaySearchColumns(className, prefix, query, getXWikiContext());
-    }
-
-    /**
-     * API to display a select box for the list of available field for a specific class This field data can then be used
-     * to generate the order element of an XWiki Query showing a table with the relevant data
-     * 
-     * @param className XWiki Class Name to display the list of columns for
-     * @param query Query to pre-select the currently selected columns
-     * @return text of the select field
-     * @throws XWikiException exception is a failure occured
-     */
-    public String displaySearchOrder(String className, XWikiQuery query) throws XWikiException
-    {
-        return this.xwiki.displaySearchOrder(className, "", query, getXWikiContext());
-    }
-
-    /**
-     * API to display a select box for the list of available field for a specific class, optionally adding a prefix This
-     * field data can then be used to generate the order element of an XWiki Query showing a table with the relevant
-     * data
-     * 
-     * @param className XWiki Class Name to display the list of columns for
-     * @param prefix Prefix to add to the field name
-     * @param query Query to pre-select the currently selected columns
-     * @return text of the select field
-     * @throws XWikiException exception is a failure occured
-     */
-    public String displaySearchOrder(String className, String prefix, XWikiQuery query) throws XWikiException
-    {
-        return this.xwiki.displaySearchOrder(className, prefix, query, getXWikiContext());
-    }
-
-    /**
-     * API to display a field in search mode for a specific class without preselected values This field data can then be
-     * used to generate an XWiki Query showing a table with the relevant data
-     * 
-     * @param fieldname field name in the class
-     * @param className class name to display the field from
-     * @return text of the select field
-     * @throws XWikiException exception is a failure occured
-     */
-    public String displaySearch(String fieldname, String className) throws XWikiException
-    {
-        return this.xwiki.displaySearch(fieldname, className, getXWikiContext());
-    }
-
-    /**
-     * API to display a field in search mode for a specific class with preselected values This field data can then be
-     * used to generate an XWiki Query showing a table with the relevant data
-     * 
-     * @param fieldname field name in the class
-     * @param className class name to display the field from
-     * @param criteria XWikiCriteria object (usually the XWikiQuery object) to take the preselected values from
-     * @return text of the select field
-     * @throws XWikiException exception is a failure occured
-     */
-    public String displaySearch(String fieldname, String className, XWikiCriteria criteria) throws XWikiException
-    {
-        return this.xwiki.displaySearch(fieldname, className, criteria, getXWikiContext());
-    }
-
-    /**
-     * API to display a field in search mode for a specific class with preselected values, optionally adding a prefix to
-     * the field name This field data can then be used to generate an XWiki Query showing a table with the relevant data
-     * 
-     * @param fieldname field name in the class
-     * @param className class name to display the field from
-     * @param prefix prefix to add to the field name
-     * @param criteria XWikiCriteria object (usually the XWikiQuery object) to take the preselected values from
-     * @return text of the select field
-     * @throws XWikiException exception is a failure occured
-     */
-    public String displaySearch(String fieldname, String className, String prefix, XWikiCriteria criteria)
-        throws XWikiException
-    {
-        return this.xwiki.displaySearch(fieldname, className, prefix, criteria, getXWikiContext());
-    }
-
-    /**
-     * API to run a search from an XWikiQuery Object An XWikiQuery object can be created from a request using the
-     * createQueryFromRequest function
-     * 
-     * @param query query to run the search for
-     * @return A list of document names matching the query
-     * @throws XWikiException exception is a failure occured
-     */
-    public <T> List<T> search(XWikiQuery query) throws XWikiException
-    {
-        return this.xwiki.search(query, getXWikiContext());
-    }
-
-    /**
-     * API to create a query from a request Object The request object is the result of a form created from the
-     * displaySearch() and displaySearchColumns() functions
-     * 
-     * @param className class name to create the query from
-     * @return an XWikiQuery object matching the selected values in the request object
-     * @throws XWikiException exception is a failure occured
-     */
-    public XWikiQuery createQueryFromRequest(String className) throws XWikiException
-    {
-        return this.xwiki.createQueryFromRequest(className, getXWikiContext());
-    }
-
-    /**
-     * API to run a search from an XWikiQuery Object and display it as a HTML table An XWikiQuery object can be created
-     * from a request using the createQueryFromRequest function
-     * 
-     * @param query query to run the search for
-     * @return An HTML table showing the result
-     * @throws XWikiException exception is a failure occured
-     */
-    public String searchAsTable(XWikiQuery query) throws XWikiException
-    {
-        return this.xwiki.searchAsTable(query, getXWikiContext());
     }
 
     /**

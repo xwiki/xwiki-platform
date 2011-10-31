@@ -22,8 +22,8 @@ package com.xpn.xwiki.plugin.lucene;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Context;
@@ -39,11 +39,13 @@ import com.xpn.xwiki.plugin.PluginApi;
  * </p>
  * 
  * @version $Id$
+ * @deprecated the plugin technology is deprecated
  */
+@Deprecated
 public class LucenePluginApi extends PluginApi<LucenePlugin>
 {
     /** Logging helper. */
-    private static final Log LOG = LogFactory.getLog(LucenePluginApi.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LucenePluginApi.class);
 
     /**
      * Return value for {@link #rebuildIndex()} meaning that the caller does not have admin rights.
@@ -147,7 +149,7 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
         try {
             return getProtectedPlugin().getQueueSize();
         } catch (Exception e) {
-            LOG.error("Failed to get the remaining number of documents to index in the queue", e);
+            LOGGER.error("Failed to get the remaining number of documents to index in the queue", e);
 
             return 0;
         }
@@ -161,7 +163,7 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
         try {
             return getProtectedPlugin().getLuceneDocCount();
         } catch (Exception e) {
-            LOG.error("Failed to get the number of documents Lucene index writer", e);
+            LOGGER.error("Failed to get the number of documents Lucene index writer", e);
 
             return 0;
         }
@@ -173,16 +175,16 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
      * @param query the query entered by the user
      * @param indexDirs comma separated list of lucene index directories to search in
      * @param languages comma separated list of language codes to search in, may be null to search all languages
-     *            reference to xwiki
+     *        reference to xwiki
      * @return {@link SearchResults} instance containing the results.
      */
     public SearchResults getSearchResultsFromIndexes(String query, String indexDirs, String languages)
     {
         try {
             return getProtectedPlugin().getSearchResults(query, (String) null, indexDirs, languages, this.context);
-        } catch (Exception e) {
-            LOG.error("Failed to search: query=[" + query + "], indexDirs=[" + indexDirs + "], languages=[" + languages
-                + "]", e);
+        } catch (Exception ex) {
+            LOGGER.error("Failed to search: query=[{}], indexDirs=[{}], languages=[{}]",
+                new Object[] {query, indexDirs, languages, ex});
         }
 
         return null;
@@ -198,11 +200,11 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
      * 
      * @param query query entered by the user
      * @param languages comma separated list of language codes to search in, may be null to search all languages.
-     *            Language codes can be:
-     *            <ul>
-     *            <li><code>default</code> for content having no specific language information</li>
-     *            <li>lower case 2-letter language codes like <code>en</code>, <code>de</code> as used by xwiki</li>
-     *            </ul>
+     *        Language codes can be:
+     *        <ul>
+     *        <li><code>default</code> for content having no specific language information</li>
+     *        <li>lower case 2-letter language codes like <code>en</code>, <code>de</code> as used by xwiki</li>
+     *        </ul>
      * @return a {@link SearchResults} instance containing the results.
      */
     public SearchResults getSearchResults(String query, String languages)
@@ -217,16 +219,16 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
      * @param sortField sortField to sort on
      * @param indexDirs comma separated list of lucene index directories to search in
      * @param languages comma separated list of language codes to search in, may be null to search all languages
-     *            reference to xwiki
+     *        reference to xwiki
      * @return {@link SearchResults} instance containing the results.
      */
     public SearchResults getSearchResultsFromIndexes(String query, String sortField, String indexDirs, String languages)
     {
         try {
             return getProtectedPlugin().getSearchResults(query, sortField, indexDirs, languages, this.context);
-        } catch (Exception e) {
-            LOG.error("Failed to search: query=[" + query + "], sortField=[" + sortField + "], indexDirs=[" + indexDirs
-                + "], languages=[" + languages + "]", e);
+        } catch (Exception ex) {
+            LOGGER.error("Failed to search: query=[{}], sortField=[{}], indexDirs=[{}], languages=[{}]",
+                new Object[] {query, sortField, indexDirs, languages, ex});
         }
 
         return null;
@@ -239,7 +241,7 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
      * @param sortField sortField(s) to sort on
      * @param indexDirs comma separated list of lucene index directories to search in
      * @param languages comma separated list of language codes to search in, may be null to search all languages
-     *            reference to xwiki
+     *        reference to xwiki
      * @return {@link SearchResults} instance containing the results.
      */
     public SearchResults getSearchResultsFromIndexes(String query, String[] sortField, String indexDirs,
@@ -247,9 +249,9 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
     {
         try {
             return getProtectedPlugin().getSearchResults(query, sortField, indexDirs, languages, this.context);
-        } catch (Exception e) {
-            LOG.error("Failed to search: query=[" + query + "], sortField=[" + sortField + "], indexDirs=[" + indexDirs
-                + "], languages=[" + languages + "]", e);
+        } catch (Exception ex) {
+            LOGGER.error("Failed to search: query=[{}], sortField=[{}], indexDirs=[{}], languages=[{}]",
+                new Object[] {query, sortField, indexDirs, languages, ex});
         }
 
         return null;
@@ -266,11 +268,11 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
      * @param query query entered by the user
      * @param sortField field to use to sort the results list (ex: date, author)
      * @param languages comma separated list of language codes to search in, may be null to search all languages.
-     *            Language codes can be:
-     *            <ul>
-     *            <li><code>default</code> for content having no specific language information</li>
-     *            <li>lower case 2-letter language codes like <code>en</code>, <code>de</code> as used by xwiki</li>
-     *            </ul>
+     *        Language codes can be:
+     *        <ul>
+     *        <li><code>default</code> for content having no specific language information</li>
+     *        <li>lower case 2-letter language codes like <code>en</code>, <code>de</code> as used by xwiki</li>
+     *        </ul>
      * @return a {@link SearchResults} instance containing the results.
      */
     public SearchResults getSearchResults(String query, String sortField, String languages)
@@ -290,11 +292,11 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
      * @param sortField field to sort on
      * @param virtualWikiNames Names of the virtual wikis to search in. May be null for global search.
      * @param languages comma separated list of language codes to search in, may be null to search all languages.
-     *            Language codes can be:
-     *            <ul>
-     *            <li><code>default</code> for content having no specific language information</li>
-     *            <li>lower case 2-letter language codes like <code>en</code>, <code>de</code> as used by xwiki</li>
-     *            </ul>
+     *        Language codes can be:
+     *        <ul>
+     *        <li><code>default</code> for content having no specific language information</li>
+     *        <li>lower case 2-letter language codes like <code>en</code>, <code>de</code> as used by xwiki</li>
+     *        </ul>
      * @return a {@link SearchResults} instance containing the results.
      */
     public SearchResults getSearchResults(String query, String sortField, String virtualWikiNames, String languages)
@@ -302,15 +304,11 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
         try {
             SearchResults retval =
                 getProtectedPlugin().getSearchResults(query, sortField, virtualWikiNames, languages, this.context);
-
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("returning " + retval.getHitcount() + " results");
-            }
-
+            LOGGER.debug("returning {} results", retval.getHitcount());
             return retval;
-        } catch (Exception e) {
-            LOG.error("Failed to search: query=[" + query + "], sortField=[" + sortField + "], languages=[" + languages
-                + "]", e);
+        } catch (Exception ex) {
+            LOGGER.error("Failed to search: query=[{}], sortField=[{}], languages=[{}]",
+                new Object[] {query, sortField, languages, ex});
         }
 
         return null;
@@ -326,11 +324,11 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
      * 
      * @param query query entered by the user
      * @param languages comma separated list of language codes to search in, may be null to search all languages.
-     *            Language codes can be:
-     *            <ul>
-     *            <li><code>default</code> for content having no specific language information</li>
-     *            <li>lower case 2-letter language codes like <code>en</code>, <code>de</code> as used by xwiki</li>
-     *            </ul>
+     *        Language codes can be:
+     *        <ul>
+     *        <li><code>default</code> for content having no specific language information</li>
+     *        <li>lower case 2-letter language codes like <code>en</code>, <code>de</code> as used by xwiki</li>
+     *        </ul>
      * @return a {@link SearchResults} instance containing the results.
      */
     public SearchResults getSearchResults(String query, String[] sortField, String languages)
@@ -350,11 +348,11 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
      * @param sortField field to sort on
      * @param virtualWikiNames Names of the virtual wikis to search in. May be null for global search.
      * @param languages comma separated list of language codes to search in, may be null to search all languages.
-     *            Language codes can be:
-     *            <ul>
-     *            <li><code>default</code> for content having no specific language information</li>
-     *            <li>lower case 2-letter language codes like <code>en</code>, <code>de</code> as used by xwiki</li>
-     *            </ul>
+     *        Language codes can be:
+     *        <ul>
+     *        <li><code>default</code> for content having no specific language information</li>
+     *        <li>lower case 2-letter language codes like <code>en</code>, <code>de</code> as used by xwiki</li>
+     *        </ul>
      * @return a {@link SearchResults} instance containing the results.
      */
     public SearchResults getSearchResults(String query, String[] sortField, String virtualWikiNames, String languages)
@@ -362,15 +360,11 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
         try {
             SearchResults retval =
                 getProtectedPlugin().getSearchResults(query, sortField, virtualWikiNames, languages, this.context);
-
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("returning " + retval.getHitcount() + " results");
-            }
-
+            LOGGER.debug("returning {} results", retval.getHitcount());
             return retval;
-        } catch (Exception e) {
-            LOG.error("Failed to search: query=[" + query + "], sortField=[" + sortField + "], virtualWikiNames=["
-                + virtualWikiNames + "], languages=[" + languages + "]", e);
+        } catch (Exception ex) {
+            LOGGER.error("Failed to search: query=[{}], sortField=[{}], virtualWikiNames=[{}], languages=[{}]",
+                new Object[] {query, sortField, virtualWikiNames, languages, ex});
         }
 
         return null;

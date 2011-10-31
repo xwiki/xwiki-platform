@@ -24,7 +24,7 @@
 <hidden>true</hidden>
 <object>
 <class>
-<name>XWiki.SheetClass</name>
+<name>XWiki.EditModeClass</name>
 <customClass></customClass>
 <customMapping></customMapping>
 <defaultViewSheet></defaultViewSheet>
@@ -44,10 +44,10 @@
 </class>
 <name>Panels.PanelSheet</name>
 <number>0</number>
-<className>XWiki.SheetClass</className>
-<guid>8784c1bf-9687-4172-8eeb-0d8597f4a1b4</guid>
+<className>XWiki.EditModeClass</className>
+<guid>72b48dfa-090a-4b17-8859-73de9e1e050c</guid>
 <property>
-<defaultEditMode></defaultEditMode>
+<defaultEditMode>inline</defaultEditMode>
 </property>
 </object>
 <content>{{velocity output="false"}}

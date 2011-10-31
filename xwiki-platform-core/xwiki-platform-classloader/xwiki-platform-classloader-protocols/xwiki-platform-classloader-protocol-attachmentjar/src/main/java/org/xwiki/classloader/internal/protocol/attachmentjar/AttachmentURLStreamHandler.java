@@ -26,10 +26,13 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLStreamHandler;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLStreamHandler;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 
@@ -39,7 +42,9 @@ import org.xwiki.model.reference.AttachmentReferenceResolver;
  * @version $Id$
  * @since 2.0.1
  */
-@Component("attachmentjar")
+@Component
+@Named("attachmentjar")
+@Singleton
 public class AttachmentURLStreamHandler extends URLStreamHandler implements ExtendedURLStreamHandler
 {
     private static final String ATTACHMENT_JAR_PROTOCOL = "attachmentjar";
@@ -47,26 +52,23 @@ public class AttachmentURLStreamHandler extends URLStreamHandler implements Exte
     private static final String ATTACHMENT_JAR_PREFIX = ATTACHMENT_JAR_PROTOCOL + "://";
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see ExtendedURLStreamHandler#getProtocol()
-     */
-    public String getProtocol()
-    {
-        return ATTACHMENT_JAR_PROTOCOL;
-    }
-
-    /**
      * Create attachment name from a string reference.
      */
-    @Requirement("current")
+    @Inject
+    @Named("current")
     private AttachmentReferenceResolver<String> attachmentReferenceResolver;
 
     /**
      * Used to get the current document name and document URLs.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
+
+    @Override
+    public String getProtocol()
+    {
+        return ATTACHMENT_JAR_PROTOCOL;
+    }
 
     /**
      * {@inheritDoc}

@@ -22,8 +22,6 @@ package com.xpn.xwiki.render.filter;
 import java.text.MessageFormat;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.api.engine.context.RenderContext;
@@ -31,6 +29,8 @@ import org.radeox.filter.CacheFilter;
 import org.radeox.filter.context.FilterContext;
 import org.radeox.filter.regex.LocaleRegexTokenFilter;
 import org.radeox.regex.MatchResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.rendering.util.IdGenerator;
 
 import com.xpn.xwiki.XWikiContext;
@@ -44,7 +44,7 @@ import com.xpn.xwiki.util.TOCGenerator;
  */
 public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheFilter
 {
-    private static final Log LOG = LogFactory.getLog(XWikiHeadingFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHeadingFilter.class);
 
     private final String TOC_NUMBERED = "tocNumbered";
 
@@ -87,7 +87,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
         VelocityContext vcontext = (VelocityContext) xcontext.get("vcontext");
         XWikiDocument doc = xcontext.getDoc();
 
-        LOG.debug("Processing '" + text + "'");
+        LOGGER.debug("Processing '" + text + "'");
         // generate unique ID of the heading
         IdGenerator idGenerator = (IdGenerator) xcontext.get("headingsIdGenerator");
         if (idGenerator == null) {
@@ -96,7 +96,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
         }
 
         id = idGenerator.generateUniqueId("H", text);
-        LOG.debug("Generated heading id '" + id + "'");
+        LOGGER.debug("Generated heading id '" + id + "'");
 
         // add numbering if the flag is set
 
@@ -130,8 +130,8 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
                 // executed as it would mean we're trying to render the headings for a null
                 // document and that doesn't make sense...
                 if ((doc != null)
-                    && ((xcontext.getUser() != null) && xcontext.getWiki().getRightService().hasAccessLevel("edit",
-                        xcontext.getUser(), doc.getFullName(), xcontext))) {
+                    && ((xcontext.getUser() != null) && xcontext.getWiki().getRightService()
+                        .hasAccessLevel("edit", xcontext.getUser(), doc.getFullName(), xcontext))) {
                     showEditButton = true;
                 }
             } catch (XWikiException e) {

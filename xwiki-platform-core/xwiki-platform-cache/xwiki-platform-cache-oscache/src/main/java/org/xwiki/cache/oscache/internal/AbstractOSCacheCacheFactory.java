@@ -29,7 +29,7 @@ import org.xwiki.container.Container;
 
 /**
  * Base implementation for OSCache support.
- *  
+ * 
  * @version $Id$
  * @since 1.9M2
  */
@@ -51,12 +51,8 @@ public abstract class AbstractOSCacheCacheFactory implements CacheFactory
      * @return the default configuration identifier used to load cache configuration file
      */
     protected abstract String getDefaultPropsId();
-    
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheFactory#newCache(org.xwiki.cache.config.CacheConfiguration)
-     */
+
+    @Override
     public <T> org.xwiki.cache.Cache<T> newCache(CacheConfiguration configuration) throws CacheException
     {
         this.logger.debug("Start OSCache initialisation");

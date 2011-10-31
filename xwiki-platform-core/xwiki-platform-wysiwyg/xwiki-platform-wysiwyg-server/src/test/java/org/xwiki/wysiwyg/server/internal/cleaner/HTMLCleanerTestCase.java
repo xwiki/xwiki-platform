@@ -61,11 +61,6 @@ public class HTMLCleanerTestCase extends TestCase
         this.expected = expected;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see TestCase#runTest()
-     */
     @Override
     protected void runTest() throws Exception
     {

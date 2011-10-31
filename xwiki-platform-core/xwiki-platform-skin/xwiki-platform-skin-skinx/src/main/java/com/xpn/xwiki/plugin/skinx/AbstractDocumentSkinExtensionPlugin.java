@@ -19,28 +19,37 @@
  */
 package com.xpn.xwiki.plugin.skinx;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.RegexEntityReference;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.DocChangeRule;
-import com.xpn.xwiki.notify.XWikiActionNotificationInterface;
-import com.xpn.xwiki.notify.XWikiActionRule;
-import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
+import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Abstract SX plugin for wiki-document-based extensions (Extensions written as object of a XWiki Extension class).
@@ -52,19 +61,27 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * @see JsSkinExtensionPlugin
  * @see CssSkinExtensionPlugin
  */
-public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinExtensionPlugin implements
-    XWikiDocChangeNotificationInterface, XWikiActionNotificationInterface
+public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinExtensionPlugin implements EventListener
 {
-    /** Log helper for logging messages in this class. */
-    private static final Log LOG = LogFactory.getLog(AbstractDocumentSkinExtensionPlugin.class);
+    /**
+     * Log helper for logging messages in this class.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDocumentSkinExtensionPlugin.class);
 
     /**
      * The name of the field that indicates whether an extension should always be used, or only when explicitly pulled.
      */
     private static final String USE_FIELDNAME = "use";
 
-    /** A Map with wiki/database name as keys and sets of extensions to use always for this wiki as values. */
+    /**
+     * A Map with wiki/database name as keys and sets of extensions to use always for this wiki as values.
+     */
     private Map<String, Set<String>> alwaysUsedExtensions;
+
+    /**
+     * Used to match events on "use" property.
+     */
+    private final List<Event> events = new ArrayList<Event>(3);
 
     /**
      * XWiki plugin constructor.
@@ -77,6 +94,21 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     public AbstractDocumentSkinExtensionPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
+
+        RegexEntityReference usePropertyReference =
+            new RegexEntityReference(Pattern.compile(USE_FIELDNAME), EntityType.OBJECT_PROPERTY,
+                new RegexEntityReference(Pattern.compile(".*:" + getExtensionClassName() + "\\[\\d*\\]"),
+                    EntityType.OBJECT));
+
+        this.events.add(new XObjectPropertyAddedEvent(usePropertyReference));
+        this.events.add(new XObjectPropertyDeletedEvent(usePropertyReference));
+        this.events.add(new XObjectPropertyUpdatedEvent(usePropertyReference));
+    }
+
+    @Override
+    public List<Event> getEvents()
+    {
+        return this.events;
     }
 
     /**
@@ -106,10 +138,11 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     public void init(XWikiContext context)
     {
         super.init(context);
+
         this.alwaysUsedExtensions = new HashMap<String, Set<String>>();
         getExtensionClass(context);
-        context.getWiki().getNotificationManager().addGeneralRule(new DocChangeRule(this));
-        context.getWiki().getNotificationManager().addGeneralRule(new XWikiActionRule(this, true, true));
+
+        Utils.getComponent(ObservationManager.class).addListener(this);
     }
 
     /**
@@ -124,6 +157,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     public void virtualInit(XWikiContext context)
     {
         super.virtualInit(context);
+
         getExtensionClass(context);
     }
 
@@ -151,7 +185,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             Set<String> extensions = new HashSet<String>();
             String query =
                 ", BaseObject as obj, StringProperty as use where obj.className='" + getExtensionClassName() + "'"
-                + " and obj.name=doc.fullName and use.id.id=obj.id and use.id.name='use' and use.value='always'";
+                    + " and obj.name=doc.fullName and use.id.id=obj.id and use.id.name='use' and use.value='always'";
             try {
                 for (String extension : context.getWiki().getStore().searchDocumentsNames(query, context)) {
                     try {
@@ -162,24 +196,19 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                             extensions.add(extension);
                         }
                     } catch (XWikiException e1) {
-                        LOG.error("Error while adding skin extension [" + extension
-                            + "] as always used. It will be ignored.", e1);
+                        LOGGER.error("Error while adding skin extension [{}] as always used. It will be ignored.",
+                            extension, e1);
                     }
                 }
                 this.alwaysUsedExtensions.put(currentWiki, extensions);
                 return extensions;
             } catch (XWikiException e) {
-                LOG.error("Error while retrieving always used JS extensions", e);
+                LOGGER.error("Error while retrieving always used JS extensions", e);
                 return Collections.emptySet();
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.skinx.AbstractSkinExtensionPlugin#hasPageExtensions(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public boolean hasPageExtensions(XWikiContext context)
     {
@@ -236,8 +265,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
 
             needsUpdate |= bclass.addTextField("name", "Name", 30);
             needsUpdate |= bclass.addTextAreaField("code", "Code", 50, 20);
-            needsUpdate |=
-                bclass.addStaticListField(USE_FIELDNAME, "Use this extension", useOptions);
+            needsUpdate |= bclass.addStaticListField(USE_FIELDNAME, "Use this extension", useOptions);
             needsUpdate |= bclass.addBooleanField("parse", "Parse content", "yesno");
             needsUpdate |= bclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
 
@@ -268,79 +296,41 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             }
             return bclass;
         } catch (Exception ex) {
-            LOG.error("Cannot initialize skin extension class [" + getExtensionClassName() + "]", ex);
+            LOGGER.error("Cannot initialize skin extension class [{}]", getExtensionClassName(), ex);
         }
         return null;
     }
 
     /**
-     * Notification method called upon document changed. This method is used to keep the {@link #alwaysUsedExtensions}
-     * map consistent when the database changes. Upon each document save, it looks in the newly saved document for an
-     * extension object. If one is found, then if the use field is set to "always" and the document has been saved with
-     * programming rights, we put the document in the map (considering it could already be there). If those last two
-     * conditions are not verified, we remove the document from the map (considering it could not have been there
-     * already). Last, if the old document (before the save) contained an extension object, but the new one (after the
-     * save) does not, it means the object has been deleted, so again we remove this document from the map.
+     * {@inheritDoc}
+     * <p>
+     * Make sure to keep the {@link #alwaysUsedExtensions} map consistent when the database changes.
      * 
-     * @param rule The rule that triggered the notification, the one that was used when registering for notifications.
-     * @param newdoc The new version of the changed document.
-     * @param olddoc The old version of the changed document.
-     * @param event The type of event (save, delete, update). Currently not correct.
-     * @param context The current request context.
-     * @see XWikiDocChangeNotificationInterface#notify(XWikiNotificationRule, XWikiDocument, XWikiDocument, int,
-     *      XWikiContext)
+     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
+     *      java.lang.Object)
      */
-    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event,
-        XWikiContext context)
+    @Override
+    public void onEvent(Event event, Object source, Object data)
     {
-        boolean remove = false;
-        if (newdoc.getObject(getExtensionClassName()) != null) {
-            // new or already existing object
-            if (newdoc.getObject(getExtensionClassName(), USE_FIELDNAME, "always", false) != null) {
-                if (context.getWiki().getRightService().hasProgrammingRights(newdoc, context)) {
-                    this.getAlwaysUsedExtensions(context).add(newdoc.getFullName());
-                    return;
-                } else {
-                    // in case the extension lost its programming rights upon this save.
-                    remove = true;
-                }
-            } else {
-                // remove if exists but use onDemand
-                remove = true;
-            }
-        } else if (olddoc.getObject(getExtensionClassName()) != null) {
-            // object removed
-            remove = true;
-        }
-        if (remove) {
-            this.getAlwaysUsedExtensions(context).remove(newdoc.getFullName());
-        }
-    }
+        XObjectPropertyEvent propertyEvent = (XObjectPropertyEvent) event;
+        XWikiDocument document = (XWikiDocument) source;
+        XWikiContext context = (XWikiContext) data;
 
-    /**
-     * Resets the list of "Use always" extensions every time a XAR is imported. This way, next time a page is rendered,
-     * such extensions will be retrieved from database, and if one has been imported during last import, it will be
-     * taken into consideration. (We have to this since the importer does not generate DocChanged notification). See
-     * http://jira.xwiki.org/jira/browse/XWIKI-2868
-     * 
-     * @param rule The rule that triggered the notification, the one that was used when registering for notifications.
-     * @param doc The context document, the one affected by this action.
-     * @param action The requested action.
-     * @param context The current request context.
-     * @see XWikiActionNotificationInterface#notify(XWikiNotificationRule, XWikiDocument, String, XWikiContext)
-     */
-    public void notify(XWikiNotificationRule rule, XWikiDocument doc, String action, XWikiContext context)
-    {
-        // If the action is not "import", this notification does not concern this method.
-        if (!action.equals("import")) {
-            return;
+        boolean remove;
+        if (propertyEvent instanceof XObjectPropertyDeletedEvent) {
+            remove = true;
+        } else {
+            remove =
+                !StringUtils.equals(
+                    (String) document.getXObjectProperty((ObjectPropertyReference) propertyEvent.getReference())
+                        .getValue(), "always");
         }
-        // If the action is "import", we check the request parameter to see if it is an actual XAR import.
-        if (StringUtils.equals(context.getRequest().getParameter("action"), action)) {
-            // If this is the case, we flush the always used extensions cache for the context wiki. This is needed
-            // because the import action does not trigger document change notifications.
-            String currentWiki = StringUtils.defaultIfEmpty(context.getDatabase(), context.getMainXWiki());
-            this.alwaysUsedExtensions.remove(currentWiki);
+
+        Set<String> extensions = getAlwaysUsedExtensions(context);
+        if (remove) {
+            extensions.remove(document.getFullName());
+        } else {
+            extensions.add(document.getFullName());
         }
     }
 }

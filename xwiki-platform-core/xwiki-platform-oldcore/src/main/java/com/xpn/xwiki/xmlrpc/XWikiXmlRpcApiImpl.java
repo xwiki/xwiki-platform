@@ -16,31 +16,41 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.xmlrpc;
 
+import java.io.StringReader;
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.HashMap;
-import java.io.StringReader;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.codehaus.swizzle.confluence.Attachment;
 import org.codehaus.swizzle.confluence.Comment;
 import org.codehaus.swizzle.confluence.ServerInfo;
 import org.codehaus.swizzle.confluence.Space;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.rendering.converter.Converter;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.xmlrpc.XWikiXmlRpcApi;
 import org.xwiki.xmlrpc.model.XWikiExtendedId;
@@ -48,17 +58,6 @@ import org.xwiki.xmlrpc.model.XWikiObject;
 import org.xwiki.xmlrpc.model.XWikiPage;
 import org.xwiki.xmlrpc.model.XWikiPageHistorySummary;
 import org.xwiki.xmlrpc.model.XWikiPageSummary;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.syntax.SyntaxFactory;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.converter.Converter;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -76,7 +75,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 {
-    private static final Log LOG = LogFactory.getLog(XWikiXmlRpcApiImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiXmlRpcApiImpl.class);
 
     private XWikiContext xwikiContext;
 
@@ -146,7 +145,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public Map getServerInfo(String token) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getServerInfo()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getServerInfo()", user.getName()));
 
         String version = this.xwikiApi.getVersion();
         Integer majorVersion = null;
@@ -191,7 +190,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public List getSpaces(String token) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getSpaces()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getSpaces()", user.getName()));
 
         List result = new ArrayList();
         List<String> spaceKeys = this.xwikiApi.getSpaces();
@@ -228,7 +227,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     {
 
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getSpace()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getSpace()", user.getName()));
 
         if (!this.xwikiApi.getSpaces().contains(spaceKey)) {
             throw new Exception(String.format("[Space '%s' does not exist]", spaceKey));
@@ -263,7 +262,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public Map addSpace(String token, Map spaceMap) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called addSpace()", user.getName()));
+        LOGGER.debug(String.format("User %s has called addSpace()", user.getName()));
 
         Space space = new Space(spaceMap);
 
@@ -297,7 +296,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public Boolean removeSpace(String token, String spaceKey) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called removeSpace()", user.getName()));
+        LOGGER.debug(String.format("User %s has called removeSpace()", user.getName()));
 
         if (!this.xwikiApi.getSpaces().contains(spaceKey)) {
             throw new Exception(String.format("[Space '%s' does not exist.]", spaceKey));
@@ -345,7 +344,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public List getPages(String token, String spaceKey) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getPages()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getPages()", user.getName()));
 
         List result = new ArrayList();
         List<String> pageNames = this.xwikiApi.getSpaceDocsName(spaceKey);
@@ -353,7 +352,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             String pageFullName = String.format("%s.%s", spaceKey, pageName);
 
             if (!this.xwikiApi.exists(pageFullName)) {
-                LOG.warn(String.format("[Page '%s' appears to be in space '%s' but no information is available.]",
+                LOGGER.warn(String.format("[Page '%s' appears to be in space '%s' but no information is available.]",
                     pageName, spaceKey));
             } else {
                 Document doc = this.xwikiApi.getDocument(pageFullName);
@@ -382,7 +381,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public Map getPage(String token, String pageId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getPage()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getPage()", user.getName()));
 
         Document doc = XWikiUtils.getDocument(this.xwikiApi, pageId, true);
 
@@ -435,7 +434,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public Map storePage(String token, Map pageMap) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called storePage()", user.getName()));
+        LOGGER.debug(String.format("User %s has called storePage()", user.getName()));
 
         XWikiPage page = new XWikiPage(pageMap);
 
@@ -612,7 +611,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public Boolean removePage(String token, String pageId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called removePage()", user.getName()));
+        LOGGER.debug(String.format("User %s has called removePage()", user.getName()));
 
         Document doc = XWikiUtils.getDocument(this.xwikiApi, pageId, true);
 
@@ -642,7 +641,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public List getPageHistory(String token, String pageId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getPageHistory()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getPageHistory()", user.getName()));
 
         List result = new ArrayList();
 
@@ -676,7 +675,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public String renderContent(String token, String space, String pageId, String content) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called renderContent()", user.getName()));
+        LOGGER.debug(String.format("User %s has called renderContent()", user.getName()));
 
         Document doc = XWikiUtils.getDocument(this.xwikiApi, pageId, true);
 
@@ -713,7 +712,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public List getComments(String token, String pageId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getComments()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getComments()", user.getName()));
 
         List result = new ArrayList();
 
@@ -741,7 +740,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public Map getComment(String token, String commentId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getComment()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getComment()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(commentId);
         int commentNumericalId = Integer.parseInt(extendedId.getParameter(XWikiExtendedId.COMMENT_ID_PARAMETER));
@@ -764,7 +763,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public Map addComment(String token, Map commentMap) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called addComment()", user.getName()));
+        LOGGER.debug(String.format("User %s has called addComment()", user.getName()));
 
         Comment comment = new Comment(commentMap);
 
@@ -793,7 +792,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public Boolean removeComment(String token, String commentId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called removeComment()", user.getName()));
+        LOGGER.debug(String.format("User %s has called removeComment()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(commentId);
         int commentNumericalId = Integer.parseInt(extendedId.getParameter(XWikiExtendedId.COMMENT_ID_PARAMETER));
@@ -824,7 +823,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public List getAttachments(String token, String pageId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getAttachments()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getAttachments()", user.getName()));
 
         Document doc = XWikiUtils.getDocument(this.xwikiApi, pageId, true);
 
@@ -853,7 +852,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called addAttachment()", user.getName()));
+        LOGGER.debug(String.format("User %s has called addAttachment()", user.getName()));
 
         Attachment attachment = new Attachment(attachmentMap);
 
@@ -885,7 +884,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getAttachmentData()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getAttachmentData()", user.getName()));
 
         Document doc = XWikiUtils.getDocument(this.xwikiApi, pageId, true);
 
@@ -909,7 +908,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public Boolean removeAttachment(String token, String pageId, String fileName) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called removeAttachment()", user.getName()));
+        LOGGER.debug(String.format("User %s has called removeAttachment()", user.getName()));
 
         /* Ignore the language or version parameters passed with the page id, and use the base page id */
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
@@ -931,7 +930,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             XWikiDocument baseXWikiDocument = this.xwiki.getDocument(extendedId.getBasePageId(), this.xwikiContext);
             XWikiAttachment baseXWikiAttachment = baseXWikiDocument.getAttachment(fileName);
             baseXWikiDocument.deleteAttachment(baseXWikiAttachment, this.xwikiContext);
-            
+
             this.xwiki.saveDocument(baseXWikiDocument, this.xwikiContext);
         } else {
             throw new Exception(String.format("Attachment '%s' does not exist on page '%s'", fileName,
@@ -951,7 +950,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public List getClasses(String token) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getClasses()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getClasses()", user.getName()));
 
         List result = new ArrayList();
 
@@ -974,7 +973,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public Map getClass(String token, String className) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getClass()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getClass()", user.getName()));
 
         if (!this.xwikiApi.exists(className)) {
             throw new Exception(String.format("[Class '%s' does not exist]", className));
@@ -995,7 +994,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public List getObjects(String token, String pageId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getObjects()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getObjects()", user.getName()));
 
         Document doc = XWikiUtils.getDocument(this.xwikiApi, pageId, true);
 
@@ -1029,7 +1028,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public Map getObject(String token, String pageId, String className, Integer id) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getObject()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getObject()", user.getName()));
 
         Document doc = XWikiUtils.getDocument(this.xwikiApi, pageId, true);
 
@@ -1054,7 +1053,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public Map storeObject(String token, Map objectMap) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called storeObject()", user.getName()));
+        LOGGER.debug(String.format("User %s has called storeObject()", user.getName()));
 
         XWikiObject object = new XWikiObject(objectMap);
 
@@ -1132,7 +1131,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public Boolean removeObject(String token, String pageId, String className, Integer id) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called removeObject()", user.getName()));
+        LOGGER.debug(String.format("User %s has called removeObject()", user.getName()));
 
         /* Ignore the language or version parameters passed with the page id, and use the base page id */
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
@@ -1167,7 +1166,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public List search(String token, String query, int maxResults) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called search()", user.getName()));
+        LOGGER.debug(String.format("User %s has called search()", user.getName()));
 
         List result = new ArrayList();
         if (query.equals("__ALL_PAGES__")) {
@@ -1175,15 +1174,15 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             for (String spaceKey : spaceKeys) {
                 List<String> pageNames = this.xwikiApi.getSpaceDocsName(spaceKey);
                 for (String pageName : pageNames) {
-                    result.add(DomainObjectFactory.createSearchResult(String.format("%s.%s", spaceKey, pageName)).toMap());
+                    result.add(DomainObjectFactory.createSearchResult(String.format("%s.%s", spaceKey, pageName))
+                        .toMap());
                 }
             }
         } else {
             List<String> searchResults =
-                    this.xwiki.getStore().searchDocumentsNames(
-                        "where doc.content like '%" + com.xpn.xwiki.web.Utils.SQLFilter(query)
-                            + "%' or doc.name like '%" + com.xpn.xwiki.web.Utils.SQLFilter(query) + "%'",
-                        this.xwikiContext);
+                this.xwiki.getStore().searchDocumentsNames(
+                    "where doc.content like '%" + com.xpn.xwiki.web.Utils.SQLFilter(query) + "%' or doc.name like '%"
+                        + com.xpn.xwiki.web.Utils.SQLFilter(query) + "%'", this.xwikiContext);
             int i = 0;
             for (String pageId : searchResults) {
                 if (maxResults > 0 && i < maxResults) {
@@ -1214,20 +1213,21 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getModifiedPagesHistory()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getModifiedPagesHistory()", user.getName()));
 
         List result = new ArrayList();
 
         String order = fromLatest ? "desc" : "asc";
         String query =
-                String.format(
+            String
+                .format(
                     "select doc.fullName, rcs.id, rcs.date, rcs.author from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId=doc.id and rcs.date > :date order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s",
                     order, order, order);
 
         QueryManager queryManager = Utils.getComponent(QueryManager.class);
         List<Object> queryResult =
-                queryManager.createQuery(query, Query.XWQL).bindValue("date", date).setLimit(numberOfResults).setOffset(
-                    start).execute();
+            queryManager.createQuery(query, Query.XWQL).bindValue("date", date).setLimit(numberOfResults)
+                .setOffset(start).execute();
 
         for (Object o : queryResult) {
             Object[] fields = (Object[]) o;
@@ -1348,7 +1348,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public Map getObject(String token, String pageId, String guid) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getObject()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getObject()", user.getName()));
 
         Document doc = XWikiUtils.getDocument(this.xwikiApi, pageId, true);
 
@@ -1439,7 +1439,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Renders a text in the context of a wiki page.
-     *
+     * 
      * @param token The authentication token.
      * @param pageId The id of the page.
      * @param content The context to be rendered.
@@ -1452,7 +1452,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         String targetSyntaxId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called renderPageContent()", user.getName()));
+        LOGGER.debug(String.format("User %s has called renderPageContent()", user.getName()));
 
         Document doc = XWikiUtils.getDocument(this.xwikiApi, pageId, true);
 
@@ -1461,7 +1461,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Gets the rendered content of an existing document.
-     *
+     * 
      * @param token The authentication token.
      * @param pageId The id of the page.
      * @param syntaxId The target syntax of the rendered content
@@ -1471,7 +1471,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     public String getRenderedContent(String token, String pageId, String syntaxId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
-        LOG.debug(String.format("User %s has called getRenderedContent()", user.getName()));
+        LOGGER.debug(String.format("User %s has called getRenderedContent()", user.getName()));
 
         Document doc = XWikiUtils.getDocument(this.xwikiApi, pageId, true);
         SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);

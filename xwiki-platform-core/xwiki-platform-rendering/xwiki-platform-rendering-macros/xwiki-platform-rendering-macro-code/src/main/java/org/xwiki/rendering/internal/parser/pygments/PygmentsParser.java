@@ -27,16 +27,17 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
@@ -59,6 +60,7 @@ import org.xwiki.rendering.parser.Parser;
 // and not a Parser too since we don't want this parser to be visible to users as a valid standard input parser
 // component.
 @Component(roles = {HighlightParser.class })
+@Singleton
 public class PygmentsParser extends AbstractHighlightParser implements Initializable
 {
     /**
@@ -135,13 +137,14 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     /**
      * Used to parse Pygment token values into blocks.
      */
-    @Requirement("plain/1.0")
+    @Inject
+    @Named("plain/1.0")
     private Parser plainTextParser;
 
     /**
      * Pygments highligh parser configuration.
      */
-    @Requirement
+    @Inject
     private PygmentsParserConfiguration configuration;
 
     /**
@@ -150,11 +153,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         String highlightSyntaxId = getSyntaxId() + "-highlight";
@@ -171,21 +170,13 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
             + "\nfrom pygments.formatters.xdom import XDOMFormatter");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.parser.Parser#getSyntax()
-     */
+    @Override
     public Syntax getSyntax()
     {
         return this.syntax;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.parser.HighlightParser#highlight(java.lang.String, java.io.Reader)
-     */
+    @Override
     public List<Block> highlight(String syntaxId, Reader source) throws ParseException
     {
         String code;
@@ -271,7 +262,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     {
         PythonInterpreter interpreter = getPythonInterpreter();
 
-        if (!StringUtils.isEmpty(language)) {
+        if (StringUtils.isNotEmpty(language)) {
             interpreter.exec(MessageFormat.format(PY_LEXER_CREATE, language));
         } else {
             interpreter.exec(PY_LEXER_FIND);

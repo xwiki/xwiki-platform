@@ -173,5 +173,4 @@
 <title>Enter your title here</title>
 </property>
 </object>
-<content>{{include document="Blog.BlogPostSheet"/}}</content>
-</xwikidoc>
+<content></content></xwikidoc>

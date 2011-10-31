@@ -35,12 +35,7 @@ public class JBossCacheLocalCacheEvictionsTest extends AbstractTestCache
 {
     public JBossCacheLocalCacheEvictionsTest()
     {
-        this("jbosscache/local");
-    }
-
-    protected JBossCacheLocalCacheEvictionsTest(String roleHint)
-    {
-        super(roleHint);
+        super("jbosscache/local");
     }
 
     // ///////////////////////////////////////////////////////::
@@ -117,6 +112,7 @@ public class JBossCacheLocalCacheEvictionsTest extends AbstractTestCache
         cache.dispose();
     }
 
+    @Test
     public void testCreateAndDestroyCacheLRUAll() throws Exception
     {
         CacheFactory factory = getCacheFactory();

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-cache</artifactId>
   <name>XWiki Platform - Cache - Parent POM</name>
@@ -38,6 +38,7 @@
     <module>xwiki-platform-cache-tests</module>
     <module>xwiki-platform-cache-oscache</module>
     <module>xwiki-platform-cache-jbosscache</module>
+    <module>xwiki-platform-cache-infinispan</module>
   </modules>
 </project>
        

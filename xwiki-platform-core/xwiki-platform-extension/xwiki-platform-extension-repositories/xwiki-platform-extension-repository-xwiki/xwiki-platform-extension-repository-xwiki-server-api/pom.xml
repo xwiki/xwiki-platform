@@ -27,16 +27,21 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension-repository-xwiki</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-repository-xwiki-server-api</artifactId>
   <name>XWiki Platform - Extension - Repository - XWiki server api</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Extension - Repository - XWiki server api</description>
-  <dependencies>   
+  <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-extension-repository-xwiki-model</artifactId>
+      <artifactId>xwiki-platform-extension-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>   
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-repository-xwiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

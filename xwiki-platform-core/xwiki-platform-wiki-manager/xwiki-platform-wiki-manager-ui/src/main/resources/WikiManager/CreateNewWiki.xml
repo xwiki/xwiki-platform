@@ -11,9 +11,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1300802249000</date>
-<contentUpdateDate>1300802249000</contentUpdateDate>
-<version>1.1</version>
+<date>1319464582000</date>
+<contentUpdateDate>1319464582000</contentUpdateDate>
+<version>2.1</version>
 <title>$msg.get("wikimanager.createwiki")</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -74,7 +74,7 @@
 ##
 ############################################################################################
 ## PLUGINS DEPENDANCIES
-#set ($WikiManager = $xwiki.wikimanager)
+#set ($WikiManager = $services.wikimanager)
 #if (!$WikiManager)
   #error($msg.get("wikimanager.pluginnotenabled"))
 #end

@@ -21,11 +21,14 @@ package org.xwiki.extension.repository.aether.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Developer;
+import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.impl.ArtifactDescriptorReader;
@@ -35,15 +38,16 @@ import org.sonatype.aether.resolution.ArtifactDescriptorResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionLicense;
+import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.ResolveException;
-import org.xwiki.extension.repository.ExtensionRepository;
+import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
+import org.xwiki.properties.ConverterManager;
 
-public class AetherExtensionRepository implements ExtensionRepository
+public class AetherExtensionRepository extends AbstractExtensionRepository
 {
-    private ExtensionRepositoryId repositoryId;
-
     private PlexusComponentManager plexusComponentManager;
 
     private RepositorySystemSession session;
@@ -54,10 +58,15 @@ public class AetherExtensionRepository implements ExtensionRepository
 
     private Method loadPomMethod;
 
+    private ConverterManager converter;
+
+    private ExtensionLicenseManager licenseManager;
+
     public AetherExtensionRepository(ExtensionRepositoryId repositoryId, RepositorySystemSession session,
-        PlexusComponentManager mavenComponentManager) throws Exception
+        PlexusComponentManager mavenComponentManager, ConverterManager converter, ExtensionLicenseManager licenseManager)
+        throws Exception
     {
-        this.repositoryId = repositoryId;
+        super(repositoryId);
 
         this.plexusComponentManager = mavenComponentManager;
 
@@ -66,6 +75,9 @@ public class AetherExtensionRepository implements ExtensionRepository
         this.artifactDescriptorReader = this.plexusComponentManager.getPlexus().lookup(ArtifactDescriptorReader.class);
 
         this.remoteRepository = new RemoteRepository(repositoryId.getId(), "default", repositoryId.getURI().toString());
+
+        this.converter = converter;
+        this.licenseManager = licenseManager;
 
         // FIXME: not very nice
         // * use a private method of a library we don't control is not the nicest thing...
@@ -77,23 +89,7 @@ public class AetherExtensionRepository implements ExtensionRepository
         this.loadPomMethod.setAccessible(true);
     }
 
-    public ExtensionRepositoryId getId()
-    {
-        return this.repositoryId;
-    }
-
-    public int countExtensions()
-    {
-        // TODO
-        return 0;
-    }
-
-    public List<Extension> getExtensions(int nb, int offset)
-    {
-        // TODO
-        return Collections.emptyList();
-    }
-
+    @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
         Model model;
@@ -103,11 +99,48 @@ public class AetherExtensionRepository implements ExtensionRepository
             throw new ResolveException("Failed to resolve extension [" + extensionId + "] descriptor", e);
         }
 
-        try {
-            return new AetherExtension(extensionId, model, this, this.plexusComponentManager);
-        } catch (ComponentLookupException e) {
-            throw new ResolveException("Failed to resolve extension [" + extensionId + "]", e);
+        AetherExtension extension = new AetherExtension(extensionId, model, this, this.plexusComponentManager);
+
+        extension.setName(model.getName());
+        extension.setDescription(model.getDescription());
+        for (Developer developer : model.getDevelopers()) {
+            extension.addAuthor(developer.getId());
         }
+        extension.setWebsite(model.getUrl());
+
+        // licenses
+        for (License license : model.getLicenses()) {
+            extension.addLicense(getExtensionLicense(license));
+        }
+
+        // features
+        String featuresString = model.getProperties().getProperty(AetherExtension.MPKEY_FEATURES);
+        if (StringUtils.isNotBlank(featuresString)) {
+            extension.setFeatures(converter.<Collection<String>> convert(List.class, featuresString));
+        }
+
+        // dependencies
+        for (Dependency mavenDependency : model.getDependencies()) {
+            if (!mavenDependency.isOptional()
+                && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime"))) {
+                extension.addDependency(new AetherExtensionDependency(mavenDependency.getGroupId(), mavenDependency
+                    .getArtifactId(), mavenDependency.getVersion()));
+            }
+        }
+
+        return extension;
+    }
+
+    // TODO: download custom licenses content
+    private ExtensionLicense getExtensionLicense(License license)
+    {
+        if (license.getName() == null) {
+            return new ExtensionLicense("noname", null);
+        }
+
+        ExtensionLicense extensionLicense = this.licenseManager.getLicense(license.getName());
+
+        return extensionLicense != null ? extensionLicense : new ExtensionLicense(license.getName(), null);
     }
 
     private Model loadPom(RepositorySystemSession session, ExtensionId extensionId) throws IllegalArgumentException,
@@ -125,19 +158,13 @@ public class AetherExtensionRepository implements ExtensionRepository
             artifactDescriptorRequest, artifactDescriptorResult);
     }
 
-    public boolean exists(ExtensionId extensionId)
-    {
-        // TODO
-        return false;
-    }
-
     public RepositorySystemSession getSession()
     {
-        return session;
+        return this.session;
     }
 
     public RemoteRepository getRemoteRepository()
     {
-        return remoteRepository;
+        return this.remoteRepository;
     }
 }

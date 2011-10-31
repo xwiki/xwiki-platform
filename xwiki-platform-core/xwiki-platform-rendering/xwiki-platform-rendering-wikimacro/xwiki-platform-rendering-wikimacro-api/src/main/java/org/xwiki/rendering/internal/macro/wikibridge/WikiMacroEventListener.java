@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -31,7 +33,6 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -48,19 +49,21 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
  * @version $Id$
  * @since 2.0M2
  */
-@Component("wikimacrolistener")
+@Component
+@Named("wikimacrolistener")
+@Singleton
 public class WikiMacroEventListener implements EventListener
 {
     /**
      * The {@link org.xwiki.rendering.macro.wikibridge.WikiMacroFactory} component.
      */
-    @Requirement
+    @Inject
     private WikiMacroFactory macroFactory;
 
     /**
      * The {@link WikiMacroManager} component.
      */
-    @Requirement
+    @Inject
     private WikiMacroManager wikiMacroManager;
 
     /**
@@ -69,26 +72,20 @@ public class WikiMacroEventListener implements EventListener
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getName()
     {
         return "wikimacrolistener";
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Event> getEvents()
     {
         return Arrays
             .<Event> asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         if (event instanceof AbstractDocumentEvent) {

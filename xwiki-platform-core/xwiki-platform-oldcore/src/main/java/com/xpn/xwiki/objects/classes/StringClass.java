@@ -16,13 +16,8 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.classes;
-
-import java.util.List;
-import java.util.Map;
 
 import org.apache.ecs.xhtml.input;
 
@@ -32,8 +27,6 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
 
 public class StringClass extends PropertyClass
 {
@@ -91,8 +84,7 @@ public class StringClass extends PropertyClass
     }
 
     @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         input input = new input();
         BaseProperty prop = (BaseProperty) object.safeget(name);
@@ -124,62 +116,6 @@ public class StringClass extends PropertyClass
         }
 
         buffer.append(input.toString());
-    }
-
-    @Override
-    public void displaySearch(StringBuffer buffer, String name, String prefix,
-        XWikiCriteria criteria, XWikiContext context)
-    {
-        input input = new input();
-        input.setType("text");
-        input.setName(prefix + name);
-        input.setID(prefix + name);
-        input.setSize(getSize());
-        String fieldFullName = getFieldFullName();
-        Object value = criteria.getParameter(fieldFullName);
-        if (value != null) {
-            input.setValue(value.toString());
-        }
-        buffer.append(input.toString());
-    }
-
-    @Override
-    public void makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
-    {
-        String value = (String) map.get(prefix);
-        if ((value != null) && (!value.equals(""))) {
-            String startsWith = (String) map.get(prefix + "startswith");
-            String endsWith = (String) map.get(prefix + "endswith");
-            if ("1".equals(startsWith)) {
-                criteriaList.add("lower(" + getFullQueryPropertyName() + ") like '" + value.toLowerCase() + "%'");
-            } else if ("1".equals(endsWith)) {
-                criteriaList.add("lower(" + getFullQueryPropertyName() + ") like '%" + value.toLowerCase() + "'");
-            } else {
-                criteriaList.add("lower(" + getFullQueryPropertyName() + ") like '%" + value.toLowerCase() + "%'");
-            }
-            return;
-        }
-
-        value = (String) map.get(prefix + "exact");
-        if ((value != null) && (!value.equals(""))) {
-            criteriaList.add(getFullQueryPropertyName() + "='" + value + "'");
-            return;
-        }
-
-        value = (String) map.get(prefix + "not");
-        if ((value != null) && (!value.equals(""))) {
-            criteriaList.add(getFullQueryPropertyName() + "!='" + value + "'");
-            return;
-        }
-    }
-
-    @Override
-    public void fromSearchMap(XWikiQuery query, Map<String, String[]> map)
-    {
-        String[] data = map.get("");
-        if ((data != null) && (data.length == 1)) {
-            query.setParam(getObject().getName() + "_" + getName(), data[0]);
-        }
     }
 
 }

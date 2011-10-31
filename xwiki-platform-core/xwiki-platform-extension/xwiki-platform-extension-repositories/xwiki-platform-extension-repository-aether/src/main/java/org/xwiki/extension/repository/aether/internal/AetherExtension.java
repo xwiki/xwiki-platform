@@ -21,11 +21,9 @@ package org.xwiki.extension.repository.aether.internal;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.aether.RepositorySystem;
@@ -36,13 +34,19 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
+import org.xwiki.properties.ConverterManager;
 
 public class AetherExtension extends AbstractExtension
 {
-    private String PKEY_GROUPID = "aether.groupid";
+    public static final String PKEY_GROUPID = "aether.groupid";
 
-    private String PKEY_ARTIFACTID = "aether.artifactid";
+    public static final String PKEY_ARTIFACTID = "aether.artifactid";
+
+    public static final String MPKEYPREFIX = "xwiki.extension.";
+
+    public static final String MPKEY_FEATURES = MPKEYPREFIX + "features";
 
     private PlexusComponentManager plexusComponentManager;
 
@@ -51,50 +55,20 @@ public class AetherExtension extends AbstractExtension
     private Model mavenModel;
 
     public AetherExtension(ExtensionId id, Model mavenModel, AetherExtensionRepository repository,
-        PlexusComponentManager mavenComponentManager) throws ComponentLookupException
+        PlexusComponentManager mavenComponentManager)
     {
-        super(repository, id, mavenModel.getPackaging());
+        // See bundle as jar packages since bundle are actually store as jar files
+        super(repository, id, mavenModel.getPackaging().equals("bundle") ? "jar" : mavenModel.getPackaging());
 
         this.plexusComponentManager = mavenComponentManager;
         this.mavenModel = mavenModel;
 
-        setName(this.mavenModel.getName());
-        setDescription(this.mavenModel.getDescription());
-        // setAuthor();
-        setWebsite(this.mavenModel.getUrl());
-
-        // dependencies
-        for (Dependency mavenDependency : this.mavenModel.getDependencies()) {
-            if (!mavenDependency.isOptional()
-                && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime") || mavenDependency
-                    .getScope().equals("provided"))) {
-                addDependency(new AetherExtensionDependency(new ExtensionId(mavenDependency.getGroupId() + ":"
-                    + mavenDependency.getArtifactId(), mavenDependency.getVersion())));
-            }
-        }
-        
         // custom properties
         putProperty(PKEY_GROUPID, this.mavenModel.getGroupId());
         putProperty(PKEY_ARTIFACTID, this.mavenModel.getArtifactId());
     }
 
-    // IDEA
-    public List<ExtensionId> getSuggestedExtensions()
-    {
-        if (this.suggested == null) {
-            this.suggested = new ArrayList<ExtensionId>();
-
-            for (Dependency mavenDependency : this.mavenModel.getDependencies()) {
-                if (mavenDependency.isOptional()) {
-                    this.suggested.add(new ExtensionId(mavenDependency.getGroupId() + ":"
-                        + mavenDependency.getArtifactId(), mavenDependency.getVersion()));
-                }
-            }
-        }
-
-        return this.suggested;
-    }
-
+    @Override
     public void download(File file) throws ExtensionException
     {
         RepositorySystem repositorySystem;
@@ -121,9 +95,17 @@ public class AetherExtension extends AbstractExtension
         File aetherFile = artifactResult.getArtifact().getFile();
 
         try {
-            FileUtils.copyFile(aetherFile, file);
+            FileUtils.moveFile(aetherFile, file);
         } catch (IOException e) {
-            new ExtensionException("Failed to copy file", e);
+            throw new ExtensionException("Failed to copy file", e);
         }
+    }
+
+    /**
+     * @return the source Maven {@link Model}.
+     */
+    public Model getMavenModel()
+    {
+        return this.mavenModel;
     }
 }

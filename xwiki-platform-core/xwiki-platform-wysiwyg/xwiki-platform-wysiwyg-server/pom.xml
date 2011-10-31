@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wysiwyg</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wysiwyg-server</artifactId>
   <name>XWiki Platform - WYSIWYG Editor - Server Side</name>
@@ -93,9 +93,7 @@
         <configuration>
           <!-- New code should follow checkstyle rules. -->
           <excludes>
-            org/xwiki/wysiwyg/server/internal/plugin/sync/DefaultSyncEngine.java,
             org/xwiki/wysiwyg/server/internal/plugin/sync/DefaultSyncEngineTest.java,
-            org/xwiki/wysiwyg/server/internal/wiki/DefaultWikiService.java,
             org/xwiki/wysiwyg/server/internal/cleaner/ComponentManagerTestSetup.java
           </excludes>
         </configuration>

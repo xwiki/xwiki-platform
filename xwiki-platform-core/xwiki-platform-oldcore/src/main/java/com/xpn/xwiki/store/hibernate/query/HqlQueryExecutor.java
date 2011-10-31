@@ -23,9 +23,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
@@ -35,8 +38,8 @@ import org.xwiki.query.QueryExecutor;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.util.Util;
 
@@ -46,13 +49,15 @@ import com.xpn.xwiki.util.Util;
  * @version $Id$
  * @since 1.6M1
  */
-@Component("hql")
+@Component
+@Named("hql")
+@Singleton
 public class HqlQueryExecutor implements QueryExecutor, Initializable
 {
     /**
      * Session factory needed for register named queries mapping.
      */
-    @Requirement
+    @Inject
     private HibernateSessionFactory sessionFactory;
 
     /**
@@ -63,21 +68,16 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     /**
      * Used for access to XWikiContext.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
-    /**
-     * {@inheritDoc}
-     * @see Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         this.sessionFactory.getConfiguration().addInputStream(Util.getResourceAsStream(this.mappingPath));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public <T> List<T> execute(final Query query) throws QueryException
     {
         String olddatabase = getContext().getDatabase();
@@ -109,9 +109,8 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
      */
     protected org.hibernate.Query createHibernateQuery(Session session, Query query)
     {
-        return query.isNamed()
-            ? session.getNamedQuery(query.getStatement())
-            : session.createQuery(query.getStatement());
+        return query.isNamed() ? session.getNamedQuery(query.getStatement()) : session
+            .createQuery(query.getStatement());
     }
 
     /**
@@ -159,6 +158,6 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
      */
     protected XWikiContext getContext()
     {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 }

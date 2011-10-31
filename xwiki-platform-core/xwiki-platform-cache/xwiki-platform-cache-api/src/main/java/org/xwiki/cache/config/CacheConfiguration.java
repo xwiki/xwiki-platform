@@ -24,7 +24,9 @@ import java.util.HashMap;
 /**
  * Contains all informations used to create the cache.
  * <p>
- * A configuration identifier can be defined. It will be used to me the cache unique for clustering process.
+ * A configuration identifier can be defined.
+ * <p>
+ * It can be used to be the cache unique identifier for clustering process.
  * <p>
  * This is also used by implementations to associate the cache with a configuration file which overwrite the
  * configuration it contains. This way any cache can be tuned in a particular installation with option specifics to
@@ -36,10 +38,10 @@ import java.util.HashMap;
 public class CacheConfiguration extends HashMap<String, Object>
 {
     /**
-     * Since this class is a Map it needs to be serializable and thus have a unique id for Serialization. 
+     * Since this class is a Map it needs to be serializable and thus have a unique id for Serialization.
      */
     private static final long serialVersionUID = -7298684313672163845L;
-    
+
     /**
      * The configuration identifier.
      */

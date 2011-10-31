@@ -1,3 +1,4 @@
+org.xwiki.extension.internal.DefaultExtensionLicenseManager
 org.xwiki.extension.internal.DefaultExtensionManager
 org.xwiki.extension.internal.DefaultExtensionManagerConfiguration
 org.xwiki.extension.internal.DefaultVersionManager
@@ -5,6 +6,7 @@ org.xwiki.extension.handler.internal.DefaultExtensionHandlerManager
 org.xwiki.extension.repository.internal.DefaultExtensionRepositoryManager
 org.xwiki.extension.repository.internal.DefaultLocalExtensionRepository
 org.xwiki.extension.repository.internal.DefaultCoreExtensionRepository
+org.xwiki.extension.repository.internal.DefaultCoreExtensionScanner
 org.xwiki.extension.repository.internal.ConfigurationExtensionRepositorySource
 org.xwiki.extension.job.internal.DefaultJobManager
 org.xwiki.extension.job.internal.InstallJob

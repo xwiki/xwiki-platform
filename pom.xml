@@ -27,21 +27,19 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>3.2-SNAPSHOT</version>
-    <relativePath>../xwiki-commons/xwiki-commons-pom</relativePath>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>3.2-SNAPSHOT</version>
+  <version>3.3-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
+    <!-- Useful for Platform extensions -->
+    <platform.version>${commons.version}</platform.version>
     <!-- Versions of XWiki dependencies used in Platform modules -->
-    <rendering.version>${project.version}</rendering.version>
-    <commons.version>${project.version}</commons.version>
-    <!-- The previous stable version of this project, used to catch API breakages. -->
-    <clirr.previous.version>3.1</clirr.previous.version>
+    <rendering.version>${platform.version}</rendering.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -56,4 +54,27 @@
     <module>xwiki-platform-tools</module>
     <module>xwiki-platform-core</module>
   </modules>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+      <!-- Check license headers -->
+      <plugin>
+        <groupId>com.mycila.maven-license-plugin</groupId>
+        <artifactId>maven-license-plugin</artifactId>
+        <configuration>
+          <includes>
+            <!-- At the moment, only check the license headers in Java file since we need to fix other types of files
+                 first -->
+            <include>**/*.java</include>
+            <include>**/*.bat</include>
+            <include>**/*.sh</include>
+          </includes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

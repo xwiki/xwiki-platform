@@ -74,5 +74,4 @@
 <name>CategoryName</name>
 </property>
 </object>
-<content>{{include document="CategorySheet"/}}</content>
-</xwikidoc>
+<content></content></xwikidoc>

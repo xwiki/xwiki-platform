@@ -1,0 +1,588 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+<xwikidoc>
+<web>XWiki</web>
+<name>GoogleAnalyticsCode</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1309440660000</creationDate>
+<date>1309796049000</date>
+<contentUpdateDate>1309796049000</contentUpdateDate>
+<version>44.1</version>
+<title>$msg.get('admin.analytics')</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden><attachment>
+<filename>analytics.png</filename>
+<filesize>10176</filesize>
+<author>XWiki.Admin</author>
+<date>1309795571000</date>
+<version>1.5</version>
+<comment></comment><content>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
+</content></attachment>
+<class>
+<name>XWiki.GoogleAnalyticsCode</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<account>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<name>account</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>Account (UA-xxxxxxx-x)</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</account>
+</class>
+<object>
+<class>
+<name>XWiki.ConfigurableClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<codeToExecute>
+<disabled>0</disabled>
+<editor>---</editor>
+<name>codeToExecute</name>
+<number>7</number>
+<picker>0</picker>
+<prettyName>codeToExecute</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</codeToExecute>
+<configurationClass>
+<disabled>0</disabled>
+<name>configurationClass</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>configurationClass</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</configurationClass>
+<configureGlobally>
+<defaultValue></defaultValue>
+<disabled>0</disabled>
+<displayFormType>checkbox</displayFormType>
+<displayType></displayType>
+<name>configureGlobally</name>
+<number>4</number>
+<prettyName>configureGlobally</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</configureGlobally>
+<displayInSection>
+<disabled>0</disabled>
+<name>displayInSection</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>displayInSection</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</displayInSection>
+<heading>
+<disabled>0</disabled>
+<name>heading</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>heading</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</heading>
+<iconAttachment>
+<disabled>0</disabled>
+<name>iconAttachment</name>
+<number>8</number>
+<picker>0</picker>
+<prettyName>iconAttachment</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</iconAttachment>
+<linkPrefix>
+<disabled>0</disabled>
+<name>linkPrefix</name>
+<number>5</number>
+<picker>0</picker>
+<prettyName>linkPrefix</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</linkPrefix>
+<propertiesToShow>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>propertiesToShow</name>
+<number>6</number>
+<picker>0</picker>
+<prettyName>propertiesToShow</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>20</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</propertiesToShow>
+</class>
+<name>XWiki.GoogleAnalyticsCode</name>
+<number>0</number>
+<className>XWiki.ConfigurableClass</className>
+<guid>73f7eae5-ce0c-43fa-9282-1a379803a375</guid>
+<property>
+<codeToExecute>{{include document='XWiki.GoogleAnalyticsCode' /}}</codeToExecute>
+</property>
+<property>
+<configurationClass></configurationClass>
+</property>
+<property>
+<configureGlobally>1</configureGlobally>
+</property>
+<property>
+<displayInSection>analytics</displayInSection>
+</property>
+<property>
+<heading></heading>
+</property>
+<property>
+<iconAttachment>analytics.png</iconAttachment>
+</property>
+<property>
+<linkPrefix></linkPrefix>
+</property>
+<property>
+<propertiesToShow/>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.GoogleAnalyticsCode</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>67bc7341-1915-4732-99bc-55de2816ef93</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>#set($analyticsDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsConfig'))
+#set($analyticsObj = $analyticsDoc.getObject('XWiki.GoogleAnalyticsCode'))
+#set($accounts = [])
+#if("$!analyticsObj" != "" &amp;&amp; "$!analyticsObj.account" != "")
+#foreach($aObj in $analyticsObj.account.split(' '))
+#if("$!aObj" != "")
+#set($discard = $accounts.add($aObj))##
+#end 
+#end
+#end
+#if($accounts.size() &gt; 0)
+  var _gaq = _gaq || [];
+#foreach($account in $accounts)
+#set($analyticsPrefix = '')
+#if($velocityCount &gt; 1)
+#set($analyticsPrefix = 't' + $velocityCount + '.')
+#end
+  _gaq.push(['${analyticsPrefix}_setAccount', '$account']);
+  _gaq.push(['${analyticsPrefix}_trackPageview']);
+  #end 
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+#end</code>
+</property>
+<property>
+<name>googleanalytics</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<content>{{velocity output="false"}}
+#macro(saveGoogleAccount $account)
+	#set($analyticsConfigDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsConfig'))
+	#set($analyticsCodeDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsCode'))
+	#set($analyticsObj = $analyticsConfigDoc.getObject('XWiki.GoogleAnalyticsCode', true))
+	#set($jsObj = $analyticsCodeDoc.getObject('XWiki.JavaScriptExtension'))
+	#set($discard = $analyticsObj.set('account', $!account))
+	$analyticsConfigDoc.save()
+	#if ("$!jsObj" != "") 
+		#if ("$!account" != "")
+			#set($discard = $jsObj.set('use', 'always'))
+		#else
+			#set($discard = $jsObj.set('use', 'onDemand'))	
+		#end
+		$analyticsCodeDoc.save()
+	#end
+#end ##macro
+
+#macro(displayAnalyticsStatus)
+	#set($analyticsCodeDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsCode'))
+	#set($jsObj = $analyticsCodeDoc.getObject('XWiki.JavaScriptExtension'))
+	#if("$!jsObj" != "")
+		#if ("$!analyticsCodeDoc.getValue('use', $jsObj)" == 'always')
+			{{info}}$msg.get("admin.analytics.running"){{/info}}
+		#else
+			{{info}}$msg.get("admin.analytics.notrunning"){{/info}}
+		#end
+	#else
+		{{error}}$msg.get("admin.analytics.noscript"){{/error}}
+	#end
+#end ##macro
+{{/velocity}}
+
+{{velocity}}
+#if ($doc.name != 'XWikiPreferences' &amp;&amp; $xcontext.action == 'view')
+$response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=analytics')) 
+#end
+#set($analyticsConfigDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsConfig'))
+#set($analyticsCodeDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsCode'))##
+#set($analyticsObj = $analyticsConfigDoc.getObject('XWiki.GoogleAnalyticsCode', true))##
+#set($analyticsCodeClass = $analyticsCodeDoc.xWikiClass)##
+#set($accountPropertyClass = $analyticsCodeClass.account)##
+#if($hasAdmin)##
+#if($request.action == 'save')##
+#saveGoogleAccount($request.get('analytics_account'))##
+#end## save action
+#else## !hasAdmin
+{{error}}$msg.get('needadminrights').{{/error}}
+#end##
+#displayAnalyticsStatus()
+
+{{html}}
+&lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform half"&gt;
+	&lt;dl&gt;
+		&lt;dt&gt;
+			&lt;label for="analytics_account"&gt;$!accountPropertyClass.prettyName&lt;/label&gt;
+			&lt;span class="xHint"&gt;$msg.get("admin.analytics.sectiondesc")&lt;/span&gt;
+		&lt;/dt&gt;
+		&lt;dd&gt;
+			$analyticsConfigDoc.displayEdit($accountPropertyClass, 'analytics_', $analyticsObj)
+		&lt;/dd&gt;
+	&lt;/dl&gt;
+	&lt;p&gt;
+		&lt;input type="hidden" name="action" value="save"/&gt;
+		&lt;span class="buttonwrapper"&gt;
+			&lt;input type="submit" value="${msg.get('save')}" class="button" /&gt;
+		&lt;/span&gt;
+	&lt;/p&gt;
+&lt;/form&gt;
+{{/html}}
+
+{{/velocity}}</content></xwikidoc>

@@ -27,12 +27,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.parser.Parser;
 
@@ -82,7 +84,7 @@ public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSour
         }
         
         // Take the first TableBlock found in the macro content.
-        List<TableBlock> tableBlocks = xdom.getChildrenByType(TableBlock.class, true);
+        List<TableBlock> tableBlocks = xdom.getBlocks(new ClassBlockMatcher(TableBlock.class), Block.Axes.DESCENDANT);
         if (tableBlocks.size() == 0) {
             throw new MacroExecutionException("Unable to locate a suitable data table.");
         }

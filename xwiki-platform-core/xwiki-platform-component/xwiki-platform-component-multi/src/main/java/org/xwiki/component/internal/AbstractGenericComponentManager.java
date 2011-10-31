@@ -22,7 +22,8 @@ package org.xwiki.component.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.component.annotation.Requirement;
+import javax.inject.Inject;
+
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
@@ -46,7 +47,7 @@ public abstract class AbstractGenericComponentManager extends DelegateComponentM
      * The Factory to use to create Component Managers whenever a component is registered for a key that doesn't
      * already exist.
      */
-    @Requirement
+    @Inject
     private ComponentManagerFactory componentManagerFactory;
 
     /**

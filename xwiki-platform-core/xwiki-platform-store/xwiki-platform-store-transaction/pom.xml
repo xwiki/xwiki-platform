@@ -27,82 +27,82 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-store</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-store-transaction</artifactId>
   <name>XWiki Platform - Store - Transaction</name>
   <description>
-The common and error prone way of saving things in the database is to open a transaction, enter a 
-try clause, do something then commit. If we catch an exception, then we rollback.
-something like this:
+    The common and error prone way of saving things in the database is to open a transaction, enter a
+    try clause, do something then commit. If we catch an exception, then we rollback.
+    something like this:
 
-begin transaction;
-try {
-   do something;
-   do something else;
-   commit;
-} catch (Any exception which may occur) {
-   rollback;
-}
+    begin transaction;
+    try {
+    do something;
+    do something else;
+    commit;
+    } catch (Any exception which may occur) {
+    rollback;
+    }
 
-There are 3 things which can go wrong. 1 we forget to begin the transaction, 2 we forget to commit 
-and 3 we do not rollback properly. What makes things worse is often the database will "assume we 
-meant to..." and things will work okay most of the time which makes things much worse because bugs 
-will hide very well.
+    There are 3 things which can go wrong. 1 we forget to begin the transaction, 2 we forget to commit
+    and 3 we do not rollback properly. What makes things worse is often the database will "assume we
+    meant to..." and things will work okay most of the time which makes things much worse because bugs
+    will hide very well.
 
-This module answers the problem with a class called TransactionRunnable. It provides a set of 5 empty 
-methods to override: onPreRun(), onRun(), onCommit(), onRollback(), and onComplete(). the exact 
-circumstances under which each are called is documented in the javadoc comments.
+    This module answers the problem with a class called TransactionRunnable. It provides a set of 5 empty
+    methods to override: onPreRun(), onRun(), onCommit(), onRollback(), and onComplete(). the exact
+    circumstances under which each are called is documented in the javadoc comments.
 
-To repeat our original example with TransactionRunnable you might say this:
+    To repeat our original example with TransactionRunnable you might say this:
 
-public class DoSomethingTransactionRunnable extends TransactionRunnable
-{
-   public void onRun()
-   {
-     do something;
-     do something else;
-   }
-}
+    public class DoSomethingTransactionRunnable extends TransactionRunnable
+    {
+    public void onRun()
+    {
+    do something;
+    do something else;
+    }
+    }
 
-Now we can use another TransactionRunnable which opens and closes the transaction for us.
+    Now we can use another TransactionRunnable which opens and closes the transaction for us.
 
-StartableTransactionRunnable transaction = new SQLTransactionRunnable();
-new DoSomethingTransactionRunnable().runIn(transaction);
-transaction.start();
+    StartableTransactionRunnable transaction = new SQLTransactionRunnable();
+    new DoSomethingTransactionRunnable().runIn(transaction);
+    transaction.start();
 
-the runIn() function allows us to run one TransactionRunnable inside of another. Supposing we wanted 
-to reuse "do something else" in other places, we can make it a separate TransactionRunnable and use 
-the runIn() function to hook it to our DoSomethingTransactionRunnable IE:
+    the runIn() function allows us to run one TransactionRunnable inside of another. Supposing we wanted
+    to reuse "do something else" in other places, we can make it a separate TransactionRunnable and use
+    the runIn() function to hook it to our DoSomethingTransactionRunnable IE:
 
-public class DoSomethingTransactionRunnable extends TransactionRunnable
-{
-   public DoSomethingTransactionRunnable()
-   {
-     new DoSomethingElseTransactionRunnable().runIn(this);
-   }
-..
+    public class DoSomethingTransactionRunnable extends TransactionRunnable
+    {
+    public DoSomethingTransactionRunnable()
+    {
+    new DoSomethingElseTransactionRunnable().runIn(this);
+    }
+    ..
 
-The only limitations on running TransactionRunnables inside of one another are they cannot run more 
-than once and they cannot call themselves (this would be an infinite loop).
+    The only limitations on running TransactionRunnables inside of one another are they cannot run more
+    than once and they cannot call themselves (this would be an infinite loop).
 
-This pattern makes each job which is done on storage easily isolated and, as I have so far 
-experienced, trivial to test. However, it still leaves the possibility that we might forget that 
-DoSomethingTransactionRunnable must be run inside of a database transaction. This module provides a  
-solution for this too. Using generics, it offers a means for the author of a TransactionRunnable to 
-communicate to the compiler what other TransactionRunnable their runnable must be run in and without 
-explicit casting or defining of an intermediary runnable, this requirement cannot be violated or 
-else it wouldn't compile!
+    This pattern makes each job which is done on storage easily isolated and, as I have so far
+    experienced, trivial to test. However, it still leaves the possibility that we might forget that
+    DoSomethingTransactionRunnable must be run inside of a database transaction. This module provides a
+    solution for this too. Using generics, it offers a means for the author of a TransactionRunnable to
+    communicate to the compiler what other TransactionRunnable their runnable must be run in and without
+    explicit casting or defining of an intermediary runnable, this requirement cannot be violated or
+    else it wouldn't compile!
 
-Finally we have the issue of starting the runnable. Who's to say I won't be tired one day and just 
-write "new DoSomethingTransactionRunnable().start()" without opening a transaction first? If 
-DoSomethingTransactionRunnable cannot be safely run outside of a transaction all it needs to do is 
-not extend StartableTransactionRunnable and it won't have any start function.
+    Finally we have the issue of starting the runnable. Who's to say I won't be tired one day and just
+    write "new DoSomethingTransactionRunnable().start()" without opening a transaction first? If
+    DoSomethingTransactionRunnable cannot be safely run outside of a transaction all it needs to do is
+    not extend StartableTransactionRunnable and it won't have any start function.
 
-This module takes a multitude of very easy mistakes and gives the author of a TransactionRunnable the 
-tools to make it very hard for the user to make them. Also, since a TransactionRunnable has no 
-reason to be very long (it can just branch off into another runnable) this will make testing and 
-code review easy in the place where it is most important. This part of the code is entirely generic 
-and has no dependence on any type of underlying transactional storage engine.
+    This module takes a multitude of very easy mistakes and gives the author of a TransactionRunnable the
+    tools to make it very hard for the user to make them. Also, since a TransactionRunnable has no
+    reason to be very long (it can just branch off into another runnable) this will make testing and
+    code review easy in the place where it is most important. This part of the code is entirely generic
+    and has no dependence on any type of underlying transactional storage engine.
   </description>
 </project>

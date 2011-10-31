@@ -75,7 +75,6 @@ public abstract class AbstractExtensionRequest extends AbstractRequest
 
     /**
      * @param namespace the namespace
-     * @return
      */
     public void addNamespace(String namespace)
     {

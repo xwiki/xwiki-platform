@@ -492,7 +492,7 @@ public class DOMUtilsTest extends DOMTestCase
         assertEquals("13", getContainer().getInnerHTML());
         // IE fails because orphan nodes that have been created with the innerHTML property are attached to a document
         // fragment.
-        assertNull(node.getParentNode());
+        assertNull("Detached node still has a parent.", node.getParentNode());
         // The following shoudn't fail.
         domUtils.detach(node);
     }
@@ -903,6 +903,6 @@ public class DOMUtilsTest extends DOMTestCase
         assertEquals(parent, getContainer().getChild(1));
         assertEquals("<span class=\"bar\"><em>one</em></span>"
             + "<span id=\"foo\" class=\"bar\"><strong>two</strong></span>" + "<span class=\"bar\">three</span>",
-            getContainer().getInnerHTML());
+            getContainer().getInnerHTML().toLowerCase());
     }
 }

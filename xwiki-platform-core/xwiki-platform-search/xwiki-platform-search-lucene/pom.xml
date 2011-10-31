@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-lucene</artifactId>
   <name>XWiki Platform - Search - Lucene</name>
@@ -41,11 +41,21 @@
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
-      <version>2.9.4</version>
+      <version>3.4.0</version>
     </dependency>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-analyzers</artifactId>
+      <version>3.4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-queryparser</artifactId>
+      <version>3.4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-collections</groupId>
@@ -85,4 +95,30 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            com/xpn/xwiki/plugin/lucene/AbstractDocumentData.java,
+            com/xpn/xwiki/plugin/lucene/AbstractIndexData.java,
+            com/xpn/xwiki/plugin/lucene/AttachmentData.java,
+            com/xpn/xwiki/plugin/lucene/DocumentData.java,
+            com/xpn/xwiki/plugin/lucene/IndexFields.java,
+            com/xpn/xwiki/plugin/lucene/IndexRebuilder.java,
+            com/xpn/xwiki/plugin/lucene/IndexUpdater.java,
+            com/xpn/xwiki/plugin/lucene/LucenePlugin.java,
+            com/xpn/xwiki/plugin/lucene/LucenePluginApi.java,
+            com/xpn/xwiki/plugin/lucene/SearchResult.java,
+            com/xpn/xwiki/plugin/lucene/SearchResults.java,
+            com/xpn/xwiki/plugin/lucene/WikiData.java,
+            com/xpn/xwiki/plugin/lucene/XWikiDocumentQueue.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

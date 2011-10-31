@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.util;
 
 import java.io.BufferedReader;
@@ -50,10 +48,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.oro.text.PatternCache;
 import org.apache.oro.text.PatternCacheLRU;
 import org.apache.oro.text.perl.Perl5Util;
@@ -62,6 +58,8 @@ import org.apache.oro.text.regex.MatchResult;
 import org.apache.oro.text.regex.Pattern;
 import org.apache.oro.text.regex.PatternMatcherInput;
 import org.apache.oro.text.regex.Perl5Matcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xwiki.container.Container;
@@ -83,7 +81,7 @@ public class Util
      */
     private static final String URL_ENCODING = "UTF-8";
 
-    private static final Log LOG = LogFactory.getLog(Util.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Util.class);
 
     private static PatternCache patterns = new PatternCacheLRU(200);
 
@@ -570,7 +568,7 @@ public class Util
 
     public static boolean isAlphaNumeric(String text)
     {
-        return StringUtils.isAlphanumeric(text.replaceAll("-", "a").replaceAll("\\.", "a"));
+        return StringUtils.isAlphanumeric(text.replace('-', 'a').replace('.', 'a'));
     }
 
     public static String getName(String name)
@@ -665,14 +663,14 @@ public class Util
     public org.w3c.dom.Document getDOMForString(String str)
     {
         try {
-            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
-                new InputSource(new StringReader(str)));
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                .parse(new InputSource(new StringReader(str)));
         } catch (SAXException ex) {
-            LOG.warn("Cannot parse string:" + str, ex);
+            LOGGER.warn("Cannot parse string:" + str, ex);
         } catch (IOException ex) {
-            LOG.warn("Cannot parse string:" + str, ex);
+            LOGGER.warn("Cannot parse string:" + str, ex);
         } catch (ParserConfigurationException ex) {
-            LOG.warn("Cannot parse string:" + str, ex);
+            LOGGER.warn("Cannot parse string:" + str, ex);
         }
 
         return null;
@@ -688,7 +686,7 @@ public class Util
         try {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         } catch (ParserConfigurationException ex) {
-            LOG.warn("Cannot create DOM tree", ex);
+            LOGGER.warn("Cannot create DOM tree", ex);
         }
 
         return null;
@@ -761,8 +759,8 @@ public class Util
 
     /**
      * Decodes a <code>application/x-www-form-urlencoded</code> string, the reverse of
-     * {@link #encodeURI(String, XWikiContext)}. This uses the UTF-8 encoding, the default encoding for URIs, as
-     * stated in <a href="http://tools.ietf.org/html/rfc3986#section-2.5">RFC 3986</a>.
+     * {@link #encodeURI(String, XWikiContext)}. This uses the UTF-8 encoding, the default encoding for URIs, as stated
+     * in <a href="http://tools.ietf.org/html/rfc3986#section-2.5">RFC 3986</a>.
      * 
      * @param text the encoded text
      * @param context the current context
@@ -851,7 +849,7 @@ public class Util
             }
         } catch (Exception e) {
             // Probably running under -security, which prevents calling File.exists()
-            LOG.debug("Failed load resource [" + resource + "] using a file path");
+            LOGGER.debug("Failed load resource [" + resource + "] using a file path");
         }
         try {
             Container container = Utils.getComponent(Container.class);
@@ -860,7 +858,7 @@ public class Util
                 return res;
             }
         } catch (Exception e) {
-            LOG.debug("Failed to load resource [" + resource + "] using the application context");
+            LOGGER.debug("Failed to load resource [" + resource + "] using the application context");
         }
 
         return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
@@ -869,7 +867,9 @@ public class Util
     /**
      * Normalize the given language code. Converts the given language code to lower case and checks its validity (i.e.
      * whether it is an ISO 639 language code or the string "default").
-     * <p><pre>
+     * <p>
+     * 
+     * <pre>
      * Util.normalizeLanguage(null)      = null
      * Util.normalizeLanguage("")        = ""
      * Util.normalizeLanguage("  ")      = ""
@@ -878,7 +878,9 @@ public class Util
      * Util.normalizeLanguage("invalid") = "default"
      * Util.normalizeLanguage("en")      = "en"
      * Util.normalizeLanguage("DE_at")   = "de_AT"
-     * </pre></p>
+     * </pre>
+     * 
+     * </p>
      * 
      * @param languageCode the language code to normalize
      * @return normalized language code or the string "default" if the code is invalid
@@ -912,7 +914,7 @@ public class Util
             l.getISO3Language();
             return result;
         } catch (MissingResourceException ex) {
-            LOG.warn("Invalid language: " + languageCode);
+            LOGGER.warn("Invalid language: " + languageCode);
         }
         return defaultLanguage;
     }

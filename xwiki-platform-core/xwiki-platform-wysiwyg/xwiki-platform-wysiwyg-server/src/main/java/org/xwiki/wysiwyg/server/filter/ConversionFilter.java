@@ -30,10 +30,10 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 
 import com.xpn.xwiki.web.Utils;
@@ -49,7 +49,7 @@ public class ConversionFilter implements Filter
     /**
      * The logger instance.
      */
-    private static final Log LOG = LogFactory.getLog(ConversionFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConversionFilter.class);
 
     /**
      * The name of the request parameter whose multiple values indicate the request parameters that require HTML
@@ -74,20 +74,12 @@ public class ConversionFilter implements Filter
      */
     private static final String CONVERSION_ERRORS = "com.xpn.xwiki.wysiwyg.server.converter.errors";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Filter#destroy()
-     */
+    @Override
     public void destroy()
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
-     */
+    @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
         ServletException
     {
@@ -116,7 +108,7 @@ public class ConversionFilter implements Filter
                     HTMLConverter converter = Utils.getComponent(HTMLConverter.class);
                     mreq.setParameter(parameterName, converter.fromHTML(req.getParameter(parameterName), syntax));
                 } catch (Exception e) {
-                    LOG.error(e.getLocalizedMessage(), e);
+                    LOGGER.error(e.getLocalizedMessage(), e);
                     errors.put(parameterName, e);
                 }
                 // If the conversion fails the output contains the value before the conversion.
@@ -153,11 +145,7 @@ public class ConversionFilter implements Filter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Filter#init(FilterConfig)
-     */
+    @Override
     public void init(FilterConfig config) throws ServletException
     {
     }

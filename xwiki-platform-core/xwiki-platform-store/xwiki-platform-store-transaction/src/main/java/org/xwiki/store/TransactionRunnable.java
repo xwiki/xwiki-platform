@@ -32,18 +32,19 @@ import java.util.ListIterator;
  * <T> specify that it can only be run inside of a certian type of TransactionRunnable.
  *
  * @param <T> The type of TransactionRunnable which this TransactionRunnable must be run inside of.
- *            A TransactionRunnable which alters a database through Hibernate would fail if it was
- *            started outside of a TransactionRunnable which began and committed a transaction around
- *            it. A class which extends TransactionRunnable<DatabaseTransactionRunnable> can only be
- *            run inside of a DatabaseTransactionRunnable or a subclass of it. Breaking that rule will
- *            be a compile time error.
- *
+ * A TransactionRunnable which alters a database through Hibernate would fail if it was
+ * started outside of a TransactionRunnable which began and committed a transaction around
+ * it. A class which extends TransactionRunnable<DatabaseTransactionRunnable> can only be
+ * run inside of a DatabaseTransactionRunnable or a subclass of it. Breaking that rule will
+ * be a compile time error.
  * @version $Id$
  * @since 3.0M2
  */
 public class TransactionRunnable<T>
 {
-    /** All of the runnables to be run then committed. */
+    /**
+     * All of the runnables to be run then committed.
+     */
     private final List<TransactionRunnable> allRunnables = new ArrayList<TransactionRunnable>();
 
     /**
@@ -52,7 +53,9 @@ public class TransactionRunnable<T>
      */
     private TransactionRunnable<T> parent;
 
-    /** If true then this runnable has already started and nothing else may be runIn it. */
+    /**
+     * If true then this runnable has already started and nothing else may be runIn it.
+     */
     private boolean hasPreRun;
 
     /**
@@ -93,26 +96,26 @@ public class TransactionRunnable<T>
      * </code>
      *
      * @param <U> The type of capabilities provided by the parent runnable.
-     *            This defines the state which the state which the storage engine is guaranteed to be in
-     *            when this runnable starts. It must extend the type of capabilities required by this
-     *            runnable.
+     * This defines the state which the state which the storage engine is guaranteed to be in
+     * when this runnable starts. It must extend the type of capabilities required by this
+     * runnable.
      * @param parentRunnable the TransactionRunnable to run this runnable inside of.
      * @return this runnable casted to a TransactionRunnable with the capabilities of it's parent.
      * @throws IllegalStateException if this function has already been called on this runnable because a
-     *                               TransactionRunnable may only be run once.
+     * TransactionRunnable may only be run once.
      * @throws IllegalArgumentException if this runnable is an ancestor of the parentRunnable as it would
-     *                                  create an unresolvable loop.
+     * create an unresolvable loop.
      */
     public <U extends T> TransactionRunnable<U> runIn(final TransactionRunnable<U> parentRunnable)
     {
         if (this.parent != null) {
             throw new IllegalStateException("This TransactionRunnable is already scheduled to run inside "
-                                            + this.parent.toString() + " and cannot be run in "
-                                            + parentRunnable.toString() + " too.");
+                + this.parent.toString() + " and cannot be run in "
+                + parentRunnable.toString() + " too.");
         }
         if (parentRunnable.hasPreRun) {
             throw new IllegalStateException("This TransactionRunnable cannot be runIn() " + parentRunnable
-                                            + " because it has already started 'the ship has set sail'");
+                + " because it has already started 'the ship has set sail'");
         }
         parentRunnable.assertNoLoop(this);
 
@@ -156,7 +159,7 @@ public class TransactionRunnable<T>
      * This is intended for acquiring locks and putting temporary storage in order prior to calling run().
      *
      * @throws Exception which will cause the execution of
-     *         onRollback then onComplete before being wrapped in a TransactionException and rethrown.
+     * onRollback then onComplete before being wrapped in a TransactionException and rethrown.
      */
     protected void onPreRun() throws Exception
     {
@@ -169,7 +172,7 @@ public class TransactionRunnable<T>
      * Whatever it does MUST be able to be reverted by calling onRollback().
      *
      * @throws Exception which will cause a rollback of the transaction and then execution of
-     *         onRollback then onComplete before being wrapped in a TransactionException and rethrown.
+     * onRollback then onComplete before being wrapped in a TransactionException and rethrown.
      */
     protected void onRun() throws Exception
     {
@@ -182,8 +185,8 @@ public class TransactionRunnable<T>
      * No work may be done in onComplete() except for cleanup of temporary files.
      *
      * @throws Exception which will stop the committing process and cause onRollback to be invoked on each
-     *                   of the runnables in the chain before being wrapped in a TransactionException and
-     *                   rethrown.
+     * of the runnables in the chain before being wrapped in a TransactionException and
+     * rethrown.
      */
     protected void onCommit() throws Exception
     {
@@ -202,7 +205,7 @@ public class TransactionRunnable<T>
      * {@link RootTransactionRunnable} which it cannot be run inside of another runnable.
      *
      * @throws Exception which will be reported as the cause of possible storage corruption.
-     *                   before being wrapped in a TransactionException and rethrown.
+     * before being wrapped in a TransactionException and rethrown.
      */
     protected void onRollback() throws Exception
     {
@@ -236,7 +239,7 @@ public class TransactionRunnable<T>
     {
         if (this == runnable) {
             throw new IllegalArgumentException("A TransactionRunnable cannot be run inside of itself as "
-                                               + "it would create a loop which would never resolve.");
+                + "it would create a loop which would never resolve.");
         }
         if (this.parent != null) {
             this.parent.assertNoLoop(runnable);
@@ -249,8 +252,8 @@ public class TransactionRunnable<T>
      * If an exception occures, call onComplete on each runnable in the reverse order preRun was called.
      *
      * @throws TransactionException if an exception is thrown by this or one of the chained runnables'
-     *                              onPreRun() functions, also may contain exceptions thrown by one or more
-     *                              of the chained runnables' onComplete() functions.
+     * onPreRun() functions, also may contain exceptions thrown by one or more
+     * of the chained runnables' onComplete() functions.
      */
     protected final void preRun() throws TransactionException
     {
@@ -287,7 +290,7 @@ public class TransactionRunnable<T>
      * Get all TransactionRunnables under and including this one in the order they need to be run.
      *
      * @param runPath a list of TransactionRunnable, every transactionRunnable in the chain
-     *        under this will be added in the order they should be run.
+     * under this will be added in the order they should be run.
      */
     private void addAllToRunPath(final List<TransactionRunnable> runPath)
     {
@@ -304,8 +307,8 @@ public class TransactionRunnable<T>
      * completed. Rollback and complete will happen in the reverse order as run.
      *
      * @throws TransactionException made by grouping together whatever is thrown by this or one of the
-     *                              chained runnables' onRun() functions and whatever might be thrown by
-     *                              onRollback() or onComplete() which are called if somethign goes wrong.
+     * chained runnables' onRun() functions and whatever might be thrown by
+     * onRollback() or onComplete() which are called if somethign goes wrong.
      */
     protected final void run() throws TransactionException
     {
@@ -339,7 +342,7 @@ public class TransactionRunnable<T>
      * After all are rolled back, onComplete() will be called on each, also in reverse order.
      *
      * @throws TransactionException made from the exception thrown by this or one of the child runnables'
-     *                              onCommit function or rollback or complete.
+     * onCommit function or rollback or complete.
      */
     protected final void commit() throws TransactionException
     {
@@ -376,7 +379,7 @@ public class TransactionRunnable<T>
      * onRollback() will NOT run for a given TransactionRunnable unless onRun() has been called.
      *
      * @throws TransactionException made from gathering whatever exceptions were thrown
-     *                              running onRollback() on this and the child runnables.
+     * running onRollback() on this and the child runnables.
      */
     protected final void rollback() throws TransactionException
     {
@@ -409,7 +412,7 @@ public class TransactionRunnable<T>
      *
      * @param iterator the iterator of TransactionRunnables to complete.
      * @throws TransactionException made up any exceptions throws by any of the onComplete calls.
-     *         this function does not stop for exceptions.
+     * this function does not stop for exceptions.
      */
     private static void completeAll(final ListIterator<TransactionRunnable> iterator)
         throws TransactionException
@@ -418,7 +421,8 @@ public class TransactionRunnable<T>
 
         while (iterator.hasPrevious()) {
             final TransactionRunnable runnable = iterator.previous();
-            list.add(new ExceptionThrowingRunnable() {
+            list.add(new ExceptionThrowingRunnable()
+            {
                 public void run() throws Exception
                 {
                     runnable.onComplete();
@@ -426,8 +430,8 @@ public class TransactionRunnable<T>
             });
         }
         doAllAndCollectThrowables(list, "Failure in onComplete() the storage engine should be "
-                                        + "consistant although it may contain uncollected garbage.",
-                                  false);
+            + "consistant although it may contain uncollected garbage.",
+            false);
     }
 
     /**
@@ -435,7 +439,7 @@ public class TransactionRunnable<T>
      *
      * @param iterator the iterator of TransactionRunnables to rollback.
      * @throws TransactionException made up any exceptions throws by any of the onRollback calls.
-     *         this function does not stop for exceptions.
+     * this function does not stop for exceptions.
      */
     private static void rollbackAll(final ListIterator<TransactionRunnable> iterator)
         throws TransactionException
@@ -444,7 +448,8 @@ public class TransactionRunnable<T>
 
         while (iterator.hasPrevious()) {
             final TransactionRunnable runnable = iterator.previous();
-            list.add(new ExceptionThrowingRunnable() {
+            list.add(new ExceptionThrowingRunnable()
+            {
                 public void run() throws Exception
                 {
                     runnable.onRollback();
@@ -453,7 +458,7 @@ public class TransactionRunnable<T>
         }
 
         doAllAndCollectThrowables(list, "Failure in onRollback() the storage engine might be "
-                                        + "in an inconsistent state", true);
+            + "in an inconsistent state", true);
     }
 
     /**
@@ -463,12 +468,12 @@ public class TransactionRunnable<T>
      * @param runnables the things to run.
      * @param message the error message to add to the TransactionException if it is thrown.
      * @param isNonRecoverable true if this operation is critical and an exception cannot be recovered
-     *                          from eg: storage corruption.
+     * from eg: storage corruption.
      * @throws TransactionException made by grouping all of the exceptions from the runnables together.
      */
     private static void doAllAndCollectThrowables(final List<ExceptionThrowingRunnable> runnables,
-                                                  final String message,
-                                                  final boolean isNonRecoverable)
+        final String message,
+        final boolean isNonRecoverable)
         throws TransactionException
     {
         List<Throwable> causes = null;
@@ -487,7 +492,9 @@ public class TransactionRunnable<T>
         }
     }
 
-    /** A closure which is capable of throwing an exception. */
+    /**
+     * A closure which is capable of throwing an exception.
+     */
     private static interface ExceptionThrowingRunnable
     {
         /**

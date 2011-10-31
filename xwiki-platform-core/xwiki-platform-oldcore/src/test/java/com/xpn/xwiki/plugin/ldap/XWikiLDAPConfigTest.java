@@ -23,17 +23,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import junit.framework.Assert;
+
+import org.junit.Test;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.web.XWikiEngineContext;
 
 /**
@@ -41,7 +43,7 @@ import com.xpn.xwiki.web.XWikiEngineContext;
  * 
  * @version $Id$
  */
-public class XWikiLDAPConfigTest extends AbstractBridgedXWikiComponentTestCase
+public class XWikiLDAPConfigTest extends AbstractBridgedComponentTestCase
 {
     private XWikiContext prefContext;
 
@@ -55,6 +57,8 @@ public class XWikiLDAPConfigTest extends AbstractBridgedXWikiComponentTestCase
 
     private static final String LDAPTOTOGRP_DN = "cn=HMS Toto,ou=crews,ou=groups,o=sevenSeas";
 
+    private static final String FILTER = "(&(objectCategory=person)(objectClass=contact)(|(sn=Smith)(sn=Johnson)))";
+
     private static final String LDAPTITIGRP2_DN = "cn=HMS Titi,ou=crews,ou=groups,o=sevenSeas2";
 
     private static final String LDAPTOTOGRP2_DN = "cn=HMS Toto,ou=crews,ou=groups,o=sevenSeas2";
@@ -63,13 +67,13 @@ public class XWikiLDAPConfigTest extends AbstractBridgedXWikiComponentTestCase
 
     private static final XWikiConfig CONFIG = new XWikiConfig();
 
-    private static final Map<String, String> RESULT_CFG_USERMAPPING = new Hashtable<String, String>();
+    private static final Map<String, String> RESULT_CFG_USERMAPPING = new HashMap<String, String>();
 
-    private static final Map<String, String> RESULT_PREF_USERMAPPING = new Hashtable<String, String>();
+    private static final Map<String, String> RESULT_PREF_USERMAPPING = new HashMap<String, String>();
 
-    private static final Map<String, Set<String>> RESULT_CFG_GROUPMAPPING = new Hashtable<String, Set<String>>();
+    private static final Map<String, Set<String>> RESULT_CFG_GROUPMAPPING = new HashMap<String, Set<String>>();
 
-    private static final Map<String, Set<String>> RESULT_PREF_GROUPMAPPING = new Hashtable<String, Set<String>>();
+    private static final Map<String, Set<String>> RESULT_PREF_GROUPMAPPING = new HashMap<String, Set<String>>();
 
     private static final Collection<String> RESULT_CFG_GROUPCLASSES = new HashSet<String>();
 
@@ -112,15 +116,27 @@ public class XWikiLDAPConfigTest extends AbstractBridgedXWikiComponentTestCase
         RESULT_CFG_USERMAPPING.put("uid2", "name");
         RESULT_CFG_USERMAPPING.put("sn2", "last_name");
 
-        addProperty("ldap_group_mapping", "xwiki.authentication.ldap.group_mapping", XADMINGROUP_FULLNAME + "="
-            + LDAPTOTOGRP_DN + "|" + XADMINGROUP_FULLNAME + "=" + LDAPTITIGRP_DN + "|" + XADMINGROUP2_FULLNAME + "="
-            + LDAPTOTOGRP_DN + "|" + XADMINGROUP2_FULLNAME + "=" + LDAPTITIGRP_DN, XADMINGROUP_FULLNAME + "="
-            + LDAPTOTOGRP2_DN + "|" + XADMINGROUP_FULLNAME + "=" + LDAPTITIGRP2_DN + "|" + XADMINGROUP2_FULLNAME + "="
-            + LDAPTOTOGRP2_DN + "|" + XADMINGROUP2_FULLNAME + "=" + LDAPTITIGRP2_DN);
+        // @formatter:off
+        addProperty("ldap_group_mapping", "xwiki.authentication.ldap.group_mapping",
+            XADMINGROUP_FULLNAME + "=" + LDAPTOTOGRP_DN + "|" +
+            XADMINGROUP_FULLNAME + "=" + LDAPTITIGRP_DN + "|" +
+            XADMINGROUP_FULLNAME + "=" + FILTER.replace("|", "\\|") + "|" +
+            XADMINGROUP2_FULLNAME + "=" + LDAPTOTOGRP_DN + "|" +
+            XADMINGROUP2_FULLNAME + "=" + LDAPTITIGRP_DN + "|" +
+            XADMINGROUP2_FULLNAME + "=" + FILTER.replace("|", "\\|"),
+
+            XADMINGROUP_FULLNAME + "=" + LDAPTOTOGRP2_DN + "|" +
+            XADMINGROUP_FULLNAME + "=" + LDAPTITIGRP2_DN + "|" +
+            XADMINGROUP_FULLNAME + "=" + FILTER.replace("|", "\\|") + "|" +
+            XADMINGROUP2_FULLNAME + "=" + LDAPTOTOGRP2_DN + "|" +
+            XADMINGROUP2_FULLNAME + "=" + LDAPTITIGRP2_DN + "|" +
+            XADMINGROUP2_FULLNAME + "=" + FILTER.replace("|", "\\|"));
+        // @formatter:on
 
         Set<String> ldapgroups = new HashSet<String>();
         ldapgroups.add(LDAPTOTOGRP_DN);
         ldapgroups.add(LDAPTITIGRP_DN);
+        ldapgroups.add(FILTER);
 
         RESULT_PREF_GROUPMAPPING.put(XADMINGROUP_FULLNAME, ldapgroups);
         RESULT_PREF_GROUPMAPPING.put(XADMINGROUP2_FULLNAME, ldapgroups);
@@ -128,6 +144,7 @@ public class XWikiLDAPConfigTest extends AbstractBridgedXWikiComponentTestCase
         Set<String> ldapgroups2 = new HashSet<String>();
         ldapgroups2.add(LDAPTOTOGRP2_DN);
         ldapgroups2.add(LDAPTITIGRP2_DN);
+        ldapgroups2.add(FILTER);
 
         RESULT_CFG_GROUPMAPPING.put(XADMINGROUP_FULLNAME, ldapgroups2);
         RESULT_CFG_GROUPMAPPING.put(XADMINGROUP2_FULLNAME, ldapgroups2);
@@ -147,13 +164,8 @@ public class XWikiLDAPConfigTest extends AbstractBridgedXWikiComponentTestCase
             "groupmemberfield1,groupmemberfield2", "groupmemberfield12");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
     @Override
-    protected void setUp() throws Exception
+    public void setUp() throws Exception
     {
         super.setUp();
 
@@ -199,54 +211,61 @@ public class XWikiLDAPConfigTest extends AbstractBridgedXWikiComponentTestCase
     // ///////////////////////////////////////////////////////////////////////////////////////:
     // Tests
 
+    @Test
     public void testGetLDAPParam1()
     {
-        assertEquals("0", XWikiLDAPConfig.getInstance().getLDAPParam("ldap", "xwiki.authentication.ldap", null,
-            prefContext));
-        assertEquals("1", XWikiLDAPConfig.getInstance().getLDAPParam("ldap", "xwiki.authentication.ldap", null,
-            cfgContext));
+        Assert.assertEquals("0",
+            XWikiLDAPConfig.getInstance().getLDAPParam("ldap", "xwiki.authentication.ldap", null, prefContext));
+        Assert.assertEquals("1",
+            XWikiLDAPConfig.getInstance().getLDAPParam("ldap", "xwiki.authentication.ldap", null, cfgContext));
     }
 
+    @Test
     public void testGetLDAPParam2()
     {
-        assertEquals("localhost", XWikiLDAPConfig.getInstance().getLDAPParam("ldap_server", null, prefContext));
-        assertEquals("127.0.0.1", XWikiLDAPConfig.getInstance().getLDAPParam("ldap_server", null, cfgContext));
-        assertEquals("127.0.0.1", XWikiLDAPConfig.getInstance().getLDAPParam("ldap_server", "default", cfgContext));
+        Assert.assertEquals("localhost", XWikiLDAPConfig.getInstance().getLDAPParam("ldap_server", null, prefContext));
+        Assert.assertEquals("127.0.0.1", XWikiLDAPConfig.getInstance().getLDAPParam("ldap_server", null, cfgContext));
+        Assert.assertEquals("127.0.0.1",
+            XWikiLDAPConfig.getInstance().getLDAPParam("ldap_server", "default", cfgContext));
     }
 
+    @Test
     public void testIsLDAPEnabled()
     {
-        assertEquals(false, XWikiLDAPConfig.getInstance().isLDAPEnabled(prefContext));
-        assertEquals(true, XWikiLDAPConfig.getInstance().isLDAPEnabled(cfgContext));
+        Assert.assertEquals(false, XWikiLDAPConfig.getInstance().isLDAPEnabled(prefContext));
+        Assert.assertEquals(true, XWikiLDAPConfig.getInstance().isLDAPEnabled(cfgContext));
     }
 
+    @Test
     public void testGetLDAPPort()
     {
-        assertEquals(10000, XWikiLDAPConfig.getInstance().getLDAPPort(prefContext));
-        assertEquals(11111, XWikiLDAPConfig.getInstance().getLDAPPort(cfgContext));
+        Assert.assertEquals(10000, XWikiLDAPConfig.getInstance().getLDAPPort(prefContext));
+        Assert.assertEquals(11111, XWikiLDAPConfig.getInstance().getLDAPPort(cfgContext));
     }
 
+    @Test
     public void testGetGroupMappings()
     {
         Map<String, Set<String>> prefMapping = XWikiLDAPConfig.getInstance().getGroupMappings(prefContext);
 
-        assertEquals(RESULT_PREF_GROUPMAPPING, prefMapping);
+        Assert.assertEquals(RESULT_PREF_GROUPMAPPING, prefMapping);
 
         Map<String, Set<String>> cfgMapping = XWikiLDAPConfig.getInstance().getGroupMappings(cfgContext);
 
-        assertEquals(RESULT_CFG_GROUPMAPPING, cfgMapping);
+        Assert.assertEquals(RESULT_CFG_GROUPMAPPING, cfgMapping);
     }
 
+    @Test
     public void testGetUserMappings()
     {
         List<String> prefAttrList = new ArrayList<String>();
 
         Map<String, String> prefMapping = XWikiLDAPConfig.getInstance().getUserMappings(prefAttrList, prefContext);
 
-        assertEquals("uid", prefAttrList.get(0));
-        assertEquals("sn", prefAttrList.get(1));
+        Assert.assertEquals("uid", prefAttrList.get(0));
+        Assert.assertEquals("sn", prefAttrList.get(1));
 
-        assertEquals(RESULT_PREF_USERMAPPING, prefMapping);
+        Assert.assertEquals(RESULT_PREF_USERMAPPING, prefMapping);
 
         // ///
 
@@ -254,27 +273,32 @@ public class XWikiLDAPConfigTest extends AbstractBridgedXWikiComponentTestCase
 
         Map<String, String> cfgMapping = XWikiLDAPConfig.getInstance().getUserMappings(cfgAttrList, cfgContext);
 
-        assertEquals("uid2", cfgAttrList.get(0));
-        assertEquals("sn2", cfgAttrList.get(1));
+        Assert.assertEquals("uid2", cfgAttrList.get(0));
+        Assert.assertEquals("sn2", cfgAttrList.get(1));
 
-        assertEquals(RESULT_CFG_USERMAPPING, cfgMapping);
+        Assert.assertEquals(RESULT_CFG_USERMAPPING, cfgMapping);
     }
 
+    @Test
     public void testGetCacheExpiration()
     {
-        assertEquals(10000, XWikiLDAPConfig.getInstance().getCacheExpiration(prefContext));
-        assertEquals(11111, XWikiLDAPConfig.getInstance().getCacheExpiration(cfgContext));
+        Assert.assertEquals(10000, XWikiLDAPConfig.getInstance().getCacheExpiration(prefContext));
+        Assert.assertEquals(11111, XWikiLDAPConfig.getInstance().getCacheExpiration(cfgContext));
     }
 
+    @Test
     public void testGetGroupClasses()
     {
-        assertEquals(RESULT_PREF_GROUPCLASSES, XWikiLDAPConfig.getInstance().getGroupClasses(prefContext));
-        assertEquals(RESULT_CFG_GROUPCLASSES, XWikiLDAPConfig.getInstance().getGroupClasses(cfgContext));
+        Assert.assertEquals(RESULT_PREF_GROUPCLASSES, XWikiLDAPConfig.getInstance().getGroupClasses(prefContext));
+        Assert.assertEquals(RESULT_CFG_GROUPCLASSES, XWikiLDAPConfig.getInstance().getGroupClasses(cfgContext));
     }
 
+    @Test
     public void testGetGroupMemberFields()
     {
-        assertEquals(RESULT_PREF_GROUPMEMBERFIELDS, XWikiLDAPConfig.getInstance().getGroupMemberFields(prefContext));
-        assertEquals(RESULT_CFG_GROUPMEMBERFIELDS, XWikiLDAPConfig.getInstance().getGroupMemberFields(cfgContext));
+        Assert.assertEquals(RESULT_PREF_GROUPMEMBERFIELDS,
+            XWikiLDAPConfig.getInstance().getGroupMemberFields(prefContext));
+        Assert.assertEquals(RESULT_CFG_GROUPMEMBERFIELDS, XWikiLDAPConfig.getInstance()
+            .getGroupMemberFields(cfgContext));
     }
 }

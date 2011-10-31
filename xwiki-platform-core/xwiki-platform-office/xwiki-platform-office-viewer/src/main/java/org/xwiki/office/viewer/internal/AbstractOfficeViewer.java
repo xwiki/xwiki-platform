@@ -34,7 +34,6 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.container.Container;
@@ -66,25 +65,25 @@ public abstract class AbstractOfficeViewer implements OfficeViewer, Initializabl
     /**
      * Used to access attachment content.
      */
-    @Requirement
+    @Inject
     protected DocumentAccessBridge documentAccessBridge;
 
     /**
      * Used to access the temporary directory.
      */
-    @Requirement
+    @Inject
     private Container container;
 
     /**
      * Used for serializing {@link AttachmentReference}s.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> serializer;
 
     /**
      * Used to initialize the view cache.
      */
-    @Requirement
+    @Inject
     private CacheManager cacheManager;
 
     /**

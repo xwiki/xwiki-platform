@@ -77,7 +77,7 @@ $response.setContentType("application/x-json")
     "lastname"      : "$!{escapetool.javascript($user.getObject('XWiki.XWikiUsers').get('last_name'))}",
     "userurl"       : "$xwiki.getURL($user.fullName)",
     "usersaveurl"   : "$user.getURL("save")",
-    "userinlineurl" : "$user.getURL("inline", "xpage=edituser")",
+    "userinlineurl" : "$user.getURL("edit", "xpage=edituser")",
     "docurl"        : "$xwiki.getURL("XWiki.XWikiPreferences", "admin", "section=Users")",
     "grayed"        : "$grayed"
   }

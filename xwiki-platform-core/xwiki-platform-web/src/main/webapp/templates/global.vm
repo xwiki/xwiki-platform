@@ -54,8 +54,12 @@
     #set($defaultLanguage = "default")
   #end
   <a href="$!doc.getURL("view", "language=$defaultLanguage")" class="language-default#if($tdoc.realLanguage == $defaultLanguage || ($defaultLanguage == 'default' && $tdoc.realLanguage == '')) language-current#end">$defaultLanguage</a>
+  #set ($wikiSettingsLanguages = $!xwiki.getXWikiPreference('languages').trim().split('\s*[,| ]\s*'))
+  #set ($hasLanguagesSet = $wikiSettingsLanguages.size() > 1 || "$!wikiSettingsLanguages.get(0)" != '')
   #foreach($lang in $doc.translationList)
-    <a href="$!doc.getURL("view", "language=$lang")" class="language-translation#if($tdoc.realLanguage == $lang) language-current#end">$!lang</a>
+    #if(!$hasLanguagesSet || $wikiSettingsLanguages.contains($lang))
+      <a href="$!doc.getURL("view", "language=$lang")" class="language-translation#if($tdoc.realLanguage == $lang) language-current#end">$!lang</a>
+    #end
   #end
   </span>
 #end

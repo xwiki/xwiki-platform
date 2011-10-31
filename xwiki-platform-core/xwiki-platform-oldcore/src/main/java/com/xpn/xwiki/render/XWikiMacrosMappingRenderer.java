@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.render;
 
 import java.util.ArrayList;
@@ -28,9 +26,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.observation.EventListener;
@@ -45,7 +43,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class XWikiMacrosMappingRenderer implements XWikiRenderer, EventListener
 {
-    private static final Log log = LogFactory.getLog(XWikiMacrosMappingRenderer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiMacrosMappingRenderer.class);
 
     /**
      * Regex pattern for matching macros that are written on single line.
@@ -57,8 +55,8 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, EventListener
      * using the {@link Pattern#DOTALL} flag to tell the compiler that "." should match any characters, including new
      * lines.
      */
-    private static final Pattern MULTI_LINE_MACRO_PATTERN =
-        Pattern.compile("\\{(\\w+)(:(.+?))?\\}(.+?)\\{\\1\\}", Pattern.DOTALL);
+    private static final Pattern MULTI_LINE_MACRO_PATTERN = Pattern.compile("\\{(\\w+)(:(.+?))?\\}(.+?)\\{\\1\\}",
+        Pattern.DOTALL);
 
     /**
      * The name of the listener.
@@ -118,8 +116,10 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, EventListener
                 StringUtils.split(xwiki.getXWikiPreference("macros_languages", "velocity,groovy", context), ", ");
             for (int i = 0; i < macrolanguages.length; i++) {
                 String language = macrolanguages[i];
-                this.macros_libraries.put(language, xwiki.getXWikiPreference("macros_" + language, "XWiki."
-                    + language.substring(0, 1).toUpperCase() + language.substring(1) + "Macros", context));
+                this.macros_libraries.put(
+                    language,
+                    xwiki.getXWikiPreference("macros_" + language, "XWiki." + language.substring(0, 1).toUpperCase()
+                        + language.substring(1) + "Macros", context));
             }
 
             String macrosmapping = xwiki.getMacroList(context);
@@ -135,7 +135,7 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, EventListener
                         }
                     }
                 } catch (Exception e) {
-                    log.error("Error reading macro mapping " + mappings[i], e);
+                    LOGGER.error("Error reading macro mapping " + mappings[i], e);
                 }
             }
         }
@@ -173,8 +173,8 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, EventListener
 
             XWikiVirtualMacro macro = this.macros_mappings.get(macroname);
             if ((macro != null) && (macro.isSingleLine())) {
-                result.append(context.getWiki().getRenderingEngine().convertSingleLine(macroname, params, allcontent,
-                    macro, context));
+                result.append(context.getWiki().getRenderingEngine()
+                    .convertSingleLine(macroname, params, allcontent, macro, context));
             } else {
                 result.append(allcontent);
             }
@@ -203,8 +203,8 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, EventListener
 
             XWikiVirtualMacro macro = this.macros_mappings.get(macroname);
             if ((macro != null) && (macro.isMultiLine())) {
-                result.append(context.getWiki().getRenderingEngine().convertMultiLine(macroname, params, data,
-                    allcontent, macro, context));
+                result.append(context.getWiki().getRenderingEngine()
+                    .convertMultiLine(macroname, params, data, allcontent, macro, context));
             } else {
                 result.append(allcontent);
             }

@@ -24,9 +24,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.filter.HTMLFilter;
@@ -37,55 +40,64 @@ import org.xwiki.xml.html.filter.HTMLFilter;
  * @version $Id$
  * @since 1.8M1
  */
-@Component("wysiwyg")
+@Component
+@Named("wysiwyg")
+@Singleton
 public class WysiwygHTMLCleaner implements HTMLCleaner
 {
     /**
      * Default html cleaner component used internally. 
      */
-    @Requirement
+    @Inject
     private HTMLCleaner defaultHtmlCleaner;
     
     /**
      * {@link HTMLFilter} for stripping various tags.
      */
-    @Requirement("officeimporter/stripper")
+    @Inject
+    @Named("officeimporter/stripper")
     private HTMLFilter stripperFilter;
     
     /**
      * {@link HTMLFilter} filtering styles.
      */
-    @Requirement("officeimporter/style")
+    @Inject
+    @Named("officeimporter/style")
     private HTMLFilter styleFilter;
     
     /**
      * {@link HTMLFilter} for stripping redundant tags.
      */
-    @Requirement("officeimporter/redundancy")
+    @Inject
+    @Named("officeimporter/redundancy")
     private HTMLFilter redundancyFilter;
     
     /**
      * {@link HTMLFilter} for cleaning empty paragraphs.
      */
-    @Requirement("officeimporter/paragraph")
+    @Inject
+    @Named("officeimporter/paragraph")
     private HTMLFilter paragraphFilter;
     
     /**
      * {@link HTMLFilter} for filtering image tags.
      */
-    @Requirement("officeimporter/image")
+    @Inject
+    @Named("officeimporter/image")
     private HTMLFilter imageFilter;
 
     /**
      * {@link HTMLFilter} for filtering lists.
      */
-    @Requirement("officeimporter/list")
+    @Inject
+    @Named("officeimporter/list")
     private HTMLFilter listFilter;
     
     /**
      * {@link HTMLFilter} for filtering tables.
      */
-    @Requirement("officeimporter/table")
+    @Inject
+    @Named("officeimporter/table")
     private HTMLFilter tableFilter;
 
     /**

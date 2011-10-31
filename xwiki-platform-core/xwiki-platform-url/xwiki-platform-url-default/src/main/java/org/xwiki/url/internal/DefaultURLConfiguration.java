@@ -19,8 +19,11 @@
  */
 package org.xwiki.url.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.url.URLConfiguration;
 
@@ -29,6 +32,7 @@ import org.xwiki.url.URLConfiguration;
  * @since 2.3M1
  */
 @Component
+@Singleton
 public class DefaultURLConfiguration implements URLConfiguration
 {
     /**
@@ -39,13 +43,11 @@ public class DefaultURLConfiguration implements URLConfiguration
     /**
      * Defines from where to read the rendering configuration data.
      */
-    @Requirement("xwikiproperties")
+    @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource configuration;
 
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.url.URLConfiguration#getURLFormatId()
-     */
+    @Override
     public String getURLFormatId()
     {
         // Note: the format corresponds to the component hint for the XWikiURLFactory implementation to use.

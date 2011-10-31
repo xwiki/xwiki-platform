@@ -23,6 +23,12 @@ bin
 /*/*/*/*/src/main/java/META-INF/
 /*/*/*/*/*/src/main/java/META-INF/
 /*/*/*/*/*/*/src/main/java/META-INF/
+/*/src/META-INF/
+/*/*/src/META-INF/
+/*/*/*/src/META-INF/
+/*/*/*/*/src/META-INF/
+/*/*/*/*/*/src/META-INF/
+/*/*/*/*/*/*/src/META-INF/
 
 # NetBeans
 nbproject

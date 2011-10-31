@@ -23,7 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
+import org.xwiki.component.annotation.ComponentDeclaration;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
@@ -56,16 +57,13 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
 
     private ComponentAnnotationLoader jarLoader;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         this.jarLoader = new ComponentAnnotationLoader();
     }
 
+    @Override
     public void install(LocalExtension localExtension, String namespace) throws InstallException
     {
         ExtensionURLClassLoader classLoader = this.jarExtensionClassLoader.getURLClassLoader(namespace, true);
@@ -81,6 +79,7 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
         loadComponents(localExtension.getFile(), classLoader);
     }
 
+    @Override
     public void uninstall(LocalExtension localExtension, String namespace) throws UninstallException
     {
         ExtensionURLClassLoader classLoader = this.jarExtensionClassLoader.getURLClassLoader(namespace, false);
@@ -96,62 +95,76 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
     private void loadComponents(File jarFile, ExtensionURLClassLoader classLoader) throws InstallException
     {
         try {
-            List<String>[] components = getDeclaredComponents(jarFile);
+            List<ComponentDeclaration> componentDeclarations = getDeclaredComponents(jarFile);
 
-            if (components[0] == null) {
-                this.logger.debug(jarFile + " does not contains any component");
+            if (componentDeclarations == null) {
+                this.logger.debug("[{}] does not contain any component", jarFile);
                 return;
             }
 
-            this.jarLoader.initialize(this.componentManager, classLoader, components[0], components[1] == null
-                ? Collections.<String> emptyList() : components[1]);
+            this.jarLoader.initialize(this.componentManager, classLoader, componentDeclarations);
         } catch (Exception e) {
             throw new InstallException("Failed to load jar file components", e);
         }
     }
 
-    private List<String>[] getDeclaredComponents(File jarFile) throws IOException
+    private List<ComponentDeclaration> getDeclaredComponents(File jarFile) throws IOException
     {
         ZipInputStream zis = new ZipInputStream(new FileInputStream(jarFile));
 
-        List<String> componentClassNames = null;
-        List<String> componentOverrideClassNames = null;
+        List<ComponentDeclaration> componentDeclarations = null;
+        List<ComponentDeclaration> componentOverrideDeclarations = null;
 
         try {
-            for (ZipEntry entry = zis.getNextEntry(); entry != null && componentClassNames == null
-                && componentOverrideClassNames == null; entry = zis.getNextEntry()) {
+            for (ZipEntry entry = zis.getNextEntry(); entry != null && (componentDeclarations == null
+                || componentOverrideDeclarations == null); entry = zis.getNextEntry())
+            {
                 if (entry.getName().equals(ComponentAnnotationLoader.COMPONENT_LIST)) {
-                    componentClassNames = this.jarLoader.getDeclaredComponents(zis);
+                    componentDeclarations = this.jarLoader.getDeclaredComponents(zis);
                 } else if (entry.getName().equals(ComponentAnnotationLoader.COMPONENT_OVERRIDE_LIST)) {
-                    componentOverrideClassNames = this.jarLoader.getDeclaredComponents(zis);
+                    componentOverrideDeclarations = this.jarLoader.getDeclaredComponents(zis);
                 }
             }
         } finally {
             zis.close();
         }
 
-        return new List[] {componentClassNames, componentOverrideClassNames};
+        // Merge all overrides found with a priority of 0. This is purely for backward compatibility since the
+        // override files is now deprecated.
+        if (componentOverrideDeclarations != null) {
+            if (componentDeclarations == null) {
+                componentDeclarations = new ArrayList<ComponentDeclaration>();
+            }
+            for (ComponentDeclaration componentOverrideDeclaration : componentOverrideDeclarations) {
+                componentDeclarations.add(
+                    new ComponentDeclaration(componentOverrideDeclaration.getImplementationClassName(), 0));
+            }
+        }
+
+        return componentDeclarations;
     }
 
     private void unloadComponents(File jarFile, ExtensionURLClassLoader classLoader) throws UninstallException
     {
         try {
-            List<String>[] components = getDeclaredComponents(jarFile);
+            List<ComponentDeclaration> componentDeclarations = getDeclaredComponents(jarFile);
 
-            if (components[0] == null) {
-                this.logger.debug(jarFile + " does not contains any component");
+            if (componentDeclarations == null) {
+                this.logger.debug("[{}] does not contain any component", jarFile);
                 return;
             }
 
-            for (String componentImplementation : components[0]) {
+            for (ComponentDeclaration componentDeclaration : componentDeclarations) {
                 try {
                     for (ComponentDescriptor componentDescriptor : this.jarLoader.getComponentsDescriptors(classLoader
-                        .loadClass(componentImplementation))) {
+                        .loadClass(componentDeclaration.getImplementationClassName())))
+                    {
                         this.componentManager.unregisterComponent(componentDescriptor.getRole(),
                             componentDescriptor.getRoleHint());
                     }
                 } catch (ClassNotFoundException e) {
-                    this.logger.error("Failed to load class [" + componentImplementation + "]", e);
+                    this.logger.error("Failed to load class [{}]", componentDeclaration.getImplementationClassName(),
+                        e);
                 }
             }
         } catch (Exception e) {

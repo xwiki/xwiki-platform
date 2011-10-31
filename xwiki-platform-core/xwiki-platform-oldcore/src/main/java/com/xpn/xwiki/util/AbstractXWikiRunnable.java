@@ -1,10 +1,29 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.util;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
@@ -23,7 +42,7 @@ public abstract class AbstractXWikiRunnable implements Runnable
     /**
      * Logging tools.
      */
-    private static final Log LOG = LogFactory.getLog(AbstractXWikiRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractXWikiRunnable.class);
 
     private Map<String, Object> properties = new HashMap<String, Object>();
 
@@ -58,17 +77,13 @@ public abstract class AbstractXWikiRunnable implements Runnable
     protected ExecutionContext initExecutionContext() throws ExecutionContextException
     {
         ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
-        Execution execution = Utils.getComponent(Execution.class);
+        ExecutionContext context = new ExecutionContext();
 
-        ExecutionContext ec = new ExecutionContext();
+        ecim.initialize(context);
 
-        ecim.initialize(ec);
+        context.setProperties(this.properties);
 
-        ec.setProperties(this.properties);
-
-        execution.setContext(ec);
-
-        return ec;
+        return context;
     }
 
     protected void cleanupExecutionContext()
@@ -79,18 +94,14 @@ public abstract class AbstractXWikiRunnable implements Runnable
         ech.removeContext();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Runnable#run()
-     */
+    @Override
     public final void run()
     {
         try {
             // initialize execution context
             initExecutionContext();
         } catch (ExecutionContextException e) {
-            LOG.error("Failed to initialize execution context", e);
+            LOGGER.error("Failed to initialize execution context", e);
             return;
         }
 

@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web.sx;
 
@@ -24,8 +23,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.yahoo.platform.yui.compressor.CssCompressor;
 
@@ -38,33 +37,21 @@ import com.yahoo.platform.yui.compressor.CssCompressor;
 public class CssExtension implements Extension
 {
     /** Logging helper. */
-    private static final Log LOG = LogFactory.getLog(CssExtension.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CssExtension.class);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Extension#getClassName()
-     */
+    @Override
     public String getClassName()
     {
         return "XWiki.StyleSheetExtension";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Extension#getContentType()
-     */
+    @Override
     public String getContentType()
     {
         return "text/css; charset=UTF-8";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Extension#getCompressor()
-     */
+    @Override
     public SxCompressor getCompressor()
     {
         return new SxCompressor()
@@ -77,7 +64,7 @@ public class CssExtension implements Extension
                     compressor.compress(out, -1);
                     return out.toString();
                 } catch (IOException ex) {
-                    LOG.warn("Exception compressing SSX code", ex);
+                    LOGGER.warn("Exception compressing SSX code", ex);
                 }
                 return source;
             }

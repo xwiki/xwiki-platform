@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1187881143000</creationDate>
-<date>1278346646000</date>
-<contentUpdateDate>1278346646000</contentUpdateDate>
+<date>1319535225000</date>
+<contentUpdateDate>1319535225000</contentUpdateDate>
 <version>1.1</version>
 <title>XWikiServerClassSheet</title>
 <template></template>
@@ -22,7 +22,7 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>false</hidden>
-<content>#set ($WikiManager = $xwiki.wikimanager)
+<content>#set ($WikiManager = $services.wikimanager)
 #set ($Exception = $WikiManager.DefaultException)
 ##
 #set ($action = $request.getParameter("action"))

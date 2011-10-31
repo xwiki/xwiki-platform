@@ -25,10 +25,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -43,7 +43,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
     /** Anything which doesn't contain any of these characters cannot be velocity code */
     private static final String VELOCITY_CHARACTERS = "$#";
 
-    private static final Log LOG = LogFactory.getLog(XWikiVelocityRenderer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiVelocityRenderer.class);
 
     /**
      * {@inheritDoc}
@@ -81,13 +81,14 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
                 if (macrolist != null) {
                     com.xpn.xwiki.XWiki xwiki = context.getWiki();
                     for (String docname : macrolist) {
-                        LOG.debug("Pre-including macro topic " + docname + " in context " + contextdoc.getFullName());
+                        LOGGER
+                            .debug("Pre-including macro topic " + docname + " in context " + contextdoc.getFullName());
                         xwiki.include(docname, true, context);
                     }
                 }
             } catch (Exception e) {
                 // Make sure we never fail
-                LOG.warn("Exception while pre-including macro topics", e);
+                LOGGER.warn("Exception while pre-including macro topics", e);
             }
 
             return evaluate(content, contextdoc.getPrefixedFullName(), vcontext, context);
@@ -187,8 +188,8 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
                     XWikiDocument doc = context.getWiki().getDocument(velocityMacrosDocumentName, context);
                     result.append(doc.getContent());
                 } catch (XWikiException e) {
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error("Impossible to load velocity macros doc " + velocityMacrosDocumentName);
+                    if (LOGGER.isErrorEnabled()) {
+                        LOGGER.error("Impossible to load velocity macros doc " + velocityMacrosDocumentName);
                     }
                 }
             }

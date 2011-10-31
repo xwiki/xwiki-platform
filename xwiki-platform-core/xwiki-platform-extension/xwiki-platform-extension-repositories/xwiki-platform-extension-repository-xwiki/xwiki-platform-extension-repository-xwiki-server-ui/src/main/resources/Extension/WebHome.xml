@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>Extension</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Main.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1304962886000</creationDate>
+<date>1319555977000</date>
+<contentUpdateDate>1319555977000</contentUpdateDate>
+<version>1.1</version>
+<title>Extensions</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity output="false"}}
+## If this page is called with createExtension=true then create a new page using the ExtensionTemplate template
+#if ($request.createExtension == "true")
+  $response.sendRedirect($xwiki.getURL("Extension.${request.name}", "inline", "$!{request.queryString}&amp;title=${request.name}"))
+#end
+{{/velocity}}
+
+(% class="centered" %) (((
+
+(% class="extension-link search-extension" %)(((
+Search Extension...
+(((
+{{velocity}}
+{{html}}
+&lt;form action="$xwiki.getURL("ExtensionCode.ExtensionSearch")"&gt;
+  &lt;input type="hidden" name="space" value="Extension" /&gt;
+  &lt;input type="text" name="text" value="extension id..." size="25" class="withTip" /&gt;
+  &lt;span class="buttonwrapper"&gt;
+    &lt;input class="button" type="submit" value="Search" /&gt;
+  &lt;/span&gt;
+&lt;/form&gt;
+{{/html}}
+{{/velocity}}
+)))
+)))
+
+(% class="extension-link add-extension" %)(((
+Contribute Extension...
+
+(((
+{{velocity}}
+{{html}}
+#if ($isGuest)
+  You need first to &lt;a href="${escapetool.xml($xwiki.getURL("Main.WebHome", "login", "xredirect=$doc.externalURL"))}"&gt;log in&lt;/a&gt; or &lt;a href="${escapetool.xml($xwiki.getURL("xwiki:Main.WebHome", "register", "xredirect=$doc.externalURL"))}"&gt;register&lt;/a&gt;.
+#else
+&lt;form action="" id="newextension"&gt;
+  &lt;input type="hidden" name="parent" value="Extension.WebHome" /&gt;
+  &lt;input type="hidden" name="template" value="ExtensionCode.ExtensionTemplate" /&gt;
+  &lt;input type="hidden" name="createExtension" value="true" /&gt;
+  &lt;input class="withTip" type="text" name="id" value="extension id..."  size="25"/&gt;
+  &lt;span class="buttonwrapper"&gt;
+    &lt;input class="button" type="submit" value="Add" /&gt;
+  &lt;/span&gt;
+&lt;/form&gt;
+{{/html}}
+#end
+{{/velocity}}
+)))
+)))
+
+)))
+
+(% class="clearfloats" %)((()))(%%)
+
+{{velocity}}
+#set($columns = ["id", "name", "summary", "type", "authors", "doc.creationDate", "doc.date"])
+#set($columnsProperties = {
+  "id" : { "type" : "text", "link" : "view" },
+  "name" : { "type" : "text", "link" : "view" },
+  "summary" : { "type" : "text" },
+  "type" : { "type" : "list" },
+  "authors" : { "type" : "string"},
+  "doc.creationDate" : { "type" : "date" },
+  "doc.date" : { "type" : "date" }
+})
+#set($options = { 
+   "tagCloud":true,
+   "resultPage":"ExtensionCode.ExtensionJSON",
+   "className":"ExtensionCode.ExtensionClass",
+   "selectedColumn":"doc.creationDate",
+   "defaultOrder":"desc",
+   "translationPrefix" : "extension.repository.",
+   "rowCount": 30,
+   "extraParams" : 'space=Extension'
+})
+#livetable("extensions" $columns $columnsProperties $options)
+
+(% class="hidden" %) (((
+Temporary provide a link for robots to index all extension.
+In the future, this link will be provided via a sitemap.
+[[ExtensionCode.AllExtensionsList]]
+)))
+{{/velocity}}</content></xwikidoc>

@@ -22,8 +22,8 @@ package com.xpn.xwiki.plugin.rightsmanager;
 
 import java.text.MessageFormat;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -52,7 +52,7 @@ public class RightsManagerRightsApi extends Api
     /**
      * The logging toolkit.
      */
-    protected static final Log LOG = LogFactory.getLog(RightsManagerRightsApi.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(RightsManagerRightsApi.class);
 
     /**
      * Create an instance of RightsManageRightsApi.
@@ -67,12 +67,12 @@ public class RightsManagerRightsApi extends Api
     /**
      * Log error and register {@link #CONTEXT_LASTERRORCODE} and {@link #CONTEXT_LASTEXCEPTION}.
      * 
-     * @param comment the comment to use with {@link #LOG}.
+     * @param comment the comment to use with {@link #LOGGER}.
      * @param e the exception.
      */
     private void logError(String comment, XWikiException e)
     {
-        LOG.error(comment, e);
+        LOGGER.error(comment, e);
 
         this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
         this.context.put(CONTEXT_LASTEXCEPTION, e);

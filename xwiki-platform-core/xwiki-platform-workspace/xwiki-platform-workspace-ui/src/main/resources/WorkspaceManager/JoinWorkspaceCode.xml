@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>WorkspaceManager</web>
+<name>JoinWorkspaceCode</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>WorkspaceManager.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1293832800000</creationDate>
+<date>1307191413000</date>
+<contentUpdateDate>1307191413000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get('workspacemanager.title.join')</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+#set ($workspaceId = $request.workspaceId)
+#set ($confirm = $request.confirm)
+##
+#if ("$!workspaceId" == '')
+  {{error}}The [workspaceId] parameter is not specified.{{/error}}
+#else
+  ## FIXME: add plugin dependency checks.
+  ##
+  #set ($WorkspaceManager = $services.workspace)
+  ##
+  #set ($workspace = $WorkspaceManager.getWorkspace($workspaceId))
+  ##
+  #if ("$!workspace" == '')
+    #if ("$!{WorkspaceManager.lastException}" != '')
+      {{error}}Exception: $!{WorkspaceManager.lastException.message}{{/error}}
+    #else
+      {{error}}$msg.get('workspacemanager.error.workspacedoesnotexist', ["$workspaceId"]){{/error}}
+    #end
+  #else
+    #set ($wikiDescriptor = $workspace.wikiDescriptor)
+    #set ($workspaceName = $wikiDescriptor.wikiPrettyName)
+    #if ("$!workspaceName" == '')
+      #set ($workspaceName = $workspaceId)
+    #end
+    #set ($workspaceGroupDocument = $workspace.groupDocument)
+    ##
+    ## Use the low level API since this page has PR and we need to make the current user modify a document of a wiki he does not yet have access to.
+    ##
+    #set ($workspaceGroupDocumentRestricted = $workspaceGroupDocument.document)
+    #set ($groupsClassReference = $services.model.createDocumentReference($workspaceId, 'XWiki', 'XWikiGroups'))
+    ## Hack for http://jira.xwiki.org/jira/browse/XWIKI-5040 untill it gets fixed. TODO: Remove redundant class copy once the bug is fixed.
+    #set ($candidateMemberClassReference = $services.model.createDocumentReference($workspaceId, 'XWiki', 'WorkspaceCandidateMemberClass'))
+    #set ($currentUser = "${xcontext.mainWikiName}:${xcontext.user}")
+    #set ($workspaceUrl = $wikiDescriptor.homePageUrl)
+    ##
+    #set ($existingMemberObject = $workspaceGroupDocumentRestricted.getXObject($groupsClassReference, 'member', $currentUser))
+    #if ("$!existingMemberObject" != '')
+      {{info}}The user [[$currentUser]] is already a member of the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/info}}
+    #elseif ($currentUser == 'xwiki:XWiki.XWikiGuest')
+      #set ($loginDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWiki', 'XWikiLogin'))
+      #set ($loginDocument = $xwiki.getDocument($loginDocumentReference))
+      #set ($loginUrl = $loginDocument.getExternalURL('login', "xredirect=$escapetool.url($xwiki.getRequestURL())"))
+      {{error}}In order to continue, you need to [[log in&gt;&gt;$loginUrl]] first.{{/error}}
+    #else
+      ## The user is not already a member of the workspace.
+      ##
+      #set ($browseDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'WebHome'))
+      #set ($backUrl = $xwiki.getURL($browseDocumentReference))
+      ##
+      #set ($membershipType = $wikiDescriptor.getValue('membershipType'))
+      ##
+      ## Determine if, regardless of membership type, an existing invitation exists for the current user.
+      #set ($candidateMembers = $workspaceGroupDocumentRestricted.getXObjects($candidateMemberClassReference))
+      #set ($existingInvitation = false)
+      #foreach ($candidateMember in $candidateMembers)
+        #if ("$!{candidateMember.get('userName').getValue()}" == "$currentUser" &amp;&amp; 
+              "$!{candidateMember.get('type').getValue()}" == 'invitation' &amp;&amp;
+              "$!{candidateMember.get('status').getValue()}" == 'pending')
+          ## Remember the existing invitation.
+          #set ($existingInvitation = $candidateMember)
+        #end
+      #end
+      #if ($existingInvitation)
+        ##
+        ## An invitation exists.
+        #if ($request.acceptInvitation || $request.rejectInvitation)
+          ##
+          ## The user decided whether to accept or to reject the invitation.
+          #set ($saveComment = "The user $currentUser accepted the invitation.")
+          #set ($notificationMessage = "The user '${xwiki.getUserName($currentUser, false)}' ($currentUser) has accepted the invitation to join the workspace '${workspaceName}' ($workspaceId).")
+          ## Common values.
+          #set ($temp = $existingInvitation.setDateValue('date', $datetool.date))
+          #set ($temp = $existingInvitation.setLargeStringValue('userComment', "$!{escapetool.xml($request.userComment)}"))
+          ## Specific values.
+          #if ($request.acceptInvitation)
+            #set ($temp = $existingInvitation.setStringValue('status', 'accepted'))
+            ## Add user to workspace.
+            #set ($newMemberObject = $workspaceGroupDocumentRestricted.newXObject($groupsClassReference, $xcontext.context))
+            #set ($temp = $newMemberObject.setStringValue('member', $currentUser))
+          #else
+            #set ($saveComment = "The user $currentUser rejected the invitation.")
+            #set ($notificationMessage = "The user '${xwiki.getUserName($currentUser, false)}' ($currentUser) has rejected the invitation to join the workspace '${workspaceName}' ($workspaceId).")
+            #set ($temp = $existingInvitation.setStringValue('status', 'rejected'))
+          #end
+          ## Save changes.
+          #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, $saveComment, true, $xcontext.context))
+          ## Send message to workspace admins. (XWikiAdminGroup)
+          #set ($workspaceAdminGroupReference = $services.model.createDocumentReference($workspaceId, 'XWiki', 'XWikiAdminGroup'))
+          #set ($temp = $services.messageStream.postMessageToGroup($notificationMessage, $workspaceAdminGroupReference))
+          ## Display the proper success info.
+          {{box image="icon:tick"}}
+          #if ($request.acceptInvitation)
+            The user [[$currentUser]] successfully accepted the invitation and joined the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].
+          #else
+            The user [[$currentUser]] successfully rejected the invitation to join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].
+          #end
+          {{/box}}
+        #else
+          ##
+          ## User can decide if to accept or reject the invitation.
+          {{html wiki='true'}}
+          You have been invited to join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].
+
+          &lt;form class='xform third' method='GET'&gt;
+            &lt;dl&gt;
+            #if ("$!existingInvitation.get('reviewerComment').getValue()" != '')
+              &lt;dt&gt;
+                &lt;label&gt;Invitation message:&lt;/label&gt;
+              &lt;/dt&gt;
+              &lt;dd&gt;
+                $existingInvitation.get('reviewerComment').getValue()
+              &lt;/dd&gt;
+            #end  
+              &lt;dt&gt;
+                &lt;label for='userComment'&gt;Reply&lt;/label&gt;
+                &lt;span class='xHint'&gt;A reply message to send, viewable by the workspace admin, in which you can motivate your decision.&lt;/span&gt;
+              &lt;/dt&gt;
+              &lt;dd&gt;&lt;textarea name='userComment' rows='7' cols='45'&gt;&lt;/textarea&gt;&lt;/dd&gt;
+              &lt;span class='buttonwrapper'&gt;
+                &lt;br/&gt;
+                &lt;input type='submit' name='acceptInvitation' value='Accept' class='button'/&gt;
+                &lt;input type='submit' name='rejectInvitation' value='Reject' class='button'/&gt;
+                &lt;a href="$backUrl" class='button secondary'&gt;Later&lt;/a&gt;
+              &lt;/span&gt;
+              &lt;input type='hidden' name='workspaceId' value="$!workspaceId"/&gt;
+              &lt;input type='hidden' name='workspaceName' value="$!workspaceName"/&gt;
+            &lt;/dl&gt;
+          &lt;/form&gt;
+          {{/html}}
+        #end
+      ##
+      ## The user is not invited to join, continue based on the current membership type of the workspace.
+      #elseif ($membershipType == 'invite')
+        ##
+        ## User does not have an invitation.
+        {{error}}This workspace is invite only. In order to join it, you need to receive an invitation from one of its admins.{{/error}}
+      #elseif ($membershipType == 'request')
+        ## Determine if a pending request already exists.
+        ##
+        #set ($candidateMembers = $workspaceGroupDocumentRestricted.getXObjects($candidateMemberClassReference))
+        #set ($pendingRequest = false)
+        #foreach ($candidateMember in $candidateMembers)
+          #if ("$!{candidateMember.get('userName').getValue()}" == "$currentUser" &amp;&amp; 
+                "$!{candidateMember.get('type').getValue()}" == 'request' &amp;&amp;
+                "$!{candidateMember.get('status').getValue()}" == 'pending')
+            ## Remember the existing request.
+            #set ($pendingRequest = $candidateMember)
+          #end
+        #end
+        #if ($pendingRequest)
+          #if ("$!{request.cancelJoinRequest}" != '1')
+            ## Request already exists.
+            ##
+            {{info}}The user [[$currentUser]] already has a pending request to join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]]. Please wait for a workspace admin to review it.{{/info}}
+          #elseif ("$!confirm" != '1')
+            ## User wants to cancel existing request.
+            ##
+            #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
+            {{box}}
+              Are you sure you want cancel the request to join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]]?
+              ((({{html}}
+                &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;Yes&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;No&lt;/a&gt;&lt;/span&gt;
+              {{/html}})))
+            {{/box}}
+          #else
+            ## User confirms the cancel of existing request.
+            ##
+            #set ($temp = $workspaceGroupDocumentRestricted.removeXObject($pendingRequest))
+            #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, "The user $currentUser canceled his join request.", true, $xcontext.context))
+            {{box image="icon:tick"}}The user [[$currentUser]] successfully canceled the request to join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/box}}
+          #end
+        #elseif ("$!confirm" != '1')
+          ## Join request.
+          ##
+          {{html wiki='true'}}
+            To join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]], you must first issue a join request. After this, a workspace admin will review your request and consider accepting or rejecting it.
+
+            &lt;form class='xform third' method='GET'&gt;
+              &lt;dl&gt;
+                &lt;dt&gt;
+                  &lt;label for='userComment'&gt;Message&lt;/label&gt;
+                  &lt;span class='xHint'&gt;A message to send, viewable by the workspace admin, in which you can motivate this join request.&lt;/span&gt;
+                &lt;/dt&gt;
+                &lt;dd&gt;&lt;textarea name='userComment' rows='7' cols='45'&gt;&lt;/textarea&gt;&lt;/dd&gt;
+                &lt;span class='buttonwrapper'&gt;
+                  &lt;br/&gt;
+                  &lt;input type='submit' name='submit' value='Send Request' class='button'/&gt;
+                  &lt;a href="$backUrl" class='button secondary'&gt;Back&lt;/a&gt;
+                &lt;/span&gt;
+                &lt;input type='hidden' name='workspaceId' value="$!workspaceId"/&gt;
+                &lt;input type='hidden' name='workspaceName' value="$!workspaceName"/&gt;
+                &lt;input type='hidden' name='requestJoin' value="$!request.requestJoin"/&gt;
+                &lt;input type='hidden' name='confirm' value="1"/&gt;
+              &lt;/dl&gt;
+            &lt;/form&gt;
+          {{/html}}
+        #else
+          ## User confirmed the join request.
+          ##
+          #set ($newRequestObject = $workspaceGroupDocumentRestricted.newXObject($candidateMemberClassReference, $xcontext.context))
+          #set ($temp = $newRequestObject.setStringValue('userName', $currentUser))
+          #set ($temp = $newRequestObject.setDateValue('date', $datetool.date))
+          #set ($temp = $newRequestObject.setLargeStringValue('userComment', "$!{escapetool.xml($request.userComment)}"))
+          #set ($temp = $newRequestObject.setStringValue('status', 'pending'))
+          #set ($temp = $newRequestObject.setStringValue('type', 'request'))
+          #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, "The user $currentUser requested to join the workspace.", true, $xcontext.context))
+          ## Send message to workspace admins. (XWikiAdminGroup)
+          #set ($workspaceAdminGroupReference = $services.model.createDocumentReference($workspaceId, 'XWiki', 'XWikiAdminGroup'))
+          #set ($notificationMessage = "The user '${xwiki.getUserName($currentUser, false)}' ($currentUser) has requested to join the workspace '${workspaceName}' ($workspaceId).")
+          #set ($temp = $services.messageStream.postMessageToGroup($notificationMessage, $workspaceAdminGroupReference))
+          ## FIXME: replace with a success macro when it will be available.
+          {{box image="icon:tick"}}The user [[$currentUser]] successfully sent the request to join workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/box}}
+        #end
+      #else
+        ## Open membership as default.
+        ##
+        #if ("$!confirm" != '1')
+          ## Open join.
+          ##
+          #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
+          {{box}}
+            Are you sure you want to join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]]?
+            ((({{html}}
+              &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;Yes&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;No&lt;/a&gt;&lt;/span&gt;
+            {{/html}})))
+          {{/box}}
+        #else
+          ## User confirmed to join the workspace.
+          ##
+          #set ($newMemberObject = $workspaceGroupDocumentRestricted.newXObject($groupsClassReference, $xcontext.context))
+          #set ($temp = $newMemberObject.setStringValue('member', $currentUser))
+          #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, "The user $currentUser joined the workspace.", true, $xcontext.context))
+          ## FIXME: replace with a success macro when it will be available.
+          {{box image="icon:tick"}}The user [[$currentUser]] successfully joined workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/box}}
+        #end
+      #end
+    #end
+  #end
+#end
+{{/velocity}}</content></xwikidoc>

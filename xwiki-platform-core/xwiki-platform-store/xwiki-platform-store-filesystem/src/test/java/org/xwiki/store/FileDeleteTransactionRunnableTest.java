@@ -24,12 +24,11 @@ import java.io.FileOutputStream;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.apache.commons.io.IOUtils;
 
 /**
  * Tests for FileDeleteTransactionRunnable
@@ -92,7 +91,8 @@ public class FileDeleteTransactionRunnableTest
         Assert.assertTrue(this.toDelete.exists());
 
         // After preRun(), before run.
-        final TransactionRunnable failRunnable = new TransactionRunnable() {
+        final TransactionRunnable failRunnable = new TransactionRunnable()
+        {
             public void onRun() throws Exception
             {
                 Assert.assertFalse(temp.exists());
@@ -112,7 +112,8 @@ public class FileDeleteTransactionRunnableTest
         Assert.assertTrue(this.toDelete.exists());
 
         // After run() before onCommit()
-        final TransactionRunnable failRunnable = new TransactionRunnable() {
+        final TransactionRunnable failRunnable = new TransactionRunnable()
+        {
             public void onRun() throws Exception
             {
                 Assert.assertTrue(temp.exists());
@@ -136,13 +137,14 @@ public class FileDeleteTransactionRunnableTest
         Assert.assertFalse(this.temp.exists());
     }
 
-    @Test(expected=Exception.class)
+    @Test(expected = Exception.class)
     public void rollbackDeleteNonexistantTest() throws Exception
     {
         this.toDelete.delete();
         Assert.assertFalse(this.toDelete.exists());
 
-        final TransactionRunnable failRunnable = new TransactionRunnable() {
+        final TransactionRunnable failRunnable = new TransactionRunnable()
+        {
             public void onRun() throws Exception
             {
                 Assert.assertFalse(temp.exists());
@@ -167,7 +169,8 @@ public class FileDeleteTransactionRunnableTest
         try {
             str.start();
             Assert.fail("StartableTransactionRunnable#start() did not throw the exception thrown by run.");
-        } catch (Exception e) { }
+        } catch (Exception expected) {
+        }
         Assert.assertTrue(this.toDelete.exists());
         Assert.assertFalse(this.temp.exists());
     }

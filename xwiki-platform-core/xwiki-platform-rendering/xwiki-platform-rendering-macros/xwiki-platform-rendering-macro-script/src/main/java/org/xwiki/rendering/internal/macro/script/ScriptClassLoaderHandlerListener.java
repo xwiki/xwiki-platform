@@ -22,11 +22,14 @@ package org.xwiki.rendering.internal.macro.script;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.CancelableEvent;
@@ -37,14 +40,19 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 
 /**
+ * Replaces the context class loader by a custom one that takes into account the "jars" Script parameter that allows
+ * to add jars that will be visible to the executing script.
+ *
  * Listens to script evaluation events ({@link org.xwiki.script.event.ScriptEvaluatingEvent} and
- * {@link org.xwiki.script.event.ScriptEvaluatedEvent}).
- * Sets the context class loader for the evaluation and restores the original class loader afterwards.
+ * {@link org.xwiki.script.event.ScriptEvaluatedEvent}) to set the context class loader and to restore the original
+ * one.
  * 
  * @version $Id$
  * @since 2.5M1
  */
-@Component("scriptmacroclassloader")
+@Component
+@Named("scriptmacroclassloader")
+@Singleton
 public class ScriptClassLoaderHandlerListener implements EventListener
 {
     /** Key used to store the original class loader in the Execution Context. */
@@ -57,20 +65,20 @@ public class ScriptClassLoaderHandlerListener implements EventListener
     private static final String EXECUTION_CONTEXT_JARPARAMS_KEY = "scriptJarParams";
 
     /** Used to find if the current document's author has programming rights. */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * Used to set the classLoader to be used by scripts across invocations. We save it in the Execution Context to be
      * sure it's the same classLoader used.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
      * Used to create a custom class loader that knows how to support JARs attached to wiki page.
      */
-    @Requirement
+    @Inject
     private AttachmentClassLoaderFactory attachmentClassLoaderFactory;
 
     /**
@@ -164,7 +172,7 @@ public class ScriptClassLoaderHandlerListener implements EventListener
             (ExtendedURLClassLoader) this.execution.getContext().getProperty(EXECUTION_CONTEXT_CLASSLOADER_KEY);
 
         if (cl == null) {
-            if (!StringUtils.isEmpty(jarsParameterValue)) {
+            if (StringUtils.isNotEmpty(jarsParameterValue)) {
                 cl = createOrExtendClassLoader(true, jarsParameterValue, parent);
             } else {
                 cl = this.attachmentClassLoaderFactory.createAttachmentClassLoader("", parent);

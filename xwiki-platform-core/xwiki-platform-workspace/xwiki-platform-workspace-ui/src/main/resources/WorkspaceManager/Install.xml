@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>WorkspaceManager</web>
+<name>Install</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>WorkspaceManager.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1187017247000</creationDate>
+<date>1316551734000</date>
+<contentUpdateDate>1316551734000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>true</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+#set ($needsAdminRights = false)
+##
+## 1. Register translations
+##
+#set ($xwikiPreferencesDocumentReference = $services.model.createDocumentReference($xcontext.database, 'XWiki', 'XWikiPreferences'))
+#set ($xwikiPreferencesDocument = $xwiki.getDocument($xwikiPreferencesDocumentReference))
+#set ($xwikiPreferencesObject = $xwikiPreferencesDocument.getObject('XWiki.XWikiPreferences'))
+#set ($documentBundles = "$!xwikiPreferencesObject.getProperty('documentBundles').value")
+#if (!$documentBundles.contains('WorkspaceManager.Translations'))
+  #if ($hasGlobalAdmin)
+    #set ($discard = $xwikiPreferencesObject.set('documentBundles', "$documentBundles, WorkspaceManager.Translations"))
+    #set ($discard = $xwikiPreferencesDocument.save('Automatically registered Workspace Manager translations.', true))
+    {{info}}$msg.get('workspacemanager.translations.install.success'){{/info}}
+  #else
+    #set ($needsAdminRights = true)
+  #end
+#else
+  ##
+  ## Don't display this information if the code is included from somewhere else.
+  ##
+  #if ($context.doc == $context.tdoc)
+    {{info}}$msg.get('workspacemanager.translations.install.success'){{/info}}
+  #end
+#end
+##
+## 2. Register workspace search suggestions
+##
+#set ($searchSuggestConfigDocumentReference = $services.model.createDocumentReference($xcontext.database, 'XWiki', 'SearchSuggestConfig'))
+#set ($searchSuggestConfigDocument = $xwiki.getDocument($searchSuggestConfigDocumentReference))
+#set ($searchSuggestConfigObject = $searchSuggestConfigDocument.getObject('XWiki.SearchSuggestSourceClass', 'name', 'Workspaces'))
+#if (!$searchSuggestConfigObject)
+  #if ($hasGlobalAdmin)
+    #set ($searchSuggestConfigObject = $searchSuggestConfigDocument.newObject('XWiki.SearchSuggestSourceClass'))
+    #set ($discard = $searchSuggestConfigObject.set('name', 'Workspaces'))
+    #set ($discard = $searchSuggestConfigObject.set('query', 'XWiki.XWikiServerClass.wikiprettyname:__INPUT__* AND object:WorkspaceManager.WorkspaceClass'))
+    #set ($discard = $searchSuggestConfigObject.set('resultsNumber', '3'))
+    #set ($suggestUrl = '$xwiki.getURL(' + $escapetool.quote + '${xcontext.mainWikiName}:WorkspaceManager.WorkspacesSuggestLuceneService' + $escapetool.quote + ', ' + $escapetool.singleQuote + 'get' + $escapetool.singleQuote + ', ' + $escapetool.singleQuote + 'outputSyntax=plain' + $escapetool.singleQuote + ')')
+    #set ($discard = $searchSuggestConfigObject.set('url', $suggestUrl))
+    #set ($discard = $searchSuggestConfigObject.set('activated', 1))
+    #set ($discard = $searchSuggestConfigObject.set('highlight', 1))
+    #set ($suggestIcon = '$xwiki.getSkinFile(' + $escapetool.singleQuote + 'icons/silk/chart_organisation.gif' + $escapetool.singleQuote + ')')
+    #set ($discard = $searchSuggestConfigObject.set('icon', $suggestIcon))
+    ##
+    #set ($discard = $searchSuggestConfigDocument.save('Automatically registered workspace search suggestions.', true))
+
+    {{info}}$msg.get('workspacemanager.searchSuggestions.install.success'){{/info}}
+  #else
+    #set ($needsAdminRights = true)
+  #end
+#else
+  ##
+  ## Don't display this information if the code is included from somewhere else.
+  ##
+  #if ($context.doc == $context.tdoc)
+
+    {{info}}$msg.get('workspacemanager.searchSuggestions.install.success'){{/info}}
+  #end
+#end
+##
+## 3. Install template
+##
+#if (!$WikiManager)
+  #set ($WikiManager = $xwiki.wikimanager)
+  #if (!$WikiManager)
+
+    {{error}}$msg.get('wikimanager.pluginnotenabled'){{/error}}
+  #end
+#end
+#if (!$xwiki.applicationmanager)
+
+  {{error}}$msg.get('xapp.pluginnotenabled'){{/error}}
+#end
+##
+## Constants
+#set ($TEMPLATE_NAME = 'workspacetemplate')
+#set ($TEMPLATE_PACKAGE = 'workspace-template.xar')
+##
+#set ($Exception = $WikiManager.DefaultException)
+#set ($template = $WikiManager.getWikiTemplateDocument($TEMPLATE_NAME))
+#if ("$!template" == '')
+  #if ($hasGlobalAdmin)
+    #if ($doc.getAttachment($TEMPLATE_PACKAGE))
+      #set ($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, 'Workspace Template', $TEMPLATE_PACKAGE))
+      #if ($result == $Exception.ERROR_NOERROR)
+
+        {{info}}$msg.get('workspacemanager.template.install.success'){{/info}}
+      #elseif ($result == $Exception.ERROR_XWIKI_ACCESS_DENIED)
+        #set ($needsAdminRights = true)
+      #else
+
+        {{error}}$msg.get('workspacemanager.template.install.error', [$services.workspace.lastException]){{/error}}
+      #end
+    #else
+
+      {{error}}$msg.get('workspacemanager.template.install.error.missingattachment', [$TEMPLATE_PACKAGE, $doc.fullName]){{/error}}
+    #end
+  #else
+    #set ($needsAdminRights = true)
+  #end
+#else
+  ##
+  ## Don't display this information if the code is included from somewhere else.
+  ##
+  #if ($context.doc == $context.tdoc)
+
+    {{info}}$msg.get('workspacemanager.template.install.success'){{/info}}
+  #end
+#end
+##
+## Empty line to properly display the message macros.
+#if ($context.doc == $context.tdoc)
+
+#end
+##
+#if ($needsAdminRights)
+  ## It might be possible that admin rights are required to register the translations themselves. Use this as backup message.
+  #if ($msg.get('workspacemanager.install.notallowed') == 'workspacemanager.install.notallowed')
+
+    {{error}}Admin rights are required to complete the Workspace Manager installation. Please login as Admin to complete the installation.{{/error}}
+  #else
+
+    {{error}}$msg.get('workspacemanager.install.notallowed'){{/error}}
+  #end
+#end
+{{/velocity}}</content></xwikidoc>

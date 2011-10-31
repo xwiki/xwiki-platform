@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.plugin.globalsearch;
 
 import java.util.ArrayList;
@@ -5,8 +24,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -38,7 +57,7 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
     /**
      * Logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(GlobalSearchPluginApi.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchPluginApi.class);
 
     /**
      * The plugin internationalization service.
@@ -76,7 +95,7 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
      */
     public void logError(String errorMessage, XWikiException e)
     {
-        LOG.error(errorMessage, e);
+        LOGGER.error(errorMessage, e);
 
         context.put(CONTEXT_LASTERRORCODE, Integer.valueOf(e.getCode()));
         context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));

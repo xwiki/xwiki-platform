@@ -179,6 +179,42 @@ public class CacheMacroTest extends AbstractComponentTestCase
         Assert.assertEquals(result1, result2);
     }
 
+    @Test
+    public void testExecuteWithDifferentTimeToLive() throws Exception
+    {
+        CacheMacroParameters params = new CacheMacroParameters();
+        MacroTransformationContext context = createMacroTransformationContext();
+
+        params.setId("id");
+        params.setMaxEntries(10);
+        params.setTimeToLive(100);
+        List<Block> result1 = this.cacheMacro.execute(params, "content1", context);
+
+        // Execute a second time with different content but with different time to live param. This means another
+        // cache will be used and thus the first cached content won't be returned.
+        params.setTimeToLive(200);
+        List<Block> result2 = this.cacheMacro.execute(params, "content2", context);
+        Assert.assertFalse(result2.equals(result1));
+    }
+
+    @Test
+    public void testExecuteWithDifferentMaxEntries() throws Exception
+    {
+        CacheMacroParameters params = new CacheMacroParameters();
+        MacroTransformationContext context = createMacroTransformationContext();
+
+        params.setId("id");
+        params.setMaxEntries(10);
+        params.setTimeToLive(100);
+        List<Block> result1 = this.cacheMacro.execute(params, "content1", context);
+
+        // Execute a second time with different content but with different time to live param. This means another
+        // cache will be used and thus the first cached content won't be returned.
+        params.setMaxEntries(11);
+        List<Block> result2 = this.cacheMacro.execute(params, "content2", context);
+        Assert.assertFalse(result2.equals(result1));
+    }
+
     private MacroTransformationContext createMacroTransformationContext() throws Exception
     {
         MacroTransformation macroTransformation =

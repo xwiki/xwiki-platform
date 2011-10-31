@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>XWikiGroupSheet</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.XWikiGroups</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1242173909000</creationDate>
+<date>1299827657000</date>
+<contentUpdateDate>1299827657000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.XWikiGroupSheet</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>d39e4d4d-4bd2-4b65-b26e-e82060e94835</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>var XWiki = (function(XWiki) {
+// Start XWiki augmentation.
+var GroupSheet = XWiki.GroupSheet = XWiki.GroupSheet || {};
+
+const ACTION_PREFIX = 'action';
+const ACTION_FOLLOW = 'follow';
+const ACTION_UNFOLLOW = 'unfollow';
+
+document.observe('xwiki:livetable:newrow', function(event) {
+  var rowData = event.memo.data;
+  var rowElement = event.memo.row;
+
+  var followAction = rowData.doc_followaction;
+  var followActionClass = ACTION_PREFIX + followAction;
+  
+  var followElement = rowElement.down('.' + ACTION_PREFIX + ACTION_FOLLOW);
+  var unfollowElement = rowElement.down('.' + ACTION_PREFIX + ACTION_UNFOLLOW);
+
+  GroupSheet.hideFollowAction(followElement, followActionClass);
+  GroupSheet.hideFollowAction(unfollowElement, followActionClass);
+});
+
+GroupSheet.hideFollowAction = function (actionElement, visibleActionClassName) {
+  if (actionElement.className.indexOf(visibleActionClassName) == -1 || visibleActionClassName == ACTION_PREFIX) {
+    actionElement.hide();
+  } 
+}
+
+GroupSheet.toggleFollowAction = function (td, toggledAction) {
+  /* Hide the clicked action. */
+  var actionClass = '.' + ACTION_PREFIX + toggledAction;
+  td.down(actionClass).hide();
+
+  /* Show symmetric action. */
+  if (toggledAction == ACTION_FOLLOW) {
+    td.down('.actionunfollow').show();
+  } else if (toggledAction == ACTION_UNFOLLOW) {
+    td.down('.actionfollow').show();
+  } 
+}
+
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}))</code>
+</property>
+<property>
+<name></name>
+</property>
+<property>
+<parse>0</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.SheetClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultEditMode>
+<disabled>0</disabled>
+<name>defaultEditMode</name>
+<number>1</number>
+<prettyName>Default Edit Mode</prettyName>
+<size>15</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultEditMode>
+</class>
+<name>XWiki.XWikiGroupSheet</name>
+<number>0</number>
+<className>XWiki.SheetClass</className>
+<guid>49dd25f2-437a-4182-b835-2d83817ccfaa</guid>
+<property>
+<defaultEditMode></defaultEditMode>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.XWikiGroupSheet</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>2f757a7c-fa89-497e-91f9-961f2ff386e0</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>.actionfollow {
+  background-image: url("$xwiki.getSkinFile('icons/silk/add.gif')");
+}
+
+.actionunfollow {
+  background-image: url("$xwiki.getSkinFile('icons/silk/delete.gif')");
+}</code>
+</property>
+<property>
+<name></name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<content>{{velocity output="false"}}
+#set($mainwk = $xcontext.isMainWiki())
+$xwiki.jsfx.use('js/xwiki/usersandgroups/usersandgroups.js', true)
+$xwiki.ssfx.use('js/xwiki/usersandgroups/usersandgroups.css')
+$xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
+$xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
+$xwiki.ssx.use('XWiki.XWikiGroupSheet')
+$xwiki.jsx.use('XWiki.XWikiGroupSheet')
+#set($groupDoc = $doc)
+#if($doc.fullName == 'Main.UserDirectory')
+  #set($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
+#end
+#macro(hasGroupRight $right $hasGroupRight)
+  #set($result = false)
+  #if($!xwiki.hasAccessLevel("$!right", $xcontext.user, $doc.fullName) &amp;&amp; $doc.getObject('XWiki.XWikiGroups', false))
+    #set($result = true)
+  #end
+  #set($hasGroupRight = $util.null)
+  #setVariable("$hasGroupRight" $result)
+#end
+#hasGroupRight('edit' $hasEditGroupRight)
+#hasGroupRight('delete' $hasDeleteGroupRight)
+##
+##
+{{/velocity}}
+
+{{velocity}}
+## Keep testing the inline action for backward compatibility with existing groups.
+#if(($xcontext.action == 'edit' || $xcontext.action == 'inline') &amp;&amp; $hasEditGroupRight)
+{{html}}
+  &lt;div id="addNewMember"&gt;
+    &lt;table&gt;
+      &lt;tr&gt;
+        &lt;td class="addlabel"&gt;$msg.get('xe.admin.groups.addUser')
+          #if(!$mainwk)
+            &lt;/td&gt;
+            &lt;td&gt;&lt;select name="wiki" id="addUserScope"&gt;
+                &lt;option value="local" selected="selected"&gt;$msg.get('xe.admin.local')&lt;/option&gt;
+                &lt;option value="global"&gt;$msg.get('xe.admin.global')&lt;/option&gt;
+              &lt;/select&gt;
+            &lt;/td&gt;
+          #else
+            &lt;input type="hidden" name="wiki" value="local" /&gt;&lt;/td&gt;
+          #end
+        &lt;td&gt;
+          &lt;input id="userSuggest" type="text" size="30" name="newMember" autocomplete="off" /&gt;
+        &lt;/td&gt;
+        &lt;td&gt;
+          &lt;input type="button" id="addNewUser" class="button" value="$msg.get('xe.admin.groups.addUser.submit')" /&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td class="addlabel"&gt;$msg.get('xe.admin.groups.addGroup')
+          #if(!$mainwk)
+            &lt;/td&gt;
+            &lt;td&gt;&lt;select name="wiki" id="addGroupScope"&gt;
+                &lt;option value="local" selected="selected"&gt;$msg.get('xe.admin.local')&lt;/option&gt;
+                &lt;option value="global"&gt;$msg.get('xe.admin.global')&lt;/option&gt;
+              &lt;/select&gt;
+            &lt;/td&gt;
+          #else
+            &lt;input type="hidden" name="wiki" value="local" /&gt;&lt;/td&gt;
+          #end
+        &lt;td&gt;
+          &lt;input id="groupSuggest" type="text" size="30" name="newMember" autocomplete="off" /&gt;
+        &lt;/td&gt;
+        &lt;td&gt;
+          &lt;input type="button" id="addNewGroup" class="button" value="$msg.get('xe.admin.groups.addGroup.submit')" /&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;&lt;td colspan="3" id="errMsg"&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+  ##
+  ##
+  &lt;script type="text/javascript"&gt;
+    // &lt;![CDATA[
+      if (typeof XWiki == "undefined") {
+        var XWiki = {}; 
+      }
+      Object.extend(XWiki, {
+        groupmanager : {
+          /*
+          ** Initialize Group Manager javascript widgets (called on document load).
+          */
+          userSuggest: null,
+
+          groupSuggest: null,
+
+          init: function() {
+            if (XWiki.contextaction != 'view') {
+              this.initSuggestWidget();
+              this.initAddNewMemberWidget();
+            }
+          },
+          initSuggestWidget: function() {
+            if ($('userSuggest')) {
+              $('userSuggest').observe('focus', this.createSuggest.bind(this, $('userSuggest'), 'user', true));
+            }
+            if ($('groupSuggest')) {
+              $('groupSuggest').observe('focus', this.createSuggest.bind(this, $('groupSuggest'), 'group', false));
+            }
+          },
+          initAddNewMemberWidget: function() {
+            if ($('addNewUser')) {
+              $('addNewUser').observe('click', this.addNewMember.bind(this, 'user', $('userSuggest')));
+            }
+            if ($('addNewGroup')) {
+              $('addNewGroup').observe('click', this.addNewMember.bind(this, 'group', $('groupSuggest')));
+            }
+          },
+          createSuggest: function(input, uorg, suggestObj) {
+            // Clear the errors
+            $('errMsg').innerHTML = "";
+            suggesturl = "${doc.getURL('view', 'xpage=uorgsuggest&amp;classname=XWiki.XWikiUsers')}";
+
+            if (uorg == "user") {
+              suggesturl += "&amp;uorg=user&amp;wiki=" + ($('addUserScope') ? $('addUserScope').value : "local") + "&amp;";
+              icon = "$xwiki.getSkinFile('icons/silk/user.gif')";
+            } else {
+              suggesturl += "&amp;uorg=group&amp;wiki=" + ($('addGroupScope') ? $('addGroupScope').value  : "local") + "&amp;";
+              icon = "$xwiki.getSkinFile('icons/silk/group.gif')";
+            }
+            return new XWiki.widgets.Suggest(input, { script: suggesturl, varname:'input', icon:icon });
+          },
+          addNewMember: function(uorg, input) {
+            if (input &amp;&amp; input.value.strip() != '') {
+              var url = "${doc.getURL()}?xpage=adduorg&amp;uorg=" + encodeURIComponent(uorg) + "&amp;name=" + encodeURIComponent(input.value) + "&amp;form_token=$!{escapetool.url($services.csrf.getToken())}";
+              new Ajax.Request(url, {
+                method: 'get',
+                onSuccess: function(transport) {
+                  $('userSuggest').value = "";
+                  $('groupSuggest').value = "";
+                  var nr = parseInt(transport.responseText);
+                  if (nr == 0) {
+                    if (uorg == "user") {
+                      $('errMsg').innerHTML = "$msg.get('xe.admin.groups.addUser.duplicate')";
+                    } else {
+                      $('errMsg').innerHTML = "$msg.get('xe.admin.groups.addGroup.duplicate')";
+                    }
+                  } else {
+                    var end = editgrouptable.limit;
+                    var start = editgrouptable.lastOffset;
+                    editgrouptable.clearCache();
+                    if (start &lt; 1) {
+                      start = 1;
+                    }
+                    editgrouptable.getRows(start, end, start, end);
+                  }
+                }
+              });
+            }
+          }
+        }
+      });
+      XWiki.groupmanager.init();
+    // ]]&gt;
+  &lt;/script&gt;
+{{/html}}#end
+##
+#set ($columns = ['_avatar', 'member'])
+##
+#set ($columnOptions = {
+  'member'  : {'link' : 'auto', 'type' : 'text'},
+  'comment' : {'type' : 'text'},
+  'tags'    : {'type' : 'text', 'html' : true},
+  '_avatar' : {'type' : 'none', 'link' : 'field', 'html' : 'true', 'sortable' : false }
+})
+##
+#set ($options = {
+  'url' : "${groupDoc.getURL('view', 'xpage=getgroupmembers')}",
+  'translationPrefix' : 'xe.admin.groups.',
+  'javascriptName' : 'editgrouptable'
+})
+##
+#if ($xcontext.action == 'view')
+  #set ($temp = $columns.addAll(['comment', 'tags']))
+#end
+#if (!$isGuest)
+  #set ($temp = $columns.add('_actions'))
+  #if (($xcontext.action == 'edit' || $xcontext.action == 'inline') &amp;&amp; $hasDeleteGroupRight)
+    #set ($temp = $columnOptions.put('_actions', {
+        'actions': ['delete'],
+        'actionCallbacks': {'delete': 'table.deleteRow(i);'},
+        'ajaxActions': {'delete': true}
+      })
+    )
+  #elseif ($xcontext.action == 'view')
+    #set ($temp = $columnOptions.put('_actions', {
+        'actions': ['follow', 'unfollow'],
+        'actionCallbacks': {
+          'follow'   : 'XWiki.GroupSheet.toggleFollowAction(td, "follow")',
+          'unfollow' : 'XWiki.GroupSheet.toggleFollowAction(td, "unfollow")'
+        },
+        'ajaxActions': {
+          'follow'   : true,
+          'unfollow' : true
+        }
+      })
+    )
+  #end
+#end
+##
+#livetable('groupusers', $columns, $columnOptions, $options)
+{{/velocity}}</content></xwikidoc>

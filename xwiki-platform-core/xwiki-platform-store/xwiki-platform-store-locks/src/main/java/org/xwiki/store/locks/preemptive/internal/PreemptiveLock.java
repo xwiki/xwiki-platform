@@ -19,12 +19,12 @@
  */
 package org.xwiki.store.locks.preemptive.internal;
 
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.TimeUnit;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 /**
  * A lock designed never to deadlock.
@@ -34,7 +34,9 @@ import java.util.Stack;
  */
 public class PreemptiveLock implements Lock
 {
-    /** Exception to throw when a function is called which has not been written. */
+    /**
+     * Exception to throw when a function is called which has not been written.
+     */
     private static final String NOT_IMPLEMENTED = "Function not implemented.";
 
     /**
@@ -61,15 +63,15 @@ public class PreemptiveLock implements Lock
      * The Constructor.
      *
      * @param locksHeldByThread a ThreadLocal which is used internally to detect and break deadlock
-     *        conditions, the same ThreadLocal must be passed to all new locks if there is a possibility
-     *        of them deadlocking and the it must not be interfered with externally. This ThreadLocal must
-     *        return an empty Set of PreemptiveLocks when {@link ThreadLocal#initialValue()} is called.
+     * conditions, the same ThreadLocal must be passed to all new locks if there is a possibility
+     * of them deadlocking and the it must not be interfered with externally. This ThreadLocal must
+     * return an empty Set of PreemptiveLocks when {@link ThreadLocal#initialValue()} is called.
      * @param lockBlockingThread another map used internally to detect and break deadlock.
-     *        the same map must be passed to all new locks if there is a possibility of
-     *        them deadlocking and the map must not be interfered with externally.
+     * the same map must be passed to all new locks if there is a possibility of
+     * them deadlocking and the map must not be interfered with externally.
      */
     public PreemptiveLock(final ThreadLocal<Set<PreemptiveLock>> locksHeldByThread,
-                          final Map<Thread, PreemptiveLock> lockBlockingThread)
+        final Map<Thread, PreemptiveLock> lockBlockingThread)
     {
         this.locksHeldByThread = locksHeldByThread;
         this.lockBlockingThread = lockBlockingThread;
@@ -91,17 +93,12 @@ public class PreemptiveLock implements Lock
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.util.concurrent.locks.Lock#lock()
-     */
+    @Override
     public synchronized void lock()
     {
         final Thread currentThread = Thread.currentThread();
 
-        for (;;)
-        {
+        for (;;) {
             if (this.tryLock()) {
                 return;
             }
@@ -140,23 +137,19 @@ public class PreemptiveLock implements Lock
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.util.concurrent.locks.Lock#unlock()
-     */
+    @Override
     public synchronized void unlock()
     {
         final Thread currentThread = Thread.currentThread();
         if (this.owners.empty() || this.owners.peek() != currentThread) {
             if (!this.owners.contains(currentThread)) {
                 throw new IllegalMonitorStateException("Cannot unlock this lock as this "
-                                                       + "thread does not own it.");
+                    + "thread does not own it.");
             }
             throw new IllegalMonitorStateException("Attempting to unlock a lock which has since been "
-                                                   + "preempted, when a lock is preempted it's original "
-                                                   + "thread should wait until it gets it back.\n"
-                                                   + "\"This should never happen\" :(");
+                + "preempted, when a lock is preempted it's original "
+                + "thread should wait until it gets it back.\n"
+                + "\"This should never happen\" :(");
         }
 
         this.owners.pop();
@@ -203,8 +196,7 @@ public class PreemptiveLock implements Lock
         // running because in order to preempt a lock, isDeadlocked() must be true and in order for
         // isDeadlocked() to be true, the thread must be in the lockBlockingThread map which it is not
         // unless it is in waiting mode.
-        if (currentThreadOwnsAllLocks())
-        {
+        if (currentThreadOwnsAllLocks()) {
             // If 1. the lock is unlocked, 2. reentrance, or 3. it's deadlocked.
             if (this.owners.empty()
                 || this.owners.peek() == currentThread

@@ -24,35 +24,40 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryExecutorManager;
+import org.xwiki.query.QueryExecutorProvider;
 
 /**
  * Default implementation of {@link QueryExecutorManager}.
- *
+ * 
  * @version $Id$
  */
-// Note that we force the Component annotation so that this component is only registered as a QueryExecutorManager
-// and not a QueryExecutor too since we don't want this manager to be visible to users as a valid QueryExecutor
-// component.
+// Note that we force the Component annotation so that this component is only registered as a
+// QueryExecutorManager and not a QueryExecutor too since we don't want this manager to be visible
+// to users as a valid QueryExecutor component.
 @Component(roles = { QueryExecutorManager.class })
+@Singleton
 public class DefaultQueryExecutorManager implements QueryExecutorManager
 {
     /**
      * Map from language to its executor.
      */
-    @Requirement
+    @Inject
     private Map<String, QueryExecutor> executors;
 
     /**
-     * Executor for named HQL queries.
+     * Executor provider for named queries.
+     * This provider will give us an executor which is native to the type of storage engine used.
      */
-    @Requirement("hql")
-    private QueryExecutor namedQueryExecutor;
+    @Inject
+    private QueryExecutorProvider namedQueryExecutorProvider;
 
     /**
      * {@inheritDoc}
@@ -60,9 +65,9 @@ public class DefaultQueryExecutorManager implements QueryExecutorManager
     public <T> List<T> execute(Query query) throws QueryException
     {
         if (query.isNamed()) {
-            return namedQueryExecutor.execute(query);
+            return this.namedQueryExecutorProvider.get().execute(query);
         } else {
-            return executors.get(query.getLanguage()).execute(query);
+            return this.executors.get(query.getLanguage()).execute(query);
         }
     }
 
@@ -71,6 +76,6 @@ public class DefaultQueryExecutorManager implements QueryExecutorManager
      */
     public Set<String> getLanguages()
     {
-        return Collections.unmodifiableSet(executors.keySet());
+        return Collections.unmodifiableSet(this.executors.keySet());
     }
 }

@@ -50,7 +50,7 @@ public class IntegrationTests
 
         mockery.checking(new Expectations() {{
             allowing(mockSkinAccessBridge).getSkinFile(with(any(String.class)));
-                will(returnValue("/xwiki/skins/albatross/icons/black-rss.png"));
+                will(returnValue("/xwiki/resources/icons/silk/feed.gif"));
         }});
     }
 }

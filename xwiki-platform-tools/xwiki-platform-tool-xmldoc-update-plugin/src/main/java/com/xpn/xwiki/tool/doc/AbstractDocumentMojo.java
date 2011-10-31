@@ -35,7 +35,6 @@ import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -97,25 +96,23 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
         Utils.setComponentManager(ecm);
 
         // We need to initialize the Component Manager so that the components can be looked up
-        XWikiContext context = new XWikiContext();
-        context.put(ComponentManager.class.getName(), ecm);
+        XWikiContext xcontext = new XWikiContext();
+        xcontext.put(ComponentManager.class.getName(), ecm);
 
         // Initialize the Container fields (request, response, session).
         ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
-        Execution execution = Utils.getComponent(Execution.class);
         try {
-            ExecutionContext ec = new ExecutionContext();
+            ExecutionContext econtext = new ExecutionContext();
 
             // Bridge with old XWiki Context, required for old code.
-            ec.setProperty("xwikicontext", context);
+            econtext.setProperty("xwikicontext", xcontext);
 
-            ecim.initialize(ec);
-            execution.setContext(ec);
+            ecim.initialize(econtext);
         } catch (ExecutionContextException e) {
             throw new MojoExecutionException("Failed to initialize Execution Context.", e);
         }
 
-        return context;
+        return xcontext;
     }
 
     /**

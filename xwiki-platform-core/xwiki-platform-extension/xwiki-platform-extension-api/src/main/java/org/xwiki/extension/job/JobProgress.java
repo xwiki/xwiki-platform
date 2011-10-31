@@ -27,12 +27,12 @@ package org.xwiki.extension.job;
 public interface JobProgress
 {
     /**
-     * @return progress between 0 and 100
-     */
-    int getPercent();
-
-    /**
-     * @return progress between 0 and 1
+     * @return global progress between 0 and 1
      */
     double getOffset();
+
+    /**
+     * @return progress of the current level between 0 and 1
+     */
+    double getCurrentLevelOffset();
 }

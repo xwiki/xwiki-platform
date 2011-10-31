@@ -24,7 +24,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -67,7 +66,6 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
         super.setUp();
         
         this.xwiki = new XWiki();
-        this.xwiki.setNotificationManager(new XWikiNotificationManager());
         getContext().setWiki(this.xwiki);
 
         // //////////////////////////////////////////////////
@@ -120,35 +118,47 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
         this.xwiki.setRightService(new XWikiRightService()
         {
+            @Override
             public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
             {
                 return true;
             }
 
+            @Override
             public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)
                 throws XWikiException
             {
                 return true;
             }
 
+            @Override
             public boolean hasAdminRights(XWikiContext context)
             {
                 return true;
             }
 
+            @Override
             public boolean hasProgrammingRights(XWikiContext context)
             {
                 return true;
             }
 
+            @Override
             public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
             {
                 return true;
             }
 
+            @Override
             public List listAllLevels(XWikiContext context) throws XWikiException
             {
                 return Collections.EMPTY_LIST;
+            }
+
+            @Override
+            public boolean hasWikiAdminRights(XWikiContext context)
+            {
+                return true;
             }
         });
     }

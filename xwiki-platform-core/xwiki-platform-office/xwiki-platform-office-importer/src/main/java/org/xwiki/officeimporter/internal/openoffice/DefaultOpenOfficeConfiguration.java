@@ -19,9 +19,14 @@
  */
 package org.xwiki.officeimporter.internal.openoffice;
 
+import java.io.File;
+
+import javax.inject.Inject;
+
 import org.artofsolving.jodconverter.office.OfficeUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 
@@ -32,7 +37,7 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
  * @since 1.8RC3
  */
 @Component
-public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration
+public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration, Initializable
 {
     /**
      * Prefix for configuration keys for the OpenOffice module.
@@ -50,16 +55,6 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration
     private static final int DEFAULT_SERVER_PORT = 8100;
 
     /**
-     * @see OpenOfficeConfiguration#getHomePath()
-     */
-    private static final String DEFAULT_HOME_PATH = OfficeUtils.getDefaultOfficeHome().getAbsolutePath();
-
-    /**
-     * @see OpenOfficeConfiguration#getProfilePath()
-     */
-    private static final String DEFAULT_PROFILE_PATH = OfficeUtils.getDefaultProfileDir().getAbsolutePath();
-
-    /**
      * @see OpenOfficeConfiguration#isAutoStart()
      */
     private static final boolean DEFAULT_AUTO_START = false;
@@ -73,15 +68,21 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration
      * @see OpenOfficeConfiguration#getTaskExecutionTimeout()
      */
     private static final long DEFAULT_TASK_EXECUTION_TIMEOUT = 30000L;
-    
+
+    /**
+     * @see OpenOfficeConfiguration#getHomePath()
+     */
+    private String defaultHomePath;
+
     /**
      * Defines from where to read the rendering configuration data.
      */
-    @Requirement
+    @Inject
     private ConfigurationSource configuration;
 
     /**
      * {@inheritDoc}
+     * 
      * @see OpenOfficeConfiguration#getServerType()
      */
     public int getServerType()
@@ -91,6 +92,7 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration
 
     /**
      * {@inheritDoc}
+     * 
      * @see OpenOfficeConfiguration#getServerPort()
      */
     public int getServerPort()
@@ -100,6 +102,7 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration
 
     /**
      * {@inheritDoc}
+     * 
      * @see OpenOfficeConfiguration#isAutoStart()
      */
     public boolean isAutoStart()
@@ -109,24 +112,27 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration
 
     /**
      * {@inheritDoc}
+     * 
      * @see OpenOfficeConfiguration#getHomePath()
      */
     public String getHomePath()
     {
-        return this.configuration.getProperty(PREFIX + "homePath", DEFAULT_HOME_PATH);
+        return this.configuration.getProperty(PREFIX + "homePath", defaultHomePath);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see OpenOfficeConfiguration#getProfilePath()
      */
     public String getProfilePath()
     {
-        return this.configuration.getProperty(PREFIX + "profilePath", DEFAULT_PROFILE_PATH);
+        return this.configuration.getProperty(PREFIX + "profilePath");
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see OpenOfficeConfiguration#getMaxTasksPerProcess()
      */
     public int getMaxTasksPerProcess()
@@ -136,10 +142,23 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration
 
     /**
      * {@inheritDoc}
+     * 
      * @see OpenOfficeConfiguration#getTaskExecutionTimeout()
      */
     public long getTaskExecutionTimeout()
     {
         return this.configuration.getProperty(PREFIX + "taskExecutionTimeout", DEFAULT_TASK_EXECUTION_TIMEOUT);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Initializable#initialize()
+     */
+    @Override
+    public void initialize() throws InitializationException
+    {
+        File defaultHomeFolder = OfficeUtils.getDefaultOfficeHome();
+        defaultHomePath = defaultHomeFolder != null ? defaultHomeFolder.getAbsolutePath() : null;
     }
 }

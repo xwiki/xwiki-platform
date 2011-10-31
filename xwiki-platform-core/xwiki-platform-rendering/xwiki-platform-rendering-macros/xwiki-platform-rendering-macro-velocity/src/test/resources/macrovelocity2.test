@@ -1,31 +1,20 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
+.# Verify inline mode for Velocity macro
 .#-----------------------------------------------------
-{{velocity}}
-#set ($list = ['one', 'two'])
-#foreach ($item in $list)
-* $item
-#end
-{{/velocity}}
+= hello {{velocity}}world{{/velocity}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [velocity] [] [#set ($list = ['one', 'two'])
-#foreach ($item in $list)
-* $item
-#end]
-beginList [BULLETED]
-beginListItem
-onWord [one]
-endListItem
-beginListItem
-onWord [two]
-endListItem
-endList [BULLETED]
-endMacroMarkerStandalone [velocity] [] [#set ($list = ['one', 'two'])
-#foreach ($item in $list)
-* $item
-#end]
+beginSection
+beginHeader [1, Hhello]
+onWord [hello]
+onSpace
+beginMacroMarkerInline [velocity] [] [world]
+onWord [world]
+endMacroMarkerInline [velocity] [] [world]
+endHeader [1, Hhello]
+endSection
 endDocument

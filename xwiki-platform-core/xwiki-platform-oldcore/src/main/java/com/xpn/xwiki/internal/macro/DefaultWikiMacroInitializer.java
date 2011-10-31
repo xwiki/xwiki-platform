@@ -19,21 +19,22 @@
  */
 package com.xpn.xwiki.internal.macro;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.macro.wikibridge.InsufficientPrivilegesException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
@@ -55,24 +56,25 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * @since 2.0M2
  */
 @Component
+@Singleton
 public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMacroConstants
 {
     /**
      * The {@link org.xwiki.rendering.macro.wikibridge.WikiMacroFactory} component.
      */
-    @Requirement
+    @Inject
     private WikiMacroFactory wikiMacroFactory;
 
     /**
      * The {@link WikiMacroManager} component.
      */
-    @Requirement
+    @Inject
     private WikiMacroManager wikiMacroManager;
 
     /**
      * The {@link Execution} component used for accessing XWikiContext.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
@@ -174,9 +176,9 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
             for (Object[] wikiMacroDocumentData : getWikiMacroDocumentData(xcontext)) {
                 // In the database the space and page names are always specified for a document. However the wiki
                 // part isn't, so we need to replace the wiki reference with the current wiki.
-                DocumentReference wikiMacroDocumentReference = new DocumentReference(
-                    (String) wikiMacroDocumentData[1], new SpaceReference((String) wikiMacroDocumentData[0],
-                    new WikiReference(wikiName)));
+                DocumentReference wikiMacroDocumentReference =
+                    new DocumentReference((String) wikiMacroDocumentData[1], new SpaceReference(
+                        (String) wikiMacroDocumentData[0], new WikiReference(wikiName)));
 
                 registerMacro(wikiMacroDocumentReference, (String) wikiMacroDocumentData[2], xcontext);
             }
@@ -189,24 +191,15 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
      * Search for all wiki macros in the current wiki.
      * 
      * @param xcontext the current request context
-     * @return a list of documents containing wiki macros, each item as a vector of 3 strings: space name, document
-     *         name, last author of the document
+     * @return a list of documents containing wiki macros, each item as a List of 3 strings: space name, document name,
+     *         last author of the document
      * @throws Exception if the database search fails
      */
     private List<Object[]> getWikiMacroDocumentData(XWikiContext xcontext) throws Exception
     {
-        // TODO: Use the query manager instead
-        String sql = "select doc.space, doc.name, doc.author from XWikiDocument doc, BaseObject obj where "
-            + "doc.fullName=obj.name and obj.className=?";
-        List<Object[]> wikiMacroDocumentData;
-        try {
-            wikiMacroDocumentData = xcontext.getWiki().getStore().search(sql, 0, 0, Arrays.asList(WIKI_MACRO_CLASS),
-                xcontext);
-        } catch (XWikiException ex) {
-            throw new Exception("Error while searching for macro documents", ex);
-        }
-
-        return wikiMacroDocumentData;
+        final QueryManager qm = xcontext.getWiki().getStore().getQueryManager();
+        final Query q = qm.getNamedQuery("getWikiMacroDocuments");
+        return (List<Object[]>) (List) q.execute();
     }
 
     /**
@@ -291,12 +284,15 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
         needsUpdate |= bclass.addTextAreaField(MACRO_DESCRIPTION_PROPERTY, "Macro description", 40, 5);
         needsUpdate |= bclass.addTextField(MACRO_DEFAULT_CATEGORY_PROPERTY, "Default category", 30);
         needsUpdate |= bclass.addBooleanField(MACRO_INLINE_PROPERTY, "Supports inline mode", "yesno");
-        needsUpdate |= bclass.addStaticListField(MACRO_VISIBILITY_PROPERTY, "Macro visibility", 1, false,
-            "Current User|Current Wiki|Global", "select", "|");
-        needsUpdate |= bclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content type", 1, false,
-            "Optional|Mandatory|No content", "select", "|");
-        needsUpdate |= bclass.addTextAreaField(MACRO_CONTENT_DESCRIPTION_PROPERTY,
-            "Content description (Not applicable for \"No content\" type)", 40, 5);
+        needsUpdate |=
+            bclass.addStaticListField(MACRO_VISIBILITY_PROPERTY, "Macro visibility", 1, false,
+                "Current User|Current Wiki|Global", "select", "|");
+        needsUpdate |=
+            bclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content type", 1, false,
+                "Optional|Mandatory|No content", "select", "|");
+        needsUpdate |=
+            bclass.addTextAreaField(MACRO_CONTENT_DESCRIPTION_PROPERTY,
+                "Content description (Not applicable for \"No content\" type)", 40, 5);
         needsUpdate |= bclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20);
 
         if (needsUpdate) {

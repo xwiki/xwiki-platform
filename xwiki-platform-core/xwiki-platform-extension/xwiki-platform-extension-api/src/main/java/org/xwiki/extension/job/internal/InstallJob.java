@@ -42,6 +42,7 @@ import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.repository.LocalExtensionRepositoryException;
 
 /**
  * Extension installation related task.
@@ -154,9 +155,9 @@ public class InstallJob extends AbstractJob<InstallRequest>
         }
 
         if (namespace != null) {
-            this.logger.info("Installing extension [{0}] on namespace [{1}]", extensionId, namespace);
+            this.logger.info("Installing extension [{}] on namespace [{}]", extensionId, namespace);
         } else {
-            this.logger.info("Installing extension [{0}]", extensionId);
+            this.logger.info("Installing extension [{}]", extensionId);
         }
 
         LocalExtension previousExtension = null;
@@ -178,7 +179,9 @@ public class InstallJob extends AbstractJob<InstallRequest>
             }
         }
 
-        return installExtension(previousExtension, extensionId, dependency, namespace);
+        LocalExtension installedExtension = installExtension(previousExtension, extensionId, dependency, namespace);
+
+        return installedExtension;
     }
 
     // TODO: support version range
@@ -196,6 +199,12 @@ public class InstallJob extends AbstractJob<InstallRequest>
     {
         if (this.coreExtensionRepository.exists(extensionDependency.getId())) {
             return null;
+        }
+
+        if (namespace != null) {
+            this.logger.info("Installing extension dependency [{}] on namespace [{}]", extensionDependency, namespace);
+        } else {
+            this.logger.info("Installing extension dependency [{}]", extensionDependency);
         }
 
         LocalExtension previousExtension = null;
@@ -235,18 +244,13 @@ public class InstallJob extends AbstractJob<InstallRequest>
         notifyPushLevelProgress(2);
 
         try {
-            // Resolve extension
-            Extension remoteExtension;
-            try {
-                remoteExtension = this.repositoryManager.resolve(extensionId);
-            } catch (ResolveException e) {
-                throw new InstallException(MessageFormat.format("Failed to resolve extension [{0}]", extensionId), e);
-            }
+            // Check is the extension is already in local repository
+            Extension extension = resolveExtension(extensionId);
 
             notifyStepPropress();
 
             try {
-                return installExtension(previousExtension, remoteExtension, dependency, namespace);
+                return installExtension(previousExtension, extension, dependency, namespace);
             } catch (Exception e) {
                 throw new InstallException("Failed to install extension", e);
             }
@@ -256,18 +260,44 @@ public class InstallJob extends AbstractJob<InstallRequest>
     }
 
     /**
+     * @param extensionId the identifier of the extension to install
+     * @return the extension
+     * @throws InstallException error when trying to resolve extension
+     */
+    private Extension resolveExtension(ExtensionId extensionId) throws InstallException
+    {
+        // Check is the extension is already in local repository
+        Extension extension;
+        try {
+            extension = this.localExtensionRepository.resolve(extensionId);
+        } catch (ResolveException e) {
+            this.logger.debug("Can't find extension in local repository, trying to download it.", e);
+
+            // Resolve extension
+            try {
+                extension = this.repositoryManager.resolve(extensionId);
+            } catch (ResolveException e1) {
+                throw new InstallException(MessageFormat.format("Failed to resolve extension [{0}]", extensionId), e1);
+            }
+        }
+
+        return extension;
+    }
+
+    /**
      * @param previousExtension the previous installed version of the extension to install
-     * @param remoteExtension the new extension to install
+     * @param extension the new extension to install
      * @param dependency indicate if the extension is installed as a dependency
      * @param namespace the namespace where to install the extension
      * @return the newly installed local extension
      * @throws ComponentLookupException failed to find proper {@link org.xwiki.extension.handler.ExtensionHandler}
      * @throws InstallException error when trying to install provided extension
+     * @throws LocalExtensionRepositoryException error when storing extension
      */
-    private LocalExtension installExtension(LocalExtension previousExtension, Extension remoteExtension,
-        boolean dependency, String namespace) throws ComponentLookupException, InstallException
+    private LocalExtension installExtension(LocalExtension previousExtension, Extension extension, boolean dependency,
+        String namespace) throws ComponentLookupException, InstallException, LocalExtensionRepositoryException
     {
-        for (ExtensionDependency dependencyDependency : remoteExtension.getDependencies()) {
+        for (ExtensionDependency dependencyDependency : extension.getDependencies()) {
             installExtensionDependency(dependencyDependency, namespace);
         }
 
@@ -275,9 +305,12 @@ public class InstallJob extends AbstractJob<InstallRequest>
 
         try {
             // Store extension in local repository
-            LocalExtension localExtension =
-                this.localExtensionRepository.installExtension(remoteExtension, previousExtension != null
-                    ? previousExtension.isDependency() : dependency, namespace);
+            LocalExtension localExtension;
+            if (extension instanceof LocalExtension) {
+                localExtension = (LocalExtension) extension;
+            } else {
+                localExtension = this.localExtensionRepository.storeExtension(extension);
+            }
 
             notifyStepPropress();
 
@@ -290,13 +323,23 @@ public class InstallJob extends AbstractJob<InstallRequest>
                     this.logger.error("Failed to uninstall extension [" + previousExtension + "]", e);
                 }
 
+                this.localExtensionRepository.installExtension(localExtension, namespace, dependency);
+
                 this.observationManager.notify(new ExtensionUpgradedEvent(localExtension.getId()), localExtension,
                     previousExtension);
             } else {
                 this.extensionHandlerManager.install(localExtension, namespace);
 
+                this.localExtensionRepository.installExtension(localExtension, namespace, dependency);
+
                 this.observationManager.notify(new ExtensionInstalledEvent(localExtension.getId()), localExtension,
                     previousExtension);
+            }
+
+            if (namespace != null) {
+                this.logger.info("Successfully installed extension [{}] on namespace [{}]", localExtension, namespace);
+            } else {
+                this.logger.info("Successfully installed extension [{}]", localExtension);
             }
 
             return localExtension;

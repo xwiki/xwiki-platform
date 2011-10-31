@@ -1,11 +1,28 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.extension.test;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
@@ -25,13 +42,11 @@ public class ResourceExtensionRepository implements ExtensionRepository
 
     private String baseResource;
 
-    private Map<ExtensionId, ResourceExtension> extension = new HashMap<ExtensionId, ResourceExtension>();
-
     public ResourceExtensionRepository(ClassLoader classLoader, String baseResource)
     {
         this.extensionSerializer = new ExtensionSerializer();
 
-        this.repositoryId = new ExtensionRepositoryId("resources", "resources", null);
+        this.repositoryId = new ExtensionRepositoryId("test-resources", "resources", null);
 
         this.classLoader = classLoader;
         this.baseResource = baseResource;
@@ -78,11 +93,7 @@ public class ResourceExtensionRepository implements ExtensionRepository
         try {
             DefaultLocalExtension localExtension = this.extensionSerializer.loadDescriptor(null, descriptor);
 
-            ResourceExtension resourceExtension = new ResourceExtension(this, localExtension);
-
-            this.extension.put(resourceExtension.getId(), resourceExtension);
-
-            return resourceExtension;
+            return new ResourceExtension(this, localExtension);
         } catch (Exception e) {
             throw new ResolveException("Failed to parse descriptor for extension [" + extensionId + "]", e);
         }

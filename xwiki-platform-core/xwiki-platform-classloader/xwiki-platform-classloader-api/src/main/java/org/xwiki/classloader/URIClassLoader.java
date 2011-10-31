@@ -16,12 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- * 
- * 
- * Originally written by Dawid Kurzyniec and released to the public domain, as explained
- * at http://creativecommons.org/licenses/publicdomain
- * 
- * Source: http://dcl.mathcs.emory.edu/php/loadPage.php?content=util/features.html#classloading
  */
 package org.xwiki.classloader;
 
@@ -65,6 +59,14 @@ import edu.emory.mathcs.util.classloader.ResourceHandle;
  * conformance and defining precise escaping semantics), and 2) using custom URLStreamHandler which ensures
  * per-classloader JAR caching policy.
  * 
+ * <p>
+ * Originally written by Dawid Kurzyniec and released to the public domain, as explained
+ * at http://creativecommons.org/licenses/publicdomain
+ * </p>
+ * <p>
+ * Source: http://dcl.mathcs.emory.edu/php/loadPage.php?content=util/features.html#classloading
+ * </p>
+ *
  * @see java.io.File#toURL
  * @see java.io.File#toURI
  * @version $Id$d

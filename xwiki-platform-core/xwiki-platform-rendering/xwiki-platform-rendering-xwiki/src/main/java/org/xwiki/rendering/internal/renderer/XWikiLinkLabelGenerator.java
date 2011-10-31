@@ -19,12 +19,15 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -38,22 +41,24 @@ import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
  * @since 2.0M1
  */
 @Component
+@Singleton
 public class XWikiLinkLabelGenerator implements LinkLabelGenerator
 {
-    @Requirement
+    @Inject
     private RenderingConfiguration renderingConfiguration;
 
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
-    @Requirement("current")
+    @Inject
+    @Named("current")
     private DocumentReferenceResolver currentDocumentReferenceResolver;
 
     /**
      * {@inheritDoc}
-     * @see LinkLabelGenerator#generate(org.xwiki.rendering.listener.reference.ResourceReference)
-     * @since 2.5RC1 
+     * @since 2.5RC1
      */
+    @Override
     public String generate(ResourceReference reference)
     {
         String result;
@@ -80,7 +85,7 @@ public class XWikiLinkLabelGenerator implements LinkLabelGenerator
         if (result.indexOf("%t") > -1) {
             try {
                 DocumentModelBridge document = this.documentAccessBridge.getDocument(documentReference);
-                if (!StringUtils.isBlank(document.getTitle())) {
+                if (StringUtils.isNotBlank(document.getTitle())) {
                     result = result.replace("%t", document.getTitle());
                 } else {
                     result = documentReference.getName();

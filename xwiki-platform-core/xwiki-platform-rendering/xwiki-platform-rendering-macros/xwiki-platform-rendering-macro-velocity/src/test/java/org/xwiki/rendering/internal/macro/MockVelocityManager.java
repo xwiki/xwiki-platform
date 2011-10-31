@@ -26,10 +26,12 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 
 import java.util.Properties;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Mock VelocityManager implementation used for testing, since we don't want to pull any dependency on the
@@ -39,19 +41,21 @@ import java.util.Properties;
  * @since 1.5M2
  */
 @Component
+@Singleton
 public class MockVelocityManager implements VelocityManager, Initializable
 {
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
      * Note that we use a single Velocity Engine instance in this Mock.
      */
-    @Requirement
+    @Inject
     private VelocityEngine velocityEngine;
 
     private VelocityContext velocityContext = new VelocityContext();
 
+    @Override
     public void initialize() throws InitializationException
     {
         try {
@@ -66,11 +70,13 @@ public class MockVelocityManager implements VelocityManager, Initializable
         }
     }
 
+    @Override
     public VelocityContext getVelocityContext()
     {
         return this.velocityContext;
     }
 
+    @Override
     public VelocityEngine getVelocityEngine() throws XWikiVelocityException
     {
         return this.velocityEngine;

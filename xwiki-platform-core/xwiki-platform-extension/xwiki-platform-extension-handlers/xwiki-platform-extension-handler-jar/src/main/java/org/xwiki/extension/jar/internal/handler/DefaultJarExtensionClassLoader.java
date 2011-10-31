@@ -32,6 +32,7 @@ public class DefaultJarExtensionClassLoader implements JarExtensionClassLoader
 
     private Map<String, ExtensionURLClassLoader> wikiClassLoaderMap = new HashMap<String, ExtensionURLClassLoader>();
 
+    @Override
     public ExtensionURLClassLoader getURLClassLoader(String namespace, boolean create)
     {
         if (this.rootClassLoader == null && create) {
@@ -43,9 +44,13 @@ public class DefaultJarExtensionClassLoader implements JarExtensionClassLoader
         if (namespace != null) {
             wikiClassLoader = this.wikiClassLoaderMap.get(namespace);
 
-            if (wikiClassLoader == null && create) {
-                wikiClassLoader = new ExtensionURLClassLoader(new URI[] {}, this.rootClassLoader, namespace);
-                this.wikiClassLoaderMap.put(namespace, wikiClassLoader);
+            if (wikiClassLoader == null) {
+                if (create) {
+                    wikiClassLoader = new ExtensionURLClassLoader(new URI[] {}, this.rootClassLoader, namespace);
+                    this.wikiClassLoaderMap.put(namespace, wikiClassLoader);
+                } else {
+                    wikiClassLoader = this.rootClassLoader;
+                }
             }
         }
 

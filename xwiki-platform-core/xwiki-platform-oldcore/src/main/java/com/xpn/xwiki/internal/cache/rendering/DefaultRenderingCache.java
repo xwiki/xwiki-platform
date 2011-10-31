@@ -19,11 +19,16 @@
  */
 package com.xpn.xwiki.internal.cache.rendering;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.DocumentReference;
@@ -38,6 +43,7 @@ import com.xpn.xwiki.internal.cache.DocumentCache;
  * @since 2.4M1
  */
 @Component
+@Singleton
 public class DefaultRenderingCache implements RenderingCache, Initializable
 {
     /**
@@ -46,22 +52,23 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
     private static final String NAME = "core.renderingcache";
 
     /**
+     * The name of the parameter used to force cache refresh.
+     */
+    private static final String PARAMETER_REFRESH = "refresh";
+
+    /**
      * Configuration of the rendering cache.
      */
-    @Requirement
+    @Inject
     private RenderingCacheConfiguration configuration;
 
     /**
      * Actually cache object.
      */
-    @Requirement
+    @Inject
     private DocumentCache<String> cache;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         if (this.configuration.isEnabled()) {
@@ -82,41 +89,32 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
 
     // cache
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.internal.cache.rendering.RenderingCache#getRenderedContent(org.xwiki.model.reference.DocumentReference,
-     *      java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public String getRenderedContent(DocumentReference documentReference, String source, XWikiContext context)
     {
         String renderedContent = null;
 
         if (this.configuration.isCached(documentReference)) {
-            String refresh = context.getRequest() != null ? context.getRequest().getParameter("refresh") : null;
+            String refresh =
+                context.getRequest() != null ? context.getRequest().getParameter(PARAMETER_REFRESH) : null;
 
             if (!"1".equals(refresh)) {
                 renderedContent =
                     this.cache.get(documentReference, source, getAction(context), context.getLanguage(),
-                        getQueryString(context));
+                        getRequestParameters(context));
             }
         }
 
         return renderedContent;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.internal.cache.rendering.RenderingCache#setRenderedContent(org.xwiki.model.reference.DocumentReference,
-     *      java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public void setRenderedContent(DocumentReference documentReference, String source, String renderedContent,
         XWikiContext context)
     {
         if (this.configuration.isCached(documentReference)) {
             this.cache.set(renderedContent, documentReference, source, getAction(context), context.getLanguage(),
-                getQueryString(context));
+                getRequestParameters(context));
         }
     }
 
@@ -132,17 +130,27 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
     }
 
     /**
-     * Extract action information from the context.
+     * Exact action information from the context.
      * 
      * @param context the XWiki context
-     * @return the current query string
+     * @return the current request parameters
      */
-    private String getQueryString(XWikiContext context)
+    private String getRequestParameters(XWikiContext context)
     {
-        String queryString =
-            context.getRequest() != null && context.getRequest().getQueryString() != null ? context.getRequest()
-                .getQueryString() : "";
+        if (context.getRequest() != null) {
+            Map<String, String> parameters = context.getRequest().getParameterMap();
 
-        return queryString.replaceAll("\\&?refresh=1", "");
+            if (parameters != null) {
+                if (parameters.containsKey(PARAMETER_REFRESH)) {
+                    parameters = new HashMap<String, String>(parameters);
+
+                    parameters.remove(PARAMETER_REFRESH);
+                }
+
+                return parameters.toString();
+            }
+        }
+
+        return "";
     }
 }

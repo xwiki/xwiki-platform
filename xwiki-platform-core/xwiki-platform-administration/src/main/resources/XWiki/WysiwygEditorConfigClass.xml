@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
 <xwikidoc>
 <web>XWiki</web>
 <name>WysiwygEditorConfigClass</name>
@@ -206,4 +225,68 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </toolBar>
 </class>
-<content>{{include document="ClassSheet"/}}</content></xwikidoc>
+<object>
+<class>
+<name>XWiki.ClassSheetBinding</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<sheet>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<name>sheet</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>Sheet</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</sheet>
+</class>
+<name>XWiki.WysiwygEditorConfigClass</name>
+<number>0</number>
+<className>XWiki.ClassSheetBinding</className>
+<guid>a3f1872b-69f3-4cda-98cd-2d4c51ea5e3d</guid>
+<property>
+<sheet>WysiwygEditorConfigSheet</sheet>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.DocumentSheetBinding</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<sheet>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<name>sheet</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>Sheet</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</sheet>
+</class>
+<name>XWiki.WysiwygEditorConfigClass</name>
+<number>0</number>
+<className>XWiki.DocumentSheetBinding</className>
+<guid>b376326a-ed18-407f-bf8e-46d3f9ddab46</guid>
+<property>
+<sheet>XWiki.ClassSheet</sheet>
+</property>
+</object>
+<content></content></xwikidoc>

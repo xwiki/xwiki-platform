@@ -32,13 +32,21 @@
     ## Normally no special characters should exist in the editor parameter, so this is just a protection measure.
     #set($editor = "$!{escapetool.xml($request.getParameter('editor'))}")
     #if($editor == '')
-      #if(($xwiki.getUserPreference('editor') == 'Wysiwyg') && ($doc.syntax.toIdString() != 'xwiki/1.0' || !$doc.isAdvancedContent()))
+      #if(!$services.sheet.getSheets($tdoc, $context.action).isEmpty())
+        #set($editor = 'inline')
+      #elseif(($xwiki.getUserPreference('editor') == 'Wysiwyg') && ($doc.syntax.toIdString() != 'xwiki/1.0' || !$doc.isAdvancedContent()))
         #set($editor = 'wysiwyg')
       #else
         #set($editor = 'wiki')
       #end
     #end
   #end
+  #if($editor == 'inline')
+    ## The inline editor uses the view layout, unlike the rest of the editors.
+    #template('startpage.vm')
+    #template('editinline.vm')
+    #template('endpage.vm')
+  #else
   ##
   ## "Compute" the title
   ##
@@ -126,4 +134,5 @@
   #end
   #template("footer.vm")
   #template("htmlfooter.vm")
+  #end ## $editor != 'inline'
 #end

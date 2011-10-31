@@ -1,213 +1,191 @@
-<?xml version="1.0"?>
-<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
 <!-- =============================================================== -->
 <!-- Configure the Jetty Server                                      -->
 <!--                                                                 -->
 <!-- Documentation of this file format can be found at:              -->
-<!-- http://docs.codehaus.org/display/JETTY/jetty.xml                -->
+<!-- http://wiki.eclipse.org/Jetty/Reference/jetty.xml_syntax        -->
 <!--                                                                 -->
+<!-- Additional configuration files are available in $JETTY_HOME/etc -->
+<!-- and can be mixed in.  For example:                              -->
+<!--   java -jar start.jar etc/jetty-ssl.xml                         -->
+<!--                                                                 -->
+<!-- See start.ini file for the default configuraton files           -->
 <!-- =============================================================== -->
 
-<Configure id="Server" class="org.mortbay.jetty.Server">
 
-    <!-- =========================================================== -->
-    <!-- Server Thread Pool                                          -->
-    <!-- =========================================================== -->
-    <Set name="ThreadPool">
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
 
-      <New class="org.mortbay.thread.QueuedThreadPool">
-        <Set name="minThreads">10</Set>
-        <Set name="maxThreads">200</Set>
-        <Set name="lowThreads">20</Set>
-        <Set name="SpawnOrShrinkAt">2</Set>
-      </New>
+  <!-- =========================================================== -->
+  <!-- Server Thread Pool                                          -->
+  <!-- =========================================================== -->
+  <Set name="ThreadPool">
+    <!-- Default queued blocking threadpool -->
+    <New class="org.eclipse.jetty.util.thread.QueuedThreadPool">
+      <Set name="minThreads">10</Set>
+      <Set name="maxThreads">200</Set>
+      <Set name="detailedDump">false</Set>
+    </New>
+  </Set>
 
-      <!-- Optional Java 5 bounded threadpool with job queue 
-      <New class="org.mortbay.thread.concurrent.ThreadPool">
-        <Set name="corePoolSize">50</Set>
-        <Set name="maximumPoolSize">50</Set>
-      </New>
-      -->
-    </Set>
+  <!-- =========================================================== -->
+  <!-- Set connectors                                              -->
+  <!-- =========================================================== -->
 
-    <!-- =========================================================== -->
-    <!-- Set connectors                                              -->
-    <!-- =========================================================== -->
-    <!-- One of each type!                                           -->
-    <!-- =========================================================== -->
-
-    <!-- Use this connector for many frequently idle connections
-         and for threadless continuations.
-    -->    
-    <Call name="addConnector">
-      <Arg>
-          <New class="org.mortbay.jetty.nio.SelectChannelConnector">
-            <Set name="host"><SystemProperty name="jetty.host" /></Set>
-            <Set name="port"><SystemProperty name="jetty.port" default="8080"/></Set>
-            <Set name="maxIdleTime">30000</Set>
-            <Set name="Acceptors">2</Set>
-            <Set name="statsOn">false</Set>
-            <Set name="confidentialPort">8443</Set>
-	    <Set name="lowResourcesConnections">5000</Set>
-	    <Set name="lowResourcesMaxIdleTime">5000</Set>
-          </New>
-      </Arg>
-    </Call>
-
-    <!-- Use this connector if NIO is not available. 
-    <Call name="addConnector">
-      <Arg>
-          <New class="org.mortbay.jetty.bio.SocketConnector">
-            <Set name="port">8081</Set>
-            <Set name="maxIdleTime">50000</Set>
-            <Set name="lowResourceMaxIdleTime">1500</Set>
-          </New>
-      </Arg>
-    </Call>
-    -->
-
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- To add a HTTPS SSL listener                                     -->
-    <!-- see jetty-ssl.xml to add an ssl connector. use                  -->
-    <!-- java -jar start.jar etc/jetty.xml etc/jetty-ssl.xml             -->
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    
-    <!-- =========================================================== -->
-    <!-- Set up global session ID manager                            -->
-    <!-- =========================================================== -->
-    <!--
-    <Set name="sessionIdManager">
-      <New class="org.mortbay.jetty.servlet.HashSessionIdManager">
-        <Set name="workerName">node1</Set>
-      </New>
-    </Set>
-    -->
-
-    <!-- =========================================================== -->
-    <!-- Set handler Collection Structure                            --> 
-    <!-- =========================================================== -->
-    <Set name="handler">
-      <New id="Handlers" class="org.mortbay.jetty.handler.HandlerCollection">
-        <Set name="handlers">
-         <Array type="org.mortbay.jetty.Handler">
-           <Item>
-             <New id="Contexts" class="org.mortbay.jetty.handler.ContextHandlerCollection"/>
-           </Item>
-           <Item>
-             <New id="DefaultHandler" class="org.mortbay.jetty.handler.DefaultHandler"/>
-           </Item>
-           <Item>
-             <New id="RequestLog" class="org.mortbay.jetty.handler.RequestLogHandler"/>
-           </Item>
-         </Array>
+  <Call name="addConnector">
+    <Arg>
+      <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
+        <Set name="host">
+          <Property name="jetty.host"/>
         </Set>
+        <Set name="port">
+          <Property name="jetty.port" default="8080"/>
+        </Set>
+        <Set name="maxIdleTime">300000</Set>
+        <Set name="Acceptors">2</Set>
+        <Set name="statsOn">false</Set>
+        <Set name="confidentialPort">8443</Set>
+        <Set name="lowResourcesConnections">20000</Set>
+        <Set name="lowResourcesMaxIdleTime">5000</Set>
       </New>
-    </Set>
-    
-    <!-- =========================================================== -->
-    <!-- Configure the context deployer                              -->
-    <!-- A context deployer will deploy contexts described in        -->
-    <!-- configuration files discovered in a directory.              -->
-    <!-- The configuration directory can be scanned for hot          -->
-    <!-- deployments at the configured scanInterval.                 -->
-    <!--                                                             -->
-    <!-- This deployer is configured to deploy contexts configured   -->
-    <!-- in the $JETTY_HOME/contexts directory                       -->
-    <!--                                                             -->
-    <!-- =========================================================== -->
+    </Arg>
+  </Call>
 
-    <!-- XWiki Note: We're using the Context Deployer instead of the Webapp Deployer
-         because we need to ensure that the javax.script.* package( JSR 223) is 
-         considered as System classes (see http://docs.codehaus.org/display/JETTY/Classloading).
-         This is needed since the JDK 1.6 provides the JSR223 JAR and if we don't
-         do this then Jetty tries to use our version and there's some Class cast exception
-         that happens. -->
-    <Call name="addLifeCycle">
-      <Arg>
-        <New class="org.mortbay.jetty.deployer.ContextDeployer">
-          <Set name="contexts"><Ref id="Contexts"/></Set>
-          <Set name="configurationDir"><SystemProperty name="jetty.home" default="."/>/contexts</Set>
-        </New>
-      </Arg>
-    </Call>
-    
-    <!-- =========================================================== -->
-    <!-- Configure the webapp deployer.                              -->
-    <!-- A webapp  deployer will deploy standard webapps discovered  -->
-    <!-- in a directory at startup, without the need for additional  -->
-    <!-- configuration files.    It does not support hot deploy or   -->
-    <!-- non standard contexts (see ContextDeployer above).          -->
-    <!--                                                             -->
-    <!-- This deployer is configured to deploy webapps from the      -->
-    <!-- $JETTY_HOME/webapps directory                               -->
-    <!--                                                             -->
-    <!-- Normally only one type of deployer need be used.            -->
-    <!--                                                             -->
-    <!-- =========================================================== -->
-    <!--
-    <Call name="addLifeCycle">
-      <Arg>
-        <New class="org.mortbay.jetty.deployer.WebAppDeployer">
-          <Set name="contexts"><Ref id="Contexts"/></Set>
-          <Set name="webAppDir"><SystemProperty name="jetty.home" default="."/>/../webapps</Set>
-	  <Set name="parentLoaderPriority">false</Set>
-	  <Set name="extract">true</Set>
-	  <Set name="allowDuplicates">false</Set>
-          <Set name="defaultsDescriptor"><SystemProperty name="jetty.home" default="."/>/etc/webdefault.xml</Set>
-        </New>
-      </Arg>
-    </Call>
-    -->
-
-    <!-- =========================================================== -->
-    <!-- Configure Authentication Realms                             -->
-    <!-- Realms may be configured for the entire server here, or     -->
-    <!-- they can be configured for a specific web app in a context  -->
-    <!-- configuration (see $(jetty.home)/contexts/test.xml for an   -->
-    <!-- example).                                                   -->
-    <!-- =========================================================== -->
-    <!--
-    <Set name="UserRealms">
-      <Array type="org.mortbay.jetty.security.UserRealm">
-        <Item>
-          <New class="org.mortbay.jetty.security.HashUserRealm">
-            <Set name="name">Test Realm</Set>
-            <Set name="config"><SystemProperty name="jetty.home" default="."/>/etc/realm.properties</Set>
-            <Set name="refreshInterval">0</Set>
-          </New>
-        </Item>
-      </Array>
-    </Set>
-    -->
-
-    <!-- =========================================================== -->
-    <!-- Configure Request Log                                       -->
-    <!-- Request logs  may be configured for the entire server here, -->
-    <!-- or they can be configured for a specific web app in a       -->
-    <!-- contexts configuration (see $(jetty.home)/contexts/test.xml -->
-    <!-- for an example).                                            -->
-    <!-- =========================================================== -->
-    <Ref id="RequestLog">
-      <Set name="requestLog">
-        <New id="RequestLogImpl" class="org.mortbay.jetty.NCSARequestLog">
-          <Set name="filename"><SystemProperty name="jetty.home" default="."/>/logs/yyyy_mm_dd.request.log</Set>
-          <Set name="filenameDateFormat">yyyy_MM_dd</Set>
-          <Set name="retainDays">90</Set>
-          <Set name="append">true</Set>
-          <Set name="extended">false</Set>
-          <Set name="logCookies">false</Set>
-          <Set name="LogTimeZone">GMT</Set>
-        </New>
+  <!-- =========================================================== -->
+  <!-- Set handler Collection Structure                            -->
+  <!-- =========================================================== -->
+  <Set name="handler">
+    <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+      <Set name="handlers">
+        <Array type="org.eclipse.jetty.server.Handler">
+          <Item>
+            <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
+          </Item>
+          <Item>
+            <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
+          </Item>
+        </Array>
       </Set>
-    </Ref>
+    </New>
+  </Set>
 
-    <!-- =========================================================== -->
-    <!-- extra options                                               -->
-    <!-- =========================================================== -->
-    <Set name="stopAtShutdown">true</Set>
-    <Set name="sendServerVersion">true</Set>
-    <Set name="sendDateHeader">true</Set>
-    <Set name="gracefulShutdown">1000</Set>
+  <!-- =============================================================== -->
+  <!-- Create the deployment manager                                   -->
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!-- The deplyment manager handles the lifecycle of deploying web    -->
+  <!-- applications. Apps are provided by instances of the             -->
+  <!-- AppProvider interface.  Typically these are provided by         -->
+  <!-- one or more of:                                                 -->
+  <!--   jetty-webapps.xml       - monitors webapps for wars and dirs  -->
+  <!--   jetty-contexts.xml      - monitors contexts for context xml   -->
+  <!--   jetty-templates.xml     - monitors contexts and templates     -->
+  <!-- =============================================================== -->
+  <Call name="addBean">
+    <Arg>
+      <New id="DeploymentManager" class="org.eclipse.jetty.deploy.DeploymentManager">
+        <Set name="contexts">
+          <Ref id="Contexts"/>
+        </Set>
+        <Call name="setContextAttribute">
+          <Arg>org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern</Arg>
+          <Arg>.*/jsp-api-[^/]*\.jar$|.*/jsp-[^/]*\.jar$</Arg>
+        </Call>
+
+
+        <!-- Add a customize step to the deployment lifecycle -->
+        <!-- uncomment and replace DebugBinding with your extended AppLifeCycle.Binding class
+        <Call name="insertLifeCycleNode">
+          <Arg>deployed</Arg>
+          <Arg>starting</Arg>
+          <Arg>customise</Arg>
+        </Call>
+        <Call name="addLifeCycleBinding">
+          <Arg>
+            <New class="org.eclipse.jetty.deploy.bindings.DebugBinding">
+              <Arg>customise</Arg>
+            </New>
+          </Arg>
+        </Call>
+        -->
+
+      </New>
+    </Arg>
+  </Call>
+
+  <!-- =============================================================== -->
+  <!-- Add a ContextProvider to the deployment manager                 -->
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!-- This scans the webapps directory for war files and directories  -->
+  <!-- to deploy.                                                      -->
+  <!-- This configuration must be used with jetty-deploy.xml, which    -->
+  <!-- creates the deployment manager instance                         -->
+  <!-- =============================================================== -->
+  <Ref id="DeploymentManager">
+    <Call name="addAppProvider">
+      <Arg>
+        <New class="org.eclipse.jetty.deploy.providers.ContextProvider">
+          <Set name="monitoredDirName"><Property name="jetty.home" default="."/>/contexts
+          </Set>
+          <Set name="scanInterval">1</Set>
+        </New>
+      </Arg>
+    </Call>
+  </Ref>
+
+  <!-- =========================================================== -->
+  <!-- Configure Request Log                                       -->
+  <!-- =========================================================== -->
+  <Ref id="Handlers">
+    <Call name="addHandler">
+      <Arg>
+        <New id="RequestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler">
+          <Set name="requestLog">
+            <New id="RequestLogImpl" class="org.eclipse.jetty.server.NCSARequestLog">
+              <Set name="filename"><Property name="jetty.home" default="."/>/logs/yyyy_mm_dd.request.log
+              </Set>
+              <Set name="filenameDateFormat">yyyy_MM_dd</Set>
+              <Set name="retainDays">90</Set>
+              <Set name="append">true</Set>
+              <Set name="extended">false</Set>
+              <Set name="logCookies">false</Set>
+              <Set name="LogTimeZone">GMT</Set>
+            </New>
+          </Set>
+        </New>
+      </Arg>
+    </Call>
+  </Ref>
+
+  <!-- =========================================================== -->
+  <!-- extra options                                               -->
+  <!-- =========================================================== -->
+  <Set name="stopAtShutdown">true</Set>
+  <Set name="sendServerVersion">true</Set>
+  <Set name="sendDateHeader">true</Set>
+  <Set name="gracefulShutdown">1000</Set>
+  <Set name="dumpAfterStart">false</Set>
+  <Set name="dumpBeforeStop">false</Set>
 
 </Configure>

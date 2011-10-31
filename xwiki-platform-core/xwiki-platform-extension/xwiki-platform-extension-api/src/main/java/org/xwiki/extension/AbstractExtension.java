@@ -20,10 +20,14 @@
 package org.xwiki.extension;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.xwiki.extension.repository.ExtensionRepository;
 
@@ -40,6 +44,11 @@ public abstract class AbstractExtension implements Extension
     protected ExtensionId id;
 
     /**
+     * @see #getFeatures()
+     */
+    protected Set<String> features = new HashSet<String>();
+
+    /**
      * @see #getType()
      */
     protected String type;
@@ -48,6 +57,16 @@ public abstract class AbstractExtension implements Extension
      * @see #getName()
      */
     protected String name;
+
+    /**
+     * @see #getLicenses()
+     */
+    protected List<ExtensionLicense> licenses = new ArrayList<ExtensionLicense>();
+
+    /**
+     * @see #getSummary()
+     */
+    protected String summary;
 
     /**
      * @see #getDescription()
@@ -78,7 +97,7 @@ public abstract class AbstractExtension implements Extension
      * @see #getDependencies()
      */
     protected List<ExtensionDependency> dependencies;
-    
+
     /**
      * @param repository the repository where this extension comes from
      * @param id the extension identifier
@@ -102,6 +121,8 @@ public abstract class AbstractExtension implements Extension
     {
         this(repository, extension.getId(), extension.getType());
 
+        setFeatures(extension.getFeatures());
+
         setDescription(extension.getDescription());
         setAuthors(extension.getAuthors());
         setWebsite(extension.getWebSite());
@@ -112,11 +133,7 @@ public abstract class AbstractExtension implements Extension
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getId()
-     */
+    @Override
     public ExtensionId getId()
     {
         return this.id;
@@ -131,11 +148,31 @@ public abstract class AbstractExtension implements Extension
         this.id = id;
     }
 
+    @Override
+    public Collection<String> getFeatures()
+    {
+        return this.features;
+    }
+
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getType()
+     * @param features the extension ids also provided by this extension
      */
+    public void setFeatures(Collection<String> features)
+    {
+        this.features = new LinkedHashSet<String>(features);
+    }
+
+    /**
+     * Add a new feature to the extension.
+     * 
+     * @param feature a feature name
+     */
+    public void addFeature(String feature)
+    {
+        this.features.add(feature);
+    }
+
+    @Override
     public String getType()
     {
         return this.type;
@@ -150,11 +187,7 @@ public abstract class AbstractExtension implements Extension
         this.type = type;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getName()
-     */
+    @Override
     public String getName()
     {
         return this.name;
@@ -168,11 +201,45 @@ public abstract class AbstractExtension implements Extension
         this.name = name;
     }
 
+    @Override
+    public Collection<ExtensionLicense> getLicenses()
+    {
+        return this.licenses;
+    }
+
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getDescription()
+     * @param licenses the licenses of the extension
      */
+    public void setLicense(Collection<ExtensionLicense> licenses)
+    {
+        this.licenses = new ArrayList<ExtensionLicense>(licenses);
+    }
+
+    /**
+     * Add a new license to the extension.
+     * 
+     * @param license a license
+     */
+    public void addLicense(ExtensionLicense license)
+    {
+        this.licenses.add(license);
+    }
+
+    @Override
+    public String getSummary()
+    {
+        return this.summary;
+    }
+
+    /**
+     * @param summary a short description of the extension
+     */
+    public void setSummary(String summary)
+    {
+        this.summary = summary;
+    }
+
+    @Override
     public String getDescription()
     {
         return this.description;
@@ -186,20 +253,16 @@ public abstract class AbstractExtension implements Extension
         this.description = description;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getAuthors()
-     */
+    @Override
     public List<String> getAuthors()
     {
         return this.authors;
     }
 
     /**
-     * @param authors the extension authors
+     * @param authors the authors of the extension
      */
-    public void setAuthors(List<String> authors)
+    public void setAuthors(Collection<String> authors)
     {
         this.authors = new ArrayList<String>(authors);
     }
@@ -214,11 +277,7 @@ public abstract class AbstractExtension implements Extension
         this.authors.add(author);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getWebSite()
-     */
+    @Override
     public String getWebSite()
     {
         return this.website;
@@ -246,11 +305,7 @@ public abstract class AbstractExtension implements Extension
         this.dependencies.add(dependency);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getDependencies()
-     */
+    @Override
     public List< ? extends ExtensionDependency> getDependencies()
     {
         return this.dependencies != null ? Collections.unmodifiableList(this.dependencies) : Collections
@@ -261,16 +316,12 @@ public abstract class AbstractExtension implements Extension
      * @param dependencies the dependencies of the extension
      * @see #getDependencies()
      */
-    public void setDependencies(List< ? extends ExtensionDependency> dependencies)
+    public void setDependencies(Collection< ? extends ExtensionDependency> dependencies)
     {
         this.dependencies = new ArrayList<ExtensionDependency>(dependencies);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getRepository()
-     */
+    @Override
     public ExtensionRepository getRepository()
     {
         return this.repository;
@@ -285,21 +336,13 @@ public abstract class AbstractExtension implements Extension
         this.repository = repository;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getProperties()
-     */
+    @Override
     public Map<String, Object> getProperties()
     {
         return Collections.unmodifiableMap(this.properties);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#getProperty(java.lang.String)
-     */
+    @Override
     public Object getProperty(String key)
     {
         return this.properties.get(key);
@@ -333,33 +376,18 @@ public abstract class AbstractExtension implements Extension
 
     // Object
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {
         return getId().toString();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
         return this == obj || (obj instanceof Extension && getId().equals(((Extension) obj).getId()));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode()
     {

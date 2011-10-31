@@ -21,6 +21,8 @@ package org.xwiki.extension.repository.aether.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import junit.framework.Assert;
 
@@ -44,6 +46,8 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
 
     private ExtensionId dependencyExtensionId;
 
+    private ExtensionId bundleExtensionId;
+
     private RepositoryUtil repositoryUtil;
 
     @Before
@@ -58,6 +62,8 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         this.extensionId = new ExtensionId("groupid:artifactid", "version");
         this.dependencyExtensionId = new ExtensionId("dgroupid:dartifactid", "dversion");
 
+        this.bundleExtensionId = new ExtensionId("groupid:bundleartifactid", "version");
+
         // lookup
 
         this.repositoryManager = getComponentManager().lookup(ExtensionRepositoryManager.class);
@@ -66,37 +72,56 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
     @Test
     public void testResolve() throws ResolveException
     {
-        Extension artifact = this.repositoryManager.resolve(this.extensionId);
+        Extension extension = this.repositoryManager.resolve(this.extensionId);
 
-        Assert.assertNotNull(artifact);
-        Assert.assertEquals(this.extensionId.getId(), artifact.getId().getId());
-        Assert.assertEquals(this.extensionId.getVersion(), artifact.getId().getVersion());
-        Assert.assertEquals("type", artifact.getType());
-        Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), artifact.getRepository().getId().getId());
-        Assert.assertEquals("description", artifact.getDescription());
-        Assert.assertEquals("http://website", artifact.getWebSite());
-        
-        ExtensionDependency dependency = artifact.getDependencies().get(0);
+        Assert.assertNotNull(extension);
+        Assert.assertEquals(this.extensionId.getId(), extension.getId().getId());
+        Assert.assertEquals(this.extensionId.getVersion(), extension.getId().getVersion());
+        Assert.assertEquals("type", extension.getType());
+        Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), extension.getRepository().getId().getId());
+        Assert.assertEquals("description", extension.getDescription());
+        Assert.assertEquals("http://website", extension.getWebSite());
+        Assert.assertEquals(Arrays.asList("groupid1:feature1", "groupid2:feature2"), new ArrayList<String>(extension.getFeatures()));
+
+        ExtensionDependency dependency = extension.getDependencies().get(0);
         Assert.assertEquals(this.dependencyExtensionId.getId(), dependency.getId());
         Assert.assertEquals(this.dependencyExtensionId.getVersion(), dependency.getVersion());
 
         // check that a new resolve of an already resolved extension provide the proper repository
-        artifact = this.repositoryManager.resolve(this.extensionId);
-        Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), artifact.getRepository().getId().getId());
+        extension = this.repositoryManager.resolve(this.extensionId);
+        Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), extension.getRepository().getId().getId());
     }
 
     @Test
     public void testDownload() throws ExtensionException, IOException
     {
-        Extension artifact = this.repositoryManager.resolve(this.extensionId);
+        Extension extension = this.repositoryManager.resolve(this.extensionId);
 
-        File file = new File("target/downloaded/" + this.extensionId.getId() + "." + artifact.getType());
+        File file = new File(this.repositoryUtil.getWorkingDirectory() + "/downloaded/extension." + extension.getType());
 
         if (file.exists()) {
             file.delete();
         }
 
-        artifact.download(file);
+        extension.download(file);
+
+        Assert.assertTrue("File has not been downloaded", file.exists());
+
+        Assert.assertEquals("content", FileUtils.readFileToString(file));
+    }
+
+    @Test
+    public void testDownloadBundle() throws ExtensionException, IOException
+    {
+        Extension extension = this.repositoryManager.resolve(this.bundleExtensionId);
+
+        File file = new File(this.repositoryUtil.getWorkingDirectory() + "/downloaded/bundleextension.jar");
+
+        if (file.exists()) {
+            file.delete();
+        }
+
+        extension.download(file);
 
         Assert.assertTrue("File has not been downloaded", file.exists());
 

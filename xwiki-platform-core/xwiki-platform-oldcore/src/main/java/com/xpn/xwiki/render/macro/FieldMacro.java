@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.render.macro;
 
 import java.io.IOException;
@@ -52,10 +50,10 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
  * <ul>
  * <li><tt>{field:title}</tt> displays the {@code title} field of the first object of the type defined in the current
  * document.</li>
- * <li><tt>{field:XWikiUsers.email}</tt> displays the {@code email} field of the first object of the {@code
- * XWiki.XWikiUsers} type.</li>
- * <li><tt>{field:XWikiComment.content|edit|3}</tt> displays the {@code content} field of the third {@code
- * XWiki.XWikiComment} type in edit mode.</li>
+ * <li><tt>{field:XWikiUsers.email}</tt> displays the {@code email} field of the first object of the
+ * {@code XWiki.XWikiUsers} type.</li>
+ * <li><tt>{field:XWikiComment.content|edit|3}</tt> displays the {@code content} field of the third
+ * {@code XWiki.XWikiComment} type in edit mode.</li>
  * </ul>
  * 
  * @deprecated It provides limited functionalities compared to the {@code doc.display} scripting API.
@@ -64,11 +62,7 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 @Deprecated
 public class FieldMacro extends BaseLocaleMacro
 {
-    /**
-     * The name of the macro.
-     * 
-     * @see org.radeox.macro.BaseLocaleMacro#getLocaleKey()
-     */
+    @Override
     public String getLocaleKey()
     {
         return "macro.field";

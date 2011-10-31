@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.extension.test;
 
 import java.util.List;
@@ -10,9 +29,8 @@ import org.xwiki.extension.job.Job;
 import org.xwiki.extension.job.JobManager;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
-import org.xwiki.logging.event.LogLevel;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.AbstractComponentTestCase;
 
 public abstract class AbstractExtensionHandlerTest extends AbstractComponentTestCase
@@ -22,8 +40,6 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
     private RepositoryUtil repositoryUtil;
 
     private JobManager jobManager;
-
-    private ObservationManager observation;
 
     @Before
     @Override
@@ -39,12 +55,6 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
 
         this.jobManager = getComponentManager().lookup(JobManager.class);
         this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class);
-        this.observation = getComponentManager().lookup(ObservationManager.class);
-    }
-
-    public ObservationManager getObservation()
-    {
-        return this.observation;
     }
 
     @Override
@@ -52,7 +62,7 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
     {
         super.registerComponents();
 
-        ConfigurableDefaultCoreExtensionRepository.register(getComponentManager());
+        registerComponent(ConfigurableDefaultCoreExtensionRepository.class);
     }
 
     protected LocalExtension install(ExtensionId extensionId) throws Throwable
@@ -69,7 +79,7 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
         return (LocalExtension) this.localExtensionRepository.resolve(extensionId);
     }
 
-    protected void uninstall(ExtensionId extensionId) throws Throwable
+    protected LocalExtension uninstall(ExtensionId extensionId) throws Throwable
     {
         UninstallRequest uninstallRequest = new UninstallRequest();
         uninstallRequest.addExtension(extensionId);
@@ -79,5 +89,7 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
         if (!errors.isEmpty()) {
             throw errors.get(0).getThrowable();
         }
+
+        return (LocalExtension) this.localExtensionRepository.resolve(extensionId);
     }
 }

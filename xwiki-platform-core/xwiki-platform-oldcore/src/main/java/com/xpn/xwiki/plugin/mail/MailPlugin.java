@@ -16,39 +16,43 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.plugin.mail;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
-public class MailPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
-        private static Log mLogger =
-                LogFactory.getLog(com.xpn.xwiki.plugin.mail.MailPlugin.class);
+public class MailPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
+{
+    private static Logger LOGGER = LoggerFactory.getLogger(com.xpn.xwiki.plugin.mail.MailPlugin.class);
 
-        public MailPlugin(String name, String className, XWikiContext context) {
-            super(name, className, context);
-            init(context);
-        }
+    public MailPlugin(String name, String className, XWikiContext context)
+    {
+        super(name, className, context);
+        init(context);
+    }
 
-    public String getName() {
+    public String getName()
+    {
         return "mail";
     }
 
-    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
+    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
+    {
         return new MailPluginApi((MailPlugin) plugin, context);
     }
 
-    public void flushCache() {
+    public void flushCache()
+    {
     }
 
-    public void init(XWikiContext context) {
+    public void init(XWikiContext context)
+    {
         super.init(context);
     }
 }

@@ -39,6 +39,11 @@ div.suggestItems em {
   margin-right:2px;
 }
 
+div.suggestItems span.info span.hint {
+  color: $theme.textSecondaryColor;
+  margin-left:5px;
+}
+
 div.suggestItems div.info {
   color: $theme.textSecondaryColor;
   font-size: 0.8em;

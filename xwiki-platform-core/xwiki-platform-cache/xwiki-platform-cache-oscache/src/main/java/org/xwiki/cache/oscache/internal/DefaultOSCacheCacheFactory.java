@@ -19,6 +19,9 @@
  */
 package org.xwiki.cache.oscache.internal;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 
 /**
@@ -26,14 +29,11 @@ import org.xwiki.component.annotation.Component;
  * 
  * @version $Id$
  */
-@Component("oscache")
+@Component
+@Named("oscache")
+@Singleton
 public class DefaultOSCacheCacheFactory extends AbstractOSCacheCacheFactory
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractJBossCacheCacheFactory#getDefaultPropsId()
-     */
     @Override
     protected String getDefaultPropsId()
     {

@@ -932,8 +932,12 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     #set($subjectLine = "$!userSuppliedSubject")
     #set($messageBody = "$!userSuppliedContent")
     ##
+    ## If the subject line provided by the user is empty then there will be trailing whitespace.
+    ## xe.invitation.emailContent.subjectLine={0} has invited you to join {1} {2}
+    #set($subjectLineWithWhitespace = "$doc.getRenderedContent($subjectLineTemplate, 'xwiki/2.0', 'plain/1.0')")
+    ##
     ## Generate the message from the template - html in the subject line is ignored by the mail client.
-    $message.set('subjectLine', "$doc.getRenderedContent($subjectLineTemplate, 'xwiki/2.0', 'plain/1.0')")##
+    $message.set('subjectLine', $subjectLineWithWhitespace.trim())##
     $message.set('messageBody', "$doc.getRenderedContent($messageBodyTemplate, 'xwiki/2.0')")##
     #set($discard = $messages.add($message))
   #end

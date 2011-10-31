@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>  
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-php</artifactId>
   <name>XWiki Platform - Rendering - Macro - PHP</name>
@@ -65,11 +65,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <id>maven2-repository.caucho.com</id>
-      <name>Caucho Repository for Maven</name>
-      <url>http://caucho.com/m2/</url>
-    </repository>
-  </repositories>
 </project>

@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki;
 
 import java.net.URL;
@@ -29,8 +27,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.map.LRUMap;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlrpc.server.XmlRpcServer;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -156,6 +155,9 @@ public class XWikiContext extends Hashtable<Object, Object>
     @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.class, "compactwiki");
+
+    /** The Execution so that we can check if permissions were dropped there. */
+    private final Execution execution = Utils.getComponent(Execution.class);
 
     public XWikiContext()
     {
@@ -325,8 +327,8 @@ public class XWikiContext extends Hashtable<Object, Object>
      */
     public boolean isMainWiki(String wikiName)
     {
-        return !getWiki().isVirtualMode()
-            || (wikiName == null ? getMainXWiki() == null : wikiName.equalsIgnoreCase(getMainXWiki()));
+        return (getWiki() != null && !getWiki().isVirtualMode())
+            || StringUtils.equalsIgnoreCase(wikiName, getMainXWiki());
     }
 
     public XWikiDocument getDoc()
@@ -356,19 +358,25 @@ public class XWikiContext extends Hashtable<Object, Object>
             remove(USERREFERENCE_KEY);
         } else {
             this.userReference = new DocumentReference(userReference);
-            put(USER_KEY, getUser());
+            boolean ismain = isMainWiki(this.userReference.getWikiReference().getName());
+            put(USER_KEY, new XWikiUser(getUser(), ismain));
             put(USERREFERENCE_KEY, this.userReference);
         }
     }
 
     /**
-     * @deprecated use {@link #setUserReference(DocumentReference)} instead
+     * @deprecated since 3.1M1 use {@link #setUserReference(DocumentReference)} instead
      */
     @Deprecated
     public void setUser(String user, boolean main)
     {
         if (user == null) {
             setUserReference(null);
+        } else if (user.endsWith(XWikiRightService.GUEST_USER_FULLNAME) || user.equals(XWikiRightService.GUEST_USER)) {
+            setUserReference(null);
+            // retro-compatibilty hack: some code does not give the same meaning to null XWikiUser and XWikiUser
+            // containing guest user
+            put(USER_KEY, new XWikiUser(user, main));
         } else {
             setUserReference(resolveUserReference(user));
         }
@@ -384,7 +392,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated use {@link #setUserReference(DocumentReference)} instead
+     * @deprecated since 3.1M1 use {@link #setUserReference(DocumentReference)} instead
      */
     @Deprecated
     public void setUser(String user)
@@ -393,7 +401,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @return use {@link #getUserReference()} instead
+     * @deprecated since 3.1M1 use {@link #getUserReference()} instead
      */
     @Deprecated
     public String getUser()
@@ -411,7 +419,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @return use {@link #getUserReference()} instead
+     * @deprecated since 3.1M1 use {@link #getUserReference()} instead
      */
     @Deprecated
     public String getLocalUser()
@@ -424,7 +432,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @return use {@link #getUserReference()} instead
+     * @deprecated since 3.1M1 use {@link #getUserReference()} instead
      */
     @Deprecated
     public XWikiUser getXWikiUser()
@@ -432,9 +440,9 @@ public class XWikiContext extends Hashtable<Object, Object>
         if (this.userReference != null) {
             boolean ismain = isMainWiki(this.userReference.getWikiReference().getName());
             return new XWikiUser(getUser(), ismain);
-        } else {
-            return null;
         }
+
+        return (XWikiUser) get(USER_KEY);
     }
 
     public String getLanguage()
@@ -585,7 +593,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     public BaseClass getBaseClass(String name)
     {
         BaseClass baseClass = null;
-        if (!StringUtils.isEmpty(name)) {
+        if (StringUtils.isNotEmpty(name)) {
             baseClass = this.classCache.get(this.currentMixedDocumentReferenceResolver.resolve(name));
         }
         return baseClass;
@@ -685,6 +693,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
+     * Drop permissions for the remainder of the request cycle.
      * After this is called:
      * <ul>
      * <li>1. {@link com.xpn.xwiki.api.Api#hasProgrammingRights()} will always return false.</li>
@@ -701,19 +710,39 @@ public class XWikiContext extends Hashtable<Object, Object>
      * way for code following this call to save another document as this user, blessing it too with programming right.
      * <p>
      * Once dropped, permissions cannot be regained for the duration of the request.
+     *
+     * <p>
+     * If you are interested in a more flexable sandboxing method which sandboxed code only
+     * for the remainder of the rendering cycle, consider using
+     * {@link com.xpn.xwiki.api.Document#dropPermissions()}.
+     * <p>
      * 
      * @since 3.0M3
      */
     public void dropPermissions()
     {
-        put("hasDroppedPermissions", "true");
+        this.put(XWikiConstant.DROPPED_PERMISSIONS, Boolean.TRUE);
     }
 
     /**
-     * @return true if {@link XWikiContext#dropPermissions()} has been called on this context.
+     * @return true if {@link XWikiContext#dropPermissions()} has been called
+     *              on this context, or if the {@link XWikiConstant.DROPPED_PERMISSIONS}
+     *              key has been set in the {@link org.xwiki.context.ExecutionContext}
+     *              for this thread. This is done by calling {@Document#dropPermissions()}
      */
     public boolean hasDroppedPermissions()
     {
-        return this.get("hasDroppedPermissions") != null;
+        if (this.get(XWikiConstant.DROPPED_PERMISSIONS) != null) {
+            return true;
+        }
+
+        final Object dropped =
+            this.execution.getContext().getProperty(XWikiConstant.DROPPED_PERMISSIONS);
+
+        if (dropped == null || !(dropped instanceof Integer)) {
+            return false;
+        }
+
+        return ((Integer) dropped) == System.identityHashCode(this.execution.getContext());
     }
 }

@@ -21,7 +21,11 @@ package org.xwiki.extension.jar.internal.handler;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,8 +33,11 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.ExtensionDependency;
+import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
@@ -49,40 +56,77 @@ public class JarHandlerApplicationStartedListener implements EventListener
     @Inject
     private ExtensionHandlerManager extensionHandlerManager;
 
+    @Inject
+    private CoreExtensionRepository coreExtensionRepository;
+
     /**
      * The logger to log.
      */
     @Inject
     private Logger logger;
 
+    @Override
     public List<Event> getEvents()
     {
         return EVENTS;
     }
 
+    @Override
     public String getName()
     {
         return "JarHandlerApplicationStartedListener";
     }
 
+    private void loadJarExtension(LocalExtension localExtension, Map<String, Set<LocalExtension>> loadedExtensions)
+        throws InstallException
+    {
+        if (localExtension.getNamespaces() != null) {
+            for (String namespace : localExtension.getNamespaces()) {
+                loadJarExtension(localExtension, namespace, loadedExtensions);
+            }
+        } else {
+            loadJarExtension(localExtension, null, loadedExtensions);
+        }
+    }
+
+    private void loadJarExtension(LocalExtension localExtension, String namespace,
+        Map<String, Set<LocalExtension>> loadedExtensions) throws InstallException
+    {
+        Set<LocalExtension> loadedExtensionsInNamespace = loadedExtensions.get(namespace);
+
+        if (loadedExtensionsInNamespace == null) {
+            loadedExtensionsInNamespace = new HashSet<LocalExtension>();
+            loadedExtensions.put(namespace, loadedExtensionsInNamespace);
+        }
+
+        if (!loadedExtensionsInNamespace.contains(localExtension)) {
+            for (ExtensionDependency dependency : localExtension.getDependencies()) {
+                if (!this.coreExtensionRepository.exists(dependency.getId())) {
+                    LocalExtension dependencyExtension =
+                        this.localExtensionRepository.getInstalledExtension(dependency.getId(), namespace);
+                    loadJarExtension(dependencyExtension, namespace, loadedExtensions);
+                }
+            }
+
+            this.extensionHandlerManager.install(localExtension, namespace);
+
+            loadedExtensionsInNamespace.add(localExtension);
+        }
+    }
+
+    @Override
     public void onEvent(Event arg0, Object arg1, Object arg2)
     {
+        Map<String, Set<LocalExtension>> loadedExtensions = new HashMap<String, Set<LocalExtension>>();
+
         // Load extensions from local repository
-        Collection<LocalExtension> localExtensions = this.localExtensionRepository.getLocalExtensions();
+        Collection<LocalExtension> localExtensions = this.localExtensionRepository.getInstalledExtensions();
         for (LocalExtension localExtension : localExtensions) {
             if (localExtension.getType().equals("jar")) {
-                if (localExtension.isInstalled()) {
-                    try {
-                        if (localExtension.getNamespaces() != null) {
-                            for (String wiki : localExtension.getNamespaces()) {
-                                this.extensionHandlerManager.install(localExtension, wiki);
-                            }
-                        } else {
-                            this.extensionHandlerManager.install(localExtension, null);
-                        }
-                    } catch (Exception e) {
-                        this.logger.error("Failed to install local extension [" + localExtension + "]", e);
-                    }
+                try {
+                    loadJarExtension(localExtension, loadedExtensions);
+                } catch (Exception e) {
+                    this.logger.error("Failed to install local extension [" + localExtension + "]", e);
                 }
             }
         }

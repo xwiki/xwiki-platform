@@ -21,31 +21,41 @@ package org.xwiki.extension.internal;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.test.AbstractComponentTestCase;
 
-public class DefaultVersionManagerTest
+public class DefaultVersionManagerTest extends AbstractComponentTestCase
 {
     private VersionManager versionManager;
-    
-    @Before
+
+    @Override
     public void setUp() throws Exception
     {
-        this.versionManager = new DefaultVersionManager();
+        super.setUp();
+
+        this.versionManager = getComponentManager().lookup(VersionManager.class);
     }
-    
+
     @Test
     public void testWithIntegers()
     {
         Assert.assertEquals(1, versionManager.compareVersions("1.1", "1.0"));
         Assert.assertEquals(8, versionManager.compareVersions("1.10", "1.2"));
     }
-    
+
     @Test
     public void testWithStrings()
     {
         Assert.assertEquals(8, versionManager.compareVersions("1.10-sometext", "1.2"));
         Assert.assertEquals(1, versionManager.compareVersions("1.1-sometext", "1.1"));
         Assert.assertEquals(67, versionManager.compareVersions("1.sometext", "1.0"));
+        Assert.assertEquals(66, versionManager.compareVersions("sometext", "1.0"));
+    }
+    
+    @Test
+    public void testWithNull()
+    {
+        Assert.assertEquals(1, versionManager.compareVersions("sometext", null));
+        Assert.assertEquals(-1, versionManager.compareVersions(null, "sometext"));
     }
 }

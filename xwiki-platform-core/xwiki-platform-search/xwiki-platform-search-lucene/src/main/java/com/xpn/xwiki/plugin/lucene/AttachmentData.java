@@ -19,12 +19,17 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Fieldable;
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -39,7 +44,26 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class AttachmentData extends AbstractDocumentData
 {
-    private static final Log LOG = LogFactory.getLog(AttachmentData.class);
+    /** Logging helper object. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(AttachmentData.class);
+
+    /** The importance of attachments in general, compared to other documents. */
+    private static final float ATTACHMENT_GLOBAL_BOOST = 0.25f;
+
+    /** The importance of the attachment filename. */
+    private static final float FILENAME_BOOST = 3f;
+
+    /** How much to weight down fields from the owner document that are not that relevant for attachments. */
+    private static final float IRRELEVANT_DOCUMENT_FIELD_BOOST = 0.1f;
+
+    /** Which fields are relevant for attachments as well and should be kept at their original importance. */
+    private static final List<String> RELEVANT_DOCUMENT_FIELDS = new ArrayList<String>();
+    static {
+        RELEVANT_DOCUMENT_FIELDS.add(IndexFields.DOCUMENT_ID);
+        RELEVANT_DOCUMENT_FIELDS.add(IndexFields.DOCUMENT_TYPE);
+        RELEVANT_DOCUMENT_FIELDS.add(IndexFields.DOCUMENT_AUTHOR);
+        RELEVANT_DOCUMENT_FIELDS.add(IndexFields.FULLTEXT);
+    }
 
     private int size;
 
@@ -62,13 +86,25 @@ public class AttachmentData extends AbstractDocumentData
         setFilename(filename);
     }
 
+    @Override
     public void addDataToLuceneDocument(Document luceneDoc, XWikiContext context) throws XWikiException
     {
         super.addDataToLuceneDocument(luceneDoc, context);
 
-        if (this.filename != null) {
-            luceneDoc.add(new Field(IndexFields.FILENAME, filename, Field.Store.YES, Field.Index.ANALYZED));
+        // Lower the importance of the fields inherited from the document
+        List<Fieldable> existingFields = luceneDoc.getFields();
+        for (Fieldable f : existingFields) {
+            if (!RELEVANT_DOCUMENT_FIELDS.contains(f.name())) {
+                f.setBoost(f.getBoost() * IRRELEVANT_DOCUMENT_FIELD_BOOST);
+            }
         }
+
+        if (this.filename != null) {
+            addFieldToDocument(IndexFields.FILENAME, this.filename, Field.Store.YES, Field.Index.ANALYZED,
+                FILENAME_BOOST, luceneDoc);
+        }
+        // Decrease the global score of attachments
+        luceneDoc.setBoost(ATTACHMENT_GLOBAL_BOOST);
     }
 
     /**
@@ -108,6 +144,7 @@ public class AttachmentData extends AbstractDocumentData
      * 
      * @see AbstractIndexData#getId()
      */
+    @Override
     public String getId()
     {
         return new StringBuffer(super.getId()).append(".file.").append(this.filename).toString();
@@ -133,7 +170,7 @@ public class AttachmentData extends AbstractDocumentData
             if (sb.length() > 0) {
                 sb.append(" ");
             }
-            sb.append(getContentAsText(doc, context));
+            sb.append(contentText);
         }
     }
 
@@ -144,19 +181,17 @@ public class AttachmentData extends AbstractDocumentData
         try {
             XWikiAttachment att = doc.getAttachment(this.filename);
 
-            LOG.debug("Start parsing attachement [" + this.filename + "] in document [" + doc.getDocumentReference()
-                + "]");
+            LOGGER.debug("Start parsing attachement [{}] in document [{}]", this.filename, doc.getDocumentReference());
 
             Tika tika = new Tika();
 
             Metadata metadata = new Metadata();
             metadata.set(Metadata.RESOURCE_NAME_KEY, this.filename);
 
-            contentText = this.filename + " " + tika.parseToString(att.getContentInputStream(context), metadata);
-        } catch (Throwable e) {
-            LOG.warn(
-                "error getting content of attachment [" + this.filename + "] for document ["
-                    + doc.getDocumentReference() + "]", e);
+            contentText = StringUtils.lowerCase(tika.parseToString(att.getContentInputStream(context), metadata));
+        } catch (Throwable ex) {
+            LOGGER.warn("error getting content of attachment [{}] for document [{}]",
+                new Object[] {this.filename, doc.getDocumentReference(), ex});
         }
 
         return contentText;

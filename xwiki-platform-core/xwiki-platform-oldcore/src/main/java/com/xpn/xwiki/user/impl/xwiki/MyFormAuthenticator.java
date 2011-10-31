@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.user.impl.xwiki;
 
 import java.io.IOException;
@@ -28,14 +26,14 @@ import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.securityfilter.authenticator.Authenticator;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.filter.URLPatternMatcher;
 import org.securityfilter.realm.SimplePrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.container.servlet.filters.SavedRequestManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -43,7 +41,7 @@ import com.xpn.xwiki.XWikiException;
 
 public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthenticator
 {
-    private static final Log LOG = LogFactory.getLog(MyFormAuthenticator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyFormAuthenticator.class);
 
     /**
      * Show the login page.
@@ -92,8 +90,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             redirectBack.append(delimiter);
             redirectBack.append(sridParameter);
         }
-        response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + this.loginPage
-            + "?" + sridParameter + "&xredirect=" + URLEncoder.encode(redirectBack.toString(), "UTF-8")));
+        response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + this.loginPage + "?"
+            + sridParameter + "&xredirect=" + URLEncoder.encode(redirectBack.toString(), "UTF-8")));
 
         return;
     }
@@ -144,7 +142,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         // persistent logins are enabled, and the persistent login info is present in this request
         if (this.persistentLoginManager != null) {
             String username =
-                    convertUsername(this.persistentLoginManager.getRememberedUsername(request, response), context);
+                convertUsername(this.persistentLoginManager.getRememberedUsername(request, response), context);
             String password = this.persistentLoginManager.getRememberedPassword(request, response);
 
             Principal principal = request.getUserPrincipal();
@@ -157,8 +155,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                 principal = authenticate(username, password, context);
 
                 if (principal != null) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("User " + principal.getName() + " has been authentified from cookie");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("User " + principal.getName() + " has been authentified from cookie");
                     }
 
                     // make sure the Principal contains wiki name information
@@ -204,8 +202,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         Principal principal = authenticate(username, password, context);
         if (principal != null) {
             // login successful
-            if (LOG.isInfoEnabled()) {
-                LOG.info("User " + principal.getName() + " has been logged-in");
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("User " + principal.getName() + " has been logged-in");
             }
 
             // invalidate old session if the user was already authenticated, and they logged in as a different user
@@ -240,8 +238,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         } else {
             // login failed
             // set response status and forward to error page
-            if (LOG.isInfoEnabled()) {
-                LOG.info("User " + username + " login has failed");
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("User " + username + " login has failed");
             }
 
             String returnCode = context.getWiki().Param("xwiki.authentication.unauthorized_code");

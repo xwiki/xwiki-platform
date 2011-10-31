@@ -21,13 +21,12 @@ package org.xwiki.store;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.locks.ReadWriteLock;
 
 import org.apache.commons.io.IOUtils;
-
 
 /**
  * A TransactionRunnable for saving a file safely.
@@ -39,19 +38,29 @@ import org.apache.commons.io.IOUtils;
  */
 public class FileSaveTransactionRunnable extends StartableTransactionRunnable<TransactionRunnable>
 {
-    /** The location of the file to save the attachment content in. */
+    /**
+     * The location of the file to save the attachment content in.
+     */
     private final File toSave;
 
-    /** The location of the temporary file. */
+    /**
+     * The location of the temporary file.
+     */
     private final File tempFile;
 
-    /** The location of the backup file. */
+    /**
+     * The location of the backup file.
+     */
     private final File backupFile;
 
-    /** A lock to hold while running this TransactionRunnable. */
+    /**
+     * A lock to hold while running this TransactionRunnable.
+     */
     private final ReadWriteLock lock;
 
-    /** The source of the data to save. */
+    /**
+     * The source of the data to save.
+     */
     private final StreamProvider provider;
 
     /**
@@ -66,20 +75,20 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
      *
      * @param toSave the file to put the content in.
      * @param tempFile a temporary file, this should not contain anything important as it will be deleted
-     *                 and must not be altered while the operation is running. This will contain the data
-     *                 until onCommit when it is renamed to the toSave file.
+     * and must not be altered while the operation is running. This will contain the data
+     * until onCommit when it is renamed to the toSave file.
      * @param backupFile a temporary file, this should not contain anything important as it will be deleted
-     *                   and must not be altered while the operation is running. This will contain whatever
-     *                   was in the toSave file prior, just in case onRollback must be called.
+     * and must not be altered while the operation is running. This will contain whatever
+     * was in the toSave file prior, just in case onRollback must be called.
      * @param lock a ReadWriteLock whose writeLock will be locked as the beginning of the process and
-     *             unlocked when complete.
+     * unlocked when complete.
      * @param provider a StreamProvider to get the data to put into the file.
      */
     public FileSaveTransactionRunnable(final File toSave,
-                                       final File tempFile,
-                                       final File backupFile,
-                                       final ReadWriteLock lock,
-                                       final StreamProvider provider)
+        final File tempFile,
+        final File backupFile,
+        final ReadWriteLock lock,
+        final StreamProvider provider)
     {
         this.toSave = toSave;
         this.tempFile = tempFile;
@@ -110,8 +119,8 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
     {
         if (!this.toSave.getParentFile().exists() && !this.toSave.getParentFile().mkdirs()) {
             throw new IOException("Could not make directory tree to place file in. "
-                                  + "Do you have permission to write to ["
-                                  + this.toSave.getAbsolutePath() + "] ?");
+                + "Do you have permission to write to ["
+                + this.toSave.getAbsolutePath() + "] ?");
         }
 
         final InputStream in = this.provider.getStream();
@@ -180,19 +189,19 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
      * Knowing there is no temp file, we can determine that one of 4 possible things happened.
      *
      * 1. No backup file and no main file. There was probably no file to begin with
-     *    and it failed before anything could be saved in the temp file. Do nothing.
+     * and it failed before anything could be saved in the temp file. Do nothing.
      *
      * 2. No backup file but there is a main file, assume onCommit happened successfully but there
-     *    was no file here to begin with so there was nothing to back up. Move the main file back
-     *    to the temporary location.
+     * was no file here to begin with so there was nothing to back up. Move the main file back
+     * to the temporary location.
      *
      * 3. If there is a backup file, but no main file, this is unexpected but since the backup file
-     *    should be the previous main file, move it back to the main location and log a warning
-     *    that the storage engine encountered an unexpected albeit probably recoverable state.
+     * should be the previous main file, move it back to the main location and log a warning
+     * that the storage engine encountered an unexpected albeit probably recoverable state.
      *
      * 4. If there is a backup file and a main file, onCommit probably went smoothly and a problem
-     *    was encountered somewhere else forcing the rollback. Move the main file back to the
-     *    temporary location and the backup file back to the main location.
+     * was encountered somewhere else forcing the rollback. Move the main file back to the
+     * temporary location and the backup file back to the main location.
      */
     private void onRollbackNoTempFile()
     {
@@ -229,15 +238,15 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
      * Knowing there is a temp file, one of 3 things might have happened:
      *
      * 1. If there is no backup file, assume onCommit did not occur, do nothing regardless
-     *    of whether there is or isn't an (existing) main file.
+     * of whether there is or isn't an (existing) main file.
      *
      * 2. If there is a backup file but no main file, there must have been a failure half way
-     *    through onCommit, it was able to move the existing main file to the backup
-     *    location but did not move the temporary file to the main location. Move the backup file
-     *    back to the main location.
+     * through onCommit, it was able to move the existing main file to the backup
+     * location but did not move the temporary file to the main location. Move the backup file
+     * back to the main location.
      *
      * 3. If there is a file in each location which should not happen and if it does,
-     *    throw an exception which will be printed in the log.
+     * throw an exception which will be printed in the log.
      */
     private void onRollbackWithTempFile()
     {
@@ -258,12 +267,12 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
         // 3.
         if (isBackupFile && isMainFile) {
             throw new IllegalStateException("Tried to rollback the saving of file "
-                                            + this.toSave.getAbsolutePath() + " and encountered a "
-                                            + "backup, a temp file, and a main file. Since any existing "
-                                            + "main file is renamed to a temp location and the content is "
-                                            + "saved in the backup location and then renamed to the main "
-                                            + "location, the existance of all 3 at once should never "
-                                            + "happen.");
+                + this.toSave.getAbsolutePath() + " and encountered a "
+                + "backup, a temp file, and a main file. Since any existing "
+                + "main file is renamed to a temp location and the content is "
+                + "saved in the backup location and then renamed to the main "
+                + "location, the existance of all 3 at once should never "
+                + "happen.");
         }
     }
 

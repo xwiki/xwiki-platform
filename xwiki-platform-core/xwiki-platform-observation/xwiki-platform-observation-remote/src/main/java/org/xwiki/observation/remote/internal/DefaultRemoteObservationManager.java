@@ -30,7 +30,6 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
@@ -216,11 +215,9 @@ public class DefaultRemoteObservationManager implements RemoteObservationManager
 
             try {
                 this.executionContextManager.initialize(context);
-            } catch (ExecutionContextException e) {
+            } catch (Exception e) {
                 this.logger.error("failed to initialize execution context", e);
             }
-
-            this.execution.setContext(context);
         }
     }
 }

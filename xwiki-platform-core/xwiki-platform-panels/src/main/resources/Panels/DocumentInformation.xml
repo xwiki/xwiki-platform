@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1154090261000</creationDate>
-<date>1285593786000</date>
-<contentUpdateDate>1285593786000</contentUpdateDate>
+<date>1314360204000</date>
+<contentUpdateDate>1314360204000</contentUpdateDate>
 <version>1.1</version>
 <title>Document Information</title>
 <template></template>
@@ -197,12 +197,18 @@ XWiki.SyntaxConverter = Class.create({
       } else if (!this.contentField.value.blank()) {
         if (confirm("Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will only change the syntax identifier, without modifying the document's content. Note that if you choose 'ok' this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.")) {
           this.disableEditingArea();
-          var url = '$doc.getURL('view', "action=convertSyntax&amp;xpage=plain&amp;outputSyntax=plain&amp;form_token=$!{services.csrf.getToken()}&amp;documentName=")' + encodeURIComponent(this.name) + '&amp;oldSyntaxId=' + encodeURIComponent(this.originalSyntax) + '&amp;newSyntaxId=' + encodeURIComponent(syntax);
           new Ajax.Request(
-            url,
+            "$doc.getURL('get')",
             {
               method: 'post',
               parameters: {
+                action: 'convertSyntax',
+                xpage: 'plain',
+                outputSyntax: 'plain',
+                form_token: '$!{services.csrf.getToken()}',
+                documentName: this.name,
+                oldSyntaxId: this.originalSyntax,
+                newSyntaxId: syntax,
                 content: $('content').value
               },
               onSuccess: this.successfulConversion.bindAsEventListener(this),
@@ -423,7 +429,7 @@ $xwiki.jsx.use($paneldoc.fullName)##
 {{/velocity}}</content>
 </property>
 <property>
-<description>Displays and allows editing the document title, parent and included documents.</description>
+<description>Displays and allows editing the document title and syntax, and lists the included documents.</description>
 </property>
 <property>
 <name>Document Information</name>
@@ -541,44 +547,43 @@ $xwiki.jsx.use($paneldoc.fullName)##
 </property>
 </object>
 <content>{{velocity output="false"}}
-#macro(convertDocument $translatedDoc $error $oldSyntax $newSyntaxId $content)
-  #if ($translatedDoc.realLanguage == $xwiki.languagePreference)
-    #set ($theDoc = $translatedDoc)
+#macro(convertDocument $targetDoc $error $oldSyntaxId $newSyntaxId)
+  #if ($targetDoc.realLanguage == $xwiki.languagePreference)
     #if ($request.content)
-      #set ($void = $translatedDoc.setContent($request.content))
+      ## Use the content received from the client if the target document is the edited one (could be also a translation of the edited document).
+      #set ($void = $targetDoc.setContent($request.content))
     #end
   #end
-  ## Use the syntax and content received from the client, as the user might have made some changes that are not on saved yet.
-  #set ($void = $translatedDoc.setSyntaxId($oldSyntax))
-  #if (!$translatedDoc.convertSyntax($newSyntaxId) || !${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+  ## Use the syntax received from the client as the user might have made some changes that are not saved yet.
+  #set ($void = $targetDoc.setSyntaxId($oldSyntaxId))
+  #if (!$services.csrf.isTokenValid($request.form_token) || !$targetDoc.convertSyntax($newSyntaxId))
     #set ($error = true)
   #else
-    #set ($void = $translatedDoc.save("Document converted from syntax $oldSyntax to syntax $newSyntaxId"))
+    #set ($void = $targetDoc.save("Document converted from syntax $oldSyntaxId to syntax $newSyntaxId"))
   #end
 #end
 {{/velocity}}
 
 {{velocity wiki="false"}}
-#if ("$!{request.action}" == 'convertSyntax')
-  #set ($oldSyntax = $request.oldSyntaxId)
+#if ("$!request.action" == 'convertSyntax')
+  #set ($oldSyntaxId = $request.oldSyntaxId)
   #set ($newSyntaxId = $request.newSyntaxId)
-  #set ($mainDoc = $xwiki.getDocument($request.documentName))
-  #set ($theDoc = $mainDoc)
+  #set ($targetDoc = $xwiki.getDocument($request.documentName))
   #set ($error = false)
   ##
-  ## Convert current document
+  ## Convert the specified document
   ##
-  #convertDocument($mainDoc $error $oldSyntax $newSyntaxId $theDoc)
+  #convertDocument($targetDoc $error $oldSyntaxId $newSyntaxId)
   ##
-  ## Convert document translations
+  ## Convert all the translations of the specified document
   ##
-  #set($languages = $theDoc.translationList)
+  #set($languages = $targetDoc.translationList)
   #if (!$error)
     #foreach ($language in $languages)
       #if (!$error)
-        #set ($translatedDoc = $mainDoc.getTranslatedDocument($language))
-        #if ($translatedDoc.language != $mainDoc.language)
-          #convertDocument($translatedDoc $error $oldSyntax $newSyntaxId $theDoc)
+        #set ($translatedDoc = $targetDoc.getTranslatedDocument($language))
+        #if ($translatedDoc.language != $targetDoc.language)
+          #convertDocument($translatedDoc $error $oldSyntaxId $newSyntaxId)
         #end
       #end
     #end
@@ -588,7 +593,7 @@ $xwiki.jsx.use($paneldoc.fullName)##
   ##
   #if (!$error)
     ## Conversion successful. The "ok:" prefix is needed, since otherwise an empty content will result in a "This template does not exist" exception.
-    ok:${theDoc.content}##
+    ok:${targetDoc.content}##
   #else
     $response.setStatus(501)
     ## TODO: Find a way to put the exception in the context and send it to the client.
@@ -598,7 +603,7 @@ $xwiki.jsx.use($paneldoc.fullName)##
 {{/velocity}}
 
 {{velocity}}
-#if ("$!{request.action}" != 'convertSyntax')
+#if ("$!request.action" != 'convertSyntax')
   {{include document="Panels.PanelSheet"/}}
 #end
 {{/velocity}}</content></xwikidoc>

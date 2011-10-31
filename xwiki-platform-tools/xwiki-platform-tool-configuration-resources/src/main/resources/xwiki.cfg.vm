@@ -1,3 +1,23 @@
+# ---------------------------------------------------------------------------
+# See the NOTICE file distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This is free software; you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License as
+# published by the Free Software Foundation; either version 2.1 of
+# the License, or (at your option) any later version.
+#
+# This software is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this software; if not, write to the Free
+# Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+# ---------------------------------------------------------------------------
+
 #---------------------------------------
 # Preamble
 #
@@ -14,11 +34,12 @@
 
 #-# [Since 1.6RC1] Defines the list of supported syntaxes
 #-# Available syntaxes are: 
-#-#    xwiki/1.0, xwiki/2.0, xwiki/2.1, confluence/1.0, jspwiki/1.0, creole/1.0,  mediawiki/1.0, twiki/1.0, xhtml/1.0, html/4.01, plain/1.0
+#-#    xwiki/1.0, xwiki/2.0, xwiki/2.1, confluence/1.0, jspwiki/1.0, creole/1.0,  mediawiki/1.0, twiki/1.0, xhtml/1.0,
+#-#    html/4.01, plain/1.0, docbook/4.4
 xwiki.rendering.syntaxes = xwiki/1.0, xwiki/2.0, xwiki/2.1
 
-#-# List of groups that a new user should be added to by default after registering. Comma-separated list of group document
-#-# names.
+#-# List of groups that a new user should be added to by default after registering. Comma-separated list of group
+#-# document names.
 # xwiki.users.initialGroups=XWiki.XWikiAllGroup
 
 #-# Should all users be considered members of XWiki.XWikiAllGroup, even if they don't have an associated object in the
@@ -50,9 +71,9 @@ xwiki.tags=1
 # Storage
 #
 
-#-# Role hints that differentiate implementations of the various storage components. To add a new implementation for one
-#-# of the storages, implement the appropriate interface and declare it in a components.xml file (using a role-hint other
-#-# than 'default') and put its hint here.
+#-# Role hints that differentiate implementations of the various storage components. To add a new implementation for
+#-# one of the storages, implement the appropriate interface and declare it in a components.xml file (using a role-hint
+#-# other than 'default') and put its hint here.
 #
 #-# The main (documents) storage.
 # xwiki.store.main.hint=default
@@ -115,8 +136,8 @@ xwiki.tags=1
 # migrating data to new formats, correct errors introduced in older versions, or even for schema updates that are not
 # handled by velocity.
 
-#-# Whether migrations are enabled or not. Should be enabled when upgrading, but for a better startup time it is better to
-#-# disable them in production.
+#-# Whether migrations are enabled or not. Should be enabled when upgrading, but for a better startup time it is better
+#-# to disable them in production.
 xwiki.store.migration=1
 
 #-# Migration manager class. The default works with a Hibernate storage.
@@ -148,8 +169,8 @@ xwiki.store.migration=1
 # Virtual wikis (farm)
 #
 
-#-# This parameter allows XWiki to operate in Hosting mode allowing to create multiple wikis having their own database and
-#-# responding to different URLs
+#-# This parameter allows XWiki to operate in Hosting mode allowing to create multiple wikis having their own database
+#-# and responding to different URLs
 xwiki.virtual=$xwikiCfgVirtual
 
 #-# URL to redirect to when a requested wiki does not exist. This should be changed to a real page.
@@ -159,8 +180,8 @@ xwiki.virtual.redirect=http://127.0.0.1:9080/xwiki/bin/Main/ThisWikiDoesNotExist
 # xwiki.virtual.reserved_wikis=
 
 #-# How virtual wikis are mapped to different URLs. If set to 0 (the default), then virtual wikis have different domain
-#-# names, in the format http://wikiname.myfarm.net/. If set to 1, then the domain is common for the entire farm, but the
-#-# path contains the wiki name, in the format http://myfarm.net/xwiki/wiki/wikiname/.
+#-# names, in the format http://wikiname.myfarm.net/. If set to 1, then the domain is common for the entire farm, but
+#-# the path contains the wiki name, in the format http://myfarm.net/xwiki/wiki/wikiname/.
 #-# Note that you can configure the "/wiki/" part with xwiki.virtual.usepath.servletpath property.
 # xwiki.virtual.usepath=0
 
@@ -194,9 +215,9 @@ xwiki.virtual.redirect=http://127.0.0.1:9080/xwiki/bin/Main/ThisWikiDoesNotExist
 #-# contain a trailing /, but not a leading one. For example:
 #-# xwiki.servletpath=bin/
 # xwiki.servletpath=
-#-# The fallback servlet mapping name to use in the generated URLs. Unlike xwiki.servletpath, this is the value used when
-#-# the correct setting could not be determined from the request URL. A good way to use this setting is to achieve short
-#-# URLs, see http://platform.xwiki.org/xwiki/bin/Main/ShortURLs
+#-# The fallback servlet mapping name to use in the generated URLs. Unlike xwiki.servletpath, this is the value used
+#-# when the correct setting could not be determined from the request URL. A good way to use this setting is to achieve
+#-# short URLs, see http://platform.xwiki.org/xwiki/bin/Main/ShortURLs
 # xwiki.defaultservletpath=bin/
 
 #-# Whether the /view/ part of the URL should be included if the target action is 'view'.
@@ -205,7 +226,8 @@ xwiki.virtual.redirect=http://127.0.0.1:9080/xwiki/bin/Main/ThisWikiDoesNotExist
 # xwiki.defaultweb=Main
 #-# Hide the /Space/ part of the URL when the space is the default one. Warning: use 1 to hide, 0 to show.
 # xwiki.usedefaultweb=0
-#-# The name of the default page of a space. This is displayed when the URL specifies a space, but not a document, or neither.
+#-# The name of the default page of a space. This is displayed when the URL specifies a space, but not a document, or
+#-# neither.
 # xwiki.defaultpage=WebHome
 #-# Hide the /WebHome part of the URL when the document is the default one. Use 0 to hide, 1 to show.
 # xwiki.usedefaultaction=0
@@ -258,7 +280,8 @@ xwiki.authentication.encryptionKey=titititititititititititititititi
 #-# Example: xwiki.authentication.cookiedomains=xwiki.org,myxwiki.org
 xwiki.authentication.cookiedomains=
 
-#-# This allows logout to happen for any page going through the /logout/ action, regardless of the document or the servlet.
+#-# This allows logout to happen for any page going through the /logout/ action, regardless of the document or the
+#-# servlet.
 #-# Comment-out if you want to enable logout only for /bin/logout/XWiki/XWikiLogout
 #-# Currently accepted patterns:
 #-# - /StrutsServletName/logout/ (this is usually /bin/logout/ and is the default setup)
@@ -363,7 +386,11 @@ xwiki.authentication.ldap.port=389
 xwiki.authentication.ldap.bind_DN=cn={0},department=USER,department=INFORMATIK,department=1230,o=MP
 xwiki.authentication.ldap.bind_pass={1}
 
-#-# LDAP query to search the user in the LDAP database (in case a static admin user is provided in xwiki.authentication.ldap.bind_DN)
+#-# The Base DN used in LDAP searches
+xwiki.authentication.ldap.base_DN=
+
+#-# LDAP query to search the user in the LDAP database (in case a static admin user is provided in
+#-# xwiki.authentication.ldap.bind_DN)
 #-# {0} is replaced with the user uid field name and {1} with the user name
 #-# The default is ({0}={1})
 # xwiki.authentication.ldap.ldap_user_search_fmt=({0}={1})
@@ -375,9 +402,6 @@ xwiki.authentication.ldap.bind_pass={1}
 #-# [Since 1.5RC1, XWikiLDAPAuthServiceImpl]
 #-# Only users not member of the following group can autheticate
 # xwiki.authentication.ldap.exclude_group=cn=admin,ou=groups,o=MegaNova,c=US
-
-#-# The Base DN used in LDAP searches
-xwiki.authentication.ldap.base_DN=
 
 #-# Specifies the LDAP attribute containing the identifier to be used as the XWiki name
 #-# The default is cn
@@ -395,16 +419,24 @@ xwiki.authentication.ldap.base_DN=
 xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email=mail
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
-#-# On every login update the mapped attributes from LDAP to XWiki otherwise this happens only once when the XWiki account is created.
+#-# On every login update the mapped attributes from LDAP to XWiki otherwise this happens only once when the XWiki
+#-# account is created.
 #-# - 0: only when creating user
 #-# - 1: at each authentication
 #-# The default is 1
 # xwiki.authentication.ldap.update_user=1
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
-#-# Mapps XWiki groups to LDAP groups, separator is "|"
-# xwiki.authentication.ldap.group_mapping=XWiki.XWikiAdminGroup=cn=AdminRole,ou=groups,o=MegaNova,c=US|\
-#                                         XWiki.Organisation=cn=testers,ou=groups,o=MegaNova,c=US
+#-# Maps XWiki groups to LDAP groups, separator is "|". The following kind of groups are supported:
+#-# * LDAP static groups (users/subgroups are listed statically in the group object)
+#-# * [Since 3.3M1] LDAP organization units (users/subgroups are sub object of the provided organization unit)
+#-# * [Since 3.3M1] LDAP filter (users/groups are object found in a search with the provided filter),
+#-#   | character in the filter need to be escaped with backslash (\).
+#-#
+#-# Here is an example:
+# xwiki.authentication.ldap.group_mapping=XWiki.XWikiAdminGroup=cn=AdminRole,ou=groups,o=domain,c=com|\
+#                                         XWiki.LDAPUsers=ou=groups,o=domain,c=com|\
+#                                         XWiki.Organisation=(cn=testers)
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# Time in s after which the list of members in a group is refreshed from LDAP
@@ -446,23 +478,9 @@ xwiki.authentication.ldap.trylocal=1
 # xwiki.authentication.ldap.validate_password=0
 
 #-# [Since 1.5M1, XWikiLDAPAuthServiceImpl]
-#-# Specifies the LDAP attribute containing the password to be used "when xwiki.authentication.ldap.validate_password" is set to 1
+#-# Specifies the LDAP attribute containing the password to be used "when xwiki.authentication.ldap.validate_password"
+#-# is set to 1
 # xwiki.authentication.ldap.password_field=userPassword
-
-#---------------------------------------
-# Cache
-# [DEPRECATED since 1.7M1: this way to configure cache provider is deprecated, you should use xwiki.properties instead.]
-#---------------------------------------
-
-#-# [Since 1.5M2]
-#-# The cache component implementation to use as "normal" (can be local or distributed depending on the implementation)
-#-# cache component.
-# xwiki.cache.cachefactory.hint=jbosscache
-
-#-# [Since 1.5M2]
-#-# The cache component to use as local cache component. 
-# xwiki.cache.cachefactory.local.hint=jbosscache/local
-
 
 #---------------------------------------
 # WYSIWYG Editor configuration
@@ -522,7 +540,8 @@ xwiki.plugins=$xwikiCfgPlugins
 #-# Stats configuration allows to globally activate/deactivate stats module (launch storage thread, register events...).
 #-# Enabled by default.
 # xwiki.stats=1
-#-# When statistics are globally enabled, storage can be enabled/disabled by wiki using the XWikiPreference property "statistics".
+#-# When statistics are globally enabled, storage can be enabled/disabled by wiki using the XWikiPreference property
+#-# "statistics".
 #-# Note: Statistics are disabled by default for improved performances/space.
 xwiki.stats.default=0
 
@@ -530,25 +549,24 @@ xwiki.stats.default=0
 # xwiki.stats.excludedUsersAndGroups=XWiki.Admin,XWiki.XWikiGuest
 
 #-# [Since 2.5M1]
-#-# List of users and groups to filter from the visit search request result. Entities are comma separated and can be relative.
-#-# "XWiki.Admin" means "XWiki.Admin" user on the wiki where the search is done and "xwiki:XWiki.Admin" only filter admin user
-#-# from main wiki.
+#-# List of users and groups to filter from the visit search request result. Entities are comma separated and can be
+#-# relative.
+#-# "XWiki.Admin" means "XWiki.Admin" user on the wiki where the search is done and "xwiki:XWiki.Admin" only filter
+#-# admin user from main wiki.
 #-# For example, the following filter default admin user and unregistered user from the most active contributor graph
 #-# on Stats.WebHome page:
 # xwiki.stats.request.excludedUsersAndGroups
 
 #-# [Since 2.5M1]
-#-# List of users and groups to skip when storing statistics to the database. Entities are comma separated and can be relative.
-#-# "XWiki.Admin" means "XWiki.Admin" user on the wiki where the search is done and "xwiki:XWiki.Admin" only filter admin user
-#-# from main wiki.
+#-# List of users and groups to skip when storing statistics to the database. Entities are comma separated and can be
+#-# relative.
+#-# "XWiki.Admin" means "XWiki.Admin" user on the wiki where the search is done and "xwiki:XWiki.Admin" only filter
+#-# admin user from main wiki.
 #-# For example, the following filter avoid storing statistics for the user "HiddenUser":
 # xwiki.stats.excludedUsersAndGroups=XWiki.HiddenUser
 
 #-# It is also possible to choose a different stats service to record statistics separately from XWiki.
 # xwiki.stats.class=com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl
-
-#-# This parameter will activate the eXo Platform integration
-xwiki.exo=$xwikiCfgExo
 
 #-# GraphViz plugin configuration. The GraphViz plugin is not configured by default.
 #-# To enable it, add "com.xpn.xwiki.plugin.graphviz.GraphVizPlugin" to the list of plugins
@@ -614,7 +632,7 @@ xwiki.plugin.image.cache.capacity=30
 
 #-# Temporary directory where XWiki can put files (during export and upload, for example).
 # xwiki.temp.dir=/tmp/xwiki
-#-# XWiki work directory
+#-# XWiki work directory. If not set temporary directory is used.
 # xwiki.work.dir=/usr/local/xwiki
 
 $!xwikiCfgAdditionalProperties

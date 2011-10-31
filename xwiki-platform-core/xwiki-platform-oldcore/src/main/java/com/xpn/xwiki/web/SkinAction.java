@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
@@ -26,9 +25,9 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -55,7 +54,7 @@ import com.xpn.xwiki.util.Util;
 public class SkinAction extends XWikiAction
 {
     /** Logging helper. */
-    private static final Log LOG = LogFactory.getLog(SkinAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SkinAction.class);
 
     /** Path delimiter. */
     private static final String DELIMITER = "/";
@@ -98,8 +97,8 @@ public class SkinAction extends XWikiAction
         // The default base skin is always a filesystem directory.
         String defaultbaseskin = xwiki.getDefaultBaseSkin(context);
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin + " ; defaultbaseskin: "
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin + " ; defaultbaseskin: "
                 + defaultbaseskin);
         }
 
@@ -110,8 +109,8 @@ public class SkinAction extends XWikiAction
         while (idx > 0) {
             try {
                 String filename = Util.decodeURI(path.substring(idx + 1), context);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Trying '" + filename + "'");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Trying '" + filename + "'");
                 }
 
                 // Try on the current skin document.
@@ -149,7 +148,7 @@ public class SkinAction extends XWikiAction
                     // successfully found. Signal this further, and stop trying to render.
                     throw ex;
                 }
-                LOG.debug(new Integer(idx), ex);
+                LOGGER.debug(String.valueOf(idx), ex);
             }
             idx = path.lastIndexOf(DELIMITER, idx - 1);
         }
@@ -169,10 +168,10 @@ public class SkinAction extends XWikiAction
      */
     public String getSkinFilePath(String filename, String skin) throws IOException
     {
-        String path = URI.create(DELIMITER + SKINS_DIRECTORY + DELIMITER + skin
-            + DELIMITER + filename).normalize().toString();
+        String path =
+            URI.create(DELIMITER + SKINS_DIRECTORY + DELIMITER + skin + DELIMITER + filename).normalize().toString();
         if (!path.startsWith(DELIMITER + SKINS_DIRECTORY)) {
-            LOG.warn("Illegal access, tried to use file [" + path + "] as a skin. Possible break-in attempt!");
+            LOGGER.warn("Illegal access, tried to use file [" + path + "] as a skin. Possible break-in attempt!");
             throw new IOException("Invalid filename: '" + filename + "' for skin '" + skin + "'");
         }
         return path;
@@ -188,7 +187,7 @@ public class SkinAction extends XWikiAction
     {
         String path = URI.create(DELIMITER + RESOURCES_DIRECTORY + DELIMITER + filename).normalize().toString();
         if (!path.startsWith(DELIMITER + RESOURCES_DIRECTORY)) {
-            LOG.warn("Illegal access, tried to use file [" + path + "] as a resource. Possible break-in attempt!");
+            LOGGER.warn("Illegal access, tried to use file [" + path + "] as a resource. Possible break-in attempt!");
             throw new IOException("Invalid filename: '" + filename + "'");
         }
         return path;
@@ -211,21 +210,22 @@ public class SkinAction extends XWikiAction
      * @throws XWikiException If the attachment cannot be loaded.
      * @throws IOException if the filename is invalid
      */
-    private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context) throws XWikiException, IOException
+    private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context) throws XWikiException,
+        IOException
     {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Rendering file '" + filename + "' within the '" + doc.getFullName() + "' document");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Rendering file '" + filename + "' within the '" + doc.getFullName() + "' document");
         }
         try {
             if (doc.isNew()) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(doc.getName() + " is not a document");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(doc.getName() + " is not a document");
                 }
             } else {
                 return renderFileFromObjectField(filename, doc, context)
                     || renderFileFromAttachment(filename, doc, context)
-                    || (SKINS_DIRECTORY.equals(doc.getSpace()) && renderFileFromFilesystem(getSkinFilePath(filename,
-                        doc.getName()), context));
+                    || (SKINS_DIRECTORY.equals(doc.getSpace()) && renderFileFromFilesystem(
+                        getSkinFilePath(filename, doc.getName()), context));
             }
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
@@ -245,8 +245,8 @@ public class SkinAction extends XWikiAction
      */
     private boolean renderFileFromFilesystem(String path, XWikiContext context) throws XWikiException
     {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Rendering filesystem file from path [" + path + "]");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Rendering filesystem file from path [" + path + "]");
         }
         XWikiResponse response = context.getResponse();
         try {
@@ -281,7 +281,7 @@ public class SkinAction extends XWikiAction
                 return true;
             }
         } catch (IOException ex) {
-            LOG.info("Skin file '" + path + "' does not exist or cannot be accessed");
+            LOGGER.info("Skin file '" + path + "' does not exist or cannot be accessed");
         }
         return false;
     }
@@ -299,7 +299,7 @@ public class SkinAction extends XWikiAction
     public boolean renderFileFromObjectField(String filename, XWikiDocument doc, XWikiContext context)
         throws IOException
     {
-        LOG.debug("... as object property");
+        LOGGER.debug("... as object property");
         BaseObject object = doc.getObject("XWiki.XWikiSkins");
         String content = null;
         if (object != null) {
@@ -321,7 +321,7 @@ public class SkinAction extends XWikiAction
             response.getOutputStream().write(data);
             return true;
         } else {
-            LOG.debug("Object field not found or empty");
+            LOGGER.debug("Object field not found or empty");
         }
         return false;
     }
@@ -339,7 +339,7 @@ public class SkinAction extends XWikiAction
     public boolean renderFileFromAttachment(String filename, XWikiDocument doc, XWikiContext context)
         throws IOException, XWikiException
     {
-        LOG.debug("... as attachment");
+        LOGGER.debug("... as attachment");
         XWikiAttachment attachment = doc.getAttachment(filename);
         if (attachment != null) {
             XWiki xwiki = context.getWiki();
@@ -358,7 +358,7 @@ public class SkinAction extends XWikiAction
             }
             return true;
         } else {
-            LOG.debug("Attachment not found");
+            LOGGER.debug("Attachment not found");
         }
         return false;
     }
@@ -372,8 +372,8 @@ public class SkinAction extends XWikiAction
     public boolean isJavascriptMimeType(String mimetype)
     {
         boolean result =
-                "text/javascript".equalsIgnoreCase(mimetype) || "application/x-javascript".equalsIgnoreCase(mimetype)
-                    || "application/javascript".equalsIgnoreCase(mimetype);
+            "text/javascript".equalsIgnoreCase(mimetype) || "application/x-javascript".equalsIgnoreCase(mimetype)
+                || "application/javascript".equalsIgnoreCase(mimetype);
         result |= "application/ecmascript".equalsIgnoreCase(mimetype) || "text/ecmascript".equalsIgnoreCase(mimetype);
         return result;
     }

@@ -23,8 +23,8 @@ package com.xpn.xwiki.plugin.rightsmanager;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -46,7 +46,7 @@ public final class RightsManagerListener implements EventListener
     /**
      * The logging tool.
      */
-    private static final Log LOG = LogFactory.getLog(RightsManagerListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RightsManagerListener.class);
 
     /**
      * The name of the listener.
@@ -132,13 +132,13 @@ public final class RightsManagerListener implements EventListener
                 try {
                     cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, true, context);
                 } catch (XWikiException e) {
-                    LOG.warn("Error when cleaning for deleted user", e);
+                    LOGGER.warn("Error when cleaning for deleted user", e);
                 }
             } else if (document.getObject("XWiki.XWikiGroups") != null) {
                 try {
                     cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, false, context);
                 } catch (XWikiException e) {
-                    LOG.warn("Error when cleaning for deleted group", e);
+                    LOGGER.warn("Error when cleaning for deleted group", e);
                 }
             }
         }

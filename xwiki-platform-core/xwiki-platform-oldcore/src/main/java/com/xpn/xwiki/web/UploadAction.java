@@ -16,24 +16,23 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -50,7 +49,7 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 public class UploadAction extends XWikiAction
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(UploadAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UploadAction.class);
 
     /** The prefix of the accepted file input field name. */
     private static final String FILE_FIELD_NAME = "filepath";
@@ -75,6 +74,7 @@ public class UploadAction extends XWikiAction
                 XWikiException exp = (XWikiException) exception;
                 if (exp.getCode() == XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE) {
                     response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+                    ((VelocityContext) context.get("vcontext")).put("message", "core.action.upload.failure.maxSize");
                     context.put("message", "fileuploadislarge");
                     return true;
                 }
@@ -90,9 +90,9 @@ public class UploadAction extends XWikiAction
 
         // The document is saved for each attachment in the group.
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
-        Map<String, String> fileNames = new HashMap<String, String>();
+        Map<String, String> fileNames = new LinkedHashMap<String, String>();
         List<String> wrongFileNames = new ArrayList<String>();
-        List<String> failedFiles = new ArrayList<String>();
+        Map<String, String> failedFiles = new LinkedHashMap<String, String>();
         for (String fieldName : fileupload.getFileItemNames(context)) {
             try {
                 if (fieldName.startsWith(FILE_FIELD_NAME)) {
@@ -110,23 +110,29 @@ public class UploadAction extends XWikiAction
             try {
                 uploadAttachment(file.getValue(), file.getKey(), fileupload, doc, context);
             } catch (Exception ex) {
-                LOG.warn("Saving uploaded file failed", ex);
-                failedFiles.add(file.getKey());
+                LOGGER.warn("Saving uploaded file failed", ex);
+                failedFiles.put(file.getKey(), ExceptionUtils.getRootCauseMessage(ex));
             }
         }
 
-        LOG.debug("Found files to upload: " + fileNames);
-        LOG.debug("Failed attachments: " + failedFiles);
-        LOG.debug("Wrong attachment names: " + wrongFileNames);
+        LOGGER.debug("Found files to upload: " + fileNames);
+        LOGGER.debug("Failed attachments: " + failedFiles);
+        LOGGER.debug("Wrong attachment names: " + wrongFileNames);
         if (ajax) {
             try {
                 response.getOutputStream().println("ok");
             } catch (IOException ex) {
-                LOG.error("Unhandled exception writing output:", ex);
+                LOGGER.error("Unhandled exception writing output:", ex);
             }
             return false;
         }
         // Forward to the attachment page
+        if (failedFiles.size() > 0 || wrongFileNames.size() > 0) {
+            ((VelocityContext) context.get("vcontext")).put("message", "core.action.upload.failure");
+            ((VelocityContext) context.get("vcontext")).put("failedFiles", failedFiles);
+            ((VelocityContext) context.get("vcontext")).put("wrongFileNames", wrongFileNames);
+            return true;
+        }
         String redirect = fileupload.getFileItemAsString("xredirect", context);
         if (StringUtils.isEmpty(redirect)) {
             redirect = context.getDoc().getURL("attach", true, context);
@@ -269,13 +275,14 @@ public class UploadAction extends XWikiAction
         boolean ajax = ((Boolean) context.get("ajax")).booleanValue();
         if (ajax) {
             try {
-                context.getResponse().getOutputStream().println(
-                    "error: " + context.getMessageTool().get((String) context.get("message")));
+                context.getResponse().getOutputStream()
+                    .println("error: " + context.getMessageTool().get((String) context.get("message")));
             } catch (IOException ex) {
-                LOG.error("Unhandled exception writing output:", ex);
+                LOGGER.error("Unhandled exception writing output:", ex);
             }
             return null;
         }
-        return "exception";
+        ((VelocityContext) context.get("vcontext")).put("viewer", "uploadfailure");
+        return "view";
     }
 }

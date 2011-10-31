@@ -27,9 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
@@ -59,11 +57,6 @@ public final class RightsManager
      * Name of the default space where users and groups are stored.
      */
     public static final String DEFAULT_USERORGROUP_SPACE = "XWiki";
-
-    /**
-     * The logging tool.
-     */
-    private static final Log LOG = LogFactory.getLog(RightsManager.class);
 
     /**
      * Separator symbol between wiki name and page full name.
@@ -140,14 +133,14 @@ public final class RightsManager
     /**
      * Used to resolve document reference based on another reference.
      */
-    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "explicit");
+    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "explicit");
 
     /**
      * Used to resolve reference based on context.
      */
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "current");
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "current");
 
     /**
      * Hidden constructor of RightsManager only access via getInstance().
@@ -448,11 +441,11 @@ public final class RightsManager
         RequestLimit limit, Object[][] order, XWikiContext context) throws XWikiException
     {
         if (user) {
-            return context.getWiki().getGroupService(context).getAllMatchedUsers(matchFields, withdetails,
-                limit.getNb(), limit.getStart(), order, context);
+            return context.getWiki().getGroupService(context)
+                .getAllMatchedUsers(matchFields, withdetails, limit.getNb(), limit.getStart(), order, context);
         } else {
-            return context.getWiki().getGroupService(context).getAllMatchedGroups(matchFields, withdetails,
-                limit.getNb(), limit.getStart(), order, context);
+            return context.getWiki().getGroupService(context)
+                .getAllMatchedGroups(matchFields, withdetails, limit.getNb(), limit.getStart(), order, context);
         }
     }
 
@@ -504,8 +497,8 @@ public final class RightsManager
     public Collection<String> getAllMatchedMembersNamesForGroup(String group, String matchField, int nb, int start,
         Boolean orderAsc, XWikiContext context) throws XWikiException
     {
-        return context.getWiki().getGroupService(context).getAllMatchedMembersNamesForGroup(group, matchField, nb,
-            start, orderAsc, context);
+        return context.getWiki().getGroupService(context)
+            .getAllMatchedMembersNamesForGroup(group, matchField, nb, start, orderAsc, context);
     }
 
     /**

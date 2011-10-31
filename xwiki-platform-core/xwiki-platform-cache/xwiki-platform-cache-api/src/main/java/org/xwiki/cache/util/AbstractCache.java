@@ -52,11 +52,7 @@ public abstract class AbstractCache<T> implements Cache<T>
      */
     protected final EventListenerList cacheEntryListeners = new EventListenerList();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#dispose()
-     */
+    @Override
     public void dispose()
     {
         for (CacheEntryListener<T> listener : this.cacheEntryListeners.getListeners(CacheEntryListener.class)) {
@@ -64,21 +60,13 @@ public abstract class AbstractCache<T> implements Cache<T>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#addCacheEntryListener(org.xwiki.cache.event.CacheEntryListener)
-     */
+    @Override
     public void addCacheEntryListener(CacheEntryListener<T> listener)
     {
         this.cacheEntryListeners.add(CacheEntryListener.class, listener);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#removeCacheEntryListener(org.xwiki.cache.event.CacheEntryListener)
-     */
+    @Override
     public void removeCacheEntryListener(CacheEntryListener<T> listener)
     {
         cacheEntryListeners.remove(CacheEntryListener.class, listener);
@@ -91,8 +79,8 @@ public abstract class AbstractCache<T> implements Cache<T>
      */
     protected void sendEntryAddedEvent(CacheEntryEvent<T> event)
     {
-        for (org.xwiki.cache.event.CacheEntryListener<T> listener
-                : this.cacheEntryListeners.getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
+        for (org.xwiki.cache.event.CacheEntryListener<T> listener : this.cacheEntryListeners
+            .getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
             listener.cacheEntryAdded(event);
         }
     }
@@ -104,8 +92,8 @@ public abstract class AbstractCache<T> implements Cache<T>
      */
     protected void sendEntryRemovedEvent(CacheEntryEvent<T> event)
     {
-        for (org.xwiki.cache.event.CacheEntryListener<T> listener
-                : this.cacheEntryListeners.getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
+        for (org.xwiki.cache.event.CacheEntryListener<T> listener : this.cacheEntryListeners
+            .getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
             listener.cacheEntryRemoved(event);
         }
 
@@ -119,8 +107,8 @@ public abstract class AbstractCache<T> implements Cache<T>
      */
     protected void sendEntryModifiedEvent(CacheEntryEvent<T> event)
     {
-        for (org.xwiki.cache.event.CacheEntryListener<T> listener
-                : this.cacheEntryListeners.getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
+        for (org.xwiki.cache.event.CacheEntryListener<T> listener : this.cacheEntryListeners
+            .getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
             listener.cacheEntryModified(event);
         }
     }
@@ -137,8 +125,9 @@ public abstract class AbstractCache<T> implements Cache<T>
                 ((DisposableCacheValue) value).dispose();
             } catch (Throwable e) {
                 if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn("Error when trying to dispose a cache object of cache ["
-                        + configuration.getConfigurationId() + "]", e);
+                    LOGGER.warn(
+                        "Error when trying to dispose a cache object of cache [" + configuration.getConfigurationId()
+                            + "]", e);
                 }
             }
         }

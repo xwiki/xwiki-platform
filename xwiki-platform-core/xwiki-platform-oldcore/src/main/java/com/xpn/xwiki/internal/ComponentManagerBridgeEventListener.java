@@ -22,31 +22,40 @@ package com.xpn.xwiki.internal;
 import java.util.Collections;
 import java.util.List;
 
-import org.xwiki.component.annotation.Requirement;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.web.Utils;
-import org.xwiki.component.annotation.Component;
 
 /**
- * This is  a temporary bridge to allow non components to call Utils.getComponent() and
- * get a component instance without having to pass around a XWiki Context (in order to 
- * retrieve the Servlet Context to get the component manager from an attribute).
- *
+ * This is a temporary bridge to allow non components to call Utils.getComponent() and get a component instance without
+ * having to pass around a XWiki Context (in order to retrieve the Servlet Context to get the component manager from an
+ * attribute).
+ * 
  * @version $Id$
  * @since 2.0M2
  */
-@Component("componentManagerBridge")
+@Component
+@Singleton
+@Named("componentManagerBridge")
 public class ComponentManagerBridgeEventListener implements EventListener
 {
-    @Requirement
-    ComponentManager componentManager;
-    
+    /**
+     * Provided to {@link Utils#setComponentManager(ComponentManager)}.
+     */
+    @Inject
+    private ComponentManager componentManager;
+
     /**
      * {@inheritDoc}
+     * 
      * @see EventListener#getEvents()
      */
     public List<Event> getEvents()
@@ -56,6 +65,7 @@ public class ComponentManagerBridgeEventListener implements EventListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see EventListener#getName()
      */
     public String getName()
@@ -65,6 +75,7 @@ public class ComponentManagerBridgeEventListener implements EventListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see EventListener#onEvent(Event, Object, Object)
      */
     public void onEvent(Event event, Object source, Object data)

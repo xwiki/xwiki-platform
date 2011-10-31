@@ -20,13 +20,13 @@
 package org.xwiki.extension.wrap;
 
 import java.util.List;
-import java.util.Queue;
 
 import org.xwiki.extension.job.JobProgress;
 import org.xwiki.extension.job.JobStatus;
 import org.xwiki.extension.job.Request;
+import org.xwiki.logging.LogLevel;
+import org.xwiki.logging.LogQueue;
 import org.xwiki.logging.event.LogEvent;
-import org.xwiki.logging.event.LogLevel;
 
 /**
  * Wrap a job status.
@@ -48,55 +48,30 @@ public class WrappingJobStatus implements JobStatus
         this.status = status;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobStatus#getState()
-     */
     @Override
     public State getState()
     {
         return this.status.getState();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobStatus#getRequest()
-     */
     @Override
     public Request getRequest()
     {
         return this.status.getRequest();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobStatus#getLog()
-     */
     @Override
-    public Queue<LogEvent> getLog()
+    public LogQueue getLog()
     {
         return this.status.getLog();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobStatus#getLog(org.xwiki.logging.event.LogLevel)
-     */
     @Override
     public List<LogEvent> getLog(LogLevel level)
     {
         return this.status.getLog(level);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobStatus#getProgress()
-     */
     @Override
     public JobProgress getProgress()
     {

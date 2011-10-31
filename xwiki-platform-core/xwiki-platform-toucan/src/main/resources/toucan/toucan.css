@@ -410,10 +410,10 @@ table td {
 
 /* special formatting of a wiki table */
 .mceContentBody table,
-    .main table {
-    font-size: 1em;
-    border-color: #e5eff8;
-    margin: 1em 0;
+.main table {
+  font-size: 1em;
+  border-collapse: collapse;
+  margin: 1em 0 1em 1px;
 }
 
 .mceContentBody caption,
@@ -427,8 +427,11 @@ table td {
 }
 
 .mceContentBody table tr td,
-    .main table tr td {
-    vertical-align: middle;
+.main table tr td {
+  border: 1px solid #CCC;
+  color: #444;
+  padding: 3px 4px;
+  vertical-align: middle;
 }
 
 .mceContentBody table tr td em,
@@ -442,25 +445,17 @@ table td {
     background: #f7fbff
 }
 
-.mceContentBody td,
-    .main td {
-    color: #4e6172;
-    border-color: #e5eff8;
-    padding: 3px 4px;
-    border-width: 1px;
-    border-style: solid;
-}
-
 .mceContentBody tr.table-head td,
-    .main th {
-    border-color: #e5eff8;
-    padding: .3em 0.5em;
-    background: #f4f9fe;
-    text-align: center;
-    font: bold 1.2em / 1.4em Arial, Helvetica, sans-serif;
-    color: #66a3d3;
-    border-width: 1px;
-    border-style: solid;
+.main th {
+  background: #EEE;
+  border-color: #CCC;
+  border-style: solid;
+  border-width: 3px 1px;
+  padding: .3em .5em;
+  text-align: center;
+  font: bold 1em Arial, Helvetica, sans-serif;
+  line-height: 1em;
+  color: #888;
 }
 
 table.xwikilogintable th {
@@ -1169,6 +1164,7 @@ body.exportbody #editPanels.panels,
 }
 
 #editPanels.panels .panel {
+    background: transparent;
     margin: 0;
     width: 210px;
     padding: 0;
@@ -2101,8 +2097,8 @@ html > body .panels {
     color: #000;
     width: 190px;
     display: block;
-    padding: 0;
-    background-color: transparent;
+    padding: 0 0 17px;
+    background: transparent url("$xwiki.getSkinFile('images/panel-v.png')") -190px bottom no-repeat;
 }
 
 #leftPanels .panel, #leftPanels .fakepanel {
@@ -2123,7 +2119,7 @@ html > body .panels {
     font-size: 0.85em;
     line-height: 1.6em;
     font-weight: normal;
-    padding: 0 15px 20px 15px;
+    padding: 6px 15px 3px;
 }
 
 div.xwikipanelcontents div.warningmessage,
@@ -2143,13 +2139,12 @@ h1.xwikipaneltitle {
     margin: 0;
     font-size: 1.1em;
     letter-spacing: -1px;
-    line-height: 30px;
-    padding: 0 20px 0 15px;
+    line-height: 1.4em;
+    padding: 10px 20px 0 15px;
     text-align: center;
     color: #333;
-    height: 30px;
     background-image: url( images/panel-v.png );
-    background-position: 0px -100px;
+    background-position: 0px 0;
     background-repeat: no-repeat;
     cursor: pointer;
 }
@@ -2166,7 +2161,7 @@ h1.xwikipaneltitle.hidden {
 }
 
 .collapsed h1.xwikipaneltitle {
-    height: 38px;
+    min-height: 8px;
     background-image: url( images/panel-v.png );
     background-position: top left;
     background-repeat: no-repeat;
@@ -2174,8 +2169,8 @@ h1.xwikipaneltitle.hidden {
 
 .xwikipanelcontents {
     background-image: url( images/panel-v.png );
-    background-position: bottom left;
-    background-repeat: no-repeat;
+    background-position: -570px 0;
+    background-repeat: repeat-y;
 }
 
 .xwikipanelcontents a {
@@ -2289,7 +2284,7 @@ span.panelitem {
 }
 
 .collapsed h1.xwikipaneltitle {
-    background-position: top right;
+    background-position: -380px 0;
 }
 
 #editPanels .EditModes .xwikipanelcontents ul {
@@ -3972,8 +3967,12 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
   background-color: white;
 }
 
+.column .rssfeed {
+  width: auto;
+}
+
 .rssfeed p.rsschanneltitle {
-  margin-bottom: 10px;
+  margin: 0;
   border-bottom: 1px solid #DDD;
   padding: 5px;
   background-color: #F4F9FE;
@@ -3983,11 +3982,12 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 }
 
 .rssfeed p.rsschanneltitle span a img {
-  margin-left:5px;
+  margin-left: 5px;
+  vertical-align: middle;
 }
 
-.rssfeed .rssitem {
-  padding: 5px;
+.rssfeed .rssitem, .rssfeed .rssitemtitle, .rssfeed .rssitemdescription {
+  padding: 0 5px;
 }
 
 .errormessage, .warningmessage, .infomessage, .plainmessage {

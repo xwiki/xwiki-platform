@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.stats.impl;
 
 import java.util.Date;
@@ -142,32 +140,17 @@ public class XWikiStats extends BaseCollection
         setIntValue(Property.pageViews.toString(), getPageViews() + 1);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#hashCode()
-     */
     @Override
     public int hashCode()
     {
         return (getName() + getClassName() + "_" + getNumber()).hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#setId(int)
-     */
     @Override
     public void setId(int id)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -187,11 +170,6 @@ public class XWikiStats extends BaseCollection
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#toXML(com.xpn.xwiki.objects.classes.BaseClass)
-     */
     @Override
     public Element toXML(BaseClass bclass)
     {

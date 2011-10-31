@@ -20,6 +20,7 @@
 package org.xwiki.extension;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,14 @@ public interface Extension
     ExtensionId getId();
 
     /**
+     * The idea is to indicate in an extension a list of provided "functionalities". Then when resolving extensions
+     * dependencies the dependencies id could be matched in this list.
+     * 
+     * @return the extension ids also provided by this extension
+     */
+    Collection<String> getFeatures();
+
+    /**
      * @return the type of the extension
      */
     String getType();
@@ -47,6 +56,16 @@ public interface Extension
      */
     String getName();
 
+    /**
+     * @return the license of the extension
+     */
+    Collection<ExtensionLicense> getLicenses();
+
+    /**
+     * @return a short description of the extension
+     */
+    String getSummary();
+    
     /**
      * @return a description of the extension
      */

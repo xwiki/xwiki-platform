@@ -36,19 +36,29 @@ import java.util.List;
  */
 public class TransactionException extends Exception
 {
-    /** The platform dependent newline string. */
+    /**
+     * The platform dependent newline string.
+     */
     private static final String NEWLINE = System.getProperty("line.separator");
 
-    /** A tab character which will be used to tab in the messages from nested exceptions. */
+    /**
+     * A tab character which will be used to tab in the messages from nested exceptions.
+     */
     private static final String TAB = "\t";
 
-    /** The list of exceptions which caused this to be thrown. */
+    /**
+     * The list of exceptions which caused this to be thrown.
+     */
     private final List<Throwable> causes;
 
-    /** Does this failure mean that the storage engine may be corrupt? */
+    /**
+     * Does this failure mean that the storage engine may be corrupt?
+     */
     private final boolean isNonRecoverable;
 
-    /** Total number of exceptions under this one. */
+    /**
+     * Total number of exceptions under this one.
+     */
     private final int exceptionCount;
 
     /**
@@ -78,11 +88,11 @@ public class TransactionException extends Exception
      * @param message the message to give with the exception.
      * @param causes the list of Throwables which caused this exception.
      * @param isNonRecoverable true if the storage engine could not recover from this
-     *                         exception and corruption might have resulted.
+     * exception and corruption might have resulted.
      */
     public TransactionException(final String message,
-                                final List<Throwable> causes,
-                                final boolean isNonRecoverable)
+        final List<Throwable> causes,
+        final boolean isNonRecoverable)
     {
         super(message);
         this.causes = new ArrayList<Throwable>(causes);
@@ -105,13 +115,17 @@ public class TransactionException extends Exception
         this.isNonRecoverable = nonRecoverable;
     }
 
-    /** @return all of the exceptions which caused this exception to be thrown. */
+    /**
+     * @return all of the exceptions which caused this exception to be thrown.
+     */
     public List<Throwable> getCauses()
     {
         return new ArrayList<Throwable>(this.causes);
     }
 
-    /** @return the total number of exceptions which caused this exception to be thrown. */
+    /**
+     * @return the total number of exceptions which caused this exception to be thrown.
+     */
     public int exceptionCount()
     {
         return this.exceptionCount;
@@ -119,7 +133,7 @@ public class TransactionException extends Exception
 
     /**
      * @return true if the storage engine could not recover from an exception in this group and
-     *              corruption of the storage engine might have resulted.
+     *         corruption of the storage engine might have resulted.
      */
     public boolean isNonRecoverable()
     {

@@ -49,11 +49,7 @@ public class OSCacheCacheEntryEvent<T> extends OSCacheCacheEvent<T> implements o
         this.event = event;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.event.CacheEntryEvent#getEntry()
-     */
+    @Override
     public CacheEntry<T> getEntry()
     {
         return new OSCacheCacheEntry<T>(this.cache, this.event.getEntry());

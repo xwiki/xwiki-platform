@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>WikiResources</web>
 <name>Translations</name>
@@ -24,39 +23,40 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language zh_TW generated from http://www.l10n.xwiki.org
-error.ERROR_XWIKI_ACCESS_DENIED=\u60A8\u6C92\u6709\u6B0A\u9650\u9032\u884C\u6B64\u64CD\u4F5C
-wikimanager.action.createwiki.hidedoc=\u96B1\u85CF\u6587\u4EF6
-wikimanager.action.createwiki.nonstepbystep=\u5207\u63DB\u81F3\u4E00\u822C\u6AA2\u8996\u6A21\u5F0F
-wikimanager.action.createwiki.showdoc=\u986F\u793A\u6587\u4EF6
-wikimanager.action.createwiki.stepbystep=\u5207\u63DB\u81F3\u7CBE\u9748\u6AA2\u8996\u6A21\u5F0F
-wikimanager.action.next=\u4E0B\u4E00\u6B65
-wikimanager.action.previous=\u524D\u4E00\u6B65
-wikimanager.admins=\u7CFB\u7D71\u7BA1\u7406\u54E1
-wikimanager.answer.deletewiki.msg=\u78BA\u5B9A\u8981\u522A\u9664 wiki "{0}"?
-wikimanager.answer.deletewiki.title=\u522A\u9664 wiki
-wikimanager.createwiki=\u65B0\u589E wiki
-wikimanager.defaultdatetimeformat=yyyy MMMM dd \u2019at\u2019 HH\:mm
-wikimanager.doc.createwiki.datafrom=\u5EFA\u7ACB\u65B0 wiki \u6642\u9810\u8A2D\u5EFA\u7ACB\u7684\u662F\u7A7A\u7684 wiki\u3002\u60A8\u53EF\u4F7F\u7528\u6A21\u677F\u6216 XAR \u5305\u88F9\u4F5C\u70BA\u65B0 wiki \u4E4B\u9810\u8A2D\u5167\u5BB9\u4F86\u6E90\u3002
-wikimanager.doc.createwiki.desc.homepage=Wiki \u9996\u9801
-wikimanager.doc.createwiki.desc.iswikitemplate=\u6B64 wiki \u662F\u5426\u53EF\u4F5C\u70BA\u65B0\u589E wiki \u7684\u6A21\u677F
-wikimanager.errorsettemplate=Wiki "{0}" \u6A21\u677F\u5C6C\u6027\u4FEE\u6539\u5931\u6557\: {1}
-wikimanager.legend.members=\u6210\u54E1
+#Mon Oct 24 18:52:45 CEST 2011
+error.ERROR_XWIKI_ACCESS_DENIED=您沒有權限進行此操作
+wikimanager.action.createwiki.hidedoc=隱藏文件
+wikimanager.action.createwiki.nonstepbystep=切換至一般檢視模式
+wikimanager.action.createwiki.showdoc=顯示文件
+wikimanager.action.createwiki.stepbystep=切換至精靈檢視模式
+wikimanager.action.next=下一步
+wikimanager.action.previous=前一步
+wikimanager.admins=系統管理員
+wikimanager.answer.deletewiki.msg=確定要刪除 wiki "{0}"?
+wikimanager.answer.deletewiki.title=刪除 wiki
+wikimanager.createwiki=新增 wiki
+wikimanager.defaultdatetimeformat=yyyy MMMM dd ’at’ HH\:mm
+wikimanager.doc.createwiki.datafrom=建立新 wiki 時預設建立的是空的 wiki。您可使用模板或 XAR 包裹作為新 wiki 之預設內容來源。
+wikimanager.doc.createwiki.desc.homepage=Wiki 首頁
+wikimanager.doc.createwiki.desc.iswikitemplate=此 wiki 是否可作為新增 wiki 的模板
+wikimanager.errorsettemplate=Wiki "{0}" 模板屬性修改失敗\: {1}
+wikimanager.legend.members=成員
 wikimanager.legend.wiki=Wiki
-wikimanager.listwikiactions=\u64CD\u4F5C
-wikimanager.listwikiactionsgroups=\u7FA4\u7D44
-wikimanager.listwikiactionsmembers=\u6210\u54E1
-wikimanager.listwikiactionsrights=\u6B0A\u9650
-wikimanager.listwikiname=\u540D\u7A31
-wikimanager.listwikirank=\u8A55\u5206
-wikimanager.listwikistate=\u72C0\u614B
-wikimanager.listwikitemplate=Wiki \u6A21\u677F
-wikimanager.prop.alias.description=\u63CF\u8FF0
-wikimanager.prop.alias.homepage=\u9996\u9801
-wikimanager.prop.wiki.description=\u63CF\u8FF0
-wikimanager.prop.wiki.homepage=\u9996\u9801
-wikimanager.prop.wiki.iswikitemplate=Wiki \u6A21\u677F
-wikimanager.prop.wiki.language=\u8A9E\u8A00
-wikimanager.prop.wiki.owner=\u64C1\u6709\u8005
-wikimanager.successdeletewiki=Wiki "{0}" \u5DF2\u522A\u9664
-wikimanager.wikitemplate=\u7531 wiki \u6A21\u677F
+wikimanager.listwikiactions=操作
+wikimanager.listwikiactionsgroups=群組
+wikimanager.listwikiactionsmembers=成員
+wikimanager.listwikiactionsrights=權限
+wikimanager.listwikiname=名稱
+wikimanager.listwikirank=評分
+wikimanager.listwikistate=狀態
+wikimanager.listwikitemplate=Wiki 模板
+wikimanager.prop.alias.description=描述
+wikimanager.prop.alias.homepage=首頁
+wikimanager.prop.wiki.description=描述
+wikimanager.prop.wiki.homepage=首頁
+wikimanager.prop.wiki.iswikitemplate=Wiki 模板
+wikimanager.prop.wiki.language=語言
+wikimanager.prop.wiki.owner=擁有者
+wikimanager.successdeletewiki=Wiki "{0}" 已刪除
+wikimanager.wikitemplate=由 wiki 模板
 </content></xwikidoc>

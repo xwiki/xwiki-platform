@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.render.macro;
 
 import java.io.IOException;
@@ -51,11 +49,7 @@ import com.xpn.xwiki.XWikiContext;
 @Deprecated
 public class LinkMacro extends BaseLocaleMacro
 {
-    /**
-     * The name of the macro.
-     * 
-     * @see org.radeox.macro.BaseLocaleMacro#getLocaleKey()
-     */
+    @Override
     public String getLocaleKey()
     {
         return "macro.link";

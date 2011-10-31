@@ -72,11 +72,7 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
 
     // Extension
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#download(java.io.File)
-     */
+    @Override
     public void download(File file) throws ExtensionException
     {
         InputStream sourceStream = null;
@@ -116,14 +112,10 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
 
     // LocalExtension
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.LocalExtension#getNamespaces()
-     */
+    @Override
     public Collection<String> getNamespaces()
     {
-        return namespaces;
+        return this.namespaces;
     }
 
     /**
@@ -149,11 +141,7 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
         this.namespaces.add(namespace);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.LocalExtension#getFile()
-     */
+    @Override
     public File getFile()
     {
         return getProperty(PKEY_FILE, null);
@@ -168,21 +156,13 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
         putProperty(PKEY_FILE, file);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.LocalExtension#isInstalled()
-     */
+    @Override
     public boolean isInstalled()
     {
         return getProperty(PKEY_INSTALLED, false);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.LocalExtension#isInstalled(java.lang.String)
-     */
+    @Override
     public boolean isInstalled(String namespace)
     {
         return isInstalled() && (this.namespaces == null || this.namespaces.contains(namespace));
@@ -224,11 +204,7 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.LocalExtension#isDependency()
-     */
+    @Override
     public boolean isDependency()
     {
         return getProperty(PKEY_DEPENDENCY, false);

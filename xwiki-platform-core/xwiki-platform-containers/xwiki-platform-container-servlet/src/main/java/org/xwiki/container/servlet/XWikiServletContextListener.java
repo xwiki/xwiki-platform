@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.container.servlet;
 
@@ -43,11 +42,7 @@ public class XWikiServletContextListener implements ServletContextListener
     /** The component manager used to lookup other components. */
     private ComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
-     */
+    @Override
     public void contextInitialized(ServletContextEvent servletContextEvent)
     {
         // Initializes the Embeddable Component Manager
@@ -92,17 +87,13 @@ public class XWikiServletContextListener implements ServletContextListener
         // Class that need to lookup then just need to get it from the XWikiContext instance.
         // This is of course not necessary for XWiki components since they just need to implement
         // the Composable interface to get access to the Component Manager or better they simply
-        // need to declare their components requirements using the @Requirement annotation of the xwiki
+        // need to declare their components requirements using the @Inject annotation of the xwiki
         // component manager together with a private class member, for automatic injection by the CM on init.
         servletContextEvent.getServletContext().setAttribute(
             org.xwiki.component.manager.ComponentManager.class.getName(), this.componentManager);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
-     */
+    @Override
     public void contextDestroyed(ServletContextEvent sce)
     {
         // Send an Observation event to signal the XWiki application is stopped. This allows components who need to do

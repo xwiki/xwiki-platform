@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.tidy.Tidy;
 import org.xwiki.xml.XMLUtils;
@@ -127,9 +127,9 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         }
     }
 
-    protected static final Log LOG = LogFactory.getLog(SyndEntryDocumentSource.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(SyndEntryDocumentSource.class);
 
-    protected static final TidyMessageLogger TIDY_LOGGER = new TidyMessageLogger(LOG);
+    protected static final TidyMessageLogger TIDY_LOGGER = new TidyMessageLogger(LOGGER);
 
     public static final String CONTENT_TYPE = "ContentType";
 
@@ -506,7 +506,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
     protected String parseString(String mapping, Document doc, XWikiContext context) throws XWikiException
     {
         if (isVelocityCode(mapping)) {
-            return doc.getRenderedContent(mapping.substring(1, mapping.length() - 1));
+            return doc.getRenderedContent(mapping.substring(1, mapping.length() - 1), doc.getSyntax().toIdString());
         } else {
             return mapping;
         }

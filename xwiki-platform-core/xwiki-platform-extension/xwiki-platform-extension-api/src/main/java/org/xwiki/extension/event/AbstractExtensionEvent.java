@@ -51,11 +51,7 @@ public abstract class AbstractExtensionEvent implements ExtensionEvent
 
     // ExtensionEvent
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.event.ExtensionEvent#getExtensionId()
-     */
+    @Override
     public ExtensionId getExtensionId()
     {
         return this.extensionId;
@@ -63,11 +59,7 @@ public abstract class AbstractExtensionEvent implements ExtensionEvent
 
     // Event
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.event.Event#matches(java.lang.Object)
-     */
+    @Override
     public boolean matches(Object event)
     {
         return this.getClass() == event.getClass()

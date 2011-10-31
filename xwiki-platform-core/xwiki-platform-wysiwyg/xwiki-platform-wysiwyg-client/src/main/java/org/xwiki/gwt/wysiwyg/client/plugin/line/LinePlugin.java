@@ -46,6 +46,7 @@ import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.regexp.shared.RegExp;
 
 /**
  * Overwrites the behavior of creating new lines of text and merging existing ones.
@@ -101,6 +102,11 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
      * The name of the <code>&lt;th&gt;</code> tag.
      */
     public static final String TH = "th";
+
+    /**
+     * A regular expression that matches a string full of whitespace.
+     */
+    private static final RegExp WHITESPACE = RegExp.compile("^\\s+$");
 
     /**
      * Collection of DOM utility methods.
@@ -311,7 +317,20 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
     {
         switch (leaf.getNodeType()) {
             case Node.TEXT_NODE:
-                return leaf.getNodeValue().length() > 0;
+                if (WHITESPACE.test(leaf.getNodeValue())) {
+                    // We have to check if the whitespace is rendered in the current context. Let's wrap the text node
+                    // with a SPAN element and see if it has any width.
+                    Element wrapper = Element.as(leaf.getOwnerDocument().createSpanElement());
+                    leaf.getParentNode().replaceChild(wrapper, leaf);
+                    wrapper.appendChild(leaf);
+                    // Note: We test only the width because an empty SPAN element normally has the height of the line.
+                    boolean needsSpace = wrapper.getOffsetWidth() > 0;
+                    // Unwrap the whitespace text node.
+                    wrapper.getParentNode().replaceChild(leaf, wrapper);
+                    return needsSpace;
+                } else {
+                    return leaf.getNodeValue().length() > 0;
+                }
             case Node.ELEMENT_NODE:
                 Element element = Element.as(leaf);
                 return BR.equalsIgnoreCase(element.getTagName()) || element.getOffsetHeight() > 0

@@ -19,6 +19,7 @@
  */
 package org.xwiki.wysiwyg.server.internal.plugin.macro;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,10 +27,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xwiki.component.annotation.Requirement;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroService;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.ParameterDescriptor;
@@ -42,48 +44,40 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.wysiwyg.server.plugin.macro.MacroDescriptorTranslator;
 
-
 /**
  * XWiki specific implementation of {@link MacroService}.
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class XWikiMacroService implements MacroService
 {
     /**
-     * Default XWiki logger to report errors correctly.
-     */
-    private static final Log LOG = LogFactory.getLog(XWikiMacroService.class);
-
-    /**
      * The syntax factory used to create {@link Syntax} instances from string syntax identifiers.
      */
-    @Requirement
+    @Inject
     private SyntaxFactory syntaxFactory;
 
     /**
      * The macro manager used to retrieve macros.
      */
-    @Requirement
+    @Inject
     private MacroManager macroManager;
 
     /**
      * The macro category manager used to retrieve macro categories.
      */
-    @Requirement
+    @Inject
     private MacroCategoryManager categoryManager;
 
     /**
      * The component used to translate macro descriptors into the execution context language.
      */
-    @Requirement
+    @Inject
     private MacroDescriptorTranslator macroDescriptorTranslator;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MacroService#getMacroDescriptor(String, String)
-     */
+    @Override
     public MacroDescriptor getMacroDescriptor(String macroId, String syntaxId)
     {
         return macroDescriptorTranslator.translate(getUntranslatedMacroDescriptor(macroId, syntaxId));
@@ -130,8 +124,7 @@ public class XWikiMacroService implements MacroService
 
             return result;
         } catch (Exception e) {
-            LOG.error("Exception while retrieving macro descriptor.", e);
-            throw new RuntimeException(e.getLocalizedMessage());
+            throw new RuntimeException("Exception while retrieving macro descriptor.", e);
         }
     }
 
@@ -150,7 +143,7 @@ public class XWikiMacroService implements MacroService
         // See XWIKI-4558 (Add macro parameter display name support to wiki macros).
         result.setName(StringUtils.isBlank(descriptor.getName()) ? descriptor.getId() : descriptor.getName());
         result.setDescription(descriptor.getDescription());
-        result.setType(createMacroParameterType(descriptor.getType()));
+        result.setType(createMacroParameterType(descriptor.getParameterType()));
         Object defaultValue = descriptor.getDefaultValue();
         if (defaultValue != null) {
             result.setDefaultValue(String.valueOf(defaultValue));
@@ -160,34 +153,33 @@ public class XWikiMacroService implements MacroService
     }
 
     /**
-     * NOTE: We can't send a {@link Class} instance to the client side because GWT can't serialize it so we have to
+     * NOTE: We can't send a {@link Type} instance to the client side because GWT can't serialize it so we have to
      * convert it to a {@link ParameterType} instance.
      * 
-     * @param parameterClass a {@link Class} that defines the values a macro parameter can have
-     * @return the parameter type associated with the given {@link Class} instance
+     * @param type the type that defines the values a macro parameter can have
+     * @return the parameter type associated with the given type
      */
-    private ParameterType createMacroParameterType(Class< ? > parameterClass)
+    private ParameterType createMacroParameterType(Type type)
     {
         ParameterType parameterType = new ParameterType();
-        parameterType.setName(parameterClass.getName());
-        if (parameterClass.isEnum()) {
-            Object[] parameterClassConstants = parameterClass.getEnumConstants();
-            Map<String, String> parameterTypeConstants = new LinkedHashMap<String, String>();
-            for (int i = 0; i < parameterClassConstants.length; i++) {
-                String constant = String.valueOf(parameterClassConstants[i]);
-                // We leave the constant unlocalized for now.
-                parameterTypeConstants.put(constant, constant);
+        if (type instanceof Class) {
+            Class< ? > parameterClass = (Class< ? >) type;
+            parameterType.setName(parameterClass.getName());
+            if (parameterClass.isEnum()) {
+                Object[] parameterClassConstants = parameterClass.getEnumConstants();
+                Map<String, String> parameterTypeConstants = new LinkedHashMap<String, String>();
+                for (int i = 0; i < parameterClassConstants.length; i++) {
+                    String constant = String.valueOf(parameterClassConstants[i]);
+                    // We leave the constant unlocalized for now.
+                    parameterTypeConstants.put(constant, constant);
+                }
+                parameterType.setEnumConstants(parameterTypeConstants);
             }
-            parameterType.setEnumConstants(parameterTypeConstants);
         }
         return parameterType;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MacroService#getMacroDescriptors(String)
-     */
+    @Override
     public List<MacroDescriptor> getMacroDescriptors(String syntaxId)
     {
         try {
@@ -211,9 +203,8 @@ public class XWikiMacroService implements MacroService
 
             return descriptors;
         } catch (Exception e) {
-            LOG.error(String
-                .format("Exception while retrieving the list of macro descriptors for syntax %s.", syntaxId), e);
-            throw new RuntimeException(e.getLocalizedMessage());
+            throw new RuntimeException("Exception while retrieving the list of macro descriptors for syntax ["
+                + syntaxId + "].", e);
         }
     }
 }

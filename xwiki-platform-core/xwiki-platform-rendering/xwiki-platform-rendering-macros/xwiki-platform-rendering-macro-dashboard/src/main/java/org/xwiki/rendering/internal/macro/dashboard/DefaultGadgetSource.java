@@ -25,10 +25,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
@@ -63,6 +66,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @since 3.0M3
  */
 @Component
+@Singleton
 public class DefaultGadgetSource implements GadgetSource
 {
     /**
@@ -75,39 +79,37 @@ public class DefaultGadgetSource implements GadgetSource
     /**
      * The execution context, to grab XWiki context and access to documents.
      */
-    @Requirement
+    @Inject
     protected Execution execution;
 
     /**
      * The current string reference resolver, to resolve the current document reference in the metadata of the block of
      * the current macro.
      */
-    @Requirement("current")
+    @Inject
+    @Named("current")
     protected DocumentReferenceResolver<String> currentReferenceResolver;
 
     /**
      * The current entity reference resolver, to resolve the gadgets class reference.
      */
-    @Requirement("current/reference")
+    @Inject
+    @Named("current/reference")
     protected DocumentReferenceResolver<EntityReference> currentReferenceEntityResolver;
 
     /**
      * Used to get the Velocity Engine and Velocity Context to use to evaluate the titles of the gadgets.
      */
-    @Requirement
+    @Inject
     private VelocityManager velocityManager;
 
     /**
      * The component manager, to get the appropriate parser for the content of the gadget and the title.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.dashboard.GadgetSource #getGadgets(String, MacroTransformationContext)
-     */
+    @Override
     public List<Gadget> getGadgets(String source, MacroTransformationContext context) throws Exception
     {
         // use the passed source as a document reference
@@ -218,12 +220,7 @@ public class DefaultGadgetSource implements GadgetSource
         return (XWikiContext) execution.getContext().getProperty("xwikicontext");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.dashboard.GadgetSource#getDashboardSourceMetadata(java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
+    @Override
     public List<Block> getDashboardSourceMetadata(String source, MacroTransformationContext context)
     {
         DocumentReference sourceDoc = getSourceDocumentReference(source);
@@ -271,11 +268,7 @@ public class DefaultGadgetSource implements GadgetSource
         return Collections.<Block> singletonList(metadataContainer);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.dashboard.GadgetSource#isEditing()
-     */
+    @Override
     public boolean isEditing()
     {
         // get the XWiki context and look at the action. if it's inline, it's edit mode

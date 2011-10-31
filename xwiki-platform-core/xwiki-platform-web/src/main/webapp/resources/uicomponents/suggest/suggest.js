@@ -47,6 +47,8 @@ var XWiki = (function(XWiki){
     resultInfo : "info",
     // The name of the JSON parameter or XML attribute holding the result icon.
     resultIcon: "icon",
+    // The name of the JSON parameter or XML attribute holding a potential result hint (displayed next to the value).
+    resultHint: "hint",
     // The id of the element that will hold the suggest element
     parentContainer : "body",
     // Should results fragments be highlighted when matching typed input
@@ -56,10 +58,16 @@ var XWiki = (function(XWiki){
     insertBeforeSuggestions: null,
     // Should value be displayed as a hint
     displayValue: false,
-    // Display value prefix text 
+    // Display value prefix text
     displayValueText: "Value :",
     // How to align the suggestion list when its with is different than the input field width
-    align: "left"
+    align: "left",
+    // When there are several suggest sources, should the widget displays only one, unified, "loading" indicator for all requests undergoing,
+    // Or should it displays one loading indicator per request next to the corresponding source.
+    unifiedLoader: false,
+    // The DOM node to use to display the loading indicator when in mode unified loader (it will receive a "loading" class name for the time of the loading)
+    // Default is null, which falls back on the input itself. This option is used only when unifiedLoader is true.
+    loaderNode: null
   },
   sInput : "",
   nInputChars : 0,
@@ -91,7 +99,7 @@ var XWiki = (function(XWiki){
     }
 
     // Flatten sources
-    this.sources = [ this.sources ].flatten().compact(); 
+    this.sources = [ this.sources ].flatten().compact();
 
     // Reset the container if the configured parameter is not valid
     if (!$(this.options.parentContainer)) {
@@ -129,6 +137,12 @@ var XWiki = (function(XWiki){
 
     // Prevent normal browser autocomplete
     this.fld.setAttribute("autocomplete", "off");
+
+    this.fld.observe("blur", function(event){
+      // Make sure any running request will be dropped after the input field has been left
+      this.latestRequest++;
+
+    }.bind(this));
   },
 
   /**
@@ -269,9 +283,13 @@ var XWiki = (function(XWiki){
    */
   doAjaxRequests: function (requestId)
   {
+    if (this.fld.value.length < this.options.minchars) {
+      return;
+    }
+
     for (var i=0;i<this.sources.length;i++) {
       var source = this.sources[i];
-      
+
       // create ajax request
       var url = source.script + source.varname + "=" + encodeURIComponent(this.fld.value.strip());
       var method = source.method || "get";
@@ -324,7 +342,8 @@ var XWiki = (function(XWiki){
            'id': results[i][source.resultId || this.options.resultId],
            'value': results[i][source.resultValue || this.options.resultValue],
            'info': results[i][source.resultInfo || this.options.resultInfo],
-           'icon' : results[i][source.resultIcon || this.options.resultIcon]
+           'icon' : results[i][source.resultIcon || this.options.resultIcon],
+           'hint' : results[i][source.resultHint || this.options.resultHint]
         });
       }
     } else {
@@ -341,7 +360,8 @@ var XWiki = (function(XWiki){
             'id': results[i].getAttribute('id'),
             'value':results[i].childNodes[0].nodeValue,
             'info':results[i].getAttribute('info'),
-            'icon':results[i].getAttribute('icon')
+            'icon':results[i].getAttribute('icon'),
+            'hint':results[i].getAttribute('hint')
           });
         }
       }
@@ -354,12 +374,12 @@ var XWiki = (function(XWiki){
    * Creates the container that will hold one or multiple source results.
    */
   prepareContainer: function(){
-    
+
     if (!$(this.options.parentContainer).down('.suggestItems')) {
       // If the suggestion top container is not in the DOM already, we create it and inject it
 
       var div = new Element("div", { 'class': "suggestItems "+ this.options.className });
-    
+
       // Get position of target textfield
       var pos = this.fld.cumulativeOffset();
 
@@ -372,6 +392,9 @@ var XWiki = (function(XWiki){
       if (this.options.align == 'left') {
         // Align the box on the left
         div.style.left = pos.left + "px";
+      } else if (this.options.align == "center") {
+        // Align the box to the center
+        div.style.left = pos.left + (this.fld.getWidth() - containerWidth - 2) / 2 + "px";
       } else {
         // Align the box on the right.
         // This has a visible effect only when the container width is not the same as the input width
@@ -409,10 +432,10 @@ var XWiki = (function(XWiki){
     if (this.sources.length > 1) {
       // If we are in multi-source mode, we need to prepare a sub-container for each of the suggestion source
       for (var i=0;i<this.sources.length;i++) {
-    
+
         var source = this.sources[i];
         source.id = i
-    
+
         if(this.resultContainer.down('.results' + source.id)) {
           // If the sub-container for this source is already present, we just re-initialize it :
           // - remove its content
@@ -420,13 +443,23 @@ var XWiki = (function(XWiki){
           if (this.resultContainer.down('.results' + source.id).down('ul')) {
             this.resultContainer.down('.results' + source.id).down('ul').remove();
           }
-          this.resultContainer.down('.results' + source.id).down('.sourceContent').addClassName('loading');
+          if (!this.options.unifiedLoader) {
+            this.resultContainer.down('.results' + source.id).down('.sourceContent').addClassName('loading');
+          }
+          else {
+            (this.options.loaderNode || this.fld).addClassName("loading");
+            this.resultContainer.down('.results' + source.id).addClassName('hidden loading');
+          }
         }
         else {
           // The sub-container for this source has not been created yet
           // Really create the subcontainer for this source and inject it in the global container
           var sourceContainer = new Element('div', {'class' : 'results results' + source.id}),
               sourceHeader = new Element('div', {'class':'sourceName'});
+
+          if (this.options.unifiedLoader) {
+            sourceContainer.addClassName('hidden loading');
+          }
 
           if (typeof source.icon != 'undefined') {
             // If there is an icon for this source group, set it as background image
@@ -446,8 +479,16 @@ var XWiki = (function(XWiki){
           }
           sourceHeader.insert(source.name)
           sourceContainer.insert( sourceHeader );
-          sourceContainer.insert( new Element('div', {'class':'sourceContent loading'}));
+          var classes = "sourceContent " + (this.options.unifiedLoader ? "" : "loading");
+          sourceContainer.insert( new Element('div', {'class':classes}));
+
+          if (typeof source.before !== 'undefined') {
+            this.resultContainer.insert(source.before);
+          }
           this.resultContainer.insert(sourceContainer);
+          if (typeof source.after !== 'undefined') {
+            this.resultContainer.insert(source.after);
+          }
         }
       }
     } else {
@@ -478,18 +519,28 @@ var XWiki = (function(XWiki){
 
     this.killTimeout();
 
-    // if no results, and shownoresults is false, do nothing
-    if (arr.length == 0 && !this.options.shownoresults)
-      return false;
-
     // create holding div
     //
     if (this.sources.length > 1) {
       var div = this.resultContainer.down(".results" + source.id);
-      div.down('.sourceContent').removeClassName('loading');
+      if (arr.length > 0 || this.options.shownoresults) {
+        div.down('.sourceContent').removeClassName('loading');
+        this.resultContainer.down(".results" + source.id).removeClassName("hidden loading");
+      }
+
+      // If we are in mode "unified loader" (showing one loading indicator for all requests and not one per request)
+      // and there aren't any source still loading, we remove the unified loading status.
+      if (this.options.unifiedLoader && !this.resultContainer.down("loading")) {
+        (this.options.loaderNode || this.fld).removeClassName("loading");
+      }
     }
     else {
       var div = this.resultContainer;
+    }
+
+    // if no results, and shownoresults is false, go no further
+    if (arr.length == 0 && !this.options.shownoresults) {
+      return false;
     }
 
     // Ensure any previous list of results for this source gets removed
@@ -510,21 +561,14 @@ var XWiki = (function(XWiki){
     // loop throught arr of suggestions
     // creating an XlistItem for each suggestion
     //
-    for (var i=0;i<arr.length;i++)
+    for (var i=0,len=arr.length;i<len;i++)
     {
-      // format output with the input enclosed in a EM element
-      // (as HTML, not DOM)
-      //
-      if (source.highlight) {
-        // If the source declares that results are matching, we highlight them in the value
-        var val = arr[i].value;
-        var st = val.toLowerCase().indexOf( this.sInput.toLowerCase() );
-        var output = val.substring(0,st) + "<em>" + val.substring(st, st+this.sInput.length) + "</em>" + val.substring(st+this.sInput.length);
+	  // Output is either emphasized or row value depending on source option
+      var output = source.highlight ? this.emphasizeMatches(this.sInput, arr[i].value) : arr[i].value;
+      if (arr[i].hint) {
+        output += "<span class='hint'>" + arr[i].hint + "</span>";
       }
-      else {
-        // Otherwise we just put row result value
-        var output = arr[i].value;
-      }
+
       if (!this.options.displayValue) {
         var displayNode = new Element("span", {'class':'info'}).update(output);
       }
@@ -574,12 +618,61 @@ var XWiki = (function(XWiki){
   },
 
   /**
+   * Emphesize the elements in passed value that matches one of the words typed as input by the user.
+   *
+   * @param String input the (typed) input
+   * @param String value the value to emphasize
+   */
+  emphasizeMatches:function(input, value)
+  {
+    // If the source declares that results are matching, we highlight them in the value
+    var output = value,
+        // Separate words (called fragments hereafter) in user input
+        fragments = input.split(' ').uniq().compact(),
+        offset = 0,
+        matches = {};
+
+    for (var j=0,flen=fragments.length;j<flen;j++) {
+      // We iterate over each fragments, and try to find one or several matches in this suggestion
+      // item display value.
+      var index = output.toLowerCase().indexOf(fragments[j].toLowerCase());
+      while (index >= 0) {
+        // As long as we have matches, we store their index and replace them in the output string with the space char
+        // so that they don't get matched for ever.
+        // Note that the space char is the only one safe to use, as it cannot be part of a fragment.
+        var match = output.substring(index, index + fragments[j].length),
+            placeholder = "";
+        fragments[j].length.times(function(){
+          placeholder += " ";
+        });
+        matches[index] = match;
+        output = output.substring(0, index) + placeholder + output.substring(index + fragments[j].length);
+        index = output.toLowerCase().indexOf(fragments[j].toLowerCase());
+      }
+    }
+    // Now that we have found all matches for all possible fragments, we iterate over them
+    // to construct the final "output String" that will be injected as a suggestion item,
+    // with all matches emphasized
+    Object.keys(matches).sortBy(function(s){return parseInt(s)}).each(function(key){
+      var before = output.substring(0, parseInt(key) + offset);
+      var after = output.substring(parseInt(key) + matches[key].length + offset);
+      // Emphasize the match in the output string that will be displayed
+      output = before + "<em>" + matches[key] + "</em>" + after;
+      // Increase the offset by 9, which correspond to the number of chars in the opening and closing "em" tags
+      // we have introduced for this match in the output String
+      offset += 9;
+    });
+
+    return output;
+  },
+
+  /**
    * Change highlight
    *
    * @param {Object} key
    */
   changeHighlight: function(key)
-  { 
+  {
     var list = this.resultContainer;
     if (!list)
       return false;
@@ -587,29 +680,49 @@ var XWiki = (function(XWiki){
     var n, elem;
 
     if (this.iHighlighted) {
-      if (key == 40) {
-        elem = this.iHighlighted.next() || ((this.iHighlighted.up('div.results') &&
-          this.iHighlighted.up('div.results').next()) ? this.iHighlighted.up('div.results').next().down('li') :
-          list.down('li'));
-      }
-      else if (key == 38) {
-        if (this.iHighlighted.previous()) {
-          elem = this.iHighlighted.previous();
+      // If there is already a highlighted element, we look for the next or previous highlightable item in the list
+      // of results, according to which key has been pressed.
+      if (key == Event.KEY_DOWN) {
+        elem = this.iHighlighted.next();
+        if (!elem && this.iHighlighted.up('div.results')) {
+          // if the next item could not be found and multi-source mode, find the next not empty source
+          var source = this.iHighlighted.up('div.results').next();
+          while (source && !elem) {
+            elem = source.down('li');
+            source = source.next();
+          }
         }
-        else {
-            if ((this.iHighlighted.up('div.results') && this.iHighlighted.up('div.results').previous())) {
-              elem = this.iHighlighted.up('div.results').previous().down('li:last-child');
-            }
-            else {
-              elem =  list.select('ul')[list.select('ul').length - 1].down('li:last-child');
-            }
+        if(!elem) {
+          elem = list.down('li');
+        }
+      }
+      else if (key == Event.KEY_UP) {
+        elem = this.iHighlighted.previous();
+        if (!elem && this.iHighlighted.up('div.results')) {
+          // if the previous item could not be found and multi-source mode, find the previous not empty source
+          var source = this.iHighlighted.up('div.results').previous();
+          while(source && !elem) {
+            elem = source.down('li:last-child');
+            source = source.previous();
+          }
+        }
+        if (!elem) {
+          elem =  list.select('ul')[list.select('ul').length - 1].down('li:last-child');
         }
       }
     }
     else {
-      if (key == 40)
-        elem = list.down('li');
-      else if (key == 38)
+      // No item is highlighted yet, so we just look for the first or last highlightable item,
+      // according to which key, up or down, has been pressed.
+      if (key == Event.KEY_DOWN) {
+        if (list.down('div.results')) {
+          elem = list.down('div.results').down('li')
+        }
+        else {
+          elem = list.down('li');
+        }
+      }
+      else if (key == Event.KEY_UP)
         if (list.select('li') > 0) {
           elem = list.select('li')[list.select('li').length - 1];
         }
@@ -694,7 +807,8 @@ var XWiki = (function(XWiki){
         'suggest' : this,
         'id': this.iHighlighted.down(".suggestId").innerHTML,
         'value': this.iHighlighted.down(".suggestValue").innerHTML,
-        'info': this.iHighlighted.down(".suggestInfo").innerHTML
+        'info': this.iHighlighted.down(".suggestInfo").innerHTML,
+        'icon' : this.iHighlighted.down('img.icon') ? this.iHighlighted.down('img.icon').src : ''
       });
 
       if (!event.stopped) {

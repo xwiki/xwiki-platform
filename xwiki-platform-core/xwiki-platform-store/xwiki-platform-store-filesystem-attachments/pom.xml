@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-store</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-store-filesystem-attachments</artifactId>
   <name>XWiki Platform - Store - Filesystem - Attachments</name>
@@ -79,7 +79,7 @@
      * XWikiAttachment, XWikiDocument, XWikiHibernateStore,
      * XWikiAttachmentStoreInterface, XWikiAttachmentVersioningStore,
      * XWikiAttachmentRecyclebinStore
-     --> 
+     -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
@@ -94,7 +94,7 @@
     </dependency>
 
 
-   <!-- Testing Dependencies -->
+    <!-- Testing Dependencies -->
 
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -125,8 +125,8 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-            <!-- This is excluded because of a fan out violation. TODO: FIX! -->
-            **/com/xpn/xwiki/store/FilesystemAttachmentRecycleBinStore.java
+            <!-- Fan-out violation in an implementation of a legacy interface. -->
+            **/legacy/store/internal/FilesystemAttachmentRecycleBinStore.java
           </excludes>
         </configuration>
       </plugin>

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>ApplicationWithinMinutes</web>
+<web>AppWithinMinutes</web>
 <name>ClassSheetGenerator</name>
 <language></language>
 <defaultLanguage></defaultLanguage>
 <translation>0</translation>
-<parent>ApplicationWithinMinutes.WebHome</parent>
+<parent>AppWithinMinutes.WebHome</parent>
 <creator>xwiki:XWiki.Admin</creator>
 <author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
@@ -95,7 +95,7 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </use>
 </class>
-<name>ApplicationWithinMinutes.ClassSheetGenerator</name>
+<name>AppWithinMinutes.ClassSheetGenerator</name>
 <number>0</number>
 <className>XWiki.StyleSheetExtension</className>
 <guid>305c2591-8b61-40dc-8a0e-1ae39071e2fa</guid>
@@ -142,7 +142,7 @@ ${indentation}: ${escapetool.d}doc.display('$property.name')
 {{{##
 {{velocity}}
 {{html wiki="true"}}
-${escapetool.d}xwiki.ssx.use('ApplicationWithinMinutes.ClassSheetGenerator')
+${escapetool.d}xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator')
 ${escapetool.h}set(${escapetool.d}discard = ${escapetool.d}doc.use('$doc.fullName'))
 ${escapetool.h}${escapetool.h} We don't have access to the form element to set the CSS class for the vertical form layout standard.
 (% class="xform half" %)

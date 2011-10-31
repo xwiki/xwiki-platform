@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>ApplicationWithinMinutes</web>
+<web>AppWithinMinutes</web>
 <name>ClassEditSheet</name>
 <language></language>
 <defaultLanguage></defaultLanguage>
 <translation>0</translation>
-<parent>ApplicationWithinMinutes.WebHome</parent>
+<parent>AppWithinMinutes.WebHome</parent>
 <creator>xwiki:XWiki.Admin</creator>
 <author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
@@ -143,7 +143,7 @@ hYEQYAqay8Tg0C3O5DeTlYGBgYE1cC6KPAAEFtSlCs4TrgAAAABJRU5ErkJggg==
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </use>
 </class>
-<name>ApplicationWithinMinutes.ClassEditSheet</name>
+<name>AppWithinMinutes.ClassEditSheet</name>
 <number>1</number>
 <className>XWiki.JavaScriptExtension</className>
 <guid>cb6bd1b4-599c-4fd6-9862-7969cf38b097</guid>
@@ -356,7 +356,7 @@ return XWiki;
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </use>
 </class>
-<name>ApplicationWithinMinutes.ClassEditSheet</name>
+<name>AppWithinMinutes.ClassEditSheet</name>
 <number>2</number>
 <className>XWiki.JavaScriptExtension</className>
 <guid>9ecc7b32-69ee-4b95-8806-60885aaeb85b</guid>
@@ -422,7 +422,7 @@ XWiki.FormField = Class.create({
   },
   _createToolBox : function() {
     var deleteIcon = new Element('img', {
-      src: '$xwiki.getAttachmentURL('ApplicationWithinMinutes.ClassEditSheet', 'bulletcross.png')',
+      src: '$xwiki.getAttachmentURL('AppWithinMinutes.ClassEditSheet', 'bulletcross.png')',
       alt: 'Delete',
       title: 'Delete'
     });
@@ -442,7 +442,7 @@ XWiki.FormField = Class.create({
     } else {
       fieldConfig.show();
       icon.alt = icon.title = 'Hide configuration panel';
-      icon.src = '$xwiki.getAttachmentURL('ApplicationWithinMinutes.ClassEditSheet', 'bullettick.png')';
+      icon.src = '$xwiki.getAttachmentURL('AppWithinMinutes.ClassEditSheet', 'bullettick.png')';
     }
   },
   _onDelete : function(event) {
@@ -714,7 +714,7 @@ XWiki.FormCanvas = Class.create({
       });
       // Create and insert the move icon.
       var moveIcon = new Element('img', {
-        src: '$xwiki.getAttachmentURL('ApplicationWithinMinutes.ClassEditSheet', 'arrow-move.png')',
+        src: '$xwiki.getAttachmentURL('AppWithinMinutes.ClassEditSheet', 'arrow-move.png')',
         alt: 'Move',
         title: 'Drag and drop to change the order',
         'class': 'icon-move'
@@ -853,7 +853,7 @@ return XWiki;
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </level>
 </class>
-<name>ApplicationWithinMinutes.ClassEditSheet</name>
+<name>AppWithinMinutes.ClassEditSheet</name>
 <number>0</number>
 <className>XWiki.RequiredRightClass</className>
 <guid>2a2d7281-2e73-4ed6-a6b4-863b8ae360e3</guid>
@@ -885,7 +885,7 @@ return XWiki;
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </action>
 </class>
-<name>ApplicationWithinMinutes.ClassEditSheet</name>
+<name>AppWithinMinutes.ClassEditSheet</name>
 <number>0</number>
 <className>XWiki.SheetDescriptorClass</className>
 <guid>c25fb06c-956e-4cc3-a891-63bef91b2c21</guid>
@@ -965,7 +965,7 @@ return XWiki;
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </use>
 </class>
-<name>ApplicationWithinMinutes.ClassEditSheet</name>
+<name>AppWithinMinutes.ClassEditSheet</name>
 <number>0</number>
 <className>XWiki.StyleSheetExtension</className>
 <guid>ca2012cf-0113-4cc4-a140-98582ca729a1</guid>
@@ -1170,7 +1170,7 @@ return XWiki;
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </use>
 </class>
-<name>ApplicationWithinMinutes.ClassEditSheet</name>
+<name>AppWithinMinutes.ClassEditSheet</name>
 <number>1</number>
 <className>XWiki.StyleSheetExtension</className>
 <guid>25c841f5-068e-4fdc-9599-6b8f63353958</guid>
@@ -1249,8 +1249,8 @@ return XWiki;
 
     ## List all form field types, grouped by category.
     #set($formFieldDocs = [])
-    #set($formFieldClassName = 'ApplicationWithinMinutes.FormFieldClass')
-    #set($categoryListStatement = 'from doc.object(ApplicationWithinMinutes.FormFieldCategoryClass) as category order by category.priority')
+    #set($formFieldClassName = 'AppWithinMinutes.FormFieldClass')
+    #set($categoryListStatement = 'from doc.object(AppWithinMinutes.FormFieldCategoryClass) as category order by category.priority')
     #foreach($category in $services.query.xwql($categoryListStatement).execute())
       #set($categoryDoc = $xwiki.getDocument($category))
       * (% class="category" %)$categoryDoc.title
@@ -1368,7 +1368,7 @@ return XWiki;
   #displayFieldProperty($field "${doc.fullName}_0_" $templateDoc.getObject($doc.fullName, true))
 
   #set($propertyNames = ['name', 'prettyName', 'number', 'required', 'hint'])
-  #set($formFieldObj = $formFieldDoc.getObject('ApplicationWithinMinutes.FormFieldClass'))
+  #set($formFieldObj = $formFieldDoc.getObject('AppWithinMinutes.FormFieldClass'))
   #set($customPropertyNames = $formFieldObj.getProperty('properties').value.split('\s+'))
   #set($discard = $customPropertyNames.removeAll($propertyNames))
   #set($discard = $propertyNames.addAll($customPropertyNames.subList(0, $customPropertyNames.size())))
@@ -1425,9 +1425,9 @@ return XWiki;
  *#
 #macro(displayEditForm)
   $xwiki.jsfx.use('js/scriptaculous/dragdrop.js')##
-  $xwiki.jsx.use('ApplicationWithinMinutes.ClassEditSheet')##
-  $xwiki.ssx.use('ApplicationWithinMinutes.ClassEditSheet')##
-  $xwiki.ssx.use('ApplicationWithinMinutes.ClassSheetGenerator')##
+  $xwiki.jsx.use('AppWithinMinutes.ClassEditSheet')##
+  $xwiki.ssx.use('AppWithinMinutes.ClassEditSheet')##
+  $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator')##
   #displayFieldPalette()
   #displayFieldCanvas()
   #displayClassOptions()
@@ -1589,7 +1589,7 @@ return XWiki;
     #end
     #if($sheetReference)
       #set($sheetDoc = $xwiki.getDocument($sheetReference))
-      #set($sheetGeneratorDoc = $xwiki.getDocument('ApplicationWithinMinutes.ClassSheetGenerator'))
+      #set($sheetGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassSheetGenerator'))
       #set($discard = $sheetDoc.setContent($doc.getRenderedContent($sheetGeneratorDoc.content, $sheetGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
       #set($discard = $sheetDoc.save('Update class sheet', $minorEdit))
     #end

@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>ApplicationWithinMinutes</web>
-<name>Pickers</name>
+<web>AppWithinMinutes</web>
+<name>Standard</name>
 <language></language>
 <defaultLanguage></defaultLanguage>
 <translation>0</translation>
-<parent>ApplicationWithinMinutes.FormFieldCategoryClass</parent>
+<parent>AppWithinMinutes.FormFieldCategoryClass</parent>
 <creator>xwiki:XWiki.Admin</creator>
 <author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1318184030000</creationDate>
+<creationDate>1318183890000</creationDate>
 <date>1318495355000</date>
 <contentUpdateDate>1318495355000</contentUpdateDate>
 <version>1.1</version>
-<title>Pickers</title>
+<title>Standard</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -25,7 +25,7 @@
 <hidden>false</hidden>
 <object>
 <class>
-<name>ApplicationWithinMinutes.FormFieldCategoryClass</name>
+<name>AppWithinMinutes.FormFieldCategoryClass</name>
 <customClass></customClass>
 <customMapping></customMapping>
 <defaultViewSheet></defaultViewSheet>
@@ -47,12 +47,12 @@
 <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
 </priority>
 </class>
-<name>ApplicationWithinMinutes.Pickers</name>
+<name>AppWithinMinutes.Standard</name>
 <number>0</number>
-<className>ApplicationWithinMinutes.FormFieldCategoryClass</className>
-<guid>b7294eee-7373-418d-9532-d12bacf40948</guid>
+<className>AppWithinMinutes.FormFieldCategoryClass</className>
+<guid>13b9e829-c5f5-45bc-89e1-19f7f6eaa8cc</guid>
 <property>
-<priority>1</priority>
+<priority>0</priority>
 </property>
 </object>
 <content></content></xwikidoc>

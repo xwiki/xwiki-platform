@@ -29,8 +29,8 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>3.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-applicationWithinMinutes</artifactId>
-  <name>XWiki Platform - Application Within Minutes</name>
+  <artifactId>xwiki-platform-appwithinminutes</artifactId>
+  <name>XWiki Platform - App Within Minutes</name>
   <packaging>xar</packaging>
   <description>An XWiki application that allows end users to use XWiki's powerful structured data management to make
     collaborative web applications with as little steps as possible. The focus is on solving most common use cases when

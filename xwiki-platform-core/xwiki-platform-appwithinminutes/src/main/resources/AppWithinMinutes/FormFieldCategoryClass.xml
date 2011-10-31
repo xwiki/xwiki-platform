@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>ApplicationWithinMinutes</web>
-<name>Advanced</name>
+<web>AppWithinMinutes</web>
+<name>FormFieldCategoryClass</name>
 <language></language>
 <defaultLanguage></defaultLanguage>
 <translation>0</translation>
-<parent>ApplicationWithinMinutes.FormFieldCategoryClass</parent>
+<parent>AppWithinMinutes.FormFieldClass</parent>
 <creator>xwiki:XWiki.Admin</creator>
 <author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1319403788000</creationDate>
-<date>1319403836000</date>
-<contentUpdateDate>1319403836000</contentUpdateDate>
+<creationDate>1318183493000</creationDate>
+<date>1318495355000</date>
+<contentUpdateDate>1318495355000</contentUpdateDate>
 <version>1.1</version>
-<title>Advanced</title>
+<title>FormFieldCategory Class</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -23,9 +23,8 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<object>
 <class>
-<name>ApplicationWithinMinutes.FormFieldCategoryClass</name>
+<name>AppWithinMinutes.FormFieldCategoryClass</name>
 <customClass></customClass>
 <customMapping></customMapping>
 <defaultViewSheet></defaultViewSheet>
@@ -47,12 +46,4 @@
 <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
 </priority>
 </class>
-<name>ApplicationWithinMinutes.Advanced</name>
-<number>0</number>
-<className>ApplicationWithinMinutes.FormFieldCategoryClass</className>
-<guid>5fe12242-beb3-4689-92aa-1c1daf6fbb4d</guid>
-<property>
-<priority>2</priority>
-</property>
-</object>
 <content></content></xwikidoc>

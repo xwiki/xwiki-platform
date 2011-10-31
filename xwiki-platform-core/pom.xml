@@ -235,6 +235,7 @@
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-annotations</module>
     <module>xwiki-platform-application-manager</module>
+    <module>xwiki-platform-appwithinminutes</module>
     <module>xwiki-platform-blog</module>
     <module>xwiki-platform-bridge</module>
     <module>xwiki-platform-cache</module>

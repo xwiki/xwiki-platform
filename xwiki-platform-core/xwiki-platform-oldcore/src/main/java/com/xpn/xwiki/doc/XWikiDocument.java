@@ -7352,7 +7352,8 @@ public class XWikiDocument implements DocumentModelBridge
     public void convertSyntax(Syntax targetSyntax, XWikiContext context) throws XWikiException
     {
         // convert content
-        setContent(performSyntaxConversion(getContent(), getSyntaxId(), targetSyntax));
+        String source = this.defaultEntityReferenceSerializer.serialize(getDocumentReference());
+        setContent(performSyntaxConversion(getContent(), source, getSyntaxId(), targetSyntax));
 
         // convert objects
         Map<DocumentReference, List<BaseObject>> objectsByClass = getXObjects();
@@ -7367,7 +7368,8 @@ public class XWikiDocument implements DocumentModelBridge
                             LargeStringProperty field = (LargeStringProperty) bobject.getField(textAreaClass.getName());
 
                             if (field != null) {
-                                field.setValue(performSyntaxConversion(field.getValue(), getSyntaxId(), targetSyntax));
+                                field.setValue(
+                                    performSyntaxConversion(field.getValue(), source, getSyntaxId(), targetSyntax));
                             }
                         }
                     }
@@ -7466,12 +7468,7 @@ public class XWikiDocument implements DocumentModelBridge
         TransformationContext txContext) throws XWikiException
     {
         try {
-            XDOM dom = parseContent(txContext.getSyntax().toIdString(), content);
-
-            // Set the source metadata for the parsed XDOM so that Renderers can resolve relative links/images based
-            // on it.
-            dom.getMetaData().addMetaData(MetaData.SOURCE, source);
-
+            XDOM dom = parseContent(txContext.getSyntax().toIdString(), content, source);
             return performSyntaxConversion(dom, targetSyntax, txContext);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
@@ -7483,18 +7480,18 @@ public class XWikiDocument implements DocumentModelBridge
      * Convert the passed content from the passed syntax to the passed new syntax.
      * 
      * @param content the content to convert
+     * @param source the reference to where the content comes from (eg document reference)
      * @param currentSyntaxId the syntax of the current content to convert
      * @param targetSyntax the new syntax after the conversion
      * @return the converted content in the new syntax
      * @throws XWikiException if an exception occurred during the conversion process
      * @since 2.4M2
      */
-    private static String performSyntaxConversion(String content, String currentSyntaxId, Syntax targetSyntax)
-        throws XWikiException
+    private static String performSyntaxConversion(String content, String source, String currentSyntaxId,
+        Syntax targetSyntax) throws XWikiException
     {
         try {
-            XDOM dom = parseContent(currentSyntaxId, content);
-
+            XDOM dom = parseContent(currentSyntaxId, content, source);
             return performSyntaxConversion(dom, targetSyntax, null);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
@@ -7563,15 +7560,25 @@ public class XWikiDocument implements DocumentModelBridge
 
     private XDOM parseContent(String content) throws XWikiException
     {
-        return parseContent(getSyntaxId(), content);
+        return parseContent(getSyntaxId(), content,
+            this.defaultEntityReferenceSerializer.serialize(getDocumentReference()));
     }
 
-    private static XDOM parseContent(String syntaxId, String content) throws XWikiException
+    /**
+     * @param source the reference to where the content comes from (eg document reference)
+     */
+    private static XDOM parseContent(String syntaxId, String content, String source)
+        throws XWikiException
     {
         try {
             Parser parser = Utils.getComponent(Parser.class, syntaxId);
+            XDOM xdom = parser.parse(new StringReader(content));
 
-            return parser.parse(new StringReader(content));
+            // Set the source meta data so that transformations and renderers can handle relative links/images
+            // correctly.
+            xdom.getMetaData().addMetaData(MetaData.SOURCE, source);
+
+            return xdom;
         } catch (ParseException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to parse content of syntax [" + syntaxId + "]", e);

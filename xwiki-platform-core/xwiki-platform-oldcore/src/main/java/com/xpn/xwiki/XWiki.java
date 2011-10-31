@@ -3237,13 +3237,14 @@ public class XWiki implements EventListener
 
         SheetBinder documentSheetBinder = Utils.getComponent(SheetBinder.class, "document");
         boolean hasDocumentSheets = documentSheetBinder.getSheets(doc).isEmpty();
-
-        needsUpdate |= setClassDocumentFields(doc, "XWiki Preferences");
-
-        // Don't use ClassSheet to display XWikiPreferences unless explicitly set.
         if (!hasDocumentSheets) {
-            DocumentReference sheet = new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "ClassSheet");
-            needsUpdate |= documentSheetBinder.unbind(doc, sheet);
+            // Bind a document sheet to prevent the default class sheet from being used.
+            documentSheetBinder.bind(doc, doc.getDocumentReference());
+        }
+        needsUpdate |= setClassDocumentFields(doc, "XWiki Preferences");
+        if (!hasDocumentSheets) {
+            // Unbind the document sheet we bound earlier.
+            documentSheetBinder.unbind(doc, doc.getDocumentReference());
         }
 
         // Use AdminSheet to display documents having XWikiPreferences objects if no other class sheet is specified.

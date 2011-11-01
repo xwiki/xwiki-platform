@@ -1081,7 +1081,7 @@ return XWiki;
   cursor: move;
   display: block;
   font-size: smaller;
-  padding: 3px 3px 3px 23px;
+  padding: .3em;
 }
 
 #palette .field:hover {
@@ -1265,11 +1265,14 @@ return XWiki;
           #else
             #set($formFieldIconURL = $formFieldDoc.getAttachmentURL($formFieldIcon))
           #end
-          ** (% class="field" style="background: url($formFieldIconURL) no-repeat scroll 3px center transparent" %)${formFieldDoc.title}##
-             ## FIXME: We should use the 'get' action instead to prevent the stats module from recording this AJAX request.
-             ## The 'edit' action is a temporary solution until the sheet module is modified to allow a sheet to be enforced through
-             ## the query string even if it doesn't match the action (e.g. the 'get' action).
-             {{html}}&lt;input type="hidden" value="$doc.getURL('edit', "xpage=plain&amp;field=$escapetool.url($formFieldDoc.fullName)")" class="data"/&gt;{{/html}}
+          ** (% class="field" %){{html}}
+              &lt;img src="$formFieldIconURL" alt="$escapetool.xml($formFieldDoc.title)" class="icon" /&gt;
+              $escapetool.xml($formFieldDoc.title)
+              ## FIXME: We should use the 'get' action instead to prevent the stats module from recording this AJAX request.
+              ## The 'edit' action is a temporary solution until the sheet module is modified to allow a sheet to be enforced through
+              ## the query string even if it doesn't match the action (e.g. the 'get' action).
+              &lt;input type="hidden" value="$doc.getURL('edit', "xpage=plain&amp;field=$escapetool.url($formFieldDoc.fullName)")" class="data"/&gt;
+            {{/html}}
         #end
     #end
   )))
@@ -1291,15 +1294,21 @@ return XWiki;
     Drag fields from the palette and drop them in this area.
 
     #set($unknownFields = [])
+    #set($empty = true)
     #foreach ($field in $doc.getxWikiClass().properties)
       #set($formFieldDoc = $propertyType2FormField.get($field.classType))
       #if($formFieldDoc)
+        #set($empty = false)
         * (((#displayField($field $formFieldDoc))))
       #else
         #set($discard = $unknownFields.add($field))
       #end
     #end
+    #if(!$empty)
+      ## Leave an empty line to separate the blocks.
 
+    #end
+    ##
     (% class="hidden" %)
     {{html}}
       ## Output the field meta data even if the field is not supported to preserve it when the class is saved.

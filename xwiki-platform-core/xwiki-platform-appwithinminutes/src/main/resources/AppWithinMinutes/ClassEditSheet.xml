@@ -370,8 +370,10 @@ return XWiki;
  * Handles the form field display (through AJAX), configure (toggle) and delete.
  */
 XWiki.FormField = Class.create({
-  initialize : function(data, container) {
+  initialize : function(container) {
     this.container = container;
+  },
+  enhance : function(data) {
     this.container.insert({top: this._createToolBox()});
     if (data) {
       this.container.addClassName('loading');
@@ -383,6 +385,28 @@ XWiki.FormField = Class.create({
       this._display(null);
     }
   },
+  getContainer : function() {
+    return this.container;
+  },
+  getViewer : function() {
+    return this.container.down('.field-viewer')
+  },
+  getConfig : function() {
+    return this.container.down('.field-config');
+  },
+  getToolBox : function() {
+    return this.container.down('.toolBox');
+  },
+  getName : function() {
+    if (!this.container._typeInput) {
+      // Field type should be stored in the first hidden input under the field container.
+      this.container._typeInput = this.container.down('input[type=hidden]');
+    }
+    return this.container._typeInput.name.substring('type-'.length);
+  },
+  getPropertyId : function(propertyName) {
+    return 'field-' + this.getName() + '_' + propertyName;
+  },
   _display : function(response) {
     // If the field container is still attached, update its content.
     if (this.container.parentNode) {
@@ -390,19 +414,11 @@ XWiki.FormField = Class.create({
         this.container.removeClassName('loading');
         this._injectHTML(response.responseText);
       }
-      var fieldConfig = this.container.down('.field-config');
-      if (fieldConfig) {
-        fieldConfig.hide();
 
-        var configIcon = new Element('img', {
-          src: '$xwiki.getSkinFile('icons/silk/bullet_wrench.gif')',
-          alt: 'Configure',
-          title: 'Configure'
-        });
-        configIcon.observe('click', this._onConfigure.bindAsEventListener(this));
-        this.container.down('.toolBox').insert({top: configIcon});
-      }
-      document.fire('xwiki:class:displayProperty', {container: this.container, 'new': !!response});
+      this.getConfig().hide();
+      this.getToolBox().insert({top: this._createConfigIcon()});
+
+      document.fire('xwiki:class:displayField', {field: this, 'new': !!response});
     }
   },
   _injectHTML : function(html) {
@@ -432,9 +448,18 @@ XWiki.FormField = Class.create({
     toolBox.insert(deleteIcon);
     return toolBox;
   },
+  _createConfigIcon : function() {
+    var configIcon = new Element('img', {
+      src: '$xwiki.getSkinFile('icons/silk/bullet_wrench.gif')',
+      alt: 'Configure',
+      title: 'Configure'
+    });
+    configIcon.observe('click', this._onConfigure.bindAsEventListener(this));
+    return configIcon;
+  },
   _onConfigure : function(event) {
-    var icon = Event.element(event);
-    var fieldConfig = this.container.down('.field-config');
+    var icon = event.element();
+    var fieldConfig = this.getConfig();
     if (fieldConfig.visible()) {
       fieldConfig.hide();
       icon.alt = icon.title = 'Configure';
@@ -454,7 +479,7 @@ XWiki.FormField = Class.create({
   },
   _onConfirmedDelete : function() {
     this.container.remove();
-    document.fire('xwiki:class:deleteProperty', {container: this.container});
+    document.fire('xwiki:class:deleteField', {field: this});
   }
 });
 
@@ -464,7 +489,7 @@ XWiki.FormField = Class.create({
 XWiki.FormFieldNameManager = Class.create({
   initialize : function() {
     // Generate a unique field name when a new field is dragged from the palette to the form canvas.
-    document.observe('xwiki:class:displayProperty', this._maybeGenerateFieldName.bind(this));
+    document.observe('xwiki:class:displayField', this._maybeGenerateFieldName.bind(this));
     // Rename the field configuration property ids/names when a field is renamed. This is needed for AJAX Save &amp; Continue.
     document.observe('xwiki:document:saved', this._maybeRenameFields.bind(this));
   },
@@ -472,50 +497,42 @@ XWiki.FormFieldNameManager = Class.create({
     if (!event.memo['new']) {
       return;
     }
-    var container = event.memo.container;
-    var nameInput = this._getNameInput(container);
+    var field = event.memo.field;
+    var nameInput = $(field.getPropertyId('name'));
     var counter = 1;
-    while($('type_' + nameInput.value + counter++));
+    // We check the type meta property because there can be unsupported field types for which we know only their type.
+    while($('type-' + nameInput.value + counter++));
     nameInput.value = nameInput.value + (counter - 1);
-    this._maybeRenameField(container);
+    this._maybeRenameField(field);
   },
   _maybeRenameFields : function() {
-    $('fields').select('li').each(this._maybeRenameField.bind(this));
+    $('fields').select('li').each(function(item) {
+      this._maybeRenameField(new XWiki.FormField(item));
+    }.bind(this));
   },
-  _maybeRenameField : function(container) {
-    var nameInput = this._getNameInput(container);
-    var oldName = nameInput.name.substring(0, nameInput.name.length - '_name'.length);
-    var newName = nameInput.value;
+  _maybeRenameField : function(field) {
+    var oldName = field.getName();
+    var newName = $(field.getPropertyId('name')).value;
     if (oldName != newName) {
-      this._maybeRenameElement(oldName, newName, container);
-      container.descendants().each(this._maybeRenameElement.bind(this, oldName, newName));
+      this._maybeRenameElement(oldName, newName, field.getContainer());
+      field.getContainer().descendants().each(this._maybeRenameElement.bind(this, oldName, newName));
     }
   },
   _maybeRenameElement : function(oldName, newName, element) {
     ['id', 'name', 'for'].each(function(attribute) {
       var value = element.readAttribute(attribute) || '';
-      if (value == '') {
-        return;
-      } else if (value.endsWith('_' + oldName)) {
+      if (value.endsWith('_0_' + oldName)) {
         value = value.substring(0, value.length - oldName.length) + newName;
-      } else if (value.startsWith(oldName + '_')) {
-        value = newName + value.substring(oldName.length);
-      }
-      element.writeAttribute(attribute, value);
-    });
-  },
-  _getNameInput : function(container) {
-    if (!container._nameProperty) {
-      var inputs = container.select("input");
-      for(var i = 0; i &lt; inputs.length; i++) {
-        var input = inputs[i];
-        if (input.name.endsWith('_name')) {
-          container._nameProperty = input;
-          break;
+      } else {
+        var nameIndex = value.indexOf('-') + 1;
+        if (nameIndex &gt; 0 &amp;&amp; (value.substring(nameIndex) == oldName || value.substring(nameIndex).startsWith(oldName + '_'))) {
+          value = value.substring(0, nameIndex) + newName + value.substring(nameIndex + oldName.length);
         }
       }
-    }
-    return container._nameProperty;
+      if (value != '') {
+        element.writeAttribute(attribute, value);
+      }
+    });
   }
 });
 
@@ -524,22 +541,11 @@ XWiki.FormFieldNameManager = Class.create({
  */
 XWiki.FormFieldPrettyNameManager = Class.create({
   initialize : function() {
-    document.observe('xwiki:class:displayProperty', this._onDisplayProperty.bindAsEventListener(this));
+    document.observe('xwiki:class:displayField', this._onDisplayField.bindAsEventListener(this));
   },
-  _onDisplayProperty : function(event) {
-    var container = event.memo.container;
-    var prettyNameInput, inputs = container.select("input");
-    for(var i = 0; i &lt; inputs.length; i++) {
-      var input = inputs[i];
-      if (input.name.endsWith('_prettyName')) {
-        prettyNameInput = input;
-        break;
-      }
-    }
-    if (!prettyNameInput) {
-      return;
-    }
-    var fieldName = prettyNameInput.name.substring(0, prettyNameInput.name.length - 11);
+  _onDisplayField : function(event) {
+    var field = event.memo.field;
+    var prettyNameInput = $(field.getPropertyId('prettyName'));
     // Hide the DD containing the pretty name input.
     var parentDD = prettyNameInput.up('dd');
     parentDD.hide();
@@ -552,7 +558,7 @@ XWiki.FormFieldPrettyNameManager = Class.create({
       prettyNameInput.title = label.textContent || label.innerText;
     }
     // Replace the preview label with the pretty name input.
-    var previewLabel = container.down('.field-viewer').down('label');
+    var previewLabel = field.getViewer().down('label');
     previewLabel.writeAttribute('for', '');
     previewLabel.removeChild(previewLabel.lastChild);
     previewLabel.insert(prettyNameInput);
@@ -568,15 +574,15 @@ XWiki.FormFieldPrettyNameManager = Class.create({
  */
 XWiki.FormFieldDefaultValueManager = Class.create({
   initialize : function() {
-    document.observe('xwiki:class:displayProperty', this._onDisplayProperty.bindAsEventListener(this));
+    document.observe('xwiki:class:displayField', this._onDisplayField.bindAsEventListener(this));
 
     // We need to listen to save event to rename the default value inputs to match the new field name.
     document.observe('xwiki:class:save', this._onSave.bind(this));
   },
-  _onDisplayProperty : function(event) {
-    var container = event.memo.container;
-    var fieldName = this._getFieldName(container);
-    container.select('input[type=text]', 'textarea').each(function(input) {
+  _onDisplayField : function(event) {
+    var field = event.memo.field;
+    var fieldName = field.getName();
+    field.getViewer().select('input[type=text]', 'textarea').each(function(input) {
       if (input.name.endsWith('_0_' + fieldName)) {
         if (!input.title) {
           input.title = 'Default value';
@@ -585,39 +591,21 @@ XWiki.FormFieldDefaultValueManager = Class.create({
       }
     });
   },
-  _getFieldName : function(container) {
-    var hiddenInputs = container.select('input[type=hidden]');
-    for(var i = 0; i &lt; hiddenInputs.length; i++) {
-      var hiddenInput = hiddenInputs[i];
-      if (hiddenInput.name.startsWith('type_')) {
-        return hiddenInput.name.substring(5);
-      }
-    }
-  },
   _onSave : function() {
-    $('fields').select('li').each(this._maybeRenameDefaultValue.bind(this));
+    $('fields').select('li').each(function(item) {
+      this._maybeRenameDefaultValue(new XWiki.FormField(item));
+    }.bind(this));
   },
-  _maybeRenameDefaultValue : function(container) {
-    var fieldNames = this._getFieldNames(container);
-    if(fieldNames[0] != fieldNames[1]) {
-      // The field was renamed.
-      container.down('.field-viewer').select('input', 'textarea', 'select').each(function(element) {
-        if (element.name.endsWith('_0_' + fieldNames[0])) {
-          element.name = element.name.substring(0, element.name.length - fieldNames[0].length) + fieldNames[1];
+  _maybeRenameDefaultValue : function(field) {
+    var oldName = field.getName();
+    var newName = $(field.getPropertyId('name')).value;
+    if(oldName != newName) {
+      field.getViewer().select('input', 'textarea', 'select').each(function(element) {
+        if (element.name.endsWith('_0_' + oldName)) {
+          element.name = element.name.substring(0, element.name.length - oldName.length) + newName;
         }
       });
     }
-  },
-  _getFieldNames : function(container) {
-    var textInputs = container.down('.field-config').select('input[type=text]');
-    for(var i = 0; i &lt; textInputs.length; i++) {
-      var textInput = textInputs[i];
-      if (textInput.name.endsWith('_name')) {
-        return [textInput.name.substring(0, textInput.name.length - 5), textInput.value];
-      }
-    }
-    // We shouldn't get here.
-    return ['', ''];
   }
 });
 
@@ -626,10 +614,10 @@ XWiki.FormFieldDefaultValueManager = Class.create({
  */
 XWiki.FormFieldHintManager = Class.create({
   initialize : function() {
-    document.observe('xwiki:class:displayProperty', this._onDisplayProperty.bindAsEventListener(this));
+    document.observe('xwiki:class:displayField', this._onDisplayField.bindAsEventListener(this));
   },
-  _onDisplayProperty : function(event) {
-    var prettyNameLabel = event.memo.container.down('.field-viewer').down('label');
+  _onDisplayField : function(event) {
+    var prettyNameLabel = event.memo.field.getViewer().down('label');
     var hintInput = new Element('input', {type:'text', 'class': 'xHint', title:'Hint'});
     prettyNameLabel.insert({after: hintInput});
     // Enhance the hint input.
@@ -643,10 +631,10 @@ XWiki.FormFieldHintManager = Class.create({
  */
 XWiki.FormFieldRequiredManager = Class.create({
   initialize : function() {
-    document.observe('xwiki:class:displayProperty', this._onDisplayProperty.bindAsEventListener(this));
+    document.observe('xwiki:class:displayField', this._onDisplayField.bindAsEventListener(this));
   },
-  _onDisplayProperty : function(event) {
-    var prettyNameLabel = event.memo.container.down('.field-viewer').down('label');
+  _onDisplayField : function(event) {
+    var prettyNameLabel = event.memo.field.getViewer().down('label');
     var wrapper = new Element('div', {'class': 'labelLine'});
     prettyNameLabel.insert({before: wrapper});
     wrapper.insert(prettyNameLabel);
@@ -663,6 +651,9 @@ XWiki.FormCanvas = Class.create({
     this.container = $(container);
     Droppables.add(this.container, {accept: 'field', hoverclass: 'hovered', onDrop: this._onDrop.bind(this)});
 
+    document.observe('xwiki:class:deleteField', this._onDeleteField.bind(this));
+    document.observe('xwiki:class:displayField', this._onDisplayField.bindAsEventListener(this));
+
     this.fields = this.container.down('ul');
     if (!this.fields) {
       this.fields = new Element('ul');
@@ -674,66 +665,66 @@ XWiki.FormCanvas = Class.create({
     } else {
       this._enhanceFields();
     }
-    this._makeSortable();
-
-    document.observe('xwiki:class:deleteProperty', this._onDeleteField.bind(this));
-    document.observe('xwiki:class:displayProperty', this._onDisplayField.bind(this));
   },
   _enhanceFields : function() {
     this.fields.select('li').each(function(item) {
-      new XWiki.FormField(null, item);
+      new XWiki.FormField(item).enhance();
     });
   },
   _onDrop : function(field) {
     var fieldContainer = new Element('li');
     this.fields.insert(fieldContainer);
     this.container.removeClassName('empty');
-    new XWiki.FormField(field.down('.data').value, fieldContainer);
+    new XWiki.FormField(fieldContainer).enhance(field.down('.data').value);
   },
   _onDeleteField : function() {
     if (this.fields.empty()) {
       this.container.addClassName('empty');
+    } else {
+      this._updateOrder();
     }
   },
   _onDisplayField : function(event) {
-    this._makeSortable(event.memo.container);
-  },
-  _makeSortable : function(item) {
-    (item ? [item] : this.fields.select('li')).each(function(item) {
-      // Hide the property number, as ordering can be done by drag and drop
-      item.select("input").each(function(input) {
-        if (input.id.endsWith("_number")) {
-          // This is needed in order for the Sortable.onUpdate() to be triggered.
-          item.id = 'field_' + input.id.substring(0, input.id.length - 7);
-          item._numberProperty = input;
-          input.up().hide();
-          if (input.up().previous('dt')) {
-            input.up().previous('dt').hide();
-          }
-        }
-      });
-      // Create and insert the move icon.
-      var moveIcon = new Element('img', {
-        src: '$xwiki.getAttachmentURL('AppWithinMinutes.ClassEditSheet', 'arrow-move.png')',
-        alt: 'Move',
-        title: 'Drag and drop to change the order',
-        'class': 'icon-move'
-      });
-      item.down('.toolBox').insert({bottom: moveIcon});
+    var field = event.memo.field;
+
+    // We have to set the ID of the field container as otherwise Sortable.onUpdate() isn't triggered.
+    field.getContainer().id = 'field-' + field.getName();
+
+    // Hide the property number, as ordering can be done by drag and drop
+    var numberInput = $(field.getPropertyId('number'));
+    numberInput.up().hide();
+    numberInput.up().previous().hide();
+
+    // Create and insert the move icon.
+    var moveIcon = new Element('img', {
+      src: '$xwiki.getAttachmentURL('AppWithinMinutes.ClassEditSheet', 'arrow-move.png')',
+      alt: 'Move',
+      title: 'Drag and drop to change the order',
+      'class': 'icon-move'
     });
+    field.getToolBox().insert({bottom: moveIcon});
+
     Sortable.create('fields', {
       handle: 'icon-move',
+      format: /^[^_\-](?:[A-Za-z0-9\-\_]*)[\-](.*)$/,
       onUpdate : this._updateOrder.bind(this)
     });
-    this._updateOrder();
+
+    if (event.memo['new']) {
+      this._updateOrder();
+    }
   },
   _updateOrder : function() {
-    var counter = 1;
-    this.fields.select('li').each(function(item) {
-      if (item._numberProperty) {
-        item._numberProperty.value = counter++;
+    var items = this.fields.select('li');
+    for(var i = 0; i &lt; items.length; i++) {
+      var field = new XWiki.FormField(items[i]);
+      if (field.getConfig()) {
+        $(field.getPropertyId('number')).value = i + 1;
+      } else {
+        // Stop updating the order. This method will be called again when the field will be loaded.
+        break;
       }
-    });
+    }
   }
 });
 
@@ -1361,7 +1352,8 @@ return XWiki;
   {{html}}
     #displayFieldMetaData($field)
     ## We need this information to avoid querying and loading all FormField documents twice.
-    &lt;input type="hidden" id="template_$field.name" name="template_$field.name" value="$escapetool.xml($formFieldDoc.fullName)" /&gt;
+    ## NOTE: We use a different ID format to avoid collisions with the field meta properties.
+    &lt;input type="hidden" id="template-$field.name" name="template-$field.name" value="$escapetool.xml($formFieldDoc.fullName)" /&gt;
   {{/html}}
 
   #set($className = $doc.name)
@@ -1385,7 +1377,7 @@ return XWiki;
   #foreach($propertyName in $propertyNames)
     #set($propertyDefinition = $field.xWikiClass.get($propertyName))
     #if($propertyDefinition)
-      #displayFieldProperty($propertyDefinition "${field.name}_" $field)
+      #displayFieldProperty($propertyDefinition "field-${field.name}_" $field)
     #end
   #end
 #end
@@ -1394,7 +1386,7 @@ return XWiki;
  * Display the field meta data. This is needed to preserve the field when its type is not supported by the editor.
  *#
 #macro(displayFieldMetaData $field)
-  &lt;input type="hidden" id="type_$field.name" name="type_$field.name" value="$field.classType" /&gt;
+  &lt;input type="hidden" id="type-$field.name" name="type-$field.name" value="$field.classType" /&gt;
 #end
 
 #**
@@ -1470,7 +1462,7 @@ return XWiki;
   ##
   #set($fieldNames = [])
   #foreach($paramName in $request.getParameterMap().keySet())
-    #if($paramName.startsWith('type_'))
+    #if($paramName.startsWith('type-'))
       #set($fieldName = $paramName.substring(5))
       #set($fieldType = $request.getParameter($paramName))
       #set($field = $class.get($fieldName))
@@ -1480,7 +1472,7 @@ return XWiki;
           #set($discard = $xclass.removeField($fieldName))
         #end
         ## Add a new class field with the specified type.
-        #set($fieldTemplateRef = $request.getParameter("template_$fieldName"))
+        #set($fieldTemplateRef = $request.getParameter("template-$fieldName"))
         #if("$!fieldTemplateRef" != '')
           #set($fieldTemplateDoc = $xwiki.getDocument($fieldTemplateRef))
           #set($field = $fieldTemplateDoc.getxWikiClass().getXWikiClass().properties.get(0).clone())
@@ -1508,7 +1500,7 @@ return XWiki;
   #set($fieldsToRename = {})
   #foreach($fieldName in $xclass.propertyNames)
     #set($field = $xclass.get($fieldName))
-    #set($valuesFromRequest = $xcontext.context.getForm().getObject($fieldName))
+    #set($valuesFromRequest = $xcontext.context.getForm().getObject("field-$fieldName"))
     #set($discard = $field.getxWikiClass().fromMap($valuesFromRequest, $field))
     #if($field.name.matches('^[\w\.\-]+$'))
       #if($fieldName != $field.name)

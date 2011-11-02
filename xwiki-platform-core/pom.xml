@@ -337,6 +337,7 @@
                 <exclude>com/xpn/xwiki/store/XWikiHibernateTransaction</exclude>
                 <exclude>com/xpn/xwiki/plugin/applicationmanager/ApplicationManagerPlugin</exclude>
                 <exclude>com/xpn/xwiki/plugin/applicationmanager/ApplicationManagerPlugin$1</exclude>
+                <exclude>org/xwiki/annotation/event/AbstractAnnotationEvent</exclude>
                 <!-- Moved to Legacy -->
                 <exclude>com/xpn/xwiki/api/XWiki</exclude>
               </excludes>

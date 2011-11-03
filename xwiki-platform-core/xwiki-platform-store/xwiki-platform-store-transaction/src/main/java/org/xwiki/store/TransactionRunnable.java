@@ -495,7 +495,7 @@ public class TransactionRunnable<T>
     /**
      * A closure which is capable of throwing an exception.
      */
-    private static interface ExceptionThrowingRunnable
+    private interface ExceptionThrowingRunnable
     {
         /**
          * Do something.

@@ -19,21 +19,16 @@
  */
 package org.xwiki.rendering.internal.configuration;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.rendering.transformation.Transformation;
 
 /**
  * All configuration options for the Rendering subsystem.
@@ -68,12 +63,6 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
     @Inject
     private ComponentManager componentManager;
 
-    /**
-     * The logger to log.
-     */
-    @Inject
-    private Logger logger;
-
     @Override
     public String getLinkLabelFormat()
     {
@@ -104,24 +93,9 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
         return this.configuration.getProperty(PREFIX + "interWikiDefinitions", Properties.class);
     }
 
-    /**
-     * {@inheritDoc}
-     * @since 2.6RC1
-     */
     @Override
-    public List<Transformation> getTransformations()
+    public List<String> getTransformationNames()
     {
-        List<Transformation> transformations = new ArrayList<Transformation>();
-        for (String hint : this.configuration.getProperty(PREFIX + "transformations",
-            Arrays.asList("macro", "icon")))
-        {
-            try {
-                transformations.add(this.componentManager.lookup(Transformation.class, hint));
-            } catch (ComponentLookupException e) {
-                this.logger.warn("Failed to locate transformation with hint [" + hint + "], ignoring it.");
-            }
-        }
-        Collections.sort(transformations);
-        return transformations;
+        return this.configuration.getProperty(PREFIX + "transformations", Arrays.asList("macro", "icon"));
     }
 }

@@ -32,6 +32,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -56,6 +57,12 @@ public class RenderingScriptService implements ScriptService
      */
     @Inject
     private ComponentManager componentManager;
+
+    /**
+     * @see #getDefaultTransformationNames()
+     */
+    @Inject
+    private RenderingConfiguration configuration;
 
     /**
      * @return the list of syntaxes for which a Parser is available
@@ -89,6 +96,15 @@ public class RenderingScriptService implements ScriptService
         }
 
         return syntaxes;
+    }
+
+    /**
+     * @return the names of Transformations that are configured in the Rendering Configuration and which are used by
+     *         the Transformation Manager when running all transformations
+     */
+    public List<String> getDefaultTransformationNames()
+    {
+        return this.configuration.getTransformationNames();
     }
 
     /**

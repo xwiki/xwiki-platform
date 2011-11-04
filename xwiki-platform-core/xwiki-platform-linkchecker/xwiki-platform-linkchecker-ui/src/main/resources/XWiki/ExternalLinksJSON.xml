@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>ExternalLinksJSON</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.ExternalLinks</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1320049413000</creationDate>
+<date>1320310931000</date>
+<contentUpdateDate>1320310931000</contentUpdateDate>
+<version>1.1</version>
+<title>JSON Generation for the External Link States LiveTable</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment>Copied from xwiki:Main.MyJSON</comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+#if("$!{request.xpage}" == 'plain')
+  $response.setContentType('application/json')
+#end
+##==============================
+## Offset = item # at which to start displaying data
+##==============================
+#set($offset = $util.parseInt($request.get('offset')))
+## offset starts from 0 in velocity and 1 in javascript
+#set($offset = $offset - 1)
+#if($offset &lt; 0)
+  #set($offset = 0)
+#end
+##==================
+## Limit = # of items to display
+##==================
+#set($limit = $util.parseInt($request.get('limit')))
+##====================================
+## Step1: Transform Map into list, one list item per link/page
+##====================================
+#set ($states = $services.linkchecker.getLinkStates())
+#set ($stateList = [])
+#foreach ($link in $states.keySet())
+  #set ($pages = $states.get($link))
+  #foreach ($page in $pages.keySet())
+    #set ($tmpMap = {})
+    #set ($dummy = $tmpMap.put("link", $link))
+    #set ($dummy = $tmpMap.put("page", $page))
+    #set ($dummy = $tmpMap.put("code", $pages.get($page).getResponseCode()))
+    #set ($dummy = $tmpMap.put("date", $datetool.format($pages.get($page).getLastCheckedTime())))
+    #set ($dummy = $stateList.add($tmpMap))
+  #end
+#end
+##============
+## Step2: Filter the list
+##============
+#set ($filteredList = [])
+#set ($linkFilter = "$!{request.get('link')}")
+#set ($pageFilter = "$!{request.get('page')}")
+#set ($codeFilter = "$!{request.get('code')}")
+#set ($dateFilter = "$!{request.get('date')}")
+#foreach ($entry in $stateList)
+  #set ($codeString = "$entry.get('code')")
+  #if ($codeFilter.startsWith("!") &amp;&amp; $codeFilter.length() &gt; 1)
+    #set ($codeMatch = !$codeString.contains($codeFilter.substring(1)))
+  #else
+    #set ($codeMatch = $codeString.contains($codeFilter))
+  #end
+  #if ($entry.get("link").contains($linkFilter) &amp;&amp; $entry.get("page").contains($pageFilter) &amp;&amp; $codeMatch &amp;&amp; $entry.get("date").contains($dateFilter))
+    #set ($dummy = $filteredList.add($entry))
+  #end
+#end
+##===================
+## Step3: Handle offset and limit
+##===================
+#set ($added = 0)
+#set ($resultList = [])
+#if ($offset &lt; $filteredList.size())
+  #set ($toIndex = $mathtool.min($mathtool.add($offset, $limit), $filteredList.size()))
+  #set ($resultList = $filteredList.subList($offset, $toIndex))
+#end
+## ==========
+## JSON Generation
+## ==========
+{
+"totalrows": $filteredList.size(),
+"matchingtags": {},
+"tags" : [],
+"returnedrows":  ${resultList.size()},
+"offset": $mathtool.add($offset, 1),
+"reqNo": $util.parseInt($request.reqNo),
+"rows": [
+#foreach ($entry in $resultList)
+  #if($velocityCount &gt; 1) , #end
+  {
+    "doc_viewable" : true,
+    #set ($url = $entry.get('link'))
+    #set ($linkHTML = "&lt;a href='$url'&gt;$entry.get('link')&lt;/a&gt;")
+    "link" : "$escapetool.javascript($linkHTML)",
+    #set ($url = $xwiki.getURL($entry.get('page')))
+    #set ($pageHTML = "&lt;a href='$url'&gt;$entry.get('page')&lt;/a&gt;")
+    "page" : "$escapetool.javascript($pageHTML)",
+    "code" : "$escapetool.javascript($entry.get("code"))",
+    "date" : "$escapetool.javascript($entry.get("date"))"
+  }
+#end
+]
+}
+{{/velocity}}
+</content></xwikidoc>

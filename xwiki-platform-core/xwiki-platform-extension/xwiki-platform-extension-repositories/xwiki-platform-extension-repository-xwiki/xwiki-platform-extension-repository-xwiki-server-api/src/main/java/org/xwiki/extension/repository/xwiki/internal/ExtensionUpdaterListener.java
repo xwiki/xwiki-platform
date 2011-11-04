@@ -122,13 +122,17 @@ public class ExtensionUpdaterListener implements EventListener
             boolean valid = !StringUtils.isBlank(extension.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_ID));
             if (valid) {
                 int nbVersions = 0;
-                for (BaseObject extensionVersion : document.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE)) {
-                    if (extensionVersion != null) {
-                        valid &=
-                            !StringUtils.isBlank(extensionVersion
-                                .getStringValue(XWikiRepositoryModel.PROP_VERSION_VERSION));
+                List<BaseObject> extensionVersions =
+                    document.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
+                if (extensionVersions != null) {
+                    for (BaseObject extensionVersion : extensionVersions) {
+                        if (extensionVersion != null) {
+                            valid &=
+                                !StringUtils.isBlank(extensionVersion
+                                    .getStringValue(XWikiRepositoryModel.PROP_VERSION_VERSION));
 
-                        ++nbVersions;
+                            ++nbVersions;
+                        }
                     }
                 }
 
@@ -197,11 +201,13 @@ public class ExtensionUpdaterListener implements EventListener
         List<BaseObject> versionObjects = document.getXObjects(versionClassReference);
 
         String lastVersion = null;
-        for (BaseObject versionObject : versionObjects) {
-            String version = versionObject.getStringValue(XWikiRepositoryModel.PROP_VERSION_VERSION);
-            if (version != null) {
-                if (lastVersion == null || this.versionManager.compareVersions(version, lastVersion) > 0) {
-                    lastVersion = version;
+        if (versionObjects != null) {
+            for (BaseObject versionObject : versionObjects) {
+                String version = versionObject.getStringValue(XWikiRepositoryModel.PROP_VERSION_VERSION);
+                if (version != null) {
+                    if (lastVersion == null || this.versionManager.compareVersions(version, lastVersion) > 0) {
+                        lastVersion = version;
+                    }
                 }
             }
         }

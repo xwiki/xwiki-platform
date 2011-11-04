@@ -28,6 +28,7 @@ $pdfdoc.use('XWiki.PDFClass')
 #end
 </title>
 <meta http-equiv="Content-Type" content="text/html; charset=${xwiki.encoding}" />
+<meta name="language" content="$!{xcontext.language}" />
 </head>
 <body id="body" class="${xcontext.action}body" pdfcover="${displayPdfCover}" pdftoc="${displayPdfToc}">
 <div class="pdfheader">

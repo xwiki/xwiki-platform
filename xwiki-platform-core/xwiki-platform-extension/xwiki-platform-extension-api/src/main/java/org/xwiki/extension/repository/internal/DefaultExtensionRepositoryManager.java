@@ -117,9 +117,8 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
 
                 return artifact;
             } catch (ResolveException e) {
-                this.logger.debug(
-                    MessageFormat.format("Could not find extension [{0}] in repository [{1}]", extensionId,
-                        repository.getId()), e);
+                this.logger.debug("Could not find extension [{}] in repository [{}]",
+                    new Object[] {extensionId, repository.getId(), e});
             }
         }
 

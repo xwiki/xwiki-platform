@@ -19,16 +19,14 @@
  */
 package org.xwiki.extension.script.internal;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -47,10 +45,8 @@ import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
-import org.xwiki.extension.wrap.WrappingCoreExtension;
-import org.xwiki.extension.wrap.WrappingExtension;
 import org.xwiki.extension.wrap.WrappingJobStatus;
-import org.xwiki.extension.wrap.WrappingLocalExtension;
+import org.xwiki.extension.wrap.WrappingUtils;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -63,103 +59,179 @@ import org.xwiki.script.service.ScriptService;
 @Singleton
 public class ExtensionManagerScriptService implements ScriptService
 {
+    /** The key under which the last encountered error is stored in the current execution context. */
     private static final String EXTENSIONERROR_KEY = "extensionerror";
 
+    /** The real extension manager bridged by this script service. */
     @Inject
     private ExtensionManager extensionManager;
 
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
+    /** Also exposed by the brige. */
     @Inject
     private VersionManager versionManager;
 
+    /** Needed for checking programming rights. */
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
+    /** The repository with custom installed extensions. */
     @Inject
     private LocalExtensionRepository localExtensionRepository;
 
+    /** The repository with core modules provided by the platform. */
     @Inject
     private CoreExtensionRepository coreExtensionRepository;
 
+    /** Repository manager, needed for cross-repository operations. */
     @Inject
-    private ExtensionRepositoryManager reporitoryManager;
+    private ExtensionRepositoryManager repositoryManager;
 
+    /** Handles and provides status feedback on extension operations (installation, upgrade, removal). */
     @Inject
     private JobManager taskManager;
 
+    /** Provides access to the current context. */
     @Inject
     private Execution execution;
 
-    private <K> Map<K, Collection<LocalExtension>> wrapExtensions(Map<K, Collection<LocalExtension>> extensions)
+    /**
+     * Gives access to the {@link VersionManager} for version utility methods.
+     * 
+     * @return the default version manager
+     */
+    public VersionManager getVersionManager()
     {
-        Map<K, Collection<LocalExtension>> wrappedExtensions = new LinkedHashMap<K, Collection<LocalExtension>>();
-
-        for (Map.Entry<K, Collection<LocalExtension>> entry : extensions.entrySet()) {
-            wrappedExtensions.put(entry.getKey(), this.<LocalExtension> wrapExtensions(entry.getValue()));
-        }
-
-        return wrappedExtensions;
+        return this.versionManager;
     }
 
-    private <T extends Extension> Collection<T> wrapExtensions(Collection< ? extends Extension> extensions)
+    // Extensions
+
+    /**
+     * Search among all {@link org.xwiki.extension.repository.Searchable} repositories for extensions matching the
+     * search terms.
+     * 
+     * @param pattern the words to search for
+     * @param offset the offset from where to start returning search results, 0-based
+     * @param nb the maximum number of search results to return
+     * @return the found extensions descriptors, empty list if nothing could be found
+     * @see org.xwiki.extension.repository.Searchable
+     */
+    public Collection<Extension> search(String pattern, int offset, int nb)
     {
-        List<T> wrappedExtensions = new ArrayList<T>(extensions.size());
-
-        for (Extension extension : extensions) {
-            wrappedExtensions.add(this.<T> wrapExtension(extension));
-        }
-
-        return wrappedExtensions;
+        return WrappingUtils.wrapExtensions(this.repositoryManager.search(pattern, offset, nb));
     }
 
-    private <T extends Extension> T wrapExtension(Extension extension)
-    {
-        T wrappedExtension;
-
-        if (extension instanceof CoreExtension) {
-            wrappedExtension = (T) new WrappingCoreExtension<CoreExtension>((CoreExtension) extension);
-        } else if (extension instanceof LocalExtension) {
-            wrappedExtension = (T) new WrappingLocalExtension<LocalExtension>((LocalExtension) extension);
-        } else if (extension != null) {
-            wrappedExtension = (T) new WrappingExtension<Extension>(extension);
-        } else {
-            wrappedExtension = null;
-        }
-
-        return wrappedExtension;
-    }
-
-    public Exception getLastError()
-    {
-        return (Exception) this.execution.getContext().getProperty(EXTENSIONERROR_KEY);
-    }
-
-    private void setError(Exception e)
-    {
-        this.execution.getContext().setProperty(EXTENSIONERROR_KEY, e);
-    }
-
+    /**
+     * Get the extension handler corresponding to the given extension ID (groupID:artifactId) and version. The returned
+     * handler can be used to get more information about the extension, such as the authors, an extension description,
+     * its license...
+     * 
+     * @param id the extension id or provided feature (virtual extension) of the extension to resolve
+     * @param version the specific version to resolve
+     * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension couldn't
+     *         be resolved, in which case {@link #getLastError()} contains the failure reason
+     */
     public Extension resolve(String id, String version)
     {
         setError(null);
 
-        Extension extension;
+        Extension extension = null;
 
         try {
-            extension = wrapExtension(this.extensionManager.resolveExtension(new ExtensionId(id, version)));
+            extension =
+                WrappingUtils.wrapExtension(this.extensionManager.resolveExtension(new ExtensionId(id, version)));
         } catch (Exception e) {
             setError(e);
-
-            extension = null;
         }
 
         return extension;
     }
 
-    public Collection<Extension> search(String pattern, int offset, int nb)
+    /**
+     * Get a list of all currently installed extensions. This doesn't include core extensions, only custom extensions
+     * installed by the administrators.
+     * 
+     * @return a list of read-only handlers corresponding to the installed extensions, an empty list if nothing is
+     *         installed
+     */
+    public Collection<LocalExtension> getInstalledExtensions()
     {
-        return wrapExtensions(this.reporitoryManager.search(pattern, offset, nb));
+        return WrappingUtils.wrapExtensions(this.localExtensionRepository.getInstalledExtensions());
     }
 
+    /**
+     * Get a list of currently installed extensions for the given namespace. This doesn't include core extensions, only
+     * custom extensions installed by the administrators .
+     * 
+     * @param namespace the target namespace (virtual wiki name) for which to retrieve the list of installed extensions
+     * @return a list of read-only handlers corresponding to the installed extensions, an empty list if nothing is
+     *         installed in the target namespace
+     */
+    public Collection<LocalExtension> getInstalledExtensions(String namespace)
+    {
+        return WrappingUtils.wrapExtensions(this.localExtensionRepository.getInstalledExtensions(namespace));
+    }
+
+    /**
+     * Get the extension handler corresponding to the given installed extension ID (groupID:artifactId) and namespace.
+     * The returned handler can be used to get more information about the extension, such as the authors, an extension
+     * description, its license...
+     * 
+     * @param id the extension id or provided feature (virtual extension) of the extension to resolve
+     * @param namespace the optional namespace (wiki name) where the extension should be installed
+     * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension isn't
+     *         installed in the target namespace
+     */
+    public LocalExtension getInstalledExtension(String id, String namespace)
+    {
+        return WrappingUtils.wrapExtension(this.localExtensionRepository.getInstalledExtension(id, namespace));
+    }
+
+    /**
+     * Get a list of core extensions provided by the current version of the platform.
+     * 
+     * @return a list of read-only handlers corresponding to the core extensions
+     */
+    public Collection<CoreExtension> getCoreExtensions()
+    {
+        return WrappingUtils.wrapExtensions(this.coreExtensionRepository.getCoreExtensions());
+    }
+
+    /**
+     * Get the extension handler corresponding to the given core extension ID (groupID:artifactId). The returned handler
+     * can be used to get more information about the extension, such as the authors, an extension description, its
+     * license...
+     * 
+     * @param id the extension id or provided feature (virtual extension) of the extension to resolve
+     * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension isn't
+     *         provided by the platform
+     */
+    public CoreExtension getCoreExtension(String id)
+    {
+        return WrappingUtils.wrapExtension(this.coreExtensionRepository.getCoreExtension(id));
+    }
+
+    /**
+     * Get a list of cached extensions from the local extension repository. This doesn't include core extensions, only
+     * custom extensions fetched or installed.
+     * 
+     * @return a list of read-only handlers corresponding to the local extensions, an empty list if nothing is available
+     *         in the local repository
+     */
+    public Collection<LocalExtension> getLocalExtensions()
+    {
+        return WrappingUtils.wrapExtensions(this.localExtensionRepository.getLocalExtensions());
+    }
+
+    /**
+     * Get all the installed extensions that depend on the specified extension. The results are grouped by wiki name, so
+     * the same extension can appear multiple times, once for each wiki where it is installed.
+     * 
+     * @param id the extension id or provided feature (virtual extension) of the extension to resolve
+     * @param version the specific version to check
+     * @return a map wiki name -&gt; list of dependent extensions, or {@code null} if any error occurs while computing
+     *         the result, in which case {@link #getLastError()} contains the failure reason
+     */
     public Map<String, Collection<LocalExtension>> getBackwardDependencies(String id, String version)
     {
         setError(null);
@@ -167,9 +239,8 @@ public class ExtensionManagerScriptService implements ScriptService
         Map<String, Collection<LocalExtension>> extensions;
 
         try {
-            extensions =
-                this.<String> wrapExtensions(this.localExtensionRepository.getBackwardDependencies(new ExtensionId(id,
-                    version)));
+            extensions = WrappingUtils.wrapExtensions(this.localExtensionRepository.getBackwardDependencies(
+                new ExtensionId(id, version)));
         } catch (Exception e) {
             setError(e);
 
@@ -179,71 +250,20 @@ public class ExtensionManagerScriptService implements ScriptService
         return extensions;
     }
 
-    public LocalExtension getInstalledExtension(String id, String namespace)
-    {
-        return wrapExtension(this.localExtensionRepository.getInstalledExtension(id, namespace));
-    }
+    // Actions
 
-    public Collection<LocalExtension> getInstalledExtensions(String namespace)
-    {
-        return wrapExtensions(this.localExtensionRepository.getInstalledExtensions(namespace));
-    }
-
-    public Collection<LocalExtension> getInstalledExtensions()
-    {
-        return wrapExtensions(this.localExtensionRepository.getInstalledExtensions());
-    }
-
-    public Collection<CoreExtension> getCoreExtensions()
-    {
-        return wrapExtensions(this.coreExtensionRepository.getCoreExtensions());
-    }
-
-    public Collection<LocalExtension> getLocalExtensions()
-    {
-        return wrapExtensions(this.localExtensionRepository.getLocalExtensions());
-    }
-
-    public CoreExtension getCoreExtension(String id)
-    {
-        return wrapExtension(this.coreExtensionRepository.getCoreExtension(id));
-    }
-
-    public VersionManager getVersionManager()
-    {
-        return this.versionManager;
-    }
-
-    // Jobs
-
-    public Job getCurrentJob()
-    {
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
-            setError(new JobException("Need programming right to get current task"));
-
-            return null;
-        }
-
-        return this.taskManager.getCurrentJob();
-    }
-
-    public JobStatus getCurrentJobStatus()
-    {
-        Job job = this.taskManager.getCurrentJob();
-
-        JobStatus jobStatus;
-        if (job != null) {
-            jobStatus = job.getStatus();
-            if (!this.documentAccessBridge.hasProgrammingRights()) {
-                jobStatus = new WrappingJobStatus(jobStatus);
-            }
-        } else {
-            jobStatus = null;
-        }
-
-        return jobStatus;
-    }
-
+    /**
+     * Start the asynchronous installation process for an extension if the context document has programming rights and
+     * no other job is in progress already.
+     * 
+     * @param id the identifier of the extension to add (groupId:artifactId)
+     * @param version the version to install
+     * @param wiki the (optional) virtual wiki where to install the extension; if {@code null} or empty, the extension
+     *        will be installed globally; not all types of extensions can be installed in only one wiki and will be
+     *        installed globally regardless of the passed value
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or {@code
+     *         null} in case of failure
+     */
     public Job install(String id, String version, String wiki)
     {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
@@ -256,7 +276,7 @@ public class ExtensionManagerScriptService implements ScriptService
 
         InstallRequest installRequest = new InstallRequest();
         installRequest.addExtension(new ExtensionId(id, version));
-        if (wiki != null) {
+        if (StringUtils.isNotBlank(wiki)) {
             installRequest.addNamespace(wiki);
         }
 
@@ -272,6 +292,15 @@ public class ExtensionManagerScriptService implements ScriptService
         return task;
     }
 
+    /**
+     * Start the asynchronous uninstall process for an extension if the context document has programming rights and no
+     * other job is in progress already.
+     * 
+     * @param id the identifier of the extension to remove (groupId:artifactId)
+     * @param version the version to remove
+     * @return the {@link Job} object which can be used to monitor the progress of the unistallation process, or {@code
+     *         null} in case of failure
+     */
     public Job uninstall(String id, String version)
     {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
@@ -295,5 +324,62 @@ public class ExtensionManagerScriptService implements ScriptService
         }
 
         return task;
+    }
+
+    // Jobs
+
+    /**
+     * Get a reference to the currently executing job, if any.
+     * 
+     * @return currently executing job, or {@code null} if no job is being executed
+     */
+    public Job getCurrentJob()
+    {
+        if (!this.documentAccessBridge.hasProgrammingRights()) {
+            setError(new JobException("Need programming right to get current task"));
+            return null;
+        }
+        return this.taskManager.getCurrentJob();
+    }
+
+    /**
+     * Get the status of the currently executing job, if any.
+     * 
+     * @return status of the currently executing job, or {@code null} if no job is being executed
+     */
+    public JobStatus getCurrentJobStatus()
+    {
+        Job job = this.taskManager.getCurrentJob();
+        JobStatus jobStatus;
+        if (job != null) {
+            jobStatus = job.getStatus();
+            if (!this.documentAccessBridge.hasProgrammingRights()) {
+                jobStatus = new WrappingJobStatus(jobStatus);
+            }
+        } else {
+            jobStatus = null;
+        }
+        return jobStatus;
+    }
+
+    /**
+     * Get the error generated while performing the previously called action.
+     * 
+     * @return an eventual exception or {@code null} if no exception was thrown
+     */
+    public Exception getLastError()
+    {
+        return (Exception) this.execution.getContext().getProperty(EXTENSIONERROR_KEY);
+    }
+
+    /**
+     * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
+     * 
+     * @param e the exception to store, can be {@code null} to clear the previously stored exception
+     * @see #getLastError()
+     */
+    private void setError(Exception e)
+    {
+        this.execution.getContext().setProperty(EXTENSIONERROR_KEY, e);
     }
 }

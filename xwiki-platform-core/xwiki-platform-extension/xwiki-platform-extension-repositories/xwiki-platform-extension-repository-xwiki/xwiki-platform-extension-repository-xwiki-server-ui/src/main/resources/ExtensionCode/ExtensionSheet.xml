@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1312816151000</creationDate>
-<date>1320334953000</date>
-<contentUpdateDate>1320334953000</contentUpdateDate>
+<date>1320411154000</date>
+<contentUpdateDate>1320411154000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -181,13 +181,17 @@
 <use>always</use>
 </property>
 </object>
-<content>{{velocity output="false"}}
+<content>{{include document="ExtensionCode.RepositoryCode"/}}
+
+{{velocity output="false"}}
 #if ($context.action == 'view' || $context.action == 'preview')
   #set($isViewMode = true)
 #else
   #set($isEditMode = true)
 #end
+
 #set($extension = $doc.getObject("ExtensionCode.ExtensionClass"))
+
 #if ($extension)
   #set($id = $extension.getProperty('id').value)
   #set($type = $extension.getProperty('type').value)
@@ -196,6 +200,13 @@
     #set ($extensionTypeDocumentName = $extensionTypeDocumentNames.get(0))
     #set($extensionTypeObject = $xwiki.getDocument($extensionTypeDocumentName).getObject("ExtensionCode.ExtensionTypeClass"))
   #end
+#end
+
+#if ($repositoryConfigObj)
+  #set($defaultIdPrefix = $repositoryConfigObj.get('$defaultIdPrefix'))
+#end
+#if (!$defaultIdPrefix)
+  #set($defaultIdPrefix = '')
 #end
 {{/velocity}}
 
@@ -293,7 +304,7 @@
     = Summary =
     #if ($doc.new)
       #if ($request.name)
-        $extension.set('id', "org.xwiki.extensions:${request.name.toLowerCase().replace(' ', '-')}")##
+        $extension.set('id', "${defaultIdPrefix}${request.name.toLowerCase().replace(' ', '-')}")##
         $extension.set('name', $request.name)##
       #else
         $extension.set('id', "org.xwiki.extensions:${doc.name.toLowerCase().replace(' ', '-')}")##

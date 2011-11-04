@@ -415,8 +415,8 @@ XWiki.FormField = Class.create({
         this._injectHTML(response.responseText);
       }
 
-      this.getConfig().hide();
       this.getToolBox().insert({top: this._createConfigIcon()});
+      this._onConfigure();
 
       document.fire('xwiki:class:displayField', {field: this, 'new': !!response});
     }
@@ -449,25 +449,21 @@ XWiki.FormField = Class.create({
     return toolBox;
   },
   _createConfigIcon : function() {
-    var configIcon = new Element('img', {
-      src: '$xwiki.getSkinFile('icons/silk/bullet_wrench.gif')',
-      alt: 'Configure',
-      title: 'Configure'
-    });
-    configIcon.observe('click', this._onConfigure.bindAsEventListener(this));
-    return configIcon;
+    return new Element('img').observe('click', this._onConfigure.bindAsEventListener(this));
   },
   _onConfigure : function(event) {
-    var icon = event.element();
+    var icon = event ? event.element() : this.getToolBox().down('img');
     var fieldConfig = this.getConfig();
     if (fieldConfig.visible()) {
       fieldConfig.hide();
       icon.alt = icon.title = 'Configure';
       icon.src = '$xwiki.getSkinFile('icons/silk/bullet_wrench.gif')';
+      this._maybePreview();
     } else {
       fieldConfig.show();
       icon.alt = icon.title = 'Hide configuration panel';
       icon.src = '$xwiki.getAttachmentURL('AppWithinMinutes.ClassEditSheet', 'bullettick.png')';
+      this._maybeSavePreviewData();
     }
   },
   _onDelete : function(event) {
@@ -480,6 +476,76 @@ XWiki.FormField = Class.create({
   _onConfirmedDelete : function() {
     this.container.remove();
     document.fire('xwiki:class:deleteField', {field: this});
+  },
+  _maybeSavePreviewData : function() {
+    // Initialize the preview data.
+    this.previewData || this._savePreviewData();
+    // Make sure the preview data is updated when the field is renamed.
+    if (!this._renameListener) {
+      this._renameListener = function(event) {
+        if (event.memo.field.getContainer() == this.container) {
+          this._savePreviewData();
+        }
+      }.bindAsEventListener(this);
+      document.observe('xwiki:class:renameField', this._renameListener);
+    }
+  },
+  _savePreviewData : function() {
+    this.previewData = this._asHash();
+    // Ignore properties that don't affect the preview.
+    ['name', 'prettyName', 'hint', 'required', 'number'].each(function(propertyName) {
+      this.previewData.unset(this.getPropertyId(propertyName));
+    }.bind(this));
+    // Add parameters required by the AJAX preview request.
+    this.previewData.set('preview', true);
+    this.previewData.set('xpage', 'plain');
+  },
+  _maybePreview : function() {
+    if(!this.previewData) {
+      return;
+    }
+    // Check if there are configuration changes.
+    var data = new Hash();
+    var areEqual = function(alice, bob) {
+      if (typeof alice == typeof bob) {
+        if (alice.join) {
+          return alice.join() == bob.join();
+        }
+        return alice == bob;
+      }
+      return false;
+    }
+    this._asHash().each(function(pair) {
+      var oldValue = this.previewData.get(pair.key);
+      if (oldValue != undefined &amp;&amp; !areEqual(pair.value, oldValue)) {
+        data.set(pair.key, pair.value);
+      }
+    }.bind(this));
+    var modifiedKeys = data.keys();
+    if (modifiedKeys.length &gt; 1 || (modifiedKeys.length == 1 &amp;&amp; !modifiedKeys[0].endsWith('_0_' + this.getName()))) {
+      this._preview(this.previewData.clone().update(data));
+    }
+  },
+  _preview : function(data) {
+    var preview = this.getViewer().down('dd');
+    if (preview) {
+      preview.addClassName('loading');
+      new Ajax.Request('', {
+        parameters: data.toQueryString(),
+        onSuccess: function(response) {
+          preview.removeClassName('loading');
+          preview.update(response.responseText);
+          this.previewData = data;
+          document.fire('xwiki:class:previewField', {field: this});
+        }.bind(this)
+      });
+    }
+  },
+  _asHash : function() {
+    // Simulate a submit so that we collect the right values.
+    document.fire('xwiki:class:save', {originalEvent: {memo: {}}});
+    var inputs = this.container.select('input', 'textarea', 'select');
+    return new Hash(Form.serializeElements(inputs, {hash: true}));
   }
 });
 
@@ -516,14 +582,20 @@ XWiki.FormFieldNameManager = Class.create({
     if (oldName != newName) {
       this._maybeRenameElement(oldName, newName, field.getContainer());
       field.getContainer().descendants().each(this._maybeRenameElement.bind(this, oldName, newName));
+      document.fire('xwiki:class:renameField', {field: field});
     }
   },
   _maybeRenameElement : function(oldName, newName, element) {
     ['id', 'name', 'for'].each(function(attribute) {
       var value = element.readAttribute(attribute) || '';
-      if (value.endsWith('_0_' + oldName)) {
+      if (value.startsWith('xwiki-form-' + oldName)) {
+        // This is for fields with multiple values (e.g. radio buttons).
+        value = 'xwiki-form-' + newName + value.substring(11 + oldName.length);
+      } else if (value.endsWith('_0_' + oldName)) {
+        // This is for field default value.
         value = value.substring(0, value.length - oldName.length) + newName;
       } else {
+        // This is for field meta properties.
         var nameIndex = value.indexOf('-') + 1;
         if (nameIndex &gt; 0 &amp;&amp; (value.substring(nameIndex) == oldName || value.substring(nameIndex).startsWith(oldName + '_'))) {
           value = value.substring(0, nameIndex) + newName + value.substring(nameIndex + oldName.length);
@@ -574,12 +646,14 @@ XWiki.FormFieldPrettyNameManager = Class.create({
  */
 XWiki.FormFieldDefaultValueManager = Class.create({
   initialize : function() {
-    document.observe('xwiki:class:displayField', this._onDisplayField.bindAsEventListener(this));
+    var enhanceFieldDefaultValue = this._enhanceFieldDefaultValue.bindAsEventListener(this);
+    document.observe('xwiki:class:displayField', enhanceFieldDefaultValue);
+    document.observe('xwiki:class:previewField', enhanceFieldDefaultValue);
 
     // We need to listen to save event to rename the default value inputs to match the new field name.
     document.observe('xwiki:class:save', this._onSave.bind(this));
   },
-  _onDisplayField : function(event) {
+  _enhanceFieldDefaultValue : function(event) {
     var field = event.memo.field;
     var fieldName = field.getName();
     field.getViewer().select('input[type=text]', 'textarea').each(function(input) {
@@ -1422,6 +1496,54 @@ return XWiki;
 #end
 
 #**
+ * Preview a class field.
+ *#
+#macro(previewField)
+  ## Find the request parameter that specifies the field template.
+  #foreach($paramName in $request.getParameterMap().keySet())
+    #if($paramName.startsWith('template-'))
+      #set($fieldName = $paramName.substring(9))
+      #set($fieldTemplateDoc = $xwiki.getDocument($request.getParameter($paramName)))
+      #break
+    #end
+  #end
+  ##
+  ## Clone the field template.
+  #set($field = $fieldTemplateDoc.getxWikiClass().getXWikiClass().properties.get(0).clone())
+  ##
+  ## Update the field meta properties based on the submitted data.
+  #set($valuesFromRequest = $xcontext.context.getForm().getObject("field-$fieldName"))
+  #set($discard = $field.getxWikiClass().fromMap($valuesFromRequest, $field))
+  ##
+  ## Don't rename the field (ignore the submitted name).
+  #set($discard = $field.setName($fieldName))
+  ##
+  ## We have to add the field to the class before setting its value.
+  ## (otherwise the field value from the request is ignored).
+  #set($xclass = $doc.getxWikiClass().getXWikiClass())
+  #set($discard = $xclass.addField($fieldName, $field))
+  ##
+  ## Create an object that has this field and set its value from request.
+  #set($object = $fieldTemplateDoc.getObject($doc.fullName, true))
+  ##
+  ## Filter empty values from the request, otherwise the update method could try to select an invalid value.
+  #set($values = [])
+  #foreach($value in $request.getParameterValues("${doc.fullName}_0_$fieldName"))
+    #if($value != '')
+      #set($discard = $values.add($value))
+    #end
+  #end
+  #if($values.size() &gt; 0)
+    #set($stringArray = $request.getParameterValues("template-$fieldName"))
+    #set($discard = $xclass.fromMap({$fieldName: $values.toArray($stringArray)}, $object.getXWikiObject()))
+  #end
+  ##
+  ## Display the field.
+  #set($field = $doc.getxWikiClass().get($fieldName))
+  {{html clean="false"}}$doc.displayEdit($field, "${doc.fullName}_0_", $object){{/html}}
+#end
+
+#**
  * Display the edit class form.
  *#
 #macro(displayEditForm)
@@ -1439,8 +1561,10 @@ return XWiki;
  * Displays either the edit class form or a new form field. The later is used when adding a new form field via AJAX.
  *#
 #macro(doEdit)
-  #if($request.xpage == 'plain' &amp;&amp; "$!request.field" != '')
+  #if("$!request.field" != '')
     #displayNewField()
+  #elseif("$!request.preview" == 'true')
+    #previewField()
   #else
     ## Make sure that only the sheet content is rendered when the class is saved using AJAX.
     (% class="hidden" %)

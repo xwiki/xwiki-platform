@@ -62,7 +62,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
 import com.xpn.xwiki.internal.xml.XMLWriter;
-import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
 
@@ -691,13 +690,7 @@ public class Package
                         }
                     }
                 }
-                for (List<ObjectDiff> objectChanges : doc.getDoc().getObjectDiff(previousdoc, doc.getDoc(), context)) {
-                    if (objectChanges.size() >= 1
-                        && ObjectDiff.ACTION_OBJECTREMOVED.equals(objectChanges.get(0).getAction())) {
-                        doc.getDoc().addXObjectToRemove(previousdoc.getXObject(
-                            objectChanges.get(0).getXClassReference(), objectChanges.get(0).getNumber()));
-                    }
-                }
+                doc.getDoc().addXObjectsToRemoveFromVersion(previousdoc);
             }
             try {
                 if (!backup) {

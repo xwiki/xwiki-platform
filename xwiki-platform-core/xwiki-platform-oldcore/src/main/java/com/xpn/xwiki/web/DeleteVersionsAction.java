@@ -86,6 +86,7 @@ public class DeleteVersionsAction extends XWikiAction
                     // before a rename)
                     newdoc.setDocumentReference(tdoc.getDocumentReference());
                     newdoc.setMetaDataDirty(false);
+                    newdoc.addXObjectsToRemoveFromVersion(tdoc);
                     context.getWiki().getStore().saveXWikiDoc(newdoc, context);
                     context.setDoc(newdoc);
                 }

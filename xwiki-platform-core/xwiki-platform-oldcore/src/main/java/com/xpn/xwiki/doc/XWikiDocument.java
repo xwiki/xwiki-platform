@@ -4665,6 +4665,32 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * Automatically add objects present in the old version, but not in the current document, to the list of objects
+     * marked for removal from the database.
+     * 
+     * @param previousVersion the version of the document present in the database
+     * @since 3.3M2
+     */
+    public void addXObjectsToRemoveFromVersion(XWikiDocument previousVersion)
+    {
+        if (previousVersion == null) {
+            return;
+        }
+        for (List<BaseObject> objects : previousVersion.getXObjects().values()) {
+            for (BaseObject originalObj : objects) {
+                if (originalObj != null) {
+                    BaseObject newObj = getXObject(originalObj.getXClassReference(), originalObj.getNumber());
+                    if (newObj == null) {
+                        // The object was deleted.
+                        getXObjectsToRemove().add(originalObj);
+                        setContentDirty(true);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * @deprecated since 2.2M2 use {@link #addXObjectToRemove(BaseObject)} )} instead
      */
     @Deprecated

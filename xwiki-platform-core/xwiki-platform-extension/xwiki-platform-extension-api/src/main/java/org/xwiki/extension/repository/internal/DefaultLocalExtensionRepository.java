@@ -320,7 +320,7 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
         } else {
             int index = 0;
             while (index < versions.size()
-                && versionManager.compareVersions(localExtension.getId().getVersion(), versions.get(index).getId()
+                && this.versionManager.compareVersions(localExtension.getId().getVersion(), versions.get(index).getId()
                     .getVersion()) > 0) {
                 ++index;
             }
@@ -408,9 +408,6 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
         }
 
         DefaultInstalledExtension installedExtension = installedExtensionsForFeature.get(namespace);
-        if (installedExtension == null) {
-            return null;
-        }
 
         return installedExtension;
     }
@@ -452,7 +449,7 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
     @Override
     public List<LocalExtension> getInstalledExtensions(String namespace)
     {
-        List<LocalExtension> result = new ArrayList<LocalExtension>(extensions.size());
+        List<LocalExtension> result = new ArrayList<LocalExtension>(this.extensions.size());
         for (LocalExtension localExtension : this.extensions.values()) {
             if (localExtension.isInstalled(namespace)) {
                 result.add(localExtension);

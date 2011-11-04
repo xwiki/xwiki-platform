@@ -21,19 +21,12 @@ package org.xwiki.rendering.internal.configuration;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.transformation.AbstractTransformation;
 import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -114,27 +107,18 @@ public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingCompo
     }
 
     @Test
-    public void testGetTransformations() throws Exception
+    public void testGetTransformationNames() throws Exception
     {
-        final Transformation expectedTransformation = new AbstractTransformation() {
-            public void transform(Block block, TransformationContext context) throws TransformationException
-            {
-                // Do nothing
-            }
-        };
-        final ComponentManager cm = getComponentManager().lookup(ComponentManager.class);
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(source).getProperty("rendering.transformations", Arrays.asList("macro", "icon"));
                 will(returnValue(Arrays.asList("mytransformation")));
-                oneOf(cm).lookup(Transformation.class, "mytransformation");
-                will(returnValue(expectedTransformation));
             }
         });
 
-        List<Transformation> txs = this.configuration.getTransformations();
+        List<String> txs = this.configuration.getTransformationNames();
         Assert.assertEquals(1, txs.size());
-        Assert.assertSame(expectedTransformation, txs.get(0));
+        Assert.assertEquals("mytransformation", txs.get(0));
     }
 }

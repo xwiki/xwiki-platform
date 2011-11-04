@@ -693,8 +693,8 @@ public class Package
             }
             try {
                 if (!backup) {
-                    doc.getDoc().setAuthor(context.getUser());
-                    doc.getDoc().setContentAuthor(context.getUser());
+                    doc.getDoc().setAuthorReference(context.getUserReference());
+                    doc.getDoc().setContentAuthorReference(context.getUserReference());
                     // if the import is not a backup pack we set the date to now
                     Date date = new Date();
                     doc.getDoc().setDate(date);

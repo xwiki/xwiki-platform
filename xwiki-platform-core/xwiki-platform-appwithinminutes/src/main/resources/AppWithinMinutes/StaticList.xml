@@ -142,7 +142,7 @@
 <priority>4</priority>
 </property>
 <property>
-<properties>displayType multiSelect values</properties>
+<properties>displayType values multiSelect</properties>
 </property>
 </object>
 <content></content></xwikidoc>

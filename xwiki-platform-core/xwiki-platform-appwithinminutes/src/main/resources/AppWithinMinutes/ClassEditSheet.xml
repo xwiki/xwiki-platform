@@ -419,6 +419,8 @@ XWiki.FormField = Class.create({
       this._onConfigure();
 
       document.fire('xwiki:class:displayField', {field: this, 'new': !!response});
+
+      this._twoColumnConfigDisplay();
     }
   },
   _injectHTML : function(html) {
@@ -546,6 +548,36 @@ XWiki.FormField = Class.create({
     document.fire('xwiki:class:save', {originalEvent: {memo: {}}});
     var inputs = this.container.select('input', 'textarea', 'select');
     return new Hash(Form.serializeElements(inputs, {hash: true}));
+  },
+  _twoColumnConfigDisplay : function() {
+    var leftColumn = this.getConfig();
+    var fieldConfig = new Element('div', {'class': leftColumn.className});
+    leftColumn.insert({before: fieldConfig});
+    fieldConfig.insert(leftColumn);
+    fieldConfig.hide();
+    leftColumn.className = 'leftColumn';
+    leftColumn.show();
+    var rightColumn = new Element('dl', {'class': 'rightColumn'});
+    fieldConfig.insert(rightColumn);
+
+    var visibleDTs = [];
+    leftColumn.select('dt').each(function(dt) {
+      if(dt.visible()) {
+        visibleDTs.push(dt);
+      }
+    });
+
+    var half = Math.ceil(visibleDTs.length / 2);
+    for(var i = half; i &lt; visibleDTs.length; i++) {
+      var dt = visibleDTs[i];
+      var dd = dt.next();
+      rightColumn.insert(dt);
+      if (dd &amp;&amp; dd.tagName.toLowerCase() == 'dd') {
+        rightColumn.insert(dd);
+      }
+    }
+
+    fieldConfig.insert(new Element('div', {'style': 'clear: left'}));
   }
 });
 
@@ -1106,6 +1138,15 @@ return XWiki;
 
 #fields .fullScreenEditLinkContainer {
   display: none;
+}
+
+#fields .field-config .leftColumn, #fields .field-config .rightColumn {
+  float: left;
+  width: 49%;
+}
+
+#fields .field-config .leftColumn {
+  margin-right: 2%;
 }
 
 #options {

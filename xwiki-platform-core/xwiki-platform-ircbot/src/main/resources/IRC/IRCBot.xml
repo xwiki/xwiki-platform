@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1251635783000</creationDate>
-<date>1320500092000</date>
-<contentUpdateDate>1320500092000</contentUpdateDate>
+<date>1320508549000</date>
+<contentUpdateDate>1320508549000</contentUpdateDate>
 <version>1.1</version>
 <title>IRC Bot</title>
 <template></template>
@@ -816,7 +816,7 @@ class IRCBot extends PircBot
               }
         }
         log(channel, "${date} &lt;${userPrefix}${sender}&gt; ${message}\n")
-        for (IRCBotlet botlet : Utils.getComponentManager().lookupList(IRCBotlet.class)) {
+        for (def botlet : com.xpn.xwiki.web.Utils.getComponentManager().lookupList(IRCBotlet.class)) {
             try {
                 def result = botlet.handleMessage(channel, sender, login, hostname, message, xwiki, context)
                 if (result &amp;&amp; result.size() &gt; 0) {
@@ -995,6 +995,11 @@ if (request.action == "start") {
     println "{{info}}IRC Bot is now active{{/info}}"
 } else if (request.action == "stop") {
 
+    // Stop all Botlets
+    Utils.getComponentManager().getComponentDescriptorList(IRCBotlet.class).each() {
+        Utils.getComponentManager().unregisterComponent(it.getRole(), it.getRoleHint());
+    }
+
     // Stop the bot
     def bot =  xcontext.getContext().getEngineContext().getAttribute("ircbot")
     bot.stop()
@@ -1011,7 +1016,6 @@ import org.xwiki.observation.*
 
 // check if the bot is started
 def isBotStarted = xcontext.getContext().getEngineContext().getAttribute("ircbot") != null 
-def observation = Utils.getComponent(ObservationManager.class)
 def buttonText
 def action
 if (isBotStarted) {
@@ -1056,5 +1060,4 @@ import org.xwiki.rendering.block.*
 
 // Pretty print the first Groovy macro content.
 println "{{code language=\"none\"}}${doc.getDocument().getXDOM().getChildrenByType(MacroBlock.class, true).get(2).getContent()}{{/code}}"
-{{/groovy}}</content>
-</xwikidoc>
+{{/groovy}}</content></xwikidoc>

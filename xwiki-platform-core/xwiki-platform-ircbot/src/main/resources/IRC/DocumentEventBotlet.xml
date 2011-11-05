@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1320480716000</creationDate>
-<date>1320500676000</date>
-<contentUpdateDate>1320500676000</contentUpdateDate>
+<date>1320503856000</date>
+<contentUpdateDate>1320503856000</contentUpdateDate>
 <version>1.1</version>
 <title>Document Event Botlet</title>
 <template></template>
@@ -223,6 +223,9 @@ class DocumentEventBotlet implements EventListener, IRCBotlet
     void onEvent(Event event, java.lang.Object source, java.lang.Object context)
     {
         def bot =  context.getEngineContext().getAttribute("ircbot")
+        if (bot == null) {
+            return
+        }
 
         // We allow the user to define a script to decide if the given event should be notified or not.
         // For example the user may want to filter out some wikis.

@@ -731,7 +731,6 @@ Ym90L1VzZXIuY2xhc3NQSwUGAAAAABIAEgCmBQAA+3UAAAAA</content>
 </property>
 </object>
 <content>This page contains the code for the XWiki IRC Bot which has the following features:
-* Send a message to IRC whenever a page is modified on this wiki
 * Log IRC messages in wiki pages
 * Ability to register IRC Botlets to perform specific actions when a message is sent on IRC. Available Botlets:
 {{velocity}}

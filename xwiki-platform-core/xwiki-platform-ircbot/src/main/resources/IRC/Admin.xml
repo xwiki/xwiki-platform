@@ -25,7 +25,6 @@
 <content>= Features =
 
 The Bot offers the following features:
-* IRC Notification of modified pages on the wiki where this IRC application is installed
 * Logging of IRC message in wiki pages
 * The following IRC Botlet are available:(((
 {{velocity}}

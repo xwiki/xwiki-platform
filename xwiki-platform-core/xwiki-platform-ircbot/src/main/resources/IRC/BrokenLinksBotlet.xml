@@ -209,7 +209,7 @@ class BrokenLinksBotlet implements EventListener, IRCBotlet
 }
 
 // Only allow to start/stop if the LinkChecker transformation is active
-if (!services.get("rendering")?.getDefaultTransformationNames().contains('linkchecker') || !services.linkchecker) {
+if (!services.get("linkchecker") || !services.get("rendering")?.getDefaultTransformationNames().contains('linkchecker')) {
     println "This Botlet can only be started/stopped if the Link Checker transformation is available and active."
     return
 }
@@ -250,7 +250,7 @@ import com.xpn.xwiki.web.*
 import org.xwiki.observation.*
 
 // Only allow to start/stop if the LinkChecker transformation is active
-if (!services.get("rendering")?.getDefaultTransformationNames().contains('linkchecker') || !services.linkchecker) {
+if (!services.get("linkchecker") || !services.get("rendering")?.getDefaultTransformationNames().contains('linkchecker')) {
     return
 }
 

@@ -723,12 +723,20 @@ XWiki.FormFieldHintManager = Class.create({
     document.observe('xwiki:class:displayField', this._onDisplayField.bindAsEventListener(this));
   },
   _onDisplayField : function(event) {
-    var prettyNameLabel = event.memo.field.getViewer().down('label');
-    var hintInput = new Element('input', {type:'text', 'class': 'xHint', title:'Hint'});
-    prettyNameLabel.insert({after: hintInput});
-    // Enhance the hint input.
-    new XWiki.InputWithTitle(hintInput);
-    new XWiki.AutoResizeInput(hintInput);
+    var field = event.memo.field;
+    var hintInput = $(field.getPropertyId('hint'));
+    // TODO: Remove this test after the 'hint' meta property is added to the platform.
+    if (hintInput) {
+      hintInput.addClassName('xHint');
+      if (!hintInput.title) {
+        hintInput.title = 'Hint';
+      }
+      // Move the hint input below the pretty name input, in the field viewer.
+      field.getViewer().down('label').insert({after: hintInput});
+      // Enhance the hint input.
+      new XWiki.InputWithTitle(hintInput);
+      new XWiki.AutoResizeInput(hintInput);
+    }
   }
 });
 
@@ -740,12 +748,17 @@ XWiki.FormFieldRequiredManager = Class.create({
     document.observe('xwiki:class:displayField', this._onDisplayField.bindAsEventListener(this));
   },
   _onDisplayField : function(event) {
-    var prettyNameLabel = event.memo.field.getViewer().down('label');
-    var wrapper = new Element('div', {'class': 'labelLine'});
-    prettyNameLabel.insert({before: wrapper});
-    wrapper.insert(prettyNameLabel);
-    wrapper.insert('&lt;label&gt;&lt;select class="xRequired" title="Click to toggle between (Optional) and (Required)"&gt;&lt;option&gt;(Optional)&lt;/option&gt;&lt;option&gt;(Required)&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;');
-    new XWiki.ToggleSelect(prettyNameLabel.next().down('select'));
+    var field = event.memo.field;
+    var requiredInput = $(field.getPropertyId('required'));
+    // TODO: Remove this test after the 'required' meta property is added to the platform.
+    if (requiredInput) {
+      var prettyNameLabel = field.getViewer().down('label');
+      var wrapper = new Element('div', {'class': 'labelLine'});
+      prettyNameLabel.insert({before: wrapper});
+      wrapper.insert(prettyNameLabel);
+      wrapper.insert('&lt;label&gt;&lt;select class="xRequired" title="Click to toggle between (Optional) and (Required)"&gt;&lt;option&gt;(Optional)&lt;/option&gt;&lt;option&gt;(Required)&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;');
+      new XWiki.ToggleSelect(prettyNameLabel.next().down('select'));
+    }
   }
 });
 

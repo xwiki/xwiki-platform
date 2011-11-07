@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1251635783000</creationDate>
-<date>1266581755000</date>
-<contentUpdateDate>1266581755000</contentUpdateDate>
+<date>1320508549000</date>
+<contentUpdateDate>1320508549000</contentUpdateDate>
 <version>1.1</version>
 <title>IRC Bot</title>
 <template></template>
@@ -596,6 +596,7 @@ Ym90L1VzZXIuY2xhc3NQSwUGAAAAABIAEgCmBQAA+3UAAAAA</content>
 <nameField></nameField>
 <validationScript></validationScript>
 <botname>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
 <name>botname</name>
 <number>1</number>
@@ -608,6 +609,7 @@ Ym90L1VzZXIuY2xhc3NQSwUGAAAAABIAEgCmBQAA+3UAAAAA</content>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </botname>
 <channel>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
 <name>channel</name>
 <number>3</number>
@@ -621,6 +623,7 @@ Ym90L1VzZXIuY2xhc3NQSwUGAAAAABIAEgCmBQAA+3UAAAAA</content>
 </channel>
 <password>
 <algorithm></algorithm>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
 <name>password</name>
 <number>4</number>
@@ -634,6 +637,7 @@ Ym90L1VzZXIuY2xhc3NQSwUGAAAAABIAEgCmBQAA+3UAAAAA</content>
 <classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
 </password>
 <server>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
 <name>server</name>
 <number>2</number>
@@ -645,20 +649,6 @@ Ym90L1VzZXIuY2xhc3NQSwUGAAAAABIAEgCmBQAA+3UAAAAA</content>
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </server>
-<validation>
-<disabled>0</disabled>
-<editor>PureText</editor>
-<name>validation</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>Validation</prettyName>
-<rows>8</rows>
-<size>100</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</validation>
 </class>
 <object>
 <class>
@@ -741,7 +731,6 @@ Ym90L1VzZXIuY2xhc3NQSwUGAAAAABIAEgCmBQAA+3UAAAAA</content>
 </property>
 </object>
 <content>This page contains the code for the XWiki IRC Bot which has the following features:
-* Send a message to IRC whenever a page is modified on this wiki
 * Log IRC messages in wiki pages
 * Ability to register IRC Botlets to perform specific actions when a message is sent on IRC. Available Botlets:
 {{velocity}}
@@ -757,14 +746,11 @@ Ym90L1VzZXIuY2xhc3NQSwUGAAAAABIAEgCmBQAA+3UAAAAA</content>
 {{include document="IRC.IRCBotlet"/}}
 
 {{groovy jars="attach:pircbot-1.5.0.jar"}}
-import org.xwiki.observation.*
-import org.xwiki.observation.event.*
 import com.xpn.xwiki.web.*
 import com.xpn.xwiki.doc.*
 import com.xpn.xwiki.*
 import org.jibble.pircbot.*
 import org.xwiki.context.*
-import org.xwiki.bridge.event.*
 
 class IRCBot extends PircBot
 {
@@ -829,7 +815,7 @@ class IRCBot extends PircBot
               }
         }
         log(channel, "${date} &lt;${userPrefix}${sender}&gt; ${message}\n")
-        for (IRCBotlet botlet : Utils.getComponentManager().lookupList(IRCBotlet.class)) {
+        for (def botlet : com.xpn.xwiki.web.Utils.getComponentManager().lookupList(IRCBotlet.class)) {
             try {
                 def result = botlet.handleMessage(channel, sender, login, hostname, message, xwiki, context)
                 if (result &amp;&amp; result.size() &gt; 0) {
@@ -975,69 +961,8 @@ class IRCBot extends PircBot
     }
 }
 
-class IRCEventListener implements EventListener
-{
-    def xwiki
-    def context
-    def bot
-    def onEventValidationScript
-
-    IRCEventListener(bot, xwiki, context, onEventValidationScript)
-    {
-        this.bot = bot
-        this.xwiki = xwiki
-        this.context = context
-        this.onEventValidationScript = onEventValidationScript
-    }
-
-    IRCBot getBot()
-    {
-        return this.bot
-    }
-
-    String getName()
-    {
-        return "irc"
-    }
-
-    List&lt;Event&gt; getEvents()
-    {
-        return Arrays.asList(new DocumentUpdatedEvent(), new DocumentDeletedEvent(), new DocumentCreatedEvent())
-    }
-
-    void onEvent(Event event, Object source, Object data)
-    {
-        // We allow the user to define a script to decide if the given event should be notified or not.
-        // For example the user may want to filter out some wikis.
-        Binding binding = new Binding();
-        binding.setVariable("event", event);
-        binding.setVariable("source", source);
-        binding.setVariable("data", data);
-        binding.setVariable("bot", bot);
-        GroovyShell shell = new GroovyShell(binding);
-        if (shell.evaluate(onEventValidationScript)) {
-            def author = source.author
-            def comment = source.comment
-            def url = source.getExternalURL("view", data)
-            if (event instanceof DocumentDeletedEvent) {
-                author = context.user
-                comment = "deleted document"
-            } else if (event instanceof DocumentCreatedEvent) {
-                comment = "created document - ${comment}"
-            } else {
-                // Compute diff URL
-                url = source.getExternalURL("view", "viewer=changes&amp;rev2=${source.getVersion()}", data)
-            }
-            bot.sendMessage(bot.getChannels()[0], "${source.fullName} was modified by ${author} ${comment ? "(${comment})" : ""} - ${url}")
-        }
-    }
-}
-
 // Register or unregister the listener depending on the parameter in the request
 if (request.action == "start") {
-    // Register against the Observation Manager
-    def observation = Utils.getComponent(ObservationManager.class)
-    observation.removeListener("irc")
 
     // Register all Botlets
     xwiki.searchDocuments(", BaseObject as obj where obj.name=doc.fullName and obj.className='IRC.IRCBotlet' order by doc.name").each() {
@@ -1051,28 +976,35 @@ if (request.action == "start") {
         }
     }
 
-    // Start the bot
+    // Initialize Bot
     def ircconfigdoc = xwiki.getDocument("IRC.IRCConfig")
     ircconfigdoc.use(doc.fullName)
     def bot = new IRCBot(ircconfigdoc.getValue("botname"), ircconfigdoc.getValue("channel"), xwiki.XWiki, xcontext.getContext())
+
+    // Start the bot
     bot.connect(ircconfigdoc.getValue("server"))
     if (ircconfigdoc.getValue("password").trim().length() &gt; 0) {
         bot.identify(ircconfigdoc.getValue("password"))
     }
     bot.start()
 
-    def listener = new IRCEventListener(bot, xwiki, xcontext, ircconfigdoc.getValue("validation"))
-    observation.addListener(listener)
+    // Save the bot instance so that we can later stop it
+    xcontext.getContext().getEngineContext().setAttribute("ircbot", bot)
+
     println "{{info}}IRC Bot is now active{{/info}}"
 } else if (request.action == "stop") {
-    def observation = Utils.getComponent(ObservationManager.class)
+
+    // Stop all Botlets
+    Utils.getComponentManager().getComponentDescriptorList(IRCBotlet.class).each() {
+        Utils.getComponentManager().unregisterComponent(it.getRole(), it.getRoleHint());
+    }
 
     // Stop the bot
-    def bot = observation.getListener("irc").getBot()
+    def bot =  xcontext.getContext().getEngineContext().getAttribute("ircbot")
     bot.stop()
     bot.dispose()
+    xcontext.getContext().getEngineContext().setAttribute("ircbot", null)
 
-    observation.removeListener("irc")
     println "{{info}}IRC Bot is now inactive{{/info}}"
 }
 {{/groovy}}
@@ -1081,22 +1013,22 @@ if (request.action == "start") {
 import com.xpn.xwiki.web.*
 import org.xwiki.observation.*
 
-// check if the listener is already registered or not.
-def observation = Utils.getComponent(ObservationManager.class)
+// check if the bot is started
+def isBotStarted = xcontext.getContext().getEngineContext().getAttribute("ircbot") != null 
 def buttonText
 def action
-if (observation.getListener("irc")) {
-    buttonText = "Unregister the IRC Bot"
+if (isBotStarted) {
+    buttonText = "Stop the IRC Bot"
     action = "stop"
-    println "Status: (% style='color:green' %)Bot is registered.(%%)"
+    println "Status: (% style='color:green' %)Bot is started.(%%)"
 } else {
-    buttonText = "Register the IRC Bot"
+    buttonText = "Start the IRC Bot"
     action = "start"
-    println "Status: (% style='color:red' %)Bot is not registered.(%%)"
+    println "Status: (% style='color:red' %)Bot is not started.(%%)"
 }
 def botlets = Utils.getComponentManager().lookupList(IRCBotlet.class)
 if (botlets.size() &gt; 0) {
-    println "The following Botlets are registered:"
+    println "The following Botlets are started:"
     botlets.each() {
         println("* ${it.getClass().getName()}")
     }
@@ -1116,9 +1048,6 @@ $ircconfigdoc.use($doc.fullName)
 * Server: $ircconfigdoc.getValue('server')
 * Channel: $ircconfigdoc.getValue('channel')
 * Bot name: $ircconfigdoc.getValue('botname')
-* Validation script for events: (((
-{{code language="groovy"}}$ircconfigdoc.getValue('validation'){{/code}}
-)))
 {{/velocity}}
 
 To modify the configuration, go to the [[IRC Configuration page&gt;&gt;IRC.IRCConfig]].
@@ -1130,5 +1059,4 @@ import org.xwiki.rendering.block.*
 
 // Pretty print the first Groovy macro content.
 println "{{code language=\"none\"}}${doc.getDocument().getXDOM().getChildrenByType(MacroBlock.class, true).get(2).getContent()}{{/code}}"
-{{/groovy}}</content>
-</xwikidoc>
+{{/groovy}}</content></xwikidoc>

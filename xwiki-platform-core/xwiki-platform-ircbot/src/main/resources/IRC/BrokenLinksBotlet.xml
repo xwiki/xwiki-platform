@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>IRC</web>
-<name>WikiSearchBotlet</name>
+<name>BrokenLinksBotlet</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
@@ -10,11 +10,11 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1251918749000</creationDate>
-<date>1320488897000</date>
-<contentUpdateDate>1320488897000</contentUpdateDate>
+<creationDate>1320518208000</creationDate>
+<date>1320582288000</date>
+<contentUpdateDate>1320582288000</contentUpdateDate>
 <version>1.1</version>
-<title>Wiki Search Botlet</title>
+<title>Broken Links Botlet</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -57,15 +57,15 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </usage>
 </class>
-<name>IRC.WikiSearchBotlet</name>
+<name>IRC.BrokenLinksBotlet</name>
 <number>0</number>
 <className>IRC.IRCBotlet</className>
-<guid>48d80227-8072-4469-b324-24a88fcff0fe</guid>
+<guid>fb10b368-77a4-4f48-bfc4-36278c96ba2c</guid>
 <property>
-<description>Search in wiki pages</description>
+<description>When a broken link is found in the wiki display a notification on IRC</description>
 </property>
 <property>
-<usage>search &lt;query term&gt;</usage>
+<usage>Called automatically when a broken link is found in the wiki</usage>
 </property>
 </object>
 <object>
@@ -134,22 +134,25 @@
 <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
 </users>
 </class>
-<name>IRC.WikiSearchBotlet</name>
+<name>IRC.BrokenLinksBotlet</name>
 <number>0</number>
 <className>XWiki.XWikiRights</className>
-<guid>d0dfaea1-29fc-4557-ba11-3809bd949abe</guid>
+<guid>f0a22f0a-0a9a-44b6-9b60-51c62297e450</guid>
 <property>
 <allow>1</allow>
 </property>
 <property>
-<groups>XWiki.XWikiAdminGroup</groups>
+<groups>XWiki.XWikiAdminGroup,</groups>
 </property>
 <property>
-<levels>view,comment,edit,delete</levels>
+<levels>view,edit,comment,delete</levels>
+</property>
+<property>
+<users></users>
 </property>
 </object>
 <content>{{velocity}}
-$doc.use($doc.fullName)
+$doc.use('IRC.IRCBotlet')
 $doc.getValue('description')
 
 Usage: $doc.getValue('usage')
@@ -161,75 +164,107 @@ Usage: $doc.getValue('usage')
 
 {{groovy}}
 import com.xpn.xwiki.*
+import com.xpn.xwiki.api.*
 import org.xwiki.component.descriptor.*
 import com.xpn.xwiki.web.*
+import org.xwiki.observation.*
+import org.xwiki.observation.event.*
 
-class WikiSearchBotlet implements IRCBotlet
+class BrokenLinksBotlet implements EventListener, IRCBotlet
 {
+    def context
+
+    void init(context) 
+    {
+        this.context  = context
+    }
+
+    String getName()
+    {
+        return "invalidurlevent"
+    }
+
+    List&lt;Event&gt; getEvents()
+    {
+        return [Class.forName("org.xwiki.rendering.transformation.linkchecker.InvalidURLEvent").getConstructor().newInstance()]
+    }
+
     List handleMessage(String channel, String sender, String login, String hostname, String message, XWiki xwiki, XWikiContext context)
     {
-        def output = []
-        def position = message.indexOf("!search")
-        if (position &gt; -1) {
-            // Number of search results to display
-            int maxResults = 5
+        // Don't do anything
+    }
 
-            // Remove the prefix "search " from the message to extract the query
-            String query = message[8+position..-1]
-
-            output.add("Results for [${query}] (${maxResults} results only)")
-
-            try {
-                def lucenePlugin = xwiki.getPlugin("lucene", context)
-                if (lucenePlugin) {
-                    def results = lucenePlugin.getSearchResults(query, (String) null,  null, null, context)
-                    if (results.hitcount &gt; 0) {
-                        for (result in results.getResults(1, maxResults)) {
-                            def itemDoc = xwiki.getDocument("${result.wiki}:${result.web}.${result.name}", context)
-                            output.add("  * ${itemDoc.database}:${itemDoc.fullName} - ${itemDoc.getExternalURL("view", context)}")
-                        }
-                    } else {
-                        output.add("No match found")
-                    }
-                } else {
-                    output.add("Lucene plugin is not installed")
-                }
-            } catch (e) {
-                e.printStackTrace();
-                output.add("Error: ${e.message}")
-            }
+    void onEvent(Event event, java.lang.Object source, java.lang.Object data)
+    {
+        def bot =  context.getEngineContext().getAttribute("ircbot")
+        if (bot == null) {
+            return
         }
-        return output
+
+        def url = source.get('url')
+        def reference = source.get('source')
+        def responseCode = source.get('state')?.getResponseCode()
+        bot.sendMessage(bot.getChannels()[0], "Invalid link found ${url} on page ${reference} (code = ${responseCode})")
     }
 }
 
+// Only allow to start/stop if the LinkChecker transformation is active
+if (!services.get("linkchecker") || !services.get("rendering")?.getDefaultTransformationNames().contains('linkchecker')) {
+    println "This Botlet can only be started/stopped if the Link Checker transformation is available and active."
+    return
+}
+
 if (request.action == "start") {
-    // Register against the component manager
+
+    // Register against the component manager as an IRCBotlet
     DefaultComponentDescriptor descriptor = new DefaultComponentDescriptor()
-    descriptor.setImplementation(WikiSearchBotlet.class)
+    descriptor.setImplementation(BrokenLinksBotlet.class)
     descriptor.setRole(IRCBotlet.class)
-    descriptor.setRoleHint("wikisearch")
+    descriptor.setRoleHint("invalidurlevent")
     Utils.getComponentManager().registerComponent(descriptor)
-    // Create the instance of the component to ensure it's initialized
-    Utils.getComponent(IRCBotlet.class, "wikisearch")
+
+    // Lookup the component to initialize it
+    def botlet = Utils.getComponent(IRCBotlet.class, "invalidurlevent")
+    botlet.init(xcontext.getContext())
+    def ircconfigdoc = xwiki.getDocument("IRC.IRCConfig")
+    ircconfigdoc.use(doc.fullName)
+
+    // Register against the Observation Manager
+    def observation = Utils.getComponent(ObservationManager.class)
+    observation.removeListener("invalidurlevent")
+    observation.addListener(botlet)
+
 } else if (request.action == "stop") {
-    Utils.getComponentManager().unregisterComponent(IRCBotlet.class, "wikisearch")
+
+    // Unregister from the Observation Manager
+    def observation = Utils.getComponent(ObservationManager.class)
+    observation.removeListener("invalidurlevent")
+
+    // Unregister from the component manager
+    Utils.getComponentManager().unregisterComponent(IRCBotlet.class, "invalidurlevent")
 }
 {{/groovy}}
 
 {{groovy}}
 import com.xpn.xwiki.web.*
+import org.xwiki.observation.*
+
+// Only allow to start/stop if the LinkChecker transformation is active
+if (!services.get("linkchecker") || !services.get("rendering")?.getDefaultTransformationNames().contains('linkchecker')) {
+    return
+}
 
 def buttonText
 def action
-if (Utils.getComponentManager().hasComponent(IRCBotlet.class, "wikisearch")) {
-    buttonText = "Unregister the Botlet"
+def observation = Utils.getComponent(ObservationManager.class)
+if (observation.getListener("invalidurlevent") != null) {
+    buttonText = "Stop the Botlet"
     action = "stop"
-    println "Status: Botlet is registered."
+    println "Status: Botlet is started."
 } else {
-    buttonText = "Register the Botlet"
+    buttonText = "Start the Botlet"
     action = "start"
-    println "Status: Botlet is not registered."
+    println "Status: Botlet is not started."
 }
 println ""
 println "{{html}}&lt;form method='get'&gt;"
@@ -238,6 +273,10 @@ println "  &lt;input type='hidden' name='action' value='${action}'/&gt;"
 println "&lt;/form&gt;{{/html}}"
 {{/groovy}}
 
+= Botlet parameters =
+
+No parameters.
+
 = Code =
 
 {{groovy}}
@@ -245,5 +284,4 @@ import org.xwiki.rendering.block.*
 
 // Pretty print the first Groovy macro content.
 println "{{code language=\"none\"}}${doc.getDocument().getXDOM().getChildrenByType(MacroBlock.class, true).get(2).getContent()}{{/code}}"
-{{/groovy}}</content>
-</xwikidoc>
+{{/groovy}}</content></xwikidoc>

@@ -204,7 +204,6 @@ XWiki.widgets.LiveTable = Class.create({
           }
 
           self.recvReqNo = res.reqNo;
-          self.loadingStatus.addClassName("hidden");
 
           if (self.tagCloud && res.matchingtags) {
             self.tagCloud.updateTagCloud(res.tags, res.matchingtags);

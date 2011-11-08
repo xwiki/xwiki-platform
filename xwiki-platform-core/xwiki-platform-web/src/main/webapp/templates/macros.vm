@@ -1248,7 +1248,7 @@ ${Msz}Mb##
   #if("$!options.selectedColumn" != '') #set($selectedColumn = $options.selectedColumn) #end
   #if("$!options.callback" != '') #set($callback = $options.callback) #end
   #if("$!options.tagCloud" == '' || $options.tagCloud == false) #set($tagcloud=false) #else #set($tagcloud = true) #end
-  #if("$!options.javascriptName" != '') #set($jsName = $options.javascriptName) #else #set($jsName = 'livetable') #end
+  #if("$!options.javascriptName" != '') #set($jsName = $options.javascriptName) #else #set($jsName = "livetable_$divid") #end
   #if("$!options.topFilters" != '') #set($topfilters = $options.topFilters) #end
   #if("$options.pageSize" == '' || $!options.pageSize == false) #set($hasPageSize=false) #else #set($hasPageSize = true) #end
   #if("$!options.pageSizeBounds" != '') #set($pageSizeBounds = $options.pageSizeBounds) #end

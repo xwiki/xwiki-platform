@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   *
-  * See the NOTICE file distributed with this work for additional
+  * See the NOTICE file distributed with extension work for additional
   * information regarding copyright ownership.
   *
-  * This is free software; you can redistribute it and/or modify it
+  * extension is free software; you can redistribute it and/or modify it
   * under the terms of the GNU Lesser General Public License as
   * published by the Free Software Foundation; either version 2.1 of
   * the License, or (at your option) any later version.
   *
-  * This software is distributed in the hope that it will be useful,
+  * extension software is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
   * Lesser General Public License for more details.
   *
   * You should have received a copy of the GNU Lesser General Public
-  * License along with this software; if not, write to the Free
+  * License along with extension software; if not, write to the Free
   * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   *
 -->
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.org"
-  xmlns:xwiki="http://www.xwiki.org" elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.org/extension"
+  xmlns:extension="http://www.xwiki.org/extension" xmlns:xwiki="http://www.xwiki.org" elementFormDefault="qualified">
+
+  <import namespace="http://www.xwiki.org" schemaLocation="http://xwiki.org/xwiki.rest.model.xsd"/>
 
   <complexType name="Extension">
     <complexContent>
-      <extension base="xwiki:AbstractExtension">
+      <extension base="extension:AbstractExtension">
       </extension>
     </complexContent>
   </complexType>
@@ -38,22 +40,21 @@
     </sequence>
   </complexType>
 
-  <element name="extension" type="xwiki:Extension"></element>
-
+  <element name="extension" type="extension:Extension"></element>
 
   <complexType name="ExtensionVersion">
     <complexContent>
-      <extension base="xwiki:AbstractExtension">
+      <extension base="extension:AbstractExtension">
         <sequence>
           <element name="version" type="string"></element>
-          <element name="dependencies" type="xwiki:ExtensionDependency" minOccurs="0" maxOccurs="unbounded"></element>
+          <element name="dependencies" type="extension:ExtensionDependency" minOccurs="0" maxOccurs="unbounded"></element>
         </sequence>
       </extension>
     </complexContent>
   </complexType>
 
 
-  <element name="extensionVersion" type="xwiki:ExtensionVersion"></element>
+  <element name="extensionVersion" type="extension:ExtensionVersion"></element>
 
 
   <complexType name="ExtensionSummary">
@@ -71,7 +72,7 @@
 
   <complexType name="ExtensionVersionSummary">
     <complexContent>
-      <extension base="xwiki:ExtensionSummary">
+      <extension base="extension:ExtensionSummary">
         <sequence>
           <element name="version" type="string"></element>
         </sequence>
@@ -84,7 +85,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="extensionSummary" type="xwiki:ExtensionSummary"
+            <element name="extensionSummary" type="extension:ExtensionSummary"
               minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
         </extension>
@@ -97,7 +98,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="extensionVersionSummary" type="xwiki:ExtensionVersionSummary"
+            <element name="extensionVersionSummary" type="extension:ExtensionVersionSummary"
               minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
         </extension>
@@ -105,39 +106,16 @@
     </complexType>
   </element>
 
-  <complexType name="Link">
-    <attribute name="href" type="string"></attribute>
-    <attribute name="rel" type="string"></attribute>
-    <attribute name="type" type="string"></attribute>
-    <attribute name="hrefLang" type="string"></attribute>
-  </complexType>
-
-  <complexType name="LinkCollection">
-    <sequence>
-      <element name="link" type="xwiki:Link" minOccurs="0" maxOccurs="unbounded"></element>
-    </sequence>
-  </complexType>
-
-  <element name="searchResult">
-    <complexType>
-      <complexContent>
-        <extension base="xwiki:LinkCollection">
-          <sequence>
-            <element name="extensions" type="xwiki:ExtensionVersion"
-              minOccurs="0" maxOccurs="unbounded"></element>
-          </sequence>
-        </extension>
-      </complexContent>
-    </complexType>
+  <element name="extensionsSearchResult" type="extension:ExtensionsSearchResult">
   </element>
 
   <complexType name="AbstractExtension">
     <complexContent>
-      <extension base="xwiki:ExtensionSummary">
+      <extension base="extension:ExtensionSummary">
         <sequence>
           <element name="summary" type="string" minOccurs="0"></element>
           <element name="description" type="string" minOccurs="0"></element>
-          <element name="license" type="xwiki:License" minOccurs="0"></element>
+          <element name="license" type="extension:License" minOccurs="0"></element>
           <element name="website" type="string" minOccurs="0"></element>
           <element name="authors" type="string" minOccurs="0"
             maxOccurs="unbounded">
@@ -155,5 +133,16 @@
       <element name="name" type="string"></element>
       <element name="content" type="string" minOccurs="0"></element>
     </sequence>
+  </complexType>
+
+  <complexType name="ExtensionsSearchResult">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="extensions" type="extension:ExtensionVersion"
+            minOccurs="0" maxOccurs="unbounded"></element>
+        </sequence>
+      </extension>
+    </complexContent>
   </complexType>
 </schema>

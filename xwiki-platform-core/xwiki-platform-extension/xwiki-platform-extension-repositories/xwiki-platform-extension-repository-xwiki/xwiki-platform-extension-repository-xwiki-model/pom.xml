@@ -33,6 +33,13 @@
   <name>XWiki Platform - Extension - Repository - XWiki model</name>
   <packaging>jar</packaging>
   <description>The (JAXB) model for XML resource representations served by the Extension REST module.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>
@@ -44,15 +51,26 @@
           <args>
             <arg>-Xfluent-api</arg>
           </args>
-          <schemaDirectory>src/main/resources</schemaDirectory>
           <generatePackage>org.xwiki.extension.repository.xwiki.model.jaxb</generatePackage>
           <verbose>true</verbose>
           <removeOldOutput>false</removeOldOutput>
+          <catalog>src/main/resources/catalog.cat</catalog>
+          <catalogResolver>org.jvnet.jaxb2.maven2.resolver.tools.ClasspathCatalogResolver</catalogResolver>
+          <episodes>
+            <episode>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-rest-model</artifactId>
+            </episode>
+          </episodes>
           <plugins>
             <plugin>
               <groupId>org.jvnet.jaxb2_commons</groupId>
               <artifactId>jaxb2-fluent-api</artifactId>
               <version>3.0</version>
+            </plugin>
+            <plugin>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-rest-model</artifactId>
             </plugin>
           </plugins>
         </configuration>

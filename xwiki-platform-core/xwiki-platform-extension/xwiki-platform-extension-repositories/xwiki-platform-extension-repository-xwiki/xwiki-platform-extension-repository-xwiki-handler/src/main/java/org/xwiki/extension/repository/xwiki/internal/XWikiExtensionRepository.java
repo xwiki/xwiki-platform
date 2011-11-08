@@ -42,7 +42,7 @@ import org.xwiki.extension.repository.SearchException;
 import org.xwiki.extension.repository.Searchable;
 import org.xwiki.extension.repository.xwiki.Resources;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
-import org.xwiki.extension.repository.xwiki.model.jaxb.SearchResult;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
 
 /**
  * @version $Id$
@@ -144,10 +144,10 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         builder.queryParam(Resources.QPARAM_LIST_START, offset);
         builder.queryParam(Resources.QPARAM_LIST_NUMBER, nb);
 
-        SearchResult restExtensions;
+        ExtensionsSearchResult restExtensions;
         try {
             restExtensions =
-                (SearchResult) this.repositoryFactory.getUnmarshaller().unmarshal(
+                (ExtensionsSearchResult) this.repositoryFactory.getUnmarshaller().unmarshal(
                     getRESTResourceAsStream(builder, pattern));
         } catch (Exception e) {
             throw new SearchException("Failed to search extensions based on pattern [" + pattern + "]", e);

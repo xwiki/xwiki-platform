@@ -604,7 +604,7 @@ XWiki.FormFieldNameManager = Class.create({
     this._maybeRenameField(field);
   },
   _maybeRenameFields : function() {
-    $('fields').select('li').each(function(item) {
+    $('fields').childElements().each(function(item) {
       this._maybeRenameField(new XWiki.FormField(item));
     }.bind(this));
   },
@@ -698,7 +698,7 @@ XWiki.FormFieldDefaultValueManager = Class.create({
     });
   },
   _onSave : function() {
-    $('fields').select('li').each(function(item) {
+    $('fields').childElements().each(function(item) {
       this._maybeRenameDefaultValue(new XWiki.FormField(item));
     }.bind(this));
   },
@@ -786,7 +786,7 @@ XWiki.FormCanvas = Class.create({
     }
   },
   _enhanceFields : function() {
-    this.fields.select('li').each(function(item) {
+    this.fields.childElements().each(function(item) {
       new XWiki.FormField(item).enhance();
     });
   },
@@ -834,7 +834,7 @@ XWiki.FormCanvas = Class.create({
     }
   },
   _updateOrder : function() {
-    var items = this.fields.select('li');
+    var items = this.fields.childElements();
     for(var i = 0; i &lt; items.length; i++) {
       var field = new XWiki.FormField(items[i]);
       if (field.getConfig()) {
@@ -1160,6 +1160,10 @@ return XWiki;
 
 #fields .field-config .leftColumn {
   margin-right: 2%;
+}
+
+#fields .field-config .readOnly {
+  background-color: $theme.backgroundSecondaryColor;
 }
 
 #options {

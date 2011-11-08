@@ -227,6 +227,7 @@
 <property>
 <code>var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
+
 /**
  * Supports the following operations on a static list of (key, value) pairs: reorder/add/remove/edit.
  */
@@ -390,19 +391,24 @@ function maybeEnhanceField(field) {
     new XWiki.StaticListManager(field);
   }
 }
-document.observe('xwiki:class:displayField', function(event) {
-  maybeEnhanceField(event.memo.field);
-});
-// This is needed in case this script is loaded asynchronously.
-var fields = $('fields');
-if (fields) {
-  fields.childElements().each(function(item) {
-    var field = new XWiki.FormField(item);
-    if (field.getConfig()) {
-      maybeEnhanceField(field);
-    }
+function init() {
+  document.observe('xwiki:class:displayField', function(event) {
+    maybeEnhanceField(event.memo.field);
   });
+  // This is needed in case this script is loaded asynchronously.
+  var fields = $('fields');
+  if (fields) {
+    fields.childElements().each(function(item) {
+      var field = new XWiki.FormField(item);
+      if (field.getConfig()) {
+        maybeEnhanceField(field);
+      }
+    });
+  }
+  return true;
 }
+(XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));</code>

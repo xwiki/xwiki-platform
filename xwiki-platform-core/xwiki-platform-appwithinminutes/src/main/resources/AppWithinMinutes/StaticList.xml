@@ -296,6 +296,12 @@ XWiki.StaticListEditor = Class.create({
 XWiki.StaticListManager = Class.create({
   initialize : function(field) {
     this.field = field;
+
+    this._deleteFieldHandler = this._onDeleteField.bindAsEventListener(this);
+    document.observe('xwiki:class:deleteField', this._deleteFieldHandler);
+    this._saveClassHandler = this._onSaveClass.bind(this);
+    document.observe('xwiki:class:save', this._saveClassHandler);
+
     this.getDisplayType().observe('change', this._onChangeDisplayType.bind(this));
     this.getMultiSelect().observe('click', this._onChangeMultiSelect.bind(this));
 
@@ -357,9 +363,8 @@ XWiki.StaticListManager = Class.create({
     }.bind(this));
     valuesInput.hide();
     valuesInput.insert({after: this.valuesEditor.getContainer()});
-    document.observe('xwiki:class:save', this._onSave.bind(this));
   },
-  _onSave : function() {
+  _onSaveClass : function() {
     var values = [];
     this.valuesEditor.each(function(pair) {
       if (pair.key == pair.value) {
@@ -369,12 +374,35 @@ XWiki.StaticListManager = Class.create({
       }
     });
     this.getValues().value = values.join('|');
+  },
+  _onDeleteField : function(event) {
+    if (this.field.getContainer() == event.memo.field.getContainer()) {
+      document.stopObserving('xwiki:class:deleteField', this._deleteFieldHandler);
+      document.stopObserving('xwiki:class:save', this._saveClassHandler);
+      this.field = undefined;
+    }
   }
 });
 
+function maybeEnhanceField(field) {
+  if (!field.getContainer()._enhanced &amp;&amp; $('template-' + field.getName()).value == '$escapetool.javascript($doc.fullName)') {
+    field.getContainer()._enhanced = true;
+    new XWiki.StaticListManager(field);
+  }
+}
 document.observe('xwiki:class:displayField', function(event) {
-  new XWiki.StaticListManager(event.memo.field);
+  maybeEnhanceField(event.memo.field);
 });
+// This is needed in case this script is loaded asynchronously.
+var fields = $('fields');
+if (fields) {
+  fields.childElements().each(function(item) {
+    var field = new XWiki.FormField(item);
+    if (field.getConfig()) {
+      maybeEnhanceField(field);
+    }
+  });
+}
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));</code>

@@ -1475,10 +1475,10 @@ return XWiki;
  *#
 #macro(displayField $field $formFieldDoc)
   #if($formFieldDoc.getObject('XWiki.StyleSheetExtension'))
-    $xwiki.ssx.use($formFieldDoc.fullName)
+    #set($discard = $xwiki.ssx.use($formFieldDoc.fullName))
   #end
   #if($formFieldDoc.getObject('XWiki.JavaScriptExtension'))
-    $xwiki.jsx.use($formFieldDoc.fullName)
+    #set($discard = $xwiki.jsx.use($formFieldDoc.fullName))
   #end
   (% class="hidden" %)
   {{html}}

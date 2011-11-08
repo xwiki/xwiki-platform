@@ -232,7 +232,7 @@
  */
 XWiki.StaticListEditor = Class.create({
   initialize : function() {
-    this.container = new Element('div', {'class': 'staticListEditor'}).update('&lt;ul&gt;&lt;/ul&gt;&lt;div class="inputLine"&gt;&lt;div class="first half"&gt;&lt;span class="xHint"&gt;Label&lt;/span&gt;&lt;input type="text"/&gt;&lt;/div&gt;&lt;div class="second half"&gt;&lt;span class="xHint"&gt;ID&lt;/span&gt;&lt;input type="text"/&gt;&lt;/div&gt;&lt;/div&gt;&lt;input type="image" class="add" title="Add" src="$xwiki.getSkinFile('icons/silk/add.gif')" alt="Add"/&gt;');
+    this.container = new Element('div', {'class': 'staticListEditor'}).update('&lt;ul&gt;&lt;/ul&gt;&lt;div class="inputLine"&gt;&lt;div class="first half"&gt;&lt;span class="xHint"&gt;Value&lt;/span&gt;&lt;input type="text"/&gt;&lt;/div&gt;&lt;div class="second half"&gt;&lt;span class="xHint"&gt;ID&lt;/span&gt;&lt;input type="text"/&gt;&lt;/div&gt;&lt;/div&gt;&lt;input type="image" class="add" title="Add" src="$xwiki.getSkinFile('icons/silk/add.gif')" alt="Add"/&gt;');
     this.keyInput = this.container.down('.second').down('input');
     this.valueInput = this.container.down('.first').down('input');
     this._deleteHandler = this._onDelete.bindAsEventListener(this);

@@ -678,8 +678,21 @@ XWiki.FormFieldPrettyNameManager = Class.create({
  */
 XWiki.FormFieldDefaultValueManager = Class.create({
   initialize : function() {
+    var enhanceFieldDefaultValue = this._enhanceFieldDefaultValue.bindAsEventListener(this);
+    document.observe('xwiki:class:displayField', enhanceFieldDefaultValue);
+    document.observe('xwiki:class:previewField', enhanceFieldDefaultValue);
+
     // We need to listen to save event to rename the default value inputs to match the new field name.
     document.observe('xwiki:class:save', this._onSave.bind(this));
+  },
+  _enhanceFieldDefaultValue : function(event) {
+    var field = event.memo.field;
+    var fieldName = field.getName();
+    field.getViewer().select('input[type=text]', 'textarea').each(function(input) {
+      if (!input.title &amp;&amp; input.name.endsWith('_0_' + fieldName)) {
+        input.title = 'Default value';
+      }
+    });
   },
   _onSave : function() {
     $('fields').childElements().each(function(item) {

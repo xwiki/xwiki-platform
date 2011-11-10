@@ -144,7 +144,8 @@ container.persistentDirectory=$xwikiPropertiesContainerPersistentDirectory
 #-# icons, a WikiWord transformation will automatically create links when it finds wiki words, etc.
 #-# Note that the Macro transformation is a special transformation that replaces macro markers by the result of the
 #-# macro execution. If you don't list it, macros won't get executed.
-#-# The default value is: rendering.transformations = macro, icon
+#-# The default value is: macro, icon
+# rendering.transformations = macro, icon
 
 #-# [Since 2.6RC1]
 #-# Icon Transformation Configuration
@@ -168,6 +169,12 @@ container.persistentDirectory=$xwikiPropertiesContainerPersistentDirectory
 #-# rendering.transformation.icon.mappings = (on) = lightbulb
 #-# rendering.transformation.icon.mappings = (off) = lightbulb_off
 #-# rendering.transformation.icon.mappings = (*) = star
+
+#-# [Since 3.3M2]
+#-# LinkChecker Transformation Configuration
+#-# Defines the time (in ms) after which an external link should be checked again for validity.
+#-# the default configuration is:
+# rendering.transformation.linkchecker.timeout = 3600000
 
 #-------------------------------------------------------------------------------------
 # Cache

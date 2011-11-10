@@ -137,4 +137,131 @@
 <properties></properties>
 </property>
 </object>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.String</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>dc79dcdd-2e35-410b-bd07-c01c1f70407f</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>var XWiki = (function (XWiki) {
+
+function maybeEnhanceFieldDefaultValue(event) {
+  var field = event.memo.field;
+  var fieldName = field.getName();
+  if (!field.getContainer()._enhanced &amp;&amp; $('template-' + fieldName).value == '$escapetool.javascript($doc.fullName)') {
+    field.getViewer().select('input[type=text]').each(function(input) {
+      if (input.name.endsWith('_0_' + fieldName)) {
+        if (!input.title) {
+          input.title = 'Default value';
+        }
+        new XWiki.InputWithTitle(input);
+        field.getContainer()._enhanced = true;
+      }
+    });
+  }
+}
+function init() {
+  document.observe('xwiki:class:displayField', maybeEnhanceFieldDefaultValue);
+  document.observe('xwiki:class:previewField', maybeEnhanceFieldDefaultValue);
+  // This is needed in case this script is loaded asynchronously.
+  var fields = $('fields');
+  if (fields) {
+    fields.childElements().each(function(item) {
+      var field = new XWiki.FormField(item);
+      if (field.getConfig()) {
+        maybeEnhanceFieldDefaultValue({memo: {field: field}});
+      }
+    });
+  }
+  return true;
+}
+(XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+
+return XWiki;
+}(XWiki || {}));</code>
+</property>
+<property>
+<name>StringManager</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
 <content></content></xwikidoc>

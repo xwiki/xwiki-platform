@@ -251,7 +251,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
     #end
   #else
 
-    {{error}}$msg.get('search.lucene.plugin.notfound')){{/error}}
+    {{error}}$msg.get('search.lucene.plugin.notfound'){{/error}}
   #end
 #end
 #if (!$rssmode)

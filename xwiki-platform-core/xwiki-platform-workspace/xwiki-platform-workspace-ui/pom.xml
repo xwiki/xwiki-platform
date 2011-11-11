@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
@@ -26,5 +27,55 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-  
+
+  <build>
+    <plugins>
+      <!-- Step 1: Download workspace template features xar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- <phase>generate-sources</phase> -->
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>xwiki-platform-workspace-template-features</artifactId>
+                  <version>${project.version}</version>
+                  <type>xar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/template-features</outputDirectory>
+                  <destFileName>workspace-template-features.xar</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Step 2: Attach template features xar to WorkspaceManager install page -->
+      <plugin>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>process-resources</phase>
+            <id>attach-template-features-xar</id>
+            <goals>
+              <goal>attach</goal>
+            </goals>
+            <configuration>
+              <file>${project.build.directory}/template-features/workspace-template-features.xar</file>
+              <sourceDocument>${basedir}/src/main/resources/WorkspaceManager/Install.xml</sourceDocument>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

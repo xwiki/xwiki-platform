@@ -113,11 +113,13 @@ public class ExtensionPackager
             }
 
             packageFile = new File(this.workingDirectory, directory);
-            packageFile.mkdirs();
             packageFile = new File(packageFile, fileName);
         }
 
         // generate
+
+        // Make sure the folder exists
+        packageFile.getParentFile().mkdirs();
 
         FileOutputStream fos = new FileOutputStream(packageFile);
         try {

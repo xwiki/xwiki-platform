@@ -97,10 +97,8 @@ public class SkinAction extends XWikiAction
         // The default base skin is always a filesystem directory.
         String defaultbaseskin = xwiki.getDefaultBaseSkin(context);
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin + " ; defaultbaseskin: "
-                + defaultbaseskin);
-        }
+        LOGGER.debug("document: [{}] ; baseskin: [{}] ; defaultbaseskin: [{}]",
+            new Object[] {doc.getDocumentReference(), baseskin, defaultbaseskin});
 
         // Since we don't know exactly what does the URL point at, meaning that we don't know where the skin identifier
         // ends and where the path to the file starts, we must try to split at every '/' character.
@@ -109,9 +107,7 @@ public class SkinAction extends XWikiAction
         while (idx > 0) {
             try {
                 String filename = Util.decodeURI(path.substring(idx + 1), context);
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Trying '" + filename + "'");
-                }
+                LOGGER.debug("Trying [{}]", filename);
 
                 // Try on the current skin document.
                 if (renderSkin(filename, doc, context)) {
@@ -171,7 +167,7 @@ public class SkinAction extends XWikiAction
         String path =
             URI.create(DELIMITER + SKINS_DIRECTORY + DELIMITER + skin + DELIMITER + filename).normalize().toString();
         if (!path.startsWith(DELIMITER + SKINS_DIRECTORY)) {
-            LOGGER.warn("Illegal access, tried to use file [" + path + "] as a skin. Possible break-in attempt!");
+            LOGGER.warn("Illegal access, tried to use file [{}] as a skin. Possible break-in attempt!", path);
             throw new IOException("Invalid filename: '" + filename + "' for skin '" + skin + "'");
         }
         return path;
@@ -187,7 +183,7 @@ public class SkinAction extends XWikiAction
     {
         String path = URI.create(DELIMITER + RESOURCES_DIRECTORY + DELIMITER + filename).normalize().toString();
         if (!path.startsWith(DELIMITER + RESOURCES_DIRECTORY)) {
-            LOGGER.warn("Illegal access, tried to use file [" + path + "] as a resource. Possible break-in attempt!");
+            LOGGER.warn("Illegal access, tried to use file [{}] as a resource. Possible break-in attempt!", path);
             throw new IOException("Invalid filename: '" + filename + "'");
         }
         return path;
@@ -213,14 +209,10 @@ public class SkinAction extends XWikiAction
     private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context) throws XWikiException,
         IOException
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Rendering file '" + filename + "' within the '" + doc.getFullName() + "' document");
-        }
+        LOGGER.debug("Rendering file [{}] within the [{}] document", filename, doc.getDocumentReference());
         try {
             if (doc.isNew()) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(doc.getName() + " is not a document");
-                }
+                LOGGER.debug("[{}] is not a document", doc.getDocumentReference().getName());
             } else {
                 return renderFileFromObjectField(filename, doc, context)
                     || renderFileFromAttachment(filename, doc, context)
@@ -245,9 +237,7 @@ public class SkinAction extends XWikiAction
      */
     private boolean renderFileFromFilesystem(String path, XWikiContext context) throws XWikiException
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Rendering filesystem file from path [" + path + "]");
-        }
+        LOGGER.debug("Rendering filesystem file from path [{}]", path);
         XWikiResponse response = context.getResponse();
         try {
             byte[] data;
@@ -281,7 +271,7 @@ public class SkinAction extends XWikiAction
                 return true;
             }
         } catch (IOException ex) {
-            LOGGER.info("Skin file '" + path + "' does not exist or cannot be accessed");
+            LOGGER.info("Skin file [{}] does not exist or cannot be accessed", path);
         }
         return false;
     }

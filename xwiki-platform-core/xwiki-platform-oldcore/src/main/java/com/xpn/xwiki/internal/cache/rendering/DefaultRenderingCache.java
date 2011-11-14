@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.internal.cache.rendering;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -47,6 +50,11 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
      * Identifier of the rendering cache.
      */
     private static final String NAME = "core.renderingcache";
+
+    /**
+     * The name of the parameter used to force cache refresh.
+     */
+    private static final String PARAMETER_REFRESH = "refresh";
 
     /**
      * Configuration of the rendering cache.
@@ -87,12 +95,13 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
         String renderedContent = null;
 
         if (this.configuration.isCached(documentReference)) {
-            String refresh = context.getRequest() != null ? context.getRequest().getParameter("refresh") : null;
+            String refresh =
+                context.getRequest() != null ? context.getRequest().getParameter(PARAMETER_REFRESH) : null;
 
             if (!"1".equals(refresh)) {
                 renderedContent =
                     this.cache.get(documentReference, source, getAction(context), context.getLanguage(),
-                        getQueryString(context));
+                        getRequestParameters(context));
             }
         }
 
@@ -105,7 +114,7 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
     {
         if (this.configuration.isCached(documentReference)) {
             this.cache.set(renderedContent, documentReference, source, getAction(context), context.getLanguage(),
-                getQueryString(context));
+                getRequestParameters(context));
         }
     }
 
@@ -121,17 +130,27 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
     }
 
     /**
-     * Extract action information from the context.
+     * Exact action information from the context.
      * 
      * @param context the XWiki context
-     * @return the current query string
+     * @return the current request parameters
      */
-    private String getQueryString(XWikiContext context)
+    private String getRequestParameters(XWikiContext context)
     {
-        String queryString =
-            context.getRequest() != null && context.getRequest().getQueryString() != null ? context.getRequest()
-                .getQueryString() : "";
+        if (context.getRequest() != null) {
+            Map<String, String> parameters = context.getRequest().getParameterMap();
 
-        return queryString.replaceAll("\\&?refresh=1", "");
+            if (parameters != null) {
+                if (parameters.containsKey(PARAMETER_REFRESH)) {
+                    parameters = new HashMap<String, String>(parameters);
+
+                    parameters.remove(PARAMETER_REFRESH);
+                }
+
+                return parameters.toString();
+            }
+        }
+
+        return "";
     }
 }

@@ -27,7 +27,7 @@ import javax.ws.rs.QueryParam;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.xwiki.Resources;
-import org.xwiki.extension.repository.xwiki.model.jaxb.SearchResult;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 
@@ -39,11 +39,14 @@ import org.xwiki.query.QueryException;
 @Path(Resources.SEARCH)
 public class SearchRESTResource extends AbstractExtensionRESTResource
 {
+    /**
+     * @since 3.3M2
+     */
     @GET
-    public SearchResult search(@QueryParam(Resources.QPARAM_SEARCH_QUERY) @DefaultValue("") String pattern,
+    public ExtensionsSearchResult search(@QueryParam(Resources.QPARAM_SEARCH_QUERY) @DefaultValue("") String pattern,
         @QueryParam(Resources.QPARAM_LIST_START) @DefaultValue("0") int offset,
         @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number) throws QueryException
-    {   
+    {
         String where =
             "extension.id like :pattern or extension.name like :pattern or extension.description like :pattern";
 
@@ -51,7 +54,7 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
 
         query.bindValue("pattern", '%' + pattern + '%');
 
-        SearchResult result = this.objectFactory.createSearchResult();
+        ExtensionsSearchResult result = this.objectFactory.createExtensionsSearchResult();
 
         getExtensions(result.getExtensions(), query);
 

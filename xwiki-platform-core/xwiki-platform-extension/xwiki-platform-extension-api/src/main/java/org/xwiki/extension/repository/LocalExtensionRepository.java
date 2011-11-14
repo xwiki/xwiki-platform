@@ -34,7 +34,7 @@ import org.xwiki.extension.UninstallException;
  * A repository containing local extension.
  * <p>
  * That's were remote extension are stored after being downloaded and from where extension are actually installed by
- * there respective handlers.
+ * their respective handlers.
  * 
  * @version $Id$
  */

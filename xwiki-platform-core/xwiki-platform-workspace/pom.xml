@@ -13,6 +13,7 @@
 
   <modules>
     <module>xwiki-platform-workspace-api</module>
+    <module>xwiki-platform-workspace-template-features</module>
     <module>xwiki-platform-workspace-ui</module>
   </modules>
 

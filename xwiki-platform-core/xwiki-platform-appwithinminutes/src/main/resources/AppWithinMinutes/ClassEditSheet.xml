@@ -1,0 +1,1653 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>AppWithinMinutes</web>
+<name>ClassEditSheet</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>AppWithinMinutes.WebHome</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1317906771000</creationDate>
+<date>1319634251000</date>
+<contentUpdateDate>1319634251000</contentUpdateDate>
+<version>1.1</version>
+<title>#if(!$doc.name.endsWith('Sheet'))Class: #end#if($doc.name.endsWith('Class'))$doc.name.substring(0, $mathtool.sub($doc.name.length(), 5))#{else}$doc.name#end</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden><attachment>
+<filename>bullettick.png</filename>
+<filesize>419</filesize>
+<author>XWiki.Admin</author>
+<date>1319487186000</date>
+<version>1.1</version>
+<comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAB3RJTUUH1woQCDUr2dijRwAAAAlw
+SFlzAAAewQAAHsEBw2lUUwAAAARnQU1BAACxjwv8YQUAAAEySURBVHjaY2AYBYzEKgxd4DPx+5/v
+Ngz/GE9uSduTBRNnIlazuJBYnqWOuREnE2cmshwLsZoVZeUZ/gHh65dvGHAakLUr3ubf3/+Hv3/9
+XrAwZPVEmGZZaWmGX/9+M2xcv43h9rubKN5G8cKf339WyAlJM/z+9adXv1dVk12EKU1KSorhz78/
+YM233txgtO4ywe2CF9+fimpxajJoK2syC/EIXhMXFWP48/8Pw7aNuxhuv7/JaNFhxLiJ5+B/nLFg
+Pl2HQZBH4L+jthPDv39/wc7evmkPw/WX1xg/zv6BNYxQXMArz8305PIzxo0fN/1X4ldhuHPzHsO1
+51cYOSXZmT4y/PhHVDowWaTF9Orq63+SLDL/b7+9wfj7/2+mzzP/YNWMF/BmsHGIN/MRndAGDgAA
+vQx64I+NPuAAAAAASUVORK5CYII=
+</content></attachment><attachment>
+<filename>bulletcross.png</filename>
+<filesize>587</filesize>
+<author>XWiki.Admin</author>
+<date>1319487186000</date>
+<version>1.1</version>
+<comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAB3RJTUUH1woQCDkQxGYFbwAAAAlw
+SFlzAAAewQAAHsEBw2lUUwAAAARnQU1BAACxjwv8YQUAAAHaSURBVHja3VJBa9RAFP5mJroxm3Td
+rR4sgojHFaGIvVvBo3gWlGr9CUrFXyD4KwQR/A1KD4VW8NBTrnWr6XazLVvbjW4mmcyML9sqG1v1
+7oOXSd7M982X7z1gIqy1/0y5sOhNfrMKwZOlw5eXL3BSZAuLsIWCUQW8t2/GNV45IcTh+vTZX8FG
+KSR37p5AoPUlIrGWc5s/etz+WZYPHrZBNR4EdvBh7eaYKFf4eus2r/7C0nOLWg225NrdhZHp1fJG
+xnkoGlNwGg1k0RZkHDOT52guv4NTIchzQwo4CwIwz4PNZAjGwH0fTjAFGUXIerE2qgS/H2MqBNnO
+zg3uuh95kgineRbCdQFjKDXkl890c18Xo9HcudWVX5iKB+7rV+s6TefUYGCgNLC5CXQ6pTeQvdgc
+gdcnMRUFR8OQMc44dAGQ22MFBfkgOC/3fj9eUZDeu9+myQjFGY9ABJ6ZobwwJqiRgcIRYX/2evvP
+CqwNHQKf8j2k29uQ/T4ZppjbbPH6+WnopA61vx9uXb7CLnY2jiuwZBY9kHZ7Zas09dq3StW/d7t6
+uPGJRoGXLYUlT4jkuAJ1MJzXo3RZDQ+MLbQ/vboiy3p8bdZPoujb6SAQcm9v3m21QCv+k/gB4NkS
+we3cC88AAAAASUVORK5CYII=
+</content></attachment><attachment>
+<filename>arrow-move.png</filename>
+<filesize>616</filesize>
+<author>XWiki.Admin</author>
+<date>1319487186000</date>
+<version>1.1</version>
+<comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A
+/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sFCwoGAh4PDUEAAAHoSURBVCjP
+Y2CAAotpDxkYGBgYzKc/1fBe9ua05cxnbgxYACMyx272C10pUbYZxuoCVneffXt29vr7XGEBng07
+YgT/wdQwGXRdhWu4eftm7cHjl4V+/vr9d/v+C28ePbpXuPPAAXYGBgYGg84rCJO1Wy/q6ndcXsXA
+wMDAmLwluvbU93/cOTvXMTAwMOh3Xpmm03bJB6aWRaHimIaUCOeMZy8/CUkVHYr+9P2H+dev3/8x
+/WfkVig7Gvr54xd1Qy1R/7eFh7OERbg3M+o1nTjtYqNtwsj4/+/3P3+Y3n7++u/r159MrOwsf///
++8/8n4Hh79cvP1gY/v57d+3acy2W58/fVt+882T+9dvP3nz+/OPu399/uY09jJyO7zx3nIWN5fXf
+33/F1K01ja8fu9rNw8f1jun1dO9dBw5fyf344fOn1zO8g/58+TTnDRM7879fP1+/nOYVzMj479HV
+/RdauQQ4eh5NcP3NwsDAwMDK+G8DMzPzdt7oZdP+fvum/p6Z8++vjx/EeGOWL/3140c1ExPT0yd9
+7n/Es7aiRgpH0Fwfvo4LT5k2///Pv/zdNw7PqdWcYQtZsUUgA1f4QkjEWLX6szeefstk21HBkrKO
+hYEQYAqay8Tg0C3O5DeTlYGBgYE1cC6KPAAEFtSlCs4TrgAAAABJRU5ErkJggg==
+</content></attachment>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.ClassEditSheet</name>
+<number>1</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>cb6bd1b4-599c-4fd6-9862-7969cf38b097</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+/**
+ * Displays the title (tool tip) inside the text input when there's no value and the text input is not focused.
+ */
+XWiki.InputWithTitle = Class.create({
+  initialize : function(input) {
+    this.input = input;
+    this.input.observe('focus', this._onFocus.bindAsEventListener(this));
+    this.input.observe('blur', this._onBlur.bind(this));
+
+    // We have to listen to the save event because 'Save &amp; Continue' doesn't trigger a form submit event.
+    document.observe('xwiki:class:save', this._onSave.bind(this));
+
+    this._onBlur();
+  },
+  _onFocus : function(event) {
+    if (this.input.hasClassName('unset')) {
+      this.input.value = '';
+      this.input.removeClassName('unset');
+    }
+  },
+  _onBlur : function() {
+    if (this.input.value == '') {
+      this.input.addClassName('unset');
+      this.input.value = this.input.title;
+    }
+  },
+  _onSave : function() {
+    this._onFocus();
+    this._onBlur.bind(this).defer();
+  }
+});
+
+/**
+ * A text input that is automatically resized to fit its value.
+ */
+XWiki.AutoResizeInput = Class.create({
+  initialize : function(input) {
+    this.input = input;
+    var resizeEvents = ['blur', 'change', 'cut', 'keyup', 'paste'];
+    for(var i = 0; i &lt; resizeEvents.length; i++) {
+      this.input.observe(resizeEvents[i], this._resize.bindAsEventListener(this));
+    }
+    this.input.observe('keypress', this._reserveSpace.bindAsEventListener(this));
+
+    this.meter = new Element('pre', {'class': 'autoResize-meter'});
+    this.meter.appendChild(document.createTextNode(''));
+    this.input.insert({after: this.meter});
+
+    this._copyStyle();
+    this._resize();
+  },
+  _resize : function(event) {
+    if (event) {
+      this._resize.bind(this).defer();
+    } else {
+      this.meter.firstChild.nodeValue = this.input.value;
+      this.input.setStyle({width: (this.meter.offsetWidth + 6) + 'px'});
+    }
+  },
+  _reserveSpace : function(event) {
+    /* Ignore: Backspace, Delete, End, Home, Left, Up, Right, Down. */
+    var ignored = [8, 46, 35, 36, 37, 38, 39, 40];
+    for(var i = 0; i &lt; ignored.length; i++) {
+      if (event.keyCode == ignored[i]) {
+        return;
+      }
+    }
+    this.input.setStyle({width: (this.input.offsetWidth + 6) + 'px'});
+  },
+  _copyStyle : function() {
+    var style = {};
+    var properties = ['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'letterSpacing', 'textTransform', 'wordSpacing'];
+    for(var i = 0; i &lt; properties.length; i++) {
+      style[properties[i]] = this.input.getStyle(properties[i]);
+    }
+    this.meter.setStyle(style);
+  }
+});
+
+/**
+ * A toggle button backed by a select with two options.
+ */
+XWiki.ToggleSelect = Class.create({
+  initialize : function(select) {
+    this.select = select;
+    this.select.hide();
+
+    this.off = select.options[0];
+    this.on = select.options[1];
+
+    this.switcher = new Element('span', {'class': this.select.className, title: this.select.title});
+    this.switcher.removeClassName('toggle').addClassName('toggle-switcher');
+    this.switcher.appendChild(document.createTextNode(''));
+    this.switcher.observe('click', this._toggle.bind(this));
+    this.select.insert({after: this.switcher});
+
+    this._update();
+  },
+  _toggle : function() {
+    if (this.on.selected) {
+      this.off.selected = true;
+    } else {
+      this.on.selected = true;
+    }
+    this._update();
+  },
+  _update : function() {
+    this.switcher.firstChild.nodeValue = this.select.options[this.select.selectedIndex].text;
+  }
+});
+
+// Allow widgets to catch the save event before the form is submitted when the 'Save &amp; Continue' button is clicked. We
+// need this hack because the 'Save &amp; Continue' handler from actionbuttons.js is added right after the page is loaded,
+// before any other code can register its own listener.
+document.observe('xwiki:actions:save', function(event) {
+  document.fire('xwiki:class:save', {originalEvent: event});
+}.bindAsEventListener(window));
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));</code>
+</property>
+<property>
+<name>Widgets</name>
+</property>
+<property>
+<parse>0</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.ClassEditSheet</name>
+<number>2</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>9ecc7b32-69ee-4b95-8806-60885aaeb85b</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+/**
+ * Handles the form field display (through AJAX), configure (toggle) and delete.
+ */
+XWiki.FormField = Class.create({
+  initialize : function(data, container) {
+    this.container = container;
+    this.container.insert({top: this._createToolBox()});
+    if (data) {
+      this.container.addClassName('loading');
+      new Ajax.Request(data, {
+        method: 'get',
+        onSuccess: this._display.bind(this)
+      });
+    } else {
+      this._display(null);
+    }
+  },
+  _display : function(response) {
+    // If the field container is still attached, update its content.
+    if (this.container.parentNode) {
+      if (response) {
+        this.container.removeClassName('loading');
+        this._injectHTML(response.responseText);
+      }
+      var fieldConfig = this.container.down('.field-config');
+      if (fieldConfig) {
+        fieldConfig.hide();
+
+        var configIcon = new Element('img', {
+          src: '$xwiki.getSkinFile('icons/silk/bullet_wrench.gif')',
+          alt: 'Configure',
+          title: 'Configure'
+        });
+        configIcon.observe('click', this._onConfigure.bindAsEventListener(this));
+        this.container.down('.toolBox').insert({top: configIcon});
+      }
+      document.fire('xwiki:class:displayProperty', {container: this.container, 'new': !!response});
+    }
+  },
+  _injectHTML : function(html) {
+    var container = new Element('div');
+    container.innerHTML = html;
+    var head = document.body.previous('head');
+    container.select('script').each(function(script) {
+      if (script.src) {
+        head.insert(new Element('script', {type: script.type, src: script.src}));
+        script.remove();
+      }
+    });
+    container.select('link').each(function(link) {
+      head.insert(link);
+    });
+    this.container.insert(container.innerHTML);
+  },
+  _createToolBox : function() {
+    var deleteIcon = new Element('img', {
+      src: '$xwiki.getAttachmentURL('AppWithinMinutes.ClassEditSheet', 'bulletcross.png')',
+      alt: 'Delete',
+      title: 'Delete'
+    });
+    deleteIcon.observe('click', this._onDelete.bindAsEventListener(this));
+
+    var toolBox = new Element('div', {'class': 'toolBox'});
+    toolBox.insert(deleteIcon);
+    return toolBox;
+  },
+  _onConfigure : function(event) {
+    var icon = Event.element(event);
+    var fieldConfig = this.container.down('.field-config');
+    if (fieldConfig.visible()) {
+      fieldConfig.hide();
+      icon.alt = icon.title = 'Configure';
+      icon.src = '$xwiki.getSkinFile('icons/silk/bullet_wrench.gif')';
+    } else {
+      fieldConfig.show();
+      icon.alt = icon.title = 'Hide configuration panel';
+      icon.src = '$xwiki.getAttachmentURL('AppWithinMinutes.ClassEditSheet', 'bullettick.png')';
+    }
+  },
+  _onDelete : function(event) {
+    new XWiki.widgets.ConfirmationBox({
+      onYes : this._onConfirmedDelete.bind(this)
+    }, {
+      confirmationText : '$msg.get('core.editors.class.deleteProperty.confirm')'
+    });
+  },
+  _onConfirmedDelete : function() {
+    this.container.remove();
+    document.fire('xwiki:class:deleteProperty', {container: this.container});
+  }
+});
+
+/**
+ * Manages the form field names. Generates unique names for newly added fields and renames field configuration property ids/names when a field is renamed.
+ */
+XWiki.FormFieldNameManager = Class.create({
+  initialize : function() {
+    // Generate a unique field name when a new field is dragged from the palette to the form canvas.
+    document.observe('xwiki:class:displayProperty', this._maybeGenerateFieldName.bind(this));
+    // Rename the field configuration property ids/names when a field is renamed. This is needed for AJAX Save &amp; Continue.
+    document.observe('xwiki:document:saved', this._maybeRenameFields.bind(this));
+  },
+  _maybeGenerateFieldName : function(event) {
+    if (!event.memo['new']) {
+      return;
+    }
+    var container = event.memo.container;
+    var nameInput = this._getNameInput(container);
+    var counter = 1;
+    while($('type_' + nameInput.value + counter++));
+    nameInput.value = nameInput.value + (counter - 1);
+    this._maybeRenameField(container);
+  },
+  _maybeRenameFields : function() {
+    $('fields').select('li').each(this._maybeRenameField.bind(this));
+  },
+  _maybeRenameField : function(container) {
+    var nameInput = this._getNameInput(container);
+    var oldName = nameInput.name.substring(0, nameInput.name.length - '_name'.length);
+    var newName = nameInput.value;
+    if (oldName != newName) {
+      this._maybeRenameElement(oldName, newName, container);
+      container.descendants().each(this._maybeRenameElement.bind(this, oldName, newName));
+    }
+  },
+  _maybeRenameElement : function(oldName, newName, element) {
+    ['id', 'name', 'for'].each(function(attribute) {
+      var value = element.readAttribute(attribute) || '';
+      if (value == '') {
+        return;
+      } else if (value.endsWith('_' + oldName)) {
+        value = value.substring(0, value.length - oldName.length) + newName;
+      } else if (value.startsWith(oldName + '_')) {
+        value = newName + value.substring(oldName.length);
+      }
+      element.writeAttribute(attribute, value);
+    });
+  },
+  _getNameInput : function(container) {
+    if (!container._nameProperty) {
+      var inputs = container.select("input");
+      for(var i = 0; i &lt; inputs.length; i++) {
+        var input = inputs[i];
+        if (input.name.endsWith('_name')) {
+          container._nameProperty = input;
+          break;
+        }
+      }
+    }
+    return container._nameProperty;
+  }
+});
+
+/**
+ * Enhances the way the field pretty name is edited. Allows users to edit the pretty name in-place inside the field preview.
+ */
+XWiki.FormFieldPrettyNameManager = Class.create({
+  initialize : function() {
+    document.observe('xwiki:class:displayProperty', this._onDisplayProperty.bindAsEventListener(this));
+  },
+  _onDisplayProperty : function(event) {
+    var container = event.memo.container;
+    var prettyNameInput, inputs = container.select("input");
+    for(var i = 0; i &lt; inputs.length; i++) {
+      var input = inputs[i];
+      if (input.name.endsWith('_prettyName')) {
+        prettyNameInput = input;
+        break;
+      }
+    }
+    if (!prettyNameInput) {
+      return;
+    }
+    var fieldName = prettyNameInput.name.substring(0, prettyNameInput.name.length - 11);
+    // Hide the DD containing the pretty name input.
+    var parentDD = prettyNameInput.up('dd');
+    parentDD.hide();
+    // Hide the DT containing the pretty name input label.
+    var previousDT = parentDD.previous('dt');
+    previousDT.hide();
+    // Use the label text as tool tip for the pretty name input, if the title attribute is not specified.
+    if (!prettyNameInput.title) {
+      var label = previousDT.down('label');
+      prettyNameInput.title = label.textContent || label.innerText;
+    }
+    // Replace the preview label with the pretty name input.
+    var previewLabel = container.down('.field-viewer').down('label');
+    previewLabel.writeAttribute('for', '');
+    previewLabel.removeChild(previewLabel.lastChild);
+    previewLabel.insert(prettyNameInput);
+    // Enhance the pretty name input.
+    new XWiki.InputWithTitle(prettyNameInput);
+    prettyNameInput.addClassName('inherit');
+    new XWiki.AutoResizeInput(prettyNameInput);
+  }
+});
+
+/**
+ * Adds a tool tip to the default value input.
+ */
+XWiki.FormFieldDefaultValueManager = Class.create({
+  initialize : function() {
+    document.observe('xwiki:class:displayProperty', this._onDisplayProperty.bindAsEventListener(this));
+
+    // We need to listen to save event to rename the default value inputs to match the new field name.
+    document.observe('xwiki:class:save', this._onSave.bind(this));
+  },
+  _onDisplayProperty : function(event) {
+    var container = event.memo.container;
+    var fieldName = this._getFieldName(container);
+    container.select('input[type=text]', 'textarea').each(function(input) {
+      if (input.name.endsWith('_0_' + fieldName)) {
+        if (!input.title) {
+          input.title = 'Default value';
+        }
+        new XWiki.InputWithTitle(input);
+      }
+    });
+  },
+  _getFieldName : function(container) {
+    var hiddenInputs = container.select('input[type=hidden]');
+    for(var i = 0; i &lt; hiddenInputs.length; i++) {
+      var hiddenInput = hiddenInputs[i];
+      if (hiddenInput.name.startsWith('type_')) {
+        return hiddenInput.name.substring(5);
+      }
+    }
+  },
+  _onSave : function() {
+    $('fields').select('li').each(this._maybeRenameDefaultValue.bind(this));
+  },
+  _maybeRenameDefaultValue : function(container) {
+    var fieldNames = this._getFieldNames(container);
+    if(fieldNames[0] != fieldNames[1]) {
+      // The field was renamed.
+      container.down('.field-viewer').select('input', 'textarea', 'select').each(function(element) {
+        if (element.name.endsWith('_0_' + fieldNames[0])) {
+          element.name = element.name.substring(0, element.name.length - fieldNames[0].length) + fieldNames[1];
+        }
+      });
+    }
+  },
+  _getFieldNames : function(container) {
+    var textInputs = container.down('.field-config').select('input[type=text]');
+    for(var i = 0; i &lt; textInputs.length; i++) {
+      var textInput = textInputs[i];
+      if (textInput.name.endsWith('_name')) {
+        return [textInput.name.substring(0, textInput.name.length - 5), textInput.value];
+      }
+    }
+    // We shouldn't get here.
+    return ['', ''];
+  }
+});
+
+/**
+ * Makes the hint editable in place.
+ */
+XWiki.FormFieldHintManager = Class.create({
+  initialize : function() {
+    document.observe('xwiki:class:displayProperty', this._onDisplayProperty.bindAsEventListener(this));
+  },
+  _onDisplayProperty : function(event) {
+    var prettyNameLabel = event.memo.container.down('.field-viewer').down('label');
+    var hintInput = new Element('input', {type:'text', 'class': 'xHint', title:'Hint'});
+    prettyNameLabel.insert({after: hintInput});
+    // Enhance the hint input.
+    new XWiki.InputWithTitle(hintInput);
+    new XWiki.AutoResizeInput(hintInput);
+  }
+});
+
+/**
+ * Replaces the input of the "required" field property with a toggle button.
+ */
+XWiki.FormFieldRequiredManager = Class.create({
+  initialize : function() {
+    document.observe('xwiki:class:displayProperty', this._onDisplayProperty.bindAsEventListener(this));
+  },
+  _onDisplayProperty : function(event) {
+    var prettyNameLabel = event.memo.container.down('.field-viewer').down('label');
+    var wrapper = new Element('div', {'class': 'labelLine'});
+    prettyNameLabel.insert({before: wrapper});
+    wrapper.insert(prettyNameLabel);
+    wrapper.insert('&lt;label&gt;&lt;select class="xRequired" title="Click to toggle between (Optional) and (Required)"&gt;&lt;option&gt;(Optional)&lt;/option&gt;&lt;option&gt;(Required)&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;');
+    new XWiki.ToggleSelect(prettyNameLabel.next().down('select'));
+  }
+});
+
+/**
+ * Manages the sortable list of form fields. Accepts fields dragged from the field palette.
+ */
+XWiki.FormCanvas = Class.create({
+  initialize : function(container) {
+    this.container = $(container);
+    Droppables.add(this.container, {accept: 'field', hoverclass: 'hovered', onDrop: this._onDrop.bind(this)});
+
+    this.fields = this.container.down('ul');
+    if (!this.fields) {
+      this.fields = new Element('ul');
+      this.container.insert(this.fields);
+    }
+    this.fields.id = 'fields';
+    if (this.fields.empty()) {
+      this.container.addClassName('empty');
+    } else {
+      this._enhanceFields();
+    }
+    this._makeSortable();
+
+    document.observe('xwiki:class:deleteProperty', this._onDeleteField.bind(this));
+    document.observe('xwiki:class:displayProperty', this._onDisplayField.bind(this));
+  },
+  _enhanceFields : function() {
+    this.fields.select('li').each(function(item) {
+      new XWiki.FormField(null, item);
+    });
+  },
+  _onDrop : function(field) {
+    var fieldContainer = new Element('li');
+    this.fields.insert(fieldContainer);
+    this.container.removeClassName('empty');
+    new XWiki.FormField(field.down('.data').value, fieldContainer);
+  },
+  _onDeleteField : function() {
+    if (this.fields.empty()) {
+      this.container.addClassName('empty');
+    }
+  },
+  _onDisplayField : function(event) {
+    this._makeSortable(event.memo.container);
+  },
+  _makeSortable : function(item) {
+    (item ? [item] : this.fields.select('li')).each(function(item) {
+      // Hide the property number, as ordering can be done by drag and drop
+      item.select("input").each(function(input) {
+        if (input.id.endsWith("_number")) {
+          // This is needed in order for the Sortable.onUpdate() to be triggered.
+          item.id = 'field_' + input.id.substring(0, input.id.length - 7);
+          item._numberProperty = input;
+          input.up().hide();
+          if (input.up().previous('dt')) {
+            input.up().previous('dt').hide();
+          }
+        }
+      });
+      // Create and insert the move icon.
+      var moveIcon = new Element('img', {
+        src: '$xwiki.getAttachmentURL('AppWithinMinutes.ClassEditSheet', 'arrow-move.png')',
+        alt: 'Move',
+        title: 'Drag and drop to change the order',
+        'class': 'icon-move'
+      });
+      item.down('.toolBox').insert({bottom: moveIcon});
+    });
+    Sortable.create('fields', {
+      handle: 'icon-move',
+      onUpdate : this._updateOrder.bind(this)
+    });
+    this._updateOrder();
+  },
+  _updateOrder : function() {
+    var counter = 1;
+    this.fields.select('li').each(function(item) {
+      if (item._numberProperty) {
+        item._numberProperty.value = counter++;
+      }
+    });
+  }
+});
+
+/**
+ * Manages the palette of form fields.
+ */
+XWiki.FormFieldPalette = Class.create({
+  initialize : function(container) {
+    $(container).select('.field').each(function(field) {
+      new Draggable(field, {
+        revert: true,
+        reverteffect: function(field) {
+          // Reset the in-line style.
+          field.setStyle({
+            height: '',
+            left: '',
+            position: '',
+            top: '',
+            zIndex: '',
+            width: ''
+          });
+        },
+        ghosting: true
+      });
+    });
+  }
+});
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));
+
+(function() {
+  function init() {
+    var form = $('inline');
+    if (!form) {
+      return false;
+    }
+    // Let the sheet handle the form submit.
+    form.action = '';
+
+    // Apply the vertical form layout standard.
+    form.addClassName('xform');
+
+    // Remove the preview button.
+    form.down("input[name='action_preview']").up().remove();
+
+    // Rename the save buttons.
+    form.down("input[name='action_save']").name = 'xaction_save';
+    form.down("input[name='action_saveandcontinue']").name = 'xaction_saveandcontinue';
+
+    // Make sure the 'Save &amp; Continue' button is submitted when clicked.
+    document.observe('xwiki:class:save', function(event) {
+      event = event.memo.originalEvent;
+      if (event.memo['continue']) {
+        var submitButton = event.memo.originalEvent.element();
+        submitButton.insert({after: new Element('input', {type: 'hidden', 'name': submitButton.name})});
+        (function () {
+          submitButton.next().remove();
+        }).defer();
+      }
+    }.bindAsEventListener(window));
+
+    // Be prepared to enhance some of the field properties.
+    new XWiki.FormFieldNameManager();
+    new XWiki.FormFieldPrettyNameManager();
+    new XWiki.FormFieldHintManager();
+    new XWiki.FormFieldDefaultValueManager();
+    new XWiki.FormFieldRequiredManager();
+
+    // Make the palette and the canvas live.
+    new XWiki.FormFieldPalette('palette');
+    new XWiki.FormCanvas('canvas');
+
+    return true;
+  }
+  (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+}).call();</code>
+</property>
+<property>
+<name>Framework</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.RequiredRightClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<level>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>level</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>level</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values>edit|programming</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</level>
+</class>
+<name>AppWithinMinutes.ClassEditSheet</name>
+<number>0</number>
+<className>XWiki.RequiredRightClass</className>
+<guid>2a2d7281-2e73-4ed6-a6b4-863b8ae360e3</guid>
+<property>
+<level>programming</level>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.SheetDescriptorClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<action>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<name>action</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>Action</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</action>
+</class>
+<name>AppWithinMinutes.ClassEditSheet</name>
+<number>0</number>
+<className>XWiki.SheetDescriptorClass</className>
+<guid>c25fb06c-956e-4cc3-a891-63bef91b2c21</guid>
+<property>
+<action>edit</action>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.ClassEditSheet</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>ca2012cf-0113-4cc4-a140-98582ca729a1</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>#template('colorThemeInit.vm')
+#canvas, #options {
+  border: 1px solid $theme.pageContentBackgroundColor;
+  margin: 0.5em 16em 0.5em 0;
+  padding: 0.5em;
+}
+
+#canvas.empty, #canvas.hovered {
+  border: 1px dashed $theme.borderColor;
+}
+
+#canvas .hint {
+  background: url($xwiki.getSkinFile('icons/silk/application_form_add.gif')) no-repeat scroll left center transparent;
+  color: $theme.textSecondaryColor;
+  display: none;
+  font-style: italic;
+  margin: 0.5em;
+  padding-left: 24px;
+}
+
+#canvas.empty .hint {
+  display: block;
+}
+
+#fields input:focus, #fields textarea:focus {
+  background-color: $theme.highlightColor;
+}
+
+#fields {
+  margin: 0;
+}
+
+#fields li {
+  border: 1px dotted $theme.pageContentBackgroundColor;
+  list-style: none;
+  /* Make sure the loading animation is properly displayed. */
+  min-height: 18px;
+  padding: 0 0.5em 0.5em;
+}
+
+#fields li .toolBox {
+  display: none;
+  position: absolute;
+  right: 0.5em;
+  top: 0.5em;
+}
+
+#fields .icon-move {
+  cursor: move;
+  margin: 2px;
+}
+
+#fields li:hover {
+  border: 1px dotted $theme.borderColor;
+}
+
+#fields li:hover .toolBox {
+  display: block;
+}
+
+#fields .field-config {
+  background-color: $theme.backgroundSecondaryColor;
+  margin-top: 1em;
+  padding: 0 0.5em 0.5em;
+}
+
+#fields .fullScreenEditLinkContainer {
+  display: none;
+}
+
+#options {
+  background-color: $theme.backgroundSecondaryColor;
+  padding-left: 1em;
+  width: 33%;
+}
+
+#options .warningmessage {
+  border: 0 none;
+  font-size: 0.8em;
+}
+
+#palette {
+  background-color: $theme.backgroundSecondaryColor;
+  float: right;
+  max-width: 13.5em;
+  padding: 0.5em 1em 1em;
+}
+
+#palette ul {
+  margin: 0;
+}
+
+#palette li {
+  list-style: none;
+}
+
+#palette .category {
+  border-bottom: 1px dotted $theme.borderColor;
+  color: $theme.linkColor;
+  display: block;
+  margin-bottom: 0.5em;
+  margin-top: 0.7em;
+}
+
+#palette .field {
+  cursor: move;
+  display: block;
+  font-size: smaller;
+  padding: .3em;
+}
+
+#palette .field:hover {
+  background-color: $theme.highlightColor !important;
+}</code>
+</property>
+<property>
+<name>Framework</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.ClassEditSheet</name>
+<number>1</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>25c841f5-068e-4fdc-9599-6b8f63353958</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>#options dt, #fields dt {
+  margin-top: 0;
+  padding-top: 0.5em;
+}
+
+#fields .field-config label {
+  color: $theme.textSecondaryColor;
+}
+
+#fields .unset {
+  color: $theme.textSecondaryColor !important;
+}
+
+#fields .autoResize-meter {
+  left: -9999px;
+  position: absolute;
+  top: 0;
+  visibility; hidden;
+}
+
+#fields .inherit {
+  border: 0 none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  padding: 0;
+  text-align: inherit;
+  text-transform: inherit;
+}
+
+#fields input.inherit:hover, #fields input.xHint:hover {
+  background-color: $theme.highlightColor;
+}
+
+#fields input.xHint {
+  border: 0 none;
+}
+
+#fields .labelLine label {
+  display: inline-block;
+}
+
+#fields .toggle-switcher {
+  cursor: pointer;
+}</code>
+</property>
+<property>
+<name>Widgets</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<content>{{velocity output="false"}}
+#**
+ * Displays the field palette.
+ *#
+#macro(displayFieldPalette)
+  (% id="palette" %)
+  (((
+    **Field Palette**
+
+    (% class="xHint" %)
+    Drag&amp;Drop fields from the palette to create your form.
+
+    ## List all form field types, grouped by category.
+    #set($formFieldDocs = [])
+    #set($formFieldClassName = 'AppWithinMinutes.FormFieldClass')
+    #set($categoryListStatement = 'from doc.object(AppWithinMinutes.FormFieldCategoryClass) as category order by category.priority')
+    #foreach($category in $services.query.xwql($categoryListStatement).execute())
+      #set($categoryDoc = $xwiki.getDocument($category))
+      * (% class="category" %)$categoryDoc.title
+        #set($formFieldsForCategoryStatement = "from doc.object($formFieldClassName) as field where field.category = :category order by field.priority")
+        #set($formFieldsForCategoryQuery = $services.query.xwql($formFieldsForCategoryStatement).bindValue('category', $category))
+        #foreach($formField in $formFieldsForCategoryQuery.execute())
+          #set($formFieldDoc = $xwiki.getDocument($formField))
+          #set($discard = $formFieldDocs.add($formFieldDoc))
+          #set($formFieldIcon = $formFieldDoc.getObject($formFieldClassName).getProperty('icon').value)
+          #if($formFieldIcon.contains('/'))
+            #set($formFieldIconURL = $xwiki.getSkinFile($formFieldIcon))
+          #else
+            #set($formFieldIconURL = $formFieldDoc.getAttachmentURL($formFieldIcon))
+          #end
+          ** (% class="field" %){{html}}
+              &lt;img src="$formFieldIconURL" alt="$escapetool.xml($formFieldDoc.title)" class="icon" /&gt;
+              $escapetool.xml($formFieldDoc.title)
+              ## FIXME: We should use the 'get' action instead to prevent the stats module from recording this AJAX request.
+              ## The 'edit' action is a temporary solution until the sheet module is modified to allow a sheet to be enforced through
+              ## the query string even if it doesn't match the action (e.g. the 'get' action).
+              &lt;input type="hidden" value="$doc.getURL('edit', "xpage=plain&amp;field=$escapetool.url($formFieldDoc.fullName)")" class="data"/&gt;
+            {{/html}}
+        #end
+    #end
+  )))
+#end
+
+#**
+ * Displays the field canvas.
+ *#
+#macro(displayFieldCanvas)
+  #set($propertyType2FormField = {})
+  #foreach($formFieldDoc in $formFieldDocs)
+    ## Use the type of the field template.
+    #set($type = $formFieldDoc.getxWikiClass().properties.get(0).classType)
+    #set($discard = $propertyType2FormField.put($type, $formFieldDoc))
+  #end
+  (% id="canvas" %)
+  (((
+    (% class="hint" %)
+    Drag fields from the palette and drop them in this area.
+
+    #set($unknownFields = [])
+    #set($empty = true)
+    #foreach ($field in $doc.getxWikiClass().properties)
+      #set($formFieldDoc = $propertyType2FormField.get($field.classType))
+      #if($formFieldDoc)
+        #set($empty = false)
+        * (((#displayField($field $formFieldDoc))))
+      #else
+        #set($discard = $unknownFields.add($field))
+      #end
+    #end
+    #if(!$empty)
+      ## Leave an empty line to separate the blocks.
+
+    #end
+    ##
+    (% class="hidden" %)
+    {{html}}
+      ## Output the field meta data even if the field is not supported to preserve it when the class is saved.
+      #foreach($field in $unknownFields)
+        #displayFieldMetaData($field)
+      #end
+    {{/html}}
+  )))
+#end
+
+#**
+ * Display the options to create/update the class template and the class sheet.
+ *#
+#macro(displayClassOptions)
+  #set($className = $doc.name)
+  #if($className.endsWith('Class'))
+    #set($className = $className.substring(0, $mathtool.sub($className.length(), 5)))
+  #end
+  #set($templateName = "${className}Template")
+  #set($classSheets = $services.sheet.getClassSheets($doc))
+  #if($classSheets.isEmpty())
+    #set($sheetName = "${className}Sheet")
+  #elseif($classSheets.size() == 1)
+    #set($sheetName = $services.model.serialize($classSheets.get(0)))
+  #end
+  {{html wiki="true"}}
+  (% id="options" %)
+  ; &lt;label for="updateClassTemplate"&gt;&lt;input type="checkbox" id="updateClassTemplate" name="updateClassTemplate" checked="checked" /&gt;Update class template&lt;/label&gt;
+  : (% class="xHint" %)Save the default field values in the class template ([[$templateName]]).
+  ; &lt;label for="updateClassSheet"&gt;&lt;input type="checkbox" id="updateClassSheet" name="updateClassSheet" #if($sheetName)checked="checked" #{else}disabled="disabled" #end/&gt;Update class sheet&lt;/label&gt;
+  : #if($sheetName)
+      (% class="xHint" %)Recreate the sheet used to display and edit objects of this class ([[$sheetName]]).
+    #else
+      (% class="warningmessage" %)This class has multiple sheets.
+    #end
+  {{/html}}
+#end
+
+#**
+ * Display a form field.
+ *#
+#macro(displayField $field $formFieldDoc)
+  #if($formFieldDoc.getObject('XWiki.StyleSheetExtension'))
+    $xwiki.ssx.use($formFieldDoc.fullName)
+  #end
+  #if($formFieldDoc.getObject('XWiki.JavaScriptExtension'))
+    $xwiki.jsx.use($formFieldDoc.fullName)
+  #end
+  (% class="hidden" %)
+  {{html}}
+    #displayFieldMetaData($field)
+    ## We need this information to avoid querying and loading all FormField documents twice.
+    &lt;input type="hidden" id="template_$field.name" name="template_$field.name" value="$escapetool.xml($formFieldDoc.fullName)" /&gt;
+  {{/html}}
+
+  #set($className = $doc.name)
+  #if($className.endsWith('Class'))
+    #set($className = $className.substring(0, $mathtool.sub($className.length(), 5)))
+  #end
+  #set($templateRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Template"))
+  #set($templateDoc = $xwiki.getDocument($templateRef))
+  ## Simulate the editing of the class instance from the template document.
+  ## Note that we can't simply call display on the template document because $field could be a new field that hasn't
+  ## been added to the class yet (so the object from the template doesn't have this field yet).
+  (% class="field-viewer" %)
+  #displayFieldProperty($field "${doc.fullName}_0_" $templateDoc.getObject($doc.fullName, true))
+
+  #set($propertyNames = ['name', 'prettyName', 'number', 'required', 'hint'])
+  #set($formFieldObj = $formFieldDoc.getObject('AppWithinMinutes.FormFieldClass'))
+  #set($customPropertyNames = $formFieldObj.getProperty('properties').value.split('\s+'))
+  #set($discard = $customPropertyNames.removeAll($propertyNames))
+  #set($discard = $propertyNames.addAll($customPropertyNames.subList(0, $customPropertyNames.size())))
+  (% class="field-config" %)
+  #foreach($propertyName in $propertyNames)
+    #set($propertyDefinition = $field.xWikiClass.get($propertyName))
+    #if($propertyDefinition)
+      #displayFieldProperty($propertyDefinition "${field.name}_" $field)
+    #end
+  #end
+#end
+
+#**
+ * Display the field meta data. This is needed to preserve the field when its type is not supported by the editor.
+ *#
+#macro(displayFieldMetaData $field)
+  &lt;input type="hidden" id="type_$field.name" name="type_$field.name" value="$field.classType" /&gt;
+#end
+
+#**
+ * Displays a configuration property of a class field. This macro can also be used to display a property of an object.
+ *#
+#macro(displayFieldProperty $property $prefix $field)
+  #set($displayFormType = $property.getProperty('displayFormType'))
+  #if($property.type.indexOf('Boolean') != -1 &amp;&amp; (!$displayFormType || $displayFormType.value == 'checkbox'))
+    ; {{html clean="false"}}&lt;label for="$!{prefix}$property.name"&gt;$doc.displayEdit($property, $prefix, $field)$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}
+  #else
+    ; {{html}}&lt;label for="${prefix}$property.name"&gt;$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}
+    : {{html clean="false"}}$doc.displayEdit($property, $prefix, $field){{/html}}
+  #end
+#end
+
+#**
+ * Called when a new form field is added via AJAX.
+ *#
+#macro(displayNewField)
+  {{html}}
+  &lt;!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin --&gt;
+  &lt;!-- com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin --&gt;
+  {{/html}}
+
+  #set($formFieldDoc = $xwiki.getDocument($request.field))
+  ## Clone the field template.
+  #set($field = $formFieldDoc.getxWikiClass().getXWikiClass().properties.get(0).clone())
+  #if("$!field.prettyName" == '')
+    #set($discard = $field.setPrettyName($formFieldDoc.title))
+  #end
+  #set($discard = $doc.getxWikiClass().getXWikiClass().addField($field.name, $field))
+  #displayField($doc.getxWikiClass().get($field.name) $formFieldDoc)
+#end
+
+#**
+ * Display the edit class form.
+ *#
+#macro(displayEditForm)
+  $xwiki.jsfx.use('js/scriptaculous/dragdrop.js')##
+  $xwiki.jsx.use('AppWithinMinutes.ClassEditSheet')##
+  $xwiki.ssx.use('AppWithinMinutes.ClassEditSheet')##
+  $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator')##
+  #displayFieldPalette()
+  #displayFieldCanvas()
+  #displayClassOptions()
+  (% class="clearfloats" %)((()))
+#end
+
+#**
+ * Displays either the edit class form or a new form field. The later is used when adding a new form field via AJAX.
+ *#
+#macro(doEdit)
+  #if($request.xpage == 'plain' &amp;&amp; "$!request.field" != '')
+    #displayNewField()
+  #else
+    ## Make sure that only the sheet content is rendered when the class is saved using AJAX.
+    (% class="hidden" %)
+    {{html}}&lt;input type="hidden" name="xpage" value="plain" /&gt;{{/html}}
+
+    #displayEditForm()
+  #end
+#end
+
+#**
+ * Updates and saves the class definition based on the submitted data.
+ *#
+#macro(updateAndSaveClass)
+  #set($class = $doc.xWikiClass)
+  #set($xclass = $class.getXWikiClass().clone())
+  #set($xdoc = $doc.document)
+  ##
+  ## Handle new fields and field type changes.
+  ##
+  #set($fieldNames = [])
+  #foreach($paramName in $request.getParameterMap().keySet())
+    #if($paramName.startsWith('type_'))
+      #set($fieldName = $paramName.substring(5))
+      #set($fieldType = $request.getParameter($paramName))
+      #set($field = $class.get($fieldName))
+      #if(!$field || $field.classType != $fieldType)
+        #if($field)
+          ## The field type has changed. Remove the field and add a new one with the proper type.
+          #set($discard = $xclass.removeField($fieldName))
+        #end
+        ## Add a new class field with the specified type.
+        #set($fieldTemplateRef = $request.getParameter("template_$fieldName"))
+        #if("$!fieldTemplateRef" != '')
+          #set($fieldTemplateDoc = $xwiki.getDocument($fieldTemplateRef))
+          #set($field = $fieldTemplateDoc.getxWikiClass().getXWikiClass().properties.get(0).clone())
+          #set($discard = $field.setObject($xclass))
+          #set($discard = $xclass.addField($fieldName, $field))
+          #set($discard = $fieldNames.add($fieldName))
+          #set($discard = $xdoc.setMetaDataDirty(true))
+        #end
+      #else
+        #set($discard = $fieldNames.add($fieldName))
+      #end
+    #end
+  #end
+  ##
+  ## Handle deleted fields.
+  ##
+  #foreach($field in $class.properties)
+    #if(!$fieldNames.contains($field.name))
+      #set($discard = $xclass.removeField($field.name))
+    #end
+  #end
+  ##
+  ## Handle field updates.
+  ##
+  #set($fieldsToRename = {})
+  #foreach($fieldName in $xclass.propertyNames)
+    #set($field = $xclass.get($fieldName))
+    #set($valuesFromRequest = $xcontext.context.getForm().getObject($fieldName))
+    #set($discard = $field.getxWikiClass().fromMap($valuesFromRequest, $field))
+    #if($field.name.matches('^[\w\.\-]+$'))
+      #if($fieldName != $field.name)
+        ## The field name has changed.
+        #if($xclass.get($field.name))
+          ## There is already a field with the same name.
+          #set($errorMessage = "The class has two fields with the same name: $field.name")
+          #break
+        #else
+          #set($discard = $xclass.removeField($fieldName))
+          #set($discard = $xclass.addField($field.name, $field))
+          #set($originalField = $class.get($fieldName))
+          #if($originalField)
+            ## This is not a new field.
+            #set($discard = $fieldsToRename.put($fieldName, $field.name))
+            #set($discard = $xclass.addPropertyForRemoval($originalField.propertyClass))
+          #end
+        #end
+      #end
+    #else
+      #set($errorMessage = $msg.get('propertynamenotcorrect'))
+      #break
+    #end
+  #end
+  ##
+  ## Save
+  ##
+  #if(!$errorMessage)
+    #set($discard = $xdoc.setXClass($xclass))
+    #set($discard = $xdoc.renameProperties($doc.documentReference, $fieldsToRename))
+    #set($discard = $xdoc.setMetaDataDirty(true))
+    #set($discard = $doc.save($msg.get('core.comment.updateClassProperty'), $minorEdit))
+  #end
+  ##
+  ## Handle field renames.
+  ##
+  #if(!$errorMessage &amp;&amp; !$fieldsToRename.isEmpty())
+    ## We need to load all documents that have objects of this class and rename their properties.
+    #set($instancesStatement = "from doc.object($doc.fullName) as obj where doc.fullName &lt;&gt; :className")
+    #set($instancesQuery = $services.query.xwql($instancesStatement).bindValue('className', $doc.fullName))
+    #foreach($instanceDocName in $instancesQuery.execute())
+      #set($instanceDoc = $xwiki.getDocument($instanceDocName))
+      #set($discard = $instanceDoc.document.renameProperties($doc.documentReference, $fieldsToRename))
+      #set($discard = $instanceDoc.save($msg.get('core.comment.updateClassPropertyName'), true))
+    #end
+  #end
+  ##
+  ## Clear cache.
+  ##
+  #if(!$errorMessage)
+    #set($discard = $xwiki.getXWiki().flushCache($xcontext.context))
+  #end
+#end
+
+#**
+ * Updates and saves the class template based on the submitted data.
+ *#
+#macro(updateAndSaveTemplate)
+  #if(!$errorMessage &amp;&amp; $request.updateClassTemplate)
+    #set($className = $doc.name)
+    #if($className.endsWith('Class'))
+      #set($className = $className.substring(0, $mathtool.sub($className.length(), 5)))
+    #end
+    #set($templateRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Template"))
+    #set($templateDoc = $xwiki.getDocument($templateRef))
+    #set($discard = $templateDoc.updateObjectFromRequest($doc.fullName))
+    #set($discard = $templateDoc.save('Update default values', $minorEdit))
+  #end
+#end
+
+#**
+ * Updates and saves the class sheet based on the submitted data.
+ *#
+#macro(updateAndSaveSheet)
+  #if(!$errorMessage &amp;&amp; $request.updateClassSheet)
+    #set($classSheets = $services.sheet.getClassSheets($doc))
+    #if($classSheets.isEmpty())
+      #set($className = $doc.name)
+      #if($className.endsWith('Class'))
+        #set($className = $className.substring(0, $mathtool.sub($className.length(), 5)))
+      #end
+      #set($sheetReference = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Sheet"))
+      #set($discard = $services.sheet.bindClassSheet($doc, $sheetReference))
+      #set($discard = $doc.save('Bind class sheet', $minorEdit))
+    #elseif($classSheets.size() == 1)
+      #set($sheetReference = $classSheets.get(0))
+    #end
+    #if($sheetReference)
+      #set($sheetDoc = $xwiki.getDocument($sheetReference))
+      #set($sheetGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassSheetGenerator'))
+      #set($discard = $sheetDoc.setContent($doc.getRenderedContent($sheetGeneratorDoc.content, $sheetGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
+      #set($discard = $sheetDoc.save('Update class sheet', $minorEdit))
+    #end
+  #end
+#end
+
+#**
+ * Updates and saves the class definition, the class sheet and the class template.
+ *#
+#macro(doSave)
+  #if($services.csrf.isTokenValid($request.form_token))
+    #set($minorEdit = $action.equals('saveandcontinue'))
+    #updateAndSaveClass()
+    #updateAndSaveTemplate()
+    #updateAndSaveSheet()
+  #else
+    #set($errorMessage = 'Invalid CSRF token!')
+  #end
+  #if($action == 'save')
+    #if($errorMessage)
+      {{error}}{{html}}$errorMessage{{/html}}{{/error}}
+    #else
+      ## Redirect to view mode.
+      $response.sendRedirect($doc.getURL())
+    #end
+  #else
+    #if($errorMessage)
+      $response.sendError(400, $errorMessage)
+    #else
+      $response.setStatus(204)
+    #end
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+## Determine the action button that triggered the request
+#set($action = 'edit')
+#foreach($paramName in $request.getParameterMap().keySet())
+  #if($paramName.startsWith('xaction_'))
+    #set($action = $paramName.substring(8))
+    #break
+  #end
+#end
+#if($action == 'edit')
+  #doEdit()
+#elseif($action == 'save' || $action == 'saveandcontinue')
+  #doSave()
+#else
+  Unknown action!
+#end
+{{/velocity}}</content></xwikidoc>

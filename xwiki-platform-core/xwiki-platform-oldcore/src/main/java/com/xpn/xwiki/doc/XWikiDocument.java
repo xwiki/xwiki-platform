@@ -2363,9 +2363,9 @@ public class XWikiDocument implements DocumentModelBridge
         BaseClass tbclass = templatedoc.getXClass();
         if (tbclass != null) {
             if (bclass == null) {
-                setXClass((BaseClass) tbclass.clone());
+                setXClass(tbclass.clone());
             } else {
-                getXClass().merge((BaseClass) tbclass.clone());
+                getXClass().merge(tbclass.clone());
             }
         }
         setContentDirty(true);
@@ -2454,7 +2454,7 @@ public class XWikiDocument implements DocumentModelBridge
             for (BaseObject otherObject : tobjects) {
                 if (otherObject != null) {
                     if (keepsIdentity) {
-                        addXObject((BaseObject) otherObject.clone());
+                        addXObject(otherObject.clone());
                     } else {
                         BaseObject newObject = otherObject.duplicate(getDocumentReference());
                         setXObject(newObject.getNumber(), newObject);
@@ -3295,7 +3295,7 @@ public class XWikiDocument implements DocumentModelBridge
         setValidationScript(document.getValidationScript());
         setLanguage(document.getLanguage());
         setTranslation(document.getTranslation());
-        setXClass((BaseClass) document.getXClass().clone());
+        setXClass(document.getXClass().clone());
         setXClassXML(document.getXClassXML());
         setComment(document.getComment());
         setMinorEdit(document.isMinorEdit());
@@ -3361,7 +3361,7 @@ public class XWikiDocument implements DocumentModelBridge
             doc.setValidationScript(getValidationScript());
             doc.setLanguage(getLanguage());
             doc.setTranslation(getTranslation());
-            doc.setXClass((BaseClass) getXClass().clone());
+            doc.setXClass(getXClass().clone());
             doc.setXClassXML(getXClassXML());
             doc.setComment(getComment());
             doc.setMinorEdit(isMinorEdit());
@@ -4630,7 +4630,7 @@ public class XWikiDocument implements DocumentModelBridge
                 String newname = entry.getValue();
                 BaseProperty origprop = (BaseProperty) bobject.safeget(origname);
                 if (origprop != null) {
-                    BaseProperty prop = (BaseProperty) origprop.clone();
+                    BaseProperty prop = origprop.clone();
                     bobject.removeField(origname);
                     prop.setName(newname);
                     bobject.addField(newname, prop);
@@ -4657,6 +4657,32 @@ public class XWikiDocument implements DocumentModelBridge
     {
         getXObjectsToRemove().add(object);
         setContentDirty(true);
+    }
+
+    /**
+     * Automatically add objects present in the old version, but not in the current document, to the list of objects
+     * marked for removal from the database.
+     * 
+     * @param previousVersion the version of the document present in the database
+     * @since 3.3M2
+     */
+    public void addXObjectsToRemoveFromVersion(XWikiDocument previousVersion)
+    {
+        if (previousVersion == null) {
+            return;
+        }
+        for (List<BaseObject> objects : previousVersion.getXObjects().values()) {
+            for (BaseObject originalObj : objects) {
+                if (originalObj != null) {
+                    BaseObject newObj = getXObject(originalObj.getXClassReference(), originalObj.getNumber());
+                    if (newObj == null) {
+                        // The object was deleted.
+                        getXObjectsToRemove().add(originalObj);
+                        setContentDirty(true);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -5959,7 +5985,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         String editModeProperty = "defaultEditMode";
         DocumentReference editModeClass =
-            currentReferenceDocumentReferenceResolver.resolve(XWikiConstant.EDIT_MODE_CLASS);
+            this.currentReferenceDocumentReferenceResolver.resolve(XWikiConstant.EDIT_MODE_CLASS);
         // check if the current document has any edit mode class object attached to it, and read the edit mode from it
         BaseObject editModeObject = this.getXObject(editModeClass);
         if (editModeObject != null) {
@@ -6609,7 +6635,7 @@ public class XWikiDocument implements DocumentModelBridge
         // in the vector
         objects.set(objectPosition, null);
         // Schedule the object for removal from the storage
-        addObjectsToRemove(object);
+        addXObjectToRemove(object);
 
         return true;
     }
@@ -7352,7 +7378,8 @@ public class XWikiDocument implements DocumentModelBridge
     public void convertSyntax(Syntax targetSyntax, XWikiContext context) throws XWikiException
     {
         // convert content
-        setContent(performSyntaxConversion(getContent(), getSyntaxId(), targetSyntax));
+        String source = this.defaultEntityReferenceSerializer.serialize(getDocumentReference());
+        setContent(performSyntaxConversion(getContent(), source, getSyntaxId(), targetSyntax));
 
         // convert objects
         Map<DocumentReference, List<BaseObject>> objectsByClass = getXObjects();
@@ -7367,7 +7394,8 @@ public class XWikiDocument implements DocumentModelBridge
                             LargeStringProperty field = (LargeStringProperty) bobject.getField(textAreaClass.getName());
 
                             if (field != null) {
-                                field.setValue(performSyntaxConversion(field.getValue(), getSyntaxId(), targetSyntax));
+                                field.setValue(
+                                    performSyntaxConversion(field.getValue(), source, getSyntaxId(), targetSyntax));
                             }
                         }
                     }
@@ -7466,12 +7494,7 @@ public class XWikiDocument implements DocumentModelBridge
         TransformationContext txContext) throws XWikiException
     {
         try {
-            XDOM dom = parseContent(txContext.getSyntax().toIdString(), content);
-
-            // Set the source metadata for the parsed XDOM so that Renderers can resolve relative links/images based
-            // on it.
-            dom.getMetaData().addMetaData(MetaData.SOURCE, source);
-
+            XDOM dom = parseContent(txContext.getSyntax().toIdString(), content, source);
             return performSyntaxConversion(dom, targetSyntax, txContext);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
@@ -7483,18 +7506,18 @@ public class XWikiDocument implements DocumentModelBridge
      * Convert the passed content from the passed syntax to the passed new syntax.
      * 
      * @param content the content to convert
+     * @param source the reference to where the content comes from (eg document reference)
      * @param currentSyntaxId the syntax of the current content to convert
      * @param targetSyntax the new syntax after the conversion
      * @return the converted content in the new syntax
      * @throws XWikiException if an exception occurred during the conversion process
      * @since 2.4M2
      */
-    private static String performSyntaxConversion(String content, String currentSyntaxId, Syntax targetSyntax)
-        throws XWikiException
+    private static String performSyntaxConversion(String content, String source, String currentSyntaxId,
+        Syntax targetSyntax) throws XWikiException
     {
         try {
-            XDOM dom = parseContent(currentSyntaxId, content);
-
+            XDOM dom = parseContent(currentSyntaxId, content, source);
             return performSyntaxConversion(dom, targetSyntax, null);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
@@ -7563,15 +7586,25 @@ public class XWikiDocument implements DocumentModelBridge
 
     private XDOM parseContent(String content) throws XWikiException
     {
-        return parseContent(getSyntaxId(), content);
+        return parseContent(getSyntaxId(), content,
+            this.defaultEntityReferenceSerializer.serialize(getDocumentReference()));
     }
 
-    private static XDOM parseContent(String syntaxId, String content) throws XWikiException
+    /**
+     * @param source the reference to where the content comes from (eg document reference)
+     */
+    private static XDOM parseContent(String syntaxId, String content, String source)
+        throws XWikiException
     {
         try {
             Parser parser = Utils.getComponent(Parser.class, syntaxId);
+            XDOM xdom = parser.parse(new StringReader(content));
 
-            return parser.parse(new StringReader(content));
+            // Set the source meta data so that transformations and renderers can handle relative links/images
+            // correctly.
+            xdom.getMetaData().addMetaData(MetaData.SOURCE, source);
+
+            return xdom;
         } catch (ParseException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to parse content of syntax [" + syntaxId + "]", e);

@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1304962886000</creationDate>
-<date>1319555977000</date>
-<contentUpdateDate>1319555977000</contentUpdateDate>
+<date>1320423599000</date>
+<contentUpdateDate>1320423599000</contentUpdateDate>
 <version>1.1</version>
 <title>Extensions</title>
 <template></template>
@@ -38,9 +38,9 @@ Search Extension...
 {{html}}
 &lt;form action="$xwiki.getURL("ExtensionCode.ExtensionSearch")"&gt;
   &lt;input type="hidden" name="space" value="Extension" /&gt;
-  &lt;input type="text" name="text" value="extension id..." size="25" class="withTip" /&gt;
+  &lt;input type="text" name="text" value="extension name..." size="25" class="withTip" id="searchTextInput" /&gt;
   &lt;span class="buttonwrapper"&gt;
-    &lt;input class="button" type="submit" value="Search" /&gt;
+    &lt;input class="button" type="submit" value="Search"  id="searchSubmit"/&gt;
   &lt;/span&gt;
 &lt;/form&gt;
 {{/html}}
@@ -61,9 +61,9 @@ Contribute Extension...
   &lt;input type="hidden" name="parent" value="Extension.WebHome" /&gt;
   &lt;input type="hidden" name="template" value="ExtensionCode.ExtensionTemplate" /&gt;
   &lt;input type="hidden" name="createExtension" value="true" /&gt;
-  &lt;input class="withTip" type="text" name="id" value="extension id..."  size="25"/&gt;
+  &lt;input class="withTip" type="text" name="name" value="extension name..."  size="25" id="contributeNameInput"/&gt;
   &lt;span class="buttonwrapper"&gt;
-    &lt;input class="button" type="submit" value="Add" /&gt;
+    &lt;input class="button" type="submit" value="Add" id="contributeSubmit"/&gt;
   &lt;/span&gt;
 &lt;/form&gt;
 {{/html}}
@@ -77,13 +77,12 @@ Contribute Extension...
 (% class="clearfloats" %)((()))(%%)
 
 {{velocity}}
-#set($columns = ["id", "name", "summary", "type", "authors", "doc.creationDate", "doc.date"])
+#set($columns = ["name", "summary", "type", "authors", "doc.creationDate", "doc.date"])
 #set($columnsProperties = {
-  "id" : { "type" : "text", "link" : "view" },
   "name" : { "type" : "text", "link" : "view" },
   "summary" : { "type" : "text" },
   "type" : { "type" : "list" },
-  "authors" : { "type" : "string"},
+  "authors" : { "type" : "text"},
   "doc.creationDate" : { "type" : "date" },
   "doc.date" : { "type" : "date" }
 })

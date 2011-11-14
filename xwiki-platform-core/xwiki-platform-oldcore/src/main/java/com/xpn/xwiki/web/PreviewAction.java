@@ -22,7 +22,6 @@ package com.xpn.xwiki.web;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -104,12 +103,11 @@ public class PreviewAction extends XWikiAction
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
-        XWiki xwiki = context.getWiki();
         XWikiDocument doc = context.getDoc();
-        XWikiForm form = context.getForm();
+        EditForm form = (EditForm) context.getForm();
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
 
-        String language = ((EditForm) form).getLanguage();
+        String language = form.getLanguage();
 
         // Make sure it is not considered as new
         XWikiDocument doc2 = doc.clone();
@@ -127,12 +125,12 @@ public class PreviewAction extends XWikiAction
             vcontext.put("doc", doc2.newDocument(context));
             vcontext.put("tdoc", vcontext.get("doc"));
             vcontext.put("cdoc", vcontext.get("doc"));
-            doc2.readFromTemplate(((EditForm) form).getTemplate(), context);
-            doc2.readFromForm((EditForm) form, context);
-            doc2.setAuthor(context.getUser());
-            doc2.setContentAuthor(context.getUser());
+            doc2.readFromTemplate(form.getTemplate(), context);
+            doc2.readFromForm(form, context);
+            doc2.setAuthorReference(context.getUserReference());
+            doc2.setContentAuthorReference(context.getUserReference());
             if (doc2.isNew()) {
-                doc2.setCreator(context.getUser());
+                doc2.setCreatorReference(context.getUserReference());
             }
         } else {
             // Need to save parent and defaultLanguage if they have changed
@@ -142,12 +140,12 @@ public class PreviewAction extends XWikiAction
             context.put("tdoc", tdoc);
             vcontext.put("tdoc", tdoc.newDocument(context));
             vcontext.put("cdoc", vcontext.get("tdoc"));
-            tdoc.readFromTemplate(((EditForm) form).getTemplate(), context);
-            tdoc.readFromForm((EditForm) form, context);
-            tdoc.setAuthor(context.getUser());
-            tdoc.setContentAuthor(context.getUser());
+            tdoc.readFromTemplate(form.getTemplate(), context);
+            tdoc.readFromForm(form, context);
+            tdoc.setAuthorReference(context.getUserReference());
+            tdoc.setContentAuthorReference(context.getUserReference());
             if (tdoc.isNew()) {
-                tdoc.setCreator(context.getUser());
+                tdoc.setCreatorReference(context.getUserReference());
             }
         }
         // reconfirm edit (captcha) when jcaptcha is not correct

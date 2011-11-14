@@ -1,0 +1,58 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-workspace</artifactId>
+    <version>3.3-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>xwiki-platform-workspace-template-features</artifactId>
+  <packaging>xar</packaging>
+
+  <name>XWiki Platform - Workspace - Template Features</name>
+  <description>Template workspace features to be added to a base admin-provided workspace template. This final workspace template shall be used when creating a new workspace.</description>
+
+  <dependencies>
+    <!-- Make sure that the Application Manager Application is included in 
+      the template. TODO: Remove this once we start using the Extension manager. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-application-manager-ui</artifactId>
+      <type>xar</type>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <configuration>
+          <includeDependencies>true</includeDependencies>
+        </configuration>
+      </plugin>
+
+      <!-- TODO: Find icons for the new sections. -->
+      <!-- Attach section icon for the WorkspaceUsers administration section. -->
+      <!-- <plugin> -->
+      <!-- <groupId>org.xwiki.platform</groupId> -->
+      <!-- <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId> -->
+      <!-- <executions> -->
+      <!-- <execution> -->
+      <!-- <phase>process-resources</phase> -->
+      <!-- <id>attach-section-icon</id> -->
+      <!-- <goals> -->
+      <!-- <goal>attach</goal> -->
+      <!-- </goals> -->
+      <!-- <configuration> -->
+      <!-- <file>${basedir}/src/main/resources/icon.png</file> -->
+      <!-- <sourceDocument>${basedir}/src/main/resources/XWiki/WorkspaceUsers.xml</sourceDocument> -->
+      <!-- </configuration> -->
+      <!-- </execution> -->
+      <!-- </executions> -->
+      <!-- </plugin> -->
+    </plugins>
+  </build>
+
+</project>

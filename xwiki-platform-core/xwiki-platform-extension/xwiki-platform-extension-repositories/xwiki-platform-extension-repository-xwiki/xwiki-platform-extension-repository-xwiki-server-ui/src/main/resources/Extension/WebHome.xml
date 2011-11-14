@@ -82,7 +82,7 @@ Contribute Extension...
   "name" : { "type" : "text", "link" : "view" },
   "summary" : { "type" : "text" },
   "type" : { "type" : "list" },
-  "authors" : { "type" : "string"},
+  "authors" : { "type" : "text"},
   "doc.creationDate" : { "type" : "date" },
   "doc.date" : { "type" : "date" }
 })

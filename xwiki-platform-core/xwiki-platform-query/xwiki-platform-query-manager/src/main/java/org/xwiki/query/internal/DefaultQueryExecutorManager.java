@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -32,7 +33,6 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryExecutorManager;
-import org.xwiki.query.QueryExecutorProvider;
 
 /**
  * Default implementation of {@link QueryExecutorManager}.
@@ -57,7 +57,7 @@ public class DefaultQueryExecutorManager implements QueryExecutorManager
      * This provider will give us an executor which is native to the type of storage engine used.
      */
     @Inject
-    private QueryExecutorProvider namedQueryExecutorProvider;
+    private Provider<QueryExecutor> namedQueryExecutorProvider;
 
     /**
      * {@inheritDoc}

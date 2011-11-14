@@ -27,7 +27,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * Generic implementation deferring single reference serialization.
  *
  * @version $Id$
- * @since 3.3M1
+ * @since 3.3M2
  */
 public abstract class AbstractStringEntityReferenceSerializer implements EntityReferenceSerializer<String>
 {

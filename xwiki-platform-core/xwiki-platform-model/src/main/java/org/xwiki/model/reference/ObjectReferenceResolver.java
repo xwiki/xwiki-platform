@@ -44,7 +44,7 @@ public interface ObjectReferenceResolver<T>
      * @param objectReferenceRepresentation the representation of an object reference (e.g. as a String)
      * @param parameters optional parameters. Their meaning depends on the resolver implementation
      * @return the valid resolved object reference as an object
-     * @since 3.3M1
+     * @since 3.3M2
      */
     ObjectReference resolve(T objectReferenceRepresentation, Object... parameters);
 }

@@ -26,11 +26,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-rendering-macros</artifactId>
+    <artifactId>xwiki-platform-dashboard</artifactId>
     <version>3.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-rendering-macro-dashboard</artifactId>
-  <name>XWiki Platform - Rendering - Macro - Dashboard</name>
+  <artifactId>xwiki-platform-dashboard-macro</artifactId>
+  <name>XWiki Platform - Dashboard - Macro</name>
   <description>Displays the macro instances (gadgets) inside in a dashboard.</description>
   <dependencies>
     <dependency>
@@ -55,6 +55,12 @@
     </dependency>
 
     <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-test</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>

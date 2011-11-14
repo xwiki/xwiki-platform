@@ -62,10 +62,6 @@ public abstract class AbstractGenericComponentManager extends DelegateComponentM
      */
     protected abstract String getKey();
 
-    /**
-     * {@inheritDoc}
-     * @see DelegateComponentManager#getComponentManager()
-     */
     @Override
     public ComponentManager getComponentManager()
     {
@@ -83,10 +79,6 @@ public abstract class AbstractGenericComponentManager extends DelegateComponentM
         return componentManager;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see DelegateComponentManager#registerComponent(ComponentDescriptor, Object)
-     */
     @Override
     public <T> void registerComponent(ComponentDescriptor<T> componentDescriptor, T componentInstance)
         throws ComponentRepositoryException
@@ -107,22 +99,14 @@ public abstract class AbstractGenericComponentManager extends DelegateComponentM
         }
     }
     
-    /**
-     * {@inheritDoc}
-     * @see DelegateComponentManager#registerComponent(ComponentDescriptor, Object)
-     */
     @Override
     public <T> void registerComponent(ComponentDescriptor<T> componentDescriptor) throws ComponentRepositoryException
     {
         registerComponent(componentDescriptor, null);
     }
     
-    /**
-     * {@inheritDoc}
-     * @see DelegateComponentManager#unregisterComponent(Class, String)
-     */
     @Override
-    public void unregisterComponent(Class< ? > role, String roleHint)
+    public <T> void unregisterComponent(Class<T> role, String roleHint)
     {
         super.unregisterComponent(role, roleHint);
             

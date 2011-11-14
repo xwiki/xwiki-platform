@@ -91,8 +91,8 @@ public class ObjectPropertyReference extends EntityReference
     protected void setParent(EntityReference parent)
     {
         if (parent == null || parent.getType() != EntityType.OBJECT) {
-            throw new IllegalArgumentException("Invalid parent reference [" + parent + "] for an object property "
-                + "reference");
+            throw new IllegalArgumentException("Invalid parent reference [" + parent
+                + "] in an object property reference");
         }
 
         super.setParent(new ObjectReference(parent));

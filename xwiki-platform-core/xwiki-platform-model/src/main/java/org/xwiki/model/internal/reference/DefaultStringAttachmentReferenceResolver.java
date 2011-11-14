@@ -41,6 +41,9 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 @Singleton
 public class DefaultStringAttachmentReferenceResolver implements AttachmentReferenceResolver<String>
 {
+    /**
+     * Default entity reference resolver used for resolution.
+     */
     @Inject
     private EntityReferenceResolver<String> entityReferenceResolver;
 

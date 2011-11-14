@@ -88,7 +88,7 @@ public class ObjectReference extends EntityReference
     protected void setParent(EntityReference parent)
     {
         if (parent == null || parent.getType() != EntityType.DOCUMENT) {
-            throw new IllegalArgumentException("Invalid parent reference [" + parent + "] for an object reference");
+            throw new IllegalArgumentException("Invalid parent reference [" + parent + "] in an object reference");
         }
 
         super.setParent(new DocumentReference(parent));

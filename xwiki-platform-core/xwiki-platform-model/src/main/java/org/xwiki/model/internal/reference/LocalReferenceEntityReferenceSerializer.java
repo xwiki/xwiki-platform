@@ -38,22 +38,19 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 @Component("local/reference")
 public class LocalReferenceEntityReferenceSerializer implements EntityReferenceSerializer<EntityReference>
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference, Object...) 
-     */
+    @Override
     public EntityReference serialize(EntityReference reference, Object... parameters)
     {
         EntityReference newReference = null;
         EntityReference parent = null;
         for (EntityReference currentReference = reference; currentReference != null; currentReference =
-            currentReference.getParent()) {
+                currentReference.getParent())
+        {
             if (currentReference.getType() == EntityType.WIKI) {
                 return newReference;
             }
 
-            parent = new EntityReference(currentReference.getName(),currentReference.getType());
+            parent = new EntityReference(currentReference.getName(), currentReference.getType());
             if (newReference != null) {
                 newReference = new EntityReference(newReference, null, parent);
             } else {

@@ -76,6 +76,12 @@ public class RegexEntityReference extends EntityReference
         return this.pattern;
     }
 
+    @Override
+    public int hashCode()
+    {
+        return super.hashCode();
+    }
+
     /**
      * {@inheritDoc}
      * <p>

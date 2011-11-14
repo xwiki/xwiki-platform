@@ -65,7 +65,7 @@ public class ObjectPropertyReferenceTest
             new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY, null));
             fail("Should have thrown exception");
         } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid parent reference [null] for an object property reference", expected.getMessage());
+            assertEquals("Invalid parent reference [null] in an object property reference", expected.getMessage());
         }
     }
 
@@ -80,7 +80,7 @@ public class ObjectPropertyReferenceTest
                 new EntityReference("Space", EntityType.SPACE)));
             fail("Should have thrown exception");
         } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid parent reference [name = [Space], type = [SPACE], parent = [null]] for an object "
+            assertEquals("Invalid parent reference [name = [Space], type = [SPACE], parent = [null]] in an object "
                 + "property reference", expected.getMessage());
         }
     }

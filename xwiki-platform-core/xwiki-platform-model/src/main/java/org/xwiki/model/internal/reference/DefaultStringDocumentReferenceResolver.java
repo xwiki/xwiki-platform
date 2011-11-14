@@ -41,14 +41,13 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 @Singleton
 public class DefaultStringDocumentReferenceResolver implements DocumentReferenceResolver<String>
 {
+    /**
+     * Default entity reference resolver used for resolution.
+     */
     @Inject
     private EntityReferenceResolver<String> entityReferenceResolver;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve
-     */
+    @Override
     public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
     {
         return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,

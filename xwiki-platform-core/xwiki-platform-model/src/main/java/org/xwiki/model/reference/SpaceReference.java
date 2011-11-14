@@ -33,6 +33,7 @@ public class SpaceReference extends EntityReference
      * Special constructor that transforms a generic entity reference into a {@link SpaceReference}. It checks the
      * validity of the passed reference (ie correct type).
      *
+     * @param reference the entity reference to transforms
      * @exception IllegalArgumentException if the passed reference is not a valid space reference
      */
     public SpaceReference(EntityReference reference)
@@ -52,16 +53,35 @@ public class SpaceReference extends EntityReference
         super(reference, oldReference, newReference);
     }
 
+    /**
+     * Create a space reference based on a space name and a parent wiki reference.
+     *
+     * @param spaceName the name of the space
+     * @param parent the wiki reference
+     */
     public SpaceReference(String spaceName, WikiReference parent)
     {
         this(spaceName, (EntityReference) parent);
     }
 
+    /**
+     * Create a space reference based on a space name and a parent space reference.
+     *
+     * @param spaceName the name of the space
+     * @param parent the space reference
+     */
     public SpaceReference(String spaceName, SpaceReference parent)
     {
         this(spaceName, (EntityReference) parent);
     }
 
+    /**
+     * Create a space reference based on a space name and a parent entity reference.
+     * The entity reference may be either a wiki or a space reference.
+     *
+     * @param spaceName the name of the space
+     * @param parent the entity reference
+     */
     public SpaceReference(String spaceName, EntityReference parent)
     {
         super(spaceName, EntityType.SPACE, parent);
@@ -70,7 +90,7 @@ public class SpaceReference extends EntityReference
     /**
      * {@inheritDoc}
      *
-     * Overridden in order to verify the validity of the passed parent
+     * Overridden in order to verify the validity of the passed parent.
      *
      * @see org.xwiki.model.reference.EntityReference#setParent(EntityReference)
      * @exception IllegalArgumentException if the passed parent is not a valid space reference parent (ie either
@@ -79,13 +99,13 @@ public class SpaceReference extends EntityReference
     @Override
     protected void setParent(EntityReference parent)
     {
-        if( parent instanceof SpaceReference || parent instanceof WikiReference) {
+        if (parent instanceof SpaceReference || parent instanceof WikiReference) {
             super.setParent(parent);
             return;
         }
 
         if (parent == null || (parent.getType() != EntityType.SPACE && parent.getType() != EntityType.WIKI)) {
-            throw new IllegalArgumentException("Invalid parent reference [" + parent + "] for a space reference");
+            throw new IllegalArgumentException("Invalid parent reference [" + parent + "] in a space reference");
         }
 
         if (parent.getType() == EntityType.SPACE) {
@@ -98,7 +118,7 @@ public class SpaceReference extends EntityReference
     /**
      * {@inheritDoc}
      *
-     * Overridden in order to verify the validity of the passed type
+     * Overridden in order to verify the validity of the passed type.
      *
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      * @exception IllegalArgumentException if the passed type is not a space type

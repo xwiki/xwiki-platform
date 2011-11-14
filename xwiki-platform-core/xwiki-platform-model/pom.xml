@@ -59,41 +59,4 @@
       <artifactId>commons-lang3</artifactId>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-            org/xwiki/model/internal/reference/AbstractReferenceEntityReferenceResolver.java,
-            org/xwiki/model/internal/reference/AbstractStringEntityReferenceResolver.java,
-            org/xwiki/model/internal/reference/DefaultEntityReferenceValueProvider.java,
-            org/xwiki/model/internal/reference/DefaultReferenceDocumentReferenceResolver.java,
-            org/xwiki/model/internal/reference/DefaultReferenceEntityReferenceResolver.java,
-            org/xwiki/model/internal/reference/DefaultStringAttachmentReferenceResolver.java,
-            org/xwiki/model/internal/reference/DefaultStringDocumentReferenceResolver.java,
-            org/xwiki/model/internal/reference/DefaultStringEntityReferenceResolver.java,
-            org/xwiki/model/internal/reference/DefaultStringEntityReferenceSerializer.java,
-            org/xwiki/model/internal/reference/ExplicitReferenceDocumentReferenceResolver.java,
-            org/xwiki/model/internal/reference/ExplicitReferenceEntityReferenceResolver.java,
-            org/xwiki/model/internal/reference/ExplicitStringAttachmentReferenceResolver.java,
-            org/xwiki/model/internal/reference/ExplicitStringDocumentReferenceResolver.java,
-            org/xwiki/model/internal/reference/ExplicitStringEntityReferenceResolver.java,
-            org/xwiki/model/internal/reference/LocalReferenceEntityReferenceSerializer.java,
-            org/xwiki/model/reference/AttachmentReference.java,
-            org/xwiki/model/reference/ClassPropertyReference.java,
-            org/xwiki/model/reference/DocumentReference.java,
-            org/xwiki/model/reference/EntityReference.java,
-            org/xwiki/model/reference/EntityReferenceSerializer.java,
-            org/xwiki/model/reference/InvalidEntityReferenceException.java,
-            org/xwiki/model/reference/ObjectReference.java,
-            org/xwiki/model/reference/RegexEntityReference.java,
-            org/xwiki/model/reference/SpaceReference.java
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

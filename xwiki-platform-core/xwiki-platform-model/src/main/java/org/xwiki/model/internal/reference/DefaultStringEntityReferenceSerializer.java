@@ -19,13 +19,16 @@
  */
 package org.xwiki.model.internal.reference;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.DBLESCAPE;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.ESCAPE;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.ESCAPES;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.REPLACEMENTS;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.WIKISEP;
 
 /**
  * Generate a string representation of an entity reference (eg "wiki:space.page" for a document reference in the "wiki"
@@ -37,36 +40,6 @@ import org.xwiki.model.reference.EntityReference;
 @Component
 public class DefaultStringEntityReferenceSerializer extends AbstractStringEntityReferenceSerializer
 {
-    /**
-     * The list of strings to escape for each type of entity.
-     */
-    private static final Map<EntityType, String[]> ESCAPES = new HashMap<EntityType, String[]>()
-    {
-        {
-            put(EntityType.ATTACHMENT, new String[] {"@", "\\"});
-            put(EntityType.DOCUMENT, new String[] {".", "\\"});
-            put(EntityType.SPACE, new String[] {".", ":", "\\"});
-            put(EntityType.OBJECT, new String[] {"^", "\\"});
-            put(EntityType.OBJECT_PROPERTY, new String[] {".", "\\"});
-            put(EntityType.CLASS_PROPERTY, new String[] {"^", ".", "\\"});
-        }
-    };
-
-    /**
-     * The replacement list corresponding to the list in {@link #ESCAPES} map.
-     */
-    private static final Map<EntityType, String[]> REPLACEMENTS = new HashMap<EntityType, String[]>()
-    {
-        {
-            put(EntityType.ATTACHMENT, new String[] {"\\@", "\\\\"});
-            put(EntityType.DOCUMENT, new String[] {"\\.", "\\\\"});
-            put(EntityType.SPACE, new String[] {"\\.", "\\:", "\\\\"});
-            put(EntityType.OBJECT, new String[] {"\\^", "\\\\"});
-            put(EntityType.OBJECT_PROPERTY, new String[] {"\\.", "\\\\"});
-            put(EntityType.CLASS_PROPERTY, new String[] {"\\^", "\\.", "\\\\"});
-        }
-    };
-
     @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
         boolean isLastReference, Object... parameters)
@@ -78,7 +51,7 @@ public class DefaultStringEntityReferenceSerializer extends AbstractStringEntity
         // Add my separator if I am not the first one in the representation
         if (currentParent != null && representation.length() > 0) {
             if (currentParent.getType() == EntityType.WIKI) {
-                representation.append(':');
+                representation.append(WIKISEP);
             } else {
                 representation.append(currentEscapeChars[0]);
             }
@@ -89,7 +62,7 @@ public class DefaultStringEntityReferenceSerializer extends AbstractStringEntity
             representation.append(StringUtils.replaceEach(currentReference.getName(), currentEscapeChars,
                 REPLACEMENTS.get(currentType)));
         } else {
-            representation.append(currentReference.getName().replace("\\", "\\\\"));
+            representation.append(currentReference.getName().replace(ESCAPE, DBLESCAPE));
         }
     }
 }

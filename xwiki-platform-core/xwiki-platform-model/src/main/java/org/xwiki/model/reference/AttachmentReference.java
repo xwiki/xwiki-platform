@@ -34,6 +34,7 @@ public class AttachmentReference extends EntityReference
      * Special constructor that transforms a generic entity reference into an {@link AttachmentReference}. It checks the
      * validity of the passed reference (ie correct type and correct parent).
      *
+     * @param reference the reference to be transformed
      * @exception IllegalArgumentException if the passed reference is not a valid attachment reference
      */
     public AttachmentReference(EntityReference reference)
@@ -54,6 +55,12 @@ public class AttachmentReference extends EntityReference
         super(reference, oldReference, newReference);
     }
 
+    /**
+     * Create a new attachement reference based on the attachment name and the parent document reference.
+     *
+     * @param fileName the name of the attachment
+     * @param parent the reference of the document
+     */
     public AttachmentReference(String fileName, DocumentReference parent)
     {
         super(fileName, EntityType.ATTACHMENT, parent);
@@ -62,9 +69,8 @@ public class AttachmentReference extends EntityReference
     /**
      * {@inheritDoc}
      *
-     * Overridden in order to verify the validity of the passed parent
+     * Overridden in order to verify the validity of the passed parent.
      *
-     * @see org.xwiki.model.reference.EntityReference#setParent(EntityReference)
      * @exception IllegalArgumentException if the passed parent is not a valid attachment reference parent (ie an
      *            attachment reference)
      */
@@ -72,7 +78,7 @@ public class AttachmentReference extends EntityReference
     protected void setParent(EntityReference parent)
     {
         if (parent == null || parent.getType() != EntityType.DOCUMENT) {
-            throw new IllegalArgumentException("Invalid parent reference [" + parent + "] for an attachment reference");
+            throw new IllegalArgumentException("Invalid parent reference [" + parent + "] in an attachment reference");
         }
 
         super.setParent(new DocumentReference(parent));
@@ -81,9 +87,8 @@ public class AttachmentReference extends EntityReference
     /**
      * {@inheritDoc}
      *
-     * Overridden in order to verify the validity of the passed type
+     * Overridden in order to verify the validity of the passed type.
      *
-     * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      * @exception IllegalArgumentException if the passed type is not an attachment type
      */
     @Override
@@ -95,6 +100,10 @@ public class AttachmentReference extends EntityReference
 
         super.setType(EntityType.ATTACHMENT);
     }
+
+    /**
+     * @return the document reference contained in this attachment reference
+     */
     public DocumentReference getDocumentReference()
     {
         return (DocumentReference) extractReference(EntityType.DOCUMENT);

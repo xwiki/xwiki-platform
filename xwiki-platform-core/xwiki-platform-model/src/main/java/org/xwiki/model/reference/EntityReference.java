@@ -61,7 +61,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     /**
      * Parameters of this entity.
      */
-    private Map<String, Object> parameters;
+    private Map<String, Serializable> parameters;
 
     /**
      * Clone an EntityReference.
@@ -154,7 +154,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @param parameters parameters for this reference, may be null
      * @since 3.3M2
      */
-    public EntityReference(String name, EntityType type, EntityReference parent, Map<String, Object> parameters)
+    public EntityReference(String name, EntityType type, EntityReference parent, Map<String, Serializable> parameters)
     {
         setName(name);
         setType(type);
@@ -234,9 +234,9 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @param parameters the map of parameter to set
      * @since 3.3M2
      */
-    protected void setParameters(Map<String, Object> parameters) {
+    protected void setParameters(Map<String, Serializable> parameters) {
         if (parameters != null) {
-            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+            for (Map.Entry<String, Serializable> entry : parameters.entrySet()) {
                 setParameter(entry.getKey(), entry.getValue());
             }
         }
@@ -249,10 +249,10 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @param value the value of the parameter
      * @since 3.3M2
      */
-    protected void setParameter(String name, Object value) {
+    protected void setParameter(String name, Serializable value) {
         if (value != null) {
             if (parameters == null) {
-                parameters = new TreeMap<String, Object>();
+                parameters = new TreeMap<String, Serializable>();
             }
             parameters.put(name, value);
         } else if (parameters != null) {
@@ -334,7 +334,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         if (parameters != null) {
             sb.append(" parameters = {");
             boolean first = true;
-            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+            for (Map.Entry<String, Serializable> entry : parameters.entrySet()) {
                 if (first) {
                     first = false;
                 } else {
@@ -432,7 +432,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         }
 
         if (parameters != null) {
-            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+            for (Map.Entry<String, Serializable> entry : parameters.entrySet()) {
                 Object obj = reference.parameters.get(entry.getKey());
                 Object myobj = entry.getValue();
                 if (myobj != null && myobj instanceof Comparable) {

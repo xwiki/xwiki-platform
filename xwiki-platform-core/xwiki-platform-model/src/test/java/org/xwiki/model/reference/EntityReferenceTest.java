@@ -19,6 +19,11 @@
  */
 package org.xwiki.model.reference;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,18 +44,18 @@ import junit.framework.Assert;
  */
 public class EntityReferenceTest
 {
-    private Map<String, Object> getParamMap(int nb)
+    private Map<String, Serializable> getParamMap(int nb)
     {
-        Map<String, Object> map = new HashMap<String, Object>(nb);
+        Map<String, Serializable> map = new HashMap<String, Serializable>(nb);
         for (int i=0; i < nb; i++) {
             map.put(UUID.randomUUID().toString(), UUID.randomUUID());
         }
         return map;
     }
 
-    private boolean checkParamMap(EntityReference ref, Map<String, Object> map)
+    private boolean checkParamMap(EntityReference ref, Map<String,Serializable> map)
     {
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
+        for (Map.Entry<String, Serializable> entry : map.entrySet()) {
             if (entry.getValue() != ref.getParameter(entry.getKey())) {
                 return false;
             }
@@ -98,8 +103,8 @@ public class EntityReferenceTest
     @Test
     public void testCopyConstructor()
     {
-        Map<String,Object> map1 = getParamMap(3);
-        Map<String,Object> map2 = getParamMap(1);
+        Map<String, Serializable> map1 = getParamMap(3);
+        Map<String, Serializable> map2 = getParamMap(1);
 
         EntityReference parent = new EntityReference("space", EntityType.SPACE,
                 new EntityReference("wiki", EntityType.WIKI, null, map2));
@@ -138,7 +143,7 @@ public class EntityReferenceTest
 
         EntityReference reference6 = new EntityReference("page", EntityType.DOCUMENT, null);
 
-        Map<String,Object> map = getParamMap(3);
+        Map<String, Serializable> map = getParamMap(3);
         EntityReference reference7 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
                 new EntityReference("wiki", EntityType.WIKI)),map);
@@ -195,7 +200,7 @@ public class EntityReferenceTest
 
         EntityReference reference6 = new EntityReference("page", EntityType.DOCUMENT, null);
 
-        Map<String,Object> map = getParamMap(3);
+        Map<String, Serializable> map = getParamMap(3);
         EntityReference reference7 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
                 new EntityReference("wiki", EntityType.WIKI)),map);
@@ -321,9 +326,9 @@ public class EntityReferenceTest
     @Test
     public void testCopyConstructorReplaceParent()
     {
-        Map<String,Object> map1 = getParamMap(3);
-        Map<String,Object> map2 = getParamMap(2);
-        Map<String,Object> map3 = getParamMap(1);
+        Map<String, Serializable> map1 = getParamMap(3);
+        Map<String, Serializable> map2 = getParamMap(2);
+        Map<String, Serializable> map3 = getParamMap(1);
 
         EntityReference wiki = new EntityReference("wiki", EntityType.WIKI, null, map3);
         EntityReference wiki2 = new EntityReference("wiki2", EntityType.WIKI, null);
@@ -345,5 +350,27 @@ public class EntityReferenceTest
         Assert.assertNotSame(space,referenceWiki2.getParent());
         Assert.assertTrue(checkParamMap(referenceWiki2.getParent(), map2));
         Assert.assertSame(wiki2,referenceWiki2.getParent().getParent());
+    }
+
+    @Test
+    public void testEntityReferenceSerialization() throws Exception
+    {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+
+        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI, null, getParamMap(1)),
+                getParamMap(2)),
+            getParamMap(3));
+
+        oos.writeObject(reference);
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(bais);
+
+        EntityReference outRefs = (EntityReference) ois.readObject();
+
+        Assert.assertEquals(reference, outRefs);
     }
 }

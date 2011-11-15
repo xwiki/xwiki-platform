@@ -31,7 +31,6 @@ import org.xwiki.model.EntityType;
  * @version $Id$
  * @since 3.3M2
  */
-
 interface StringReferenceSeparators
 {
     /**
@@ -72,7 +71,7 @@ interface StringReferenceSeparators
     /**
      * A backslash string.
      */
-     String ESCAPE = Character.toString(CESCAPE);
+    String ESCAPE = Character.toString(CESCAPE);
 
     /**
      * A double backslash string.

@@ -47,6 +47,16 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
     private static final Integer ONE = new Integer(1);
 
     /**
+     * Space of the editor configuration document.
+     */
+    private static final String XWIKI_SPACE = "XWiki";
+
+    /**
+     * Name of the editor configuration document.
+     */
+    private static final String EDITOR_CONFIG_DOC = "WysiwygEditorConfig";
+
+    /**
      * The component used to access documents. This is temporary till XWiki model is moved into components.
      */
     @Inject
@@ -70,14 +80,14 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
     private Object getProperty(String propertyName)
     {
         String currentWiki = modelContext.getCurrentEntityReference().getName();
-        DocumentReference configDocumentReference = new DocumentReference(currentWiki, "XWiki", "WysiwygEditorConfig");
+        DocumentReference configDocumentReference = new DocumentReference(currentWiki, XWIKI_SPACE, EDITOR_CONFIG_DOC);
         DocumentReference configClassReference =
             new DocumentReference("WysiwygEditorConfigClass", configDocumentReference.getLastSpaceReference());
         Object value = documentAccessBridge.getProperty(configDocumentReference, configClassReference, propertyName);
         if (value == null) {
             String mainWiki = getMainWiki();
             if (!StringUtils.equals(currentWiki, mainWiki)) {
-                configDocumentReference = new DocumentReference(mainWiki, "XWiki", "WysiwygEditorConfig");
+                configDocumentReference = new DocumentReference(mainWiki, XWIKI_SPACE, EDITOR_CONFIG_DOC);
                 value = documentAccessBridge.getProperty(configDocumentReference, configClassReference, propertyName);
             }
         }

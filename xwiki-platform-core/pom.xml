@@ -248,6 +248,7 @@
     <module>xwiki-platform-containers</module>
     <module>xwiki-platform-crypto</module>
     <module>xwiki-platform-csrf</module>
+    <module>xwiki-platform-dashboard</module>
     <module>xwiki-platform-display</module>
     <module>xwiki-platform-eventstream</module>
     <module>xwiki-platform-extension</module>
@@ -339,6 +340,7 @@
                 <exclude>com/xpn/xwiki/plugin/applicationmanager/ApplicationManagerPlugin</exclude>
                 <exclude>com/xpn/xwiki/plugin/applicationmanager/ApplicationManagerPlugin$1</exclude>
                 <exclude>org/xwiki/annotation/event/AbstractAnnotationEvent</exclude>
+                <exclude>org/xwiki/query/QueryExecutorProvider</exclude> <!-- Use new Provider injection -->
                 <!-- Moved to Legacy -->
                 <exclude>com/xpn/xwiki/api/XWiki</exclude>
               </excludes>

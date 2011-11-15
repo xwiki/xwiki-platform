@@ -93,7 +93,7 @@ public class ContextComponentManager extends DelegateComponentManager implements
     }
 
     @Override
-    public void unregisterComponent(Class< ? > role, String roleHint)
+    public <T> void unregisterComponent(Class<T> role, String roleHint)
     {
         throwException();
     }

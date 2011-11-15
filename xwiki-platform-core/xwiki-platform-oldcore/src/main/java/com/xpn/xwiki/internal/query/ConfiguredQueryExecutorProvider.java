@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.query;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -28,7 +29,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.query.QueryExecutor;
-import org.xwiki.query.QueryExecutorProvider;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -40,7 +40,7 @@ import com.xpn.xwiki.XWikiContext;
  */
 @Component
 @Singleton
-public class ConfiguredQueryExecutorProvider implements QueryExecutorProvider
+public class ConfiguredQueryExecutorProvider implements Provider<QueryExecutor>
 {
     /** A means of getting QueryExecutors. */
     @Inject

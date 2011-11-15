@@ -104,7 +104,6 @@ Thus it is forbidden to depend on the HTML Macro.
     <module>xwiki-platform-rendering-macro-python</module>
     <module>xwiki-platform-rendering-macro-php</module>
     <module>xwiki-platform-rendering-macro-container</module>
-    <module>xwiki-platform-rendering-macro-dashboard</module>
     <module>xwiki-platform-rendering-macro-context</module>
     <module>xwiki-platform-rendering-macro-cache</module>
     <module>xwiki-platform-rendering-macro-gallery</module>

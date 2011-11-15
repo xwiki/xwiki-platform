@@ -238,17 +238,12 @@
       #end
       |(% class="label" %)Type(%%)|$typeDisplay
       ##------- Developed By --------
-      #set($supported =  $extension.getProperty("supported").value)
-      #set($contributors = $doc.getValue("authors"))
-      |(% class="label" %)Developed by(%%)|(((
-        #if ($contributors.size() &gt; 0)
-         {{context document="$doc.fullName"}}
-           #foreach($contributor in $contributors)#if($velocityCount &gt; 1), #end${contributor}#end
-         {{/context}}
-        #else
+      #set($authors = $doc.getValue("authors"))
+      |(% class="label" %)Developed by(%%)|#if ($authors.isEmpty())
           Unknown
+        #else
+          $doc.authors
         #end
-      )))
       ##------- Features --------
       #set($features = $doc.getValue("features"))
       #if ($features &amp;&amp; $features.size() &gt; 0)

@@ -31,87 +31,88 @@ import org.xwiki.model.EntityType;
  * @version $Id$
  * @since 3.3M2
  */
-final class StringReferenceSeparators
+
+interface StringReferenceSeparators
 {
     /**
      * A backslash string.
      */
-    static final char CESCAPE = '\\';
+    char CESCAPE = '\\';
 
     /**
       * A colon string. Colon is used to separate wiki name.
       */
-    static final char CWIKISEP = ':';
+    char CWIKISEP = ':';
 
     /**
      * A dot string. Dot is used to separate space names and document name.
      */
-    static final char CSPACESEP = '.';
+    char CSPACESEP = '.';
 
     /**
      * An at-sign string. At sign is used to separate attachment name.
      */
-    static final char CATTACHMENTSEP = '@';
+    char CATTACHMENTSEP = '@';
 
     /**
      * An hat sign string. Hat sign is used to separate object name.
      */
-    static final char COBJECTSEP = '^';
+    char COBJECTSEP = '^';
 
     /**
      * An dot is used to separate object property name.
      */
-    static final char CPROPERTYSEP = CSPACESEP;
+    char CPROPERTYSEP = CSPACESEP;
 
     /**
      * An hat sign is used to separate class name.
      */
-    static final char CCLASSPROPSEP = COBJECTSEP;
+    char CCLASSPROPSEP = COBJECTSEP;
 
     /**
      * A backslash string.
      */
-    static final String ESCAPE = Character.toString(CESCAPE);
+     String ESCAPE = Character.toString(CESCAPE);
 
     /**
      * A double backslash string.
      */
-    static final String DBLESCAPE = ESCAPE + ESCAPE;
+    String DBLESCAPE = ESCAPE + ESCAPE;
 
     /**
       * A colon string. Colon is used to separate wiki name.
       */
-    static final String WIKISEP = Character.toString(CWIKISEP);
+    String WIKISEP = Character.toString(CWIKISEP);
 
     /**
      * A dot string. Dot is used to separate space names and document name.
      */
-    static final String SPACESEP = Character.toString(CSPACESEP);
+    String SPACESEP = Character.toString(CSPACESEP);
 
     /**
      * An at-sign string. At sign is used to separate attachment name.
      */
-    static final String ATTACHMENTSEP = Character.toString(CATTACHMENTSEP);
+    String ATTACHMENTSEP = Character.toString(CATTACHMENTSEP);
 
     /**
      * An hat sign string. Hat sign is used to separate object name.
      */
-    static final String OBJECTSEP = Character.toString(COBJECTSEP);
+    String OBJECTSEP = Character.toString(COBJECTSEP);
 
     /**
      * An dot is used to separate object property name.
      */
-    static final String PROPERTYSEP = Character.toString(CPROPERTYSEP);
+    String PROPERTYSEP = Character.toString(CPROPERTYSEP);
 
     /**
      * An hat sign is used to separate class property name.
      */
-    static final String CLASSPROPSEP = Character.toString(CCLASSPROPSEP);
+    String CLASSPROPSEP = Character.toString(CCLASSPROPSEP);
 
     /**
      * The list of strings to escape for each type of entity.
      */
-    static final Map<EntityType, String[]> ESCAPES = new HashMap<EntityType, String[]>()
+    Map<EntityType, String[]> ESCAPES = new HashMap<EntityType, String[]>()
     {
         {
             put(EntityType.ATTACHMENT, new String[] {ATTACHMENTSEP, ESCAPE});
@@ -126,7 +127,7 @@ final class StringReferenceSeparators
     /**
      * The replacement list corresponding to the list in {@link #ESCAPES} map.
      */
-    static final Map<EntityType, String[]> REPLACEMENTS = new HashMap<EntityType, String[]>()
+    Map<EntityType, String[]> REPLACEMENTS = new HashMap<EntityType, String[]>()
     {
         {
             put(EntityType.ATTACHMENT, new String[] {ESCAPE + ATTACHMENTSEP, DBLESCAPE});
@@ -141,7 +142,7 @@ final class StringReferenceSeparators
     /**
      * Map defining syntax separators for each type of reference.
      */
-    static final Map<EntityType, char[]> SEPARATORS = new HashMap<EntityType, char[]>()
+    Map<EntityType, char[]> SEPARATORS = new HashMap<EntityType, char[]>()
     {
         {
             put(EntityType.DOCUMENT, new char[] {CSPACESEP, CWIKISEP});
@@ -152,9 +153,4 @@ final class StringReferenceSeparators
             put(EntityType.CLASS_PROPERTY, new char[] {CCLASSPROPSEP, CSPACESEP, CWIKISEP});
         }
     };
-
-    /**
-     * Utility class, never create an instance.
-     */
-    private StringReferenceSeparators() { }
 }

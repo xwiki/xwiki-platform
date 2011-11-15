@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>Dashboard</web>
-<name>DashboardTemplate</name>
+<name>SpaceDashboardTemplate</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
@@ -71,10 +71,10 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </title>
 </class>
-<name>Dashboard.DashboardTemplate</name>
+<name>Dashboard.SpaceDashboardTemplate</name>
 <number>0</number>
 <className>XWiki.GadgetClass</className>
-<guid>e5950031-094c-4d74-b58d-e340a0234d68</guid>
+<guid>dfad4770-6d52-41af-9018-88511f31a10f</guid>
 <property>
 <content>{{velocity}}
 #if ($doc.space == "Main")
@@ -138,10 +138,10 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </title>
 </class>
-<name>Dashboard.DashboardTemplate</name>
+<name>Dashboard.SpaceDashboardTemplate</name>
 <number>1</number>
 <className>XWiki.GadgetClass</className>
-<guid>a802cfb5-b634-465b-82cd-44e66d14f20b</guid>
+<guid>3bafd624-2fa9-4711-b2bc-c3e8a58131ca</guid>
 <property>
 <content>{{velocity}}
 #set($tagSpace = $util.null)
@@ -206,10 +206,10 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </title>
 </class>
-<name>Dashboard.DashboardTemplate</name>
+<name>Dashboard.SpaceDashboardTemplate</name>
 <number>2</number>
 <className>XWiki.GadgetClass</className>
-<guid>52ea2b0e-6ac1-4345-b69d-bfd52bbd4db6</guid>
+<guid>5a58a6cc-13a8-4ee3-b5d2-9df994cf6671</guid>
 <property>
 <content>{{velocity}}
 #set($aSpace = $util.null)

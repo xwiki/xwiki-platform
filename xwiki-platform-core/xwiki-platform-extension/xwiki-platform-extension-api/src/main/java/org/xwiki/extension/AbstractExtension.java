@@ -123,9 +123,14 @@ public abstract class AbstractExtension implements Extension
 
         setFeatures(extension.getFeatures());
 
+        setName(extension.getName());
         setDescription(extension.getDescription());
         setAuthors(extension.getAuthors());
         setWebsite(extension.getWebSite());
+        if (extension.getLicenses() != null && !extension.getLicenses().isEmpty()) {
+            setLicense(extension.getLicenses());
+        }
+        setSummary(extension.getSummary());
 
         List< ? extends ExtensionDependency> newDependencies = extension.getDependencies();
         if (!newDependencies.isEmpty()) {

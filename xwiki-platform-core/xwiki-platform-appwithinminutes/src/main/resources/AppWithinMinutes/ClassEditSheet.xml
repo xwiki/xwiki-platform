@@ -1781,7 +1781,7 @@ return XWiki;
  *#
 #macro(doSave)
   #if($services.csrf.isTokenValid($request.form_token))
-    #set($minorEdit = $action.equals('saveandcontinue'))
+    #set($minorEdit = "$!request.minorEdit" != '')
     #updateAndSaveClass()
     #updateAndSaveTemplate()
     #updateAndSaveSheet()

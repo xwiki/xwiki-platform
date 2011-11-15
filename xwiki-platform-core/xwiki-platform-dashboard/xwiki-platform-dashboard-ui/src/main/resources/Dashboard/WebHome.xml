@@ -306,13 +306,13 @@
 #set($displayDashboard = true)
 #if ($context.user != "XWiki.XWikiGuest")
   ## get the preferences of the current user
-  #set($userDbPrefs = $xwiki.getDocument($context.user).getObject("XWiki.UserDashboardPreferencesClass"))
+  #set($userDbPrefs = $xwiki.getDocument($context.user).getObject("Dashboard.UserDashboardPreferencesClass"))
   #if ($userDbPrefs)
     ## if the object exists, use the object value
     #set($prefValue = $userDbPrefs.getProperty('displayOnMainPage').value)
   #else
     ## if the object does not exist, use the default value of the property in the class
-    #set($userPrefClass = $xwiki.getClass("XWiki.UserDashboardPreferencesClass"))
+    #set($userPrefClass = $xwiki.getClass("Dashboard.UserDashboardPreferencesClass"))
     #set($displayOnMainPageProp = $userPrefClass.get('displayOnMainPage'))
     #set($prefValue = $displayOnMainPageProp.getProperty('defaultValue').value)
   #end

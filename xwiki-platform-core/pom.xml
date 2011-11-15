@@ -312,8 +312,15 @@
                 <!-- To be removed when we release 3.3 -->
                 <exclude>org/xwiki/cache/eviction/EntryEvictionConfiguration</exclude>
                 <exclude>org/xwiki/workspace/WorkspaceManagerException</exclude>
+                <exclude>org/xwiki/model/reference/ClassPropertyReference</exclude>
+                <exclude>org/xwiki/model/reference/EntityReference</exclude>
+                <exclude>org/xwiki/model/reference/DocumentReference</exclude>
+                <exclude>org/xwiki/model/reference/ObjectReference</exclude>
                 <exclude>org/xwiki/model/reference/ObjectReferenceResolver</exclude>
+                <exclude>org/xwiki/model/reference/ObjectPropertyReference</exclude>
                 <exclude>org/xwiki/model/reference/ObjectPropertyReferenceResolver</exclude>
+                <exclude>org/xwiki/model/reference/SpaceReference</exclude>
+                <exclude>org/xwiki/model/reference/WikiReference</exclude>
                 <exclude>com/xpn/xwiki/doc/DeletedFilesystemAttachment</exclude>
                 <exclude>com/xpn/xwiki/doc/FilesystemAttachmentContent</exclude>
                 <exclude>com/xpn/xwiki/doc/FilesystemAttachmentContent$1LockingFileInputStream</exclude>

@@ -63,6 +63,19 @@ public class ObjectReference extends EntityReference
     }
 
     /**
+     * Deprecated constructor.
+     * @param wiki wiki where the parent document of the object is
+     * @param space space where the parent document of the object is
+     * @param document parent document of the object
+     * @param objectName the name of the object
+     */
+    @Deprecated
+    public ObjectReference(String wiki, String space, String document, String objectName)
+    {
+        this(objectName, new DocumentReference(wiki, space, document));
+    }
+
+    /**
      * {@inheritDoc} <br />
      * Overridden to check the type to be an object type.
      * 

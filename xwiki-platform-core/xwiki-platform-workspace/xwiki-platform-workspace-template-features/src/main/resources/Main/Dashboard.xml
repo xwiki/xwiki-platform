@@ -395,7 +395,7 @@
 <content>{{velocity}}
 #set($AppManager = $services.applicationmanager)
 #if(!$AppManager)
-  #error($msg.get("xapp.pluginnotenabled"))
+  #error($msg.get("workspacemanager.dependencies.applicationmanager.missing"))
 #else
   This is the list of available applications for this workspace:
   #set($applications = $AppManager.getApplicationDocumentList())

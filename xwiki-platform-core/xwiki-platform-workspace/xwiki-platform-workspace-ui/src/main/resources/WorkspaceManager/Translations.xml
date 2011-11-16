@@ -31,6 +31,8 @@ workspacemanager.template.install.error.missingtemplateattachment=Error installi
 workspacemanager.translations.install.success=Workspace Manager translations have been successfully installed.
 workspacemanager.searchSuggestions.install.success=Workspace search suggestions have been successfully installed.
 workspacemanager.install.notallowed=Admin rights are required to complete the Workspace Manager installation. Please login as Admin to complete the installation.
+workspacemanager.dependencies.wikimanager.missing=The [[Wiki Manager Plugin>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Manager+Plugin]] is not installed. Please install it and try again.
+workspacemanager.dependencies.applicationmanager.missing=The [[Application Manager Plugin>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Application+Manager+Plugin]] is not installed. Please install it and try again.
 
 # LABELS
 workspacemanager.createworkspace=Create a new workspace

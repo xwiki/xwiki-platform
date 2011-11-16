@@ -93,12 +93,12 @@
   #set ($WikiManager = $services.wikimanager)
   #if (!$WikiManager)
 
-    {{error}}$msg.get('wikimanager.pluginnotenabled'){{/error}}
+    {{error}}$msg.get('workspacemanager.dependencies.wikimanager.missing'){{/error}}
   #end
 #end
 #if (!$services.applicationmanager)
 
-  {{error}}$msg.get('xapp.pluginnotenabled'){{/error}}
+  {{error}}$msg.get('workspacemanager.dependencies.applicationmanager.missing'){{/error}}
 #end
 ##
 ## Constants

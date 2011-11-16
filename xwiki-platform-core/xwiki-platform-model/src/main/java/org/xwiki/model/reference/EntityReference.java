@@ -154,7 +154,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @param parameters parameters for this reference, may be null
      * @since 3.3M2
      */
-    protected EntityReference(String name, EntityType type, EntityReference parent, Map<String, Serializable> parameters)
+    protected EntityReference(String name, EntityType type, EntityReference parent,
+        Map<String, Serializable> parameters)
     {
         setName(name);
         setType(type);

@@ -41,7 +41,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
      * changes.
      */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /**
      * Name of this entity.
@@ -154,7 +154,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @param parameters parameters for this reference, may be null
      * @since 3.3M2
      */
-    public EntityReference(String name, EntityType type, EntityReference parent, Map<String, Serializable> parameters)
+    protected EntityReference(String name, EntityType type, EntityReference parent, Map<String, Serializable> parameters)
     {
         setName(name);
         setType(type);
@@ -274,7 +274,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @since 3.3M2
      */
     @SuppressWarnings("unchecked")
-    public final <T> T getParameter(String name) {
+    protected final <T> T getParameter(String name) {
         return (parameters == null) ? null : (T) parameters.get(name);
     }
 

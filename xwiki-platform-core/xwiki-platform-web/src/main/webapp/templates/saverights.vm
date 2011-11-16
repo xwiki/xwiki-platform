@@ -18,7 +18,7 @@
       ### if action = clear, remove the right from the allow rule, if exists
       #set($founda = true)
       #if($action == "allow")
-        #if($levels.indexOf($right) == -1) ## the right is not in the allow list, add it
+        #if(!$levels.matches(".*\b${right}\b.*")) ## the right is not in the allow list, add it
           #set($levels = $levels + "," + $right)
           
 ##1. person: $pers; rule: allow; action: allow; levels: $levels
@@ -28,9 +28,9 @@
         #set($i = $levels.indexOf($right))
         #if($i > -1) ## the right was found in the allow levels, remove it
           #if($i == 0)
-            #set($levels = $levels.replaceAll("${right}(,|$)", ""))
+            #set($levels = $levels.replaceAll("\b${right}(,|$)", ""))
           #else
-            #set($levels = $levels.replaceAll("(,|)${right}", ""))
+            #set($levels = $levels.replaceAll(",${right}\b", ""))
           #end
         #end
 
@@ -47,7 +47,7 @@
       ### if action = deny, add the right to the deny rule, if it does not exist;
       ### if action = clear, remove the right from the deny rule, if exists
       #if($action == "deny")
-        #if($levels.indexOf($right) == -1) ## the right is not in the allow list, add it
+        #if(!$levels.matches(".*\b${right}\b.*")) ## the right is not in the allow list, add it
           #set($levels = $levels + "," + $right)
 
 ##3. person: $pers; rule: deny; action:deny; levels: $levels
@@ -57,9 +57,9 @@
         #set($i = $levels.indexOf($right))
         #if($i > -1) ## the right was found in the allow levels, remove it
           #if($i == 0)
-            #set($levels = $levels.replaceAll("${right}(,|$)", ""))
+            #set($levels = $levels.replaceAll("\b${right}(,|$)", ""))
           #else
-            #set($levels = $levels.replaceAll(",${right}", ""))
+            #set($levels = $levels.replaceAll(",${right}\b", ""))
           #end
         #end
 

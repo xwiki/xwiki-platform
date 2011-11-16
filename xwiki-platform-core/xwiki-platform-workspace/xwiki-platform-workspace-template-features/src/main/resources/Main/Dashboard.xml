@@ -393,7 +393,7 @@
 <guid>3cfb2ec3-76e5-4627-a681-46882fd06cc9</guid>
 <property>
 <content>{{velocity}}
-#set($AppManager = $xwiki.applicationmanager)
+#set($AppManager = $services.applicationmanager)
 #if(!$AppManager)
   #error($msg.get("xapp.pluginnotenabled"))
 #else

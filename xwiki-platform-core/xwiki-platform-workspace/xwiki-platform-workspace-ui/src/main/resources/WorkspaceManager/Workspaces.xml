@@ -283,7 +283,7 @@ $xwiki.ssx.use('WorkspaceManager.Workspaces')
   ## List workspaces.
   ##
   #foreach($workspaceDocumentName in $workspaceDocumentsList)
-    #set ($workspaceWikiDocument = $xwiki.wikimanager.getWikiFromDocumentName($workspaceDocumentName))
+    #set ($workspaceWikiDocument = $services.wikimanager.getWikiFromDocumentName($workspaceDocumentName))
     #set ($workspaceWikiDescriptor = $workspaceWikiDocument.firstWikiAlias)
       &lt;li id='spWorkspaceItem' class='xitem xunderline xhighlight workspace'&gt;
         &lt;div class='xitemcontainer'&gt;

@@ -263,11 +263,11 @@ function prettyNameChanged()
 #if (!$WorkspaceManager)
   #error($msg.get("workspacemanager.pluginnotenabled"))
 #end
-#set ($WikiManager = $xwiki.wikimanager)
+#set ($WikiManager = $services.wikimanager)
 #if (!$WikiManager)
   #error($msg.get("wikimanager.pluginnotenabled"))
 #end
-#if (!$xwiki.applicationmanager)
+#if (!$services.applicationmanager)
   #error($msg.get("xapp.pluginnotenabled"))
 #end
 #if(!$xwiki.isVirtualMode())

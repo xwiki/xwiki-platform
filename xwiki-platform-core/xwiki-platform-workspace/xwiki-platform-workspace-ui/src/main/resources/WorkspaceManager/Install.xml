@@ -90,13 +90,13 @@
 ## 3. Install template
 ##
 #if (!$WikiManager)
-  #set ($WikiManager = $xwiki.wikimanager)
+  #set ($WikiManager = $services.wikimanager)
   #if (!$WikiManager)
 
     {{error}}$msg.get('wikimanager.pluginnotenabled'){{/error}}
   #end
 #end
-#if (!$xwiki.applicationmanager)
+#if (!$services.applicationmanager)
 
   {{error}}$msg.get('xapp.pluginnotenabled'){{/error}}
 #end

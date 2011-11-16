@@ -223,7 +223,7 @@
         #set($itemDoc = $xwiki.getDocument($item))
         #set($fullname = "${itemDoc.wiki}:${itemDoc.space}.${itemDoc.name}")
         #set($discard = $itemDoc.use($className))
-        #set ($itemWikiDocument = $xwiki.wikimanager.getWikiFromDocumentName($itemDoc.fullName))
+        #set ($itemWikiDocument = $services.wikimanager.getWikiFromDocumentName($itemDoc.fullName))
         #set ($itemWikiDescriptor = $itemWikiDocument.firstWikiAlias)
         #set ($itemWikiName = $itemWikiDescriptor.wikiName)
         #set ($workspace = $WorkspaceManager.getWorkspace($itemWikiName))

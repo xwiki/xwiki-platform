@@ -108,7 +108,7 @@
   ##
   #includeMacros("WikiCode.Macros")
   ##
-  #set($WikiManager = $xwiki.wikimanager)
+  #set($WikiManager = $services.wikimanager)
   #if(!$WikiManager)
     #error($msg.get("wikimanager.pluginnotenabled"))
   #end

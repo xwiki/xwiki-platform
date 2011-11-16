@@ -103,7 +103,7 @@
 <cache>long</cache>
 </property>
 <property>
-<code>.xform label input[type=checkbox] {
+<code>.xform label input[type=checkbox], .xform label input[type=radio] {
   margin: 0 0.2em 0 0;
   vertical-align: text-bottom;
 }</code>

@@ -24,6 +24,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
@@ -42,9 +44,10 @@ public class ResourceExtensionRepository implements ExtensionRepository
 
     private String baseResource;
 
-    public ResourceExtensionRepository(ClassLoader classLoader, String baseResource)
+    public ResourceExtensionRepository(ClassLoader classLoader, String baseResource, ComponentManager componentManager)
+        throws ComponentLookupException
     {
-        this.extensionSerializer = new ExtensionSerializer();
+        this.extensionSerializer = componentManager.lookup(ExtensionSerializer.class);
 
         this.repositoryId = new ExtensionRepositoryId("test-resources", "resources", null);
 

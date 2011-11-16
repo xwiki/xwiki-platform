@@ -1,4 +1,4 @@
-#set($Appmanager = $xwiki.applicationmanager)
+#set($Appmanager = $services.applicationmanager)
 #set($Exception = $Appmanager.DefaultException)
 ##
 #set($object = $doc.getObject("XAppClasses.XWikiApplicationClass"))

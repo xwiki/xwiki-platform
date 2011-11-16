@@ -187,6 +187,7 @@ function getPageList(nb) {
   {{html clean="false"}}
     $xwiki.jsx.use("ExtensionCode.ExtensionAuthorsDisplayer", { "defer" : false })
     #set($script = $xwiki.getURL("ExtensionCode.ExtensionAuthorsSuggest", "get", "outputSyntax=plain"))
+    ## TODO: support disabled Javascript
     &lt;input id="pagepicker-${pagePickerCounter}-suggest" type="text" name="search" value="" onfocus='suggest${pagePickerCounter}(this);' autocomplete='off' size='40' /&gt;
     &lt;span class="buttonwrapper"&gt;&lt;a href="#" id="action_addauthor" class="button" type="submit" onclick="addPage(${pagePickerCounter}, $('pagepicker-${pagePickerCounter}-suggest').value, $('pagepicker-${pagePickerCounter}-suggest').value);"&gt;Add&lt;/a&gt;&lt;/span&gt;
     &lt;input id="pagepicker-${pagePickerCounter}-input" type="hidden" name="${prefix}${name}" value="$!pageListValue" /&gt;

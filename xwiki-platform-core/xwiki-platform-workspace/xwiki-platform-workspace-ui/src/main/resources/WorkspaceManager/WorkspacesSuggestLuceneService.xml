@@ -40,7 +40,7 @@
   &lt;results&gt;
     #foreach($item in $results)
       #set($itemfullname = "${item.wiki}:${item.space}.${item.name}")
-      #set($itemWikiDocument = $xwiki.wikimanager.getWikiFromDocumentName($itemfullname))
+      #set($itemWikiDocument = $services.wikimanager.getWikiFromDocumentName($itemfullname))
       #set($itemWikiDescriptor = $itemWikiDocument.firstWikiAlias)
       #set($name = $itemWikiDescriptor.wikiprettyname)
       #set($url = $itemWikiDescriptor.homePageUrl)

@@ -33,6 +33,8 @@ import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InvalidExtensionException;
 import org.xwiki.extension.LocalExtension;
@@ -65,15 +67,24 @@ public class ExtensionStorage
     private File rootFolder;
 
     /**
+     * Used to lookup the extension serializer.
+     */
+    private ComponentManager componentManager;
+
+    /**
      * @param repository the repository
      * @param rootFolder the repository folder
+     * @param componentManager used to lookup needed components
+     * @throws ComponentLookupException can't find ExtensionSerializer
      */
-    public ExtensionStorage(DefaultLocalExtensionRepository repository, File rootFolder)
+    public ExtensionStorage(DefaultLocalExtensionRepository repository, File rootFolder,
+        ComponentManager componentManager) throws ComponentLookupException
     {
         this.repository = repository;
         this.rootFolder = rootFolder;
+        this.componentManager = componentManager;
 
-        this.extensionSerializer = new ExtensionSerializer();
+        this.extensionSerializer = this.componentManager.lookup(ExtensionSerializer.class);
     }
 
     /**
@@ -161,8 +172,8 @@ public class ExtensionStorage
      * @throws TransformerException error when trying to save the descriptor
      * @throws IOException error when trying to save the descriptor
      */
-    protected void saveDescriptor(LocalExtension extension) throws ParserConfigurationException, TransformerException,
-        IOException
+    protected void saveDescriptor(DefaultLocalExtension extension) throws ParserConfigurationException,
+        TransformerException, IOException
     {
         File file = getDescriptorFile(extension.getId());
         FileOutputStream fos = new FileOutputStream(file);

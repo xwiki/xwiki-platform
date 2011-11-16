@@ -23,7 +23,7 @@
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>false</hidden>
 <content>#if ($request.wikiname)
-  #if (!$xwiki.wikimanager.isWikiNameAvailable($request.wikiname))
+  #if (!$services.wikimanager.isWikiNameAvailable($request.wikiname))
     #if ($services.wikimanager.getWikiFromName($request.wikiname).isNew())
 database#else
 wiki#end

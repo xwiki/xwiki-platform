@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
@@ -42,9 +44,9 @@ public class FileExtensionRepository implements ExtensionRepository
 
     private File directory;
 
-    public FileExtensionRepository(File directory)
+    public FileExtensionRepository(File directory, ComponentManager componentManager) throws ComponentLookupException
     {
-        this.extensionSerializer = new ExtensionSerializer();
+        this.extensionSerializer = componentManager.lookup(ExtensionSerializer.class);
 
         this.repositoryId = new ExtensionRepositoryId("test-file", "file", null);
 

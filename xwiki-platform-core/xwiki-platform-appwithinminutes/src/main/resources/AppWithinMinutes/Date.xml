@@ -33,7 +33,7 @@
 <nameField></nameField>
 <validationScript></validationScript>
 <date>
-<customDisplay></customDisplay>
+<customDisplay>{{include document="AppWithinMinutes.Date"/}}</customDisplay>
 <dateFormat>dd/MM/yyyy HH:mm:ss</dateFormat>
 <disabled>0</disabled>
 <emptyIsToday>1</emptyIsToday>
@@ -139,4 +139,1531 @@
 <properties>emptyIsToday dateFormat</properties>
 </property>
 </object>
-<content></content></xwikidoc>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.Date</name>
+<number>1</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>a04e0631-206e-400c-8322-954ec9acf7ea</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>var Externals = (function (Externals) {
+
+// CalendarDateSelect version 1.16.3 - a Prototype.js based date picker
+// Questions, comments, bugs? - see the project page: http://code.google.com/p/calendardateselect
+if (typeof Prototype == 'undefined') {
+  alert("CalendarDateSelect depends on Prototype.js which is not available.");
+}
+if (Prototype.Version &lt; "1.6") {
+  alert("Prototype 1.6.0 is required. If you're using an earlier version of Prototype.js, please use calendar_date_select version 1.8.3");
+}
+
+Element.addMethods({
+  purgeChildren: function(element) { $A(element.childNodes).each(function(e){$(e).remove();}); },
+  build: function(element, type, options, style) {
+    var newElement = Element.buildAndAppend(type, options, style);
+    element.appendChild(newElement);
+    return newElement;
+  }
+});
+
+Element.buildAndAppend = function(type, options, style) {
+  var e = $(document.createElement(type));
+  $H(options).each(function(pair) { e[pair.key] = pair.value });
+  if (style) e.setStyle(style);
+  return e;
+};
+var nil = null;
+
+Date.one_day = 24*60*60*1000;
+Date.weekdays = $w("Sun Mon Tue Wed Thu Fri Sat");
+Date.first_day_of_week = 0;
+Date.months = $w("January February March April May June July August September October November December" );
+Date.padded2 = function(hour) {
+  var padded2 = parseInt(hour, 10);
+  if (hour &lt; 10) {
+    padded2 = "0" + padded2;
+  }
+  return padded2;
+}
+Date.prototype.getPaddedMinutes = function() {
+  return Date.padded2(this.getMinutes());
+}
+Date.prototype.getAMPMHour = function() {
+  var hour = this.getHours();
+  return (hour == 0) ? 12 : (hour &gt; 12 ? hour - 12 : hour)
+}
+Date.prototype.getAMPM = function() {
+  return (this.getHours() &lt; 12) ? "AM" : "PM";
+}
+Date.prototype.stripTime = function() {
+  return new Date(this.getFullYear(), this.getMonth(), this.getDate());
+}
+Date.prototype.daysDistance = function(compare_date) {
+  return Math.round((compare_date - this) / Date.one_day);
+}
+
+var defaultFormatter = {
+  format : function(date) {
+    return Date.months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear() + " " + date.getAMPMHour() + ":" + date.getPaddedMinutes() + " " + date.getAMPM();
+  },
+  parse : function(string) {
+    return new Date(string);
+  }
+}
+
+Math.floor_to_interval = function(n, i) {
+  return Math.floor(n/i) * i;
+}
+
+window.f_height = function() {
+  return( [window.innerHeight ? window.innerHeight : null, document.documentElement ? document.documentElement.clientHeight : null, document.body ? document.body.clientHeight : null].select(function(x){return x&gt;0}).first()||0);
+}
+window.f_scrollTop = function() {
+  return ([window.pageYOffset ? window.pageYOffset : null, document.documentElement ? document.documentElement.scrollTop : null, document.body ? document.body.scrollTop : null].select(function(x){return x&gt;0}).first()||0 );
+}
+
+_translations = {
+  "OK": "OK",
+  "Now": "Now",
+  "Today": "Today",
+  "Clear": "Clear"
+}
+
+SelectBox = Class.create();
+SelectBox.prototype = {
+  initialize: function(parent_element, values, html_options, style_options) {
+    this.element = $(parent_element).build("select", html_options, style_options);
+    this.populate(values);
+  },
+  populate: function(values) {
+    this.element.purgeChildren();
+    var that = this;
+    $A(values).each(function(pair) {
+      if (typeof(pair) != "object") {
+        pair = [pair, pair];
+      }
+      that.element.build("option", {
+        value: pair[1],
+        innerHTML: pair[0]
+      })
+    });
+  },
+  setValue: function(value) {
+    var e = this.element;
+    var matched = false;
+    $R(0, e.options.length - 1 ).each(function(i) {
+      if (e.options[i].value == value.toString()) {
+        e.selectedIndex = i;
+        matched = true;
+      }
+    });
+    return matched;
+  },
+  getValue: function() {
+    return $F(this.element)
+  }
+}
+
+Externals.CalendarDateSelect = Class.create();
+Externals.CalendarDateSelect.prototype = {
+  initialize: function(target_element, options) {
+    this.target_element = $(target_element);
+    if (!this.target_element) {
+      alert("Target element " + target_element + " not found!");
+      return false;
+    }
+    if (this.target_element.tagName != "INPUT") {
+      this.target_element = this.target_element.down("INPUT");
+    }
+
+    this.target_element.calendar_date_select = this;
+    this.last_click_at = 0;
+    // initialize the date control
+    this.options = $H({
+      embedded: false,
+      popup: nil,
+      time: false,
+      buttons: true,
+      clear_button: true,
+      year_range: 10,
+      close_on_click: nil,
+      minute_interval: 5,
+      popup_by: this.target_element,
+      month_year: "dropdowns",
+      onchange: function(target_element) {
+        return function() {
+          if(target_element.dispatchEvent) {
+            var event=document.createEvent('HTMLEvents');
+            event.initEvent('change', true, true);
+            target_element.dispatchEvent(event);
+          } else {
+            var event=document.createEventObject();
+            event.type='onChange';
+            target_element.fireEvent('onChange', event);
+          }
+        }; 
+      }(this.target_element),
+      valid_date_check: nil,
+      formatter: defaultFormatter
+    }).merge(options || {});
+    this.use_time = this.options.get("time");
+    this.formatter = this.options.get('formatter');
+    this.parseDate();
+    this.callback("before_show")
+    this.initCalendarDiv();
+    if(!this.options.get("embedded")) {
+      this.positionCalendarDiv()
+      // set the click handler to check if a user has clicked away from the document
+      Event.observe(document, "mousedown", this.closeIfClickedOut_handler = this.closeIfClickedOut.bindAsEventListener(this));
+      Event.observe(document, "keypress", this.keyPress_handler = this.keyPress.bindAsEventListener(this));
+    }
+    this.callback("after_show");
+  },
+  positionCalendarDiv: function() {
+    var above = false;
+    var c_pos = this.calendar_div.cumulativeOffset(), c_left = c_pos[0], c_top = c_pos[1], c_dim = this.calendar_div.getDimensions(), c_height = c_dim.height, c_width = c_dim.width; 
+    var w_top = window.f_scrollTop(), w_height = window.f_height();
+    var e_dim = $(this.options.get("popup_by")).cumulativeOffset(), e_top = e_dim[1], e_left = e_dim[0], e_height = $(this.options.get("popup_by")).getDimensions().height, e_bottom = e_top + e_height;
+
+    if ( (( e_bottom + c_height ) &gt; (w_top + w_height)) &amp;&amp; ( e_bottom - c_height &gt; w_top )) above = true;
+    var left_px = e_left.toString() + "px", top_px = (above ? (e_top - c_height ) : ( e_top + e_height )).toString() + "px";
+
+    this.calendar_div.style.left = left_px;  this.calendar_div.style.top = top_px;
+
+    this.calendar_div.setStyle({visibility:""});
+
+    // draw an iframe behind the calendar -- ugly hack to make IE 6 happy
+    if(navigator.appName=="Microsoft Internet Explorer") this.iframe = $(document.body).build("iframe", {src: "javascript:false", className: "ie6_blocker"}, { left: left_px, top: top_px, height: c_height.toString()+"px", width: c_width.toString()+"px", border: "0px"})
+  },
+  initCalendarDiv: function() {
+    if (this.options.get("embedded")) {
+      var parent = this.target_element.parentNode;
+      var style = {}
+    } else {
+      var parent = document.body
+      var style = { position:"absolute", visibility: "hidden", left:0, top:0 }
+    }
+    this.calendar_div = $(parent).build('div', {className: "calendar_date_select"}, style);
+
+    var that = this;
+    // create the divs
+    $w("top header body buttons footer bottom").each(function(name) {
+      eval("var " + name + "_div = that." + name + "_div = that.calendar_div.build('div', { className: 'cds_"+name+"' }, { clear: 'left'} ); ");
+    });
+
+    this.initHeaderDiv();
+    this.initButtonsDiv();
+    this.initCalendarGrid();
+    this.updateFooter("&amp;#160;");
+
+    this.refresh();
+    this.setUseTime(this.use_time);
+  },
+  initHeaderDiv: function() {
+    var header_div = this.header_div;
+    this.close_button = header_div.build("a", { innerHTML: "x", href:"#", onclick:function () { this.close(); return false; }.bindAsEventListener(this), className: "close" });
+    this.next_month_button = header_div.build("a", { innerHTML: "&amp;gt;", href:"#", onclick:function () { this.navMonth(this.date.getMonth() + 1 ); return false; }.bindAsEventListener(this), className: "next" });
+    this.prev_month_button = header_div.build("a", { innerHTML: "&amp;lt;", href:"#", onclick:function () { this.navMonth(this.date.getMonth() - 1 ); return false; }.bindAsEventListener(this), className: "prev" });
+
+    if (this.options.get("month_year")=="dropdowns") {
+      this.month_select = new SelectBox(header_div, $R(0,11).map(function(m){return [Date.months[m], m]}), {className: "month", onchange: function () { this.navMonth(this.month_select.getValue()) }.bindAsEventListener(this)});
+      this.year_select = new SelectBox(header_div, [], {className: "year", onchange: function () { this.navYear(this.year_select.getValue()) }.bindAsEventListener(this)});
+      this.populateYearRange();
+    } else {
+      this.month_year_label = header_div.build("span")
+    }
+  },
+  initCalendarGrid: function() {
+    var body_div = this.body_div;
+    this.calendar_day_grid = [];
+    var days_table = body_div.build("table", { cellPadding: "0px", cellSpacing: "0px", width: "100%" })
+    // make the weekdays!
+    var weekdays_row = days_table.build("thead").build("tr");
+    Date.weekdays.each( function(weekday) { 
+      weekdays_row.build("th", {innerHTML: weekday});
+    });
+
+    var days_tbody = days_table.build("tbody")
+    // Make the days!
+    var row_number = 0, weekday;
+    for(var cell_index = 0; cell_index&lt;42; cell_index++)
+    {
+      weekday = (cell_index+Date.first_day_of_week ) % 7;
+      if ( cell_index % 7==0 ) days_row = days_tbody.build("tr", {className: 'row_'+row_number++});
+      (this.calendar_day_grid[cell_index] = days_row.build("td", {
+          calendar_date_select: this,
+          onmouseover: function () { this.calendar_date_select.dayHover(this); },
+          onmouseout: function () { this.calendar_date_select.dayHoverOut(this) },
+          onclick: function() { this.calendar_date_select.updateSelectedDate(this, true); },
+          className: (weekday==0) || (weekday==6) ? " weekend" : "" //clear the class
+        },
+        { cursor: "pointer" }
+      )).build("div");
+      this.calendar_day_grid[cell_index];
+    }
+  },
+  initButtonsDiv: function() {
+    var buttons_div = this.buttons_div;
+    if (this.options.get("time")) {
+      var blank_time = $A(this.options.get("time")=="mixed" ? [[" - ", ""]] : []);
+      buttons_div.build("span", {innerHTML:"@", className: "at_sign"});
+
+      var t = new Date();
+      this.hour_select = new SelectBox(buttons_div,
+        blank_time.concat($R(0,23).map(function(x) {t.setHours(x); return $A([t.getAMPMHour()+ " " + t.getAMPM(),x])} )),
+        {
+          calendar_date_select: this,
+          onchange: function() { this.calendar_date_select.updateSelectedDate( { hour: this.value });},
+          className: "hour"
+        }
+      );
+      buttons_div.build("span", {innerHTML:":", className: "seperator"});
+      var that = this;
+      this.minute_select = new SelectBox(buttons_div,
+        blank_time.concat($R(0,59).select(function(x){return (x % that.options.get('minute_interval')==0)}).map(function(x){ return $A([ Date.padded2(x), x]); } ) ),
+        { 
+          calendar_date_select: this,
+          onchange: function() { this.calendar_date_select.updateSelectedDate( {minute: this.value }) },
+          className: "minute"
+        }
+      );
+
+    } else if (!this.options.get("buttons")) {
+      buttons_div.remove();
+    }
+
+    if (this.options.get("buttons")) {
+      buttons_div.build("span", {innerHTML: "&amp;#160;"});
+      if (this.options.get("time") == "mixed" || !this.options.get("time")) {
+        b = buttons_div.build("a", {
+          innerHTML: _translations["Today"],
+          href: "#",
+          onclick: function() {this.today(false); return false;}.bindAsEventListener(this)
+        });
+      }
+
+      if (this.options.get("time") == "mixed") {
+        buttons_div.build("span", {innerHTML: "&amp;#160;|&amp;#160;", className:"button_seperator"});
+      }
+
+      if (this.options.get("time")) {
+        b = buttons_div.build("a", {
+          innerHTML: _translations["Now"],
+          href: "#",
+          onclick: function() {
+            this.today(true);
+            return false;
+          }.bindAsEventListener(this)
+        });
+      }
+
+      if (!this.options.get("embedded") &amp;&amp; !this.closeOnClick()) {
+        buttons_div.build("span", {innerHTML: "&amp;#160;|&amp;#160;", className:"button_seperator"})
+        buttons_div.build("a", {
+          innerHTML: _translations["OK"],
+          href: "#",
+          onclick: function() {
+            this.close();
+            return false;
+          }.bindAsEventListener(this)
+        });
+      }
+      if (this.options.get('clear_button')) {
+        buttons_div.build("span", {innerHTML: "&amp;#160;|&amp;#160;", className:"button_seperator"})
+        buttons_div.build("a", {
+          innerHTML: _translations["Clear"],
+          href: "#",
+          onclick: function() {
+            this.clearDate();
+            if (!this.options.get("embedded")) {
+              this.close();
+            }
+            return false;
+          }.bindAsEventListener(this)
+        });
+      }
+    }
+  },
+  refresh: function () {
+    this.refreshMonthYear();
+    this.refreshCalendarGrid();
+
+    this.setSelectedClass();
+    this.updateFooter();
+  },
+  refreshCalendarGrid: function () {
+    this.beginning_date = new Date(this.date).stripTime();
+    this.beginning_date.setDate(1);
+    this.beginning_date.setHours(12); // Prevent daylight savings time boundaries from showing a duplicate day
+    var pre_days = this.beginning_date.getDay() // draw some days before the fact
+    if (pre_days &lt; 3) pre_days += 7;
+    this.beginning_date.setDate(1 - pre_days + Date.first_day_of_week);
+
+    var iterator = new Date(this.beginning_date);
+
+    var today = new Date().stripTime();
+    var this_month = this.date.getMonth();
+    vdc = this.options.get("valid_date_check");
+    for (var cell_index = 0;cell_index&lt;42; cell_index++) {
+      day = iterator.getDate(); month = iterator.getMonth();
+      cell = this.calendar_day_grid[cell_index];
+      Element.remove(cell.childNodes[0]); div = cell.build("div", {innerHTML:day});
+      if (month!=this_month) div.className = "other";
+      cell.day = day; cell.month = month; cell.year = iterator.getFullYear();
+      if (vdc) { if (vdc(iterator.stripTime())) cell.removeClassName("disabled"); else cell.addClassName("disabled") };
+      iterator.setDate( day + 1);
+    }
+
+    if (this.today_cell) this.today_cell.removeClassName("today");
+
+    if ( $R( 0, 41 ).include(days_until = this.beginning_date.stripTime().daysDistance(today)) ) {
+      this.today_cell = this.calendar_day_grid[days_until];
+      this.today_cell.addClassName("today");
+    }
+  },
+  refreshMonthYear: function() {
+    var m = this.date.getMonth();
+    var y = this.date.getFullYear();
+    // set the month
+    if (this.options.get("month_year") == "dropdowns") {
+      this.month_select.setValue(m, false);
+
+      var e = this.year_select.element; 
+      if (this.flexibleYearRange() &amp;&amp; (!(this.year_select.setValue(y, false)) || e.selectedIndex &lt;= 1 || e.selectedIndex &gt;= e.options.length - 2 )) this.populateYearRange();
+
+      this.year_select.setValue(y);
+    } else {
+      this.month_year_label.update().insert(Date.months[m] + " " + y.toString());
+    }
+  },
+  populateYearRange: function() {
+    this.year_select.populate(this.yearRange().toArray());
+  },
+  yearRange: function() {
+    if (!this.flexibleYearRange()) {
+      return $R(this.options.get("year_range")[0], this.options.get("year_range")[1]);
+    }
+
+    var y = this.date.getFullYear();
+    return $R(y - this.options.get("year_range"), y + this.options.get("year_range"));
+  },
+  flexibleYearRange: function() {
+    return (typeof(this.options.get("year_range")) == "number");
+  },
+  validYear: function(year) {
+    if (this.flexibleYearRange()) {
+      return true;
+    } else {
+      return this.yearRange().include(year);
+    }
+  },
+  dayHover: function(element) {
+    var hover_date = new Date(this.selected_date);
+    hover_date.setFullYear(element.year, element.month, element.day);
+    this.updateFooter(this.formatter.format(hover_date));
+  },
+  dayHoverOut: function(element) {
+    this.updateFooter();
+  },
+  clearSelectedClass: function() {
+    if (this.selected_cell) {
+      this.selected_cell.removeClassName("selected");
+    }
+  },
+  setSelectedClass: function() {
+    if (!this.selection_made) return;
+    this.clearSelectedClass()
+    if ($R(0,42).include( days_until = this.beginning_date.stripTime().daysDistance(this.selected_date.stripTime()) )) {
+      this.selected_cell = this.calendar_day_grid[days_until];
+      this.selected_cell.addClassName("selected");
+    }
+  },
+  reparse: function() {
+    this.parseDate();
+    this.refresh();
+  },
+  dateString: function() {
+    return (this.selection_made) ? this.formatter.format(this.selected_date) : "&amp;#160;";
+  },
+  parseDate: function() {
+    var value = $F(this.target_element).strip()
+    var default_time = this.options.get("default_time");
+    this.selection_made = (value != "" || default_time);
+    this.date = value=="" ? NaN : this.formatter.parse(this.options.get("date") || value);
+    if (isNaN(this.date) &amp;&amp; !default_time)
+        this.date = new Date();
+    else if (isNaN(this.date) &amp;&amp; default_time)
+        this.date = (Object.prototype.toString.apply(default_time) === '[object Function]') ? default_time() : default_time;
+
+    if (!this.validYear(this.date.getFullYear())) this.date.setYear( (this.date.getFullYear() &lt; this.yearRange().start) ? this.yearRange().start : this.yearRange().end);
+    this.selected_date = new Date(this.date);
+    this.use_time = /[0-9]:[0-9]{2}/.exec(value) ? true : false;
+    this.date.setDate(1);
+  },
+  updateFooter:function(text) {
+    if (!text) {
+      text = this.dateString();
+    }
+    this.footer_div.purgeChildren();
+    this.footer_div.build("span", {innerHTML: text});
+  },
+  clearDate:function() {
+    if ((this.target_element.disabled || this.target_element.readOnly) &amp;&amp; this.options.get("popup") != "force") return false;
+    var last_value = this.target_element.value;
+    this.target_element.value = "";
+    this.clearSelectedClass();
+    this.updateFooter('&amp;#160;');
+    if (last_value!=this.target_element.value) this.callback("onchange");
+  },
+  updateSelectedDate:function(partsOrElement, via_click) {
+    var parts = $H(partsOrElement);
+    if ((this.target_element.disabled || this.target_element.readOnly) &amp;&amp; this.options.get("popup") != "force") return false;
+    if (parts.get("day")) {
+      var t_selected_date = this.selected_date, vdc = this.options.get("valid_date_check");
+      t_selected_date.setFullYear(parts.get("year"), parts.get("month"), parts.get("day"));
+
+      if (vdc &amp;&amp; ! vdc(t_selected_date.stripTime())) { return false; }
+      this.selected_date = t_selected_date;
+      this.selection_made = true;
+    }
+
+    if (!isNaN(parts.get("hour"))) this.selected_date.setHours(parts.get("hour"));
+    if (!isNaN(parts.get("minute"))) this.selected_date.setMinutes( Math.floor_to_interval(parts.get("minute"), this.options.get("minute_interval")) );
+    if (parts.get("hour") === "" || parts.get("minute") === "")
+      this.setUseTime(false);
+    else if (!isNaN(parts.get("hour")) || !isNaN(parts.get("minute")))
+      this.setUseTime(true);
+
+    this.updateFooter();
+    this.setSelectedClass();
+
+    if (this.selection_made) this.updateValue();
+    if (this.closeOnClick()) { this.close(); }
+    if (via_click &amp;&amp; !this.options.get("embedded")) {
+      if ((new Date() - this.last_click_at) &lt; 333) this.close();
+      this.last_click_at = new Date();
+    }
+  },
+  closeOnClick: function() {
+    if (this.options.get("embedded")) return false;
+    if (this.options.get("close_on_click")===nil )
+      return (this.options.get("time")) ? false : true
+    else
+      return (this.options.get("close_on_click"))
+  },
+  navMonth: function(month) {
+    (target_date = new Date(this.date)).setMonth(month);
+    return (this.navTo(target_date));
+  },
+  navYear: function(year) {
+    (target_date = new Date(this.date)).setYear(year);
+    return (this.navTo(target_date));
+  },
+  navTo: function(date) {
+    if (!this.validYear(date.getFullYear())) return false;
+    this.date = date;
+    this.date.setDate(1);
+    this.refresh();
+    this.callback("after_navigate", this.date);
+    return true;
+  },
+  setUseTime: function(turn_on) {
+    this.use_time = this.options.get("time") &amp;&amp; (this.options.get("time")=="mixed" ? turn_on : true) // force use_time to true if time==true &amp;&amp; time!="mixed"
+    if (this.use_time &amp;&amp; this.selected_date) { // only set hour/minute if a date is already selected
+      var minute = Math.floor_to_interval(this.selected_date.getMinutes(), this.options.get("minute_interval"));
+      var hour = this.selected_date.getHours();
+
+      this.hour_select.setValue(hour);
+      this.minute_select.setValue(minute)
+    } else if (this.options.get("time")=="mixed") {
+      this.hour_select.setValue(""); this.minute_select.setValue("");
+    }
+  },
+  updateValue: function() {
+    var last_value = this.target_element.value;
+    this.target_element.value = this.dateString();
+    if (last_value!=this.target_element.value) this.callback("onchange");
+  },
+  today: function(now) {
+    var d = new Date(); this.date = new Date();
+    var o = $H({ day: d.getDate(), month: d.getMonth(), year: d.getFullYear(), hour: d.getHours(), minute: d.getMinutes()});
+    if ( ! now ) o = o.merge({hour: "", minute:""});
+    this.updateSelectedDate(o, true);
+    this.refresh();
+  },
+  close: function() {
+    if (this.closed) return false;
+    this.callback("before_close");
+    this.target_element.calendar_date_select = nil;
+    Event.stopObserving(document, "mousedown", this.closeIfClickedOut_handler);
+    Event.stopObserving(document, "keypress", this.keyPress_handler);
+    this.calendar_div.remove(); this.closed = true;
+    if (this.iframe) this.iframe.remove();
+    if (this.target_element.type != "hidden" &amp;&amp; ! this.target_element.disabled) this.target_element.focus();
+    this.callback("after_close");
+  },
+  closeIfClickedOut: function(event) {
+    var target = event.element();
+    if (target != this.target_element &amp;&amp; !target.descendantOf(this.calendar_div)) {
+      this.close();
+    }
+  },
+  keyPress: function(e) {
+    if (e.keyCode==Event.KEY_ESC) this.close();
+  },
+  callback: function(name, param) {
+    if (this.options.get(name)) {
+      this.options.get(name).bind(this.target_element)(param);
+    }
+  }
+}
+
+return Externals;
+}(Externals || {}));</code>
+</property>
+<property>
+<name>CalendarDateSelect Widget</name>
+</property>
+<property>
+<parse>0</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.Date</name>
+<number>2</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>a5dfb5b9-76d3-45b6-b5e8-039f3e310cf2</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>/**
+ * Copyright 2007 Tim Down.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * simpledateformat.js
+ *
+ * A faithful JavaScript implementation of Java's SimpleDateFormat's format
+ * method. All pattern layouts present in the Java implementation are
+ * implemented here except for z, the text version of the date's time zone.
+ *
+ * Thanks to Ash Searle (http://hexmen.com/blog/) for his fix to my
+ * misinterpretation of pattern letters h and k.
+ * 
+ * See the official Sun documentation for the Java version:
+ * http://java.sun.com/j2se/1.5.0/docs/api/java/text/SimpleDateFormat.html
+ *
+ * Author: Tim Down &lt;tim@timdown.co.uk&gt;
+ * Last modified: 6/2/2007
+ * Website: http://www.timdown.co.uk/code/simpledateformat.php
+ */
+
+/* ------------------------------------------------------------------------- */
+
+var Externals = (function (Externals) {
+
+  function isUndefined(obj) {
+    return typeof obj == "undefined";
+  }
+
+  var regex = /('[^']*')|(G+|y+|M+|w+|W+|D+|d+|F+|E+|a+|H+|k+|K+|h+|m+|s+|S+|Z+)|([a-zA-Z]+)|([^a-zA-Z']+)/;
+  var monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
+  var dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  var TEXT2 = 0, TEXT3 = 1, NUMBER = 2, YEAR = 3, MONTH = 4, TIMEZONE = 5;
+  var types = {
+    G : TEXT2,
+    y : YEAR,
+    M : MONTH,
+    w : NUMBER,
+    W : NUMBER,
+    D : NUMBER,
+    d : NUMBER,
+    F : NUMBER,
+    E : TEXT3,
+    a : TEXT2,
+    H : NUMBER,
+    k : NUMBER,
+    K : NUMBER,
+    h : NUMBER,
+    m : NUMBER,
+    s : NUMBER,
+    S : NUMBER,
+    Z : TIMEZONE
+  };
+  var ONE_DAY = 24 * 60 * 60 * 1000;
+  var ONE_WEEK = 7 * ONE_DAY;
+  var DEFAULT_MINIMAL_DAYS_IN_FIRST_WEEK = 1;
+
+  var newDateAtMidnight = function(year, month, day) {
+    var d = new Date(year, month, day, 0, 0, 0);
+    d.setMilliseconds(0);
+    return d;
+  }
+
+  Date.prototype.getDifference = function(date) {
+    return this.getTime() - date.getTime();
+  };
+
+  Date.prototype.isBefore = function(d) {
+    return this.getTime() &lt; d.getTime();
+  };
+
+  Date.prototype.getUTCTime = function() {
+    return Date.UTC(this.getFullYear(), this.getMonth(), this.getDate(), this.getHours(), this.getMinutes(),
+        this.getSeconds(), this.getMilliseconds());
+  };
+
+  Date.prototype.getTimeSince = function(d) {
+    return this.getUTCTime() - d.getUTCTime();
+  };
+
+  Date.prototype.getPreviousSunday = function() {
+    // Using midday avoids any possibility of DST messing things up
+    var midday = new Date(this.getFullYear(), this.getMonth(), this.getDate(), 12, 0, 0);
+    var previousSunday = new Date(midday.getTime() - this.getDay() * ONE_DAY);
+    return newDateAtMidnight(previousSunday.getFullYear(), previousSunday.getMonth(),
+        previousSunday.getDate());
+  }
+
+  Date.prototype.getWeekInYear = function(minimalDaysInFirstWeek) {
+    if (isUndefined(this.minimalDaysInFirstWeek)) {
+      minimalDaysInFirstWeek = DEFAULT_MINIMAL_DAYS_IN_FIRST_WEEK;
+    }
+    var previousSunday = this.getPreviousSunday();
+    var startOfYear = newDateAtMidnight(this.getFullYear(), 0, 1);
+    var numberOfSundays = previousSunday.isBefore(startOfYear) ?
+      0 : 1 + Math.floor(previousSunday.getTimeSince(startOfYear) / ONE_WEEK);
+    var numberOfDaysInFirstWeek =  7 - startOfYear.getDay();
+    var weekInYear = numberOfSundays;
+    if (numberOfDaysInFirstWeek &lt; minimalDaysInFirstWeek) {
+      weekInYear--;
+    }
+    return weekInYear;
+  };
+
+  Date.prototype.getWeekInMonth = function(minimalDaysInFirstWeek) {
+    if (isUndefined(this.minimalDaysInFirstWeek)) {
+      minimalDaysInFirstWeek = DEFAULT_MINIMAL_DAYS_IN_FIRST_WEEK;
+    }
+    var previousSunday = this.getPreviousSunday();
+    var startOfMonth = newDateAtMidnight(this.getFullYear(), this.getMonth(), 1);
+    var numberOfSundays = previousSunday.isBefore(startOfMonth) ?
+      0 : 1 + Math.floor((previousSunday.getTimeSince(startOfMonth)) / ONE_WEEK);
+    var numberOfDaysInFirstWeek =  7 - startOfMonth.getDay();
+    var weekInMonth = numberOfSundays;
+    if (numberOfDaysInFirstWeek &gt;= minimalDaysInFirstWeek) {
+      weekInMonth++;
+    }
+    return weekInMonth;
+  };
+
+  Date.prototype.getDayInYear = function() {
+    var startOfYear = newDateAtMidnight(this.getFullYear(), 0, 1);
+    return 1 + Math.floor(this.getTimeSince(startOfYear) / ONE_DAY);
+  };
+
+  /* ----------------------------------------------------------------- */
+
+  Externals.SimpleDateFormat = function(formatString) {
+    this.formatString = formatString;
+  };
+
+  /**
+   * Sets the minimum number of days in a week in order for that week to
+   * be considered as belonging to a particular month or year
+   */
+  Externals.SimpleDateFormat.prototype.setMinimalDaysInFirstWeek = function(days) {
+    this.minimalDaysInFirstWeek = days;
+  };
+
+  Externals.SimpleDateFormat.prototype.getMinimalDaysInFirstWeek = function(days) {
+    return isUndefined(this.minimalDaysInFirstWeek)  ?
+      DEFAULT_MINIMAL_DAYS_IN_FIRST_WEEK : this.minimalDaysInFirstWeek;
+  };
+
+  Externals.SimpleDateFormat.prototype.format = function(date) {
+    var formattedString = "";
+    var result;
+
+    var padWithZeroes = function(str, len) {
+      while (str.length &lt; len) {
+        str = "0" + str;
+      }
+      return str;
+    };
+
+    var formatText = function(data, numberOfLetters, minLength) {
+      return (numberOfLetters &gt;= 4) ? data : data.substr(0, Math.max(minLength, numberOfLetters));
+    };
+
+    var formatNumber = function(data, numberOfLetters) {
+      var dataString = "" + data;
+      // Pad with 0s as necessary
+      return padWithZeroes(dataString, numberOfLetters);
+    };
+
+    var searchString = this.formatString;
+    while ((result = regex.exec(searchString))) {
+      var matchedString = result[0];
+      var quotedString = result[1];
+      var patternLetters = result[2];
+      var otherLetters = result[3];
+      var otherCharacters = result[4];
+
+      // If the pattern matched is quoted string, output the text between the quotes
+      if (quotedString) {
+        if (quotedString == "''") {
+          formattedString += "'";
+        } else {
+          formattedString += quotedString.substring(1, quotedString.length - 1);
+        }
+      } else if (otherLetters) {
+        // Swallow non-pattern letters by doing nothing here
+      } else if (otherCharacters) {
+        // Simply output other characters
+        formattedString += otherCharacters;
+      } else if (patternLetters) {
+        // Replace pattern letters
+        var patternLetter = patternLetters.charAt(0);
+        var numberOfLetters = patternLetters.length;
+        var rawData = "";
+        switch (patternLetter) {
+          case "G":
+            rawData = "AD";
+            break;
+          case "y":
+            rawData = date.getFullYear();
+            break;
+          case "M":
+            rawData = date.getMonth();
+            break;
+          case "w":
+            rawData = date.getWeekInYear(this.getMinimalDaysInFirstWeek());
+            break;
+          case "W":
+            rawData = date.getWeekInMonth(this.getMinimalDaysInFirstWeek());
+            break;
+          case "D":
+            rawData = date.getDayInYear();
+            break;
+          case "d":
+            rawData = date.getDate();
+            break;
+          case "F":
+            rawData = 1 + Math.floor((date.getDate() - 1) / 7);
+            break;
+          case "E":
+            rawData = dayNames[date.getDay()];
+            break;
+          case "a":
+            rawData = (date.getHours() &gt;= 12) ? "PM" : "AM";
+            break;
+          case "H":
+            rawData = date.getHours();
+            break;
+          case "k":
+            rawData = date.getHours() || 24;
+            break;
+          case "K":
+            rawData = date.getHours() % 12;
+            break;
+          case "h":
+            rawData = (date.getHours() % 12) || 12;
+            break;
+          case "m":
+            rawData = date.getMinutes();
+            break;
+          case "s":
+            rawData = date.getSeconds();
+            break;
+          case "S":
+            rawData = date.getMilliseconds();
+            break;
+          case "Z":
+            rawData = date.getTimezoneOffset(); // This is returns the number of minutes since GMT was this time.
+            break;
+        }
+        // Format the raw data depending on the type
+        switch (types[patternLetter]) {
+          case TEXT2:
+            formattedString += formatText(rawData, numberOfLetters, 2);
+            break;
+          case TEXT3:
+            formattedString += formatText(rawData, numberOfLetters, 3);
+            break;
+          case NUMBER:
+            formattedString += formatNumber(rawData, numberOfLetters);
+            break;
+          case YEAR:
+            if (numberOfLetters &lt;= 3) {
+              // Output a 2-digit year
+              var dataString = "" + rawData;
+              formattedString += dataString.substr(2, 2);
+            } else {
+              formattedString += formatNumber(rawData, numberOfLetters);
+            }
+            break;
+          case MONTH:
+            if (numberOfLetters &gt;= 3) {
+              formattedString += formatText(monthNames[rawData], numberOfLetters, numberOfLetters);
+            } else {
+              // NB. Months returned by getMonth are zero-based
+              formattedString += formatNumber(rawData + 1, numberOfLetters);
+            }
+            break;
+          case TIMEZONE:
+            var isPositive = (rawData &gt; 0);
+            // The following line looks like a mistake but isn't
+            // because of the way getTimezoneOffset measures.
+            var prefix = isPositive ? "-" : "+";
+            var absData = Math.abs(rawData);
+
+            // Hours
+            var hours = "" + Math.floor(absData / 60);
+            hours = padWithZeroes(hours, 2);
+            // Minutes
+            var minutes = "" + (absData % 60);
+            minutes = padWithZeroes(minutes, 2);
+
+            formattedString += prefix + hours + minutes;
+            break;
+        }
+      }
+      searchString = searchString.substr(result.index + result[0].length);
+    }
+    return formattedString;
+  };
+
+return Externals;
+}(Externals || {}));</code>
+</property>
+<property>
+<name>SimpleDateFormat</name>
+</property>
+<property>
+<parse>0</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.Date</name>
+<number>3</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>617d28b0-cbe1-47bc-b22c-19e11d2d090c</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+
+/**
+ * Enhances a date-time field with the ability to pick the date and time from a Gregorian calendar widget.
+ */
+XWiki.DateTimePicker = Class.create({
+  timeStampClassNamePattern : /^t\d+$/,
+  initialize : function(input, format) {
+    this.input = $(input);
+    this.input.writeAttribute('autocomplete', 'off');
+    var trigger = this._trigger.bindAsEventListener(this);
+    this.input.observe('focus', trigger).observe('click', trigger);
+
+    this.formatter = new Externals.SimpleDateFormat(format);
+    this.timePickerEnabled = this._isTimePickerEnabled();
+  },
+  _isTimePickerEnabled : function() {
+    var formattedDate = this.formatter.format(new Date(1876, 1, 1, 23, 59, 0, 0));
+    return formattedDate.indexOf('23') &gt;= 0 &amp;&amp; formattedDate.indexOf('59') &gt;= 0;
+  },
+  _getDate : function() {
+    if (!this.input._timestamp) {
+      var classNames = $w(this.input.className);
+      this.input._timestamp = new Date().getTime();
+      for(var i = 0; i &lt; classNames.length; i++) {
+        if (this.timeStampClassNamePattern.test(classNames[i])) {
+          this.input._timestamp = parseInt(classNames[i].substring(1));
+        }
+      }
+    }
+    return new Date(this.input._timestamp);
+  },
+  _trigger : function(event) {
+    if (!this.input.calendar_date_select &amp;&amp; !this.input.calendar_date_select_closing) {
+      new Externals.CalendarDateSelect(this.input, {
+        time: this.timePickerEnabled,
+        date: this._getDate(),
+        clear_button: false,
+        formatter: this,
+        before_close: function() {
+          this.calendar_date_select_closing = true;
+          if (this.calendar_date_select.selection_made) {
+            // Store the timestamp of the selected date so that we don't have to parse the input value when the picker is redisplayed.
+            event.element()._timestamp = this.calendar_date_select.selected_date.getTime();
+          }
+        },
+        after_close: function() {
+          this.calendar_date_select_closing = undefined;
+        }
+      });
+    }
+  },
+  format : function(date) {
+    return this.formatter.format(date);
+  },
+  parse : function(string) {
+    return new Date(string);
+  }
+});
+
+function enhanceEmptyIsToday(field) {
+  var emptyIsToday = $(field.getPropertyId('emptyIsToday'));
+  if (emptyIsToday.type == 'text') {
+    emptyIsToday.type = 'checkbox';
+    emptyIsToday.checked = emptyIsToday.value == '1';
+    emptyIsToday.value = '1';
+    var dd = emptyIsToday.up('dd');
+    dd.previous('dt').down('label').insert({top: emptyIsToday});
+    dd.remove();
+    emptyIsToday.insert({after: new Element('input', {type: 'hidden', value: '0', name: emptyIsToday.name})});
+  }
+}
+function enhanceDateFormat(field) {
+  var dateFormatInput = $(field.getPropertyId('dateFormat'));
+  if (dateFormatInput.type == 'text') {
+    // TODO
+  }
+}
+function enhanceDefaultValue(field) {
+  field.getViewer().select('input[type=text]').each(function(input) {
+    if (input.name.endsWith('_0_' + field.getName())) {
+      new XWiki.DateTimePicker(input, $(field.getPropertyId('dateFormat')).value);
+    }
+  });
+}
+function isDateField(field) {
+  return $('template-' + field.getName()).value == '$escapetool.javascript($doc.fullName)';
+}
+function maybeEnhanceField(field) {
+  if (isDateField(field)) {
+    enhanceEmptyIsToday(field);
+    enhanceDateFormat(field);
+    enhanceDefaultValue(field);
+  }
+}
+function init() {
+  document.observe('xwiki:class:displayField', function(event) {
+    maybeEnhanceField(event.memo.field);
+  });
+  document.observe('xwiki:class:previewField', function(event) {
+    var field = event.memo.field;
+    if (isDateField(field)) {
+      enhanceDefaultValue(field);
+    }
+  });
+  // This is needed in case this script is loaded asynchronously.
+  var fields = $('fields');
+  if (fields) {
+    fields.childElements().each(function(item) {
+      var field = new XWiki.FormField(item);
+      if (field.getConfig()) {
+        maybeEnhanceField(field);
+      }
+    });
+  }
+
+  var inlineForm = $('inline');
+  if (inlineForm) {
+    inlineForm.select('input.datetime').each(function(dateTimeInput) {
+      new XWiki.DateTimePicker(dateTimeInput, dateTimeInput.title);
+    });
+  }
+
+  return true;
+}
+(XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));</code>
+</property>
+<property>
+<name>DateManager</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.Date</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>3a15284d-a337-4e66-a5ca-7c540429abdc</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>/**
+ * This is the plain style sheet for CalendarDateSelect widget, adapted to use XWiki's color theme mechanism.
+ * See https://github.com/timcharper/calendar_date_select/blob/master/public/stylesheets/calendar_date_select/plain.css
+ */
+#template('colorThemeInit.vm')
+.calendar_date_select {
+  background-color: $theme.pageContentBackgroundColor;
+  border: 1px solid $theme.borderColor;
+  width: 195px;
+  z-index: 1000;
+}
+/* This is a fun ie6 hack to get drop downs to stay behind the popup window. This should always be just underneath .calendar_date_select */
+iframe.ie6_blocker {
+  position: absolute;
+  z-index: 999;
+}
+
+.calendar_date_select thead th {
+}
+
+.calendar_date_select .cds_buttons {
+  padding: 0.4em 0;
+  text-align: center;
+}
+
+.calendar_date_select .cds_footer {
+  font-size: smaller;
+  padding: 0.2em;
+  text-align: center;
+}
+
+.calendar_date_select table {
+  font-size: 90%;
+  margin: 0;
+  padding: 0;
+}
+
+.calendar_date_select .cds_header {
+  text-align: center;
+}
+
+.calendar_date_select .cds_header span {
+  font-weight: bolder;
+  line-height: 20px;
+}
+
+.calendar_date_select .cds_header a {
+  color: $theme.textColor !important;
+  font-size: 1.1em;
+  font-weight: bolder;
+  height: 20px;
+  line-height: 20px;
+  text-decoration: none;
+  width: 22px;
+}
+
+.calendar_date_select .cds_header a.prev {
+  float:left;
+}
+.calendar_date_select .cds_header a.next {
+  float:right;
+}
+.calendar_date_select .cds_header a.close {
+  float:right;
+  display:none;
+}
+
+.calendar_date_select select {
+  font-size: smaller;
+}
+.calendar_date_select .cds_header select {
+  border: 0;
+  vertical-align: middle;
+}
+
+.calendar_date_select .cds_header select.month {
+  width: 90px;
+}
+
+.calendar_date_select .cds_header select.year {
+  width: 61px;
+}
+
+.calendar_date_select .cds_buttons a {
+  color: $theme.textColor;
+  font-size: xx-small;
+}
+
+.calendar_date_select td {
+  height: 21px;
+  text-align: center;
+  vertical-align: middle;
+  width: 24px;
+}
+
+.calendar_date_select th {
+  padding: 0.2em 0;
+  text-align: center;
+}
+
+.calendar_date_select td.weekend {
+}
+
+.calendar_date_select td div.other {
+  color: $theme.textSecondaryColor;
+}
+
+.calendar_date_select td.selected div {
+  color: $theme.panelHeaderTextColor;
+}
+
+.calendar_date_select td.selected {
+  background-color: $theme.panelHeaderBackgroundColor !important;
+}
+
+.calendar_date_select td:hover {
+  background-color: $theme.highlightColor;
+}
+
+.calendar_date_select td.today {
+  background-color: $theme.backgroundSecondaryColor;
+}
+
+.calendar_date_select td.disabled div {
+  color: $theme.textSecondaryColor;
+  opacity: 0.4;
+}
+
+.fieldWithErrors .calendar_date_select {
+  border: 2px solid $theme.notificationErrorColor;
+}</code>
+</property>
+<property>
+<name>CalendarDateSelect Widget</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<content>{{velocity}}
+{{html clean="false"}}
+#set($field = $object.getxWikiClass().get($name))
+#set($format = $field.getProperty('dateFormat').value)
+#set($formattedValue = $escapetool.xml($datetool.format($format, $value)))
+#if($type == 'edit')
+  #set($discard = $xwiki.jsx.use('AppWithinMinutes.Date'))
+  #set($discard = $xwiki.ssx.use('AppWithinMinutes.Date'))
+  #set($id = $escapetool.xml("${prefix}${name}"))
+    &lt;input type="text" id="$!id" name="$!id" class="datetime t$!value.time" value="$!formattedValue" title="$!escapetool.xml($format)"/&gt;
+#else
+  $!formattedValue
+#end
+{{/html}}
+{{/velocity}}</content></xwikidoc>

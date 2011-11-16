@@ -123,9 +123,14 @@ public abstract class AbstractExtension implements Extension
 
         setFeatures(extension.getFeatures());
 
+        setName(extension.getName());
         setDescription(extension.getDescription());
         setAuthors(extension.getAuthors());
         setWebsite(extension.getWebSite());
+        if (extension.getLicenses() != null && !extension.getLicenses().isEmpty()) {
+            setLicenses(extension.getLicenses());
+        }
+        setSummary(extension.getSummary());
 
         List< ? extends ExtensionDependency> newDependencies = extension.getDependencies();
         if (!newDependencies.isEmpty()) {
@@ -210,7 +215,7 @@ public abstract class AbstractExtension implements Extension
     /**
      * @param licenses the licenses of the extension
      */
-    public void setLicense(Collection<ExtensionLicense> licenses)
+    public void setLicenses(Collection<ExtensionLicense> licenses)
     {
         this.licenses = new ArrayList<ExtensionLicense>(licenses);
     }

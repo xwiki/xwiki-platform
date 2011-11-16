@@ -1,4 +1,4 @@
-#set ($WikiManager = $xwiki.wikimanager)
+#set ($WikiManager = $services.wikimanager)
 #set ($Exception = $WikiManager.DefaultException)
 ##
 #set ($action = $request.getParameter("action"))

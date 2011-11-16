@@ -142,7 +142,442 @@
 <priority>4</priority>
 </property>
 <property>
-<properties>displayType multiSelect values</properties>
+<properties>displayType size values sort multiSelect</properties>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.StaticList</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>3d4a5074-49f3-4462-a006-15f6902c9bd1</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+
+/**
+ * Supports the following operations on a static list of (key, value) pairs: reorder/add/remove/edit.
+ */
+XWiki.StaticListEditor = Class.create({
+  initialize : function() {
+    this.container = new Element('div', {'class': 'staticListEditor'}).update('&lt;ul&gt;&lt;/ul&gt;&lt;div class="inputLine"&gt;&lt;div class="first half"&gt;&lt;span class="xHint"&gt;Value&lt;/span&gt;&lt;input type="text"/&gt;&lt;/div&gt;&lt;div class="second half"&gt;&lt;span class="xHint"&gt;ID&lt;/span&gt;&lt;input type="text"/&gt;&lt;/div&gt;&lt;/div&gt;&lt;input type="image" class="add" title="Add" src="$xwiki.getSkinFile('icons/silk/add.gif')" alt="Add"/&gt;');
+    this.keyInput = this.container.down('.second').down('input');
+    this.valueInput = this.container.down('.first').down('input');
+    this._deleteHandler = this._onDelete.bindAsEventListener(this);
+    this._selectHandler = this._onSelect.bindAsEventListener(this);
+    this.container.down('.add').observe('click', this._onAdd.bindAsEventListener(this));
+  },
+  getContainer : function() {
+    return this.container;
+  },
+  put : function(key, value) {
+    if (value == undefined || value == '') {
+      return;
+    }
+    key = key || value;
+    var item = this._getItem(key);
+    if (!item) {
+      item = new Element('li').update('&lt;span&gt;__value__&lt;/span&gt;&lt;span title="Delete" class="delete"&gt;X&lt;/span&gt;');
+      item.key = key;
+      item.down().observe('mousedown', this._selectHandler);
+      item.down('.delete').observe('click', this._deleteHandler);
+      var list = this.container.down('ul');
+      list.insert(item);
+      Sortable.create(list, {overlap: 'horizontal', constraint: 'horizontal'});
+    }
+    var valueContainer = item.down();
+    valueContainer.title = key != value ? key : '';
+    valueContainer.firstChild.nodeValue = value;
+  },
+  each : function(visitor) {
+    this.container.select('li').each(function(item) {
+      visitor({key: item.key, value: item.down().firstChild.nodeValue});
+    });
+  },
+  _getItem : function(key) {
+    var items = this.container.select('li');
+    for(var i = 0; i &lt; items.length; i++) {
+      if (items[i].key == key) {
+        return items[i];
+      }
+    }
+    return undefined;
+  },
+  _onDelete : function(event) {
+    event.element().stopObserving('click', this._deleteHandler).up('li').remove();
+  },
+  _onAdd : function(event) {
+    event.stop();
+    this.put(this.keyInput.value, this.valueInput.value);
+    this.valueInput.activate();
+  },
+  _onSelect : function(event) {
+    var item = event.element().up();
+    this.keyInput.value = item.key;
+    this.valueInput.value = item.down().firstChild.nodeValue;
+  }
+});
+
+/**
+ * Enhances the StaticList fields when editing a class.
+ */
+XWiki.StaticListManager = Class.create({
+  initialize : function(field) {
+    this.field = field;
+
+    this._deleteFieldHandler = this._onDeleteField.bindAsEventListener(this);
+    document.observe('xwiki:class:deleteField', this._deleteFieldHandler);
+    this._saveClassHandler = this._onSaveClass.bind(this);
+    document.observe('xwiki:class:save', this._saveClassHandler);
+
+    this.getDisplayType().observe('change', this._onChangeDisplayType.bind(this));
+    this.getMultiSelect().observe('click', this._onChangeMultiSelect.bind(this));
+
+    this._enhanceValuesInput();
+    this._onChangeDisplayType();
+  },
+  getDisplayType : function() {
+    return $(this.field.getPropertyId('displayType'));
+  },
+  getSize : function() {
+    return $(this.field.getPropertyId('size'));
+  },
+  getMultiSelect : function() {
+    return $(this.field.getPropertyId('multiSelect'));
+  },
+  getValues : function() {
+    return $(this.field.getPropertyId('values'));
+  },
+  _onChangeDisplayType : function() {
+    var displayType = this.getDisplayType().value;
+
+    // The size meta property makes sense only when display type is select.
+    var size = this.getSize();
+    size.readOnly = displayType != 'select';
+    if (!size.readOnly) {
+      size.removeClassName('readOnly');
+      this._onChangeMultiSelect();
+    } else {
+      size.addClassName('readOnly');
+    }
+
+    // Radio display type doesn't support multiple selection.
+    if (displayType == 'radio') {
+      this.getMultiSelect().checked = false;
+    }
+  },
+  _onChangeMultiSelect : function() {
+    if (this.getMultiSelect().checked) {
+      var displayType = this.getDisplayType();
+      if (displayType.value == 'radio') {
+        // Radio display type doesn't support multiple selection.
+        displayType.value = 'checkbox';
+      } else if (displayType.value == 'select') {
+        var size = this.getSize();
+        // Select box with multiple selection enabled should be displayed as an expanded list box
+        // so we have to adjust the size (size 1 means drop down list box).
+        if (parseInt(size.value) &lt; 2) {
+          size.value = Math.min(Math.max(this.valuesEditor.size(), 1), 5);
+        }
+      }
+    }
+  },
+  _enhanceValuesInput : function() {
+    var valuesInput = this.getValues();
+    this.valuesEditor = new XWiki.StaticListEditor();
+    valuesInput.value.split('|').each(function(serializedPair) {
+      var pair = serializedPair.split('=', 2);
+      this.valuesEditor.put(pair[0], pair[pair.length - 1]);
+    }.bind(this));
+    valuesInput.hide();
+    valuesInput.insert({after: this.valuesEditor.getContainer()});
+  },
+  _onSaveClass : function() {
+    var values = [];
+    this.valuesEditor.each(function(pair) {
+      if (pair.key == pair.value) {
+        values.push(pair.key);
+      } else {
+        values.push(pair.key + '=' + pair.value);
+      }
+    });
+    this.getValues().value = values.join('|');
+  },
+  _onDeleteField : function(event) {
+    if (this.field.getContainer() == event.memo.field.getContainer()) {
+      document.stopObserving('xwiki:class:deleteField', this._deleteFieldHandler);
+      document.stopObserving('xwiki:class:save', this._saveClassHandler);
+      this.field = undefined;
+    }
+  }
+});
+
+function maybeEnhanceField(field) {
+  if (!field.getContainer()._enhanced &amp;&amp; $('template-' + field.getName()).value == '$escapetool.javascript($doc.fullName)') {
+    field.getContainer()._enhanced = true;
+    new XWiki.StaticListManager(field);
+  }
+}
+function init() {
+  document.observe('xwiki:class:displayField', function(event) {
+    maybeEnhanceField(event.memo.field);
+  });
+  // This is needed in case this script is loaded asynchronously.
+  var fields = $('fields');
+  if (fields) {
+    fields.childElements().each(function(item) {
+      var field = new XWiki.FormField(item);
+      if (field.getConfig()) {
+        maybeEnhanceField(field);
+      }
+    });
+  }
+  return true;
+}
+(XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));</code>
+</property>
+<property>
+<name>StaticListManager</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.StaticList</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>f19f7ef1-3f86-40c8-9950-c044ae7d1264</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>#template('colorThemeInit.vm')
+#fields .staticListEditor {
+  position: relative;
+}
+
+#fields .staticListEditor ul {
+  font-size: 90%;
+  margin: 0;
+}
+
+#fields .staticListEditor li {
+  background-color: #F7F7F7;
+  border: 1px solid $theme.borderColor;
+  cursor: move;
+  display: inline-block;
+  margin: 0 0.2em 0.2em 0;
+  min-height: 0;
+  padding: 0.1em 0.6em;
+}
+
+#fields .staticListEditor li:hover {
+  background-color: $theme.highlightColor;
+}
+
+#fields .staticListEditor li .delete {
+  color: $theme.pageContentBackgroundColor;
+  cursor: pointer;
+  font-size: 70%;
+  font-weight: bold;
+  position: absolute;
+  text-decoration: none !important;
+  vertical-align: super;
+}
+
+#fields .staticListEditor li:hover .delete {
+  color: $theme.textPrimaryColor;
+}
+
+#fields .staticListEditor li .delete:hover {
+  color: #C00;
+}
+
+#fields .staticListEditor .inputLine {
+  line-height; normal;
+  margin-right: 16px;
+}
+
+#fields .staticListEditor .inputLine .xHint {
+  margin-bottom: 0.2em;
+}
+
+#fields .staticListEditor .inputLine .half {
+  display: inline-block;
+  width: 49.5%;
+}
+
+#fields .staticListEditor .inputLine .second.half {
+  margin-left: 0.5%;
+}
+
+#fields .staticListEditor .add {
+  bottom: 0;
+  margin-bottom: 2px;
+  position: absolute;
+  right: 0;
+}</code>
+</property>
+<property>
+<name>StaticListManager</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
 </property>
 </object>
 <content></content></xwikidoc>

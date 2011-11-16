@@ -128,7 +128,7 @@ public abstract class AbstractExtension implements Extension
         setAuthors(extension.getAuthors());
         setWebsite(extension.getWebSite());
         if (extension.getLicenses() != null && !extension.getLicenses().isEmpty()) {
-            setLicense(extension.getLicenses());
+            setLicenses(extension.getLicenses());
         }
         setSummary(extension.getSummary());
 

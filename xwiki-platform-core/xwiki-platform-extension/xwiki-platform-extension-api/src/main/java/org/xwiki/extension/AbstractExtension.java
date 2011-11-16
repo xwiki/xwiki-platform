@@ -215,7 +215,7 @@ public abstract class AbstractExtension implements Extension
     /**
      * @param licenses the licenses of the extension
      */
-    public void setLicense(Collection<ExtensionLicense> licenses)
+    public void setLicenses(Collection<ExtensionLicense> licenses)
     {
         this.licenses = new ArrayList<ExtensionLicense>(licenses);
     }

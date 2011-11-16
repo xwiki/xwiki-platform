@@ -20,38 +20,24 @@
 package org.xwiki.extension.test;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.Properties;
-import java.util.Set;
-import java.util.jar.Attributes;
-import java.util.jar.JarOutputStream;
-import java.util.jar.Manifest;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
-import org.reflections.vfs.Vfs;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.ExtensionRepositoryException;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.test.MockConfigurationSource;
-
-import com.google.common.base.Predicates;
 
 public class RepositoryUtil
 {
@@ -148,10 +134,10 @@ public class RepositoryUtil
 
         ExtensionRepositoryManager repositoryManager = this.componentManager.lookup(ExtensionRepositoryManager.class);
 
-        // lite remote repository
+        // light remote repository
 
         if (copyResourceFolder(getRemoteRepository(), "repository.remote") > 0) {
-            this.remoteRepository = new FileExtensionRepository(getRemoteRepository());
+            this.remoteRepository = new FileExtensionRepository(getRemoteRepository(), this.componentManager);
             repositoryManager.addRepository(remoteRepository);
         }
 

@@ -35,6 +35,8 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
@@ -85,6 +87,9 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
     @Inject
     private Logger logger;
 
+    @Inject
+    private ComponentManager componentManager;
+
     /**
      * The repository identifier.
      */
@@ -120,7 +125,11 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
     @Override
     public void initialize() throws InitializationException
     {
-        this.storage = new ExtensionStorage(this, this.configuration.getLocalRepository());
+        try {
+            this.storage = new ExtensionStorage(this, this.configuration.getLocalRepository(), this.componentManager);
+        } catch (ComponentLookupException e) {
+            throw new InitializationException("Failed to intialize local extension storage", e);
+        }
 
         this.repositoryId = new ExtensionRepositoryId("local", "xwiki", this.storage.getRootFolder().toURI());
 

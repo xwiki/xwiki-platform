@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.readonly;
+package org.xwiki.extension.unmodifiable;
 
 import java.util.Collection;
 
@@ -30,13 +30,13 @@ import org.xwiki.extension.repository.CoreExtensionRepository;
  * @param <T>
  * @version $Id$
  */
-public class ReadonlyCoreExtensionRepository<T extends CoreExtensionRepository> extends ReadonlyExtensionRepository<T>
-    implements CoreExtensionRepository
+public class UnmodifiableCoreExtensionRepository<T extends CoreExtensionRepository> extends
+    UnmodifiableExtensionRepository<T> implements CoreExtensionRepository
 {
     /**
      * @param repository wrapped repository
      */
-    public ReadonlyCoreExtensionRepository(T repository)
+    public UnmodifiableCoreExtensionRepository(T repository)
     {
         super(repository);
     }
@@ -52,13 +52,13 @@ public class ReadonlyCoreExtensionRepository<T extends CoreExtensionRepository> 
     @Override
     public Collection<CoreExtension> getCoreExtensions()
     {
-        return ReadonlyUtils.unmodifiableExtensions(getRepository().getCoreExtensions());
+        return UnmodifiableUtils.unmodifiableExtensions(getRepository().getCoreExtensions());
     }
 
     @Override
     public CoreExtension getCoreExtension(String id)
     {
-        return ReadonlyUtils.unmodifiableExtension(getRepository().getCoreExtension(id));
+        return UnmodifiableUtils.unmodifiableExtension(getRepository().getCoreExtension(id));
     }
 
     @Override

@@ -42,11 +42,11 @@ import org.xwiki.extension.job.JobException;
 import org.xwiki.extension.job.JobManager;
 import org.xwiki.extension.job.JobStatus;
 import org.xwiki.extension.job.UninstallRequest;
-import org.xwiki.extension.readonly.ReadonlyJobStatus;
-import org.xwiki.extension.readonly.ReadonlyUtils;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.unmodifiable.UnmodifiableJobStatus;
+import org.xwiki.extension.unmodifiable.UnmodifiableUtils;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -118,7 +118,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<Extension> search(String pattern, int offset, int nb)
     {
-        return ReadonlyUtils.unmodifiableExtensions(this.repositoryManager.search(pattern, offset, nb));
+        return UnmodifiableUtils.unmodifiableExtensions(this.repositoryManager.search(pattern, offset, nb));
     }
 
     /**
@@ -139,7 +139,7 @@ public class ExtensionManagerScriptService implements ScriptService
 
         try {
             extension =
-                ReadonlyUtils.unmodifiableExtension(this.extensionManager
+                UnmodifiableUtils.unmodifiableExtension(this.extensionManager
                     .resolveExtension(new ExtensionId(id, version)));
         } catch (Exception e) {
             setError(e);
@@ -157,7 +157,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<LocalExtension> getInstalledExtensions()
     {
-        return ReadonlyUtils.unmodifiableExtensions(this.localExtensionRepository.getInstalledExtensions());
+        return UnmodifiableUtils.unmodifiableExtensions(this.localExtensionRepository.getInstalledExtensions());
     }
 
     /**
@@ -170,7 +170,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<LocalExtension> getInstalledExtensions(String namespace)
     {
-        return ReadonlyUtils.unmodifiableExtensions(this.localExtensionRepository.getInstalledExtensions(namespace));
+        return UnmodifiableUtils.unmodifiableExtensions(this.localExtensionRepository.getInstalledExtensions(namespace));
     }
 
     /**
@@ -185,7 +185,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public LocalExtension getInstalledExtension(String id, String namespace)
     {
-        return ReadonlyUtils.unmodifiableExtension(this.localExtensionRepository.getInstalledExtension(id, namespace));
+        return UnmodifiableUtils.unmodifiableExtension(this.localExtensionRepository.getInstalledExtension(id, namespace));
     }
 
     /**
@@ -195,7 +195,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<CoreExtension> getCoreExtensions()
     {
-        return ReadonlyUtils.unmodifiableExtensions(this.coreExtensionRepository.getCoreExtensions());
+        return UnmodifiableUtils.unmodifiableExtensions(this.coreExtensionRepository.getCoreExtensions());
     }
 
     /**
@@ -209,7 +209,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public CoreExtension getCoreExtension(String id)
     {
-        return ReadonlyUtils.unmodifiableExtension(this.coreExtensionRepository.getCoreExtension(id));
+        return UnmodifiableUtils.unmodifiableExtension(this.coreExtensionRepository.getCoreExtension(id));
     }
 
     /**
@@ -221,7 +221,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<LocalExtension> getLocalExtensions()
     {
-        return ReadonlyUtils.unmodifiableExtensions(this.localExtensionRepository.getLocalExtensions());
+        return UnmodifiableUtils.unmodifiableExtensions(this.localExtensionRepository.getLocalExtensions());
     }
 
     /**
@@ -241,7 +241,7 @@ public class ExtensionManagerScriptService implements ScriptService
 
         try {
             extensions =
-                ReadonlyUtils.unmodifiableExtensions(this.localExtensionRepository
+                UnmodifiableUtils.unmodifiableExtensions(this.localExtensionRepository
                     .getBackwardDependencies(new ExtensionId(id, version)));
         } catch (Exception e) {
             setError(e);
@@ -356,7 +356,7 @@ public class ExtensionManagerScriptService implements ScriptService
         if (job != null) {
             jobStatus = job.getStatus();
             if (!this.documentAccessBridge.hasProgrammingRights()) {
-                jobStatus = new ReadonlyJobStatus(jobStatus);
+                jobStatus = new UnmodifiableJobStatus(jobStatus);
             }
         } else {
             jobStatus = null;

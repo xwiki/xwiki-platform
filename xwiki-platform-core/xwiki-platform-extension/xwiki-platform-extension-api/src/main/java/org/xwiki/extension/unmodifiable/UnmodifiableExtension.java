@@ -17,35 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.readonly;
+package org.xwiki.extension.unmodifiable;
 
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepository;
-import org.xwiki.extension.wrap.WrappingExtensionRepository;
+import org.xwiki.extension.wrap.WrappingExtension;
 
 /**
- * Provide a readonly access to a repository.
+ * Provide a readonly access to an extension.
  * 
- * @param <T>
+ * @param <T> the extension type
  * @version $Id$
  */
-public class ReadonlyExtensionRepository<T extends ExtensionRepository> extends WrappingExtensionRepository<T>
+public class UnmodifiableExtension<T extends Extension> extends WrappingExtension<T>
 {
     /**
-     * @param repository the wrapped repository
+     * @param extension the wrapped extension
      */
-    public ReadonlyExtensionRepository(T repository)
+    public UnmodifiableExtension(T extension)
     {
-        super(repository);
+        super(extension);
     }
 
-    // ExtensionRepository
+    // Extension
 
     @Override
-    public Extension resolve(ExtensionId extensionId) throws ResolveException
+    public ExtensionRepository getRepository()
     {
-        return ReadonlyUtils.unmodifiableExtension(super.resolve(extensionId));
+        return UnmodifiableUtils.unmodifiableExtensionRepository(super.getRepository());
     }
 }

@@ -17,26 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.readonly;
+package org.xwiki.extension.unmodifiable;
 
-import org.xwiki.extension.CoreExtension;
+import java.io.File;
+
+import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.repository.ExtensionRepository;
-import org.xwiki.extension.wrap.WrappingCoreExtension;
+import org.xwiki.extension.wrap.WrappingLocalExtension;
 
 /**
- * Provide a readonly access to a core extension.
+ * Provide a readonly access to a local extension.
  * 
  * @param <T> the extension type
  * @version $Id$
  */
-public class ReadonlyCoreExtension<T extends CoreExtension> extends WrappingCoreExtension<T> implements CoreExtension
+public class UnmodifiableLocalExtension<T extends LocalExtension> extends WrappingLocalExtension<T> implements
+    LocalExtension
 {
     /**
-     * @param extension the wrapped core extension
+     * @param localExtension the wrapped local extension
      */
-    public ReadonlyCoreExtension(T extension)
+    public UnmodifiableLocalExtension(T localExtension)
     {
-        super(extension);
+        super(localExtension);
     }
 
     // Extension
@@ -44,6 +47,15 @@ public class ReadonlyCoreExtension<T extends CoreExtension> extends WrappingCore
     @Override
     public ExtensionRepository getRepository()
     {
-        return ReadonlyUtils.unmodifiableExtensionRepository(super.getRepository());
+        return UnmodifiableUtils.unmodifiableExtensionRepository(super.getRepository());
     }
+
+    // LocalExtension
+
+    @Override
+    public File getFile()
+    {
+        return getExtension().getFile();
+    }
+
 }

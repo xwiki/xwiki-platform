@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.readonly;
+package org.xwiki.extension.unmodifiable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,12 +38,12 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
  * 
  * @version $Id$
  */
-public final class ReadonlyUtils
+public final class UnmodifiableUtils
 {
     /**
      * Prevents instantiation of this utility class.
      */
-    private ReadonlyUtils()
+    private UnmodifiableUtils()
     {
         // Empty
     }
@@ -62,7 +62,7 @@ public final class ReadonlyUtils
 
         for (Map.Entry<K, Collection<LocalExtension>> entry : extensions.entrySet()) {
             wrappedExtensions.put(entry.getKey(),
-                ReadonlyUtils.<LocalExtension, LocalExtension> unmodifiableExtensions(entry.getValue()));
+                UnmodifiableUtils.<LocalExtension, LocalExtension> unmodifiableExtensions(entry.getValue()));
         }
 
         return wrappedExtensions;
@@ -107,11 +107,11 @@ public final class ReadonlyUtils
         if (extension == null) {
             wrappedExtension = null;
         } else if (extension instanceof CoreExtension) {
-            wrappedExtension = (T) new ReadonlyCoreExtension<CoreExtension>((CoreExtension) extension);
+            wrappedExtension = (T) new UnmodifiableCoreExtension<CoreExtension>((CoreExtension) extension);
         } else if (extension instanceof LocalExtension) {
-            wrappedExtension = (T) new ReadonlyLocalExtension<LocalExtension>((LocalExtension) extension);
+            wrappedExtension = (T) new UnmodifiableLocalExtension<LocalExtension>((LocalExtension) extension);
         } else {
-            wrappedExtension = (T) new ReadonlyExtension<Extension>(extension);
+            wrappedExtension = (T) new UnmodifiableExtension<Extension>(extension);
         }
 
         return wrappedExtension;
@@ -134,14 +134,15 @@ public final class ReadonlyUtils
             wrappedExtensionRepository = null;
         } else if (extensionRepository instanceof CoreExtensionRepository) {
             wrappedExtensionRepository =
-                (T) new ReadonlyCoreExtensionRepository<CoreExtensionRepository>(
+                (T) new UnmodifiableCoreExtensionRepository<CoreExtensionRepository>(
                     (CoreExtensionRepository) extensionRepository);
         } else if (extensionRepository instanceof LocalExtensionRepository) {
             wrappedExtensionRepository =
-                (T) new ReadonlyLocalExtensionRepository<LocalExtensionRepository>(
+                (T) new UnmodifiableLocalExtensionRepository<LocalExtensionRepository>(
                     (LocalExtensionRepository) extensionRepository);
         } else {
-            wrappedExtensionRepository = (T) new ReadonlyExtensionRepository<ExtensionRepository>(extensionRepository);
+            wrappedExtensionRepository =
+                (T) new UnmodifiableExtensionRepository<ExtensionRepository>(extensionRepository);
         }
 
         return wrappedExtensionRepository;

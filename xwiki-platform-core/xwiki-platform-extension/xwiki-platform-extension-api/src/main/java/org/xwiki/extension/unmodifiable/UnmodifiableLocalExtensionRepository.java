@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.readonly;
+package org.xwiki.extension.unmodifiable;
 
 import java.util.Collection;
 import java.util.Map;
@@ -37,13 +37,13 @@ import org.xwiki.extension.repository.LocalExtensionRepositoryException;
  * @param <T>
  * @version $Id$
  */
-public class ReadonlyLocalExtensionRepository<T extends LocalExtensionRepository> extends
-    ReadonlyExtensionRepository<T> implements LocalExtensionRepository
+public class UnmodifiableLocalExtensionRepository<T extends LocalExtensionRepository> extends
+    UnmodifiableExtensionRepository<T> implements LocalExtensionRepository
 {
     /**
      * @param repository wrapped repository
      */
-    public ReadonlyLocalExtensionRepository(T repository)
+    public UnmodifiableLocalExtensionRepository(T repository)
     {
         super(repository);
     }
@@ -59,25 +59,25 @@ public class ReadonlyLocalExtensionRepository<T extends LocalExtensionRepository
     @Override
     public Collection<LocalExtension> getLocalExtensions()
     {
-        return ReadonlyUtils.unmodifiableExtensions(getRepository().getLocalExtensions());
+        return UnmodifiableUtils.unmodifiableExtensions(getRepository().getLocalExtensions());
     }
 
     @Override
     public Collection<LocalExtension> getInstalledExtensions()
     {
-        return ReadonlyUtils.unmodifiableExtensions(getRepository().getInstalledExtensions());
+        return UnmodifiableUtils.unmodifiableExtensions(getRepository().getInstalledExtensions());
     }
 
     @Override
     public Collection<LocalExtension> getInstalledExtensions(String namespace)
     {
-        return ReadonlyUtils.unmodifiableExtensions(getRepository().getInstalledExtensions(namespace));
+        return UnmodifiableUtils.unmodifiableExtensions(getRepository().getInstalledExtensions(namespace));
     }
 
     @Override
     public LocalExtension getInstalledExtension(String feature, String namespace)
     {
-        return ReadonlyUtils.unmodifiableExtension(getRepository().getInstalledExtension(feature, namespace));
+        return UnmodifiableUtils.unmodifiableExtension(getRepository().getInstalledExtension(feature, namespace));
     }
 
     @Override
@@ -108,14 +108,14 @@ public class ReadonlyLocalExtensionRepository<T extends LocalExtensionRepository
     @Override
     public Collection<LocalExtension> getBackwardDependencies(String feature, String namespace) throws ResolveException
     {
-        return ReadonlyUtils.unmodifiableExtensions(getRepository().getBackwardDependencies(feature, namespace));
+        return UnmodifiableUtils.unmodifiableExtensions(getRepository().getBackwardDependencies(feature, namespace));
     }
 
     @Override
     public Map<String, Collection<LocalExtension>> getBackwardDependencies(ExtensionId extensionId)
         throws ResolveException
     {
-        return ReadonlyUtils.unmodifiableExtensions(getRepository().getBackwardDependencies(extensionId));
+        return UnmodifiableUtils.unmodifiableExtensions(getRepository().getBackwardDependencies(extensionId));
     }
 
 }

@@ -466,12 +466,15 @@ return XWiki;
 #macro(listAvailableColumns)
   {{html}}
   &lt;select id="availableColumns"&gt;
-    &lt;optgroup label="Class fields" id="classFields"&gt;
-      #set($className = $liveTableObj.getProperty('class').value)
-      #foreach($field in $xwiki.getDocument($className).getxWikiClass().properties)
-        &lt;option value="$field.name"&gt;$escapetool.xml($field.prettyName)&lt;/option&gt;
-      #end
-    &lt;/optgroup&gt;
+    #set($className = $liveTableObj.getProperty('class').value)
+    #set($classFields = $xwiki.getDocument($className).getxWikiClass().properties)
+    #if($classFields.size() &gt; 0)
+      &lt;optgroup label="Class fields" id="classFields"&gt;
+        #foreach($field in $classFields)
+          &lt;option value="$field.name"&gt;$escapetool.xml($field.prettyName)&lt;/option&gt;
+        #end
+      &lt;/optgroup&gt;
+    #end
     &lt;optgroup label="Generic columns"&gt;
       #set($genericColumns = {
         'doc.title': 'Title',

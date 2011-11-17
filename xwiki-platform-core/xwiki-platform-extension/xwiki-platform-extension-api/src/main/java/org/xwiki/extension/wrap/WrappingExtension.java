@@ -40,7 +40,9 @@ import org.xwiki.extension.repository.ExtensionRepository;
  */
 public class WrappingExtension<T extends Extension> implements Extension
 {
-    /** The format of the {@link #toString} output. */
+    /**
+     * The format of the {@link #toString} output.
+     */
     private static final MessageFormat TOSTRING_FORMAT = new MessageFormat("{0} ({1})");
 
     /**
@@ -59,7 +61,7 @@ public class WrappingExtension<T extends Extension> implements Extension
     /**
      * @return the wrapped extension
      */
-    public T getExtension()
+    protected T getExtension()
     {
         return this.extension;
     }

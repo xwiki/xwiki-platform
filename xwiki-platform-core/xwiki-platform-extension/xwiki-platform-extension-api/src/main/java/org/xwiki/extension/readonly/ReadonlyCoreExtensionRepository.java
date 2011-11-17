@@ -17,64 +17,53 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.wrap;
+package org.xwiki.extension.readonly;
 
-import java.util.List;
+import java.util.Collection;
 
-import org.xwiki.extension.job.JobProgress;
-import org.xwiki.extension.job.JobStatus;
-import org.xwiki.extension.job.Request;
-import org.xwiki.logging.LogLevel;
-import org.xwiki.logging.LogQueue;
-import org.xwiki.logging.event.LogEvent;
+import org.xwiki.extension.CoreExtension;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 
 /**
- * Wrap a job status.
+ * Provide a readonly access to a core extension repository.
  * 
+ * @param <T>
  * @version $Id$
  */
-public class WrappingJobStatus implements JobStatus
+public class ReadonlyCoreExtensionRepository<T extends CoreExtensionRepository> extends ReadonlyExtensionRepository<T>
+    implements CoreExtensionRepository
 {
     /**
-     * The wrapped job status.
+     * @param repository wrapped repository
      */
-    private JobStatus status;
-
-    /**
-     * @param status the wrapped job status
-     */
-    public WrappingJobStatus(JobStatus status)
+    public ReadonlyCoreExtensionRepository(T repository)
     {
-        this.status = status;
+        super(repository);
+    }
+
+    // CoreExtensionRepository
+
+    @Override
+    public int countExtensions()
+    {
+        return getRepository().countExtensions();
     }
 
     @Override
-    public State getState()
+    public Collection<CoreExtension> getCoreExtensions()
     {
-        return this.status.getState();
+        return ReadonlyUtils.unmodifiableExtensions(getRepository().getCoreExtensions());
     }
 
     @Override
-    public Request getRequest()
+    public CoreExtension getCoreExtension(String id)
     {
-        return this.status.getRequest();
+        return ReadonlyUtils.unmodifiableExtension(getRepository().getCoreExtension(id));
     }
 
     @Override
-    public LogQueue getLog()
+    public boolean exists(String id)
     {
-        return this.status.getLog();
-    }
-
-    @Override
-    public List<LogEvent> getLog(LogLevel level)
-    {
-        return this.status.getLog(level);
-    }
-
-    @Override
-    public JobProgress getProgress()
-    {
-        return this.status.getProgress();
+        return getRepository().exists(id);
     }
 }

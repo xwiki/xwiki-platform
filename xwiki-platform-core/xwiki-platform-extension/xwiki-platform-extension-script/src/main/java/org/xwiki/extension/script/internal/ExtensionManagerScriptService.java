@@ -42,11 +42,11 @@ import org.xwiki.extension.job.JobException;
 import org.xwiki.extension.job.JobManager;
 import org.xwiki.extension.job.JobStatus;
 import org.xwiki.extension.job.UninstallRequest;
+import org.xwiki.extension.readonly.ReadonlyJobStatus;
+import org.xwiki.extension.readonly.ReadonlyUtils;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
-import org.xwiki.extension.wrap.WrappingJobStatus;
-import org.xwiki.extension.wrap.WrappingUtils;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -118,7 +118,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<Extension> search(String pattern, int offset, int nb)
     {
-        return WrappingUtils.wrapExtensions(this.repositoryManager.search(pattern, offset, nb));
+        return ReadonlyUtils.unmodifiableExtensions(this.repositoryManager.search(pattern, offset, nb));
     }
 
     /**
@@ -139,7 +139,8 @@ public class ExtensionManagerScriptService implements ScriptService
 
         try {
             extension =
-                WrappingUtils.wrapExtension(this.extensionManager.resolveExtension(new ExtensionId(id, version)));
+                ReadonlyUtils.unmodifiableExtension(this.extensionManager
+                    .resolveExtension(new ExtensionId(id, version)));
         } catch (Exception e) {
             setError(e);
         }
@@ -156,7 +157,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<LocalExtension> getInstalledExtensions()
     {
-        return WrappingUtils.wrapExtensions(this.localExtensionRepository.getInstalledExtensions());
+        return ReadonlyUtils.unmodifiableExtensions(this.localExtensionRepository.getInstalledExtensions());
     }
 
     /**
@@ -169,7 +170,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<LocalExtension> getInstalledExtensions(String namespace)
     {
-        return WrappingUtils.wrapExtensions(this.localExtensionRepository.getInstalledExtensions(namespace));
+        return ReadonlyUtils.unmodifiableExtensions(this.localExtensionRepository.getInstalledExtensions(namespace));
     }
 
     /**
@@ -184,7 +185,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public LocalExtension getInstalledExtension(String id, String namespace)
     {
-        return WrappingUtils.wrapExtension(this.localExtensionRepository.getInstalledExtension(id, namespace));
+        return ReadonlyUtils.unmodifiableExtension(this.localExtensionRepository.getInstalledExtension(id, namespace));
     }
 
     /**
@@ -194,7 +195,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<CoreExtension> getCoreExtensions()
     {
-        return WrappingUtils.wrapExtensions(this.coreExtensionRepository.getCoreExtensions());
+        return ReadonlyUtils.unmodifiableExtensions(this.coreExtensionRepository.getCoreExtensions());
     }
 
     /**
@@ -208,7 +209,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public CoreExtension getCoreExtension(String id)
     {
-        return WrappingUtils.wrapExtension(this.coreExtensionRepository.getCoreExtension(id));
+        return ReadonlyUtils.unmodifiableExtension(this.coreExtensionRepository.getCoreExtension(id));
     }
 
     /**
@@ -220,7 +221,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<LocalExtension> getLocalExtensions()
     {
-        return WrappingUtils.wrapExtensions(this.localExtensionRepository.getLocalExtensions());
+        return ReadonlyUtils.unmodifiableExtensions(this.localExtensionRepository.getLocalExtensions());
     }
 
     /**
@@ -239,8 +240,9 @@ public class ExtensionManagerScriptService implements ScriptService
         Map<String, Collection<LocalExtension>> extensions;
 
         try {
-            extensions = WrappingUtils.wrapExtensions(this.localExtensionRepository.getBackwardDependencies(
-                new ExtensionId(id, version)));
+            extensions =
+                ReadonlyUtils.unmodifiableExtensions(this.localExtensionRepository
+                    .getBackwardDependencies(new ExtensionId(id, version)));
         } catch (Exception e) {
             setError(e);
 
@@ -259,10 +261,10 @@ public class ExtensionManagerScriptService implements ScriptService
      * @param id the identifier of the extension to add (groupId:artifactId)
      * @param version the version to install
      * @param wiki the (optional) virtual wiki where to install the extension; if {@code null} or empty, the extension
-     *        will be installed globally; not all types of extensions can be installed in only one wiki and will be
-     *        installed globally regardless of the passed value
-     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or {@code
-     *         null} in case of failure
+     *            will be installed globally; not all types of extensions can be installed in only one wiki and will be
+     *            installed globally regardless of the passed value
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
      */
     public Job install(String id, String version, String wiki)
     {
@@ -298,8 +300,8 @@ public class ExtensionManagerScriptService implements ScriptService
      * 
      * @param id the identifier of the extension to remove (groupId:artifactId)
      * @param version the version to remove
-     * @return the {@link Job} object which can be used to monitor the progress of the unistallation process, or {@code
-     *         null} in case of failure
+     * @return the {@link Job} object which can be used to monitor the progress of the unistallation process, or
+     *         {@code null} in case of failure
      */
     public Job uninstall(String id, String version)
     {
@@ -354,7 +356,7 @@ public class ExtensionManagerScriptService implements ScriptService
         if (job != null) {
             jobStatus = job.getStatus();
             if (!this.documentAccessBridge.hasProgrammingRights()) {
-                jobStatus = new WrappingJobStatus(jobStatus);
+                jobStatus = new ReadonlyJobStatus(jobStatus);
             }
         } else {
             jobStatus = null;

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.wrap;
+package org.xwiki.extension.readonly;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,20 +28,22 @@ import java.util.Map;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.repository.CoreExtensionRepository;
+import org.xwiki.extension.repository.ExtensionRepository;
+import org.xwiki.extension.repository.LocalExtensionRepository;
 
 /**
  * Utility class that offers methods for wrapping extension handlers inside read-only wrappers which can be safely used
  * from public scripts.
  * 
  * @version $Id$
- * @since 3.3M2
  */
-public final class WrappingUtils
+public final class ReadonlyUtils
 {
     /**
      * Prevents instantiation of this utility class.
      */
-    private WrappingUtils()
+    private ReadonlyUtils()
     {
         // Empty
     }
@@ -53,13 +55,14 @@ public final class WrappingUtils
      * @param extensions the read-write extension handlers to wrap
      * @return an equivalent collection of read-only wrappers
      */
-    public static <K> Map<K, Collection<LocalExtension>> wrapExtensions(Map<K, Collection<LocalExtension>> extensions)
+    public static <K> Map<K, Collection<LocalExtension>> unmodifiableExtensions(
+        Map<K, Collection<LocalExtension>> extensions)
     {
         Map<K, Collection<LocalExtension>> wrappedExtensions = new LinkedHashMap<K, Collection<LocalExtension>>();
 
         for (Map.Entry<K, Collection<LocalExtension>> entry : extensions.entrySet()) {
             wrappedExtensions.put(entry.getKey(),
-                WrappingUtils.<LocalExtension, LocalExtension> wrapExtensions(entry.getValue()));
+                ReadonlyUtils.<LocalExtension, LocalExtension> unmodifiableExtensions(entry.getValue()));
         }
 
         return wrappedExtensions;
@@ -69,17 +72,17 @@ public final class WrappingUtils
      * Wrap a collection of internal (read-write) extension handlers into safe read-only bridges.
      * 
      * @param <T> the expected output type, should be a generic extension type, like {@link Extension},
-     *        {@link LocalExtension} or {@code CoreExtension}
+     *            {@link LocalExtension} or {@code CoreExtension}
      * @param <U> the input type, a read-write subtype of T
      * @param extensions the read-write extension handlers to wrap
      * @return an equivalent collection of read-only wrappers
      */
-    public static <T extends Extension, U extends T> Collection<T> wrapExtensions(Collection<U> extensions)
+    public static <T extends Extension, U extends T> Collection<T> unmodifiableExtensions(Collection<U> extensions)
     {
         List<T> wrappedExtensions = new ArrayList<T>(extensions.size());
 
         for (U extension : extensions) {
-            T wrapper = wrapExtension(extension);
+            T wrapper = unmodifiableExtension(extension);
             if (wrapper != null) {
                 wrappedExtensions.add(wrapper);
             }
@@ -92,26 +95,55 @@ public final class WrappingUtils
      * Wrap an internal (read-write) extension handler into a safe read-only bridge.
      * 
      * @param <T> the expected output type, should be a generic extension type, like {@link Extension},
-     *        {@link LocalExtension} or {@code CoreExtension}
+     *            {@link LocalExtension} or {@code CoreExtension}
      * @param <U> the input type, a subtype of T
      * @param extension the read-write extension handler to wrap
-     * @return a read-only wrapper, or {@code null} if the provided instance is {@code null} or if there is no known
-     *         wrapper for this type of internal extension handler
+     * @return a read-only wrapper, or {@code null} if the provided instance is {@code null}
      */
-    public static <T extends Extension, U extends T> T wrapExtension(U extension)
+    public static <T extends Extension, U extends T> T unmodifiableExtension(U extension)
     {
         T wrappedExtension;
 
         if (extension == null) {
             wrappedExtension = null;
         } else if (extension instanceof CoreExtension) {
-            wrappedExtension = (T) new WrappingCoreExtension<CoreExtension>((CoreExtension) extension);
+            wrappedExtension = (T) new ReadonlyCoreExtension<CoreExtension>((CoreExtension) extension);
         } else if (extension instanceof LocalExtension) {
-            wrappedExtension = (T) new WrappingLocalExtension<LocalExtension>((LocalExtension) extension);
+            wrappedExtension = (T) new ReadonlyLocalExtension<LocalExtension>((LocalExtension) extension);
         } else {
-            wrappedExtension = (T) new WrappingExtension<Extension>(extension);
+            wrappedExtension = (T) new ReadonlyExtension<Extension>(extension);
         }
 
         return wrappedExtension;
+    }
+
+    /**
+     * Wrap an internal (read-write) repository handler into a safe read-only bridge.
+     * 
+     * @param <T> the expected output type, should be a generic repository type, like {@link ExtensionRepository},
+     *            {@link LocalExtensionRepository} or {@code CoreExtensionRepository}
+     * @param <U> the input type, a subtype of T
+     * @param extensionRepository the read-write repository handler to wrap
+     * @return a read-only wrapper, or {@code null} if the provided instance is {@code null}
+     */
+    public static <T extends ExtensionRepository, U extends T> T unmodifiableExtensionRepository(U extensionRepository)
+    {
+        T wrappedExtensionRepository;
+
+        if (extensionRepository == null) {
+            wrappedExtensionRepository = null;
+        } else if (extensionRepository instanceof CoreExtensionRepository) {
+            wrappedExtensionRepository =
+                (T) new ReadonlyCoreExtensionRepository<CoreExtensionRepository>(
+                    (CoreExtensionRepository) extensionRepository);
+        } else if (extensionRepository instanceof LocalExtensionRepository) {
+            wrappedExtensionRepository =
+                (T) new ReadonlyLocalExtensionRepository<LocalExtensionRepository>(
+                    (LocalExtensionRepository) extensionRepository);
+        } else {
+            wrappedExtensionRepository = (T) new ReadonlyExtensionRepository<ExtensionRepository>(extensionRepository);
+        }
+
+        return wrappedExtensionRepository;
     }
 }

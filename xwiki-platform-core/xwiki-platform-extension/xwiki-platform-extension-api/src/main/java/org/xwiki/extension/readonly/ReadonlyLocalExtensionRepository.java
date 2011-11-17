@@ -1,0 +1,121 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.extension.readonly;
+
+import java.util.Collection;
+import java.util.Map;
+
+import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstallException;
+import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.UninstallException;
+import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.repository.LocalExtensionRepositoryException;
+
+/**
+ * Provide a readonly access to a local extension repository.
+ * 
+ * @param <T>
+ * @version $Id$
+ */
+public class ReadonlyLocalExtensionRepository<T extends LocalExtensionRepository> extends
+    ReadonlyExtensionRepository<T> implements LocalExtensionRepository
+{
+    /**
+     * @param repository wrapped repository
+     */
+    public ReadonlyLocalExtensionRepository(T repository)
+    {
+        super(repository);
+    }
+
+    // LocalExtensionRepository
+
+    @Override
+    public int countExtensions()
+    {
+        return getRepository().countExtensions();
+    }
+
+    @Override
+    public Collection<LocalExtension> getLocalExtensions()
+    {
+        return ReadonlyUtils.unmodifiableExtensions(getRepository().getLocalExtensions());
+    }
+
+    @Override
+    public Collection<LocalExtension> getInstalledExtensions()
+    {
+        return ReadonlyUtils.unmodifiableExtensions(getRepository().getInstalledExtensions());
+    }
+
+    @Override
+    public Collection<LocalExtension> getInstalledExtensions(String namespace)
+    {
+        return ReadonlyUtils.unmodifiableExtensions(getRepository().getInstalledExtensions(namespace));
+    }
+
+    @Override
+    public LocalExtension getInstalledExtension(String feature, String namespace)
+    {
+        return ReadonlyUtils.unmodifiableExtension(getRepository().getInstalledExtension(feature, namespace));
+    }
+
+    @Override
+    public LocalExtension storeExtension(Extension extension) throws LocalExtensionRepositoryException
+    {
+        throw new ForbiddenException("Calling storeExtension is forbidden in readonly proxy");
+    }
+
+    @Override
+    public void removeExtension(LocalExtension extension) throws ResolveException
+    {
+        throw new ForbiddenException("Calling removeExtension is forbidden in readonly proxy");
+    }
+
+    @Override
+    public void installExtension(LocalExtension extension, String namespace, boolean dependency)
+        throws InstallException
+    {
+        throw new ForbiddenException("Calling installExtension is forbidden in readonly proxy");
+    }
+
+    @Override
+    public void uninstallExtension(LocalExtension extension, String namespace) throws UninstallException
+    {
+        throw new ForbiddenException("Calling uninstallExtension is forbidden in readonly proxy");
+    }
+
+    @Override
+    public Collection<LocalExtension> getBackwardDependencies(String feature, String namespace) throws ResolveException
+    {
+        return ReadonlyUtils.unmodifiableExtensions(getRepository().getBackwardDependencies(feature, namespace));
+    }
+
+    @Override
+    public Map<String, Collection<LocalExtension>> getBackwardDependencies(ExtensionId extensionId)
+        throws ResolveException
+    {
+        return ReadonlyUtils.unmodifiableExtensions(getRepository().getBackwardDependencies(extensionId));
+    }
+
+}

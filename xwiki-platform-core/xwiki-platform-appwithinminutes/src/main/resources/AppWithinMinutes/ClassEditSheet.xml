@@ -1541,13 +1541,18 @@ return XWiki;
   {{/html}}
 
   #set($formFieldDoc = $xwiki.getDocument($request.field))
-  ## Clone the field template.
-  #set($field = $formFieldDoc.getxWikiClass().getXWikiClass().properties.get(0).clone())
-  #if("$!field.prettyName" == '')
-    #set($discard = $field.setPrettyName($formFieldDoc.title))
+  #set($formFieldDocClassFields = $formFieldDoc.getxWikiClass().getXWikiClass().properties)
+  #if($formFieldDocClassFields.size() &gt; 0)
+    ## Clone the field template.
+    #set($field = $formFieldDocClassFields.get(0).clone())
+    #if("$!field.prettyName" == '')
+      #set($discard = $field.setPrettyName($formFieldDoc.title))
+    #end
+    #set($discard = $doc.getxWikiClass().getXWikiClass().addField($field.name, $field))
+    #displayField($doc.getxWikiClass().get($field.name) $formFieldDoc)
+  #else
+    Unsupported form field.
   #end
-  #set($discard = $doc.getxWikiClass().getXWikiClass().addField($field.name, $field))
-  #displayField($doc.getxWikiClass().get($field.name) $formFieldDoc)
 #end
 
 #**

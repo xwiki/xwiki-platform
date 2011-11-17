@@ -252,6 +252,7 @@
     <module>xwiki-platform-display</module>
     <module>xwiki-platform-eventstream</module>
     <module>xwiki-platform-extension</module>
+    <module>xwiki-platform-faq</module>
     <module>xwiki-platform-formula</module>
     <module>xwiki-platform-gwt</module>
     <module>xwiki-platform-invitation</module>

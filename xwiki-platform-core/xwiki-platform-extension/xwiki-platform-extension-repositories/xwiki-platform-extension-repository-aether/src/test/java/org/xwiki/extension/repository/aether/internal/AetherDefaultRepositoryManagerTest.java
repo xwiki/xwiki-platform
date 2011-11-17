@@ -20,6 +20,7 @@
 package org.xwiki.extension.repository.aether.internal;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,7 +82,8 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), extension.getRepository().getId().getId());
         Assert.assertEquals("description", extension.getDescription());
         Assert.assertEquals("http://website", extension.getWebSite());
-        Assert.assertEquals(Arrays.asList("groupid1:feature1", "groupid2:feature2"), new ArrayList<String>(extension.getFeatures()));
+        Assert.assertEquals(Arrays.asList("groupid1:feature1", "groupid2:feature2"),
+            new ArrayList<String>(extension.getFeatures()));
 
         ExtensionDependency dependency = extension.getDependencies().get(0);
         Assert.assertEquals(this.dependencyExtensionId.getId(), dependency.getId());
@@ -97,13 +99,20 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
     {
         Extension extension = this.repositoryManager.resolve(this.extensionId);
 
-        File file = new File(this.repositoryUtil.getWorkingDirectory() + "/downloaded/extension." + extension.getType());
+        File file =
+            new File(this.repositoryUtil.getWorkingDirectory() + "/downloaded/extension." + extension.getType());
 
         if (file.exists()) {
             file.delete();
         }
 
-        extension.download(file);
+        FileOutputStream fos = FileUtils.openOutputStream(file);
+
+        try {
+            extension.download(fos);
+        } finally {
+            fos.close();
+        }
 
         Assert.assertTrue("File has not been downloaded", file.exists());
 
@@ -121,7 +130,13 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
             file.delete();
         }
 
-        extension.download(file);
+        FileOutputStream fos = FileUtils.openOutputStream(file);
+
+        try {
+            extension.download(fos);
+        } finally {
+            fos.close();
+        }
 
         Assert.assertTrue("File has not been downloaded", file.exists());
 

@@ -20,10 +20,13 @@
 package org.xwiki.extension.repository.aether.internal;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.aether.RepositorySystem;
@@ -34,9 +37,7 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
-import org.xwiki.properties.ConverterManager;
 
 public class AetherExtension extends AbstractExtension
 {
@@ -69,7 +70,7 @@ public class AetherExtension extends AbstractExtension
     }
 
     @Override
-    public void download(File file) throws ExtensionException
+    public void download(OutputStream stream) throws ExtensionException
     {
         RepositorySystem repositorySystem;
         try {
@@ -95,9 +96,17 @@ public class AetherExtension extends AbstractExtension
         File aetherFile = artifactResult.getArtifact().getFile();
 
         try {
-            FileUtils.moveFile(aetherFile, file);
+            FileInputStream fis = new FileInputStream(aetherFile);
+
+            try {
+                IOUtils.copy(fis, stream);
+            } finally {
+                fis.close();
+            }
         } catch (IOException e) {
             throw new ExtensionException("Failed to copy file", e);
+        } finally {
+            FileUtils.deleteQuietly(aetherFile);
         }
     }
 

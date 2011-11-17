@@ -19,7 +19,7 @@
  */
 package org.xwiki.extension.wrap;
 
-import java.io.File;
+import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
@@ -129,9 +129,9 @@ public class WrappingExtension<T extends Extension> implements Extension
     }
 
     @Override
-    public void download(File file) throws ExtensionException
+    public void download(OutputStream stream) throws ExtensionException
     {
-        getExtension().download(file);
+        getExtension().download(stream);
     }
 
     @Override

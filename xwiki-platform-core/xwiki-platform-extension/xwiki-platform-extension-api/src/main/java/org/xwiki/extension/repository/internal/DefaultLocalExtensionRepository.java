@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.repository.internal;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -524,7 +526,12 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
                 localExtension = createExtension(extension);
 
                 // Store extension in the local repository
-                extension.download(localExtension.getFile());
+                FileOutputStream fos = FileUtils.openOutputStream(localExtension.getFile());
+                try {
+                    extension.download(fos);
+                } finally {
+                    fos.close();
+                }
                 this.storage.saveDescriptor(localExtension);
 
                 // Cache extension

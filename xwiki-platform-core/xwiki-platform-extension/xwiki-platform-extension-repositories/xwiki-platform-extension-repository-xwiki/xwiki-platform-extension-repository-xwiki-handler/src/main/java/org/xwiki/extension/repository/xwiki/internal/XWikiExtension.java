@@ -19,13 +19,12 @@
  */
 package org.xwiki.extension.repository.xwiki.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.DefaultExtensionDependency;
@@ -57,7 +56,7 @@ public class XWikiExtension extends AbstractExtension
 
         setAuthors(extension.getAuthors());
         setFeatures(extension.getFeatures());
-        
+
         // License
 
         License license = extension.getLicense();
@@ -93,16 +92,16 @@ public class XWikiExtension extends AbstractExtension
     }
 
     @Override
-    public void download(File file) throws ExtensionException
+    public void download(OutputStream stream) throws ExtensionException
     {
         XWikiExtensionRepository repository = getRepository();
 
         try {
-            InputStream stream =
+            InputStream inputStream =
                 repository.getRESTResourceAsStream(repository.getExtensionFileUriBuider(), getId().getId(), getId()
                     .getVersion());
 
-            FileUtils.copyInputStreamToFile(stream, file);
+            IOUtils.copy(inputStream, stream);
         } catch (IOException e) {
             throw new ExtensionException("Failed to download extension [" + this + "]");
         }

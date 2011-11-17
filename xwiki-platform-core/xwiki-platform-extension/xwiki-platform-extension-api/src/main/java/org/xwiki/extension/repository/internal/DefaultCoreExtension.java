@@ -19,7 +19,7 @@
  */
 package org.xwiki.extension.repository.internal;
 
-import java.io.File;
+import java.io.OutputStream;
 import java.net.URL;
 
 import org.xwiki.extension.AbstractExtension;
@@ -50,7 +50,7 @@ public class DefaultCoreExtension extends AbstractExtension implements CoreExten
     // Extension
 
     @Override
-    public void download(File file) throws ExtensionException
+    public void download(OutputStream stream) throws ExtensionException
     {
         // TODO
     }

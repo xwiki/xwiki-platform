@@ -21,7 +21,6 @@ package org.xwiki.extension.repository.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -73,16 +72,14 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
     // Extension
 
     @Override
-    public void download(File file) throws ExtensionException
+    public void download(OutputStream stream) throws ExtensionException
     {
         InputStream sourceStream = null;
-        OutputStream targetStream = null;
 
         try {
             sourceStream = new FileInputStream(getFile());
-            targetStream = new FileOutputStream(file);
 
-            IOUtils.copy(sourceStream, targetStream);
+            IOUtils.copy(sourceStream, stream);
         } catch (Exception e) {
             throw new ExtensionException("Failed to copy file", e);
         } finally {
@@ -91,14 +88,6 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
             if (sourceStream != null) {
                 try {
                     sourceStream.close();
-                } catch (IOException e) {
-                    closeException = e;
-                }
-            }
-
-            if (targetStream != null) {
-                try {
-                    targetStream.close();
                 } catch (IOException e) {
                     closeException = e;
                 }

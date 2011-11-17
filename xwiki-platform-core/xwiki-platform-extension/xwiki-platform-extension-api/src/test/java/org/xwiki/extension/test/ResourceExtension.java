@@ -19,10 +19,10 @@
  */
 package org.xwiki.extension.test;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionException;
@@ -34,14 +34,12 @@ public class ResourceExtension extends AbstractExtension
         super(repository, extension);
     }
 
-    public void download(File file) throws ExtensionException
+    public void download(OutputStream stream) throws ExtensionException
     {
         try {
-            FileUtils.copyInputStreamToFile(getResourceExtensionRepository().getResourceAsStream(getId(), getType()),
-                file);
+            IOUtils.copy(getResourceExtensionRepository().getResourceAsStream(getId(), getType()), stream);
         } catch (IOException e) {
-            throw new ExtensionException("Failed to copy resource containing extension [" + getId() + "] to file ["
-                + file + "]", e);
+            throw new ExtensionException("Failed to copy resource containing extension [" + getId() + "]", e);
         }
     }
 

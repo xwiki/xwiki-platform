@@ -19,7 +19,7 @@
  */
 package org.xwiki.extension;
 
-import java.io.File;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -89,10 +89,10 @@ public interface Extension
     /**
      * Download the extension in the provided file.
      * 
-     * @param file the file where to save the extension
+     * @param stream the stream where to write the extension content
      * @throws ExtensionException error when downloading the extension
      */
-    void download(File file) throws ExtensionException;
+    void download(OutputStream stream) throws ExtensionException;
 
     /**
      * @return the repository of the extension

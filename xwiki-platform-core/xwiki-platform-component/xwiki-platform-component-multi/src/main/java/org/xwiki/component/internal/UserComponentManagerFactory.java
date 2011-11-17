@@ -28,7 +28,7 @@ import org.xwiki.component.internal.multi.ComponentManagerFactory;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
- * Implementation of {@link ComponentManagerFactory} which force parent to be {@link WikiComponentManager};
+ * Implementation of {@link ComponentManagerFactory} which force parent to be {@link WikiComponentManager}.
  * 
  * @version $Id$
  * @since 3.3M2
@@ -38,6 +38,9 @@ import org.xwiki.component.manager.ComponentManager;
 @Singleton
 public class UserComponentManagerFactory implements ComponentManagerFactory
 {
+    /**
+     * The default {@link ComponentManagerFactory} used to actually create the {@link ComponentManager} instance.
+     */
     @Inject
     private ComponentManagerFactory factory;
 

@@ -339,7 +339,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     }
 
     /**
-     * Return a clone of this reference with a parent appended at the root of its parents chain
+     * Return a clone of this reference with a parent appended at the root of its parents chain.
      *
      * @param newParent the parent that became the root parent of this reference (and its parent)
      * @return a new reference with newParent added to its parent chain

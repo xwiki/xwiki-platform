@@ -558,7 +558,7 @@ return XWiki;
 
 {{velocity}}
 ## Determine the action button that triggered the request
-#set($action = 'edit')
+#set($action = $context.action)
 #foreach($paramName in $request.getParameterMap().keySet())
   #if($paramName.startsWith('xaction_'))
     #set($action = $paramName.substring(8))

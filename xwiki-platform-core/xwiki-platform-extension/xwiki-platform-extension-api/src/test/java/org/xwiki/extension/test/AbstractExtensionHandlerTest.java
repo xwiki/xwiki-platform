@@ -67,8 +67,16 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
 
     protected LocalExtension install(ExtensionId extensionId) throws Throwable
     {
+        return install(extensionId, null);
+    }
+
+    protected LocalExtension install(ExtensionId extensionId, String namespace) throws Throwable
+    {
         InstallRequest installRequest = new InstallRequest();
         installRequest.addExtension(extensionId);
+        if (namespace != null) {
+            installRequest.addNamespace(namespace);
+        }
         Job installJob = this.jobManager.install(installRequest);
 
         List<LogEvent> errors = installJob.getStatus().getLog(LogLevel.ERROR);
@@ -80,6 +88,11 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
     }
 
     protected LocalExtension uninstall(ExtensionId extensionId) throws Throwable
+    {
+        return uninstall(extensionId, null);
+    }
+
+    protected LocalExtension uninstall(ExtensionId extensionId, String namespace) throws Throwable
     {
         UninstallRequest uninstallRequest = new UninstallRequest();
         uninstallRequest.addExtension(extensionId);

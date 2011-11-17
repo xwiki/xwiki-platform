@@ -22,6 +22,7 @@ package org.xwiki.extension.jar;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.extension.ExtensionId;
@@ -38,6 +39,8 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
     private ExtensionId testArtifactId;
 
     private LocalExtensionRepository localExtensionRepository;
+    
+    private ComponentManagerManager componentManagerManager;
 
     @Override
     protected void registerComponents() throws Exception
@@ -55,6 +58,7 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
         // lookup
 
         this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class);
+        this.componentManagerManager = getComponentManager().lookup(ComponentManagerManager.class);
 
         this.testArtifactId = new ExtensionId("org.xwiki.test:test-extension", "test");
     }
@@ -73,10 +77,10 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
         Assert.assertTrue(localExtension.getFile().exists());
         Assert.assertTrue(localExtension.isInstalled(null));
 
+        // lookup registered component
         getComponentManager().lookup(TestComponent.class);
 
-        // lookup registered component
-
+        // try to install again
         try {
             install(this.testArtifactId);
             Assert.fail("installExtension should have failed");
@@ -111,5 +115,62 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
         localExtension = install(this.testArtifactId);
 
         Assert.assertTrue(localExtension.isInstalled(null));
+    }
+
+    @Test
+    public void testInstallAndUninstallExtensionOnANamespace() throws Throwable
+    {
+        // /////////////////////////////////////////////////////////////////////
+        // install
+        // /////////////////////////////////////////////////////////////////////
+        // actual test
+        LocalExtension localExtension = install(this.testArtifactId, "namespace");
+
+        Assert.assertNotNull(localExtension);
+        Assert.assertNotNull(localExtension.getFile());
+        Assert.assertTrue(localExtension.getFile().exists());
+        Assert.assertTrue(localExtension.isInstalled("namespace"));
+        Assert.assertFalse(localExtension.isInstalled(null));
+
+        this.componentManagerManager.getComponentManager("namespace", false).lookup(TestComponent.class);        
+
+        try {
+            getComponentManager().lookup(TestComponent.class);
+            Assert.fail("the component should not be in the root component manager");
+        } catch (ComponentLookupException expected) {
+            // expected
+        }
+
+        // lookup registered component
+
+        try {
+            install(this.testArtifactId, "namespace");
+            Assert.fail("installExtension should have failed");
+        } catch (InstallException expected) {
+            // expected
+        }
+
+        getComponentManager().lookup(ExecutionContextInitializer.class, "jarextension").initialize(null);
+
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension("feature", "namespace"));
+        Assert.assertNull(this.localExtensionRepository.getInstalledExtension("feature", null));
+
+        // /////////////////////////////////////////////////////////////////////
+        // uninstall
+        // /////////////////////////////////////////////////////////////////////
+
+        localExtension = uninstall(this.testArtifactId);
+
+        Assert.assertFalse(localExtension.isInstalled(null));
+        Assert.assertFalse(localExtension.isInstalled("namespace"));
+        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(this.testArtifactId.getId(), "namespace"));
+        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(this.testArtifactId.getId(), null));
+
+        try {
+            getComponentManager().lookup(TestComponent.class);
+            Assert.fail("the extension has not been uninstalled");
+        } catch (ComponentLookupException expected) {
+            // expected
+        }
     }
 }

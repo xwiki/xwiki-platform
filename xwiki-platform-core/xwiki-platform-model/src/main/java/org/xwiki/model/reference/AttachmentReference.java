@@ -50,13 +50,13 @@ public class AttachmentReference extends EntityReference
      * @param newReference the new parent that will replace oldReference in the chain
      * @since 3.3M2
      */
-    public AttachmentReference(EntityReference reference, EntityReference oldReference, EntityReference newReference)
+    protected AttachmentReference(EntityReference reference, EntityReference oldReference, EntityReference newReference)
     {
         super(reference, oldReference, newReference);
     }
 
     /**
-     * Create a new attachement reference based on the attachment name and the parent document reference.
+     * Create a new attachment reference based on the attachment name and the parent document reference.
      *
      * @param fileName the name of the attachment
      * @param parent the reference of the document
@@ -77,6 +77,11 @@ public class AttachmentReference extends EntityReference
     @Override
     protected void setParent(EntityReference parent)
     {
+        if (parent instanceof DocumentReference) {
+            super.setParent(parent);
+            return;
+        }
+
         if (parent == null || parent.getType() != EntityType.DOCUMENT) {
             throw new IllegalArgumentException("Invalid parent reference [" + parent + "] in an attachment reference");
         }
@@ -107,5 +112,11 @@ public class AttachmentReference extends EntityReference
     public DocumentReference getDocumentReference()
     {
         return (DocumentReference) extractReference(EntityType.DOCUMENT);
+    }
+
+    @Override
+    public AttachmentReference replaceParent(EntityReference oldParent, EntityReference newParent)
+    {
+        return new AttachmentReference(this, oldParent, newParent);
     }
 }

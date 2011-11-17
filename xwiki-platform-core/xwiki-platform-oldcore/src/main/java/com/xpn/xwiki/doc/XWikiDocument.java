@@ -507,7 +507,7 @@ public class XWikiDocument implements DocumentModelBridge
         DocumentReference reference = this.currentDocumentReferenceResolver.resolve(name, contextReference);
 
         if (!StringUtils.isEmpty(wiki)) {
-            reference = new DocumentReference(reference, reference.getWikiReference(), new WikiReference(wiki));
+            reference = reference.replaceParent(reference.getWikiReference(), new WikiReference(wiki));
         }
 
         init(reference);
@@ -5184,7 +5184,7 @@ public class XWikiDocument implements DocumentModelBridge
             WikiReference wiki = reference.getWikiReference();
             WikiReference newWiki = new WikiReference(database);
             if( !newWiki.equals(wiki) ) {
-                this.documentReference = new DocumentReference(reference, wiki, newWiki);
+                this.documentReference = reference.replaceParent(wiki, newWiki);
 
                 // Clean the absolute parent reference cache to rebuild it next time getParentReference is called.
                 this.parentReferenceCache = null;

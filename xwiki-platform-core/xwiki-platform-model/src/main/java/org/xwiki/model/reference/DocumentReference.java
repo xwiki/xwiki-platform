@@ -59,7 +59,7 @@ public class DocumentReference extends EntityReference
      * @param newReference the new parent that will replace oldReference in the chain
      * @since 3.3M2
      */
-    public DocumentReference(EntityReference reference, EntityReference oldReference, EntityReference newReference)
+    protected DocumentReference(EntityReference reference, EntityReference oldReference, EntityReference newReference)
     {
         super(reference, oldReference, newReference);
     }
@@ -181,6 +181,11 @@ public class DocumentReference extends EntityReference
     @Override
     protected void setParent(EntityReference parent)
     {
+        if (parent instanceof SpaceReference) {
+            super.setParent(parent);
+            return;
+        }
+
         if (parent == null || parent.getType() != EntityType.SPACE) {
             throw new IllegalArgumentException("Invalid parent reference [" + parent + "] in a document reference");
         }
@@ -276,5 +281,11 @@ public class DocumentReference extends EntityReference
             parent = spaceReference;
         }
         return spaceReference;
+    }
+
+    @Override
+    public DocumentReference replaceParent(EntityReference oldParent, EntityReference newParent)
+    {
+        return new DocumentReference(this, oldParent, newParent);
     }
 }

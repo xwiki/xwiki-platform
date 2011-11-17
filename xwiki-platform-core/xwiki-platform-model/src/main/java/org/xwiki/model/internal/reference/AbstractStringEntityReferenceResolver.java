@@ -111,7 +111,7 @@ public abstract class AbstractStringEntityReferenceResolver  extends AbstractEnt
             if (name != null) {
                 EntityReference newReference = new EntityReference(name, entityTypesForType[i]);
                 if (reference != null) {
-                    reference = new EntityReference(reference, null, newReference);
+                    reference = reference.appendParent(newReference);
                 } else {
                     reference = newReference;
                 }
@@ -129,7 +129,7 @@ public abstract class AbstractStringEntityReferenceResolver  extends AbstractEnt
         if (name != null) {
             EntityReference newReference = new EntityReference(name, entityTypesForType[separatorsForType.length]);
             if (reference != null) {
-                reference = new EntityReference(reference, null, newReference);
+                reference = reference.appendParent(newReference);
             } else {
                 reference = newReference;
             }

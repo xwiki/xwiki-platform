@@ -67,7 +67,7 @@ public class XarPageLimitedHandler extends AbstractHandler
                this.pageReference.getParent());
             this.xarEntry.setDocumentReference(this.pageReference);
         } else if (qName.equals("web")) {
-            this.pageReference = new EntityReference(this.pageReference, this.pageReference.getParent(),
+            this.pageReference = this.pageReference.replaceParent(this.pageReference.getParent(),
                new EntityReference(this.value.toString(), EntityType.SPACE));
             this.xarEntry.setDocumentReference(this.pageReference);
         } else {

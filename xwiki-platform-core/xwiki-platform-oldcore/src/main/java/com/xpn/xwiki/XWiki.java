@@ -4650,10 +4650,10 @@ public class XWiki implements EventListener
             WikiReference targetWikiReference = new WikiReference(targetWiki);
             for (String docname : list) {
                 DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
-                sourceDocumentReference = new DocumentReference(sourceDocumentReference,
+                sourceDocumentReference = sourceDocumentReference.replaceParent(
                     sourceDocumentReference.getWikiReference(), sourceWikiReference);
-                DocumentReference targetDocumentReference = new DocumentReference(sourceDocumentReference,
-                    sourceDocumentReference.getWikiReference(), targetWikiReference);
+                DocumentReference targetDocumentReference = sourceDocumentReference.replaceParent(
+                    sourceWikiReference, targetWikiReference);
                 copyDocument(sourceDocumentReference, targetDocumentReference, language, context);
                 nb++;
             }

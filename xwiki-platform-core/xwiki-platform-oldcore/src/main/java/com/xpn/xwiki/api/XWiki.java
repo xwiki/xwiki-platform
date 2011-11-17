@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.QueryManager;
@@ -1481,7 +1480,8 @@ public class XWiki extends Api
      * API to copy a translation of a document to another document of the same name in another wiki additionally
      * resetting the version and overwriting the previous document
      * 
-     * @param docname source document
+     * @param docname source document name
+     * @param targetdocname target document name
      * @param sourceWiki source wiki
      * @param targetWiki target wiki
      * @param wikilanguage language to copy
@@ -1495,13 +1495,13 @@ public class XWiki extends Api
     {
         DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
         if (!StringUtils.isEmpty(sourceWiki)) {
-            sourceDocumentReference = new DocumentReference(sourceDocumentReference,
+            sourceDocumentReference = sourceDocumentReference.replaceParent(
                 sourceDocumentReference.getWikiReference(), new WikiReference(sourceWiki));
         }
 
         DocumentReference targetDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(targetdocname);
         if (!StringUtils.isEmpty(targetWiki)) {
-            targetDocumentReference = new DocumentReference(targetDocumentReference,
+            targetDocumentReference = targetDocumentReference.replaceParent(
                 targetDocumentReference.getWikiReference(), new WikiReference(targetWiki));
         }
 

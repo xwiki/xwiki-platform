@@ -111,13 +111,13 @@ public abstract class AbstractReferenceEntityReferenceResolver extends AbstractE
                 EntityReference newReference =
                     new EntityReference(resolveDefaultValue(types.get(0), parameters), types.get(0), reference
                         .getParent());
-                normalizedReference = new EntityReference(normalizedReference, reference.getParent(), newReference);
+                normalizedReference = normalizedReference.replaceParent(reference.getParent(), newReference);
                 reference = newReference;
             } else if (reference.getParent() == null && !types.isEmpty()) {
                 // The top reference isn't the allowed top level reference, add a parent reference
                 EntityReference newReference =
                     new EntityReference(resolveDefaultValue(types.get(0), parameters), types.get(0));
-                normalizedReference = new EntityReference(normalizedReference, null, newReference);
+                normalizedReference = normalizedReference.appendParent(newReference);
                 reference = newReference;
             } else if (reference.getParent() != null && types.isEmpty()) {
                 // There's a parent but no one is allowed

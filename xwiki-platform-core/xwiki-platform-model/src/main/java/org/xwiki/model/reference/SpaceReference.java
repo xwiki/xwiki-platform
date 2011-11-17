@@ -49,7 +49,7 @@ public class SpaceReference extends EntityReference
      * @param newReference the new parent that will replace oldReference in the chain
      * @since 3.3M2
      */
-    public SpaceReference(EntityReference reference, EntityReference oldReference, EntityReference newReference) {
+    protected SpaceReference(EntityReference reference, EntityReference oldReference, EntityReference newReference) {
         super(reference, oldReference, newReference);
     }
 
@@ -131,5 +131,11 @@ public class SpaceReference extends EntityReference
         }
 
         super.setType(EntityType.SPACE);
+    }
+
+    @Override
+    public SpaceReference replaceParent(EntityReference oldParent, EntityReference newParent)
+    {
+        return new SpaceReference(this, oldParent, newParent);
     }
 }

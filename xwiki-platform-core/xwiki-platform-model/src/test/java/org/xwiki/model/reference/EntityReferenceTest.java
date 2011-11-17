@@ -324,7 +324,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testCopyConstructorReplaceParent()
+    public void testReplaceParent()
     {
         Map<String, Serializable> map1 = getParamMap(3);
         Map<String, Serializable> map2 = getParamMap(2);
@@ -337,8 +337,8 @@ public class EntityReferenceTest
         EntityReference space2 = new EntityReference("space2", EntityType.SPACE, wiki);
 
         EntityReference reference = new EntityReference("page", EntityType.DOCUMENT, space, map1);
-        EntityReference referenceSpace2 = new EntityReference(reference, space, space2);
-        EntityReference referenceWiki2 = new EntityReference(reference, wiki, wiki2);
+        EntityReference referenceSpace2 = reference.replaceParent(space, space2);
+        EntityReference referenceWiki2 = reference.replaceParent(wiki, wiki2);
 
 
         Assert.assertNotSame(reference,referenceSpace2);

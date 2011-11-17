@@ -52,7 +52,7 @@ public class LocalReferenceEntityReferenceSerializer implements EntityReferenceS
 
             parent = new EntityReference(currentReference.getName(), currentReference.getType());
             if (newReference != null) {
-                newReference = new EntityReference(newReference, null, parent);
+                newReference = newReference.appendParent(parent);
             } else {
                 newReference = parent;
             }

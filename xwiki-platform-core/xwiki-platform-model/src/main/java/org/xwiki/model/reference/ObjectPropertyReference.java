@@ -48,7 +48,7 @@ public class ObjectPropertyReference extends EntityReference
      * @param newReference the new parent that will replace oldReference in the chain
      * @since 3.3M2
      */
-    public ObjectPropertyReference(EntityReference reference, EntityReference oldReference,
+    protected ObjectPropertyReference(EntityReference reference, EntityReference oldReference,
         EntityReference newReference)
     {
         super(reference, oldReference, newReference);
@@ -104,11 +104,22 @@ public class ObjectPropertyReference extends EntityReference
     @Override
     protected void setParent(EntityReference parent)
     {
+        if (parent instanceof ObjectReference) {
+            super.setParent(parent);
+            return;
+        }
+
         if (parent == null || parent.getType() != EntityType.OBJECT) {
             throw new IllegalArgumentException("Invalid parent reference [" + parent
                 + "] in an object property reference");
         }
 
         super.setParent(new ObjectReference(parent));
+    }
+
+    @Override
+    public ObjectPropertyReference replaceParent(EntityReference oldParent, EntityReference newParent)
+    {
+        return new ObjectPropertyReference(this, oldParent, newParent);
     }
 }

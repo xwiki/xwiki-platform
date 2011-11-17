@@ -87,14 +87,14 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     }
 
     /**
-     * Clone an EntityReference, but replace one of the parent in the chain by a new one.
+     * Clone an EntityReference, but replace one of the parent in the chain by an other one.
      *
      * @param reference the reference that is cloned
      * @param oldReference the old parent that will be replaced
      * @param newReference the new parent that will replace oldReference in the chain
      * @since 3.3M2
      */
-    public EntityReference(EntityReference reference, EntityReference oldReference, EntityReference newReference)
+    protected EntityReference(EntityReference reference, EntityReference oldReference, EntityReference newReference)
     {
         if (reference == null) {
             throw new IllegalArgumentException("Cloned reference must not be null");
@@ -235,7 +235,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @param parameters the map of parameter to set
      * @since 3.3M2
      */
-    protected void setParameters(Map<String, Serializable> parameters) {
+    protected void setParameters(Map<String, Serializable> parameters)
+    {
         if (parameters != null) {
             for (Map.Entry<String, Serializable> entry : parameters.entrySet()) {
                 setParameter(entry.getKey(), entry.getValue());
@@ -250,7 +251,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @param value the value of the parameter
      * @since 3.3M2
      */
-    protected void setParameter(String name, Serializable value) {
+    protected void setParameter(String name, Serializable value)
+    {
         if (value != null) {
             if (parameters == null) {
                 parameters = new TreeMap<String, Serializable>();
@@ -275,7 +277,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @since 3.3M2
      */
     @SuppressWarnings("unchecked")
-    protected final <T> T getParameter(String name) {
+    protected final <T> T getParameter(String name)
+    {
         return (parameters == null) ? null : (T) parameters.get(name);
     }
 
@@ -295,7 +298,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @return a list of references in the parents chain of this reference, ordered from root to this reference.
      */
     @SuppressWarnings("unchecked")
-    public List<EntityReference> getReversedReferenceChain() {
+    public List<EntityReference> getReversedReferenceChain()
+    {
         Deque<EntityReference> referenceList = new LinkedList<EntityReference>();
         EntityReference reference = this;
         do {
@@ -319,6 +323,30 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         }
 
         return reference;
+    }
+
+    /**
+     * Return a clone of this reference, but with one of its parent replaced by another one.
+     *
+     * @param oldParent the old parent that will be replaced
+     * @param newParent the new parent that will replace oldParent in the chain
+     * @return a new reference with a amended parent chain
+     * @since 3.3M2
+     */
+    public EntityReference replaceParent(EntityReference oldParent, EntityReference newParent)
+    {
+        return new EntityReference(this, oldParent, newParent);
+    }
+
+    /**
+     * Return a clone of this reference with a parent appended at the root of its parents chain
+     *
+     * @param newParent the parent that became the root parent of this reference (and its parent)
+     * @return a new reference with newParent added to its parent chain
+     */
+    public EntityReference appendParent(EntityReference newParent)
+    {
+        return this.replaceParent(null, newParent);
     }
 
     @Override

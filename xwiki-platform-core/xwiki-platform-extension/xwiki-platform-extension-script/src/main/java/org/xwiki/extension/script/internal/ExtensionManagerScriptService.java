@@ -139,8 +139,8 @@ public class ExtensionManagerScriptService implements ScriptService
 
         try {
             extension =
-                UnmodifiableUtils.unmodifiableExtension(this.extensionManager
-                    .resolveExtension(new ExtensionId(id, version)));
+                UnmodifiableUtils.unmodifiableExtension(this.extensionManager.resolveExtension(new ExtensionId(id,
+                    version)));
         } catch (Exception e) {
             setError(e);
         }
@@ -170,7 +170,8 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<LocalExtension> getInstalledExtensions(String namespace)
     {
-        return UnmodifiableUtils.unmodifiableExtensions(this.localExtensionRepository.getInstalledExtensions(namespace));
+        return UnmodifiableUtils
+            .unmodifiableExtensions(this.localExtensionRepository.getInstalledExtensions(namespace));
     }
 
     /**
@@ -185,7 +186,8 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public LocalExtension getInstalledExtension(String id, String namespace)
     {
-        return UnmodifiableUtils.unmodifiableExtension(this.localExtensionRepository.getInstalledExtension(id, namespace));
+        return UnmodifiableUtils.unmodifiableExtension(this.localExtensionRepository.getInstalledExtension(id,
+            namespace));
     }
 
     /**

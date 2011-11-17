@@ -46,7 +46,7 @@ public class PathStringEntityReferenceSerializer extends AbstractStringEntityRef
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
         boolean isLastReference, Object... parameters)
     {
-        if (currentReference.getParent() != null /*&& representation.length() > 0*/) {
+        if (currentReference.getParent() != null) {
             representation.append(File.separator);
         }
 

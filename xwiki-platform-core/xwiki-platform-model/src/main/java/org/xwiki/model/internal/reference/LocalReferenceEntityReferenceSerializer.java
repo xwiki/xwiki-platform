@@ -42,7 +42,7 @@ public class LocalReferenceEntityReferenceSerializer implements EntityReferenceS
     public EntityReference serialize(EntityReference reference, Object... parameters)
     {
         EntityReference newReference = null;
-        EntityReference parent = null;
+        EntityReference parent;
         for (EntityReference currentReference = reference; currentReference != null; currentReference =
                 currentReference.getParent())
         {

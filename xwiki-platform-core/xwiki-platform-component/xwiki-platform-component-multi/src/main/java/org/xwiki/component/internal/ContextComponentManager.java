@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.internal.multi.DelegateComponentManager;
 import org.xwiki.component.manager.ComponentEventManager;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentManager;
@@ -33,9 +34,9 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 
 /**
- * Chains Component Managers to perform lookups based on the current execution context
- * (current user, current wiki, etc).
- *  
+ * Chains Component Managers to perform lookups based on the current execution context (current user, current wiki,
+ * etc).
+ * 
  * @version $Id$
  * @since 2.1RC1
  */
@@ -97,10 +98,10 @@ public class ContextComponentManager extends DelegateComponentManager implements
     {
         throwException();
     }
-    
+
     /**
-     * Exception to throw when trying to access a write method since this Component Manager is a chaining
-     * Component Manager and should only be used for read-only access.
+     * Exception to throw when trying to access a write method since this Component Manager is a chaining Component
+     * Manager and should only be used for read-only access.
      */
     private void throwException()
     {

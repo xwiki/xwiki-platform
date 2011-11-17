@@ -17,46 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.component.internal.embed;
+package org.xwiki.component.internal;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.embed.EmbeddableComponentManager;
-import org.xwiki.component.internal.ComponentManagerFactory;
+import org.xwiki.component.internal.multi.ComponentManagerFactory;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
- * Create Component Manager implementation based on the Embeddable Component Manager
- * (i.e. a simple implementation of {@link ComponentManager} to be used when using 
- * some XWiki modules standalone).
+ * Implementation of {@link ComponentManagerFactory} which force parent to be {@link WikiComponentManager};
  * 
  * @version $Id$
- * @since 2.1RC1
+ * @since 3.3M2
  */
 @Component
+@Named("user")
 @Singleton
-public class EmbeddableComponentManagerFactory implements ComponentManagerFactory
+public class UserComponentManagerFactory implements ComponentManagerFactory
 {
+    @Inject
+    private ComponentManagerFactory factory;
+
     /**
-     * The Root Component Manager used to get access to the set Component Event Manager that we
-     * set by default for newly created Component Managers.
+     * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
     @Inject
-    private ComponentManager rootComponentManager;
+    @Named("wiki")
+    private ComponentManager wikiComponentManager;
 
     @Override
     public ComponentManager createComponentManager(ComponentManager parentComponentManager)
     {
-        ComponentManager cm = new EmbeddableComponentManager();
-     
-        // Set the parent
-        cm.setParent(parentComponentManager);
-        
-        // Make sure the Event Manager is set so that events can be sent
-        cm.setComponentEventManager(this.rootComponentManager.getComponentEventManager());
-        
-        return cm;
+        return factory.createComponentManager(this.wikiComponentManager);
     }
 }

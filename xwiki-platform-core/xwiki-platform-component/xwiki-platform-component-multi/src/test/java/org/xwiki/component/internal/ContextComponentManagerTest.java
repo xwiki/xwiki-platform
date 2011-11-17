@@ -32,9 +32,9 @@ import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link ContextComponentManager} which indirectly test
- * {@link org.xwiki.component.internal.WikiComponentManager} and 
+ * {@link org.xwiki.component.internal.WikiComponentManager} and
  * {@link org.xwiki.component.internal.UserComponentManager} (and their ancillary classes).
- *  
+ * 
  * @version $Id$
  * @since 2.1RC1
  */
@@ -44,7 +44,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
      * Mock document access bridge.
      */
     private DocumentAccessBridge mockDocumentAccessBridge;
-    
+
     public static interface Role
     {
     }
@@ -52,11 +52,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
     public static class RoleImpl implements Role
     {
     }
-    
-    /**
-     * {@inheritDoc}
-     * @see AbstractComponentTestCase#registerComponents()
-     */
+
     @Override
     protected void registerComponents() throws Exception
     {
@@ -69,31 +65,35 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
     @Test
     public void testRegisterComponentInUserComponentManager() throws Exception
     {
-        final States state  = getMockery().states("test");
+        final States state = getMockery().states("test");
 
+        //@formatter:off
         getMockery().checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).getCurrentUser(); when(state.isNot("otheruser"));
                 will(returnValue("user1")); 
         }});
-        
+        //@formatter:on
+
         ComponentManager userCM = getComponentManager().lookup(ComponentManager.class, "user");
         DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
         cd.setRole(Role.class);
         cd.setImplementation(RoleImpl.class);
 
-        // Register component for the current user 
+        // Register component for the current user
         userCM.registerComponent(cd);
 
         // Verify we can lookup the component from the Context CM
         ComponentManager contextCM = getComponentManager().lookup(ComponentManager.class, "context");
         Assert.assertNotNull(contextCM.lookup(Role.class));
-        
+
         // Now verify that we cannot look it up anymore if there's another user in the context
         state.become("otheruser");
+        //@formatter:off
         getMockery().checking(new Expectations() {{
             oneOf(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("user2")); 
             oneOf(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki"));
         }});
+        //@formatter:on
 
         try {
             contextCM.lookup(Role.class);
@@ -102,19 +102,21 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
             // No need to assert the message, we just want to ensure an exception is raised.
         }
     }
-    
+
     @Test
     public void testRegisterComponentInWikiComponentManager() throws Exception
     {
-        final States state  = getMockery().states("test");
+        final States state = getMockery().states("test");
 
+        //@formatter:off
         getMockery().checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).getCurrentWiki();  when(state.isNot("otherwiki"));
                 will(returnValue("wiki1"));
             allowing(mockDocumentAccessBridge).getCurrentUser(); when(state.isNot("otherwiki"));
                 will(returnValue("user")); 
         }});
-        
+        //@formatter:on
+
         // Register in the current wiki.
         ComponentManager wikiCM = getComponentManager().lookup(ComponentManager.class, "wiki");
         DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
@@ -125,33 +127,39 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         // Verify we can lookup the component from the context CM.
         ComponentManager contextCM = getComponentManager().lookup(ComponentManager.class, "context");
         Assert.assertNotNull(contextCM.lookup(Role.class));
-        
+
         // Now verify that we cannot look it up anymore if there's another wiki in the context
         state.become("otherwiki");
+
+        //@formatter:off
         getMockery().checking(new Expectations() {{
             oneOf(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("user")); 
             allowing(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki2"));
         }});
+        //@formatter:on
+
         try {
             contextCM.lookup(Role.class);
             Assert.fail("Should have raised an exception");
         } catch (ComponentLookupException expected) {
             // No need to assert the message, we just want to ensure an exception is raised.
-        }        
+        }
     }
-    
+
     @Test
     public void testRegisterComponentInRootComponentManager() throws Exception
     {
-        final States state  = getMockery().states("test");
+        final States state = getMockery().states("test");
 
+        //@formatter:off
         getMockery().checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).getCurrentWiki();  when(state.isNot("otherwiki"));
                 will(returnValue("wiki"));
             allowing(mockDocumentAccessBridge).getCurrentUser(); when(state.isNot("otherwiki"));
                 will(returnValue("user")); 
         }});
-        
+        //@formatter:on
+
         // Register in the current wiki.
         DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
         cd.setRole(Role.class);
@@ -162,7 +170,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         ComponentManager contextCM = getComponentManager().lookup(ComponentManager.class, "context");
         Assert.assertNotNull(contextCM.lookup(Role.class));
     }
-    
+
     @Test
     public void testRegisterComponentInContextComponentManagerThrowsException() throws Exception
     {

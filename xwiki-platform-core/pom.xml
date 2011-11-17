@@ -310,7 +310,7 @@
               <excludes>
                 <exclude>**/internal/**</exclude>
                 <!-- To be removed when we release 3.3 -->
-                <excluse>org/xwiki/annotation/reference/IndexedObjectReference</excluse>
+                <exclude>org/xwiki/annotation/reference/IndexedObjectReference</exclude>
                 <exclude>org/xwiki/cache/eviction/EntryEvictionConfiguration</exclude>
                 <exclude>org/xwiki/workspace/WorkspaceManagerException</exclude>
                 <exclude>org/xwiki/model/reference/AttachmentReference</exclude>

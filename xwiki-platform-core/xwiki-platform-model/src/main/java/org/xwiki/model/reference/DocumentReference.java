@@ -213,9 +213,7 @@ public class DocumentReference extends EntityReference
      */
     protected void setLocale(Locale locale)
     {
-        if (locale != null) {
-            setParameter(LOCALE, locale);
-        }
+        setParameter(LOCALE, locale);
     }
 
     /**

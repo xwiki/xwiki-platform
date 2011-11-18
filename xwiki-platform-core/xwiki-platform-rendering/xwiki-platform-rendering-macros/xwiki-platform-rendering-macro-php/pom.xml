@@ -32,7 +32,6 @@
   <artifactId>xwiki-platform-rendering-macro-php</artifactId>
   <name>XWiki Platform - Rendering - Macro - PHP</name>
   <description>XWiki macro for interpreting PHP code.</description>
-  <url>http://extensions.xwiki.org/xwiki/bin/view/Extension/PHP+Macro</url>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

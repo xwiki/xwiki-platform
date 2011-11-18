@@ -197,10 +197,12 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         assertEquals("**title**", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
 
-        this.document.setTitle("<strong>title</strong>");
+        this.document.setTitle("<strong>ti<em>tle</strong>");
 
-        assertEquals("<strong>title</strong>", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
-        assertEquals("title", this.document.getRenderedTitle(Syntax.PLAIN_1_0, getContext()));
+        // The title is parsed as plain text after the Velocity code is evaluated so the HTML have no meaning.
+        assertEquals("&lt;strong&gt;ti&lt;em&gt;tle&lt;/strong&gt;",
+            this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+        assertEquals("<strong>ti<em>tle</strong>", this.document.getRenderedTitle(Syntax.PLAIN_1_0, getContext()));
 
         this.document.setTitle("#set($key = \"title\")$key");
         this.mockXWikiRenderingEngine.stubs().method("interpretText").with(eq("#set($key = \"title\")$key"), ANYTHING,

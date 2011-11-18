@@ -56,7 +56,7 @@ public class XWiki10DocumentTitleDisplayer extends DocumentTitleDisplayer
         }
 
         if (!title.isEmpty()) {
-            return parseXDOM(evaluateTitle(title, document.getDocumentReference(), parameters));
+            return parseTitle(evaluateTitle(title, document.getDocumentReference(), parameters));
         }
 
         return null;

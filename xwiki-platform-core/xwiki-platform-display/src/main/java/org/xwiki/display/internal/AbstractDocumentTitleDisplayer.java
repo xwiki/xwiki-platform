@@ -65,8 +65,8 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
      * The component used to parse the rendered title into an XDOM.
      */
     @Inject
-    @Named("html/4.01")
-    private Parser htmlParser;
+    @Named("plain/1.0")
+    private Parser plainTextParser;
 
     /**
      * The component used to get the Velocity Engine and the Velocity Context needed to evaluate the Velocity script
@@ -104,7 +104,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         // 1. Try to use the title provided by the user.
         if (!StringUtils.isEmpty(document.getTitle())) {
             try {
-                return parseXDOM(evaluateTitle(document.getTitle(), document.getDocumentReference(), parameters));
+                return parseTitle(evaluateTitle(document.getTitle(), document.getDocumentReference(), parameters));
             } catch (Exception e) {
                 String reference = defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
                 logger.warn("Failed to interpret title of document [{}].", reference);
@@ -123,7 +123,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         }
 
         // 3. No title has been found. Use the document name as title.
-        return parseXDOM(document.getDocumentReference().getName());
+        return parseTitle(document.getDocumentReference().getName());
     }
 
     /**
@@ -132,10 +132,10 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
      * @param title the title to be parsed
      * @return the XDOM generated from parsing the title as plain text
      */
-    protected XDOM parseXDOM(String title)
+    protected XDOM parseTitle(String title)
     {
         try {
-            XDOM xdom = htmlParser.parse(new StringReader(title));
+            XDOM xdom = plainTextParser.parse(new StringReader(title));
             parserUtils.removeTopLevelParagraph(xdom.getChildren());
             return xdom;
         } catch (ParseException e) {

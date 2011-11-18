@@ -115,9 +115,11 @@
         <sequence>
           <element name="summary" type="string" minOccurs="0"></element>
           <element name="description" type="string" minOccurs="0"></element>
-          <element name="license" type="extension:License" minOccurs="0"></element>
+          <element name="licenses" type="extension:License" minOccurs="0"
+            maxOccurs="unbounded">
+          </element>
           <element name="website" type="string" minOccurs="0"></element>
-          <element name="authors" type="string" minOccurs="0"
+          <element name="authors" type="extension:ExtensionAuthor" minOccurs="0"
             maxOccurs="unbounded">
           </element>
           <element name="features" type="string" minOccurs="0"
@@ -132,6 +134,13 @@
     <sequence>
       <element name="name" type="string"></element>
       <element name="content" type="string" minOccurs="0"></element>
+    </sequence>
+  </complexType>
+
+  <complexType name="ExtensionAuthor">
+    <sequence>
+      <element name="name" type="string" minOccurs="0"></element>
+      <element name="url" type="string" minOccurs="0"></element>
     </sequence>
   </complexType>
 

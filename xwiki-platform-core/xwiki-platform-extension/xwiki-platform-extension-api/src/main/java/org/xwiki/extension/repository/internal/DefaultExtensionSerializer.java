@@ -24,7 +24,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
@@ -39,14 +42,15 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.DefaultExtensionAuthor;
 import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
@@ -73,9 +77,9 @@ public class DefaultExtensionSerializer implements ExtensionSerializer
 
     private static final String ELEMENT_LLICENSE = "license";
 
-    private static final String ELEMENT_LNAME = "name";
+    private static final String ELEMENT_LLNAME = "name";
 
-    private static final String ELEMENT_LCONTENT = "content";
+    private static final String ELEMENT_LLCONTENT = "content";
 
     private static final String ELEMENT_NAME = "name";
 
@@ -88,6 +92,10 @@ public class DefaultExtensionSerializer implements ExtensionSerializer
     private static final String ELEMENT_AUTHORS = "authors";
 
     private static final String ELEMENT_AAUTHOR = "author";
+
+    private static final String ELEMENT_AANAME = "name";
+
+    private static final String ELEMENT_AAURL = "url";
 
     private static final String ELEMENT_DEPENDENCIES = "dependencies";
 
@@ -172,8 +180,8 @@ public class DefaultExtensionSerializer implements ExtensionSerializer
                 Node licenseNode = licenses.item(i);
 
                 if (licenseNode.getNodeName().equals(ELEMENT_LLICENSE)) {
-                    Node licenseNameNode = getNode(licenseNode, ELEMENT_LNAME);
-                    Node licenceContentNode = getNode(licenseNode, ELEMENT_LCONTENT);
+                    Node licenseNameNode = getNode(licenseNode, ELEMENT_LLNAME);
+                    Node licenceContentNode = getNode(licenseNode, ELEMENT_LLCONTENT);
 
                     String licenseName = licenseNameNode.getTextContent();
                     ExtensionLicense license = this.licenseManager.getLicense(licenseName);
@@ -201,7 +209,19 @@ public class DefaultExtensionSerializer implements ExtensionSerializer
                 Node authorNode = authors.item(i);
 
                 if (authorNode.getNodeName() == ELEMENT_AAUTHOR) {
-                    localExtension.addAuthor(authorNode.getTextContent());
+                    Node authorNameNode = getNode(authorNode, ELEMENT_AANAME);
+                    Node authorURLNode = getNode(authorNode, ELEMENT_AAURL);
+
+                    String authorName = authorNameNode != null ? authorNameNode.getTextContent() : null;
+                    URL authorURL;
+                    try {
+                        authorURL = authorURLNode != null ? new URL(authorURLNode.getTextContent()) : null;
+                    } catch (MalformedURLException e) {
+                        // That should never happen
+                        throw new InvalidExtensionException("Malformed URL [" + authorURLNode.getTextContent() + "]", e);
+                    }
+
+                    localExtension.addAuthor(new DefaultExtensionAuthor(authorName, authorURL));
                 }
             }
         }
@@ -296,8 +316,9 @@ public class DefaultExtensionSerializer implements ExtensionSerializer
         addElement(document, extensionElement, ELEMENT_SUMMARY, extension.getSummary());
         addElement(document, extensionElement, ELEMENT_DESCRIPTION, extension.getDescription());
         addElement(document, extensionElement, ELEMENT_WEBSITE, extension.getWebSite());
-        addCollection(document, extensionElement, extension.getAuthors(), ELEMENT_AAUTHOR, ELEMENT_AUTHORS);
         addCollection(document, extensionElement, extension.getNamespaces(), ELEMENT_NFEATURE, ELEMENT_FEATURES);
+
+        addAuthors(document, extensionElement, extension);
 
         addLicenses(document, extensionElement, extension);
 
@@ -337,7 +358,7 @@ public class DefaultExtensionSerializer implements ExtensionSerializer
                 Element licenseElement = document.createElement(ELEMENT_LLICENSE);
                 licensesElement.appendChild(licenseElement);
 
-                addElement(document, licenseElement, ELEMENT_LNAME, license.getName());
+                addElement(document, licenseElement, ELEMENT_LLNAME, license.getName());
                 if (this.licenseManager.getLicense(license.getName()) == null && license.getContent() != null) {
                     // Only store content if it's a custom license (license content is pretty big generally)
                     StringWriter content = new StringWriter();
@@ -346,8 +367,25 @@ public class DefaultExtensionSerializer implements ExtensionSerializer
                     } catch (IOException e) {
                         // That should never happen
                     }
-                    addElement(document, licenseElement, ELEMENT_LCONTENT, content.toString());
+                    addElement(document, licenseElement, ELEMENT_LLCONTENT, content.toString());
                 }
+            }
+        }
+    }
+
+    private void addAuthors(Document document, Element parentElement, Extension extension)
+    {
+        List<ExtensionAuthor> authors = extension.getAuthors();
+        if (!authors.isEmpty()) {
+            Element dependenciesElement = document.createElement(ELEMENT_AUTHORS);
+            parentElement.appendChild(dependenciesElement);
+
+            for (ExtensionAuthor author : authors) {
+                Element dependencyElement = document.createElement(ELEMENT_AAUTHOR);
+                dependenciesElement.appendChild(dependencyElement);
+
+                addElement(document, dependencyElement, ELEMENT_AANAME, author.getName());
+                addElement(document, dependencyElement, ELEMENT_AAURL, author.getURL().toString());
             }
         }
     }

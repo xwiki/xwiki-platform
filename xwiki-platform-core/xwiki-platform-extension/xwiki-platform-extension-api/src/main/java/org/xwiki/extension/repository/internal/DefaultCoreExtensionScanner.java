@@ -21,6 +21,7 @@ package org.xwiki.extension.repository.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,6 +47,7 @@ import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.DefaultExtensionAuthor;
 import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
@@ -137,7 +139,16 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
                 coreExtension.setName(mavenModel.getName());
                 coreExtension.setDescription(mavenModel.getDescription());
                 for (Developer developer : mavenModel.getDevelopers()) {
-                    coreExtension.addAuthor(developer.getId());
+                    URL authorURL = null;
+                    if (developer.getUrl() != null) {
+                        try {
+                            authorURL = new URL(developer.getUrl());
+                        } catch (MalformedURLException e) {
+                            // TODO: log ?
+                        }
+                    }
+
+                    coreExtension.addAuthor(new DefaultExtensionAuthor(developer.getId(), authorURL));
                 }
                 coreExtension.setWebsite(mavenModel.getUrl());
 

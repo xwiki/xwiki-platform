@@ -78,7 +78,7 @@ public interface Extension
     /**
      * @return the extension authors
      */
-    List<String> getAuthors();
+    List<ExtensionAuthor> getAuthors();
 
     /**
      * @return the dependencies of the extension

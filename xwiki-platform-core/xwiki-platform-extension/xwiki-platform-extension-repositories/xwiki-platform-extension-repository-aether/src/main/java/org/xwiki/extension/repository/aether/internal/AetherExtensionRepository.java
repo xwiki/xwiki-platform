@@ -21,6 +21,8 @@ package org.xwiki.extension.repository.aether.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
@@ -36,6 +38,7 @@ import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.ArtifactDescriptorRequest;
 import org.sonatype.aether.resolution.ArtifactDescriptorResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.xwiki.extension.DefaultExtensionAuthor;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
@@ -104,7 +107,16 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
         extension.setName(model.getName());
         extension.setDescription(model.getDescription());
         for (Developer developer : model.getDevelopers()) {
-            extension.addAuthor(developer.getId());
+            URL authorURL = null;
+            if (developer.getUrl() != null) {
+                try {
+                    authorURL = new URL(developer.getUrl());
+                } catch (MalformedURLException e) {
+                    // TODO: log ?
+                }
+            }
+
+            extension.addAuthor(new DefaultExtensionAuthor(developer.getId(), authorURL));
         }
         extension.setWebsite(model.getUrl());
 

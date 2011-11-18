@@ -76,7 +76,7 @@ public abstract class AbstractExtension implements Extension
     /**
      * @see #getAuthors()
      */
-    protected List<String> authors = new ArrayList<String>();
+    protected List<ExtensionAuthor> authors = new ArrayList<ExtensionAuthor>();
 
     /**
      * @see #getWebSite()
@@ -264,7 +264,7 @@ public abstract class AbstractExtension implements Extension
     }
 
     @Override
-    public List<String> getAuthors()
+    public List<ExtensionAuthor> getAuthors()
     {
         return this.authors;
     }
@@ -272,17 +272,17 @@ public abstract class AbstractExtension implements Extension
     /**
      * @param authors the authors of the extension
      */
-    public void setAuthors(Collection<String> authors)
+    public void setAuthors(Collection<ExtensionAuthor> authors)
     {
-        this.authors = new ArrayList<String>(authors);
+        this.authors = new ArrayList<ExtensionAuthor>(authors);
     }
 
     /**
      * Add a new author to the extension.
      * 
-     * @param author an author name
+     * @param author an author
      */
-    public void addAuthor(String author)
+    public void addAuthor(ExtensionAuthor author)
     {
         this.authors.add(author);
     }

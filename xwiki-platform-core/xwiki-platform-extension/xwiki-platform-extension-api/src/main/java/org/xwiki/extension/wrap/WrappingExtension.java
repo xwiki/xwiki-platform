@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionFile;
 import org.xwiki.extension.ExtensionId;
@@ -116,7 +117,7 @@ public class WrappingExtension<T extends Extension> implements Extension
     }
 
     @Override
-    public List<String> getAuthors()
+    public List<ExtensionAuthor> getAuthors()
     {
         return getExtension().getAuthors();
     }

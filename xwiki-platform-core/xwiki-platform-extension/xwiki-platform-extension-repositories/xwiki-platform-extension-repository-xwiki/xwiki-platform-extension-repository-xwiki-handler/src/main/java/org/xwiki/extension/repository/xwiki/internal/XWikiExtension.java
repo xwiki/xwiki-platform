@@ -21,15 +21,19 @@ package org.xwiki.extension.repository.xwiki.internal;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.xwiki.extension.AbstractExtension;
+import org.xwiki.extension.DefaultExtensionAuthor;
 import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
 import org.xwiki.extension.ExtensionLicenseManager;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionAuthor;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.License;
@@ -51,27 +55,39 @@ public class XWikiExtension extends AbstractExtension
         setDescription(extension.getDescription());
         setWebsite(extension.getWebsite());
 
-        setAuthors(extension.getAuthors());
         setFeatures(extension.getFeatures());
+
+        // Authors
+        for (ExtensionAuthor author : extension.getAuthors()) {
+            URL url;
+            try {
+                url = new URL(author.getUrl());
+            } catch (MalformedURLException e) {
+                url = null;
+            }
+
+            addAuthor(new DefaultExtensionAuthor(author.getName(), url));
+        }
 
         // License
 
-        License license = extension.getLicense();
-        if (license != null && license.getName() != null) {
-            ExtensionLicense extensionLicense = licenseManager.getLicense(license.getName());
-            if (extensionLicense != null) {
-                addLicense(extensionLicense);
-            } else {
-                List<String> content = null;
-                if (license.getContent() != null) {
-                    try {
-                        content = IOUtils.readLines(new StringReader(license.getContent()));
-                    } catch (IOException e) {
-                        // That should never happen
+        for (License license : extension.getLicenses()) {
+            if (license.getName() != null) {
+                ExtensionLicense extensionLicense = licenseManager.getLicense(license.getName());
+                if (extensionLicense != null) {
+                    addLicense(extensionLicense);
+                } else {
+                    List<String> content = null;
+                    if (license.getContent() != null) {
+                        try {
+                            content = IOUtils.readLines(new StringReader(license.getContent()));
+                        } catch (IOException e) {
+                            // That should never happen
+                        }
                     }
-                }
 
-                addLicense(new ExtensionLicense(license.getName(), content));
+                    addLicense(new ExtensionLicense(license.getName(), content));
+                }
             }
         }
 

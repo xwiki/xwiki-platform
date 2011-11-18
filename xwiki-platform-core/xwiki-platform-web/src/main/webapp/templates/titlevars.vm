@@ -18,7 +18,10 @@
 ## ensure we don't break existing documents that have not yet migrated to the
 ## new way.
 ## ----------------------------------------------------------------------------------
-#set ($titleToDisplay = $tdoc.displayTitle)
+## NOTE: We don't have to escape the rendered title because:
+## * if it comes from the document title/name then it was parsed as plain text
+## * if it comes from a heading in the document content then special XML characters are already escaped.
+#set ($titleToDisplay = $tdoc.getRenderedTitle('xhtml/1.0'))
 #if ($tdoc.title.length() == 0 || $xwiki.isTitleInCompatibilityMode())
   ## Look for first H1-H6 either in lowercase or uppercase
   #set ($regexResult = $regextool.find($renderedContent, "<([hH][1-6]).*?>(?:<span>)?(.*?)(?:</span>)?</[hH][1-6]>"))
@@ -33,9 +36,4 @@
     #end
     #set ($titleToDisplay = $regexResult.get(2).group)
   #end
-#end
-## If the title comes from a heading in the content, special XML characters are already escaped.
-## If the title comes from the title field or from the document name it must be manually escaped for security.
-#if ("$!{tdoc.title}" != '' || $tdoc.name == $titleToDisplay)
-  #set ($titleToDisplay = $escapetool.xml($titleToDisplay))
 #end

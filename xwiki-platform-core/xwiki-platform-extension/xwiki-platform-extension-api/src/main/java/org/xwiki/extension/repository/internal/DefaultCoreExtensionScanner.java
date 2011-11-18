@@ -22,11 +22,9 @@ package org.xwiki.extension.repository.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -119,7 +117,6 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
 
         for (String descriptor : descriptors) {
             URL descriptorUrl = getClass().getClassLoader().getResource(descriptor);
-
             InputStream descriptorStream = getClass().getClassLoader().getResourceAsStream(descriptor);
             try {
                 MavenXpp3Reader reader = new MavenXpp3Reader();
@@ -155,6 +152,13 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
                     coreExtension.setFeatures(this.converter.<Collection<String>> convert(List.class, featuresString));
                 }
 
+                // custom properties
+                coreExtension.putProperty("maven.groupId", groupId);
+                coreExtension.putProperty("maven.artifactId", mavenModel.getArtifactId());
+
+                extensions.put(coreExtension.getId().getId(), coreExtension);
+                coreArtefactIds.add(new Object[] {mavenModel.getArtifactId(), coreExtension});
+
                 // dependencies
                 for (Dependency mavenDependency : mavenModel.getDependencies()) {
                     if (!mavenDependency.isOptional()
@@ -165,27 +169,19 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
                             + ':' + mavenDependency.getArtifactId(), resolveVersion(mavenDependency.getVersion(),
                             mavenModel, true)));
                     }
+
+                    if (mavenDependency.getGroupId().equals("${project.groupId}")) {
+                        mavenDependency.setGroupId(groupId);
+                    }
+                    if (mavenDependency.getVersion() == null) {
+                        mavenDependency.setVersion(UNKNOWN);
+                    } else if (mavenDependency.getVersion().equals("${project.version}")
+                        || mavenDependency.getVersion().equals("${pom.version}")) {
+                        mavenDependency.setVersion(version);
+                    }
+                    dependencies.add(mavenDependency);
                 }
 
-                // custom properties
-                coreExtension.putProperty("maven.groupId", groupId);
-                coreExtension.putProperty("maven.artifactId", mavenModel.getArtifactId());
-
-                extensions.put(coreExtension.getId().getId(), coreExtension);
-                coreArtefactIds.add(new Object[] {mavenModel.getArtifactId(), coreExtension});
-
-                for (Dependency dependency : mavenModel.getDependencies()) {
-                    if (dependency.getGroupId().equals("${project.groupId}")) {
-                        dependency.setGroupId(groupId);
-                    }
-                    if (dependency.getVersion() == null) {
-                        dependency.setVersion(UNKNOWN);
-                    } else if (dependency.getVersion().equals("${project.version}")
-                        || dependency.getVersion().equals("${pom.version}")) {
-                        dependency.setVersion(version);
-                    }
-                    dependencies.add(dependency);
-                }
             } catch (Exception e) {
                 this.logger.warn("Failed to parse descriptor [" + descriptorUrl
                     + "], it will be ignored and not found in core extensions.", e);
@@ -197,72 +193,89 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
                     this.logger.error("Failed to close descriptor stream [" + descriptorUrl + "]", e);
                 }
             }
+        }
 
-            // Normalize and guess
+        // Normalize and guess
 
-            Map<String, Object[]> artefacts = new HashMap<String, Object[]>();
-            Set<URL> urls = ClasspathHelper.forClassLoader();
+        Map<String, Object[]> fileNames = new HashMap<String, Object[]>();
+        Map<String, Object[]> guessedArtefacts = new HashMap<String, Object[]>();
+        Set<URL> urls = ClasspathHelper.forClassLoader();
 
-            for (URL url : urls) {
-                try {
-                    String path = url.toURI().getPath();
-                    String filename = path.substring(path.lastIndexOf('/') + 1);
-
-                    int extIndex = filename.lastIndexOf('.');
-                    if (extIndex != -1) {
-                        filename = filename.substring(0, extIndex);
-                    }
-
-                    int index;
-                    if (!filename.endsWith(SNAPSHOTSUFFIX)) {
-                        index = filename.lastIndexOf('-');
-                    } else {
-                        index = filename.lastIndexOf('-', filename.length() - SNAPSHOTSUFFIX.length());
-                    }
-
-                    if (index != -1) {
-                        String artefactname = filename.substring(0, index);
-                        String version = filename.substring(index + 1);
-
-                        artefacts.put(artefactname, new Object[] {version, url});
-                    }
-                } catch (Exception e) {
-                    this.logger.warn("Failed to parse resource name [" + url + "]", e);
-                }
-            }
-
-            // Try to resolve version no easy to find from the pom.xml
+        for (URL url : urls) {
             try {
-                for (Object[] coreArtefactId : coreArtefactIds) {
-                    Object[] artefact = artefacts.get(coreArtefactId[0]);
+                String path = url.toURI().getPath();
+                String filename = path.substring(path.lastIndexOf('/') + 1);
 
-                    DefaultCoreExtension coreExtension = (DefaultCoreExtension) coreArtefactId[1];
-                    if (artefact != null && coreExtension.getId().getVersion().charAt(0) == '$') {
-                        coreExtension.setId(new ExtensionId(coreExtension.getId().getId(), (String) artefact[0]));
-                        coreExtension.setGuessed(true);
-                    }
+                int extIndex = filename.lastIndexOf('.');
+                if (extIndex != -1) {
+                    filename = filename.substring(0, extIndex);
                 }
 
-                // Add dependencies that does not provide proper pom.xml resource and can't be found in the classpath
-                for (Dependency dependency : dependencies) {
-                    String dependencyId = dependency.getGroupId() + ':' + dependency.getArtifactId();
+                int index;
+                if (!filename.endsWith(SNAPSHOTSUFFIX)) {
+                    index = filename.lastIndexOf('-');
+                } else {
+                    index = filename.lastIndexOf('-', filename.length() - SNAPSHOTSUFFIX.length());
+                }
 
-                    Object[] artefact = artefacts.get(dependency.getArtifactId());
-                    if (artefact != null) {
-                        DefaultCoreExtension coreExtension = extensions.get(dependencyId);
-                        if (coreExtension == null) {
-                            coreExtension =
-                                new DefaultCoreExtension(repository, (URL) artefact[1], new ExtensionId(dependencyId,
-                                    (String) artefact[0]), packagingToType(dependency.getType()));
-                            coreExtension.setGuessed(true);
+                if (index != -1) {
+                    fileNames.put(filename, new Object[] {url});
 
-                            extensions.put(dependencyId, coreExtension);
-                        }
-                    }
+                    String artefactname = filename.substring(0, index);
+                    String version = filename.substring(index + 1);
+
+                    guessedArtefacts.put(artefactname, new Object[] {version, url});
                 }
             } catch (Exception e) {
-                this.logger.warn("Failed to guess extra information about some extensions", e);
+                this.logger.warn("Failed to parse resource name [" + url + "]", e);
             }
+        }
+
+        // Try to resolve version no easy to find from the pom.xml
+        try {
+            for (Object[] coreArtefactId : coreArtefactIds) {
+                Object[] artefact = guessedArtefacts.get(coreArtefactId[0]);
+
+                DefaultCoreExtension coreExtension = (DefaultCoreExtension) coreArtefactId[1];
+                if (artefact != null && coreExtension.getId().getVersion().charAt(0) == '$') {
+                    coreExtension.setId(new ExtensionId(coreExtension.getId().getId(), (String) artefact[0]));
+                    coreExtension.setGuessed(true);
+                }
+            }
+
+            // Add dependencies that does not provide proper pom.xml resource and can't be found in the classpath
+            for (Dependency dependency : dependencies) {
+                String dependencyId = dependency.getGroupId() + ':' + dependency.getArtifactId();
+
+                DefaultCoreExtension coreExtension = extensions.get(dependencyId);
+                if (coreExtension == null) {
+                    String dependencyFileName = dependency.getArtifactId() + '-' + dependency.getVersion();
+                    if (dependency.getClassifier() != null) {
+                        dependencyFileName += '-' + dependency.getClassifier();
+                    }
+
+                    Object[] filenameArtifact = fileNames.get(dependencyFileName);
+                    Object[] guessedArtefact = guessedArtefacts.get(dependency.getArtifactId());
+
+                    if (filenameArtifact != null) {
+                        coreExtension =
+                            new DefaultCoreExtension(repository, (URL) filenameArtifact[0], new ExtensionId(
+                                dependencyId, dependency.getVersion()), packagingToType(dependency.getType()));
+                        coreExtension.setGuessed(true);
+                    } else if (guessedArtefact != null) {
+                        coreExtension =
+                            new DefaultCoreExtension(repository, (URL) guessedArtefact[1], new ExtensionId(
+                                dependencyId, (String) guessedArtefact[0]), packagingToType(dependency.getType()));
+                        coreExtension.setGuessed(true);
+                    }
+
+                    if (coreExtension != null) {
+                        extensions.put(dependencyId, coreExtension);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            this.logger.warn("Failed to guess extra information about some extensions", e);
         }
 
         return extensions;

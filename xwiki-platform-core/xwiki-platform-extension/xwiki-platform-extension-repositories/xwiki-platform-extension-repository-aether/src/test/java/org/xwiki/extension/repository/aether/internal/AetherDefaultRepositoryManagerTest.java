@@ -19,15 +19,14 @@
  */
 package org.xwiki.extension.repository.aether.internal;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.Extension;
@@ -99,24 +98,13 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
     {
         Extension extension = this.repositoryManager.resolve(this.extensionId);
 
-        File file =
-            new File(this.repositoryUtil.getWorkingDirectory() + "/downloaded/extension." + extension.getType());
-
-        if (file.exists()) {
-            file.delete();
-        }
-
-        FileOutputStream fos = FileUtils.openOutputStream(file);
+        InputStream is = extension.getFile().openStream();
 
         try {
-            extension.download(fos);
+            Assert.assertEquals("content", IOUtils.toString(is));
         } finally {
-            fos.close();
+            is.close();
         }
-
-        Assert.assertTrue("File has not been downloaded", file.exists());
-
-        Assert.assertEquals("content", FileUtils.readFileToString(file));
     }
 
     @Test
@@ -124,22 +112,12 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
     {
         Extension extension = this.repositoryManager.resolve(this.bundleExtensionId);
 
-        File file = new File(this.repositoryUtil.getWorkingDirectory() + "/downloaded/bundleextension.jar");
-
-        if (file.exists()) {
-            file.delete();
-        }
-
-        FileOutputStream fos = FileUtils.openOutputStream(file);
+        InputStream is = extension.getFile().openStream();
 
         try {
-            extension.download(fos);
+            Assert.assertEquals("content", IOUtils.toString(is));
         } finally {
-            fos.close();
+            is.close();
         }
-
-        Assert.assertTrue("File has not been downloaded", file.exists());
-
-        Assert.assertEquals("content", FileUtils.readFileToString(file));
     }
 }

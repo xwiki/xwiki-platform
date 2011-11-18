@@ -19,29 +19,17 @@
  */
 package org.xwiki.extension;
 
+import java.net.URL;
+
 /**
- * Represent an extension which can't be modified (uninstalled, upgraded).
- * <p>
- * In practice it's generally all the jars already in the classpath at startup.
+ * Extension {@link ExtensionFile} with some more informations related local extensions.
  * 
  * @version $Id$
  */
-public interface CoreExtension extends Extension
+public interface CoreExtensionFile extends ExtensionFile
 {
     /**
-     * @see #getURL()
+     * @return the core extension URL
      */
-    String PKEY_URL = "core.url";
-
-    /**
-     * @see #isGuessed()
-     */
-    String PKEY_GUESSED = "core.guessed";
-
-    /**
-     * @return true if the extension is "guessed" which means that it's id or version are not 100% sure. It generally
-     *         indicate that a jar without any technical information or partial information has been found in the
-     *         classpath.
-     */
-    boolean isGuessed();
+    URL getURL();
 }

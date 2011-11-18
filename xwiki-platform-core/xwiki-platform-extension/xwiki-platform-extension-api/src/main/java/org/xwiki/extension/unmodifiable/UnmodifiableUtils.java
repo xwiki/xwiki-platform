@@ -26,8 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.extension.CoreExtension;
+import org.xwiki.extension.CoreExtensionFile;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionFile;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.LocalExtensionFile;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
@@ -146,5 +149,33 @@ public final class UnmodifiableUtils
         }
 
         return wrappedExtensionRepository;
+    }
+
+    /**
+     * Wrap an internal (read-write) extension file handler into a safe read-only bridge.
+     * 
+     * @param <T> the expected output type, should be a generic extension file type, like {@link ExtensionFile},
+     *            {@link LocalExtensionFile} or {@code CoreExtensionFile}
+     * @param <U> the input type, a subtype of T
+     * @param extensionFile the read-write extension file handler to wrap
+     * @return a read-only wrapper, or {@code null} if the provided instance is {@code null}
+     */
+    public static <T extends ExtensionFile, U extends T> T unmodifiableExtensionFile(U extensionFile)
+    {
+        T wrappedExtensionFile;
+
+        if (extensionFile == null) {
+            wrappedExtensionFile = null;
+        } else if (extensionFile instanceof CoreExtension) {
+            wrappedExtensionFile =
+                (T) new UnmodifiableCoreExtensionFile<CoreExtensionFile>((CoreExtensionFile) extensionFile);
+        } else if (extensionFile instanceof LocalExtension) {
+            wrappedExtensionFile =
+                (T) new UnmodifiableLocalExtensionFile<LocalExtensionFile>((LocalExtensionFile) extensionFile);
+        } else {
+            wrappedExtensionFile = (T) new UnmodifiableExtensionFile<ExtensionFile>(extensionFile);
+        }
+
+        return wrappedExtensionFile;
     }
 }

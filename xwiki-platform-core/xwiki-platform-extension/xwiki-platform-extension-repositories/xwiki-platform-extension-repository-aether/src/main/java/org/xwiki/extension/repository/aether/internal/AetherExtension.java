@@ -19,23 +19,8 @@
  */
 package org.xwiki.extension.repository.aether.internal;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.model.Model;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.resolution.ArtifactRequest;
-import org.sonatype.aether.resolution.ArtifactResolutionException;
-import org.sonatype.aether.resolution.ArtifactResult;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.xwiki.extension.AbstractExtension;
-import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
 
@@ -49,72 +34,16 @@ public class AetherExtension extends AbstractExtension
 
     public static final String MPKEY_FEATURES = MPKEYPREFIX + "features";
 
-    private PlexusComponentManager plexusComponentManager;
-
-    private List<ExtensionId> suggested;
-
-    private Model mavenModel;
-
     public AetherExtension(ExtensionId id, Model mavenModel, AetherExtensionRepository repository,
-        PlexusComponentManager mavenComponentManager)
+        PlexusComponentManager plexusComponentManager)
     {
         // See bundle as jar packages since bundle are actually store as jar files
         super(repository, id, mavenModel.getPackaging().equals("bundle") ? "jar" : mavenModel.getPackaging());
 
-        this.plexusComponentManager = mavenComponentManager;
-        this.mavenModel = mavenModel;
+        setFile(new AetherExtensionFile(mavenModel, repository, plexusComponentManager, getType()));
 
         // custom properties
-        putProperty(PKEY_GROUPID, this.mavenModel.getGroupId());
-        putProperty(PKEY_ARTIFACTID, this.mavenModel.getArtifactId());
-    }
-
-    @Override
-    public void download(OutputStream stream) throws ExtensionException
-    {
-        RepositorySystem repositorySystem;
-        try {
-            repositorySystem = this.plexusComponentManager.getPlexus().lookup(RepositorySystem.class);
-        } catch (ComponentLookupException e) {
-            throw new ExtensionException("Failed to get org.sonatype.aether.RepositorySystem component", e);
-        }
-
-        AetherExtensionRepository aetherRepository = (AetherExtensionRepository) getRepository();
-
-        ArtifactRequest artifactRequest = new ArtifactRequest();
-        artifactRequest.addRepository(aetherRepository.getRemoteRepository());
-        artifactRequest.setArtifact(new DefaultArtifact(this.mavenModel.getGroupId(), this.mavenModel.getArtifactId(),
-            getType(), this.mavenModel.getVersion()));
-
-        ArtifactResult artifactResult;
-        try {
-            artifactResult = repositorySystem.resolveArtifact(aetherRepository.getSession(), artifactRequest);
-        } catch (ArtifactResolutionException e) {
-            throw new ExtensionException("Failed to resolve artifact", e);
-        }
-
-        File aetherFile = artifactResult.getArtifact().getFile();
-
-        try {
-            FileInputStream fis = new FileInputStream(aetherFile);
-
-            try {
-                IOUtils.copy(fis, stream);
-            } finally {
-                fis.close();
-            }
-        } catch (IOException e) {
-            throw new ExtensionException("Failed to copy file", e);
-        } finally {
-            FileUtils.deleteQuietly(aetherFile);
-        }
-    }
-
-    /**
-     * @return the source Maven {@link Model}.
-     */
-    public Model getMavenModel()
-    {
-        return this.mavenModel;
+        putProperty(PKEY_GROUPID, mavenModel.getGroupId());
+        putProperty(PKEY_ARTIFACTID, mavenModel.getArtifactId());
     }
 }

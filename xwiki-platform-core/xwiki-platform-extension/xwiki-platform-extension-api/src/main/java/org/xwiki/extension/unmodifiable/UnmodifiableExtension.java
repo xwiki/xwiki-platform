@@ -20,6 +20,7 @@
 package org.xwiki.extension.unmodifiable;
 
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionFile;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.wrap.WrappingExtension;
 
@@ -41,6 +42,12 @@ public class UnmodifiableExtension<T extends Extension> extends WrappingExtensio
 
     // Extension
 
+    @Override
+    public ExtensionFile getFile()
+    {
+        return UnmodifiableUtils.unmodifiableExtensionFile(super.getFile());
+    }
+    
     @Override
     public ExtensionRepository getRepository()
     {

@@ -149,7 +149,7 @@ public class ExtensionStorage
 
             localExtension.setFile(getExtensionFile(localExtension.getId(), localExtension.getType()));
 
-            if (!localExtension.getFile().exists()) {
+            if (!localExtension.getFile().getFile().exists()) {
                 throw new InvalidExtensionException("Failed to load local extension [" + descriptor + "]: ["
                     + localExtension.getFile() + "] file does not exists");
             }

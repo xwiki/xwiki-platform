@@ -19,8 +19,6 @@
  */
 package org.xwiki.extension.unmodifiable;
 
-import java.io.File;
-
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.wrap.WrappingLocalExtension;
@@ -49,13 +47,4 @@ public class UnmodifiableLocalExtension<T extends LocalExtension> extends Wrappi
     {
         return UnmodifiableUtils.unmodifiableExtensionRepository(super.getRepository());
     }
-
-    // LocalExtension
-
-    @Override
-    public File getFile()
-    {
-        return getExtension().getFile();
-    }
-
 }

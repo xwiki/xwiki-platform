@@ -79,14 +79,13 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         return this.extensionVersionFileUriBuider;
     }
 
-    public InputStream getRESTResourceAsStream(UriBuilder builder, Object... values) throws ResolveException,
-        IOException
+    public GetMethod getRESTResource(UriBuilder builder, Object... values) throws IOException, IOException
     {
         String url;
         try {
             url = builder.build(values).toString();
         } catch (Exception e) {
-            throw new ResolveException("Failed to build REST URL", e);
+            throw new IOException("Failed to build REST URL", e);
         }
 
         HttpClient httpClient = createClient();
@@ -96,15 +95,19 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         try {
             httpClient.executeMethod(getMethod);
         } catch (Exception e) {
-            throw new ResolveException("Failed to request [" + getMethod.getURI() + "]", e);
+            throw new IOException("Failed to request [" + getMethod.getURI() + "]", e);
         }
 
         if (getMethod.getStatusCode() != HttpStatus.SC_OK) {
-            throw new ResolveException("Invalid answer (" + getMethod.getStatusCode()
-                + ") fo the server when requesting");
+            throw new IOException("Invalid answer (" + getMethod.getStatusCode() + ") fo the server when requesting");
         }
 
-        return getMethod.getResponseBodyAsStream();
+        return getMethod;
+    }
+
+    public InputStream getRESTResourceAsStream(UriBuilder builder, Object... values) throws IOException, IOException
+    {
+        return getRESTResource(builder, values).getResponseBodyAsStream();
     }
 
     // ExtensionRepository

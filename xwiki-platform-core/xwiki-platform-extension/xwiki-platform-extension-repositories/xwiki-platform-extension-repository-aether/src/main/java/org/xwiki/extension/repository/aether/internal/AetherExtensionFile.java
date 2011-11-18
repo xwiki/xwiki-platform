@@ -1,0 +1,97 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.extension.repository.aether.internal;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.maven.model.Model;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.sonatype.aether.RepositorySystem;
+import org.sonatype.aether.resolution.ArtifactRequest;
+import org.sonatype.aether.resolution.ArtifactResolutionException;
+import org.sonatype.aether.resolution.ArtifactResult;
+import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.xwiki.extension.ExtensionFile;
+import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
+
+public class AetherExtensionFile implements ExtensionFile
+{
+    private PlexusComponentManager plexusComponentManager;
+
+    private Model mavenModel;
+
+    private String type;
+
+    private AetherExtensionRepository repository;
+
+    public AetherExtensionFile(Model mavenModel, AetherExtensionRepository repository,
+        PlexusComponentManager plexusComponentManager, String type)
+    {
+        this.repository = repository;
+        this.plexusComponentManager = plexusComponentManager;
+        this.mavenModel = mavenModel;
+        this.type = type;
+    }
+
+    /**
+     * @return the source Maven {@link Model}.
+     */
+    public Model getMavenModel()
+    {
+        return this.mavenModel;
+    }
+
+    @Override
+    public long getLength()
+    {
+        // TODO
+        return -1;
+    }
+
+    @Override
+    public InputStream openStream() throws IOException
+    {
+        RepositorySystem repositorySystem;
+        try {
+            repositorySystem = this.plexusComponentManager.getPlexus().lookup(RepositorySystem.class);
+        } catch (ComponentLookupException e) {
+            throw new IOException("Failed to get org.sonatype.aether.RepositorySystem component", e);
+        }
+
+        ArtifactRequest artifactRequest = new ArtifactRequest();
+        artifactRequest.addRepository(repository.getRemoteRepository());
+        artifactRequest.setArtifact(new DefaultArtifact(this.mavenModel.getGroupId(), this.mavenModel.getArtifactId(),
+            this.type, this.mavenModel.getVersion()));
+
+        ArtifactResult artifactResult;
+        try {
+            artifactResult = repositorySystem.resolveArtifact(repository.getSession(), artifactRequest);
+        } catch (ArtifactResolutionException e) {
+            throw new IOException("Failed to resolve artifact", e);
+        }
+
+        File aetherFile = artifactResult.getArtifact().getFile();
+
+        return new FileInputStream(aetherFile);
+    }
+}

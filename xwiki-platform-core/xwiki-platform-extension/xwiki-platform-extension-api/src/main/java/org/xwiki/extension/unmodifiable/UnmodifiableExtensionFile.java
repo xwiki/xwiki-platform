@@ -17,31 +17,53 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension;
+package org.xwiki.extension.unmodifiable;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.xwiki.extension.ExtensionFile;
 
 /**
- * Represent an extension which can't be modified (uninstalled, upgraded).
- * <p>
- * In practice it's generally all the jars already in the classpath at startup.
+ * Provide a readonly access to an extension file.
  * 
+ * @param <T> the extension type
  * @version $Id$
  */
-public interface CoreExtension extends Extension
+public class UnmodifiableExtensionFile<T extends ExtensionFile> implements ExtensionFile
 {
     /**
-     * @see #getURL()
+     * The wrapped file.
      */
-    String PKEY_URL = "core.url";
+    private T file;
 
     /**
-     * @see #isGuessed()
+     * @param file he wrapped file
      */
-    String PKEY_GUESSED = "core.guessed";
+    public UnmodifiableExtensionFile(T file)
+    {
+        this.file = file;
+    }
 
     /**
-     * @return true if the extension is "guessed" which means that it's id or version are not 100% sure. It generally
-     *         indicate that a jar without any technical information or partial information has been found in the
-     *         classpath.
+     * @return the wrapped file
      */
-    boolean isGuessed();
+    protected T getFile()
+    {
+        return this.file;
+    }
+
+    // ExtensionFile
+
+    @Override
+    public long getLength()
+    {
+        return getFile().getLength();
+    }
+
+    @Override
+    public InputStream openStream() throws IOException
+    {
+        return getFile().openStream();
+    }
 }

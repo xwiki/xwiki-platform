@@ -143,8 +143,9 @@
         <configuration>
           <excludes>
               **/DefaultCoreExtensionScanner.java,
+              **/DefaultExtensionSerializer.java,
               **/DefaultLocalExtensionRepository.java,
-              **/DefaultExtensionSerializer.java
+              **/UnmodifiableUtils.java
           </excludes>
         </configuration>
       </plugin>

@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.jar;
 
+import java.io.File;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -74,7 +76,7 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
 
         Assert.assertNotNull(localExtension);
         Assert.assertNotNull(localExtension.getFile());
-        Assert.assertTrue(localExtension.getFile().exists());
+        Assert.assertTrue(new File(localExtension.getFile().getAbsolutePath()).exists());
         Assert.assertTrue(localExtension.isInstalled(null));
 
         // lookup registered component
@@ -128,7 +130,7 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
 
         Assert.assertNotNull(localExtension);
         Assert.assertNotNull(localExtension.getFile());
-        Assert.assertTrue(localExtension.getFile().exists());
+        Assert.assertTrue(new File(localExtension.getFile().getAbsolutePath()).exists());
         Assert.assertTrue(localExtension.isInstalled("namespace"));
         Assert.assertFalse(localExtension.isInstalled(null));
 

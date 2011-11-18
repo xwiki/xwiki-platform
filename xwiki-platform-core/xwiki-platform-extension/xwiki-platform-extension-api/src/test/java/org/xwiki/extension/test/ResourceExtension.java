@@ -19,28 +19,19 @@
  */
 package org.xwiki.extension.test;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 
-import org.apache.commons.io.IOUtils;
 import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionException;
+import org.xwiki.extension.repository.internal.DefaultCoreExtensionFile;
 
 public class ResourceExtension extends AbstractExtension
 {
-    ResourceExtension(ResourceExtensionRepository repository, Extension extension)
+    ResourceExtension(ResourceExtensionRepository repository, Extension extension) throws UnsupportedEncodingException
     {
         super(repository, extension);
-    }
 
-    public void download(OutputStream stream) throws ExtensionException
-    {
-        try {
-            IOUtils.copy(getResourceExtensionRepository().getResourceAsStream(getId(), getType()), stream);
-        } catch (IOException e) {
-            throw new ExtensionException("Failed to copy resource containing extension [" + getId() + "]", e);
-        }
+        setFile(new DefaultCoreExtensionFile(getResourceExtensionRepository().getResource(getId(), getType())));
     }
 
     private ResourceExtensionRepository getResourceExtensionRepository()

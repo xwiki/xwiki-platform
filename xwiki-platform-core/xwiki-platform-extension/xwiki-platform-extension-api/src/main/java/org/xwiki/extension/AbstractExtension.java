@@ -99,6 +99,11 @@ public abstract class AbstractExtension implements Extension
     protected List<ExtensionDependency> dependencies;
 
     /**
+     * The file of the extension.
+     */
+    protected ExtensionFile file;
+
+    /**
      * @param repository the repository where this extension comes from
      * @param id the extension identifier
      * @param type the extension type
@@ -339,6 +344,20 @@ public abstract class AbstractExtension implements Extension
     protected void setRepository(ExtensionRepository repository)
     {
         this.repository = repository;
+    }
+
+    @Override
+    public ExtensionFile getFile()
+    {
+        return this.file;
+    }
+
+    /**
+     * @param file the file of the extension
+     */
+    protected void setFile(ExtensionFile file)
+    {
+        this.file = file;
     }
 
     @Override

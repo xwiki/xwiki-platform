@@ -19,7 +19,6 @@
  */
 package org.xwiki.extension;
 
-import java.io.File;
 import java.util.Collection;
 
 /**
@@ -48,11 +47,6 @@ public interface LocalExtension extends Extension
     String PKEY_DEPENDENCY = "local.dependency";
 
     /**
-     * @return the extension file in the filesystem
-     */
-    File getFile();
-
-    /**
      * @return indicate if the extension is installed
      */
     boolean isInstalled();
@@ -79,4 +73,9 @@ public interface LocalExtension extends Extension
      * @return true if the the extension has been installed only because it was a dependency of another extension
      */
     boolean isDependency();
+
+    // Extension
+
+    @Override
+    LocalExtensionFile getFile();
 }

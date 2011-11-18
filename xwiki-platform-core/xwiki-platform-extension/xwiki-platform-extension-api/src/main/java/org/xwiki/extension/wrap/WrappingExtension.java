@@ -19,7 +19,6 @@
  */
 package org.xwiki.extension.wrap;
 
-import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
@@ -27,7 +26,7 @@ import java.util.Map;
 
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
-import org.xwiki.extension.ExtensionException;
+import org.xwiki.extension.ExtensionFile;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -129,9 +128,9 @@ public class WrappingExtension<T extends Extension> implements Extension
     }
 
     @Override
-    public void download(OutputStream stream) throws ExtensionException
+    public ExtensionFile getFile()
     {
-        getExtension().download(stream);
+        return getExtension().getFile();
     }
 
     @Override

@@ -20,18 +20,12 @@
 package org.xwiki.extension.repository.internal;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
 
@@ -55,7 +49,6 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
     public DefaultLocalExtension(DefaultLocalExtensionRepository repository, ExtensionId id, String type)
     {
         super(repository, id, type);
-
     }
 
     /**
@@ -67,36 +60,6 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
     public DefaultLocalExtension(DefaultLocalExtensionRepository repository, Extension extension)
     {
         super(repository, extension);
-    }
-
-    // Extension
-
-    @Override
-    public void download(OutputStream stream) throws ExtensionException
-    {
-        InputStream sourceStream = null;
-
-        try {
-            sourceStream = new FileInputStream(getFile());
-
-            IOUtils.copy(sourceStream, stream);
-        } catch (Exception e) {
-            throw new ExtensionException("Failed to copy file", e);
-        } finally {
-            IOException closeException = null;
-
-            if (sourceStream != null) {
-                try {
-                    sourceStream.close();
-                } catch (IOException e) {
-                    closeException = e;
-                }
-            }
-
-            if (closeException != null) {
-                throw new ExtensionException("Failed to close file", closeException);
-            }
-        }
     }
 
     // LocalExtension
@@ -131,9 +94,9 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
     }
 
     @Override
-    public File getFile()
+    public DefaultLocalExtensionFile getFile()
     {
-        return getProperty(PKEY_FILE, null);
+        return (DefaultLocalExtensionFile) super.getFile();
     }
 
     /**
@@ -142,6 +105,7 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
      */
     public void setFile(File file)
     {
+        setFile(new DefaultLocalExtensionFile(file));
         putProperty(PKEY_FILE, file);
     }
 

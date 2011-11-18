@@ -17,60 +17,68 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.wrap;
+package org.xwiki.extension.repository.internal;
 
-import java.util.Collection;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.LocalExtensionFile;
 
 /**
- * Wrap a local extension.
+ * Default implementation of {@link LocalExtensionFile}.
  * 
- * @param <T> the extension type
  * @version $Id$
  */
-public class WrappingLocalExtension<T extends LocalExtension> extends WrappingExtension<T> implements LocalExtension
+public class DefaultLocalExtensionFile implements LocalExtensionFile
 {
     /**
-     * @param localExtension the wrapped local extension
+     * The filesystem file of the local extension.
      */
-    public WrappingLocalExtension(T localExtension)
+    private File file;
+
+    /**
+     * @param file the filesystem file of the local extension
+     */
+    public DefaultLocalExtensionFile(File file)
     {
-        super(localExtension);
+        this.file = file;
     }
 
-    // Extension
-
-    @Override
-    public LocalExtensionFile getFile()
+    /**
+     * @return the real file
+     */
+    public File getFile()
     {
-        return (LocalExtensionFile) super.getFile();
+        return file;
     }
 
-    // LocalExtension
+    // ExtensionFile
 
     @Override
-    public boolean isInstalled()
+    public long getLength()
     {
-        return getExtension().isInstalled();
-    }
-
-    @Override
-    public boolean isInstalled(String namespace)
-    {
-        return getExtension().isInstalled(namespace);
-    }
-
-    @Override
-    public boolean isDependency()
-    {
-        return getExtension().isDependency();
+        return this.file.length();
     }
 
     @Override
-    public Collection<String> getNamespaces()
+    public InputStream openStream() throws IOException
     {
-        return getExtension().getNamespaces();
+        return new FileInputStream(this.file);
+    }
+
+    // LocalExtensionFile
+
+    @Override
+    public String getAbsolutePath()
+    {
+        return this.file.getAbsolutePath();
+    }
+
+    @Override
+    public String getName()
+    {
+        return this.file.getName();
     }
 }

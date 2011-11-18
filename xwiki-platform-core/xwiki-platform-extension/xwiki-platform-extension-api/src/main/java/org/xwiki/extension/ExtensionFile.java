@@ -19,29 +19,28 @@
  */
 package org.xwiki.extension;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
- * Represent an extension which can't be modified (uninstalled, upgraded).
- * <p>
- * In practice it's generally all the jars already in the classpath at startup.
+ * Contains the actual file of the extensions and some informations like the size.
  * 
  * @version $Id$
  */
-public interface CoreExtension extends Extension
+public interface ExtensionFile
 {
     /**
-     * @see #getURL()
+     * @return the size of the extension file, -1 if not provided
      */
-    String PKEY_URL = "core.url";
+    long getLength();
 
     /**
-     * @see #isGuessed()
+     * Open an input stream to allows reading the extensions.
+     * <p>
+     * Note that it's up to the user of this method to close the stream.
+     * 
+     * @return the stream to read
+     * @throws IOException error when opening the stream
      */
-    String PKEY_GUESSED = "core.guessed";
-
-    /**
-     * @return true if the extension is "guessed" which means that it's id or version are not 100% sure. It generally
-     *         indicate that a jar without any technical information or partial information has been found in the
-     *         classpath.
-     */
-    boolean isGuessed();
+    InputStream openStream() throws IOException;
 }

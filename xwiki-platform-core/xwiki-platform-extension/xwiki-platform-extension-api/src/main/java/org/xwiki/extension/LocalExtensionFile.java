@@ -20,28 +20,25 @@
 package org.xwiki.extension;
 
 /**
- * Represent an extension which can't be modified (uninstalled, upgraded).
- * <p>
- * In practice it's generally all the jars already in the classpath at startup.
+ * Extension {@link ExtensionFile} with some more informations related local extensions.
  * 
  * @version $Id$
  */
-public interface CoreExtension extends Extension
+public interface LocalExtensionFile extends ExtensionFile
 {
     /**
-     * @see #getURL()
+     * Returns the name of the file. This is just the last name in the pathname's name sequence.
+     * 
+     * @return the name of the file
+     * @see java.io.File#getName()
      */
-    String PKEY_URL = "core.url";
+    String getName();
 
     /**
-     * @see #isGuessed()
+     * Returns the absolute pathname string of this file.
+     * 
+     * @return The absolute pathname string of the file
+     * @see java.io.File#getAbsolutePath()
      */
-    String PKEY_GUESSED = "core.guessed";
-
-    /**
-     * @return true if the extension is "guessed" which means that it's id or version are not 100% sure. It generally
-     *         indicate that a jar without any technical information or partial information has been found in the
-     *         classpath.
-     */
-    boolean isGuessed();
+    String getAbsolutePath();
 }

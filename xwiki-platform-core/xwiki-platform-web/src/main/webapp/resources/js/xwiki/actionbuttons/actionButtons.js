@@ -226,8 +226,8 @@ function init() {
 }
 
 // When the document is loaded, install action buttons
-(XWiki.isInitialized && init())
-|| document.observe('xwiki:dom:loading', init );
+(XWiki.domIsLoaded && init())
+|| document.observe('xwiki:dom:loaded', init );
 
 function updateForShortcut() {
   if (typeof(Wysiwyg) == 'undefined') {

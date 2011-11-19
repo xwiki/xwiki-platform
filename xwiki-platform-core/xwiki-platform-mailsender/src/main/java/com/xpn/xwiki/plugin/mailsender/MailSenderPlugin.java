@@ -637,7 +637,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * Prepares a Mail Velocity context
+     * Prepares a Mail Velocity context based on a map of parameters
      *
      * @param fromAddr Mail from
      * @param toAddr Mail to
@@ -866,8 +866,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * Uses an XWiki document to build the message subject and context, based on variables stored in the
-     * VelocityContext. Sends the email.
+     * Uses an XWiki document to build the message subject and context, based on variables stored in a map.
+     * Sends the email.
      *
      * @param templateDocFullName Full name of the template to be used (example: XWiki.MyEmailTemplate). The template
      *            needs to have an XWiki.Email object attached

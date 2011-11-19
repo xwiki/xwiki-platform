@@ -153,7 +153,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
      * @see MailSender#sendMessageFromTemplate(String, String, String, String, String, String, java.util.Map)
      */
     public int sendMessageFromTemplate(String from, String to, String cc, String bcc, String language,
-        String documentFullName, Map parameters)
+        String documentFullName, Map<String, Object> parameters)
     {
         this.parameters = parameters;
         try {

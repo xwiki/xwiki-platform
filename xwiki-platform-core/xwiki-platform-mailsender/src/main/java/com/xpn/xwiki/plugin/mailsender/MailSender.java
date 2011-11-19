@@ -152,8 +152,8 @@ public interface MailSender
         String documentFullName, VelocityContext vcontext);
 
     /**
-     * Uses an XWiki document to build the message subject and context, based on variables stored in the
-     * VelocityContext. Sends the email.
+     * Uses an XWiki document to build the message subject and context, based on variables stored in a map.
+     * Sends the email.
      *
      * @param from Email sender
      * @param to Email recipient
@@ -167,5 +167,5 @@ public interface MailSender
      *         "error" key.
      */
     int sendMessageFromTemplate(String from, String to, String cc, String bcc, String language,
-        String documentFullName, Map parameters);
+        String documentFullName, Map<String, Object> parameters);
 }

@@ -634,7 +634,8 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
         if (installedExtensionsByFeature != null) {
             result = new HashMap<String, Collection<LocalExtension>>();
             for (DefaultInstalledExtension installedExtension : installedExtensionsByFeature.values()) {
-                if (namespaces == null || namespaces.contains(installedExtension.getNamespace())) {
+                if ((namespaces == null || namespaces.contains(installedExtension.getNamespace())) &&
+                    !installedExtension.getBackwardDependencies().isEmpty()) {
                     result.put(installedExtension.getNamespace(), Collections
                         .<LocalExtension> unmodifiableCollection(installedExtension.getBackwardDependencies()));
                 }

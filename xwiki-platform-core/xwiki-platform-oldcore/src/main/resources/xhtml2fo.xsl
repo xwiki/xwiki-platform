@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
 Copyright Antenna House, Inc. (http://www.antennahouse.com) 2001, 2002.
@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
 
     <xsl:output method="xml"
                 version="1.0"
-                encoding="iso-8859-1"
+                encoding="UTF-8"
                 indent="no"/>
 
     <!--======================================================================

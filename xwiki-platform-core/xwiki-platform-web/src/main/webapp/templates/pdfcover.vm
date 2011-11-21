@@ -1,6 +1,6 @@
 <div style="text-align: center; width: 100%;">
 <h1>
-#set ($title = "$!pdfdoc.display('title', 'rendered')")
+#set ($title = "$!pdfdoc.display('title', 'rendered', '', $pdfobj)")
 #if ($title == '')
   $escapetool.xml($!tdoc.plainTitle)
 #else

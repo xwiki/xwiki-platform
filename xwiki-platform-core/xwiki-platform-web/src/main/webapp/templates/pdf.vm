@@ -4,7 +4,7 @@
 #else
   #set($pdfdoc = $tdoc)
 #end
-$pdfdoc.use('XWiki.PDFClass')
+#set($pdfobj = $pdfdoc.getObject('XWiki.PDFClass'))
 #template("pdfhtmlheader.vm")
 #set ($withPageBreaks = false)
 #if ("$!{request.pagebreaks}" == '1')

@@ -31,8 +31,8 @@ workspacemanager.template.install.error.missingtemplateattachment=Error installi
 workspacemanager.translations.install.success=Workspace Manager translations have been successfully installed.
 workspacemanager.searchSuggestions.install.success=Workspace search suggestions have been successfully installed.
 workspacemanager.install.notallowed=Admin rights are required to complete the Workspace Manager installation. Please login as Admin to complete the installation.
-workspacemanager.dependencies.wikimanager.missing=The [[Wiki Manager Plugin>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Manager+Plugin]] is not installed. Please install it and try again.
-workspacemanager.dependencies.applicationmanager.missing=The [[Application Manager Plugin>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Application+Manager+Plugin]] is not installed. Please install it and try again.
+workspacemanager.dependencies.wikimanager.missing=The [[Wiki Manager Plugin&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Manager+Plugin]] is not installed. Please install it and try again.
+workspacemanager.dependencies.applicationmanager.missing=The [[Application Manager Plugin&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Application+Manager+Plugin]] is not installed. Please install it and try again.
 
 # LABELS
 workspacemanager.createworkspace=Create a new workspace
@@ -67,13 +67,18 @@ workspacemanager.menu.user.workspaces=Workspaces
 workspacemanager.profile.category.workspaces=Workspaces
 
 # MESSAGES
-workspacemanager.wikiname.error.wikialreadyexists=A workspace with this identifier already exists
 workspacemanager.wikiprettyname.error.empty=Pretty name must not be empty
 workspacemanager.successcreatewiki=Your workspace \"{0}\" has been created. You can access it at the following address: {1}
 workspacemanager.errorcreatewiki=Workspace \"{0}\" creation failed: {1}.
 workspacemanager.errorcreatewiki.ERROR_WM_WIKIALREADYEXISTS=This workspace \"{0}\" already exist. Please choose another name.
 workspacemanager.install.translations=The translations page has been automatically registered in XWiki's preferences.
 workspacemanager.error.workspacedoesnotexist=Workspace [{0}] does not exist
+workspacemanager.wikiname.error.databasealreadyexists=A database with this identifier already exists
+workspacemanager.wikiname.error.wikialreadyexists=A wiki with this identifier already exists
+workspacemanager.wikiname.error.workspacealreadyexists=A workspace with this identifier already exists
+workspacemanager.wikiname.error.empty=Identifier can't be empty
+workspacemanager.wikiname.error.alreadyused=This identifier is already used
+workspacemanager.error.notinvirtualmode=The current XWiki installation is not in virtual mode. This means you can only access the main wiki. Make sure you have &lt;tt&gt;xwiki.virtual=1&lt;/tt&gt; in the &lt;tt&gt;xwiki.cfg&lt;/tt&gt; file.
 
 # PROPERTIES
 workspacemanager.prop.wiki.wikiname=Workspace Identifier

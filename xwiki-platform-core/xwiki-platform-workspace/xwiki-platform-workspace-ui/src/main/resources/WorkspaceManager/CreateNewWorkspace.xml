@@ -104,15 +104,15 @@
 <property>
 <code>## Error messages
 #set ($MSG_ERROR_WIKIALREADYEXISTS = "$msg.get('workspacemanager.wikiname.error.wikialreadyexists')")
-#set ($MSG_WARNING_DATABASEALREADYEXISTS = "$msg.get('wikimanager.wikiname.error.databasealreadyexists')")
-#set ($MSG_ERROR_DATABASEALREADYEXISTS = "$msg.get('wikimanager.wikiname.error.databasealreadyexists')")
-#set ($MSG_ERROR_WIKINAMEALREADYUSED = "$msg.get('wikimanager.wikiname.error.alreadyused')")
-#set ($MSG_ERROR_WIKINAMEEMPTY = "$msg.get('wikimanager.wikiname.error.empty')")
+#set ($MSG_ERROR_DATABASEALREADYEXISTS = "$msg.get('workspacemanager.wikiname.error.databasealreadyexists')")
+#set ($MSG_ERROR_WORKSPACEALREADYEXISTS = "$msg.get('workspacemanager.wikiname.error.workspacealreadyexists')")
+#set ($MSG_ERROR_WIKINAMEALREADYUSED = "$msg.get('workspacemanager.wikiname.error.alreadyused')")
+#set ($MSG_ERROR_WIKINAMEEMPTY = "$msg.get('workspacemanager.wikiname.error.empty')")
 #set ($MSG_ERROR_WIKIPRETTYNAMEEMPTY = "$msg.get('workspacemanager.wikiprettyname.error.empty')")
 #set ($MSG_INFO_WIKINAMEVALID = "$msg.get('workspacemanager.wikiname.info.valid')")
 ##
 ## CONSTANTS
-#set ($ISWIKINAMEAVAILABLE = $xwiki.getDocument("WikiCode.IsWikiOrDatabaseAvailableService").URL)
+#set ($ISWIKINAMEAVAILABLE = $xwiki.getDocument("WorkspaceManager.IsWikiOrDatabaseOrWorkspaceAvailableService").URL)
 ############################################################################################
 var domainnamesetted = false;
 var prettynamesetted = false;
@@ -160,7 +160,7 @@ function validateWikiName()
           }
           else if (transport.responseText == "database")
           {
-            $('wikinamevalidation').innerHTML = "$MSG_WARNING_DATABASEALREADYEXISTS";
+            $('wikinamevalidation').innerHTML = "$MSG_ERROR_DATABASEALREADYEXISTS";
             addClass($('wikiname'), 'xErrorField');
 
             $('actioncreatebutton').disabled = true;
@@ -168,6 +168,13 @@ function validateWikiName()
           else if (transport.responseText == "wiki")
           {
             $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKIALREADYEXISTS";
+            addClass($('wikiname'), 'xErrorField');
+
+            $('actioncreatebutton').disabled = true;
+          }
+          else if (transport.responseText == "workspace")
+          {
+            $('wikinamevalidation').innerHTML = "$MSG_ERROR_WORKSPACEALREADYEXISTS";
             addClass($('wikiname'), 'xErrorField');
 
             $('actioncreatebutton').disabled = true;
@@ -271,7 +278,7 @@ function prettyNameChanged()
   #error($msg.get("workspacemanager.dependencies.applicationmanager.missing"))
 #end
 #if(!$xwiki.isVirtualMode())
-  #error($msg.get("wikimanager.notinvirtualmode"))
+  #error($msg.get("workspacemanager.error.notinvirtualmode"))
 #end
 ############################################################################################
 ## WORKSPACE TEMPLATE AUTOMATIC INSTALLATION

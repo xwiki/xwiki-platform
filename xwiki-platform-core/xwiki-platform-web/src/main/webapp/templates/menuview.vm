@@ -158,7 +158,7 @@
     #set ($wikiEntryId = 'tmWorkspace')
   #end
 #end
-#if ($services.isVirtualMode() && $services.wikimanager)
+#if ($xwiki.isVirtualMode() && $services.wikimanager)
   #set ($wikiName = $services.wikimanager.getWikiDocument($xcontext.getDatabase()).getWikiPrettyName())
   #if ("$!wikiName.trim()" == '')
     #set ($wikiName = $xcontext.getDatabase())

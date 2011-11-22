@@ -48,11 +48,6 @@
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />
   </replace-with>
 
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.MozillaLinePlugin">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />
-    <when-property-is name="user.agent" value="gecko1_8" />
-  </replace-with>
-
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.IELinePlugin">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />
     <any>

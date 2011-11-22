@@ -311,6 +311,7 @@
                 <exclude>org/xwiki/gwt/wysiwyg/client/plugin/submit/IESubmitPlugin</exclude>
                 <exclude>com/xpn/xwiki/plugin/lucene/IndexRebuilder</exclude>
                 <exclude>com/xpn/xwiki/plugin/lucene/SearchResults</exclude>
+                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/line/MozillaLinePlugin</exclude>
                 <!-- LOGGER change -->
                 <exclude>com/xpn/xwiki/plugin/globalsearch/GlobalSearchPlugin</exclude>
                 <exclude>com/xpn/xwiki/plugin/globalsearch/GlobalSearchPluginApi</exclude>

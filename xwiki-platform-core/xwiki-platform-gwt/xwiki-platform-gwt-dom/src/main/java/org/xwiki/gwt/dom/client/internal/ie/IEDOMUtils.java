@@ -20,6 +20,7 @@
 package org.xwiki.gwt.dom.client.internal.ie;
 
 import org.xwiki.gwt.dom.client.DOMUtils;
+import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Window;
 
 /**
@@ -33,5 +34,11 @@ public class IEDOMUtils extends DOMUtils
     public void stop(Window window)
     {
         window.getDocument().execCommand("Stop", null);
+    }
+
+    @Override
+    public void ensureBlockIsEditable(Element block)
+    {
+        // Do nothing.
     }
 }

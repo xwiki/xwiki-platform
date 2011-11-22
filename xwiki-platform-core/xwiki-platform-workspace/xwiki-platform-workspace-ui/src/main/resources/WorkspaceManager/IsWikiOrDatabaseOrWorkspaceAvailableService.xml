@@ -20,9 +20,10 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>#if ($request.wikiname)
+<content>{{velocity}}
+#if ($request.wikiname)
   #if (!$services.wikimanager.isWikiNameAvailable($request.wikiname))
     #if ($services.wikimanager.getWikiFromName($request.wikiname).isNew())
 database
@@ -34,4 +35,5 @@ wiki
   #else
 true
   #end
-#end</content></xwikidoc>
+#end
+{{/velocity}}</content></xwikidoc>

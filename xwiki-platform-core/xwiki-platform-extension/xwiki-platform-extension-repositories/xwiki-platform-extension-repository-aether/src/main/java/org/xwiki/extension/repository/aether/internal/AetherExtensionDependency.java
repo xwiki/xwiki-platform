@@ -28,8 +28,8 @@ public class AetherExtensionDependency extends AbstractExtensionDependency
 
     public AetherExtensionDependency(Dependency aetherDependency)
     {
-        super(aetherDependency.getArtifact().getGroupId() + ':' + aetherDependency.getArtifact().getArtifactId(),
-            aetherDependency.getArtifact().getVersion());
+        super(AetherUtils.createExtensionId(aetherDependency.getArtifact()).getId(), aetherDependency.getArtifact()
+            .getVersion());
     }
 
     public Dependency getAetherDependency()

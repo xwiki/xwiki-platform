@@ -263,6 +263,7 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
                     String dependencyFileName = dependency.getArtifactId() + '-' + dependency.getVersion();
                     if (dependency.getClassifier() != null) {
                         dependencyFileName += '-' + dependency.getClassifier();
+                        dependencyId += ':' + dependency.getClassifier();
                     }
 
                     Object[] filenameArtifact = fileNames.get(dependencyFileName);

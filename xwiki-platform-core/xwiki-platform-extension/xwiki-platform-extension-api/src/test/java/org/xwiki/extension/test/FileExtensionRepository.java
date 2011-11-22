@@ -31,24 +31,23 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.internal.DefaultLocalExtension;
 import org.xwiki.extension.repository.internal.ExtensionSerializer;
 
-public class FileExtensionRepository implements ExtensionRepository
+public class FileExtensionRepository extends AbstractExtensionRepository implements ExtensionRepository
 {
     private ExtensionSerializer extensionSerializer;
-
-    private ExtensionRepositoryId repositoryId;
 
     private File directory;
 
     public FileExtensionRepository(File directory, ComponentManager componentManager) throws ComponentLookupException
     {
-        this.extensionSerializer = componentManager.lookup(ExtensionSerializer.class);
+        super(new ExtensionRepositoryId("test-file", "file", null));
 
-        this.repositoryId = new ExtensionRepositoryId("test-file", "file", null);
+        this.extensionSerializer = componentManager.lookup(ExtensionSerializer.class);
 
         this.directory = directory;
     }
@@ -79,11 +78,6 @@ public class FileExtensionRepository implements ExtensionRepository
     String getPathSuffix(ExtensionId extensionId, String type)
     {
         return extensionId.getId() + '-' + extensionId.getVersion() + '.' + type;
-    }
-
-    public ExtensionRepositoryId getId()
-    {
-        return this.repositoryId;
     }
 
     public Extension resolve(ExtensionId extensionId) throws ResolveException

@@ -20,6 +20,7 @@
 package org.xwiki.extension.repository;
 
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 
@@ -44,6 +45,16 @@ public interface ExtensionRepository
      * @throws ResolveException failed to find extension in the repository
      */
     Extension resolve(ExtensionId extensionId) throws ResolveException;
+
+    /**
+     * Return extension descriptor from the repository. If the extension can't be found a {@link ResolveException} is
+     * thrown.
+     * 
+     * @param extensionDependency the target extension as a dependency
+     * @return the found extension descriptor
+     * @throws ResolveException failed to find extension in the repository
+     */
+    Extension resolve(ExtensionDependency extensionDependency) throws ResolveException;
 
     /**
      * @param extensionId the extension identifier

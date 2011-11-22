@@ -29,6 +29,7 @@ import junit.framework.Assert;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionException;
@@ -44,7 +45,13 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
 
     private ExtensionId extensionId;
 
-    private ExtensionId dependencyExtensionId;
+    private ExtensionId extensionIdClassifier;
+
+    private ExtensionDependency dependencyExtensionId;
+
+    private ExtensionDependency dependencyExtensionIdRange;
+
+    private ExtensionDependency dependencyExtensionIdClassifier;
 
     private ExtensionId bundleExtensionId;
 
@@ -60,7 +67,10 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         this.repositoryUtil.setup();
 
         this.extensionId = new ExtensionId("groupid:artifactid", "version");
-        this.dependencyExtensionId = new ExtensionId("dgroupid:dartifactid", "dversion");
+        this.extensionIdClassifier = new ExtensionId("groupid:artifactid:classifier", "version");
+        this.dependencyExtensionId = new DefaultExtensionDependency("dgroupid:dartifactid", "dversion");
+        this.dependencyExtensionIdRange = new DefaultExtensionDependency("dgroupid:dartifactid", "[dversion,)");
+        this.dependencyExtensionIdClassifier = new DefaultExtensionDependency("dgroupid:dartifactid:classifier", "dversion");
 
         this.bundleExtensionId = new ExtensionId("groupid:bundleartifactid", "version");
 
@@ -94,6 +104,26 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
     }
 
     @Test
+    public void testResolveVersionClassifier() throws ResolveException
+    {
+        Extension extension = this.repositoryManager.resolve(this.extensionIdClassifier);
+
+        Assert.assertNotNull(extension);
+        Assert.assertEquals(this.extensionIdClassifier.getId(), extension.getId().getId());
+        Assert.assertEquals(this.extensionIdClassifier.getVersion(), extension.getId().getVersion());
+    }
+
+    @Test
+    public void testResolveVersionRange() throws ResolveException
+    {
+        Extension extension = this.repositoryManager.resolve(this.dependencyExtensionIdRange);
+
+        Assert.assertNotNull(extension);
+        Assert.assertEquals(this.dependencyExtensionId.getId(), extension.getId().getId());
+        Assert.assertEquals(this.dependencyExtensionId.getVersion(), extension.getId().getVersion());
+    }
+
+    @Test
     public void testDownload() throws ExtensionException, IOException
     {
         Extension extension = this.repositoryManager.resolve(this.extensionId);
@@ -107,6 +137,20 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         }
     }
 
+    @Test
+    public void testDownloadClassifier() throws ExtensionException, IOException
+    {
+        Extension extension = this.repositoryManager.resolve(this.extensionIdClassifier);
+
+        InputStream is = extension.getFile().openStream();
+
+        try {
+            Assert.assertEquals("classifier content", IOUtils.toString(is));
+        } finally {
+            is.close();
+        }
+    }
+    
     @Test
     public void testDownloadBundle() throws ExtensionException, IOException
     {

@@ -19,29 +19,21 @@
  */
 package org.xwiki.extension.repository.aether.internal;
 
+import org.sonatype.aether.graph.Dependency;
 import org.xwiki.extension.AbstractExtensionDependency;
 
 public class AetherExtensionDependency extends AbstractExtensionDependency
 {
-    private String groupId;
+    private Dependency aetherDependency;
 
-    private String artifactId;
-
-    public AetherExtensionDependency(String groupId, String artifactId, String version)
+    public AetherExtensionDependency(Dependency aetherDependency)
     {
-        super(groupId + ':' + artifactId, version);
-
-        this.groupId = groupId;
-        this.artifactId = artifactId;
+        super(aetherDependency.getArtifact().getGroupId() + ':' + aetherDependency.getArtifact().getArtifactId(),
+            aetherDependency.getArtifact().getVersion());
     }
 
-    public String getGroupId()
+    public Dependency getAetherDependency()
     {
-        return groupId;
-    }
-
-    public String getArtifactId()
-    {
-        return artifactId;
+        return this.aetherDependency;
     }
 }

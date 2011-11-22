@@ -33,6 +33,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -109,20 +110,44 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
     @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
-        Extension artifact = null;
+        Extension extension = null;
 
         for (ExtensionRepository repository : this.repositories.values()) {
             try {
-                artifact = repository.resolve(extensionId);
+                extension = repository.resolve(extensionId);
 
-                return artifact;
+                return extension;
             } catch (ResolveException e) {
-                this.logger.debug("Could not find extension [{}] in repository [{}]",
-                    new Object[] {extensionId, repository.getId(), e});
+                if (this.logger.isDebugEnabled()) {
+                    this.logger.debug("Could not find extension [{}] in repository [{}]", new Object[] {extensionId,
+                        repository.getId(), e});
+                }
             }
         }
 
         throw new ResolveException(MessageFormat.format("Could not find extension [{0}]", extensionId));
+    }
+
+    @Override
+    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    {
+        Extension extension = null;
+
+        for (ExtensionRepository repository : this.repositories.values()) {
+            try {
+                extension = repository.resolve(extensionDependency);
+
+                return extension;
+            } catch (ResolveException e) {
+                if (this.logger.isDebugEnabled()) {
+                    this.logger.debug("Could not find extension dependency [{}] in repository [{}]", new Object[] {
+                        extensionDependency, repository.getId(), e});
+                }
+            }
+        }
+
+        throw new ResolveException(MessageFormat.format("Could not find extension dependency [{0}]",
+            extensionDependency));
     }
 
     @Override

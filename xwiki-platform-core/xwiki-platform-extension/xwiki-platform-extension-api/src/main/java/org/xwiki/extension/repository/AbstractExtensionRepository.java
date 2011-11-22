@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.repository;
 
+import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 
@@ -35,11 +37,42 @@ public abstract class AbstractExtensionRepository implements ExtensionRepository
     private ExtensionRepositoryId id;
 
     /**
+     * Default constructor. Used by extended classes which can't set the id in there constructor but make sure it's set
+     * later or that {@link #getId()} is overwritten.
+     */
+    protected AbstractExtensionRepository()
+    {
+
+    }
+
+    /**
      * @param id the repository identifier
      */
-    public AbstractExtensionRepository(ExtensionRepositoryId id)
+    protected AbstractExtensionRepository(ExtensionRepositoryId id)
     {
-        this.id = new ExtensionRepositoryId(id.getId(), id.getType(), id.getURI());
+        setId(new ExtensionRepositoryId(id));
+    }
+
+    /**
+     * @param id the repository identifier
+     */
+    public void setId(ExtensionRepositoryId id)
+    {
+        this.id = id;
+    }
+
+    // ExtensionRepository
+
+    @Override
+    public ExtensionRepositoryId getId()
+    {
+        return this.id;
+    }
+
+    @Override
+    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    {
+        return resolve(new ExtensionId(extensionDependency.getId(), extensionDependency.getVersion()));
     }
 
     @Override
@@ -55,11 +88,5 @@ public abstract class AbstractExtensionRepository implements ExtensionRepository
         }
 
         return exists;
-    }
-
-    @Override
-    public ExtensionRepositoryId getId()
-    {
-        return this.id;
     }
 }

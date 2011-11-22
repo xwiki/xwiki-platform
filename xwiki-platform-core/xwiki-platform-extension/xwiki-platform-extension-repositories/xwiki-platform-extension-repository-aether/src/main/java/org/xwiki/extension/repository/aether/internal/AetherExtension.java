@@ -20,30 +20,25 @@
 package org.xwiki.extension.repository.aether.internal;
 
 import org.apache.maven.model.Model;
+import org.sonatype.aether.artifact.Artifact;
 import org.xwiki.extension.AbstractExtension;
-import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
 
 public class AetherExtension extends AbstractExtension
 {
-    public static final String PKEY_GROUPID = "aether.groupid";
+    public static final String PKEY_AETHER_ATIFACT = "aether.Artifact";
 
-    public static final String PKEY_ARTIFACTID = "aether.artifactid";
+    public static final String PKEY_MAVEN_MODEL = "maven.Model";
 
-    public static final String MPKEYPREFIX = "xwiki.extension.";
-
-    public static final String MPKEY_FEATURES = MPKEYPREFIX + "features";
-
-    public AetherExtension(ExtensionId id, Model mavenModel, AetherExtensionRepository repository,
+    public AetherExtension(Artifact artifact, Model mavenModel, AetherExtensionRepository repository,
         PlexusComponentManager plexusComponentManager)
     {
-        // See bundle as jar packages since bundle are actually store as jar files
-        super(repository, id, mavenModel.getPackaging().equals("bundle") ? "jar" : mavenModel.getPackaging());
+        super(repository, AetherUtils.createExtensionId(artifact), artifact.getExtension());
 
-        setFile(new AetherExtensionFile(mavenModel, repository, plexusComponentManager, getType()));
+        setFile(new AetherExtensionFile(artifact, repository, plexusComponentManager, getType()));
 
         // custom properties
-        putProperty(PKEY_GROUPID, mavenModel.getGroupId());
-        putProperty(PKEY_ARTIFACTID, mavenModel.getArtifactId());
+        putProperty(PKEY_AETHER_ATIFACT, artifact);
+        putProperty(PKEY_MAVEN_MODEL, mavenModel);
     }
 }

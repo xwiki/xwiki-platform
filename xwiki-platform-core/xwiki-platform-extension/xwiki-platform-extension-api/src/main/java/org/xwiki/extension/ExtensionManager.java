@@ -45,4 +45,22 @@ public interface ExtensionManager
      * @throws ResolveException error when trying to resolve extension
      */
     Extension resolveExtension(ExtensionId extensionId) throws ResolveException;
+
+    /**
+     * Search the provided extension as a dependency of another extension among all repositories including core and
+     * local repositories.
+     * <p>
+     * The search is done in the following order:
+     * <ul>
+     * <li>Is it a core extension ?</li>
+     * <li>Is it a local extension ?</li>
+     * <li>Is it a remote extension in one of the configured remote repositories ?</li>
+     * </ul>
+     * The first one found is returned.
+     * 
+     * @param extensionDependency the extension as dependency
+     * @return the resolved extension
+     * @throws ResolveException error when trying to resolve extension
+     */
+    Extension resolveExtension(ExtensionDependency extensionDependency) throws ResolveException;
 }

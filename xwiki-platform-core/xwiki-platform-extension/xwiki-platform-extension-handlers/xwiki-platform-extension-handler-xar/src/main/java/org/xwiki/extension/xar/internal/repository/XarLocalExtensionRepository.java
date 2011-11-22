@@ -45,6 +45,7 @@ import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
+import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
@@ -53,10 +54,16 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
+/**
+ * Local repository proxy for XAR extensions.
+ * 
+ * @version $Id$
+ */
 @Component
 @Singleton
 @Named("xar")
-public class XarLocalExtensionRepository implements LocalExtensionRepository, Initializable
+public class XarLocalExtensionRepository extends AbstractExtensionRepository implements LocalExtensionRepository,
+    Initializable
 {
     private static final List<Event> EVENTS = Arrays.<Event> asList(new ExtensionInstalledEvent(),
         new ExtensionUninstalledEvent(), new ExtensionUpgradedEvent());
@@ -76,14 +83,12 @@ public class XarLocalExtensionRepository implements LocalExtensionRepository, In
     @Inject
     private Logger logger;
 
-    private ExtensionRepositoryId repositoryId;
-
     private Map<ExtensionId, XarLocalExtension> extensions = new ConcurrentHashMap<ExtensionId, XarLocalExtension>();
 
     @Override
     public void initialize() throws InitializationException
     {
-        this.repositoryId = new ExtensionRepositoryId("xar", "xar", this.localRepository.getId().getURI());
+        setId(new ExtensionRepositoryId("xar", "xar", this.localRepository.getId().getURI()));
 
         loadExtensions();
 
@@ -159,12 +164,6 @@ public class XarLocalExtensionRepository implements LocalExtensionRepository, In
     }
 
     // LocalExtensionRepository
-
-    @Override
-    public ExtensionRepositoryId getId()
-    {
-        return this.repositoryId;
-    }
 
     @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException

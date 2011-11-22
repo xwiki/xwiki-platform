@@ -24,13 +24,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.maven.model.Model;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.aether.RepositorySystem;
+import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.aether.resolution.ArtifactResult;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.xwiki.extension.ExtensionFile;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
 
@@ -38,27 +37,19 @@ public class AetherExtensionFile implements ExtensionFile
 {
     private PlexusComponentManager plexusComponentManager;
 
-    private Model mavenModel;
+    private Artifact artifact;
 
     private String type;
 
     private AetherExtensionRepository repository;
 
-    public AetherExtensionFile(Model mavenModel, AetherExtensionRepository repository,
+    public AetherExtensionFile(Artifact artifact, AetherExtensionRepository repository,
         PlexusComponentManager plexusComponentManager, String type)
     {
         this.repository = repository;
         this.plexusComponentManager = plexusComponentManager;
-        this.mavenModel = mavenModel;
+        this.artifact = artifact;
         this.type = type;
-    }
-
-    /**
-     * @return the source Maven {@link Model}.
-     */
-    public Model getMavenModel()
-    {
-        return this.mavenModel;
     }
 
     @Override
@@ -79,13 +70,12 @@ public class AetherExtensionFile implements ExtensionFile
         }
 
         ArtifactRequest artifactRequest = new ArtifactRequest();
-        artifactRequest.addRepository(repository.getRemoteRepository());
-        artifactRequest.setArtifact(new DefaultArtifact(this.mavenModel.getGroupId(), this.mavenModel.getArtifactId(),
-            this.type, this.mavenModel.getVersion()));
+        artifactRequest.addRepository(this.repository.getRemoteRepository());
+        artifactRequest.setArtifact(this.artifact);
 
         ArtifactResult artifactResult;
         try {
-            artifactResult = repositorySystem.resolveArtifact(repository.getSession(), artifactRequest);
+            artifactResult = repositorySystem.resolveArtifact(this.repository.getSession(), artifactRequest);
         } catch (ArtifactResolutionException e) {
             throw new IOException("Failed to resolve artifact", e);
         }

@@ -27,19 +27,29 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.artifact.ArtifactTypeRegistry;
+import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.impl.ArtifactDescriptorReader;
+import org.sonatype.aether.impl.VersionRangeResolver;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.ArtifactDescriptorRequest;
 import org.sonatype.aether.resolution.ArtifactDescriptorResult;
+import org.sonatype.aether.resolution.VersionRangeRequest;
+import org.sonatype.aether.resolution.VersionRangeResolutionException;
+import org.sonatype.aether.resolution.VersionRangeResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.sonatype.aether.version.Version;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.DefaultExtensionAuthor;
+import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
 import org.xwiki.extension.ExtensionLicenseManager;
@@ -51,58 +61,150 @@ import org.xwiki.properties.ConverterManager;
 
 public class AetherExtensionRepository extends AbstractExtensionRepository
 {
+    public static final String MPKEYPREFIX = "xwiki.extension.";
+
+    public static final String MPKEY_FEATURES = MPKEYPREFIX + "features";
+
+    private ComponentManager componentManager;
+
     private PlexusComponentManager plexusComponentManager;
 
     private RepositorySystemSession session;
 
     private RemoteRepository remoteRepository;
 
-    private ArtifactDescriptorReader artifactDescriptorReader;
+    private ArtifactDescriptorReader mavenDescriptorReader;
 
-    private Method loadPomMethod;
+    private VersionRangeResolver versionRangeResolver;
+
+    private static Method loadPomMethod;
+
+    private static Method convertMethod;
 
     private ConverterManager converter;
 
     private ExtensionLicenseManager licenseManager;
 
     public AetherExtensionRepository(ExtensionRepositoryId repositoryId, RepositorySystemSession session,
-        PlexusComponentManager mavenComponentManager, ConverterManager converter, ExtensionLicenseManager licenseManager)
-        throws Exception
+        PlexusComponentManager mavenComponentManager, ComponentManager componentManager) throws Exception
     {
         super(repositoryId);
 
+        this.componentManager = componentManager;
         this.plexusComponentManager = mavenComponentManager;
 
         this.session = session;
 
-        this.artifactDescriptorReader = this.plexusComponentManager.getPlexus().lookup(ArtifactDescriptorReader.class);
-
         this.remoteRepository = new RemoteRepository(repositoryId.getId(), "default", repositoryId.getURI().toString());
 
-        this.converter = converter;
-        this.licenseManager = licenseManager;
+        this.converter = this.componentManager.lookup(ConverterManager.class);
+        this.licenseManager = this.componentManager.lookup(ExtensionLicenseManager.class);
 
-        // FIXME: not very nice
-        // * use a private method of a library we don't control is not the nicest thing...
-        // * having to parse the pom.xml since we are supposed to support anything supported by aether is not very clean
-        // either
-        this.loadPomMethod =
-            this.artifactDescriptorReader.getClass().getDeclaredMethod("loadPom", RepositorySystemSession.class,
-                ArtifactDescriptorRequest.class, ArtifactDescriptorResult.class);
-        this.loadPomMethod.setAccessible(true);
+        this.versionRangeResolver = this.plexusComponentManager.getPlexus().lookup(VersionRangeResolver.class);
+
+        try {
+            this.mavenDescriptorReader = this.plexusComponentManager.getPlexus().lookup(ArtifactDescriptorReader.class);
+
+            if (loadPomMethod == null) {
+                // FIXME: not very nice
+                // * use a private method of a library we don't control is not the nicest thing. But it's a big and very
+                // uselfull method. A shame is not a bit more public.
+                // * having to parse the pom.xml since we are supposed to support anything supported by aether is not
+                // very
+                // clean
+                // either. But Aether almost resolve nothing, not even the type of the artifact, we pretty much get only
+                // dependencies and licenses.
+                loadPomMethod =
+                    this.mavenDescriptorReader.getClass().getDeclaredMethod("loadPom", RepositorySystemSession.class,
+                        ArtifactDescriptorRequest.class, ArtifactDescriptorResult.class);
+                loadPomMethod.setAccessible(true);
+                convertMethod =
+                    this.mavenDescriptorReader.getClass().getDeclaredMethod("convert",
+                        org.apache.maven.model.Dependency.class, ArtifactTypeRegistry.class);
+                convertMethod.setAccessible(true);
+            }
+        } catch (ComponentLookupException e) {
+            // Maven handler not found
+        }
     }
 
     @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
-        Model model;
+        return resolve(new DefaultExtensionDependency(extensionId.getId(), extensionId.getVersion()));
+    }
+
+    @Override
+    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    {
+        if (getId().getType().equals("maven") && this.mavenDescriptorReader != null) {
+            return resolveMaven(extensionDependency);
+        } else {
+            // FIXME: impossible to resolve extension type as well as most of the information with pure Aether API
+            throw new ResolveException("Unsupported");
+        }
+    }
+
+    public Version resolveVersionRange(Artifact artifact) throws ResolveException
+    {
+        VersionRangeResult rangeResult;
         try {
-            model = loadPom(this.session, extensionId);
-        } catch (Exception e) {
-            throw new ResolveException("Failed to resolve extension [" + extensionId + "] descriptor", e);
+            VersionRangeRequest rangeRequest = new VersionRangeRequest();
+            rangeRequest.setArtifact(artifact);
+            rangeRequest.addRepository(this.remoteRepository);
+
+            rangeResult = this.versionRangeResolver.resolveVersionRange(getSession(), rangeRequest);
+
+            if (rangeResult.getVersions().isEmpty()) {
+                throw new VersionRangeResolutionException(rangeResult, "No versions available for " + artifact
+                    + " within specified range");
+            }
+        } catch (VersionRangeResolutionException e) {
+            throw new ResolveException("Failed to resolve version range", e);
         }
 
-        AetherExtension extension = new AetherExtension(extensionId, model, this, this.plexusComponentManager);
+        return rangeResult.getVersions().get(rangeResult.getVersions().size() - 1);
+    }
+
+    public AetherExtension resolveMaven(ExtensionDependency extensionDependency) throws ResolveException
+    {
+        Artifact artifact;
+        if (extensionDependency instanceof AetherExtensionDependency) {
+            artifact = ((AetherExtensionDependency) extensionDependency).getAetherDependency().getArtifact();
+        } else {
+            artifact = AetherUtils.createArtifact(extensionDependency.getId(), extensionDependency.getVersion());
+        }
+
+        // Resolve version range
+
+        Version version = resolveVersionRange(artifact);
+        artifact = artifact.setVersion(version.toString());
+
+        // Get descriptor
+
+        Model model;
+        try {
+            model = loadPom(artifact);
+        } catch (Exception e) {
+            throw new ResolveException("Failed to resolve extension [" + extensionDependency + "] descriptor", e);
+        }
+
+        // Set type
+
+        String artifactExtension;
+        if (extensionDependency instanceof AetherExtensionDependency) {
+            artifactExtension =
+                ((AetherExtensionDependency) extensionDependency).getAetherDependency().getArtifact().getExtension();
+        } else {
+            // See bundle as jar packages since bundle are actually store as jar files
+            artifactExtension = model.getPackaging().equals("bundle") ? "jar" : model.getPackaging();
+        }
+
+        artifact =
+            new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(),
+                artifactExtension, artifact.getVersion());
+
+        AetherExtension extension = new AetherExtension(artifact, model, this, this.plexusComponentManager);
 
         extension.setName(model.getName());
         extension.setDescription(model.getDescription());
@@ -126,21 +228,32 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
         }
 
         // features
-        String featuresString = model.getProperties().getProperty(AetherExtension.MPKEY_FEATURES);
+        String featuresString = model.getProperties().getProperty(MPKEY_FEATURES);
         if (StringUtils.isNotBlank(featuresString)) {
             extension.setFeatures(converter.<Collection<String>> convert(List.class, featuresString));
         }
 
         // dependencies
-        for (Dependency mavenDependency : model.getDependencies()) {
-            if (!mavenDependency.isOptional()
-                && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime"))) {
-                extension.addDependency(new AetherExtensionDependency(mavenDependency.getGroupId(), mavenDependency
-                    .getArtifactId(), mavenDependency.getVersion()));
+        try {
+            for (org.apache.maven.model.Dependency mavenDependency : model.getDependencies()) {
+                if (!mavenDependency.isOptional()
+                    && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime"))) {
+                    extension.addDependency(new AetherExtensionDependency(convertToAether(mavenDependency)));
+                }
             }
+        } catch (Exception e) {
+            throw new ResolveException("Failed to resolve dependencies", e);
         }
 
         return extension;
+    }
+
+    private Dependency convertToAether(org.apache.maven.model.Dependency dependency) throws IllegalArgumentException,
+        IllegalAccessException, InvocationTargetException
+    {
+        ArtifactTypeRegistry stereotypes = getSession().getArtifactTypeRegistry();
+
+        return (Dependency) convertMethod.invoke(this.mavenDescriptorReader, dependency, stereotypes);
     }
 
     // TODO: download custom licenses content
@@ -150,24 +263,28 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
             return new ExtensionLicense("noname", null);
         }
 
-        ExtensionLicense extensionLicense = this.licenseManager.getLicense(license.getName());
-
-        return extensionLicense != null ? extensionLicense : new ExtensionLicense(license.getName(), null);
+        return createLicenseByName(license.getName());
     }
 
-    private Model loadPom(RepositorySystemSession session, ExtensionId extensionId) throws IllegalArgumentException,
-        IllegalAccessException, InvocationTargetException
+    private ExtensionLicense createLicenseByName(String name)
     {
-        Artifact artifact = new DefaultArtifact(extensionId.getId() + ':' + extensionId.getVersion());
+        ExtensionLicense extensionLicense = this.licenseManager.getLicense(name);
 
+        return extensionLicense != null ? extensionLicense : new ExtensionLicense(name, null);
+
+    }
+
+    private Model loadPom(Artifact artifact) throws IllegalArgumentException, IllegalAccessException,
+        InvocationTargetException
+    {
         ArtifactDescriptorRequest artifactDescriptorRequest = new ArtifactDescriptorRequest();
         artifactDescriptorRequest.setArtifact(artifact);
         artifactDescriptorRequest.addRepository(this.remoteRepository);
 
         ArtifactDescriptorResult artifactDescriptorResult = new ArtifactDescriptorResult(artifactDescriptorRequest);
 
-        return (Model) this.loadPomMethod.invoke(this.artifactDescriptorReader, this.session,
-            artifactDescriptorRequest, artifactDescriptorResult);
+        return (Model) loadPomMethod.invoke(this.mavenDescriptorReader, getSession(), artifactDescriptorRequest,
+            artifactDescriptorResult);
     }
 
     public RepositorySystemSession getSession()

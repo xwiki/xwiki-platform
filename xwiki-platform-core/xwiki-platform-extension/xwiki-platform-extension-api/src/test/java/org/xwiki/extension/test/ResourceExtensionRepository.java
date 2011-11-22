@@ -29,16 +29,15 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.internal.DefaultLocalExtension;
 import org.xwiki.extension.repository.internal.ExtensionSerializer;
 
-public class ResourceExtensionRepository implements ExtensionRepository
+public class ResourceExtensionRepository extends AbstractExtensionRepository implements ExtensionRepository
 {
     private ExtensionSerializer extensionSerializer;
-
-    private ExtensionRepositoryId repositoryId;
 
     private ClassLoader classLoader;
 
@@ -47,9 +46,9 @@ public class ResourceExtensionRepository implements ExtensionRepository
     public ResourceExtensionRepository(ClassLoader classLoader, String baseResource, ComponentManager componentManager)
         throws ComponentLookupException
     {
-        this.extensionSerializer = componentManager.lookup(ExtensionSerializer.class);
+        super(new ExtensionRepositoryId("test-resources", "resources", null));
 
-        this.repositoryId = new ExtensionRepositoryId("test-resources", "resources", null);
+        this.extensionSerializer = componentManager.lookup(ExtensionSerializer.class);
 
         this.classLoader = classLoader;
         this.baseResource = baseResource;
@@ -73,11 +72,6 @@ public class ResourceExtensionRepository implements ExtensionRepository
     String getPathSuffix(ExtensionId extensionId, String type)
     {
         return extensionId.getId() + '-' + extensionId.getVersion() + '.' + type;
-    }
-
-    public ExtensionRepositoryId getId()
-    {
-        return this.repositoryId;
     }
 
     public Extension resolve(ExtensionId extensionId) throws ResolveException

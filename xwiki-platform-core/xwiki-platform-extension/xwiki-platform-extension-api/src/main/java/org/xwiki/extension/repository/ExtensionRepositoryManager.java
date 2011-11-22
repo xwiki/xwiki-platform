@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 
@@ -73,6 +74,21 @@ public interface ExtensionRepositoryManager
      * @throws ResolveException failed to find extension in the repository
      */
     Extension resolve(ExtensionId extensionId) throws ResolveException;
+
+    /**
+     * Get extension descriptor found in one of the repositories.
+     * <p>
+     * The proxy search in all repositories and return the first extension it could find.
+     * <p>
+     * This method takes {@link ExtensionDependency} instead of {@link ExtensionId} to allow any implementation of
+     * {@link ExtensionRepository} to extension dependencies with filter not supported yet by Extension Manage. As an
+     * example Aether implementation add support from classifiers, excludes and version ranges.
+     * 
+     * @param extensionDependency the extension dependency
+     * @return the found extension descriptor
+     * @throws ResolveException failed to find extension in the repository
+     */
+    Extension resolve(ExtensionDependency extensionDependency) throws ResolveException;
 
     /**
      * Search among all repository implementing {@link Searchable} interface.

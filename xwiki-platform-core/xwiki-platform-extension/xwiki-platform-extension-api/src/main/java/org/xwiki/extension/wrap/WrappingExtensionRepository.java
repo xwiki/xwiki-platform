@@ -20,6 +20,7 @@
 package org.xwiki.extension.wrap;
 
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -66,6 +67,12 @@ public class WrappingExtensionRepository<T extends ExtensionRepository> implemen
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
         return getRepository().resolve(extensionId);
+    }
+
+    @Override
+    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    {
+        return getRepository().resolve(extensionDependency);
     }
 
     @Override

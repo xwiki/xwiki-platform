@@ -52,6 +52,7 @@ import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.internal.VersionManager;
+import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.LocalExtensionRepository;
@@ -65,7 +66,8 @@ import org.xwiki.extension.repository.LocalExtensionRepositoryException;
 @Component
 @Singleton
 // TODO: make it threadsafe bulletproofs
-public class DefaultLocalExtensionRepository implements LocalExtensionRepository, Initializable
+public class DefaultLocalExtensionRepository extends AbstractExtensionRepository implements LocalExtensionRepository,
+    Initializable
 {
     /**
      * Used to get repository path.
@@ -93,11 +95,6 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
 
     @Inject
     private ComponentManager componentManager;
-
-    /**
-     * The repository identifier.
-     */
-    private ExtensionRepositoryId repositoryId;
 
     /**
      * Used to manipulate filesystem repository storage.
@@ -135,7 +132,7 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
             throw new InitializationException("Failed to intialize local extension storage", e);
         }
 
-        this.repositoryId = new ExtensionRepositoryId("local", "xwiki", this.storage.getRootFolder().toURI());
+        setId(new ExtensionRepositoryId("local", "xwiki", this.storage.getRootFolder().toURI()));
 
         this.storage.loadExtensions();
 
@@ -443,12 +440,6 @@ public class DefaultLocalExtensionRepository implements LocalExtensionRepository
     public boolean exists(ExtensionId extensionId)
     {
         return this.extensions.containsKey(extensionId);
-    }
-
-    @Override
-    public ExtensionRepositoryId getId()
-    {
-        return this.repositoryId;
     }
 
     // LocalRepository

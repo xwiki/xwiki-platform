@@ -55,11 +55,6 @@
     <when-type-is class="org.xwiki.gwt.dom.client.DOMUtils" />
   </replace-with>
 
-  <replace-with class="org.xwiki.gwt.dom.client.internal.mozilla.MozillaDOMUtils">
-    <when-type-is class="org.xwiki.gwt.dom.client.DOMUtils" />
-    <when-property-is name="user.agent" value="gecko1_8" />
-  </replace-with>
-
   <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IEDOMUtils">
     <when-type-is class="org.xwiki.gwt.dom.client.DOMUtils" />
     <when-property-is name="user.agent" value="ie9" />

@@ -905,9 +905,9 @@ public class DOMUtils
      * Given a subtree specified by its root parent and one of the inner nodes, this method splits the subtree by the
      * path from the given descendant (inner node) to the root parent. Additionally to what
      * {@link #splitNode(Node, Node, int)}) does this method ensures that both subtrees are editable in design mode.
-     * This method is required because some browsers like Firefox prevent the user from placing the caret inside empty
-     * block elements such as paragraphs or headers. This empty block elements can be obtained by splitting at the
-     * beginning or at the end of such a block element.
+     * This method is required because most browsers prevent the user from placing the caret inside empty block elements
+     * such as paragraphs or headers. This empty block elements can be obtained by splitting at the beginning or at the
+     * end of such a block element.
      * 
      * @param parent the parent node of the subtree's root
      * @param descendant an inner node within the specified subtree
@@ -918,9 +918,37 @@ public class DOMUtils
      */
     public Node splitHTMLNode(Node parent, Node descendant, int offset)
     {
-        // By default we just do the split because browsers shouldn't require any further adjustments.
-        // Those who do require adjustments should overwrite this method.
-        return splitNode(parent, descendant, offset);
+        // Save the length of the descendant before the split to be able to detect where the split took place.
+        int length = getLength(descendant);
+
+        // Split the subtree rooted in the given parent.
+        Node nextLevelSibling = splitNode(parent, descendant, offset);
+
+        // See if the split took place.
+        if (nextLevelSibling != descendant) {
+            if (offset == 0) {
+                // The split took place at the beginning of the descendant. Ensure the first subtree is accessible.
+                // But first see if the first subtree has any leafs besides the descendant.
+                Node child = getChild(parent, descendant);
+                if (!isInline(child) && getFirstLeaf(child) == descendant) {
+                    Node refNode = getFarthestInlineAncestor(descendant);
+                    refNode = refNode == null ? child : refNode.getParentNode();
+                    ensureBlockIsEditable((Element) refNode);
+                }
+            }
+            if (offset == length) {
+                // The split took place at the end of the descendant. Ensure the second subtree is accessible.
+                // But first see if the second subtree has any leafs besides the nextLevelSibling.
+                Node child = getChild(parent, nextLevelSibling);
+                if (!isInline(child) && getLastLeaf(child) == nextLevelSibling) {
+                    Node refNode = getFarthestInlineAncestor(nextLevelSibling);
+                    refNode = refNode == null ? child : refNode.getParentNode();
+                    ensureBlockIsEditable((Element) refNode);
+                }
+            }
+        }
+
+        return nextLevelSibling;
     }
 
     /**
@@ -1343,15 +1371,18 @@ public class DOMUtils
     }
 
     /**
-     * Ensures the given block-level element can be edited in design mode. This method is required because in some
-     * browsers you can't place the caret inside elements that don't have any visible content and thus you cannot edit
-     * them.
+     * Ensures the given block-level element can be edited in design mode. This method is required because most browsers
+     * don't allow the caret inside elements that don't have any visible content and thus we cannot edit them otherwise.
+     * <p>
+     * The default implementation adds a BR element. Overwrite for browsers that don't like it.
      * 
      * @param block a block-level DOM element
      */
     public void ensureBlockIsEditable(Element block)
     {
-        // Do nothing by default.
+        if (block.canHaveChildren()) {
+            block.appendChild(block.getOwnerDocument().createBRElement());
+        }
     }
 
     /**

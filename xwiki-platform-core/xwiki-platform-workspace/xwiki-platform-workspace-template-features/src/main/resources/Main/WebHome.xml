@@ -22,4 +22,4 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>{{dashboard source="Dashboard.WebHome" /}}</content></xwikidoc>
+<content>{{include document="Dashboard.WebHome" context="new" /}}</content></xwikidoc>

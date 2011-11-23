@@ -99,8 +99,6 @@ public class DefaultExtensionLicenseManager implements ExtensionLicenseManager, 
                 try {
                     List<String> content = IOUtils.readLines(is);
 
-                    ExtensionLicense license = new ExtensionLicense(name, content);
-
                     List<String> aliases = new ArrayList<String>();
                     aliases.add(name);
 
@@ -114,6 +112,8 @@ public class DefaultExtensionLicenseManager implements ExtensionLicenseManager, 
 
                     content = content.subList(aliases.size() - 1, content.size());
 
+                    ExtensionLicense license = new ExtensionLicense(name, content);
+                    
                     for (String alias : aliases) {
                         this.licenses.put(alias.toLowerCase(), license);
                     }

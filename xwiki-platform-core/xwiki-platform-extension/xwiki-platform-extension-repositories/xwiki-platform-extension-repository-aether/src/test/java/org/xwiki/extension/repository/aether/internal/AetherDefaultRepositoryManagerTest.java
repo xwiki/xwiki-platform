@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import junit.framework.Assert;
 
@@ -36,6 +37,8 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionLicense;
+import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.test.RepositoryUtil;
@@ -53,7 +56,7 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
 
     private ExtensionDependency dependencyExtensionIdRange;
 
-    private ExtensionDependency dependencyExtensionIdClassifier;
+    private ExtensionLicenseManager extensionLicenseManager;
 
     private ExtensionId bundleExtensionId;
 
@@ -72,13 +75,13 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         this.extensionIdClassifier = new ExtensionId("groupid:artifactid:classifier", "version");
         this.dependencyExtensionId = new DefaultExtensionDependency("dgroupid:dartifactid", "dversion");
         this.dependencyExtensionIdRange = new DefaultExtensionDependency("dgroupid:dartifactid", "[dversion,)");
-        this.dependencyExtensionIdClassifier = new DefaultExtensionDependency("dgroupid:dartifactid:classifier", "dversion");
 
         this.bundleExtensionId = new ExtensionId("groupid:bundleartifactid", "version");
 
         // lookup
 
         this.repositoryManager = getComponentManager().lookup(ExtensionRepositoryManager.class);
+        this.extensionLicenseManager = getComponentManager().lookup(ExtensionLicenseManager.class);
     }
 
     @Test
@@ -91,12 +94,15 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         Assert.assertEquals(this.extensionId.getVersion(), extension.getId().getVersion());
         Assert.assertEquals("type", extension.getType());
         Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), extension.getRepository().getId().getId());
+        Assert.assertEquals("name", extension.getName());
         Assert.assertEquals("description", extension.getDescription());
         Assert.assertEquals("http://website", extension.getWebSite());
         Assert.assertEquals("Full Name", extension.getAuthors().get(0).getName());
         Assert.assertEquals(new URL("http://profile"), extension.getAuthors().get(0).getURL());
         Assert.assertEquals(Arrays.asList("groupid1:feature1", "groupid2:feature2"),
             new ArrayList<String>(extension.getFeatures()));
+        Assert.assertSame(this.extensionLicenseManager.getLicense("GNU Lesser General Public License 2.1"), extension
+            .getLicenses().iterator().next());
 
         ExtensionDependency dependency = extension.getDependencies().get(0);
         Assert.assertEquals(this.dependencyExtensionId.getId(), dependency.getId());
@@ -154,7 +160,7 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
             is.close();
         }
     }
-    
+
     @Test
     public void testDownloadBundle() throws ExtensionException, IOException
     {

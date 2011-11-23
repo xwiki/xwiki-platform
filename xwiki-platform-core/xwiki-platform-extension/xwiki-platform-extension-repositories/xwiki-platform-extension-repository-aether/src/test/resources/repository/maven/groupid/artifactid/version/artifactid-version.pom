@@ -19,6 +19,11 @@
     <properties>
       <xwiki.extension.features>groupid1:feature1,groupid2:feature2</xwiki.extension.features>
     </properties>
+    <licenses>
+      <license>
+        <name>LGPL 2.1</name>
+      </license>
+    </licenses>
 	<dependencies>
 	  <dependency>
 	    <groupId>dgroupid</groupId>

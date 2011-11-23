@@ -230,7 +230,7 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
         // features
         String featuresString = model.getProperties().getProperty(MPKEY_FEATURES);
         if (StringUtils.isNotBlank(featuresString)) {
-            extension.setFeatures(converter.<Collection<String>> convert(List.class, featuresString));
+            extension.setFeatures(this.converter.<Collection<String>> convert(List.class, featuresString));
         }
 
         // dependencies

@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>InstalledExtensions</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1321058328000</creationDate>
+<date>1322042708000</date>
+<contentUpdateDate>1322042708000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get("admin.xwiki.installedextensions")</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.1</syntaxId>
+<hidden>false</hidden><attachment>
+<filename>icon.png</filename>
+<filesize>7346</filesize>
+<author>xwiki:XWiki.Admin</author>
+<date>1322042708000</date>
+<version>1.1</version>
+<comment></comment><content>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
+</content></attachment>
+<content>{{include document="ExtensionManagerMacros" /}}
+
+{{velocity}}
+(% class="full column" %)(((
+#if ($request.actionuninstall)
+  = Uninstall
+
+  #if (!$request.extensionid || !$request.extensionversion)
+    {{error}}You have to provide both extension id and version.{{/error}}
+  #elseif ($request.confirm)
+    #set($uninstallJob = $extensionManager.uninstall($request.extensionid, $request.extensionversion))
+    #set($lasterror = $extensionManager.lastError)
+    #if ($lasterror)
+      {{error}}
+        Failed to uninstall extension with id $request.extensionid and version $request.extensionversion: #printThrowable($lasterror)
+      {{/error}}
+    #else
+      {{box}}
+        #printJobLog($uninstallJob)
+      {{/box}}
+    #end
+  #else
+    #set ($extensionsToUninstall = [])
+    #prepareUninstall($request.extensionid $request.extensionversion $extensionsToUninstall)
+    #set ($lasterror = $extensionManager.lastError)
+    #if ($lasterror)
+      {{error}}Failed to prepare uninstalling extension with id $request.extensionid and version $request.extensionversion: $lasterror.message{{/error}}
+    #elseif ($extensionsToUninstall.empty)
+      Extension does not exists
+    #else
+      The following extensions will be removed:
+      #foreach ($extensionid in $extensionsToUninstall)
+        * $extensionid
+      #end
+
+      {{html}}
+      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform"&gt;
+        &lt;div&gt;
+          &lt;input name="extensionid" value="${escapetool.xml($request.extensionid)}" type="hidden" /&gt;
+          &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;
+          &lt;input name="actionuninstall" type="hidden" /&gt;
+          &lt;p&gt;
+            &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
+          &lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/form&gt;
+      {{/html}}
+    #end
+  #end
+#else
+= Installed extensions
+
+#displayExtensionSearchBar()
+
+#if ($request.extensionid &amp;&amp; $request.extensionversion)
+  #set ($extensions = [$extensionManager.resolve($request.extensionid, $request.extensionversion)])
+#else
+  #set($extensions = $extensionManager.getInstalledExtensions())
+#end
+#if ($extensions.isEmpty())
+  {{info}}No extension installed.{{/info}}##
+#else
+  #if ($extensions.size() &gt; 1)
+    #set ($hasPagination = true)
+    #set ($paginationParams = {'totalItems': $extensions.size()})
+    {{html}}#pagination($paginationParams){{/html}}
+    #set ($extensions = $extensions.subList($paginationParams.firstItem, $mathtool.min($extensions.size(), $mathtool.add($paginationParams.firstItem, $paginationParams.itemsPerPage))))
+  #end
+  #set ($actions = [])
+  #if ($request.actionshowdetails)
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^=]++', ''))"" class=""button""&gt;Back to list&lt;/a&gt;&lt;/span&gt;"))
+  #else
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""Show details"" class=""button""/&gt;&lt;/span&gt;"))
+  #end
+  #if ($hasProgramming)
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionuninstall"" value=""Uninstall"" class=""button""/&gt;&lt;/span&gt;"))
+  #end
+  #foreach($extension in $extensions)
+    #displayExtension($extension $actions)
+  #end
+  #if ($hasPagination)
+    #set ($discard = $paginationParams.put('position', 'bottom'))
+    {{html}}#pagination($paginationParams){{/html}}
+  #end
+#end
+#end
+)))
+{{/velocity}}</content></xwikidoc>

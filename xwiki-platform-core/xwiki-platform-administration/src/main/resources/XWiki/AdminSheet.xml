@@ -3177,6 +3177,14 @@ document.observe('xwiki:dom:loaded', function() {
     ]
   },
   {
+    'id' : 'extensionmanager',
+    'children': [
+       {'id' : 'XWiki.AddExtensions'},
+       {'id' : 'XWiki.InstalledExtensions'},
+       {'id' : 'XWiki.CoreExtensions'}
+    ]
+  },
+  {
     'id' : 'applications',
     'children' : []
   }

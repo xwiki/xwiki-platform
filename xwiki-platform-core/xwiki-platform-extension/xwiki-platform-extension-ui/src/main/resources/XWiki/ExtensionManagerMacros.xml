@@ -1,0 +1,1017 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>ExtensionManagerMacros</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1321509118000</creationDate>
+<date>1322044885000</date>
+<contentUpdateDate>1322044885000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.1</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.ExtensionManagerMacros</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>9a7ab38c-4990-415a-beed-6968710f3b02</guid>
+<property>
+<cache>forbid</cache>
+</property>
+<property>
+<code>#template('colorThemeInit.vm')
+.extension-item {
+  border-color: $theme.borderColor $theme.pageContentBackgroundColor $theme.pageContentBackgroundColor $theme.borderColor;
+  border-style: solid solid solid;
+  border-width: 1px 1px 1px 1px;
+  display: block;
+  -moz-box-shadow: 1px 0 0 $theme.borderColor;
+  -webkit-box-shadow:  1px 0 0 $theme.borderColor;
+  box-shadow:  1px 0 0 $theme.borderColor;
+  margin-right: 1px;
+  position: relative;
+}
+.extension-item &gt; * {
+  padding: 0.8em 1em 1em 2.7em;
+}
+
+.extension-item:last-of-type {
+  border-bottom-color: $theme.borderColor;
+}
+
+.extension-name {
+  color: $theme.titleColor;
+  font-size: 1.2em;
+  font-weight: 700;
+  border: none;
+  background: url("$xwiki.getSkinFile('icons/silk/cog.gif')") no-repeat scroll 0.2em 0.3em transparent;
+  margin: 0 0 0 -1.8em;
+  padding: 2px 0 2px 1.8em;
+}
+.ui-progress-bar {
+  background-image:-moz-repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.2) 5px, transparent 5px, transparent 10px);
+  background-repeat: repeat;
+  background-color: $theme.notificationSuccessColor !important;
+  background-position: left;
+  -moz-animation-duration: 0.2s;
+  -moz-animation-iteration-count: infinite;
+  -moz-animation-name: progress-animation;
+  -moz-animation-timing-function: linear;
+}
+
+@-moz-keyframes progress-animation {
+	0% {background-position: -14.142px 0;}
+	100% {background-position: 0px 0;}
+}
+
+.extension-version {
+  color: $theme.textSecondaryColor;
+  margin-left: 1em;
+  font-weight: normal;
+  font-size: .8em;
+}
+
+.extension-authors {
+  color: $theme.textSecondaryColor;
+  font-size: .9em;
+}
+
+.extension-actions {
+  float: right;
+}
+
+.extension-description {
+  font-size: .9em;
+}
+
+.extension-body {
+  border-top: 1px dotted $theme.borderColor;
+  padding-top: 0;
+}
+
+*[id^="extension-body-"]:target {
+  display: none;
+}
+
+*[class^="extension-body-"] {
+  display: none;
+}
+*[id^="extension-body-"]:target + *[class^="extension-body-"] {
+  display: block;
+}
+.extension-metadata {
+  margin: 0 !important;
+  -moz-column-width: 30em;
+  -webkit-column-width: 30em;
+  column-width: 30em;
+}
+.extension-metadata li {
+  display: block;
+  vertical-align: top;
+  padding: 0.5em 0;
+}
+
+*[class|="dependency-type"] {
+  padding-left: 20px;
+  background: transparent none no-repeat left;
+}
+
+.extension-body-dependencies ul {
+  list-style-type: none;
+}
+.dependency-type-core {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cog.gif')");
+}
+.dependency-type-installed {
+  background-image: url("$xwiki.getSkinFile('icons/silk/plugin.gif')");
+}
+.dependency-type-remote {
+  background-image: url("$xwiki.getSkinFile('icons/silk/world.gif')");
+}
+/****************************** &lt;Inner Menu&gt; *************************/
+
+.innerMenu {
+  color: $theme.textSecondaryColor;
+  font-size: 1em;
+  font-size: 0.8em;
+  padding: 0 1.55em .1em 3.35em;
+  margin-top: -5px !important;
+  bsorder: 1px solid blue;
+}
+
+.innerMenu li {
+  display: inline-block;
+  sborder: 1px solid red;
+  vertical-align: top;
+}
+.innerMenu li a {
+  border-radius: 5px 5px 0 0 / 3px 3px 0 0;
+  border-top: 3px solid $theme.borderColor;
+  display: inline-block;
+  margin: 2px 2em 0 0;
+  padding: 6px .5em .2em;
+  position: relative;
+  top: 0px;
+}
+.innerMenu li a:hover {
+  border-radius: 5px 5px 0 0;
+  border-top: 5px solid $theme.borderColor;
+  margin-top: 0px;
+}
+
+.innerMenu li.current a {
+  background-color: $theme.panelCollapsedBackgroundColor;
+  border: 0 none;
+  border-top: 5px solid $theme.panelCollapsedBackgroundColor;
+  margin-top: 0;
+  border-radius: 0 0 5px 5px;
+  box-shadow: 3px;
+}
+
+.innerMenu li.current a:after {
+  border-style: solid;
+  border-color: transparent transparent  $theme.borderColor;
+  border-width: 0 5px 5px 0;
+  width: 0;
+  display: block;
+  position: absolute;
+  height: 0;
+  content: "";
+  top: -5px;
+  right: -5px;
+}
+
+.innerMenu li.current a {
+  color: $theme.panelCollapsedTextColor;
+  text-decoration: none;
+}
+
+/****************************** &lt;/ Clean&gt; *************************/
+
+
+
+
+.ui-progress-background {
+  background-color: transparent;
+  border-radius: 8px 8px 8px 8px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3) inset, 0 1px 0 0 $theme.pageContentBackgroundColor;
+  height: 8px;
+}
+
+.ui-progress-bar {
+  background-color: $theme.backgroundSecondaryColor;
+  border-radius: 8px 8px 8px 8px;
+  height: 8px;
+}
+
+.ui-progress-bar.green {
+
+  -webkit-box-shadow:
+    inset 0 2px 9px  rgba(255,255,255,0.3),
+    inset 0 -2px 6px rgba(0,0,0,0.4);
+  -moz-box-shadow:
+    inset 0 2px 9px  rgba(255,255,255,0.3),
+    inset 0 -2px 6px rgba(0,0,0,0.4);
+  box-shadow:
+    inset 0 2px 9px  rgba(255,255,255,0.3),
+    inset 0 -2px 6px rgba(0,0,0,0.4);
+
+  background-image:
+     -webkit-gradient(linear, 0 0, 100% 100%,
+        color-stop(.25, rgba(255, 255, 255, .2)),
+        color-stop(.25, transparent), color-stop(.5, transparent),
+        color-stop(.5, rgba(255, 255, 255, .2)),
+        color-stop(.75, rgba(255, 255, 255, .2)),
+        color-stop(.75, transparent), to(transparent)
+     );
+
+  -webkit-background-size: 50px 50px;
+  -moz-background-size: 50px 50px;
+}
+
+.ui-progress-bar.orange {
+  /*other*/ background: -moz-repeating-linear-gradient(left top -30deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.17) 15px, rgba(255, 255, 255, 0) 15px, rgba(255, 255, 255, 0) 30px) repeat scroll 0 0%, -moz-linear-gradient(center top , #F1A165, #D09000) repeat scroll 0 0 transparent;
+}
+
+.ui-progress-bar.red {
+  /*other*/ background: -moz-repeating-linear-gradient(left top -30deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.17) 15px, rgba(255, 255, 255, 0) 15px, rgba(255, 255, 255, 0) 30px) repeat scroll 0 0%, -moz-linear-gradient(center top , #F0A3A3, #F42323) repeat scroll 0 0 transparent;
+}
+
+.ui-progress-message {
+  color: $theme.textSecondaryColor;
+  font-size: .85em;
+  min-width: 100px;
+}
+
+/****************************** &lt;/ Progress &gt; *************************/
+
+/***************** Selection Menus **************/
+
+.selection {
+  display: inline-block;
+  float: left;
+  font-size: 1.05em;
+  position: relative;
+}
+
+.selection .menuarrow {
+    color: $theme.textSecondaryColor;
+    font-size: 0.6em;
+    font-weight: bold;
+    margin: 0;
+    padding-left: 2px;
+    padding-right: 3px;
+    position: relative;
+    top: -3px;
+}
+.selection .menuarrow .tooltipHint {
+    color: $theme.textSecondaryColor;
+}
+.selection .rightmenu {
+    display: block;
+    padding: 0;
+    position: relative;
+}
+.selection .submenu {
+    -moz-box-shadow: 1px 1px 1px rgba(80, 80, 80, 0.8);
+    background: none repeat scroll 0 0 $theme.panelCollapsedBackgroundColor;
+    border: 1px solid $theme.borderColor;
+    display: block;
+    margin-left: 16px;
+    margin-top: 3px;
+    padding: 2px;
+    position: absolute;
+    width: 120px;
+    z-index: 998;
+}
+.rightmenu .icon img:hover, .tools .tool img:hover {
+    background-color: $theme.panelCollapsedBackgroundColor;
+}
+
+.selection .submenuitem {
+    cursor: pointer;
+    display: block;
+    padding-left: 20px;
+}
+
+.selection .rightmenu .topmenuentry {
+  display: inline-block;
+  float: none;
+  margin: 0;
+}
+
+.changedRight {
+    background: url("/xwiki/resources/icons/silk/bullet_black.gif") no-repeat scroll 0 center transparent;
+    font-weight: bold;
+}
+
+.selection .topmenuentry {
+  min-height: 1em;
+}
+
+.extHeaderRight .selection .submenu, .extHeaderLeft .selection .submenu  {
+  margin-left: 10px;
+  width: 100px;
+}
+
+.extHeaderLeft .selection .submenu  {
+  margin-left: 6px;
+}
+
+/***********************   Extension Manager ****************/
+
+.extHeader {
+  /*background: -moz-linear-gradient(270deg, #FFFFFF, #EFEFEF) repeat scroll 0 0 #EFEFEF;*/
+  background-color: $theme.panelCollapsedBackgroundColor;
+  border: 1px solid $theme.borderColor;
+  color: $theme.panelCollapsedTextColor;
+  padding: 3px 1.2em 3px 0.7em;
+  font-size: .8em;
+}
+
+.extHeader:first-of-type {
+  border-bottom: 0;
+}
+
+.extHeaderLeft {
+  float: left;
+}
+
+.extHeaderBottom  .extHeaderLeft{
+  padding-left: 2.5em;
+  margin-top: 3px;
+}
+
+.extHeaderRight {
+  float: right;
+  cursor: pointer;
+  margin: 3px 0 -3px;
+}
+
+.extHeaderBottom  .extHeaderRight {
+  margin: 0 0.4em;
+}
+
+.type{
+  display: inline-block;
+  height: 16px;
+  text-indent: -9999px;
+  width: 16px;
+}
+
+.type {
+  background: url("/xwiki/resources/icons/silk/bricks.gif") no-repeat scroll 0 0 transparent;
+}
+
+.extFilter {
+  color: $theme.textColor;
+  padding: 0 4px;
+  cursor: pointer;
+}
+
+.extHeaderLeftSearch {
+  float: left;
+  margin-left: .2em;
+}
+
+.extHeaderLeftInput {
+  font-size: 1.1em;
+  padding: 0 .5em;
+  min-width: 340px;
+}
+
+.extMiniName {
+
+}
+
+.extMeta {
+  padding: 1.3em 1.5em 0 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: .8em;
+  color: $theme.textSecondaryColor;
+  text-align: right;
+}
+
+.extMiniMeta {
+
+}
+
+.extButtons {
+  padding: 0 1.55em 1.6em 0;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  font-size: .8em;
+  color: $theme.textSecondaryColor;
+}
+
+.extButtons .button {
+  min-width: 5em;
+  text-align: center;
+}
+
+.progressButtons {
+  padding-bottom: 2.4em;
+}
+
+.extUpdateTitle {
+  margin-right: .5em;
+}
+
+.secondary {
+  color: $theme.textSecondaryColor;
+  font-size: .9em;
+}
+
+.extItem.statusInstalled, .extItem.statusUpgradable, .extItem.statusIncompatible, .extItem.statusDisable {
+  border-right: 7px solid transparent;
+}
+
+.extItem.statusInstalled .extButtons, .extItem.statusUpgradable .extButtons, .extItem.statusIncompatible .extButtons, .extItem.statusDisable .extButtons{
+  padding: 0 1em 1.6em 0;
+}
+
+.typeApp{
+  background-image: url("/xwiki/resources/icons/silk/application.gif");
+}
+
+.typeModule{
+  background-image: url("/xwiki/resources/icons/silk/connect.gif");
+}
+
+.typeSkin{
+  background-image: url("/xwiki/resources/icons/silk/layout_content.gif");
+}
+
+.typeMacro{
+  background-image: url("/xwiki/resources/icons/silk/cog.gif");
+}
+
+.typePlugin{
+  background-image: url("/xwiki/resources/icons/silk/plugin.gif");
+}
+
+.extItem.statusInstalled  {
+  border-right-color: $theme.notificationSuccessColor;
+}
+
+.statusInstalled  .extStatus, .extItem .statusInstalled  .extMiniStatus{
+  color: $theme.notificationSuccessColor;
+}
+
+.extItem.statusUpgradable  {
+  border-right-color: $theme.notificationWarningColor;
+}
+
+.statusUpgradable  .extStatus, .extItem .statusUpgradable .extMiniStatus{
+  color: $theme.notificationWarningColor;
+}
+
+.extItem.statusIncompatible  {
+  border-right-color: $theme.notificationErrorColor;
+}
+
+.statusIncompatible  .extStatus, .extItem .statusIncompatible  .extMiniStatus{
+  color: $theme.notificationErrorColor;
+}
+
+.extItem.statusDisable  {
+  border-right-color: $theme.backgroundSecondaryColor;
+}
+
+.extItem.statusDisable  .extItemHeader{
+  background-image: -moz-linear-gradient(center top , $theme.backgroundSecondaryColor , $theme.pageContentBackgroundColor);
+}
+
+.statusDisable  .extStatus, .statusDisable  .extDescription, .statusDisable  .extName, .statusDisable  .extAuthor a{
+  color: $theme.textSecondaryColor;
+}
+
+.expandTool {
+  border-style: solid;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: 5px;
+  z-index: 2;
+}
+
+.expandedExt .expandTool{
+  border-color: transparent $theme.borderColor transparent transparent;
+  border-width: 0 7px 7px 0;
+  float: right;
+}
+
+.collapsedExt:hover  .expandTool {
+  border-color: transparent transparent $theme.panelHeaderBackgroundColor transparent;
+  border-width: 0 7px 7px 0;
+  display: block; /* Content is hidden but keep at least the activator */
+  float: right;
+  width: 0;
+}
+
+.collapsedExt  .extItemContent {
+  display: none; /* Hide inside content when collapsed */
+}
+
+.extItemHeader {
+  padding: 0.8em 1em 1em 2.7em;
+  position: relative;
+}
+
+.extItemContent h6 {
+  border: 0 none;
+  font-size: 1em;
+  margin: 1.5em 0 0;
+}
+
+.dependencies {
+  border-top: 1px dotted $theme.borderColor;
+}
+
+.dependencies .extItem {
+  padding: 0.3em 0;
+  border-style: solid solid dotted;
+  border-width: 0 7px 1px 0;
+  border-bottom-color: $theme.borderColor;
+  box-shadow: none;
+}
+
+.dependencies .extItem:hover {
+  background-color: $theme.highlightColor;
+}
+
+.dependencies .extMeta {
+  padding-top: .8em;
+}
+
+.zone {
+  display: none;
+}
+
+.zone.current {
+  display: block;
+}
+
+#extensions .releasenotesZone ul, #extensions .descriptionZone ul  {
+  float: none;
+  list-style-type: circle;
+  margin-left: 1.3em;
+}
+
+.extHeaderBottom .xwiki-livetable-pagination {
+  font-size: 1.1em;
+  line-height: 1.8em;
+  padding-left: 0.5em;
+}
+
+.extHeaderBottom .pagination {
+  line-height: 1.8em; 
+  margin: 0;
+}
+
+.pagenumber.selected {
+  font-weight: 700;
+}
+
+.extHeaderBottom .pagesizeselect {
+  font-size: .9em;
+}
+
+.leftmetadata {
+  float: left;
+}
+
+.rightmetadata {
+  float: right;
+}
+
+/*********** Pagination *********/
+#xwikicontent .controlPagination {
+  height: 15px;
+  line-height: 1.6em !important;
+  margin: 0.35em 0 0 1em !important;
+  vertical-align: bottom;
+  width: 27px;
+}
+#xwikicontent .controlPagination .prevPagination, #xwikicontent .controlPagination .noPrevPagination, #xwikicontent .controlPagination .nextPagination, #xwikicontent .controlPagination .noNextPagination {
+  height: 13px;
+  width: 13px;
+}
+
+#xwikicontent .controlPagination .prevPagination, #xwikicontent .controlPagination .noPrevPagination {
+  background-image: url("/xwiki/bin/download/Improvements/ExtensionManagerProposal1/arrowleft.gif");
+  background-position: left top;
+}
+#xwikicontent .controlPagination .nextPagination, #xwikicontent .controlPagination .noNextPagination {
+  background-image: url("/xwiki/bin/download/Improvements/ExtensionManagerProposal1/arrowright.gif");
+  background-position: right top;
+  left: 14px;
+}
+
+/*********** /Pagination *********/
+
+/*********** Repositories *********/
+ul.repositories {
+  background-color: #F7F7F7;
+  font-size: .9em;
+  list-style-type: none;
+  margin: 0;
+  padding: 0.5em;
+}
+
+ul.repositories li {
+  padding: 2px;
+  position: relative;
+}
+
+ul.repositories span {
+  display: block;
+}
+
+ul.repositories .tools {
+  display: none;
+  position: absolute;
+  right: 3px;
+  top: 3px;
+}
+ul.repositories li:hover .tools {
+  display: block;
+}
+
+ul.repositories  li:hover{
+  background-color: $theme.highlightColor;
+}
+
+.tools a {
+  background: none no-repeat scroll 94% 50% transparent;
+  display: inline-block;
+  float: left;
+  padding: 0;
+  text-indent: -9999px;
+  width: 16px;
+}
+
+.tools .delete {
+  background-image: url("/xwiki/bin/download/Improvements/ExtensionManagerProposal1/bulletcross.png");
+}
+
+.tools .edit {
+  background-image: url("/xwiki/bin/download/Improvements/ExtensionManagerProposal1/bulletedit.png");
+  background-position: 0 -2px;
+}    
+
+.addRepository {
+  margin-top: .3em;
+}
+
+.addRepository input[type="text"]{
+  color: $theme.textSecondaryColor;
+  font-size: .95em;
+}
+
+.addRepository .icon {
+  margin: -3px 0 0 -23px;
+}
+
+ul.repositories .addRepository:hover  {
+  background-color: transparent;
+}
+
+/*********** /Repositories *********/</code>
+</property>
+<property>
+<name></name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<content>{{velocity output="false"}}
+$xwiki.ssx.use('ExtensionManagerMacros')
+$xwiki.jsx.use('ExtensionManagerMacros')
+#set ($extensionManager = $services.extension)
+#set ($versionManager = $extensionManager.versionManager)
+#if ($request.extensionwiki &amp;&amp; $request.extensionwiki.trim() != '')
+  #set($extensionwiki = $request.extensionwiki)
+#end
+
+#macro (displayExtensionSearchBar)
+  (% class="extHeader" %)(((
+    (% class="extHeaderLeft" %)(((
+      {{html}}
+      &lt;form action="$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1').replaceAll('(^|&amp;)(extension(id|version)=[^&amp;]++&amp;?+)+', '$1').replaceAll('(^|&amp;)section=[^&amp;]++', '$1section=XWiki.AddExtensions'))" method="post"&gt;
+        &lt;div class="globalsearch extHeaderLeftSearch"&gt;
+          &lt;label class="hidden" for="headerglobalsearchinput"&gt;Search&lt;/label&gt;&lt;input type="text" autocomplete="off" class="globalsearchinput#if ("$!request.searchextension" == '') withTip#end extHeaderLeftInput" id="headerglobalsearchinput" name="searchextension" value="#if ("$!request.searchextension" != '')$request.searchextension#{else}search extension...#{end}" size="60"&gt;&lt;input type="image" class="button" value="Go" alt="Go" src="/xwiki/resources/icons/xwiki/search.png"&gt;
+        &lt;/div&gt;
+      &lt;/form&gt;
+      {{/html}}
+    )))
+    (% class="clearfloats" %)((()))
+  )))
+#end
+rep
+#macro (displayExtensionName $extension $actions)
+  #set ($name = "$!{extension.name}")
+  #if ($name == '')
+    #set ($name = "$!{extension.id.id}")
+    #if ($name.indexOf(':') &gt;= 0)
+      #set ($name = $name.substring($mathtool.add($name.indexOf(':'), 1)))
+    #end
+  #end
+  $name##  
+#end
+
+#macro (displayExtension $extension)
+    (% class="extension-item" %)(((
+    (% class="extension-header" %)(((
+    (% class="extension-name" %)
+    ==#displayExtensionName($extension) (% class="extension-version %)$extension.id.version==
+
+    {{html}}
+    &lt;form method="post" action="$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++', ''))"&gt;
+      &lt;div class="extension-actions"&gt;
+        &lt;input type="hidden" name="extensionid" value="$extension.id.id"/&gt;
+        &lt;input type="hidden" name="extensionversion" value="$extension.id.version"/&gt;
+        #foreach ($action in $actions)
+          $action
+        #end
+      &lt;/div&gt;
+    &lt;/form&gt;
+    {{/html}}
+
+    #if ($extension.authors.size() &gt; 0)
+      (% class="extension-authors" %)(((
+      $msg.get('by:') ##
+      #foreach ($author in $extension.authors)
+        #if ($author.name == 'devs')
+          [[$msg.get('XWiki Development Team')&gt;&gt;http://www.xwiki.org/]]##
+        #elseif ("$!author.url" != '' &amp;&amp; "$!author.name" != '')
+          [[${author.name}&gt;&gt;${author.url}]]##
+        #else
+          ${author.name}##
+        #end
+        #if ($foreach.hasNext), ##
+        #else
+        )))
+
+        #end
+      #end
+    #end
+    #if ("$!{extension.description}" != '')
+      (% class="extension-description" %)
+      (((
+      $extension.description.replaceAll('\s+', ' ')
+      )))
+
+    #end
+    (% class="clearfloats" %)((()))
+    )))
+    #if ($request.actionshowdetails)
+    #set ($backwardDependencies = $extensionManager.getBackwardDependencies($extension.id.id, $extension.id.version))
+    #if (!$backwardDependencies)
+      #set ($backwardDependencies = {})
+    #end
+    (% class="extension-body" %)(((
+      (% class="innerMenu" %)
+      * [[Description&gt;&gt;||anchor="extension-body-description-${extension.id.id}-${extension.id.version}"]]
+      #if ("$!{extension.releaseNotes}" != '')
+        * [[Release Notes&gt;&gt;||anchor="extension-body-relnotes-${extension.id.id}-${extension.id.version}"]]
+      #end
+      #if ($extension.dependencies.size() &gt; 0 || $backwardDependencies.size() &gt; 0)
+        * [[Dependencies&gt;&gt;||anchor="extension-body-dependencies-${extension.id.id}-${extension.id.version}"]]
+      #end
+
+      {{id name="extension-body-description-${extension.id.id}-${extension.id.version}" /}}
+
+      (% class="extension-body-description" %)(((
+        (% class="extension-metadata" %)
+        * $msg.get('extensions.info.license', [$extension.licenses.size()]) ##
+        #foreach ($license in $extension.licenses)
+          ${license.name}##
+          #if ($foreach.hasNext), #end
+        #end
+
+        #if ($extension.repository.id.URI &amp;&amp; $extension.repository.id.URI.scheme != 'file')
+          * $msg.get('extensions.info.repository') [[$extension.repository.id.id&gt;&gt;$extension.repository.id.URI]]
+        #end
+        #if ($extension.dependency)
+          * $msg.get('extensions.info.dependency')
+        #end
+        #if ($extension.webSite)
+          * $msg.get('extensions.info.website') [[$extension.webSite.replaceAll('^[^/]++//([^/]++)/?.*+$', '$1')&gt;&gt;$extension.webSite]]
+        #end
+        #if ($extension.features.size() &gt; 0)
+          * $msg.get('extensions.info.features') $extension.features
+        #end
+        #if ($xwiki.virtualMode)
+          #if (!$extension.namespaces || $extension.namespaces.size() == 0)
+            * $msg.get('extensions.info.namespaces.global')
+          #else
+            * $msg.get('extensions.info.namespaces.list') #foreach ($namespace in $extension.namespaces)$namespace#if($foreach.hasNext), #end#end
+
+          #end
+        #end
+
+        $!extension.summary
+      )))
+
+      #if ("$!{extension.releaseNotes}" != '')
+      {{id name="extension-body-relnotes-${extension.id.id}-${extension.id.version}" /}}
+      (% class="extension-body-relnotes" %)(((
+        $!{extension.releaseNotes}
+      )))
+      #end
+
+      {{id name="extension-body-dependencies-${extension.id.id}-${extension.id.version}" /}}
+      (% class="extension-body-dependencies" %)(((
+        $msg.get('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])
+        #foreach ($dependency in $extension.dependencies)
+          #set ($dependency = $extensionManager.resolve($dependency.id, $dependency.version))
+          #set ($dependencyClass = "${dependency.class}")
+          * [[#displayExtensionName($dependency)&gt;&gt;##
+          #if ($dependencyClass.endsWith('CoreExtension'))
+            path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.CoreExtensions")||class="dependency-type-core"]]
+          #elseif ($dependencyClass.endsWith('LocalExtension'))
+            path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.InstalledExtensions")||class="dependency-type-installed"]]
+          #else
+            path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.AddExtensions")||class="dependency-type-remote"]]
+          #end
+          #if (!$foreach.hasNext)
+
+          #end
+        #end
+        $msg.get('extensions.info.dependencies.backwardDependencies', [$backwardDependencies.size()])
+        #foreach ($namespace in $backwardDependencies.entrySet())
+          #foreach ($dependency in $namespace.value)
+            #set ($dependencyClass = "${dependency.class}")
+            * [[#displayExtensionName($dependency)&gt;&gt;##
+            #if ($dependencyClass.endsWith('CoreExtension'))
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.CoreExtensions")||class="dependency-type-core"]]##
+            #elseif ($dependencyClass.endsWith('LocalExtension'))
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.InstalledExtensions")||class="dependency-type-installed"]]##
+            #else
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.AddExtensions")||class="dependency-type-remote"]]##
+            #end
+            #if ("$!{namespace.key}" != '')
+              (in wiki $namespace.key)
+            #else
+
+            #end
+          #end
+        #end
+      )))
+    )))
+    #end
+    )))
+#end
+
+#macro (prepareInstall $extensionid $extensionversion $extensionsToInstall $extensionsToUpgrade $extensionsSuggested $coreExtensionsConflicts)
+  #set ($extension = $extensionManager.resolve($extensionid, $extensionversion))
+  #set ($extensionclass = "${extension.class}")
+  #if (!$extensionclass.endsWith('CoreExtension'))
+    #if (!$extension.isInstalled($extensionwiki))
+      #set($installedExtension = $extensionManager.getInstalledExtension($extensionid, $extensionwiki))
+      #if ($installedExtension &amp;&amp; $versionManager.compareVersions($installedExtension.id.version, $extensionversion) &gt; 0)
+        #set($extensionsToUpgrade[$extension.id] = $extension)
+      #else
+        #set($extensionsToInstall[$extension.id] = $extension)
+      #end
+      #prepareInstallDependencies($extension, $extensionsToInstall, $extensionsToUpgrade, $extensionsSuggested, $coreExtensionsConflicts)
+    #end
+  #elseif ($versionManager.compareVersions($extensionversion, $extension.id.version) &gt; 0)
+    #set($coreExtensionsConflicts[$extension.id] = [$extension, $extensionversion])
+  #end
+#end
+
+#macro (prepareInstallDependencies $extension $extensionsToInstall $extensionsToUpgrade $extensionsSuggested $coreExtensionsConflicts)
+  #foreach ($dependency in $extension.dependencies)
+    #prepareInstall($dependency.id, $dependency.version, $extensionsToInstall, $extensionsToUpgrade, $extensionsSuggested, $coreExtensionsConflicts)
+  #end
+#end
+
+#macro (printThrowable $throwable)
+  $throwable.class: #if(!$throwable.message)null#else$throwable.message#end
+
+  #foreach($stackTraceElement in $throwable.stackTrace)
+    ~    at $stackTraceElement
+  #end
+  #if ($throwable.cause)
+    Caused by: #printThrowable($throwable.cause)
+  #end
+#end
+
+#macro (printJobLog $job)
+  #foreach ($log in $installJob.status.log)
+    #set ($logLevel = $log.level.toString().toLowerCase())
+    {{$logLevel}}
+      $log.formattedMessage
+      #if ($log.throwable)
+        #printThrowable($log.throwable)
+      #end
+    {{/$logLevel}}
+  #end
+#end
+
+#macro (prepareUninstall $extensionid $extensionversion $extensionsToUninstall)
+  #set ($discard = $extensionsToUninstall.add("${extensionid}-${extensionversion}"))
+  #set ($backwardDependencies = $extensionManager.getBackwardDependencies($extensionid, $extensionversion))
+  #prepareUninstallBackwardDependencies($backwardDependencies, $extensionsToUninstall)
+#end
+
+#macro(prepareUninstallBackwardDependencies $backwardDependencies $extensionsToUninstall)
+  #foreach ($backwardDependencyMap in $backwardDependencies.values())
+    #foreach ($backwardDependency in $backwardDependencyMap)
+      #prepareUninstall($backwardDependency.id.id, $backwardDependency.id.version, $extensionsToUninstall)
+    #end
+  #end
+#end
+{{/velocity}}</content></xwikidoc>

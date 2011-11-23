@@ -303,18 +303,18 @@ $msg.get('xe.admin.forgotUsername.instructions')
   #if($results.size() == 0)
     $msg.get('xe.admin.forgotUsername.error.noAccount')
 
-    [[$msg.get('xe.admin.forgotUsername.error.retry')&gt;&gt;$doc.fullName]] | [[$msg.get('xe.admin.forgotUsername.login')>>path:${xwiki.getURL('XWiki.XWikiLogin', 'login')}]]
+    [[$msg.get('xe.admin.forgotUsername.error.retry')&gt;&gt;$doc.fullName]] | [[$msg.get('xe.admin.forgotUsername.login')&gt;&gt;path:${xwiki.getURL('XWiki.XWikiLogin', 'login')}]]
   #elseif($results.size() == 1)
     $msg.get('xe.admin.forgotUsername.result', ["**${results.get(0).substring($results.get(0).indexOf('.')).substring(1)}**"])
 
-    [[$msg.get('xe.admin.forgotUsername.login')>>path:${xwiki.getURL('XWiki.XWikiLogin', 'login')}]]
+    [[$msg.get('xe.admin.forgotUsername.login')&gt;&gt;path:${xwiki.getURL('XWiki.XWikiLogin', 'login')}]]
   #else
     $msg.get('xe.admin.forgotUsername.multipleResults')
     #foreach($item in $results)
       * **${item.substring($item.indexOf('.')).substring(1)}**
     #end
 
-    [[$msg.get('xe.admin.forgotUsername.login')>>path:${xwiki.getURL('XWiki.XWikiLogin', 'login')}]]
+    [[$msg.get('xe.admin.forgotUsername.login')&gt;&gt;path:${xwiki.getURL('XWiki.XWikiLogin', 'login')}]]
   #end
 #end
 {{/velocity}}</content></xwikidoc>

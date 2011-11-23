@@ -21,6 +21,8 @@ package org.xwiki.extension.repository.aether.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -80,7 +82,7 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
     }
 
     @Test
-    public void testResolve() throws ResolveException
+    public void testResolve() throws ResolveException, MalformedURLException
     {
         Extension extension = this.repositoryManager.resolve(this.extensionId);
 
@@ -91,6 +93,8 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), extension.getRepository().getId().getId());
         Assert.assertEquals("description", extension.getDescription());
         Assert.assertEquals("http://website", extension.getWebSite());
+        Assert.assertEquals("Full Name", extension.getAuthors().get(0).getName());
+        Assert.assertEquals(new URL("http://profile"), extension.getAuthors().get(0).getURL());
         Assert.assertEquals(Arrays.asList("groupid1:feature1", "groupid2:feature2"),
             new ArrayList<String>(extension.getFeatures()));
 

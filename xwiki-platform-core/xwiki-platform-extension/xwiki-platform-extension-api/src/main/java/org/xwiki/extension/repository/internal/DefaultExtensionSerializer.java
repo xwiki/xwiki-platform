@@ -385,7 +385,11 @@ public class DefaultExtensionSerializer implements ExtensionSerializer
                 dependenciesElement.appendChild(dependencyElement);
 
                 addElement(document, dependencyElement, ELEMENT_AANAME, author.getName());
-                addElement(document, dependencyElement, ELEMENT_AAURL, author.getURL().toString());
+
+                URL authorURL = author.getURL();
+                if (authorURL != null) {
+                    addElement(document, dependencyElement, ELEMENT_AAURL, authorURL.toString());
+                }
             }
         }
     }

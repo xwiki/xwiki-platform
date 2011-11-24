@@ -216,9 +216,11 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
             try {
                 String path = url.toURI().getPath();
                 String filename = path.substring(path.lastIndexOf('/') + 1);
+                String type = null;
 
                 int extIndex = filename.lastIndexOf('.');
                 if (extIndex != -1) {
+                    type = filename.substring(extIndex + 1);
                     filename = filename.substring(0, extIndex);
                 }
 
@@ -235,7 +237,7 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
                     String artefactname = filename.substring(0, index);
                     String version = filename.substring(index + 1);
 
-                    guessedArtefacts.put(artefactname, new Object[] {version, url});
+                    guessedArtefacts.put(artefactname, new Object[] {version, url, type});
                 }
             } catch (Exception e) {
                 this.logger.warn("Failed to parse resource name [" + url + "]", e);
@@ -248,9 +250,16 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
                 Object[] artefact = guessedArtefacts.get(coreArtefactId[0]);
 
                 DefaultCoreExtension coreExtension = (DefaultCoreExtension) coreArtefactId[1];
-                if (artefact != null && coreExtension.getId().getVersion().charAt(0) == '$') {
-                    coreExtension.setId(new ExtensionId(coreExtension.getId().getId(), (String) artefact[0]));
-                    coreExtension.setGuessed(true);
+                if (artefact != null) {
+                    if (coreExtension.getId().getVersion().charAt(0) == '$') {
+                        coreExtension.setId(new ExtensionId(coreExtension.getId().getId(), (String) artefact[0]));
+                        coreExtension.setGuessed(true);
+                    }
+
+                    if (coreExtension.getType().charAt(0) == '$') {
+                        coreExtension.setType((String) artefact[2]);
+                        coreExtension.setGuessed(true);
+                    }
                 }
             }
 

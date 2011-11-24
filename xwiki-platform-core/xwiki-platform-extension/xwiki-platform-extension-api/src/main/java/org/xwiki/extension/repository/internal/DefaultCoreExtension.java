@@ -55,6 +55,12 @@ public class DefaultCoreExtension extends AbstractExtension implements CoreExten
         super.setId(id);
     }
 
+    @Override
+    public void setType(String type)
+    {
+        super.setType(type);
+    }
+    
     // CoreExtension
 
     @Override

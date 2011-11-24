@@ -1977,7 +1977,9 @@ $xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {"forceSkinAction": true
   *#
 #macro(wysiwyg_createCache $parameters)
 #set($ok = $parameters.put('cacheId', "wysiwygCache$!{util.generateRandomString(4)}"))
-<input type="hidden" id="$!{parameters.cacheId}" />
+## HACK: We use a text input hidden through CSS instead of a hidden input because Chrome doesn't cache hidden inputs.
+## See http://code.google.com/p/chromium/issues/detail?id=105362
+<input type="text" class="hidden" id="$!{parameters.cacheId}"/>
 #end
 
 #**

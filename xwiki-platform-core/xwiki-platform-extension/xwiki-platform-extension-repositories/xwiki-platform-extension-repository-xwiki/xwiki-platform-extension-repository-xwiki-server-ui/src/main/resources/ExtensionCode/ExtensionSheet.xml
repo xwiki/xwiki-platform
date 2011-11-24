@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1312816151000</creationDate>
-<date>1320681507000</date>
-<contentUpdateDate>1320681507000</contentUpdateDate>
+<date>1322142079000</date>
+<contentUpdateDate>1322142079000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -231,6 +231,7 @@
     ## Viewing
     ##
     {{box cssClass="floatinginfobox"}}
+      (% class="extensionInfo" %)
       ##------- Type --------------
       #set($typeDisplay = $extensionTypeObject.getProperty('name').value)
       #if ("$!typeDisplay" == '')
@@ -267,7 +268,7 @@
       #if ("$!source" != "")
       
         {{context document="$doc.fullName"}}[[View Source&gt;&gt;$source||class="extension-link small-extension-link source-extension"]]{{/context}}
-    #end
+      #end
       ##------- Download button ------
       ## Get the last ExtensionVersion object and consider it corresponds to the last version
       #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
@@ -305,21 +306,22 @@
         $extension.set('id', "${defaultIdPrefix}${doc.name.toLowerCase().replace(' ', '-')}")##
         $extension.set('name', $doc.name)##
       #end
-      $extension.set('authors', $xwiki.getUserName($xcontext.user, false))##
+      $extension.set('authors', $xcontext.user)##
       {{html}}&lt;input value="${escapetool.xml($extension.getProperty('id').value)}" name="ExtensionCode.ExtensionClass_0_id" type="hidden"&gt;{{/html}}
     #end
 
     (% class="extension" %)
-    |Name|$doc.display("name")
-    |Type|$doc.display("type")
-    |Summary|$doc.display("summary")
-    |Authors|$doc.display("authors")
-    |License|$doc.display("licenseName")
-    |Source|$doc.display("source")
+    |Name|$doc.display('name')
+    |Type|$doc.display('type')
+    |Summary|$doc.display('summary')
+    |Authors|$doc.display('authors')
+    |License|$doc.display('licenseName')
+    |Source|$doc.display('source')
+    |Display Icon Location
+(Syntax: #set($comment = '##')${comment}icon:{{html}}&lt;a href="http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png" target="_blank"&gt;icon name&lt;/a&gt;{{/html}}${comment})|$doc.display("icon")
 
     #if (!$doc.isNew())
-      |Display Icon Location
-(Syntax: #set($comment = '##')${comment}icon:{{html}}&lt;a href="http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png" target="_blank"&gt;icon name&lt;/a&gt;{{/html}}${comment})|$doc.display("icon")
+      |Features (a list of virtual ids, e.g. an old id for an extension which changed its id)|$doc.display('features')
     #end
   #end
 
@@ -333,42 +335,48 @@
       $doc.display("description")
     #end
 
-    = Prerequisites &amp; Installation Instructions =
-
-    #if ($isEditMode)
-      ; Custom installation only
-      : $extension.customInstallationOnly
+    #if ($extensionTypeObject &amp;&amp; $latestVersion &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" == '')
+      #set($standardInstallation = "$!{extensionTypeObject.getProperty('installation').value}")
+    #else
+      #set($standardInstallation = '')
     #end
-    ##
-    #if ($extensionTypeObject)
-      ## Standard installation
-      #if ($isEditMode)
-        == Standard installation instructions
+    #set($extraInstallation = "$!{doc.getValue('installation')}")
 
+    #if ($isEditMode || $standardInstallation != '' || $extraInstallation != '')
+      = Prerequisites &amp; Installation Instructions =
+
+      #if ($isEditMode)
+        ; Custom installation only
+        : $extension.customInstallationOnly
       #end
-      #if ($isEditMode || ($extension.getProperty('customInstallationOnly').value == 0 &amp;&amp; "$!{extensionTypeObject.getProperty('installation').value}" != ''))
+      ##
+      ## Standard installation
+      #if ($standardInstallation != '')
+        #if ($isEditMode)
+          == Standard installation instructions
+
+        #end
         $extensionTypeObject.display('installation', 'view')
       #end
-    #end
-    ##
-    ## Extra installation
-    #if ($isEditMode)
-      == Custom installation instructions
+      ##
+      ## Extra installation
+      #if ($isEditMode)
+        == Custom installation instructions
 
-    #end
-    #set($extraInstallation = $doc.getValue("installation"))
-    #if ("$!extraInstallation" != '' || $isEditMode)
-      $extension.installation
+      #end
+      #if ($isEditMode || $extraInstallation != '')
+        $extension.installation
+      #end
     #end
 
+    ## Only display release notes if there are downloads and release notes
     #if ($latestVersion)
       #set($notes = $!{latestVersion.getProperty('notes').value})
-      ## Only display release notes if there are release notes
       #if ("$!notes" != "")
         = Release Notes =
      
         Release notes for version $version:
-       
+
         {{box}}
           $notes
         {{/box}}
@@ -378,7 +386,7 @@
       #if ($extensionDependencies.size() &gt; 0)
         = Dependencies =
 
-        #foreach($extensionDependency in $extensionDependencies)
+         #foreach($extensionDependency in $extensionDependencies)
           #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())
           #if (!$dependencyDocumentNames.isEmpty())
             #set($dependencyDocumentName = $dependencyDocumentNames.get(0))

@@ -109,7 +109,7 @@
 #set ($template = $WikiManager.getWikiTemplateDocument($TEMPLATE_NAME))
 #if ("$!template" == '')
   #if ($hasGlobalAdmin)
-    #if ($doc.getAttachment($TEMPLATE_PACKAGE))
+    #if ($xcontext.doc.getAttachment($TEMPLATE_PACKAGE))
       #set ($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, 'Workspace Template', $TEMPLATE_PACKAGE))
       #if ($result == $Exception.ERROR_NOERROR)
 
@@ -122,7 +122,7 @@
       #end
     #else
 
-      {{error}}$msg.get('workspacemanager.template.install.error.missingtemplateattachment', [$TEMPLATE_PACKAGE, $doc.fullName, "http://nexus.xwiki.org/nexus/content/groups/public/org/xwiki/enterprise/xwiki-enterprise-wiki/${xwiki.version}/xwiki-enterprise-wiki-${xwiki.version}.xar"]){{/error}}
+      {{error}}$msg.get('workspacemanager.template.install.error.missingtemplateattachment', [$TEMPLATE_PACKAGE, $xcontext.doc.fullName, "http://nexus.xwiki.org/nexus/content/groups/public/org/xwiki/enterprise/xwiki-enterprise-wiki/${xwiki.version}/xwiki-enterprise-wiki-${xwiki.version}.xar"]){{/error}}
     #end
   #else
     #set ($needsAdminRights = true)
@@ -152,7 +152,7 @@
     {{error}}Workspace template features can not be installed without the workspace base template being installed first.{{/error}}
   #end
 #elseif (!$xwiki.exists($manageWorkspaceDocumentReference))
-  #set ($templateFeaturesAttachment = $doc.getAttachment($TEMPLATE_FEATURES_PACKAGE))
+  #set ($templateFeaturesAttachment = $xcontext.doc.getAttachment($TEMPLATE_FEATURES_PACKAGE))
   #if (!$hasGlobalAdmin)
     #set ($needsAdminRights = true)
   #elseif ($templateFeaturesAttachment)
@@ -314,7 +314,7 @@
     #end
   #else
 
-    {{error}}$msg.get('workspacemanager.template.install.error.missingattachment', [$TEMPLATE_FEATURES_PACKAGE, $doc.fullName]){{/error}}
+    {{error}}$msg.get('workspacemanager.template.install.error.missingattachment', [$TEMPLATE_FEATURES_PACKAGE, $xcontext.doc.fullName]){{/error}}
   #end
 #else
   ##

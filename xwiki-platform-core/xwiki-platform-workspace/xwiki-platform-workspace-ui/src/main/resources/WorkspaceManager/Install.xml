@@ -122,7 +122,7 @@
       #end
     #else
 
-      {{error}}$msg.get('workspacemanager.template.install.error.missingtemplateattachment', [$TEMPLATE_PACKAGE, $xcontext.doc.fullName, "http://nexus.xwiki.org/nexus/content/groups/public/org/xwiki/enterprise/xwiki-enterprise-wiki/${xwiki.version}/xwiki-enterprise-wiki-${xwiki.version}.xar"]){{/error}}
+      {{error}}$msg.get('workspacemanager.template.install.error.missingtemplateattachment', [$TEMPLATE_PACKAGE, $xcontext.doc.fullName, "http://nexus.xwiki.org/nexus/content/groups/public/org/xwiki/enterprise/xwiki-enterprise-ui-all/${xwiki.version}/xwiki-enterprise-ui-all-${xwiki.version}.xar"]){{/error}}
     #end
   #else
     #set ($needsAdminRights = true)

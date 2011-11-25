@@ -335,7 +335,7 @@
       $doc.display("description")
     #end
 
-    #if ($extensionTypeObject &amp;&amp; $latestVersion &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" == '')
+    #if ($extensionTypeObject &amp;&amp; $latestVersion &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" != '1')
       #set($standardInstallation = "$!{extensionTypeObject.getProperty('installation').value}")
     #else
       #set($standardInstallation = '')

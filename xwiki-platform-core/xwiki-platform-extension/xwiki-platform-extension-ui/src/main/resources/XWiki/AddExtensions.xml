@@ -254,7 +254,7 @@ bOgK9Cz44w32Cfjt5Xb7Qse/TsjlX79O6AT0E/p/8v1MS0rb84IAAAAASUVORK5CYII=
 #end
 #if (!$extensions)
   {{html}}
-  &lt;form action="$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++', ''))" method="post" class="xform"&gt;
+  &lt;form action="$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1'))" method="post" class="xform"&gt;
     &lt;fieldset&gt;
       &lt;label for="searchextension"&gt;What would you like to add?&lt;br /&gt;&lt;input type="text" name="searchextension" id="searchextension" /&gt;&lt;/label&gt;
       &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Search" class="button" /&gt;&lt;/span&gt;
@@ -267,13 +267,17 @@ bOgK9Cz44w32Cfjt5Xb7Qse/TsjlX79O6AT0E/p/8v1MS0rb84IAAAAASUVORK5CYII=
 #else
   #if ($extensions.size() &gt; 1)
     #set ($hasPagination = true)
-    #set ($paginationParams = {'totalItems': $extensions.size()})
+    #set ($paginationURL = $doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)firstIndex=[^&amp;]++&amp;?', '$1')))
+    #if ("$!{request.searchextension}" != '')
+      #set ($paginationURL = "${paginationURL}&amp;searchextension=${request.searchextension}")
+    #end
+    #set ($paginationParams = {'totalItems': $extensions.size(), 'url': $paginationURL})
     {{html}}#pagination($paginationParams){{/html}}
     #set ($extensions = $extensions.subList($paginationParams.firstItem, $mathtool.min($extensions.size(), $mathtool.add($paginationParams.firstItem, $paginationParams.itemsPerPage))))
   #end
   #set ($actions = [])
   #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++', ''))"" class=""button""&gt;Back to list&lt;/a&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1'))"" class=""button""&gt;Back to list&lt;/a&gt;&lt;/span&gt;"))
   #else
     #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""Show details"" class=""button""/&gt;&lt;/span&gt;"))
   #end

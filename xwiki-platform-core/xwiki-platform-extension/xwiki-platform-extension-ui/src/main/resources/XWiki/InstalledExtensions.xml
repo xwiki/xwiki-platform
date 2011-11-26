@@ -221,13 +221,13 @@ xHK69dZf45Of/OTPybOUL8vlF1eXoSul+MXQZf0/5jXQOJ2yhBwAAAAASUVORK5CYII=
 #else
   #if ($extensions.size() &gt; 1)
     #set ($hasPagination = true)
-    #set ($paginationParams = {'totalItems': $extensions.size()})
+    #set ($paginationParams = {'totalItems': $extensions.size(), 'url': $doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)firstIndex=[^&amp;]++&amp;?', '$1'))})
     {{html}}#pagination($paginationParams){{/html}}
     #set ($extensions = $extensions.subList($paginationParams.firstItem, $mathtool.min($extensions.size(), $mathtool.add($paginationParams.firstItem, $paginationParams.itemsPerPage))))
   #end
   #set ($actions = [])
   #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^=]++', ''))"" class=""button""&gt;Back to list&lt;/a&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1'))"" class=""button""&gt;Back to list&lt;/a&gt;&lt;/span&gt;"))
   #else
     #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""Show details"" class=""button""/&gt;&lt;/span&gt;"))
   #end

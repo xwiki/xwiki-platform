@@ -160,7 +160,8 @@
     #set ($currentDatabase = $xcontext.database)
     #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
     #set ($packager = $xwiki.package)
-    #set ($templateFeaturesAttachmentLoadResultOk = $packager.importPackageFromByteArray($templateFeaturesAttachment.content))
+    ## FIXME: This way of retrieving the attachment's content is a workaround for XWIKI-7184 since $xcontext.doc.getAttachment(...) outputs an XWikiAttachment and not an api.Attachment.
+    #set ($templateFeaturesAttachmentLoadResultOk = $packager.importPackageFromByteArray($templateFeaturesAttachment.getContent($xcontext.context)))
     #set ($templateFeaturesAttachmentInstallResult = $packager.install())
     ## Change back to the current wiki.
     #set ($discard = $xcontext.setDatabase($currentDatabase))

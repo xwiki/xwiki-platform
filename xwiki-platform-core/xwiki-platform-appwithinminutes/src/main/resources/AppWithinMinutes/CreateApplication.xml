@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>AppWithinMinutes</web>
+<name>CreateApplication</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>AppWithinMinutes.WebHome</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1322209154000</creationDate>
+<date>1322394814000</date>
+<contentUpdateDate>1322394814000</contentUpdateDate>
+<version>1.1</version>
+<title>Create Application</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.CreateApplication</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>3782ad9f-9bfd-43f2-9310-c196092a0ad1</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>#template('colorThemeInit.vm')
+.wizard-help {
+  background-color: $theme.backgroundSecondaryColor;
+  border-bottom: 1px solid $theme.borderColor;
+  color: $theme.textSecondaryColor;
+  float: right;
+  font-size: 0.857em;
+  margin: 0 0 2em 2em;
+  padding: 1em;
+  width: 17em;
+}
+
+.wizard-help strong {
+  color: $theme.textColor;
+}
+
+.wizard-help .steps {
+  list-style-position: inside;
+  list-style-type: none;
+  margin: 0;
+}
+
+.wizard-help .steps li {
+  margin-top: .5em;
+}
+
+.wizard-help .steps .description {
+  display: block;
+  line-height: normal;
+  margin-left: 23px;
+}
+
+.wizard-body {
+  margin-right: 19em;
+}</code>
+</property>
+<property>
+<name>Style</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>currentPage</use>
+</property>
+</object>
+<content>{{include document="AppWithinMinutes.WizardStep"/}}
+
+{{velocity output="false"}}
+#macro(showStep)
+  {{html wiki="true"}}
+  #appWizardHeader(1)
+  (% class="wizard-help" %)
+  (((
+    **Steps** This wizard will guide you towards building your application. These steps will configure the way your application will be displayed and what kind of information will contain:
+    (% class="steps" %)
+    * (% class="number" %)1(%%) (% class="name" %)Name(%%)
+      (% class="description" %)Provide the application name.
+    * (% class="number" %)2(%%) (% class="name" %)Structure(%%)
+      (% class="description" %)Generate the structure of your application by specifying what types of fields it will contain.
+    * (% class="number" %)3(%%) (% class="name" %)Presentation(%%)
+      (% class="description" %)Personalize the home page of your application.
+  )))
+  &lt;form action="" method="post" class="xform wizard-body"&gt;
+    (% class="hidden" %)
+    (((
+      &lt;input type="hidden" name="form_token" value="$services.csrf.getToken()"/&gt;
+    )))
+    ; &lt;label for="appName"&gt;Application Name&lt;/label&gt;
+      (% class="xHint" %)The name of the application determines the URL of the application home page, the space where application data will be stored as well as the name of the class that will describe the application structure.
+    : &lt;input type="text" id="appName" name="appName" /&gt;
+    #appWizardFooter(1)
+  &lt;/form&gt;
+  {{/html}}
+#end
+
+#macro(processStep)
+  #set($classRef = $services.model.createDocumentReference($doc.wiki, $request.appName, "${request.appName}Class"))
+  #set($classDoc = $xwiki.getDocument($classRef))
+  #if($classDoc.isNew())
+    #set($discard = $classDoc.setParent('WebHome'))
+    #set($discard = $classDoc.setTitle("$request.appName Class"))
+    #set($editSheetRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'ClassEditSheet'))
+    #set($discard = $services.sheet.bindDocumentSheet($classDoc, $editSheetRef))
+    #set($viewSheetRef = $services.model.createDocumentReference($doc.wiki, 'XWiki', 'ClassSheet'))
+    #set($discard = $services.sheet.bindDocumentSheet($classDoc, $viewSheetRef))
+    #set($discard = $classDoc.save('Initialize application class'))
+  #end
+  $response.sendRedirect($classDoc.getURL('edit', 'wizard=true'))
+#end
+{{/velocity}}
+
+{{velocity}}
+#if("$!request.appName" != '' &amp;&amp; $services.csrf.isTokenValid($request.form_token))
+  #processStep()
+#else
+  #showStep()
+#end
+{{/velocity}}</content></xwikidoc>

@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>AppWithinMinutes</web>
+<name>WizardStep</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>AppWithinMinutes.WebHome</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1322241394000</creationDate>
+<date>1322394959000</date>
+<contentUpdateDate>1322394959000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.WizardStep</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>1bfbb711-c23d-4f82-ba0d-d7f223193604</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>#template('colorThemeInit.vm')
+.wizard-header {
+  background-color: $theme.backgroundSecondaryColor;
+  border-bottom: 1px solid $theme.borderColor;
+  margin: 1em 0;
+}
+
+.wizard-header h1 {
+  border-bottom: 0 none;
+  color: $theme.titleColor;
+  float: left;
+  font-size: 1.5em;
+  margin: 0;
+  padding: 0.5em;
+}
+
+.wizard-header .steps {
+  float: right;
+  line-height: 1.5em;
+  list-style-position: inside;
+  list-style-type: none;
+  margin: 0;
+  padding: .8em 0;
+}
+
+.wizard-header .steps li {
+  display: inline-block;
+  margin-right: 1em;
+}
+
+.steps .number {
+  background-color: $theme.menuBackgroundColor;
+  border-radius: 10px 10px 10px 10px;
+  box-shadow: 0 -4px 5px rgba(0, 0, 0, 0.05) inset, 0 4px 3px rgba(252, 254, 255, 0.4) inset, 0 2px 1px rgba(0, 0, 0, 0.1);
+  color: $theme.menuLinkColor;
+  display: inline-block;
+  font-weight: 700;
+  font-size: 0.85em;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  vertical-align: middle;
+  width: 20px;
+}
+
+.steps .number.active {
+  background-color: transparent;
+  border: 3px solid $theme.notificationSuccessColor;
+  color: $theme.notificationSuccessColor;
+  height: 15px;
+  line-height: 15px;
+  width: 15px;
+}
+
+.steps .number.done {
+  background-color: transparent;
+  border: 3px solid $theme.menuBackgroundColor;
+  color: $theme.menuBackgroundColor;
+  height: 15px;
+  line-height: 15px;
+  width: 15px;
+}
+
+.steps .name {
+  color: $theme.titleColor;
+}
+
+.steps .name.active {
+  color: $theme.notificationSuccessColor;
+}
+
+.steps .name.done {
+  color: $theme.menuBackgroundColor;
+  opacity: .5;
+}
+
+.wizard-footer {
+  background-color: $theme.backgroundSecondaryColor;
+  border-top: 1px solid $theme.borderColor;
+  margin-top: 2em;
+  padding: .5em 1em;
+  position: relative;
+  text-align: right;
+}
+
+.wizard-footer .buttonwrapper.left {
+  left: 1em;
+  position: absolute;
+  top: .1em;
+}</code>
+</property>
+<property>
+<name>Style</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<content>{{velocity output="false"}}
+#macro(appWizardHeader $stepNumber)
+  #set($stepNames = ['Name', 'Structure', 'Presentation'])
+  #set($stepTitles = ['Name your application', 'Define the structure of your application', 'Customize the home page of your application'])
+  {{html wiki="true"}}
+  (% class="wizard-header" %)
+  (((
+    = Step $!stepNumber &amp;mdash; $!stepTitles.get($mathtool.sub($stepNumber, 1)) =
+
+    (% class="steps" %)
+    #foreach($stepName in $stepNames)
+      #set($extraClassName = "#if($stepNumber == $velocityCount) active#elseif($stepNumber &gt; $velocityCount) done#end")
+      * (% class="number$extraClassName" %)#if($stepNumber &gt; $velocityCount)&amp;${escapetool.h}10004;#else$velocityCount#end(%%) (% class="name$extraClassName" %)$stepName
+    #end
+
+    &lt;div class="clearfloats"&gt;&lt;/div&gt;
+  )))
+  {{/html}}
+#end
+
+#macro(appWizardFooter $stepNumber)
+  {{html wiki="true"}}
+  (% class="wizard-footer buttons" %)
+  (((
+    #set($nextLabel = 'Next Step')
+    #set($nextTip = 'Go to next step')
+    #if($stepNumber == 3)##
+      #set($nextLabel = 'Finish')
+      #set($nextTip = 'Go to the application home page')
+      &lt;span class="buttonwrapper left"&gt;&lt;a href="$xwiki.getURL($className, 'edit', 'wizard=true')" title="Go to previous step" class="button secondary"&gt;Previous Step&lt;/a&gt;&lt;/span&gt;##
+    #end
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" id="wizard-next" name="xaction_save" value="$nextLabel" title="$nextTip" class="button"/&gt;&lt;/span&gt;
+  )))
+  {{/html}}
+#end
+{{/velocity}}
+
+{{velocity}}
+#if($doc.fullName == 'AppWithinMinutes.WizardStep')
+  Code shared by all AppWithinMinutes wizard steps.
+#else
+  ## Use the style sheet required by the velocity macros previously defined.
+  #set($discard = $xwiki.ssx.use('AppWithinMinutes.WizardStep'))
+#end
+{{/velocity}}</content></xwikidoc>

@@ -256,6 +256,11 @@ function init() {
     }
   }.bindAsEventListener(window));
 
+  // Hide action buttons when in wizard mode because the wizard has its own buttons.
+  if ($('wizard-next')) {
+    form.down('.bottombuttons').hide();
+  }
+
   new XWiki.LiveTableEditor();
 
   return true;
@@ -503,7 +508,11 @@ return XWiki;
   #set($discard = $doc.use($liveTableObj))
   #set($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
   #set($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableEditSheet'))
-  #set($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableEditSheet', {'minify': false}))
+  #set($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableEditSheet'))
+  #if("$!request.wizard" == 'true')
+    #appWizardHeader(3)
+
+  #end
   {{html wiki="true"}}
   (% class="hidden" %)
   (((
@@ -519,6 +528,10 @@ return XWiki;
   ; &lt;label for="AppWithinMinutes.LiveTableClass_0_columns"&gt;$doc.displayPrettyName('columns', false, false)&lt;/label&gt;
   : $doc.display('columns')
   {{/html}}
+  #if("$!request.wizard" == 'true')
+
+    #appWizardFooter(3)
+  #end
 #end
 
 #macro(updateAndSaveLiveTable)
@@ -553,6 +566,12 @@ return XWiki;
       $response.setStatus(204)
     #end
   #end
+#end
+{{/velocity}}
+
+{{velocity}}
+#if("$!request.wizard" == 'true')
+  {{include document="AppWithinMinutes.WizardStep" /}}
 #end
 {{/velocity}}
 

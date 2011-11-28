@@ -24,6 +24,264 @@
 <hidden>false</hidden>
 <object>
 <class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.ExtensionManagerMacros</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>ce6647d0-aa85-4972-a890-a76e852f7be6</guid>
+<property>
+<cache>forbid</cache>
+</property>
+<property>
+<code>var XWiki = (function (XWiki) {
+  var admin = XWiki.admin = XWiki.admin || {};
+ /**
+  * Javascript enhancements for the Extension Manager.
+  */
+  admin.ExtensionManager = Class.create({
+    /** How to find an element corresponding to a displayed extension in the UI: */
+    extensionItemSelector : ".extension-item",
+    /** Extension details */
+    extensionBodySelector : ".extension-body",
+    /** Extension details "menu" */
+    extensionMenuItemSelector : ".innerMenu li",
+    /** Extension details section */
+    extensionDetailsSectionSelector : ".extension-body-section",
+    /** CSS class of the menu item that is currently active */
+    crtExtensionMenuItemMarker : 'current',
+    /**
+     * Initialization: Enable loading extension details via AJAX
+     */ 
+    initialize : function () {
+      $$(this.extensionItemSelector + " form input[name='actionshowdetails']").invoke("observe", "click", this.loadExtensionDetails.bindAsEventListener(this));
+    },
+    /**
+     * Ajax loading of Extension details
+     */
+    loadExtensionDetails : function(event) {
+      var form = event.element().form;
+
+      event.stop();
+      // Ignore consecutive requests, just handle the first one
+      if (form.__disabled) {
+        return false;
+      }
+      form.__disabled = true;
+      // Prepare the data for the ajax call
+      var formData = new Hash(form.serialize(true));
+      formData.set('actionshowdetails', '1');
+      formData.set('ajax', '1');
+
+      // Prepare the url for the ajax call
+      var targetDocument;
+      if (XWiki.currentDocument.page == 'XWikiPreferences') {
+        targetDocument = form.action.replace(/^.*(&amp;|\?)section=/, "").replace(/&amp;.*$/, "");
+        targetDocument = XWiki.getResource(targetDocument);
+        targetDocument = new XWiki.Document(targetDocument.name, targetDocument.space, targetDocument.wiki);
+      } else {
+        targetDocument = XWiki.currentDocument;
+      }
+      var targetDocumentURL = targetDocument.getURL('get');
+
+      // Launch the ajax call to fetch extension details
+      new Ajax.Request(
+            // Ajax request URL
+            targetDocumentURL,
+            // Ajax request parameters
+            {
+              method: 'post',
+              parameters : formData,
+              onCreate : function() {
+                // Don't panic, the content is loading...
+                form.up(this.extensionItemSelector).insert({bottom: new Element('div', {'class' : 'extension-body loading'})});
+              }.bind(this),
+              onSuccess : function(response) {
+                // Replace the old Extension data element with the one that was just fetched
+                var originalExtensionItem = form.up(this.extensionItemSelector);
+                originalExtensionItem.addClassName('hidden');
+                originalExtensionItem.insert({after : response.responseText});
+                var newExtensionItem = originalExtensionItem.next();
+                originalExtensionItem.remove();
+                // Attach behavior to the new element
+                this.addExtensionElementBehavior(newExtensionItem);
+              }.bind(this),
+              onFailure : function (response) {
+                var failureReason = response.statusText;
+                if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+                  failureReason = 'Server not responding';
+                }
+                new XWiki.widgets.Notification("$msg.get('extensions.info.fetch.failed')" + failureReason, "error");
+              }.bind(this),
+              on0 : function (response) {
+                response.request.options.onFailure(response);
+              },
+              onComplete : function() {
+                // In the end: re-enable the button
+                form.__disabled = false;
+                // Remove the loading marker if it's still there (i.e. fetching failed)
+                form.down(".extension-body.loading").remove();
+              }
+            }
+          );
+    },
+    
+    /**
+     * Add JS enhancement to the UI of an extension
+     */ 
+    addExtensionElementBehavior : function(extensionItem) {
+      // Show/hide extension details
+      var showDetailsButton = extensionItem.down('input[name="showdetails"]').up();
+      var hideDetailsButton = extensionItem.down('input[name="hidedetails"]').up();
+      showDetailsButton.__otherButton = hideDetailsButton;
+      hideDetailsButton.__otherButton = showDetailsButton;
+      showDetailsButton.__targetElement = hideDetailsButton.__targetElement = extensionItem.down(this.extensionBodySelector);
+      extensionItem.select('.visibilityAction').invoke('observe', 'click', function(event) {
+        event.stop();
+        var button = event.element().up('span');
+//        button.__otherButton.toggleClassName('hidden');
+        button.__targetElement.toggleClassName('hidden');
+        button.replace(button.__otherButton);
+      }.bindAsEventListener(this));
+      showDetailsButton.remove();
+      // Add JS handlers for the extension menu
+      this.addExtensionMenuBehavior(extensionItem);
+      // Fix dependencies links
+      extensionItem.select(".extension-body-dependencies a.dependency-type-core, .extension-body-dependencies a.dependency-type-installed").each(function (link) {
+         link.setAttribute('href', XWiki.currentDocument.getURL((XWiki.currentDocument.page == 'XWikiPreferences' ? 'admin' : 'view'), link.getAttribute('href').replace(/.*\?/, "")));
+      });
+    },
+
+    /**
+     * Add JS handlers for the extension menu
+     */
+    addExtensionMenuBehavior : function(extensionItem) {
+      // Expand the first menu item
+      var firstMenuItem = extensionItem.down(this.extensionMenuItemSelector);
+      if (firstMenuItem) {
+        this.activateExtensionMenuItem(firstMenuItem.down('a'));
+        // Make the activation of menu items persistent
+        $$(this.extensionMenuItemSelector + " a").invoke("observe", "click", function(event) {
+          // when a menu link is clicked...
+          event.stop();
+          var menuLink = event.element();
+          this.activateExtensionMenuItem(menuLink);
+        }.bindAsEventListener(this));
+      }
+    },
+     
+    activateExtensionMenuItem : function (menuLink) {
+      var extensionItem = menuLink.up(this.extensionItemSelector);
+      // ... hide all sections ...
+      extensionItem.select(this.extensionDetailsSectionSelector).invoke("setStyle", {'display' : 'none'});
+      // ... unmark the currently active menu item ...
+      var crtMenuItem = extensionItem.down(this.extensionMenuItemSelector + "." + this.crtExtensionMenuItemMarker);
+      if (crtMenuItem) {
+         crtMenuItem.removeClassName(this.crtExtensionMenuItemMarker);
+      }
+      // ... and display the one indicated by the clicked menu link
+      // (the href attribute is expected be "#id-of-an-anchor-placed-before-the-section-to-display
+      $(menuLink.getAttribute('href').substring(1)).next(this.extensionDetailsSectionSelector).setStyle({'display' : 'block'});
+      // ... also marking the clicked menu item as current
+      menuLink.up(this.extensionMenuItemSelector).addClassName(this.crtExtensionMenuItemMarker);
+    }
+  });
+
+  function init() {
+    var em =  new admin.ExtensionManager();
+    if ($$(em.extensionItemSelector).length == 1 &amp;&amp; $$(em.extensionBodySelector).length == 1) {
+      em.addExtensionMenuBehavior($$(em.extensionItemSelector)[0]);
+    }
+    return em;
+  }
+
+  // When the document is loaded, trigger the ExtensionManager form enhancements.
+  (XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
+
+  // End XWiki augmentation.
+  return XWiki;
+}(XWiki || {}));</code>
+</property>
+<property>
+<name></name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
 <name>XWiki.StyleSheetExtension</name>
 <customClass></customClass>
 <customMapping></customMapping>
@@ -154,6 +412,10 @@
   font-size: .8em;
 }
 
+.extension-header .buttonwrapper {
+  margin: 0 0 0 5px;
+}
+
 .extension-authors {
   color: $theme.textSecondaryColor;
   font-size: .9em;
@@ -166,10 +428,14 @@
 .extension-description {
   font-size: .9em;
 }
-
 .extension-body {
-  border-top: 1px dotted $theme.borderColor;
-  padding-top: 0;
+  background-color: $theme.highlightColor;
+  border: 1px dotted $theme.borderColor;;
+  padding: 0 .8em .8em 1.8em !important;
+  margin: 0 1em 1em;
+}
+.extension-body.loading {
+  padding: 16px !important;
 }
 
 *[id^="extension-body-"]:target {
@@ -217,15 +483,17 @@
   color: $theme.textSecondaryColor;
   font-size: 1em;
   font-size: 0.8em;
-  padding: 0 1.55em .1em 3.35em;
+  /*padding: 0 1.55em .1em 3.35em;*/
+  padding: 0 0 .1em;
+  margin: 0 0 0 0 !important;
   margin-top: -5px !important;
-  bsorder: 1px solid blue;
 }
 
 .innerMenu li {
   display: inline-block;
   sborder: 1px solid red;
   vertical-align: top;
+  margin-left: -1px;
 }
 .innerMenu li a {
   border-radius: 5px 5px 0 0 / 3px 3px 0 0;
@@ -817,12 +1085,17 @@ rep
     ==#displayExtensionName($extension) (% class="extension-version %)$extension.id.version==
 
     {{html}}
-    &lt;form method="post" action="$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++', ''))"&gt;
+    #if ($doc.name == 'XWikiPreferences')
+      #set ($action = 'admin')
+    #else
+      #set ($action = 'view')
+    #end
+    &lt;form method="post" action="$doc.getURL($action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++', ''))"&gt;
       &lt;div class="extension-actions"&gt;
         &lt;input type="hidden" name="extensionid" value="$extension.id.id"/&gt;
         &lt;input type="hidden" name="extensionversion" value="$extension.id.version"/&gt;
         #foreach ($action in $actions)
-          $action
+          ${action}##
         #end
       &lt;/div&gt;
     &lt;/form&gt;
@@ -871,8 +1144,7 @@ rep
       #end
 
       {{id name="extension-body-description-${extension.id.id}-${extension.id.version}" /}}
-
-      (% class="extension-body-description" %)(((
+      (% class="extension-body-description extension-body-section" %)(((
         (% class="extension-metadata" %)
         * $msg.get('extensions.info.license', [$extension.licenses.size()]) ##
         #foreach ($license in $extension.licenses)
@@ -905,14 +1177,14 @@ rep
       )))
 
       #if ("$!{extension.releaseNotes}" != '')
-      {{id name="extension-body-relnotes-${extension.id.id}-${extension.id.version}" /}}
-      (% class="extension-body-relnotes" %)(((
+      {{id name="extension-body-relnotes-${extension.id.id}-${extension.id.version}"/}}
+      (% class="extension-body-relnotes extension-body-section" %)(((
         $!{extension.releaseNotes}
       )))
       #end
 
       {{id name="extension-body-dependencies-${extension.id.id}-${extension.id.version}" /}}
-      (% class="extension-body-dependencies" %)(((
+      (% class="extension-body-dependencies extension-body-section" %)(((
         $msg.get('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])
         #foreach ($dependency in $extension.dependencies)
           #set ($dependency = $extensionManager.resolve($dependency.id, $dependency.version))

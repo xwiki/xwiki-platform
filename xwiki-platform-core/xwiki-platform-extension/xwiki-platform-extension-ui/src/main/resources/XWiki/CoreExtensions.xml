@@ -169,6 +169,16 @@ cPGOHtmwkU3C7KlFrg12hq+bPXeh67dsNgP4B5ahZ/sCVdG/1IjApB0AAAAASUVORK5CYII=
 <content>{{include document="ExtensionManagerMacros" /}}
 
 {{velocity}}
+## Ajax call for a single extension
+#if ($request.extensionid &amp;&amp; $request.extensionversion &amp;&amp; $request.ajax)
+  #set ($actions = [])
+  #if ($request.actionshowdetails)
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""Show details"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""Hide details"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
+  #end
+  #displayExtension($extensionManager.resolve($request.extensionid, $request.extensionversion) $actions)
+#else
+##
 (% class="full column" %)(((
 = Core extensions
 
@@ -189,7 +199,7 @@ cPGOHtmwkU3C7KlFrg12hq+bPXeh67dsNgP4B5ahZ/sCVdG/1IjApB0AAAAASUVORK5CYII=
   #end
   #set ($actions = [])
   #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1'))"" class=""button""&gt;Back to list&lt;/a&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1').replaceAll('(^|&amp;)(extension(id|version)=[^&amp;]++&amp;?+)+', '$1'))"" class=""button""&gt;Back to list&lt;/a&gt;&lt;/span&gt;"))
   #else
     #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""Show details"" class=""button""/&gt;&lt;/span&gt;"))
   #end
@@ -202,4 +212,5 @@ cPGOHtmwkU3C7KlFrg12hq+bPXeh67dsNgP4B5ahZ/sCVdG/1IjApB0AAAAASUVORK5CYII=
   #end
 #end
 )))
+#end
 {{/velocity}}</content></xwikidoc>

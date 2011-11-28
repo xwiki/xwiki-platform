@@ -181,17 +181,12 @@
 
 #macro(processStep)
   #set($classRef = $services.model.createDocumentReference($doc.wiki, $request.appName, "${request.appName}Class"))
-  #set($classDoc = $xwiki.getDocument($classRef))
-  #if($classDoc.isNew())
-    #set($discard = $classDoc.setParent('WebHome'))
-    #set($discard = $classDoc.setTitle("$request.appName Class"))
-    #set($editSheetRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'ClassEditSheet'))
-    #set($discard = $services.sheet.bindDocumentSheet($classDoc, $editSheetRef))
-    #set($viewSheetRef = $services.model.createDocumentReference($doc.wiki, 'XWiki', 'ClassSheet'))
-    #set($discard = $services.sheet.bindDocumentSheet($classDoc, $viewSheetRef))
-    #set($discard = $classDoc.save('Initialize application class'))
+  #set($queryString = 'wizard=true')
+  #if(!$xwiki.exists($classRef))
+    #set($classTitle = "$request.appName Class")
+    #set($queryString = "$queryString&amp;editor=inline&amp;template=AppWithinMinutes.ClassTemplate&amp;parent=WebHome&amp;title=$escapetool.url($classTitle)")
   #end
-  $response.sendRedirect($classDoc.getURL('edit', 'wizard=true'))
+  $response.sendRedirect($xwiki.getURL($classRef, 'edit', $queryString))
 #end
 {{/velocity}}
 

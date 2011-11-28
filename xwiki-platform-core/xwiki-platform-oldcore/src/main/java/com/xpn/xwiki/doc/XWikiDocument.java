@@ -447,10 +447,19 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
 
-    private RenderingCache renderingCache = Utils.getComponent(RenderingCache.class);
+    /**
+     * Use to store rendered documents in #getRenderedContent().
+     * Do not inject the component here to avoid any simple new XWikiDocument to cause many useless initialization,
+     * in particular, during initialization of the stub context and other fake documents in tests.
+     */
+    private RenderingCache renderingCache;
 
-    /** Used to display the title and the content of this document. */
-    private DocumentDisplayer documentDisplayer = Utils.getComponent(DocumentDisplayer.class, "configured");
+    /**
+     * Used to display the title and the content of this document.
+     * Do not inject the component here to avoid any simple new XWikiDocument to cause many useless initialization,
+     * in particular, during initialization of the stub context and other fake documents in tests.
+     */
+    private DocumentDisplayer documentDisplayer;
 
     /**
      * @since 2.2M1
@@ -800,6 +809,28 @@ public class XWikiDocument implements DocumentModelBridge
         setContent(renderXDOM(content, getSyntax()));
     }
 
+    /**
+     * @return the default rendering cache
+     */
+    private RenderingCache getRenderingCache()
+    {
+        if (this.renderingCache == null) {
+            this.renderingCache = Utils.getComponent(RenderingCache.class);
+        }
+        return this.renderingCache;
+    }
+
+    /**
+     * @return the configured document displayer
+     */
+    private DocumentDisplayer getDocumentDisplayer()
+    {
+        if (this.documentDisplayer == null) {
+            this.documentDisplayer = Utils.getComponent(DocumentDisplayer.class, "configured");
+        }
+        return this.documentDisplayer;
+    }
+
     public String getRenderedContent(Syntax targetSyntax, XWikiContext context) throws XWikiException
     {
         return getRenderedContent(targetSyntax, true, context);
@@ -816,16 +847,16 @@ public class XWikiDocument implements DocumentModelBridge
         XWikiDocument tdoc = getTranslatedDocument(context);
         String content = tdoc.getContent();
 
-        String renderedContent = this.renderingCache.getRenderedContent(getDocumentReference(), content, context);
+        String renderedContent = getRenderingCache().getRenderedContent(getDocumentReference(), content, context);
 
         if (renderedContent == null) {
             DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
             parameters.setTransformationContextIsolated(isolateVelocityMacros);
             // Render the translated content (matching the current language) using this document's syntax.
             parameters.setContentTranslated(tdoc != this);
-            XDOM contentXDOM = this.documentDisplayer.display(this, parameters);
+            XDOM contentXDOM = getDocumentDisplayer().display(this, parameters);
             renderedContent = renderXDOM(contentXDOM, targetSyntax);
-            this.renderingCache.setRenderedContent(getDocumentReference(), content, renderedContent, context);
+            getRenderingCache().setRenderedContent(getDocumentReference(), content, renderedContent, context);
         }
 
         return renderedContent;
@@ -857,7 +888,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId, XWikiContext context)
     {
-        String result = this.renderingCache.getRenderedContent(getDocumentReference(), text, context);
+        String result = getRenderingCache().getRenderedContent(getDocumentReference(), text, context);
 
         if (result == null) {
             Map<String, Object> backup = null;
@@ -879,10 +910,10 @@ public class XWikiDocument implements DocumentModelBridge
 
                 DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
                 parameters.setTransformationContextIsolated(true);
-                XDOM contentXDOM = this.documentDisplayer.display(fakeDocument, parameters);
+                XDOM contentXDOM = getDocumentDisplayer().display(fakeDocument, parameters);
                 result = renderXDOM(contentXDOM, this.syntaxFactory.createSyntaxFromIdString(targetSyntaxId));
 
-                this.renderingCache.setRenderedContent(getDocumentReference(), text, result, context);
+                getRenderingCache().setRenderedContent(getDocumentReference(), text, result, context);
             } catch (Exception e) {
                 // Failed to render for some reason. This method should normally throw an exception but this
                 // requires changing the signature of calling methods too.
@@ -1089,7 +1120,7 @@ public class XWikiDocument implements DocumentModelBridge
         DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
         parameters.setTitleDisplayed(true);
         parameters.setExecutionContextIsolated(true);
-        XDOM titleXDOM = this.documentDisplayer.display(this, parameters);
+        XDOM titleXDOM = getDocumentDisplayer().display(this, parameters);
         try {
             return renderXDOM(titleXDOM, outputSyntax);
         } catch (XWikiException e) {

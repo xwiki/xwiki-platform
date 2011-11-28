@@ -37,6 +37,7 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.LocalExtensionFile;
@@ -61,6 +62,12 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
     public void initialize() throws InitializationException
     {
         this.jarLoader = new ComponentAnnotationLoader();
+    }
+
+    @Override
+    public void initialize(LocalExtension localExtension, String namespace) throws ExtensionException
+    {
+        install(localExtension, namespace);
     }
 
     @Override

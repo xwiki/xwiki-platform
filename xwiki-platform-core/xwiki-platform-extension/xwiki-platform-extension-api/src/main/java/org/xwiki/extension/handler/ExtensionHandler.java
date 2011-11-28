@@ -20,6 +20,7 @@
 package org.xwiki.extension.handler;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.UninstallException;
@@ -60,4 +61,13 @@ public interface ExtensionHandler
      */
     void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace)
         throws InstallException;
+
+    /**
+     * Initialize the provided local extension (during application startup, reinitialization...).
+     *
+     * @param localExtension the extension to install
+     * @param namespace the namespace where to install the extension
+     * @throws ExtensionException error when trying to install the extension
+     */
+    void initialize(LocalExtension localExtension, String namespace) throws ExtensionException;
 }

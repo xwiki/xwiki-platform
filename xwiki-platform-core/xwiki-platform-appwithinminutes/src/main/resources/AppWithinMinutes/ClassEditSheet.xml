@@ -208,7 +208,9 @@ XWiki.AutoResizeInput = Class.create({
     if (event) {
       this._resize.bind(this).defer();
     } else {
-      this.meter.firstChild.nodeValue = this.input.value;
+      // Make sure the meter text is not set to the empty string because otherwise the meter offset width is wrongly
+      // computed in Chrome. See http://code.google.com/p/chromium/issues/detail?id=105573 .
+      this.meter.firstChild.data = this.input.value || ' ';
       this.input.setStyle({width: (this.meter.offsetWidth + 6) + 'px'});
     }
   },

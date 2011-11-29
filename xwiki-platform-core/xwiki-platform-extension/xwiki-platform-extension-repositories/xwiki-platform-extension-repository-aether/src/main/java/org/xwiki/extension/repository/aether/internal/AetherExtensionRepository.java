@@ -218,7 +218,8 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
                 }
             }
 
-            extension.addAuthor(new DefaultExtensionAuthor(developer.getName(), authorURL));
+            extension.addAuthor(new DefaultExtensionAuthor(
+                StringUtils.defaultIfBlank(developer.getName(), developer.getId()), authorURL));
         }
         extension.setWebsite(model.getUrl());
 

@@ -1061,7 +1061,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
       {{html}}
       &lt;form action="$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1').replaceAll('(^|&amp;)(extension(id|version)=[^&amp;]++&amp;?+)+', '$1').replaceAll('(^|&amp;)section=[^&amp;]++', '$1section=XWiki.AddExtensions'))" method="post"&gt;
         &lt;div class="globalsearch extHeaderLeftSearch"&gt;
-          &lt;label class="hidden" for="headerglobalsearchinput"&gt;Search&lt;/label&gt;&lt;input type="text" autocomplete="off" class="globalsearchinput#if ("$!request.searchextension" == '') withTip#end extHeaderLeftInput" id="headerglobalsearchinput" name="searchextension" value="#if ("$!request.searchextension" != '')$request.searchextension#{else}search extension...#{end}" size="60"&gt;&lt;input type="image" class="button" value="Go" alt="Go" src="/xwiki/resources/icons/xwiki/search.png"&gt;
+          &lt;label class="hidden" for="extensionsearchinput"&gt;Search&lt;/label&gt;&lt;input type="text" class="globalsearchinput#if ("$!request.searchextension" == '') withTip#end extHeaderLeftInput" id="extensionsearchinput" name="searchextension" value="#if ("$!request.searchextension" != '')$request.searchextension#{else}search extension...#{end}" size="60"&gt;&lt;input type="image" class="button" value="Go" alt="Go" src="/xwiki/resources/icons/xwiki/search.png"&gt;
         &lt;/div&gt;
       &lt;/form&gt;
       {{/html}}

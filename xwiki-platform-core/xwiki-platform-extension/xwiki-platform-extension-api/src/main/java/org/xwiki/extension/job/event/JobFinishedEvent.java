@@ -17,17 +17,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.job;
+
+package org.xwiki.extension.job.event;
+
+import org.xwiki.extension.job.Request;
+import org.xwiki.observation.event.EndEvent;
 
 /**
- * Request used in {@link org.xwiki.extension.job.internal.InstallJob}.
- * 
+ * Job finished event launched when a job is finished.
+ * Additional data may contains an exception if the job has not been finished with success.
+ *
  * @version $Id$
  */
-public class InstallRequest extends AbstractExtensionRequest
+public class JobFinishedEvent extends AbstractJobEvent implements EndEvent
 {
     /**
      * Serialization identifier.
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Default constructor.
+     */
+    public JobFinishedEvent()
+    {
+
+    }
+
+    /**
+     * @param jobId the event related job id
+     */
+    public JobFinishedEvent(String jobId)
+    {
+        super(jobId);
+    }
+
+    /**
+     * @param jobId the event related job id
+     * @param request the event related job request
+     */
+    public JobFinishedEvent(String jobId, Request request)
+    {
+        super(jobId, request);
+    }
 }

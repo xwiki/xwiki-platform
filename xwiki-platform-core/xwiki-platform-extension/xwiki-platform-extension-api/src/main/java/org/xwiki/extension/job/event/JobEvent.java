@@ -17,17 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.job;
+
+package org.xwiki.extension.job.event;
+
+import java.io.Serializable;
+
+import org.xwiki.extension.job.Request;
+import org.xwiki.observation.event.Event;
 
 /**
- * Request used in {@link org.xwiki.extension.job.internal.InstallJob}.
- * 
+ * Common interface for job events.
+ *
  * @version $Id$
  */
-public class InstallRequest extends AbstractExtensionRequest
+public interface JobEvent extends Event, Serializable
 {
     /**
-     * Serialization identifier.
+     * @return the job id of the source job of this event
      */
-    private static final long serialVersionUID = 1L;
+    String getJobId();
+
+    /**
+     * @return the request related to the source job of this event
+     */
+    Request getRequest();
 }

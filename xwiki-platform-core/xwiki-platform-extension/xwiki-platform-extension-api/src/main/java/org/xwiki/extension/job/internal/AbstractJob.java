@@ -29,6 +29,8 @@ import org.xwiki.extension.job.PopLevelProgressEvent;
 import org.xwiki.extension.job.PushLevelProgressEvent;
 import org.xwiki.extension.job.Request;
 import org.xwiki.extension.job.StepProgressEvent;
+import org.xwiki.extension.job.event.JobFinishedEvent;
+import org.xwiki.extension.job.event.JobStartedEvent;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
 
@@ -84,18 +86,24 @@ public abstract class AbstractJob<R extends Request> implements Job
     @Override
     public void start(Request request)
     {
+        this.observationManager.notify(new JobStartedEvent(getId(), request), this);
+
         this.status = new DefaultJobStatus<R>((R) request, getId(), this.observationManager, this.loggerManager);
 
         this.status.startListening();
 
+        Exception exception = null;
         try {
             start();
         } catch (Exception e) {
             logger.error("Failed to start job", e);
+            exception = e;
         } finally {
             this.status.stopListening();
 
             this.status.setState(JobStatus.State.FINISHED);
+
+            this.observationManager.notify(new JobFinishedEvent(getId(), request), this, exception);
         }
     }
 

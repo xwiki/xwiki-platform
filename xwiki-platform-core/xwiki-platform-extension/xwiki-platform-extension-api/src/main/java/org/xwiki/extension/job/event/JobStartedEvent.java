@@ -17,17 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.job;
+package org.xwiki.extension.job.event;
+
+import org.xwiki.extension.job.Request;
+import org.xwiki.observation.event.BeginEvent;
 
 /**
- * Request used in {@link org.xwiki.extension.job.internal.InstallJob}.
- * 
+ * Job started event launched when a new job start.
+ *
  * @version $Id$
  */
-public class InstallRequest extends AbstractExtensionRequest
+public class JobStartedEvent extends AbstractJobEvent implements BeginEvent
 {
     /**
      * Serialization identifier.
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Default constructor.
+     */
+    public JobStartedEvent()
+    {
+
+    }
+
+    /**
+     * @param jobId the event related job id
+     */
+    public JobStartedEvent(String jobId)
+    {
+        super(jobId);
+    }
+
+    /**
+     * @param jobId the event related job id
+     * @param request the event related job request
+     */
+    public JobStartedEvent(String jobId, Request request)
+    {
+        super(jobId, request);
+    }
 }

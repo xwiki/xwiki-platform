@@ -32,6 +32,11 @@ import org.xwiki.extension.ExtensionId;
 public abstract class AbstractExtensionRequest extends AbstractRequest
 {
     /**
+     * Serialization identifier.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * @see #getExtensions()
      */
     private List<ExtensionId> extensions = new ArrayList<ExtensionId>();

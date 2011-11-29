@@ -19,12 +19,14 @@
  */
 package org.xwiki.extension.job;
 
+import java.io.Serializable;
+
 /**
  * A {@link Job} request.
  * 
  * @version $Id$
  */
-public interface Request
+public interface Request extends Serializable
 {
 
 }

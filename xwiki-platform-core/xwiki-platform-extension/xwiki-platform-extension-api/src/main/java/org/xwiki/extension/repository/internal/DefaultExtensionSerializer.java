@@ -377,18 +377,19 @@ public class DefaultExtensionSerializer implements ExtensionSerializer
     {
         List<ExtensionAuthor> authors = extension.getAuthors();
         if (!authors.isEmpty()) {
-            Element dependenciesElement = document.createElement(ELEMENT_AUTHORS);
-            parentElement.appendChild(dependenciesElement);
+            Element authorsElement = document.createElement(ELEMENT_AUTHORS);
+            parentElement.appendChild(authorsElement);
 
             for (ExtensionAuthor author : authors) {
-                Element dependencyElement = document.createElement(ELEMENT_AAUTHOR);
-                dependenciesElement.appendChild(dependencyElement);
+                Element authorElement = document.createElement(ELEMENT_AAUTHOR);
+                authorsElement.appendChild(authorElement);
 
-                addElement(document, dependencyElement, ELEMENT_AANAME, author.getName());
+                addElement(document, authorElement, ELEMENT_AAID, author.getId());
+                addElement(document, authorElement, ELEMENT_AANAME, author.getName());
 
                 URL authorURL = author.getURL();
                 if (authorURL != null) {
-                    addElement(document, dependencyElement, ELEMENT_AAURL, authorURL.toString());
+                    addElement(document, authorElement, ELEMENT_AAURL, authorURL.toString());
                 }
             }
         }

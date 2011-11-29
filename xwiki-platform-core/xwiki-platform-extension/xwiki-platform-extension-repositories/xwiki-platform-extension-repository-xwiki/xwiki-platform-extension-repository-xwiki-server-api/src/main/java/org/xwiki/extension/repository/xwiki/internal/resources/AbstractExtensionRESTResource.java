@@ -376,6 +376,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         return property != null ? (T) property.getValue() : def;
     }
 
+    @Override
     protected XWikiContext getXWikiContext()
     {
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");

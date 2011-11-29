@@ -477,6 +477,9 @@
 .dependency-type-remote {
   background-image: url("$xwiki.getSkinFile('icons/silk/world.gif')");
 }
+.dependency-type-unknown {
+  background-image: url("$xwiki.getSkinFile('icons/silk/plugin_error.gif')");
+}
 /****************************** &lt;Inner Menu&gt; *************************/
 
 .innerMenu {
@@ -1066,7 +1069,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     (% class="clearfloats" %)((()))
   )))
 #end
-rep
+
 #macro (displayExtensionName $extension $actions)
   #set ($name = "$!{extension.name}")
   #if ($name == '')
@@ -1187,15 +1190,19 @@ rep
       (% class="extension-body-dependencies extension-body-section" %)(((
         $msg.get('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])
         #foreach ($dependency in $extension.dependencies)
-          #set ($dependency = $extensionManager.resolve($dependency.id, $dependency.version))
-          #set ($dependencyClass = "${dependency.class}")
-          * [[#displayExtensionName($dependency)&gt;&gt;##
-          #if ($dependencyClass.endsWith('CoreExtension'))
-            path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.CoreExtensions")||class="dependency-type-core"]]
-          #elseif ($dependencyClass.endsWith('LocalExtension'))
-            path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.InstalledExtensions")||class="dependency-type-installed"]]
+          #set ($dependencyExtension = $extensionManager.resolve($dependency.id, $dependency.version))
+          #set ($dependencyClass = "$!{dependencyExtension.class}")
+          #if ($dependencyExtension)
+            * [[#displayExtensionName($dependencyExtension)&gt;&gt;##
+            #if ($dependencyClass.endsWith('CoreExtension'))
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.version}&amp;section=XWiki.CoreExtensions")||class="dependency-type-core"]]
+            #elseif ($dependencyClass.endsWith('LocalExtension'))
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.version}&amp;section=XWiki.InstalledExtensions")||class="dependency-type-installed"]]
+            #else
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.version}&amp;section=XWiki.AddExtensions")||class="dependency-type-remote"]]
+            #end
           #else
-            path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.AddExtensions")||class="dependency-type-remote"]]
+            * (% class="dependency-type-unknown" %)${dependency.id}
           #end
           #if (!$foreach.hasNext)
 

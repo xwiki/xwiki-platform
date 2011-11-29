@@ -384,7 +384,6 @@ public class DefaultExtensionSerializer implements ExtensionSerializer
                 Element authorElement = document.createElement(ELEMENT_AAUTHOR);
                 authorsElement.appendChild(authorElement);
 
-                addElement(document, authorElement, ELEMENT_AAID, author.getId());
                 addElement(document, authorElement, ELEMENT_AANAME, author.getName());
 
                 URL authorURL = author.getURL();

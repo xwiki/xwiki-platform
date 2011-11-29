@@ -905,14 +905,6 @@ return XWiki;
       }
     }.bindAsEventListener(window));
 
-    // When in wizard mode..
-    if($('wizard-next')) {
-      // ..hide the form action buttons because the wizard buttons are displayed instead.
-      form.down('.bottombuttons').hide();
-      // ..hide the options panel because it is useful only when re-editing the class.
-      $('options').hide();
-    }
-
     // Be prepared to enhance some of the field properties.
     new XWiki.FormFieldNameManager();
     new XWiki.FormFieldPrettyNameManager();
@@ -1470,7 +1462,8 @@ return XWiki;
     #set($sheetName = $services.model.serialize($classSheets.get(0)))
   #end
   {{html wiki="true"}}
-  (% id="options" %)
+  ## Hide the options if neither the sheet nor the template exists. They don't have to be updated, they have to be created.
+  (% id="options" #if(!$xwiki.exists($sheetName) &amp;&amp; !$xwiki.exists($templateName))class="hidden" #end%)
   ; &lt;label for="updateClassTemplate"&gt;&lt;input type="checkbox" id="updateClassTemplate" name="updateClassTemplate" checked="checked" /&gt;Update class template&lt;/label&gt;
   : (% class="xHint" %)Save the default field values in the class template ([[$templateName]]).
   ; &lt;label for="updateClassSheet"&gt;&lt;input type="checkbox" id="updateClassSheet" name="updateClassSheet" #if($sheetName)checked="checked" #{else}disabled="disabled" #end/&gt;Update class sheet&lt;/label&gt;

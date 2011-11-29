@@ -256,11 +256,6 @@ function init() {
     }
   }.bindAsEventListener(window));
 
-  // Hide action buttons when in wizard mode because the wizard has its own buttons.
-  if ($('wizard-next')) {
-    form.down('.bottombuttons').hide();
-  }
-
   new XWiki.LiveTableEditor();
 
   return true;

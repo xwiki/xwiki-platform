@@ -22,6 +22,7 @@ package org.xwiki.extension.jar.internal.handler;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -70,6 +71,11 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
         install(localExtension, namespace);
     }
 
+    private static URL getExtensionURL(LocalExtension localExtension) throws MalformedURLException
+    {
+        return new File(localExtension.getFile().getAbsolutePath()).toURI().toURL();
+    }
+
     @Override
     public void install(LocalExtension localExtension, String namespace) throws InstallException
     {
@@ -77,7 +83,7 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
 
         // 1) load jar into classloader
         try {
-            classLoader.addURL(new File(localExtension.getFile().getAbsolutePath()).toURI().toURL());
+            classLoader.addURL(getExtensionURL(localExtension));
         } catch (MalformedURLException e) {
             throw new InstallException("Failed to load jar file", e);
         }
@@ -95,7 +101,8 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
             // unregister components
             unloadComponents(localExtension.getFile(), classLoader, namespace);
 
-            // TODO: find a way to unload the jar from the classloader
+            // The ClassLoader(s) will be replaced and reloaded at the end of the job
+            // @see org.xwiki.extension.jar.internal.handler.JarExtensionJobFinishedListener
         }
     }
 

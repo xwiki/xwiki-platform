@@ -1,3 +1,4 @@
 org.xwiki.extension.jar.internal.handler.JarExtensionHandler
 org.xwiki.extension.jar.internal.handler.DefaultJarExtensionClassLoader
 org.xwiki.extension.jar.internal.handler.JarExtensionExecutionContextInitializer
+org.xwiki.extension.jar.internal.handler.JarExtensionJobFinishedListener

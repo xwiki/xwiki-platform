@@ -17,16 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.jar.internal.handler;
 
-import org.xwiki.component.annotation.ComponentRole;
+package org.xwiki.extension.jar;
 
-@ComponentRole
-public interface JarExtensionClassLoader
+import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.jar.internal.handler.DefaultJarExtensionClassLoader;
+
+/**
+ * Override the DefaultJarExtensionClassLoader to prevent access to extension classes available in the classpath
+ * of the test and therefore isolate the tested extension properly.
+ *
+ * @version $Id$
+ */
+@Component
+public class TestJarExtensionClassLoader extends DefaultJarExtensionClassLoader
 {
-    ExtensionURLClassLoader getURLClassLoader(String namespace, boolean create);
-
-    void dropURLClassLoaders();
-
-    void dropURLClassLoader(String namespace);
+    @Override
+    protected ClassLoader getSystemClassLoader() {
+        return new TestExtensionClassLoader();
+    }
 }

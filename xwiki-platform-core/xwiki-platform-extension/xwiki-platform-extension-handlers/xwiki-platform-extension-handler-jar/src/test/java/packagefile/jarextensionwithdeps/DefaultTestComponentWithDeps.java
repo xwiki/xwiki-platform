@@ -17,16 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.jar.internal.handler;
 
-import org.xwiki.component.annotation.ComponentRole;
+package packagefile.jarextensionwithdeps;
 
-@ComponentRole
-public interface JarExtensionClassLoader
+import javax.inject.Inject;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+
+import packagefile.jarextension.TestComponent;
+
+@Component
+public class DefaultTestComponentWithDeps implements TestComponentWithDeps, Initializable
 {
-    ExtensionURLClassLoader getURLClassLoader(String namespace, boolean create);
+    @Inject
+    private TestComponent testComponent;
 
-    void dropURLClassLoaders();
-
-    void dropURLClassLoader(String namespace);
+    @Override
+    public void initialize() throws InitializationException
+    {
+        if (testComponent == null) {
+            throw new InitializationException("Injection of dependency failed");
+        }
+    }
 }

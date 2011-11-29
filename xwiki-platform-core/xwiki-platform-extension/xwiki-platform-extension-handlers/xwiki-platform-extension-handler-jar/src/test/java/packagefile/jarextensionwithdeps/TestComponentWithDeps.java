@@ -17,16 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.jar.internal.handler;
+
+package packagefile.jarextensionwithdeps;
 
 import org.xwiki.component.annotation.ComponentRole;
 
 @ComponentRole
-public interface JarExtensionClassLoader
+public interface TestComponentWithDeps
 {
-    ExtensionURLClassLoader getURLClassLoader(String namespace, boolean create);
-
-    void dropURLClassLoaders();
-
-    void dropURLClassLoader(String namespace);
+    
 }

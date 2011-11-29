@@ -17,16 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.jar.internal.handler;
 
-import org.xwiki.component.annotation.ComponentRole;
+package org.xwiki.extension.jar;
 
-@ComponentRole
-public interface JarExtensionClassLoader
+/**
+ * A isolation class loader that prevent access to classes loaded in its parent when their class name starts with
+ * "packagefile."
+ *
+ * @version $Id$
+ */
+public class TestExtensionClassLoader extends ClassLoader
 {
-    ExtensionURLClassLoader getURLClassLoader(String namespace, boolean create);
-
-    void dropURLClassLoaders();
-
-    void dropURLClassLoader(String namespace);
+    @Override
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
+    {
+        if (!name.startsWith("packagefile.") && getParent() != null) {
+            return getParent().loadClass(name);
+        }
+        throw new ClassNotFoundException("TestExtensionClassLoader restrict access to parent classloader for class "
+            + name);
+    }
 }

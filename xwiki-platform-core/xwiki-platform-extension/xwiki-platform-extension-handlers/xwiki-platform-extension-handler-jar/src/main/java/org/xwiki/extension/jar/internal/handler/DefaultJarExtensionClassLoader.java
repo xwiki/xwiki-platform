@@ -32,11 +32,19 @@ public class DefaultJarExtensionClassLoader implements JarExtensionClassLoader
 
     private Map<String, ExtensionURLClassLoader> wikiClassLoaderMap = new HashMap<String, ExtensionURLClassLoader>();
 
+    /**
+     * Allow overriding the system classloader during tests.
+     * @return a ClassLoader to be used as the system parent
+     */
+    protected ClassLoader getSystemClassLoader() {
+        return getClass().getClassLoader();
+    }
+
     @Override
     public ExtensionURLClassLoader getURLClassLoader(String namespace, boolean create)
     {
         if (this.rootClassLoader == null && create) {
-            this.rootClassLoader = new ExtensionURLClassLoader(new URI[] {}, getClass().getClassLoader(), null);
+            this.rootClassLoader = new ExtensionURLClassLoader(new URI[] {}, getSystemClassLoader(), null);
         }
 
         ExtensionURLClassLoader wikiClassLoader = this.rootClassLoader;
@@ -55,5 +63,26 @@ public class DefaultJarExtensionClassLoader implements JarExtensionClassLoader
         }
 
         return wikiClassLoader;
+    }
+
+    @Override
+    public void dropURLClassLoaders()
+    {
+        if (this.rootClassLoader != null) {
+            for (String namespace : wikiClassLoaderMap.keySet()) {
+                dropURLClassLoader(namespace);
+            }
+            this.rootClassLoader = null;
+        }
+    }
+
+    @Override
+    public void dropURLClassLoader(String namespace)
+    {
+        if (this.rootClassLoader != null) { 
+           if (this.wikiClassLoaderMap.get(namespace) != null) {
+               this.wikiClassLoaderMap.put(namespace, null);
+           }
+        }
     }
 }

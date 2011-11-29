@@ -96,6 +96,9 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
     {
         UninstallRequest uninstallRequest = new UninstallRequest();
         uninstallRequest.addExtension(extensionId);
+        if (namespace != null) {
+            uninstallRequest.addNamespace(namespace);
+        }
         Job uninstallJob = this.jobManager.uninstall(uninstallRequest);
 
         List<LogEvent> errors = uninstallJob.getStatus().getLog(LogLevel.ERROR);

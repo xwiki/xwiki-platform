@@ -25,6 +25,6 @@ public class OSCacheLocalCacheTest extends AbstractEvictionGenericTestCache
 {
     public OSCacheLocalCacheTest()
     {
-        super("oscache/local");
+        super("oscache/local", false);
     }
 }

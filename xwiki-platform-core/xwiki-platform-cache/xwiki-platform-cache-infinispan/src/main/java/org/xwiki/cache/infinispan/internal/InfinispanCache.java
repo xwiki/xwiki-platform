@@ -119,15 +119,8 @@ public class InfinispanCache<T> extends AbstractCache<T>
             String key = entry.getKey();
             T value = entry.getValue();
 
-            if (!event.isPre()) {
-                if (value != null) {
-                    this.preEventData.put(key, value);
-                }
-            } else {
-                cacheEntryRemoved(key, this.preEventData.get(key));
-
-                this.preEventData.remove(key);
-            }
+            // Looks like eviction does not produce any pre event
+            cacheEntryRemoved(key, value);
         }
     }
 

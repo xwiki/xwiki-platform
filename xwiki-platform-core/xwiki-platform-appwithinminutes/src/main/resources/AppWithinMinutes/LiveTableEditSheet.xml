@@ -450,6 +450,33 @@ return XWiki;
 .columnPicker input[type=image] {
   margin-left: 2px;
   vertical-align: text-bottom;
+}
+
+.form-body {
+  margin-right: 19em;
+}
+
+.wizard-help {
+  background-color: $theme.backgroundSecondaryColor;
+  border-bottom: 1px solid $theme.borderColor;
+  color: $theme.textSecondaryColor;
+  float: right;
+  font-size: 0.857em;
+  margin: 0 0 2em 2em;
+  padding: 1em;
+  width: 17em;
+}
+
+.wizard-help dl, .wizard-help p {
+  font-size: 0.9em;
+}
+
+.wizard-help dl {
+  margin-left: 1em;
+}
+
+.wizard-help dt, .wizard-help strong {
+  color: $theme.textColor;
 }</code>
 </property>
 <property>
@@ -476,25 +503,54 @@ return XWiki;
       &lt;/optgroup&gt;
     #end
     &lt;optgroup label="Generic columns"&gt;
-      #set($genericColumns = {
-        'doc.title': 'Title',
-        'doc.name': 'Name',
-        'doc.space': 'Space',
-        'doc.fullname': 'Full name',
-        'doc.author': 'Last Author',
-        'doc.creator': 'Creator',
-        'doc.date': 'Update date',
-        'doc.creationDate': 'Creation date',
-        '_avatar': 'Avatar',
-        '_images': 'Images',
-        '_attachments': 'Attachments',
-        '_actions': 'Actions'
-      })
       #foreach($entry in $genericColumns.entrySet())
-        &lt;option value="$entry.key"&gt;$escapetool.xml($entry.value)&lt;/option&gt;
+        &lt;option value="$entry.key" title="$escapetool.xml($entry.value.get(1))"&gt;$escapetool.xml($entry.value.get(0))&lt;/option&gt;
       #end
     &lt;/optgroup&gt;
   &lt;/select&gt;
+  {{/html}}
+#end
+
+#macro(displayHelpPanel)
+  #set($genericColumns = {
+    'doc.title': ['Page title', 'The title of the page that contains the application entry'],
+    'doc.name': ['Page name', 'The name of the page that contains the application entry'],
+    'doc.author': ['Last Author', 'The user who last edited the application entry'],
+    'doc.creator': ['Creator', 'The user who created the application entry'],
+    'doc.date': ['Update date', 'The date when the application entry was last edited'],
+    'doc.creationDate': ['Creation date', 'The date when the application entry was created'],
+    '_actions': ['Actions', 'A list of actions that can be performed on the application entry, such as edit and delete'],
+    '_attachments': ['Attachments', 'A special column to display links to the attachments of the entry page'],
+    '_images': ['Images', 'A special column to display the images attached to the entry page']
+  })
+  (% class="wizard-help" %)
+  (((
+    **Tip** Generic live table columns are independent of your application structure. They provide information about the pages that hold your application entries.
+
+    #foreach($columnId in ['doc.name', 'doc.date', 'doc.author', '_actions'])
+      ; {{{$genericColumns.get($columnId).get(0)}}}
+      : {{{$genericColumns.get($columnId).get(1)}}}
+    #end
+  )))
+#end
+
+#macro(displayFormFields)
+  {{html wiki="true"}}
+  (% class="hidden" %)
+  (((
+    ## Make sure that only the sheet content is rendered when the class is saved using AJAX.
+    &lt;input type="hidden" name="xpage" value="plain" /&gt;
+    ## We prevent the class name from being edited directly. The class name can be specified in the URL.
+    $doc.display('class', 'hidden')
+    ## We have to pass the list of available columns to the JavaScript code.
+    #listAvailableColumns()
+  )))
+  ; &lt;label for="AppWithinMinutes.LiveTableClass_0_description"&gt;$doc.displayPrettyName('description', false, false)&lt;/label&gt;##
+    (% class="xHint" %)The description contains a short resume of what the application does and what kind of data it will handle.
+  : $doc.display('description')
+  ; &lt;label for="AppWithinMinutes.LiveTableClass_0_columns"&gt;$doc.displayPrettyName('columns', false, false)&lt;/label&gt;##
+    (% class="xHint" %)Select the columns you would like to include in the live table displayed on the application home page.
+  : $doc.display('columns')
   {{/html}}
 #end
 
@@ -508,25 +564,16 @@ return XWiki;
     #appWizardHeader(3)
 
   #end
-  {{html wiki="true"}}
-  (% class="hidden" %)
+  #displayHelpPanel()
+  (% class="form-body" %)
   (((
-    ## Make sure that only the sheet content is rendered when the class is saved using AJAX.
-    &lt;input type="hidden" name="xpage" value="plain" /&gt;
-    ## We prevent the class name from being edited directly. The class name can be specified in the URL.
-    $doc.display('class', 'hidden')
-    ## We have to pass the list of available columns to the JavaScript code.
-    #listAvailableColumns()
-  )))
-  ; &lt;label for="AppWithinMinutes.LiveTableClass_0_description"&gt;$doc.displayPrettyName('description', false, false)&lt;/label&gt;
-  : $doc.display('description')
-  ; &lt;label for="AppWithinMinutes.LiveTableClass_0_columns"&gt;$doc.displayPrettyName('columns', false, false)&lt;/label&gt;
-  : $doc.display('columns')
-  {{/html}}
-  #if("$!request.wizard" == 'true')
+    #displayFormFields()
+    #if("$!request.wizard" == 'true')
 
-    #appWizardFooter(3)
-  #end
+      #appWizardFooter(3)
+    #end
+  )))
+  {{html}}&lt;div class="clearfloats"&gt;&lt;/div&gt;{{/html}}
 #end
 
 #macro(updateAndSaveLiveTable)

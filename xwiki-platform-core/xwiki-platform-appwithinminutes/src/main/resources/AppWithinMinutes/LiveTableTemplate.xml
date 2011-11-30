@@ -83,7 +83,7 @@
 <class></class>
 </property>
 <property>
-<columns>doc.title doc.date doc.author _actions</columns>
+<columns>doc.name doc.date doc.author _actions</columns>
 </property>
 <property>
 <description></description>

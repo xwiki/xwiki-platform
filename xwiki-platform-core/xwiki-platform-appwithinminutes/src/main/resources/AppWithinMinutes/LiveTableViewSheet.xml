@@ -322,7 +322,10 @@ return XWiki;
   )))
   = Description =
   $doc.display('description')
-  = Entries =
-  {{include document="$doc.fullName.replaceAll('~', '~~').replaceAll('"', '~"')"/}}
+  ## Display the live table only if it was generated.
+  #if($doc.content.length() &gt; 0)
+    = Entries =
+    {{include document="$doc.fullName.replaceAll('~', '~~').replaceAll('"', '~"')"/}}
+  #end
 #end
 {{/velocity}}</content></xwikidoc>

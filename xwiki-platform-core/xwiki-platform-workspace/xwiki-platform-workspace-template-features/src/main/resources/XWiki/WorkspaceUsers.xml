@@ -471,7 +471,9 @@ Comment: $message")
         $xwiki.getUserName($candidateMember.userName)#if("$!userComment" != ''): &lt;span class='candidateCommentSpan'&gt;$userComment&lt;/span&gt;#end
       &lt;/div&gt;
       &lt;div class='date xHint'&gt;
-        $candidateMember.date
+        #if ($candidateMember.getProperty('date').value)
+          $candidateMember.date
+        #end
       &lt;/div&gt;
       &lt;div class='candidateStatus'&gt;
         &lt;label&gt;Status:&lt;/label&gt; $candidateMember.status
@@ -503,7 +505,9 @@ Comment: $message")
         #end
       &lt;/div&gt;
       &lt;div class='date xHint'&gt;
-        $candidateMember.resolutionDate
+        #if ($candidateMember.getProperty('resolutionDate').value)
+          $candidateMember.resolutionDate
+        #end
       &lt;/div&gt;
       &lt;div class='reviewerActions'&gt;
         #if ($status == 'pending' &amp;&amp; $type == 'request')

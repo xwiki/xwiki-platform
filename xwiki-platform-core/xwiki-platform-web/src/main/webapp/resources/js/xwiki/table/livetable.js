@@ -169,8 +169,6 @@ XWiki.widgets.LiveTable = Class.create({
       }
       url += self.getSortURLFragment();
 
-      self.loadingStatus.removeClassName("hidden");
-
       // Let code know the table is about to load new entries.
       // 1. Named event (for code interested by that table only)
       document.fire("xwiki:livetable:" + this.domNodeName + ":loadingEntries");
@@ -226,6 +224,10 @@ XWiki.widgets.LiveTable = Class.create({
       });
 
     }
+
+    // Make sure to set show the loading as soon as possible (instead of waiting the delay for the actual ajax request)
+    // so that it really reflect the status of the livetable
+    self.loadingStatus.removeClassName("hidden");
 
     if (typeof delay != 'undefined' && delay > 0) {
       // fire the request after a withdrawal period in which it can be cancelled

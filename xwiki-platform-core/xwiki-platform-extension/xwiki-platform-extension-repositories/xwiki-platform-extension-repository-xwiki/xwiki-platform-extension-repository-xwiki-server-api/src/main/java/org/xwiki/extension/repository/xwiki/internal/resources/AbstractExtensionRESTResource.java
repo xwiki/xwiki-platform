@@ -88,8 +88,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         String select =
             "extension.id, extension.type, extension.name"
-                + ", extension.summary, extension.description, extension.website, extension.authors, extension.features"
-                + ", extensionVersion.version";
+                + ", extension.summary, extension.description, extension.website, extension.authors, extension.features";
 
         if (where != null) {
             where += " and extensionVersion.version = extension.lastVersion";
@@ -284,7 +283,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         }
 
         if (document != null && !document.isNew()) {
-            author.setName(xcontext.getWiki().getUserName(authorId, xcontext));
+            author.setName(xcontext.getWiki().getUserName(authorId, null, false, xcontext));
             author.setUrl(document.getExternalURL("view", xcontext));
         } else {
             author.setName(authorId);
@@ -318,16 +317,19 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setId((String) entry[0]);
         extension.setType((String) entry[1]);
         extension.setName((String) entry[2]);
-        extension.setVersion((String) entry[3]);
-        extension.setSummary((String) entry[4]);
-        extension.setDescription((String) entry[5]);
-        extension.setWebsite((String) entry[6]);
+        extension.setSummary((String) entry[3]);
+        extension.setDescription((String) entry[4]);
+        extension.setWebsite((String) entry[5]);
 
-        for (String authorId : ListClass.getListFromString((String) entry[7], "|", false)) {
+        // Authors
+        for (String authorId : ListClass.getListFromString((String) entry[6], "|", false)) {
             extension.getAuthors().add(resolveExtensionAuthor(authorId));
         }
 
-        extension.getFeatures().addAll(ListClass.getListFromString((String) entry[8], "|", false));
+        // Features
+        extension.getFeatures().addAll(ListClass.getListFromString((String) entry[7], "|", false));
+
+        extension.setVersion((String) entry[8]);
 
         // TODO: add support for
         // * dependencies

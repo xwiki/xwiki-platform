@@ -155,10 +155,12 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
     {
         List<Extension> extensions = new ArrayList<Extension>(nb > 0 ? nb : 0);
 
+        int properOffset = offset > 0 ? offset : 0;
+
         // A local index would avoid things like this...
         int currentOffset = 0;
         for (ExtensionRepository repository : this.repositories.values()) {
-            currentOffset = search(extensions, repository, pattern, offset, nb, currentOffset);
+            currentOffset = search(extensions, repository, pattern, properOffset, nb, currentOffset);
         }
 
         return extensions;

@@ -59,6 +59,11 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     private static final String TYPE_MAVEN = "maven";
 
     /**
+     * The type identifier for a xwiki repository.
+     */
+    private static final String TYPE_XWIKI = "xwiki";
+
+    /**
      * Used to manipulate xwiki.properties files.
      */
     @Inject
@@ -129,6 +134,8 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
             try {
                 repositories.add(new ExtensionRepositoryId("maven-xwiki", TYPE_MAVEN, new URI(
                     "http://nexus.xwiki.org/nexus/content/groups/public")));
+                repositories.add(new ExtensionRepositoryId("extensions.xwiki.org", TYPE_XWIKI, new URI(
+                    "http://extensions.xwiki.org/xwiki/rest/")));
             } catch (Exception e) {
                 // Should never happen
             }

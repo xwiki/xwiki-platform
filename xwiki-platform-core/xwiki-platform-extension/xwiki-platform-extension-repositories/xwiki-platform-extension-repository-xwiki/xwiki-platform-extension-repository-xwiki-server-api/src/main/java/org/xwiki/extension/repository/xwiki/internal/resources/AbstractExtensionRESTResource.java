@@ -133,12 +133,12 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
                 .append(", doc.object(" + XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME + ") as extensionVersion");
         }
 
-        // where
-
         if (from != null) {
             queryStr.append(',');
             queryStr.append(from);
         }
+
+        // where
 
         queryStr.append(" where ");
         if (where != null) {

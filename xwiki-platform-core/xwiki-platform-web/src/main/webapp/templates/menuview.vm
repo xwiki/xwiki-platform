@@ -128,7 +128,7 @@
       #set ($hasPreviousMenuSection = false)
       #if ($hasMainWikiAdmin)
         #set ($mainWikiAdministrationDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWiki', 'XWikiPreferences'))
-        #submenuitem("$xwiki.getURL($mainWikiAdministrationDocumentReference)" $msg.get('workspacemanager.menu.mainwiki.admin') 'tmAdminMainWiki' '')
+        #submenuitem("$xwiki.getURL($mainWikiAdministrationDocumentReference, 'admin', '')" $msg.get('workspacemanager.menu.mainwiki.admin') 'tmAdminMainWiki' '')
         #set ($hasPreviousMenuSection = true)
       #end
       #if($hasPreviousMenuSection)

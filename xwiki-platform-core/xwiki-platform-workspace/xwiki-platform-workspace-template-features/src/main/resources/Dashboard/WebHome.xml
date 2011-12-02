@@ -401,7 +401,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </title>
 </class>
-<name>Main.Dashboard</name>
+<name>Dashboard.WebHome</name>
 <number>4</number>
 <className>XWiki.GadgetClass</className>
 <guid>3cfb2ec3-76e5-4627-a681-46882fd06cc9</guid>
@@ -502,7 +502,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </title>
 </class>
-<name>Main.Dashboard</name>
+<name>Dashboard.WebHome</name>
 <number>5</number>
 <className>XWiki.GadgetClass</className>
 <guid>4505776f-6e41-4c59-a0b2-c2082743e60d</guid>

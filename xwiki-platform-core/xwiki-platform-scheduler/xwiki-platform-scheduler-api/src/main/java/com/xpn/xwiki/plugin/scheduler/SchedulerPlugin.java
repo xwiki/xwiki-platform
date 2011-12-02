@@ -231,6 +231,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         XWikiServletRequestStub dummy = new XWikiServletRequestStub();
         dummy.setHost(context.getRequest().getHeader("x-forwarded-host"));
         dummy.setScheme(context.getRequest().getScheme());
+        dummy.setContextPath(context.getRequest().getContextPath());
         XWikiServletRequest request = new XWikiServletRequest(dummy);
         scontext.setRequest(request);
 

@@ -38,8 +38,10 @@ import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
-import org.xwiki.extension.repository.SearchException;
-import org.xwiki.extension.repository.Searchable;
+import org.xwiki.extension.repository.search.CollectionSearchResult;
+import org.xwiki.extension.repository.search.SearchException;
+import org.xwiki.extension.repository.search.SearchResult;
+import org.xwiki.extension.repository.search.Searchable;
 import org.xwiki.extension.repository.xwiki.Resources;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
@@ -140,7 +142,7 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
     // Searchable
 
     @Override
-    public List<Extension> search(String pattern, int offset, int nb) throws SearchException
+    public SearchResult<Extension> search(String pattern, int offset, int nb) throws SearchException
     {
         UriBuilder builder = this.searchUriBuider.clone();
 
@@ -161,6 +163,7 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
             extensions.add(new XWikiExtension(this, restExtension, this.licenseManager));
         }
 
-        return extensions;
+        return new CollectionSearchResult<Extension>(restExtensions.getTotalHits(), restExtensions.getOffset(),
+            extensions);
     }
 }

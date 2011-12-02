@@ -31,6 +31,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.xwiki.Resources;
 import org.xwiki.extension.repository.xwiki.internal.XWikiRepositoryModel;
@@ -79,7 +80,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
 
         String download = (String) getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_DOWNLOAD);
 
-        if (download == null) {
+        if (StringUtils.isNotEmpty(download)) {
             // User explicitly indicated a download location
             ResourceReference resourceReference = this.resourceReferenceParser.parse(download);
 

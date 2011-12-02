@@ -34,7 +34,7 @@ import org.xwiki.extension.repository.LocalExtensionRepositoryException;
 /**
  * Provide a readonly access to a local extension repository.
  * 
- * @param <T>
+ * @param <T> the extension type
  * @version $Id$
  */
 public class UnmodifiableLocalExtensionRepository<T extends LocalExtensionRepository> extends

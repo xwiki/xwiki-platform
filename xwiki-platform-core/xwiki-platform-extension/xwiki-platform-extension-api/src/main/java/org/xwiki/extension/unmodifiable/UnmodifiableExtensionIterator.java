@@ -17,30 +17,49 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository;
+package org.xwiki.extension.unmodifiable;
 
-import java.util.List;
+import java.util.Iterator;
 
 import org.xwiki.extension.Extension;
 
 /**
- * A repository can implements it to provide search capabilities.
+ * Provide a readonly access to an iterator on an extension.
  * 
+ * @param <E> the extension type
  * @version $Id$
  */
-// TODO: add more complete query support
-public interface Searchable
+public class UnmodifiableExtensionIterator<E extends Extension> implements Iterator<E>
 {
     /**
-     * Search extension based of the provided pattern.
-     * <p>
-     * The pattern is a simple character chain.
-     * 
-     * @param pattern the pattern to search
-     * @param offset the offset from where to start returning search results
-     * @param nb the maximum number of search results to return
-     * @return the found extensions descriptors, empty list if nothing could be found
-     * @throws SearchException error when trying to search provided pattern
+     * The wrapped iterator.
      */
-    List<Extension> search(String pattern, int offset, int nb) throws SearchException;
+    private Iterator<E> iterator;
+
+    /**
+     * @param iterator the wrapped iterator
+     */
+    public UnmodifiableExtensionIterator(Iterator<E> iterator)
+    {
+        this.iterator = iterator;
+    }
+
+    @Override
+    public boolean hasNext()
+    {
+        return this.iterator.hasNext();
+    }
+
+    @Override
+    public E next()
+    {
+        return UnmodifiableUtils.unmodifiableExtension(this.iterator.next());
+    }
+
+    @Override
+    public void remove()
+    {
+        throw new ForbiddenException("Calling remove is forbidden in readonly proxy");
+    }
+
 }

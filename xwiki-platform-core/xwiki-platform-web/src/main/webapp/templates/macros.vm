@@ -1671,9 +1671,6 @@ function (row, i, table) {
   #if(!$parameters.url.contains('?'))
     #set($parameters.url = "${parameters.url}?")
   #end
-  #if($util.parseInt("$!{parameters.defaultItemsPerPage}") <= 0)
-    #set($parameters.defaultItemsPerPage = 20)
-  #end
   #if($parameters.position != 'bottom')
     #set($parameters.position = 'top')
   #end
@@ -1706,6 +1703,9 @@ function (row, i, table) {
   ## If the value is missing or invalid, parseInt returns 0, which is the default first item.
   #set($parameters.firstItem = $util.parseInt($parameters.firstItem))
   ## Get number of items per page from request
+  #if($util.parseInt("$!{parameters.defaultItemsPerPage}") <= 0)
+    #set($parameters.defaultItemsPerPage = 20)
+  #end
   #set($parameters.itemsPerPage = "$!{request.get($parameters.itemsPerPageParamName)}")
   #set($parameters.itemsPerPage = $util.parseInt($parameters.itemsPerPage))
   #if($parameters.itemsPerPage <= 0)

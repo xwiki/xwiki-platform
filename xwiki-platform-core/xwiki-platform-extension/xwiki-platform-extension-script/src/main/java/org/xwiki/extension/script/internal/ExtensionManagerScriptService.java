@@ -45,6 +45,7 @@ import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.repository.search.SearchResult;
 import org.xwiki.extension.unmodifiable.UnmodifiableJobStatus;
 import org.xwiki.extension.unmodifiable.UnmodifiableUtils;
 import org.xwiki.script.service.ScriptService;
@@ -107,18 +108,19 @@ public class ExtensionManagerScriptService implements ScriptService
     // Extensions
 
     /**
-     * Search among all {@link org.xwiki.extension.repository.Searchable} repositories for extensions matching the
-     * search terms.
+     * Search among all {@link org.xwiki.extension.repository.search.Searchable} repositories for extensions matching
+     * the search terms.
      * 
      * @param pattern the words to search for
      * @param offset the offset from where to start returning search results, 0-based
-     * @param nb the maximum number of search results to return
+     * @param nb the maximum number of search results to return. -1 indicate no limit. 0 indicate that no result will be
+     *            returned but it can be used to get the total hits.
      * @return the found extensions descriptors, empty list if nothing could be found
-     * @see org.xwiki.extension.repository.Searchable
+     * @see org.xwiki.extension.repository.search.Searchable
      */
-    public Collection<Extension> search(String pattern, int offset, int nb)
+    public SearchResult<Extension> search(String pattern, int offset, int nb)
     {
-        return UnmodifiableUtils.unmodifiableExtensions(this.repositoryManager.search(pattern, offset, nb));
+        return this.repositoryManager.search(pattern, offset, nb);
     }
 
     /**

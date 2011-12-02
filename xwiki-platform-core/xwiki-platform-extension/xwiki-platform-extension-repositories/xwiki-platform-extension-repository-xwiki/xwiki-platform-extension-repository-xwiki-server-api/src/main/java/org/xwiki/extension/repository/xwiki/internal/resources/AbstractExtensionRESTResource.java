@@ -82,23 +82,36 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         this.objectFactory = new ObjectFactory();
     }
 
+    protected Query createExtensionsCountQuery(String from, String where) throws QueryException
+    {
+        // select
+
+        String select = "count(extension.id)";
+
+        return createExtensionsQuery(select, from, where, 0, -1, false);
+    }
+
+    protected long getExtensionsCountResult(Query query) throws QueryException
+    {
+        return ((Number) query.execute().get(0)).intValue();
+    }
+
     protected Query createExtensionsQuery(String from, String where, int offset, int number) throws QueryException
     {
         // select
 
         String select =
-            "extension.id, extension.type, extension.name"
+            "distinct extension.id, extension.type, extension.name"
                 + ", extension.summary, extension.description, extension.website, extension.authors, extension.features";
 
+        // TODO: add support for real lists: need a HQL or JPQL equivalent to MySQL GROUP_CONCAT
+        // * dependencies
+
         if (where != null) {
-            where += " and extensionVersion.version = extension.lastVersion";
+            where = "(" + where + ") and extensionVersion.version = extension.lastVersion";
         } else {
             where = "extensionVersion.version = extension.lastVersion";
         }
-
-        // TODO: add support for lists: need a HQL or JPQL equivalent to MySQL GROUP_CONCAT
-        // solution yet
-        // * dependencies
 
         return createExtensionsQuery(select, from, where, offset, number, true);
     }
@@ -142,7 +155,9 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         queryStr.append(" where ");
         if (where != null) {
+            queryStr.append('(');
             queryStr.append(where);
+            queryStr.append(')');
             queryStr.append(" and ");
         }
         queryStr.append("extension." + XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION + " = 1");

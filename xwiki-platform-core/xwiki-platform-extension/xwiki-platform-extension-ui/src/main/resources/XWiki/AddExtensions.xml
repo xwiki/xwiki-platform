@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1321658413000</creationDate>
-<date>1322044994000</date>
-<contentUpdateDate>1322044994000</contentUpdateDate>
+<date>1322840333000</date>
+<contentUpdateDate>1322840333000</contentUpdateDate>
 <version>1.1</version>
 <title>$msg.get("admin.xwiki.addextensions")</title>
 <template></template>
@@ -261,7 +261,9 @@ bOgK9Cz44w32Cfjt5Xb7Qse/TsjlX79O6AT0E/p/8v1MS0rb84IAAAAASUVORK5CYII=
 #if ($request.extensionid &amp;&amp; $request.extensionversion)
   #set ($extensions = [$extensionManager.resolve($request.extensionid, $request.extensionversion)])
 #elseif ("$!request.searchextension" != '')
-  #set ($extensions = $extensionManager.search($request.searchextension, -1, -1))
+  #set ($paginationParams = {})
+  #paginationPrepareParams($paginationParams)
+  #set ($extensions = $extensionManager.search($request.searchextension, $paginationParams.firstItem, $paginationParams.itemsPerPage))
 #else
   #set ($extensions = false)
 #end
@@ -275,18 +277,18 @@ bOgK9Cz44w32Cfjt5Xb7Qse/TsjlX79O6AT0E/p/8v1MS0rb84IAAAAASUVORK5CYII=
   &lt;/form&gt;
   {{/html}}
 
-#elseif ($extensions.isEmpty())
+#elseif ($extensions.size() == 0)
   {{info}}No extension found.{{/info}}##
 #else
-  #if ($extensions.size() &gt; 1)
+  #if ($extensions.totalHits &gt; $paginationParams.itemsPerPage)
     #set ($hasPagination = true)
     #set ($paginationURL = $doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)firstIndex=[^&amp;]++&amp;?', '$1')))
     #if ("$!{request.searchextension}" != '')
       #set ($paginationURL = "${paginationURL}&amp;searchextension=${request.searchextension}")
     #end
-    #set ($paginationParams = {'totalItems': $extensions.size(), 'url': $paginationURL})
+    #set($paginationParams.totalItems = $extensions.totalHits)
+    #set($paginationParams.url = $paginationURL)
     {{html}}#pagination($paginationParams){{/html}}
-    #set ($extensions = $extensions.subList($paginationParams.firstItem, $mathtool.min($extensions.size(), $mathtool.add($paginationParams.firstItem, $paginationParams.itemsPerPage))))
   #end
   #set ($actions = [])
   #if ($request.actionshowdetails)

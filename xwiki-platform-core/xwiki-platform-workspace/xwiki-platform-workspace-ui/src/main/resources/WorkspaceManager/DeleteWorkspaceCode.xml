@@ -72,8 +72,7 @@
         #if ($WorkspaceManager.lastException)
           #printException($WorkspaceManager.lastException)
         #else
-          ## FIXME: replace with a success macro when it will be available.
-          {{box image="icon:tick"}}The user [[$currentUser]] successfully deleted the workspace ${workspaceName}.{{/box}}
+          {{success}}The user [[$currentUser]] successfully deleted the workspace ${workspaceName}.{{/success}}
         #end
       #end
     #end

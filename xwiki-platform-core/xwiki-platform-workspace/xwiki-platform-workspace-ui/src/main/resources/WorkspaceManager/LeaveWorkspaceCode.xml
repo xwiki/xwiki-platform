@@ -71,8 +71,7 @@
       #else
         #set ($temp = $workspaceGroupDocumentRestricted.removeXObject($existingMemberObject))
         #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, "User $currentUser left workspace.", true, $xcontext.context))
-        ## FIXME: replace with a success macro when it will be available.
-        {{box image="icon:tick"}}The user [[$currentUser]] successfully left workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/box}}
+        {{success}}The user [[$currentUser]] successfully left workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/success}}
       #end
     #end
   #end

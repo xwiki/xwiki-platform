@@ -13,16 +13,6 @@
   <name>XWiki Platform - Workspace - Template Features</name>
   <description>Template workspace features to be added to a base admin-provided workspace template. This final workspace template shall be used when creating a new workspace.</description>
 
-  <dependencies>
-    <!-- Make sure that the Application Manager Application is included in 
-      the template. TODO: Remove this once we start using the Extension manager. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-application-manager-ui</artifactId>
-      <type>xar</type>
-    </dependency>
-  </dependencies>
-
   <build>
     <plugins>
       <plugin>

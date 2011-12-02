@@ -107,7 +107,7 @@
 <content>{{spaces/}}</content>
 </property>
 <property>
-<position>1,4</position>
+<position>1,3</position>
 </property>
 <property>
 <title>$msg.get("platform.dashboard.wiki.spaces")</title>
@@ -170,7 +170,7 @@
 <content>{{tagcloud/}}</content>
 </property>
 <property>
-<position>1,5</position>
+<position>1,4</position>
 </property>
 <property>
 <title>$msg.get("platform.dashboard.wiki.tagcloud")</title>
@@ -403,107 +403,6 @@
 </class>
 <name>Dashboard.WebHome</name>
 <number>4</number>
-<className>XWiki.GadgetClass</className>
-<guid>3cfb2ec3-76e5-4627-a681-46882fd06cc9</guid>
-<property>
-<content>{{velocity}}
-#set($AppManager = $services.applicationmanager)
-#if(!$AppManager)
-  #error($msg.get("workspacemanager.dependencies.applicationmanager.missing"))
-#else
-  This is the list of available applications for this workspace:
-  #set($applications = $AppManager.getApplicationDocumentList())
-  #foreach($application in $applications)
-    ## Do a 'wild guess' to find an application's entry point. The descriptor does not specify this so we 'guess' that
-    ## it's the first space WebHome we find. If we find none, we just use the application's descriptor as fallback.
-    #set($entryPoint = $application.getFullName())
-    #set($documentNames = $application.getDocumentsNames(true, true))
-    #set($spaceEndsWithBlacklist = ['Code', 'Classes', 'Resources', 'Templates', 'Sheets'])
-    #foreach($documentName in $documentNames)
-      #set($documentSpaceName = $services.model.resolveDocument($documentName).lastSpaceReference.name)
-      #if ($documentName.endsWith('WebHome'))
-        #set($blackListed = false)
-        #foreach($spaceBlacklistEntry in $spaceEndsWithBlacklist)
-          #if ($documentSpaceName.endsWith($spaceBlacklistEntry))
-            #set($blackListed = true)
-            #break
-          #end
-        #end
-        #if (!$blackListed)
-          #set($entryPoint = $documentName)
-          #break
-        #end
-      #end
-    #end
-    #set ($appPrettyName = $application.getValue('appprettyname'))
-    #set ($appName = $application.getValue('appname'))
-    * [[#if("$!{appPrettyName.trim()}" != '')$appPrettyName#{else}$appName#{end}&gt;&gt;$entryPoint]]
-  #end
-  #if ($hasAdmin)
-
-    To manage applications, you can use the [[Application Manager&gt;&gt;XAppManager.WebHome]].
-  #end
-#end
-{{/velocity}}</content>
-</property>
-<property>
-<position>1,3</position>
-</property>
-<property>
-<title>Applications</title>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.GadgetClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<content>
-<disabled>0</disabled>
-<editor>---</editor>
-<name>content</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>content</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</content>
-<position>
-<disabled>0</disabled>
-<name>position</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>position</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</position>
-<title>
-<disabled>0</disabled>
-<name>title</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>title</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</title>
-</class>
-<name>Dashboard.WebHome</name>
-<number>5</number>
 <className>XWiki.GadgetClass</className>
 <guid>4505776f-6e41-4c59-a0b2-c2082743e60d</guid>
 <property>

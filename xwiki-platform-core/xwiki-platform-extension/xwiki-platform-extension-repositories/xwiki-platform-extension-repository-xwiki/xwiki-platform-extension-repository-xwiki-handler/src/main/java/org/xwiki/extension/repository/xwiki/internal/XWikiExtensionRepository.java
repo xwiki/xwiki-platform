@@ -148,12 +148,12 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
 
         builder.queryParam(Resources.QPARAM_LIST_START, offset);
         builder.queryParam(Resources.QPARAM_LIST_NUMBER, nb);
+        builder.queryParam(Resources.QPARAM_SEARCH_QUERY, pattern);
 
         ExtensionsSearchResult restExtensions;
         try {
-            restExtensions =
-                (ExtensionsSearchResult) this.repositoryFactory.getUnmarshaller().unmarshal(
-                    getRESTResourceAsStream(builder, pattern));
+            restExtensions = (ExtensionsSearchResult) this.repositoryFactory.getUnmarshaller().unmarshal(
+                getRESTResourceAsStream(builder));
         } catch (Exception e) {
             throw new SearchException("Failed to search extensions based on pattern [" + pattern + "]", e);
         }

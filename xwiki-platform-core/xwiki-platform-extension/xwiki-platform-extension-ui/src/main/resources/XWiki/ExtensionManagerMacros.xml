@@ -1122,10 +1122,10 @@ $xwiki.jsx.use('ExtensionManagerMacros')
         #end
       #end
     #end
-    #if ("$!{extension.description}" != '')
+    #if ("$!{extension.summary}" != '')
       (% class="extension-description" %)
       (((
-      $extension.description.replaceAll('\s+', ' ')
+      $extension.summary.replaceAll('\s+', ' ')
       )))
 
     #end
@@ -1176,7 +1176,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
           #end
         #end
 
-        $!extension.summary
+        $!extension.description
       )))
 
       #if ("$!{extension.releaseNotes}" != '')

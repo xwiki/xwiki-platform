@@ -191,7 +191,7 @@ public class ExtensionUpdaterListener implements EventListener
 
                 extensionObject.setIntValue(XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, valid ? 1 : 0);
 
-                context.getWiki().saveDocument(document, "Validate extension", context);
+                context.getWiki().saveDocument(document, "Validated extension", true, context);
             } catch (XWikiException e) {
                 this.logger.error("Failed to validate extension [{}]", document, e);
             }

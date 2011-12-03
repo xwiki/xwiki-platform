@@ -277,7 +277,7 @@ bOgK9Cz44w32Cfjt5Xb7Qse/TsjlX79O6AT0E/p/8v1MS0rb84IAAAAASUVORK5CYII=
   &lt;/form&gt;
   {{/html}}
 
-#elseif ($extensions.size() == 0)
+#elseif ($extensions.size == 0)
   {{info}}No extension found.{{/info}}##
 #else
   #if ($extensions.totalHits &gt; $paginationParams.itemsPerPage)

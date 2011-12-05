@@ -3236,13 +3236,13 @@ public class XWiki implements EventListener
         }
 
         SheetBinder documentSheetBinder = Utils.getComponent(SheetBinder.class, "document");
-        boolean hasDocumentSheets = documentSheetBinder.getSheets(doc).isEmpty();
-        if (!hasDocumentSheets) {
+        boolean withoutDocumentSheets = documentSheetBinder.getSheets(doc).isEmpty();
+        if (withoutDocumentSheets) {
             // Bind a document sheet to prevent the default class sheet from being used.
             documentSheetBinder.bind(doc, doc.getDocumentReference());
         }
         needsUpdate |= setClassDocumentFields(doc, "XWiki Preferences");
-        if (!hasDocumentSheets) {
+        if (withoutDocumentSheets) {
             // Unbind the document sheet we bound earlier.
             documentSheetBinder.unbind(doc, doc.getDocumentReference());
         }

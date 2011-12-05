@@ -203,8 +203,9 @@ public class ExtensionUpdaterListener implements EventListener
     {
         String lastVersion = findLastVersion(document);
 
-        if (lastVersion != null && !StringUtils.equals(lastVersion,
-            extensionObject.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION))) {
+        if (lastVersion != null
+            && !StringUtils.equals(lastVersion,
+                extensionObject.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION))) {
             try {
                 // FIXME: We can't save directly the provided document coming from the event
                 document = context.getWiki().getDocument(document, context);
@@ -242,10 +243,12 @@ public class ExtensionUpdaterListener implements EventListener
         String lastVersion = null;
         if (versionObjects != null) {
             for (BaseObject versionObject : versionObjects) {
-                String version = versionObject.getStringValue(XWikiRepositoryModel.PROP_VERSION_VERSION);
-                if (version != null) {
-                    if (lastVersion == null || this.versionManager.compareVersions(version, lastVersion) > 0) {
-                        lastVersion = version;
+                if (versionObject != null) {
+                    String version = versionObject.getStringValue(XWikiRepositoryModel.PROP_VERSION_VERSION);
+                    if (version != null) {
+                        if (lastVersion == null || this.versionManager.compareVersions(version, lastVersion) > 0) {
+                            lastVersion = version;
+                        }
                     }
                 }
             }

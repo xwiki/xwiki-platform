@@ -81,6 +81,7 @@ public class ExtensionUpdaterListener implements EventListener
      * Used to validate download reference.
      */
     @Inject
+    @Named("link")
     private ResourceReferenceParser resourceReferenceParser;
 
     /**

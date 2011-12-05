@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -56,6 +57,7 @@ import com.xpn.xwiki.api.Document;
 public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResource
 {
     @Inject
+    @Named("link")
     private ResourceReferenceParser resourceReferenceParser;
 
     @Inject

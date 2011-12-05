@@ -23,65 +23,54 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>{{velocity}}
-#if($request.method.equalsIgnoreCase('post') &amp;&amp; "$!request.className" != '')
-  #if("$!request.targetPageName" != '')
-    ## Generate LiveTable
-    #set($targetPage = $xwiki.getDocument($request.targetPageName))
-    $response.sendRedirect($xwiki.getURL($request.targetPageName, 'edit', "editor=inline&amp;template=AppWithinMinutes.LiveTableTemplate&amp;AppWithinMinutes.LiveTableClass_0_class=$escapetool.url($request.className)&amp;title=$escapetool.url($targetPage.name)"));
-  #else
-    ## Create/Edit Class
-    $response.sendRedirect($xwiki.getURL($request.className, 'edit', 'editor=inline&amp;sheet=AppWithinMinutes.ClassEditSheet'))
-  #end
-#else
-{{warning}}
-These features are experimental, use them at your own risk.
-{{/warning}}
+<content>(% class="buttonwrapper" %)[[Create Application&gt;&gt;CreateApplication||class="button"]]
 
-= Create/Edit Class =
+= Applications =
 
-{{html}}
-&lt;form action="" method="post" class="xform half"&gt;
-  &lt;dl&gt;
-    &lt;dt&gt;
-      &lt;label for="className"&gt;Class name&lt;/label&gt;
-    &lt;/dt&gt;
-    &lt;dd&gt;
-      &lt;input type="text" id="className" name="className"/&gt;
-    &lt;/dd&gt;
-  &lt;/dl&gt;
-  &lt;p&gt;
-    &lt;span class="buttonwrapper"&gt;
-      &lt;input type="submit" value="Create / Edit" class="button"/&gt;
-    &lt;/span&gt;
-  &lt;/p&gt;
-&lt;/form&gt;
-{{/html}}
-
-= Generate LiveTable =
-
-{{html}}
-&lt;form action="" method="post" class="xform half"&gt;
-  &lt;dl&gt;
-    &lt;dt&gt;
-      &lt;label for="xclassName"&gt;Class name&lt;/label&gt;
-    &lt;/dt&gt;
-    &lt;dd&gt;
-      &lt;input type="text" id="xclassName" name="className"/&gt;
-    &lt;/dd&gt;
-    &lt;dt&gt;
-      &lt;label for="targetPageName"&gt;Target page name&lt;/label&gt;
-    &lt;/dt&gt;
-    &lt;dd&gt;
-      &lt;input type="text" id="targetPageName" name="targetPageName"/&gt;
-    &lt;/dd&gt;
-  &lt;/dl&gt;
-  &lt;p&gt;
-    &lt;span class="buttonwrapper"&gt;
-      &lt;input type="submit" value="Generate" class="button"/&gt;
-    &lt;/span&gt;
-  &lt;/p&gt;
-&lt;/form&gt;
-{{/html}}
-#end
+{{velocity}}
+#set($originalMsg = $msg)
+#set($msg = {
+  'apps.livetable.doc.space': 'Application name',
+  'apps.livetable.doc.author': 'Last author',
+  'apps.livetable.doc.date': 'Update date',
+  'xe.livetable.results': $originalMsg.get('xe.livetable.results'),
+  'xe.livetable.resultsmacros': $originalMsg.get('xe.livetable.resultsmacros'),
+  'xe.livetable.filters.title': $originalMsg.get('xe.livetable.filters.title'),
+  'xe.livetable.loading': $originalMsg.get('xe.livetable.loading'),
+  'xe.livetable.tags.help': $originalMsg.get('xe.livetable.tags.help'),
+  'xe.livetable.tags.help.cancel': $originalMsg.get('xe.livetable.tags.help.cancel'),
+  'xe.livetable.environmentCannotLoadTableMessage': $originalMsg.get('xe.livetable.environmentCannotLoadTableMessage'),
+  'xe.livetable.pagesize.label': $originalMsg.get('xe.livetable.pagesize.label'),
+  'xe.livetable.tools': $originalMsg.get('xe.livetable.tools'),
+  'xe.livetable.tools.excel': $originalMsg.get('xe.livetable.tools.excel'),
+  'xe.livetable.select.all': $originalMsg.get('xe.livetable.select.all'),
+  'xe.pagination.page': $originalMsg.get('xe.pagination.page'),
+  'xe.pagination.page.title': $originalMsg.get('xe.pagination.page.title'),
+  'xe.pagination.page.previous': $originalMsg.get('xe.pagination.page.previous'),
+  'xe.pagination.page.prev.title': $originalMsg.get('xe.pagination.page.prev.title'),
+  'xe.pagination.page.next': $originalMsg.get('xe.pagination.page.next'),
+  'xe.pagination.page.next.title': $originalMsg.get('xe.pagination.page.next.title'),
+  'xe.pagination.results.none': $originalMsg.get('xe.pagination.results.none'),
+  'xe.pagination.results.one': $originalMsg.get('xe.pagination.results.one'),
+  'xe.pagination.results.single': $originalMsg.get('xe.pagination.results.single'),
+  'xe.pagination.results.many': $originalMsg.get('xe.pagination.results.many')
+})
+#set($columnsProperties = {
+  'doc.space': {'type': 'text', 'link': 'view', 'size': 10, 'filterable': true, 'sortable': true},
+  'doc.author': {'type': 'text', 'link': 'author', 'size': 10, 'filterable': true, 'sortable': true},
+  'doc.date': {'type': 'text', 'size': 10, 'filterable': true, 'sortable': true}
+})
+#set($options = {
+  'className': 'AppWithinMinutes.LiveTableClass',
+  'resultPage' : 'AppWithinMinutes.LiveTableGenerator',
+  'translationPrefix': 'apps.livetable.',
+  'tagCloud': true,
+  'rowCount': 15,
+  'maxPages': 10,
+  'selectedColumn': 'doc.space',
+  'defaultOrder': 'asc'
+})
+#set($columns = ['doc.space', 'doc.author', 'doc.date'])
+#livetable('livetable' $columns $columnsProperties $options)
+#set($msg = $originalMsg)
 {{/velocity}}</content></xwikidoc>

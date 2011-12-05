@@ -471,9 +471,9 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         ResponseBuilder response = Response.ok();
 
-        response.type(xwikiAttachment.getMimeType());
-        response.entity(xwikiAttachment.getContent());
-        response.header("Content-Disposition", "attachment; filename=\"" + xwikiAttachment.getFilename() + "\"");
+        response = response.type(xwikiAttachment.getMimeType());
+        response = response.entity(xwikiAttachment.getContent());
+        response = response.header("content-disposition", "attachment; filename=\"" + xwikiAttachment.getFilename() + "\"");
 
         return response;
     }

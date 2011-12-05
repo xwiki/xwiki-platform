@@ -19,8 +19,11 @@
  */
 package org.xwiki.extension.repository.xwiki.internal.resources;
 
-import java.net.URI;
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,6 +36,8 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.StringUtils;
+import org.restlet.data.MediaType;
+import org.restlet.resource.InputRepresentation;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.xwiki.Resources;
 import org.xwiki.extension.repository.xwiki.internal.XWikiRepositoryModel;
@@ -66,7 +71,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
     @GET
     public Response downloadExtension(@PathParam(Resources.PPARAM_EXTENSIONID) String extensionId,
         @PathParam(Resources.PPARAM_EXTENSIONVERSION) String extensionVersion) throws XWikiException, QueryException,
-        URISyntaxException
+        URISyntaxException, IOException
     {
         Document extensionDocument = getExtensionDocument(extensionId);
 
@@ -100,7 +105,25 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
                 response = getAttachmentResponse(xwikiAttachment);
             } else if (ResourceType.URL.equals(resourceReference.getType())) {
                 // It's an URL
-                response = Response.created(new URI(resourceReference.getReference()));
+                URL url = new URL(resourceReference.getReference());
+
+                // TODO: find a proper way to do a perfect proxy of the URL without directly using Restlet classes.
+                // It's a real pain since Restlet does not properly support some standard headers (like the charset in
+                // the content-type for example) when given as it is in the Response
+
+                URLConnection connection = url.openConnection();
+
+                if (connection instanceof HttpURLConnection) {
+                    HttpURLConnection httpConnection = (HttpURLConnection) connection;
+                    response = Response.status(httpConnection.getResponseCode());
+                } else {
+                    response = Response.ok();
+                }
+
+                InputRepresentation content =
+                    new InputRepresentation(connection.getInputStream(), new MediaType(connection.getContentType()),
+                        connection.getContentLength());
+                response.entity(content);
             } else {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }

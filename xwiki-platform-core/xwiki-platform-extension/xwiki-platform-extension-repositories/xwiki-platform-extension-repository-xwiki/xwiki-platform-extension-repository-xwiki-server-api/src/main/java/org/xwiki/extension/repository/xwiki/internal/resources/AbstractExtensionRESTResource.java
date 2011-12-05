@@ -310,7 +310,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setWebsite((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE));
 
         for (String authorId : (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS)) {
-
             extension.getAuthors().add(resolveExtensionAuthor(authorId));
         }
 
@@ -321,12 +320,14 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             for (com.xpn.xwiki.api.Object dependencyObject : extensionDocument.getObjects(
                 XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME,
                 XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, version)) {
-                ExtensionDependency dependency = new ExtensionDependency();
-                dependency.setId((String) getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_ID));
-                dependency
-                    .setVersion((String) getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_VERSION));
+                if (dependencyObject != null) {
+                    ExtensionDependency dependency = new ExtensionDependency();
+                    dependency.setId((String) getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_ID));
+                    dependency.setVersion((String) getValue(dependencyObject,
+                        XWikiRepositoryModel.PROP_DEPENDENCY_VERSION));
 
-                extensionVersion.getDependencies().add(dependency);
+                    extensionVersion.getDependencies().add(dependency);
+                }
             }
         }
 
@@ -473,7 +474,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         response = response.type(xwikiAttachment.getMimeType());
         response = response.entity(xwikiAttachment.getContent());
-        response = response.header("content-disposition", "attachment; filename=\"" + xwikiAttachment.getFilename() + "\"");
+        response =
+            response.header("content-disposition", "attachment; filename=\"" + xwikiAttachment.getFilename() + "\"");
 
         return response;
     }

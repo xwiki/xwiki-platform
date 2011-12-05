@@ -103,8 +103,12 @@ $separator
   '$escapetool.javascript($column)': {'type': '$type', 'size': 10, 'filterable': true, 'sortable': true, 'html': $isHTML}##
 #set($separator = ',')
 #elseif($genericColumns.contains($column))
+#set($link = 'view')
+#if($column == 'doc.creator' || $column == 'doc.author')
+#set($link = 'author')
+#end
 $separator
-  '$column': {'type': 'text', 'link': 'view', 'size': #if($column == 'doc.title')20#{else}10#end, 'filterable': true, 'sortable': true}##
+  '$column': {'type': 'text', 'link': '$link', 'size': #if($column == 'doc.title')20#{else}10#end, 'filterable': true, 'sortable': true}##
 #set($separator = ',')
 #elseif($specialColumns.contains($column))
 $separator

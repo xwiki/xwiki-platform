@@ -597,18 +597,25 @@ public class XWikiAttachment implements Cloneable
         }
     }
 
-    // We assume versions go from 1.1 to the current one
-    // This allows not to read the full archive file
-    public synchronized List<Version> getVersionList() throws XWikiException
+    /**
+     * Get the list of all versions up to the current.
+     * We assume versions go from 1.1 to the current one
+     * This allows not to read the full archive file.
+     *
+     * @return a list of Version from 1.1 to the current version.
+     * @throws XWikiException never happens.
+     */
+    public List<Version> getVersionList() throws XWikiException
     {
-        List<Version> list = new ArrayList<Version>();
+        final List<Version> list = new ArrayList<Version>();
+        final String currentVersion = this.version.toString();
         Version v = new Version("1.1");
-        while (true) {
+        for (;;) {
             list.add(v);
-            if (v.toString().equals(this.version.toString())) {
+            if (v.toString().equals(currentVersion)) {
                 break;
             }
-            v.next();
+            v = v.next();
         }
 
         return list;

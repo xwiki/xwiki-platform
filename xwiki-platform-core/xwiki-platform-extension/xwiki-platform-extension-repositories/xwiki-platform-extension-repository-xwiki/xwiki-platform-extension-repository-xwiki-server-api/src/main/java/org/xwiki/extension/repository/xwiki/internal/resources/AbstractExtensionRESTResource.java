@@ -31,6 +31,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
@@ -307,7 +308,9 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setSummary((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));
         extension.setDescription((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION));
         extension.setName((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_NAME));
-        extension.setWebsite((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE));
+        extension.setWebsite(StringUtils.defaultIfEmpty(
+            (String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE),
+            extensionDocument.getExternalURL()));
 
         for (String authorId : (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS)) {
             extension.getAuthors().add(resolveExtensionAuthor(authorId));
@@ -389,6 +392,9 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setName(this.<String> getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_NAME));
         extension.setSummary(this.<String> getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));
         extension.setDescription(this.<String> getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION));
+
+        // TODO: if no website is provided return the page external URL but should absolutely be done without loading
+        // the XWikiDocument
         extension.setWebsite(this.<String> getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE));
 
         // Authors

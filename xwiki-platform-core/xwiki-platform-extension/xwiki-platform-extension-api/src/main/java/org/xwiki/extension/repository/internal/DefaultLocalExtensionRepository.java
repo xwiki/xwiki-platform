@@ -291,20 +291,35 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
     /**
      * @param localExtension the extension to remove from backward dependencies map
      */
-    private void removeFromBackwardDependencies(LocalExtension localExtension)
+    private void removeFromBackwardDependencies(DefaultLocalExtension localExtension)
     {
         Collection<String> namespaces = localExtension.getNamespaces();
 
         if (namespaces == null) {
             this.installedExtensions.remove(localExtension.getId().getId());
-            // this.backwardDependenciesMap.remove(localExtension.getId().getId());
+            removeFromBackwardDependencies(localExtension, null);
         } else {
             Map<String, DefaultInstalledExtension> namespaceBackwardDependencies =
                 this.installedExtensions.get(localExtension.getId().getId());
-            // this.backwardDependenciesMap.get(localExtension.getId().getId());
 
             for (String namespace : namespaces) {
                 namespaceBackwardDependencies.remove(namespace);
+                removeFromBackwardDependencies(localExtension, namespace);
+            }
+        }
+    }
+
+    private void removeFromBackwardDependencies(DefaultLocalExtension localExtension, String namespace)
+    {
+        // Clean provided extension dependencies backward dependencies
+        for (ExtensionDependency dependency : localExtension.getDependencies()) {
+            DefaultInstalledExtension installedExtension =
+                getInstalledExtensionFromCache(dependency.getId(), namespace);
+
+            if (installedExtension.getBackwardDependencies().remove(localExtension)) {
+                // That should never happen so lets log it
+                this.logger.warn("Extension [" + localExtension + "] was not regisistered as backward dependency of ["
+                    + installedExtension.getExtension() + "]");
             }
         }
     }
@@ -348,26 +363,27 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
      */
     private DefaultInstalledExtension addInstalledExtension(DefaultLocalExtension localExtension, String namespace)
     {
+        // Register the extension in the installed extensions for the provided namespace
         DefaultInstalledExtension installedExtension =
-            getInstalledExtensionFromCache(localExtension.getId().getId(), namespace, localExtension, true);
+            getInstalledExtensionFromCache(localExtension.getId().getId(), namespace, localExtension);
 
         // Add virtual extensions
         for (String feature : localExtension.getFeatures()) {
-            getInstalledExtensionFromCache(feature, namespace, localExtension, true);
+            getInstalledExtensionFromCache(feature, namespace, localExtension);
         }
 
         // Add backward dependencies
         for (ExtensionDependency dependency : localExtension.getDependencies()) {
             if (!this.coreExtensionRepository.exists(dependency.getId())) {
-                DefaultInstalledExtension dependencyExtension =
-                    getInstalledExtensionFromCache(dependency.getId(), namespace);
-                if (dependencyExtension == null) {
-                    // That should never happen but better be careful
-                    this.logger.error("Requeired dependency [" + dependency + "] is not installed when registering ["
-                        + localExtension + "]");
-                }
+                // Get the extension for the dependency feature for the provided namespace
+                DefaultLocalExtension dependencyLocalExtension =
+                    (DefaultLocalExtension) getInstalledExtension(dependency.getId(), namespace);
 
-                dependencyExtension.addBackwardDependency(localExtension);
+                // Make sure to register backward dependency on the right namespace
+                DefaultInstalledExtension dependencyInstalledExtension =
+                    getInstalledExtensionFromCache(dependency.getId(), namespace, dependencyLocalExtension);
+
+                dependencyInstalledExtension.addBackwardDependency(localExtension);
             }
         }
 
@@ -375,16 +391,17 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
     }
 
     /**
-     * Get extension registered as installed for the provided feature and namespace.
+     * Get extension registered as installed for the provided feature and namespace or can register it if provided.
+     * <p>
+     * Only look at provide namespace and does take into account inheritance.
      * 
-     * @param feature Get extension registered as installed for the provided feature and namespace.
+     * @param feature the feature provided by the extension
      * @param namespace the namespace where the extension is installed
      * @param localExtension the extension
-     * @param create add the extension to the cache if it's not already there
      * @return the installed extension informations
      */
     private DefaultInstalledExtension getInstalledExtensionFromCache(String feature, String namespace,
-        DefaultLocalExtension localExtension, boolean create)
+        DefaultLocalExtension localExtension)
     {
         Map<String, DefaultInstalledExtension> installedExtensionsForFeature = this.installedExtensions.get(feature);
 
@@ -403,7 +420,7 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
     }
 
     /**
-     * Get extension registered as installed for the provided feature and namespace.
+     * Get extension registered as installed for the provided feature and namespace (including on root namespace).
      * 
      * @param feature the feature provided by the extension
      * @param namespace the namespace where the extension is installed
@@ -418,6 +435,10 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
         }
 
         DefaultInstalledExtension installedExtension = installedExtensionsForFeature.get(namespace);
+
+        if (installedExtension == null && namespace != null) {
+            installedExtension = getInstalledExtensionFromCache(feature, null);
+        }
 
         return installedExtension;
     }
@@ -548,11 +569,6 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
         return localExtension;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.repository.LocalExtensionRepository#removeExtension(org.xwiki.extension.LocalExtension)
-     */
     @Override
     public void removeExtension(LocalExtension extension) throws ResolveException
     {
@@ -600,8 +616,9 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
             if (installedExtension != null) {
                 Set<DefaultLocalExtension> backwardDependencies = installedExtension.getBackwardDependencies();
 
-                return backwardDependencies != null ? Collections
-                    .<LocalExtension> unmodifiableCollection(backwardDependencies) : Collections
+                // copy the list to allow use cases like uninstalling all backward dependencies without getting a
+                // concurrent issue on the list
+                return backwardDependencies != null ? new ArrayList<LocalExtension>(backwardDependencies) : Collections
                     .<LocalExtension> emptyList();
             }
         }
@@ -625,10 +642,12 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
         if (installedExtensionsByFeature != null) {
             result = new HashMap<String, Collection<LocalExtension>>();
             for (DefaultInstalledExtension installedExtension : installedExtensionsByFeature.values()) {
-                if ((namespaces == null || namespaces.contains(installedExtension.getNamespace())) &&
-                    !installedExtension.getBackwardDependencies().isEmpty()) {
-                    result.put(installedExtension.getNamespace(), Collections
-                        .<LocalExtension> unmodifiableCollection(installedExtension.getBackwardDependencies()));
+                if ((namespaces == null || namespaces.contains(installedExtension.getNamespace()))
+                    && !installedExtension.getBackwardDependencies().isEmpty()) {
+                    // copy the list to allow use cases like uninstalling all backward dependencies without getting a
+                    // concurrent issue on the list
+                    result.put(installedExtension.getNamespace(),
+                        new ArrayList<LocalExtension>(installedExtension.getBackwardDependencies()));
                 }
             }
         } else {

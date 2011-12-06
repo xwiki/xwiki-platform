@@ -124,9 +124,8 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
-     * Get the extension handler corresponding to the given extension ID (groupID:artifactId) and version. The returned
-     * handler can be used to get more information about the extension, such as the authors, an extension description,
-     * its license...
+     * Get the extension handler corresponding to the given extension ID and version. The returned handler can be used
+     * to get more information about the extension, such as the authors, an extension description, its license...
      * 
      * @param id the extension id or provided feature (virtual extension) of the extension to resolve
      * @param version the specific version to resolve
@@ -163,8 +162,10 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
-     * Get a list of currently installed extensions for the given namespace. This doesn't include core extensions, only
-     * custom extensions installed by the administrators .
+     * Return all the extensions available for the provide namespace. This also include root extension since namespaces
+     * inherit from root.
+     * <p>
+     * This doesn't include core extensions, only extension installed through the API.
      * 
      * @param namespace the target namespace (virtual wiki name) for which to retrieve the list of installed extensions
      * @return a list of read-only handlers corresponding to the installed extensions, an empty list if nothing is
@@ -177,7 +178,9 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
-     * Get the extension handler corresponding to the given installed extension ID (groupID:artifactId) and namespace.
+     * Get the extension handler corresponding to the given installed extension ID or feature (virtual ID) provided by
+     * the extension and namespace.
+     * <p>
      * The returned handler can be used to get more information about the extension, such as the authors, an extension
      * description, its license...
      * 
@@ -186,9 +189,9 @@ public class ExtensionManagerScriptService implements ScriptService
      * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension isn't
      *         installed in the target namespace
      */
-    public LocalExtension getInstalledExtension(String id, String namespace)
+    public LocalExtension getInstalledExtension(String feature, String namespace)
     {
-        return UnmodifiableUtils.unmodifiableExtension(this.localExtensionRepository.getInstalledExtension(id,
+        return UnmodifiableUtils.unmodifiableExtension(this.localExtensionRepository.getInstalledExtension(feature,
             namespace));
     }
 
@@ -203,9 +206,8 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
-     * Get the extension handler corresponding to the given core extension ID (groupID:artifactId). The returned handler
-     * can be used to get more information about the extension, such as the authors, an extension description, its
-     * license...
+     * Get the extension handler corresponding to the given core extension ID. The returned handler can be used to get
+     * more information about the extension, such as the authors, an extension description, its license...
      * 
      * @param id the extension id or provided feature (virtual extension) of the extension to resolve
      * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension isn't
@@ -262,7 +264,7 @@ public class ExtensionManagerScriptService implements ScriptService
      * Start the asynchronous installation process for an extension if the context document has programming rights and
      * no other job is in progress already.
      * 
-     * @param id the identifier of the extension to add (groupId:artifactId)
+     * @param id the identifier of the extension to add
      * @param version the version to install
      * @param wiki the (optional) virtual wiki where to install the extension; if {@code null} or empty, the extension
      *            will be installed globally; not all types of extensions can be installed in only one wiki and will be
@@ -302,9 +304,9 @@ public class ExtensionManagerScriptService implements ScriptService
      * Start the asynchronous uninstall process for an extension if the context document has programming rights and no
      * other job is in progress already.
      * 
-     * @param id the identifier of the extension to remove (groupId:artifactId)
+     * @param id the identifier of the extension to remove
      * @param version the version to remove
-     * @return the {@link Job} object which can be used to monitor the progress of the unistallation process, or
+     * @return the {@link Job} object which can be used to monitor the progress of the uninstallation process, or
      *         {@code null} in case of failure
      */
     public Job uninstall(String id, String version)

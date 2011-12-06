@@ -572,11 +572,23 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
         DefaultLocalExtension localExtension = this.extensions.get(extension.getId());
 
         if (localExtension != null) {
-            if (dependency || localExtension.getProperty(LocalExtension.PKEY_DEPENDENCY) == null) {
-                localExtension.setDependency(dependency);
-            }
+            if (extension.isInstalled(namespace)) {
+                if (localExtension.isDependency() == dependency) {
+                    throw new InstallException("The extension [" + localExtension
+                        + "] is already installed on namespace [" + namespace + "]");
+                }
 
-            installLocalExtension(localExtension, namespace);
+                localExtension.setDependency(dependency);
+            } else {
+                if (dependency || localExtension.getProperty(LocalExtension.PKEY_DEPENDENCY) == null) {
+                    localExtension.setDependency(dependency);
+                }
+
+                installLocalExtension(localExtension, namespace);
+            }
+        } else {
+            // Should be a very rare use case since we explicitly ask for a LocalExtension
+            throw new InstallException("The extension [" + extension + "] need to be stored first");
         }
     }
 
@@ -594,7 +606,7 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
     public Collection<LocalExtension> getBackwardDependencies(String feature, String namespace) throws ResolveException
     {
         if (getInstalledExtension(feature, namespace) == null) {
-            throw new ResolveException("Extension [" + feature + "] does is not installed");
+            throw new ResolveException("Extension [" + feature + "] is not installed on namespace [" + namespace + "]");
         }
 
         Map<String, DefaultInstalledExtension> installedExtensionsByFeature = this.installedExtensions.get(feature);

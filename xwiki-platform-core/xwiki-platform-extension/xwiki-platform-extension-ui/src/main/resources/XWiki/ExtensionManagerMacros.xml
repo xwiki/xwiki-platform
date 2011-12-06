@@ -401,8 +401,8 @@
 }
 
 @-moz-keyframes progress-animation {
-	0% {background-position: -14.142px 0;}
-	100% {background-position: 0px 0;}
+  0% {background-position: -14.142px 0;}
+  100% {background-position: 0px 0;}
 }
 
 .extension-version {
@@ -1078,7 +1078,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
       #set ($name = $name.substring($mathtool.add($name.indexOf(':'), 1)))
     #end
   #end
-  $name##  
+  $name##
 #end
 
 #macro (displayExtension $extension)
@@ -1161,7 +1161,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
         #if ($extension.dependency)
           * $msg.get('extensions.info.dependency')
         #end
-        #if ($extension.webSite)
+        #if ("$!{extension.webSite}" != '')
           * $msg.get('extensions.info.website') [[$extension.webSite.replaceAll('^[^/]++//([^/]++)/?.*+$', '$1')&gt;&gt;$extension.webSite]]
         #end
         #if ($extension.features.size() &gt; 0)

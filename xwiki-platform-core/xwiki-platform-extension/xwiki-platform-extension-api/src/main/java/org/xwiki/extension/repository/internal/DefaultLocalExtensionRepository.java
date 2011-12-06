@@ -262,7 +262,16 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
 
         // Clean caches
 
-        removeFromBackwardDependencies(localExtension);
+        if (namespace == null) {
+            this.installedExtensions.remove(localExtension.getId().getId());
+        } else {
+            Map<String, DefaultInstalledExtension> namespaceInstalledExtension =
+                this.installedExtensions.get(localExtension.getId().getId());
+
+            namespaceInstalledExtension.remove(namespace);
+        }
+
+        removeFromBackwardDependencies(localExtension, namespace);
     }
 
     /**
@@ -286,27 +295,6 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
         // Update caches
 
         addInstalledExtension(localExtension, namespace);
-    }
-
-    /**
-     * @param localExtension the extension to remove from backward dependencies map
-     */
-    private void removeFromBackwardDependencies(DefaultLocalExtension localExtension)
-    {
-        Collection<String> namespaces = localExtension.getNamespaces();
-
-        if (namespaces == null) {
-            this.installedExtensions.remove(localExtension.getId().getId());
-            removeFromBackwardDependencies(localExtension, null);
-        } else {
-            Map<String, DefaultInstalledExtension> namespaceBackwardDependencies =
-                this.installedExtensions.get(localExtension.getId().getId());
-
-            for (String namespace : namespaces) {
-                namespaceBackwardDependencies.remove(namespace);
-                removeFromBackwardDependencies(localExtension, namespace);
-            }
-        }
     }
 
     private void removeFromBackwardDependencies(DefaultLocalExtension localExtension, String namespace)

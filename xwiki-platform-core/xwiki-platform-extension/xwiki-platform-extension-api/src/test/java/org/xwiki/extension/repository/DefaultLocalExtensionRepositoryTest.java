@@ -169,6 +169,23 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     }
 
     @Test
+    public void testUninsatllExtension() throws ResolveException, LocalExtensionRepositoryException,
+        UninstallException, InstallException
+    {
+        // uninstall from root
+
+        this.localExtensionRepository.uninstallExtension(this.existingExtension, null);
+        this.localExtensionRepository.uninstallExtension(this.existingExtensionDependency, null);
+
+        // uninstall from namespace
+
+        this.localExtensionRepository.installExtension(this.existingExtensionDependency, "namespace", false);
+        this.localExtensionRepository.installExtension(this.existingExtension, "namespace", false);
+        this.localExtensionRepository.uninstallExtension(this.existingExtension, "namespace");
+        this.localExtensionRepository.uninstallExtension(this.existingExtensionDependency, "namespace");
+    }
+
+    @Test
     public void testBackwardDependencies() throws ResolveException
     {
         Assert.assertEquals(
@@ -212,7 +229,6 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     {
         this.localExtensionRepository.uninstallExtension(this.existingExtension, null);
 
-        this.localExtensionRepository.installExtension(this.existingExtensionDependency, null, true);
         this.localExtensionRepository.installExtension(this.existingExtension, "namespace", true);
 
         Assert.assertEquals(Collections.EMPTY_LIST,

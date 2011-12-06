@@ -477,6 +477,11 @@ return XWiki;
 
 .wizard-help dt, .wizard-help strong {
   color: $theme.textColor;
+}
+
+/* Fix WYSIWYG Editor display. */
+#inline .xToolbar div.clearfloats {
+  clear: left;
 }</code>
 </property>
 <property>

@@ -153,6 +153,17 @@ public class Attachment extends Api
         }
     }
 
+    /**
+     * Get an array containing the versions of the attachment.
+     * Versions are represented as a JRCS Version object.
+     * This gets versions directly from the database which is slower than {@link #getVersionList()}.
+     * WARNING: If there is an error loading content from the database, a single element array will
+     *          be returned containing only the current version of the attachment.
+     *          Consider using {@link #getVersionList()} instead.
+     *
+     * @return an array of Versions.
+     * @throws XWikiException this will never happen.
+     */
     public Version[] getVersions() throws XWikiException
     {
         this.attachment.loadArchive(getXWikiContext());
@@ -160,12 +171,16 @@ public class Attachment extends Api
     }
 
     /**
-     * @return a list of string with all the versions number in String
-     * @throws XWikiException
+     * Get a list of attachment versions from 1.1 to the current.
+     * Versions are represented as a JRCS Version object.
+     * This gets versions by counting backward from the current version to 1.1
+     * which will be correct as long as the database is in a consistant state.
+     *
+     * @return a list of Versions.
+     * @throws XWikiException this will never happen.
      */
     public List<Version> getVersionList() throws XWikiException
     {
-        this.attachment.loadArchive(getXWikiContext());
         return this.attachment.getVersionList();
     }
 

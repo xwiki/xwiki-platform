@@ -90,7 +90,12 @@ public class DefaultExtensionInitializer implements ExtensionInitializer
         Map<String, Set<LocalExtension>> loadedExtensions = new HashMap<String, Set<LocalExtension>>();
 
         // Load extensions from local repository
-        Collection<LocalExtension> localExtensions = this.localExtensionRepository.getInstalledExtensions();
+        Collection<LocalExtension> localExtensions;
+        if (namespaceToLoad != null) {
+            localExtensions = this.localExtensionRepository.getInstalledExtensions(namespaceToLoad);
+        } else {
+            localExtensions = this.localExtensionRepository.getInstalledExtensions();
+        }
         for (LocalExtension localExtension : localExtensions) {
             if (type == null || type.equals(localExtension.getType())) {
                 try {
@@ -113,15 +118,15 @@ public class DefaultExtensionInitializer implements ExtensionInitializer
         Map<String, Set<LocalExtension>> loadedExtensions) throws ExtensionException
     {
         if (localExtension.getNamespaces() != null) {
-            for (String namespace : localExtension.getNamespaces()) {
-                if (namespaceToLoad == null || namespaceToLoad.equals(namespace)) {
+            if (namespaceToLoad == null) {
+                for (String namespace : localExtension.getNamespaces()) {
                     loadExtensionInNamespace(localExtension, namespace, loadedExtensions);
                 }
+            } else if (localExtension.getNamespaces().contains(namespaceToLoad)) {
+                loadExtensionInNamespace(localExtension, namespaceToLoad, loadedExtensions);
             }
-        } else {
-            if (namespaceToLoad == null) {
-                loadExtensionInNamespace(localExtension, null, loadedExtensions);
-            }
+        } else if (namespaceToLoad == null) {
+            loadExtensionInNamespace(localExtension, null, loadedExtensions);
         }
     }
 
@@ -129,7 +134,7 @@ public class DefaultExtensionInitializer implements ExtensionInitializer
      * Initialize an extension in the given namespace.
      * @param localExtension the extension to initialize
      * @param namespace the namespace in which the extention is initialized, null for global
-     * @param loadedExtensions the currently initialized extensions set
+     * @param loadedExtensions the currently initialized extensions set (to avoid initializing twice a dependency)
      * @throws ExtensionException when an initialization error occurs
      */
     private void loadExtensionInNamespace(LocalExtension localExtension, String namespace,

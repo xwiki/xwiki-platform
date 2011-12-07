@@ -24,7 +24,7 @@ import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * Handle installed extensions initialization (during application startup, reinitialization...).
- *
+ * 
  * @version $Id$
  */
 @ComponentRole
@@ -37,14 +37,16 @@ public interface ExtensionInitializer
 
     /**
      * Initialize installed extensions of the provided namespace.
-     * @param namespace namespace to initialize
+     * 
+     * @param namespace namespace to initialize, <code>null</code> means all namespaces
      */
     void initialize(String namespace);
 
     /**
      * Initialize installed extensions of the provided type.
-     * @param namespace namespace to initialize
-     * @param type type of extension to initialize
+     * 
+     * @param namespace namespace to initialize, <code>null</code> means all namespaces
+     * @param type type of extension to initialize, <code>null</code> means all types
      */
     void initialize(String namespace, String type);
 }

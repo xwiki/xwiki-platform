@@ -67,10 +67,6 @@ public class EmailAddressLinkWizardStep extends AbstractExternalLinkWizardStep
     @Override
     protected void setURL(String url)
     {
-        String emailAddress = url;
-        if (emailAddress.startsWith("mailto:")) {
-            emailAddress = emailAddress.substring(7);
-        }
-        super.setURL(emailAddress);
+        super.setURL(url != null && url.startsWith("mailto:") ? url.substring(7) : url);
     }
 }

@@ -15,7 +15,7 @@
 <date>1319488378000</date>
 <contentUpdateDate>1319488378000</contentUpdateDate>
 <version>1.1</version>
-<title>Date</title>
+<title>$msg.get('platform.appwithinminutes.classEditorDateFieldName')</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -248,9 +248,12 @@ Element.buildAndAppend = function(type, options, style) {
 var nil = null;
 
 Date.one_day = 24*60*60*1000;
-Date.weekdays = $w("Sun Mon Tue Wed Thu Fri Sat");
-Date.first_day_of_week = 0;
-Date.months = $w("January February March April May June July August September October November December" );
+Date.weekdays = '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerWeekDayNames'))'.split(/\s*,\s*/);
+for(var i = 0; i &lt; Date.weekdays.length; i++) {
+  Date.weekdays[i] = Date.weekdays[i].substring(0, 3);
+}
+Date.first_day_of_week = $msg.get('platform.appwithinminutes.classEditorDatePickerFirstWeekDay');
+Date.months = '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerMonthNames'))'.split(/\s*,\s*/);
 Date.padded2 = function(hour) {
   var padded2 = parseInt(hour, 10);
   if (hour &lt; 10) {
@@ -296,10 +299,10 @@ window.f_scrollTop = function() {
 }
 
 _translations = {
-  "OK": "OK",
-  "Now": "Now",
-  "Today": "Today",
-  "Clear": "Clear"
+  "OK": '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate'))',
+  "Now": '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerSelectCurrentTime'))',
+  "Today": '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerSelectCurrentDate'))',
+  "Clear": '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerClearSelectedDate'))'
 }
 
 SelectBox = Class.create();
@@ -798,7 +801,7 @@ return Externals;
 <name>CalendarDateSelect Widget</name>
 </property>
 <property>
-<parse>0</parse>
+<parse>1</parse>
 </property>
 <property>
 <use>onDemand</use>
@@ -927,9 +930,8 @@ var Externals = (function (Externals) {
   }
 
   var regex = /('[^']*')|(G+|y+|M+|w+|W+|D+|d+|F+|E+|a+|H+|k+|K+|h+|m+|s+|S+|Z+)|([a-zA-Z]+)|([^a-zA-Z']+)/;
-  var monthNames = ["January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"];
-  var dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  var monthNames = '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerMonthNames'))'.split(/\s*,\s*/);
+  var dayNames = '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerWeekDayNames'))'.split(/\s*,\s*/);
   var TEXT2 = 0, TEXT3 = 1, NUMBER = 2, YEAR = 3, MONTH = 4, TIMEZONE = 5;
   var types = {
     G : TEXT2,
@@ -1202,7 +1204,7 @@ return Externals;
 <name>SimpleDateFormat</name>
 </property>
 <property>
-<parse>0</parse>
+<parse>1</parse>
 </property>
 <property>
 <use>onDemand</use>

@@ -15,7 +15,7 @@
 <date>1321383708000</date>
 <contentUpdateDate>1321383708000</contentUpdateDate>
 <version>1.1</version>
-<title>#if($doc.fullName=='AppWithinMinutes.LiveTableEditSheet')LiveTable Edit Sheet#{else}$doc.title#end</title>
+<title>#if($doc.fullName=='AppWithinMinutes.LiveTableEditSheet')LiveTable Edit Sheet#{else}#evaluate($doc.title)#end</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -131,7 +131,7 @@ XWiki.LiveTableEditor = Class.create({
     }
     var deprecated = !prettyName;
     prettyName = prettyName || name;
-    var item = new Element('li').update('&lt;span title="Drag and drop to change the order"&gt;' + prettyName.escapeHTML() + '&lt;/span&gt;&lt;span title="Delete" class="delete"&gt;X&lt;/span&gt;');
+    var item = new Element('li').update('&lt;span title="$escapetool.xml($msg.get('platform.appwithinminutes.liveTableEditorMoveColumnHint'))"&gt;' + prettyName.escapeHTML() + '&lt;/span&gt;&lt;span title="$escapetool.xml($msg.get('platform.appwithinminutes.liveTableEditorDeleteColumnHint'))" class="delete"&gt;X&lt;/span&gt;');
     if (deprecated) {
       item.addClassName('deprecated');
       this.deprecationMessage.show();
@@ -166,7 +166,7 @@ XWiki.LiveTableEditor = Class.create({
     this.columnsSelect = $('availableColumns');
     this.columnsSelect.selectedIndex = -1;
 
-    var addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.gif')', alt: 'Add'});
+    var addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.gif')', alt: '$escapetool.javascript($msg.get('platform.appwithinminutes.liveTableEditorAddColumnHint'))'});
     addButton.observe('click', this._onAddColumn.bindAsEventListener(this));
 
     var picker = new Element('div', {'class': 'columnPicker'}).insert(this.columnsSelect).insert(addButton);
@@ -199,7 +199,7 @@ XWiki.LiveTableEditor = Class.create({
     }.bind(this));
   },
   _createDeprecationMessage : function() {
-    this.deprecationMessage = new Element('div', {'class': 'warningmessage'}).update('Some columns are deprecated, probably because the corresponding class fields have been deleted. Do you wish to remove them? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;');
+    this.deprecationMessage = new Element('div', {'class': 'warningmessage'}).update('$escapetool.javascript($msg.get('platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning'))');
     this.columnsInput.up().insert(this.deprecationMessage);
     this.deprecationMessage.hide();
     var yes = this.deprecationMessage.down('a');
@@ -501,13 +501,13 @@ return XWiki;
     #set($className = "$!liveTableObj.getProperty('class').value")
     #set($classFields = $xwiki.getDocument($className).getxWikiClass().properties)
     #if($classFields.size() &gt; 0)
-      &lt;optgroup label="Class fields" id="classFields"&gt;
+      &lt;optgroup label="$escapetool.xml($msg.get('platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel'))" id="classFields"&gt;
         #foreach($field in $classFields)
           &lt;option value="$field.name"&gt;$escapetool.xml($field.prettyName)&lt;/option&gt;
         #end
       &lt;/optgroup&gt;
     #end
-    &lt;optgroup label="Generic columns"&gt;
+    &lt;optgroup label="$escapetool.xml($msg.get('platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel'))"&gt;
       #foreach($entry in $genericColumns.entrySet())
         &lt;option value="$entry.key" title="$escapetool.xml($entry.value.get(1))"&gt;$escapetool.xml($entry.value.get(0))&lt;/option&gt;
       #end
@@ -518,19 +518,19 @@ return XWiki;
 
 #macro(displayHelpPanel)
   #set($genericColumns = {
-    'doc.title': ['Page title', 'The title of the page that contains the application entry'],
-    'doc.name': ['Page name', 'The name of the page that contains the application entry'],
-    'doc.author': ['Last Author', 'The user who last edited the application entry'],
-    'doc.creator': ['Creator', 'The user who created the application entry'],
-    'doc.date': ['Update date', 'The date when the application entry was last edited'],
-    'doc.creationDate': ['Creation date', 'The date when the application entry was created'],
-    '_actions': ['Actions', 'A list of actions that can be performed on the application entry, such as edit and delete'],
-    '_attachments': ['Attachments', 'A special column to display links to the attachments of the entry page'],
-    '_images': ['Images', 'A special column to display the images attached to the entry page']
+    'doc.title': [$msg.get('platform.appwithinminutes.liveTableEditorDocTitleColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocTitleColumnDescription')],
+    'doc.name': [$msg.get('platform.appwithinminutes.liveTableEditorDocNameColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocNameColumnDescription')],
+    'doc.author': [$msg.get('platform.appwithinminutes.liveTableEditorDocAuthorColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription')],
+    'doc.creator': [$msg.get('platform.appwithinminutes.liveTableEditorDocCreatorColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription')],
+    'doc.date': [$msg.get('platform.appwithinminutes.liveTableEditorDocDateColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocDateColumnDescription')],
+    'doc.creationDate': [$msg.get('platform.appwithinminutes.liveTableEditorDocCreationDateColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription')],
+    '_actions': [$msg.get('platform.appwithinminutes.liveTableEditorActionsColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorActionsColumnDescription')],
+    '_attachments': [$msg.get('platform.appwithinminutes.liveTableEditorAttachmentsColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription')],
+    '_images': [$msg.get('platform.appwithinminutes.liveTableEditorImagesColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorImagesColumnDescription')]
   })
   (% class="wizard-help" %)
   (((
-    **Tip** Generic live table columns are independent of your application structure. They provide information about the pages that hold your application entries.
+    **$msg.get('platform.appwithinminutes.liveTableEditorHelpTitle')** $msg.get('platform.appwithinminutes.liveTableEditorHelpDescription')
 
     #foreach($columnId in ['doc.name', 'doc.date', 'doc.author', '_actions'])
       ; {{{$genericColumns.get($columnId).get(0)}}}
@@ -551,10 +551,10 @@ return XWiki;
     #listAvailableColumns()
   )))
   ; &lt;label for="AppWithinMinutes.LiveTableClass_0_description"&gt;$doc.displayPrettyName('description', false, false)&lt;/label&gt;##
-    (% class="xHint" %)The description contains a short resume of what the application does and what kind of data it will handle.
+    (% class="xHint" %)$msg.get('platform.appwithinminutes.liveTableEditorDescriptionHint')
   : $doc.display('description')
   ; &lt;label for="AppWithinMinutes.LiveTableClass_0_columns"&gt;$doc.displayPrettyName('columns', false, false)&lt;/label&gt;##
-    (% class="xHint" %)Select the columns you would like to include in the live table displayed on the application home page.
+    (% class="xHint" %)$msg.get('platform.appwithinminutes.liveTableEditorColumnsHint')
   : $doc.display('columns')
   {{/html}}
 #end
@@ -588,17 +588,13 @@ return XWiki;
   #set($minorEdit = "$!request.minorEdit" != '')
   #set($comment = $request.comment)
   #if("$!comment" == '')
-    #set($comment = 'Update LiveTable')
+    #set($comment = $msg.get('platform.appwithinminutes.liveTableEditorSaveComment'))
   #end
   #set($discard = $doc.save($comment, $minorEdit))
 #end
 
 #macro(doSave)
-  #if($services.csrf.isTokenValid($request.form_token))
-    #updateAndSaveLiveTable()
-  #else
-    #set($errorMessage = 'Invalid CSRF token!')
-  #end
+  #updateAndSaveLiveTable()
   #if($action == 'save')
     #if($errorMessage)
       {{error}}{{html}}$errorMessage{{/html}}{{/error}}
@@ -634,8 +630,10 @@ return XWiki;
 #if($action == 'edit')
   #doEdit()
 #elseif($action == 'save' || $action == 'saveandcontinue')
-  #doSave()
-#else
-  Unknown action!
+  #if($services.csrf.isTokenValid($request.form_token))
+    #doSave()
+  #else
+    $response.sendRedirect($services.csrf.getResubmissionURL());
+  #end
 #end
 {{/velocity}}</content></xwikidoc>

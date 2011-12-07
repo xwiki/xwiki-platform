@@ -15,7 +15,7 @@
 <date>1319487958000</date>
 <contentUpdateDate>1319487958000</contentUpdateDate>
 <version>1.1</version>
-<title>Boolean</title>
+<title>$msg.get('platform.appwithinminutes.classEditorBooleanFieldName')</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>

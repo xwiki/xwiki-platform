@@ -15,7 +15,7 @@
 <date>1320656877000</date>
 <contentUpdateDate>1320656877000</contentUpdateDate>
 <version>1.1</version>
-<title>AppWithinMinutes Home</title>
+<title>$msg.get('platform.appwithinminutes.homePageTitle')</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -23,38 +23,12 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>(% class="buttonwrapper" %)[[Create Application&gt;&gt;CreateApplication||class="button"]]
+<content>{{velocity}}
+$msg.get('platform.appwithinminutes.description')
 
-= Applications =
+(% class="buttonwrapper" %)[[$msg.get('platform.appwithinminutes.createAppButtonLabel')&gt;&gt;CreateApplication||class="button"]]
 
-{{velocity}}
-#set($originalMsg = $msg)
-#set($msg = {
-  'apps.livetable.doc.space': 'Application name',
-  'apps.livetable.doc.author': 'Last author',
-  'apps.livetable.doc.date': 'Update date',
-  'xe.livetable.results': $originalMsg.get('xe.livetable.results'),
-  'xe.livetable.resultsmacros': $originalMsg.get('xe.livetable.resultsmacros'),
-  'xe.livetable.filters.title': $originalMsg.get('xe.livetable.filters.title'),
-  'xe.livetable.loading': $originalMsg.get('xe.livetable.loading'),
-  'xe.livetable.tags.help': $originalMsg.get('xe.livetable.tags.help'),
-  'xe.livetable.tags.help.cancel': $originalMsg.get('xe.livetable.tags.help.cancel'),
-  'xe.livetable.environmentCannotLoadTableMessage': $originalMsg.get('xe.livetable.environmentCannotLoadTableMessage'),
-  'xe.livetable.pagesize.label': $originalMsg.get('xe.livetable.pagesize.label'),
-  'xe.livetable.tools': $originalMsg.get('xe.livetable.tools'),
-  'xe.livetable.tools.excel': $originalMsg.get('xe.livetable.tools.excel'),
-  'xe.livetable.select.all': $originalMsg.get('xe.livetable.select.all'),
-  'xe.pagination.page': $originalMsg.get('xe.pagination.page'),
-  'xe.pagination.page.title': $originalMsg.get('xe.pagination.page.title'),
-  'xe.pagination.page.previous': $originalMsg.get('xe.pagination.page.previous'),
-  'xe.pagination.page.prev.title': $originalMsg.get('xe.pagination.page.prev.title'),
-  'xe.pagination.page.next': $originalMsg.get('xe.pagination.page.next'),
-  'xe.pagination.page.next.title': $originalMsg.get('xe.pagination.page.next.title'),
-  'xe.pagination.results.none': $originalMsg.get('xe.pagination.results.none'),
-  'xe.pagination.results.one': $originalMsg.get('xe.pagination.results.one'),
-  'xe.pagination.results.single': $originalMsg.get('xe.pagination.results.single'),
-  'xe.pagination.results.many': $originalMsg.get('xe.pagination.results.many')
-})
+= $msg.get('platform.appwithinminutes.appsLiveTableHeading') =##
 #set($columnsProperties = {
   'doc.space': {'type': 'text', 'link': 'view', 'size': 10, 'filterable': true, 'sortable': true},
   'doc.author': {'type': 'text', 'link': 'author', 'size': 10, 'filterable': true, 'sortable': true},
@@ -62,8 +36,7 @@
 })
 #set($options = {
   'className': 'AppWithinMinutes.LiveTableClass',
-  'resultPage' : 'AppWithinMinutes.LiveTableGenerator',
-  'translationPrefix': 'apps.livetable.',
+  'translationPrefix': 'platform.appwithinminutes.appsLiveTable.',
   'tagCloud': true,
   'rowCount': 15,
   'maxPages': 10,
@@ -72,5 +45,4 @@
 })
 #set($columns = ['doc.space', 'doc.author', 'doc.date'])
 #livetable('livetable' $columns $columnsProperties $options)
-#set($msg = $originalMsg)
 {{/velocity}}</content></xwikidoc>

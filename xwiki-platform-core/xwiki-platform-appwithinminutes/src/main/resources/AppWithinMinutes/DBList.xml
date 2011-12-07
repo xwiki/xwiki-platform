@@ -15,7 +15,7 @@
 <date>1319488700000</date>
 <contentUpdateDate>1319488700000</contentUpdateDate>
 <version>1.1</version>
-<title>Database List</title>
+<title>$msg.get('platform.appwithinminutes.classEditorDBListFieldName')</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>

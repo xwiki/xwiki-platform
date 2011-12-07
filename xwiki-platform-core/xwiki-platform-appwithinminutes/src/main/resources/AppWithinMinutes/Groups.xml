@@ -15,7 +15,7 @@
 <date>1319488509000</date>
 <contentUpdateDate>1319488509000</contentUpdateDate>
 <version>1.1</version>
-<title>Group</title>
+<title>$msg.get('platform.appwithinminutes.classEditorGroupsFieldName')</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>

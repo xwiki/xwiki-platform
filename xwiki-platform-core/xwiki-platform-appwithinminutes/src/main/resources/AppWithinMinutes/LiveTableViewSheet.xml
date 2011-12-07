@@ -15,7 +15,7 @@
 <date>1321380065000</date>
 <contentUpdateDate>1321380065000</contentUpdateDate>
 <version>1.1</version>
-<title>#if($doc.fullName=='AppWithinMinutes.LiveTableViewSheet')LiveTable View Sheet#{else}$doc.title#end</title>
+<title>#if($doc.fullName=='AppWithinMinutes.LiveTableViewSheet')LiveTable View Sheet#{else}#evaluate($doc.title)#end</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -111,7 +111,7 @@ XWiki.EntryNamePopup = Class.create(XWiki.widgets.ModalPopup, {
     this.urlTemplate = trigger.up().next('input[type=hidden]').value;
 
     this.input = new Element('input', {type: 'text'});
-    this.addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.gif')', alt: 'Add'});
+    this.addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.gif')', alt: '$escapetool.javascript($msg.get('platform.appwithinminutes.appHomePageAddEntryLabel'))'});
 
     var container = new Element('div', {id: 'entryNamePopup'});
     container.insert(this.input);
@@ -121,7 +121,7 @@ XWiki.EntryNamePopup = Class.create(XWiki.widgets.ModalPopup, {
       show: {method: this.showDialog, keys: []},
       add: {method: this._onAdd, keys: ['Enter']}
     }, {
-      title: 'Entry name:',
+      title: '$escapetool.javascript($msg.get('platform.appwithinminutes.appHomePageEntryNameLabel'))',
       verticalPosition: 'top'
     });
   },
@@ -307,9 +307,9 @@ return XWiki;
   #set($className = $liveTableObj.getProperty('class').value)
   (% id="actionBox" class="floatinginfobox" %)
   (((
-    = Actions =
+    = $msg.get('platform.appwithinminutes.appHomePageActionsHeading') =
     {{html wiki="true"}}
-    * [[Add new entry&gt;&gt;#AddNewEntry||class="action add"]]##
+    * [[$msg.get('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;#AddNewEntry||class="action add"]]##
       #set($templateName = $className)
       #if($templateName.endsWith('Class'))
         #set($templateName = $templateName.substring(0, $mathtool.sub($templateName.length(), 5)))
@@ -317,14 +317,14 @@ return XWiki;
       #set($templateName = $escapetool.url("${templateName}Template"))
       #set($entryDoc = $services.model.createDocumentReference($doc.wiki, $doc.space, '__entryName__'))
       {{html clean="false"}}&lt;input type="hidden" value="$xwiki.getURL($entryDoc, 'edit', "editor=inline&amp;template=$!templateName&amp;parent=WebHome")" /&gt;{{/html}}
-    * &lt;a class="action edit" href="$xwiki.getURL($className, 'edit')"&gt;Edit class&lt;/a&gt;
+    * &lt;a class="action edit" href="$xwiki.getURL($className, 'edit')"&gt;$msg.get('platform.appwithinminutes.appHomePageEditClassLabel')&lt;/a&gt;
     {{/html}}
   )))
-  = Description =
+  = $msg.get('platform.appwithinminutes.appHomePageDescriptionHeading') =
   $doc.display('description')
   ## Display the live table only if it was generated.
   #if($doc.content.length() &gt; 0)
-    = Entries =
+    = $msg.get('platform.appwithinminutes.appLiveTableHeading') =
     {{include document="$doc.fullName.replaceAll('~', '~~').replaceAll('"', '~"')"/}}
   #end
 #end

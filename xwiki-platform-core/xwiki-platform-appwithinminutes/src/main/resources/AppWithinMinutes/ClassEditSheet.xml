@@ -443,8 +443,8 @@ XWiki.FormField = Class.create({
   _createToolBox : function() {
     var deleteIcon = new Element('img', {
       src: '$xwiki.getAttachmentURL('AppWithinMinutes.ClassEditSheet', 'bulletcross.png')',
-      alt: 'Delete',
-      title: 'Delete'
+      alt: '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDeleteFieldLabel'))',
+      title: '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDeleteFieldLabel'))'
     });
     deleteIcon.observe('click', this._onDelete.bindAsEventListener(this));
 
@@ -460,12 +460,13 @@ XWiki.FormField = Class.create({
     var fieldConfig = this.getConfig();
     if (fieldConfig.visible()) {
       fieldConfig.hide();
-      icon.alt = icon.title = 'Configure';
+      icon.alt = icon.title = '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorConfigureFieldLabel'))';
       icon.src = '$xwiki.getSkinFile('icons/silk/bullet_wrench.gif')';
       this._maybePreview();
     } else {
       fieldConfig.show();
-      icon.alt = icon.title = 'Hide configuration panel';
+      icon.alt = '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorPreviewFieldLabel'))';
+      icon.title = '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorPreviewFieldHint'))';
       icon.src = '$xwiki.getAttachmentURL('AppWithinMinutes.ClassEditSheet', 'bullettick.png')';
       this._maybeSavePreviewData();
     }
@@ -692,7 +693,7 @@ XWiki.FormFieldDefaultValueManager = Class.create({
     var fieldName = field.getName();
     field.getViewer().select('input[type=text]', 'textarea').each(function(input) {
       if (!input.title &amp;&amp; input.name.endsWith('_0_' + fieldName)) {
-        input.title = 'Default value';
+        input.title = '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorFieldDefaultValueToolTip'))';
       }
     });
   },
@@ -816,8 +817,8 @@ XWiki.FormCanvas = Class.create({
     // Create and insert the move icon.
     var moveIcon = new Element('img', {
       src: '$xwiki.getAttachmentURL('AppWithinMinutes.ClassEditSheet', 'arrow-move.png')',
-      alt: 'Move',
-      title: 'Drag and drop to change the order',
+      alt: '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorMoveFieldLabel'))',
+      title: '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorMoveFieldHint'))',
       'class': 'icon-move'
     });
     field.getToolBox().insert({bottom: moveIcon});
@@ -1368,10 +1369,10 @@ return XWiki;
 #macro(displayFieldPalette)
   (% id="palette" %)
   (((
-    **Field Palette**
+    **$msg.get('platform.appwithinminutes.classEditorPaletteTitle')**
 
     (% class="xHint" %)
-    Drag&amp;Drop fields from the palette to create your form.
+    $msg.get('platform.appwithinminutes.classEditorPaletteHint')
 
     ## List all form field types, grouped by category.
     #set($formFieldDocs = [])
@@ -1379,7 +1380,7 @@ return XWiki;
     #set($categoryListStatement = 'from doc.object(AppWithinMinutes.FormFieldCategoryClass) as category order by category.priority')
     #foreach($category in $services.query.xwql($categoryListStatement).execute())
       #set($categoryDoc = $xwiki.getDocument($category))
-      * (% class="category" %)$categoryDoc.title
+      * (% class="category" %)$categoryDoc.plainTitle
         #set($formFieldsForCategoryStatement = "from doc.object($formFieldClassName) as field where field.category = :category order by field.priority")
         #set($formFieldsForCategoryQuery = $services.query.xwql($formFieldsForCategoryStatement).bindValue('category', $category))
         #foreach($formField in $formFieldsForCategoryQuery.execute())
@@ -1393,7 +1394,7 @@ return XWiki;
           #end
           ** (% class="field" %){{html}}
               &lt;img src="$formFieldIconURL" alt="$escapetool.xml($formFieldDoc.title)" class="icon" /&gt;
-              $escapetool.xml($formFieldDoc.title)
+              $escapetool.xml($formFieldDoc.plainTitle)
               ## FIXME: We should use the 'get' action instead to prevent the stats module from recording this AJAX request.
               ## The 'edit' action is a temporary solution until the sheet module is modified to allow a sheet to be enforced through
               ## the query string even if it doesn't match the action (e.g. the 'get' action).
@@ -1418,7 +1419,7 @@ return XWiki;
   (% id="canvas" %)
   (((
     (% class="hint" %)
-    Drag fields from the palette and drop them in this area.
+    $msg.get('platform.appwithinminutes.classEditorCanvasHint')
 
     #set($unknownFields = [])
     #set($empty = true)
@@ -1464,13 +1465,13 @@ return XWiki;
   {{html wiki="true"}}
   ## Hide the options if neither the sheet nor the template exists. They don't have to be updated, they have to be created.
   (% id="options" #if(!$xwiki.exists($sheetName) &amp;&amp; !$xwiki.exists($templateName))class="hidden" #end%)
-  ; &lt;label for="updateClassTemplate"&gt;&lt;input type="checkbox" id="updateClassTemplate" name="updateClassTemplate" checked="checked" /&gt;Update class template&lt;/label&gt;
-  : (% class="xHint" %)Save the default field values in the class template ([[$templateName]]).
-  ; &lt;label for="updateClassSheet"&gt;&lt;input type="checkbox" id="updateClassSheet" name="updateClassSheet" #if($sheetName)checked="checked" #{else}disabled="disabled" #end/&gt;Update class sheet&lt;/label&gt;
+  ; &lt;label for="updateClassTemplate"&gt;&lt;input type="checkbox" id="updateClassTemplate" name="updateClassTemplate" checked="checked" /&gt;$msg.get('platform.appwithinminutes.classEditorUpdateTemplateLabel')&lt;/label&gt;
+  : (% class="xHint" %)$msg.get('platform.appwithinminutes.classEditorUpdateTemplateHint', "[[$templateName]]")
+  ; &lt;label for="updateClassSheet"&gt;&lt;input type="checkbox" id="updateClassSheet" name="updateClassSheet" #if($sheetName)checked="checked" #{else}disabled="disabled" #end/&gt;$msg.get('platform.appwithinminutes.classEditorUpdateSheetLabel')&lt;/label&gt;
   : #if($sheetName)
-      (% class="xHint" %)Recreate the sheet used to display and edit objects of this class ([[$sheetName]]).
+      (% class="xHint" %)$msg.get('platform.appwithinminutes.classEditorUpdateSheetHint', "[[$sheetName]]")
     #else
-      (% class="warningmessage" %)This class has multiple sheets.
+      (% class="warningmessage" %)$msg.get('platform.appwithinminutes.classEditorMultipleSheetsWarning')
     #end
   {{/html}}
 #end
@@ -1707,7 +1708,7 @@ return XWiki;
         ## The field name has changed.
         #if($xclass.get($field.name))
           ## There is already a field with the same name.
-          #set($errorMessage = "The class has two fields with the same name: $field.name")
+          #set($errorMessage = $msg.get('platform.appwithinminutes.classEditorDuplicateFieldNameError', $field.name))
           #break
         #else
           #set($discard = $xclass.removeField($fieldName))
@@ -1767,7 +1768,7 @@ return XWiki;
     #set($templateRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Template"))
     #set($templateDoc = $xwiki.getDocument($templateRef))
     #set($discard = $templateDoc.updateObjectFromRequest($doc.fullName))
-    #set($discard = $templateDoc.save('Update default values', $minorEdit))
+    #set($discard = $templateDoc.save($msg.get('platform.appwithinminutes.classEditorTemplateSaveComment'), $minorEdit))
   #end
 #end
 
@@ -1784,7 +1785,7 @@ return XWiki;
       #end
       #set($sheetReference = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Sheet"))
       #set($discard = $services.sheet.bindClassSheet($doc, $sheetReference))
-      #set($discard = $doc.save('Bind class sheet', $minorEdit))
+      #set($discard = $doc.save($msg.get('platform.appwithinminutes.classEditorBindSheetSaveComment'), $minorEdit))
     #elseif($classSheets.size() == 1)
       #set($sheetReference = $classSheets.get(0))
     #end
@@ -1792,7 +1793,7 @@ return XWiki;
       #set($sheetDoc = $xwiki.getDocument($sheetReference))
       #set($sheetGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassSheetGenerator'))
       #set($discard = $sheetDoc.setContent($doc.getRenderedContent($sheetGeneratorDoc.content, $sheetGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
-      #set($discard = $sheetDoc.save('Update class sheet', $minorEdit))
+      #set($discard = $sheetDoc.save($msg.get('platform.appwithinminutes.classEditorSheetSaveComment'), $minorEdit))
     #end
   #end
 #end
@@ -1801,14 +1802,10 @@ return XWiki;
  * Updates and saves the class definition, the class sheet and the class template.
  *#
 #macro(doSave)
-  #if($services.csrf.isTokenValid($request.form_token))
-    #set($minorEdit = "$!request.minorEdit" != '')
-    #updateAndSaveClass()
-    #updateAndSaveTemplate()
-    #updateAndSaveSheet()
-  #else
-    #set($errorMessage = 'Invalid CSRF token!')
-  #end
+  #set($minorEdit = "$!request.minorEdit" != '')
+  #updateAndSaveClass()
+  #updateAndSaveTemplate()
+  #updateAndSaveSheet()
   #if($action == 'save')
     #if($errorMessage)
       {{error}}{{html}}$errorMessage{{/html}}{{/error}}
@@ -1817,7 +1814,7 @@ return XWiki;
       #set($homePageRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebHome'))
       #set($queryString = 'wizard=true')
       #if(!$xwiki.exists($homePageRef))
-        #set($homePageTitle = "$doc.space Home")
+        #set($homePageTitle = '$msg.get(''platform.appwithinminutes.appHomePageTitle'', $doc.space)')
         #set($queryString = "$queryString&amp;editor=inline&amp;template=AppWithinMinutes.LiveTableTemplate&amp;AppWithinMinutes.LiveTableClass_0_class=$escapetool.url($doc.fullName)&amp;title=$escapetool.url($homePageTitle)&amp;parent=Main.WebHome")
       #end
       $response.sendRedirect($xwiki.getURL($homePageRef, 'edit', $queryString));
@@ -1853,8 +1850,10 @@ return XWiki;
 #if($action == 'edit')
   #doEdit()
 #elseif($action == 'save' || $action == 'saveandcontinue')
-  #doSave()
-#else
-  Unknown action!
+  #if($services.csrf.isTokenValid($request.form_token))
+    #doSave()
+  #else
+    $response.sendRedirect($services.csrf.getResubmissionURL());
+  #end
 #end
 {{/velocity}}</content></xwikidoc>

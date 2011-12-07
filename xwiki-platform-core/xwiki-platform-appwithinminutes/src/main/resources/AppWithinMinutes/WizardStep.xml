@@ -340,17 +340,16 @@ return XWiki;
 </object>
 <content>{{velocity output="false"}}
 #macro(appWizardHeader $stepNumber)
-  #set($stepNames = ['Name', 'Structure', 'Presentation'])
-  #set($stepTitles = ['Name your application', 'Define the structure of your application', 'Customize the home page of your application'])
   {{html wiki="true"}}
   (% class="wizard-header" %)
   (((
-    = Step $!stepNumber &amp;mdash; $!stepTitles.get($mathtool.sub($stepNumber, 1)) =
+    #set($stepTitle = $msg.get("platform.appwithinminutes.wizardStep${stepNumber}Title"))
+    = $msg.get('platform.appwithinminutes.wizardStepHeading', [$stepNumber, $stepTitle])  =
 
     (% class="steps" %)
-    #foreach($stepName in $stepNames)
-      #set($extraClassName = "#if($stepNumber == $velocityCount) active#elseif($stepNumber &gt; $velocityCount) done#end")
-      * (% class="number$extraClassName" %)#if($stepNumber &gt; $velocityCount)&amp;${escapetool.h}10004;#else$velocityCount#end(%%) (% class="name$extraClassName" %)$stepName
+    #foreach($index in [1,2,3])
+      #set($extraClassName = "#if($stepNumber == $index) active#elseif($stepNumber &gt; $index) done#end")
+      * (% class="number$extraClassName" %)#if($stepNumber &gt; $index)&amp;${escapetool.h}10004;#else$index#end(%%) (% class="name$extraClassName" %)$msg.get("platform.appwithinminutes.wizardStep${index}Name")
     #end
 
     &lt;div class="clearfloats"&gt;&lt;/div&gt;
@@ -362,14 +361,14 @@ return XWiki;
   {{html wiki="true"}}
   (% class="wizard-footer buttons" %)
   (((
-    #set($nextLabel = 'Next Step')
-    #set($nextTip = 'Go to next step')
+    #set($nextLabel = $msg.get('platform.appwithinminutes.wizardStepNextButtonLabel'))
+    #set($nextTip = $msg.get('platform.appwithinminutes.wizardStepNextButtonTip'))
     #if($stepNumber == 3)##
-      #set($nextLabel = 'Finish')
-      #set($nextTip = 'Go to the application home page')
-      &lt;span class="buttonwrapper left"&gt;&lt;a href="$xwiki.getURL($className, 'edit', 'wizard=true')" title="Go to previous step" class="button secondary"&gt;Previous Step&lt;/a&gt;&lt;/span&gt;##
+      #set($nextLabel = $msg.get('platform.appwithinminutes.wizardStepFinishButtonLabel'))
+      #set($nextTip = $msg.get('platform.appwithinminutes.wizardStepFinishButtonTip'))
+      &lt;span class="buttonwrapper left"&gt;&lt;a href="$xwiki.getURL($className, 'edit', 'wizard=true')" title="$escapetool.xml($msg.get('platform.appwithinminutes.wizardStepPreviousButtonTip'))" class="button secondary"&gt;$escapetool.xml($msg.get('platform.appwithinminutes.wizardStepPreviousButtonLabel'))&lt;/a&gt;&lt;/span&gt;##
     #end
-    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" id="wizard-next" name="xaction_save" value="$nextLabel" title="$nextTip" class="button"/&gt;&lt;/span&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" id="wizard-next" name="xaction_save" value="$escapetool.xml($nextLabel)" title="$escapetool.xml($nextTip)" class="button"/&gt;&lt;/span&gt;
   )))
   {{/html}}
 #end

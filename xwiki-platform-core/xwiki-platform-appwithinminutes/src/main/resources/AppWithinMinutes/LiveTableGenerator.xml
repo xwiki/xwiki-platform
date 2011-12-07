@@ -24,50 +24,57 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>{{velocity output="false" filter="none"}}
+#macro(escapeApostrophe $string)
+$string.replace("'", "''")##
+#end
+
 #macro(prepareTranslations)
 ${escapetool.h}set(${escapetool.d}originalMsg = ${escapetool.d}msg)
 ${escapetool.h}set(${escapetool.d}msg = ${escapetool.d}services.dynamicMessageToolFactory.createDynamicMessageTool(${escapetool.d}msg, {
 ##
 ## Inject translations for the selected columns.
 #set($genericColumns = {
-'doc.title': 'Page title',
-'doc.name': 'Page name',
-'doc.space': 'Space',
-'doc.fullname': 'Page full name',
-'doc.author': 'Last author',
-'doc.creator': 'Creator',
-'doc.date': 'Update date',
-'doc.creationDate': 'Creation date',
-'_avatar': 'Avatar',
-'_images': 'Images',
-'_attachments': 'Attachments',
-'_actions': 'Actions'
+'doc.title': '$msg.get(''platform.appwithinminutes.liveTableEditorDocTitleColumnName'')',
+'doc.name': '$msg.get(''platform.appwithinminutes.liveTableEditorDocNameColumnName'')',
+'doc.space': '$msg.get(''platform.appwithinminutes.liveTableEditorDocSpaceColumnName'')',
+'doc.fullname': '$msg.get(''platform.appwithinminutes.liveTableEditorDocFullNameColumnName'')',
+'doc.author': '$msg.get(''platform.appwithinminutes.liveTableEditorDocAuthorColumnName'')',
+'doc.creator': '$msg.get(''platform.appwithinminutes.liveTableEditorDocCreatorColumnName'')',
+'doc.date': '$msg.get(''platform.appwithinminutes.liveTableEditorDocDateColumnName'')',
+'doc.creationDate': '$msg.get(''platform.appwithinminutes.liveTableEditorDocCreationDateColumnName'')',
+'_avatar': '$msg.get(''platform.appwithinminutes.liveTableEditorAvatarColumnName'')',
+'_images': '$msg.get(''platform.appwithinminutes.liveTableEditorImagesColumnName'')',
+'_attachments': '$msg.get(''platform.appwithinminutes.liveTableEditorAttachmentsColumnName'')',
+'_actions': '$msg.get(''platform.appwithinminutes.liveTableEditorActionsColumnName'')'
 })
 #foreach($column in $columns)
 ## Default on the specified column name.
 #set($translatedColumnName = $column)
+#set($wrapper = "'")
 ## Check if the column is based on a class field.
 #set($field = $xclass.get($column))
 #if($field)
-#set($translatedColumnName = $field.prettyName)
+#set($translatedColumnName = "#escapeApostrophe($field.prettyName)")
 #if($field.type.endsWith('ListClass'))
 ## Inject translations for the list values.
 #foreach($entry in $field.mapValues.entrySet())
-  '${className}_${column}_$escapetool.javascript($entry.key)': '$escapetool.javascript($entry.value.value)',
+  '#escapeApostrophe("${className}_${column}_$entry.key")': '#escapeApostrophe($entry.value.value)',
 #end
 #end
 #elseif($genericColumns.containsKey($column))
 ## A generic column.
+## Don't escape the apostrophes because we simply copy the translation.
 #set($translatedColumnName = $genericColumns.get($column))
+#set($wrapper = '')
 ## The Actions column is a bit special.
 #if($column == '_actions')
-#set($actionNames = {'edit': 'Edit', 'delete': 'Delete'})
+#set($actionNames = {'edit': '$msg.get(''platform.appwithinminutes.appLiveTableEditEntryActionName'')', 'delete': '$msg.get(''platform.appwithinminutes.appLiveTableDeleteEntryActionName'')'})
 #foreach($entry in $actionNames.entrySet())
-  '${shortName}.livetable._actions.${entry.key}': '$escapetool.javascript($entry.value)',
+  '${shortName}.livetable._actions.${entry.key}': $entry.value,
 #end
 #end## Actions column
 #end## Generic column
-  '${shortName}.livetable.$column': '$escapetool.javascript($translatedColumnName)'##
+  '${shortName}.livetable.$column': $wrapper$translatedColumnName$wrapper##
 #if($velocityCount &lt; $columns.size())
 ,
 #end
@@ -92,7 +99,7 @@ ${escapetool.h}set(${escapetool.d}columnsProperties = {##
 #set($type = 'list')
 #end
 $separator
-  '$escapetool.javascript($column)': {'type': '$type', 'size': 10, 'filterable': true, 'sortable': true, 'html': $isHTML}##
+  '$column': {'type': '$type', 'size': 10, 'filterable': true, 'sortable': true, 'html': $isHTML}##
 #set($separator = ',')
 #elseif($genericColumns.contains($column))
 #set($link = 'view')

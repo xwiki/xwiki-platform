@@ -15,7 +15,7 @@
 <date>1322394814000</date>
 <contentUpdateDate>1322394814000</contentUpdateDate>
 <version>1.1</version>
-<title>Create Application</title>
+<title>$msg.get('platform.appwithinminutes.appNamePageTitle')</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -170,7 +170,7 @@ XWiki.AppNameValidator = Class.create({
   onUpdate : function() {
     if (this.input.value == '') {
       this._onValidate({
-        responseText: '&lt;span class="xErrorMsg"&gt;Please enter the application name.&lt;/span&gt;'
+        responseText: '&lt;span class="xErrorMsg"&gt;$msg.get('platform.appwithinminutes.appNameEmptyError')&lt;/span&gt;'
       });
     } else {
       this.preview.addClassName('loading');
@@ -356,22 +356,20 @@ return XWiki;
   #appWizardHeader(1)
   (% class="wizard-help" %)
   (((
-    **Steps** This wizard will guide you towards building your application. These steps will configure the way your application will be displayed and what kind of information will contain:
+    **$msg.get('platform.appwithinminutes.wizardStepHelpTitle')** $msg.get('platform.appwithinminutes.wizardStepHelpDescription')
     (% class="steps" %)
-    * (% class="number" %)1(%%) (% class="name" %)Name(%%)
-      (% class="description" %)Provide the application name.
-    * (% class="number" %)2(%%) (% class="name" %)Structure(%%)
-      (% class="description" %)Generate the structure of your application by specifying what types of fields it will contain.
-    * (% class="number" %)3(%%) (% class="name" %)Presentation(%%)
-      (% class="description" %)Personalize the home page of your application.
+    #foreach($index in [1, 2, 3])
+      * (% class="number" %)$index(%%) (% class="name" %)$msg.get("platform.appwithinminutes.wizardStep${index}Name")(%%)
+        (% class="description" %)$msg.get("platform.appwithinminutes.wizardStep${index}Description")
+    #end
   )))
   &lt;form action="" method="post" class="xform wizard-body"&gt;
     (% class="hidden" %)
     (((
       &lt;input type="hidden" name="form_token" value="$services.csrf.getToken()"/&gt;
     )))
-    ; &lt;label for="appName"&gt;Application Name&lt;/label&gt;
-      (% class="xHint" %)The name of the application determines the URL of the application home page, the space where application data will be stored as well as the name of the class that will describe the application structure.
+    ; &lt;label for="appName"&gt;$msg.get('platform.appwithinminutes.appNameLabel')&lt;/label&gt;
+      (% class="xHint" %)$msg.get('platform.appwithinminutes.appNameHint')
     : &lt;input type="text" id="appName" name="appName" /&gt;
     #appWizardFooter(1)
   &lt;/form&gt;
@@ -399,29 +397,33 @@ return XWiki;
 #macro(validateAppName $appName)
   #set($className = "#toXMLName($appName)")
   #if($className == '')
-    (% class="xErrorMsg" %)We can't extract a valid class name from the application name you entered. Make sure you include letters in the application name besides digits and punctuation signs.
+    (% class="xErrorMsg" %)$msg.get('platform.appwithinminutes.appNameInvalidClassNameError')
   #end
   #set($appHomeRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebHome'))
   #set($appHomeURL = $xwiki.getDocument($appHomeRef).getExternalURL())
-  ; Application home page URL
+  ; $msg.get('platform.appwithinminutes.appNamePreviewHomePageUrlLabel')
   : {{{$!appHomeURL.substring(0, $mathtool.sub($appHomeURL.length(), 7))}}}
-  ; Application data space
+  ; $msg.get('platform.appwithinminutes.appNamePreviewDataSpaceLabel')
   : {{{$doc.wiki}}} » {{{$appName}}}
-  ; Application class
+  ; $msg.get('platform.appwithinminutes.appNamePreviewClassReferenceLabel')
   : {{{$doc.wiki}}} » {{{$appName}}} » {{{$!{className}Class}}}
   #set($appClassRef = $services.model.createDocumentReference($doc.wiki, $appName, "$!{className}Class"))
   #if($xwiki.exists($appHomeRef) || $xwiki.exists($appClassRef))
 
-    {{warning}}This application already exists. If you go to the next step you will be editing the existing application.{{/warning}}
+    {{warning}}$msg.get('platform.appwithinminutes.appNameIsUsedWarning'){{/warning}}
   #end
 #end
 {{/velocity}}
 
 {{velocity}}
-#if($context.action == 'get' &amp;&amp; "$!request.appName" != '')
-  #validateAppName($request.appName)
-#elseif("$!request.appName" != '' &amp;&amp; $services.csrf.isTokenValid($request.form_token))
-  #processStep()
+#if("$!request.appName" != '')
+  #if($context.action == 'get')
+    #validateAppName($request.appName)
+  #elseif($services.csrf.isTokenValid($request.form_token))
+    #processStep()
+  #else
+    $response.sendRedirect($services.csrf.getResubmissionURL());
+  #end
 #else
   #showStep()
 #end

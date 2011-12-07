@@ -15,7 +15,7 @@
 <date>1318495355000</date>
 <contentUpdateDate>1318495355000</contentUpdateDate>
 <version>1.1</version>
-<title>Pickers</title>
+<title>$msg.get('platform.appwithinminutes.classEditorPickersCategoryName')</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>

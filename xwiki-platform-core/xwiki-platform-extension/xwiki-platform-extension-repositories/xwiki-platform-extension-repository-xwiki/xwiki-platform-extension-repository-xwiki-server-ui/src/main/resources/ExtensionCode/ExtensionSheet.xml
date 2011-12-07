@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1312816151000</creationDate>
-<date>1323166788000</date>
-<contentUpdateDate>1323166788000</contentUpdateDate>
+<date>1323273836000</date>
+<contentUpdateDate>1323273836000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -218,9 +218,9 @@
     (% class="extensionSummary" %)
     #set($icon = $doc.getValue("icon"))
     #if ("$!{icon.trim()}" != "")
-      |[[image:${doc.getValue('icon')}]]|**$doc.getValue("summary")**
+      |[[image:${doc.getValue('icon')}]]|**{{{$doc.getValue("summary")}}}**
     #else
-      |[[image:icon:cog]]|**$doc.getValue("summary")**
+      |[[image:icon:cog]]|**{{{$doc.getValue("summary")}}}**
     #end
 
     ## Viewing

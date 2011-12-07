@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1251635783000</creationDate>
-<date>1320508549000</date>
-<contentUpdateDate>1320508549000</contentUpdateDate>
+<date>1323119538000</date>
+<contentUpdateDate>1323119538000</contentUpdateDate>
 <version>1.1</version>
 <title>IRC Bot</title>
 <template></template>
@@ -962,7 +962,13 @@ class IRCBot extends PircBot
 }
 
 // Register or unregister the listener depending on the parameter in the request
-if (request.action == "start") {
+if (request.action == "start" || xcontext.get("botAction") == "start") {
+
+    // Verify if the bot isn't already started
+    if (xcontext.getContext().getEngineContext().getAttribute("ircbot") != null) {
+        println "{{error}}IRC Bot is already started{{/error}}"
+        return
+    }
 
     // Register all Botlets
     xwiki.searchDocuments(", BaseObject as obj where obj.name=doc.fullName and obj.className='IRC.IRCBotlet' order by doc.name").each() {
@@ -992,7 +998,13 @@ if (request.action == "start") {
     xcontext.getContext().getEngineContext().setAttribute("ircbot", bot)
 
     println "{{info}}IRC Bot is now active{{/info}}"
-} else if (request.action == "stop") {
+} else if (request.action == "stop" || xcontext.get("botAction") == "stop") {
+
+    // Verify if the bot isn't already stopped
+    if (xcontext.getContext().getEngineContext().getAttribute("ircbot") == null) {
+        println "{{error}}IRC Bot is already stopped{{/error}}"
+        return
+    }
 
     // Stop all Botlets
     Utils.getComponentManager().getComponentDescriptorList(IRCBotlet.class).each() {

@@ -33,8 +33,6 @@ import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
 
 /**
  * Basic handler used for tests.
- * 
- * @version $Id$
  */
 @Component("type")
 public class TestExtensionHandler extends AbstractExtensionHandler

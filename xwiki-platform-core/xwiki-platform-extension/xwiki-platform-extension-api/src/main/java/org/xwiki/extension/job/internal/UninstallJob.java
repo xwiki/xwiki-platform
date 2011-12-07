@@ -20,6 +20,7 @@
 package org.xwiki.extension.job.internal;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +86,8 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
                     if (getRequest().hasNamespaces()) {
                         uninstallExtension(localExtension, getRequest().getNamespaces());
                     } else if (localExtension.getNamespaces() != null) {
-                        uninstallExtension(localExtension, localExtension.getNamespaces());
+                        // Duplicate the namespace list to avoid ConcurrentModificationException
+                        uninstallExtension(localExtension, new ArrayList<String>(localExtension.getNamespaces()));
                     } else {
                         uninstallExtension(localExtension, (String) null);
                     }
@@ -179,7 +181,7 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
         if (!localExtension.isInstalled()) {
             throw new UninstallException(MessageFormat.format(ERROR_NOTINSTALLED, localExtension, namespace));
         } else if (namespace != null
-            && (localExtension.getNamespaces() == null || localExtension.getNamespaces().contains(namespace))) {
+            && (localExtension.getNamespaces() == null || !localExtension.getNamespaces().contains(namespace))) {
             throw new UninstallException(MessageFormat.format(ERROR_NOTINSTALLEDNAMESPACE, localExtension, namespace));
         }
 

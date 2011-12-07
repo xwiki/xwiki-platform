@@ -12,5 +12,9 @@
       <id>coreextension</id>
       <version>version</version>
     </dependency>
+    <dependency>
+      <id>remoteextensiondependency</id>
+      <version>version</version>
+    </dependency>
   </dependencies>
 </extension>

@@ -34,6 +34,7 @@ import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.extension.handler.ExtensionInitializer;
 import org.xwiki.extension.repository.ExtensionRepositoryException;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
@@ -151,6 +152,10 @@ public class RepositoryUtil
         // generated extensions
 
         this.extensionPackager.generateExtensions();
+        
+        // init
+
+        this.componentManager.lookup(ExtensionInitializer.class).initialize();
     }
 
     public int copyResourceFolder(File targetFolder, String resourcePackage) throws IOException

@@ -133,7 +133,7 @@ public class InstallJob extends AbstractJob<InstallRequest>
      * @return the newly installed local extension
      * @throws InstallException error when trying to install provided extension
      */
-    public LocalExtension installExtension(ExtensionId extensionId, String namespace) throws InstallException
+    private LocalExtension installExtension(ExtensionId extensionId, String namespace) throws InstallException
     {
         return installExtension(extensionId, false, namespace);
     }

@@ -35,11 +35,11 @@ import org.xwiki.test.AbstractComponentTestCase;
 
 public abstract class AbstractExtensionHandlerTest extends AbstractComponentTestCase
 {
-    private LocalExtensionRepository localExtensionRepository;
+    protected LocalExtensionRepository localExtensionRepository;
 
-    private RepositoryUtil repositoryUtil;
+    protected RepositoryUtil repositoryUtil;
 
-    private JobManager jobManager;
+    protected JobManager jobManager;
 
     @Before
     @Override

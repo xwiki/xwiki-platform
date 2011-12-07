@@ -351,6 +351,8 @@
                 <exclude>com/xpn/xwiki/plugin/applicationmanager/ApplicationManagerPlugin$1</exclude>
                 <exclude>org/xwiki/annotation/event/AbstractAnnotationEvent</exclude>
                 <exclude>org/xwiki/gwt/wysiwyg/client/plugin/line/MozillaLinePlugin</exclude>
+                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/link/ui/AbstractExternalLinkWizardStep</exclude>
+                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/link/ui/WebPageLinkWizardStep</exclude>
                 <exclude>org/xwiki/query/QueryExecutorProvider</exclude> <!-- Use new Provider injection -->
                 <!-- Moved to Legacy -->
                 <exclude>com/xpn/xwiki/api/XWiki</exclude>

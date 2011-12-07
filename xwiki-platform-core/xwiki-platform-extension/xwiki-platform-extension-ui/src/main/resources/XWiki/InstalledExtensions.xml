@@ -213,6 +213,9 @@ xHK69dZf45Of/OTPybOUL8vlF1eXoSul+MXQZf0/5jXQOJ2yhBwAAAAASUVORK5CYII=
           &lt;input name="actionuninstall" type="hidden" /&gt;
           &lt;p&gt;
             &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
+            #if ("$!{request.xback}" != '')
+              &lt;span class="buttonwrapper"&gt;&lt;a href="${request.xback}" class="secondary button"&gt;Cancel&lt;/a&gt;&lt;/span&gt;
+            #end
           &lt;/p&gt;
         &lt;/div&gt;
       &lt;/form&gt;
@@ -239,10 +242,11 @@ xHK69dZf45Of/OTPybOUL8vlF1eXoSul+MXQZf0/5jXQOJ2yhBwAAAAASUVORK5CYII=
     #set ($extensions = $extensions.subList($paginationParams.firstItem, $mathtool.min($extensions.size(), $mathtool.add($paginationParams.firstItem, $paginationParams.itemsPerPage))))
   #end
   #set ($actions = [])
+  #computeXBack()
   #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1').replaceAll('(^|&amp;)(extension(id|version)=[^&amp;]++&amp;?+)+', '$1'))"" class=""button""&gt;Back to list&lt;/a&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;Back to list&lt;/a&gt;&lt;/span&gt;"))
   #else
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""Show details"" class=""button""/&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""Show details"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
   #end
   #if ($hasProgramming)
     #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionuninstall"" value=""Uninstall"" class=""button""/&gt;&lt;/span&gt;"))

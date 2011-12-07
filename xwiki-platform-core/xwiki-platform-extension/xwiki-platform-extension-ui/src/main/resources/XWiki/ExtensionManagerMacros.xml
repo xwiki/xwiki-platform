@@ -480,6 +480,22 @@
 .dependency-type-unknown {
   background-image: url("$xwiki.getSkinFile('icons/silk/plugin_error.gif')");
 }
+
+#advancedextensionsearch div {
+  display: none;
+}
+#advancedextensionsearch legend {
+  font-size: .8em;
+}
+#advancedextensionsearch legend a:after {
+  content: "&gt;&gt;";
+}
+#advancedextensionsearch-body {
+  display: none;
+}
+#advancedextensionsearch-body:target ~ div {
+  display: block;
+}
 /****************************** &lt;Inner Menu&gt; *************************/
 
 .innerMenu {
@@ -1059,7 +1075,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   (% class="extHeader" %)(((
     (% class="extHeaderLeft" %)(((
       {{html}}
-      &lt;form action="$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1').replaceAll('(^|&amp;)(extension(id|version)=[^&amp;]++&amp;?+)+', '$1').replaceAll('(^|&amp;)section=[^&amp;]++', '$1section=XWiki.AddExtensions'))" method="post"&gt;
+      &lt;form action="$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1').replaceAll('(^|&amp;)(extension(id|version)=[^&amp;]++&amp;?+)+', '$1').replaceAll('(^|&amp;)section=[^&amp;]++', '$1section=XWiki.AddExtensions').replaceAll('(^|&amp;)searchextension=[^&amp;]++&amp;?', '$1'))" method="post"&gt;
         &lt;div class="globalsearch extHeaderLeftSearch"&gt;
           &lt;label class="hidden" for="extensionsearchinput"&gt;Search&lt;/label&gt;&lt;input type="text" class="globalsearchinput#if ("$!request.searchextension" == '') withTip#end extHeaderLeftInput" id="extensionsearchinput" name="searchextension" value="#if ("$!request.searchextension" != '')$request.searchextension#{else}search extension...#{end}" size="60"&gt;&lt;input type="image" class="button" value="Go" alt="Go" src="/xwiki/resources/icons/xwiki/search.png"&gt;
         &lt;/div&gt;
@@ -1095,8 +1111,8 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     #end
     &lt;form method="post" action="$doc.getURL($action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++', ''))"&gt;
       &lt;div class="extension-actions"&gt;
-        &lt;input type="hidden" name="extensionid" value="$extension.id.id"/&gt;
-        &lt;input type="hidden" name="extensionversion" value="$extension.id.version"/&gt;
+        &lt;input type="hidden" name="extensionid" value="$extension.id.id" /&gt;
+        &lt;input type="hidden" name="extensionversion" value="$extension.id.version" /&gt;
         #foreach ($action in $actions)
           ${action}##
         #end
@@ -1187,6 +1203,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
       #end
 
       {{id name="extension-body-dependencies-${extension.id.id}-${extension.id.version}" /}}
+      #computeXBack()
       (% class="extension-body-dependencies extension-body-section" %)(((
         $msg.get('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])
         #foreach ($dependency in $extension.dependencies)
@@ -1195,11 +1212,11 @@ $xwiki.jsx.use('ExtensionManagerMacros')
           #if ($dependencyExtension)
             * [[#displayExtensionName($dependencyExtension)&gt;&gt;##
             #if ($dependencyClass.endsWith('CoreExtension'))
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.version}&amp;section=XWiki.CoreExtensions")||class="dependency-type-core"]]
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.version}&amp;section=XWiki.CoreExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-core"]]
             #elseif ($dependencyClass.endsWith('LocalExtension'))
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.version}&amp;section=XWiki.InstalledExtensions")||class="dependency-type-installed"]]
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.version}&amp;section=XWiki.InstalledExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-installed"]]
             #else
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.version}&amp;section=XWiki.AddExtensions")||class="dependency-type-remote"]]
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.version}&amp;section=XWiki.AddExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-remote"]]
             #end
           #else
             * (% class="dependency-type-unknown" %)${dependency.id}
@@ -1214,11 +1231,11 @@ $xwiki.jsx.use('ExtensionManagerMacros')
             #set ($dependencyClass = "${dependency.class}")
             * [[#displayExtensionName($dependency)&gt;&gt;##
             #if ($dependencyClass.endsWith('CoreExtension'))
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.CoreExtensions")||class="dependency-type-core"]]##
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.CoreExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-core"]]##
             #elseif ($dependencyClass.endsWith('LocalExtension'))
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.InstalledExtensions")||class="dependency-type-installed"]]##
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.InstalledExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-installed"]]##
             #else
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.AddExtensions")||class="dependency-type-remote"]]##
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.AddExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-remote"]]##
             #end
             #if ("$!{namespace.key}" != '')
               (in wiki $namespace.key)
@@ -1291,6 +1308,24 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     #foreach ($backwardDependency in $backwardDependencyMap)
       #prepareUninstall($backwardDependency.id.id, $backwardDependency.id.version, $extensionsToUninstall)
     #end
+  #end
+#end
+
+#macro(computeXBack)
+  #set ($xback = "$!{request.xback}")
+  #if ($xback == '')
+    #set ($params = '')
+    #foreach ($parameterName in $request.parameterNames)
+      #if (!$parameterName.startsWith('action') &amp;&amp; !$parameterName.startsWith('extension'))
+        #foreach ($value in $request.getParameterValues($parameterName))
+          #set ($params = "${params}&amp;${parameterName}=${value}")
+        #end
+      #end
+    #end
+    #if ($params.length() &gt; 0)
+      #set ($params = $params.substring(1))
+    #end
+    #set ($xback = $doc.getURL($xcontext.action, $params))
   #end
 #end
 {{/velocity}}</content></xwikidoc>

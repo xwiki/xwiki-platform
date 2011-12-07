@@ -249,6 +249,9 @@ bOgK9Cz44w32Cfjt5Xb7Qse/TsjlX79O6AT0E/p/8v1MS0rb84IAAAAASUVORK5CYII=
             &lt;input name="actioninstall" type="hidden" /&gt;
             &lt;p&gt;
               &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
+              #if ("$!{request.xback}" != '')
+                &lt;span class="buttonwrapper"&gt;&lt;a href="${request.xback}" class="secondary button"&gt;Cancel&lt;/a&gt;&lt;/span&gt;
+              #end
             &lt;/p&gt;
           &lt;/div&gt;
         &lt;/form&gt;
@@ -272,11 +275,27 @@ bOgK9Cz44w32Cfjt5Xb7Qse/TsjlX79O6AT0E/p/8v1MS0rb84IAAAAASUVORK5CYII=
   #set ($extensions = false)
 #end
 #if (!$extensions)
-  {{html}}
-  &lt;form action="$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1'))" method="post" class="xform"&gt;
+  {{html clean="false"}}
+  &lt;form action="$escapetool.xml($doc.getURL($xcontext.action, $request.getQueryString()))" method="post" class="xform"&gt;
     &lt;fieldset&gt;
       &lt;label for="searchextension"&gt;What would you like to add?&lt;br /&gt;&lt;input type="text" name="searchextension" id="searchextension" /&gt;&lt;/label&gt;
       &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Search" class="button" /&gt;&lt;/span&gt;
+    &lt;/fieldset&gt;
+  &lt;/form&gt;
+  &lt;form action="$escapetool.xml($doc.getURL($xcontext.action, $request.getQueryString()))" method="post" class="xform"&gt;
+    &lt;fieldset id="advancedextensionsearch"&gt;
+      &lt;div id="advancedextensionsearch-body"&gt;&lt;/div&gt;
+      &lt;legend&gt;&lt;a href="#advancedextensionsearch-body"&gt;Advanced search&lt;/a&gt;&lt;/legend&gt;
+      &lt;div class="half"&gt;
+        &lt;input type="hidden" name="xback" value="$escapetool.xml($doc.getURL($xcontext.action, $request.queryString))" /&gt;
+        &lt;dl&gt;
+        &lt;dt&gt;&lt;label for="advancedextensionsearch-id"&gt;Extension ID&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd&gt;&lt;input type="text" name="extensionid" id="advancedextensionsearch-id" value="" /&gt;&lt;/dd&gt;
+        &lt;dt&gt;&lt;label for="advancedextensionsearch-version"&gt;Version&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd&gt;&lt;input type="text" name="extensionversion" id="advancedextensionsearch-version" value="" /&gt;&lt;/dd&gt;
+        &lt;/dl&gt;
+        &lt;p&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" name="actioninstall" value="Install" class="button" /&gt;&lt;/span&gt;&lt;/p&gt;
+      &lt;/div&gt;
     &lt;/fieldset&gt;
   &lt;/form&gt;
   {{/html}}
@@ -284,7 +303,7 @@ bOgK9Cz44w32Cfjt5Xb7Qse/TsjlX79O6AT0E/p/8v1MS0rb84IAAAAASUVORK5CYII=
 #elseif ($extensions.size == 0)
   {{info}}No extension found.{{/info}}##
 #else
-  #if ($extensions.totalHits &gt; $paginationParams.itemsPerPage)
+  #if ($extensions.totalHits &amp;&amp; $extensions.totalHits &gt; $paginationParams.itemsPerPage)
     #set ($hasPagination = true)
     #set ($paginationURL = $doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)firstIndex=[^&amp;]++&amp;?', '$1')))
     #if ("$!{request.searchextension}" != '')
@@ -295,10 +314,11 @@ bOgK9Cz44w32Cfjt5Xb7Qse/TsjlX79O6AT0E/p/8v1MS0rb84IAAAAASUVORK5CYII=
     {{html}}#pagination($paginationParams){{/html}}
   #end
   #set ($actions = [])
+  #computeXBack()
   #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1').replaceAll('(^|&amp;)(extension(id|version)=[^&amp;]++&amp;?+)+', '$1'))"" class=""button""&gt;Back to list&lt;/a&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;Back to list&lt;/a&gt;&lt;/span&gt;"))
   #else
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""Show details"" class=""button""/&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""Show details"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
   #end
   #if ($hasProgramming)
     #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actioninstall"" value=""Install"" class=""button""/&gt;&lt;/span&gt;"))

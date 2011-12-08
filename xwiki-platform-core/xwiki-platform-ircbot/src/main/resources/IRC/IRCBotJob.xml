@@ -10,9 +10,9 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1323010153000</creationDate>
-<date>1323263714000</date>
-<contentUpdateDate>1323263714000</contentUpdateDate>
+<creationDate>1323347519000</creationDate>
+<date>1323360175000</date>
+<contentUpdateDate>1323360175000</contentUpdateDate>
 <version>1.1</version>
 <title>IRC Bot Scheduler Job</title>
 <template></template>
@@ -143,20 +143,13 @@
 <jobName>IRC Bot Scheduler Job</jobName>
 </property>
 <property>
-<script>import com.xpn.xwiki.web.*
-import org.xwiki.rendering.transformation.*
-import org.xwiki.rendering.block.*
-import org.xwiki.rendering.syntax.*
-
-if (context.getEngineContext().getAttribute("ircbot") == null) {
+<script>if (context.getEngineContext().getAttribute("ircbot") == null) {
     context.put("botAction", "start")
-    def xdom = new XDOM([new MacroBlock("include", [document:"IRC.IRCBot", context:"new"], false)])
-    def txManager = Utils.getComponent(TransformationManager.class)
-    txManager.performTransformations(xdom, new TransformationContext(xdom, Syntax.XWIKI_2_0))
-}</script>
-</property>
-<property>
-<status>Normal</status>
+    def ircBotDoc = xwiki.getDocument("IRC.IRCBot")
+    // Make sure we use the right getRenderedContent() API so that it's executed in the context of the target doc
+    ircBotDoc.getRenderedContent(ircBotDoc.getContent(), "xwiki/2.0", "plain/1.0")
+}
+</script></property><property><status>Normal</status>
 </property>
 </object>
 <content>{{include document="XWiki.SchedulerJobSheet"/}}</content></xwikidoc>

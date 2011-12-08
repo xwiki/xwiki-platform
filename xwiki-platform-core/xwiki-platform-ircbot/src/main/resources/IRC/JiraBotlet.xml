@@ -10,9 +10,9 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1251927949000</creationDate>
-<date>1320515270000</date>
-<contentUpdateDate>1320515270000</contentUpdateDate>
+<creationDate>1323347519000</creationDate>
+<date>1323360574000</date>
+<contentUpdateDate>1323360574000</contentUpdateDate>
 <version>1.1</version>
 <title>JIRA Botlet</title>
 <template></template>
@@ -267,7 +267,7 @@ class JiraBotlet implements IRCBotlet
     }
 }
 
-if (request.action == "start") {
+if (request.action == "start" || xcontext.get("botAction") == "start") {
     // Register against the component manager
     DefaultComponentDescriptor descriptor = new DefaultComponentDescriptor()
     descriptor.setImplementation(JiraBotlet.class)
@@ -280,7 +280,7 @@ if (request.action == "start") {
     def ircconfigdoc = xwiki.getDocument("IRC.IRCConfig")
     ircconfigdoc.use(doc.fullName)
     botlet.init(ircconfigdoc.getValue("jiraURL"), ircconfigdoc.getValue("jiraPattern"))
-} else if (request.action == "stop") {
+} else if (request.action == "stop" || xcontext.get("botAction") == "stop") {
     Utils.getComponentManager().unregisterComponent(IRCBotlet.class, "jira")
 }
 {{/groovy}}

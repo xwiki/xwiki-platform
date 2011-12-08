@@ -10,9 +10,9 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1320480716000</creationDate>
-<date>1320503856000</date>
-<contentUpdateDate>1320503856000</contentUpdateDate>
+<creationDate>1323347519000</creationDate>
+<date>1323360264000</date>
+<contentUpdateDate>1323360264000</contentUpdateDate>
 <version>1.1</version>
 <title>Document Event Botlet</title>
 <template></template>
@@ -253,7 +253,7 @@ class DocumentEventBotlet implements EventListener, IRCBotlet
     }
 }
 
-if (request.action == "start") {
+if (request.action == "start" || xcontext.get("botAction") == "start") {
 
     // Register against the component manager as an IRCBotlet
     DefaultComponentDescriptor descriptor = new DefaultComponentDescriptor()
@@ -273,7 +273,7 @@ if (request.action == "start") {
     observation.removeListener("ircdocumentevents")
     observation.addListener(botlet)
 
-} else if (request.action == "stop") {
+} else if (request.action == "stop" || xcontext.get("botAction") == "stop") {
 
     // Unregister from the Observation Manager
     def observation = Utils.getComponent(ObservationManager.class)

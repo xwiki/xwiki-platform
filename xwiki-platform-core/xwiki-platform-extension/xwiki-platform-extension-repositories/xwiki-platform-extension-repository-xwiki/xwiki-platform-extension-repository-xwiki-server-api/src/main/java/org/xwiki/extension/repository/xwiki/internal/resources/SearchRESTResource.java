@@ -39,6 +39,9 @@ import org.xwiki.query.QueryException;
 @Path(Resources.SEARCH)
 public class SearchRESTResource extends AbstractExtensionRESTResource
 {
+    private static final String WHERE = "extension.id like :pattern or extension.name like :pattern"
+        + " or extension.summary like :pattern or extension.description like :pattern";
+
     /**
      * @since 3.3M2
      */
@@ -49,15 +52,12 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         @QueryParam(Resources.QPARAM_SEARCH_REQUIRETOTALHITS) @DefaultValue("true") boolean requireTotalHits)
         throws QueryException
     {
-        String where =
-            "extension.id like :pattern or extension.name like :pattern or extension.description like :pattern";
-
         ExtensionsSearchResult result = this.objectFactory.createExtensionsSearchResult();
 
         result.setOffset(offset);
 
         if (requireTotalHits) {
-            Query query = createExtensionsCountQuery(null, where);
+            Query query = createExtensionsCountQuery(null, WHERE);
 
             query.bindValue("pattern", '%' + pattern + '%');
 
@@ -67,7 +67,7 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         }
 
         if (number != 0 && (result.getTotalHits() == -1 || offset < result.getTotalHits())) {
-            Query query = createExtensionsQuery(null, where, offset, number);
+            Query query = createExtensionsQuery(null, WHERE, offset, number);
 
             query.bindValue("pattern", '%' + pattern + '%');
 

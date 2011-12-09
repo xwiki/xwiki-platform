@@ -2414,27 +2414,21 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * @since 2.2M1
      */
-    public void mergeXObjects(XWikiDocument templatedoc)
+    public void mergeXObjects(XWikiDocument templateDoc)
     {
-        // TODO: look for each object if it already exist and add it if it doesn't
-        for (Map.Entry<DocumentReference, List<BaseObject>> entry : templatedoc.getXObjects().entrySet()) {
-            List<BaseObject> myObjects = getXObjects().get(entry.getKey());
-
-            if (myObjects == null) {
-                myObjects = new ArrayList<BaseObject>();
-            }
-
-            if (!entry.getValue().isEmpty()) {
-                DocumentReference newXClassReference = null;
-                for (BaseObject otherObject : entry.getValue()) {
-                    if (otherObject != null) {
-                        BaseObject myObject = otherObject.duplicate(getDocumentReference());
-                        myObjects.add(myObject);
-                        myObject.setNumber(myObjects.size() - 1);
-                        newXClassReference = myObject.getXClassReference();
+        for (Map.Entry<DocumentReference, List<BaseObject>> entry : templateDoc.getXObjects().entrySet()) {
+            // Documents can't have objects of types defined in a different wiki so we make sure the class reference
+            // matches this document's wiki.
+            DocumentReference classReference =
+                entry.getKey().replaceParent(entry.getKey().getWikiReference(),
+                    getDocumentReference().getWikiReference());
+            // Copy the objects from the template document only if this document doesn't have them already.
+            if (getXObjectSize(classReference) == 0) {
+                for (BaseObject object : entry.getValue()) {
+                    if (object != null) {
+                        addXObject(object.duplicate());
                     }
                 }
-                setXObjects(newXClassReference, myObjects);
             }
         }
         setContentDirty(true);

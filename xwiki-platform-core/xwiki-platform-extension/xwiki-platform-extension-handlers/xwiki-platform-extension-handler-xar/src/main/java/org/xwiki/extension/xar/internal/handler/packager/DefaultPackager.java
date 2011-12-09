@@ -63,6 +63,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 
+/**
+ * Default implementation of {@link Packager}.
+ * 
+ * @version $Id$
+ */
 @Component
 @Singleton
 public class DefaultPackager implements Packager, Initializable
@@ -85,22 +90,12 @@ public class DefaultPackager implements Packager, Initializable
 
     private SAXParserFactory parserFactory;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
     public void initialize() throws InitializationException
     {
         this.parserFactory = SAXParserFactory.newInstance();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.xar.internal.handler.packager.Packager#importXAR(org.xwiki.extension.xar.internal.handler.packager.XarFile,
-     *      java.io.File, java.lang.String, com.xpn.xwiki.doc.merge.MergeConfiguration)
-     */
+    @Override
     public void importXAR(XarFile previousXarFile, File xarFile, String wiki, MergeConfiguration mergeConfiguration)
         throws IOException, XWikiException
     {
@@ -167,11 +162,7 @@ public class DefaultPackager implements Packager, Initializable
         return mergeResult;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.xar.internal.handler.packager.Packager#unimportXAR(java.io.File, java.lang.String)
-     */
+    @Override
     public void unimportXAR(File xarFile, String wiki) throws IOException, XWikiException
     {
         if (wiki == null) {
@@ -199,12 +190,7 @@ public class DefaultPackager implements Packager, Initializable
         unimportPagesFromWiki(getEntries(xarFile), wiki);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.xar.internal.handler.packager.Packager#unimportPages(java.util.Collection,
-     *      java.lang.String)
-     */
+    @Override
     public void unimportPages(Collection<XarEntry> pages, String wiki) throws XWikiException
     {
         if (wiki == null) {
@@ -252,11 +238,7 @@ public class DefaultPackager implements Packager, Initializable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.xar.internal.handler.packager.Packager#getEntries(java.io.File)
-     */
+    @Override
     public List<XarEntry> getEntries(File xarFile) throws IOException
     {
         List<XarEntry> documents = null;

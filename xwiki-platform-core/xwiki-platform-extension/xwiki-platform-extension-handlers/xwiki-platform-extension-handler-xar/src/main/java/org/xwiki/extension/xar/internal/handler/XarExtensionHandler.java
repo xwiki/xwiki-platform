@@ -60,6 +60,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     private Logger logger;
 
     // TODO: support question/answer with the UI to resolve conflicts
+    @Override
     public void install(LocalExtension localExtension, String wiki) throws InstallException
     {
         install(null, localExtension, wiki);
@@ -135,6 +136,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
     }
 
+    @Override
     public void uninstall(LocalExtension localExtension, String namespace) throws UninstallException
     {
         // TODO: delete pages from the wiki which belong only to this extension (several extension could have some

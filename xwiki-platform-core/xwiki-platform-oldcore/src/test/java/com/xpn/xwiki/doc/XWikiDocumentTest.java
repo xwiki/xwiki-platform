@@ -1324,4 +1324,24 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             this.defaultEntityReferenceSerializer.serialize(this.baseObject.getXClassReference()), this.document
                 .getDocumentReference())));
     }
+
+    public void testSetXObjectswithPreviousObject()
+    {
+        BaseObject object = new BaseObject();
+        object.setXClassReference(this.baseObject.getXClassReference());
+        this.document.addXObject(object);
+
+        this.document.setXObjects(this.baseObject.getXClassReference(), Arrays.asList(object));
+
+        Assert.assertEquals(Arrays.asList(object), this.document.getXObjects(this.baseObject.getXClassReference()));
+    }
+
+    public void testSetXObjectWhithNoPreviousObject()
+    {
+        XWikiDocument document = new XWikiDocument(this.document.getDocumentReference());
+
+        document.setXObject(this.baseObject.getXClassReference(), 0, this.baseObject);
+
+        Assert.assertEquals(Arrays.asList(this.baseObject), document.getXObjects(this.baseObject.getXClassReference()));
+    }
 }

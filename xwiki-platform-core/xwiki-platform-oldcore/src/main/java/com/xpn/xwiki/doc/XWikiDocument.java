@@ -2000,10 +2000,10 @@ public class XWikiDocument implements DocumentModelBridge
         BaseObject object = BaseClass.newCustomClassInstance(absoluteClassReference, context);
         object.setDocumentReference(getDocumentReference());
         object.setXClassReference(classReference);
-        List<BaseObject> objects = getXObjects(absoluteClassReference);
+        List<BaseObject> objects = this.xObjects.get(absoluteClassReference);
         if (objects == null) {
             objects = new ArrayList<BaseObject>();
-            setXObjects(absoluteClassReference, objects);
+            this.xObjects.put(absoluteClassReference, objects);
         }
         objects.add(object);
         int nb = objects.size() - 1;
@@ -2051,6 +2051,7 @@ public class XWikiDocument implements DocumentModelBridge
         if (classReference == null) {
             return new ArrayList<BaseObject>();
         }
+
         return getXObjects().get(classReference);
     }
 
@@ -2074,7 +2075,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public Vector<BaseObject> getObjects(String className)
     {
-        List<BaseObject> result = getXObjects(resolveClassReference(className));
+        List<BaseObject> result = this.xObjects.get(resolveClassReference(className));
         return result == null ? null : new Vector<BaseObject>(result);
     }
 
@@ -2083,8 +2084,18 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setXObjects(DocumentReference classReference, List<BaseObject> objects)
     {
+        // Remove existing objects
+        List<BaseObject> existingbjects = this.xObjects.get(classReference);
+        if (existingbjects != null) {
+            existingbjects.clear();
+        }
+
+        // Add new objects
         if (objects.isEmpty()) {
-            getXObjects().put(classReference, objects);
+            // Pretty wrong but can't remove that for retro compatibility reasons...
+            // Note that it means that someone can put an unmodifiable list here make impossible to add any object of
+            // this class.
+            this.xObjects.put(classReference, objects);
         } else {
             for (BaseObject baseObject : objects) {
                 addXObject(classReference, baseObject);
@@ -2277,7 +2288,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public void addXObject(DocumentReference classReference, BaseObject object)
     {
-        List<BaseObject> vobj = getXObjects(classReference);
+        List<BaseObject> vobj = this.xObjects.get(classReference);
         if (vobj == null) {
             setXObject(classReference, 0, object);
         } else {
@@ -2297,7 +2308,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         object.setDocumentReference(getDocumentReference());
 
-        List<BaseObject> vobj = getXObjects(object.getXClassReference());
+        List<BaseObject> vobj = this.xObjects.get(object.getXClassReference());
         if (vobj == null) {
             setXObject(0, object);
         } else {
@@ -2325,10 +2336,11 @@ public class XWikiDocument implements DocumentModelBridge
             object.setDocumentReference(getDocumentReference());
             object.setNumber(nb);
         }
-        List<BaseObject> objects = getXObjects(classReference);
+
+        List<BaseObject> objects = this.xObjects.get(classReference);
         if (objects == null) {
             objects = new ArrayList<BaseObject>();
-            setXObjects(classReference, objects);
+            this.xObjects.put(classReference, objects);
         }
         while (nb >= objects.size()) {
             objects.add(null);
@@ -2351,10 +2363,10 @@ public class XWikiDocument implements DocumentModelBridge
         object.setDocumentReference(getDocumentReference());
         object.setNumber(nb);
 
-        List<BaseObject> objects = getXObjects(object.getXClassReference());
+        List<BaseObject> objects = this.xObjects.get(object.getXClassReference());
         if (objects == null) {
             objects = new ArrayList<BaseObject>();
-            setXObjects(object.getXClassReference(), objects);
+            this.xObjects.put(object.getXClassReference(), objects);
         }
         while (nb >= objects.size()) {
             objects.add(null);
@@ -4641,7 +4653,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void renameProperties(DocumentReference classReference, Map<String, String> fieldsToRename)
     {
-        List<BaseObject> objects = getXObjects(classReference);
+        List<BaseObject> objects = this.xObjects.get(classReference);
         if (objects == null) {
             return;
         }
@@ -6634,7 +6646,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public boolean removeXObject(BaseObject object)
     {
-        List<BaseObject> objects = getXObjects(object.getXClassReference());
+        List<BaseObject> objects = this.xObjects.get(object.getXClassReference());
         // No objects at all, nothing to remove
         if (objects == null) {
             return false;
@@ -6691,7 +6703,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public boolean removeXObjects(DocumentReference classReference)
     {
-        List<BaseObject> objects = getXObjects(classReference);
+        List<BaseObject> objects = this.xObjects.get(classReference);
         // No objects at all, nothing to remove
         if (objects == null) {
             return false;

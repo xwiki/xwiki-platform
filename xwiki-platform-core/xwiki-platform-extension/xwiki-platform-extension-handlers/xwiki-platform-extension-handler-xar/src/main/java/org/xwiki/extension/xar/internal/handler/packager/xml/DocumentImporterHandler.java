@@ -48,7 +48,7 @@ public class DocumentImporterHandler extends DocumentHandler
     private DefaultPackager packager;
 
     private XarEntryMergeResult mergeResult;
-    
+
     private MergeConfiguration mergeConfiguration;
 
     public DocumentImporterHandler(DefaultPackager packager, ComponentManager componentManager, String wiki)
@@ -70,7 +70,7 @@ public class DocumentImporterHandler extends DocumentHandler
 
     public XarEntryMergeResult getMergeResult()
     {
-        return mergeResult;
+        return this.mergeResult;
     }
 
     private void saveDocument(String comment) throws SAXException
@@ -82,8 +82,10 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiDocument dbDocument = getDatabaseDocument().clone();
             XWikiDocument previousDocument = getPreviousDocument();
 
+            // Merge and save
             if (previousDocument != null && !dbDocument.isNew()) {
-                MergeResult documentMergeResult = dbDocument.merge(previousDocument, document, this.mergeConfiguration, context);
+                MergeResult documentMergeResult =
+                    dbDocument.merge(previousDocument, document, this.mergeConfiguration, context);
                 if (documentMergeResult.isModified()) {
                     context.getWiki().saveDocument(dbDocument, comment, context);
                 }
@@ -91,8 +93,14 @@ public class DocumentImporterHandler extends DocumentHandler
                     new XarEntryMergeResult(new XarEntry(dbDocument.getDocumentReference(), dbDocument.getLanguage()),
                         documentMergeResult);
             } else {
+                // Set proper version
+                document.setAuthorReference(context.getUserReference());
+                document.setContentAuthorReference(context.getUserReference());
                 if (!dbDocument.isNew()) {
+                    document.setCreatorReference(dbDocument.getCreatorReference());
                     document.setVersion(dbDocument.getVersion());
+                } else {
+                    document.setCreatorReference(context.getUserReference());
                 }
 
                 context.getWiki().saveDocument(document, comment, context);
@@ -118,7 +126,7 @@ public class DocumentImporterHandler extends DocumentHandler
     {
         XWikiDocument previousDocument = null;
 
-        if (previousXarFile != null) {
+        if (this.previousXarFile != null) {
             XWikiDocument document = getDocument();
 
             DocumentHandler documentHandler = new DocumentHandler(getComponentManager(), document.getWikiName());
@@ -140,6 +148,13 @@ public class DocumentImporterHandler extends DocumentHandler
     {
         try {
             XWikiContext context = getXWikiContext();
+
+            // Set proper author
+            // TODO: add a setAuthorReference in XWikiAttachment
+            XWikiDocument document = getDocument();
+            document.setAuthorReference(context.getUserReference());
+            attachment.setAuthor(document.getAuthor());
+
             XWikiDocument dbDocument = getDatabaseDocument();
 
             XWikiAttachment dbAttachment = dbDocument.getAttachment(attachment.getFilename());

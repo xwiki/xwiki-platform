@@ -51,7 +51,7 @@ public class DefaultJobManager implements JobManager
     /**
      * @see #getCurrentJob()
      */
-    private Job currentJob;
+    private volatile Job currentJob;
 
     @Override
     public Job getCurrentJob()
@@ -84,6 +84,7 @@ public class DefaultJobManager implements JobManager
             throw new JobException("Failed to lookup any Task for role hint [" + taskId + "]", e);
         }
 
+        // TODO: make non-blocker
         this.currentJob.start(request);
 
         return this.currentJob;

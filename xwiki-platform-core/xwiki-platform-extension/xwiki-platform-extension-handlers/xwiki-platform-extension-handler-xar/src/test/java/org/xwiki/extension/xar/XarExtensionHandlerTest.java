@@ -67,6 +67,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     private LocalExtensionRepository localExtensionRepository;
 
     private Map<String, BaseClass> classes = new HashMap<String, BaseClass>();
+    
+    private DocumentReference contextUser;
 
     @Before
     public void setUp() throws Exception
@@ -82,6 +84,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         this.mockXWiki = getMockery().mock(XWiki.class);
         getContext().setWiki(this.mockXWiki);
         getContext().setDatabase("xwiki");
+        this.contextUser = new DocumentReference(getContext().getDatabase(), "XWiki", "ExtensionUser");
 
         this.localXarExtensiontId1 = new ExtensionId("test", "1.0");
         this.localXarExtensiontId2 = new ExtensionId("test", "2.0");
@@ -169,8 +172,13 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                         return classes.get(documentReference.getName());
                     }
                 });
+                
+                allowing(mockXWiki).isVirtualMode();
+                will(returnValue(true));
             }
         });
+        
+        getContext().setUserReference(this.contextUser);
 
         // lookup
 
@@ -220,7 +228,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertFalse("Document wiki.space.page has not been saved in the database", page.isNew());
 
         Assert.assertEquals("Wrong content", "content", page.getContent());
-        Assert.assertEquals("Wrong author", "XWiki.author", page.getAuthor());
+        Assert.assertEquals("Wrong author", this.contextUser, page.getAuthorReference());
         Assert.assertEquals("Wrong versions", "1.1", page.getVersion());
 
         BaseClass baseClass = page.getXClass();
@@ -250,7 +258,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertFalse("Document wiki.space.page has not been saved in the database", page.isNew());
 
         Assert.assertEquals("Wrong content", "content 2", page.getContent());
-        Assert.assertEquals("Wrong author", "XWiki.author", page.getAuthor());
+        Assert.assertEquals("Wrong author", this.contextUser, page.getAuthorReference());
         Assert.assertEquals("Wrong versions", "2.1", page.getVersion());
 
         BaseClass baseClass = page.getXClass();

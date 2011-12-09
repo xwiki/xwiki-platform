@@ -21,9 +21,11 @@ package org.xwiki.extension.repository.aether.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.artifact.Artifact;
@@ -42,6 +44,25 @@ public class AetherExtensionFile implements ExtensionFile
     private String type;
 
     private AetherExtensionRepository repository;
+
+    static class AetherExtensionFileInputStream extends FileInputStream
+    {
+        private File file;
+
+        public AetherExtensionFileInputStream(File file) throws FileNotFoundException
+        {
+            super(file);
+        }
+
+        @Override
+        public void close() throws IOException
+        {
+            super.close();
+
+            // Delete the file until a real stream download is done
+            FileUtils.deleteQuietly(file);
+        }
+    }
 
     public AetherExtensionFile(Artifact artifact, AetherExtensionRepository repository,
         PlexusComponentManager plexusComponentManager, String type)
@@ -82,6 +103,6 @@ public class AetherExtensionFile implements ExtensionFile
 
         File aetherFile = artifactResult.getArtifact().getFile();
 
-        return new FileInputStream(aetherFile);
+        return new AetherExtensionFileInputStream(aetherFile);
     }
 }

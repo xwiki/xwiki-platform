@@ -80,7 +80,11 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     private static final String DOCFULLNAME = DOCSPACE + "." + DOCNAME;
 
+    private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME);
+
     private static final String CLASSNAME = DOCFULLNAME;
+
+    private static final DocumentReference CLASS_REFERENCE = DOCUMENT_REFERENCE;
 
     private XWikiDocument document;
 
@@ -1250,7 +1254,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     /**
      * Verify that merging objects modify their references to point to the document in which they are cloned into and
-     * that GUID fors merged objects are different from the original GUIDs.
+     * that GUID for merged objects are different from the original GUIDs.
      */
     public void testMergeObjectsHaveCorrectReferenceAndDifferentGuids()
     {
@@ -1261,19 +1265,48 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             }
         }
 
+        // Use a document from a different wiki to see if the class reference of the merged objects is adjusted:
+        // documents can't have objects of types defined in a different wiki.
         XWikiDocument doc = new XWikiDocument(new DocumentReference("somewiki", "somespace", "somepage"));
         doc.mergeXObjects(this.document);
 
         assertTrue(doc.getXObjects().size() > 0);
 
-        // Verify that the object references point to the doc in which it's cloned.
-        // Verify that GUIDs are not the same as the original ones
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : doc.getXObjects().entrySet()) {
+            // Verify that the class reference and the target document reference have the same wiki component.
+            assertEquals(doc.getDocumentReference().getWikiReference(), entry.getKey().getWikiReference());
             for (BaseObject baseObject : entry.getValue()) {
+                // Verify that the object references point to the doc in which it's cloned.
                 assertEquals(doc.getDocumentReference(), baseObject.getDocumentReference());
+                // Verify that GUIDs are not the same as the original ones
                 assertFalse("Non unique object GUID found!", originalGuids.contains(baseObject.getGuid()));
             }
         }
+    }
+
+    /**
+     * Tests that objects are not copied again when {@link XWikiDocument#mergeXObjects(XWikiDocument)} is called twice.
+     */
+    public void testMergeObjectsTwice() throws XWikiException
+    {
+        // Make sure the target document and the template document are from different wikis.
+        XWikiDocument targetDoc = new XWikiDocument(new DocumentReference("someWiki", "someSpace", "somePage"));
+
+        // Merge the objects.
+        targetDoc.mergeXObjects(this.document);
+
+        assertEquals(1, targetDoc.getXObjects().size());
+        assertEquals(0, targetDoc.getXObjectSize(CLASS_REFERENCE));
+        DocumentReference classReference =
+            CLASS_REFERENCE.replaceParent(CLASS_REFERENCE.getWikiReference(), targetDoc.getDocumentReference()
+                .getWikiReference());
+        assertEquals(1, targetDoc.getXObjectSize(classReference));
+
+        // Try to merge the objects again.
+        targetDoc.mergeXObjects(this.document);
+
+        // Check that the object from the template document was not copied again.
+        assertEquals(1, targetDoc.getXObjectSize(classReference));
     }
 
     /** Check that a new empty document has empty content (used to have a new line before 2.5). */

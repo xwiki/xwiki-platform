@@ -37,7 +37,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.data.MediaType;
-import org.restlet.resource.InputRepresentation;
+import org.restlet.representation.InputRepresentation;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.xwiki.Resources;
 import org.xwiki.extension.repository.xwiki.internal.XWikiRepositoryModel;

@@ -25,15 +25,12 @@ import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.restlet.Filter;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.ext.servlet.ServletUtils;
+import org.restlet.routing.Filter;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentManager;
-
-import com.noelios.restlet.ext.servlet.ServletCall;
-import com.noelios.restlet.http.HttpCall;
-import com.noelios.restlet.http.HttpRequest;
 
 /**
  * <p>
@@ -103,15 +100,7 @@ public class XWikiSetupCleanupFilter extends Filter
      */
     protected static HttpServletRequest getHttpRequest(Request req)
     {
-        if (req instanceof HttpRequest) {
-            HttpRequest httpRequest = (HttpRequest) req;
-            HttpCall httpCall = httpRequest.getHttpCall();
-            if (httpCall instanceof ServletCall) {
-                return ((ServletCall) httpCall).getRequest();
-            }
-        }
-
-        return null;
+        return ServletUtils.getRequest(req);
     }
 
 }

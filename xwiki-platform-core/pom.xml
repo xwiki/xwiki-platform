@@ -38,6 +38,7 @@
     <gwt.version>2.4.0</gwt.version>
     <gwt.maven.plugin.version>2.4.0</gwt.maven.plugin.version>
     <smartgwt.version>2.5</smartgwt.version>
+    <restlet.version>2.0.10</restlet.version>
   </properties>
   <dependencies>
     <dependency>
@@ -311,6 +312,11 @@
               <excludes>
                 <exclude>**/internal/**</exclude>
                 <!-- To be removed when we release 3.3 -->
+                <exclude>org/xwiki/rest/XWikiAuthentication</exclude>
+                <exclude>org/xwiki/rest/XWikiRestletJaxRsApplication</exclude>
+                <exclude>org/xwiki/rest/XWikiRestletServlet</exclude>
+                <exclude>org/xwiki/rest/XWikiSetupCleanupFilter</exclude>
+                <exclude>org/xwiki/rest/resources/BrowserAuthenticationResource</exclude>
                 <exclude>org/xwiki/annotation/reference/IndexedObjectReference</exclude>
                 <exclude>org/xwiki/cache/eviction/EntryEvictionConfiguration</exclude>
                 <exclude>org/xwiki/workspace/WorkspaceManagerException</exclude>

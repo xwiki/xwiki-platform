@@ -33,8 +33,8 @@ import javax.ws.rs.ext.MessageBodyReader;
 
 import org.restlet.Context;
 import org.restlet.data.Form;
-import org.restlet.resource.InputRepresentation;
-import org.restlet.resource.Representation;
+import org.restlet.representation.InputRepresentation;
+import org.restlet.representation.Representation;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationField;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationRequest;
 import org.xwiki.annotation.rest.model.jaxb.ObjectFactory;

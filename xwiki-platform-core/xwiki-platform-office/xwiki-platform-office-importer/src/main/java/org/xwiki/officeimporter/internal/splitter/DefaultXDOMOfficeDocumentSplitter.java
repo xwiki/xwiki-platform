@@ -23,9 +23,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -51,42 +54,46 @@ import org.xwiki.rendering.renderer.BlockRenderer;
  * @since 2.1M1
  */
 @Component
+@Singleton
 public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSplitter
 {
     /**
      * Document access bridge.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge docBridge;
 
     /**
      * Plain text renderer used for rendering heading names.
      */
-    @Requirement("plain/1.0")
+    @Inject
+    @Named("plain/1.0")
     private BlockRenderer plainTextRenderer;
 
     /**
      * Document name serializer used for serializing document names into strings.
      */
-    @Requirement("compactwiki")
+    @Inject
+    @Named("compactwiki")
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * Required for converting string document names to {@link org.xwiki.model.reference.DocumentReference} instances.
      */
-    @Requirement("currentmixed")
+    @Inject
+    @Named("currentmixed")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
     /**
      * The {@link DocumentSplitter} used for splitting wiki documents.
      */
-    @Requirement
+    @Inject
     private DocumentSplitter documentSplitter;
 
     /**
      * Used by {@link org.xwiki.officeimporter.splitter.TargetDocumentDescriptor}.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**

@@ -26,5 +26,8 @@ package org.xwiki.extension.job;
  */
 public abstract class AbstractRequest implements Request
 {
-
+    /**
+     * Serialization identifier.
+     */
+    private static final long serialVersionUID = 1L;
 }

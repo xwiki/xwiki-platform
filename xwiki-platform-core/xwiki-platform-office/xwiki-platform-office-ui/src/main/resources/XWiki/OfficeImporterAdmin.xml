@@ -273,6 +273,7 @@ lq1soW/lB5YqcHYSQfVSAAAAAElFTkSuQmCC</content></attachment>
 #set($msgServerTypeExternalRemote=$msg.get("xe.officeimporter.openoffice.servertype.remote"))
 #set($msgServerPath=$msg.get("xe.officeimporter.openoffice.serverpath"))
 #set($msgServerProfile=$msg.get("xe.officeimporter.openoffice.serverprofile"))
+#set($msgServerProfileDefault=$msg.get("xe.officeimporter.openoffice.serverprofile.default"))
 #set($msgServerState=$msg.get("xe.officeimporter.openoffice.serverstate"))
 #set($msgActions=$msg.get("xe.officeimporter.openoffice.actions"))
 #set($msgStart=$msg.get("xe.officeimporter.openoffice.actions.start"))
@@ -336,7 +337,7 @@ lq1soW/lB5YqcHYSQfVSAAAAAElFTkSuQmCC</content></attachment>
   &lt;dt&gt;&lt;label&gt;$msgServerPath&lt;/label&gt;&lt;/dt&gt;
   &lt;dd&gt;$ooconfig.homePath&lt;/dd&gt;
   &lt;dt&gt;&lt;label&gt;$msgServerProfile&lt;/label&gt;&lt;/dt&gt;
-  &lt;dd&gt;$ooconfig.profilePath&lt;/dd&gt;
+  &lt;dd&gt;#if("$!ooconfig.profilePath" == '' &amp;&amp; $ooconfig.profilePath != '')$msgServerProfileDefault#{else}$ooconfig.profilePath#end&lt;/dd&gt;
 #end
 &lt;dt&gt;&lt;label&gt;$msgServerState&lt;/label&gt;&lt;/dt&gt;
 &lt;dd&gt;$oomanager.serverState&lt;/dd&gt;

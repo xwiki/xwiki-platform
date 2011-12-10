@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
 <xwikidoc>
 <web>XWiki</web>
 <name>WysiwygEditorConfigSheet</name>
@@ -14,7 +33,7 @@
 <date>1300789006000</date>
 <contentUpdateDate>1300789006000</contentUpdateDate>
 <version>1.1</version>
-<title>$msg.get('wysiwyg.config.sheet.title')</title>
+<title>#if($doc.name == 'WysiwygEditorConfigSheet')$msg.get('wysiwyg.config.sheet.title')#{else}$msg.get('wysiwyg.config.title')#end</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -1062,34 +1081,6 @@ return XWiki;
 </property>
 <property>
 <use>onDemand</use>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.SheetClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<defaultEditMode>
-<disabled>0</disabled>
-<name>defaultEditMode</name>
-<number>1</number>
-<prettyName>Default Edit Mode</prettyName>
-<size>15</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</defaultEditMode>
-</class>
-<name>XWiki.WysiwygEditorConfigSheet</name>
-<number>0</number>
-<className>XWiki.SheetClass</className>
-<guid>118e3dcf-1c20-4f06-a9ef-ea5bd9a5e393</guid>
-<property>
-<defaultEditMode>inline</defaultEditMode>
 </property>
 </object>
 <object>

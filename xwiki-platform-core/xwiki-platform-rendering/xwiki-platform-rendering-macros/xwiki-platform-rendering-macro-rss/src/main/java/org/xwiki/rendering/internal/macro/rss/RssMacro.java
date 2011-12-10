@@ -28,7 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
@@ -63,11 +63,12 @@ import com.sun.syndication.feed.synd.SyndFeed;
 @Singleton
 public class RssMacro extends AbstractMacro<RssMacroParameters>
 {
-
     /**
      * The name of the CSS class attribute.
      */
     private static final String CLASS_ATTRIBUTE = "class";
+
+    private static final String FEED_CLASS_VALUE = "rssfeed";
 
     /**
      * The description of the macro.
@@ -131,25 +132,30 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
     public List<Block> execute(RssMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
+        List<Block> result;
         SyndFeed feed = this.romeFeedFactory.createFeed(parameters);
 
-        BoxMacroParameters boxParameters = new BoxMacroParameters();
-        boolean hasImage = parameters.isImage() && (feed.getImage() != null);
-        boxParameters.setCssClass("rssfeed");
+        if (parameters.isDecoration()) {
+            BoxMacroParameters boxParameters = new BoxMacroParameters();
+            boolean hasImage = parameters.isImage() && (feed.getImage() != null);
+            boxParameters.setCssClass(FEED_CLASS_VALUE);
 
-        if (!StringUtils.isEmpty(parameters.getWidth())) {
-            boxParameters.setWidth(parameters.getWidth());
+            if (StringUtils.isNotEmpty(parameters.getWidth())) {
+                boxParameters.setWidth(parameters.getWidth());
+            }
+
+            boxParameters.setBlockTitle(generateBoxTitle("rsschanneltitle", feed));
+
+            if (hasImage) {
+                boxParameters.setImage(new ResourceReference(feed.getImage().getUrl(), ResourceType.URL));
+            }
+
+            result = this.boxMacro.execute(boxParameters, content == null ? StringUtils.EMPTY : content, context);
+        } else {
+            result = Arrays.<Block>asList(new GroupBlock(Collections.singletonMap(CLASS_ATTRIBUTE, FEED_CLASS_VALUE)));
         }
 
-        boxParameters.setBlockTitle(generateBoxTitle("rsschanneltitle", feed));
-
-        if (hasImage) {
-            boxParameters.setImage(new ResourceReference(feed.getImage().getUrl(), ResourceType.URL));
-        }
-
-        List<Block> result =
-            this.boxMacro.execute(boxParameters, content == null ? StringUtils.EMPTY : content, context);
-        generaterEntries(result.get(0), feed, parameters, context);
+        generateEntries(result.get(0), feed, parameters);
 
         return result;
     }
@@ -195,11 +201,10 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
      * @param parentBlock the parent Block to which the output is going to be added
      * @param feed the RSS Channel we retrieved via the Feed URL
      * @param parameters our parameter helper object
-     * @param context the macro's transformation context
      * @throws MacroExecutionException if the content cannot be rendered
      */
-    private void generaterEntries(Block parentBlock, SyndFeed feed, RssMacroParameters parameters,
-        MacroTransformationContext context) throws MacroExecutionException
+    private void generateEntries(Block parentBlock, SyndFeed feed, RssMacroParameters parameters)
+        throws MacroExecutionException
     {
         int maxElements = parameters.getCount();
         int count = 0;

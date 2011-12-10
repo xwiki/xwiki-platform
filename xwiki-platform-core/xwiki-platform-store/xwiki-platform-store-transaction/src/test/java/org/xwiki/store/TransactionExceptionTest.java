@@ -20,7 +20,6 @@
 package org.xwiki.store;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -71,8 +70,9 @@ public class TransactionExceptionTest
       + "java.lang.Error\n"
       + "\t" + "SEGFAULT!\n";
 
-
-    /** Make sure the messages from the underlying throwables are preserved. */
+    /**
+     * Make sure the messages from the underlying throwables are preserved.
+     */
     @Test
     public void simpleExceptionTest()
     {
@@ -101,15 +101,15 @@ public class TransactionExceptionTest
         TransactionException te = new TransactionException(new ArrayList<Throwable>() {{
             add(new Exception("something bad happened."));
             add(new TransactionException("This means there is db corruption",
-                                         new ArrayList<Throwable>() {{
-                add(new Error("Corruption!!"));
-            }}, true));
+                    new ArrayList<Throwable>() {{
+                        add(new Error("Corruption!!"));
+                    }}, true));
             add(new Error("SEGFAULT!"));
         }});
         Assert.assertTrue(te.isNonRecoverable());
         Assert.assertEquals("Wrong number of exceptions reported", 3, te.exceptionCount());
         Assert.assertEquals("The wrong exception message was given",
-                            NONRECOVERABLE_TEST_OUT, te.getMessage());
+            NONRECOVERABLE_TEST_OUT, te.getMessage());
     }
 
     private TransactionException getException()

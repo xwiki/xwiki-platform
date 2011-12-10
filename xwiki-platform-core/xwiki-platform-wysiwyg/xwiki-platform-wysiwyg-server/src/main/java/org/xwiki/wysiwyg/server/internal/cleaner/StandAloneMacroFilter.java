@@ -23,11 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xwiki.xml.html.filter.HTMLFilter;
+import org.xwiki.component.annotation.Component;
 
 /**
  * Looks for stand alone macros that are wrapped in paragraphs and unwraps them. In other words, looks for paragraphs
@@ -37,13 +40,12 @@ import org.xwiki.xml.html.filter.HTMLFilter;
  * 
  * @version $Id$
  */
+@Component(roles = {HTMLFilter.class })
+@Named("standAloneMacro")
+@Singleton
 public class StandAloneMacroFilter implements HTMLFilter
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLFilter#filter(Document, Map)
-     */
+    @Override
     public void filter(Document document, Map<String, String> parameters)
     {
         List<Element> wrappers = getStandAloneMacroWrappers(document);

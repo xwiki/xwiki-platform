@@ -19,12 +19,10 @@
  */
 package org.xwiki.extension.repository.internal;
 
-import java.io.File;
 import java.net.URL;
 
 import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.CoreExtension;
-import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
 
 /**
@@ -44,48 +42,28 @@ public class DefaultCoreExtension extends AbstractExtension implements CoreExten
     {
         super(repository, id, type);
 
+        setFile(new DefaultCoreExtensionFile(url));
+
         putProperty(PKEY_URL, url);
     }
 
     // Extension
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#download(java.io.File)
-     */
-    public void download(File file) throws ExtensionException
-    {
-        // TODO
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.AbstractExtension#setId(org.xwiki.extension.ExtensionId)
-     */
+    @Override
     public void setId(ExtensionId id)
     {
         super.setId(id);
     }
 
+    @Override
+    public void setType(String type)
+    {
+        super.setType(type);
+    }
+    
     // CoreExtension
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.CoreExtension#getURL()
-     */
-    public URL getURL()
-    {
-        return getProperty(PKEY_URL, null);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.CoreExtension#isGuessed()
-     */
+    @Override
     public boolean isGuessed()
     {
         return getProperty(PKEY_GUESSED, false);
@@ -101,11 +79,6 @@ public class DefaultCoreExtension extends AbstractExtension implements CoreExten
 
     // Object
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.AbstractExtension#toString()
-     */
     @Override
     public String toString()
     {

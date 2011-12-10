@@ -26,11 +26,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
@@ -48,29 +51,29 @@ import org.xwiki.xml.html.HTMLCleanerConfiguration;
  * @since 2.1M1
  */
 @Component
+@Singleton
 public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBuilder
 {
     /**
      * Used to serialize the reference document name.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * Used to obtain document converter.
      */
-    @Requirement
+    @Inject
     private OpenOfficeManager officeManager;
 
     /**
      * OpenOffice HTML cleaner.
      */
-    @Requirement("openoffice")
+    @Inject
+    @Named("openoffice")
     private HTMLCleaner ooHtmlCleaner;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XHTMLOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference,
         boolean filterStyles) throws OfficeImporterException
     {

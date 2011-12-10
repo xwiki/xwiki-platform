@@ -72,13 +72,7 @@ public abstract class AbstractFormUrlEncodedAnnotationRequestReader<T extends An
      */
     protected abstract T getReadObjectInstance(ObjectFactory factory);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.ws.rs.ext.MessageBodyReader#readFrom(java.lang.Class, java.lang.reflect.Type,
-     *      java.lang.annotation.Annotation[], javax.ws.rs.core.MediaType, javax.ws.rs.core.MultivaluedMap,
-     *      java.io.InputStream)
-     */
+    @Override
     public T readFrom(Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType,
         MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException,
         WebApplicationException

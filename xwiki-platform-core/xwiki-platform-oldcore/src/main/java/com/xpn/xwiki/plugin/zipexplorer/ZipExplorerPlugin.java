@@ -20,6 +20,7 @@
 package com.xpn.xwiki.plugin.zipexplorer;
 
 import java.io.ByteArrayInputStream;
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -131,12 +132,15 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
         newAttachment.setAuthor(attachment.getAuthor());
         newAttachment.setDate(attachment.getDate());
 
+        InputStream stream = null;
         try {
-            if (!isZipFile(attachment.getContentInputStream(context))) {
+            stream = new BufferedInputStream(attachment.getContentInputStream(context));
+
+            if (!isZipFile(stream)) {
                 return attachment;
             }
 
-            ZipInputStream zis = new ZipInputStream(attachment.getContentInputStream(context));
+            ZipInputStream zis = new ZipInputStream(stream);
             ZipEntry entry;
 
             while ((entry = zis.getNextEntry()) != null) {
@@ -162,6 +166,8 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            IOUtils.closeQuietly(stream);
         }
         return newAttachment;
     }
@@ -178,11 +184,13 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     {
         List<String> zipList = new ArrayList<String>();
         Attachment attachment = document.getAttachment(attachmentName);
+
+        InputStream stream = null;
         try {
-            byte[] stream = attachment.getContent();
-            ByteArrayInputStream bais = new ByteArrayInputStream(stream);
-            if (isZipFile(bais)) {
-                ZipInputStream zis = new ZipInputStream(bais);
+            stream = new ByteArrayInputStream(attachment.getContent());
+
+            if (isZipFile(stream)) {
+                ZipInputStream zis = new ZipInputStream(stream);
                 ZipEntry entry;
                 while ((entry = zis.getNextEntry()) != null) {
                     zipList.add(entry.getName());
@@ -299,11 +307,10 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     protected boolean isZipFile(InputStream filecontent)
     {
         int standardZipHeader = 0x504b0304;
+        filecontent.mark(8);
         try {
             DataInputStream datastream = new DataInputStream(filecontent);
             int fileHeader = datastream.readInt();
-            // This is safe, since ByteArrayInputStream ignores close() calls.
-            datastream.close();
             return (standardZipHeader == fileHeader);
         } catch (IOException e) {
             // The file doesn't have 4 bytes, so it isn't a zip file

@@ -52,11 +52,7 @@ public abstract class AbstractJBossCacheCacheFactory implements CacheFactory
      */
     protected abstract String getDefaultPropsId();
     
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheFactory#newCache(org.xwiki.cache.config.CacheConfiguration)
-     */
+    @Override
     public <T> org.xwiki.cache.Cache<T> newCache(CacheConfiguration configuration) throws CacheException
     {
         this.logger.debug("Start JBoss Cache initialisation");

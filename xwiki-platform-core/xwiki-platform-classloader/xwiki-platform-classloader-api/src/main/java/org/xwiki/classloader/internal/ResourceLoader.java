@@ -16,12 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- * 
- * 
- * Originally written by Dawid Kurzyniec and released to the public domain, as explained
- * at http://creativecommons.org/licenses/publicdomain
- * 
- * Source: http://dcl.mathcs.emory.edu/php/loadPage.php?content=util/features.html#classloading
  */
 package org.xwiki.classloader.internal;
 
@@ -79,6 +73,14 @@ import edu.emory.mathcs.util.classloader.ResourceUtils;
  * when done processing, just like input streams. In contrast, find methods return URLs that can be used to open
  * multiple connections to the resource. In typical class loader applications, when a single retrieval is sufficient, it
  * is preferable to use <i>get</i> methods since they pose slightly smaller communication overhead.
+ *
+ * <p>
+ * Originally written by Dawid Kurzyniec and released to the public domain, as explained
+ * at http://creativecommons.org/licenses/publicdomain
+ * </p>
+ * <p>
+ * Source: http://dcl.mathcs.emory.edu/php/loadPage.php?content=util/features.html#classloading
+ * </p>
  *
  * @version $Id$
  * @since 2.0.1

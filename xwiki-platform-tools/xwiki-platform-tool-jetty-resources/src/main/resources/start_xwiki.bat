@@ -29,6 +29,9 @@ if not exist %JETTY_HOME%\logs mkdir %JETTY_HOME%\logs
 REM Ensure the work directory exists so that Jetty uses it for its temporary files.
 if not exist %JETTY_HOME%\work mkdir %JETTY_HOME%\work
 
+REM Ensure the data directory exists so that XWiki can use it for storing permanent data.
+if not exist data mkdir data
+
 REM Specify port on which HTTP requests will be handled
 set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.port=%JETTY_PORT%
 
@@ -40,5 +43,13 @@ set XWIKI_OPTS=%XWIKI_OPTS% -DSTOP.KEY=xwiki -DSTOP.PORT=8079
 
 REM Specify the encoding to use
 set XWIKI_OPTS=%XWIKI_OPTS% -Dfile.encoding=UTF8
+
+REM In order to avoid getting a "java.lang.IllegalStateException: Form too large" error
+REM when editing large page in XWiki we need to tell Jetty to allow for large content
+REM since by default it only allows for 20K. We do this by passing the
+REM org.mortbay.http.HttpRequest.maxFormContentSize property.
+REM Note that setting this value too high can leave your server vulnerable to denial of
+REM service attacks.
+set XWIKI_OPTS=%XWIKI_OPTS% -Dorg.mortbay.jetty.Request.maxFormContentSize=1000000
 
 java %XWIKI_OPTS% %2 %3 %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar

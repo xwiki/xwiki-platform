@@ -19,13 +19,20 @@
  */
 package org.xwiki.extension;
 
+import java.io.Serializable;
+
 /**
  * The combination of properties which makes an extension unique.
  * 
  * @version $Id$
  */
-public class ExtensionId
+public class ExtensionId implements Serializable
 {
+    /**
+     * Serialization identifier.
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * @see #getId()
      */

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -40,6 +41,7 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
  * @since 2.0M3
  */
 @Component
+@Singleton
 public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
 {
     /**

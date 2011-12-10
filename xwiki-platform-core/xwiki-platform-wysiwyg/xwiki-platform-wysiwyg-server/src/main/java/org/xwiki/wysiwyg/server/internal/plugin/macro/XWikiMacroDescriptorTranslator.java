@@ -21,7 +21,10 @@ package org.xwiki.wysiwyg.server.internal.plugin.macro;
 
 import java.util.Map.Entry;
 
-import org.xwiki.component.annotation.Requirement;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.ParameterDescriptor;
@@ -35,6 +38,8 @@ import com.xpn.xwiki.web.XWikiMessageTool;
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class XWikiMacroDescriptorTranslator implements MacroDescriptorTranslator
 {
     /**
@@ -53,7 +58,7 @@ public class XWikiMacroDescriptorTranslator implements MacroDescriptorTranslator
     private static final String KEY_RENDERING = "rendering";
 
     /** Execution context handler, needed for accessing the XWikiMessageTool. */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
@@ -61,11 +66,7 @@ public class XWikiMacroDescriptorTranslator implements MacroDescriptorTranslator
      */
     private XWikiMessageTool messageTool;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MacroDescriptorTranslator#translate(MacroDescriptor)
-     */
+    @Override
     public MacroDescriptor translate(MacroDescriptor macroDescriptor)
     {
         // Update the message tool.

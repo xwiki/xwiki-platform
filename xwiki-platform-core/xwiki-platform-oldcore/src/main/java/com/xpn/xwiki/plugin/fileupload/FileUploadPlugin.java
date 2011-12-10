@@ -35,8 +35,8 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -83,7 +83,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     /**
      * Log object to log messages in this class.
      */
-    private static final Log LOG = LogFactory.getLog(FileUploadPlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileUploadPlugin.class);
 
     /**
      * The default maximum size for uploaded documents. This limit can be changed using the <tt>upload_maxsize</tt>
@@ -102,7 +102,6 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      * @param name the plugin name
      * @param className the plugin classname (used in logs for example)
      * @param context the XWiki Context
-     * 
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
     public FileUploadPlugin(String name, String className, XWikiContext context)
@@ -173,7 +172,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      */
     public void cleanFileList(XWikiContext context)
     {
-        LOG.debug("Cleaning uploaded files");
+        LOGGER.debug("Cleaning uploaded files");
 
         List<FileItem> fileuploadlist = getFileItems(context);
         if (fileuploadlist != null) {
@@ -181,7 +180,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
                 try {
                     item.delete();
                 } catch (Exception ex) {
-                    LOG.warn("Exception cleaning uploaded files", ex);
+                    LOGGER.warn("Exception cleaning uploaded files", ex);
                 }
             }
             context.remove(FILE_LIST_KEY);
@@ -198,9 +197,9 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     public void loadFileList(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
-        loadFileList(xwiki.getXWikiPreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE, context),
-            (int) xwiki
-                .getXWikiPreferenceAsLong(UPLOAD_SIZETHRESHOLD_PARAMETER, UPLOAD_DEFAULT_SIZETHRESHOLD, context),
+        loadFileList(
+            xwiki.getSpacePreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE, context),
+            (int) xwiki.getSpacePreferenceAsLong(UPLOAD_SIZETHRESHOLD_PARAMETER, UPLOAD_DEFAULT_SIZETHRESHOLD, context),
             xwiki.Param("xwiki.upload.tempdir"), context);
     }
 
@@ -217,19 +216,20 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     public void loadFileList(long uploadMaxSize, int uploadSizeThreashold, String tempdir, XWikiContext context)
         throws XWikiException
     {
-        LOG.debug("Loading uploaded files");
+        LOGGER.debug("Loading uploaded files");
 
         // If we already have a file list then loadFileList was already called
         // Continuing would empty the list.. We need to stop.
         if (context.get(FILE_LIST_KEY) != null) {
-            LOG.debug("Called loadFileList twice");
+            LOGGER.debug("Called loadFileList twice");
 
             return;
         }
 
         // Get the FileUpload Data
         // Make sure the factory only ever creates file items which will be deleted when the jvm is stopped.
-        DiskFileItemFactory factory = new DiskFileItemFactory() {
+        DiskFileItemFactory factory = new DiskFileItemFactory()
+        {
             public FileItem createItem(String fieldName, String contentType, boolean isFormField, String fileName)
             {
                 try {
@@ -245,7 +245,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
                         path = super.getRepository().getPath();
                     }
                     throw new RuntimeException("Unable to create a temporary file for saving the attachment. "
-                                               + "Do you have write access on " + path + "?");
+                        + "Do you have write access on " + path + "?");
                 }
             }
         };
@@ -269,7 +269,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
             @SuppressWarnings("unchecked")
             List<FileItem> list = fileupload.parseRequest(reqContext);
             if (list.size() > 0) {
-                LOG.info("Loaded " + list.size() + " uploaded files");
+                LOGGER.info("Loaded " + list.size() + " uploaded files");
             }
             // We store the file list in the context
             context.put(FILE_LIST_KEY, list);
@@ -455,7 +455,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      */
     public FileItem getFile(String formfieldName, XWikiContext context)
     {
-        LOG.debug("Searching file uploaded for field " + formfieldName);
+        LOGGER.debug("Searching file uploaded for field " + formfieldName);
 
         List<FileItem> fileuploadlist = getFileItems(context);
         if (fileuploadlist == null) {
@@ -466,7 +466,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
         for (FileItem item : fileuploadlist) {
             if (formfieldName.equals(item.getFieldName())) {
                 fileitem = item;
-                LOG.debug("Found uploaded file!");
+                LOGGER.debug("Found uploaded file!");
                 break;
             }
         }

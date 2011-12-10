@@ -30,12 +30,14 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -44,6 +46,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.criteria.impl.Period;
@@ -2493,5 +2496,44 @@ public class Document extends Api
         }
 
         return true;
+    }
+
+    /**
+     * Drop permissions for the remainder of the rendering cycle.
+     * After this is called:
+     * <ul>
+     * <li>1. {@link com.xpn.xwiki.api.Api#hasProgrammingRights()} will always return false.</li>
+     * <li>2. {@link com.xpn.xwiki.api.XWiki#getDocumentAsAuthor(org.xwiki.model.reference.DocumentReference)},
+     * {@link com.xpn.xwiki.api.XWiki#getDocumentAsAuthor(String)}, {@link com.xpn.xwiki.api.Document#saveAsAuthor()},
+     * {@link com.xpn.xwiki.api.Document#saveAsAuthor(String)},
+     * {@link com.xpn.xwiki.api.Document#saveAsAuthor(String, boolean)}, and
+     * {@link com.xpn.xwiki.api.Document#deleteAsAuthor()} will perform all of their actions as if the document's
+     * content author was the guest user (XWiki.XWikiGuest).</li>
+     * </ul>
+     * <p>
+     * This sandboxing will expire at the end of the rendering cycle and can be suspended by
+     * beginning a new rendering cycle. A rendering cycle can be begin by calling
+     * {@link #getRenderedContent(String)}, {@link #display(String)} (or variations thereof)
+     * or by invoking the include macro or using {@link com.xpn.xwiki.api.XWiki#includeTopic(String)}
+     * <p>
+     * NOTE: Even if you include the same document, permissions will be regained.
+     * What this does is sandbox the remainder of the code on the page because although
+     * it can temporarily suspend the permissions drop, it cannot get itself to be executed
+     * with permissions because if it calls itself, it will hit the drop function first.
+     * <p>
+     * If you are interested in a more secure sandboxing method where code is guaranteed not
+     * to have permissions for the remainder of the request, you should consider
+     * {@link com.xpn.xwiki.api.Context#dropPermissions()}.
+     * <p>
+     *
+     * @since 3.2M2
+     */
+    public void dropPermissions()
+    {
+        // Set the droppedPermissions key to the context so if the context is cloned and
+        // pushed, it will return false until it is popped again.
+        final ExecutionContext context = Utils.getComponent(Execution.class).getContext();
+        context.setProperty(XWikiConstant.DROPPED_PERMISSIONS,
+                            System.identityHashCode(context));
     }
 }

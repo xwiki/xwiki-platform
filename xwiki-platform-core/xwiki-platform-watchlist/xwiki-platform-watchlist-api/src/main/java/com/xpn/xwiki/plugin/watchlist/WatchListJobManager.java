@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
@@ -77,7 +77,7 @@ public class WatchListJobManager
     /**
      * Logger.
      */
-    private static final Log LOG = LogFactory.getLog(WatchListJobManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WatchListJobManager.class);
 
     /**
      * XWiki Rights class name.
@@ -145,7 +145,7 @@ public class WatchListJobManager
             doc = context.getWiki().getDocument(WATCHLIST_JOB_CLASS, context);
         } catch (Exception e) {
             doc = new XWikiDocument();
-            String[] spaceAndName = WATCHLIST_JOB_CLASS.split(".");
+            String[] spaceAndName = StringUtils.split(WATCHLIST_JOB_CLASS, '.');
             doc.setSpace(spaceAndName[0]);
             doc.setName(spaceAndName[1]);
             needsUpdate = true;
@@ -299,7 +299,7 @@ public class WatchListJobManager
                 ((SchedulerPlugin) context.getWiki().getPlugin("scheduler", context)).scheduleJob(job, context);
             }
         } catch (Exception e) {
-            LOG.error("Cannot initialize WatchListJob", e);
+            LOGGER.error("Cannot initialize WatchListJob", e);
         }
     }
     
@@ -325,7 +325,7 @@ public class WatchListJobManager
                 results.add(new Document(doc, context));
             }
         } catch (Exception e) {
-            LOG.error("error getting list of available watchlist jobs", e);
+            LOGGER.error("error getting list of available watchlist jobs", e);
         } finally {
             context.setDatabase(oriDatabase);
         }

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-model</artifactId>
   <name>XWiki Platform - Model</name>
@@ -55,8 +55,8 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
   </dependencies>
 </project>

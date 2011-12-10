@@ -44,11 +44,7 @@ public class OSCacheCacheEvent<T> implements CacheEvent<T>
         this.cache = cache;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.event.CacheEntryEvent#getCache()
-     */
+    @Override
     public Cache<T> getCache()
     {
         return cache;

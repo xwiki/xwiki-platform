@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.ListUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
@@ -231,7 +231,7 @@ public class WatchListStore implements EventListener
             doc = context.getWiki().getDocument(WATCHLIST_CLASS, context);
         } catch (Exception e) {
             doc = new XWikiDocument();
-            String[] spaceAndName = WATCHLIST_CLASS.split(SPACE_PAGE_SEP);
+            String[] spaceAndName = StringUtils.split(WATCHLIST_CLASS, SPACE_PAGE_SEP);
             doc.setSpace(spaceAndName[0]);
             doc.setName(spaceAndName[1]);
             needsUpdate = true;
@@ -404,7 +404,7 @@ public class WatchListStore implements EventListener
         if (StringUtils.isBlank(watchedItems)) {
             return elements;
         }
-        elements.addAll(Arrays.asList(watchedItems.split(WATCHLIST_ELEMENT_SEP)));
+        elements.addAll(Arrays.asList(StringUtils.split(watchedItems, WATCHLIST_ELEMENT_SEP)));
         return elements;
     }
 

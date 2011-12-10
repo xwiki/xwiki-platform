@@ -21,7 +21,6 @@ package org.xwiki.extension.repository;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
@@ -33,7 +32,7 @@ public class DefaultCoreExtensionRepositoryTest extends AbstractComponentTestCas
 {
     private ConfigurableDefaultCoreExtensionRepository coreExtensionRepository;
 
-    @Before
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();
@@ -47,15 +46,21 @@ public class DefaultCoreExtensionRepositoryTest extends AbstractComponentTestCas
     {
         super.registerComponents();
 
-        ConfigurableDefaultCoreExtensionRepository.register(getComponentManager());
+        registerComponent(ConfigurableDefaultCoreExtensionRepository.class);
     }
 
+    /**
+     * Validate core extension loading and others initializations.
+     */
     @Test
     public void testInit()
     {
         Assert.assertTrue(this.coreExtensionRepository.countExtensions() > 0);
-    }    
+    }
 
+    /**
+     * Validate {@link CoreExtensionRepository#getCoreExtension(String)}
+     */
     @Test
     public void testGetCoreExtension()
     {
@@ -70,6 +75,9 @@ public class DefaultCoreExtensionRepositoryTest extends AbstractComponentTestCas
         Assert.assertEquals("version", extension.getId().getVersion());
     }
 
+    /**
+     * Validate {@link CoreExtensionRepository#resolve(ExtensionId)}
+     */
     @Test
     public void testResolve() throws ResolveException
     {

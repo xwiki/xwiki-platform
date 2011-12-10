@@ -104,9 +104,9 @@ public class IndexedObjectReference extends ObjectReference
      * Overridden to always compute the class name and the object number.
      * 
      * @see org.xwiki.model.reference.EntityReference#setName(java.lang.String)
-     */
+     */ 
     @Override
-    public void setName(String name)
+    protected void setName(String name)
     {
         super.setName(name);
 

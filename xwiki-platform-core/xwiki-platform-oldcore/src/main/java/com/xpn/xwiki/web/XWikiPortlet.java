@@ -34,15 +34,17 @@ import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.portlet.PortletContainerException;
 import org.xwiki.container.portlet.PortletContainerInitializer;
 import org.xwiki.context.Execution;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -57,7 +59,7 @@ public class XWikiPortlet extends GenericPortlet
     public static final String ROOT_SPACE_PARAM_NAME = "rootSpace";
 
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(XWikiPortlet.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiPortlet.class);
 
     private String name = "XWiki Portlet";
 
@@ -118,8 +120,9 @@ public class XWikiPortlet extends GenericPortlet
     protected void handleException(XWikiRequest request, XWikiResponse response, Throwable e, XWikiContext context)
     {
         if (!(e instanceof XWikiException)) {
-            e = new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Uncaught exception", e);
+            e =
+                new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Uncaught exception", e);
         }
 
         VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
@@ -159,8 +162,8 @@ public class XWikiPortlet extends GenericPortlet
     }
 
     @Override
-    public void processAction(ActionRequest actionRequest, ActionResponse actionResponse)
-        throws PortletException, IOException
+    public void processAction(ActionRequest actionRequest, ActionResponse actionResponse) throws PortletException,
+        IOException
     {
         WindowState windowState = actionRequest.getWindowState();
         if (!windowState.equals(WindowState.MINIMIZED) && actionRequest.getPortletMode().equals(CONFIG_PORTLET_MODE)) {
@@ -186,8 +189,7 @@ public class XWikiPortlet extends GenericPortlet
         }
     }
 
-    public void processAction(XWikiContext context)
-        throws PortletException, IOException
+    public void processAction(XWikiContext context) throws PortletException, IOException
     {
         try {
             if (prepareAction(context.getAction(), context.getRequest(), context.getResponse(),
@@ -274,15 +276,15 @@ public class XWikiPortlet extends GenericPortlet
         preferences.setValue(XWikiPortletRequest.ROOT_SPACE_PREF_NAME, rootSpace);
         actionResponse.setPortletMode(PortletMode.VIEW);
         preferences.store();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("New root space is [" + rootSpace + "]");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("New root space is [" + rootSpace + "]");
         }
 
     }
 
     @Override
-    protected void doView(RenderRequest renderRequest, RenderResponse renderResponse)
-        throws PortletException, IOException
+    protected void doView(RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException,
+        IOException
     {
         XWikiContext context = null;
 
@@ -303,8 +305,7 @@ public class XWikiPortlet extends GenericPortlet
         }
     }
 
-    protected void doView(XWikiContext context)
-        throws PortletException, IOException
+    protected void doView(XWikiContext context) throws PortletException, IOException
     {
         try {
             if (prepareAction(context.getAction(), context.getRequest(), context.getResponse(),
@@ -375,8 +376,8 @@ public class XWikiPortlet extends GenericPortlet
                 Utils.parseTemplate(page, context);
             }
         } catch (Throwable e) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("oops", e);
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn("oops", e);
             }
 
             handleException(context.getRequest(), context.getResponse(), e, context);
@@ -387,11 +388,15 @@ public class XWikiPortlet extends GenericPortlet
             } catch (Throwable e) {
             }
 
-            // / Let's handle the notification and make sure it never fails
+            // For the moment we're sending the XWiki context as the data, but this will be
+            // changed in the future, when the whole platform will be written using components
+            // and there won't be a need for the context.
             try {
-                context.getWiki().getNotificationManager().verify(context.getDoc(), context.getAction(), context);
-            } catch (Throwable e) {
-                e.printStackTrace();
+                ObservationManager om = Utils.getComponent(ObservationManager.class);
+                om.notify(new ActionExecutedEvent(context.getAction()), context.getDoc(), context);
+            } catch (Throwable ex) {
+                LOGGER.error("Cannot send action notifications for document [" + context.getDoc() + " using action ["
+                    + context.getAction() + "]", ex);
             }
             cleanUp(context);
         }
@@ -439,12 +444,11 @@ public class XWikiPortlet extends GenericPortlet
         PortletContainerInitializer containerInitializer = Utils.getComponent(PortletContainerInitializer.class);
 
         try {
-            containerInitializer.initializeRequest(
-                ((XWikiPortletRequest) context.getRequest()).getPortletRequest(), context);
-            containerInitializer.initializeResponse(
-                ((XWikiPortletResponse) context.getResponse()).getPortletResponse());
-            containerInitializer.initializeSession(
-                ((XWikiPortletRequest) context.getRequest()).getPortletRequest());
+            containerInitializer.initializeRequest(((XWikiPortletRequest) context.getRequest()).getPortletRequest(),
+                context);
+            containerInitializer
+                .initializeResponse(((XWikiPortletResponse) context.getResponse()).getPortletResponse());
+            containerInitializer.initializeSession(((XWikiPortletRequest) context.getRequest()).getPortletRequest());
         } catch (PortletContainerException e) {
             throw new PortletException("Failed to initialize request/response or session", e);
         }

@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 /*
  * This file is part of "SnipSnap Radeox Rendering Engine".
  *
@@ -46,16 +44,16 @@
 package com.xpn.xwiki.render.macro;
 
 /**
- * This class has been copied from Radeox. The reason is because the class returned getLoadClass() is used to load
- * the service providers. We are passing our own XWikiMacro class so that the
- * META-INF/com.xpn.xwiki.render.macro.XWikiMacro file is used to load the Macros instead of the default macro list
- * provided in the Radeox JAR. Since we need to pass this MacroLoader class to the MacroRepository class we have
- * also copied the MacroRepository class.
+ * This class has been copied from Radeox. The reason is because the class returned getLoadClass() is used to load the
+ * service providers. We are passing our own XWikiMacro class so that the META-INF/com.xpn.xwiki.render.macro.XWikiMacro
+ * file is used to load the Macros instead of the default macro list provided in the Radeox JAR. Since we need to pass
+ * this MacroLoader class to the MacroRepository class we have also copied the MacroRepository class.
  */
 public class MacroLoader extends org.radeox.macro.MacroLoader
 {
+    @Override
     public Class getLoadClass()
     {
-      return XWikiMacro.class;
+        return XWikiMacro.class;
     }
 }

@@ -72,6 +72,9 @@ mkdir -p $JETTY_HOME/logs 2>/dev/null
 # Ensure the work directory exists so that Jetty uses it for its temporary files.
 mkdir -p $JETTY_HOME/work 2>/dev/null
 
+# Ensure the data directory exists so that XWiki can use it for storing permanent data
+mkdir -p data 2>/dev/null
+
 # Specify port on which HTTP requests will be handled
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.port=$JETTY_PORT"
 
@@ -83,6 +86,14 @@ XWIKI_OPTS="$XWIKI_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOPPORT"
 
 # Specify the encoding to use
 XWIKI_OPTS="$XWIKI_OPTS -Dfile.encoding=UTF8"
+
+# In order to avoid getting a "java.lang.IllegalStateException: Form too large" error
+# when editing large page in XWiki we need to tell Jetty to allow for large content
+# since by default it only allows for 20K. We do this by passing the
+# org.mortbay.http.HttpRequest.maxFormContentSize property.
+# Note that setting this value too high can leave your server vulnerable to denial of
+# service attacks.
+XWIKI_OPTS="$XWIKI_OPTS -Dorg.mortbay.jetty.Request.maxFormContentSize=1000000"
 
 # Create a lock file to signify that XWiki is running
 touch xwiki.lck

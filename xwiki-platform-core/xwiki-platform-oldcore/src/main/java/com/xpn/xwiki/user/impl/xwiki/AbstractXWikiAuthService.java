@@ -21,10 +21,10 @@ package com.xpn.xwiki.user.impl.xwiki;
 
 import java.security.Principal;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.securityfilter.realm.SimplePrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
@@ -43,7 +43,7 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
     /**
      * Logging tool.
      */
-    private static final Log LOG = LogFactory.getLog(AbstractXWikiAuthService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractXWikiAuthService.class);
 
     /**
      * The XWiki config property for storing the superadmin password.
@@ -61,9 +61,9 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
         // XWikiRightServiceImpl#isSuperadmin(String)
 
         // Note 1: we use the default document reference resolver here but it doesn't matter since we only care about
-        //         the resolved page name.
+        // the resolved page name.
         // Note 2: we use a resolver since the passed username could contain the wiki and/or space too and we want
-        //         to retrieve only the page name
+        // to retrieve only the page name
         DocumentReference documentReference = Utils.getComponent(DocumentReferenceResolver.class).resolve(username);
         return StringUtils.equalsIgnoreCase(documentReference.getName(), XWikiRightService.SUPERADMIN_USER);
     }
@@ -75,8 +75,8 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
      */
     protected Principal authenticateSuperAdmin(String password, XWikiContext context)
     {
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("Authenticate superadmin");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Authenticate superadmin");
         }
 
         Principal principal;

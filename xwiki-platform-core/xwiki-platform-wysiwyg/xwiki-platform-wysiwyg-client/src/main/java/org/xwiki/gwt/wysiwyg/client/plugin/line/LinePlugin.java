@@ -46,6 +46,7 @@ import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.regexp.shared.RegExp;
 
 /**
  * Overwrites the behavior of creating new lines of text and merging existing ones.
@@ -101,6 +102,11 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
      * The name of the <code>&lt;th&gt;</code> tag.
      */
     public static final String TH = "th";
+
+    /**
+     * A regular expression that matches a string full of whitespace.
+     */
+    private static final RegExp WHITESPACE = RegExp.compile("^\\s+$");
 
     /**
      * Collection of DOM utility methods.
@@ -309,9 +315,25 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
      */
     protected boolean needsSpace(Node leaf)
     {
+        if (leaf == null) {
+            return false;
+        }
         switch (leaf.getNodeType()) {
             case Node.TEXT_NODE:
-                return leaf.getNodeValue().length() > 0;
+                if (WHITESPACE.test(leaf.getNodeValue())) {
+                    // We have to check if the whitespace is rendered in the current context. Let's wrap the text node
+                    // with a SPAN element and see if it has any width.
+                    Element wrapper = Element.as(leaf.getOwnerDocument().createSpanElement());
+                    leaf.getParentNode().replaceChild(wrapper, leaf);
+                    wrapper.appendChild(leaf);
+                    // Note: We test only the width because an empty SPAN element normally has the height of the line.
+                    boolean needsSpace = wrapper.getOffsetWidth() > 0;
+                    // Unwrap the whitespace text node.
+                    wrapper.getParentNode().replaceChild(leaf, wrapper);
+                    return needsSpace;
+                } else {
+                    return leaf.getNodeValue().length() > 0;
+                }
             case Node.ELEMENT_NODE:
                 Element element = Element.as(leaf);
                 return BR.equalsIgnoreCase(element.getTagName()) || element.getOffsetHeight() > 0
@@ -564,12 +586,41 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
         }
 
         // Place the caret after the inserted line break.
-        Node start = lineBreak.getNextSibling();
-        if (start == null || start.getNodeType() != Node.TEXT_NODE) {
-            start = getTextArea().getDocument().createTextNode("");
-            domUtils.insertAfter(start, lineBreak);
+        caret.setStartAfter(lineBreak);
+
+        // In case the line break was inserted at the end of a line..
+        ensureLineBreakIsVisible(lineBreak, container);
+    }
+
+    /**
+     * Ensures that the line created by inserting a line break is visible. This is need especially when the line break
+     * is inserted at the end of an existing line because most browsers don't allow the caret to be placed on invisible
+     * lines.
+     * 
+     * @param lineBreak the line break that was inserted
+     * @param container the container (e.g. the paragraph) where the line break was inserted
+     */
+    protected void ensureLineBreakIsVisible(Node lineBreak, Node container)
+    {
+        Node lastLeaf = null;
+        Node leaf = lineBreak;
+        // Look if there is any visible element on the new line, taking care to remain in the current block container.
+        while (leaf != null && container == domUtils.getNearestBlockContainer(leaf)) {
+            lastLeaf = leaf;
+            leaf = domUtils.getNextLeaf(leaf);
+            if (needsSpace(leaf)) {
+                return;
+            }
         }
-        caret.setStart(start, 0);
+
+        if (lastLeaf != null) {
+            // It seems there's no visible element on the new line. We should add a spacer up in the tree.
+            Node ancestor = lastLeaf;
+            while (ancestor.getParentNode() != container && ancestor.getNextSibling() == null) {
+                ancestor = ancestor.getParentNode();
+            }
+            domUtils.insertAfter(getTextArea().getDocument().createBRElement(), ancestor);
+        }
     }
 
     /**
@@ -617,12 +668,6 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
         Element.as(paragraph).ensureEditable();
 
         // Place the caret inside the new container, at the beginning.
-        if (!start.hasChildNodes()) {
-            start.appendChild(getTextArea().getDocument().createTextNode(""));
-        }
-        if (start.getFirstChild().getNodeType() == Node.TEXT_NODE) {
-            start = start.getFirstChild();
-        }
         caret.setStart(start, 0);
     }
 

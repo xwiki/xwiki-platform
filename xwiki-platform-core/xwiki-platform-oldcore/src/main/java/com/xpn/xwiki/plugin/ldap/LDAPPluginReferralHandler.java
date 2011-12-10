@@ -16,14 +16,13 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.plugin.ldap;
 
 import java.text.MessageFormat;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.novell.ldap.LDAPAuthHandler;
 import com.novell.ldap.LDAPAuthProvider;
@@ -39,7 +38,7 @@ public class LDAPPluginReferralHandler implements LDAPAuthHandler
     /**
      * Logging tool.
      */
-    private static final Log LOG = LogFactory.getLog(LDAPPluginReferralHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LDAPPluginReferralHandler.class);
 
     /**
      * The DN to use when binding.
@@ -76,11 +75,11 @@ public class LDAPPluginReferralHandler implements LDAPAuthHandler
     public LDAPAuthProvider getAuthProvider(String host, int port)
     {
         try {
-            LOG.debug(MessageFormat.format("Looking for auth for referral to {0}:{1}", host, port));
+            LOGGER.debug(MessageFormat.format("Looking for auth for referral to {0}:{1}", host, port));
 
             return new LDAPAuthProvider(this.bindDN, this.bindPassword.getBytes("UTF8"));
         } catch (Exception e) {
-            LOG.error(MessageFormat.format("Failed to create LDAPAuthProvider for referral {0}:{1}", host, port));
+            LOGGER.error(MessageFormat.format("Failed to create LDAPAuthProvider for referral {0}:{1}", host, port));
 
             return null;
         }

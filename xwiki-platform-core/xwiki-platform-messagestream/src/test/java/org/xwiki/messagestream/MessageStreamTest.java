@@ -16,14 +16,13 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.messagestream;
 
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Test;
@@ -95,8 +94,8 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
     public void testPostPublicMessageWithLongMessage() throws Exception
     {
         Event postedMessage = setupForPublicMessage();
-        this.stream.postPublicMessage(StringUtils.repeat("a", 10000));
-        Assert.assertEquals(StringUtils.repeat("a", 2000), postedMessage.getBody());
+        this.stream.postPublicMessage(StringUtils.repeat('a', 10000));
+        Assert.assertEquals(StringUtils.repeat('a', 2000), postedMessage.getBody());
     }
 
     @Test
@@ -130,8 +129,8 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
     public void testPostPersonalMessageWithLongMessage() throws Exception
     {
         Event postedMessage = setupForPersonalMessage();
-        this.stream.postPersonalMessage(StringUtils.repeat("a", 10000));
-        Assert.assertEquals(StringUtils.repeat("a", 2000), postedMessage.getBody());
+        this.stream.postPersonalMessage(StringUtils.repeat('a', 10000));
+        Assert.assertEquals(StringUtils.repeat('a', 2000), postedMessage.getBody());
     }
 
     @Test
@@ -166,8 +165,8 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
     public void testPostDirectMessageWithLongMessage() throws Exception
     {
         Event postedMessage = setupForDirectMessage();
-        this.stream.postDirectMessageToUser(StringUtils.repeat("a", 10000), this.targetUser);
-        Assert.assertEquals(StringUtils.repeat("a", 2000), postedMessage.getBody());
+        this.stream.postDirectMessageToUser(StringUtils.repeat('a', 10000), this.targetUser);
+        Assert.assertEquals(StringUtils.repeat('a', 2000), postedMessage.getBody());
     }
 
     @Test

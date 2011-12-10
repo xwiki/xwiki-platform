@@ -16,65 +16,59 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
-
 package com.xpn.xwiki.web.includeservletasstring;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
-public class IncludeServletAsString {
-  
-    private static final Log log = LogFactory.getLog(IncludeServletAsString.class);
-  
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class IncludeServletAsString
+{
+    private static final Logger LOGGER = LoggerFactory.getLogger(IncludeServletAsString.class);
+
     /**
-     * Creates a new instance of IncludeServletAsString 
+     * Creates a new instance of IncludeServletAsString
      */
-    private IncludeServletAsString() {
+    private IncludeServletAsString()
+    {
     }
-    
-    
-    static public String invokeServletAndReturnAsString(String url,
-            HttpServletRequest servletRequest,
-            HttpServletResponse servletResponse)
-    throws IOException, ServletException {
-      
-        if( log.isDebugEnabled() )
-        {
-            log.debug("Including url \""+url+"\"...");
+
+    static public String invokeServletAndReturnAsString(String url, HttpServletRequest servletRequest,
+        HttpServletResponse servletResponse) throws IOException, ServletException
+    {
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Including url \"" + url + "\"...");
         }
-      
+
         RequestDispatcher requestDispatcher = servletRequest.getRequestDispatcher(url);
-        
-        if( requestDispatcher == null )
-        {
-            IllegalArgumentException iae = new IllegalArgumentException(
-                    "Failed to get RequestDispatcher for url: "+url);
-            log.error(iae.getMessage(),iae);
+
+        if (requestDispatcher == null) {
+            IllegalArgumentException iae =
+                new IllegalArgumentException("Failed to get RequestDispatcher for url: " + url);
+            LOGGER.error(iae.getMessage(), iae);
             throw iae;
         }
-      
+
         BufferedResponse bufferedResponse = new BufferedResponse(servletResponse);
-        
+
         requestDispatcher.include(servletRequest, bufferedResponse);
-        
+
         byte[] buffer = bufferedResponse.getBufferAsByteArray();
-        if( log.isDebugEnabled() )
-        {
-            log.debug("Buffer returned with "+buffer.length+" bytes.");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Buffer returned with " + buffer.length + " bytes.");
         }
-        
+
         String bufferString = new String(buffer, servletResponse.getCharacterEncoding());
-     
+
         return bufferString;
     }
-  
+
 }

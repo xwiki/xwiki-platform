@@ -38,7 +38,7 @@ import java.util.HashMap;
 public class EntryEvictionConfiguration extends HashMap<String, Object>
 {
     /**
-     * The key use to access eviction configuration in the {@link CacheConfiguration}.
+     * The key use to access eviction configuration in the {@link org.xwiki.cache.config.CacheConfiguration}.
      */
     public static final String CONFIGURATIONID = "eviction";
 
@@ -76,7 +76,7 @@ public class EntryEvictionConfiguration extends HashMap<String, Object>
     /**
      * @param mode the ordering/storing algorithm used by the cache.
      */
-    public void setAlgotithm(Algorithm mode)
+    public void setAlgorithm(Algorithm mode)
     {
         this.mode = mode;
     }

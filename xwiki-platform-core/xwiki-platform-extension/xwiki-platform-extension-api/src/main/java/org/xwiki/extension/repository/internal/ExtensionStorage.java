@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.extension.repository.internal;
 
 import java.io.File;
@@ -14,6 +33,8 @@ import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InvalidExtensionException;
 import org.xwiki.extension.LocalExtension;
@@ -46,15 +67,24 @@ public class ExtensionStorage
     private File rootFolder;
 
     /**
+     * Used to lookup the extension serializer.
+     */
+    private ComponentManager componentManager;
+
+    /**
      * @param repository the repository
      * @param rootFolder the repository folder
+     * @param componentManager used to lookup needed components
+     * @throws ComponentLookupException can't find ExtensionSerializer
      */
-    public ExtensionStorage(DefaultLocalExtensionRepository repository, File rootFolder)
+    public ExtensionStorage(DefaultLocalExtensionRepository repository, File rootFolder,
+        ComponentManager componentManager) throws ComponentLookupException
     {
         this.repository = repository;
         this.rootFolder = rootFolder;
+        this.componentManager = componentManager;
 
-        this.extensionSerializer = new ExtensionSerializer();
+        this.extensionSerializer = this.componentManager.lookup(ExtensionSerializer.class);
     }
 
     /**
@@ -75,6 +105,7 @@ public class ExtensionStorage
         if (this.rootFolder.exists()) {
             FilenameFilter descriptorFilter = new FilenameFilter()
             {
+                @Override
                 public boolean accept(File dir, String name)
                 {
                     return name.endsWith(".xed");
@@ -84,7 +115,7 @@ public class ExtensionStorage
             for (File child : this.rootFolder.listFiles(descriptorFilter)) {
                 if (!child.isDirectory()) {
                     try {
-                        LocalExtension localExtension = loadDescriptor(child);
+                        DefaultLocalExtension localExtension = loadDescriptor(child);
 
                         repository.addLocalExtension(localExtension);
                     } catch (Exception e) {
@@ -104,7 +135,7 @@ public class ExtensionStorage
      * @return the extension descriptor
      * @throws InvalidExtensionException error when trying to load extension descriptor
      */
-    private LocalExtension loadDescriptor(File descriptor) throws InvalidExtensionException
+    private DefaultLocalExtension loadDescriptor(File descriptor) throws InvalidExtensionException
     {
         FileInputStream fis;
         try {
@@ -118,7 +149,7 @@ public class ExtensionStorage
 
             localExtension.setFile(getExtensionFile(localExtension.getId(), localExtension.getType()));
 
-            if (!localExtension.getFile().exists()) {
+            if (!localExtension.getFile().getFile().exists()) {
                 throw new InvalidExtensionException("Failed to load local extension [" + descriptor + "]: ["
                     + localExtension.getFile() + "] file does not exists");
             }
@@ -128,7 +159,7 @@ public class ExtensionStorage
             try {
                 fis.close();
             } catch (IOException e) {
-                // TODO: log something
+                LOGGER.error("Failed to close stream for file [" + descriptor + "]", e);
             }
         }
     }
@@ -141,8 +172,8 @@ public class ExtensionStorage
      * @throws TransformerException error when trying to save the descriptor
      * @throws IOException error when trying to save the descriptor
      */
-    protected void saveDescriptor(LocalExtension extension) throws ParserConfigurationException, TransformerException,
-        IOException
+    protected void saveDescriptor(DefaultLocalExtension extension) throws ParserConfigurationException,
+        TransformerException, IOException
     {
         File file = getDescriptorFile(extension.getId());
         FileOutputStream fos = new FileOutputStream(file);
@@ -190,5 +221,16 @@ public class ExtensionStorage
 
             return fileName;
         }
+    }
+
+    /**
+     * Remove extension from storage.
+     * 
+     * @param extension extension to remove
+     */
+    protected void removeExtension(LocalExtension extension)
+    {
+        getExtensionFile(extension.getId(), extension.getType()).delete();
+        getDescriptorFile(extension.getId()).delete();
     }
 }

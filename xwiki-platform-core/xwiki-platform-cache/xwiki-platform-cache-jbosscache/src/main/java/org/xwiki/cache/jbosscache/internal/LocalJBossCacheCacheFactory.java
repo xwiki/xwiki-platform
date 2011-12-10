@@ -19,21 +19,21 @@
  */
 package org.xwiki.cache.jbosscache.internal;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 
 /**
- * Implements {@link CacheFactory} based on JBossCache.
+ * Implements {@link org.xwiki.cache.CacheFactory} based on JBossCache.
  * 
  * @version $Id$
  */
-@Component("jbosscache/local")
+@Component
+@Named("jbosscache/local")
+@Singleton
 public class LocalJBossCacheCacheFactory extends AbstractJBossCacheCacheFactory
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractJBossCacheCacheFactory#getDefaultPropsId()
-     */
     @Override
     protected String getDefaultPropsId()
     {

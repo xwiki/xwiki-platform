@@ -22,10 +22,11 @@ package com.xpn.xwiki.internal.macro;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.internal.macro.wikibridge.WikiMacroBindingInitializer;
@@ -42,7 +43,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 2.5M1
  */
-@Component("core")
+@Component
+@Singleton
+@Named("core")
 public class CoreWikiMacroBindingInitializer implements WikiMacroBindingInitializer
 {
     /**
@@ -54,7 +57,7 @@ public class CoreWikiMacroBindingInitializer implements WikiMacroBindingInitiali
     /**
      * Execution context handler, needed for accessing the XWikiContext.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**

@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.xwiki.bridge.event.AbstractDocumentEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
@@ -34,7 +36,6 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -58,8 +59,8 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
     /**
      * Event listened by the component.
      */
-    private static final List<Event> EVENTS =
-        Arrays.<Event> asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
+    private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentCreatedEvent(),
+        new DocumentUpdatedEvent(), new DocumentDeletedEvent());
 
     /**
      * Used to listen to document modification events.
@@ -68,32 +69,19 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
      */
     protected class Listener implements EventListener
     {
-        /**
-         * {@inheritDoc}
-         * 
-         * @see org.xwiki.observation.EventListener#getName()
-         */
+        @Override
         public String getName()
         {
             return name;
         }
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @see org.xwiki.observation.EventListener#getEvents()
-         */
+        @Override
         public List<Event> getEvents()
         {
             return EVENTS;
         }
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-         *      java.lang.Object)
-         */
+        @Override
         public void onEvent(Event event, Object source, Object data)
         {
             String documentReferenceString = ((AbstractDocumentEvent) event).getEventFilter().getFilter();
@@ -118,14 +106,20 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
     /**
      * Used to initialize the actual cache component.
      */
-    @Requirement
+    @Inject
     private CacheManager cacheManager;
 
     /**
      * Serialize a document reference into a String.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> serializer;
+
+    /**
+     * Used to register as event listener to invalidate the cache.
+     */
+    @Inject
+    private ObservationManager observationManager;
 
     /**
      * The actual cache object.
@@ -142,17 +136,7 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
      */
     private String name;
 
-    /**
-     * Used to register as event listener to invalidate the cache.
-     */
-    @Requirement
-    private ObservationManager observationManager;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.internal.cache.DocumentCache#create(org.xwiki.cache.config.CacheConfiguration)
-     */
+    @Override
     public void create(CacheConfiguration cacheConfiguration) throws CacheException
     {
         this.name = cacheConfiguration.getConfigurationId();
@@ -162,30 +146,20 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
         CacheConfiguration mappingCacheConfiguration = (CacheConfiguration) cacheConfiguration.clone();
         mappingCacheConfiguration.setConfigurationId(cacheConfiguration.getConfigurationId() + ".mapping");
 
-        this.mappingCache = this.cacheManager.createNewCache(cacheConfiguration);
+        this.mappingCache = this.cacheManager.createNewCache(mappingCacheConfiguration);
 
         this.observationManager.addListener(this.listener);
     }
 
     // cache
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.internal.cache.DocumentCache#get(org.xwiki.model.reference.DocumentReference,
-     *      java.lang.Object[])
-     */
+    @Override
     public C get(DocumentReference documentReference, Object... extensions)
     {
         return this.cache.get(getKey(documentReference, extensions));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.internal.cache.DocumentCache#set(java.lang.Object,
-     *      org.xwiki.model.reference.DocumentReference, java.lang.Object[])
-     */
+    @Override
     public void set(C data, DocumentReference documentReference, Object... extensions)
     {
         String key = getKey(documentReference, extensions);
@@ -238,12 +212,7 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
         return str.replace("\\", "\\\\").replace(":", "\\:");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.internal.cache.DocumentCache#remove(java.lang.Object,
-     *      org.xwiki.model.reference.DocumentReference, java.lang.Object[])
-     */
+    @Override
     public void remove(C data, DocumentReference documentReference, Object... extensions)
     {
         String key = getKey(documentReference, extensions);
@@ -258,22 +227,14 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.internal.cache.DocumentCache#removeAll()
-     */
+    @Override
     public void removeAll()
     {
         this.cache.removeAll();
         this.mappingCache.removeAll();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.internal.cache.DocumentCache#dispose()
-     */
+    @Override
     public void dispose()
     {
         this.cache.dispose();

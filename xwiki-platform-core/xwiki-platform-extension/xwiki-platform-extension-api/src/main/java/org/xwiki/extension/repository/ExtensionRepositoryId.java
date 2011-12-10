@@ -44,6 +44,16 @@ public class ExtensionRepositoryId
     private final URI uri;
 
     /**
+     * @param id the identifier to clone
+     */
+    public ExtensionRepositoryId(ExtensionRepositoryId id)
+    {
+        this.id = id.getId();
+        this.type = id.getType();
+        this.uri = id.getURI();
+    }
+
+    /**
      * @param id the unique identifier
      * @param type the repository type (maven, xwiki, etc.)
      * @param uri the repository adress

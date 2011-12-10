@@ -22,10 +22,10 @@ package org.xwiki.crypto.passwd.internal;
 import java.util.Properties;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 
 import org.xwiki.crypto.passwd.PasswordCryptoServiceConfiguration;
@@ -39,6 +39,7 @@ import org.xwiki.crypto.passwd.PasswordCiphertext;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultPasswordCryptoServiceConfiguration implements PasswordCryptoServiceConfiguration
 {
     /**
@@ -118,14 +119,10 @@ public class DefaultPasswordCryptoServiceConfiguration implements PasswordCrypto
 
 
     /** Configuration is loaded from this source. */
-    @Requirement
+    @Inject
     private ConfigurationSource source;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see PasswordCryptoServiceConfiguration#getCipherClass()
-     */
+    @Override
     public Class<? extends PasswordCiphertext> getCipherClass()
     {
         return this.getClass(this.configurationPrefix + this.cipherKey,
@@ -133,11 +130,7 @@ public class DefaultPasswordCryptoServiceConfiguration implements PasswordCrypto
                              this.defaultCipherClass);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see PasswordCryptoServiceConfiguration#getKeyDerivationFunctionClassForEncryption()
-     */
+    @Override
     public Class<? extends KeyDerivationFunction> getKeyDerivationFunctionClassForEncryption()
     {
         return this.getClass(this.configurationPrefix + this.keyDerivationFunctionClassForEncryption,
@@ -145,22 +138,14 @@ public class DefaultPasswordCryptoServiceConfiguration implements PasswordCrypto
                              this.defaultKeyDerivationFunctionClassForEncryption);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see PasswordCryptoServiceConfiguration#getKeyDerivationFunctionPropertiesForEncryption()
-     */
+    @Override
     public Properties getKeyDerivationFunctionPropertiesForEncryption()
     {
         return new Properties(this.source.getProperty(this.keyDerivationFunctionPropertiesForEncryption,
                                                       this.defaultKeyDerivationFunctionPropertiesForEncryption));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see PasswordCryptoServiceConfiguration#getPasswordVerificationFunctionClass()
-     */
+    @Override
     public Class<? extends PasswordVerificationFunction> getPasswordVerificationFunctionClass()
     {
         return this.getClass(this.configurationPrefix + this.passwordVerificationFunctionClass,
@@ -168,11 +153,7 @@ public class DefaultPasswordCryptoServiceConfiguration implements PasswordCrypto
                              this.defaultPasswordVerificationFunctionClass);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see PasswordCryptoServiceConfiguration#getKeyDerivationFunctionClassForPasswordVerification()
-     */
+    @Override
     public Class<? extends KeyDerivationFunction> getKeyDerivationFunctionClassForPasswordVerification()
     {
         return this.getClass(this.configurationPrefix + this.keyDerivationFunctionClassForPasswordVerification,
@@ -180,11 +161,7 @@ public class DefaultPasswordCryptoServiceConfiguration implements PasswordCrypto
                              this.defaultKeyDerivationFunctionClassForPasswordVerification);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see PasswordCryptoServiceConfiguration#getKeyDerivationFunctionPropertiesForPasswordVerification()
-     */
+    @Override
     public Properties getKeyDerivationFunctionPropertiesForPasswordVerification()
     {
         return new Properties(
@@ -211,7 +188,7 @@ public class DefaultPasswordCryptoServiceConfiguration implements PasswordCrypto
                 return Class.forName(value).asSubclass(mustExtend);
             }
         } catch (Exception e) {
-            this.logger.info("Unable to read configuration for [" + configurationKey + "] using default.");
+            this.logger.info("Unable to read configuration for [{}] using default.", configurationKey);
         }
         return defaultOut.asSubclass(mustExtend);
     }

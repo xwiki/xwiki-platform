@@ -41,18 +41,14 @@ public class XWikiRemoteServiceServlet extends RemoteServiceServlet
      */
     private static final long serialVersionUID = 1911611911891893986L;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RemoteServiceServlet#processCall(String)
-     */
+    @Override
     public String processCall(String payload) throws SerializationException
     {
         try {
             RPCRequest req = RPC.decodeRequest(payload, null, this);
             RemoteService service = (RemoteService) Utils.getComponent(req.getMethod().getDeclaringClass());
-            return RPC.invokeAndEncodeResponse(service, req.getMethod(), req.getParameters(), req
-                .getSerializationPolicy());
+            return RPC.invokeAndEncodeResponse(service, req.getMethod(), req.getParameters(),
+                req.getSerializationPolicy());
         } catch (IncompatibleRemoteServiceException ex) {
             log("IncompatibleRemoteServiceException in the processCall(String) method.", ex);
             return RPC.encodeResponseForFailure(null, ex);

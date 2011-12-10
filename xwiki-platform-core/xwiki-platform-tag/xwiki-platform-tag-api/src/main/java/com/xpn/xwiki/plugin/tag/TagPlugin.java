@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.tag;
 
 import java.util.ArrayList;
@@ -29,9 +28,9 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -53,7 +52,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
     /** Logging helper object. */
-    public static final Log LOG = LogFactory.getLog(TagPlugin.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(TagPlugin.class);
 
     /**
      * The identifier for this plugin; used for accessing the plugin from velocity, and as the action returning the
@@ -150,7 +149,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             PropertyClass tagPropertyDefinition = (PropertyClass) tagClass.getField(TAG_PROPERTY);
             tagProperty = tagPropertyDefinition.newProperty();
         } catch (XWikiException ex) {
-            LOG.warn("Failed to properly create tag property for the tag object, creating a default one");
+            LOGGER.warn("Failed to properly create tag property for the tag object, creating a default one");
             tagProperty = new DBStringListProperty();
         }
         tagProperty.setName(TAG_PROPERTY);

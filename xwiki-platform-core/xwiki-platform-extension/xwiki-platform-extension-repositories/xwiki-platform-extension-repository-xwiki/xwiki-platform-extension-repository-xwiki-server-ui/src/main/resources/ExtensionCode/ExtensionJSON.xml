@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>ExtensionCode</web>
+<name>ExtensionJSON</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>ExtensionCode.WebHome</parent>
+<creator>XWiki.VincentMassol</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1291631258000</creationDate>
+<date>1319553333000</date>
+<contentUpdateDate>1319553333000</contentUpdateDate>
+<version>1.1</version>
+<title>ExtensionJSON</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{include document="XWiki.LiveTableResultsMacros" /}}
+{{velocity}}
+#gridresultwithfilter($request.classname $request.collist.split(",") "" " and doc.space='$!request.space'")
+{{/velocity}}</content></xwikidoc>

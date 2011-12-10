@@ -24,14 +24,19 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Developer;
+import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -41,8 +46,13 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.DefaultExtensionAuthor;
+import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionLicense;
+import org.xwiki.extension.ExtensionLicenseManager;
+import org.xwiki.properties.ConverterManager;
 
 import com.google.common.base.Predicates;
 
@@ -51,13 +61,10 @@ import com.google.common.base.Predicates;
  * 
  * @version $Id$
  */
-public class DefaultCoreExtensionScanner
+@Component
+@Singleton
+public class DefaultCoreExtensionScanner implements CoreExtensionScanner
 {
-    /**
-     * Logging tool.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCoreExtensionScanner.class);
-
     /**
      * The package containing maven informations in a jar file.
      */
@@ -74,34 +81,31 @@ public class DefaultCoreExtensionScanner
     private static final String SNAPSHOTSUFFIX = "-SNAPSHOT";
 
     /**
-     * JBoss vfszip protocol.
+     * The logger to log.
      */
-    private static final String PROTOCOL_VFSZIP = "vfszip:";
+    @Inject
+    private Logger logger;
 
     /**
-     * JBoss vfsfile protocol.
+     * Used to parse some custom properties.
      */
-    private static final String PROTOCOL_VFSFILE = "vfsfile:";
+    @Inject
+    private ConverterManager converter;
 
     /**
-     * file protocol.
+     * Used to find proper {@link ExtensionLicense}.
      */
-    private static final String PROTOCOL_FILE = "file:";
+    @Inject
+    private ExtensionLicenseManager licenseManager;
 
-    /**
-     * Scan classpath to find core extensions.
-     * 
-     * @return scan jar files in classpath to find core extensions
-     */
+    @Override
     public Map<String, DefaultCoreExtension> loadExtensions(DefaultCoreExtensionRepository repository)
     {
-        Set<URL> baseURLs = ClasspathHelper.getUrlsForPackagePrefix(MAVENPACKAGE);
-
-        baseURLs = filterURLs(baseURLs);
+        Set<URL> mavenURLs = ClasspathHelper.forPackage(MAVENPACKAGE);
 
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.setScanners(new ResourcesScanner());
-        configurationBuilder.setUrls(baseURLs);
+        configurationBuilder.setUrls(mavenURLs);
         configurationBuilder.filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(MAVENPACKAGE)));
 
         Reflections reflections = new Reflections(configurationBuilder);
@@ -115,82 +119,108 @@ public class DefaultCoreExtensionScanner
 
         for (String descriptor : descriptors) {
             URL descriptorUrl = getClass().getClassLoader().getResource(descriptor);
-
             InputStream descriptorStream = getClass().getClassLoader().getResourceAsStream(descriptor);
             try {
                 MavenXpp3Reader reader = new MavenXpp3Reader();
                 Model mavenModel = reader.read(descriptorStream);
 
-                Properties properties = mavenModel.getProperties();
-                String version = mavenModel.getVersion();
-                String groupId = mavenModel.getGroupId();
+                String version = resolveVersion(mavenModel.getVersion(), mavenModel, false);
+                String groupId = resolveGroupId(mavenModel.getGroupId(), mavenModel, false);
 
-                // TODO: download parents and resolve pom.xml properties using aether
-                if (version == null || groupId == null) {
-                    Parent parent = mavenModel.getParent();
-
-                    if (groupId == null) {
-                        groupId = parent.getGroupId();
-                    }
-
-                    if (version == null) {
-                        version = parent.getVersion();
-                    }
-
-                    if (version == null) {
-                        version = UNKNOWN;
-                    }
-                    if (groupId == null) {
-                        groupId = UNKNOWN;
-                    }
-                } else {
-                    if (version.startsWith("$")) {
-                        version = properties.getProperty(version.substring(2, version.length() - 1));
-                    }
-                }
+                String extensionURLStr = descriptorUrl.toString();
+                extensionURLStr =
+                    extensionURLStr.substring(0, descriptorUrl.toString().indexOf(MAVENPACKAGE.replace('.', '/')));
+                URL extensionURL = new URL(extensionURLStr);
 
                 DefaultCoreExtension coreExtension =
-                    new DefaultCoreExtension(repository, ClasspathHelper.getBaseUrl(descriptorUrl, baseURLs),
-                        new ExtensionId(groupId + ':' + mavenModel.getArtifactId(), version),
-                        packagingToType(mavenModel.getPackaging()));
+                    new DefaultCoreExtension(repository, extensionURL, new ExtensionId(groupId + ':'
+                        + mavenModel.getArtifactId(), version), packagingToType(mavenModel.getPackaging()));
+
+                coreExtension.setName(mavenModel.getName());
+                coreExtension.setDescription(mavenModel.getDescription());
+                for (Developer developer : mavenModel.getDevelopers()) {
+                    URL authorURL = null;
+                    if (developer.getUrl() != null) {
+                        try {
+                            authorURL = new URL(developer.getUrl());
+                        } catch (MalformedURLException e) {
+                            // TODO: log ?
+                        }
+                    }
+
+                    coreExtension.addAuthor(new DefaultExtensionAuthor(developer.getId(), authorURL));
+                }
+                coreExtension.setWebsite(mavenModel.getUrl());
+
+                // licenses
+                for (License license : mavenModel.getLicenses()) {
+                    coreExtension.addLicense(getExtensionLicense(license));
+                }
+
+                // features
+                String featuresString = mavenModel.getProperties().getProperty("xwiki.extension.features");
+                if (StringUtils.isNotBlank(featuresString)) {
+                    coreExtension.setFeatures(this.converter.<Collection<String>> convert(List.class, featuresString));
+                }
+
+                // custom properties
+                coreExtension.putProperty("maven.groupId", groupId);
+                coreExtension.putProperty("maven.artifactId", mavenModel.getArtifactId());
 
                 extensions.put(coreExtension.getId().getId(), coreExtension);
                 coreArtefactIds.add(new Object[] {mavenModel.getArtifactId(), coreExtension});
 
-                for (Dependency dependency : mavenModel.getDependencies()) {
-                    if (dependency.getGroupId().equals("${project.groupId}")) {
-                        dependency.setGroupId(groupId);
+                // dependencies
+                for (Dependency mavenDependency : mavenModel.getDependencies()) {
+                    if (!mavenDependency.isOptional()
+                        && (mavenDependency.getScope() == null || mavenDependency.getScope().equals("compile") || mavenDependency
+                            .getScope().equals("runtime"))) {
+                        coreExtension.addDependency(new DefaultExtensionDependency(resolveGroupId(
+                            mavenDependency.getGroupId(), mavenModel, true)
+                            + ':' + mavenDependency.getArtifactId(), resolveVersion(mavenDependency.getVersion(),
+                            mavenModel, true)));
                     }
-                    if (dependency.getVersion() == null) {
-                        dependency.setVersion(UNKNOWN);
-                    } else if (dependency.getVersion().equals("${project.version}")
-                        || dependency.getVersion().equals("${pom.version}")) {
-                        dependency.setVersion(version);
+
+                    if (mavenDependency.getGroupId().equals("${project.groupId}")) {
+                        mavenDependency.setGroupId(groupId);
                     }
-                    dependencies.add(dependency);
+                    if (mavenDependency.getVersion() == null) {
+                        mavenDependency.setVersion(UNKNOWN);
+                    } else if (mavenDependency.getVersion().equals("${project.version}")
+                        || mavenDependency.getVersion().equals("${pom.version}")) {
+                        mavenDependency.setVersion(version);
+                    }
+                    dependencies.add(mavenDependency);
                 }
+
             } catch (Exception e) {
-                LOGGER.warn("Failed to parse descriptor [" + descriptorUrl
+                this.logger.warn("Failed to parse descriptor [" + descriptorUrl
                     + "], it will be ignored and not found in core extensions.", e);
             } finally {
                 try {
                     descriptorStream.close();
                 } catch (IOException e) {
                     // Should not happen
-                    LOGGER.error("Failed to close descriptor stream [" + descriptorUrl + "]", e);
+                    this.logger.error("Failed to close descriptor stream [" + descriptorUrl + "]", e);
                 }
             }
+        }
 
-            // Normalize and guess
+        // Normalize and guess
 
-            Map<String, Object[]> artefacts = new HashMap<String, Object[]>();
-            Set<URL> urls = ClasspathHelper.getUrlsForCurrentClasspath();
+        Map<String, Object[]> fileNames = new HashMap<String, Object[]>();
+        Map<String, Object[]> guessedArtefacts = new HashMap<String, Object[]>();
+        Set<URL> urls = ClasspathHelper.forClassLoader();
 
-            for (URL url : urls) {
-                String filename = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
+        for (URL url : urls) {
+            try {
+                String path = url.toURI().getPath();
+                String filename = path.substring(path.lastIndexOf('/') + 1);
+                String type = null;
 
                 int extIndex = filename.lastIndexOf('.');
                 if (extIndex != -1) {
+                    type = filename.substring(extIndex + 1);
                     filename = filename.substring(0, extIndex);
                 }
 
@@ -202,78 +232,151 @@ public class DefaultCoreExtensionScanner
                 }
 
                 if (index != -1) {
+                    fileNames.put(filename, new Object[] {url});
+
                     String artefactname = filename.substring(0, index);
                     String version = filename.substring(index + 1);
 
-                    artefacts.put(artefactname, new Object[] {version, url});
+                    guessedArtefacts.put(artefactname, new Object[] {version, url, type});
                 }
+            } catch (Exception e) {
+                this.logger.warn("Failed to parse resource name [" + url + "]", e);
             }
+        }
 
-            // Try to resolve version no easy to find from the pom.xml
-            try {
-                for (Object[] coreArtefactId : coreArtefactIds) {
-                    Object[] artefact = artefacts.get(coreArtefactId[0]);
+        // Try to resolve version no easy to find from the pom.xml
+        try {
+            for (Object[] coreArtefactId : coreArtefactIds) {
+                Object[] artefact = guessedArtefacts.get(coreArtefactId[0]);
 
-                    DefaultCoreExtension coreExtension = (DefaultCoreExtension) coreArtefactId[1];
-                    if (artefact != null && coreExtension.getId().getVersion().charAt(0) == '$') {
+                DefaultCoreExtension coreExtension = (DefaultCoreExtension) coreArtefactId[1];
+                if (artefact != null) {
+                    if (coreExtension.getId().getVersion().charAt(0) == '$') {
                         coreExtension.setId(new ExtensionId(coreExtension.getId().getId(), (String) artefact[0]));
                         coreExtension.setGuessed(true);
                     }
-                }
 
-                // Add dependencies that does not provide proper pom.xml resource and can't be found in the classpath
-                for (Dependency dependency : dependencies) {
-                    String dependencyId = dependency.getGroupId() + ':' + dependency.getArtifactId();
-
-                    Object[] artefact = artefacts.get(dependency.getArtifactId());
-                    if (artefact != null) {
-                        DefaultCoreExtension coreExtension = extensions.get(dependencyId);
-                        if (coreExtension == null) {
-                            coreExtension =
-                                new DefaultCoreExtension(repository, (URL) artefact[1], new ExtensionId(dependencyId,
-                                    (String) artefact[0]), packagingToType(dependency.getType()));
-                            coreExtension.setGuessed(true);
-
-                            extensions.put(dependencyId, coreExtension);
-                        }
+                    if (coreExtension.getType().charAt(0) == '$') {
+                        coreExtension.setType((String) artefact[2]);
+                        coreExtension.setGuessed(true);
                     }
                 }
-            } catch (Exception e) {
-                LOGGER.warn("Failed to guess extra information about some extensions", e);
             }
+
+            // Add dependencies that does not provide proper pom.xml resource and can't be found in the classpath
+            for (Dependency dependency : dependencies) {
+                String dependencyId = dependency.getGroupId() + ':' + dependency.getArtifactId();
+
+                DefaultCoreExtension coreExtension = extensions.get(dependencyId);
+                if (coreExtension == null) {
+                    String dependencyFileName = dependency.getArtifactId() + '-' + dependency.getVersion();
+                    if (dependency.getClassifier() != null) {
+                        dependencyFileName += '-' + dependency.getClassifier();
+                        dependencyId += ':' + dependency.getClassifier();
+                    }
+
+                    Object[] filenameArtifact = fileNames.get(dependencyFileName);
+                    Object[] guessedArtefact = guessedArtefacts.get(dependency.getArtifactId());
+
+                    if (filenameArtifact != null) {
+                        coreExtension =
+                            new DefaultCoreExtension(repository, (URL) filenameArtifact[0], new ExtensionId(
+                                dependencyId, dependency.getVersion()), packagingToType(dependency.getType()));
+                        coreExtension.setGuessed(true);
+                    } else if (guessedArtefact != null) {
+                        coreExtension =
+                            new DefaultCoreExtension(repository, (URL) guessedArtefact[1], new ExtensionId(
+                                dependencyId, (String) guessedArtefact[0]), packagingToType(dependency.getType()));
+                        coreExtension.setGuessed(true);
+                    }
+
+                    if (coreExtension != null) {
+                        extensions.put(dependencyId, coreExtension);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            this.logger.warn("Failed to guess extra information about some extensions", e);
         }
 
         return extensions;
     }
 
-    /**
-     * JBoss returns URLs with the vfszip and vfsfile protocol for resources, and the org.reflections library doesn't
-     * recognize them. This is more a bug inside the reflections library, but we can write a small workaround for a
-     * quick fix on our side.
-     * 
-     * @param urls base URLs to modify
-     * @return modified base URLs
-     */
-    // TODO: remove when http://code.google.com/p/reflections/issues/detail?id=76 is fixed
-    private Set<URL> filterURLs(Set<URL> urls)
+    private String resolveVersion(String modelVersion, Model mavenModel, boolean dependency)
     {
-        Set<URL> results = new HashSet<URL>(urls.size());
-        for (URL url : urls) {
-            String cleanURL = url.toString();
-            // Fix JBoss URLs
-            if (url.getProtocol().startsWith(PROTOCOL_VFSZIP)) {
-                cleanURL = cleanURL.replaceFirst(PROTOCOL_VFSZIP, PROTOCOL_FILE);
-            } else if (url.getProtocol().startsWith(PROTOCOL_VFSFILE)) {
-                cleanURL = cleanURL.replaceFirst(PROTOCOL_VFSFILE, PROTOCOL_FILE);
+        String version = modelVersion;
+
+        // TODO: download parents and resolve pom.xml properties using aether ? could be pretty expensive for
+        // the init
+        if (version == null) {
+            if (!dependency) {
+                Parent parent = mavenModel.getParent();
+
+                if (parent != null) {
+                    version = parent.getVersion();
+                }
             }
-            cleanURL = cleanURL.replaceFirst("\\.jar/", ".jar!/");
-            try {
-                results.add(new URL(cleanURL));
-            } catch (MalformedURLException ex) {
-                // Shouldn't happen, but we can't do more to fix this URL.
+        } else if (version.startsWith("$")) {
+            String propertyName = version.substring(2, version.length() - 1);
+
+            if (propertyName.equals("project.version") || propertyName.equals("pom.version")
+                || propertyName.equals("version")) {
+                version = resolveVersion(mavenModel.getVersion(), mavenModel, false);
+            } else {
+                String value = mavenModel.getProperties().getProperty(propertyName);
+                if (value != null) {
+                    version = value;
+                }
             }
         }
-        return results;
+
+        if (version == null) {
+            version = UNKNOWN;
+        }
+
+        return version;
+    }
+
+    private String resolveGroupId(String modelGroupId, Model mavenModel, boolean dependency)
+    {
+        String groupId = modelGroupId;
+
+        // TODO: download parents and resolve pom.xml properties using aether ? could be pretty expensive for
+        // the init
+        if (groupId == null) {
+            if (!dependency) {
+                Parent parent = mavenModel.getParent();
+
+                if (parent != null) {
+                    groupId = parent.getGroupId();
+                }
+            }
+        } else if (groupId.startsWith("$")) {
+            String propertyName = groupId.substring(2, groupId.length() - 1);
+
+            String value = mavenModel.getProperties().getProperty(propertyName);
+            if (value != null) {
+                groupId = value;
+            }
+        }
+
+        if (groupId == null) {
+            groupId = UNKNOWN;
+        }
+
+        return groupId;
+    }
+
+    // TODO: download custom licenses content
+    private ExtensionLicense getExtensionLicense(License license)
+    {
+        if (license.getName() == null) {
+            return new ExtensionLicense("noname", null);
+        }
+
+        ExtensionLicense extensionLicense = this.licenseManager.getLicense(license.getName());
+
+        return extensionLicense != null ? extensionLicense : new ExtensionLicense(license.getName(), null);
     }
 
     /**

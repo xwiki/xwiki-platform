@@ -20,26 +20,24 @@
 package com.xpn.xwiki.internal.model.reference;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
  * Unit tests for {@link XClassRelativeStringEntityReferenceResolver}.
  *
  * @version $Id$
- * @since 2.2.3
  */
-public class XClassRelativeStringEntityReferenceResolverTest extends AbstractBridgedXWikiComponentTestCase
+public class XClassRelativeStringEntityReferenceResolverTest extends AbstractBridgedComponentTestCase
 {
     private EntityReferenceResolver<String> resolver;
 
-    @Before
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();

@@ -19,10 +19,13 @@
  */
 package org.xwiki.officeimporter.internal.openoffice;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManagerVelocityBridge;
@@ -34,7 +37,9 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @version $Id$
  * @since 1.8RC3
  */
-@Component("oomanager")
+@Component
+@Named("oomanager")
+@Singleton
 public class OpenOfficeManagerVelocityContextInitializer implements VelocityContextInitializer
 {
     /**
@@ -45,19 +50,19 @@ public class OpenOfficeManagerVelocityContextInitializer implements VelocityCont
     /**
      * The {@link Execution} component.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
      * The {@link OpenOfficeManager} component.
      */
-    @Requirement
+    @Inject
     private OpenOfficeManager ooManager;
 
     /**
      * The {@link DocumentAccessBridge} component.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge docBridge;
 
     /**

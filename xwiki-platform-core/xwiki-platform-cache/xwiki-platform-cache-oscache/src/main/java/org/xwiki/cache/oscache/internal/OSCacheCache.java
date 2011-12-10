@@ -101,31 +101,19 @@ public class OSCacheCache<T> extends AbstractCache<T> implements CacheEntryEvent
         return getName() != null ? cacheKey.substring(getName().length()) : cacheKey;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#remove(java.lang.String)
-     */
+    @Override
     public void remove(String key)
     {
         this.cacheAdmin.flushEntry(cacheKey(key));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#set(java.lang.String, java.lang.Object)
-     */
+    @Override
     public void set(String key, T obj)
     {
         this.cacheAdmin.putInCache(cacheKey(key), obj);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#get(java.lang.String)
-     */
+    @Override
     public T get(String key)
     {
         T value = null;
@@ -144,21 +132,12 @@ public class OSCacheCache<T> extends AbstractCache<T> implements CacheEntryEvent
         return value;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#removeAll()
-     */
+    @Override
     public void removeAll()
     {
         this.cacheAdmin.flushAll();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.util.AbstractCache#dispose()
-     */
     @Override
     public void dispose()
     {
@@ -171,69 +150,41 @@ public class OSCacheCache<T> extends AbstractCache<T> implements CacheEntryEvent
     // Events
     // ////////////////////////////////////////////////////////////////
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.opensymphony.oscache.base.events.CacheEntryEventListener#cacheEntryAdded(com.opensymphony.oscache.base.events.CacheEntryEvent)
-     */
+    @Override
     public void cacheEntryAdded(CacheEntryEvent event)
     {
         sendEntryAddedEvent(new OSCacheCacheEntryEvent<T>(this, event));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.opensymphony.oscache.base.events.CacheEntryEventListener#cacheEntryFlushed(com.opensymphony.oscache.base.events.CacheEntryEvent)
-     */
+    @Override
     public void cacheEntryFlushed(CacheEntryEvent event)
     {
         sendEntryRemovedEvent(new OSCacheCacheEntryEvent<T>(this, event));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.opensymphony.oscache.base.events.CacheEntryEventListener#cacheEntryRemoved(com.opensymphony.oscache.base.events.CacheEntryEvent)
-     */
+    @Override
     public void cacheEntryRemoved(CacheEntryEvent event)
     {
         sendEntryRemovedEvent(new OSCacheCacheEntryEvent<T>(this, event));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.opensymphony.oscache.base.events.CacheEntryEventListener#cacheEntryUpdated(com.opensymphony.oscache.base.events.CacheEntryEvent)
-     */
+    @Override
     public void cacheEntryUpdated(CacheEntryEvent event)
     {
         sendEntryModifiedEvent(new OSCacheCacheEntryEvent<T>(this, event));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.opensymphony.oscache.base.events.CacheEntryEventListener#cacheGroupFlushed(com.opensymphony.oscache.base.events.CacheGroupEvent)
-     */
+    @Override
     public void cacheGroupFlushed(CacheGroupEvent event)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.opensymphony.oscache.base.events.CacheEntryEventListener#cachePatternFlushed(com.opensymphony.oscache.base.events.CachePatternEvent)
-     */
+    @Override
     public void cachePatternFlushed(CachePatternEvent event)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.opensymphony.oscache.base.events.CacheEntryEventListener#cacheFlushed(com.opensymphony.oscache.base.events.CachewideEvent)
-     */
+    @Override
     public void cacheFlushed(CachewideEvent event)
     {
     }

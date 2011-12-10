@@ -79,7 +79,6 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
      * The JavaScript object that catches the submit event and calls {@link #onSubmit()}. We couldn't use a FormPanel
      * because it overwrites the onsubmit property of the form element instead of registering itself as a listener.
      */
-    @SuppressWarnings("unused")
     private JavaScriptObject submitHandler;
 
     /**
@@ -97,11 +96,7 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
      */
     private Element form;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
@@ -156,11 +151,7 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         if (rootExtension.getFeatures().length > 0) {
@@ -213,11 +204,7 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
         form.removeEventListener('submit', handler, false);
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BlurHandler#onBlur(BlurEvent)
-     */
+    @Override
     public void onBlur(BlurEvent event)
     {
         if (event.getSource() == getTextArea()) {
@@ -236,22 +223,14 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
-     */
+    @Override
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
         // ignore
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onCommand(CommandManager, Command, String)
-     */
+    @Override
     public void onCommand(CommandManager sender, Command command, String param)
     {
         if (hiddenConfig != null && sender == getTextArea().getCommandManager() && Command.ENABLE.equals(command)) {
@@ -263,11 +242,7 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClosingHandler#onWindowClosing(ClosingEvent)
-     */
+    @Override
     public void onWindowClosing(ClosingEvent event)
     {
         // Allow the browser to cache the content of the rich text area when the user navigates away from the edit page.

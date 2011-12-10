@@ -57,5 +57,4 @@ function fireContentLoad(contentLoadTriggerId) {
 #end
 <body id="body" class="main">$!content<script id="__contentLoadTrigger" type="text/javascript"><!--
 fireContentLoad('__contentLoadTrigger')
---></script></body>
-</html>
+--></script></body></html>

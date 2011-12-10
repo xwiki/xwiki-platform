@@ -16,16 +16,15 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web.sx;
 
 import java.io.StringWriter;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -54,7 +53,7 @@ public class SxDocumentSource implements SxSource
     private static final String CACHE_POLICY_PROPERTY_NAME = "cache";
 
     /** Logging helper. */
-    private static final Log LOG = LogFactory.getLog(SxDocumentSource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SxDocumentSource.class);
 
     /** The document containing the extension. */
     private XWikiDocument document;
@@ -100,21 +99,16 @@ public class SxDocumentSource implements SxSource
                         finalCache = cache;
                     }
                 } catch (Exception ex) {
-                    LOG.warn(String.format("SX object [%s#%s] has an invalid cache policy: [%s]",
-                        this.document.getFullName(),
-                        sxObj.getStringValue("name"),
-                        sxObj.getStringValue(CACHE_POLICY_PROPERTY_NAME)));
+                    LOGGER.warn("SX object [{}#{}] has an invalid cache policy: [{}]",
+                        new Object[]{this.document.getFullName(), sxObj.getStringValue("name"),
+                            sxObj.getStringValue(CACHE_POLICY_PROPERTY_NAME)});
                 }
             }
         }
         return finalCache;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SxSource#getContent()
-     */
+    @Override
     public String getContent()
     {
         StringBuilder resultBuilder = new StringBuilder();
@@ -141,8 +135,8 @@ public class SxDocumentSource implements SxSource
                             engine.stoppedUsingMacroNamespace(this.document.getPrefixedFullName());
                         }
                     } catch (XWikiVelocityException ex) {
-                        LOG.warn("Velocity errors while parsing skin extension [" + this.document.getPrefixedFullName()
-                            + "]: " + ex.getMessage());
+                        LOGGER.warn("Velocity errors while parsing skin extension [{}]: ",
+                            this.document.getPrefixedFullName(), ex.getMessage());
                     }
                 }
                 // Also add a newline, in case the different object contents don't end with a blank

@@ -205,7 +205,6 @@ public class Reloader implements RequestCallback, LoadHandler
      * @return the new in-line frame element
      * @see #renewRichTextAreaElement()
      */
-    @SuppressWarnings("unused")
     private IFrameElement renewIFrameElement()
     {
         IFrameElement iFrame = IFrameElement.as(rta.getElement()).cast();

@@ -19,6 +19,9 @@
  */
 package org.xwiki.url.internal.standard;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.url.standard.HostResolver;
@@ -29,12 +32,12 @@ import org.xwiki.url.standard.HostResolver;
  * @version $Id$
  * @since 3.0M3
  */
-@Component("domain")
+@Component
+@Named("domain")
+@Singleton
 public class DomainHostResolver implements HostResolver
 {
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public WikiReference resolve(String host)
     {
         String wiki;

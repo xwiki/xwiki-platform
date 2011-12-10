@@ -44,11 +44,6 @@ public class LocalTypedStringEntityReferenceSerializer extends AbstractTypedStri
     @Named("local")
     private EntityReferenceSerializer<String> referenceSerializer;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.reference.internal.AbstractTypedStringEntityReferenceSerializer #getSerializer()
-     */
     @Override
     protected EntityReferenceSerializer<String> getSerializer()
     {

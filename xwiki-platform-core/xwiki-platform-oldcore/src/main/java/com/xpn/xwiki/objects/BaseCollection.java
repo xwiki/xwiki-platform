@@ -34,14 +34,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -71,7 +71,7 @@ import com.xpn.xwiki.web.Utils;
 public abstract class BaseCollection<R extends EntityReference> extends BaseElement<R> implements ObjectInterface,
     Cloneable
 {
-    protected static final Log LOG = LogFactory.getLog(BaseCollection.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseCollection.class);
 
     /**
      * The meaning of this reference fields depends on the element represented. Examples:
@@ -295,7 +295,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             try {
                 baseClass = context.getWiki().getXClass(classReference, context);
             } catch (Exception e) {
-                LOG.error("Failed to get class [" + classReference + "]", e);
+                LOGGER.error("Failed to get class [" + classReference + "]", e);
             }
         }
 

@@ -169,8 +169,6 @@ XWiki.widgets.LiveTable = Class.create({
       }
       url += self.getSortURLFragment();
 
-      self.loadingStatus.removeClassName("hidden");
-
       // Let code know the table is about to load new entries.
       // 1. Named event (for code interested by that table only)
       document.fire("xwiki:livetable:" + this.domNodeName + ":loadingEntries");
@@ -204,7 +202,6 @@ XWiki.widgets.LiveTable = Class.create({
           }
 
           self.recvReqNo = res.reqNo;
-          self.loadingStatus.addClassName("hidden");
 
           if (self.tagCloud && res.matchingtags) {
             self.tagCloud.updateTagCloud(res.tags, res.matchingtags);
@@ -227,6 +224,10 @@ XWiki.widgets.LiveTable = Class.create({
       });
 
     }
+
+    // Make sure to set show the loading as soon as possible (instead of waiting the delay for the actual ajax request)
+    // so that it really reflect the status of the livetable
+    self.loadingStatus.removeClassName("hidden");
 
     if (typeof delay != 'undefined' && delay > 0) {
       // fire the request after a withdrawal period in which it can be cancelled
@@ -722,6 +723,48 @@ var LiveTablePagination = Class.create({
              elem.insert(self.createPageLink(pages, false));
         });
       }
+      if (currentPage <= 1) {
+        this.pagesNodes.each(function(item) {
+          if (!item.up().previous('.controlPagination')) {
+            return;
+          }
+          var prevPage = item.up().previous('.controlPagination').down('.prevPagination');
+          if (prevPage) {
+            prevPage.addClassName('noPrevPagination').removeClassName('prevPagination');
+          }
+        });
+      } else {
+        this.pagesNodes.each(function(item) {
+          if (!item.up().previous('.controlPagination')) {
+            return;
+          }
+          var prevPage = item.up().previous('.controlPagination').down('.noPrevPagination');
+          if (prevPage) {
+            prevPage.addClassName('prevPagination').removeClassName('noPrevPagination');
+          }
+        });
+      }
+      if (currentPage >= pages) {
+        this.pagesNodes.each(function(item) {
+          if (!item.up().previous('.controlPagination')) {
+            return;
+          }
+          var nextPage = item.up().previous('.controlPagination').down('.nextPagination');
+          if (nextPage) {
+            nextPage.addClassName('noNextPagination').removeClassName('nextPagination');
+          }
+        });
+      } else {
+        this.pagesNodes.each(function(item) {
+          if (!item.up().previous('.controlPagination')) {
+            return;
+          }
+          var nextPage = item.up().previous('.controlPagination').down('.noNextPagination');
+          if (nextPage) {
+            nextPage.addClassName('nextPagination').removeClassName('noNextPagination');
+          }
+        });
+      }
     },
     createPageLink:function(page, selected) {
         var pageSpan = new Element("a", {'class':'pagenumber', 'href':'#'}).update(page);
@@ -1043,7 +1086,7 @@ var LiveTableTagCloud = Class.create({
                 self.table.showRows(1, self.table.limit);
             });
          }
-         if (this.selectedTags[tagLabel] != undefined) {
+         if (typeof this.selectedTags[tagLabel] == "object") {
             tag.addClassName("selected");
          }
          var self = this;

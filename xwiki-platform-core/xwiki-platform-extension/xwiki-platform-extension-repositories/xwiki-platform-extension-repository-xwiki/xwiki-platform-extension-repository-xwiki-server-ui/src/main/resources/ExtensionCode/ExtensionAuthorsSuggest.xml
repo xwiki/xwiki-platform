@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xwikidoc>
+<web>ExtensionCode</web>
+<name>ExtensionAuthorsSuggest</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1320676115000</creationDate>
+<date>1321273804000</date>
+<contentUpdateDate>1321273804000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity output="false"}}
+#set($ok = $response.setContentType('text/xml'))
+#set($input = "$!request.input")
+#set($input = $input.toLowerCase())
+#set($i = $input.lastIndexOf(','))
+#set($i = $i + 1)
+#set($input = $input.substring($i))
+#set($input = "${input}%")
+#set($query = 'FROM doc.object(XWiki.XWikiUsers) as user WHERE doc.name &lt;&gt; ''Admin'' and (lower(user.first_name) like :input or lower(user.last_name) like :input or lower(doc.name) like :input)')
+#set($users = $services.query.xwql($query).bindValue('input', $input).execute())
+#if (!$xcontext.isMainWiki())
+  #set($mainUsers = $services.query.xwql($query).setWiki($xcontext.mainWikiName).bindValue('input', $input).execute())
+#end
+{{/velocity}}
+
+{{velocity}}
+&lt;results&gt;
+#foreach($userName in $users)
+  &lt;rs id="${escapetool.xml($userName)}" info="${escapetool.xml($userName)}"&gt;${escapetool.xml($xwiki.getUserName($userName, false))} (${escapetool.xml($userName)})&lt;/rs&gt;
+#end
+#if ($mainUsers)
+  #foreach($userName in $mainUsers)
+    #set($mainUserName = "${xcontext.mainWikiName}:$userName")
+    &lt;rs id="${escapetool.xml($mainUserName)}" info="${escapetool.xml($mainUserName)}"&gt;${escapetool.xml($xwiki.getUserName($mainUserName, false))}  (${escapetool.xml($userName)})&lt;/rs&gt;
+  #end
+#end
+&lt;/results&gt;
+{{/velocity}}</content></xwikidoc>

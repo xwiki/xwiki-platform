@@ -22,7 +22,9 @@ package com.xpn.xwiki.store.hibernate;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -45,6 +47,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
  * @since 1.4M1
  */
 @Component
+@Singleton
 public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore implements AttachmentRecycleBinStore
 {
     /** String used to annotate unchecked exceptions. */
@@ -75,15 +78,14 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void saveToRecycleBin(XWikiAttachment attachment, String deleter, Date date, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
         final DeletedAttachment trashAtachment = new DeletedAttachment(attachment, deleter, date, context);
         executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {
+            @Override
             public Object doInHibernate(Session session) throws HibernateException
             {
                 session.save(trashAtachment);
@@ -92,14 +94,13 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiAttachment restoreFromRecycleBin(final XWikiAttachment attachment, final long index,
         final XWikiContext context, boolean bTransaction) throws XWikiException
     {
         return executeRead(context, bTransaction, new HibernateCallback<XWikiAttachment>()
         {
+            @Override
             public XWikiAttachment doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 try {
@@ -114,14 +115,13 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DeletedAttachment getDeletedAttachment(final long index, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
         return executeRead(context, bTransaction, new HibernateCallback<DeletedAttachment>()
         {
+            @Override
             public DeletedAttachment doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 return (DeletedAttachment) session.get(DeletedAttachment.class, Long.valueOf(index));
@@ -129,15 +129,14 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<DeletedAttachment> getAllDeletedAttachments(final XWikiAttachment attachment, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
         return executeRead(context, bTransaction, new HibernateCallback<List<DeletedAttachment>>()
         {
             @SuppressWarnings(ANOTATE_UNCHECKED)
+            @Override
             public List<DeletedAttachment> doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 Criteria c = session.createCriteria(DeletedAttachment.class);
@@ -152,15 +151,14 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<DeletedAttachment> getAllDeletedAttachments(final XWikiDocument doc, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
         return executeRead(context, bTransaction, new HibernateCallback<List<DeletedAttachment>>()
         {
             @SuppressWarnings(ANOTATE_UNCHECKED)
+            @Override
             public List<DeletedAttachment> doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 assert doc != null;
@@ -170,19 +168,18 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void deleteFromRecycleBin(final long index, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
         executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {
+            @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 try {
-                    session.createQuery("delete from " + DeletedAttachment.class.getName() + " where id=?").setLong(0,
-                        index).executeUpdate();
+                    session.createQuery("delete from " + DeletedAttachment.class.getName() + " where id=?")
+                        .setLong(0, index).executeUpdate();
                 } catch (Exception ex) {
                     // Invalid ID?
                 }

@@ -22,8 +22,10 @@ package org.xwiki.url.internal;
 import java.net.URL;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.url.InvalidURLException;
@@ -39,23 +41,22 @@ import org.xwiki.url.XWikiURLFactory;
  * @since 3.0M3
  */
 @Component
+@Singleton
 public class DefaultXWikiURLFactory implements XWikiURLFactory<URL>
 {
     /**
      * Used to get the hint of the {@link XWikiURLFactory} to use.
      */
-    @Requirement
+    @Inject
     private URLConfiguration configuration;
 
     /**
      * Used to lookup the correct {@link XWikiURLFactory} component.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiURL createURL(URL urlRepresentation, Map<String, Object> parameters) throws InvalidURLException
     {
         XWikiURLFactory factory;

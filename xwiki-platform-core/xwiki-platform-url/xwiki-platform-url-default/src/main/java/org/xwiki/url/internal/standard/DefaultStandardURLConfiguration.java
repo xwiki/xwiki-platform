@@ -19,8 +19,11 @@
  */
 package org.xwiki.url.internal.standard;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.url.standard.StandardURLConfiguration;
 
@@ -29,6 +32,7 @@ import org.xwiki.url.standard.StandardURLConfiguration;
  * @since 2.3M1
  */
 @Component
+@Singleton
 public class DefaultStandardURLConfiguration implements StandardURLConfiguration
 {
     /**
@@ -39,22 +43,17 @@ public class DefaultStandardURLConfiguration implements StandardURLConfiguration
     /**
      * Defines from where to read the URL configuration data.
      */
-    @Requirement("xwikiproperties")
+    @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource configuration;
 
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.url.standard.StandardURLConfiguration#isPathBasedMultiWiki()
-     */
+    @Override
     public boolean isPathBasedMultiWiki()
     {
         return this.configuration.getProperty(PREFIX + "multiwiki.isPathBased", Boolean.FALSE);
     }
 
-    /**
-     * {@inheritDoc}
-     * @see StandardURLConfiguration#getWikiPathPrefix()
-     */
+    @Override
     public String getWikiPathPrefix()
     {
         return this.configuration.getProperty(PREFIX + "multiwiki.wikiPathPrefix", "wiki");

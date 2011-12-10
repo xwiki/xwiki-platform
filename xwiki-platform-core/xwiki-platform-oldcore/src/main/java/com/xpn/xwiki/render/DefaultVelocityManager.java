@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.render;
 
@@ -24,11 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.velocity.VelocityConfiguration;
@@ -53,6 +54,7 @@ import com.xpn.xwiki.web.Utils;
  * @since 1.5M1
  */
 @Component
+@Singleton
 public class DefaultVelocityManager implements VelocityManager
 {
     /**
@@ -72,7 +74,7 @@ public class DefaultVelocityManager implements VelocityManager
      */
     private Map<String, VelocityEngine> velocityManagers = new HashMap<String, VelocityEngine>();
 
-    @Requirement
+    @Inject
     private Execution execution;
 
     public VelocityContext getVelocityContext()

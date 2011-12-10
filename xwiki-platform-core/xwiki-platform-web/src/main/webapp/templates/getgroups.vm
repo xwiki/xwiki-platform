@@ -71,7 +71,7 @@ $response.setContentType("application/x-json")
     "members"       : "$xwiki.rightsmanager.countAllMembersNamesForGroup($group.fullName)", 
     "userurl"       : "$xwiki.getURL($group.fullName)",
     "usersaveurl"   : "$group.getURL('save')",
-    "userinlineurl" : "$group.getURL("inline", "xpage=plain")",
+    "userinlineurl" : "$group.getURL("edit", "xpage=plain")",
     "docurl"        : "$xwiki.getURL("XWiki.XWikiPreferences", "admin", "section=Groups")"
   }
 #end

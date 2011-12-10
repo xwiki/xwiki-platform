@@ -29,13 +29,13 @@ import org.junit.Test;
  */
 public class RootTransactionRunnableTest
 {
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void runInTest() throws Exception
     {
         new RootTransactionRunnable().runIn(new TransactionRunnable());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void runInAsProviderTest() throws Exception
     {
         new RootTransactionRunnable().asProvider().runIn(new TransactionRunnable());

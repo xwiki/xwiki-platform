@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.xar.internal.repository;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class XarLocalExtension extends WrappingLocalExtension<LocalExtension>
 
     private void enumeratePages(Packager packager) throws IOException
     {
-        this.pages = packager.getEntries(getFile());
+        this.pages = packager.getEntries(new File(getFile().getAbsolutePath()));
     }
 
     // ExtensionRepository

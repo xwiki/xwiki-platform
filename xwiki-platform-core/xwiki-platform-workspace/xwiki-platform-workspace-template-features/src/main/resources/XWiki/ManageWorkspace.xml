@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>ManageWorkspace</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.XWikiPreferences</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1303899640000</creationDate>
+<date>1308327581000</date>
+<contentUpdateDate>1308327581000</contentUpdateDate>
+<version>1.1</version>
+<title>Workspace</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>true</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+#if ("$!currentDoc" == '')
+  #set ($currentDoc = $doc.prefixedFullName)
+#end
+#set ($workspaceId = $xcontext.database)
+#set ($WorkspaceManager = $services.workspace)
+##
+## TODO: use a dependency check macro.
+##
+#set ($workspace = $WorkspaceManager.getWorkspace($workspaceId))
+#if (!$workspace)
+  #if (!$WorkspaceManager.lastException)
+    {{error}}The workspace '$workspaceId' does not exist.{{/error}}
+  #elseif("$!{$WorkspaceManager.lastException.message}" != '')
+    {{error}}$WorkspaceManager.lastException.message{{/error}}
+  #else
+    {{error}}$WorkspaceManager.lastException.class{{/error}}
+  #end
+#else
+  #set ($wikiDocument = $workspace.wikiDocument)
+  #set ($updateWorkspaceDocumentReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'UpdateWorkspaceCode'))
+  {{html clean='false'}}
+  &lt;form class='xform half' action="$xwiki.getURL($updateWorkspaceDocumentReference)" method='POST'&gt;
+  {{/html}}
+
+  ## Use a second html macro because wiki='true' in the first causes the action URL to be interpreted as wiki syntax and it's rendered as an &lt;a&gt; tag. We need an $escapetool.wiki(...) method to escape wiki syntax.
+  {{html clean='false' wiki='true'}}
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;label for='XWiki.XWikiServerClass_0_wikiprettyname'&gt;$msg.get('workspacemanager.prop.wikiprettyname.label')&lt;/label&gt;
+        &lt;span class='xHint'&gt;$msg.get('workspacemanager.prop.wikiprettyname.hint')&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;((($wikiDocument.display('wikiprettyname', 'edit'))))&lt;/dd&gt;
+
+      &lt;dt&gt;
+        &lt;label for='XWiki.XWikiServerClass_0_description'&gt;$msg.get('workspacemanager.prop.description.label')&lt;/label&gt;
+        &lt;span class='xHint'&gt;$msg.get('workspacemanager.prop.description.hint')&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;((($wikiDocument.display('description', 'edit'))))&lt;/dd&gt;
+
+      &lt;dt&gt;
+        &lt;label for='XWiki.XWikiServerClass_0_owner'&gt;$msg.get('workspacemanager.prop.owner.label')&lt;/label&gt;
+        &lt;span class='xHint'&gt;$msg.get('workspacemanager.prop.owner.hint')&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;((($wikiDocument.display('owner', 'edit'))))&lt;/dd&gt;
+
+      &lt;dt&gt;
+        &lt;label for='WorkspaceManager.WorkspaceClass_0_membershipType'&gt;$msg.get('workspacemanager.prop.membershipType.label')&lt;/label&gt;
+        &lt;span class='xHint'&gt;$msg.get('workspacemanager.prop.membershipType.hint')&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;((($wikiDocument.display('membershipType', 'edit'))))&lt;/dd&gt;
+    &lt;/dl&gt;
+    &lt;br/&gt;
+    &lt;span class="buttonwrapper"&gt;
+      &lt;input class="button" type="submit" name='save' value="$msg.get('admin.save')"/&gt;
+    &lt;/span&gt;
+    &lt;input type='hidden' name='workspaceId' value="$workspaceId"/&gt;
+  {{/html}}
+
+  ## Again, because of the URL in the xredirect field, we need to have it in a html macro with wiki='false' (default).
+  {{html clean='false'}}
+    #set ($currentDocument = $xwiki.getDocument($currentDoc))
+    &lt;input type='hidden' name='xredirect' value="$currentDocument.getExternalURL($xcontext.action, ${request.queryString})" /&gt;
+  &lt;/form&gt;
+  {{/html}}
+#end
+{{/velocity}}</content></xwikidoc>

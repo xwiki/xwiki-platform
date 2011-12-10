@@ -29,12 +29,15 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.classloader.ExtendedURLStreamHandler;
 import org.xwiki.classloader.URIClassLoader;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 
 /**
  * Supports the following syntax for JARs attached to wiki pages:
@@ -44,6 +47,7 @@ import org.xwiki.component.annotation.Requirement;
  * @since 2.0.1
  */
 @Component
+@Singleton
 public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoaderFactory
 {
     /**
@@ -56,14 +60,15 @@ public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoade
      * The Stream handler factory to use in the created classloader in order to be able to load our custom 
      * {@code attachmentjar} custom protocol.
      */
-    @Requirement
+    @Inject
     private URLStreamHandlerFactory streamHandlerFactory;
 
     /**
      * The stream handler for our custom {@code attachmentjar} protocol. We use it to get access to the protocol 
      * name and to transform from URI to URL.
      */
-    @Requirement("attachmentjar")
+    @Inject
+    @Named("attachmentjar")
     private ExtendedURLStreamHandler attachmentJarHander;
     
     /**
@@ -102,7 +107,7 @@ public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoade
     {
         // Parse the passed JAR URLs to tokenize it.
         Set<URI> uris = new LinkedHashSet<URI>();
-        if (!StringUtils.isEmpty(jarURLs)) {
+        if (StringUtils.isNotEmpty(jarURLs)) {
             StringTokenizer tokenizer = new StringTokenizer(jarURLs, ",");
             while (tokenizer.hasMoreElements()) {
                 String token = tokenizer.nextToken().trim();

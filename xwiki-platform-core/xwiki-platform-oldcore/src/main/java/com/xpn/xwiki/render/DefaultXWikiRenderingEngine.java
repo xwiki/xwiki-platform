@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.render;
 
 import java.util.ArrayList;
@@ -28,8 +26,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
@@ -48,11 +46,11 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 {
-    private static final Log LOG = LogFactory.getLog(XWikiRenderingEngine.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRenderingEngine.class);
 
     /** The default order in which the rendering engines will be run on the input. */
-    private final String[] defaultRenderingOrder =
-        new String[]{"macromapping", "groovy", "velocity", "plugin", "wiki", "wikiwiki"};
+    private final String[] defaultRenderingOrder = new String[] {"macromapping", "groovy", "velocity", "plugin",
+    "wiki", "wikiwiki"};
 
     private List<XWikiRenderer> renderers = new ArrayList<XWikiRenderer>();
 
@@ -293,8 +291,8 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
                                 content = renderer.render(content, contentdoc, includingdoc, context);
                             }
                         } else {
-                            if (LOG.isDebugEnabled()) {
-                                LOG.debug("skip renderer: " + rendererName + " for the document "
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.debug("skip renderer: " + rendererName + " for the document "
                                     + contentdoc.getFullName());
                             }
                         }
@@ -327,7 +325,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
                         this.cache.set(key, cacheObject);
                     }
                 } catch (Exception e) {
-                    LOG.error("cache exception", e);
+                    LOGGER.error("cache exception", e);
                 }
                 return content;
             } finally {
@@ -358,7 +356,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
             }
             return true;
         } catch (Exception e) {
-            LOG.error("Error in the function shouldRender", e);
+            LOGGER.error("Error in the function shouldRender", e);
             return true;
         }
     }

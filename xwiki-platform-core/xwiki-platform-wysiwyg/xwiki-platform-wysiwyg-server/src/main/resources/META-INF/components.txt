@@ -1,4 +1,9 @@
 org.xwiki.wysiwyg.server.internal.cleaner.DefaultHTMLCleaner
+org.xwiki.wysiwyg.server.internal.cleaner.EmptyAttributeFilter
+org.xwiki.wysiwyg.server.internal.cleaner.EmptyLineFilter
+org.xwiki.wysiwyg.server.internal.cleaner.LineBreakFilter
+org.xwiki.wysiwyg.server.internal.cleaner.NestedAnchorsFilter
+org.xwiki.wysiwyg.server.internal.cleaner.StandAloneMacroFilter
 org.xwiki.wysiwyg.server.internal.converter.DefaultHTMLConverter
 org.xwiki.wysiwyg.server.internal.filter.http.MutableHttpServletRequestFactory
 org.xwiki.wysiwyg.server.internal.plugin.macro.XWikiMacroService

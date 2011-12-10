@@ -21,9 +21,9 @@ package com.xpn.xwiki.user.impl.xwiki;
 
 import java.text.MessageFormat;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -61,7 +61,7 @@ public class AppServerTrustedKerberosAuthServiceImpl extends XWikiAuthServiceImp
     /**
      * The logger for this class.
      */
-    private static final Log LOG = LogFactory.getLog(AppServerTrustedKerberosAuthServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppServerTrustedKerberosAuthServiceImpl.class);
 
     /**
      * {@inheritDoc}
@@ -73,7 +73,7 @@ public class AppServerTrustedKerberosAuthServiceImpl extends XWikiAuthServiceImp
     {
         String user = context.getRequest().getRemoteUser();
 
-        LOG.debug(MessageFormat.format("Checking auth for remote user {0}", user));
+        LOGGER.debug(MessageFormat.format("Checking auth for remote user {0}", user));
 
         if (StringUtils.isBlank(user)) {
             return super.checkAuth(context);
@@ -109,7 +109,7 @@ public class AppServerTrustedKerberosAuthServiceImpl extends XWikiAuthServiceImp
     private String extractUsernameFromPrincipal(final String principal)
     {
         String username = principal;
-        
+
         // Clears the Kerberos principal, by removing the domain part, to retain only the user name of the
         // authenticated remote user.
         if (username.contains(ANTI_SLASH)) {

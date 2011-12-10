@@ -19,8 +19,10 @@
  */
 package org.xwiki.rendering.internal.macro.formula;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.macro.formula.FormulaMacroConfiguration;
 
@@ -32,6 +34,7 @@ import org.xwiki.rendering.macro.formula.FormulaMacroConfiguration;
  * @since 2.0M3
  */
 @Component
+@Singleton
 public class DefaultFormulaMacroConfiguration implements FormulaMacroConfiguration
 {
     /**
@@ -56,24 +59,16 @@ public class DefaultFormulaMacroConfiguration implements FormulaMacroConfigurati
     /**
      * Defines from where to read the rendering configuration data.
      */
-    @Requirement
+    @Inject
     private ConfigurationSource configuration;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see FormulaMacroConfiguration#getRenderer()
-     */
+    @Override
     public String getRenderer()
     {
         return this.configuration.getProperty(PREFIX + "renderer", DEFAULT_RENDERER);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see FormulaMacroConfiguration#getSafeRenderer()
-     */
+    @Override
     public String getSafeRenderer()
     {
         return SAFE_RENDERER;

@@ -21,7 +21,6 @@ package org.xwiki.store;
 
 import java.io.InputStream;
 
-
 /**
  * A generic thing which provides access to an InputStream on demand.
  *

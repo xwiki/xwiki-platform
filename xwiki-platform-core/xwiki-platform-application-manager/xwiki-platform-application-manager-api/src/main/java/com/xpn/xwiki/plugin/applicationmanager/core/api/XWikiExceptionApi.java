@@ -62,11 +62,6 @@ public class XWikiExceptionApi extends Api
         this.exception = exception;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {

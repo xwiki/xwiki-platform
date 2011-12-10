@@ -64,7 +64,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)##
   #if("$!request.category" != '')
     #set($category = "&amp;${blogPostClassname}_${blogPostObjectNumber}_category=${escapetool.url(${request.category})}")
   #end
-  $response.sendRedirect($xwiki.getURL($postDocName, 'inline', "template=${blogPostTemplate}&amp;parent=${parent}&amp;title=${title}&amp;${blogPostClassname}_0_title=${title}$!{category}&amp;form_token=$!{request.getParameter('form_token')}"))
+  $response.sendRedirect($xwiki.getURL($postDocName, 'edit', "template=${blogPostTemplate}&amp;parent=${parent}&amp;title=${title}&amp;${blogPostClassname}_0_title=${title}$!{category}&amp;form_token=$!{request.getParameter('form_token')}"))
 #end## name == ''
 #elseif("$!request.entryTitle" != '')## !hasEdit &amp;&amp; form submitted
   #template('accessdenied.vm')

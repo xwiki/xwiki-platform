@@ -16,20 +16,18 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package org.xwiki.store.serialization.xml.internal;
 
-import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
-import org.dom4j.io.SAXReader;
-import org.dom4j.io.OutputFormat;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
 import org.xml.sax.SAXException;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.store.serialization.xml.XMLSerializer;
@@ -45,11 +43,7 @@ import org.xwiki.store.serialization.xml.XMLSerializer;
 @ComponentRole()
 public abstract class AbstractXMLSerializer<R, P extends R> implements XMLSerializer<R, P>
 {
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.store.filesystem.internal.XMLSerializer#serialize(T)
-     */
+    @Override
     public InputStream serialize(final R object) throws IOException
     {
         // This puts everything on the heap for now.
@@ -78,11 +72,7 @@ public abstract class AbstractXMLSerializer<R, P extends R> implements XMLSerial
         return new ByteArrayInputStream(baos.toByteArray());
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.store.filesystem.internal.XMLSerializer#parse(InputStream)
-     */
+    @Override
     public P parse(final InputStream stream) throws IOException
     {
         final SAXReader reader = new SAXReader();

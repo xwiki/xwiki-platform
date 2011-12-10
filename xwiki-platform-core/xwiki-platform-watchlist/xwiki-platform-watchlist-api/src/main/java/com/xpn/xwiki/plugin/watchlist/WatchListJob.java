@@ -24,13 +24,13 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
@@ -59,7 +59,7 @@ public class WatchListJob extends AbstractJob implements Job
     /**
      * Logger.
      */
-    private static final Log LOG = LogFactory.getLog(WatchListPlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WatchListPlugin.class);
 
     /**
      * Scheduler Job XObject.
@@ -271,12 +271,12 @@ public class WatchListJob extends AbstractJob implements Job
                             getEmailTemplate(userWiki), previousFireTime, this.context);
                     }
                 } catch (Exception e) {
-                    LOG.error("Failed to send watchlist notification to user [" + subscriber + "]", e);
+                    LOGGER.error("Failed to send watchlist notification to user [{}]", subscriber, e);
                 }
             }
         } catch (Exception e) {
             // We're in a job, we don't throw exceptions
-            LOG.error("Exception while running job", e);
+            LOGGER.error("Exception while running job", e);
         } finally {
             this.context.getWiki().getStore().cleanUp(this.context);
             cleanupComponents();

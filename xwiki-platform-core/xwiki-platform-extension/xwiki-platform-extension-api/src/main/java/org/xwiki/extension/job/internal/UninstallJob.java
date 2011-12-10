@@ -20,6 +20,7 @@
 package org.xwiki.extension.job.internal;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,16 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
 public class UninstallJob extends AbstractJob<UninstallRequest>
 {
     /**
+     * Error message used in exception throw when trying to uninstall an extension which is not installed.
+     */
+    private static final String ERROR_NOTINSTALLED = "Extension [{0}] is not installed";
+
+    /**
+     * Error message used in exception throw when trying to uninstall an extension which is not installed.
+     */
+    private static final String ERROR_NOTINSTALLEDNAMESPACE = ERROR_NOTINSTALLED + " on namespace [{1}]";
+
+    /**
      * Used to manipulate local repository.
      */
     @Inject
@@ -60,11 +71,6 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
     @Inject
     private ExtensionHandlerManager extensionHandlerManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.internal.AbstractJob#start()
-     */
     @Override
     protected void start() throws Exception
     {
@@ -80,7 +86,8 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
                     if (getRequest().hasNamespaces()) {
                         uninstallExtension(localExtension, getRequest().getNamespaces());
                     } else if (localExtension.getNamespaces() != null) {
-                        uninstallExtension(localExtension, localExtension.getNamespaces());
+                        // Duplicate the namespace list to avoid ConcurrentModificationException
+                        uninstallExtension(localExtension, new ArrayList<String>(localExtension.getNamespaces()));
                     } else {
                         uninstallExtension(localExtension, (String) null);
                     }
@@ -104,7 +111,7 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
      * @param namespaces the namespaces from where to uninstall the extension
      * @throws UninstallException error when trying to uninstall provided extensions
      */
-    public void uninstallExtension(String extensionId, Collection<String> namespaces) throws UninstallException
+    private void uninstallExtension(String extensionId, Collection<String> namespaces) throws UninstallException
     {
         notifyPushLevelProgress(namespaces.size());
 
@@ -124,12 +131,12 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
      * @param namespace the namespace from where to uninstall the extension
      * @throws UninstallException error when trying to uninstall provided extension
      */
-    public void uninstallExtension(String extensionId, String namespace) throws UninstallException
+    private void uninstallExtension(String extensionId, String namespace) throws UninstallException
     {
         LocalExtension localExtension = this.localExtensionRepository.getInstalledExtension(extensionId, namespace);
 
         if (localExtension == null) {
-            throw new UninstallException(MessageFormat.format("[{0}]: extension is not installed", extensionId));
+            throw new UninstallException(MessageFormat.format(ERROR_NOTINSTALLED, extensionId));
         }
 
         try {
@@ -144,7 +151,7 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
      * @param namespaces the namespaces from where to uninstall the extension
      * @throws UninstallException error when trying to uninstall provided extension
      */
-    public void uninstallExtension(LocalExtension localExtension, Collection<String> namespaces)
+    private void uninstallExtension(LocalExtension localExtension, Collection<String> namespaces)
         throws UninstallException
     {
         for (String namespace : namespaces) {
@@ -157,7 +164,7 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
      * @param namespace the namespaces from where to uninstall the extensions
      * @throws UninstallException error when trying to uninstall provided extensions
      */
-    public void uninstallExtensions(Collection<LocalExtension> extensions, String namespace) throws UninstallException
+    private void uninstallExtensions(Collection<LocalExtension> extensions, String namespace) throws UninstallException
     {
         for (LocalExtension backardDependency : extensions) {
             uninstallExtension(backardDependency, namespace);
@@ -169,17 +176,20 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
      * @param namespace the namespace from where to uninstall the extension
      * @throws UninstallException error when trying to uninstall provided extension
      */
-    public void uninstallExtension(LocalExtension localExtension, String namespace) throws UninstallException
+    private void uninstallExtension(LocalExtension localExtension, String namespace) throws UninstallException
     {
-        if (namespace != null && !localExtension.isInstalled(namespace)) {
-            throw new UninstallException(MessageFormat.format("[{0}]: extension is not installed on wiki [{1}]",
-                localExtension, namespace));
+        if (!localExtension.isInstalled()) {
+            throw new UninstallException(MessageFormat.format(ERROR_NOTINSTALLED, localExtension, namespace));
+        } else if (namespace != null
+            && (localExtension.getNamespaces() == null || !localExtension.getNamespaces().contains(namespace))) {
+            throw new UninstallException(MessageFormat.format(ERROR_NOTINSTALLEDNAMESPACE, localExtension, namespace));
         }
 
+        // Log progression
         if (namespace != null) {
-            this.logger.info("Uninstalling extension [{0}] from namespace [{1}]", localExtension, namespace);
+            this.logger.info("Uninstalling extension [{}] from namespace [{}]", localExtension, namespace);
         } else {
-            this.logger.info("Uninstalling extension [{0}]", localExtension);
+            this.logger.info("Uninstalling extension [{}]", localExtension);
         }
 
         notifyPushLevelProgress(3);

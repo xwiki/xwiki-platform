@@ -22,9 +22,14 @@ package org.xwiki.wysiwyg.server.internal.plugin.sync;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.gwt.wysiwyg.client.diff.Diff;
+import org.xwiki.gwt.wysiwyg.client.diff.DifferentiationFailedException;
+import org.xwiki.gwt.wysiwyg.client.diff.PatchFailedException;
 import org.xwiki.gwt.wysiwyg.client.diff.Revision;
 import org.xwiki.gwt.wysiwyg.client.diff.ToString;
 import org.xwiki.gwt.wysiwyg.client.plugin.sync.SyncResult;
@@ -33,122 +38,140 @@ import org.xwiki.gwt.wysiwyg.client.plugin.sync.SyncTools;
 import org.xwiki.wysiwyg.server.plugin.sync.SyncEngine;
 import org.xwiki.wysiwyg.server.plugin.sync.SyncException;
 
-
 /**
  * Default implementation of {@link SyncEngine}.
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class DefaultSyncEngine implements SyncEngine
 {
     /**
-     * Default XWiki logger to report errors correctly.
+     * Logger.
      */
-    private static final Log LOG = LogFactory.getLog(DefaultSyncEngine.class);
+    @Inject
+    private Logger logger;
 
     /**
      * The map of synchronization statuses.
      */
     private Map<String, SyncStatus> syncMap = new HashMap<String, SyncStatus>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SyncEngine#getSyncStatus(String)
-     */
+    @Override
     public SyncStatus getSyncStatus(String key)
     {
         return syncMap.get(key);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SyncEngine#setSyncStatus(String, SyncStatus)
-     */
+    @Override
     public void setSyncStatus(String key, SyncStatus syncStatus)
     {
         syncMap.put(key, syncStatus);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SyncEngine#sync(SyncStatus, Revision, int)
-     */
+    @Override
     public SyncResult sync(SyncStatus syncStatus, Revision revision, int version) throws SyncException
     {
         try {
-            SyncResult result = new SyncResult();
-            String originalContent = syncStatus.getVersion(version);
-
-            LOG.debug("Current server version is: " + syncStatus.getCurrentVersionNumber());
-            LOG.debug("Client version is: " + version);
+            this.logger.debug("Current server version is [{}] ", syncStatus.getCurrentVersionNumber());
+            this.logger.debug("Client version is [{}]", version);
 
             if (version == syncStatus.getCurrentVersionNumber()) {
-                // this is simple just apply the patch if there is a patch
-                LOG.debug("Nothing to apply from the server");
-
-                if (revision == null) {
-                    LOG.debug("Nothing to apply from the client");
-                    return null;
-                }
-
-                LOG.debug("Applying patch from the client: " + revision);
-                LOG.debug("Original content: " + originalContent);
-
-                String newContent = ToString.arrayToString(revision.patch(ToString.stringToArray(originalContent)));
-
-                LOG.debug("New content: " + newContent);
-                syncStatus.addVersion(newContent);
-                result.setVersion(syncStatus.getCurrentVersionNumber());
-                result.setRevision(null);
-                result.setStatus(true);
-                return result;
+                // This is simple: just apply the patch if there is a patch.
+                return maybeCommitRevision(syncStatus, revision, version);
             } else {
-                String lastContent = syncStatus.getCurrentVersion();
-                Revision rev;
-                if (lastContent.equals(originalContent)) {
-                    rev = null;
-                } else {
-                    rev = Diff.diff(ToString.stringToArray(originalContent), ToString.stringToArray(lastContent));
-                    LOG.debug("Content on client is based on this content: " + originalContent);
-                    LOG.debug("Clients needs to update it's content with rev: " + rev);
-                }
-
-                if (revision == null) {
-                    result.setVersion(syncStatus.getCurrentVersionNumber());
-                    result.setRevision(rev);
-                    result.setStatus(true);
-                    return result;
-                } else {
-                    LOG.debug("Original revision is: " + revision);
-                    LOG.debug("Other revision is: " + rev);
-                    if (rev != null) {
-                        revision = SyncTools.relocateRevision(revision, rev);
-                    }
-                    LOG.debug("Relocated revision is: " + revision);
-                    LOG.debug("Content being patched: " + lastContent);
-
-                    String newContent = ToString.arrayToString(revision.patch(ToString.stringToArray(lastContent)));
-                    LOG.debug("New content is: " + newContent);
-
-                    // Calculate the new revision to send back
-                    Revision newRevision =
-                        Diff.diff(ToString.stringToArray(originalContent), ToString.stringToArray(newContent));
-
-                    LOG.debug("New revision to apply on the client: " + newRevision);
-
-                    syncStatus.addVersion(newContent);
-                    result.setVersion(syncStatus.getCurrentVersionNumber());
-                    result.setRevision(newRevision);
-                    result.setStatus(true);
-                    return result;
-                }
+                return maybeRelocateRevision(syncStatus, revision, version);
             }
         } catch (Exception e) {
-            LOG.error("Exception while processing sync", e);
+            this.logger.error("Exception while processing sync", e);
             throw new SyncException("Sync Failed", e);
+        }
+    }
+
+    /**
+     * @param syncStatus the latest version of the content
+     * @param revision the revision to be committed
+     * @param version the revision version; specifies what version is affected by the given revision
+     * @return the result of the synchronization
+     * @throws PatchFailedException if committing the revision fails
+     */
+    private SyncResult maybeCommitRevision(SyncStatus syncStatus, Revision revision, int version)
+        throws PatchFailedException
+    {
+        this.logger.debug("Nothing to apply from the server");
+
+        if (revision == null) {
+            this.logger.debug("Nothing to apply from the client");
+            return null;
+        }
+
+        this.logger.debug("Applying patch from the client [{}]", revision);
+        String originalContent = syncStatus.getVersion(version);
+        this.logger.debug("Original content [{}]", originalContent);
+
+        String newContent = ToString.arrayToString(revision.patch(ToString.stringToArray(originalContent)));
+
+        this.logger.debug("New content [{}]", newContent);
+        syncStatus.addVersion(newContent);
+        SyncResult result = new SyncResult();
+        result.setVersion(syncStatus.getCurrentVersionNumber());
+        result.setRevision(null);
+        result.setStatus(true);
+        return result;
+    }
+
+    /**
+     * @param syncStatus the latest version of the content
+     * @param revision the revision to be committed
+     * @param version the revision version; specifies what version is affected by the given revision
+     * @return the result of the synchronization
+     * @throws PatchFailedException if committing the revision fails
+     * @throws DifferentiationFailedException if generating the diffs fails
+     */
+    private SyncResult maybeRelocateRevision(SyncStatus syncStatus, Revision revision, int version)
+        throws DifferentiationFailedException, PatchFailedException
+    {
+        String lastContent = syncStatus.getCurrentVersion();
+        Revision rev;
+        String originalContent = syncStatus.getVersion(version);
+        if (lastContent.equals(originalContent)) {
+            rev = null;
+        } else {
+            rev = Diff.diff(ToString.stringToArray(originalContent), ToString.stringToArray(lastContent));
+            this.logger.debug("Content on client is based on this content [{}]", originalContent);
+            this.logger.debug("Clients needs to update it's content with rev [{}]", rev);
+        }
+
+        SyncResult result = new SyncResult();
+        if (revision == null) {
+            result.setVersion(syncStatus.getCurrentVersionNumber());
+            result.setRevision(rev);
+            result.setStatus(true);
+            return result;
+        } else {
+            this.logger.debug("Original revision is [{}]", revision);
+            this.logger.debug("Other revision is [{}]", rev);
+
+            rev = rev == null ? revision : SyncTools.relocateRevision(revision, rev);
+
+            this.logger.debug("Relocated revision is [{}]", rev);
+            this.logger.debug("Content being patched [{}]", lastContent);
+
+            String newContent = ToString.arrayToString(rev.patch(ToString.stringToArray(lastContent)));
+            this.logger.debug("New content is [{}]", newContent);
+
+            // Calculate the new revision to send back
+            Revision newRevision =
+                Diff.diff(ToString.stringToArray(originalContent), ToString.stringToArray(newContent));
+
+            this.logger.debug("New revision to apply on the client [{}]", newRevision);
+
+            syncStatus.addVersion(newContent);
+            result.setVersion(syncStatus.getCurrentVersionNumber());
+            result.setRevision(newRevision);
+            result.setStatus(true);
+            return result;
         }
     }
 }

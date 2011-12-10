@@ -16,21 +16,21 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package org.xwiki.store.serialization.xml.internal;
 
 import java.io.IOException;
 import java.util.Date;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.DeletedFilesystemAttachment;
-import com.xpn.xwiki.doc.MutableDeletedFilesystemAttachment;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.store.legacy.doc.internal.DeletedFilesystemAttachment;
+import org.xwiki.store.legacy.doc.internal.MutableDeletedFilesystemAttachment;
 import org.xwiki.store.serialization.xml.XMLSerializer;
 
 /**
@@ -39,48 +39,61 @@ import org.xwiki.store.serialization.xml.XMLSerializer;
  * @version $Id$
  * @since 3.0M3
  */
-@Component("deleted-attachment-meta/1.0")
+@Component
+@Named("deleted-attachment-meta/1.0")
+@Singleton
 public class DeletedAttachmentMetadataSerializer
     extends AbstractXMLSerializer<DeletedFilesystemAttachment, MutableDeletedFilesystemAttachment>
 {
-    /** The root element for serialized element. */
+    /**
+     * The root element for serialized element.
+     */
     private static final String ROOT_ELEMENT_NAME = "deletedattachment";
 
-    /** Root node paramter which must be present in order to attempt parsing. */
+    /**
+     * Root node paramter which must be present in order to attempt parsing.
+     */
     private static final String SERIALIZER_PARAM = "serializer";
 
-    /** Value of SERIALIZER_PARAM must be this in order to continue parsing. */
+    /**
+     * Value of SERIALIZER_PARAM must be this in order to continue parsing.
+     */
     private static final String THIS_SERIALIZER = "deletedattachment-meta/1.0";
 
-    /** Interpret a node by this name as the document full name of the deleter's user document. */
+    /**
+     * Interpret a node by this name as the document full name of the deleter's user document.
+     */
     private static final String DELETER = "deleter";
 
-    /** Interpret this node as the date of deletion in seconds from the epoch. */
+    /**
+     * Interpret this node as the date of deletion in seconds from the epoch.
+     */
     private static final String DATE_DELETED = "datedeleted";
 
-    /** Interpret this node as the an attachment to be parsed by the attachment-meta serializer. */
+    /**
+     * Interpret this node as the an attachment to be parsed by the attachment-meta serializer.
+     */
     private static final String ATTACHMENT = "attachment";
 
-    /** Needed to serialize/parse the deleted attachment metadata. */
-    @Requirement("attachment-meta/1.0")
+    /**
+     * Needed to serialize/parse the deleted attachment metadata.
+     */
+    @Inject
+    @Named("attachment-meta/1.0")
     private XMLSerializer<XWikiAttachment, XWikiAttachment> attachSerializer;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractXMLSerializer#parse(Element)
-     */
+    @Override
     public MutableDeletedFilesystemAttachment parse(final Element docel) throws IOException
     {
         if (!ROOT_ELEMENT_NAME.equals(docel.getName())) {
             throw new IOException("XML not recognizable as deleted attachment metadata, "
-                                  + "expecting <deletedattachment> tag");
+                + "expecting <deletedattachment> tag");
         }
         if (docel.attribute(SERIALIZER_PARAM) == null
             || !THIS_SERIALIZER.equals(docel.attribute(SERIALIZER_PARAM).getValue()))
         {
             throw new IOException("Cannot parse this deleted attachment metadata, "
-                                  + "it was saved with a different serializer.");
+                + "it was saved with a different serializer.");
         }
         final MutableDeletedFilesystemAttachment out = new MutableDeletedFilesystemAttachment();
 
@@ -91,11 +104,7 @@ public class DeletedAttachmentMetadataSerializer
         return out;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractXMLSerializer#serialize(T, XMLWriter)
-     */
+    @Override
     public void serialize(final DeletedFilesystemAttachment delAttach, final XMLWriter writer)
         throws IOException
     {

@@ -30,10 +30,10 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.tika.Tika;
 import org.apache.tika.mime.MimeTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.container.Container;
 
 import com.xpn.xwiki.XWikiContext;
@@ -61,7 +61,7 @@ public class TempResourceAction extends XWikiAction
     /**
      * Logging support.
      */
-    private static final Log LOG = LogFactory.getLog(TempResourceAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TempResourceAction.class);
 
     /**
      * Used for detecting mime-types of files.
@@ -95,8 +95,9 @@ public class TempResourceAction extends XWikiAction
         try {
             contentType = tika.detect(tempFile);
         } catch (IOException ex) {
-            LOG.warn(String.format("Unable to determine mime type for temporary resource [%s]", tempFile
-                .getAbsolutePath()), ex);
+            LOGGER.warn(
+                String.format("Unable to determine mime type for temporary resource [%s]", tempFile.getAbsolutePath()),
+                ex);
         }
         response.setContentType(contentType);
         try {

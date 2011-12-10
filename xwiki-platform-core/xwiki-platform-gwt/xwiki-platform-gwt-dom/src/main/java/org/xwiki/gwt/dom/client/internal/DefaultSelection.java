@@ -57,11 +57,7 @@ public class DefaultSelection extends AbstractSelection
         return nativeSelection;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#addRange(Range)
-     */
+    @Override
     public void addRange(Range range)
     {
         NativeRangeWrapper wrapper = (NativeRangeWrapper) range;
@@ -72,22 +68,18 @@ public class DefaultSelection extends AbstractSelection
         NativeRange nativeRange = wrapper.getNativeRange().cast();
         nativeRange.setStart(range.getStartContainer(), range.getStartOffset());
         nativeRange.setEnd(range.getEndContainer(), range.getEndOffset());
-        nativeSelection.addRange(nativeRange);
+        getNativeSelection().addRange(nativeRange);
         DOMUtils.getInstance().scrollIntoView(range);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#getRangeAt(int)
-     */
+    @Override
     public Range getRangeAt(int index)
     {
         if (index < 0 || index >= getRangeCount()) {
             throw new IndexOutOfBoundsException();
         }
 
-        NativeRange nativeRange = nativeSelection.getRangeAt(index);
+        NativeRange nativeRange = getNativeSelection().getRangeAt(index);
         Range range = ((Document) nativeRange.getStartContainer().getOwnerDocument()).createRange();
         range.setStart(nativeRange.getStartContainer(), nativeRange.getStartOffset());
         range.setEnd(nativeRange.getEndContainer(), nativeRange.getEndOffset());
@@ -96,34 +88,22 @@ public class DefaultSelection extends AbstractSelection
         return range;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#getRangeCount()
-     */
+    @Override
     public int getRangeCount()
     {
-        return nativeSelection.getRangeCount();
+        return getNativeSelection().getRangeCount();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#removeAllRanges()
-     */
+    @Override
     public void removeAllRanges()
     {
-        nativeSelection.removeAllRanges();
+        getNativeSelection().removeAllRanges();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#removeRange(Range)
-     */
+    @Override
     public void removeRange(Range range)
     {
         NativeRangeWrapper wrapper = (NativeRangeWrapper) range;
-        nativeSelection.removeRange((NativeRange) wrapper.getNativeRange());
+        getNativeSelection().removeRange((NativeRange) wrapper.getNativeRange());
     }
 }

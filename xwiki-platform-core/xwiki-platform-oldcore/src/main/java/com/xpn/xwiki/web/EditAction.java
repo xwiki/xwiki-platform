@@ -16,146 +16,105 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
-import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.rendering.syntax.Syntax;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 
+/**
+ * Initializes a document before it is edited.
+ * 
+ * @version $Id$
+ */
 public class EditAction extends XWikiAction
 {
-    private static final Log log = LogFactory.getLog(EditAction.class);
+    /**
+     * The object used for logging.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
 
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
-        XWikiRequest request = context.getRequest();
-        String content = request.getParameter("content");
-        String title = request.getParameter("title");
         XWikiDocument doc = context.getDoc();
-        XWiki xwiki = context.getWiki();
-        XWikiForm form = context.getForm();
+        EditForm editForm = (EditForm) context.getForm();
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
 
-        boolean hasTranslation = false;
-        if (doc != context.get("tdoc")) {
-            hasTranslation = true;
-        }
+        boolean hasTranslation = doc != context.get("tdoc");
 
-        // we need to clone so that nothing happens in memory
+        // We have to clone the context document because it is cached and the changes we are going to make are valid
+        // only for the duration of the current request.
         doc = doc.clone();
         context.put("doc", doc);
         vcontext.put("doc", doc.newDocument(context));
 
         synchronized (doc) {
-            XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
-            EditForm peform = (EditForm) form;
-            String parent = peform.getParent();
-            if (parent != null) {
-                doc.setParent(parent);
-            }
-            String creator = peform.getCreator();
-            if (creator != null) {
-                doc.setCreator(creator);
-            }
-            String defaultTemplate = peform.getDefaultTemplate();
-            if (defaultTemplate != null) {
-                doc.setDefaultTemplate(defaultTemplate);
-            }
-            String defaultLanguage = peform.getDefaultLanguage();
-            if ((defaultLanguage != null) && !defaultLanguage.equals("")) {
-                doc.setDefaultLanguage(defaultLanguage);
-            }
-            if (doc.isNew() && doc.getDefaultLanguage().equals("")) {
-                doc.setDefaultLanguage(context.getWiki().getLanguagePreference(context));
-            }
+            doc.readDocMetaFromForm(editForm, context);
 
             String language = context.getWiki().getLanguagePreference(context);
-            String languagefromrequest = context.getRequest().getParameter("language");
-            languagefromrequest = (languagefromrequest == null) ? "" : languagefromrequest;
-            String languagetoedit = languagefromrequest.equals("") ? language : languagefromrequest;
-
-            // if no specific language is set or if it is "default" then we edit the current doc
-            if ((languagetoedit == null) || (languagetoedit.equals("default"))) {
-                languagetoedit = "";
-            }
-            // if the document is new then we edit it as the default
-            // if the language to edit is the one of the default document then the language is the
-            // default
-            if (doc.isNew() || (doc.getDefaultLanguage().equals(languagetoedit))) {
-                languagetoedit = "";
-            }
-            // if the doc does not exist in the language to edit and the language was not
-            // explicitely set in the URL
-            // then we edit the default doc, otherwise this can cause to create translations without
-            // wanting it.
-            if ((!hasTranslation) && languagefromrequest.equals("")) {
-                languagetoedit = "";
+            if (doc.isNew() && doc.getDefaultLanguage().equals("")) {
+                doc.setDefaultLanguage(language);
             }
 
-            if (languagetoedit.equals("")) {
-                // In this case the created document is going to be the default document
+            String languageToEdit = StringUtils.isEmpty(editForm.getLanguage()) ? language : editForm.getLanguage();
+
+            // If no specific language is set or if it is "default" then we edit the current doc.
+            if (languageToEdit == null || languageToEdit.equals("default")) {
+                languageToEdit = "";
+            }
+            // If the document is new or if the language to edit is the default language then we edit the default
+            // translation.
+            if (doc.isNew() || doc.getDefaultLanguage().equals(languageToEdit)) {
+                languageToEdit = "";
+            }
+            // If the doc does not exist in the language to edit and the language was not explicitly set in the URL then
+            // we edit the default document translation. This prevents use from creating unneeded translations.
+            if (!hasTranslation && StringUtils.isEmpty(editForm.getLanguage())) {
+                languageToEdit = "";
+            }
+
+            // Initialize the translated document.
+            XWikiDocument tdoc;
+            if (languageToEdit.equals("")) {
+                // Edit the default document translation (default language).
                 tdoc = doc;
-                context.put("tdoc", doc);
-                vcontext.put("tdoc", vcontext.get("doc"));
                 if (doc.isNew()) {
                     doc.setDefaultLanguage(language);
                     doc.setLanguage("");
                 }
+            } else if (!hasTranslation && context.getWiki().isMultiLingual(context)) {
+                // Edit a new translation.
+                tdoc = new XWikiDocument(doc.getDocumentReference());
+                tdoc.setLanguage(languageToEdit);
+                tdoc.setContent(doc.getContent());
+                tdoc.setSyntax(doc.getSyntax());
+                tdoc.setAuthorReference(context.getUserReference());
+                tdoc.setStore(doc.getStore());
             } else {
-                // If the translated doc object is the same as the doc object
-                // this means the translated doc did not exists so we need to create it
-                if ((!hasTranslation) && context.getWiki().isMultiLingual(context)) {
-                    tdoc = new XWikiDocument(doc.getDocumentReference());
-                    tdoc.setLanguage(languagetoedit);
-                    tdoc.setContent(doc.getContent());
-                    tdoc.setSyntax(doc.getSyntax());
-                    tdoc.setAuthor(context.getUser());
-                    tdoc.setStore(doc.getStore());
-                    context.put("tdoc", tdoc);
-                    vcontext.put("tdoc", tdoc.newDocument(context));
-                }
+                // Edit an existing translation. Clone the translated document object to be sure that the changes we are
+                // going to make will last only for the duration of the current request.
+                tdoc = ((XWikiDocument) context.get("tdoc")).clone();
             }
 
-            // Check for edit section
-            String sectionContent = "";
-            int sectionNumber = 0;
-            if (request.getParameter("section") != null && xwiki.hasSectionEdit(context)) {
-                sectionNumber = NumberUtils.toInt(request.getParameter("section"));
-                sectionContent = tdoc.getContentOfSection(sectionNumber);
-            }
-            vcontext.put("sectionNumber", new Integer(sectionNumber));
+            // Check if section editing is enabled and if a section is specified.
+            boolean sectionEditingEnabled = context.getWiki().hasSectionEdit(context);
+            int sectionNumber =
+                sectionEditingEnabled ? NumberUtils.toInt(context.getRequest().getParameter("section")) : 0;
+            vcontext.put("sectionNumber", sectionNumber);
 
-            XWikiDocument tdoc2 = tdoc.clone();
-            if (content != null) {
-                tdoc2.setContent(content);
-                tdoc2.setTitle(title);
-            }
-            if (sectionContent != null && !sectionContent.equals("")) {
-                if (content != null) {
-                    tdoc2.setContent(content);
-                } else {
-                    tdoc2.setContent(sectionContent);
-                }
-                if (title != null) {
-                    tdoc2.setTitle(doc.getDocumentSection(sectionNumber).getSectionTitle());
-                } else {
-                    tdoc2.setTitle(title);
-                }
-            }
-            context.put("tdoc", tdoc2);
-            vcontext.put("tdoc", tdoc2.newDocument(context));
             try {
-                tdoc2.readFromTemplate(peform, context);
+                // Try to update the edited document based on the template specified on the request.
+                tdoc.readFromTemplate(editForm, context);
             } catch (XWikiException e) {
                 if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
                     context.put("exception", e);
@@ -163,20 +122,56 @@ public class EditAction extends XWikiAction
                 }
             }
 
+            // Update the edited content.
+            if (editForm.getContent() != null) {
+                tdoc.setContent(editForm.getContent());
+            } else if (sectionNumber > 0) {
+                tdoc.setContent(tdoc.getContentOfSection(sectionNumber));
+            }
+
+            // Update the edited title.
+            if (editForm.getTitle() != null) {
+                tdoc.setTitle(editForm.getTitle());
+            } else if (sectionNumber > 0) {
+                // The edited content is either the content of the specified section or the content provided on the
+                // request. We assume the content provided on the request is meant to overwrite the specified section.
+                // In both cases the document content is currently having one section, so we can take its title.
+                String sectionTitle = tdoc.getDocumentSection(1).getSectionTitle();
+                if (StringUtils.isNotBlank(sectionTitle)) {
+                    tdoc.setTitle(context.getMessageTool().get("core.editors.content.titleField.sectionEditingFormat",
+                        tdoc.getRenderedTitle(Syntax.PLAIN_1_0, context), sectionNumber, sectionTitle));
+                }
+            }
+
+            // Update the edited objects.
+            tdoc.readObjectsFromForm(editForm, context);
+
+            // Expose the translated document on the XWiki context and the Velocity context.
+            context.put("tdoc", tdoc);
+            vcontext.put("tdoc", tdoc.newDocument(context));
+            // XWiki applications that were previously using the inline action might still expect the cdoc (content
+            // document) to be properly set on the context. Expose tdoc (translated document) also as cdoc for backward
+            // compatibility.
+            context.put("cdoc", context.get("tdoc"));
+            vcontext.put("cdoc", vcontext.get("tdoc"));
+
             /* Setup a lock */
             try {
                 XWikiLock lock = tdoc.getLock(context);
-                if ((lock == null) || (lock.getUserName().equals(context.getUser())) || (peform.isLockForce())) {
+                if (lock == null || lock.getUserName().equals(context.getUser()) || editForm.isLockForce()) {
                     tdoc.setLock(context.getUser(), context);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                // Lock should never make XWiki fail
-                // But we should log any related information
-                log.error("Exception while setting up lock", e);
+                // Lock should never make XWiki fail, but we should log any related information.
+                LOGGER.error("Exception while setting up lock", e);
             }
         }
 
+        // Make sure object property fields are displayed in edit mode.
+        // See XWikiDocument#display(String, BaseObject, XWikiContext)
+        // TODO: Revisit the display mode after the inline action is removed. Is the display mode still needed when
+        // there is only one edit action?
+        context.put("display", "edit");
         return "edit";
     }
 }

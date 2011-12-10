@@ -138,5 +138,4 @@
 <title>Blog title</title>
 </property>
 </object>
-<content>{{include document="Blog.BlogSheet"/}}</content>
-</xwikidoc>
+<content></content></xwikidoc>

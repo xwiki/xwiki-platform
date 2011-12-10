@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.InputStream;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.artofsolving.jodconverter.OfficeDocumentConverter;
 import org.artofsolving.jodconverter.document.JsonDocumentFormatRegistry;
@@ -31,7 +32,6 @@ import org.artofsolving.jodconverter.office.ExternalOfficeManagerConfiguration;
 import org.artofsolving.jodconverter.office.OfficeManager;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.container.Container;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
@@ -45,6 +45,7 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
  * @since 1.8RC3
  */
 @Component
+@Singleton
 public class DefaultOpenOfficeManager implements OpenOfficeManager
 {
     /**
@@ -55,13 +56,13 @@ public class DefaultOpenOfficeManager implements OpenOfficeManager
     /**
      * The {@link OpenOfficeConfiguration} component.
      */
-    @Requirement
+    @Inject
     private OpenOfficeConfiguration conf;
 
     /**
      * Used to query global temporary working directory.
      */
-    @Requirement
+    @Inject
     private Container container;
 
     /**
@@ -106,12 +107,19 @@ public class DefaultOpenOfficeManager implements OpenOfficeManager
     public void initialize() throws OpenOfficeManagerException
     {
         if (this.conf.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_INTERNAL) {
-            File officeHome = new File(this.conf.getHomePath());
-            File officeProfile = new File(this.conf.getProfilePath());
             DefaultOfficeManagerConfiguration configuration = new DefaultOfficeManagerConfiguration();
             configuration.setPortNumber(this.conf.getServerPort());
-            configuration.setOfficeHome(officeHome);
-            configuration.setTemplateProfileDir(officeProfile);
+
+            String homePath = this.conf.getHomePath();
+            if (homePath != null) {
+                configuration.setOfficeHome(homePath);
+            }
+
+            String profilePath = this.conf.getProfilePath();
+            if (profilePath != null) {
+                configuration.setTemplateProfileDir(new File(profilePath));
+            }
+
             configuration.setMaxTasksPerProcess(this.conf.getMaxTasksPerProcess());
             configuration.setTaskExecutionTimeout(this.conf.getTaskExecutionTimeout());
             this.jodOOManager = configuration.buildOfficeManager();

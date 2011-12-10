@@ -16,17 +16,15 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package org.xwiki.store.serialization.xml;
 
 import java.io.IOException;
 
 import org.dom4j.Element;
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.store.serialization.xml.internal.XMLWriter;
 import org.xwiki.store.serialization.Serializer;
+import org.xwiki.store.serialization.xml.internal.XMLWriter;
 
 /**
  * A Serializer which converts objects into XML Elements and back.
@@ -36,7 +34,7 @@ import org.xwiki.store.serialization.Serializer;
  * @version $Id$
  * @since 3.0M2
  */
-@ComponentRole()
+@ComponentRole
 public interface XMLSerializer<R, P extends R> extends Serializer<R, P>
 {
     /**

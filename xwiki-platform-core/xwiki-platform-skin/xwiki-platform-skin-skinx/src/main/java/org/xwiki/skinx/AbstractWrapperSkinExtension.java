@@ -21,8 +21,9 @@ package org.xwiki.skinx;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWiki;
@@ -39,26 +40,17 @@ import com.xpn.xwiki.plugin.skinx.SkinExtensionPluginApi;
  */
 public abstract class AbstractWrapperSkinExtension implements SkinExtension
 {
-
     /** Execution context handler, needed for accessing the XWikiContext. */
-    @Requirement
+    @Inject
     private Execution execution;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SkinExtension#use(java.lang.String)
-     */
+    @Override
     public void use(String resource)
     {
         getSkinExtensionPluginApi().use(resource);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SkinExtension#use(java.lang.String, java.util.Map)
-     */
+    @Override
     public void use(String resource, Map<String, Object> parameters)
     {
         getSkinExtensionPluginApi().use(resource, parameters);

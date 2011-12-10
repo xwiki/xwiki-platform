@@ -16,21 +16,19 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.stats.impl.xwiki;
 
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.stats.impl.VisitStats;
 import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
+import com.xpn.xwiki.stats.impl.VisitStats;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 
 /**
@@ -44,7 +42,7 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
     /**
      * Logging tools.
      */
-    private static final Log LOG = LogFactory.getLog(DocumentStatsStoreItem.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentStatsStoreItem.class);
 
     /**
      * The {@link VisitStats} object to store.
@@ -65,22 +63,14 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
         this.visitStats = (VisitStats) visitStats.clone();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreItem#getId()
-     */
+    @Override
     public String getId()
     {
         return String.format("%s %s %s %s", getClass(), this.visitStats.getName(), this.visitStats.getUniqueID(),
             this.visitStats.getCookie());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreItem#store(java.util.List)
-     */
+    @Override
     public void storeInternal(List<XWikiStatsStoreItem> stats)
     {
         VisitStatsStoreItem firstItem = (VisitStatsStoreItem) stats.get(0);
@@ -102,8 +92,8 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
                     // TODO Fix use of deprecated call.
                     store.deleteXWikiCollection(oldVisitStats, this.context, true, true);
                 } catch (Exception e) {
-                    if (LOG.isWarnEnabled()) {
-                        LOG.warn("Failed to delete old visit statistics object from database [" + getId() + "]");
+                    if (LOGGER.isWarnEnabled()) {
+                        LOGGER.warn("Failed to delete old visit statistics object from database [" + getId() + "]");
                     }
                 }
             }
@@ -111,7 +101,7 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
             // TODO Fix use of deprecated call.
             store.saveXWikiCollection(newVisitStats, this.context, true);
         } catch (XWikiException e) {
-            LOG.error("Failed to save visit statictics object [" + getId() + "]");
+            LOGGER.error("Failed to save visit statictics object [" + getId() + "]");
         }
     }
 }

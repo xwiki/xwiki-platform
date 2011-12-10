@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
@@ -138,21 +137,23 @@ public class SaveAction extends PreviewAction
         // Validate the document if we have xvalidate=1 in the request
         if ("1".equals(request.getParameter("xvalidate"))) {
             boolean validationResult = tdoc.validate(context);
-            // if the validation fails we should show the inline action
+            // If the validation fails we should show the "Inline form" edit mode
             if (validationResult == false) {
                 // Set display context to 'edit'
                 context.put("display", "edit");
-                // Set the action to inline
-                context.setAction("inline");
+                // Set the action used by the "Inline form" edit mode as the context action. See #render(XWikiContext).
+                context.setAction(tdoc.getDefaultEditMode(context));
                 // Set the document in the context
-                VelocityContext vcontext = (VelocityContext) context.get("vcontext");
                 context.put("doc", doc);
                 context.put("cdoc", tdoc);
                 context.put("tdoc", tdoc);
                 Document vdoc = tdoc.newDocument(context);
+                VelocityContext vcontext = (VelocityContext) context.get("vcontext");
                 vcontext.put("doc", doc.newDocument(context));
                 vcontext.put("cdoc", vdoc);
                 vcontext.put("tdoc", vdoc);
+                // Force the "Inline form" edit mode.
+                vcontext.put("editor", "inline");
                 return true;
             }
         }
@@ -207,8 +208,10 @@ public class SaveAction extends PreviewAction
         }
 
         if ("edit".equals(context.get("display"))) {
-            // When form validation (xvalidate) fails the save action forwards to the inline action.
-            return "inline";
+            // When form validation (xvalidate) fails the save action forwards to the "Inline form" edit mode. In this
+            // case the context action is not "save" anymore because it was changed in #save(XWikiContext). The context
+            // action should be the action used by the "Inline form" edit mode (either "edit" or "inline").
+            return context.getAction();
         }
 
         return "exception";

@@ -24,13 +24,16 @@ import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -46,25 +49,29 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
  * @version $Id$
  * @since 1.8M1
  */
-@Component("officeimporter/image")
+@Component
+@Named("officeimporter/image")
+@Singleton
 public class ImageFilter extends AbstractHTMLFilter
 {
     /**
      * The {@link DocumentAccessBridge} component.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * Used to serialize the image reference as XHTML comment.
      */
-    @Requirement("xhtmlmarker")
+    @Inject
+    @Named("xhtmlmarker")
     private ResourceReferenceSerializer xhtmlMarkerSerializer;
 
     /**
      * The component used to parse string document references.
      */
-    @Requirement("currentmixed")
+    @Inject
+    @Named("currentmixed")
     private DocumentReferenceResolver<String> documentStringReferenceResolver;
 
     /**

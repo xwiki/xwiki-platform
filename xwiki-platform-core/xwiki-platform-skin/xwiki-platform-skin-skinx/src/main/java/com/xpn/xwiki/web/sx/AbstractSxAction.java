@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web.sx;
 
@@ -25,9 +24,9 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -70,7 +69,7 @@ public abstract class AbstractSxAction extends XWikiAction
     private static final String COMPRESS_SCRIPT_REQUEST_PARAMETER = "minify";
 
     /** @return the logging object of the concrete subclass. */
-    protected abstract Log getLog();
+    protected abstract Logger getLogger();
 
     /**
      * This method must be called by render(XWikiContext). Render is in charge of creating the proper source and
@@ -119,7 +118,7 @@ public abstract class AbstractSxAction extends XWikiAction
             response.setContentLength(extensionContent.getBytes(RESPONSE_CHARACTER_SET).length);
             response.getOutputStream().write(extensionContent.getBytes(RESPONSE_CHARACTER_SET));
         } catch (IOException ex) {
-            getLog().warn("Failed to send SX content: " + ex.getMessage());
+            getLogger().warn("Failed to send SX content: [{}]", ex.getMessage());
         }
 
     }

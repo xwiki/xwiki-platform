@@ -19,10 +19,12 @@
  */
 package com.xpn.xwiki.render;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.ScriptContextInitializer;
@@ -39,10 +41,12 @@ import com.xpn.xwiki.web.Utils;
  * 
  * @version $Id$
  */
-@Component("xwiki")
+@Component
+@Named("xwiki")
+@Singleton
 public class XWikiScriptContextInitializer implements ScriptContextInitializer
 {
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**

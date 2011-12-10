@@ -27,11 +27,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -56,47 +59,48 @@ import org.xwiki.xml.html.HTMLUtils;
  * @since 2.1M1
  */
 @Component
+@Singleton
 public class DefaultPresentationBuilder implements PresentationBuilder
 {
     /**
      * Component manager used by {@link XDOMOfficeDocument}.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
      * Used to obtain document converter.
      */
-    @Requirement
+    @Inject
     private OpenOfficeManager officeManager;
 
     /**
      * Used to access current context document.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * Used to serialize the reference document name.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * OpenOffice HTML cleaner.
      */
-    @Requirement("openoffice")
+    @Inject
+    @Named("openoffice")
     private HTMLCleaner ooHTMLCleaner;
 
     /**
      * The component used to parse the XHTML obtained after cleaning.
      */
-    @Requirement("xhtml/1.0")
+    @Inject
+    @Named("xhtml/1.0")
     private Parser xhtmlParser;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName,
         DocumentReference documentReference) throws OfficeImporterException
     {

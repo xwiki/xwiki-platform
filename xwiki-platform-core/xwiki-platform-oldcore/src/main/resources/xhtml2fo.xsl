@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
 Copyright Antenna House, Inc. (http://www.antennahouse.com) 2001, 2002.
@@ -23,7 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
 
     <xsl:output method="xml"
                 version="1.0"
-                encoding="iso-8859-1"
+                encoding="UTF-8"
                 indent="no"/>
 
     <!--======================================================================
@@ -57,6 +57,9 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     <!-- hyphenate: true | false -->
     <xsl:param name="hyphenate">false</xsl:param>
 
+    <!-- language -->
+    <xsl:param name="language" select="//html:head/html:meta[@name='language']/@content"></xsl:param>
+
 
     <!--======================================================================
     Attribute Sets
@@ -70,7 +73,13 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="writing-mode"><xsl:value-of select="$writing-mode"/></xsl:attribute>
         <xsl:attribute name="hyphenate"><xsl:value-of select="$hyphenate"/></xsl:attribute>
         <xsl:attribute name="text-align"><xsl:value-of select="$text-align"/></xsl:attribute>
-        <xsl:attribute name="font-family">FreeSerif,serif</xsl:attribute>
+        <xsl:attribute name="font-family">
+          <xsl:choose>
+            <xsl:when test="starts-with($language, 'ja')">FreeSerif, IPAMincho, AR PL UMing CN, serif</xsl:when>
+            <xsl:when test="starts-with($language, 'kp') or starts-with($language, 'kr')">FreeSerif, Baekmuk Gulim, AR PL UMing CN, serif</xsl:when>
+            <xsl:otherwise>FreeSerif, AR PL UMing CN, serif</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
         <!-- specified on fo:root to change the properties' initial values -->
     </xsl:attribute-set>
 
@@ -191,14 +200,22 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
 
     <xsl:attribute-set name="pre">
         <xsl:attribute name="font-size">0.83em</xsl:attribute>
-        <xsl:attribute name="font-family">FreeMono,monospace</xsl:attribute>
+        <xsl:attribute name="font-family">
+          <xsl:choose>
+            <xsl:when test="starts-with($language, 'ja')">FreeMono, IPAMincho, monospace</xsl:when>
+            <xsl:when test="starts-with($language, 'kp') or starts-with($language, 'kr')">FreeMono, Baekmuk Gulim, monospace</xsl:when>
+            <xsl:otherwise>FreeMono, AR PL UMing CN, monospace</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
         <xsl:attribute name="white-space">pre</xsl:attribute>
         <xsl:attribute name="space-before">1em</xsl:attribute>
         <xsl:attribute name="space-after">1em</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="address">
-        <xsl:attribute name="font-style">italic</xsl:attribute>
+      <xsl:attribute name="font-style">
+        <xsl:if test="not(starts-with($language, 'ja') or starts-with($language, 'kp') or starts-with($language, 'kr') or starts-with($language, 'zh'))">italic</xsl:if>
+      </xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="hr">
@@ -338,37 +355,73 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     </xsl:attribute-set>
 
     <xsl:attribute-set name="strong-em">
-        <xsl:attribute name="font-weight">bold</xsl:attribute>
-        <xsl:attribute name="font-style">italic</xsl:attribute>
+      <xsl:attribute name="font-weight">bold</xsl:attribute>
+      <xsl:attribute name="font-style">
+        <xsl:if test="not(starts-with($language, 'ja') or starts-with($language, 'kp') or starts-with($language, 'kr') or starts-with($language, 'zh'))">italic</xsl:if>
+      </xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="i">
-        <xsl:attribute name="font-style">italic</xsl:attribute>
+      <xsl:attribute name="font-style">
+        <xsl:if test="not(starts-with($language, 'ja') or starts-with($language, 'kp') or starts-with($language, 'kr') or starts-with($language, 'zh'))">italic</xsl:if>
+      </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="cite">
-        <xsl:attribute name="font-style">italic</xsl:attribute>
+      <xsl:attribute name="font-style">
+        <xsl:if test="not(starts-with($language, 'ja') or starts-with($language, 'kp') or starts-with($language, 'kr') or starts-with($language, 'zh'))">italic</xsl:if>
+      </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="em">
-        <xsl:attribute name="font-style">italic</xsl:attribute>
+      <xsl:attribute name="font-style">
+        <xsl:if test="not(starts-with($language, 'ja') or starts-with($language, 'kp') or starts-with($language, 'kr') or starts-with($language, 'zh'))">italic</xsl:if>
+      </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="var">
-        <xsl:attribute name="font-style">italic</xsl:attribute>
+      <xsl:attribute name="font-style">
+        <xsl:if test="not(starts-with($language, 'ja') or starts-with($language, 'kp') or starts-with($language, 'kr') or starts-with($language, 'zh'))">italic</xsl:if>
+      </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="dfn">
-        <xsl:attribute name="font-style">italic</xsl:attribute>
+      <xsl:attribute name="font-style">
+        <xsl:if test="not(starts-with($language, 'ja') or starts-with($language, 'kp') or starts-with($language, 'kr') or starts-with($language, 'zh'))">italic</xsl:if>
+      </xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="tt">
-        <xsl:attribute name="font-family">FreeMono,monospace</xsl:attribute>
+      <xsl:attribute name="font-family">
+        <xsl:choose>
+          <xsl:when test="starts-with($language, 'ja')">FreeMono, IPAMincho, monospace</xsl:when>
+          <xsl:when test="starts-with($language, 'kp') or starts-with($language, 'kr')">FreeMono, Baekmuk Gulim, monospace</xsl:when>
+          <xsl:otherwise>FreeMono, AR PL UMing CN, monospace</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="code">
-        <xsl:attribute name="font-family">FreeMono,monospace</xsl:attribute>
+      <xsl:attribute name="font-family">
+        <xsl:choose>
+          <xsl:when test="starts-with($language, 'ja')">FreeMono, IPAMincho, monospace</xsl:when>
+          <xsl:when test="starts-with($language, 'kp') or starts-with($language, 'kr')">FreeMono, Baekmuk Gulim, monospace</xsl:when>
+          <xsl:otherwise>FreeMono, AR PL UMing CN, monospace</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="kbd">
-        <xsl:attribute name="font-family">FreeMono,monospace</xsl:attribute>
+      <xsl:attribute name="font-family">
+        <xsl:choose>
+          <xsl:when test="starts-with($language, 'ja')">FreeMono, IPAMincho, monospace</xsl:when>
+          <xsl:when test="starts-with($language, 'kp') or starts-with($language, 'kr')">FreeMono, Baekmuk Gulim, monospace</xsl:when>
+          <xsl:otherwise>FreeMono, AR PL UMing CN, monospace</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="samp">
-        <xsl:attribute name="font-family">FreeMono,monospace</xsl:attribute>
+      <xsl:attribute name="font-family">
+        <xsl:choose>
+          <xsl:when test="starts-with($language, 'ja')">FreeMono, IPAMincho, monospace</xsl:when>
+          <xsl:when test="starts-with($language, 'kp') or starts-with($language, 'kr')">FreeMono, Baekmuk Gulim, monospace</xsl:when>
+          <xsl:otherwise>FreeMono, AR PL UMing CN, monospace</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="big">

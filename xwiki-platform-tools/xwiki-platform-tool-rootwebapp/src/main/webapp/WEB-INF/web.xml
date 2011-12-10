@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
- *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,13 +18,13 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
 -->
 
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app id="WebApp_ID">
   <display-name>XWiki</display-name>
-  <servlet>		
+  <servlet>
     <servlet-name>XWikiDispatcherServlet</servlet-name>
     <servlet-class>com.xpn.xwiki.XWikiRootServlet</servlet-class>
     <!-- Uncomment and edit this if you want to redirect to a different webapp name.
@@ -49,9 +48,5 @@
   <servlet-mapping>
     <servlet-name>XWikiDispatcherServlet</servlet-name>
     <url-pattern>/</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>default</servlet-name>
-    <url-pattern>/robots.txt</url-pattern>
   </servlet-mapping>
 </web-app>

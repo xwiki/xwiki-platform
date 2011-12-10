@@ -23,9 +23,10 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.Requirement;
 
 /**
  * Base class for all implementations of the {@link FormulaRenderer} component. Provides all the common functionalities
@@ -41,14 +42,10 @@ public abstract class AbstractFormulaRenderer implements FormulaRenderer
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractFormulaRenderer.class);
 
     /** A storage system for rendered images, for reuse in subsequent requests. */
-    @Requirement
+    @Inject
     private ImageStorage storage;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see FormulaRenderer#process(String, boolean, FontSize, Type)
-     */
+    @Override
     public String process(String formula, boolean inline, FontSize size, Type type) throws IllegalArgumentException,
         IOException
     {
@@ -61,11 +58,7 @@ public abstract class AbstractFormulaRenderer implements FormulaRenderer
         return cacheKey;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see FormulaRenderer#getImage(String)
-     */
+    @Override
     public ImageData getImage(String imageID)
     {
         return this.storage.get(imageID);

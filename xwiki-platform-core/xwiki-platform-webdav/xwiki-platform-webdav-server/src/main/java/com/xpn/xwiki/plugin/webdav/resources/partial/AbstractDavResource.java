@@ -132,10 +132,8 @@ public abstract class AbstractDavResource implements XWikiDavResource
     }
 
     /**
-     * <p>
      * The default decode implementation assumes the next resource in chain to be a temporary resource. Sub classes
      * should override this method to provide their own implementation.
-     * </p>
      */
     public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
@@ -503,14 +501,26 @@ public abstract class AbstractDavResource implements XWikiDavResource
     }
 
     /**
-     * Checks if the given resource name corresponds to a temporary resource.
-     * 
+     * Checks if the given resource name corresponds to an excluded resource, ie a resource asked by the OS but that
+     * we want to ignore. This is because some WebDAV clients (such as Mac OSX Finder) send PROPFIND requests for
+     * special resources that are not real resources and thus we don't want to handle those.
+     *
+     * Note 1: Mac OSX sends a *lot* of unnecessary PROPFIND requests for special filesystem resources (a.k.a
+     * <a href="http://en.wikipedia.org/wiki/Resource_fork">Resource Forks</a>) + some other exotic stuff. See a
+     * <a href="http://code.google.com/p/sabredav/wiki/Finder">good description</a> for what's happening.
+     *
+     * Note 2: As a consequence this means that XWiki Document names cannot start with ".", end with "~" or match
+     * "mach_kernel" or "Backups.backupdb".
+     *
      * @param resourceName Name of the resource.
      * @return True if the resourceName corresponds to a temporary file / directory. False otherwise.
      */
     public boolean isTempResource(String resourceName)
     {
-        return resourceName.startsWith(".") || resourceName.endsWith("~");
+        return resourceName.startsWith(".")
+            || resourceName.endsWith("~")
+            || resourceName.equals("mach_kernel")
+            || resourceName.equals("Backups.backupdb");
     }
     
     /**

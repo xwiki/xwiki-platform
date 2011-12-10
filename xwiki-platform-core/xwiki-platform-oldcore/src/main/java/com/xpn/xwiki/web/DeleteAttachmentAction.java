@@ -23,7 +23,8 @@ import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWiki;
@@ -110,6 +111,13 @@ public class DeleteAttachmentAction extends XWikiAction
 
         // No such attachment
         if (attachment == null) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+            if (vcontext != null) {
+                vcontext.put("message", context.getMessageTool().get("core.action.deleteAttachment.failed", filename));
+                vcontext.put("details",
+                    context.getMessageTool().get("platform.core.action.deleteAttachment.noAttachment"));
+            }
             return true;
         }
 
@@ -124,13 +132,23 @@ public class DeleteAttachmentAction extends XWikiAction
             newdoc.setComment(context.getMessageTool().get("core.comment.deleteAttachmentComment", params));
         }
 
-        newdoc.deleteAttachment(attachment, context);
+        try {
+            newdoc.deleteAttachment(attachment, context);
 
-        // Needed to counter a side effect of XWIKI-1982: the attachment is deleted from the newdoc.originalDoc as well
-        newdoc.setOriginalDocument(doc);
+            // Needed to counter a side effect: the attachment is deleted from the newdoc.originalDoc as well
+            newdoc.setOriginalDocument(doc);
 
-        // Also save the document and attachment metadata
-        context.getWiki().saveDocument(newdoc, context);
+            // Also save the document and attachment metadata
+            context.getWiki().saveDocument(newdoc, context);
+        } catch (Exception ex) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+            if (vcontext != null) {
+                vcontext.put("message", context.getMessageTool().get("core.action.deleteAttachment.failed", filename));
+                vcontext.put("details", ExceptionUtils.getRootCauseMessage(ex));
+            }
+            return true;
+        }
 
         // forward to attach page
         String redirect = Utils.getRedirect("attach", context);
@@ -147,11 +165,6 @@ public class DeleteAttachmentAction extends XWikiAction
     @Override
     public String render(XWikiContext context)
     {
-        context.getResponse().setStatus(HttpServletResponse.SC_NOT_FOUND);
-        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-        if (vcontext != null) {
-            vcontext.put("details", context.getMessageTool().get("platform.core.action.deleteAttachment.noAttachment"));
-        }
         return "error";
     }
 }

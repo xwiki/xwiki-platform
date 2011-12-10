@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.UninstallException;
@@ -60,21 +61,14 @@ public class DefaultExtensionHandlerManager implements ExtensionHandlerManager
      */
     private ExtensionHandler getExtensionHandler(LocalExtension localExtension) throws ComponentLookupException
     {
-        // Load extension
-        return this.componentManager.lookup(ExtensionHandler.class, localExtension.getType().toString().toLowerCase());
+        return this.componentManager.lookup(ExtensionHandler.class, localExtension.getType().toLowerCase());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.handler.ExtensionHandlerManager#install(org.xwiki.extension.LocalExtension,
-     *      java.lang.String)
-     */
+    @Override
     public void install(LocalExtension localExtension, String namespace) throws InstallException
     {
         ExtensionHandler extensionHandler;
         try {
-            // Load extension
             extensionHandler = getExtensionHandler(localExtension);
         } catch (ComponentLookupException e) {
             throw new InstallException(LOOKUPERROR + '[' + localExtension + ']', e);
@@ -89,16 +83,10 @@ public class DefaultExtensionHandlerManager implements ExtensionHandlerManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.handler.ExtensionHandlerManager#uninstall(org.xwiki.extension.LocalExtension,
-     *      java.lang.String)
-     */
+    @Override
     public void uninstall(LocalExtension localExtension, String namespace) throws UninstallException
     {
         try {
-            // Load extension
             ExtensionHandler extensionHandler = getExtensionHandler(localExtension);
 
             extensionHandler.uninstall(localExtension, namespace);
@@ -107,22 +95,28 @@ public class DefaultExtensionHandlerManager implements ExtensionHandlerManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.handler.ExtensionHandlerManager#upgrade(org.xwiki.extension.LocalExtension,
-     *      org.xwiki.extension.LocalExtension, java.lang.String)
-     */
+    @Override
     public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace)
         throws InstallException
     {
         try {
-            // Load extension
-            ExtensionHandler extensionInstaller = getExtensionHandler(previousLocalExtension);
+            ExtensionHandler extensionHandler = getExtensionHandler(previousLocalExtension);
 
-            extensionInstaller.upgrade(previousLocalExtension, newLocalExtension, namespace);
+            extensionHandler.upgrade(previousLocalExtension, newLocalExtension, namespace);
         } catch (ComponentLookupException e) {
             throw new InstallException(LOOKUPERROR + '[' + newLocalExtension + ']');
+        }
+    }
+
+    @Override
+    public void initialize(LocalExtension localExtension, String namespace) throws ExtensionException
+    {
+        try {
+            ExtensionHandler extensionHandler = getExtensionHandler(localExtension);
+
+            extensionHandler.initialize(localExtension, namespace);
+        } catch (Exception e) {
+            throw new InstallException("Failed to initialize extension [" + localExtension.getId() + "]", e);
         }
     }
 }

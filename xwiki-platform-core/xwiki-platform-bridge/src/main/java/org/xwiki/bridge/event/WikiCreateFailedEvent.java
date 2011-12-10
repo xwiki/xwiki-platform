@@ -23,7 +23,7 @@ import org.xwiki.observation.event.EndEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * An event triggered after a wiki is created.
+ * An event triggered after trying to create a wiki if the creation failed.
  * 
  * @version $Id$
  * @since 3.2M1

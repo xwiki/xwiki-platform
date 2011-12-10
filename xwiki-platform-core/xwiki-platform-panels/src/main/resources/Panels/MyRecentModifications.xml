@@ -20,7 +20,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
+<syntaxId>xwiki/2.1</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -113,7 +113,7 @@
     #if ($foreach.index &gt; 0)
       (% class="pitemseparator" %) ~| (%%)##
     #end
-    (% class="panelitem" %)[[$rdoc.plainTitle&gt;&gt;$rdoc]](%%)##
+    (% class="panelitem" %)[[$rdoc.plainTitle.replaceAll('(\[|\]|\||&gt;)', '~~$1')&gt;&gt;$services.model.serialize($rdoc.documentReference).replaceAll('(\[|\]|\||&gt;)', '~$1')]](%%)##
   #end
   #panelfooter()
 #end

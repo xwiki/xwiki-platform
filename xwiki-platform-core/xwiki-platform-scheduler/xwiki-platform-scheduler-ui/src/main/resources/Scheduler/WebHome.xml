@@ -3,13 +3,13 @@
 <web>Scheduler</web>
 <name>WebHome</name>
 <language></language>
-<defaultLanguage>en</defaultLanguage>
+<defaultLanguage></defaultLanguage>
 <translation>0</translation>
 <parent>Main.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1252454400000</creationDate>
 <date>1288213047000</date>
 <contentUpdateDate>1288213047000</contentUpdateDate>
@@ -25,110 +25,99 @@
 <content>{{velocity}}
 ## First, set a shortcut to our Scheduler plugin
 ##
-#set($scheduler=$xwiki.scheduler)
+#set ($scheduler = $xwiki.scheduler)
 ##
 ## If the sheet is called with an action ($request.do), let us first process this action
 ## Possible values are : "schedule", "pause", "resume", "unschedule", "delete"
 ##
-#if($request.do &amp;&amp; $request.do!="")
- ##
- ## Obtain the Job document and object for which the action has been called
- ##
- #set($tJobHolder=$request.which)
- #set($jobDoc=$xwiki.getDocument($tJobHolder))
- #set($jobObj=$jobDoc.getObject('XWiki.SchedulerJobClass'))
- #if($request.do=="schedule")
+#if ("$!request.do" != '' &amp;&amp; "$!request.which" != '')
   ##
-  ## Schedule a job
+  ## Obtain the Job document and object for which the action has been called
   ##
-  #set($ok=$scheduler.scheduleJob($jobObj))
-  #if($ok==false) 
+  #set ($tJobHolder = $request.which)
+  #set ($jobDoc = $xwiki.getDocument($tJobHolder))
+  #set ($jobObj = $jobDoc.getObject('XWiki.SchedulerJobClass'))
+  #if ($request.do == 'schedule')
+    ##
+    ## Schedule a job
+    ##
+    #set ($ok = $scheduler.scheduleJob($jobObj))
+    #if (!$ok)
+      {{error}}$xcontext.get('error'){{/error}}
 
-   {{error}}$xcontext.get('error'){{/error}}
+    #else
+      #set ($jobName = "$jobObj.get('jobName')")
+      {{info}}$msg.get('xe.scheduler.jobscheduled', [$jobName, $scheduler.getNextFireTime($jobObj)]){{/info}}
 
-  #else
-   #set($jobName = "$jobObj.get('jobName')")
+    #end
+  #elseif ($request.do == 'pause')
+    ##
+    ## Pause a scheduled job
+    ##
+    #set ($ok = $scheduler.pauseJob($jobObj))
+    #if (!$ok)
+      {{error}}$xcontext.get('error'){{/error}}
 
-   {{info}}$msg.get('xe.scheduler.jobscheduled', [$jobName, $scheduler.getNextFireTime($jobObj)]){{/info}}
+    #else
+      {{info}}$msg.get('xe.scheduler.paused', [$jobObj.get('jobName')]){{/info}}
 
+    #end
+  #elseif ($request.do == 'resume')
+    ##
+    ## Resume a paused job
+    ##
+    #set ($ok = $scheduler.resumeJob($jobObj))
+    #if (!$ok)
+      {{error}}$xcontext.get('error'){{/error}}
+
+    #else
+      {{info}}$msg.get('xe.scheduler.resumed', [$jobObj.get('jobName'), $scheduler.getNextFireTime($jobObj)]){{/info}}
+
+    #end
+  #elseif ($request.do == 'unschedule')
+    ##
+    ## Unschedule a scheduled job (paused or not)
+    ##
+    #set ($ok = $scheduler.unscheduleJob($jobObj))
+    #if (!$ok)
+      {{error}}$xcontext.get('error'){{/error}}
+
+    #else
+      {{info}}$msg.get('xe.scheduler.unscheduled', [$jobObj.get('jobName')]){{/info}}
+
+    #end
+  #elseif ($request.do == 'delete')
+    ##
+    ## Delete a job
+    ## First unschedule it (if needed), then delete its document holder
+    ##
+    #set ($jobName = $jobObj.get('jobName'))
+    #if ($jobObj.get('status') == 'Normal' || $jobObj.get('status') == 'Paused')
+      #set ($ok = $scheduler.unscheduleJob($jobObj))
+      #if ($ok)
+        #set ($deleteRedirect = $xwiki.getURL($jobObj.getName(), 'delete'))
+        $response.sendRedirect($deleteRedirect)
+      #else
+        {{error}}$xcontext.get('error'){{/error}}
+
+      #end
+    #else
+      #set ($deleteRedirect = $xwiki.getURL($jobObj.getName(), 'delete'))
+      $response.sendRedirect($deleteRedirect))
+    #end
+  #elseif ($request.do == 'trigger')
+    ##
+    ## Trigger a job (execute it now)
+    ##
+    #set ($ok = $scheduler.triggerJob($jobObj))
+    #if (!$ok)
+      {{error}}$xcontext.get('error'){{/error}}
+
+    #else
+      {{info}}$msg.get('xe.scheduler.triggered', [$jobObj.get('jobName')]){{/info}}
+
+    #end
   #end
- #elseif($request.do=="pause")
-  ##
-  ## Pause a scheduled job
-  ##
-  #set($ok=$scheduler.pauseJob($jobObj))
-  #if($ok==false) 
-
-   {{error}}$xcontext.get('error'){{/error}}
-
-  #else
-
-   {{info}}$msg.get('xe.scheduler.paused', [$jobObj.get('jobName')]){{/info}}
-
-  #end
- #elseif($request.do=="resume")
-  ##
-  ## Resume a paused job
-  ##
-  #set($ok=$scheduler.resumeJob($jobObj))
-  #if($ok==false)
-
-   {{error}}$xcontext.get('error'){{/error}}
-
-  #else
-
-   {{info}}$msg.get('xe.scheduler.resumed', [$jobObj.get('jobName'), $scheduler.getNextFireTime($jobObj)]){{/info}}
-
-  #end
- #elseif($request.do=="unschedule")
-  ##
-  ## Unschedule a scheduled job (paused or not)
-  ##
-  #set($ok=$scheduler.unscheduleJob($jobObj))
-  #if($ok==false)
-
-   {{error}}$xcontext.get('error'){{/error}}
-
-  #else
-
-   {{info}}$msg.get('xe.scheduler.unscheduled', [$jobObj.get('jobName')]){{/info}}
-
-  #end
- #elseif($request.do=="delete")
-  ##
-  ## Delete a job
-  ## First unschedule it (if needed), then delete its document holder
-  ##
-  #set($jobName=$jobObj.get('jobName'))
-  #if($jobObj.get("status")=="Normal"||$jobObj.get('status')=="Paused")
-   #set($ok=$scheduler.unscheduleJob($jobObj))
-   #if($ok==true)
-    #set($deleteRedirect = $xwiki.getURL($jobObj.getName(),"delete"))
-    $response.sendRedirect($deleteRedirect)
-   #else
-
-    {{error}}$xcontext.get('error'){{/error}}
-
-   #end
-  #else
-    #set($deleteRedirect = $xwiki.getURL($jobObj.getName(),"delete"))
-    $response.sendRedirect($deleteRedirect))
-  #end
- #elseif($request.do=="trigger")
-  ##
-  ## Trigger a job (execute it now)
-  ##
-  #set($ok=$scheduler.triggerJob($jobObj))
-  #if($ok==false)
-
-   {{error}}$xcontext.get('error'){{/error}}
-
-  #else
-
-   {{info}}$msg.get('xe.scheduler.triggered', [$jobObj.get('jobName')]){{/info}}
-
-  #end
- #end
 #end
 $msg.get('xe.scheduler.welcome')
 
@@ -138,41 +127,41 @@ $msg.get('xe.scheduler.welcome')
 ## Retrieve all scheduler jobs
 ## Display their name, status, possible next fire time, and available actions
 ##
-|=(%scope="col"%) $msg.get('xe.scheduler.jobs.name')|=(%scope="col"%) $msg.get('xe.scheduler.jobs.status')|=(%scope="col"%) $msg.get('xe.scheduler.jobs.next')|=(%scope="col"%) $msg.get('xe.scheduler.jobs.actions')
-#foreach($docName in $services.query.xwql("from doc.object(XWiki.SchedulerJobClass) as jobs where doc.fullName &lt;&gt; 'XWiki.SchedulerJobTemplate'").execute())
-  #set($actions = $util.hashMap)## get a hash to store action urls
-  #set($jobHolder = $xwiki.getDocument($docName))
-  #set($job = $jobHolder.getObject('XWiki.SchedulerJobClass'))
-  #set($status = $scheduler.getJobStatus($job).value)
-  #if($status == "")
-    #set($status="None")
+|=(%scope="col"%)$msg.get('xe.scheduler.jobs.name')|=(%scope="col"%)$msg.get('xe.scheduler.jobs.status')|=(%scope="col"%)$msg.get('xe.scheduler.jobs.next')|=(%scope="col"%)$msg.get('xe.scheduler.jobs.actions')
+#foreach ($docName in $services.query.xwql('from doc.object(XWiki.SchedulerJobClass) as jobs where doc.fullName &lt;&gt; ''XWiki.SchedulerJobTemplate''').execute())
+  #set ($actions = {})
+  #set ($jobHolder = $xwiki.getDocument($docName))
+  #set ($job = $jobHolder.getObject('XWiki.SchedulerJobClass'))
+  #set ($status = $scheduler.getJobStatus($job).value)
+  #if ($status == '')
+    #set ($status = 'None')
   #end
-  #set($firetime = "")
-  #if($status != "None")
-    #set($firetime = $scheduler.getNextFireTime($job))
+  #set ($firetime = '')
+  #if ($status != 'None')
+    #set ($firetime = $scheduler.getNextFireTime($job))
   #else
-    #set($firetime="N/A")
+    #set ($firetime = $msg.get('xe.scheduler.jobs.next.undefined'))
   #end
-  #if($status == "None") 
-    #set($ok = $!actions.put("schedule",$doc.getExternalURL("view","do=schedule&amp;which=${jobHolder.fullName}")))
-  #elseif($status == "Normal")
-    #set($ok = $!actions.put("pause",$doc.getExternalURL("view","do=pause&amp;which=${jobHolder.fullName}")))
-    #set($ok = $!actions.put("unschedule",$doc.getExternalURL("view","do=unschedule&amp;which=${jobHolder.fullName}")))
-  #elseif($status == "Paused")
-    #set($ok = $!actions.put("resume",$doc.getExternalURL("view","do=resume&amp;which=${jobHolder.fullName}")))
-    #set($ok = $!actions.put("unschedule",$doc.getExternalURL("view","do=unschedule&amp;which=${jobHolder.fullName}")))
+  #set ($ok = $!actions.put('trigger', $doc.getExternalURL('view', "do=trigger&amp;which=${jobHolder.fullName}")))
+  #if ($status == 'None')
+    #set ($ok = $!actions.put('schedule', $doc.getExternalURL('view', "do=schedule&amp;which=${jobHolder.fullName}")))
+  #elseif($status == 'Normal')
+    #set ($ok = $!actions.put('pause', $doc.getExternalURL('view', "do=pause&amp;which=${jobHolder.fullName}")))
+    #set ($ok = $!actions.put('unschedule', $doc.getExternalURL('view', "do=unschedule&amp;which=${jobHolder.fullName}")))
+  #elseif ($status == 'Paused')
+    #set ($ok = $!actions.put('resume', $doc.getExternalURL('view', "do=resume&amp;which=${jobHolder.fullName}")))
+    #set ($ok = $!actions.put('unschedule', $doc.getExternalURL('view', "do=unschedule&amp;which=${jobHolder.fullName}")))
   #end
-  #set($ok = $!actions.put("delete",$doc.getExternalURL("view","do=delete&amp;which=${jobHolder.fullName}")))
-  #set($ok = $!actions.put("trigger",$doc.getExternalURL("view","do=trigger&amp;which=${jobHolder.fullName}")))
-|$job.get("jobName")|$status|$firetime|**$msg.get('xe.scheduler.jobs.infos')**: [[view&gt;&gt;$jobHolder.fullName]]#if($jobHolder.hasAccessLevel("programming")) [[$msg.get("edit")&gt;&gt;${jobHolder.getExternalURL('inline')}]]#end **$msg.get('job')**:#foreach($action in $actions.keySet()) [[$action&gt;&gt;${actions.get($action)}]]#end
+  #set ($ok = $!actions.put('delete', $doc.getExternalURL('view', "do=delete&amp;which=${jobHolder.fullName}")))
+|$job.get('jobName')|$status|$firetime|**$msg.get('xe.scheduler.jobs.actions.access')** [[$msg.get('xe.scheduler.jobs.actions.view')&gt;&gt;$jobHolder.fullName]]#if($jobHolder.hasAccessLevel('programming')) [[$msg.get('xe.scheduler.jobs.actions.edit')&gt;&gt;${jobHolder.getExternalURL('inline')}]]#end **$msg.get('xe.scheduler.jobs.actions.manage')**#foreach($action in $actions.entrySet()) [[$msg.get("xe.scheduler.jobs.actions.${action.key}")&gt;&gt;${action.value}]]#end
 
 #end
-#if($doc.hasAccessLevel("programming"))
+#if ($doc.hasAccessLevel('programming'))
 ##
 ## Job creation is offered only for programmers, because the job page needs to be saved 
 ## with programming right for groovy jobs to be executed.
-## However, this page should stay accessibles to admins, that can manipulate existing jobs :
-## scheduler, pause, etc.
+## However, this page should stay accessible to admins, that can manipulate existing jobs:
+## schedule, pause, etc.
 ##
 
 = $msg.get('xe.scheduler.jobs.create') =
@@ -183,25 +172,21 @@ $msg.get('xe.scheduler.welcome')
 {{info}}$msg.get('xe.scheduler.jobs.explaincreate'){{/info}}
 
 {{html}}
-&lt;form action="" id="newdoc"&gt;
-&lt;div&gt;
-&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-&lt;input type="hidden" name="parent" value="Scheduler.WebHome" /&gt;
-&lt;input type="hidden" name="template" value="XWiki.SchedulerJobTemplate" /&gt;
-&lt;input type="hidden" name="sheet" value="1" /&gt;
-&lt;input type="hidden" name="webname" value="Scheduler"/&gt;
-&lt;input type="hidden" name="name" value=""/&gt;
-&lt;input type="hidden" name="parent" value="${doc.fullName}"/&gt;
-&lt;label class="hidden" for="title"&gt;Job page name&lt;/label&gt;
-&lt;input id="title" name="title" size="30" type="text" value="Job page name" /&gt;
-&lt;span class="buttonwrapper"&gt;&lt;input type="button" class="button" value="$msg.get('xe.scheduler.jobs.add')" onclick='if (updateName(this.form.title,this.form.name)) { action="../../inline/" + this.form.webname.value + "/" + this.form.name.value; this.form.submit(); }' /&gt;&lt;/span&gt;
-&lt;/div&gt;
-&lt;/form&gt;
+&lt;form action="$doc.getURL('create')" id="newdoc"&gt;&lt;div&gt;
+  &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+  &lt;input type="hidden" name="parent" value="Scheduler.WebHome" /&gt;
+  &lt;input type="hidden" name="template" value="XWiki.SchedulerJobTemplate" /&gt;
+  &lt;input type="hidden" name="sheet" value="1" /&gt;
+  &lt;input type="hidden" name="space" value="Scheduler"/&gt;
+  &lt;label class="hidden" for="page"&gt;$msg.get('xe.scheduler.jobs.create.nameTip')&lt;/label&gt;
+  &lt;input id="page" name="page" size="30" type="text" class="withTip" value="$msg.get('xe.scheduler.jobs.create.nameTip')" /&gt;
+  &lt;span class="buttonwrapper"&gt;&lt;input type="submit" class="button" value="$msg.get('xe.scheduler.jobs.create.submit')"/&gt;&lt;/span&gt;
+&lt;/div&gt;&lt;/form&gt;
 {{/html}}
 
 #else
 
- {{warning}}$msg.get('xe.scheduler.jobs.warning')){{/warning}}
+  {{warning}}$msg.get('xe.scheduler.jobs.warning')){{/warning}}
 
 #end
 {{/velocity}}</content></xwikidoc>

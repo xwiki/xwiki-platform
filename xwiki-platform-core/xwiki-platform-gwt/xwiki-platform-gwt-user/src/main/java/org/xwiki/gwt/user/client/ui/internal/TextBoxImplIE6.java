@@ -44,11 +44,7 @@ public class TextBoxImplIE6 extends com.google.gwt.user.client.ui.impl.TextBoxIm
      */
     private static final String SELECTION_PRESERVED = "__selectionPreserved";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.TextBoxImplIE6#getSelectionLength(Element)
-     */
+    @Override
     public int getSelectionLength(Element element)
     {
         if (isFocused(element)) {
@@ -58,11 +54,7 @@ public class TextBoxImplIE6 extends com.google.gwt.user.client.ui.impl.TextBoxIm
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.TextBoxImplIE6#getTextAreaCursorPos(Element)
-     */
+    @Override
     public int getTextAreaCursorPos(Element element)
     {
         if (isFocused(element)) {
@@ -72,11 +64,7 @@ public class TextBoxImplIE6 extends com.google.gwt.user.client.ui.impl.TextBoxIm
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.TextBoxImplIE6#setSelectionRange(Element, int, int)
-     */
+    @Override
     public void setSelectionRange(Element element, int pos, int length)
     {
         if (!element.getPropertyBoolean(SELECTION_PRESERVED)) {
@@ -127,7 +115,6 @@ public class TextBoxImplIE6 extends com.google.gwt.user.client.ui.impl.TextBoxIm
      * 
      * @param element the element whose selection is restored.
      */
-    @SuppressWarnings("unused")
     private void restoreSelection(Element element)
     {
         setSelectionRange(element, element.getPropertyInt(CURSOR_POS), element.getPropertyInt(SELECTION_LENGTH));
@@ -138,7 +125,6 @@ public class TextBoxImplIE6 extends com.google.gwt.user.client.ui.impl.TextBoxIm
      * 
      * @param element the element whose selection is saved
      */
-    @SuppressWarnings("unused")
     private void saveSelection(Element element)
     {
         element.setPropertyInt(CURSOR_POS, getTextAreaCursorPos(element));

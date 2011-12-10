@@ -26,5 +26,8 @@ package org.xwiki.extension.job;
  */
 public class InstallRequest extends AbstractExtensionRequest
 {
-
+    /**
+     * Serialization identifier.
+     */
+    private static final long serialVersionUID = 1L;
 }

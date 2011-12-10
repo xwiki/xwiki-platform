@@ -20,19 +20,12 @@
 package org.xwiki.extension.repository.internal;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
 
@@ -56,7 +49,6 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
     public DefaultLocalExtension(DefaultLocalExtensionRepository repository, ExtensionId id, String type)
     {
         super(repository, id, type);
-
     }
 
     /**
@@ -70,60 +62,12 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
         super(repository, extension);
     }
 
-    // Extension
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.Extension#download(java.io.File)
-     */
-    public void download(File file) throws ExtensionException
-    {
-        InputStream sourceStream = null;
-        OutputStream targetStream = null;
-
-        try {
-            sourceStream = new FileInputStream(getFile());
-            targetStream = new FileOutputStream(file);
-
-            IOUtils.copy(sourceStream, targetStream);
-        } catch (Exception e) {
-            throw new ExtensionException("Failed to copy file", e);
-        } finally {
-            IOException closeException = null;
-
-            if (sourceStream != null) {
-                try {
-                    sourceStream.close();
-                } catch (IOException e) {
-                    closeException = e;
-                }
-            }
-
-            if (targetStream != null) {
-                try {
-                    targetStream.close();
-                } catch (IOException e) {
-                    closeException = e;
-                }
-            }
-
-            if (closeException != null) {
-                throw new ExtensionException("Failed to close file", closeException);
-            }
-        }
-    }
-
     // LocalExtension
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.LocalExtension#getNamespaces()
-     */
+    @Override
     public Collection<String> getNamespaces()
     {
-        return namespaces;
+        return this.namespaces;
     }
 
     /**
@@ -149,14 +93,10 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
         this.namespaces.add(namespace);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.LocalExtension#getFile()
-     */
-    public File getFile()
+    @Override
+    public DefaultLocalExtensionFile getFile()
     {
-        return getProperty(PKEY_FILE, null);
+        return (DefaultLocalExtensionFile) super.getFile();
     }
 
     /**
@@ -165,24 +105,17 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
      */
     public void setFile(File file)
     {
+        setFile(new DefaultLocalExtensionFile(file));
         putProperty(PKEY_FILE, file);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.LocalExtension#isInstalled()
-     */
+    @Override
     public boolean isInstalled()
     {
         return getProperty(PKEY_INSTALLED, false);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.LocalExtension#isInstalled(java.lang.String)
-     */
+    @Override
     public boolean isInstalled(String namespace)
     {
         return isInstalled() && (this.namespaces == null || this.namespaces.contains(namespace));
@@ -224,11 +157,7 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.LocalExtension#isDependency()
-     */
+    @Override
     public boolean isDependency()
     {
         return getProperty(PKEY_DEPENDENCY, false);

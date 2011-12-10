@@ -32,10 +32,19 @@ public class DefaultJarExtensionClassLoader implements JarExtensionClassLoader
 
     private Map<String, ExtensionURLClassLoader> wikiClassLoaderMap = new HashMap<String, ExtensionURLClassLoader>();
 
+    /**
+     * Allow overriding the system classloader during tests.
+     * @return a ClassLoader to be used as the system parent
+     */
+    protected ClassLoader getSystemClassLoader() {
+        return getClass().getClassLoader();
+    }
+
+    @Override
     public ExtensionURLClassLoader getURLClassLoader(String namespace, boolean create)
     {
         if (this.rootClassLoader == null && create) {
-            this.rootClassLoader = new ExtensionURLClassLoader(new URI[] {}, getClass().getClassLoader(), null);
+            this.rootClassLoader = new ExtensionURLClassLoader(new URI[] {}, getSystemClassLoader(), null);
         }
 
         ExtensionURLClassLoader wikiClassLoader = this.rootClassLoader;
@@ -43,12 +52,37 @@ public class DefaultJarExtensionClassLoader implements JarExtensionClassLoader
         if (namespace != null) {
             wikiClassLoader = this.wikiClassLoaderMap.get(namespace);
 
-            if (wikiClassLoader == null && create) {
-                wikiClassLoader = new ExtensionURLClassLoader(new URI[] {}, this.rootClassLoader, namespace);
-                this.wikiClassLoaderMap.put(namespace, wikiClassLoader);
+            if (wikiClassLoader == null) {
+                if (create) {
+                    wikiClassLoader = new ExtensionURLClassLoader(new URI[] {}, this.rootClassLoader, namespace);
+                    this.wikiClassLoaderMap.put(namespace, wikiClassLoader);
+                } else {
+                    wikiClassLoader = this.rootClassLoader;
+                }
             }
         }
 
         return wikiClassLoader;
+    }
+
+    @Override
+    public void dropURLClassLoaders()
+    {
+        if (this.rootClassLoader != null) {
+            for (String namespace : wikiClassLoaderMap.keySet()) {
+                dropURLClassLoader(namespace);
+            }
+            this.rootClassLoader = null;
+        }
+    }
+
+    @Override
+    public void dropURLClassLoader(String namespace)
+    {
+        if (this.rootClassLoader != null) { 
+           if (this.wikiClassLoaderMap.get(namespace) != null) {
+               this.wikiClassLoaderMap.put(namespace, null);
+           }
+        }
     }
 }

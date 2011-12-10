@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface JobManager
 {
     /**
-     * @return the task currently running or the lastest task
+     * @return the task currently running or the latest task
      */
     Job getCurrentJob();
 
@@ -57,7 +57,7 @@ public interface JobManager
     Job uninstall(UninstallRequest request) throws JobException;
 
     /**
-     * Start a new task with teh provided identifier.
+     * Start a new task with the provided identifier.
      * 
      * @param taskId the role hint of the task component
      * @param request the request

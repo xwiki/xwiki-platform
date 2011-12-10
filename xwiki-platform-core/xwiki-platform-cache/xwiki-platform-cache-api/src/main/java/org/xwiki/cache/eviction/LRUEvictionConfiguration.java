@@ -37,7 +37,7 @@ public class LRUEvictionConfiguration extends EntryEvictionConfiguration
      */
     public LRUEvictionConfiguration()
     {
-        setAlgotithm(Algorithm.LRU);
+        setAlgorithm(Algorithm.LRU);
     }
 
     /**

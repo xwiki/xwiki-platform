@@ -115,7 +115,7 @@ public class ProvidingTransactionRunnableTest
         protected void onRun()
         {
             Assert.assertEquals("DB Connection was not correct in TR1",
-                                DB_CONNECTION, this.getContext().getConnection());
+                DB_CONNECTION, this.getContext().getConnection());
             this.dataA1 = DATA_A1;
         }
 
@@ -131,7 +131,7 @@ public class ProvidingTransactionRunnableTest
         protected void onRun()
         {
             Assert.assertEquals("DB Connection was not correct in TR2",
-                                DB_CONNECTION, this.getContext().getConnection());
+                DB_CONNECTION, this.getContext().getConnection());
         }
     }
 
@@ -140,9 +140,9 @@ public class ProvidingTransactionRunnableTest
         protected void onRun()
         {
             Assert.assertEquals("Data A1 was not correct in TR3",
-                                DATA_A1, this.getContext().getDataA1());
+                DATA_A1, this.getContext().getDataA1());
             Assert.assertEquals("DB Connection was not correct in TR3",
-                                DB_CONNECTION, this.getContext().getConnection());
+                DB_CONNECTION, this.getContext().getConnection());
         }
     }
 }

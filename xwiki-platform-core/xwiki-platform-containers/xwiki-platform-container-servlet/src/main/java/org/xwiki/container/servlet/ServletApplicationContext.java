@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.container.servlet;
 
@@ -27,14 +26,24 @@ import java.net.URL;
 
 import javax.servlet.ServletContext;
 
-import org.xwiki.container.ApplicationContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.container.AbstractApplicationContext;
 
-public class ServletApplicationContext implements ApplicationContext
+public class ServletApplicationContext extends AbstractApplicationContext
 {
-    private ServletContext servletContext;
+    /**
+     * The logger to log.
+     */
+    protected static final Logger LOGGER = LoggerFactory.getLogger(ServletApplicationContext.class);
 
-    public ServletApplicationContext(ServletContext servletContext)
+    private final ServletContext servletContext;
+
+    public ServletApplicationContext(ServletContext servletContext, ComponentManager componentManager)
     {
+        super(componentManager);
+
         this.servletContext = servletContext;
     }
 
@@ -43,31 +52,19 @@ public class ServletApplicationContext implements ApplicationContext
         return this.servletContext;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.container.ApplicationContext#getResourceAsStream(String)
-     */
+    @Override
     public InputStream getResourceAsStream(String resourceName)
     {
         return getServletContext().getResourceAsStream(resourceName);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.container.ApplicationContext#getResource(String)
-     */
+    @Override
     public URL getResource(String resourceName) throws MalformedURLException
     {
         return getServletContext().getResource(resourceName);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.container.ApplicationContext#getTemporaryDirectory()
-     */
+    @Override
     public File getTemporaryDirectory()
     {
         // Section SRV.4.7.1 of the Servlet 2.5 specification says that this should be available.

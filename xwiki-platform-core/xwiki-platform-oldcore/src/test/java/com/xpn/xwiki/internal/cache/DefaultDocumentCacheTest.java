@@ -21,10 +21,8 @@ package com.xpn.xwiki.internal.cache;
 
 import junit.framework.Assert;
 
-import org.jmock.Mock;
-import org.junit.Before;
+import org.jmock.Expectations;
 import org.junit.Test;
-import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
@@ -33,7 +31,7 @@ import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
  * Unit test for {@link DefaultDocumentCache}.
@@ -41,15 +39,15 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  * @version $Id$
  * @since 2.4M1
  */
-public class DefaultDocumentCacheTest extends AbstractBridgedXWikiComponentTestCase
+public class DefaultDocumentCacheTest extends AbstractBridgedComponentTestCase
 {
-    private Mock mockXWiki;
+    private XWiki mockXWiki;
 
     private XWikiDocument document;
 
     private DefaultDocumentCache<String> cache;
 
-    @Before
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();
@@ -65,15 +63,16 @@ public class DefaultDocumentCacheTest extends AbstractBridgedXWikiComponentTestC
         this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         this.document.setOriginalDocument(this.document.clone());
 
-        this.mockXWiki = mock(XWiki.class);
-        getContext().setWiki((XWiki) this.mockXWiki.proxy());
+        this.mockXWiki = getMockery().mock(XWiki.class);
+        getContext().setWiki((XWiki) this.mockXWiki);
         
-        this.mockXWiki.stubs().method("getDocument").with(eq(this.document.getDocumentReference()), ANYTHING).will(
-            returnValue(this.document));
+        getMockery().checking(new Expectations() {{
+            allowing(mockXWiki).getDocument(document.getDocumentReference(), getContext()); will(returnValue(document));
+        }});
     }
 
     @Override
-    protected void tearDown() throws Exception
+    public void tearDown() throws Exception
     {
         this.cache.dispose();
 

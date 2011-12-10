@@ -26,12 +26,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.xpn.xwiki.plugin.PluginApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.xpn.xwiki.plugin.PluginApi;
 
 /**
  * API for managing rights, users and groups.
@@ -54,7 +54,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
     /**
      * The logging toolkit.
      */
-    protected static final Log LOG = LogFactory.getLog(RightsManagerPluginApi.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(RightsManagerPluginApi.class);
 
     /**
      * API for managing rights and inheritance.
@@ -182,12 +182,12 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
     /**
      * Log error and register {@link #CONTEXT_LASTERRORCODE} and {@link #CONTEXT_LASTEXCEPTION}.
      * 
-     * @param comment the comment to use with {@link #LOG}.
+     * @param comment the comment to use with {@link #LOGGER}.
      * @param e the exception.
      */
     private void logError(String comment, XWikiException e)
     {
-        LOG.error(comment, e);
+        LOGGER.error(comment, e);
 
         this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
         this.context.put(CONTEXT_LASTEXCEPTION, e);

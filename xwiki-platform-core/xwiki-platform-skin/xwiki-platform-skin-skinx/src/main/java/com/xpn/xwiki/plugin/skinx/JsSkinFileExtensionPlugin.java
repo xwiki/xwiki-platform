@@ -23,8 +23,8 @@ package com.xpn.xwiki.plugin.skinx;
 import java.util.Collections;
 import java.util.Set;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;

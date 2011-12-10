@@ -20,7 +20,6 @@
 package org.xwiki.url.internal.standard;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.WikiReference;
@@ -42,6 +41,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 /**
  * There are 2 possibilities:
  * <ul>
@@ -52,7 +55,9 @@ import java.util.Map;
  * @version $Id$
  * @since 2.3M1
  */
-@Component("standard")
+@Component
+@Named("standard")
+@Singleton
 public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
 {
     /**
@@ -60,16 +65,18 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
      */
     private static final String IGNORE_PREFIX_KEY = "ignorePrefix";
 
-    @Requirement
+    @Inject
     private StandardURLConfiguration configuration;
 
-    @Requirement("path")
+    @Inject
+    @Named("path")
     private HostResolver pathBasedHostResolver;
 
-    @Requirement("domain")
+    @Inject
+    @Named("domain")
     private HostResolver domainHostResolver;
 
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
     
     private class URLParsingState
@@ -91,6 +98,7 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
      *
      * @see org.xwiki.url.XWikiURLFactory#createURL(Object, java.util.Map) 
      */
+    @Override
     public XWikiURL createURL(URL url, Map<String, Object> parameters) throws InvalidURLException
     {
         XWikiURL xwikiURL;

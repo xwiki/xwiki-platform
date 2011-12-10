@@ -21,8 +21,8 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.formula.ImageData;
 import org.xwiki.formula.ImageStorage;
 
@@ -40,7 +40,7 @@ import com.xpn.xwiki.util.Util;
 public class TexAction extends XWikiAction
 {
     /** Logging helper object */
-    private static final Log LOG = LogFactory.getLog(TexAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TexAction.class);
 
     /**
      * {@inheritDoc}
@@ -63,7 +63,7 @@ public class TexAction extends XWikiAction
         try {
             response.getOutputStream().write(image.getData());
         } catch (IOException e) {
-            LOG.info("Failed to send image to the client");
+            LOGGER.info("Failed to send image to the client");
         }
 
         return null;

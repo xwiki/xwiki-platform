@@ -50,15 +50,16 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 ##
 ##
 #**
- * Shows blog information. In view mode, the description is printed. In inline edit mode, allows changing
- * blog settings: title, description, blog type (global or in-space), index display type (fixed size pagination, weekly
- * index, monthly index, all entries).
+ * Shows blog information. In view mode, the description is printed. In edit mode, allows changing blog settings: title,
+ * description, blog type (global or in-space), index display type (fixed size pagination, weekly index, monthly index,
+ * all entries).
  * 
  * @param blogDoc The blog document. It should contain a &lt;tt&gt;Blog.BlogClass&lt;/tt&gt; object.
  *###
 #macro(showBlogInfo $blogDoc)
   #if($blogDoc.getObject($blogClassname))
-    #if($xcontext.action == 'inline')
+    ## Keep testing for inline action for backward compatibility with older blogs.
+    #if($xcontext.action == 'edit' || $xcontext.action == 'inline')
       #macro(displayProperty $blogDoc $propname)
         &lt;dt&gt;#displayPropName($xwiki.getClass($blogClassname).get($propname)):&lt;/dt&gt;
         &lt;dd&gt;$blogDoc.display($propname)&lt;/dd&gt;
@@ -594,7 +595,8 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  *###
 #macro(displayEditButton $entryDoc $entryObj)
   #if($xwiki.hasAccessLevel('edit', $xcontext.user, $entryDoc.fullName))
-    &lt;a href="$entryDoc.getURL('inline')" title="${escapetool.xml($msg.get('xe.blog.code.editpost'))}"&gt;#toolImage('pencil' 'edit ')&lt;/a&gt;##
+    ## Call getDefaultEditMode() for backward compatibility with older blog posts.
+    &lt;a href="$entryDoc.getURL($entryDoc.getDefaultEditMode())" title="${escapetool.xml($msg.get('xe.blog.code.editpost'))}"&gt;#toolImage('pencil' 'edit ')&lt;/a&gt;##
   #end
 #end
 ##

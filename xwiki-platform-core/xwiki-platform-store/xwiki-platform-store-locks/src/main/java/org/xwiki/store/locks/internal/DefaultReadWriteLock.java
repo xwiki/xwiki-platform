@@ -30,10 +30,14 @@ import java.util.concurrent.locks.ReadWriteLock;
  */
 public class DefaultReadWriteLock implements ReadWriteLock
 {
-    /** The lock for reading. */
+    /**
+     * The lock for reading.
+     */
     private final Lock readLock;
 
-    /** The lock for writing. */
+    /**
+     * The lock for writing.
+     */
     private final Lock writeLock;
 
     /**
@@ -48,21 +52,13 @@ public class DefaultReadWriteLock implements ReadWriteLock
         this.writeLock = writeLock;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.util.concurrent.locks.ReadWriteLock#readLock()
-     */
+    @Override
     public Lock readLock()
     {
         return this.readLock;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.util.concurrent.locks.ReadWriteLock#writeLock()
-     */
+    @Override
     public Lock writeLock()
     {
         return this.writeLock;

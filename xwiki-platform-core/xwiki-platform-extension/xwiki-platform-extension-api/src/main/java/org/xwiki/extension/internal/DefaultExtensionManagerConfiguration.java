@@ -35,6 +35,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.container.Container;
 import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 
@@ -48,21 +49,6 @@ import org.xwiki.extension.repository.ExtensionRepositoryId;
 public class DefaultExtensionManagerConfiguration implements ExtensionManagerConfiguration
 {
     /**
-     * The current user home path.
-     */
-    private static final String USERHOME = System.getProperty("user.home");
-
-    /**
-     * The xwiki home path.
-     */
-    private static final File XWIKIHOME = new File(USERHOME, ".xwiki");
-
-    /**
-     * The extension manage home path.
-     */
-    private static final File EXTENSIONSHOME = new File(XWIKIHOME, "extensions");
-
-    /**
      * Used to parse repositories entries from the configuration.
      */
     private static final Pattern REPOSITORYIDPATTERN = Pattern.compile("([^:]+):([^:]+):(.+)");
@@ -71,6 +57,11 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
      * The type identifier for a maven repository.
      */
     private static final String TYPE_MAVEN = "maven";
+
+    /**
+     * The type identifier for a xwiki repository.
+     */
+    private static final String TYPE_XWIKI = "xwiki";
 
     /**
      * Used to manipulate xwiki.properties files.
@@ -85,6 +76,12 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     @Inject
     private Logger logger;
 
+    /**
+     * Used to get work directory.
+     */
+    @Inject
+    private Container container;
+
     // Cache
 
     /**
@@ -97,14 +94,10 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
      */
     public File getHome()
     {
-        return EXTENSIONSHOME;
+        return new File(this.container.getApplicationContext().getPermanentDirectory(), "extension/");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.ExtensionManagerConfiguration#getLocalRepository()
-     */
+    @Override
     public File getLocalRepository()
     {
         if (this.localRepository == null) {
@@ -120,11 +113,7 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
         return this.localRepository;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.ExtensionManagerConfiguration#getRepositories()
-     */
+    @Override
     public List<ExtensionRepositoryId> getRepositories()
     {
         List<ExtensionRepositoryId> repositories = new ArrayList<ExtensionRepositoryId>();
@@ -143,10 +132,10 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
             }
         } else {
             try {
-                repositories.add(new ExtensionRepositoryId("maven-xwiki-releases", TYPE_MAVEN, new URI(
-                    "http://maven.xwiki.org/releases/")));
-                repositories.add(new ExtensionRepositoryId("maven-central", TYPE_MAVEN, new URI(
-                    "http://repo1.maven.org/maven2/")));
+                repositories.add(new ExtensionRepositoryId("maven-xwiki", TYPE_MAVEN, new URI(
+                    "http://nexus.xwiki.org/nexus/content/groups/public")));
+                repositories.add(new ExtensionRepositoryId("extensions.xwiki.org", TYPE_XWIKI, new URI(
+                    "http://extensions.xwiki.org/xwiki/rest/")));
             } catch (Exception e) {
                 // Should never happen
             }

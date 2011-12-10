@@ -20,33 +20,17 @@
 package org.xwiki.gwt.user.client.ui.rta.internal;
 
 import org.xwiki.gwt.dom.client.Event;
-import org.xwiki.gwt.dom.client.internal.ie.NativeSelection;
 
 import com.google.gwt.event.dom.client.KeyCodes;
 
 /**
- * Adjusts the behavior of the rich text area in Internet Explorer browsers.
+ * Adjusts the behavior of the rich text area in the newer versions of the Internet Explorer browser (9 and above).
  * 
  * @version $Id$
  */
 public class IEBehaviorAdjuster extends BehaviorAdjuster
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BehaviorAdjuster#onLoad(Event)
-     */
-    public void onLoad(Event event)
-    {
-        super.onLoad(event);
-        NativeSelection.ensureSelectionIsPreserved(getTextArea().getDocument());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BehaviorAdjuster#onKeyDown(Event)
-     */
+    @Override
     protected void onKeyDown(Event event)
     {
         if (event == null || event.isCancelled()) {

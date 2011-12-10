@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.plugin.usertools;
 
@@ -155,7 +154,7 @@ public class XWikiUserManagementToolsImpl extends XWikiDefaultPlugin implements 
     }
 
     private String getRandomPassword() {
-        return org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(8);
+        return org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(8);
     }
 
     private String prepareInvitationMessage(XWikiDocument doc, String name, String password, String email, 

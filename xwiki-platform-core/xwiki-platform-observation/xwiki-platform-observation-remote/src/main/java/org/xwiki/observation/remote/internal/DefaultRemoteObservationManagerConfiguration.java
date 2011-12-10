@@ -22,8 +22,11 @@ package org.xwiki.observation.remote.internal;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 
@@ -34,19 +37,17 @@ import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
  * @since 2.0M3
  */
 @Component
+@Singleton
 public class DefaultRemoteObservationManagerConfiguration implements RemoteObservationManagerConfiguration
 {
     /**
      * USed to access configuration storage.
      */
-    @Requirement("xwikiproperties")
+    @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource configurationSource;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.RemoteObservationManagerConfiguration#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         Boolean enabled = this.configurationSource.getProperty("observation.remote.enabled", Boolean.class);
@@ -54,11 +55,7 @@ public class DefaultRemoteObservationManagerConfiguration implements RemoteObser
         return enabled != null ? enabled : false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.RemoteObservationManagerConfiguration#getChannels()
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public List<String> getChannels()
     {
@@ -67,11 +64,7 @@ public class DefaultRemoteObservationManagerConfiguration implements RemoteObser
         return channels == null ? Collections.<String> emptyList() : channels;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.RemoteObservationManagerConfiguration#getNetworkAdapter()
-     */
+    @Override
     public String getNetworkAdapter()
     {
         return this.configurationSource.getProperty("observation.remote.networkadapter", "jgroups");

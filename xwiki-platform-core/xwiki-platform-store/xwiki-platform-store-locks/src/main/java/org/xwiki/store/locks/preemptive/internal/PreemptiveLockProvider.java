@@ -19,19 +19,20 @@
  */
 package org.xwiki.store.locks.preemptive.internal;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.HashMap;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.store.locks.internal.DefaultReadWriteLock;
 import org.xwiki.store.locks.LockProvider;
+import org.xwiki.store.locks.internal.DefaultReadWriteLock;
 
 /**
  * A provider of preemptive locks.
@@ -46,20 +47,27 @@ import org.xwiki.store.locks.LockProvider;
 @Singleton
 public class PreemptiveLockProvider implements LockProvider
 {
-    /** A map which holds locks by the object so that the same lock is used for any equivilent object. */
+    /**
+     * A map which holds locks by the object so that the same lock is used for any equivilent object.
+     */
     private final Map<Object, WeakReference<ReadWriteLock>> lockMap =
         new WeakHashMap<Object, WeakReference<ReadWriteLock>>();
 
-    /** Used by PreemptiveLock. */
+    /**
+     * Used by PreemptiveLock.
+     */
     private final ThreadLocal<Set<PreemptiveLock>> locksHeldByThread =
-        new ThreadLocal<Set<PreemptiveLock>>() {
+        new ThreadLocal<Set<PreemptiveLock>>()
+        {
             protected Set<PreemptiveLock> initialValue()
             {
                 return new HashSet<PreemptiveLock>();
             }
         };
 
-    /** Used by PreemptiveLock. */
+    /**
+     * Used by PreemptiveLock.
+     */
     private final Map<Thread, PreemptiveLock> lockBlockingThread =
         new HashMap<Thread, PreemptiveLock>();
 

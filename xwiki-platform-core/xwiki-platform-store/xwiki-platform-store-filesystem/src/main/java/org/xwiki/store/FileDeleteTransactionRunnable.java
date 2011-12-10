@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.locks.ReadWriteLock;
 
-
 /**
  * A TransactionRunnable for deleting a file safely.
  * The operation can be rolled back even after the onCommit() function is called.
@@ -34,13 +33,19 @@ import java.util.concurrent.locks.ReadWriteLock;
  */
 public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<TransactionRunnable>
 {
-    /** The location of the file to sdelete. */
+    /**
+     * The location of the file to sdelete.
+     */
     private final File toDelete;
 
-    /** The location of the backup file. */
+    /**
+     * The location of the backup file.
+     */
     private final File backupFile;
 
-    /** A lock to hold while running this TransactionRunnable. */
+    /**
+     * A lock to hold while running this TransactionRunnable.
+     */
     private final ReadWriteLock lock;
 
     /**
@@ -55,14 +60,14 @@ public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<
      *
      * @param toDelete the file to delete.
      * @param backupFile a temporary file, this should not contain anything important as it will be deleted
-     *                   and must not be altered while the operation is running. This will contain whatever
-     *                   was in the toDelete file prior, just in case onRollback must be called.
+     * and must not be altered while the operation is running. This will contain whatever
+     * was in the toDelete file prior, just in case onRollback must be called.
      * @param lock a ReadWriteLock whose writeLock will be locked as the beginning of the process and
-     *             unlocked when complete.
+     * unlocked when complete.
      */
     public FileDeleteTransactionRunnable(final File toDelete,
-                                         final File backupFile,
-                                         final ReadWriteLock lock)
+        final File backupFile,
+        final ReadWriteLock lock)
     {
         this.toDelete = toDelete;
         this.backupFile = backupFile;
@@ -105,7 +110,7 @@ public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<
      * 3. There are neither backup nor main files, this means we tried to delete a file which didn't exist
      *    to begin with.
      * 4. There are both main and backup files. AAAAAaaa what do we do?! Throw an exception which will be
-     *    reported.
+     * reported.
      *
      * @see StartableTransactionRunnable#onRollback()
      */
@@ -135,10 +140,10 @@ public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<
             // 4.
             if (isBackupFile && isMainFile) {
                 throw new IllegalStateException("Tried to rollback the deletion of file "
-                                                + this.toDelete.getAbsolutePath() + " and encountered a "
-                                                + "backup and a main file. Since the main file is renamed "
-                                                + "to a backup location before deleting, this should never "
-                                                + "happen.");
+                    + this.toDelete.getAbsolutePath() + " and encountered a "
+                    + "backup and a main file. Since the main file is renamed "
+                    + "to a backup location before deleting, this should never "
+                    + "happen.");
             }
         }
     }
@@ -154,8 +159,8 @@ public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<
     {
         if (!this.preRunComplete) {
             throw new IllegalStateException("Deleting file: " + this.toDelete.getAbsolutePath()
-                                            + " onPreRun has not been called, maybe the class was extended "
-                                            + "and it was overridden?");
+                + " onPreRun has not been called, maybe the class was extended "
+                + "and it was overridden?");
         }
         try {
             this.clearBackup();

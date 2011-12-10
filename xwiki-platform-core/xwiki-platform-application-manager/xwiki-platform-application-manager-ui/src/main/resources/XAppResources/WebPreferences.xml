@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>XAppResources</web>
 <name>WebPreferences</name>
@@ -19,8 +18,10 @@
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment></comment>
+<comment>Imported from XAR</comment>
 <minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>XWiki.XWikiGlobalRights</name>
@@ -33,6 +34,7 @@
 <validationScript></validationScript>
 <allow>
 <defaultValue>1</defaultValue>
+<disabled>0</disabled>
 <displayFormType>select</displayFormType>
 <displayType>allow</displayType>
 <name>allow</name>
@@ -43,10 +45,11 @@
 </allow>
 <groups>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>1</multiSelect>
 <name>groups</name>
-<number>4</number>
+<number>1</number>
 <prettyName>Groups</prettyName>
 <relationalStorage>0</relationalStorage>
 <separator> </separator>
@@ -57,10 +60,11 @@
 </groups>
 <levels>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>1</multiSelect>
 <name>levels</name>
-<number>4</number>
+<number>2</number>
 <prettyName>Levels</prettyName>
 <relationalStorage>0</relationalStorage>
 <separator> </separator>
@@ -70,10 +74,11 @@
 </levels>
 <users>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>1</multiSelect>
 <name>users</name>
-<number>4</number>
+<number>3</number>
 <prettyName>Users</prettyName>
 <relationalStorage>0</relationalStorage>
 <separator> </separator>
@@ -86,6 +91,7 @@
 <name>XAppResources.WebPreferences</name>
 <number>0</number>
 <className>XWiki.XWikiGlobalRights</className>
+<guid>17c35a50-c224-448e-8c31-69bae2a897da</guid>
 <property>
 <allow>1</allow>
 </property>

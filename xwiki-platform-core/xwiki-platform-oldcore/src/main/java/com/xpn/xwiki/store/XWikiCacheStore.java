@@ -16,17 +16,14 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.store;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -59,7 +56,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 {
-    private static final Log log = LogFactory.getLog(XWikiCacheStore.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiCacheStore.class);
 
     private XWikiStoreInterface store;
 
@@ -92,21 +89,13 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         this.observationManager.addListener(this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return "XWikiCacheStore";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
+    @Override
     public List<Event> getEvents()
     {
         return Arrays.<Event> asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(),
@@ -172,11 +161,13 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         this.store = store;
     }
 
+    @Override
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         saveXWikiDoc(doc, context, true);
     }
 
+    @Override
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         String key = getKey(doc, context);
@@ -198,6 +189,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
          */
     }
 
+    @Override
     public void flushCache()
     {
         if (this.cache != null) {
@@ -211,12 +203,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-     *      java.lang.Object)
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         // only react to remote events since local actions are already taken into account
@@ -256,28 +243,32 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 
     public String getKey(String wiki, String fullName, String language)
     {
-        String key = (wiki == null ? "" : wiki) + ":" + fullName;
+        final String key = (wiki == null ? "" : wiki) + ":" + fullName;
 
-        if (StringUtils.isEmpty(language)) {
+        // This is copied strait from XWikiDocument#getId()
+        // It is important to note that a document called "Main.WebHome:es" will have
+        // the same cache key as the Spanish version of "Main.WebHome".
+        // This is a problem which must be fixed here and in XWikiDocument#getId()
+        // simultaneously.
+        // See: http://jira.xwiki.org/jira/browse/XWIKI-6169
+        if ((language == null) || language.trim().equals("")) {
             return key;
         } else {
             return key + ":" + language;
         }
     }
 
+    @Override
     public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         String key = getKey(doc, context);
-        if (log.isDebugEnabled()) {
-            log.debug("Cache: begin for doc " + key + " in cache");
-        }
+
+        LOGGER.debug("Cache: begin for doc {} in cache", key);
 
         // Make sure cache is initialized
         initCache(context);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Cache: Trying to get doc " + key + " from cache");
-        }
+        LOGGER.debug("Cache: Trying to get doc {} from cache", key);
 
         XWikiDocument cachedoc = getCache().get(key);
 
@@ -285,33 +276,27 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
             doc = cachedoc;
             doc.setFromCache(true);
 
-            if (log.isDebugEnabled()) {
-                log.debug("Cache: got doc " + key + " from cache");
-            }
+            LOGGER.debug("Cache: got doc {} from cache", key);
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Cache: Trying to get doc " + key + " for real");
-            }
+            LOGGER.debug("Cache: Trying to get doc {} from persistent storage", key);
 
             doc = this.store.loadXWikiDoc(doc, context);
             doc.setStore(this.store);
 
-            if (log.isDebugEnabled()) {
-                log.debug("Cache: Got doc " + key + " for real");
-                log.debug("Cache: put doc " + key + " in cache");
-            }
+            LOGGER.debug("Cache: Got doc {} from storage", key);
 
             getCache().set(key, doc);
             getPageExistCache().set(key, new Boolean(!doc.isNew()));
+
+            LOGGER.debug("Cache: put doc {} in cache", key);
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Cache: end for doc " + key + " in cache");
-        }
+        LOGGER.debug("Cache: end for doc {} in cache", key);
 
         return doc;
     }
 
+    @Override
     public void deleteXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         String key = getKey(doc, context);
@@ -326,243 +311,169 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         getPageExistCache().set(key, new Boolean(false));
     }
 
+    @Override
     public List<String> getClassList(XWikiContext context) throws XWikiException
     {
         return this.store.getClassList(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiStoreInterface#countDocuments(String, XWikiContext)
-     */
+    @Override
     public int countDocuments(String wheresql, XWikiContext context) throws XWikiException
     {
         return this.store.countDocuments(wheresql, context);
     }
 
-    /**
-     * @since 2.2M2
-     */
+    @Override
     public List<DocumentReference> searchDocumentReferences(String wheresql, XWikiContext context)
         throws XWikiException
     {
         return this.store.searchDocumentReferences(wheresql, context);
     }
 
-    /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, com.xpn.xwiki.XWikiContext)}
-     */
-    @Deprecated
+    @Override
     public List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocumentsNames(wheresql, context);
     }
 
-    /**
-     * @since 2.2M2
-     */
+    @Override
     public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, XWikiContext context)
         throws XWikiException
     {
         return this.store.searchDocumentReferences(wheresql, nb, start, context);
     }
 
-    /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, com.xpn.xwiki.XWikiContext)}
-     */
-    @Deprecated
+    @Override
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context)
         throws XWikiException
     {
         return this.store.searchDocumentsNames(wheresql, nb, start, context);
     }
 
-    /**
-     * @since 2.2M2
-     */
+    @Override
     public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, String selectColumns,
         XWikiContext context) throws XWikiException
     {
         return this.store.searchDocumentReferences(wheresql, nb, start, selectColumns, context);
     }
 
-    /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, String, XWikiContext)}
-     */
-    @Deprecated
+    @Override
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns,
         XWikiContext context) throws XWikiException
     {
         return this.store.searchDocumentsNames(wheresql, nb, start, selectColumns, context);
     }
 
-    /**
-     * @since 2.2M2
-     */
+    @Override
     public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
         List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocumentReferences(parametrizedSqlClause, nb, start, parameterValues, context);
     }
 
-    /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, List, XWikiContext)}
-     */
-    @Deprecated
+    @Override
     public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
         List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocumentsNames(parametrizedSqlClause, nb, start, parameterValues, context);
     }
 
-    /**
-     * @since 2.2M2
-     */
+    @Override
     public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List< ? > parameterValues,
         XWikiContext context) throws XWikiException
     {
         return this.store.searchDocumentReferences(parametrizedSqlClause, parameterValues, context);
     }
 
-    /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, List, XWikiContext)}
-     */
-    @Deprecated
+    @Override
     public List<String> searchDocumentsNames(String parametrizedSqlClause, List< ? > parameterValues,
         XWikiContext context) throws XWikiException
     {
         return this.store.searchDocumentsNames(parametrizedSqlClause, parameterValues, context);
     }
 
+    @Override
     public boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context)
         throws XWikiException
     {
         return this.store.isCustomMappingValid(bclass, custommapping1, context);
     }
 
+    @Override
     public boolean injectCustomMapping(BaseClass doc1class, XWikiContext context) throws XWikiException
     {
         return this.store.injectCustomMapping(doc1class, context);
     }
 
+    @Override
     public boolean injectCustomMappings(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         return this.store.injectCustomMappings(doc, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname, XWikiContext context)
         throws XWikiException
     {
         return this.store.searchDocuments(wheresql, distinctbyname, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, boolean,
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping,
         XWikiContext context) throws XWikiException
     {
         return this.store.searchDocuments(wheresql, distinctbyname, customMapping, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, int, int,
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname, int nb, int start,
         XWikiContext context) throws XWikiException
     {
         return this.store.searchDocuments(wheresql, distinctbyname, nb, start, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, boolean, int, int,
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, int nb,
         int start, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocuments(wheresql, distinctbyname, customMapping, nb, start, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocuments(wheresql, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, int, int,
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, XWikiContext context)
         throws XWikiException
     {
         return this.store.searchDocuments(wheresql, nb, start, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, boolean, boolean, int,
-     *      int, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping,
         boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocuments(wheresql, distinctbyname, customMapping, checkRight, nb, start, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, int, int, java.util.List,
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start,
         List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocuments(wheresql, distinctbylanguage, nb, start, parameterValues, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, java.util.List,
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, List< ? > parameterValues, XWikiContext context)
         throws XWikiException
     {
         return this.store.searchDocuments(wheresql, parameterValues, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, boolean, int, int,
-     *      java.util.List, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
         int nb, int start, List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
@@ -570,24 +481,14 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
             context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, int, int, java.util.List,
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List< ? > parameterValues,
         XWikiContext context) throws XWikiException
     {
         return this.store.searchDocuments(wheresql, nb, start, parameterValues, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, boolean, boolean, int,
-     *      int, java.util.List, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
         boolean checkRight, int nb, int start, List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
@@ -595,127 +496,97 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
             parameterValues, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiStoreInterface#countDocuments(String, List, XWikiContext)
-     */
+    @Override
     public int countDocuments(String parametrizedSqlClause, List< ? > parameterValues, XWikiContext context)
         throws XWikiException
     {
         return this.store.countDocuments(parametrizedSqlClause, parameterValues, context);
     }
 
+    @Override
     public XWikiLock loadLock(long docId, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         return this.store.loadLock(docId, context, bTransaction);
     }
 
+    @Override
     public void saveLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         this.store.saveLock(lock, context, bTransaction);
     }
 
+    @Override
     public void deleteLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         this.store.deleteLock(lock, context, bTransaction);
     }
 
+    @Override
     public List<XWikiLink> loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         return this.store.loadLinks(docId, context, bTransaction);
     }
 
-    /**
-     * @since 2.2M2
-     */
+    @Override
     public List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
         XWikiContext context) throws XWikiException
     {
         return this.store.loadBacklinks(documentReference, bTransaction, context);
     }
 
-    /**
-     * @deprecated since 2.2M2 use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}
-     */
-    @Deprecated
+    @Override
     public List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
         return this.store.loadBacklinks(fullName, context, bTransaction);
     }
 
+    @Override
     public void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         this.store.saveLinks(doc, context, bTransaction);
     }
 
+    @Override
     public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         this.store.deleteLinks(docId, context, bTransaction);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public <T> List<T> search(String sql, int nb, int start, XWikiContext context) throws XWikiException
     {
         return this.store.search(sql, nb, start, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int, java.lang.Object[][],
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context)
         throws XWikiException
     {
         return this.store.search(sql, nb, start, whereParams, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int, java.util.List,
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public <T> List<T> search(String sql, int nb, int start, List< ? > parameterValues, XWikiContext context)
         throws XWikiException
     {
         return this.store.search(sql, nb, start, parameterValues, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int, java.lang.Object[][],
-     *      java.util.List, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List< ? > parameterValues,
         XWikiContext context) throws XWikiException
     {
         return this.store.search(sql, nb, start, whereParams, parameterValues, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#cleanUp(com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public synchronized void cleanUp(XWikiContext context)
     {
         this.store.cleanUp(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#isWikiNameAvailable(java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public boolean isWikiNameAvailable(String wikiName, XWikiContext context) throws XWikiException
     {
         synchronized (wikiName) {
@@ -723,11 +594,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#createWiki(java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public void createWiki(String wikiName, XWikiContext context) throws XWikiException
     {
         synchronized (wikiName) {
@@ -735,11 +602,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#deleteWiki(java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public void deleteWiki(String wikiName, XWikiContext context) throws XWikiException
     {
         synchronized (wikiName) {
@@ -748,6 +611,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         }
     }
 
+    @Override
     public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         String key = getKey(doc, context);
@@ -787,29 +651,31 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         this.pageExistCache = pageExistCache;
     }
 
+    @Override
     public List<String> getCustomMappingPropertyList(BaseClass bclass)
     {
         return this.store.getCustomMappingPropertyList(bclass);
     }
 
+    @Override
     public synchronized void injectCustomMappings(XWikiContext context) throws XWikiException
     {
         this.store.injectCustomMappings(context);
     }
 
+    @Override
     public void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException
     {
         this.store.injectUpdatedCustomMappings(context);
     }
 
+    @Override
     public List<String> getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         return this.store.getTranslationList(doc, context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public QueryManager getQueryManager()
     {
         return getStore().getQueryManager();

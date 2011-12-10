@@ -154,6 +154,12 @@ textarea, select {
 textarea {
   max-width: 100%; /* Prevent resizing beyond the visible area in modern browsers */
 }
+/* IE7 will shrink floated textareas continuously if we set a max-width,
+   since 100% max-width is computed within the border, while the current width includes the border.
+   Disable it since anyway it doesn't support native textarea resizing. */
+*+html textarea {
+  max-width: none;
+}
 
 /* -----------------------Tables-------------------------*/
 table {
@@ -700,16 +706,18 @@ div.buttonwrapper {
 
 .diff {
   overflow: auto;
-  white-space: normal;
+  white-space: pre-wrap;
 }
 
 .diffaddword {
   color: $theme.notificationSuccessColor;
+  background-color: rgba(0, 255, 0, 0.15);
 }
 
 .diffremoveword {
   color: $theme.notificationErrorColor;
   text-decoration: line-through;
+  background-color: rgba(255, 0, 0, 0.15);
 }
 
 /* --------------Information--------------*/
@@ -1257,6 +1265,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url("$xwiki.getSkinFile('icons/silk/group.gif')");
 }
 
+.actionmenu .tmUserDashboard {
+  background-image: url("$xwiki.getSkinFile('icons/silk/application_view_tile.gif')");
+}
+
 /* @group FORMS */
 /* --------------------------------------------------------------
   * forms components
@@ -1663,6 +1675,13 @@ ul.xlist li.attachment {
   padding-bottom: 0;
 }
 
+ul.xlist li.create a {
+  background: url("$xwiki.getSkinFile('icons/silk/bullet_add.gif')") 7px 3px no-repeat;
+  color: $theme.textSecondaryColor;
+  text-decoration: none;
+  padding-left: 1.5em;
+}
+
 ul.xlist li.xitem div.xitemcontainer {
   text-indent: 1.5em;
 }
@@ -1936,6 +1955,12 @@ ol.footnotes {
   border: 1px dotted $theme.borderColor;
   padding: 8px;
   width: 300px;
+}
+
+/* This rule is for allowing the RSS macro to use all width available when inserted as a gadget in a dashboard
+but still maintain the 300 px width when used as a Macro from the WYSIWYG Editor */
+.column .rssfeed {
+  width: auto;
 }
 
 .rssfeed .rsschanneltitle {

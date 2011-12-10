@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.user.api;
 
 import java.util.List;
@@ -43,7 +41,7 @@ public interface XWikiRightService
      * The Guest username.
      */
     public static final String GUEST_USER = "XWikiGuest";
-      
+
     /**
      * The Guest full name.
      */
@@ -58,7 +56,7 @@ public interface XWikiRightService
      * The AllGroup full name.
      */
     public static final String ALLGROUP_GROUP_FULLNAME = "XWiki." + ALLGROUP_GROUP;
-    
+
     /**
      * Checks if the wiki current user has the right to execute (@code action} on the document {@code doc}, along with
      * redirecting to the login if it's not the case and there is no logged in user (the user is the guest user).
@@ -107,13 +105,23 @@ public interface XWikiRightService
     public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context);
 
     /**
-     * Checks that the current user in the context (the currently authenticated user) has administration rights on the
-     * current wiki.
+     * Checks that the current user in the context (the currently authenticated user) has administration rights either
+     * on the current wiki or on the current space.
      * 
      * @param context the xwiki context of this request
      * @return {@code true} if the current user in the context has the {@code admin} right, {@code false} otherwise
      */
     public boolean hasAdminRights(XWikiContext context);
+
+    /**
+     * Checks that the current user in the context (the currently authenticated user) has administration rights on the
+     * current wiki, regardless of any space admin rights that might also be available.
+     * 
+     * @param context the xwiki context of this request
+     * @return {@code true} if the current user in the context has the {@code admin} right, {@code false} otherwise
+     * @since 3.2M3
+     */
+    public boolean hasWikiAdminRights(XWikiContext context);
 
     /**
      * @param context the xwiki context of this request

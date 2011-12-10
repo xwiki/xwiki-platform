@@ -33,7 +33,9 @@ import java.util.Map;
 import javax.servlet.http.Cookie;
 
 import org.apache.commons.collections.IteratorUtils;
+import org.jmock.Expectations;
 import org.jmock.Mock;
+import org.jmock.core.Constraint;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
@@ -463,5 +465,40 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         userObject.safeput("validkey", validationKey);
 
         assertEquals(-1, this.xwiki.validateUser(false, getContext()));
+    }
+
+    /**
+     * Tests that XWiki.XWikiPreferences page is not saved each time XWiki is initialized.
+     * 
+     * @throws Exception when any exception occurs inside XWiki
+     */
+    public void testGetPrefsClass() throws Exception
+    {
+        Mock mockStore = registerMockComponent(XWikiStoreInterface.class);
+        this.xwiki.setStore((XWikiStoreInterface) mockStore.proxy());
+
+        XWikiDocument prefsDoc = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "XWikiPreferences"));
+        final Map<DocumentReference, XWikiDocument> documents = new HashMap<DocumentReference, XWikiDocument>();
+        documents.put(prefsDoc.getDocumentReference(), prefsDoc);
+
+        mockStore.expects(atLeastOnce()).method("loadXWikiDoc").with(NOT_NULL, same(getContext()))
+            .will(new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
+            {
+                @Override
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
+                    if (!documents.containsKey(document.getDocumentReference())) {
+                        documents.put(document.getDocumentReference(), document);
+                    } else {
+                        document = documents.get(document.getDocumentReference());
+                    }
+                    return document;
+                }
+            });
+        mockStore.expects(once()).method("saveXWikiDoc").with(same(prefsDoc), same(getContext()));
+
+        xwiki.getPrefsClass(getContext());
+        xwiki.getPrefsClass(getContext());
     }
 }

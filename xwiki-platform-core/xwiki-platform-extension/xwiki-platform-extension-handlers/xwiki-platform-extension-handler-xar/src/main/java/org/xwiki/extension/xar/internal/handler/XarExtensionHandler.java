@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.xar.internal.handler;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -59,6 +60,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     private Logger logger;
 
     // TODO: support question/answer with the UI to resolve conflicts
+    @Override
     public void install(LocalExtension localExtension, String wiki) throws InstallException
     {
         install(null, localExtension, wiki);
@@ -101,7 +103,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             newPages = newXarExtension.getPages();
         } catch (ResolveException e) {
             try {
-                newPages = this.packager.getEntries(newLocalExtension.getFile());
+                newPages = this.packager.getEntries(new File(newLocalExtension.getFile().getAbsolutePath()));
             } catch (IOException e1) {
                 throw new InstallException("Failed to get xar extension [" + newLocalExtension.getId() + "] pages", e);
             }
@@ -126,13 +128,15 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
         // import xar into wiki (add new version when the page already exists)
         try {
-            this.packager.importXAR(previousExtension != null ? new XarFile(previousExtension.getFile(),
-                previousExtension.getPages()) : null, localExtension.getFile(), wiki, mergeConfiguration);
+            this.packager.importXAR(previousExtension != null ? new XarFile(new File(previousExtension.getFile()
+                .getAbsolutePath()), previousExtension.getPages()) : null, new File(localExtension.getFile()
+                .getAbsolutePath()), wiki, mergeConfiguration);
         } catch (Exception e) {
             throw new InstallException("Failed to import xar for extension [" + localExtension + "]", e);
         }
     }
 
+    @Override
     public void uninstall(LocalExtension localExtension, String namespace) throws UninstallException
     {
         // TODO: delete pages from the wiki which belong only to this extension (several extension could have some

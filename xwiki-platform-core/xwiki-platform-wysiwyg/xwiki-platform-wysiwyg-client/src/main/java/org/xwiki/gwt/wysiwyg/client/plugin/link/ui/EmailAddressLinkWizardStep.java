@@ -40,42 +40,33 @@ public class EmailAddressLinkWizardStep extends AbstractExternalLinkWizardStep
         setStepTitle(Strings.INSTANCE.linkToEmail());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractExternalLinkWizardStep#getURLTextBoxTooltip()
-     */
+    @Override
     protected String getURLTextBoxTooltip()
     {
         return Strings.INSTANCE.linkURLToEmailAddressTextBoxTooltip();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractExternalLinkWizardStep#getURLErrorMessage()
-     */
+    @Override
     protected String getURLErrorMessage()
     {
         return Strings.INSTANCE.linkEmailAddressError();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractExternalLinkWizardStep#getURLLabel()
-     */
+    @Override
     protected String getURLLabel()
     {
         return Strings.INSTANCE.linkEmailLabel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getURLHelpLabel()
     {
         return Strings.INSTANCE.linkEmailHelpLabel();
+    }
+
+    @Override
+    protected void setURL(String url)
+    {
+        super.setURL(url != null && url.startsWith("mailto:") ? url.substring(7) : url);
     }
 }

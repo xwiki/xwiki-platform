@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
@@ -47,6 +48,7 @@ import com.xpn.xwiki.web.Utils;
  * @since 3.2M1
  */
 @Component
+@Singleton
 @Named("CommentEventGeneratorListener")
 public class CommentEventGeneratorListener implements EventListener
 {

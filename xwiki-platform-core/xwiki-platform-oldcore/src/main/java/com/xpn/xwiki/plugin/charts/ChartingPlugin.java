@@ -16,14 +16,12 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.plugin.charts;
 
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
@@ -33,11 +31,11 @@ import java.lang.reflect.Method;
 import org.apache.batik.apps.rasterizer.SVGConverterException;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.Plot;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
@@ -71,19 +69,19 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
     public void init(XWikiContext context)
     {
         super.init(context);
-        log.info("Charting Plugin - init");
+        LOGGER.info("Charting Plugin - init");
 
         File dir = context.getWiki().getTempDirectory(context);
         tempDir = new File(dir, "charts");
         try {
             tempDir.mkdirs();
         } catch (Exception e1) {
-            log.warn("Could not create charts temporary directory: " + tempDir, e1);
+            LOGGER.warn("Could not create charts temporary directory: " + tempDir, e1);
             dir = new File(context.getWiki().Param("xwiki.upload.tempdir"));
             try {
                 tempDir = new File(dir, "charts");
             } catch (Exception e2) {
-                log.error("Could not create charts temporary directory: " + tempDir, e2);
+                LOGGER.error("Could not create charts temporary directory: " + tempDir, e2);
             }
         }
     }
@@ -162,8 +160,8 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         String imageURL;
         try {
             imageURL =
-                svgPlugin.getSVGImageURL(svgText, params.getInteger(ChartParams.HEIGHT).intValue(), params.getInteger(
-                    ChartParams.WIDTH).intValue(), context);
+                svgPlugin.getSVGImageURL(svgText, params.getInteger(ChartParams.HEIGHT).intValue(),
+                    params.getInteger(ChartParams.WIDTH).intValue(), context);
         } catch (SVGConverterException sce) {
             throw new GenerateException(sce);
         }
@@ -222,7 +220,7 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         return new File(tempDir, filename);
     }
 
-    private static Log log = LogFactory.getLog(ChartingPlugin.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(ChartingPlugin.class);
 
     private File tempDir;
 }

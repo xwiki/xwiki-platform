@@ -19,23 +19,32 @@
  */
 package com.xpn.xwiki.store.migration;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import org.apache.commons.collections.set.ListOrderedSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import org.apache.commons.collections.set.ListOrderedSet;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.util.*;
 
 /**
  * Template for {@link XWikiMigrationManagerInterface}.
- *
+ * 
  * @version $Id$
  */
 public abstract class AbstractXWikiMigrationManager implements XWikiMigrationManagerInterface
 {
     /** logger. */
-    private static final Log LOG = LogFactory.getLog(AbstractXWikiMigrationManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractXWikiMigrationManager.class);
 
     /**
      * Internal class used to find out the migrators that are being forced in the XWiki configuration file.
@@ -43,6 +52,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
     protected class XWikiMigration
     {
         public boolean isForced;
+
         public XWikiMigratorInterface migrator;
 
         public XWikiMigration(XWikiMigratorInterface migrator, boolean isForced)
@@ -53,14 +63,14 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
     }
 
     /**
-     * The database version when the migration process starts (before any migrator is applied).
-     * This is useful for mirgator which need to run only when the database is in a certain version.
+     * The database version when the migration process starts (before any migrator is applied). This is useful for
+     * mirgator which need to run only when the database is in a certain version.
      */
     private XWikiDBVersion startupVersion;
 
     /**
      * Unified constructor for all subclasses.
-     *
+     * 
      * @param context - used everywhere
      */
     public AbstractXWikiMigrationManager(XWikiContext context) throws XWikiException
@@ -70,7 +80,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
 
     /**
      * read data version from xwiki.cfg.
-     *
+     * 
      * @param context used for read config
      * @return data version if set, or null.
      */
@@ -80,9 +90,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
         return ver == null ? null : new XWikiDBVersion(Integer.parseInt(ver));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDBVersion getDBVersion(XWikiContext context) throws XWikiException
     {
         XWikiDBVersion result = getDBVersionFromConfig(context);
@@ -94,12 +102,9 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
      * @param context used everywhere
      * @throws XWikiException if any error
      */
-    protected abstract void setDBVersion(XWikiDBVersion version, XWikiContext context)
-        throws XWikiException;
+    protected abstract void setDBVersion(XWikiDBVersion version, XWikiContext context) throws XWikiException;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void startMigrations(XWikiContext context) throws XWikiException
     {
         if (context.getWiki().isVirtualMode()) {
@@ -110,8 +115,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
             try {
                 for (Iterator it = getDatabasesToMigrate(context).iterator(); it.hasNext();) {
                     String database = (String) it.next();
-                    LOG.info(new Formatter().format("Starting migration for database  [%s]...",
-                        new Object[] {database}));
+                    LOGGER.info("Starting migration for database [{}]...", database);
                     // Set up the context so that it points to the virtual wiki corresponding to the
                     // database.
                     context.setDatabase(database);
@@ -126,8 +130,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
                         // Run the migrations on the current database
                         startMigrationsForDatabase(context);
                     } catch (XWikiException e) {
-                        LOG.info(new Formatter().format("Failed to migrate database [%s]...",
-                            new Object[] {database}), e);
+                        LOGGER.info("Failed to migrate database [" + database + "]...", e);
                     }
                 }
             } finally {
@@ -139,18 +142,17 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
             try {
                 startMigrationsForDatabase(context);
             } catch (XWikiException ex) {
-                LOG.info("Failed to migrate main database...", ex);
+                LOGGER.info("Failed to migrate main database...", ex);
             }
         }
     }
 
     /**
      * Returns the names of the databases that should be migrated. This is controlled through the
-     * "xwiki.store.migration.databases" configuration property in xwiki.cfg. A value of "all" will
-     * add all databases. Note that the main database is automatically added even if not specified.
-     *
-     * @param context The {@link com.xpn.xwiki.XWikiContext} object, needed for accessing the main
-     *            wiki.
+     * "xwiki.store.migration.databases" configuration property in xwiki.cfg. A value of "all" will add all databases.
+     * Note that the main database is automatically added even if not specified.
+     * 
+     * @param context The {@link com.xpn.xwiki.XWikiContext} object, needed for accessing the main wiki.
      * @return The names of all databases to migrate.
      * @throws XWikiException if the list of wikis cannot be obtained.
      */
@@ -167,8 +169,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
         // it's "all" or "ALL"
         // then automatically add all the registered databases.
         if (context.getWiki().isVirtualMode()) {
-            String[] databases =
-                context.getWiki().getConfig().getPropertyAsList("xwiki.store.migration.databases");
+            String[] databases = context.getWiki().getConfig().getPropertyAsList("xwiki.store.migration.databases");
             if ((databases.length == 1) && databases[0].equalsIgnoreCase("all")) {
                 databasesToMigrate.addAll(context.getWiki().getVirtualWikisDatabaseNames(context));
             } else {
@@ -182,11 +183,9 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
     }
 
     /**
-     * It is assumed that before calling this method the XWiki context has been set with the
-     * database to migrate.
-     *
-     * @param context The {@link com.xpn.xwiki.XWikiContext} object, needed for accessing the
-     *            storage module.
+     * It is assumed that before calling this method the XWiki context has been set with the database to migrate.
+     * 
+     * @param context The {@link com.xpn.xwiki.XWikiContext} object, needed for accessing the storage module.
      * @throws XWikiException if there is an error updating the database.
      */
     private void startMigrationsForDatabase(XWikiContext context) throws XWikiException
@@ -195,16 +194,13 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
             Collection neededMigrations = getNeededMigrations(context);
             startMigrations(neededMigrations, context);
         } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_MIGRATION,
-                "Migration failed",
-                e);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MIGRATION,
+                "Migration failed", e);
         }
     }
 
     /**
-     * @return collection of {@link XWikiMigratorInterface} in ascending order, which need be
-     *         executed.
+     * @return collection of {@link XWikiMigratorInterface} in ascending order, which need be executed.
      * @param context used everywhere
      * @throws Exception if any error
      */
@@ -217,14 +213,14 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
         if (!forcedMigrations.isEmpty()) {
             neededMigrations.putAll(forcedMigrations);
         } else {
-            Set ignoredMigrations = new HashSet(Arrays.asList(context.getWiki().getConfig()
-                .getPropertyAsList("xwiki.store.migration.ignored")));
+            Set ignoredMigrations =
+                new HashSet(Arrays.asList(context.getWiki().getConfig()
+                    .getPropertyAsList("xwiki.store.migration.ignored")));
             List allMigrations = getAllMigrations(context);
             for (Iterator it = allMigrations.iterator(); it.hasNext();) {
                 XWikiMigratorInterface migrator = (XWikiMigratorInterface) it.next();
                 if (ignoredMigrations.contains(migrator.getClass().getName())
-                    || ignoredMigrations.contains(migrator.getVersion().toString()))
-                {
+                    || ignoredMigrations.contains(migrator.getVersion().toString())) {
                     continue;
                 }
                 if (migrator.getVersion().compareTo(curversion) >= 0) {
@@ -235,20 +231,19 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
         }
 
         Collection neededMigrationsAsCollection = neededMigrations.values();
-        if (LOG.isInfoEnabled()) {
+        if (LOGGER.isInfoEnabled()) {
             if (!neededMigrations.isEmpty()) {
-                LOG.info("Current storage version = [" + curversion.toString() + "]");
-                LOG.info("List of migrations that will be executed:");
+                LOGGER.info("Current storage version = [" + curversion.toString() + "]");
+                LOGGER.info("List of migrations that will be executed:");
                 for (Iterator it = neededMigrationsAsCollection.iterator(); it.hasNext();) {
                     XWikiMigration migration = (XWikiMigration) it.next();
                     if (migration.isForced || migration.migrator.shouldExecute(this.startupVersion)) {
-                        LOG.info("  " + migration.migrator.getName() + " - " + migration.migrator.getDescription()
+                        LOGGER.info("  " + migration.migrator.getName() + " - " + migration.migrator.getDescription()
                             + (migration.isForced ? " (forced)" : ""));
                     }
                 }
             } else {
-                LOG.info("No storage migration required since current version is ["
-                    + curversion.toString() + "]");
+                LOGGER.info("No storage migration required since current version is [" + curversion.toString() + "]");
             }
         }
 
@@ -273,30 +268,29 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
      * @param context - used everywhere
      * @throws XWikiException if any error
      */
-    protected void startMigrations(Collection migrations, XWikiContext context)
-        throws Exception
+    protected void startMigrations(Collection migrations, XWikiContext context) throws Exception
     {
         XWikiDBVersion curversion = getDBVersion(context);
         for (Iterator it = migrations.iterator(); it.hasNext();) {
             XWikiMigration migration = (XWikiMigration) it.next();
 
             if (migration.isForced || migration.migrator.shouldExecute(this.startupVersion)) {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("Running migration [" + migration.migrator.getName() + "] with version ["
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Running migration [" + migration.migrator.getName() + "] with version ["
                         + migration.migrator.getVersion() + "]");
                 }
                 migration.migrator.migrate(this, context);
             } else {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("Skipping unneeded migration [" + migration.migrator.getName() + "] with version ["
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Skipping unneeded migration [" + migration.migrator.getName() + "] with version ["
                         + migration.migrator.getVersion() + "]");
                 }
             }
 
             if (migration.migrator.getVersion().compareTo(curversion) > 0) {
                 setDBVersion(migration.migrator.getVersion().increment(), context);
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("New storage version is now [" + getDBVersion(context) + "]");
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("New storage version is now [" + getDBVersion(context) + "]");
                 }
             }
 

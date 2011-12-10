@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>AppWithinMinutes</web>
+<name>CreateApplication</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>AppWithinMinutes.WebHome</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1322209154000</creationDate>
+<date>1322394814000</date>
+<contentUpdateDate>1322394814000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get('platform.appwithinminutes.appNamePageTitle')</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.CreateApplication</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>25bc0a83-b45b-4646-bf2b-a62ac7384f1d</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>var XWiki = (function (XWiki) {
+
+XWiki.DeferredUpdater = Class.create({
+  initialize : function(updatable) {
+    this.elapsedHandler = updatable.onUpdate.bind(updatable);
+    this.updatable = updatable;
+  },
+  deferUpdate : function() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+    this.timer = setTimeout(this.elapsedHandler, 500);
+  }
+});
+
+XWiki.AppNameValidator = Class.create({
+  initialize : function(input, submitButton) {
+    this.input = input;
+    this.deferredUpdater = new XWiki.DeferredUpdater(this);
+    var updateScheduler = this._scheduleUpdate.bindAsEventListener(this);
+    ['keypress', 'paste', 'cut'].each(function(eventType) {
+      input.observe(eventType, updateScheduler);
+    }.bind(this));
+
+    this.submitButton = submitButton;
+    this.submitButton.observe('click', this._onSubmit.bindAsEventListener(this));
+
+    this.preview = new Element('div', {'class': 'appName-preview'});
+    this.input.insert({after: this.preview});
+
+    var previousDT = input.up('dd').previous();
+    this.errorMessage = previousDT.down('xErrorMsg');
+    if (!this.errorMessage) {
+      this.errorMessage = new Element('span', {'class': 'xErrorMsg'});
+      previousDT.insert(this.errorMessage.hide());
+    }
+  },
+  _onSubmit : function(event) {
+    if (!this.input._validated) {
+      event.stop();
+      this._scheduleUpdate();
+    }
+  },
+  _scheduleUpdate : function(event) {
+    if(!this.input._validated || [9, 13, 35, 36, 37, 38, 39, 40].indexOf(event.keyCode) &lt; 0) {
+      this.input._validated = false;
+      this.deferredUpdater.deferUpdate();
+    }
+  },
+  _onValidate : function(response) {
+    this.preview.removeClassName('loading').update(response.responseText);
+    var error = this.preview.down('.xErrorMsg');
+    this.input._validated = !error;
+    this._showError(error ? error.remove().firstChild.nodeValue : '');
+  },
+  _showError : function(message) {
+    if (message) {
+      this.input.addClassName('xErrorField').focus();
+      this.errorMessage.update(message.escapeHTML()).show();
+    } else {
+      this.input.removeClassName('xErrorField');
+      this.errorMessage.hide();
+    }
+  },
+  onUpdate : function() {
+    if (this.input.value == '') {
+      this._onValidate({
+        responseText: '&lt;span class="xErrorMsg"&gt;$msg.get('platform.appwithinminutes.appNameEmptyError')&lt;/span&gt;'
+      });
+    } else {
+      this.preview.addClassName('loading');
+      new Ajax.Request('$doc.getURL('get')', {
+        method: 'get',
+        parameters: {'appName': this.input.value},
+        onSuccess: this._onValidate.bind(this)
+      });
+    }
+  }
+});
+
+function init() {
+  var appNameInput = $('appName');
+  appNameInput &amp;&amp; new XWiki.AppNameValidator(appNameInput, $('wizard-next'));
+  return !!appNameInput;
+}
+(XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+
+return XWiki;
+}(XWiki || {}));</code>
+</property>
+<property>
+<name>Code</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>currentPage</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.CreateApplication</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>3782ad9f-9bfd-43f2-9310-c196092a0ad1</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>#template('colorThemeInit.vm')
+.wizard-help {
+  background-color: $theme.backgroundSecondaryColor;
+  border-bottom: 1px solid $theme.borderColor;
+  color: $theme.textSecondaryColor;
+  float: right;
+  font-size: 0.857em;
+  margin: 0 0 2em 2em;
+  padding: 1em;
+  width: 17em;
+}
+
+.wizard-help strong {
+  color: $theme.textColor;
+}
+
+.wizard-help .steps {
+  list-style-position: inside;
+  list-style-type: none;
+  margin: 0;
+}
+
+.wizard-help .steps li {
+  margin-top: .5em;
+}
+
+.wizard-help .steps .description {
+  display: block;
+  line-height: normal;
+  margin-left: 23px;
+}
+
+.wizard-body {
+  margin-right: 19em;
+}
+
+.appName-preview dl {
+  color: $theme.textSecondaryColor;
+  font-size: 0.8em;
+  margin-bottom: 1em;
+}
+
+.appName-preview dl tt {
+  color: $theme.textColor;
+}
+
+.appName-preview dt {
+  font-weight: normal;
+  margin-top: 1em;
+}
+
+.appName-preview dt:after {
+  content: ":"
+}</code>
+</property>
+<property>
+<name>Style</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>currentPage</use>
+</property>
+</object>
+<content>{{include document="AppWithinMinutes.WizardStep"/}}
+
+{{velocity output="false"}}
+#macro(showStep)
+  {{html wiki="true"}}
+  #appWizardHeader(1)
+  (% class="wizard-help" %)
+  (((
+    **$msg.get('platform.appwithinminutes.wizardStepHelpTitle')** $msg.get('platform.appwithinminutes.wizardStepHelpDescription')
+    (% class="steps" %)
+    #foreach($index in [1, 2, 3])
+      * (% class="number" %)$index(%%) (% class="name" %)$msg.get("platform.appwithinminutes.wizardStep${index}Name")(%%)
+        (% class="description" %)$msg.get("platform.appwithinminutes.wizardStep${index}Description")
+    #end
+  )))
+  &lt;form action="" method="post" class="xform wizard-body"&gt;
+    (% class="hidden" %)
+    (((
+      &lt;input type="hidden" name="form_token" value="$services.csrf.getToken()"/&gt;
+    )))
+    ; &lt;label for="appName"&gt;$msg.get('platform.appwithinminutes.appNameLabel')&lt;/label&gt;
+      (% class="xHint" %)$msg.get('platform.appwithinminutes.appNameHint')
+    : &lt;input type="text" id="appName" name="appName" /&gt;
+    #appWizardFooter(1)
+  &lt;/form&gt;
+  {{/html}}
+#end
+
+#macro(toXMLName $string)
+  ## Keep only Unicode letters and digits plus the hyphen and the underscore characters.
+  #set($string = $string.replaceAll('[^\p{L}\p{N}_\-]+', ''))
+  ## Make sure the string doesn't start with a number or the hyphen character.
+  #set($string = $string.replaceAll('^[\p{N}\-]+', ''))
+  $string##
+#end
+
+#macro(processStep)
+  #set($classRef = $services.model.createDocumentReference($doc.wiki, $request.appName, "#toXMLName($request.appName)Class"))
+  #set($queryString = 'wizard=true')
+  #if(!$xwiki.exists($classRef))
+    #set($classTitle = "$request.appName Class")
+    #set($queryString = "$queryString&amp;editor=inline&amp;template=AppWithinMinutes.ClassTemplate&amp;parent=WebHome&amp;title=$escapetool.url($classTitle)")
+  #end
+  $response.sendRedirect($xwiki.getURL($classRef, 'edit', $queryString))
+#end
+
+#macro(validateAppName $appName)
+  #set($className = "#toXMLName($appName)")
+  #if($className == '')
+    (% class="xErrorMsg" %)$msg.get('platform.appwithinminutes.appNameInvalidClassNameError')
+  #end
+  #set($appHomeRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebHome'))
+  #set($appHomeURL = $xwiki.getDocument($appHomeRef).getExternalURL())
+  ; $msg.get('platform.appwithinminutes.appNamePreviewHomePageUrlLabel')
+  : {{{$!appHomeURL.substring(0, $mathtool.sub($appHomeURL.length(), 7))}}}
+  ; $msg.get('platform.appwithinminutes.appNamePreviewDataSpaceLabel')
+  : {{{$doc.wiki}}} » {{{$appName}}}
+  ; $msg.get('platform.appwithinminutes.appNamePreviewClassReferenceLabel')
+  : {{{$doc.wiki}}} » {{{$appName}}} » {{{$!{className}Class}}}
+  #set($appClassRef = $services.model.createDocumentReference($doc.wiki, $appName, "$!{className}Class"))
+  #if($xwiki.exists($appHomeRef) || $xwiki.exists($appClassRef))
+
+    {{warning}}$msg.get('platform.appwithinminutes.appNameIsUsedWarning'){{/warning}}
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+#if("$!request.appName" != '')
+  #if($context.action == 'get')
+    #validateAppName($request.appName)
+  #elseif($services.csrf.isTokenValid($request.form_token))
+    #processStep()
+  #else
+    $response.sendRedirect($services.csrf.getResubmissionURL());
+  #end
+#else
+  #showStep()
+#end
+{{/velocity}}</content></xwikidoc>

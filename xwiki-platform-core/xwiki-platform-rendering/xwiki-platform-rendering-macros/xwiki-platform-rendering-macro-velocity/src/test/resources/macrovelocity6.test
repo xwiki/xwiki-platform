@@ -1,59 +1,37 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Verify identation is cleaned
+.# Verify filter option is taken into account
 .#-----------------------------------------------------
 {{velocity}}
-some text #if (true)
-    #if (true)
-      and the end of the sentence indented to be more readable.
-    #end
-  #end
+  Some text
+{{/velocity}}
+
+{{velocity filter="none"}}
+  Some text
 {{/velocity}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [velocity] [] [some text #if (true)
-    #if (true)
-      and the end of the sentence indented to be more readable.
-    #end
-  #end]
+beginMacroMarkerStandalone [velocity] [] [  Some text]
 beginParagraph
-onWord [some]
+onWord [Some]
 onSpace
 onWord [text]
-onSpace
-onWord [and]
-onSpace
-onWord [the]
-onSpace
-onWord [end]
-onSpace
-onWord [of]
-onSpace
-onWord [the]
-onSpace
-onWord [sentence]
-onSpace
-onWord [indented]
-onSpace
-onWord [to]
-onSpace
-onWord [be]
-onSpace
-onWord [more]
-onSpace
-onWord [readable]
-onSpecialSymbol [.]
 endParagraph
-endMacroMarkerStandalone [velocity] [] [some text #if (true)
-    #if (true)
-      and the end of the sentence indented to be more readable.
-    #end
-  #end]
+endMacroMarkerStandalone [velocity] [] [  Some text]
+beginMacroMarkerStandalone [velocity] [filter=none] [  Some text]
+beginParagraph
+onSpace
+onSpace
+onWord [Some]
+onSpace
+onWord [text]
+endParagraph
+endMacroMarkerStandalone [velocity] [filter=none] [  Some text]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>some text and the end of the sentence indented to be more readable.</p>
+<p>Some text</p><p>&nbsp;&nbsp;Some text</p>

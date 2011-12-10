@@ -22,7 +22,7 @@ package com.xpn.xwiki.plugin.lucene;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.commons.lang.time.FastDateFormat;
+import org.apache.commons.lang3.time.FastDateFormat;
 
 /**
  * Contains constants naming the Lucene index fields used by this Plugin and some helper methods for proper handling of

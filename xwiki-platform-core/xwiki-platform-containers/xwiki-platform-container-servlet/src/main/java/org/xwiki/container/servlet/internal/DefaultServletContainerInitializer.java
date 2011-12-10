@@ -55,12 +55,12 @@ import org.xwiki.url.XWikiURLFactory;
 @Singleton
 public class DefaultServletContainerInitializer implements ServletContainerInitializer
 {
-     // Implementation note: It's important that we don't use @Requirement annotations here
-     // for RequestInitializerManager and ExecutionContextManager since we can have
-     // RequestInitializer and ExecutionContextInitializer components which try to access
-     // the Application Context in their initialize() method and we need it to be available 
-     // (i.e. initializeApplicationContext() needs to have been called) before they are 
-     // looked up (and thus initialized).
+    // Implementation note: It's important that we don't use @Inject annotations here
+    // for RequestInitializerManager and ExecutionContextManager since we can have
+    // RequestInitializer and ExecutionContextInitializer components which try to access
+    // the Application Context in their initialize() method and we need it to be available
+    // (i.e. initializeApplicationContext() needs to have been called) before they are
+    // looked up (and thus initialized).
 
     @Inject
     private ApplicationContextListenerManager applicationContextListenerManager;
@@ -80,13 +80,15 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
     @Inject
     private Logger logger;
 
+    @Override
     public void initializeApplicationContext(ServletContext servletContext)
     {
-        ApplicationContext applicationContext = new ServletApplicationContext(servletContext);
+        ApplicationContext applicationContext = new ServletApplicationContext(servletContext, this.componentManager);
         this.container.setApplicationContext(applicationContext);
         this.applicationContextListenerManager.initializeApplicationContext(applicationContext);
     }
 
+    @Override
     public void initializeRequest(HttpServletRequest httpServletRequest, Object xwikiContext)
         throws ServletContainerException
     {
@@ -110,8 +112,9 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
         try {
             URL url = getURL(httpServletRequest);
             XWikiURLFactory<URL> urlFactory = this.componentManager.lookup(XWikiURLFactory.class);
-            XWikiURL xwikiURL = urlFactory.createURL(url,
-                Collections.<String, Object>singletonMap("ignorePrefix", httpServletRequest.getContextPath()));
+            XWikiURL xwikiURL =
+                urlFactory.createURL(url,
+                    Collections.<String, Object> singletonMap("ignorePrefix", httpServletRequest.getContextPath()));
             this.container.getRequest().setProperty(Request.XWIKI_URL, xwikiURL);
         } catch (MalformedURLException mue) {
             // Happens if getURL() fails, shouldn't happen normally since the Servlet Container should always return
@@ -143,25 +146,28 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
         }
     }
 
+    @Override
     public void initializeRequest(HttpServletRequest httpServletRequest) throws ServletContainerException
     {
         initializeRequest(httpServletRequest, null);
     }
 
+    @Override
     public void initializeResponse(HttpServletResponse httpServletResponse)
     {
         this.container.setResponse(new ServletResponse(httpServletResponse));
     }
 
+    @Override
     public void initializeSession(HttpServletRequest httpServletRequest)
     {
         this.container.setSession(new ServletSession(httpServletRequest));
     }
 
     /**
-     * Helper method to reconstruct a URL based on the HTTP Servlet Request (since this feature isn't offered by
-     * the Servlet specification).
-     *
+     * Helper method to reconstruct a URL based on the HTTP Servlet Request (since this feature isn't offered by the
+     * Servlet specification).
+     * 
      * @param httpServletRequest
      * @return the URL as a real URL object
      * @throws ServletContainerException if the original request isn't a valid URL (shouldn't happen)

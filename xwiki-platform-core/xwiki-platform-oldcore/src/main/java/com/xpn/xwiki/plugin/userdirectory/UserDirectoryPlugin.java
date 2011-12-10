@@ -16,9 +16,17 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.plugin.userdirectory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -31,54 +39,57 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.usertools.XWikiUserManagementTools;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.web.XWikiRequest;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.VelocityContext;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-
-public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPluginInterface {
-    private static Log mLogger =
-            LogFactory.getLog(UserDirectoryPlugin.class);
+public class UserDirectoryPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
+{
+    private static Logger LOGGER = LoggerFactory.getLogger(UserDirectoryPlugin.class);
 
     public static final String DEFAULT_PLUGIN_SPACE = "Directory";
-    public static final String DEFAULT_GROUP_TEMPLATE= "XWiki.DirectoryGroupTemplate";
+
+    public static final String DEFAULT_GROUP_TEMPLATE = "XWiki.DirectoryGroupTemplate";
+
     public static final String DEFAULT_DEACTIVATION_MESSAGE_PAGE = "XWiki.DeactivationMessage";
+
     public static final int ERROR_USERDIRECTORYPLUGIN_UNKNOWN = 0;
+
     public static final int ERROR_USERDIRECTORYPLUGIN_ALREADYEXIST = 1;
+
     public static final int ERROR_USERDIRECTORYPLUGIN_GRPDOESNTEXIST = 2;
+
     private static final int ERROR_XWIKI_EMAIL_CANNOT_PREPARE_VALIDATION_EMAIL = 3;
+
     private static final int ERROR_XWIKI_EMAIL_CANNOT_GET_VALIDATION_CONFIG = 4;
 
-    public UserDirectoryPlugin(String name, String className, XWikiContext context) {
+    public UserDirectoryPlugin(String name, String className, XWikiContext context)
+    {
         super(name, className, context);
     }
 
-    public String getName() {
+    public String getName()
+    {
         return "userdirectory";
     }
 
-    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
+    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
+    {
         return new UserDirectoryPluginAPI((UserDirectoryPlugin) plugin, context);
     }
 
-
     /**
      * Add a group from the request
+     * 
      * @param context
      * @return
      */
-    public Group addGroup(XWikiContext context) throws XWikiException {
+    public Group addGroup(XWikiContext context) throws XWikiException
+    {
         XWikiRequest req = context.getRequest();
         String name = req.get("XWiki.DirectoryGroupClass_0_name");
         name = context.getWiki().clearName(name, context);
         XWikiDocument tmpDoc = context.getWiki().getDocument(DEFAULT_PLUGIN_SPACE, name, context);
         if (!tmpDoc.isNew())
-            throw new PluginException(UserDirectoryPlugin.class, ERROR_USERDIRECTORYPLUGIN_ALREADYEXIST, "This document already exist, try another name");
+            throw new PluginException(UserDirectoryPlugin.class, ERROR_USERDIRECTORYPLUGIN_ALREADYEXIST,
+                "This document already exist, try another name");
         Document doc = tmpDoc.newDocument(context);
         doc.addObjectFromRequest("XWiki.DirectoryGroupClass");
         doc.setContent(getTemplate(context));
@@ -86,11 +97,13 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
         return new Group(doc, context);
     }
 
-    public String getTemplate(XWikiContext context) throws XWikiException {
+    public String getTemplate(XWikiContext context) throws XWikiException
+    {
         return context.getWiki().getDocument(DEFAULT_GROUP_TEMPLATE, context).getContent();
     }
 
-    public void updateGroup(XWikiContext context) throws XWikiException {
+    public void updateGroup(XWikiContext context) throws XWikiException
+    {
         XWikiRequest req = context.getRequest();
         String pageName = req.get("pageName");
         XWikiDocument tmpDoc = context.getWiki().getDocument(pageName, context);
@@ -99,36 +112,43 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
         doc.save();
     }
 
-    public boolean groupExist(String name, XWikiContext context) throws XWikiException {
+    public boolean groupExist(String name, XWikiContext context) throws XWikiException
+    {
         return getGroup(name, context).isNew();
     }
 
-     public Group getGroup(String space, String name, XWikiContext context) throws XWikiException {
+    public Group getGroup(String space, String name, XWikiContext context) throws XWikiException
+    {
         return Group.getGroup(space, name, context);
     }
 
-    public Group getGroup(String name, XWikiContext context) throws XWikiException {
+    public Group getGroup(String name, XWikiContext context) throws XWikiException
+    {
         return getGroup(DEFAULT_PLUGIN_SPACE, name, context);
     }
 
-    public List getAllGroupsPageName(XWikiContext context) throws XWikiException {
+    public List getAllGroupsPageName(XWikiContext context) throws XWikiException
+    {
         return Group.getAllGroupsPageName(context);
     }
 
-    public List getAllGroupsPageName(String orderBy, XWikiContext context) throws XWikiException {
+    public List getAllGroupsPageName(String orderBy, XWikiContext context) throws XWikiException
+    {
         return Group.getAllGroupsPageName(orderBy, context);
     }
 
-    public List getAllGroups(XWikiContext context) throws XWikiException {
+    public List getAllGroups(XWikiContext context) throws XWikiException
+    {
         return getAllGroups(null, context);
     }
 
-    public List getAllGroups(String orderBy, XWikiContext context) throws XWikiException {
+    public List getAllGroups(String orderBy, XWikiContext context) throws XWikiException
+    {
         List allGroupsPageName;
         if (orderBy == null)
             allGroupsPageName = getAllGroupsPageName(context);
         else
-             allGroupsPageName = getAllGroupsPageName(orderBy, context);
+            allGroupsPageName = getAllGroupsPageName(orderBy, context);
         List groups = new ArrayList();
         if (allGroupsPageName == null)
             return groups;
@@ -138,48 +158,59 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
         return groups;
     }
 
-    public List getMembers(String grpPage, XWikiContext context) throws XWikiException {
+    public List getMembers(String grpPage, XWikiContext context) throws XWikiException
+    {
         Group grp = getGroup(grpPage, context);
         return grp.getMembers(context);
     }
 
-    public List getUnactivatedMembers(String grpPage, XWikiContext context) throws XWikiException {
+    public List getUnactivatedMembers(String grpPage, XWikiContext context) throws XWikiException
+    {
         Group grp = getGroup(grpPage, context);
         return grp.getUnactivatedMembers(context);
     }
 
-    public boolean removeGroup(String name, XWikiContext context){
+    public boolean removeGroup(String name, XWikiContext context)
+    {
         return false;
     }
 
-    public boolean addParentGroup(String childGroupName, String parentGroupName, XWikiContext context) throws XWikiException {
+    public boolean addParentGroup(String childGroupName, String parentGroupName, XWikiContext context)
+        throws XWikiException
+    {
         Group grp = getGroup(childGroupName, context);
         boolean res = grp.addParentName(parentGroupName, this, context);
-        if (res){
+        if (res) {
             grp.save(context);
             return true;
         }
         return false;
     }
 
-    public boolean removeParentGroup(String childGroupName, String parentGroupName, XWikiContext context) throws XWikiException {
+    public boolean removeParentGroup(String childGroupName, String parentGroupName, XWikiContext context)
+        throws XWikiException
+    {
         Group grp = getGroup(childGroupName, context);
-        boolean res =  grp.removeParent(parentGroupName, this, context);
-        if (res){
+        boolean res = grp.removeParent(parentGroupName, this, context);
+        if (res) {
             grp.save(context);
             return true;
         }
         return false;
     }
 
-    public List getParentGroups(String grpName, XWikiContext context) throws XWikiException {
+    public List getParentGroups(String grpName, XWikiContext context) throws XWikiException
+    {
         Group grp = getGroup(grpName, context);
         return grp.getParents(context);
     }
 
-    public String inviteToGroup(String name, String firstName, String email, String group, XWikiContext context) throws XWikiException {
+    public String inviteToGroup(String name, String firstName, String email, String group, XWikiContext context)
+        throws XWikiException
+    {
         String pageName = context.getWiki().convertUsername(email, context);
-        XWikiUserManagementTools userTools = (XWikiUserManagementTools) context.getWiki().getPlugin("usermanagementtools", context);
+        XWikiUserManagementTools userTools =
+            (XWikiUserManagementTools) context.getWiki().getPlugin("usermanagementtools", context);
         XWikiDocument doc = context.getWiki().getDocument(userTools.getUserSpace(context) + "." + pageName, context);
         if (doc.isNew()) {
             String userDocName = userTools.inviteUser(name, email, context);
@@ -192,47 +223,57 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
         return doc.getFullName();
     }
 
-    public void addUserToGroup(String userPage, String group, XWikiContext context) throws XWikiException {
+    public void addUserToGroup(String userPage, String group, XWikiContext context) throws XWikiException
+    {
         Group grp = getGroup(group, context);
         if (grp == null)
-            throw new PluginException(UserDirectoryPlugin.class, ERROR_USERDIRECTORYPLUGIN_GRPDOESNTEXIST, "This group doesn't exist");
+            throw new PluginException(UserDirectoryPlugin.class, ERROR_USERDIRECTORYPLUGIN_GRPDOESNTEXIST,
+                "This group doesn't exist");
         if (grp.addUser(userPage, context))
             grp.save(context);
     }
 
-    public String getUserName(String userPage, XWikiContext context) throws XWikiException {
-        XWikiUserManagementTools userTools = (XWikiUserManagementTools) context.getWiki().getPlugin("usermanagementtools", context);
+    public String getUserName(String userPage, XWikiContext context) throws XWikiException
+    {
+        XWikiUserManagementTools userTools =
+            (XWikiUserManagementTools) context.getWiki().getPlugin("usermanagementtools", context);
         return userTools.getUserName(userPage, context);
     }
 
-    public String getUserEmail(String userPage, XWikiContext context) throws XWikiException {
-        XWikiUserManagementTools userTools = (XWikiUserManagementTools) context.getWiki().getPlugin("usermanagementtools", context);
+    public String getUserEmail(String userPage, XWikiContext context) throws XWikiException
+    {
+        XWikiUserManagementTools userTools =
+            (XWikiUserManagementTools) context.getWiki().getPlugin("usermanagementtools", context);
         return userTools.getEmail(userPage, context);
     }
 
-    public List getUsersDocumentName(String grpPage, XWikiContext context) throws XWikiException {
+    public List getUsersDocumentName(String grpPage, XWikiContext context) throws XWikiException
+    {
         Group grp = getGroup(grpPage, context);
         return grp.getUsersPageName(context);
     }
 
-    public List getUsersDocument(String grpPage, XWikiContext context) throws XWikiException {
+    public List getUsersDocument(String grpPage, XWikiContext context) throws XWikiException
+    {
         List users = getUsersDocumentName(grpPage, context);
         List usersDoc = new ArrayList();
         Iterator it = users.iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             usersDoc.add(context.getWiki().getDocument((String) it.next(), context).newDocument(context));
         }
         return usersDoc;
     }
 
-    public boolean removeMemberships(String userPage, String grpPage, XWikiContext context) throws XWikiException {
+    public boolean removeMemberships(String userPage, String grpPage, XWikiContext context) throws XWikiException
+    {
         Group grp = getGroup(grpPage, context);
         grp.removeUser(userPage, context);
         grp.save(context);
         return true;
     }
 
-    public void sendDeactivationEMail(String userPage, String grpPage, XWikiContext context) throws XWikiException {
+    public void sendDeactivationEMail(String userPage, String grpPage, XWikiContext context) throws XWikiException
+    {
         Group grp = getGroup(grpPage, context);
         String userName = getUserName(userPage, context);
         String email = getUserEmail(userPage, context);
@@ -242,13 +283,15 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
             sender = context.getWiki().getXWikiPreference("admin_email", context);
         } catch (Exception e) {
             throw new PluginException(getName(), ERROR_XWIKI_EMAIL_CANNOT_GET_VALIDATION_CONFIG,
-                    "Exception while reading the validation email config", e, null);
+                "Exception while reading the validation email config", e, null);
 
         }
         context.getWiki().sendMessage(sender, email, message, context);
     }
 
-    private String prepareDeactivationMessage(String name,String email, String grp, XWikiContext context) throws XWikiException {
+    private String prepareDeactivationMessage(String name, String email, String grp, XWikiContext context)
+        throws XWikiException
+    {
         XWikiDocument doc = context.getWiki().getDocument(getDeactivationMessageDocument(context), context);
 
         String content = doc.getContent();
@@ -261,7 +304,7 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
             content = context.getWiki().parseContent(content, context);
         } catch (Exception e) {
             throw new PluginException(getName(), ERROR_XWIKI_EMAIL_CANNOT_PREPARE_VALIDATION_EMAIL,
-                    "Exception while preparing the validation email", e, null);
+                "Exception while preparing the validation email", e, null);
 
         }
         return content;
@@ -272,12 +315,13 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
         return DEFAULT_DEACTIVATION_MESSAGE_PAGE;
     }
 
-    public List getUserMemberships(String userPage, XWikiContext context) throws XWikiException {
+    public List getUserMemberships(String userPage, XWikiContext context) throws XWikiException
+    {
         XWikiGroupService groupService = context.getWiki().getGroupService(context);
         Collection groups = groupService.listGroupsForUser(userPage, context);
         List userGrps = new ArrayList();
         Iterator it = groups.iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             String grpName = (String) it.next();
             if (Group.isValidGroup(grpName, context))
                 userGrps.add(grpName);
@@ -285,7 +329,8 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
         return userGrps;
     }
 
-    public boolean deactivateAccount(String userPage, XWikiContext context) throws XWikiException {
+    public boolean deactivateAccount(String userPage, XWikiContext context) throws XWikiException
+    {
         Document doc = context.getWiki().getDocument(userPage, context).newDocument(context);
         doc.use("XWiki.XWikiUsers");
         doc.set("active", "0");
@@ -295,12 +340,12 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
         return true;
     }
 
-    public void resendInvitation(String userPage, XWikiContext context) throws XWikiException {
-        XWikiUserManagementTools userTools = (XWikiUserManagementTools) context.getWiki().getPlugin("usermanagementtools", context);
+    public void resendInvitation(String userPage, XWikiContext context) throws XWikiException
+    {
+        XWikiUserManagementTools userTools =
+            (XWikiUserManagementTools) context.getWiki().getPlugin("usermanagementtools", context);
 
         userTools.resendInvitation(userTools.getEmail(userPage, context), context);
     }
-
-
 
 }

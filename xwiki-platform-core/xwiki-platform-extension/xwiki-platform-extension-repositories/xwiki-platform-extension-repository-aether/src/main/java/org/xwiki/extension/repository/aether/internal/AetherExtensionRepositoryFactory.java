@@ -29,6 +29,7 @@ import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.util.DefaultRepositorySystemSession;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -41,22 +42,25 @@ import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentMana
 @Component
 @Singleton
 @Named("maven")
-public class AetherExtensionRepositoryFactory implements ExtensionRepositoryFactory,
-    Initializable
+public class AetherExtensionRepositoryFactory implements ExtensionRepositoryFactory, Initializable
 {
     @Inject
-    private PlexusComponentManager aetherComponentManager;
+    private ComponentManager componentManager;
+
+    @Inject
+    private PlexusComponentManager plexusComponentManager;
 
     @Inject
     private AetherConfiguration aetherConfiguration;
 
     private DefaultRepositorySystemSession session;
 
+    @Override
     public void initialize() throws InitializationException
     {
         RepositorySystem repositorySystem;
         try {
-            repositorySystem = this.aetherComponentManager.getPlexus().lookup(RepositorySystem.class);
+            repositorySystem = this.plexusComponentManager.getPlexus().lookup(RepositorySystem.class);
         } catch (ComponentLookupException e) {
             throw new InitializationException("Failed to lookup RepositorySystem", e);
         }
@@ -69,10 +73,12 @@ public class AetherExtensionRepositoryFactory implements ExtensionRepositoryFact
         this.session.setIgnoreInvalidArtifactDescriptor(false);
     }
 
+    @Override
     public ExtensionRepository createRepository(ExtensionRepositoryId repositoryId) throws ExtensionRepositoryException
     {
         try {
-            return new AetherExtensionRepository(repositoryId, this.session, this.aetherComponentManager);
+            return new AetherExtensionRepository(repositoryId, this.session, this.plexusComponentManager,
+                this.componentManager);
         } catch (Exception e) {
             throw new ExtensionRepositoryException("Failed to create repository [" + repositoryId + "]", e);
         }

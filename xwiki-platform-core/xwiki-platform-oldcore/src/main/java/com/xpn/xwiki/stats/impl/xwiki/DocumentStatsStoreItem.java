@@ -16,16 +16,14 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.stats.impl.xwiki;
 
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -44,7 +42,7 @@ public class DocumentStatsStoreItem extends AbstractStatsStoreItem
     /**
      * Logging tools.
      */
-    private static final Log LOG = LogFactory.getLog(DocumentStatsStoreItem.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentStatsStoreItem.class);
 
     /**
      * The action made on provided wiki/space/document.
@@ -71,30 +69,22 @@ public class DocumentStatsStoreItem extends AbstractStatsStoreItem
      * @param isVisit is this part of a user visit.
      * @param context the XWiki context.
      */
-    public DocumentStatsStoreItem(String name, Date periodDate, PeriodType periodType,
-        String action, boolean isVisit, XWikiContext context)
+    public DocumentStatsStoreItem(String name, Date periodDate, PeriodType periodType, String action, boolean isVisit,
+        XWikiContext context)
     {
         super(name, periodDate, periodType, context);
-        
+
         this.action = action;
         this.isVisit = isVisit;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreItem#getId()
-     */
+    @Override
     public String getId()
     {
         return String.format("%s %s %s %s", getClass(), this.name, this.action, this.period);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreItem#store(java.util.List)
-     */
+    @Override
     public void storeInternal(List<XWikiStatsStoreItem> stats)
     {
         DocumentStatsStoreItem lastItem = (DocumentStatsStoreItem) stats.get(stats.size() - 1);
@@ -105,16 +95,15 @@ public class DocumentStatsStoreItem extends AbstractStatsStoreItem
         }
 
         DocumentStats documentStat =
-            new DocumentStats(lastItem.name, lastItem.action, lastItem.periodDate,
-                lastItem.periodType);
+            new DocumentStats(lastItem.name, lastItem.action, lastItem.periodDate, lastItem.periodType);
 
         // Load old statistics object from database
         try {
             // TODO Fix use of deprecated call.
             store.loadXWikiCollection(documentStat, context, true);
         } catch (XWikiException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Failed to load document statictics object [" + getId() + "]");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Failed to load document statictics object [" + getId() + "]");
             }
         }
 
@@ -133,7 +122,7 @@ public class DocumentStatsStoreItem extends AbstractStatsStoreItem
             // TODO Fix use of deprecated call.
             store.saveXWikiCollection(documentStat, context, true);
         } catch (XWikiException e) {
-            LOG.error("Failed to save document statictics object [" + getId() + "]");
+            LOGGER.error("Failed to save document statictics object [" + getId() + "]");
         }
     }
 }

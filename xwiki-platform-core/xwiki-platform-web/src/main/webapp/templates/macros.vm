@@ -1248,7 +1248,7 @@ ${Msz}Mb##
   #if("$!options.selectedColumn" != '') #set($selectedColumn = $options.selectedColumn) #end
   #if("$!options.callback" != '') #set($callback = $options.callback) #end
   #if("$!options.tagCloud" == '' || $options.tagCloud == false) #set($tagcloud=false) #else #set($tagcloud = true) #end
-  #if("$!options.javascriptName" != '') #set($jsName = $options.javascriptName) #else #set($jsName = 'livetable') #end
+  #if("$!options.javascriptName" != '') #set($jsName = $options.javascriptName) #else #set($jsName = "livetable_$divid") #end
   #if("$!options.topFilters" != '') #set($topfilters = $options.topFilters) #end
   #if("$options.pageSize" == '' || $!options.pageSize == false) #set($hasPageSize=false) #else #set($hasPageSize = true) #end
   #if("$!options.pageSizeBounds" != '') #set($pageSizeBounds = $options.pageSizeBounds) #end
@@ -1499,7 +1499,7 @@ ${Msz}Mb##
 function (row, i, table) {
   // This callback method code has been generated from velocity.
   var tr = new Element("tr");
-  if (row.doc_viewable) {
+  if (row["doc_viewable"]) {
   #foreach($colname in $collist)
     // $colname
     #set($colprop = $colprops.get($colname))
@@ -1516,10 +1516,10 @@ function (row, i, table) {
         var link = #if("$!colprop.link" != "editor") new Element("a"); #else new Element("span"); #end
         ## Automatic: the link url is in JSON results, with key column name + "_url"
         #if("$!colprop.link"=="auto")
-          link.href = (row.${jscolname}_url=="") ? row.doc_url : row.${jscolname}_url;
+          link.href = (row["${jscolname}_url"]=="") ? row["doc_url"] : row["${jscolname}_url"];
         #elseif($colprop.link=="field")
-          if (row.${jscolname}_url != "") {
-            link.href = row.${jscolname}_url;
+          if (row["${jscolname}_url"] != "") {
+            link.href = row["${jscolname}_url"];
           }
         ## Property editor
         #elseif($colprop.link=="editor")
@@ -1532,24 +1532,24 @@ function (row, i, table) {
             var tag = event.element().down("span");
             if (!tag)
              tag = event.element();
-            editProperty(row.doc_fullname, "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
+            editProperty(row["doc_fullname"], "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
           });
         ## Author
         #elseif($colprop.link == "author")
-          link.href = row.doc_author_url;
+          link.href = row["doc_author_url"];
         ## Space URL
         #elseif($colprop.link == "space")
-          link.href = row.doc_space_url;
+          link.href = row["doc_space_url"];
         ## Wiki URL
         #elseif($colprop.link == "wiki")
-          link.href = row.doc_wiki_url;
+          link.href = row["doc_wiki_url"];
         #else
-          link.href = row.doc_url;
+          link.href = row["doc_url"];
         #end
         #if($colprop.html && $colprop.html==true)
-          link.innerHTML = row.${jscolname};
+          link.innerHTML = row["${jscolname}"];
         #else
-          link.update(row.${jscolname});
+          link.update(row["${jscolname}"]);
         #end
         td.appendChild(link);
         tr.appendChild(td);
@@ -1557,7 +1557,7 @@ function (row, i, table) {
         var adminActions = ['admin', 'rename', 'rights'];
         var td = new Element("td", {'class' : 'actions'});
         #foreach($action in $colprop.get("actions"))
-          if (row.doc_has${action} || '${action}' == 'view' || (row.doc_has${action} === undefined && (row.doc_hasadmin || adminActions.indexOf('${action}') < 0))) {
+          if (row["doc_has${action}"] || '${action}' == 'view' || (row["doc_has${action}"] === undefined && (row["doc_hasadmin"] || adminActions.indexOf('${action}') < 0))) {
             #if($velocityCount > 1)
               td.insert(" ");
             #end
@@ -1568,7 +1568,7 @@ function (row, i, table) {
             #else
               #set($text = "$action")
             #end
-            var link = new Element("a", {"href": row.doc_${action}_url, "class":"action action${action}"}).update("$text");
+            var link = new Element("a", {"href": row["doc_${action}_url"], "class":"action action${action}"}).update("$text");
             #if("$!colprop.ajaxActions.get($action)" == 'true')
               link.observe('click', function(event) {
                 event.stop();
@@ -1587,9 +1587,9 @@ function (row, i, table) {
         #set($tdClass = "${jscolname} link$!{colprop.link} type$!{colprop.type}")
         var fieldel = new Element("td", {'class':"$tdClass"});
         #if($colprop.html && $colprop.html==true)
-          fieldel.innerHTML = row.${jscolname};
+          fieldel.innerHTML = row["${jscolname}"];
         #else
-          fieldel.update(row.${jscolname});
+          fieldel.update(row["${jscolname}"]);
         #end
         tr.appendChild(fieldel);
       #end
@@ -1597,7 +1597,7 @@ function (row, i, table) {
   #end
   }
   else {
-    var page = row.doc_fullname;
+    var page = row["doc_fullname"];
     var dp = page.indexOf(':');
     var p = page.indexOf('.');
     var space = (dp > 0) ? page.substring(dp + 1, p) : page.substring(0, p);
@@ -1671,9 +1671,6 @@ function (row, i, table) {
   #if(!$parameters.url.contains('?'))
     #set($parameters.url = "${parameters.url}?")
   #end
-  #if($util.parseInt("$!{parameters.defaultItemsPerPage}") <= 0)
-    #set($parameters.defaultItemsPerPage = 20)
-  #end
   #if($parameters.position != 'bottom')
     #set($parameters.position = 'top')
   #end
@@ -1706,6 +1703,9 @@ function (row, i, table) {
   ## If the value is missing or invalid, parseInt returns 0, which is the default first item.
   #set($parameters.firstItem = $util.parseInt($parameters.firstItem))
   ## Get number of items per page from request
+  #if($util.parseInt("$!{parameters.defaultItemsPerPage}") <= 0)
+    #set($parameters.defaultItemsPerPage = 20)
+  #end
   #set($parameters.itemsPerPage = "$!{request.get($parameters.itemsPerPageParamName)}")
   #set($parameters.itemsPerPage = $util.parseInt($parameters.itemsPerPage))
   #if($parameters.itemsPerPage <= 0)
@@ -1736,8 +1736,14 @@ function (row, i, table) {
       #paginationResultsRange($parameters)
     #end
     #if($parameters.totalItems > 0)
-      #paginationControl($parameters)
-      #paginationPages($parameters)
+      #if($parameters.controlsAround == true)
+        #paginationControlLeft($parameters)
+        #paginationPages($parameters)
+        #paginationControlRight($parameters)
+      #else
+        #paginationControl($parameters)
+        #paginationPages($parameters)
+      #end
     #end
   </div>
 #end
@@ -1814,6 +1820,19 @@ function (row, i, table) {
  *#
 #macro(paginationControl $parameters)
   <span class="controlPagination">
+  #paginationControlLeft($parameters)
+  #paginationControlRight($parameters)
+  </span>
+#end
+#**
+ * Pagination : display prev link
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationControlLeft $parameters)
   #if($parameters.crtPage > 0)
     #set($prevPage = $parameters.crtPage - 1)
     #set($firstItem = $prevPage * $parameters.itemsPerPage)
@@ -1821,6 +1840,16 @@ function (row, i, table) {
   #else
     <span class="noPrevPagination"> </span>
   #end
+#end
+#**
+ * Pagination : display next link
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationControlRight $parameters)
   #if($parameters.crtPage < $parameters.lastPage)
     #set($nextPage = $parameters.crtPage + 1)
     #set($firstItem = $nextPage * $parameters.itemsPerPage)
@@ -1828,7 +1857,6 @@ function (row, i, table) {
   #else
     <span class="noNextPagination"> </span>
   #end
-  </span>
 #end
 #**
  * Pagination : message informing the user which items are being displayed on the current page (Results i - j of N)
@@ -1949,7 +1977,9 @@ $xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {"forceSkinAction": true
   *#
 #macro(wysiwyg_createCache $parameters)
 #set($ok = $parameters.put('cacheId', "wysiwygCache$!{util.generateRandomString(4)}"))
-<input type="hidden" id="$!{parameters.cacheId}" />
+## HACK: We use a text input hidden through CSS instead of a hidden input because Chrome doesn't cache hidden inputs.
+## See http://code.google.com/p/chromium/issues/detail?id=105362
+<label for="$!{parameters.cacheId}" class="hidden"><input type="text" id="$!{parameters.cacheId}"/></label>
 #end
 
 #**

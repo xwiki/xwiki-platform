@@ -19,6 +19,10 @@
  */
 package org.xwiki.query.xwql.internal.hql;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.query.jpql.internal.JPQLParser;
 import org.xwiki.query.jpql.node.Start;
 import org.xwiki.query.xwql.internal.QueryAnalyzer;
@@ -27,14 +31,16 @@ import org.xwiki.query.xwql.internal.QueryTranslator;
 import org.xwiki.query.Query;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 
-@Component("hql")
+@Component
+@Named("hql")
+@Singleton
 public class XWQLtoHQLTranslator implements QueryTranslator
 {
-    @Requirement
+    @Inject
     protected DocumentAccessBridge documentAccessBridge;
 
+    @Override
     public String translate(String input) throws Exception
     {
         input = input.trim();
@@ -55,6 +61,7 @@ public class XWQLtoHQLTranslator implements QueryTranslator
         return printer.print();
     }
 
+    @Override
     public String getOutputLanguage()
     {
         return Query.HQL;

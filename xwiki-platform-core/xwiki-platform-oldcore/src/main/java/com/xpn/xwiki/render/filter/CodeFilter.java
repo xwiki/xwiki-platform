@@ -16,14 +16,11 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.render.filter;
 
 import java.io.Writer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.filter.context.FilterContext;
 import org.radeox.filter.regex.RegexTokenFilter;
@@ -31,12 +28,14 @@ import org.radeox.macro.Macro;
 import org.radeox.macro.parameter.MacroParameter;
 import org.radeox.regex.MatchResult;
 import org.radeox.util.StringBufferWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.render.macro.XWikiCodeMacro;
 
 public class CodeFilter extends RegexTokenFilter
 {
-    private static Log log = LogFactory.getLog(CodeFilter.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(CodeFilter.class);
 
     private Macro codeMacro = new XWikiCodeMacro();
     
@@ -62,7 +61,7 @@ public class CodeFilter extends RegexTokenFilter
         try {
         	this.codeMacro.execute(writer, mParams);
         } catch (Throwable e) {
-            log.warn("CodeFilter: unable to format macro: " + result.group(1), e);
+            LOGGER.warn("CodeFilter: unable to format macro: " + result.group(1), e);
             buffer.append("<div class=\"error\">" + result.group(1) + ": " + e.getMessage() + "</div>");
         }
     }

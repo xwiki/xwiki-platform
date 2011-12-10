@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 /*
  * This file is part of "SnipSnap Radeox Rendering Engine".
@@ -46,7 +45,7 @@ package com.xpn.xwiki.render.macro;
 
 import org.radeox.macro.CodeMacro;
 import org.radeox.macro.parameter.MacroParameter;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.Writer;

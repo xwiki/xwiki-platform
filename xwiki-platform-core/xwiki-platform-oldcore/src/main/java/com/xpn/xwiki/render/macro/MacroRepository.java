@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 /*
  * This file is part of "SnipSnap Radeox Rendering Engine".
  *
@@ -45,71 +43,84 @@
  */
 package com.xpn.xwiki.render.macro;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.macro.Macro;
-
-import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * See {@link MacroLoader} for why we have copied this class from Radeox.
  */
-public class MacroRepository extends org.radeox.macro.PluginRepository {
-  protected static Log log = LogFactory.getLog(MacroRepository.class);
-  protected InitialRenderContext context;
+public class MacroRepository extends org.radeox.macro.PluginRepository
+{
+    protected static Logger LOGGER = LoggerFactory.getLogger(MacroRepository.class);
 
-  protected static MacroRepository instance;
-  protected List loaders;
+    protected InitialRenderContext context;
 
-  public synchronized static com.xpn.xwiki.render.macro.MacroRepository getInstance() {
-   if (null == instance) {
-     instance = new com.xpn.xwiki.render.macro.MacroRepository();
-   }
-   return (com.xpn.xwiki.render.macro.MacroRepository)instance;
- }
+    protected static MacroRepository instance;
 
-  protected void initialize(InitialRenderContext context) {
-    Iterator iterator = list.iterator();
-    while (iterator.hasNext()) {
-      Macro macro = (Macro) iterator.next();
-      macro.setInitialContext(context);
+    protected List loaders;
+
+    public synchronized static com.xpn.xwiki.render.macro.MacroRepository getInstance()
+    {
+        if (null == instance) {
+            instance = new com.xpn.xwiki.render.macro.MacroRepository();
+        }
+        return (com.xpn.xwiki.render.macro.MacroRepository) instance;
     }
-    init();
-  }
 
-  public void setInitialContext(InitialRenderContext context) {
-    this.context = context;
-    initialize(context);
-  }
-
-  protected void init() {
-    Map newPlugins = new HashMap();
-
-    Iterator iterator = list.iterator();
-    while (iterator.hasNext()) {
-      Macro macro = (Macro) iterator.next();
-      newPlugins.put(macro.getName(), macro);
+    protected void initialize(InitialRenderContext context)
+    {
+        Iterator iterator = list.iterator();
+        while (iterator.hasNext()) {
+            Macro macro = (Macro) iterator.next();
+            macro.setInitialContext(context);
+        }
+        init();
     }
-    plugins = newPlugins;
-  }
 
-  /**
+    public void setInitialContext(InitialRenderContext context)
+    {
+        this.context = context;
+        initialize(context);
+    }
+
+    protected void init()
+    {
+        Map newPlugins = new HashMap();
+
+        Iterator iterator = list.iterator();
+        while (iterator.hasNext()) {
+            Macro macro = (Macro) iterator.next();
+            newPlugins.put(macro.getName(), macro);
+        }
+        plugins = newPlugins;
+    }
+
+    /**
      * Loads macros from all loaders into plugins.
-  */
-  protected void load() {
-      Iterator iterator = loaders.iterator();
-      while (iterator.hasNext()) {
-        MacroLoader loader = (MacroLoader) iterator.next();
-        loader.setRepository(this);
-        log.debug("Loading from: " + loader.getClass());
-        loader.loadPlugins(this);
-      }
-  }
+     */
+    protected void load()
+    {
+        Iterator iterator = loaders.iterator();
+        while (iterator.hasNext()) {
+            MacroLoader loader = (MacroLoader) iterator.next();
+            loader.setRepository(this);
+            LOGGER.debug("Loading from: " + loader.getClass());
+            loader.loadPlugins(this);
+        }
+    }
 
-  protected MacroRepository() {
-   loaders = new ArrayList();
-   loaders.add(new MacroLoader());
-   load();
- }
+    protected MacroRepository()
+    {
+        loaders = new ArrayList();
+        loaders.add(new MacroLoader());
+        load();
+    }
 }

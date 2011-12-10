@@ -25,9 +25,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.filter.HTMLFilter;
@@ -38,74 +41,81 @@ import org.xwiki.xml.html.filter.HTMLFilter;
  * @version $Id$
  * @since 1.8M1
  */
-@Component("openoffice")
+@Component
+@Named("openoffice")
+@Singleton
 public class OpenOfficeHTMLCleaner implements HTMLCleaner
 {  
     /**
      * Default html cleaner component used internally. 
      */
-    @Requirement
+    @Inject
     private HTMLCleaner defaultHtmlCleaner;
     
     /**
      * {@link HTMLFilter} for stripping various tags.
      */
-    @Requirement("officeimporter/stripper")
+    @Inject
+    @Named("officeimporter/stripper")
     private HTMLFilter stripperFilter;
     
     /**
      * {@link HTMLFilter} filtering styles.
      */
-    @Requirement("officeimporter/style")
+    @Inject
+    @Named("officeimporter/style")
     private HTMLFilter styleFilter;
     
     /**
      * {@link HTMLFilter} for stripping redundant tags.
      */
-    @Requirement("officeimporter/redundancy")
+    @Inject
+    @Named("officeimporter/redundancy")
     private HTMLFilter redundancyFilter;
     
     /**
      * {@link HTMLFilter} for cleaning empty paragraphs.
      */
-    @Requirement("officeimporter/paragraph")
+    @Inject
+    @Named("officeimporter/paragraph")
     private HTMLFilter paragraphFilter;
     
     /**
      * {@link HTMLFilter} for filtering image tags.
      */
-    @Requirement("officeimporter/image")
+    @Inject
+    @Named("officeimporter/image")
     private HTMLFilter imageFilter;
     
     /**
      * {@link HTMLFilter} for filtering HTML anchors.
      */
-    @Requirement("officeimporter/anchor")
+    @Inject
+    @Named("officeimporter/anchor")
     private HTMLFilter anchorFilter;
     
     /**
      * {@link HTMLFilter} for filtering lists.
      */
-    @Requirement("officeimporter/list")
+    @Inject
+    @Named("officeimporter/list")
     private HTMLFilter listFilter;
     
     /**
      * {@link HTMLFilter} for filtering tables.
      */
-    @Requirement("officeimporter/table")
+    @Inject
+    @Named("officeimporter/table")
     private HTMLFilter tableFilter;
     
     /**
      * {@link HTMLFilter} for filtering line breaks.
      */
-    @Requirement("officeimporter/linebreak")
+    @Inject
+    @Named("officeimporter/linebreak")
     private HTMLFilter lineBreakFilter;
     
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLCleaner#clean(Reader)
-     */
+    @Override
     public Document clean(Reader originalHtmlContent)
     {
         // Add special parameters used in filters
@@ -115,21 +125,13 @@ public class OpenOfficeHTMLCleaner implements HTMLCleaner
         return clean(originalHtmlContent, configuration);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLCleaner#clean(Reader, HTMLCleanerConfiguration)
-     */
+    @Override
     public Document clean(Reader originalHtmlContent, HTMLCleanerConfiguration configuration)
     {
         return this.defaultHtmlCleaner.clean(originalHtmlContent, configuration);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLCleaner#getDefaultConfiguration()
-     */
+    @Override
     public HTMLCleanerConfiguration getDefaultConfiguration()
     {
         HTMLCleanerConfiguration configuration = this.defaultHtmlCleaner.getDefaultConfiguration();

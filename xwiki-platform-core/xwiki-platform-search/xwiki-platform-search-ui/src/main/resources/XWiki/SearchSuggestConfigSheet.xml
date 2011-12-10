@@ -24,7 +24,7 @@
 <hidden>false</hidden>
 <object>
 <class>
-<name>XWiki.SheetClass</name>
+<name>XWiki.EditModeClass</name>
 <customClass></customClass>
 <customMapping></customMapping>
 <defaultViewSheet></defaultViewSheet>
@@ -44,8 +44,8 @@
 </class>
 <name>XWiki.SearchSuggestConfigSheet</name>
 <number>0</number>
-<className>XWiki.SheetClass</className>
-<guid>933b2bea-9566-4352-83ed-0cd9b4fba530</guid>
+<className>XWiki.EditModeClass</className>
+<guid>4514612b-ad6d-49e0-8cb6-6bf91d999474</guid>
 <property>
 <defaultEditMode>inline</defaultEditMode>
 </property>

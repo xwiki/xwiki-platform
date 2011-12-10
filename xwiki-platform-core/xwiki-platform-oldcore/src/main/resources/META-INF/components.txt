@@ -3,6 +3,7 @@ com.xpn.xwiki.doc.DefaultDocumentAccessBridge
 com.xpn.xwiki.internal.ComponentManagerBridgeEventListener
 com.xpn.xwiki.internal.DefaultCoreConfiguration
 com.xpn.xwiki.internal.DefaultXWikiStubContextProvider
+com.xpn.xwiki.internal.MessageToolVelocityContextInitializer
 com.xpn.xwiki.internal.XWikiStubContextInitializer
 com.xpn.xwiki.internal.cache.DefaultDocumentCache
 com.xpn.xwiki.internal.cache.rendering.DefaultRenderingCache
@@ -11,6 +12,8 @@ com.xpn.xwiki.internal.event.AttachmentEventGeneratorListener
 com.xpn.xwiki.internal.event.CommentEventGeneratorListener
 com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener
 com.xpn.xwiki.internal.event.XObjectEventGeneratorListener
+com.xpn.xwiki.internal.display.scripting.DisplayScriptService
+com.xpn.xwiki.internal.display.XWiki10DocumentContentDisplayer
 com.xpn.xwiki.internal.macro.CoreWikiMacroBindingInitializer
 com.xpn.xwiki.internal.macro.DefaultWikiMacroFactory
 com.xpn.xwiki.internal.macro.DefaultWikiMacroInitializer
@@ -25,6 +28,7 @@ com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver
+com.xpn.xwiki.internal.model.reference.CurrentReferenceObjectReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentStringAttachmentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CompactStringEntityReferenceSerializer
 com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer
@@ -34,6 +38,12 @@ com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverter
 com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
+com.xpn.xwiki.internal.sheet.scripting.SheetScriptService
+com.xpn.xwiki.internal.sheet.ClassSheetBinder
+com.xpn.xwiki.internal.sheet.DefaultSheetManager
+com.xpn.xwiki.internal.sheet.DocumentSheetBinder
+com.xpn.xwiki.internal.sheet.SheetDocumentDisplayer
+com.xpn.xwiki.internal.sheet.SheetRequestInitializer
 com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiVelocityContextInitializer
 com.xpn.xwiki.render.XWikiScriptContextInitializer

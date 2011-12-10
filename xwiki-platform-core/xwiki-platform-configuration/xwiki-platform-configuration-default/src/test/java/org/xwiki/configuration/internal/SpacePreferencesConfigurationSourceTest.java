@@ -62,7 +62,5 @@ public class SpacePreferencesConfigurationSourceTest extends AbstractComponentTe
         String result = source.getProperty("key", String.class);
 
         Assert.assertEquals("value", result);
-        // Check that the current document reference is not modified
-        Assert.assertEquals(currentDocument.getName(), currentDocument.getParent().getChild().getName());
     }
 }

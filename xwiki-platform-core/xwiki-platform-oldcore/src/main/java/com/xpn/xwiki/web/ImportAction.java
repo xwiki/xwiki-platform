@@ -16,11 +16,12 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -36,8 +37,6 @@ import com.xpn.xwiki.util.Util;
  * 
  * @version $Id$
  */
-import org.apache.commons.lang.StringUtils;
-
 public class ImportAction extends XWikiAction
 {
     /**
@@ -109,26 +108,24 @@ public class ImportAction extends XWikiAction
                                 }
                             }
 
-                            String docName = pageName.replaceAll(":.*$", "");
+                            String docName = pageName.replaceAll(":[^:]*$", "");
                             if (language == null) {
                                 importer.setDocumentAction(docName, iAction);
                             } else {
                                 importer.setDocumentAction(docName, language, iAction);
                             }
                         }
-                    }                    
+                    }
                     // Set the appropriate strategy to handle versions
                     if (StringUtils.equals(request.getParameter("historyStrategy"), "reset")) {
-                    	importer.setPreserveVersion(false);
-                    	importer.setWithVersions(false);
-                    }
-                    else if(StringUtils.equals(request.getParameter("historyStrategy"), "replace")) {
-                    	importer.setPreserveVersion(false);
-                    	importer.setWithVersions(true);
-                    }
-                    else {
-                    	importer.setPreserveVersion(true);
-                    	importer.setWithVersions(false);
+                        importer.setPreserveVersion(false);
+                        importer.setWithVersions(false);
+                    } else if (StringUtils.equals(request.getParameter("historyStrategy"), "replace")) {
+                        importer.setPreserveVersion(false);
+                        importer.setWithVersions(true);
+                    } else {
+                        importer.setPreserveVersion(true);
+                        importer.setWithVersions(false);
                     }
                     // Set the backup pack option
                     if (StringUtils.equals(request.getParameter("importAsBackup"), "true")) {
@@ -139,13 +136,12 @@ public class ImportAction extends XWikiAction
                     // Import files
                     importer.install();
                     if (!StringUtils.isBlank(request.getParameter("ajax"))) {
-                    	// If the import is done from an AJAX request we don't want to return a whole HTML page,
-                    	// instead we return "inline" the list of imported documents, 
-                    	// evaluating imported.vm template.
-                    	return "imported";
-                    }
-                    else {
-                        return "admin";    
+                        // If the import is done from an AJAX request we don't want to return a whole HTML page,
+                        // instead we return "inline" the list of imported documents,
+                        // evaluating imported.vm template.
+                        return "imported";
+                    } else {
+                        return "admin";
                     }
                 }
             }

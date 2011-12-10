@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>Dashboard</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Main.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1321280440000</creationDate>
+<date>1321283551000</date>
+<contentUpdateDate>1321283551000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get("platform.dashboard.wiki")</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.EditModeClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultEditMode>
+<disabled>0</disabled>
+<name>defaultEditMode</name>
+<number>1</number>
+<prettyName>Default Edit Mode</prettyName>
+<size>15</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultEditMode>
+</class>
+<name>Dashboard.WebHome</name>
+<number>0</number>
+<className>XWiki.EditModeClass</className>
+<guid>22045e2a-e5ac-4b9e-9ff7-10ee2b62624c</guid>
+<property>
+<defaultEditMode>inline</defaultEditMode>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.GadgetClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<content>
+<disabled>0</disabled>
+<editor>---</editor>
+<name>content</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>content</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<position>
+<disabled>0</disabled>
+<name>position</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>position</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</position>
+<title>
+<disabled>0</disabled>
+<name>title</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>title</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</title>
+</class>
+<name>Dashboard.WebHome</name>
+<number>0</number>
+<className>XWiki.GadgetClass</className>
+<guid>97097f8e-471b-44bc-aaa9-2d926b0650ff</guid>
+<property>
+<content>{{spaces/}}</content>
+</property>
+<property>
+<position>1, 2</position>
+</property>
+<property>
+<title>$msg.get("platform.dashboard.wiki.spaces")</title>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.GadgetClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<content>
+<disabled>0</disabled>
+<editor>---</editor>
+<name>content</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>content</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<position>
+<disabled>0</disabled>
+<name>position</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>position</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</position>
+<title>
+<disabled>0</disabled>
+<name>title</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>title</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</title>
+</class>
+<name>Dashboard.WebHome</name>
+<number>1</number>
+<className>XWiki.GadgetClass</className>
+<guid>c2db55c8-b0be-4719-8459-76b75563e7df</guid>
+<property>
+<content>{{tagcloud/}}</content>
+</property>
+<property>
+<position>1, 3</position>
+</property>
+<property>
+<title>$msg.get("platform.dashboard.wiki.tagcloud")</title>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.GadgetClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<content>
+<disabled>0</disabled>
+<editor>---</editor>
+<name>content</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>content</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<position>
+<disabled>0</disabled>
+<name>position</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>position</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</position>
+<title>
+<disabled>0</disabled>
+<name>title</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>title</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</title>
+</class>
+<name>Dashboard.WebHome</name>
+<number>2</number>
+<className>XWiki.GadgetClass</className>
+<guid>e25f1704-9c33-4aa9-acde-488981752823</guid>
+<property>
+<content>{{activity/}}</content>
+</property>
+<property>
+<position>2, 1</position>
+</property>
+<property>
+<title>$msg.get("platform.dashboard.wiki.activity")</title>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.GadgetClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<content>
+<disabled>0</disabled>
+<editor>---</editor>
+<name>content</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>content</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<position>
+<disabled>0</disabled>
+<name>position</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>position</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</position>
+<title>
+<disabled>0</disabled>
+<name>title</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>title</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</title>
+</class>
+<name>Dashboard.WebHome</name>
+<number>3</number>
+<className>XWiki.GadgetClass</className>
+<guid>b180bc56-ce23-436c-9c6f-c08a4ff444a7</guid>
+<property>
+<content>{{include document="Main.Welcome"/}}</content>
+</property>
+<property>
+<position>1, 1</position>
+</property>
+<property>
+<title>$msg.get("platform.dashboard.wiki.welcome")</title>
+</property>
+</object>
+<content>{{velocity}}
+#set($displayDashboard = true)
+#if ($context.user != "XWiki.XWikiGuest")
+  ## get the preferences of the current user
+  #set($userDbPrefs = $xwiki.getDocument($context.user).getObject("Dashboard.UserDashboardPreferencesClass"))
+  #if ($userDbPrefs)
+    ## if the object exists, use the object value
+    #set($prefValue = $userDbPrefs.getProperty('displayOnMainPage').value)
+  #else
+    ## if the object does not exist, use the default value of the property in the class
+    #set($userPrefClass = $xwiki.getClass("Dashboard.UserDashboardPreferencesClass"))
+    #set($displayOnMainPageProp = $userPrefClass.get('displayOnMainPage'))
+    #set($prefValue = $displayOnMainPageProp.getProperty('defaultValue').value)
+  #end
+  #if ($prefValue &amp;&amp; $prefValue &gt; 0)
+    #set($dashboardObjects = $xwiki.getDocument($context.user).getObjects("XWiki.GadgetClass"))
+    #if ($dashboardObjects.size() &gt; 0)
+      {{dashboard source = "$context.user" /}}
+      #set($displayDashboard = false)
+    #else
+      #set($editDashboardLabel = $msg.get('platform.dashboard.wiki.personal.empty.edit'))
+      #set($editDashboardUrl = $xwiki.getURL($context.user, 'inline', "category=dashboard"))
+      {{info}}{{html}}$msg.get('platform.dashboard.wiki.personal.empty', ["&lt;a href='${editDashboardUrl}'&gt;$editDashboardLabel&lt;/a&gt;"]){{/html}}{{/info}}
+      #set($displayDashboard = true)
+    #end
+  #end
+#end
+
+#if($displayDashboard)
+  {{dashboard/}}
+#end
+  
+{{/velocity}}
+</content></xwikidoc>

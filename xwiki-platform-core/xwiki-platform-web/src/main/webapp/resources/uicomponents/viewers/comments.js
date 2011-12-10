@@ -32,6 +32,7 @@ viewers.Comments = Class.create({
     this.loadIDs();
     this.addDeleteListener();
     this.addReplyListener();
+    this.addPermalinkListener();
     this.addSubmitListener(this.form);
     this.addCancelListener();
     this.addEditListener();
@@ -224,6 +225,31 @@ viewers.Comments = Class.create({
         item.hide();
       });
     }
+  },
+  /**
+   * Permalink: Display a modal popup providing the permalink.
+   */
+  addPermalinkListener : function() {
+    $$(this.xcommentSelector + ' a.permalink').each(function(item) {
+      item.observe('click', function(event) {
+        item.blur();
+        event.stop();
+        var permalinkBox = new XWiki.widgets.ConfirmationBox(
+        {
+          onYes : function () {
+            window.location = item.href;
+          }
+        },
+        /* Interaction parameters */
+        {
+          confirmationText: "$msg.get('core.viewers.comments.permalink'): <input type='text' class='full' value='" + item.href + "'/>",
+          yesButtonText: "$msg.get('core.viewers.comments.permalink.goto')",
+          noButtonText : "$msg.get('core.viewers.comments.permalink.hide')"
+        });
+        permalinkBox.dialog.addClassName('permalinkBox')
+        permalinkBox.dialog.down('input[type="text"]').select();
+      });
+    });
   },
   /**
    * When pressing Submit, check that the comment is not empty. Submit the form with ajax and update the whole comments

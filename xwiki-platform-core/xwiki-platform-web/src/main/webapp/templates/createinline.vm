@@ -222,7 +222,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
           <span class="xHint">$msg.get('core.create.page.space.hint')</span>
         </dt>
         <dd>
-          <input type="text" id="space" size="60" name="space" value="$!{escapetool.xml($defaultSpace)}"/>
+          <input type="text" id="space" size="60" name="space" class="suggestSpaces" value="$!{escapetool.xml($defaultSpace)}"/>
         </dd>
       </dl>
       #set($discard = $jsValidationInitializersContainer.add("XWiki.createPage.initSpaceValidator();"))

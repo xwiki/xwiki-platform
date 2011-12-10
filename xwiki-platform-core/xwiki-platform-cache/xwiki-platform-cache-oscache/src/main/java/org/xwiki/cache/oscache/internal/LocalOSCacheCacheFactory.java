@@ -19,21 +19,21 @@
  */
 package org.xwiki.cache.oscache.internal;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 
 /**
- * Implements {@link CacheFactory} based on OSCache.
+ * Implements {@link org.xwiki.cache.CacheFactory} based on OSCache.
  * 
  * @version $Id$
  */
-@Component("oscache/local")
+@Component
+@Named("oscache/local")
+@Singleton
 public class LocalOSCacheCacheFactory extends AbstractOSCacheCacheFactory
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractOSCacheCacheFactory#getDefaultPropsId()
-     */
     @Override
     protected String getDefaultPropsId()
     {

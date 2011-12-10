@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-api</artifactId>
   <name>XWiki Platform - Extension - API</name>
@@ -56,12 +56,22 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-properties</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-logging-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-container-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -72,11 +82,17 @@
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
-      <version>0.9.5-RC2</version>
+      <version>0.9.6</version>
       <exclusions>
+        <!-- Useless for what we use in reflections -->
         <exclusion>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
+          <artifactId>dom4j</artifactId>
+          <groupId>dom4j</groupId>
+        </exclusion>
+        <!-- Prevent future conflicts -->
+        <exclusion>
+          <artifactId>slf4j-api</artifactId>
+          <groupId>org.slf4j</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -96,6 +112,12 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-observation-local</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-logging-logback</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
@@ -127,19 +149,12 @@
         <configuration>
           <excludes>
               **/DefaultCoreExtensionScanner.java,
+              **/DefaultExtensionSerializer.java,
               **/DefaultLocalExtensionRepository.java,
-              **/ExtensionSerializer.java
+              **/UnmodifiableUtils.java
           </excludes>
         </configuration>
       </plugin>
     </plugins>
   </build>
-
-  <repositories>
-    <repository>
-      <id>reflections-repo</id>
-      <name>Reflections Maven2 Repository</name>
-      <url>http://reflections.googlecode.com/svn/repo</url>
-    </repository>
-  </repositories>
 </project>

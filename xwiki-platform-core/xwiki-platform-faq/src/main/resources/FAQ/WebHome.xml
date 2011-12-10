@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xwikidoc>
+<web>FAQ</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Main.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1319795649000</creationDate>
+<date>1319806820000</date>
+<contentUpdateDate>1319806820000</contentUpdateDate>
+<version>1.1</version>
+<title>FAQ</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment>typo</comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity output="false"}}
+$xwiki.jsx.use("FAQCode.SkinExtension")
+$xwiki.ssx.use("FAQCode.SkinExtension")
+## If this page is called with createFAQ=true then create a new page using the FAQTemplate template
+#if ($request.createFAQ == "true")
+  $response.sendRedirect($xwiki.getURL("FAQ.${request.question}", "inline", "$!{request.queryString}&amp;title=${request.question}"))
+#end
+{{/velocity}}
+
+{{box cssClass="faqAbout"}}
+**Frequently Asked Questions (FAQ) are an easy way to find answers to most of your questions.**
+{{/box}}
+
+(% class="centered" %) (((
+
+(% class="faq-link search-faq" %)(((
+Search FAQ...
+(((
+{{velocity}}
+{{html}}
+&lt;form action="$xwiki.getURL("FAQCode.FAQSearch")"&gt;
+  &lt;input type="hidden" name="space" value="FAQ" /&gt;
+  &lt;input type="text" name="text" value="question text..." size="25" class="withTip" /&gt;
+  &lt;span class="buttonwrapper"&gt;
+    &lt;input class="button" type="submit" value="Search" /&gt;
+  &lt;/span&gt;
+&lt;/form&gt;
+{{/html}}
+{{/velocity}}
+)))
+)))
+
+(% class="faq-link add-faq" %)(((
+Contribute FAQ...
+
+(((
+{{velocity}}
+{{html}}
+#if ($isGuest)
+  You need first to &lt;a href="${escapetool.xml($xwiki.getURL("Main.WebHome", "login", "xredirect=$doc.externalURL"))}"&gt;log in&lt;/a&gt; or &lt;a href="${escapetool.xml($xwiki.getURL("xwiki:Main.WebHome", "register", "xredirect=$doc.externalURL"))}"&gt;register&lt;/a&gt;.
+#else
+&lt;form action="" id="newfaq"&gt;
+  &lt;input type="hidden" name="parent" value="FAQ.WebHome" /&gt;
+  &lt;input type="hidden" name="template" value="FAQCode.FAQTemplate" /&gt;
+  &lt;input type="hidden" name="createFAQ" value="true" /&gt;
+  &lt;input class="withTip" type="text" name="question" value="question text..."  size="25"/&gt;
+  &lt;span class="buttonwrapper"&gt;
+    &lt;input class="button" type="submit" value="Add" /&gt;
+  &lt;/span&gt;
+&lt;/form&gt;
+{{/html}}
+#end
+{{/velocity}}
+)))
+)))
+
+)))
+
+(% class="clearfloats" %)((()))(%%)
+
+{{faq filter="space=FAQ"/}}
+</content></xwikidoc>

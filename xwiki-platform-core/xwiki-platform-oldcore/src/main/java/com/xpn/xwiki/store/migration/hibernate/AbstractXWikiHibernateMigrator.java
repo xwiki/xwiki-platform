@@ -21,34 +21,30 @@ package com.xpn.xwiki.store.migration.hibernate;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.XWikiMigrationManagerInterface;
 import com.xpn.xwiki.store.migration.XWikiMigratorInterface;
-import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
  * Template for migrators of hibernate store
+ * 
  * @see XWikiMigratorInterface
  * @version $Id$
  */
 public abstract class AbstractXWikiHibernateMigrator implements XWikiMigratorInterface
 {
-    /** {@inheritDoc} */
-    public void migrate(XWikiMigrationManagerInterface manager, XWikiContext context)
-        throws XWikiException
+    @Override
+    public void migrate(XWikiMigrationManagerInterface manager, XWikiContext context) throws XWikiException
     {
-        migrate((XWikiHibernateMigrationManager)manager, context);
+        migrate((XWikiHibernateMigrationManager) manager, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * @see com.xpn.xwiki.store.migration.XWikiMigratorInterface#shouldExecute(XWikiDBVersion)
-     */
+    @Override
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
         return true;
     }
 
-    /** @see XWikiMigratorInterface#migrate(XWikiMigrationManagerInterface,XWikiContext)  */
-    public abstract void migrate(XWikiHibernateMigrationManager manager, XWikiContext context)
-        throws XWikiException;
+    /** @see XWikiMigratorInterface#migrate(XWikiMigrationManagerInterface,XWikiContext) */
+    public abstract void migrate(XWikiHibernateMigrationManager manager, XWikiContext context) throws XWikiException;
 }

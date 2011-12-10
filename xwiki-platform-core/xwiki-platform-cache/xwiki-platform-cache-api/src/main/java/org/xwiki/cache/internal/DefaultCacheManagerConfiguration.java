@@ -44,39 +44,31 @@ public class DefaultCacheManagerConfiguration implements CacheManagerConfigurati
     /**
      * The default cache implementation.
      */
-    private static final String DEFAULT_CACHE_HINT = "jbosscache";
+    private static final String DEFAULT_CACHE_HINT = "infinispan";
 
     /**
      * The default local cache implementation.
      */
-    private static final String DEFAULT_LOCALCACHE_HINT = "jbosscache/local";
+    private static final String DEFAULT_LOCALCACHE_HINT = "infinispan/local";
 
     /**
-     * We read the cache configuration data only from the XWiki configuration file. We don't look
-     * for cache configuration in other sources (such as in the XWikiPreferences page for example) since
-     * the cache configuration is farm wide and shouldn't be overridden in wikis. In addition that
-     * would cause some cyclic dependency since the configuration source would look for config data
-     * in wiki pages thus calling the cache store which in turn would call this class again.
+     * We read the cache configuration data only from the XWiki configuration file. We don't look for cache
+     * configuration in other sources (such as in the XWikiPreferences page for example) since the cache configuration
+     * is farm wide and shouldn't be overridden in wikis. In addition that would cause some cyclic dependency since the
+     * configuration source would look for config data in wiki pages thus calling the cache store which in turn would
+     * call this class again.
      */
     @Inject
     @Named("xwikiproperties")
     private ConfigurationSource configuration;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheManagerConfiguration#getDefaultCache()
-     */
+    @Override
     public String getDefaultCache()
     {
         return this.configuration.getProperty(PREFIX + "defaultCache", DEFAULT_CACHE_HINT);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheManagerConfiguration#getDefaultLocalCache()
-     */
+    @Override
     public String getDefaultLocalCache()
     {
         return this.configuration.getProperty(PREFIX + "defaultLocalCache", DEFAULT_LOCALCACHE_HINT);

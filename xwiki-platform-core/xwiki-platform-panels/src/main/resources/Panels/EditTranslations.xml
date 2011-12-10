@@ -143,7 +143,7 @@
   #end
   #set ($elangs = $doc.translationList)
   #set ($extraTranslations = '')
-  #foreach ($olang in $xwiki.getXWikiPreference('languages').split('[|, ]'))
+  #foreach ($olang in $xwiki.getXWikiPreference('languages').split('\s*[|, ]\s*'))
     #if (!$elangs.contains($olang) &amp;&amp; $olang != $doc.defaultLanguage &amp;&amp; $olang != $forcetrans)
       #set ($extraTranslations = "${extraTranslations}[[$olang&gt;&gt;path:${doc.getURL('edit', ""editor=${editor}&amp;language=${olang}"")}]] ")
     #end

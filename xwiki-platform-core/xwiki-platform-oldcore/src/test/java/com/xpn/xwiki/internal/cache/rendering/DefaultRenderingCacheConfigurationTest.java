@@ -23,21 +23,19 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.MockConfigurationSource;
 
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
  * Unit test for {@link DefaultRenderingCacheConfiguration}.
  * 
  * @version $Id$
- * @since 2.4M1
  */
-public class DefaultRenderingCacheConfigurationTest extends AbstractBridgedXWikiComponentTestCase
+public class DefaultRenderingCacheConfigurationTest extends AbstractBridgedComponentTestCase
 {
     private RenderingCacheConfiguration configuration;
 
@@ -61,7 +59,7 @@ public class DefaultRenderingCacheConfigurationTest extends AbstractBridgedXWiki
         return (MockConfigurationSource) getComponentManager().lookup(ConfigurationSource.class, "xwikiproperties");
     }
 
-    @Before
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();

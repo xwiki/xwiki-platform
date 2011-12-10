@@ -19,7 +19,7 @@
  */
 package org.xwiki.rest;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 

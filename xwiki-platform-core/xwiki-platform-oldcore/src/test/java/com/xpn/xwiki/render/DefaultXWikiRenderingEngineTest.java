@@ -16,14 +16,32 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.render;
 
+import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Locale;
+import java.util.Map;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
 
+import javax.portlet.PortalContext;
+import javax.portlet.PortletMode;
+import javax.portlet.PortletPreferences;
+import javax.portlet.PortletSession;
+import javax.portlet.WindowState;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.jmock.Mock;
 
@@ -33,7 +51,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletContext;
+import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 
@@ -70,6 +90,9 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
             returnValue(new ByteArrayInputStream("".getBytes("UTF-8"))));
         XWikiServletContext engineContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
 
+        getContext().setURL(new URL("http://host"));
+        getContext().setRequest(new XWikiServletRequestStub());
+        
         xwiki = new XWiki(config, getContext(), engineContext, false)
         {
             public String getSkin(XWikiContext context)

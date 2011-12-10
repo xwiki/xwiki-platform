@@ -28,6 +28,7 @@ import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -133,7 +134,12 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.mockXWiki.stubs().method("getDocument").will(returnValue(this.document));
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
         this.mockXWiki.stubs().method("exists").will(returnValue(false));
-        this.mockXWiki.stubs().method("ParamAsLong").will(returnValue(2L));
+        // Called from MessageToolVelocityContextInitializer.
+        this.mockXWiki.stubs().method("prepareResources");
+        // The next 3 stubs are needed to properly initialize the Velocity engine.
+        this.mockXWiki.stubs().method("getSkin").will(returnValue("default"));
+        this.mockXWiki.stubs().method("getSkinFile").will(returnValue(null));
+        this.mockXWiki.stubs().method("Param").with(eq("xwiki.render.velocity.macrolist")).will(returnValue(""));
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
 
@@ -159,6 +165,17 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.baseObject.setStringListValue("stringlist", Arrays.asList("VALUE1", "VALUE2"));
     }
 
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        // Setup display configuration.
+        Mock mockDisplayConfiguration = registerMockComponent(DisplayConfiguration.class);
+        mockDisplayConfiguration.stubs().method("getDocumentDisplayerHint").will(returnValue("default"));
+        mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(2));
+    }
+
     public void testCurrentDocumentVariableIsInjectedBeforeRendering() throws XWikiException
     {
         // Verifies we can access the doc variable from a groovy macro.
@@ -180,10 +197,12 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         assertEquals("**title**", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
 
-        this.document.setTitle("<strong>title</strong>");
+        this.document.setTitle("<strong>ti<em>tle</strong>");
 
-        assertEquals("<strong>title</strong>", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
-        assertEquals("title", this.document.getRenderedTitle(Syntax.PLAIN_1_0, getContext()));
+        // The title is parsed as plain text after the Velocity code is evaluated so the HTML have no meaning.
+        assertEquals("&lt;strong&gt;ti&lt;em&gt;tle&lt;/strong&gt;",
+            this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+        assertEquals("<strong>ti<em>tle</strong>", this.document.getRenderedTitle(Syntax.PLAIN_1_0, getContext()));
 
         this.document.setTitle("#set($key = \"title\")$key");
         this.mockXWikiRenderingEngine.stubs().method("interpretText").with(eq("#set($key = \"title\")$key"), ANYTHING,

@@ -15,8 +15,8 @@
 <date>1236779890000</date>
 <contentUpdateDate>1236779890000</contentUpdateDate>
 <version>1.1</version>
-<title>$doc.getValue("title")</title>
-<template>Blog.BlogPostTemplate</template>
+<title></title>
+<template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
@@ -194,5 +194,4 @@ Happy blogging!
 <title>First blog post</title>
 </property>
 </object>
-<content>{{include document='Blog.BlogPostSheet'/}}</content>
-</xwikidoc>
+<content></content></xwikidoc>

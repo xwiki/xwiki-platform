@@ -24,7 +24,6 @@ import org.xwiki.gwt.wysiwyg.client.diff.Revision;
 import org.xwiki.gwt.wysiwyg.client.plugin.sync.SyncResult;
 import org.xwiki.gwt.wysiwyg.client.plugin.sync.SyncStatus;
 
-
 /**
  * This class is responsible for synchronizing the editors when the real-time editing is enabled.
  * 

@@ -41,8 +41,7 @@ public class DefaultOpenOfficeConfigurationTest extends AbstractOfficeImporterTe
         OpenOfficeConfiguration configuration = getComponentManager().lookup(OpenOfficeConfiguration.class, "default");
         Assert.assertEquals(OpenOfficeConfiguration.SERVER_TYPE_INTERNAL, configuration.getServerType());
         Assert.assertEquals(8100, configuration.getServerPort());
-        Assert.assertNotNull(configuration.getHomePath());
-        Assert.assertNotNull(configuration.getProfilePath());
+        Assert.assertNull(configuration.getProfilePath());
         Assert.assertTrue(configuration.getMaxTasksPerProcess() > 0);
         Assert.assertTrue(configuration.getTaskExecutionTimeout() > 0);
     }

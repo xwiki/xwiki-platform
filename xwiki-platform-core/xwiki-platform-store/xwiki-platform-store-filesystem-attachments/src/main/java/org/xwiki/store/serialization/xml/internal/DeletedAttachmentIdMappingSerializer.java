@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package org.xwiki.store.serialization.xml.internal;
 
 import java.io.IOException;
@@ -41,41 +39,48 @@ import org.xwiki.component.annotation.Component;
 public class DeletedAttachmentIdMappingSerializer
     extends AbstractXMLSerializer<Map<Long, String>, Map<Long, String>>
 {
-    /** The root element for serialized element. */
+    /**
+     * The root element for serialized element.
+     */
     private static final String ROOT_ELEMENT_NAME = "deletedattachmentids";
 
-    /** Root node paramter which must be present in order to attempt parsing. */
+    /**
+     * Root node paramter which must be present in order to attempt parsing.
+     */
     private static final String SERIALIZER_PARAM = "serializer";
 
-    /** Value of SERIALIZER_PARAM must be this in order to continue parsing. */
+    /**
+     * Value of SERIALIZER_PARAM must be this in order to continue parsing.
+     */
     private static final String THIS_SERIALIZER = "deleted-attachment-id-mappings/1.0";
 
-
-    /** Interpret a node by this name as an entry in the map. */
+    /**
+     * Interpret a node by this name as an entry in the map.
+     */
     private static final String ENTRY = "entry";
 
-    /** Interpret a node by this name as the long id number in base 10. */
+    /**
+     * Interpret a node by this name as the long id number in base 10.
+     */
     private static final String ID = "id";
 
-    /** Interpret this node as the path on the filesystem, relitive to the storage location. */
+    /**
+     * Interpret this node as the path on the filesystem, relitive to the storage location.
+     */
     private static final String PATH = "path";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractXMLSerializer#parse(Element)
-     */
+    @Override
     public Map<Long, String> parse(final Element docel) throws IOException
     {
         if (!ROOT_ELEMENT_NAME.equals(docel.getName())) {
             throw new IOException("XML not recognizable as attachment metadata, "
-                                  + "expecting <deletedattachmentids> tag");
+                + "expecting <deletedattachmentids> tag");
         }
         if (docel.attribute(SERIALIZER_PARAM) == null
             || !THIS_SERIALIZER.equals(docel.attribute(SERIALIZER_PARAM).getValue()))
         {
             throw new IOException("Cannot parse this deleted attachment id mapping, "
-                                  + "it was saved with a different serializer.");
+                + "it was saved with a different serializer.");
         }
         final Map<Long, String> out = new HashMap<Long, String>();
 
@@ -85,11 +90,7 @@ public class DeletedAttachmentIdMappingSerializer
         return out;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractXMLSerializer#serialize(T, XMLWriter)
-     */
+    @Override
     public void serialize(final Map<Long, String> map, final XMLWriter writer)
         throws IOException
     {

@@ -65,8 +65,8 @@ public class Style extends com.google.gwt.dom.client.Style
     /**
      * Decorates the text.
      */
-    public static final Property TEXT_DECORATION =
-        new Property("text-decoration", "textDecoration", false, true, TextDecoration.NONE);
+    public static final Property TEXT_DECORATION = new Property("text-decoration", "textDecoration", false, true,
+        TextDecoration.NONE);
 
     /**
      * The text-align property aligns the text in an element.
@@ -102,8 +102,8 @@ public class Style extends com.google.gwt.dom.client.Style
      * <p>
      * The background of an element is the total size of the element, including padding and border (but not the margin).
      */
-    public static final Property BACKGROUND_COLOR =
-        new Property("background-color", "backgroundColor", false, false, "transparent");
+    public static final Property BACKGROUND_COLOR = new Property("background-color", "backgroundColor", false, false,
+        "transparent");
 
     /**
      * Sets the width of an element.
@@ -154,8 +154,8 @@ public class Style extends com.google.gwt.dom.client.Style
     /**
      * The vertical-align property sets the vertical alignment of an element.
      */
-    public static final Property VERTICAL_ALIGN =
-        new Property("vertical-align", "verticalAlign", false, false, "baseline");
+    public static final Property VERTICAL_ALIGN = new Property("vertical-align", "verticalAlign", false, false,
+        "baseline");
 
     /**
      * Standard values for {@link Style#DISPLAY}.
@@ -421,14 +421,14 @@ public class Style extends com.google.gwt.dom.client.Style
     }
 
     /**
-     * Internet Explorer specific implementation of {@link FloatProperty}.
+     * Specific implementation of {@link FloatProperty} for older versions of Internet Explorer (6, 7 and 8).
      */
-    public static final class IEFloatProperty extends FloatProperty
+    public static final class IEOldFloatProperty extends FloatProperty
     {
         /**
          * Default constructor required in order to use the deferred binding mechanism.
          */
-        public IEFloatProperty()
+        public IEOldFloatProperty()
         {
             super("styleFloat");
         }

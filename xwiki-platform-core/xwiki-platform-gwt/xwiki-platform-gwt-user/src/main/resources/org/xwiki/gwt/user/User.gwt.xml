@@ -27,13 +27,17 @@
   <extend-property name="locale" values="ca,de,es,fr,it,ru,sv,zh,zh_TW" />
 
   <!-- RichTextArea -->
-  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplIE6">
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplIEOld">
     <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl" />
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
     </any>
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplIE">
+    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl" />
+    <when-property-is name="user.agent" value="ie9" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplMozilla">
@@ -67,10 +71,14 @@
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.IEBehaviorAdjuster">
     <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster" />
+    <when-property-is name="user.agent" value="ie9" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.IEOldBehaviorAdjuster">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster" />
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
     </any>
   </replace-with>
 
@@ -79,12 +87,12 @@
     <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImpl" />
   </replace-with>
 
-  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImplIE">
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImplIEOld">
     <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImpl" />
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
+      <!-- ie9 fires the unload event when the in-line frame is detached -->
     </any>
   </replace-with>
 
@@ -103,23 +111,12 @@
     <when-property-is name="user.agent" value="gecko1_8" />
   </replace-with>
 
-  <!-- DOMImpl for widgets -->
-  <replace-with class="org.xwiki.gwt.user.client.internal.IEDOMImpl">
-    <when-type-is class="com.google.gwt.user.client.impl.DOMImpl" />
-    <any>
-      <when-property-is name="user.agent" value="ie6" />
-      <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
-    </any>
-  </replace-with>
-
   <!-- TextBoxImpl -->
   <replace-with class="org.xwiki.gwt.user.client.ui.internal.TextBoxImplIE6">
     <when-type-is class="com.google.gwt.user.client.ui.impl.TextBoxImpl" />
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
     </any>
   </replace-with>
 
@@ -128,12 +125,11 @@
     <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImpl" />
   </replace-with>
 
-  <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImplIE">
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImplIEOld">
     <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImpl" />
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
     </any>
   </replace-with>
 
@@ -147,7 +143,7 @@
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <when-property-is name="user.agent" value="ie9" />
+      <!-- TODO: Check if the standard implementation works fine in IE9 -->
     </any>
   </replace-with>
 </module>

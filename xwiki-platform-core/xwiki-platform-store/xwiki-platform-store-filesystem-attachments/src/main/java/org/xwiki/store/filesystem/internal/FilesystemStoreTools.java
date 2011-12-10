@@ -24,10 +24,10 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
  * Tools for getting files to store data in the filesystem.
@@ -78,7 +78,7 @@ public interface FilesystemStoreTools
      * @return a provider which will provide files with collision free path and repeatable with same inputs.
      */
     DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(final XWikiAttachment attachment,
-                                                                   final Date deleteDate);
+        final Date deleteDate);
 
     /**
      * Get a map of dates of deletion by the document where the attachment was attached.
@@ -112,7 +112,7 @@ public interface FilesystemStoreTools
 
     /**
      * Get a {@link java.util.concurrent.locks.ReadWriteLock} which is unique to the given file.
-     * This method will always return the same lock for the path on the filesystem even if the 
+     * This method will always return the same lock for the path on the filesystem even if the
      * {@link java.io.File} object is different.
      *
      * @param toLock the file to get a lock for.

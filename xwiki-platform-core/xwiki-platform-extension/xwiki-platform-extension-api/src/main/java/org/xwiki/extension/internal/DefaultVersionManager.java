@@ -21,11 +21,17 @@ package org.xwiki.extension.internal;
 
 import java.util.regex.Pattern;
 
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 /**
  * Default implementation of {@link VersionManager}.
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class DefaultVersionManager implements VersionManager
 {
     /**
@@ -33,13 +39,15 @@ public class DefaultVersionManager implements VersionManager
      */
     private static final Pattern SEPARATORS = Pattern.compile("[\\.-]");
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.internal.VersionManager#compareVersions(java.lang.String, java.lang.String)
-     */
+    @Override
     public int compareVersions(String version1, String version2)
     {
+        if (version1 == null) {
+            return -1;
+        } else if (version2 == null) {
+            return 1;
+        }
+
         String[] elements1 = SEPARATORS.split(version1);
         String[] elements2 = SEPARATORS.split(version2);
 

@@ -142,6 +142,7 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
+                allowing(xwiki).isVirtualMode(); will(returnValue(true));
                 allowing(xwiki).getDocument(with(equal(macroDocument.getDocumentReference())),
                     with(any(XWikiContext.class)));
                 will(returnValue(macroDocument));

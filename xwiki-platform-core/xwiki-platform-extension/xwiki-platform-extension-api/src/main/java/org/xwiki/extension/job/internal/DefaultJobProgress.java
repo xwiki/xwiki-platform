@@ -49,24 +49,34 @@ public class DefaultJobProgress implements EventListener, JobProgress
     /**
      * The progress stack.
      */
-    private Stack<Step> progress = new Stack<Step>();
+    private Stack<Level> progress = new Stack<Level>();
 
     /**
      * A step.
      * 
      * @version $Id$
      */
-    static class Step
+    static class Level
     {
         /**
-         * Current progress between 0 and 1.
+         * Global progress between 0 and 1.
          */
-        public double offset;
+        public double globalOffset;
+
+        /**
+         * Current level progress between 0 and 1.
+         */
+        public double levelOffset;
 
         /**
          * Size of the step between 0 and 1.
          */
-        public double stepSize;
+        public double globalStepSize;
+
+        /**
+         * Size of the step between 0 and 1.
+         */
+        public double localStepSize;
 
         /**
          * The current step.
@@ -83,11 +93,15 @@ public class DefaultJobProgress implements EventListener, JobProgress
          * @param offset the current offset
          * @param parentSize the size of the parent step
          */
-        public Step(int steps, double offset, double parentSize)
+        public Level(int steps, double offset, double parentSize)
         {
             this.steps = steps;
-            this.offset = offset;
-            this.stepSize = parentSize / steps;
+
+            this.globalOffset = offset;
+            this.globalStepSize = parentSize / steps;
+
+            this.levelOffset = 0.0D;
+            this.localStepSize = 1.0D / steps;
         }
     }
 
@@ -101,11 +115,6 @@ public class DefaultJobProgress implements EventListener, JobProgress
 
     // EventListener
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
     @Override
     public String getName()
     {
@@ -123,21 +132,16 @@ public class DefaultJobProgress implements EventListener, JobProgress
         return EVENTS;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-     *      java.lang.Object)
-     */
     @Override
     public void onEvent(Event event, Object arg1, Object arg2)
     {
         if (event instanceof PushLevelProgressEvent) {
             PushLevelProgressEvent progressEvent = (PushLevelProgressEvent) event;
             if (this.progress.isEmpty()) {
-                this.progress.push(new Step(progressEvent.getSteps(), getOffset(), 1.0D));
+                this.progress.push(new Level(progressEvent.getSteps(), getOffset(), 1.0D));
             } else {
-                this.progress.push(new Step(progressEvent.getSteps(), getOffset(), this.progress.peek().stepSize));
+                this.progress
+                    .push(new Level(progressEvent.getSteps(), getOffset(), this.progress.peek().globalStepSize));
             }
         } else if (event instanceof PopLevelProgressEvent) {
             this.progress.pop();
@@ -153,34 +157,25 @@ public class DefaultJobProgress implements EventListener, JobProgress
     private void nextStep()
     {
         if (!this.progress.isEmpty()) {
-            Step step = this.progress.peek();
+            Level step = this.progress.peek();
 
             ++step.currentStep;
-            step.offset += step.stepSize;
+            step.globalOffset += step.globalStepSize;
+            step.levelOffset += step.localStepSize;
         }
     }
 
     // JobProgress
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobProgress#getPercent()
-     */
-    @Override
-    public int getPercent()
-    {
-        return (int) (100D * getOffset());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.JobProgress#getOffset()
-     */
     @Override
     public double getOffset()
     {
-        return this.progress.isEmpty() ? 0 : this.progress.peek().offset;
+        return this.progress.isEmpty() ? 0.0D : this.progress.peek().globalOffset;
+    }
+
+    @Override
+    public double getCurrentLevelOffset()
+    {
+        return this.progress.isEmpty() ? 0.0D : this.progress.peek().levelOffset;
     }
 }

@@ -25,7 +25,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -215,7 +215,7 @@ public class AbstractHandler extends DefaultHandler
 
     protected ExecutionContext getExecutionContext() throws ComponentLookupException
     {
-        return this.componentManager.lookup(Execution.class).getContext();
+        return getComponentManager().lookup(Execution.class).getContext();
     }
 
     protected XWikiContext getXWikiContext() throws ComponentLookupException

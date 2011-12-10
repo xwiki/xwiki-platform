@@ -22,7 +22,6 @@ package org.xwiki.wysiwyg.server.plugin.macro;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor;
 
-
 /**
  * Translates a {@link MacroDescriptor} into the execution context language.
  * 

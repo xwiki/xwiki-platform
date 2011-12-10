@@ -23,15 +23,15 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
 
 /**
- * The default QueryExecutor, this uses The HqlQueryExecutor since XWikiHibernateStore is the default store.
- * Wrapping the HQL executor with this allows the main store hint in xwiki.cfg to be used to select the
- * QueryExecutor.
+ * The default QueryExecutor, this uses The HqlQueryExecutor since XWikiHibernateStore is the default store. Wrapping
+ * the HQL executor with this allows the main store hint in xwiki.cfg to be used to select the QueryExecutor.
  * 
  * @version $Id$
  * @since 3.2M2
@@ -44,9 +44,7 @@ public class DefaultQueryExecutor implements QueryExecutor
     @Named("hql")
     private QueryExecutor executor;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public <T> List<T> execute(final Query query) throws QueryException
     {
         return this.executor.execute(query);

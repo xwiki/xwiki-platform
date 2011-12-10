@@ -653,7 +653,7 @@ XWiki.Dashboard = Class.create( {
     if (editForm) {
       var formTokenElt = editForm['form_token'];
       if (formTokenElt) {
-        return formTokenElt.getValue();
+        return formTokenElt.value;
       }
     }
     return '';

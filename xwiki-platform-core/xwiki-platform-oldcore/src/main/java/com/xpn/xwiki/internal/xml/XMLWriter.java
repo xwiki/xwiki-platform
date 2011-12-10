@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.internal.xml;
 
@@ -129,8 +128,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
 
     /**
      * Writes the <code>{@link Element}</code>, including its <code>{@link
-     * Attribute}</code>s, using the <code>{@link Reader}</code>
-     * for its content.
+     * Attribute}</code>s, using the <code>{@link Reader}</code> for its content.
      * <p>
      * Note that proper decoding/encoding will occurs during this operation, converting the encoding of the Reader into
      * the encoding of the Writer.
@@ -149,8 +147,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
 
     /**
      * Writes the <code>{@link Element}</code>, including its <code>{@link
-     * Attribute}</code>s, using the
-     * <code>{@link InputStream}</code> for its content.
+     * Attribute}</code>s, using the <code>{@link InputStream}</code> for its content.
      * <p>
      * Note that no decoding/encoding of the InputStream will be ensured during this operation. The byte content is
      * transfered untouched.
@@ -170,8 +167,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
 
     /**
      * Writes the <code>{@link Element}</code>, including its <code>{@link
-     * Attribute}</code>s, using the
-     * <code>{@link InputStream}</code> encoded in Base64 for its content.
+     * Attribute}</code>s, using the <code>{@link InputStream}</code> encoded in Base64 for its content.
      * 
      * @param element <code>{@link Element}</code> to output.
      * @param is <code>{@link InputStream}</code> that will be fully read and encoded in Base64 into the element

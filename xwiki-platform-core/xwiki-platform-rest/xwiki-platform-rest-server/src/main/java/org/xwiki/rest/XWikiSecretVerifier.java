@@ -49,6 +49,12 @@ public class XWikiSecretVerifier extends SecretVerifier
      */
     private Context context;
 
+    /**
+     * Constructor.
+     *
+     * @param context the Restlet context in which to verify the secrect
+     * @param manager XWiki's component manager
+     */
     public XWikiSecretVerifier(Context context, ComponentManager manager)
     {
         this.context = context;

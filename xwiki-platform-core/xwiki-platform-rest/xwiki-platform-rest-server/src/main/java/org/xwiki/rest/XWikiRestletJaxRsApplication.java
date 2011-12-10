@@ -52,7 +52,8 @@ public class XWikiRestletJaxRsApplication extends JaxRsApplication
         XWikiSetupCleanupFilter setupCleanupFilter = new XWikiSetupCleanupFilter();
 
         XWikiAuthentication xwikiAuthentication = new XWikiAuthentication(getContext());
-        ComponentManager componentManager = (ComponentManager) getContext().getAttributes().get(Constants.XWIKI_COMPONENT_MANAGER);
+        ComponentManager componentManager = 
+            (ComponentManager) getContext().getAttributes().get(Constants.XWIKI_COMPONENT_MANAGER);
         xwikiAuthentication.setVerifier(new XWikiSecretVerifier(getContext(), componentManager));
 
         /* Create a router for adding resources */

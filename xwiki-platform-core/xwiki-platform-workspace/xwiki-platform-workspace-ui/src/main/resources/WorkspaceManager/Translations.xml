@@ -28,6 +28,9 @@ workspacemanager.template.install.success=Workspace template has been successful
 workspacemanager.template.install.error=Error installing workspace template. {0}
 workspacemanager.template.install.error.missingattachment=Error installing the workspace template. The file "{0}" is not attached to the document [[{1}&gt;&gt;{1}]]. Please re-import the [[{1}&gt;&gt;{1}]] document from the Workspaces Application XAR.
 workspacemanager.template.install.error.missingtemplateattachment=Error installing the workspace template. The file "{0}" is not attached to the document [[{1}&gt;&gt;{1}]]. Please attach a base template that will be used for all newly created workspaces. You can download one from [[here&gt;&gt;{2}]] and rename it to "{0}" before attaching it.
+workspacemanager.template.install.notYetComplete=The installation process is not yet complete.\n\
+\n\
+In order to finish the installation process, please log in as Admin and go to the page [{0}&gt;{0}].
 workspacemanager.translations.install.success=Workspace Manager translations have been successfully installed.
 workspacemanager.searchSuggestions.install.success=Workspace search suggestions have been successfully installed.
 workspacemanager.install.notallowed=Admin rights are required to complete the Workspace Manager installation. Please login as Admin to complete the installation.

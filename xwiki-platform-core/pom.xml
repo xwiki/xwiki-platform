@@ -311,22 +311,12 @@
             <configuration>
               <excludes>
                 <exclude>**/internal/**</exclude>
-<<<<<<< HEAD
-                <exclude>**/test/**</exclude>
-                <!-- To be removed when we release 3.2 -->
-                <exclude>com/xpn/xwiki/plugin/lucene/IndexRebuilder</exclude>
-                <exclude>org/xwiki/bridge/AttachmentNameFactory</exclude>
-                <exclude>org/xwiki/bridge/AttachmentNameSerializer</exclude>
-                <exclude>org/xwiki/bridge/DocumentNameFactory</exclude>
-                <exclude>org/xwiki/bridge/DocumentNameSerializer</exclude>
-                <exclude>com/xpn/xwiki/plugin/wikimanager/WikiManager</exclude>
+                <!-- To be removed when we release 3.3 -->
                 <exclude>org/xwiki/rest/XWikiAuthentication</exclude>
                 <exclude>org/xwiki/rest/XWikiRestletJaxRsApplication</exclude>
                 <exclude>org/xwiki/rest/XWikiRestletServlet</exclude>
                 <exclude>org/xwiki/rest/XWikiSetupCleanupFilter</exclude>
                 <exclude>org/xwiki/rest/resources/BrowserAuthenticationResource</exclude>
-=======
-                <!-- To be removed when we release 3.3 -->
                 <exclude>org/xwiki/annotation/reference/IndexedObjectReference</exclude>
                 <exclude>org/xwiki/cache/eviction/EntryEvictionConfiguration</exclude>
                 <exclude>org/xwiki/workspace/WorkspaceManagerException</exclude>
@@ -372,7 +362,6 @@
                 <exclude>org/xwiki/query/QueryExecutorProvider</exclude> <!-- Use new Provider injection -->
                 <!-- Moved to Legacy -->
                 <exclude>com/xpn/xwiki/api/XWiki</exclude>
->>>>>>> 1bc2506dac3106a76ab3b768d335dad5c16d3824
               </excludes>
             </configuration>
           </plugin>

@@ -19,8 +19,11 @@
  */
 package org.xwiki.annotation.rest.internal;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -35,6 +38,9 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang.StringUtils;
+import org.restlet.Request;
+import org.restlet.data.Form;
 import org.xwiki.annotation.AnnotationServiceException;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationAddRequest;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationField;
@@ -58,6 +64,16 @@ import com.xpn.xwiki.XWikiException;
 public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
 {
     /**
+     * Request parameter to request a field in an annotation request.
+     */
+    private static final String ANNOTATION_REQUEST_REQUESTED_FIELD_PARAMETER = "request_field";
+    
+    /**
+     * Request parameter prefix for a filter in an annotation request.
+     */
+    
+    private static final String ANNOTATION_REQUEST_FILTER_PARAMETER_PREFIX = "filter_";
+    /**
      * Entity reference serializer used to get reference to the document to perform annotation operation on.
      */
     @Inject
@@ -67,15 +83,13 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
      * @param wiki the wiki of the document to get annotations for
      * @param space the space of the document to get annotations for
      * @param page the name of the document to get annotation for
-     * @param request the extra fields to be returned from the annotation structure when returning the annotation resume
-     *            to the client side
      * @return annotations of a given XWiki page. Note that we're returning a response holding the AnnotatedContent
      *         instead of an AnnotatedContent object because we need to be able to set custom expire fields to prevent
      *         IE from caching this resource.
      */
     @GET
     public Response doGetAnnotatedContent(@PathParam("spaceName") String space, @PathParam("pageName") String page,
-        @PathParam("wikiName") String wiki, AnnotationRequest request)
+        @PathParam("wikiName") String wiki)
     {
         try {
             DocumentReference docRef = new DocumentReference(wiki, space, page);
@@ -84,6 +98,32 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             if (!annotationRightService.canViewAnnotatedTarget(documentName, getXWikiUser())) {
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
+
+            // Manually construct the Annotation request entity
+            // Historically it used to be passed as method argument, but this only worked because of a bug in
+            // earlier version of Restlet (1.1.x) ; the JAX-RS specification explicitly states that such entity
+            // parameters "[are] mapped from the request entity body.", and thus cannot be passed to a GET resource.
+            // See paragraph 3.3.2.1 "Entity Parameters" of JAX-RS 1.1 specification.
+            Form form = Request.getCurrent().getResourceRef().getQueryAsForm();
+            AnnotationRequest request = new AnnotationRequest();
+            AnnotationFieldCollection fields = new AnnotationFieldCollection();
+            List<AnnotationField> annotationFields = new ArrayList<AnnotationField>();
+            AnnotationRequest.Request requestedFields = new AnnotationRequest.Request();
+            for (String name : form.getNames()) {
+                if (StringUtils.startsWith(name, ANNOTATION_REQUEST_FILTER_PARAMETER_PREFIX)) {
+                    for (String value : form.getValuesArray(name)) {
+                        AnnotationField field = new AnnotationField();
+                        field.setName(StringUtils.substringAfter(name, ANNOTATION_REQUEST_FILTER_PARAMETER_PREFIX));
+                        field.setValue(value);
+                        annotationFields.add(field);
+                    }
+                } else if (StringUtils.equals(name, ANNOTATION_REQUEST_REQUESTED_FIELD_PARAMETER)) {
+                    requestedFields.getFields().addAll(Arrays.asList(form.getValuesArray(name)));
+                }
+            }
+            request.setRequest(requestedFields);
+            fields.getFields().addAll(annotationFields);
+            request.setFilter(fields);
 
             AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, request);
             // make this content expire now because cacheControl is not implemented in this version of restlet

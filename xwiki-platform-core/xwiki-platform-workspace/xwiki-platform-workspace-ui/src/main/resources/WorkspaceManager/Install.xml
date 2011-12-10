@@ -35,7 +35,7 @@
   #if ($hasGlobalAdmin)
     #set ($discard = $xwikiPreferencesObject.set('documentBundles', "$documentBundles, WorkspaceManager.Translations"))
     #set ($discard = $xwikiPreferencesDocument.save('Automatically registered Workspace Manager translations.', true))
-    {{info}}$msg.get('workspacemanager.translations.install.success'){{/info}}
+    {{success}}$msg.get('workspacemanager.translations.install.success'){{/success}}
   #else
     #set ($needsAdminRights = true)
   #end
@@ -44,7 +44,7 @@
   ## Don't display this information if the code is included from somewhere else.
   ##
   #if ($context.doc == $context.tdoc)
-    {{info}}$msg.get('workspacemanager.translations.install.success'){{/info}}
+    {{success}}$msg.get('workspacemanager.translations.install.success'){{/success}}
   #end
 #end
 ##
@@ -70,7 +70,7 @@
       #set ($discard = $searchSuggestConfigDocument.save('Automatically registered workspace search suggestions.', true))
       #if (!$skipSuccessMessage)
 
-        {{info}}$msg.get('workspacemanager.searchSuggestions.install.success'){{/info}}
+        {{success}}$msg.get('workspacemanager.searchSuggestions.install.success'){{/success}}
       #end
     #elseif (!$skipNeedsAdminRightsCheck)
       #set ($needsAdminRights = true)
@@ -81,7 +81,7 @@
     ##
     #if ($context.doc == $context.tdoc)
 
-      {{info}}$msg.get('workspacemanager.searchSuggestions.install.success'){{/info}}
+      {{success}}$msg.get('workspacemanager.searchSuggestions.install.success'){{/success}}
     #end
   #end
 #end
@@ -110,15 +110,32 @@
 #if ("$!template" == '')
   #if ($hasGlobalAdmin)
     #if ($xcontext.doc.getAttachment($TEMPLATE_PACKAGE))
-      #set ($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, 'Workspace Template', $TEMPLATE_PACKAGE))
-      #if ($result == $Exception.ERROR_NOERROR)
+      #if ($request.confirmTemplateInstall == '1')
+        #set ($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, 'Workspace Template', $TEMPLATE_PACKAGE))
+        #if ($result == $Exception.ERROR_NOERROR)
+          ## Use a redirect so that the page can be refreshed after the form's POST.
+          #set ($discard = $response.sendRedirect($doc.getURL()))
 
-        {{info}}$msg.get('workspacemanager.template.install.success'){{/info}}
-      #elseif ($result == $Exception.ERROR_XWIKI_ACCESS_DENIED)
-        #set ($needsAdminRights = true)
+          {{success}}$msg.get('workspacemanager.template.install.success'){{/success}}
+        #elseif ($result == $Exception.ERROR_XWIKI_ACCESS_DENIED)
+          #set ($needsAdminRights = true)
+        #else
+
+          {{error}}$msg.get('workspacemanager.template.install.error', [$xcontext.lastexception]){{/error}}
+        #end
       #else
 
-        {{error}}$msg.get('workspacemanager.template.install.error', [$services.workspace.lastException]){{/error}}
+        {{warning}}
+          Workspace template is not yet installed. Install the workspace template now?
+
+          {{html}}
+          &lt;form method='POST'&gt;
+            &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
+            &lt;input type='hidden' name='confirmTemplateInstall' value='1' /&gt;
+            &lt;input type='submit' value='Install' class='button' /&gt;
+          &lt;/form&gt;
+          {{/html}}
+        {{/warning}}
       #end
     #else
 
@@ -133,7 +150,7 @@
   ##
   #if ($context.doc == $context.tdoc)
 
-    {{info}}$msg.get('workspacemanager.template.install.success'){{/info}}
+    {{success}}$msg.get('workspacemanager.template.install.success'){{/success}}
   #end
 #end
 ##
@@ -311,7 +328,7 @@
       #set ($templateLocalAdminDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'Admin'))
       #permanentlyDeleteDocument($templateLocalAdminDocumentReference)
 
-      {{info}}Workspace template features successfully installed.{{/info}}
+      {{success}}Workspace template features successfully installed.{{/success}}
     #end
   #else
 
@@ -323,7 +340,7 @@
   ##
   #if ($context.doc == $context.tdoc)
 
-    {{info}}Workspace template features successfully installed.{{/info}}
+    {{success}}Workspace template features successfully installed.{{/success}}
   #end
 #end
 ##

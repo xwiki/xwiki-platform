@@ -280,8 +280,10 @@ function prettyNameChanged()
   #error($msg.get("workspacemanager.error.notinvirtualmode"))
 #end
 ############################################################################################
-## WORKSPACE TEMPLATE AUTOMATIC INSTALLATION
-#includeTopic('WorkspaceManager.Install')
+## WORKSPACE INSTALLATION STATUS CHECK
+#if ("$!{services.wikimanager.getWikiTemplateDocument('workspacetemplate')}" == '')
+  #warning($msg.get('workspacemanager.template.install.notYetComplete', ['WorkspaceManager.Install']))
+#end
 ############################################################################################
 ## MACROS
 #macro(getRequestList $paramlist $paramname)

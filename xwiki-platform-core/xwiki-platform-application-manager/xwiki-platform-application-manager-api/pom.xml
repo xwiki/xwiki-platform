@@ -37,7 +37,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
     </dependency>
 
     <!-- Test dependencies -->

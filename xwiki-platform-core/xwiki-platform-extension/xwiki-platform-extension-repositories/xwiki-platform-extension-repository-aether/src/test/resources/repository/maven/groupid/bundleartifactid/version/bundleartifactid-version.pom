@@ -8,6 +8,6 @@
 	<name>name</name>
 	<version>version</version>
 	<packaging>bundle</packaging>
-	<description>description</description>
+	<description>summary</description>
 	<url>http://website</url>
 </project>

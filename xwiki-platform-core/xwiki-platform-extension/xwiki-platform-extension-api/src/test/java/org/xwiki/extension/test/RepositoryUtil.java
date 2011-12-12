@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
@@ -144,15 +143,15 @@ public class RepositoryUtil
 
         // maven resource repository
 
-        URL url = getClass().getClassLoader().getResource("repository/maven");
-        if (url != null) {
-            repositoryManager.addRepository(new ExtensionRepositoryId(MAVENREPOSITORY_ID, "maven", url.toURI()));
+        if (copyResourceFolder(getMavenRepository(), "repository.maven") > 0) {
+            repositoryManager.addRepository(new ExtensionRepositoryId(MAVENREPOSITORY_ID, "maven", getMavenRepository()
+                .toURI()));
         }
 
         // generated extensions
 
         this.extensionPackager.generateExtensions();
-        
+
         // init
 
         this.componentManager.lookup(ExtensionInitializer.class).initialize();

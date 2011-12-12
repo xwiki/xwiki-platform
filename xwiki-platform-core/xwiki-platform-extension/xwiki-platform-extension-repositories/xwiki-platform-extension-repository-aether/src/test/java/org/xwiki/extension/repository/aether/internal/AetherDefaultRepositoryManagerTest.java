@@ -19,16 +19,16 @@
  */
 package org.xwiki.extension.repository.aether.internal;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +37,6 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.ExtensionLicense;
 import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
@@ -46,6 +45,10 @@ import org.xwiki.test.AbstractComponentTestCase;
 
 public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCase
 {
+    private static final String GROUPID = "groupid";
+
+    private static final String ARTIfACTID = "artifactid";
+
     private ExtensionRepositoryManager repositoryManager;
 
     private ExtensionId extensionId;
@@ -71,8 +74,8 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
             new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());
         this.repositoryUtil.setup();
 
-        this.extensionId = new ExtensionId("groupid:artifactid", "version");
-        this.extensionIdClassifier = new ExtensionId("groupid:artifactid:classifier", "version");
+        this.extensionId = new ExtensionId(GROUPID + ':' + ARTIfACTID, "version");
+        this.extensionIdClassifier = new ExtensionId(GROUPID + ':' + ARTIfACTID + ":classifier", "version");
         this.dependencyExtensionId = new DefaultExtensionDependency("dgroupid:dartifactid", "dversion");
         this.dependencyExtensionIdRange = new DefaultExtensionDependency("dgroupid:dartifactid", "[dversion,)");
 
@@ -85,7 +88,7 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
     }
 
     @Test
-    public void testResolve() throws ResolveException, MalformedURLException
+    public void testResolve() throws ResolveException, IOException
     {
         Extension extension = this.repositoryManager.resolve(this.extensionId);
 
@@ -95,7 +98,7 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         Assert.assertEquals("type", extension.getType());
         Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), extension.getRepository().getId().getId());
         Assert.assertEquals("name", extension.getName());
-        Assert.assertEquals("description", extension.getDescription());
+        Assert.assertEquals("summary", extension.getSummary());
         Assert.assertEquals("http://website", extension.getWebSite());
         Assert.assertEquals("Full Name", extension.getAuthors().get(0).getName());
         Assert.assertEquals(new URL("http://profile"), extension.getAuthors().get(0).getURL());
@@ -111,6 +114,22 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         // check that a new resolve of an already resolved extension provide the proper repository
         extension = this.repositoryManager.resolve(this.extensionId);
         Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), extension.getRepository().getId().getId());
+
+        /*
+        // TODO: see http://jira.xwiki.org/browse/XWIKI-7163
+        // Modify the file on the descriptor on the repository
+
+        File pomFile =
+            new File(this.repositoryUtil.getMavenRepository(), this.extensionId.getId().replace('.', '/')
+                .replace(':', '/')
+                + '/' + this.extensionId.getVersion() + '/' + ARTIfACTID + '-' + this.extensionId.getVersion() + ".pom");
+
+        FileUtils.writeStringToFile(pomFile, FileUtils.readFileToString(pomFile, "UTF-8").replace("<description>summary</description>", "<description>modified summary</description>"), "UTF-8");
+
+        extension = this.repositoryManager.resolve(this.extensionId);
+
+        Assert.assertEquals("modified description", extension.getSummary());
+        */
     }
 
     @Test

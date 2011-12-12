@@ -69,8 +69,6 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
 
     private PlexusComponentManager plexusComponentManager;
 
-    private RepositorySystemSession session;
-
     private RemoteRepository remoteRepository;
 
     private ArtifactDescriptorReader mavenDescriptorReader;
@@ -85,15 +83,17 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
 
     private ExtensionLicenseManager licenseManager;
 
-    public AetherExtensionRepository(ExtensionRepositoryId repositoryId, RepositorySystemSession session,
-        PlexusComponentManager mavenComponentManager, ComponentManager componentManager) throws Exception
+    private AetherExtensionRepositoryFactory repositoryFactory;
+
+    public AetherExtensionRepository(ExtensionRepositoryId repositoryId,
+        AetherExtensionRepositoryFactory repositoryFactory, PlexusComponentManager mavenComponentManager,
+        ComponentManager componentManager) throws Exception
     {
         super(repositoryId);
 
+        this.repositoryFactory = repositoryFactory;
         this.componentManager = componentManager;
         this.plexusComponentManager = mavenComponentManager;
-
-        this.session = session;
 
         this.remoteRepository = new RemoteRepository(repositoryId.getId(), "default", repositoryId.getURI().toString());
 
@@ -128,6 +128,11 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
         }
     }
 
+    public RepositorySystemSession createRepositorySystemSession()
+    {
+        return this.repositoryFactory.createRepositorySystemSession();
+    }
+
     @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
@@ -145,7 +150,7 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
         }
     }
 
-    public Version resolveVersionRange(Artifact artifact) throws ResolveException
+    public Version resolveVersionRange(Artifact artifact, RepositorySystemSession session) throws ResolveException
     {
         VersionRangeResult rangeResult;
         try {
@@ -153,7 +158,7 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
             rangeRequest.setArtifact(artifact);
             rangeRequest.addRepository(this.remoteRepository);
 
-            rangeResult = this.versionRangeResolver.resolveVersionRange(getSession(), rangeRequest);
+            rangeResult = this.versionRangeResolver.resolveVersionRange(session, rangeRequest);
 
             if (rangeResult.getVersions().isEmpty()) {
                 throw new VersionRangeResolutionException(rangeResult, "No versions available for " + artifact
@@ -168,6 +173,8 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
 
     public AetherExtension resolveMaven(ExtensionDependency extensionDependency) throws ResolveException
     {
+        RepositorySystemSession session = createRepositorySystemSession();
+
         Artifact artifact;
         if (extensionDependency instanceof AetherExtensionDependency) {
             artifact = ((AetherExtensionDependency) extensionDependency).getAetherDependency().getArtifact();
@@ -177,14 +184,14 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
 
         // Resolve version range
 
-        Version version = resolveVersionRange(artifact);
+        Version version = resolveVersionRange(artifact, session);
         artifact = artifact.setVersion(version.toString());
 
         // Get descriptor
 
         Model model;
         try {
-            model = loadPom(artifact);
+            model = loadPom(artifact, session);
         } catch (Exception e) {
             throw new ResolveException("Failed to resolve extension [" + extensionDependency + "] descriptor", e);
         }
@@ -207,7 +214,7 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
         AetherExtension extension = new AetherExtension(artifact, model, this, this.plexusComponentManager);
 
         extension.setName(model.getName());
-        extension.setDescription(model.getDescription());
+        extension.setSummary(model.getDescription());
         for (Developer developer : model.getDevelopers()) {
             URL authorURL = null;
             if (developer.getUrl() != null) {
@@ -218,8 +225,8 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
                 }
             }
 
-            extension.addAuthor(new DefaultExtensionAuthor(
-                StringUtils.defaultIfBlank(developer.getName(), developer.getId()), authorURL));
+            extension.addAuthor(new DefaultExtensionAuthor(StringUtils.defaultIfBlank(developer.getName(),
+                developer.getId()), authorURL));
         }
         extension.setWebsite(model.getUrl());
 
@@ -236,10 +243,13 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
 
         // dependencies
         try {
+            ArtifactTypeRegistry stereotypes = session.getArtifactTypeRegistry();
+
             for (org.apache.maven.model.Dependency mavenDependency : model.getDependencies()) {
                 if (!mavenDependency.isOptional()
                     && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime"))) {
-                    extension.addDependency(new AetherExtensionDependency(convertToAether(mavenDependency)));
+                    extension
+                        .addDependency(new AetherExtensionDependency(convertToAether(mavenDependency, stereotypes)));
                 }
             }
         } catch (Exception e) {
@@ -249,11 +259,9 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
         return extension;
     }
 
-    private Dependency convertToAether(org.apache.maven.model.Dependency dependency) throws IllegalArgumentException,
-        IllegalAccessException, InvocationTargetException
+    private Dependency convertToAether(org.apache.maven.model.Dependency dependency, ArtifactTypeRegistry stereotypes)
+        throws IllegalArgumentException, IllegalAccessException, InvocationTargetException
     {
-        ArtifactTypeRegistry stereotypes = getSession().getArtifactTypeRegistry();
-
         return (Dependency) convertMethod.invoke(this.mavenDescriptorReader, dependency, stereotypes);
     }
 
@@ -275,8 +283,8 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
 
     }
 
-    private Model loadPom(Artifact artifact) throws IllegalArgumentException, IllegalAccessException,
-        InvocationTargetException
+    private Model loadPom(Artifact artifact, RepositorySystemSession session) throws IllegalArgumentException,
+        IllegalAccessException, InvocationTargetException
     {
         ArtifactDescriptorRequest artifactDescriptorRequest = new ArtifactDescriptorRequest();
         artifactDescriptorRequest.setArtifact(artifact);
@@ -284,13 +292,8 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
 
         ArtifactDescriptorResult artifactDescriptorResult = new ArtifactDescriptorResult(artifactDescriptorRequest);
 
-        return (Model) loadPomMethod.invoke(this.mavenDescriptorReader, getSession(), artifactDescriptorRequest,
+        return (Model) loadPomMethod.invoke(this.mavenDescriptorReader, session, artifactDescriptorRequest,
             artifactDescriptorResult);
-    }
-
-    public RepositorySystemSession getSession()
-    {
-        return this.session;
     }
 
     public RemoteRepository getRemoteRepository()

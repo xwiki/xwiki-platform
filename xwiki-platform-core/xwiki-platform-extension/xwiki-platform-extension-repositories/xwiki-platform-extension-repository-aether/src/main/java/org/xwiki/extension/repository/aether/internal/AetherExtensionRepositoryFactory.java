@@ -26,8 +26,10 @@ import javax.inject.Singleton;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.aether.RepositorySystem;
+import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
+import org.sonatype.aether.repository.LocalRepositoryManager;
+import org.sonatype.aether.repository.RepositoryPolicy;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
@@ -53,7 +55,7 @@ public class AetherExtensionRepositoryFactory implements ExtensionRepositoryFact
     @Inject
     private AetherConfiguration aetherConfiguration;
 
-    private DefaultRepositorySystemSession session;
+    private LocalRepositoryManager localRepositoryManager;
 
     @Override
     public void initialize() throws InitializationException
@@ -65,20 +67,27 @@ public class AetherExtensionRepositoryFactory implements ExtensionRepositoryFact
             throw new InitializationException("Failed to lookup RepositorySystem", e);
         }
 
-        this.session = new MavenRepositorySystemSession();
-
         LocalRepository localRepo = new LocalRepository(this.aetherConfiguration.getLocalRepository());
-        this.session.setLocalRepositoryManager(repositorySystem.newLocalRepositoryManager(localRepo));
-        this.session.setIgnoreMissingArtifactDescriptor(false);
-        this.session.setIgnoreInvalidArtifactDescriptor(false);
+        this.localRepositoryManager = repositorySystem.newLocalRepositoryManager(localRepo);
+    }
+
+    public RepositorySystemSession createRepositorySystemSession()
+    {
+        MavenRepositorySystemSession session = new MavenRepositorySystemSession();
+
+        session.setLocalRepositoryManager(this.localRepositoryManager);
+        session.setIgnoreMissingArtifactDescriptor(false);
+        session.setIgnoreInvalidArtifactDescriptor(false);
+        session.setUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
+
+        return session;
     }
 
     @Override
     public ExtensionRepository createRepository(ExtensionRepositoryId repositoryId) throws ExtensionRepositoryException
     {
         try {
-            return new AetherExtensionRepository(repositoryId, this.session, this.plexusComponentManager,
-                this.componentManager);
+            return new AetherExtensionRepository(repositoryId, this, this.plexusComponentManager, this.componentManager);
         } catch (Exception e) {
             throw new ExtensionRepositoryException("Failed to create repository [" + repositoryId + "]", e);
         }

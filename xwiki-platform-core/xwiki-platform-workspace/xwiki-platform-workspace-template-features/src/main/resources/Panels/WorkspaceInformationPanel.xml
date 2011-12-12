@@ -106,7 +106,7 @@
 <property>
 <content>#panelheader($msg.get('workspacemanager.panel.title'))
 #set ($currentWiki = $xcontext.database)
-#set ($currentUser = "#if($xcontext.isMainWiki())${xcontext.mainWikiName}:${xcontext.user}#{else}${xcontext.user}#end")
+#set ($currentUser = $services.model.serialize($xcontext.userReference, 'default'))
 #set ($WorkspaceManager = $services.workspace)
 ##
 ## TODO: use a dependency check macro.
@@ -125,44 +125,85 @@
   #end
   ----
   ## Join/Leave
-  #set ($hasOwner = ($wikiDescriptor.owner.equals($currentUser)))
   #if ($isGuest)
     To join this workspace you need to be logged in.
-  #else    
+  #else
+    #set ($hasOwner = ($wikiDescriptor.owner.equals($currentUser)))
     #set ($workspaceGroupDocument = $workspace.groupDocument)
     #set ($groupsClass = "$currentWiki:XWiki.XWikiGroups")
     #set ($currentUserGroupObject = $workspaceGroupDocument.getObject($groupsClass, 'member', $currentUser))
-    #set ($hasJoin = ("$!currentUserGroupObject" == ''))
-    #if ($hasJoin)
+    #set ($currentUserIsMember = ("$!currentUserGroupObject" != ''))
+    #if (!$currentUserIsMember)
+      ## Determine if, regardless of membership type, an existing invitation or join request exists for the current user.
+      #set ($candidateMembers = $workspaceGroupDocument.getObjects('XWiki.WorkspaceCandidateMemberClass', 'userName', $currentUser))
+      #set ($existingInvitationOrRequest = false)
+      #foreach ($candidateMember in $candidateMembers)
+        ## Use getProperty because it's an api Object.
+        #if ("$!{candidateMember.getProperty('status').value}" == 'pending')
+          ## Remember the existing invitation.
+          #set ($existingInvitationOrRequest = $candidateMember)
+          ## Stop the search.
+          #break
+        #end
+      #end
+      #set ($membershipType = $wikiDescriptor.getObject('WorkspaceManager.WorkspaceClass').getProperty('membershipType').value)
       #set ($joinPageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'JoinWorkspaceCode'))
-      #set ($joinUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiPrettyName}"))
-      #set ($membershipType = $wikiDescriptor.getObject('WorkspaceManager.WorkspaceClass').getProperty('membershipType').getValue())
-      #if ($membershipType != 'invite')
-        &lt;span class='buttonwrapper'&gt;&lt;a href="$joinUrl" class='button'&gt;Join Workspace&lt;a/&gt;&lt;/span&gt;
+      #set ($joinText = $wikiDescriptor.display('membershipType', 'view'))
+      #set ($actionLabel = false)
+      #set ($actionUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}"))
+      #if ($existingInvitationOrRequest)
+        #if ("$!{existingInvitationOrRequest.getProperty('type').value}" == 'invitation')
+          #set ($joinText = 'You have been invited to join this workspace')
+          #set ($actionLabel = 'View Invitation')
+        #else
+          #set ($joinText = 'You have requested to join this workspace')
+          #set ($actionLabel = 'Cancel Request')
+          #set ($actionUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;cancelJoinRequest=1"))
+        #end
       #else
-        This workspace is invite only.
+        #if ($membershipType == 'request')
+          #set ($actionLabel = 'Request Join')
+        #elseif ($membershipType == 'open')
+          #set ($actionLabel = 'Join')
+        #end
+      #end
+      ## Display
+      $joinText\\
+      #if ($membershipType != 'invite' || "$!{existingInvitationOrRequest.getProperty('type').value}" == 'invitation')
+        &lt;span class='buttonwrapper'&gt;&lt;a href="$actionUrl" class='button'&gt;$actionLabel&lt;a/&gt;&lt;/span&gt;
       #end
     #elseif (!$hasOwner)
+      You are a member of this workspace\\
       #set ($leavePageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'LeaveWorkspaceCode'))
       #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiPrettyName}"))
       &lt;span class='buttonwrapper'&gt;&lt;a href="$leaveUrl" class='button'&gt;Leave Workspace&lt;a/&gt;&lt;/span&gt;
     #else
-      You are the owner.
+      You are the owner of this workspace\\
     #end
   #end
   ----
   *Members*\\
   #set ($workspaceGroupDocument = $workspace.groupDocument)
   #set ($workspaceGroupMemberObjects = $workspaceGroupDocument.getObjects('XWiki.XWikiGroups'))
-  #foreach($workspaceGroupMemberObject in $workspaceGroupMemberObjects)
-    #set ($user = $workspaceGroupDocument.getValue('member', $workspaceGroupMemberObject))
-    #if ("$!user" != '')
-      #if ("$!user" != 'XWiki.XWikiGuest')
-        &lt;a href="$xwiki.getURL($user)"&gt;#smallUserAvatar("$user")&lt;/a&gt;
+  #set ($totalNrOfUsers = $workspaceGroupMemberObjects.size())
+  #set ($MAX_USERS = 12)
+  #set ($nrOfUsersToGet = $MAX_USERS)
+  #if ($totalNrOfUsers &lt; $MAX_USERS)
+    #set ($nrOfUsersToGet = $totalNrOfUsers)
+  #end
+  #foreach ($i in [1..$nrOfUsersToGet])
+    #set ($randomMemberIndex = $mathtool.random(0, $workspaceGroupMemberObjects.size()))
+    #set ($randomMemberObject = $workspaceGroupMemberObjects.get($randomMemberIndex))
+    #set ($randomMember = "$!{randomMemberObject.getProperty('member').value}")
+    #if ("$!randomMember" != '')
+      #if ("$!randomMember" != 'XWiki.XWikiGuest')
+        &lt;a href="$xwiki.getURL($randomMember)"&gt;#smallUserAvatar($randomMember)&lt;/a&gt;
       #else
-        #smallUserAvatar("$user")
-      #end  
+        #smallUserAvatar($randomMember)
+      #end
     #end
+    ## Avoid repeating the same user.
+    #set ($discard = $workspaceGroupMemberObjects.remove($randomMemberIndex))
   #end
 #end
 #panelfooter()</content>

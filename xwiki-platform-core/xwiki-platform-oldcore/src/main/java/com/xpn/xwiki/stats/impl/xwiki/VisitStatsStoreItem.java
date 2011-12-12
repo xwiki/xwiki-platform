@@ -101,7 +101,7 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
             // TODO Fix use of deprecated call.
             store.saveXWikiCollection(newVisitStats, this.context, true);
         } catch (XWikiException e) {
-            LOGGER.error("Failed to save visit statictics object [{}]", getId(), e);
+            LOGGER.error("Failed to save visit statistics object [{}]", getId(), e);
         }
     }
 }

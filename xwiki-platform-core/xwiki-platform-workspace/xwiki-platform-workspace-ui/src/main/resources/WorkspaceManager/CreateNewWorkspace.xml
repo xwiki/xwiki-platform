@@ -335,6 +335,8 @@ function prettyNameChanged()
 ##
 #set($members = [])
 #getRequestList($members 'members')
+## Remove any duplicate members (like the owner in some cases).
+#set ($discard = $members.remove($wikidocument.owner))
 #############################################################################
 ##
 #if ($action &amp;&amp; $action == "create")

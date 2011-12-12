@@ -73,6 +73,14 @@ public class DocumentImporterHandler extends DocumentHandler
         return this.mergeResult;
     }
 
+    private void saveDocument(XWikiDocument document, String comment, XWikiContext context) throws XWikiException
+    {
+        document.setAuthorReference(context.getUserReference());
+        document.setContentAuthorReference(context.getUserReference());
+
+        context.getWiki().saveDocument(document, comment, context);
+    }
+
     private void saveDocument(String comment) throws SAXException
     {
         try {
@@ -83,27 +91,25 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiDocument previousDocument = getPreviousDocument();
 
             // Merge and save
-            if (previousDocument != null && !dbDocument.isNew()) {
-                MergeResult documentMergeResult =
-                    dbDocument.merge(previousDocument, document, this.mergeConfiguration, context);
-                if (documentMergeResult.isModified()) {
-                    context.getWiki().saveDocument(dbDocument, comment, context);
-                }
-                this.mergeResult =
-                    new XarEntryMergeResult(new XarEntry(dbDocument.getDocumentReference(), dbDocument.getLanguage()),
-                        documentMergeResult);
-            } else {
-                // Set proper version
-                document.setAuthorReference(context.getUserReference());
-                document.setContentAuthorReference(context.getUserReference());
-                if (!dbDocument.isNew()) {
-                    document.setCreatorReference(dbDocument.getCreatorReference());
-                    document.setVersion(dbDocument.getVersion());
+            if (!dbDocument.isNew()) {
+                if (previousDocument != null) {
+                    MergeResult documentMergeResult =
+                        dbDocument.merge(previousDocument, document, this.mergeConfiguration, context);
+                    if (documentMergeResult.isModified()) {
+                        saveDocument(dbDocument, comment, context);
+                    }
+                    this.mergeResult =
+                        new XarEntryMergeResult(new XarEntry(dbDocument.getDocumentReference(),
+                            dbDocument.getLanguage()), documentMergeResult);
                 } else {
-                    document.setCreatorReference(context.getUserReference());
+                    if (dbDocument.apply(document)) {
+                        saveDocument(dbDocument, comment, context);
+                    }
                 }
+            } else {
+                document.setCreatorReference(context.getUserReference());
 
-                context.getWiki().saveDocument(document, comment, context);
+                saveDocument(document, comment, context);
             }
         } catch (Exception e) {
             throw new SAXException("Failed to save document", e);

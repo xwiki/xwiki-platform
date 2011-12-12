@@ -20,6 +20,7 @@
 
 package org.xwiki.extension.xar;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,10 +42,13 @@ import org.xwiki.extension.xar.internal.repository.XarLocalExtension;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
@@ -67,7 +71,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     private LocalExtensionRepository localExtensionRepository;
 
     private Map<String, BaseClass> classes = new HashMap<String, BaseClass>();
-    
+
     private DocumentReference contextUser;
 
     @Before
@@ -172,18 +176,21 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                         return classes.get(documentReference.getName());
                     }
                 });
-                
+
                 allowing(mockXWiki).isVirtualMode();
                 will(returnValue(true));
             }
         });
-        
+
         getContext().setUserReference(this.contextUser);
 
         // lookup
 
         this.taskManager = getComponentManager().lookup(JobManager.class);
         this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class, "xar");
+        
+        // Get rid of wiki macro listener
+        getComponentManager().lookup(ObservationManager.class).removeListener("RegisterMacrosOnImportListener");
     }
 
     private XarLocalExtension install(ExtensionId extensionId, String namespace) throws Throwable
@@ -217,19 +224,33 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     @Test
     public void testInstall() throws Throwable
     {
+        XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        existingDocument.setDefaultLanguage("en");
+        existingDocument.setTranslation(0);
+        existingDocument.setNew(false);
+        existingDocument.setVersion("1.1");
+        BaseObject object = new BaseObject();
+        object.setXClassReference(new DocumentReference("wiki", "space", "object"));
+        existingDocument.addXObject(object);
+        Map<String, XWikiDocument> documentMap = new HashMap<String, XWikiDocument>();
+        documentMap.put(existingDocument.getRealLanguage(), existingDocument);
+        this.documents.put(existingDocument.getDocumentReference(), documentMap);
+
         // install
 
         install(this.localXarExtensiontId1, "wiki");
 
         // validate
 
-        XWikiDocument page = this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
+        XWikiDocument page = this.mockXWiki.getDocument(existingDocument.getDocumentReference(), getContext());
 
         Assert.assertFalse("Document wiki.space.page has not been saved in the database", page.isNew());
 
+        Assert.assertNull(page.getXObject(object.getXClassReference()));
+
         Assert.assertEquals("Wrong content", "content", page.getContent());
         Assert.assertEquals("Wrong author", this.contextUser, page.getAuthorReference());
-        Assert.assertEquals("Wrong versions", "1.1", page.getVersion());
+        Assert.assertEquals("Wrong versions", "2.1", page.getVersion());
 
         BaseClass baseClass = page.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));

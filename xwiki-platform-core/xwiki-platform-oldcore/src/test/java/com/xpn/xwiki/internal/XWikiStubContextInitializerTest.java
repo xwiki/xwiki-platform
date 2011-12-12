@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.internal;
 
+import org.jmock.Mock;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -37,6 +38,8 @@ public class XWikiStubContextInitializerTest extends AbstractBridgedXWikiCompone
 {
     private ExecutionContextManager executionContextManager;
 
+    private Mock mockXWiki;
+
     @Override
     protected void setUp() throws Exception
     {
@@ -49,7 +52,11 @@ public class XWikiStubContextInitializerTest extends AbstractBridgedXWikiCompone
     {
         XWikiContext xcontext = new XWikiContext();
         xcontext.put("key", "value");
-        xcontext.setWiki(new XWiki());
+
+        this.mockXWiki = mock(XWiki.class);
+        this.mockXWiki.stubs().method("prepareResources");
+
+        xcontext.setWiki((XWiki) this.mockXWiki.proxy());
 
         ExecutionContext context = new ExecutionContext();
         context.setProperty("xwikicontext", xcontext);

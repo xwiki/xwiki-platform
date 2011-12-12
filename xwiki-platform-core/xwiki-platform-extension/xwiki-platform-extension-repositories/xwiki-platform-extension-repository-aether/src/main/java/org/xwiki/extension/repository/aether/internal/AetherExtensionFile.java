@@ -28,6 +28,7 @@ import java.io.InputStream;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.aether.RepositorySystem;
+import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
@@ -96,7 +97,9 @@ public class AetherExtensionFile implements ExtensionFile
 
         ArtifactResult artifactResult;
         try {
-            artifactResult = repositorySystem.resolveArtifact(this.repository.getSession(), artifactRequest);
+            RepositorySystemSession session = this.repository.createRepositorySystemSession();
+
+            artifactResult = repositorySystem.resolveArtifact(session, artifactRequest);
         } catch (ArtifactResolutionException e) {
             throw new IOException("Failed to resolve artifact", e);
         }

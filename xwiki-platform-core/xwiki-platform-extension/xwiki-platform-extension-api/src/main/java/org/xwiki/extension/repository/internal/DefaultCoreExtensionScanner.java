@@ -181,19 +181,17 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
                             mavenModel, true)));
                     }
 
-                    if (mavenDependency.getGroupId().equals("$    mavenDepe     }
-              u            mavenDepe     }
-              ull) {
+                    if (mavenDependency.getGroupId().equals("${project.groupId}")) {
+                        mavenDependency.setGroupId(groupId);
                     }
-              ull) {
-              N);
-       sion() == null) {
-              N);
-                    } else ision(UNKNOWN);
+
+                    if (mavenDependency.getVersion() == null) {
+                        mavenDependency.setVersion(UNKNOWN);
                     } else if (mavenDependency.getVersion().equals("${project.version}")
                         || mavenDependency.getVersion().equals("${pom.version}")) {
                         mavenDependency.setVersion(version);
                     }
+
                     dependencies.add(mavenDependency);
                 }
 

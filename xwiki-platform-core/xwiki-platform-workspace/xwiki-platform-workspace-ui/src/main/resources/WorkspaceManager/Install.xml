@@ -110,7 +110,7 @@
 #if ("$!template" == '')
   #if ($hasGlobalAdmin)
     #if ($xcontext.doc.getAttachment($TEMPLATE_PACKAGE))
-      #if ($request.confirmTemplateInstall == '1')
+      #if ("$!request.confirmTemplateInstall" == '1')
         #set ($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, 'Workspace Template', $TEMPLATE_PACKAGE))
         #if ($result == $Exception.ERROR_NOERROR)
           ## Use a redirect so that the page can be refreshed after the form's POST.
@@ -129,10 +129,14 @@
           Workspace template is not yet installed. Install the workspace template now?
 
           {{html}}
-          &lt;form method='POST'&gt;
-            &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
-            &lt;input type='hidden' name='confirmTemplateInstall' value='1' /&gt;
-            &lt;input type='submit' value='Install' class='button' /&gt;
+          &lt;form method='post' action="$doc.getURL()"&gt;
+            &lt;div&gt;
+              &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
+              &lt;input type='hidden' name='confirmTemplateInstall' value='1' /&gt;
+              &lt;span class='buttonwrapper'&gt;
+                &lt;input type='submit' value='Install' class='button' /&gt;
+              &lt;/span&gt;
+            &lt;/div&gt;
           &lt;/form&gt;
           {{/html}}
         {{/warning}}

@@ -57,11 +57,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.internal.event.XARImportedEvent;
+import com.xpn.xwiki.internal.event.XARImportingEvent;
 
 /**
  * Default implementation of {@link Packager}.
@@ -87,6 +90,9 @@ public class DefaultPackager implements Packager, Initializable
      */
     @Inject
     private Logger logger;
+
+    @Inject
+    private ObservationManager observation;
 
     private SAXParserFactory parserFactory;
 
@@ -137,26 +143,39 @@ public class DefaultPackager implements Packager, Initializable
 
         ZipInputStream zis = new ZipInputStream(xarInputStream);
 
-        for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
-            if (!entry.isDirectory()) {
-                try {
-                    DocumentImporterHandler documentHandler =
-                        new DocumentImporterHandler(this, this.componentManager, wiki);
-                    documentHandler.setPreviousXarFile(previousXarFile);
-                    documentHandler.setMergeConfiguration(mergeConfiguration);
+        XWikiContext xcontext = getXWikiContext();
 
-                    parseDocument(zis, documentHandler);
+        String currentWiki = xcontext.getDatabase();
+        try {
+            xcontext.setDatabase(wiki);
 
-                    if (documentHandler.getMergeResult() != null) {
-                        mergeResult.addMergeResult(documentHandler.getMergeResult());
+            this.observation.notify(new XARImportingEvent(), null, xcontext);
+
+            for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
+                if (!entry.isDirectory()) {
+                    try {
+                        DocumentImporterHandler documentHandler =
+                            new DocumentImporterHandler(this, this.componentManager, wiki);
+                        documentHandler.setPreviousXarFile(previousXarFile);
+                        documentHandler.setMergeConfiguration(mergeConfiguration);
+
+                        parseDocument(zis, documentHandler);
+
+                        if (documentHandler.getMergeResult() != null) {
+                            mergeResult.addMergeResult(documentHandler.getMergeResult());
+                        }
+                    } catch (NotADocumentException e) {
+                        // Impossible to know that before parsing
+                        this.logger.debug("Entry [" + entry + "] is not a document", e);
+                    } catch (Exception e) {
+                        this.logger.error("Failed to parse document [" + entry.getName() + "]", e);
                     }
-                } catch (NotADocumentException e) {
-                    // Impossible to know that before parsing
-                    this.logger.debug("Entry [" + entry + "] is not a document", e);
-                } catch (Exception e) {
-                    this.logger.error("Failed to parse document [" + entry.getName() + "]", e);
                 }
             }
+        } finally {
+            this.observation.notify(new XARImportedEvent(), null, xcontext);
+
+            xcontext.setDatabase(currentWiki);
         }
 
         return mergeResult;

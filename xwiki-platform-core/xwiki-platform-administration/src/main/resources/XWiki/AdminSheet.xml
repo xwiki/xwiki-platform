@@ -3410,8 +3410,10 @@ document.observe('xwiki:dom:loaded', function() {
   $xwiki.ssx.use('XWiki.AdminSheet')##
   #if ($crtSectionId != '' &amp;&amp; $crtSectionId.indexOf('.') &gt; 0)
     #set ($sectionName = $xwiki.getDocument($crtSectionId).getDisplayTitle())
-  #elseif ($crtSectionId != '')
+  #elseif ($crtSectionId != '' &amp;&amp; $msg.get("admin.${crtSectionId.toLowerCase()}") != "admin.${crtSectionId.toLowerCase()}")
     #set ($sectionName = $msg.get("admin.${crtSectionId.toLowerCase()}"))
+  #elseif ($crtSectionId != '')
+    #set ($sectionName = $crtSectionId)
   #elseif ($crtCategoryId != '')
     #set ($sectionName = $msg.get("admin.${crtItemId}"))
   #elseif ($editor == 'globaladmin')

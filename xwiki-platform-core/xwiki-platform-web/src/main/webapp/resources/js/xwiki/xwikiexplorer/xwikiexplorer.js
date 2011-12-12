@@ -513,6 +513,14 @@ isc.XWEDataSource.addMethods({
     transformRequest : function(dsRequest) {
         if (dsRequest.originalData) {
             dsRequest.originalData.r = "" + Math.floor(Math.random() * 1000000);
+            // We override ISC default Accept headers because we are hitting this bug in Restlet
+            // JAX-RS extension : http://restlet.tigris.org/issues/show_bug.cgi?id=730
+            // Precisely, the default ISC DataSource AJAX request sends the following accept header :
+            // text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8,application/rdf+xml;q=0.93,text/rdf+n3;q=0.5
+            // And Restlet chokes with "No message body writer found" while it has all the info necessary to use the XML writer.
+            // FIXME Remove this when the issue is fixed upstream in restlet JAX-RS or when we switch to another
+            // JAX-RS implementation.
+            dsRequest.httpHeaders = { "Accept" : "application/xml" };
         }
         return dsRequest.data;
     },

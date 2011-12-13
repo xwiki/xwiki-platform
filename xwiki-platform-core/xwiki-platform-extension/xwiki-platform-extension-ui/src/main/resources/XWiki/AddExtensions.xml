@@ -285,7 +285,7 @@ bOgK9Cz44w32Cfjt5Xb7Qse/TsjlX79O6AT0E/p/8v1MS0rb84IAAAAASUVORK5CYII=
   &lt;form action="$escapetool.xml($doc.getURL($xcontext.action, $request.getQueryString()))" method="post" class="xform"&gt;
     &lt;fieldset id="advancedextensionsearch"&gt;
       &lt;div id="advancedextensionsearch-body"&gt;&lt;/div&gt;
-      &lt;legend&gt;&lt;a href="#advancedextensionsearch-body"&gt;Advanced search&lt;/a&gt;&lt;/legend&gt;
+      &lt;legend&gt;&lt;a href="#advancedextensionsearch-body"&gt;Advanced install&lt;/a&gt;&lt;/legend&gt;
       &lt;div class="half"&gt;
         &lt;input type="hidden" name="xback" value="$escapetool.xml($doc.getURL($xcontext.action, $request.queryString))" /&gt;
         &lt;dl&gt;

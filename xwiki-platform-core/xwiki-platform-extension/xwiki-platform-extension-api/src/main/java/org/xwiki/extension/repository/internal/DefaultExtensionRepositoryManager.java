@@ -122,7 +122,7 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
             } catch (ResolveException e) {
                 if (this.logger.isDebugEnabled()) {
                     this.logger.debug("Could not find extension [{}] in repository [{}]", new Object[] {extensionId,
-                        repository.getId(), e});
+                            repository.getId(), e});
                 }
             }
         }
@@ -165,17 +165,19 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
             try {
                 searchResult = search(repository, pattern, currentOffset, currentNb, searchResult);
 
-                if (currentOffset > 0) {
-                    currentOffset = offset - searchResult.getTotalHits();
-                    if (currentOffset < 0) {
-                        currentOffset = 0;
+                if (searchResult != null) {
+                    if (currentOffset > 0) {
+                        currentOffset = offset - searchResult.getTotalHits();
+                        if (currentOffset < 0) {
+                            currentOffset = 0;
+                        }
                     }
-                }
 
-                if (currentNb > 0) {
-                    currentNb = nb - searchResult.getSize();
-                    if (currentNb < 0) {
-                        currentNb = 0;
+                    if (currentNb > 0) {
+                        currentNb = nb - searchResult.getSize();
+                        if (currentNb < 0) {
+                            currentNb = 0;
+                        }
                     }
                 }
             } catch (SearchException e) {

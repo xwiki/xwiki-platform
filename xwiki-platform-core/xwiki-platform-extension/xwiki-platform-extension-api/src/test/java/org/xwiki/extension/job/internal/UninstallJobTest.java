@@ -22,11 +22,14 @@ package org.xwiki.extension.job.internal;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.ExtensionHandler;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.test.AbstractExtensionHandlerTest;
+import org.xwiki.extension.test.ConfigurableDefaultCoreExtensionRepository;
 import org.xwiki.extension.test.TestExtensionHandler;
 
 public class UninstallJobTest extends AbstractExtensionHandlerTest
@@ -40,6 +43,8 @@ public class UninstallJobTest extends AbstractExtensionHandlerTest
     private LocalExtension existingExtensionDependency;
 
     private TestExtensionHandler handler;
+
+    private ConfigurableDefaultCoreExtensionRepository coreRepository;
 
     @Override
     public void setUp() throws Exception
@@ -60,6 +65,15 @@ public class UninstallJobTest extends AbstractExtensionHandlerTest
             (LocalExtension) this.localExtensionRepository.resolve(this.existingExtensionDependencyId);
     }
 
+    @Override
+    protected void beforeRepositoryUtil() throws Exception
+    {
+        // repositoryUtil lookup the local repository and one of the local extension require a core extension
+        this.coreRepository =
+            (ConfigurableDefaultCoreExtensionRepository) getComponentManager().lookup(CoreExtensionRepository.class);
+        this.coreRepository.addExtensions("coreextension", "version");
+    }
+    
     @Test
     public void testUninstall() throws Throwable
     {

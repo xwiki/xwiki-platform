@@ -47,6 +47,8 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
     {
         super.setUp();
 
+        beforeRepositoryUtil();
+
         this.repositoryUtil =
             new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());
         this.repositoryUtil.setup();
@@ -55,6 +57,11 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
 
         this.jobManager = getComponentManager().lookup(JobManager.class);
         this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class);
+    }
+
+    protected void beforeRepositoryUtil() throws Exception
+    {
+
     }
 
     @Override

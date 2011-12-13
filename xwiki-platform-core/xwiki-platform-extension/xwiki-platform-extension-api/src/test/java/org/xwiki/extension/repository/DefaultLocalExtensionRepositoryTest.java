@@ -68,7 +68,6 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
         this.coreRepository =
             (ConfigurableDefaultCoreExtensionRepository) getComponentManager().lookup(CoreExtensionRepository.class);
         this.coreRepository.addExtensions("coreextension", "version");
-
         
         this.repositoryUtil =
             new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());

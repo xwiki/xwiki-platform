@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.HashMap;
 
 import org.junit.Test;
+import org.xwiki.component.internal.StackingComponentEventManager;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
@@ -36,6 +37,7 @@ import org.xwiki.extension.test.AbstractExtensionHandlerTest;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationManager;
 
 import junit.framework.Assert;
 import packagefile.jarextension.DefaultTestComponent;
@@ -81,6 +83,13 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
         this.jarExtensionClassLoader = getComponentManager().lookup(JarExtensionClassLoader.class);
         this.modelContext = getComponentManager().lookup(ModelContext.class);
         this.execution = getComponentManager().lookup(Execution.class);
+
+        // Make sure to fully enable ObservationManager to test EventListener live registration
+        ObservationManager manager = getComponentManager().lookup(ObservationManager.class);
+        StackingComponentEventManager componentEventManager = new StackingComponentEventManager();
+        componentEventManager.shouldStack(false);
+        componentEventManager.setObservationManager(manager);
+        getComponentManager().setComponentEventManager(componentEventManager);
     }
 
     /**

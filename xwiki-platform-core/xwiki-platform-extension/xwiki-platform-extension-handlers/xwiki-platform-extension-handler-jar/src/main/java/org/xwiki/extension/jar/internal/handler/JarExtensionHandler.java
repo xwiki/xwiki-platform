@@ -35,7 +35,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.annotation.ComponentDeclaration;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.internal.StackingComponentEventManager;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
+import org.xwiki.component.manager.ComponentEventManager;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.ExtensionException;
@@ -117,8 +120,30 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
                 return;
             }
 
-            this.jarLoader.initialize(this.componentManagerManager.getComponentManager(namespace, true), classLoader,
-                componentDeclarations);
+            ComponentManager componentManager = this.componentManagerManager.getComponentManager(namespace, true);
+
+            ComponentEventManager componentEventManager = componentManager.getComponentEventManager();
+
+            // Make sure to send events only when the extension is fully ready
+            StackingComponentEventManager stackingComponentEventManager = null;
+            try {
+                if (componentEventManager instanceof StackingComponentEventManager) {
+                    stackingComponentEventManager = (StackingComponentEventManager) componentEventManager;
+                } else {
+                    stackingComponentEventManager = new StackingComponentEventManager();
+                    componentManager.setComponentEventManager(stackingComponentEventManager);
+                }
+
+                this.jarLoader.initialize(componentManager, classLoader, componentDeclarations);
+            } finally {
+                if (stackingComponentEventManager != null) {
+                    if (componentEventManager != stackingComponentEventManager) {
+                        componentManager.setComponentEventManager(componentEventManager);
+                    }
+                    stackingComponentEventManager.shouldStack(false);
+                    stackingComponentEventManager.flushEvents();
+                }
+            }
         } catch (Exception e) {
             throw new InstallException("Failed to load jar file components", e);
         }

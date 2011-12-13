@@ -5299,6 +5299,16 @@ public class XWikiDocument implements DocumentModelBridge
         return getTranslatedDocument(language, context);
     }
 
+    /**
+     * Return the document in the provided language.
+     * <p>
+     * This method return this if the provided language does not exists. See 
+     * 
+     * @param language the language of the documetn to return
+     * @param context the XWiki Context
+     * @return the document in the provided language or this if the provided language does not exists
+     * @throws XWikiException error when loading the document
+     */
     public XWikiDocument getTranslatedDocument(String language, XWikiContext context) throws XWikiException
     {
         XWikiDocument tdoc = this;

@@ -64,6 +64,12 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     {
         super.setUp();
 
+        // repositoryUtil lookup the local repository and one of the local extension require a core extension
+        this.coreRepository =
+            (ConfigurableDefaultCoreExtensionRepository) getComponentManager().lookup(CoreExtensionRepository.class);
+        this.coreRepository.addExtensions("coreextension", "version");
+
+        
         this.repositoryUtil =
             new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());
         this.repositoryUtil.setup();
@@ -71,9 +77,8 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
         // lookup
 
         this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class);
+
         this.repositoryManager = getComponentManager().lookup(ExtensionRepositoryManager.class);
-        this.coreRepository =
-            (ConfigurableDefaultCoreExtensionRepository) getComponentManager().lookup(CoreExtensionRepository.class);
 
         // resources
 
@@ -174,8 +179,6 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
         Assert.assertFalse(localExtension.isInstalled());
 
         // install
-
-        this.coreRepository.addExtensions("coreextension", "version");
 
         this.localExtensionRepository.installExtension(localExtension, null, false);
 

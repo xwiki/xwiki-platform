@@ -52,6 +52,10 @@ import org.xwiki.script.service.ScriptService;
 
 /**
  * Entry point of extension manager from scripts.
+ * <p>
+ * Namespaces are ways to isolate extensions in a particular context, they are generally prefixed with the type of
+ * context. For example to install an extension in a namespace linked to a particular wiki the namespace is prefixed
+ * with <code>wiki:</code> which gives for the wiki <code>wiki1</code>: <code>wiki:wiki1</code>.
  * 
  * @version $Id$
  */

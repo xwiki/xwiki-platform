@@ -1288,7 +1288,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #end
 
 #macro (printJobLog $job)
-  #foreach ($log in $installJob.status.log)
+  #foreach ($log in $job.status.log)
     #set ($logLevel = $log.level.toString().toLowerCase())
     {{$logLevel}}
       $log.formattedMessage

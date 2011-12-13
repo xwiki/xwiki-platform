@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -91,7 +92,7 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiDocument previousDocument = getPreviousDocument();
 
             // Merge and save
-            if (!dbDocument.isNew()) {
+            if (dbDocument != null && !dbDocument.isNew()) {
                 if (previousDocument != null) {
                     MergeResult documentMergeResult =
                         dbDocument.merge(previousDocument, document, this.mergeConfiguration, context);
@@ -122,7 +123,20 @@ public class DocumentImporterHandler extends DocumentHandler
         XWikiDocument document = getDocument();
 
         XWikiDocument existingDocument = context.getWiki().getDocument(document.getDocumentReference(), context);
-        existingDocument = existingDocument.getTranslatedDocument(document.getLanguage(), context);
+
+        if (StringUtils.isNotEmpty(document.getLanguage())) {
+            String defaultLanguage = existingDocument.getDefaultLanguage();
+            XWikiDocument translatedDocument = existingDocument.getTranslatedDocument(document.getLanguage(), context);
+
+            if (translatedDocument == existingDocument) {
+                translatedDocument = new XWikiDocument(document.getDocumentReference());
+                translatedDocument.setDefaultLanguage(defaultLanguage);
+                translatedDocument.setTranslation(1);
+                translatedDocument.setLanguage(document.getLanguage());
+            }
+
+            existingDocument = translatedDocument;
+        }
 
         return existingDocument;
     }

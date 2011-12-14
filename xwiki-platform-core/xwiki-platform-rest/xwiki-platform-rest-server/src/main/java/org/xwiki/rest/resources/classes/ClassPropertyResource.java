@@ -78,7 +78,7 @@ public class ClassPropertyResource extends XWikiResource
             throw new WebApplicationException(Status.NOT_FOUND);
 
         } finally {
-            Utils.getXWiki(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
     }
 }

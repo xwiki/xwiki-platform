@@ -20,13 +20,11 @@
  */
 package org.xwiki.security.internal;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
+import java.util.Iterator;
 
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.Right;
 
-import java.util.Iterator;
+import com.xpn.xwiki.objects.BaseObject;
 
 public class MockObject extends BaseObject
 {
@@ -91,6 +89,7 @@ public class MockObject extends BaseObject
     private static void fillOut(MockObject o, final Iterable<Right> levels, Iterable<String> users, Iterable<String> groups)
     {
         o.levels = join(new Iterable<String>() {
+                @Override
                 public Iterator<String> iterator()
                 {
                     return new Iterator<String>() {

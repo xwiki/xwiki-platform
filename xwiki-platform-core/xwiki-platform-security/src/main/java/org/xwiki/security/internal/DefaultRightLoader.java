@@ -22,30 +22,32 @@
  */
 package org.xwiki.security.internal;
 
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.DocumentReference;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
-
-import org.xwiki.security.RightLoader;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.security.AccessLevel;
+import org.xwiki.security.ConflictingInsertionException;
+import org.xwiki.security.EntityTypeNotSupportedException;
+import org.xwiki.security.ParentEntryEvictedException;
 import org.xwiki.security.RightCache;
 import org.xwiki.security.RightCacheEntry;
 import org.xwiki.security.RightCacheKey;
+import org.xwiki.security.RightLoader;
 import org.xwiki.security.RightResolver;
-import org.xwiki.security.ParentEntryEvictedException;
-import org.xwiki.security.ConflictingInsertionException;
-import org.xwiki.security.EntityTypeNotSupportedException;
 import org.xwiki.security.RightServiceException;
 import org.xwiki.security.RightsObject;
 import org.xwiki.security.RightsObjectFactory;
-import org.xwiki.security.AccessLevel;
-
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Collection;
 
 /**
  * The default implementation for the right loader.
@@ -53,29 +55,39 @@ import java.util.Collection;
  * @version $Id$
  */
 @Component
-public class DefaultRightLoader extends AbstractLogEnabled implements RightLoader
+@Singleton
+public class DefaultRightLoader implements RightLoader
 {
     /** Maximum number of attempts at loading an entry. */
     private static final int MAX_RETRIES = 5;
 
+    /** Logger. **/
+    @Inject
+    private Logger logger;
+
     /** Resolver for the user, group and rights objects. */
-    @Requirement("priority") private RightResolver rightResolver;
+    @Inject
+    @Named("priority")
+    private RightResolver rightResolver;
 
     /** The right cache. */
-    @Requirement private RightCache rightCache;
+    @Inject
+    private RightCache rightCache;
 
     /** Event listener responsible for invalidating cache entries. */
-    @Requirement private RightCacheInvalidator rightCacheInvalidator;
+    @Inject
+    private RightCacheInvalidator rightCacheInvalidator;
 
     /** Factory object for producing RightsObject instances from the corresponding xwiki rights objects. */
-    @Requirement private RightsObjectFactory rightsObjectFactory;
+    @Inject
+    private RightsObjectFactory rightsObjectFactory;
 
     @Override
     public AccessLevel load(DocumentReference user, EntityReference entity)
         throws RightServiceException
     {
         int retries = 0;
-    RETRY: 
+
         while (true) {
             rightCacheInvalidator.suspend();
 
@@ -84,22 +96,22 @@ public class DefaultRightLoader extends AbstractLogEnabled implements RightLoade
                 return loadRequiredEntries(user, entity);
             } catch (ParentEntryEvictedException e) {
                 if (retries < MAX_RETRIES) {
-                    getLogger().debug("The parent entry was evicted. Have tried " 
+                    this.logger.debug("The parent entry was evicted. Have tried " 
                                       + retries
                                       + " times.  Trying again...");
-                    continue RETRY;
+                    continue;
                 }
             } catch (ConflictingInsertionException e) {
                 if (retries < MAX_RETRIES) {
-                    getLogger().debug("There were conflicting insertions.  Have tried "
+                    this.logger.debug("There were conflicting insertions.  Have tried "
                                       + retries
                                       + " times.  Retrying...");
-                    continue RETRY;
+                    continue;
                 }
             } finally {
                 rightCacheInvalidator.resume();
             }
-            getLogger().error("Failed to load the cache in "
+            this.logger.error("Failed to load the cache in "
                               + retries
                               + " attempts.  Giving up.");
             throw new RightServiceException();
@@ -108,7 +120,7 @@ public class DefaultRightLoader extends AbstractLogEnabled implements RightLoade
 
     /**
      * @param user The user identity.
-     * @param entity The entity that is the object of thi rihghts check.
+     * @param entity The entity that is the object of thi rights check.
      * @return The resulting access level for the user at the entity.
      * @throws ParentEntryEvictedException If one of the parent
      * entries are evicted before the load is completed.
@@ -154,22 +166,17 @@ public class DefaultRightLoader extends AbstractLogEnabled implements RightLoade
     private AccessLevel loadUserAtEntity(DocumentReference user, EntityReference entity)
         throws ParentEntryEvictedException, ConflictingInsertionException, RightServiceException
     {
-        /*
-         * Make sure the group entries are loaded
-         */
+        // Make sure the group entries are loaded
         Collection<DocumentReference> groups = loadGroupEntries(user);
-        EntityReference userParent = user.getParent().clone();
-        userParent.setChild(null);
-        /*
-         * Make sure the parent of the user document is loaded.
-         */
+        EntityReference userParent = user.getParent();
+
+        // Make sure the parent of the user document is loaded.
         RightCacheKey userParentKey = rightCache.getRightCacheKey(userParent);
         getRightsObjects(userParentKey, userParent);
-        /*
-         * Parent entries of the user entry are group entries in
-         * addition to the space entry of the user page.
-         */
-        Collection<RightCacheKey> parents = new LinkedList();
+
+        // Parent entries of the user entry are group entries in
+        // addition to the space entry of the user page.
+        Collection<RightCacheKey> parents = new LinkedList<RightCacheKey>();
         parents.add(userParentKey);
         for (DocumentReference group : groups) {
             parents.add(rightCache.getRightCacheKey(group));
@@ -184,7 +191,7 @@ public class DefaultRightLoader extends AbstractLogEnabled implements RightLoade
             = getRightsObjects(entityKey, entity);
 
         AccessLevel accessLevel = rightResolver.resolve(user, entity, entityKey, groups, rightsObjects);
-        getLogger().debug("Adding "
+        this.logger.debug("Adding "
                           + userKey.getEntityReference() + "@"
                           + entityKey.getEntityReference() + ": "
                           + accessLevel);
@@ -208,11 +215,9 @@ public class DefaultRightLoader extends AbstractLogEnabled implements RightLoade
         Collection<DocumentReference> groups = XWikiUtils.getGroupsForUser(user);
                                               
         for (DocumentReference group : groups) {
-            EntityReference parent = group.getParent().clone();
-            parent.setChild(null);
-            /*
-             * Make sure the parent entries of the group is cached.
-             */
+            EntityReference parent = group.getParent();
+
+            // Make sure the parent entries of the group is cached.
             getRightsObjects(rightCache.getRightCacheKey(parent), parent);
 
             RightCacheKey groupKey = rightCache.getRightCacheKey(group);
@@ -246,10 +251,10 @@ public class DefaultRightLoader extends AbstractLogEnabled implements RightLoade
     private List<Collection<RightsObject>> getRightsObjects(RightCacheKey entityKey, EntityReference entity)
         throws RightServiceException, ParentEntryEvictedException, ConflictingInsertionException
     {
-        List<Collection<RightsObject>> rightsObjects = new LinkedList();
+        List<Collection<RightsObject>> rightsObjects = new LinkedList<Collection<RightsObject>>();
         EntityReference hierarchy = entityKey.getEntityReference();
-        for (EntityReference ref = hierarchy.getRoot(); ref != null; ref = ref.getChild()) {
-            Collection<RightsObject> thisLevel = new LinkedList();
+        for (EntityReference ref : hierarchy.getReversedReferenceChain()) {
+            Collection<RightsObject> thisLevel = new LinkedList<RightsObject>();
             rightsObjects.add(thisLevel);
             RightCacheEntry entry = rightCache.get(rightCache.getRightCacheKey(ref));
             if (entry == null) {
@@ -271,7 +276,7 @@ public class DefaultRightLoader extends AbstractLogEnabled implements RightLoade
                     String message = "There is an entry of type "
                         + ref.getType()
                         + " in the right cache!";
-                    getLogger().error(message);
+                    this.logger.error(message);
                     throw new RightServiceException(message);
             }
         }
@@ -280,31 +285,31 @@ public class DefaultRightLoader extends AbstractLogEnabled implements RightLoade
 
     /**
      * Load the global rights object of a wiki or space.
-     * @param entity Either a document, space or wiki entity referenced.
+     * @param entityKey Either a document, space or wiki entity referenced.
      * @return the right cache entry that should be loaded into the cache.
      * @throws RightServiceException On error.
      */
-    private RightCacheEntry loadRightsObjects(EntityReference entity)
+    private RightCacheEntry loadRightsObjects(EntityReference entityKey)
         throws RightServiceException
     {
+        EntityReference entity = entityKey;
         DocumentReference docRef;
         boolean global;
+
+        if (entity.getRoot().getName().equals(XWikiUtils.getMainWiki())) {
+            List<EntityReference> chain = entity.getReversedReferenceChain();
+            if (chain.size() > 1 && chain.get(1).getType() == EntityType.WIKI) {
+                entity = entity.replaceParent(entity.getRoot(), null);
+            }
+        }
+
         switch (entity.getType()) {
-            case SPACE:
-                EntityReference spaceDoc = new EntityReference(XWikiUtils.SPACE_DOC,
-                                                               EntityType.DOCUMENT,
-                                                               entity.clone());
-                docRef = new DocumentReference(spaceDoc);
+            case WIKI:
+                docRef = new DocumentReference(entity.getName(), XWikiUtils.WIKI_SPACE, XWikiUtils.WIKI_DOC);
                 global = true;
                 break;
-            case WIKI:
-                EntityReference space = new EntityReference(XWikiUtils.WIKI_SPACE,
-                                                            EntityType.SPACE,
-                                                            entity.clone());
-                EntityReference wikiDoc = new EntityReference(XWikiUtils.WIKI_DOC,
-                                                              EntityType.DOCUMENT,
-                                                              space);
-                docRef = new DocumentReference(wikiDoc);
+            case SPACE:
+                docRef = new DocumentReference(XWikiUtils.SPACE_DOC, new SpaceReference(entity));
                 global = true;
                 break;
             case DOCUMENT:
@@ -312,7 +317,7 @@ public class DefaultRightLoader extends AbstractLogEnabled implements RightLoade
                 global = false;
                 break;
             default:
-                getLogger().error("Rights on entities of type "
+                this.logger.error("Rights on entities of type "
                                   + entity.getType()
                                   + " is not supported by this loader!");
                 throw new EntityTypeNotSupportedException(entity.getType(), this);

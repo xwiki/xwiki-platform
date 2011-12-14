@@ -20,35 +20,21 @@
  */
 package org.xwiki.security.internal;
 
-import org.xwiki.test.AbstractComponentTestCase;
-
-import com.xpn.xwiki.web.Utils;
-
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-
-import org.junit.Before;
-import org.junit.runner.RunWith;
-
-import org.jmock.Expectations;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jmock.Mockery;
-import org.jmock.States;
 import org.jmock.integration.junit4.JMock;
 import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.security.RightResolver;
+import org.xwiki.test.AbstractComponentTestCase;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiGroupService;
-
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.xwiki.security.*;
-import static org.xwiki.security.Right.*;
-import static org.xwiki.security.RightState.*;
+import com.xpn.xwiki.web.Utils;
 
 @RunWith(JMock.class)
 public abstract class AbstractTestCase extends AbstractComponentTestCase

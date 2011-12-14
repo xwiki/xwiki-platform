@@ -22,57 +22,65 @@
  */
 package org.xwiki.security.internal;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
-import org.xwiki.cache.event.CacheEntryListener;
 import org.xwiki.cache.event.CacheEntryEvent;
-
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.cache.event.CacheEntryListener;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.logging.AbstractLogEnabled;
-
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.ConflictingInsertionException;
+import org.xwiki.security.ParentEntryEvictedException;
 import org.xwiki.security.RightCache;
 import org.xwiki.security.RightCacheConfiguration;
 import org.xwiki.security.RightCacheEntry;
 import org.xwiki.security.RightCacheKey;
-import org.xwiki.security.ParentEntryEvictedException;
-import org.xwiki.security.ConflictingInsertionException;
-
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * A cache for fast access right checking.
  * @version $Id$
  */
 @Component
-public class DefaultRightCache extends AbstractLogEnabled implements RightCache, Initializable
+@Singleton
+public class DefaultRightCache implements RightCache, Initializable
 {
+    /** Logger. **/
+    @Inject
+    private Logger logger;
+
     /** The keys in the cache are generated from instances of {@link EntityReference}. */
-    @Requirement("rightcachekey") private EntityReferenceSerializer<String> keySerializer;
+    @Inject
+    @Named("rightcachekey")
+    private EntityReferenceSerializer<String> keySerializer;
 
     /** The cache instance. */
     private Cache<RightCacheEntry> cache;
 
     /** Configuration object to acquire a configured cache instance. */
-    @Requirement private RightCacheConfiguration configuration;
+    @Inject
+    private RightCacheConfiguration configuration;
 
     /**
      * The cache entries are arranged into a hierarchy.  This data
      * structure stores the parent-child relationships between
      * entries.
-     */ 
-    private final Map<String, Node> parentRelations = new TreeMap();
+     */
+    private final Map<String, Node> parentRelations = new TreeMap<String, Node>();
 
     /** Fair read-write lock. */
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
@@ -88,14 +96,13 @@ public class DefaultRightCache extends AbstractLogEnabled implements RightCache,
     @Override
     public RightCacheKey getRightCacheKey(EntityReference entity)
     {
-        final EntityReference clone = entity.clone();
-        clone.setChild(null);
+        final EntityReference clone;
+
         String mainWiki = XWikiUtils.getMainWiki();
-        EntityReference root = clone.getRoot();
-        assert (root.getType() == EntityType.WIKI);
-        if (!root.getName().equals(mainWiki)) {
-            EntityReference main = new EntityReference(mainWiki, EntityType.WIKI, null);
-            root.setParent(main);
+        if (!entity.getRoot().getName().equals(mainWiki)) {
+            clone = new EntityReference(entity).appendParent(new WikiReference(mainWiki));
+        } else {
+            clone = entity;
         }
 
         return new RightCacheKey() {
@@ -119,12 +126,12 @@ public class DefaultRightCache extends AbstractLogEnabled implements RightCache,
     private String generateKey(EntityReference user, EntityReference entity)
     {
         // We prefix this category of entries with a unique prefix symbol.
-        return "1" + keySerializer.serialize(user) 
+        return "1" + keySerializer.serialize(user)
              + ":" + keySerializer.serialize(entity);
     }
 
     /**
-     * Generate a key for representing an entry containging
+     * Generate a key for representing an entry containing
      * information on whether this entity is associated with any
      * rights object.
      * @param entity The entity that is the object for this key.
@@ -149,7 +156,7 @@ public class DefaultRightCache extends AbstractLogEnabled implements RightCache,
     }
 
     /**
-     * Generate a key for representing an entry containging
+     * Generate a key for representing an entry containing
      * information on whether this entity is associated with any
      * rights object.
      * @param entity The entity that is the object for this key.
@@ -160,43 +167,20 @@ public class DefaultRightCache extends AbstractLogEnabled implements RightCache,
         return generateKey(entity.getEntityReference());
     }
 
-
-    /**
-     * Add an entry to this cache.
-     * @param user Entity representing the user.
-     * @param entity The entity which is the object of this cache entry.
-     * @param entry The entry to insert.
-     * @throws ParentEntryEvictedException when the parent entry of
-     * this entry was evicted before this insertion.  Since all
-     * entries, except wiki-entries, must have a parent cached, the
-     * {@link RightsLoader} must restart its load attempt.
-     * @throws ConflictingInsertionException when another thread have
-     * inserted this entry, but with a different content.
-     */
+    @Override
     public void addUserAtEntity(RightCacheKey user, RightCacheKey entity, RightCacheEntry entry)
         throws ParentEntryEvictedException, ConflictingInsertionException
     {
-        List<RightCacheKey> parents = new LinkedList();
+        List<RightCacheKey> parents = new LinkedList<RightCacheKey>();
         parents.add(user);
         parents.add(entity);
-        getLogger().debug("Adding user at entity: "
-                          + user.getEntityReference() + ", "
-                          + entity.getEntityReference());
+        this.logger.debug("Adding user at entity: "
+            + user.getEntityReference() + ", "
+            + entity.getEntityReference());
         addEntry(generateKey(user, entity), parents, entry);
     }
 
-    /**
-     * Add an entry to this cache.
-     * @param entity The entity which is the object of this cache entry.
-     * @param parent The parent entity.
-     * @param entry The entry to insert.
-     * @exception ParentEntryEvictedException when the parent entry of
-     * this entry was evicted before this insertion.  Since all
-     * entries, except wiki-entries, must have a parent cached, the
-     * {@link RightsLoader} must restart its load attempt.
-     * @throws ConflictingInsertionException when another thread have
-     * inserted this entry, but with a different content.
-     */
+    @Override
     public void addWithExplicitParent(RightCacheKey entity, RightCacheKey parent, RightCacheEntry entry)
         throws ParentEntryEvictedException, ConflictingInsertionException
     {
@@ -204,35 +188,14 @@ public class DefaultRightCache extends AbstractLogEnabled implements RightCache,
         addEntry(generateKey(entity), parentKey, entry);
     }
 
-    /**
-     * Add an entry to this cache with several parent relations.
-     * @param entity The entity which is the object of this cache entry.
-     * @param parents The parent entities.
-     * @param entry The entry to insert.
-     * @exception ParentEntryEvictedException when the parent entry of
-     * this entry was evicted before this insertion.  Since all
-     * entries, except wiki-entries, must have a parent cached, the
-     * {@link RightsLoader} must restart its load attempt.
-     * @throws ConflictingInsertionException when another thread have
-     * inserted this entry, but with a different content.
-     */
+    @Override
     public void addWithMultipleParents(RightCacheKey entity, Iterable<RightCacheKey> parents, RightCacheEntry entry)
         throws ParentEntryEvictedException, ConflictingInsertionException
     {
         addEntry(generateKey(entity), parents, entry);
     }
 
-    /**
-     * Add an entry to this cache.
-     * @param entity The entity which is the object of this cache entry.
-     * @param entry The entry to insert.
-     * @throws ParentEntryEvictedException when the parent entry of
-     * this entry was evicted before this insertion.  Since all
-     * entries, except wiki-entries, must have a parent cached, the
-     * {@link RightsLoader} must restart its load attempt.
-     * @throws ConflictingInsertionException when another thread have
-     * inserted this entry, but with a different content.
-     */
+    @Override
     public void add(RightCacheKey entity, RightCacheEntry entry)
         throws ParentEntryEvictedException, ConflictingInsertionException
     {
@@ -252,7 +215,7 @@ public class DefaultRightCache extends AbstractLogEnabled implements RightCache,
      * @throws ParentEntryEvictedException when the parent entry of
      * this entry was evicted before this insertion.  Since all
      * entries, except wiki-entries, must have a parent cached, the
-     * {@link RightsLoader} must restart its load attempt.
+     * {@link org.xwiki.security.RightLoader} must restart its load attempt.
      * @throws ConflictingInsertionException when another thread have
      * inserted this entry, but with a different content.
      */
@@ -293,7 +256,7 @@ public class DefaultRightCache extends AbstractLogEnabled implements RightCache,
     @Override
     public RightCacheEntry get(RightCacheKey user, RightCacheKey entity)
     {
-        getLogger().debug("Getting " + user.getEntityReference() + " at " + entity.getEntityReference());
+        this.logger.debug("Getting " + user.getEntityReference() + " at " + entity.getEntityReference());
         readWriteLock.readLock().lock();
         try {
             return cache.get(generateKey(user, entity));
@@ -354,7 +317,7 @@ public class DefaultRightCache extends AbstractLogEnabled implements RightCache,
     {
         if (parentObject == null || parentObject instanceof String) {
             addParentRelation((String) parentObject, key);
-        } else if (parentObject instanceof Iterable) {
+        } else if (parentObject instanceof Iterable<?>) {
             addParentRelation((Iterable<RightCacheKey>) parentObject, key);
         }
     }
@@ -366,7 +329,7 @@ public class DefaultRightCache extends AbstractLogEnabled implements RightCache,
      * @throws ParentEntryEvictedException when the parent entry of
      * this entry was evicted before this insertion.  Since all
      * entries, except wiki-entries, must have a parent cached, the
-     * {@link RightsLoader} must restart its load attempt.
+     * {@link org.xwiki.security.RightLoader} must restart its load attempt.
      */
     private void addParentRelation(String parentKey, String key)
         throws ParentEntryEvictedException
@@ -377,11 +340,11 @@ public class DefaultRightCache extends AbstractLogEnabled implements RightCache,
         } else {
             parent = parentRelations.get(parentKey);
             if (parent == null) {
-                getLogger().debug("Parent entry was evicted.  Throwing exception.");
+                this.logger.debug("Parent entry was evicted.  Throwing exception.");
                 throw new ParentEntryEvictedException();
             }
             parent.addChild(key);
-        } 
+        }
         Node n = new Node(parent);
         parentRelations.put(key, n);
     }
@@ -396,11 +359,11 @@ public class DefaultRightCache extends AbstractLogEnabled implements RightCache,
     private void addParentRelation(Iterable<RightCacheKey> parentReferences, String key)
         throws ParentEntryEvictedException
     {
-        List<Node> parents = new LinkedList();
+        List<Node> parents = new LinkedList<Node>();
         for (RightCacheKey ref : parentReferences) {
             Node parent = parentRelations.get(generateKey(ref));
             if (parent == null) {
-                getLogger().debug("One of the parent entries was evicted.  Throwing exception.");
+                this.logger.debug("One of the parent entries was evicted.  Throwing exception.");
                 throw new ParentEntryEvictedException();
             }
             parents.add(parent);
@@ -510,7 +473,6 @@ public class DefaultRightCache extends AbstractLogEnabled implements RightCache,
          */
         Node(Parent parent)
         {
-            this.children = children;
             this.parent = parent;
         }
 
@@ -527,10 +489,10 @@ public class DefaultRightCache extends AbstractLogEnabled implements RightCache,
         }
 
         @Override
-        public void addChild(String childKey) 
+        public void addChild(String childKey)
         {
             if (children == null) {
-                children = new TreeSet();
+                children = new TreeSet<String>();
             }
             children.add(childKey);
         }
@@ -560,26 +522,26 @@ public class DefaultRightCache extends AbstractLogEnabled implements RightCache,
      */
     private class Listener implements CacheEntryListener<RightCacheEntry>
     {
-        /** {@inheritDoc} */
+        @Override
         public void cacheEntryAdded(CacheEntryEvent<RightCacheEntry> event)
         {
             String key = event.getEntry().getKey();
-            getLogger().debug("Cache entry added: " + key);
+            logger.debug("Cache entry added: " + key);
         }
 
-        /** {@inheritDoc} */
+        @Override
         public void cacheEntryRemoved(CacheEntryEvent<RightCacheEntry> event)
         {
             String key = event.getEntry().getKey();
             removeChildren(key);
             removeParentRelation(key);
-            getLogger().debug("Cache entry removed: " + key);
+            logger.debug("Cache entry removed: " + key);
         }
 
-        /** {@inheritDoc} */
+        @Override
         public void cacheEntryModified(CacheEntryEvent<RightCacheEntry> event)
         {
-            getLogger().debug("Got cache entry modified event for key " + event.getEntry().getKey());
+            logger.debug("Got cache entry modified event for key " + event.getEntry().getKey());
         }
     }
 }

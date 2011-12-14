@@ -41,7 +41,7 @@ public class AccessLevelTest extends TestCase
             }));
     }
 
-    public void testAccessLevel()
+    public void testAccessLevel() throws Exception
     {
         AccessLevel l = AccessLevel.DEFAULT_ACCESS_LEVEL.clone();
 
@@ -127,7 +127,7 @@ public class AccessLevelTest extends TestCase
         assertDefaultAccessLevel();
     }
 
-    public void testClone()
+    public void testClone() throws Exception
     {
         AccessLevel l = AccessLevel.DEFAULT_ACCESS_LEVEL.clone();
         AccessLevel k = l.clone();

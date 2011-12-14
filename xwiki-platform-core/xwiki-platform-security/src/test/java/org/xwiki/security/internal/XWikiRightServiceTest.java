@@ -19,34 +19,26 @@
  */
 package org.xwiki.security.internal;
 
-import org.xwiki.security.*;
-import static org.xwiki.security.Right.*;
-import static org.xwiki.security.RightState.*;
-
-import static org.junit.Assert.*;
-import org.junit.Test;
-import org.jmock.Expectations;
-
 import java.util.Collections;
-import static java.util.Collections.EMPTY_LIST;
-import static java.util.Arrays.asList;
 
-import org.jmock.Mock;
-import org.jmock.core.Invocation;
-import org.jmock.core.stub.CustomStub;
+import org.jmock.Expectations;
+import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-
 import org.xwiki.observation.EventListener;
+import org.xwiki.security.RightService;
+import org.xwiki.security.XWikiCachingRightService;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.user.api.XWikiGroupService;
-import com.xpn.xwiki.user.api.XWikiRightNotFoundException;
 import com.xpn.xwiki.user.api.XWikiRightService;
+
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.xwiki.security.Right.ADMIN;
+import static org.xwiki.security.Right.PROGRAM;
+import static org.xwiki.security.Right.VIEW;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl}.
@@ -77,7 +69,7 @@ public class XWikiRightServiceTest extends AbstractTestCase
         mockery.checking(new Expectations() {{
             allowing(mockGroupService)
                 .getAllGroupsNamesForMember("wiki:XWiki.user", Integer.MAX_VALUE, 0, xwikiContext);
-            will(returnValue(asList(new String[]{"wiki:XWiki.group"})));
+            will(returnValue(asList("wiki:XWiki.group")));
         }});
 
         getContext().setDatabase("wiki");
@@ -87,7 +79,7 @@ public class XWikiRightServiceTest extends AbstractTestCase
 
         // direct user rights
 
-        preferences.allowGlobal(asList(new Right[]{VIEW }), asList(new String[]{user.getPrefixedFullName() }), EMPTY_LIST);
+        preferences.allowGlobal(asList(VIEW), asList(user.getPrefixedFullName()), Collections.<String>emptyList());
 
         ((EventListener) invalidator).onEvent(null, preferences, null);
 
@@ -114,7 +106,7 @@ public class XWikiRightServiceTest extends AbstractTestCase
         
 
         preferences = new MockDocument("wiki2:XWiki.XWikiPreferences", "xwiki:XWiki.Admin");
-        preferences.allowGlobal(asList(new Right[]{VIEW}), EMPTY_LIST, asList(new String[]{group.getPrefixedFullName()}));
+        preferences.allowGlobal(asList(VIEW), Collections.<String>emptyList(), asList(group.getPrefixedFullName()));
         wiki.add(preferences);
         
         ((EventListener) invalidator).onEvent(null, preferences, null);
@@ -169,6 +161,7 @@ public class XWikiRightServiceTest extends AbstractTestCase
 
     /**
      * Test that programming rights are checked on the context user when no context document is set.
+     * @throws com.xpn.xwiki.XWikiException on error
      */
     @Test
     public void testProgrammingRightsWhenNoContextDocumentIsSet() throws XWikiException
@@ -176,19 +169,19 @@ public class XWikiRightServiceTest extends AbstractTestCase
         final XWikiRightService rightService = new XWikiCachingRightService();
         // Setup an XWikiPreferences document granting programming rights to XWiki.Programmer
         MockDocument prefs = new MockDocument("XWiki.XWikiPreferences", "XWiki.Admin");
-        prefs.allowGlobal(asList(new Right[]{PROGRAM, ADMIN}), asList(new String[]{"XWiki.Programmer" }), EMPTY_LIST);
+        prefs.allowGlobal(asList(PROGRAM, ADMIN), asList("XWiki.Programmer"), Collections.<String>emptyList());
         wiki.add(prefs);
 
         mockery.checking(new Expectations() {{
             allowing(mockGroupService)
                 .getAllGroupsNamesForMember("xwiki:" + RightService.GUEST_USER_FULLNAME, Integer.MAX_VALUE, 0, xwikiContext);
-            will(returnValue(EMPTY_LIST));
+            will(returnValue(Collections.emptyList()));
             allowing(mockGroupService)
                 .getAllGroupsNamesForMember("xwiki:XWiki.Programmer", Integer.MAX_VALUE, 0, xwikiContext);
-            will(returnValue(EMPTY_LIST));
+            will(returnValue(Collections.emptyList()));
             allowing(mockGroupService)
                 .getAllGroupsNamesForMember("xwiki:XWiki.superadmin", Integer.MAX_VALUE, 0, xwikiContext);
-            will(returnValue(EMPTY_LIST));
+            will(returnValue(Collections.emptyList()));
         }});
 
         // Setup the context (no context document)

@@ -32,7 +32,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * This is the API for checking the access rights of users on wiki documents.
  * @version $Id$
- * @since
  */
 @ComponentRole
 public interface RightService
@@ -117,6 +116,15 @@ public interface RightService
      * @return {@code true} if the current user in the context has the {@code admin} right, {@code false} otherwise
      */
     boolean hasAdminRights(XWikiContext context);
+
+    /**
+     * Checks that the current user in the context (the currently authenticated user) has administration rights on the
+     * current space.
+     *
+     * @param context the xwiki context of this request
+     * @return {@code true} if the current user in the context has the {@code admin} right, {@code false} otherwise
+     */
+    boolean hasWikiAdminRights(XWikiContext context);
 
     /**
      * @param context the xwiki context of this request

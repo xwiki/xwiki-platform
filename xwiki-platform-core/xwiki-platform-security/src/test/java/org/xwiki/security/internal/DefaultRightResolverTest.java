@@ -20,29 +20,26 @@
  */
 package org.xwiki.security.internal;
 
-import junit.framework.TestCase;
-
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.States;
-
-import static org.junit.Assert.*;
-import org.junit.Test;
-import org.junit.Before;
-
-import org.xwiki.security.*;
-import static org.xwiki.security.Right.*;
-import static org.xwiki.security.RightState.*;
-
-import java.util.List;
-import java.util.LinkedList;
-import java.util.HashSet;
 import java.util.Collection;
-import static java.util.Arrays.asList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.AccessLevel;
+import org.xwiki.security.Right;
+import org.xwiki.security.RightCacheKey;
+import org.xwiki.security.RightsObject;
+
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertTrue;
+import static org.xwiki.security.Right.ADMIN;
+import static org.xwiki.security.Right.DELETE;
+import static org.xwiki.security.Right.PROGRAM;
+import static org.xwiki.security.RightState.ALLOW;
 
 
 public class DefaultRightResolverTest  extends AbstractTestCase
@@ -54,28 +51,29 @@ public class DefaultRightResolverTest  extends AbstractTestCase
             wiki.add(new MockDocument(docRefResolver.resolve("wikiY:SpaceX.DocY"), "wikiY:XWiki.UserY"));
 
             Right[] rights = {ADMIN, PROGRAM };
-            DocumentReference[] groups = { uResolver.resolve("GroupX", "wikiY"), uResolver.resolve("SpaceY.GroupY") };
-            DocumentReference[] users  = { uResolver.resolve("UserX", "wikiY") };
+            DocumentReference[] groups = { uResolver.resolve("GroupX", new WikiReference("wikiY")), uResolver.resolve("SpaceY.GroupY") };
+            DocumentReference[] users  = { uResolver.resolve("UserX", new WikiReference("wikiY")) };
 
-            RightsObject o = new MockRightsObject(new HashSet(asList(rights)),
+            RightsObject o = new MockRightsObject(new HashSet<Right>(asList(rights)),
                                                   ALLOW,
-                                                  new HashSet(asList(users)),
-                                                  new HashSet(asList(groups)));
+                                                  new HashSet<DocumentReference>(asList(users)),
+                                                  new HashSet<DocumentReference>(asList(groups)));
 
             final DocumentReference doc = docRefResolver.resolve("wikiY:SpaceX.DocY");
-            DocumentReference userX = uResolver.resolve("UserX", "wikiY");
-            DocumentReference userY = uResolver.resolve("UserY", "wikiY");
+            DocumentReference userX = uResolver.resolve("UserX", new WikiReference("wikiY"));
+            DocumentReference userY = uResolver.resolve("UserY", new WikiReference("wikiY"));
             
-            RightCacheKey key = new RightCacheKey() { public EntityReference getEntityReference() { return doc; }};
+            RightCacheKey key = new RightCacheKey()
+                { @Override public EntityReference getEntityReference() { return doc; }};
 
-            List<Collection<RightsObject>> docLevel = new LinkedList();
-            docLevel.add(new LinkedList());
-            docLevel.add(new LinkedList());
-            Collection<RightsObject> pageRights = new LinkedList();
+            List<Collection<RightsObject>> docLevel = new LinkedList<Collection<RightsObject>>();
+            docLevel.add(new LinkedList<RightsObject>());
+            docLevel.add(new LinkedList<RightsObject>());
+            Collection<RightsObject> pageRights = new LinkedList<RightsObject>();
             pageRights.add(o);
             docLevel.add(pageRights);
 
-            AccessLevel level = resolver.resolve(userX, doc, key, new LinkedList(), docLevel);
+            AccessLevel level = resolver.resolve(userX, doc, key, new LinkedList<DocumentReference>(), docLevel);
             assertTrue(level.equals(AccessLevel.DEFAULT_ACCESS_LEVEL));
 
             level = resolver.resolve(userY, doc, key, asList(groups), docLevel);
@@ -83,18 +81,18 @@ public class DefaultRightResolverTest  extends AbstractTestCase
             delete.allow(DELETE);
             assertTrue(level.equals(delete));
 
-            level = resolver.resolve(userY, doc, key, new LinkedList(), docLevel);
+            level = resolver.resolve(userY, doc, key, new LinkedList<DocumentReference>(), docLevel);
             assertTrue(level.equals(delete));
 
-            List<Collection<RightsObject>> spaceLevel = new LinkedList();
-            spaceLevel.add(new LinkedList());
-            Collection<RightsObject> spaceRights = new LinkedList();
+            List<Collection<RightsObject>> spaceLevel = new LinkedList<Collection<RightsObject>>();
+            spaceLevel.add(new LinkedList<RightsObject>());
+            Collection<RightsObject> spaceRights = new LinkedList<RightsObject>();
             spaceRights.add(o);
             spaceLevel.add(spaceRights);
-            spaceLevel.add(new LinkedList());
+            spaceLevel.add(new LinkedList<RightsObject>());
             
             
-            level = resolver.resolve(userX, doc, key, new LinkedList(), spaceLevel);
+            level = resolver.resolve(userX, doc, key, new LinkedList<DocumentReference>(), spaceLevel);
             AccessLevel expected = AccessLevel.DEFAULT_ACCESS_LEVEL.clone();
             expected.allow(ADMIN);
             expected.allow(DELETE);
@@ -103,24 +101,24 @@ public class DefaultRightResolverTest  extends AbstractTestCase
             level = resolver.resolve(userY, doc, key, asList(groups), spaceLevel);
             assertTrue(level.equals(expected));
 
-            level = resolver.resolve(userY, doc, key, new LinkedList(), spaceLevel);
+            level = resolver.resolve(userY, doc, key, new LinkedList<DocumentReference>(), spaceLevel);
             assertTrue(level.equals(delete));
 
-            List<Collection<RightsObject>> wikiLevel = new LinkedList();
-            Collection<RightsObject> wikiRights = new LinkedList();
+            List<Collection<RightsObject>> wikiLevel = new LinkedList<Collection<RightsObject>>();
+            Collection<RightsObject> wikiRights = new LinkedList<RightsObject>();
             wikiRights.add(o);
             wikiLevel.add(wikiRights);
-            wikiLevel.add(new LinkedList());
-            wikiLevel.add(new LinkedList());
+            wikiLevel.add(new LinkedList<RightsObject>());
+            wikiLevel.add(new LinkedList<RightsObject>());
             
-            level = resolver.resolve(userX, doc, key, new LinkedList(), wikiLevel);
+            level = resolver.resolve(userX, doc, key, new LinkedList<DocumentReference>(), wikiLevel);
             expected.allow(PROGRAM);
             assertTrue(level.equals(expected));
 
             level = resolver.resolve(userY, doc, key, asList(groups), wikiLevel);
             assertTrue(level.equals(expected));
 
-            level = resolver.resolve(userY, doc, key, new LinkedList(), wikiLevel);
+            level = resolver.resolve(userY, doc, key, new LinkedList<DocumentReference>(), wikiLevel);
             assertTrue(level.equals(delete));
         } catch (Exception e) {
             LOG.error("Caught exception!", e);

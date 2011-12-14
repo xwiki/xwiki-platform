@@ -22,31 +22,38 @@
  */
 package org.xwiki.security.internal;
 
-import org.xwiki.component.annotation.Component;
-
-import org.xwiki.security.Right;
-import static org.xwiki.security.Right.*;
-import org.xwiki.security.RightState;
-import org.xwiki.security.RightCacheKey;
-import static org.xwiki.security.RightState.*;
-import org.xwiki.security.AccessLevel;
-import org.xwiki.security.RightsObject;
-
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.EnumMap;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.security.AccessLevel;
+import org.xwiki.security.Right;
+import org.xwiki.security.RightCacheKey;
+import org.xwiki.security.RightState;
+import org.xwiki.security.RightsObject;
+
+import static org.xwiki.security.Right.ADMIN;
+import static org.xwiki.security.Right.DELETE;
+import static org.xwiki.security.Right.PROGRAM;
+import static org.xwiki.security.RightState.ALLOW;
+import static org.xwiki.security.RightState.UNDETERMINED;
 
 /**
  * The default implementation for the right resolver.
  *
  * @version $Id$
  */
-@Component("priority")
+@Component
+@Named("priority")
+@Singleton
 public class PrioritizingRightResolver extends AbstractRightResolver
 {
     /** Priority of rights specified for users. */
@@ -152,7 +159,7 @@ public class PrioritizingRightResolver extends AbstractRightResolver
                          AccessLevel accessLevel)
     {
         AccessLevel currentLevel = new AccessLevel();
-        Map<Right, Integer> priorities = new EnumMap(Right.class);
+        Map<Right, Integer> priorities = new EnumMap<Right, Integer>(Right.class);
 
         for (Right right : enabledRights.get(ref.getType())) {
             boolean foundAllow = false;

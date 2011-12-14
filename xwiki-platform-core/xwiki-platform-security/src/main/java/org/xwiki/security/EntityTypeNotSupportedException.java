@@ -29,6 +29,9 @@ import org.xwiki.model.EntityType;
  */
 public class EntityTypeNotSupportedException extends RightServiceException
 {
+    /** Serialization identifier. */
+    private static final long serialVersionUID = 1L;
+
     /**
      * @param entityType Type of the unsupported entity.
      * @param loader The loader that does not support the entity type.

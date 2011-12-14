@@ -37,7 +37,7 @@ public interface RightsObject
     boolean checkRight(Right right);
 
     /**
-     * @return The {@cod RightState} of this object.
+     * @return The {@code RightState} of this object.
      */
     RightState getState();
 

@@ -22,22 +22,23 @@
  */
 package org.xwiki.security.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
-
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.component.logging.AbstractLogEnabled;
-import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP;
-
 import org.xwiki.security.RightCacheConfiguration;
 import org.xwiki.security.RightCacheEntry;
+
+import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP;
 
 /**
  * Default configuration for right cache.
@@ -45,18 +46,24 @@ import org.xwiki.security.RightCacheEntry;
  */
 @Component
 @InstantiationStrategy(PER_LOOKUP)
-public class DefaultRightCacheConfiguration extends AbstractLogEnabled
-    implements RightCacheConfiguration
+public class DefaultRightCacheConfiguration implements RightCacheConfiguration
 {
     /** Prefix for the configuration property keys. */
     private static final String RIGHTCACHE_PREFIX = "security.rightcache.";
 
+    /** Logger. **/
+    @Inject
+    private Logger logger;
+
     /** Obtain configuration from the xwiki.properties file. */
-    @Requirement("xwikiproperties")
+    @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource configuration;
 
     /** Cache factory. */
-    @Requirement("oscache") private CacheFactory cacheFactory;
+    @Inject
+    @Named("oscache")
+    private CacheFactory cacheFactory;
 
     /**
      * @param name Name of the property.
@@ -89,10 +96,10 @@ public class DefaultRightCacheConfiguration extends AbstractLogEnabled
         try {
             cache = cacheFactory.newCache(cacheConfig);
         } catch (CacheException e) {
-            getLogger().error("Failed to create rights cache.");
+            this.logger.error("Failed to create rights cache.");
             throw new RuntimeException(e);
         }
-        getLogger().info("Created a cache of type "
+        this.logger.info("Created a cache of type "
                          + cache.getClass().getName()
                          + " with a capacity of "
                          + capacity

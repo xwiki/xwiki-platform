@@ -22,22 +22,21 @@
  */
 package org.xwiki.security.internal;
 
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
-
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.GroupsClass;
-import com.xpn.xwiki.objects.classes.UsersClass;
-
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.Right;
 import org.xwiki.security.RightState;
 import org.xwiki.security.RightsObject;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.EnumSet;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.GroupsClass;
+import com.xpn.xwiki.objects.classes.UsersClass;
 
 /**
  * Wrapper around xwiki rights objects.
@@ -83,13 +82,14 @@ public abstract class AbstractRightsObject implements RightsObject
      * xwiki object.
      * @param obj An xwiki rights object.
      * @param resolver A document reference resolver for user and group pages.
-     * @param wikiName The name of the current wiki.
+     * @param wikiReference The name of the current wiki.
      */
-    protected AbstractRightsObject(BaseObject obj, DocumentReferenceResolver resolver, String wikiName)
+    protected AbstractRightsObject(BaseObject obj, DocumentReferenceResolver<String> resolver,
+        WikiReference wikiReference)
     {
         state = (obj.getIntValue(ALLOW_FIELD_NAME) == 1) ? RightState.ALLOW : RightState.DENY;
-        users = new HashSet();
-        groups = new HashSet();
+        users = new HashSet<DocumentReference>();
+        groups = new HashSet<DocumentReference>();
         rights = EnumSet.noneOf(Right.class);
 
         String levels = obj.getStringValue("levels");
@@ -101,15 +101,13 @@ public abstract class AbstractRightsObject implements RightsObject
             }
         }
 
-        for (String u : UsersClass.getListFromString(obj.getStringValue(USERS_FIELD_NAME))) {
-            String user = u;
-            DocumentReference ref = resolver.resolve(user, wikiName);
+        for (String user : UsersClass.getListFromString(obj.getStringValue(USERS_FIELD_NAME))) {
+            DocumentReference ref = resolver.resolve(user, wikiReference);
             this.users.add(ref);
         }
 
-        for (String g : GroupsClass.getListFromString(obj.getStringValue(GROUPS_FIELD_NAME))) {
-            String group = g;
-            DocumentReference ref = resolver.resolve(group, wikiName);
+        for (String group : GroupsClass.getListFromString(obj.getStringValue(GROUPS_FIELD_NAME))) {
+            DocumentReference ref = resolver.resolve(group, wikiReference);
             this.groups.add(ref);
         }
     }
@@ -132,42 +130,25 @@ public abstract class AbstractRightsObject implements RightsObject
         this.state = state;
     }
 
-    /**
-     * Check if the state of this object should be applied for a given right.
-     * @param right The righ to check.
-     * @return {@code true} if the state should be applied for the right,
-     * othewise {@code false}.
-     */
+    @Override
     public boolean checkRight(Right right)
     {
         return rights.contains(right);
     }
 
-    /**
-     * @return The {@cod RightState} of this object.
-     */
+    @Override
     public RightState getState()
     {
         return state;
     }
 
-    /**
-     * Check if the state of this object should be applied to a given group.
-     * @param group The group to check.
-     * @return {@code true} if the state should be applied for group,
-     * othewise {@code false}.
-     */
+    @Override
     public boolean checkGroup(DocumentReference group)
     {
         return groups.contains(group);
     }
 
-    /**
-     * Check if the state of this object should be applied to a given user.
-     * @param user The user to check.
-     * @return {@code true} if the state should be applied for user,
-     * othewise {@code false}.
-     */
+    @Override
     public boolean checkUser(DocumentReference user)
     {
         return users.contains(user);
@@ -176,14 +157,12 @@ public abstract class AbstractRightsObject implements RightsObject
     @Override
     public boolean equals(Object other)
     {
-        if (!(other instanceof AbstractRightsObject)) {
-            return false;
-        }
-
-        return state == ((AbstractRightsObject) other).state
-            && rights.equals(((AbstractRightsObject) other).rights)
-            && users.equals(((AbstractRightsObject) other).users)
-            && groups.equals(((AbstractRightsObject) other).groups);
+        return other == this
+            || (other instanceof AbstractRightsObject
+                && state == ((AbstractRightsObject) other).state
+                && rights.equals(((AbstractRightsObject) other).rights)
+                && users.equals(((AbstractRightsObject) other).users)
+                && groups.equals(((AbstractRightsObject) other).groups));
     }
 
     @Override
@@ -195,9 +174,10 @@ public abstract class AbstractRightsObject implements RightsObject
     @Override
     public String toString()
     {
-        return "State: " + state
-            + "Rights: " + rights
-            + "Users: "  + users
-            + "Groups: " + groups;
+        return "[State=" + state
+            + ", Rights=" + rights
+            + ", Users="  + users
+            + ", Groups=" + groups
+            + "]";
     }
 }

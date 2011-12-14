@@ -20,22 +20,21 @@
  */
 package org.xwiki.security.internal;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
-import java.util.Map;
-import java.util.HashMap;
-
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 public class MockXWiki extends XWiki
 {
-    Map<DocumentReference, MockDocument> documents = new HashMap();
-    Map<String, String> wikiOwners = new HashMap();
+    Map<DocumentReference, MockDocument> documents = new HashMap<DocumentReference, MockDocument>();
+    Map<String, String> wikiOwners = new HashMap<String, String>();
 
     private final XWiki mainXWiki;
     private String cacheCapacity = "500";

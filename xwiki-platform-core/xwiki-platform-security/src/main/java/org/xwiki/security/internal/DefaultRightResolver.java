@@ -22,22 +22,26 @@
  */
 package org.xwiki.security.internal;
 
-import org.xwiki.component.annotation.Component;
-
-import org.xwiki.security.Right;
-import static org.xwiki.security.Right.*;
-import org.xwiki.security.RightState;
-import org.xwiki.security.RightCacheKey;
-import static org.xwiki.security.RightState.*;
-import org.xwiki.security.AccessLevel;
-import org.xwiki.security.RightsObject;
-
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
+
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.security.AccessLevel;
+import org.xwiki.security.Right;
+import org.xwiki.security.RightCacheKey;
+import org.xwiki.security.RightState;
+import org.xwiki.security.RightsObject;
+
+import static org.xwiki.security.Right.ADMIN;
+import static org.xwiki.security.Right.DELETE;
+import static org.xwiki.security.Right.PROGRAM;
+import static org.xwiki.security.RightState.ALLOW;
+import static org.xwiki.security.RightState.UNDETERMINED;
 
 /**
  * The default implementation for the right resolver.
@@ -45,6 +49,7 @@ import java.util.ListIterator;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultRightResolver extends AbstractRightResolver
 {
     @Override

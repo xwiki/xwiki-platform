@@ -26,7 +26,7 @@ import org.xwiki.model.reference.EntityReference;
  * Interface for wrapping a class around a properly preprocessed
  * entity reference for use with the cache.
  *
- * TODO Since the usage is broader than just beeing a key for the Cache,
+ * TODO Since the usage is broader than just being a key for the Cache,
  * this interface should be renamed.  Maybe "RightHierarchy".
  * @version $Id$
  */

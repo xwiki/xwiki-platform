@@ -20,29 +20,26 @@
  */
 package org.xwiki.security.internal;
 
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.user.api.XWikiGroupService;
-import com.xpn.xwiki.doc.XWikiDocument;
-
-import org.xwiki.security.RightServiceException;
-import org.xwiki.security.RightCache;
-
-import com.xpn.xwiki.web.Utils;
-
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.RightCache;
+import org.xwiki.security.RightServiceException;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.user.api.XWikiGroupService;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * This class contains utility functions for accessing various xwiki
@@ -97,10 +94,10 @@ final class XWikiUtils
          * The groups inherit the wiki of the user, unless the wiki
          * name is explicitly given.
          */
-        String wikiName = user.getWikiReference().getName();
-        Collection<DocumentReference> groups = new LinkedList();
+        WikiReference wikiReference = user.getWikiReference();
+        Collection<DocumentReference> groups = new LinkedList<DocumentReference>();
         for (String groupName : groupNames) {
-            DocumentReference group = resolver.resolve(groupName, wikiName);
+            DocumentReference group = resolver.resolve(groupName, wikiReference);
             groups.add(group);
         }
         return groups;
@@ -128,7 +125,7 @@ final class XWikiUtils
              * The group members inherit the wiki from the group
              * itself, unless the wiki name is explicitly given.
              */
-            String wikiName = group.getWikiReference().getName();
+            WikiReference wikiReference = group.getWikiReference();
             final int nb = 100;
             int i = 0;
             Collection<String> memberNames;
@@ -138,7 +135,7 @@ final class XWikiUtils
                                                                       i * nb,
                                                                       xwikiContext);
                 for (String member : memberNames) {
-                    DocumentReference memberRef = resolver.resolve(member, wikiName);
+                    DocumentReference memberRef = resolver.resolve(member, wikiReference);
                     /*
                      * Avoid infinite loops.
                      */
@@ -185,8 +182,7 @@ final class XWikiUtils
     {
         Execution execution = Utils.getComponent(Execution.class);
         ExecutionContext context = execution.getContext();
-        XWikiContext xwikiContext = (XWikiContext) context.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        return xwikiContext;
+        return (XWikiContext) context.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 
     /**
@@ -224,28 +220,28 @@ final class XWikiUtils
         }
         String creator = doc.getCreator();
         DocumentReferenceResolver<String> resolver = getUserResolver();
-        DocumentReference creatorRef = resolver.resolve(creator, document.getWikiReference().getName());
+        DocumentReference creatorRef = resolver.resolve(creator, document.getWikiReference());
         return user.equals(creatorRef);
     }
 
     /**
      * @param user A user identity.
-     * @param wikiName The name of the wiki.
+     * @param wikiReference The name of the wiki.
      * @return {@code true} if and only if the user is the owner of
      * the wiki.
      */
-    public static boolean isWikiOwner(DocumentReference user, String wikiName)
+    public static boolean isWikiOwner(DocumentReference user, WikiReference wikiReference)
     {
         XWikiContext context = getXWikiContext();
         DocumentReferenceResolver<String> resolver = getUserResolver();
         String wikiOwner;
         try {
-            wikiOwner = context.getWiki().getWikiOwner(wikiName, context);
+            wikiOwner = context.getWiki().getWikiOwner(wikiReference.getName(), context);
         } catch (XWikiException e) {
             LOG.error("Failed to obtain wiki owner.", e);
             return false;
         }
-        DocumentReference ownerRef = resolver.resolve(wikiOwner, wikiName);
+        DocumentReference ownerRef = resolver.resolve(wikiOwner, wikiReference);
         return user.equals(ownerRef);
     }
 

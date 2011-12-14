@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Representation of an entry in the {@link RightCheckerCache}.
+ * Representation of an entry in the {@link RightCache}.
  * @version $Id$
  */
 public interface RightCacheEntry
@@ -37,7 +37,7 @@ public interface RightCacheEntry
         HAVE_NO_OBJECTS,
         /** The entry stores an access level for a particular user on a particular entity. */
         ACCESS_LEVEL 
-    };
+    }
 
     /** Instance for indicating that a rights object do not exist for the entry. */
     RightCacheEntry HAVE_NO_RIGHT_OBJECT_ENTRY = new RightCacheEntry() {
@@ -50,7 +50,7 @@ public interface RightCacheEntry
             @Override
             public <T> Collection<T> getObjects(Class<T> type)
             {
-                return Collections.EMPTY_SET;
+                return Collections.emptySet();
             }
         };
 

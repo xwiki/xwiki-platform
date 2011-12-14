@@ -20,14 +20,12 @@
  */
 package org.xwiki.security;
 
-import com.xpn.xwiki.user.api.XWikiRightService;
-
 import java.util.List;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -75,6 +73,12 @@ public class XWikiCachingRightService implements XWikiRightService
     public boolean hasAdminRights(XWikiContext context)
     {
         return rightService.hasAdminRights(context);
+    }
+
+    @Override
+    public boolean hasWikiAdminRights(XWikiContext context)
+    {
+        return rightService.hasWikiAdminRights(context);
     }
 
     @Override

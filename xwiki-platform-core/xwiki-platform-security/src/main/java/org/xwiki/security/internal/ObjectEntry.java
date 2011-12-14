@@ -20,10 +20,10 @@
  */
 package org.xwiki.security.internal;
 
-import org.xwiki.security.RightCacheEntry;
-
 import java.util.Collection;
 import java.util.LinkedList;
+
+import org.xwiki.security.RightCacheEntry;
 
 /**
  * A right cache entry that caches objects, which may be of type
@@ -53,7 +53,7 @@ class ObjectEntry implements RightCacheEntry
     @Override
     public <T> Collection<T> getObjects(Class<T> type)
     {
-        Collection<T> matchingObjects = new LinkedList();
+        Collection<T> matchingObjects = new LinkedList<T>();
         for (Object o : objects) {
             if (type.isInstance(o)) {
                 matchingObjects.add(type.cast(o));

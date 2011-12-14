@@ -22,21 +22,22 @@
  */
 package org.xwiki.security.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.component.logging.AbstractLogEnabled;
-import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP;
-
 import org.xwiki.configuration.ConfigurationSource;
-
-import org.xwiki.security.RightServiceConfigurationManager;
-import org.xwiki.security.RightService;
 import org.xwiki.security.RightResolver;
+import org.xwiki.security.RightService;
+import org.xwiki.security.RightServiceConfigurationManager;
+
+import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP;
 
 /**
  * Default factory for right service.
@@ -44,8 +45,7 @@ import org.xwiki.security.RightResolver;
  */
 @Component
 @InstantiationStrategy(PER_LOOKUP)
-public class DefaultRightServiceConfigurationManager extends AbstractLogEnabled
-    implements RightServiceConfigurationManager
+public class DefaultRightServiceConfigurationManager implements RightServiceConfigurationManager
 {
     /** Prefix for configuration keys. */
     private static final String CONFIGURATION_PREFIX = "security.";
@@ -56,11 +56,17 @@ public class DefaultRightServiceConfigurationManager extends AbstractLogEnabled
     /** Default hint for component manager. */
     private static final String DEFAULT_HINT = "default";
 
+    /** Logger. **/
+    @Inject
+    private Logger logger;
+
     /** The component manager. */
-    @Requirement private ComponentManager componentManager;
+    @Inject
+    private ComponentManager componentManager;
 
     /** Obtain configuration from the xwiki.properties file. */
-    @Requirement("xwikiproperties")
+    @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource configuration;
 
     /**
@@ -82,7 +88,7 @@ public class DefaultRightServiceConfigurationManager extends AbstractLogEnabled
         try {
             resolver = componentManager.lookup(RightResolver.class, hint);
         } catch (ComponentLookupException e) {
-            getLogger().error("Failed to lookup component for RightResolver of type '" + hint + "'", e);
+            this.logger.error("Failed to lookup component for RightResolver of type '" + hint + "'", e);
             throw new RuntimeException(e);
         }
 
@@ -92,12 +98,12 @@ public class DefaultRightServiceConfigurationManager extends AbstractLogEnabled
                     = componentManager.getComponentDescriptor(RightResolver.class, DEFAULT_HINT);
                 componentManager.registerComponent(descriptor, resolver);
             } catch (ComponentRepositoryException e) {
-                getLogger().error("Failed to register default right resolver instance.", e);
+                this.logger.error("Failed to register default right resolver instance.", e);
                 throw new RuntimeException(e);
             }
         }
 
-        getLogger().info("Successfully configured right resolver of type "
+        this.logger.info("Successfully configured right resolver of type "
                          + resolver.getClass().getName());
     }
 
@@ -109,7 +115,7 @@ public class DefaultRightServiceConfigurationManager extends AbstractLogEnabled
         try {
             return componentManager.lookup(RightService.class);
         } catch (ComponentLookupException e) {
-            getLogger().error("Failed to lookup component for RightService.");
+            this.logger.error("Failed to lookup component for RightService.");
             throw new RuntimeException(e);
         }
     }

@@ -20,15 +20,12 @@
  */
 package org.xwiki.security.internal;
 
-import junit.framework.TestCase;
-
+import org.junit.Test;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.AbstractComponentTestCase;
 
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.DocumentReference;
-
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 public class UserAndGroupReferenceResolverTest  extends AbstractComponentTestCase
 {
@@ -41,8 +38,8 @@ public class UserAndGroupReferenceResolverTest  extends AbstractComponentTestCas
             DocumentReferenceResolver<String> defaultResolver = getComponentManager().lookup(DocumentReferenceResolver.class, "user");
             assertTrue(resolver.resolve("Bosse")                          .equals(defaultResolver.resolve("xwiki:XWiki.Bosse")));
             assertTrue(resolver.resolve("bossesSpace.Bosse")              .equals(defaultResolver.resolve("xwiki:bossesSpace.Bosse")));
-            assertTrue(resolver.resolve("Bosse", "bossesWiki")            .equals(defaultResolver.resolve("bossesWiki:XWiki.Bosse")));
-            assertTrue(resolver.resolve("bossesSpace.Bosse", "bossesWiki").equals(defaultResolver.resolve("bossesWiki:bossesSpace.Bosse")));
+            assertTrue(resolver.resolve("Bosse", new WikiReference("bossesWiki")).equals(defaultResolver.resolve("bossesWiki:XWiki.Bosse")));
+            assertTrue(resolver.resolve("bossesSpace.Bosse", new WikiReference("bossesWiki")).equals(defaultResolver.resolve("bossesWiki:bossesSpace.Bosse")));
             assertTrue(resolver.resolve("bossesWiki:bossesSpace.Bosse")   .equals(defaultResolver.resolve("bossesWiki:bossesSpace.Bosse")));
         } catch(Exception e) {
             System.out.println("Caught exception: " + e);

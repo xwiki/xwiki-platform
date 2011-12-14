@@ -22,40 +22,49 @@
  */
 package org.xwiki.security.internal;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.RightServiceException;
 import org.xwiki.security.RightsObject;
 import org.xwiki.security.RightsObjectFactory;
-import org.xwiki.security.RightServiceException;
 
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-
-import org.xwiki.context.Execution;
-
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.DocumentReference;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.LinkedList;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Implementation of the rights object factory interface.
  * @version $Id$
  */
 @Component
-public class DefaultRightsObjectFactory extends AbstractLogEnabled implements RightsObjectFactory
+@Singleton
+public class DefaultRightsObjectFactory implements RightsObjectFactory
 {
+    /** Logger. **/
+    @Inject
+    private Logger logger;
+    
     /** Resolver for user and group names. */
-    @Requirement("user") private DocumentReferenceResolver<String> resolver;
+    @Inject
+    @Named("user")
+    private DocumentReferenceResolver<String> resolver;
 
     /** Execution object. */
-    @Requirement private Execution execution;
+    @Inject
+    private Execution execution;
 
     @Override
     public Collection<RightsObject> getInstances(DocumentReference docRef,  boolean global)
@@ -64,18 +73,18 @@ public class DefaultRightsObjectFactory extends AbstractLogEnabled implements Ri
         XWikiContext context = (XWikiContext) execution.getContext()
             .getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
         List<BaseObject> baseObjs;
-        List<RightsObject> rightsObjs = new LinkedList();
+        List<RightsObject> rightsObjs = new LinkedList<RightsObject>();
 
         /*
          * The users and groups listed by the rights object, inherit
          * the wiki from the document, unless explicitly given.
          */
-        String wikiName = docRef.getWikiReference().getName();
+        WikiReference wikiReference = docRef.getWikiReference();
         String className = global
             ? AbstractRightsObject.GLOBAL_RIGHTS_CLASS
             : AbstractRightsObject.LOCAL_RIGHTS_CLASS;
 
-        DocumentReference classRef = resolver.resolve(className, wikiName);
+        DocumentReference classRef = resolver.resolve(className, wikiReference);
 
         try {
             XWikiDocument doc = context.getWiki().getDocument(docRef, context);
@@ -90,11 +99,11 @@ public class DefaultRightsObjectFactory extends AbstractLogEnabled implements Ri
         if (baseObjs != null) {
             for (BaseObject obj : baseObjs) {
                 if (obj == null) {
-                    getLogger().error("There was a null object!");
+                    this.logger.error("There was a null object!");
                 } else {
                     rightsObjs.add(global
-                                   ? new GlobalRightsObject(obj, resolver, wikiName)
-                                   :  new LocalRightsObject(obj, resolver, wikiName));
+                                   ? new GlobalRightsObject(obj, resolver, wikiReference)
+                                   :  new LocalRightsObject(obj, resolver, wikiReference));
                 }
             }
         }

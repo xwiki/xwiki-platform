@@ -51,9 +51,10 @@ public enum Right
      ILLEGAL(8, "illegal");
 
     /** Map containing all known actions. */
-    private static Map<String, Right> actionMap = new HashMap();
+    private static final Map<String, Right> actionMap = new HashMap<String, Right>();
+
     /** List of all rights, as strings. */
-    private static List<String> allRights = new LinkedList();
+    private static final List<String> allRights = new LinkedList<String>();
 
     /** The numeric value of this access right. */
     private final int value;

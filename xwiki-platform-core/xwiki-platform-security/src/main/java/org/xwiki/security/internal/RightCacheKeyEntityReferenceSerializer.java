@@ -20,16 +20,20 @@
  */
 package org.xwiki.security.internal;
 
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.EntityReference;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * A serializer used by the right cache for generating keys.
  * @version $Id$
  */
-@Component("rightcachekey")
+@Component
+@Named("rightcachekey")
+@Singleton
 public class RightCacheKeyEntityReferenceSerializer implements EntityReferenceSerializer<String>
 {
     @Override
@@ -37,7 +41,7 @@ public class RightCacheKeyEntityReferenceSerializer implements EntityReferenceSe
     {
         StringBuilder builder = new StringBuilder();
         EntityReference mainWiki = reference.getRoot();
-        for (EntityReference ref = reference.getRoot(); ref != null; ref = ref.getChild()) {
+        for (EntityReference ref : reference.getReversedReferenceChain()) {
             builder.append(ref.getName());
             switch (ref.getType()) {
                 case WIKI:

@@ -25,8 +25,11 @@ package org.xwiki.security;
  */
 public class RightServiceException extends Exception
 {
+    /** Serialization identifier. */
+    private static final long serialVersionUID = 1L;
+
     /**
-     * @see java.lang.Exception}. 
+     * @see java.lang.Exception
      */
     public RightServiceException()
     {
@@ -35,7 +38,7 @@ public class RightServiceException extends Exception
 
     /**
      * @param message Message.
-     * @see java.lang.Exception.
+     * @see java.lang.Exception
      */
     public RightServiceException(String message)
     {
@@ -45,7 +48,7 @@ public class RightServiceException extends Exception
     /**
      * @param message Message.
      * @param cause Original cause.
-     * @see java.lang.Exception.
+     * @see java.lang.Exception
      */
     public RightServiceException(String message, Throwable cause)
     {
@@ -54,7 +57,7 @@ public class RightServiceException extends Exception
 
     /**
      * @param cause Original cause.
-     * @see java.lang.Exception.
+     * @see java.lang.Exception
      */
     public RightServiceException(Throwable cause)
     {

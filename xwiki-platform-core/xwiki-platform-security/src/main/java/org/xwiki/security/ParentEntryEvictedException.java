@@ -34,4 +34,6 @@ package org.xwiki.security;
  */
 public class ParentEntryEvictedException extends Exception
 {
+    /** Serialization identifier. */
+    private static final long serialVersionUID = 1L;
 }

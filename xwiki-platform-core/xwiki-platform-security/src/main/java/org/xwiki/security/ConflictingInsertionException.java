@@ -21,7 +21,7 @@
 package org.xwiki.security;
 
 /**
- * This exception is thrown if two or more parallell threads have
+ * This exception is thrown if two or more parallel threads have
  * attempted to load the cache with the same entry at the same time as
  * a right was updated, so the resulting entries are different.
  *
@@ -34,4 +34,6 @@ package org.xwiki.security;
  */
 public class ConflictingInsertionException extends Exception
 {
+    /** Serialization identifier. */
+    private static final long serialVersionUID = 1L;
 }

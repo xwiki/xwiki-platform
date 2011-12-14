@@ -44,6 +44,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-cache-oscache</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -60,9 +66,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-default</artifactId>
-      <version>${commons.version}</version>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

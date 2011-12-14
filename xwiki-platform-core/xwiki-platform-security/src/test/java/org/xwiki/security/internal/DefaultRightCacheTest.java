@@ -20,54 +20,36 @@
  */
 package org.xwiki.security.internal;
 
-import junit.framework.TestCase;
-
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.States;
-
-import org.xwiki.test.AbstractComponentTestCase;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.web.Utils;
-
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.manager.ComponentManager;
-
-import static org.junit.Assert.*;
-import org.junit.Test;
-import org.junit.Before;
-
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-
-import org.xwiki.security.RightCache;
-import org.xwiki.security.RightCacheKey;
-import org.xwiki.security.RightCacheEntry;
-import org.xwiki.security.ParentEntryEvictedException;
-import org.xwiki.security.ConflictingInsertionException;
-import org.xwiki.security.AccessLevel;
-import org.xwiki.security.Right;
-
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.security.AccessLevel;
+import org.xwiki.security.ConflictingInsertionException;
+import org.xwiki.security.ParentEntryEvictedException;
+import org.xwiki.security.Right;
+import org.xwiki.security.RightCache;
+import org.xwiki.security.RightCacheEntry;
+import org.xwiki.security.RightCacheKey;
+import org.xwiki.test.AbstractComponentTestCase;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
+
+import static org.junit.Assert.assertTrue;
 
 public class DefaultRightCacheTest extends AbstractComponentTestCase
 {
-    /**
-     * Mockery for creating mock objects.
-     */
-    private Mockery mockery = new Mockery();
-
     DocumentReferenceResolver<String> resolver = null;
     RightCache cache = null;
 
@@ -98,9 +80,12 @@ public class DefaultRightCacheTest extends AbstractComponentTestCase
         return c.getRightCacheKey(e);
     }
 
+    @Override
     @Before
-    public void initializeTest() throws Exception
+    public void setUp() throws Exception
     {
+        super.setUp();
+
         try {
             Utils.setComponentManager(getComponentManager());
             final Execution execution = getComponentManager().lookup(Execution.class);
@@ -115,7 +100,7 @@ public class DefaultRightCacheTest extends AbstractComponentTestCase
             context.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xwikiContext);
             xwikiContext.setWiki(new XWiki());
 
-            cache = getComponentManager().lookup(RightCache.class, "default");
+            cache = getComponentManager().lookup(RightCache.class);
             resolver = getComponentManager().lookup(DocumentReferenceResolver.class);
 
         } catch (Exception e) {
@@ -133,7 +118,7 @@ public class DefaultRightCacheTest extends AbstractComponentTestCase
 
         try {
             RightCacheKey k = cache.getRightCacheKey(document);
-            for (EntityReference e = k.getEntityReference().getRoot(); e != null; e = e.getChild()) {
+            for (EntityReference e : k.getEntityReference().getReversedReferenceChain()) {
                 cache.add(k(cache, e), AccessLevel.DEFAULT_ACCESS_LEVEL);
             }
 
@@ -166,11 +151,11 @@ public class DefaultRightCacheTest extends AbstractComponentTestCase
         String[] wikis = {"wiki1", "wiki2", "wiki3", "wiki4"};
         String[] spaces = {"space1", "spac2", "space3", "space4"};
         String[] pages = {"page1", "Page2", "page3", "page4"};
-        List<EntityReference> entities = new LinkedList();
-        for (int w = 0; w < wikis.length; w++) {
-            for (int s = 0; s < spaces.length; s++) {
-                for (int p = 0; p < pages.length; p++) {
-                    entities.add(resolver.resolve(wikis[w] + ":" + spaces[s] + "." + pages[p]));
+        List<EntityReference> entities = new LinkedList<EntityReference>();
+        for (String wiki : wikis) {
+            for (String space : spaces) {
+                for (String page : pages) {
+                    entities.add(resolver.resolve(wiki + ":" + space + "." + page));
                 }
             }
         }
@@ -203,11 +188,11 @@ public class DefaultRightCacheTest extends AbstractComponentTestCase
         String[] wikis = {"wiki1", "wiki2", "wiki3", "wiki4"};
         String[] spaces = {"space1", "spac2", "space3", "space4"};
         String[] pages = {"page1", "Page2", "page3", "page4"};
-        List<EntityReference> entities = new LinkedList();
-        for (int w = 0; w < wikis.length; w++) {
-            for (int s = 0; s < spaces.length; s++) {
-                for (int p = 0; p < pages.length; p++) {
-                    entities.add(resolver.resolve(wikis[w] + ":" + spaces[s] + "." + pages[p]));
+        List<EntityReference> entities = new LinkedList<EntityReference>();
+        for (String wiki : wikis) {
+            for (String space : spaces) {
+                for (String page : pages) {
+                    entities.add(resolver.resolve(wiki + ":" + space + "." + page));
                 }
             }
         }
@@ -246,7 +231,7 @@ public class DefaultRightCacheTest extends AbstractComponentTestCase
     private void insertToCache(EntityReference e, List<EntityReference> parents, RightCache c, RightCacheEntry x)
     {
         int attempts = 0;
-        RETRY: while (true) {
+        while (true) {
             try {
                 attempts++;
                 if (parents != null) {
@@ -255,7 +240,7 @@ public class DefaultRightCacheTest extends AbstractComponentTestCase
                     }
                 }
                 RightCacheKey key = k(c, e);
-                for (EntityReference r = key.getEntityReference().getRoot(); r != null; r = r.getChild()) {
+                for (EntityReference r : key.getEntityReference().getReversedReferenceChain()) {
                     RightCacheEntry entry = c.get(k(cache, r));
                     if (entry == null) {
                         c.add(c.getRightCacheKey(r), x);
@@ -266,13 +251,13 @@ public class DefaultRightCacheTest extends AbstractComponentTestCase
                     LOG.error("Failed to insert entry on " + attempts + " attempts.");
                     throw new RuntimeException("Failed to insert entry on " + attempts + " attempts.");
                 }
-                continue RETRY;
+                continue;
             } catch (ConflictingInsertionException e0) {
                 if (attempts > 10) {
                     LOG.error("Failed to insert entry on " + attempts + " attempts.");
                     throw new RuntimeException("Failed to insert entry on " + attempts + " attempts.");
                 }
-                continue RETRY;
+                continue;
             }
             break;
         }

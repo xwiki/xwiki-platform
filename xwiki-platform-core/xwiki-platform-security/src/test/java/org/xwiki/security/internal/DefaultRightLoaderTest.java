@@ -20,29 +20,21 @@
  */
 package org.xwiki.security.internal;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
-import org.junit.Before;
+import java.util.Collections;
 
 import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.States;
-
-import org.xwiki.security.*;
-import static org.xwiki.security.Right.*;
-import static org.xwiki.security.RightState.*;
-
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.EntityType;
+import org.xwiki.observation.EventListener;
+import org.xwiki.security.AccessLevel;
+import org.xwiki.security.RightCache;
+import org.xwiki.security.RightCacheEntry;
+import org.xwiki.security.RightLoader;
 
 import static java.util.Arrays.asList;
-import java.util.List;
-import static java.util.Collections.EMPTY_LIST;
-import static java.util.Collections.EMPTY_SET;
-
-import org.xwiki.observation.EventListener;
+import static org.junit.Assert.assertTrue;
+import static org.xwiki.security.Right.COMMENT;
+import static org.xwiki.security.Right.EDIT;
 
 public class DefaultRightLoaderTest extends AbstractTestCase
 {
@@ -51,21 +43,19 @@ public class DefaultRightLoaderTest extends AbstractTestCase
     {
         DocumentReference userX = docRefResolver.resolve("wikiY:XWiki.userX");
         DocumentReference userY = docRefResolver.resolve("wikiY:XWiki.userY");
-        DocumentReference userZ = docRefResolver.resolve("xwiki:XWiki.userZ");
-        DocumentReference admin = docRefResolver.resolve("xwiki:XWiki.Admin");
 
         MockDocument wikiDocument = new MockDocument("xwiki:XWiki.XWikiPreferences", "xwiki:XWiki.Admin");
         MockDocument allGroupDocument = MockDocument.newGroupDocument("xwiki:XWiki.XWikiAllGroup", 
                                                                       new String[]{"wikiY:XWiki.userX", 
                                                                                    "wikiY:XWiki.userY" });
         wiki.add(new MockDocument(userX, "xwiki:XWiki.Admin")
-                 .allowLocal(asList(new Right[]{EDIT }),
-                             asList(new String[]{"wikiY:XWiki.userX"}),
-                             EMPTY_LIST ))
+                 .allowLocal(asList(EDIT),
+                             asList("wikiY:XWiki.userX"),
+                             Collections.<String>emptyList()))
             .add(new MockDocument(userY, "xwiki:XWiki.Admin")
-                 .allowLocal(asList(new Right[]{EDIT }),
-                             asList(new String[]{"wikiY:XWiki.userY"}),
-                             EMPTY_LIST ))
+                 .allowLocal(asList(EDIT),
+                             asList("wikiY:XWiki.userY"),
+                             Collections.<String>emptyList()))
             .add(wikiDocument)
             .add(allGroupDocument);
 
@@ -73,10 +63,10 @@ public class DefaultRightLoaderTest extends AbstractTestCase
             mockery.checking(new Expectations() {{
                 allowing(mockGroupService)
                     .getAllGroupsNamesForMember("wikiY:XWiki.userX", Integer.MAX_VALUE, 0, xwikiContext);
-                will(returnValue(asList(new String[]{"XWiki.XWikiAllGroup"})));
+                will(returnValue(asList("XWiki.XWikiAllGroup")));
                 allowing(mockGroupService)
                     .getAllGroupsNamesForMember("wikiY:XWiki.userY", Integer.MAX_VALUE, 0, xwikiContext);
-                will(returnValue(asList(new String[]{"XWiki.XWikiAllGroup"})));
+                will(returnValue(asList("XWiki.XWikiAllGroup")));
             }});
 
             RightLoader loader = getComponentManager().lookup(RightLoader.class);
@@ -120,9 +110,9 @@ public class DefaultRightLoaderTest extends AbstractTestCase
             entry = cache.get(cache.getRightCacheKey(userX.getParent().getParent()));
             assertTrue(entry == null);
 
-            wikiDocument.denyGlobal(asList(new Right[]{COMMENT }),
-                                    EMPTY_LIST,
-                                    asList(new String[]{"wikiY:XWiki.XWikiAllGroup" }));
+            wikiDocument.denyGlobal(asList(COMMENT),
+                                    Collections.<String>emptyList(),
+                                    asList("wikiY:XWiki.XWikiAllGroup"));
 
             AccessLevel editNoComment = edit.clone();
             editNoComment.deny(COMMENT);
@@ -131,7 +121,7 @@ public class DefaultRightLoaderTest extends AbstractTestCase
 
             mockery.checking(new Expectations() {{
                 allowing(mockGroupService).getAllMembersNamesForGroup("xwiki:XWiki.GroupX", 100, 0, xwikiContext);
-                will(returnValue(asList(new String[]{"wikiY:XWiki.userX"})));
+                will(returnValue(asList("wikiY:XWiki.userX")));
             }});
             MockDocument group = MockDocument.newGroupDocument("XWiki.GroupX", new String[] {"wikiY:XWiki.userX" } );
             wiki.add(group);

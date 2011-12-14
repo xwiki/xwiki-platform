@@ -59,9 +59,10 @@ public class AccessLevel implements RightCacheEntry, Cloneable, Comparable<Acces
     private static final int RO_MASK =  1 << 31;
 
     /** Pool of existing instances. */
-    private static SortedSet<ALWeakRef> pool = new TreeSet();
+    private static SortedSet<ALWeakRef> pool = new TreeSet<ALWeakRef>();
+
     /** Reference queue for removing cleared references.  */
-    private static ReferenceQueue<AccessLevel> refQueue = new ReferenceQueue();
+    private static ReferenceQueue<AccessLevel> refQueue = new ReferenceQueue<AccessLevel>();
 
     static {
         DEFAULT_ACCESS_LEVEL = new AccessLevel() 
@@ -81,9 +82,9 @@ public class AccessLevel implements RightCacheEntry, Cloneable, Comparable<Acces
     }
 
     /**
-     * We use two consequtive bits to store an access level.  The
+     * We use two consecutive bits to store an access level.  The
      * high order bit indicate if the state of the level is
-     * determined and the low order wether the level is set or
+     * determined and the low order whether the level is set or
      * not.
      *
      * The enumeration values of the Right enum gives the offset
@@ -154,7 +155,6 @@ public class AccessLevel implements RightCacheEntry, Cloneable, Comparable<Acces
 
     /**
      * Reuse existing instance, if available.
-     * @param levels
      * @return An access levels instance that equals the given one.
      */
     public AccessLevel getExistingInstance()
@@ -179,7 +179,7 @@ public class AccessLevel implements RightCacheEntry, Cloneable, Comparable<Acces
     /**
      * Shorthand for the shift operation.
      * @param value The value to shift.
-     * @param right The right, which's value is the basis for
+     * @param right The right, which value is the basis for
      * computing an offset.
      * @return Shifted value.
      */
@@ -266,7 +266,7 @@ public class AccessLevel implements RightCacheEntry, Cloneable, Comparable<Acces
     }
 
     @Override
-    public AccessLevel clone()
+    public AccessLevel clone() throws CloneNotSupportedException
     {
         try {
             AccessLevel clone = (AccessLevel) super.clone();
@@ -304,7 +304,7 @@ public class AccessLevel implements RightCacheEntry, Cloneable, Comparable<Acces
     @Override
     public <T> Collection<T> getObjects(Class<T> type)
     {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     @Override

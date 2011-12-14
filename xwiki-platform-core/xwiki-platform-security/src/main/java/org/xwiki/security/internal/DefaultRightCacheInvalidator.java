@@ -22,25 +22,24 @@
  */
 package org.xwiki.security.internal;
 
-import org.xwiki.security.RightCache;
-import org.xwiki.security.RightCacheKey;
-import org.xwiki.security.RightServiceException;
-
-import org.xwiki.model.reference.DocumentReference;
-
-import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.Event;
-import org.xwiki.bridge.event.DocumentDeletedEvent;
-import org.xwiki.bridge.event.DocumentUpdatedEvent;
-
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.event.Event;
+import org.xwiki.security.RightCache;
+import org.xwiki.security.RightCacheKey;
+import org.xwiki.security.RightServiceException;
 
 /**
  * The instance of this class monitors updates and invalidates right
@@ -48,10 +47,16 @@ import org.xwiki.component.logging.AbstractLogEnabled;
  * @version $Id$
  */
 @Component
-public class DefaultRightCacheInvalidator extends AbstractLogEnabled implements RightCacheInvalidator, EventListener
+@Singleton
+public class DefaultRightCacheInvalidator implements RightCacheInvalidator, EventListener
 {
+    /** Logger. **/
+    @Inject
+    private Logger logger;
+
     /** The right cache. */
-    @Requirement private RightCache rightCache;
+    @Inject
+    private RightCache rightCache;
 
     /**
      * We use a fair read-write lock to suspend the delivery of
@@ -71,21 +76,13 @@ public class DefaultRightCacheInvalidator extends AbstractLogEnabled implements 
         readWriteLock.readLock().unlock();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return getClass().getName();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
+    @Override
     public List<Event> getEvents()
     {
         Event[] events = {
@@ -95,12 +92,7 @@ public class DefaultRightCacheInvalidator extends AbstractLogEnabled implements 
         return Arrays.asList(events);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-     *      java.lang.Object)
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         DocumentReference ref = XWikiUtils.getDocumentReference(source);
@@ -111,14 +103,14 @@ public class DefaultRightCacheInvalidator extends AbstractLogEnabled implements 
                 XWikiUtils.invalidateGroupMembers(ref, rightCache);
             }
         } catch (RightServiceException e) {
-            getLogger().error("Failed to invalidate group members on the document: " + ref, e);
+            this.logger.error("Failed to invalidate group members on the document: " + ref, e);
         } finally {
             readWriteLock.writeLock().unlock();
         }
     }
 
     /**
-     * Describe <code>deliverUpdateEvent</code> method here.
+     * Describe {@code deliverUpdateEvent} method here.
      *
      * @param ref Reference to the document that should be
      * invalidated.

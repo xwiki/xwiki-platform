@@ -19,8 +19,10 @@
  */
 package org.xwiki.security.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -28,34 +30,31 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
- * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
- * component to resolve {@link DocumentReference} objects from their string representation.  This resolver
- * is specialized for generating document references of user and group documents.  The resolve
- * 
+ * Specialized version of {@link org.xwiki.model.reference.DocumentReferenceResolver<String>} which ensure the
+ * proper space is used to find user documents and allow overwriting the wiki only.
+ *
  * @version $Id$
  */
 @Component(hints = { "user", "group" })
+@Singleton
 public class UserAndGroupReferenceResolver implements DocumentReferenceResolver<String>
 {
     /** Default user space. */
     private static final String DEFAULT_USER_SPACE = "XWiki";
 
     /** Internally used resolver. */
-    @Requirement private EntityReferenceResolver<String> resolver;
+    @Inject
+    private EntityReferenceResolver<String> resolver;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve
-     */
+    @Override
     public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
     {
-        if (parameters.length == 1 && !(parameters[0] instanceof String)) {
-            throw new IllegalArgumentException("The resolver parameter is not a String.");
+        if (parameters.length > 0 && !(parameters[0] instanceof EntityReference)) {
+            throw new IllegalArgumentException("The resolver parameter is not a WikiReference.");
         }
         EntityReference defaultSpace;
-        if (parameters.length == 1) {
-            EntityReference defaultWiki = new EntityReference((String) parameters[0], EntityType.WIKI, null);
+        if (parameters.length > 0) {
+            EntityReference defaultWiki = ((EntityReference) parameters[0]).extractReference(EntityType.WIKI);
             defaultSpace = new EntityReference(DEFAULT_USER_SPACE, EntityType.SPACE, defaultWiki);
         } else {
             defaultSpace = resolver.resolve(DEFAULT_USER_SPACE, EntityType.SPACE);

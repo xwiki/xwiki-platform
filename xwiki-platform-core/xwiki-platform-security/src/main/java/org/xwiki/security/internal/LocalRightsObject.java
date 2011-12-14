@@ -20,8 +20,10 @@
  */
 package org.xwiki.security.internal;
 
-import com.xpn.xwiki.objects.BaseObject;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
+
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Java class corresponding to XWiki.XWikiRightsClass.
@@ -36,7 +38,7 @@ public class LocalRightsObject extends AbstractRightsObject
      * @param resolver A document reference resolver.
      * @param wikiName The name of the current wiki.
      */
-    public LocalRightsObject(BaseObject obj, DocumentReferenceResolver resolver, String wikiName)
+    public LocalRightsObject(BaseObject obj, DocumentReferenceResolver<String> resolver, WikiReference wikiName)
     {
         super(obj, resolver, wikiName);
     }

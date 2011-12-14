@@ -20,24 +20,22 @@
  */
 package org.xwiki.security.internal;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-
 import org.xwiki.security.Right;
 
-import java.util.List;
-import java.util.LinkedList;
-
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class MockDocument extends XWikiDocument
 {
-    private List<BaseObject> globalRights = new LinkedList();
-    private List<BaseObject> localRights = new LinkedList();
-    private List<BaseObject> groups = new LinkedList();
+    private List<BaseObject> globalRights = new LinkedList<BaseObject>();
+    private List<BaseObject> localRights = new LinkedList<BaseObject>();
+    private List<BaseObject> groups = new LinkedList<BaseObject>();
 
     public MockDocument(DocumentReference docRef, String creator)
     {

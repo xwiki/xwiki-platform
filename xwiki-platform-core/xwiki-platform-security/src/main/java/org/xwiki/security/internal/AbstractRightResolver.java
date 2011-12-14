@@ -22,46 +22,57 @@
  */
 package org.xwiki.security.internal;
 
-import org.xwiki.security.RightResolver;
-import org.xwiki.security.RightService;
-import org.xwiki.security.Right;
-import org.xwiki.security.RightState;
-import static org.xwiki.security.Right.*;
-import static org.xwiki.security.RightState.*;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
-
+import org.apache.commons.lang.StringUtils;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.Right;
+import org.xwiki.security.RightResolver;
+import org.xwiki.security.RightService;
+import org.xwiki.security.RightState;
 
-import java.util.HashMap;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.EnumMap;
-
-import org.xwiki.component.logging.AbstractLogEnabled;
-import org.apache.commons.lang.StringUtils;
+import static org.xwiki.security.Right.ADMIN;
+import static org.xwiki.security.Right.COMMENT;
+import static org.xwiki.security.Right.DELETE;
+import static org.xwiki.security.Right.EDIT;
+import static org.xwiki.security.Right.ILLEGAL;
+import static org.xwiki.security.Right.LOGIN;
+import static org.xwiki.security.Right.PROGRAM;
+import static org.xwiki.security.Right.REGISTER;
+import static org.xwiki.security.Right.VIEW;
+import static org.xwiki.security.RightState.ALLOW;
+import static org.xwiki.security.RightState.DENY;
 
 /**
  * Abstract super class for right resolvers.
  * @version $Id$
  */
-abstract class AbstractRightResolver extends AbstractLogEnabled implements RightResolver
+abstract class AbstractRightResolver implements RightResolver
 {
     /** Map for resolving conflicting rights within a document hierarchy level. */
-    protected final Map<Right, RightState> tieResolution = new EnumMap(Right.class);
-    /** Map to resolving configting rights between document hierarchy levels. */
-    protected final Map<Right, Boolean> smallerWin = new EnumMap(Right.class);
+    protected final Map<Right, RightState> tieResolution = new EnumMap<Right, RightState>(Right.class);
+
+    /** Map to resolving conflicting rights between document hierarchy levels. */
+    protected final Map<Right, Boolean> smallerWin = new EnumMap<Right, Boolean>(Right.class);
+
     /** Additional rights an admin have. */
-    protected final Right[] adminImpliedRights   = {LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT };
+    protected final Right[] adminImpliedRights = {LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT};
+
     /** Additional rights a programmer have. */
-    protected final Right[] programImpliedRights = {LOGIN, VIEW, EDIT, DELETE, ADMIN, REGISTER, COMMENT };
+    protected final Right[] programImpliedRights = {LOGIN, VIEW, EDIT, DELETE, ADMIN, REGISTER, COMMENT};
+
     /**
-     * The enabled rights for a document hierarcy level.  The PROGRAM
+     * The enabled rights for a document hierarchy level.  The PROGRAM
      * right should only be enabled for the main wiki, not for wikis
      * in general. 
      */
-    protected final Map<EntityType, Iterable<Right>> enabledRights = new HashMap();
+    protected final Map<EntityType, Iterable<Right>> enabledRights = new HashMap<EntityType, Iterable<Right>>();
 
     {
         tieResolution.put(LOGIN,    ALLOW);
@@ -82,8 +93,8 @@ abstract class AbstractRightResolver extends AbstractLogEnabled implements Right
         smallerWin.put(REGISTER, false);
         smallerWin.put(COMMENT,  true);
         smallerWin.put(ILLEGAL,  false);
-        Right[] pageRights        = {VIEW, EDIT, COMMENT, DELETE };
-        Right[] spaceRights       = {VIEW, EDIT, COMMENT, DELETE, ADMIN }; 
+        Right[] pageRights = {VIEW, EDIT, COMMENT, DELETE };
+        Right[] spaceRights = {VIEW, EDIT, COMMENT, DELETE, ADMIN };
         Right[] wikiRights = {VIEW, EDIT, COMMENT, DELETE, ADMIN, REGISTER, LOGIN, PROGRAM };
         enabledRights.put(EntityType.DOCUMENT, Arrays.asList(pageRights));
         enabledRights.put(EntityType.SPACE,    Arrays.asList(spaceRights));
@@ -115,10 +126,7 @@ abstract class AbstractRightResolver extends AbstractLogEnabled implements Right
      */
     protected boolean isCreator(DocumentReference user, EntityReference entity)
     {
-        if (entity.getType() == EntityType.DOCUMENT) {
-            return XWikiUtils.isCreator(user, new DocumentReference(entity));
-        }
-        return false;
+        return (entity.getType() == EntityType.DOCUMENT) && XWikiUtils.isCreator(user, new DocumentReference(entity));
     }
 
     /**
@@ -129,7 +137,7 @@ abstract class AbstractRightResolver extends AbstractLogEnabled implements Right
      */
     protected boolean isWikiOwner(DocumentReference user, EntityReference entity)
     {
-        EntityReference wiki = entity.getRoot();
-        return XWikiUtils.isWikiOwner(user, wiki.getName());
+        WikiReference wiki = (WikiReference) entity.getRoot();
+        return XWikiUtils.isWikiOwner(user, wiki);
     }
 }

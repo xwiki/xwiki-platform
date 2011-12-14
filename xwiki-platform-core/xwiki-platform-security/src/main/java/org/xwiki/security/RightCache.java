@@ -38,7 +38,7 @@ public interface RightCache
      * @throws ParentEntryEvictedException when the parent entry of
      * this entry was evicted before this insertion.  Since all
      * entries, except wiki-entries, must have a parent cached, the
-     * {@link RightsLoader} must restart its load attempt.
+     * {@link RightLoader} must restart its load attempt.
      * @throws ConflictingInsertionException when another thread have
      * inserted this entry, but with a different content.
      */
@@ -53,7 +53,7 @@ public interface RightCache
      * @throws ParentEntryEvictedException when the parent entry of
      * this entry was evicted before this insertion.  Since all
      * entries, except wiki-entries, must have a parent cached, the
-     * {@link RightsLoader} must restart its load attempt.
+     * {@link RightLoader} must restart its load attempt.
      * @throws ConflictingInsertionException when another thread have
      * inserted this entry, but with a different content.
      */
@@ -62,14 +62,14 @@ public interface RightCache
 
     /**
      * Add an entry to this cache.  To explicitly name the parent is
-     * needed for nested spaces and for virtual wiki's.
+     * needed for nested spaces and for virtual wikis.
      * @param entity The entity which is the object of this cache entry.
      * @param parent The parent entity.
      * @param entry The entry to insert.
      * @exception ParentEntryEvictedException when the parent entry of
      * this entry was evicted before this insertion.  Since all
      * entries, except wiki-entries, must have a parent cached, the
-     * {@link RightsLoader} must restart its load attempt.
+     * {@link RightLoader} must restart its load attempt.
      * @throws ConflictingInsertionException when another thread have
      * inserted this entry, but with a different content.
      */
@@ -84,7 +84,7 @@ public interface RightCache
      * @exception ParentEntryEvictedException when the parent entry of
      * this entry was evicted before this insertion.  Since all
      * entries, except wiki-entries, must have a parent cached, the
-     * {@link RightsLoader} must restart its load attempt.
+     * {@link RightLoader} must restart its load attempt.
      * @throws ConflictingInsertionException when another thread have
      * inserted this entry, but with a different content.
      */

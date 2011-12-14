@@ -8029,7 +8029,7 @@ public class XWikiDocument implements DocumentModelBridge
         for (List<BaseObject> objects : document.getXObjects().values()) {
             for (BaseObject newObj : objects) {
                 if (newObj != null) {
-                    BaseObject originalObj = document.getXObject(newObj.getXClassReference(), newObj.getNumber());
+                    BaseObject originalObj = getXObject(newObj.getXClassReference(), newObj.getNumber());
                     if (ObjectUtils.notEqual(newObj, originalObj)) {
                         // The object added or modified
                         setXObject(newObj.getNumber(), newObj);

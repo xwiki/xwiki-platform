@@ -144,7 +144,9 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
                 .hasPrevious();) {
                 DefaultLocalExtension localExtension = it.previous();
 
-                validateExtension(localExtension, validatedExtension);
+                if (localExtension.isInstalled()) {
+                    validateExtension(localExtension, validatedExtension);
+                }
             }
         }
     }
@@ -198,8 +200,11 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
         String namespace)
     {
         try {
-            if (!localExtension.isInstalled(namespace)
-                || this.coreExtensionRepository.exists(localExtension.getId().getId())) {
+            if (!localExtension.isInstalled(namespace)) {
+                return;
+            }
+            
+            if (this.coreExtensionRepository.exists(localExtension.getId().getId())) {
                 // Impossible to overwrite core extensions
                 localExtension.setInstalled(false, namespace);
 

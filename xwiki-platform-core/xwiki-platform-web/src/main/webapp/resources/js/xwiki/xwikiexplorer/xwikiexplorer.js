@@ -494,7 +494,11 @@ isc.XWEDataSource.addProperties({
      * Properties passed to the RPCManager when request are performed.
      */
     requestProperties : {
-        promptStyle: "cursor"
+        promptStyle: "cursor",
+        // Prevent the RPCManager from displaying a warning message every time a request fails. This is especially
+        // annoying when we try to open the tree to a page that doesn't exist.
+        // See http://www.smartclient.com/smartgwtee/javadoc/com/smartgwt/client/rpc/RPCRequest.html#getWillHandleError()
+        willHandleError: true
     },
 
     /**

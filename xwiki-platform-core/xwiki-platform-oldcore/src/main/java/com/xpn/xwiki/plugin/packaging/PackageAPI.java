@@ -254,7 +254,7 @@ public class PackageAPI extends Api
     
     /**
      * Load a package in memory from a byte array. It may be installed later using {@link #install()}.
-     * Your should prefer {@link #Import(InputStream, XWikiContext) which may avoid loading the package twice in memory.
+     * Your should prefer {@link #Import(InputStream, XWikiContext)} which may avoid loading the package twice in memory.
      *
      * @param file an byte array containing a zipped package file
      * @return an empty string, useless.

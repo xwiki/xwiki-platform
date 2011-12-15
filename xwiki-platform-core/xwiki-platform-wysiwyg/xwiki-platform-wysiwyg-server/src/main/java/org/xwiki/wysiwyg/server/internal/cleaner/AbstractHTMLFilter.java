@@ -19,21 +19,16 @@
  */
 package org.xwiki.wysiwyg.server.internal.cleaner;
 
-import org.xwiki.component.annotation.ComponentRole;
-
 /**
- * Interface used to tag WYSIWYG editor specific HTML cleaning filters.
+ * Abstract {@link HTMLFilter} that has a default priority of 100.
  * 
  * @version $Id$
  */
-@ComponentRole
-public interface HTMLFilter extends org.xwiki.xml.html.filter.HTMLFilter
+public abstract class AbstractHTMLFilter implements HTMLFilter
 {
-    /**
-     * The filter priority is used to determine the order in which filters are applied. The lower the returned value the
-     * higher the priority. 0 is top priority.
-     * 
-     * @return the priority of this filter
-     */
-    int getPriority();
+    @Override
+    public int getPriority()
+    {
+        return 100;
+    }
 }

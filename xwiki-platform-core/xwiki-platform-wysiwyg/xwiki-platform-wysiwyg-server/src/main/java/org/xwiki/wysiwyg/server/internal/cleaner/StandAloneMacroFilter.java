@@ -43,7 +43,7 @@ import org.xwiki.component.annotation.Component;
 @Component(roles = {HTMLFilter.class })
 @Named("standAloneMacro")
 @Singleton
-public class StandAloneMacroFilter implements HTMLFilter
+public class StandAloneMacroFilter extends AbstractHTMLFilter
 {
     @Override
     public void filter(Document document, Map<String, String> parameters)

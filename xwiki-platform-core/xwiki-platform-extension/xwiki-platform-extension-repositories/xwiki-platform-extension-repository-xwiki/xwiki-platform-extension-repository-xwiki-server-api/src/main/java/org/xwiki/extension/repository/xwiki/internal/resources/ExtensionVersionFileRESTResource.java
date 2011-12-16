@@ -108,8 +108,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
                 URL url = new URL(resourceReference.getReference());
 
                 // TODO: find a proper way to do a perfect proxy of the URL without directly using Restlet classes.
-                // It's a real pain since Restlet does not properly support some standard headers (like the charset in
-                // the content-type for example) when given as it is in the Response
+                // Should probably use javax.ws.rs.ext.MessageBodyWriter
 
                 URLConnection connection = url.openConnection();
 

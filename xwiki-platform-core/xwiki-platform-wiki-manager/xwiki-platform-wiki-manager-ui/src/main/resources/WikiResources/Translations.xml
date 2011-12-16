@@ -72,7 +72,7 @@ wikimanager.widget.mylastmodifications.title=My recent modifications
 
 # ANSWERS
 wikimanager.answer.deletewiki.title=Delete wiki
-wikimanager.answer.deletewiki.msg=Are you sure you wish to delete wiki \"{0}\" ?
+wikimanager.answer.deletewiki.msg=Are you sure you wish to delete wiki \"{0}\"?
 
 # ACTIONS
 wikimanager.listwikiactions=Actions

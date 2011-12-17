@@ -22,13 +22,12 @@
  */
 package org.xwiki.security;
 
-import java.util.TreeSet;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.SortedSet;
-
-import java.lang.ref.WeakReference;
-import java.lang.ref.ReferenceQueue;
+import java.util.TreeSet;
 
 /**
  * Represents access level.
@@ -50,36 +49,24 @@ import java.lang.ref.ReferenceQueue;
  */
 public class AccessLevel implements RightCacheEntry, Cloneable, Comparable<AccessLevel>
 {
+    /** Read-only flag/mask. */
+    private static final int RO_MASK =  1 << 31;
+
     /**
      * The default access levels.
      */
-    public static final AccessLevel DEFAULT_ACCESS_LEVEL;
+    private static AccessLevel defaultAccessLevel = null;
 
-    /** Read-only flag/mask. */
-    private static final int RO_MASK =  1 << 31;
+    /**
+     * The default access levels size. Check to update defaultAccessLevel if a new Right is added.
+     */
+    public static int defaultAccessLevelSize;
 
     /** Pool of existing instances. */
     private static SortedSet<ALWeakRef> pool = new TreeSet<ALWeakRef>();
 
     /** Reference queue for removing cleared references.  */
     private static ReferenceQueue<AccessLevel> refQueue = new ReferenceQueue<AccessLevel>();
-
-    static {
-        DEFAULT_ACCESS_LEVEL = new AccessLevel() 
-            {
-                {
-                    allow(Right.VIEW);
-                    allow(Right.EDIT);
-                    allow(Right.COMMENT);
-                    allow(Right.LOGIN);
-                    allow(Right.REGISTER);
-                    deny(Right.DELETE);
-                    deny(Right.ADMIN);
-                    deny(Right.PROGRAM);
-                    deny(Right.ILLEGAL);
-                }
-            } .getExistingInstance();
-    }
 
     /**
      * We use two consecutive bits to store an access level.  The
@@ -91,6 +78,18 @@ public class AccessLevel implements RightCacheEntry, Cloneable, Comparable<Acces
      * to the bits corresponding to the specific level.
      */
     private int levels;
+    
+    public static AccessLevel getDefaultAccessLevel()
+    {
+        if (defaultAccessLevel == null || Right.size() != defaultAccessLevelSize) {
+            defaultAccessLevel = new AccessLevel();
+            for (Right right : Right.values()) {
+                defaultAccessLevel.set(right, right.getDefaultState());
+            }
+            defaultAccessLevel = defaultAccessLevel.getExistingInstance();
+        }
+        return defaultAccessLevel;
+    }
 
     /**
      * Weak reference for storing instances in a pool.
@@ -185,7 +184,7 @@ public class AccessLevel implements RightCacheEntry, Cloneable, Comparable<Acces
      */
     private int shift(int value, Right right)
     {
-        return value << (2 * right.getValue());
+        return value << (2 * right.ordinal());
     }
         
     /**

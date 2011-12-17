@@ -39,10 +39,12 @@ import org.xwiki.security.Right;
 import org.xwiki.security.RightCache;
 import org.xwiki.security.RightCacheEntry;
 import org.xwiki.security.RightCacheKey;
+import org.xwiki.security.RightDescription;
 import org.xwiki.security.RightLoader;
 import org.xwiki.security.RightService;
 import org.xwiki.security.RightServiceException;
 import org.xwiki.security.RightState;
+import org.xwiki.security.UnableToRegisterRightException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -336,6 +338,16 @@ public class DefaultRightService implements RightService
         return Right.getAllRightsAsString();
     }
 
+    @Override
+    public Right registerRight(RightDescription rightDescription) throws UnableToRegisterRightException
+    {
+        try {
+            return new Right(rightDescription);
+        } catch(Throwable e) {
+            throw new UnableToRegisterRightException(rightDescription, e);
+        }
+    }
+
     /**
      * @param context The current context
      * @return A document reference uniquely identifying the current
@@ -360,7 +372,7 @@ public class DefaultRightService implements RightService
      * @param user The user identity.
      * @param entity The entity.  May be of type DOCUMENT, WIKI, or SPACE.
      * @return the cached access level object.
-     * @exception RightServiceException if an error occurs
+     * @exception org.xwiki.security.RightServiceException if an error occurs
      */
     private AccessLevel getAccessLevel(DocumentReference user, EntityReference entity)
         throws RightServiceException
@@ -418,7 +430,7 @@ public class DefaultRightService implements RightService
         }
 
         this.logger.debug("Returning default access level.");
-        return AccessLevel.DEFAULT_ACCESS_LEVEL;
+        return AccessLevel.getDefaultAccessLevel();
     }
 
     /**
@@ -435,7 +447,7 @@ public class DefaultRightService implements RightService
             String docName = entityReferenceSerializer.serialize(entity);
             Formatter f = new Formatter();
             this.logger.debug(f.format("Access has been granted for (%s,%s,%s): %s",
-                                       userName, docName, right.toString(), info).toString());
+                                       userName, docName, right.getName(), info).toString());
         }
     }
 
@@ -453,7 +465,7 @@ public class DefaultRightService implements RightService
             String docName = entityReferenceSerializer.serialize(entity);
             Formatter f = new Formatter();
             this.logger.info(f.format("Access has been denied for (%s,%s,%s): %s",
-                                      userName, docName, right.toString(), info).toString());
+                                      userName, docName, right.getName(), info).toString());
         }
     }
     
@@ -503,7 +515,7 @@ public class DefaultRightService implements RightService
      */
     private boolean needsAuth(Right right, XWikiContext context)
     {
-        String prefName = "authenticate_" + right.toString();
+        String prefName = "authenticate_" + right.getName();
 
         String value = context.getWiki().getXWikiPreference(prefName, "", context);
         Boolean result = checkNeedsAuthValue(value);

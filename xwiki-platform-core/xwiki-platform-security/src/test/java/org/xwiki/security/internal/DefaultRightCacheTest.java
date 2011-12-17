@@ -119,18 +119,18 @@ public class DefaultRightCacheTest extends AbstractComponentTestCase
         try {
             RightCacheKey k = cache.getRightCacheKey(document);
             for (EntityReference e : k.getEntityReference().getReversedReferenceChain()) {
-                cache.add(k(cache, e), AccessLevel.DEFAULT_ACCESS_LEVEL);
+                cache.add(k(cache, e), AccessLevel.getDefaultAccessLevel());
             }
 
-            insertToCache(guestUser, null, cache, AccessLevel.DEFAULT_ACCESS_LEVEL);
-            cache.addUserAtEntity(k(cache, guestUser), k(cache, document), AccessLevel.DEFAULT_ACCESS_LEVEL);
+            insertToCache(guestUser, null, cache, AccessLevel.getDefaultAccessLevel());
+            cache.addUserAtEntity(k(cache, guestUser), k(cache, document), AccessLevel.getDefaultAccessLevel());
             RightCacheEntry rce = cache.get(k(cache, guestUser), k(cache, document));
-            assertTrue(rce == AccessLevel.DEFAULT_ACCESS_LEVEL);
+            assertTrue(rce == AccessLevel.getDefaultAccessLevel());
             cache.remove(k(cache, guestUser), k(cache, document));
             rce = cache.get(k(cache, guestUser), k(cache, document));
             assertTrue(rce == null);
             rce = cache.get(k(cache, document));
-            assertTrue(rce == AccessLevel.DEFAULT_ACCESS_LEVEL);
+            assertTrue(rce == AccessLevel.getDefaultAccessLevel());
             cache.remove(k(cache, document.getRoot()));
             rce = cache.get(k(cache, document.getParent()));
             assertTrue(rce == null);

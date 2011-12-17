@@ -26,7 +26,7 @@ public class AccessLevelTest extends TestCase
 {
     public static void assertDefaultAccessLevel()
     {
-        assertTrue(AccessLevel.DEFAULT_ACCESS_LEVEL.equals(new AccessLevel() {
+        assertTrue(AccessLevel.getDefaultAccessLevel().equals(new AccessLevel() {
                 {
                     allow(Right.VIEW);
                     allow(Right.EDIT);
@@ -43,7 +43,7 @@ public class AccessLevelTest extends TestCase
 
     public void testAccessLevel() throws Exception
     {
-        AccessLevel l = AccessLevel.DEFAULT_ACCESS_LEVEL.clone();
+        AccessLevel l = AccessLevel.getDefaultAccessLevel().clone();
 
         assertTrue(l.get(Right.VIEW) == RightState.ALLOW);
         assertTrue(l.get(Right.EDIT) == RightState.ALLOW);
@@ -129,7 +129,7 @@ public class AccessLevelTest extends TestCase
 
     public void testClone() throws Exception
     {
-        AccessLevel l = AccessLevel.DEFAULT_ACCESS_LEVEL.clone();
+        AccessLevel l = AccessLevel.getDefaultAccessLevel().clone();
         AccessLevel k = l.clone();
         assertTrue(k.equals(l));
         assertFalse(k == l);

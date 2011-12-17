@@ -54,7 +54,7 @@ public class DefaultRightResolverTest  extends AbstractTestCase
             DocumentReference[] groups = { uResolver.resolve("GroupX", new WikiReference("wikiY")), uResolver.resolve("SpaceY.GroupY") };
             DocumentReference[] users  = { uResolver.resolve("UserX", new WikiReference("wikiY")) };
 
-            RightsObject o = new MockRightsObject(new HashSet<Right>(asList(rights)),
+            RightsObject o = new MockRightsObject(new RightSet(asList(rights)),
                                                   ALLOW,
                                                   new HashSet<DocumentReference>(asList(users)),
                                                   new HashSet<DocumentReference>(asList(groups)));
@@ -74,10 +74,10 @@ public class DefaultRightResolverTest  extends AbstractTestCase
             docLevel.add(pageRights);
 
             AccessLevel level = resolver.resolve(userX, doc, key, new LinkedList<DocumentReference>(), docLevel);
-            assertTrue(level.equals(AccessLevel.DEFAULT_ACCESS_LEVEL));
+            assertTrue(level.equals(AccessLevel.getDefaultAccessLevel()));
 
             level = resolver.resolve(userY, doc, key, asList(groups), docLevel);
-            AccessLevel delete = AccessLevel.DEFAULT_ACCESS_LEVEL.clone();
+            AccessLevel delete = AccessLevel.getDefaultAccessLevel().clone();
             delete.allow(DELETE);
             assertTrue(level.equals(delete));
 
@@ -93,7 +93,7 @@ public class DefaultRightResolverTest  extends AbstractTestCase
             
             
             level = resolver.resolve(userX, doc, key, new LinkedList<DocumentReference>(), spaceLevel);
-            AccessLevel expected = AccessLevel.DEFAULT_ACCESS_LEVEL.clone();
+            AccessLevel expected = AccessLevel.getDefaultAccessLevel().clone();
             expected.allow(ADMIN);
             expected.allow(DELETE);
             assertTrue(level.equals(expected));

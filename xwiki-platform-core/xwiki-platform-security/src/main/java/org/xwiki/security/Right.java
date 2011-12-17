@@ -20,147 +20,276 @@
  */
 package org.xwiki.security;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.HashMap;
 import java.util.Map;
+
+import org.xwiki.model.EntityType;
+
+import static org.xwiki.security.RightState.ALLOW;
+import static org.xwiki.security.RightState.DENY;
+import static org.xwiki.security.RightState.UNDETERMINED;
 
 /**
  * Enumeration of the possible rights.
  * @version $Id$
  */
-public enum Right
+public class Right implements RightDescription, Serializable, Comparable<Right>
 {
     /** The login access right. */
-       LOGIN(0, "login"),
-    /** The view access right. */
-        VIEW(1, "view"), 
-    /** The edit access right. */
-        EDIT(2, "edit"),
-    /** The delete access right. */
-      DELETE(3, "delete"),
-    /** The Admin access right. */
-       ADMIN(4, "admin"), 
-    /** The program access right. */
-     PROGRAM(5, "programming"),
-    /** The register access right. */
-    REGISTER(6, "register"),
-    /** The comment access right. */
-     COMMENT(7, "comment"),
-    /** Illegal value. */
-     ILLEGAL(8, "illegal");
+    public static final Right LOGIN;
 
-    /** Map containing all known actions. */
-    private static final Map<String, Right> actionMap = new HashMap<String, Right>();
+    /** The view access right. */
+    public static final Right VIEW;
+
+    /** The edit access right. */
+    public static final Right EDIT;
+
+    /** The delete access right. */
+    public static final Right DELETE;
+
+    /** The Admin access right. */
+    public static final Right ADMIN;
+
+    /** The program access right. */
+    public static final Right PROGRAM;
+
+    /** The register access right. */
+    public static final Right REGISTER;
+
+    /** The comment access right. */
+    public static final Right COMMENT;
+
+    /** Illegal value. */
+    public static final Right ILLEGAL;
+
+    /** Serialization identifier. */
+    private static final long serialVersionUID = 1L;
+
+    /** Internal list of existing instances. */
+    private static final List<Right> VALUES = new ArrayList<Right>();
+
+    /** Unmodifiable list of existing instance for public dissemination. */
+    private static final List<Right> UNMODIFIABLE_VALUES = Collections.unmodifiableList(VALUES);
 
     /** List of all rights, as strings. */
-    private static final List<String> allRights = new LinkedList<String>();
+    private static final List<String> ALL_RIGHTS = new LinkedList<String>();
+
+    /** List of all rights, as strings. */
+    private static final List<String> UNMODIFIABLE_ALL_RIGHTS = Collections.unmodifiableList(ALL_RIGHTS);
+
+    /**
+     * Specialized map with a chainable put action to avoid exceeding code complexity during initialization.
+     */
+    private static class ActionMap extends HashMap<String, Right>
+    {
+        /** Serialization identifier for conformance to Serializable. */
+        private static final long serialVersionUID = 1;
+
+        /** Allow filling the map in the initializer without exceeding code complexity.
+         * @param action the action name
+         * @param right the corresponding right required
+         * @return this action map to allow code chaining
+         */
+        public ActionMap putAction(String action, Right right)
+        {
+            put(action, right);
+            return this;
+        }
+    }
+
+    /** Map containing all known actions. */
+    private static final ActionMap ACTION_MAP = new ActionMap();
+
+    /**
+     * The enabled rights by entity types.  There is a special case hardcoded : The PROGRAM
+     * right should only be enabled for the main wiki, not for wikis in general.
+     */
+    private static final Map<EntityType, List<Right>> ENABLED_RIGHTS = new HashMap<EntityType, List<Right>>();
+
+    /**
+     * The enabled rights by entity types, but with unmodifiable list for getters.
+     */
+    private static final Map<EntityType, List<Right>> UNMODIFIABLE_ENABLED_RIGHTS = new HashMap<EntityType, List<Right>>();
+
+    static {
+        EntityType[] AllEntities = {EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI};
+        EntityType[] SpaceEntities = {EntityType.SPACE, EntityType.WIKI};
+
+        LOGIN    = new Right("login",       ALLOW,  ALLOW, true,  null, Arrays.asList(EntityType.WIKI));
+        VIEW     = new Right("view",        ALLOW,  DENY,  true,  null, Arrays.asList(AllEntities)    );
+        EDIT     = new Right("edit",        ALLOW,  DENY,  true,  null, Arrays.asList(AllEntities)    );
+        DELETE   = new Right("delete",      DENY,   DENY,  true,  null, Arrays.asList(AllEntities)    );
+        REGISTER = new Right("register",    ALLOW,  ALLOW, false, null, Arrays.asList(EntityType.WIKI));
+        COMMENT  = new Right("comment",     ALLOW,  DENY,  true,  null, Arrays.asList(AllEntities)    );
+        
+        Right[] adminImpliedRight = {LOGIN, VIEW,   EDIT, DELETE, REGISTER, COMMENT};
+        ADMIN    = new Right("admin",       DENY,   ALLOW, false, Arrays.asList(adminImpliedRight),
+            Arrays.asList(SpaceEntities));
+        
+        Right[] programImpliedRight = {LOGIN, VIEW, EDIT, DELETE, ADMIN, REGISTER, COMMENT};
+        PROGRAM  = new Right("programming", DENY,   ALLOW, false, Arrays.asList(programImpliedRight),
+            Arrays.asList(EntityType.WIKI));
+        
+        ILLEGAL  = new Right("illegal",     DENY,   DENY,  false, null, null                          );
+
+        ACTION_MAP
+            .putAction(LOGIN.getName(), LOGIN)
+            .putAction(VIEW.getName(), VIEW)
+            .putAction(DELETE.getName(), DELETE)
+            .putAction(ADMIN.getName(), ADMIN)
+            .putAction(PROGRAM.getName(), PROGRAM)
+            .putAction(EDIT.getName(), EDIT)
+            .putAction(REGISTER.getName(), REGISTER)
+            .putAction("logout", LOGIN)
+            .putAction("loginerror", LOGIN)
+            .putAction("loginsubmit", LOGIN)
+            .putAction("viewrev", VIEW)
+            .putAction("get", VIEW)
+            // .putAction("downloadrev", "download"); Huh??
+            .putAction("downloadrev", VIEW)
+            .putAction("plain", VIEW)
+            .putAction("raw", VIEW)
+            .putAction("attach", VIEW)
+            .putAction("charting", VIEW)
+            .putAction("skin", VIEW)
+            .putAction("download", VIEW)
+            .putAction("dot", VIEW)
+            .putAction("svg", VIEW)
+            .putAction("pdf", VIEW)
+            .putAction("deleteversions", ADMIN)
+            // .putAction("undelete", "undelete"); Huh??
+            .putAction("undelete", EDIT)
+            .putAction("reset", DELETE)
+            .putAction("commentadd", COMMENT)
+            .putAction("redirect", VIEW)
+            .putAction("export", VIEW)
+            .putAction("import", ADMIN)
+            .putAction("jsx", VIEW)
+            .putAction("ssx", VIEW)
+            .putAction("tex", VIEW)
+            .putAction("unknown", VIEW)
+            .putAction("save", EDIT)
+            .putAction("preview", EDIT)
+            .putAction("lock", EDIT)
+            .putAction("cancel", EDIT)
+            .putAction("delattachment", EDIT)
+            .putAction("inline", EDIT)
+            .putAction("propadd", EDIT)
+            .putAction("propupdate", EDIT)
+            .putAction("propdelete", EDIT)
+            .putAction("objectadd", EDIT)
+            .putAction("objectremove", EDIT)
+            .putAction("objectsync", EDIT)
+            .putAction("rollback", EDIT)
+            .putAction("upload", EDIT)
+            .putAction("create", EDIT);
+    }
 
     /** The numeric value of this access right. */
     private final int value;
 
     /** The string representation. */
-    private final String stringRepr;
+    private final String name;
+
+    /** The string representation. */
+    private final RightState defaultState;
+
+    /** Whether this right should be allowed or denied in case of a tie. */
+    private final RightState tieResolutionPolicy;
+
+    /** Policy on how this right should be overridden by lower levels. */
+    private final boolean inheritanceOverridePolicy;
+
+    /** Additional rights implied by this right. */
+    private final List<Right> impliedRights;
 
     /**
-     * Putter to circumvent the checkstyle max number of statements.
+     * Construct a new Right from its description
+     * @param description Description of the right to create.
      */
-    private static class Putter
+    public Right(RightDescription description)
     {
-        /**
-         * @param key Action string.
-         * @param value Right value.
-         * @return This object.
-         */
-        Putter put(String key, Right value)
-        {
-            actionMap.put(key, value);
-            return this;
-        }
+        this(description.getName(), description.getDefaultState(), description.getTieResolutionPolicy(),
+            description.getInheritanceOverridePolicy(), description.getImpliedRights(), 
+            description.getDocumentLevels());
     }
 
-    static {
-        new Putter()
-            .put(LOGIN.toString(), LOGIN)
-            .put(VIEW.toString(), VIEW)
-            .put(DELETE.toString(), DELETE)
-            .put(ADMIN.toString(), ADMIN)
-            .put(PROGRAM.toString(), PROGRAM)
-            .put(EDIT.toString(), EDIT)
-            .put(REGISTER.toString(), REGISTER)
-            .put("logout", LOGIN)
-            .put("loginerror", LOGIN)
-            .put("loginsubmit", LOGIN)
-            .put("viewrev", VIEW)
-            .put("get", VIEW)
-            //        actionMap.put("downloadrev", "download"); Huh??
-            .put("downloadrev", VIEW)
-            .put("plain", VIEW)
-            .put("raw", VIEW)
-            .put("attach", VIEW)
-            .put("charting", VIEW)
-            .put("skin", VIEW)
-            .put("download", VIEW)
-            .put("dot", VIEW)
-            .put("svg", VIEW)
-            .put("pdf", VIEW)
-            .put("deleteversions", ADMIN)
-            //        actionMap.put("undelete", "undelete"); Huh??
-            .put("undelete", EDIT)
-            .put("reset", DELETE)
-            .put("commentadd", COMMENT)
-            .put("redirect", VIEW)
-            .put("export", VIEW)
-            .put("import", ADMIN)
-            .put("jsx", VIEW)
-            .put("ssx", VIEW)
-            .put("tex", VIEW)
-            .put("unknown", VIEW)
-            .put("save", EDIT)
-            .put("preview", EDIT)
-            .put("lock", EDIT)
-            .put("cancel", EDIT)
-            .put("delattachment", EDIT)
-            .put("inline", EDIT)
-            .put("propadd", EDIT)
-            .put("propupdate", EDIT)
-            .put("propdelete", EDIT)
-            .put("objectadd", EDIT)
-            .put("objectremove", EDIT)
-            .put("objectsync", EDIT)
-            .put("rollback", EDIT)
-            .put("upload", EDIT)
-            .put("create", EDIT);
+    /**
+     * Construct a new Right.
+     * @param name The string representation of this right.
+     * @param defaultState The default state, in case no matching right is found at any level.
+     * @param tieResolutionPolicy Whether this right should be allowed or denied in case of a tie.
+     * @param inheritanceOverridePolicy Policy on how this right should be overridden by lower levels.
+     * @param impliedRights Additional rights implied by this right.
+     * @param validEntityTypes The type of entity where this right should be enabled.
+     */
+    private Right(String name, RightState defaultState, RightState tieResolutionPolicy, 
+        boolean inheritanceOverridePolicy, List<Right> impliedRights, List<EntityType> validEntityTypes)
+    {
+        if (name == null || ALL_RIGHTS.contains(name)) {
+            throw new IllegalArgumentException("Duplicate name for right [" + name + "].");
+        }
 
-        for (Right level : values()) {
-            if (!level.equals(ILLEGAL)) {
-                allRights.add(level.toString());
+        if (defaultState == null || defaultState == UNDETERMINED) {
+            throw new IllegalArgumentException("Invalid default state [" + defaultState 
+                + "] for right [" + name + "].");
+        }
+        
+        if (tieResolutionPolicy == null || tieResolutionPolicy == UNDETERMINED) {
+            throw new IllegalArgumentException("Invalid tie resolution policy [" + tieResolutionPolicy
+                + "] for right [" + name + "].");
+        }
+
+        this.name = name;
+        this.defaultState = defaultState;
+        this.tieResolutionPolicy = tieResolutionPolicy;
+        this.inheritanceOverridePolicy = inheritanceOverridePolicy;
+        if (impliedRights != null && !impliedRights.isEmpty() && impliedRights.get(0) != null) {
+            List<Right> implied = new ArrayList<Right>(impliedRights.size());
+            for (Right right : impliedRights) {
+                if (right != null) {
+                    implied.add(right);
+                }
+            }
+            this.impliedRights = Collections.unmodifiableList(implied);
+        } else {
+            this.impliedRights = null;
+        }
+        synchronized (VALUES) {
+            this.value = VALUES.size();
+            if (this.value >= 64) {
+                throw new IndexOutOfBoundsException();
+            }
+            VALUES.add(this);
+            ALL_RIGHTS.add(name);
+            if (validEntityTypes != null) {
+                for (EntityType type : validEntityTypes) {
+                    if (type != null) {
+                        List<Right> rights = ENABLED_RIGHTS.get(type);
+                        if (rights == null) {
+                            rights = new ArrayList<Right>();
+                            ENABLED_RIGHTS.put(type, rights);
+                            UNMODIFIABLE_ENABLED_RIGHTS.put(type, Collections.unmodifiableList(rights));
+                        }
+                        rights.add(this);
+                    }
+                }
             }
         }
     }
 
     /**
-     * @param value Numeric value.
-     * @param stringRepr String representation of this instance.
+     * @return an unmodifiable list of available Right
      */
-    private Right(int value, String stringRepr)
+    public static List<Right> values()
     {
-        this.value = value;
-        this.stringRepr = stringRepr;
-    }
-
-    /**
-     * @return The numeric value of this access right.
-     */
-    public int getValue()
-    {
-        return value;
-    }
-
-    @Override
-    public String toString()
-    {
-        return stringRepr;
+        return UNMODIFIABLE_VALUES;
     }
 
     /**
@@ -170,8 +299,8 @@ public enum Right
      */
     public static Right toRight(String string)
     {
-        for (Right right : values()) {
-            if (right.stringRepr.equals(string)) {
+        for (Right right : VALUES) {
+            if (right.name.equals(string)) {
                 return right;
             }
         }
@@ -186,7 +315,7 @@ public enum Right
      */
     public static Right actionToRight(String action)
     {
-        Right right = actionMap.get(action);
+        Right right = ACTION_MAP.get(action);
         if (right == null) {
             return ILLEGAL;
         }
@@ -194,10 +323,98 @@ public enum Right
     }
 
     /**
+     * Returns the list of rights available for a given entity type
+     * @param entityType the entity type
+     * @return a list of {@code Right} enabled of this entity type
+     */
+    public static List<Right> getEnabledRights(EntityType entityType)
+    {
+        return UNMODIFIABLE_ENABLED_RIGHTS.get(entityType);
+    }
+
+    /**
+     * Retrieve a right based on its ordinal.
+     * @param ordinal the ordinal of the right
+     * @return the {@code Right}
+     */
+    public static Right get(int ordinal) {
+        return VALUES.get(ordinal);
+    }
+
+    /**
+     * @return the count of all existing rights
+     */
+    public static int size() {
+        return values().size();
+    }
+
+    /**
      * @return a list of the string representation of all valid rights.
      */
     public static List<String> getAllRightsAsString()
     {
-        return allRights;
+        return UNMODIFIABLE_ALL_RIGHTS;
+    }
+
+    /**
+     * @return The numeric value of this access right.
+     */
+    public int ordinal()
+    {
+        return value;
+    }
+
+    @Override
+    public String getName()
+    {
+        return name;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getName();
+    }
+
+    @Override
+    public List<Right> getImpliedRights()
+    {
+        return impliedRights;
+    }
+
+    @Override
+    public List<EntityType> getDocumentLevels()
+    {
+        List<EntityType> levels = new ArrayList<EntityType>();
+        for (Map.Entry<EntityType,List<Right>> entry : ENABLED_RIGHTS.entrySet()) {
+            if (entry.getValue().contains(this)) {
+                levels.add(entry.getKey());
+            }
+        }
+        return levels;
+    }
+
+    @Override
+    public boolean getInheritanceOverridePolicy()
+    {
+        return inheritanceOverridePolicy;
+    }
+
+    @Override
+    public RightState getTieResolutionPolicy()
+    {
+        return tieResolutionPolicy;
+    }
+
+    @Override
+    public RightState getDefaultState()
+    {
+        return this.defaultState;
+    }
+
+    @Override
+    public int compareTo(Right other)
+    {
+        return this.ordinal() - other.ordinal();
     }
 }

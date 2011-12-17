@@ -117,21 +117,18 @@ public class DefaultRightResolver extends AbstractRightResolver
                      */
                     accessLevel.deny(right);
                 } else {
-                    accessLevel.set(right, AccessLevel.DEFAULT_ACCESS_LEVEL.get(right));
+                    accessLevel.set(right, right.getDefaultState());
+                }
+            }
+            if (accessLevel.get(right) == ALLOW) {
+                List<Right> impliedRights = right.getImpliedRights();
+                if (impliedRights != null) {
+                    for (Right impliedRight : impliedRights) {
+                        accessLevel.allow(impliedRight);
+                    }
                 }
             }
         }
-
-        if (accessLevel.get(PROGRAM) == ALLOW) {
-            for (Right right : programImpliedRights) {
-                accessLevel.allow(right);
-            }
-        } else if (accessLevel.get(ADMIN)  == ALLOW) {
-            for (Right right : adminImpliedRights) {
-                accessLevel.allow(right);
-            }
-        }
-
     }
 
     /**
@@ -150,7 +147,7 @@ public class DefaultRightResolver extends AbstractRightResolver
     {
         AccessLevel currentLevel = new AccessLevel();
 
-        for (Right right : enabledRights.get(ref.getType())) {
+        for (Right right : Right.getEnabledRights(ref.getType())) {
             boolean foundAllow = false;
             for (RightsObject obj : rightsObjects) {
                 if (obj.checkRight(right)) {
@@ -224,7 +221,7 @@ public class DefaultRightResolver extends AbstractRightResolver
             return;
         }
         if (accessLevel.get(right) != state) {
-            accessLevel.set(right, tieResolution.get(right));
+            accessLevel.set(right, right.getTieResolutionPolicy());
         }
     }
 
@@ -238,7 +235,7 @@ public class DefaultRightResolver extends AbstractRightResolver
                              AccessLevel accessLevel,
                              EntityReference ref)
     {
-        for (Right right : enabledRights.get(ref.getType())) {
+        for (Right right : Right.getEnabledRights(ref.getType())) {
             if (right == PROGRAM && ref.getParent() != null) {
                 /*
                  * Programming rights only allowed on main wiki.
@@ -253,7 +250,7 @@ public class DefaultRightResolver extends AbstractRightResolver
                 continue;
             }
             if (currentLevel.get(right) == ALLOW) {
-                if (!smallerWin.get(right)) {
+                if (!right.getInheritanceOverridePolicy()) {
                     accessLevel.allow(right);
                 }
             }

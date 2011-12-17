@@ -18,16 +18,22 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.security.internal;
+package org.xwiki.security;
 
-import java.util.Set;
+/**
+ * @version $Id$
+ */
+public class UnableToRegisterRightException extends RightServiceException
+{
+    /** Serialization identifier. */
+    private static final long serialVersionUID = 1L;
 
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.RightState;
-
-public class MockRightsObject extends AbstractRightsObject {
-    public MockRightsObject(RightSet rights, RightState state, Set<DocumentReference> users, Set<DocumentReference> groups)
+    /**
+     * @param right The right description of the right that fail to register.
+     * @param t A throwable of the detailed exception.
+     */
+    public UnableToRegisterRightException(RightDescription right, Throwable t)
     {
-        super(rights, state, users, groups);
+        super("Unable to register right " + right.getName() + ".", t);
     }
 }

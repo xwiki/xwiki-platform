@@ -22,7 +22,6 @@
  */
 package org.xwiki.security.internal;
 
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -72,7 +71,7 @@ public abstract class AbstractRightsObject implements RightsObject
     private final Set<DocumentReference> groups;
 
     /** The set of right levels. */
-    private final Set<Right> rights;
+    private final RightSet rights;
 
     /** The state specified by this object. */
     private final RightState state;
@@ -90,7 +89,7 @@ public abstract class AbstractRightsObject implements RightsObject
         state = (obj.getIntValue(ALLOW_FIELD_NAME) == 1) ? RightState.ALLOW : RightState.DENY;
         users = new HashSet<DocumentReference>();
         groups = new HashSet<DocumentReference>();
-        rights = EnumSet.noneOf(Right.class);
+        rights = new RightSet();
 
         String levels = obj.getStringValue("levels");
         String[] levelsarray = StringUtils.split(levels, " ,|");
@@ -119,7 +118,7 @@ public abstract class AbstractRightsObject implements RightsObject
      * @param users The set of users.
      * @param groups The set of groups.
      */
-    protected AbstractRightsObject(Set<Right> rights,
+    protected AbstractRightsObject(RightSet rights,
                                    RightState state,
                                    Set<DocumentReference> users,
                                    Set<DocumentReference> groups)

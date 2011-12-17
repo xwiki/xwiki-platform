@@ -22,32 +22,13 @@
  */
 package org.xwiki.security.internal;
 
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.security.Right;
 import org.xwiki.security.RightResolver;
 import org.xwiki.security.RightService;
-import org.xwiki.security.RightState;
-
-import static org.xwiki.security.Right.ADMIN;
-import static org.xwiki.security.Right.COMMENT;
-import static org.xwiki.security.Right.DELETE;
-import static org.xwiki.security.Right.EDIT;
-import static org.xwiki.security.Right.ILLEGAL;
-import static org.xwiki.security.Right.LOGIN;
-import static org.xwiki.security.Right.PROGRAM;
-import static org.xwiki.security.Right.REGISTER;
-import static org.xwiki.security.Right.VIEW;
-import static org.xwiki.security.RightState.ALLOW;
-import static org.xwiki.security.RightState.DENY;
 
 /**
  * Abstract super class for right resolvers.
@@ -55,52 +36,6 @@ import static org.xwiki.security.RightState.DENY;
  */
 abstract class AbstractRightResolver implements RightResolver
 {
-    /** Map for resolving conflicting rights within a document hierarchy level. */
-    protected final Map<Right, RightState> tieResolution = new EnumMap<Right, RightState>(Right.class);
-
-    /** Map to resolving conflicting rights between document hierarchy levels. */
-    protected final Map<Right, Boolean> smallerWin = new EnumMap<Right, Boolean>(Right.class);
-
-    /** Additional rights an admin have. */
-    protected final Right[] adminImpliedRights = {LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT};
-
-    /** Additional rights a programmer have. */
-    protected final Right[] programImpliedRights = {LOGIN, VIEW, EDIT, DELETE, ADMIN, REGISTER, COMMENT};
-
-    /**
-     * The enabled rights for a document hierarchy level.  The PROGRAM
-     * right should only be enabled for the main wiki, not for wikis
-     * in general. 
-     */
-    protected final Map<EntityType, Iterable<Right>> enabledRights = new HashMap<EntityType, Iterable<Right>>();
-
-    {
-        tieResolution.put(LOGIN,    ALLOW);
-        tieResolution.put(VIEW,     DENY);
-        tieResolution.put(EDIT,     DENY);
-        tieResolution.put(DELETE,   DENY);
-        tieResolution.put(ADMIN,    ALLOW);
-        tieResolution.put(PROGRAM,  ALLOW);
-        tieResolution.put(REGISTER, ALLOW);
-        tieResolution.put(COMMENT,  DENY);
-        tieResolution.put(ILLEGAL,  DENY);
-        smallerWin.put(LOGIN,    true);
-        smallerWin.put(VIEW,     true);
-        smallerWin.put(EDIT,     true);
-        smallerWin.put(DELETE,   true);
-        smallerWin.put(ADMIN,    false);
-        smallerWin.put(PROGRAM,  false);
-        smallerWin.put(REGISTER, false);
-        smallerWin.put(COMMENT,  true);
-        smallerWin.put(ILLEGAL,  false);
-        Right[] pageRights = {VIEW, EDIT, COMMENT, DELETE };
-        Right[] spaceRights = {VIEW, EDIT, COMMENT, DELETE, ADMIN };
-        Right[] wikiRights = {VIEW, EDIT, COMMENT, DELETE, ADMIN, REGISTER, LOGIN, PROGRAM };
-        enabledRights.put(EntityType.DOCUMENT, Arrays.asList(pageRights));
-        enabledRights.put(EntityType.SPACE,    Arrays.asList(spaceRights));
-        enabledRights.put(EntityType.WIKI,     Arrays.asList(wikiRights));
-    }
-
     /**
      * Check if the user is the super admin.
      *

@@ -23,7 +23,6 @@
 package org.xwiki.security.internal;
 
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -126,22 +125,19 @@ public class PrioritizingRightResolver extends AbstractRightResolver
                     if (right == DELETE && isCreator(user, entity)) {
                         accessLevel.allow(DELETE);
                     } else {
-                        accessLevel.set(right, AccessLevel.DEFAULT_ACCESS_LEVEL.get(right));
+                        accessLevel.set(right, right.getDefaultState());
+                    }
+                }
+            }
+            if (accessLevel.get(right) == ALLOW) {
+                List<Right> impliedRights = right.getImpliedRights();
+                if (impliedRights != null) {
+                    for (Right impliedRight : impliedRights) {
+                        accessLevel.allow(impliedRight);
                     }
                 }
             }
         }
-
-        if (accessLevel.get(PROGRAM) == ALLOW) {
-            for (Right right : programImpliedRights) {
-                accessLevel.allow(right);
-            }
-        } else if (accessLevel.get(ADMIN)  == ALLOW) {
-            for (Right right : adminImpliedRights) {
-                accessLevel.allow(right);
-            }
-        }
-
     }
 
     /**
@@ -159,9 +155,9 @@ public class PrioritizingRightResolver extends AbstractRightResolver
                          AccessLevel accessLevel)
     {
         AccessLevel currentLevel = new AccessLevel();
-        Map<Right, Integer> priorities = new EnumMap<Right, Integer>(Right.class);
+        Map<Right, Integer> priorities = new RightMap<Integer>();
 
-        for (Right right : enabledRights.get(ref.getType())) {
+        for (Right right : Right.getEnabledRights(ref.getType())) {
             boolean foundAllow = false;
             for (RightsObject obj : rightsObjects) {
                 if (obj.checkRight(right)) {
@@ -237,7 +233,7 @@ public class PrioritizingRightResolver extends AbstractRightResolver
                 accessLevel.set(right, state);
                 priorities.put(right, priority);
             } else {
-                accessLevel.set(right, tieResolution.get(right));
+                accessLevel.set(right, right.getTieResolutionPolicy());
             }
         }
     }
@@ -252,7 +248,7 @@ public class PrioritizingRightResolver extends AbstractRightResolver
                              AccessLevel accessLevel,
                              EntityReference ref)
     {
-        for (Right right : enabledRights.get(ref.getType())) {
+        for (Right right : Right.getEnabledRights(ref.getType())) {
             if (right == PROGRAM && ref.getParent() != null) {
                 /*
                  * Programming rights only allowed on main wiki.
@@ -267,7 +263,7 @@ public class PrioritizingRightResolver extends AbstractRightResolver
                 continue;
             }
             if (currentLevel.get(right) == ALLOW) {
-                if (!smallerWin.get(right)) {
+                if (!right.getInheritanceOverridePolicy()) {
                     accessLevel.allow(right);
                 }
             }

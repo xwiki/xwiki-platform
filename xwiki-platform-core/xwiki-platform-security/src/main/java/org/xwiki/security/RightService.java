@@ -132,4 +132,12 @@ public interface RightService
      * @throws XWikiException if something goes wrong during the rights checking process
      */
     List<String> listAllLevels(XWikiContext context) throws XWikiException;
+
+    /**
+     * Register a new custom {@link Right}.
+     * @param rightDescription the full description of the new {@link Right}
+     * @return the created {@link Right}
+     * @throws UnableToRegisterRightException if an error prevent creation
+     */
+    Right registerRight(RightDescription rightDescription) throws UnableToRegisterRightException;
 }

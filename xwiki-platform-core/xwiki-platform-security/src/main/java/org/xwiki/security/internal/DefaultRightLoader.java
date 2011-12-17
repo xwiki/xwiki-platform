@@ -132,7 +132,7 @@ public class DefaultRightLoader implements RightLoader
         throws ParentEntryEvictedException, ConflictingInsertionException, RightServiceException
     {
         if (entity == null) {
-            return AccessLevel.DEFAULT_ACCESS_LEVEL;
+            return AccessLevel.getDefaultAccessLevel();
         }
 
         RightCacheKey entityKey = rightCache.getRightCacheKey(entity);

@@ -97,7 +97,7 @@ public class MockObject extends BaseObject
                         @Override
                         public String next()
                         {
-                            return iterator.next().toString();
+                            return iterator.next().getName();
                         }
                         @Override
                         public boolean hasNext()

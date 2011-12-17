@@ -73,7 +73,7 @@ public class DefaultRightLoaderTest extends AbstractTestCase
             RightCache  cache  = getComponentManager().lookup(RightCache.class);
             RightCacheInvalidator invalidator = getComponentManager().lookup(RightCacheInvalidator.class);
 
-            AccessLevel edit = AccessLevel.DEFAULT_ACCESS_LEVEL.clone();
+            AccessLevel edit = AccessLevel.getDefaultAccessLevel().clone();
             edit.allow(EDIT);
 
             AccessLevel level = loader.load(userX, userX);

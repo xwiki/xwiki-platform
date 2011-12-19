@@ -32,6 +32,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
@@ -93,6 +94,19 @@ public class DefaultCoreExtensionRepository extends AbstractExtensionRepository 
         if (extension == null
             || (extensionId.getVersion() != null && !extension.getId().getVersion().equals(extensionId.getVersion()))) {
             throw new ResolveException("Could not find extension [" + extensionId + "]");
+        }
+
+        return extension;
+    }
+
+    @Override
+    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    {
+        Extension extension = getCoreExtension(extensionDependency.getId());
+
+        if (extension == null
+            || (!extensionDependency.getVersionConstraint().containsVersion(extension.getId().getVersion()))) {
+            throw new ResolveException("Could not find extension dependency [" + extensionDependency + "]");
         }
 
         return extension;

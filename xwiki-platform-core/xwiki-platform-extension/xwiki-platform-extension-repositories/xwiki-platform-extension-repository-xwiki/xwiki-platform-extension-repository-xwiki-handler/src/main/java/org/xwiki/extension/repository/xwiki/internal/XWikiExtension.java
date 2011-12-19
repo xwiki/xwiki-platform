@@ -33,10 +33,14 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
 import org.xwiki.extension.ExtensionLicenseManager;
+import org.xwiki.extension.InvalidExtensionException;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionAuthor;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.License;
+import org.xwiki.extension.version.InvalidVersionConstraintException;
+import org.xwiki.extension.version.InvalidVersionRangeException;
+import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 
 /**
  * XWiki Repository implementation of {@link Extension}.
@@ -46,7 +50,7 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.License;
 public class XWikiExtension extends AbstractExtension
 {
     public XWikiExtension(XWikiExtensionRepository repository, ExtensionVersion extension,
-        ExtensionLicenseManager licenseManager)
+        ExtensionLicenseManager licenseManager) throws InvalidExtensionException
     {
         super(repository, new ExtensionId(extension.getId(), extension.getVersion()), extension.getType());
 
@@ -94,7 +98,12 @@ public class XWikiExtension extends AbstractExtension
         // Dependencies
 
         for (ExtensionDependency dependency : extension.getDependencies()) {
-            addDependency(new DefaultExtensionDependency(dependency.getId(), dependency.getVersion()));
+            try {
+                addDependency(new DefaultExtensionDependency(dependency.getId(), new DefaultVersionConstraint(
+                    dependency.getVersion())));
+            } catch (InvalidVersionConstraintException e) {
+                throw new InvalidExtensionException("Invalid version [" + dependency.getVersion() + "]", e);
+            }
         }
 
         // File

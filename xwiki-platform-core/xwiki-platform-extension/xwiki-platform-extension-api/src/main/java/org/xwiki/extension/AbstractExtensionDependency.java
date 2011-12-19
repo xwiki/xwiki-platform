@@ -19,6 +19,12 @@
  */
 package org.xwiki.extension;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.xwiki.extension.version.VersionConstraint;
+
 /**
  * Base class for {@link ExtensionDependency} implementations.
  * 
@@ -29,21 +35,50 @@ public abstract class AbstractExtensionDependency implements ExtensionDependency
     /**
      * @see #getId()
      */
-    private String id;
+    protected String id;
 
     /**
-     * @see #getVersion()
+     * @see #getVersionConstraint()
      */
-    private String version;
+    protected VersionConstraint versionConstraint;
 
     /**
-     * @param id the id of the extension
-     * @param version the version of the extension
+     * @see #getProperties()
      */
-    public AbstractExtensionDependency(String id, String version)
+    protected Map<String, Object> properties = new HashMap<String, Object>();
+
+    /**
+     * Create new instance by cloning the provided one with different version constraint.
+     * 
+     * @param dependency the extension dependency to copy
+     * @param versionConstraint the version constraint to set
+     */
+    public AbstractExtensionDependency(ExtensionDependency dependency, VersionConstraint versionConstraint)
+    {
+        this(dependency.getId(), versionConstraint, dependency.getProperties());
+    }
+
+    /**
+     * @param id the id (or feature) of the extension dependency
+     * @param versionConstraint the version constraint of the extension dependency
+     */
+    public AbstractExtensionDependency(String id, VersionConstraint versionConstraint)
+    {
+        this(id, versionConstraint, null);
+    }
+
+    /**
+     * @param id the id (or feature) of the extension dependency
+     * @param versionConstraint the version constraint of the extension dependency
+     * @param properties the custom properties of the extension dependency
+     */
+    public AbstractExtensionDependency(String id, VersionConstraint versionConstraint, Map<String, Object> properties)
     {
         this.id = id;
-        this.version = version;
+        this.versionConstraint = versionConstraint;
+        if (properties != null) {
+            this.properties.putAll(properties);
+        }
     }
 
     @Override
@@ -62,23 +97,62 @@ public abstract class AbstractExtensionDependency implements ExtensionDependency
     }
 
     @Override
-    public String getVersion()
+    public VersionConstraint getVersionConstraint()
     {
-        return this.version;
+        return this.versionConstraint;
     }
 
     /**
-     * @param version the extension version
-     * @see #getVersion()
+     * @param versionConstraint the version constraint of the target extension
      */
-    public void setVersion(String version)
+    public void setVersionConstraint(VersionConstraint versionConstraint)
     {
-        this.version = version;
+        this.versionConstraint = versionConstraint;
     }
+
+    @Override
+    public Map<String, Object> getProperties()
+    {
+        return Collections.unmodifiableMap(this.properties);
+    }
+
+    @Override
+    public Object getProperty(String key)
+    {
+        return this.properties.get(key);
+    }
+
+    /**
+     * Set a property.
+     * 
+     * @param key the property key
+     * @param value the property value
+     * @see #getProperty(String)
+     */
+    protected void putProperty(String key, Object value)
+    {
+        this.properties.put(key, value);
+    }
+
+    /**
+     * Get a property.
+     * 
+     * @param <T> type of the property value
+     * @param key the property key
+     * @param def the value to return if no property is associated to the provided key
+     * @return the property value or <code>default</code> of the property is not found
+     * @see #getProperty(String)
+     */
+    public <T> T getProperty(String key, T def)
+    {
+        return this.properties.containsKey(key) ? (T) this.properties.get(key) : def;
+    }
+
+    // Object
 
     @Override
     public String toString()
     {
-        return getId() + '-' + getVersion();
+        return getId() + '-' + getVersionConstraint();
     }
 }

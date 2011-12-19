@@ -21,6 +21,9 @@ package org.xwiki.extension;
 
 import java.io.Serializable;
 
+import org.xwiki.extension.version.Version;
+import org.xwiki.extension.version.internal.DefaultVersion;
+
 /**
  * The combination of properties which makes an extension unique.
  * 
@@ -41,13 +44,22 @@ public class ExtensionId implements Serializable
     /**
      * @see #getVersion()
      */
-    private final String version;
+    private final Version version;
 
     /**
      * @param id the extension identifier
      * @param version the extension version
      */
     public ExtensionId(String id, String version)
+    {
+        this(id, new DefaultVersion(version));
+    }
+
+    /**
+     * @param id the extension identifier
+     * @param version the extension version
+     */
+    public ExtensionId(String id, Version version)
     {
         this.id = id;
         this.version = version;
@@ -64,7 +76,7 @@ public class ExtensionId implements Serializable
     /**
      * @return the extension version
      */
-    public String getVersion()
+    public Version getVersion()
     {
         return version;
     }

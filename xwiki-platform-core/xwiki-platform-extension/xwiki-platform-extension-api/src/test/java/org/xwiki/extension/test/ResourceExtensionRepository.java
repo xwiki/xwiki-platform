@@ -27,6 +27,7 @@ import java.net.URLEncoder;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
@@ -34,6 +35,7 @@ import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.internal.DefaultLocalExtension;
 import org.xwiki.extension.repository.internal.ExtensionSerializer;
+import org.xwiki.extension.version.internal.DefaultVersion;
 
 public class ResourceExtensionRepository extends AbstractExtensionRepository implements ExtensionRepository
 {
@@ -94,6 +96,13 @@ public class ResourceExtensionRepository extends AbstractExtensionRepository imp
         } catch (Exception e) {
             throw new ResolveException("Failed to parse descriptor for extension [" + extensionId + "]", e);
         }
+    }
+    
+    @Override
+    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    {
+        return resolve(new ExtensionId(extensionDependency.getId(), new DefaultVersion(extensionDependency
+            .getVersionConstraint().getValue())));
     }
 
     public boolean exists(ExtensionId extensionId)

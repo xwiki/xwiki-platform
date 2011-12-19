@@ -25,7 +25,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 import junit.framework.Assert;
 
@@ -37,11 +36,11 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.ExtensionLicense;
 import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.test.RepositoryUtil;
+import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.test.AbstractComponentTestCase;
 
 public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCase
@@ -73,8 +72,10 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
 
         this.extensionId = new ExtensionId("groupid:artifactid", "version");
         this.extensionIdClassifier = new ExtensionId("groupid:artifactid:classifier", "version");
-        this.dependencyExtensionId = new DefaultExtensionDependency("dgroupid:dartifactid", "dversion");
-        this.dependencyExtensionIdRange = new DefaultExtensionDependency("dgroupid:dartifactid", "[dversion,)");
+        this.dependencyExtensionId =
+            new DefaultExtensionDependency("dgroupid:dartifactid", new DefaultVersionConstraint("dversion"));
+        this.dependencyExtensionIdRange =
+            new DefaultExtensionDependency("dgroupid:dartifactid", new DefaultVersionConstraint("[dversion,)"));
 
         this.bundleExtensionId = new ExtensionId("groupid:bundleartifactid", "version");
 
@@ -106,7 +107,7 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
 
         ExtensionDependency dependency = extension.getDependencies().get(0);
         Assert.assertEquals(this.dependencyExtensionId.getId(), dependency.getId());
-        Assert.assertEquals(this.dependencyExtensionId.getVersion(), dependency.getVersion());
+        Assert.assertEquals(this.dependencyExtensionId.getVersionConstraint(), dependency.getVersionConstraint());
 
         // check that a new resolve of an already resolved extension provide the proper repository
         extension = this.repositoryManager.resolve(this.extensionId);
@@ -130,7 +131,7 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
 
         Assert.assertNotNull(extension);
         Assert.assertEquals(this.dependencyExtensionId.getId(), extension.getId().getId());
-        Assert.assertEquals(this.dependencyExtensionId.getVersion(), extension.getId().getVersion());
+        Assert.assertEquals(this.dependencyExtensionId.getVersionConstraint(), extension.getId().getVersion());
     }
 
     @Test

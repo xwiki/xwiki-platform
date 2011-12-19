@@ -112,7 +112,7 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
         Assert.assertEquals("version", extension.getId().getVersion());
         Assert.assertEquals("type", extension.getType());
         Assert.assertEquals("existingextensiondependency", extension.getDependencies().get(0).getId());
-        Assert.assertEquals("version", extension.getDependencies().get(0).getVersion());
+        Assert.assertEquals("version", extension.getDependencies().get(0).getVersionConstraint().getValue());
     }
 
     @Test

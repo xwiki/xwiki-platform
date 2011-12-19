@@ -17,27 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.aether.internal;
+package org.xwiki.extension.version;
 
-import org.sonatype.aether.graph.Dependency;
-import org.xwiki.extension.AbstractExtensionDependency;
-import org.xwiki.extension.version.InvalidVersionRangeException;
-import org.xwiki.extension.version.internal.DefaultVersionConstraint;
-
-public class AetherExtensionDependency extends AbstractExtensionDependency
+/**
+ * A range of versions.
+ * 
+ * @version $Id$
+ */
+public interface VersionRange
 {
-    private Dependency aetherDependency;
+    /**
+     * Indicate if the provided version is part of this range.
+     * 
+     * @param version the version to search
+     * @return true if the version is part of the range, false otherwise
+     */
+    boolean containsVersion(Version version);
 
-    public AetherExtensionDependency(Dependency aetherDependency) throws InvalidVersionRangeException
-    {
-        super(AetherUtils.createExtensionId(aetherDependency.getArtifact()).getId(), new DefaultVersionConstraint(
-            aetherDependency.getArtifact().getVersion()));
+    /**
+     * @return the string representation of this version range
+     */
+    String getValue();
 
-        this.aetherDependency = aetherDependency;
-    }
-
-    public Dependency getAetherDependency()
-    {
-        return this.aetherDependency;
-    }
+    /**
+     * Indicate if the provided version range is compatible with the provided version range.
+     * 
+     * @param otherRange the version range to compare
+     * @return true if the two version ranges are compatibles, false otherwise
+     */
+    boolean isCompatible(VersionRange otherRange);
 }

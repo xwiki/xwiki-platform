@@ -57,6 +57,7 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
+import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.properties.ConverterManager;
 
 public class AetherExtensionRepository extends AbstractExtensionRepository
@@ -131,7 +132,8 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
     @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
-        return resolve(new DefaultExtensionDependency(extensionId.getId(), extensionId.getVersion()));
+        return resolve(new DefaultExtensionDependency(extensionId.getId(), new DefaultVersionConstraint(
+            extensionId.getVersion())));
     }
 
     @Override
@@ -172,7 +174,9 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
         if (extensionDependency instanceof AetherExtensionDependency) {
             artifact = ((AetherExtensionDependency) extensionDependency).getAetherDependency().getArtifact();
         } else {
-            artifact = AetherUtils.createArtifact(extensionDependency.getId(), extensionDependency.getVersion());
+            artifact =
+                AetherUtils.createArtifact(extensionDependency.getId(), extensionDependency.getVersionConstraint()
+                    .getValue());
         }
 
         // Resolve version range
@@ -218,8 +222,8 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
                 }
             }
 
-            extension.addAuthor(new DefaultExtensionAuthor(
-                StringUtils.defaultIfBlank(developer.getName(), developer.getId()), authorURL));
+            extension.addAuthor(new DefaultExtensionAuthor(StringUtils.defaultIfBlank(developer.getName(),
+                developer.getId()), authorURL));
         }
         extension.setWebsite(model.getUrl());
 

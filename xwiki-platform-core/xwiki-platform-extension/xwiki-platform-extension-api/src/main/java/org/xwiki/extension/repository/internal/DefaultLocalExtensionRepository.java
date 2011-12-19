@@ -51,7 +51,6 @@ import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
-import org.xwiki.extension.internal.VersionManager;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
@@ -82,12 +81,6 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
     private CoreExtensionRepository coreExtensionRepository;
 
     /**
-     * Used to compare extensions versions when upgrading.
-     */
-    @Inject
-    private VersionManager versionManager;
-
-    /**
      * The logger to log.
      */
     @Inject
@@ -108,7 +101,7 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
         new ConcurrentHashMap<ExtensionId, DefaultLocalExtension>();
 
     /**
-     * The local extensions grouped by ids.
+     * The local extensions grouped by ids and ordered by version DESC.
      * <p>
      * <extension id, extensions>
      */
@@ -333,8 +326,7 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
         } else {
             int index = 0;
             while (index < versions.size()
-                && this.versionManager.compareVersions(localExtension.getId().getVersion(), versions.get(index).getId()
-                    .getVersion()) > 0) {
+                && localExtension.getId().getVersion().compareTo(versions.get(index).getId().getVersion()) < 0) {
                 ++index;
             }
 
@@ -443,6 +435,21 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
         }
 
         return localExtension;
+    }
+
+    @Override
+    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    {
+        List<DefaultLocalExtension> versions = this.extensionsById.get(extensionDependency.getId());
+
+        for (DefaultLocalExtension extension : versions) {
+            if (extensionDependency.getVersionConstraint().containsVersion(extension.getId().getVersion())) {
+                // Return the higher version which satisfy the version constraint
+                return extension;
+            }
+        }
+
+        return null;
     }
 
     @Override

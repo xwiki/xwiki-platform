@@ -33,8 +33,10 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.data.MediaType;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicenseManager;
+import org.xwiki.extension.InvalidExtensionException;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
@@ -127,6 +129,19 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         }
     }
 
+    @Override
+    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    {
+        try {
+            return new XWikiExtension(this, (ExtensionVersion) this.repositoryFactory.getUnmarshaller().unmarshal(
+                getRESTResourceAsStream(this.extensionVersionUriBuider, extensionDependency.getId(),
+                    extensionDependency.getVersionConstraint().getValue())), this.licenseManager);
+        } catch (Exception e) {
+            throw new ResolveException("Failed to create extension object for extension dependency ["
+                + extensionDependency + "]", e);
+        }
+    }
+
     private HttpClient createClient()
     {
         HttpClient httpClient = new HttpClient();
@@ -152,15 +167,20 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
 
         ExtensionsSearchResult restExtensions;
         try {
-            restExtensions = (ExtensionsSearchResult) this.repositoryFactory.getUnmarshaller().unmarshal(
-                getRESTResourceAsStream(builder));
+            restExtensions =
+                (ExtensionsSearchResult) this.repositoryFactory.getUnmarshaller().unmarshal(
+                    getRESTResourceAsStream(builder));
         } catch (Exception e) {
             throw new SearchException("Failed to search extensions based on pattern [" + pattern + "]", e);
         }
 
         List<Extension> extensions = new ArrayList<Extension>(restExtensions.getExtensions().size());
         for (ExtensionVersion restExtension : restExtensions.getExtensions()) {
-            extensions.add(new XWikiExtension(this, restExtension, this.licenseManager));
+            try {
+                extensions.add(new XWikiExtension(this, restExtension, this.licenseManager));
+            } catch (InvalidExtensionException e) {
+                throw new SearchException("Found invalid extension", e);
+            }
         }
 
         return new CollectionSearchResult<Extension>(restExtensions.getTotalHits(), restExtensions.getOffset(),

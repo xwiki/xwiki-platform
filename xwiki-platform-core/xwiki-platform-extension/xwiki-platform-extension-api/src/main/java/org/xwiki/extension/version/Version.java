@@ -19,13 +19,15 @@
  */
 package org.xwiki.extension.version;
 
+/**
+ * An extension version.
+ * 
+ * @version $Id$
+ */
 public interface Version extends Comparable<Version>
 {
     /**
-     * Gets the original string representation of the version.
-     * 
-     * @return the string representation of the version
+     * @return the string representation of this version constraint
      */
-    @Override
-    String toString();
+    String getValue();
 }

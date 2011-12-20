@@ -29,6 +29,8 @@ import org.xwiki.extension.version.VersionRange;
  * Default implementation of {@link VersionRange}.
  * <p>
  * Based on AETHER implementation which is itself based on Maven specifications
+ * <p>
+ * (,1.0]
  * 
  * @see org.sonatype.aether.util.version.GenericVersionRange
  * @version $Id$
@@ -95,6 +97,6 @@ public class DefaultVersionRange implements VersionRange
     public boolean isCompatible(VersionRange otherRange)
     {
         // TODO Auto-generated method stub
-        return fal se;
+        return false;
     }
 }

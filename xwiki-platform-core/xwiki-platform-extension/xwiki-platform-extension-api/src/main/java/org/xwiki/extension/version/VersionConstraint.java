@@ -17,7 +17,7 @@ public interface VersionConstraint
      * 
      * @return the version ranges, never null.
      */
-    Collection<VersionRange> getRanges();
+    Collection<CollectionVersionRange> getRanges();
 
     /**
      * Gets the version recommended by this constraint.

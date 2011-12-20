@@ -132,7 +132,7 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
     @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
-        return resolve(new DefaultExtensionDependency(extensionId.getId(), new DefaultVersionConstraint(
+        return resolve(new DefaultExtensionDependency(extensionId.getId(), new DefaultVersionConstraint(null,
             extensionId.getVersion())));
     }
 

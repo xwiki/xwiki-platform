@@ -38,8 +38,6 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionAuthor;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.License;
-import org.xwiki.extension.version.InvalidVersionConstraintException;
-import org.xwiki.extension.version.InvalidVersionRangeException;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 
 /**
@@ -98,12 +96,8 @@ public class XWikiExtension extends AbstractExtension
         // Dependencies
 
         for (ExtensionDependency dependency : extension.getDependencies()) {
-            try {
-                addDependency(new DefaultExtensionDependency(dependency.getId(), new DefaultVersionConstraint(
-                    dependency.getVersion())));
-            } catch (InvalidVersionConstraintException e) {
-                throw new InvalidExtensionException("Invalid version [" + dependency.getVersion() + "]", e);
-            }
+            addDependency(new DefaultExtensionDependency(dependency.getId(), new DefaultVersionConstraint(
+                dependency.getVersion())));
         }
 
         // File

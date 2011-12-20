@@ -56,7 +56,6 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
 import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.InvalidExtensionException;
-import org.xwiki.extension.version.InvalidVersionConstraintException;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 
 /**
@@ -252,13 +251,8 @@ public class DefaultExtensionSerializer implements ExtensionSerializer
                     Node dependencyIdNode = getNode(dependency, ELEMENT_ID);
                     Node dependencyVersionNode = getNode(dependency, ELEMENT_VERSION);
 
-                    try {
-                        localExtension.addDependency(new DefaultExtensionDependency(dependencyIdNode.getTextContent(),
-                            new DefaultVersionConstraint(dependencyVersionNode.getTextContent())));
-                    } catch (InvalidVersionConstraintException e) {
-                        throw new InvalidExtensionException("Failed to parse extension [" + localExtension
-                            + "] dependency version [" + dependencyVersionNode.getTextContent() + "]", e);
-                    }
+                    localExtension.addDependency(new DefaultExtensionDependency(dependencyIdNode.getTextContent(),
+                        new DefaultVersionConstraint(dependencyVersionNode.getTextContent())));
                 }
             }
         }

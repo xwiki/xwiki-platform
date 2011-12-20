@@ -123,7 +123,7 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
             return new XWikiExtension(this,
                 (ExtensionVersion) this.repositoryFactory.getUnmarshaller().unmarshal(
                     getRESTResourceAsStream(this.extensionVersionUriBuider, extensionId.getId(),
-                        extensionId.getVersion())), this.licenseManager);
+                        extensionId.getVersion().getValue())), this.licenseManager);
         } catch (Exception e) {
             throw new ResolveException("Failed to create extension object for extension [" + extensionId + "]", e);
         }

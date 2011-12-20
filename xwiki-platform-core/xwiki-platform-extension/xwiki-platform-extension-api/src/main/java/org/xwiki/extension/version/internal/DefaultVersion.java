@@ -19,6 +19,10 @@
  */
 package org.xwiki.extension.version.internal;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import org.sonatype.aether.util.version.GenericVersionScheme;
 import org.sonatype.aether.version.InvalidVersionSpecificationException;
 import org.xwiki.extension.version.Version;
@@ -35,6 +39,11 @@ import org.xwiki.extension.version.Version;
 public class DefaultVersion implements Version
 {
     /**
+     * Serialization identifier.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Used to parse the version.
      */
     private static final GenericVersionScheme VERSIONSCHEME = new GenericVersionScheme();
@@ -49,12 +58,7 @@ public class DefaultVersion implements Version
      */
     public DefaultVersion(String rawVersion)
     {
-        try {
-            this.aetherVersion = VERSIONSCHEME.parseVersion(rawVersion);
-        } catch (InvalidVersionSpecificationException e) {
-            // Should never happen since org.sonatype.aether.util.version.GenericVersion does not really produce any
-            // exception but can't use it directly since it's package protected
-        }
+        setVersion(rawVersion);
     }
 
     /**
@@ -73,6 +77,19 @@ public class DefaultVersion implements Version
     public DefaultVersion(Version version)
     {
         this(version.getValue());
+    }
+
+    /**
+     * @param rawVersion the version string representation to parse
+     */
+    private void setVersion(String rawVersion)
+    {
+        try {
+            this.aetherVersion = VERSIONSCHEME.parseVersion(rawVersion);
+        } catch (InvalidVersionSpecificationException e) {
+            // Should never happen since org.sonatype.aether.util.version.GenericVersion does not really produce any
+            // exception but can't use it directly since it's package protected
+        }
     }
 
     @Override
@@ -99,5 +116,69 @@ public class DefaultVersion implements Version
     public String getValue()
     {
         return this.aetherVersion.toString();
+    }
+
+    // Object
+
+    @Override
+    public String toString()
+    {
+        return getValue();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return this.aetherVersion.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == this) {
+            return true;
+        }
+
+        boolean equals;
+
+        if (obj instanceof DefaultVersion) {
+            equals = equals((DefaultVersion) obj);
+        } else if (obj instanceof Version) {
+            equals = equals(new DefaultVersion(((Version) obj).getValue()));
+        } else {
+            equals = false;
+        }
+
+        return equals;
+    }
+
+    /**
+     * @param version the version
+     * @return true if the provided version is equals to this version
+     */
+    public boolean equals(DefaultVersion version)
+    {
+        return this.aetherVersion.equals(version.aetherVersion);
+    }
+
+    // Serializable
+
+    /**
+     * @param out the stream
+     * @throws IOException error when serializing the version
+     */
+    private void writeObject(ObjectOutputStream out) throws IOException
+    {
+        out.writeObject(getValue());
+    }
+
+    /**
+     * @param in the stream
+     * @throws IOException error when unserializing the version
+     * @throws ClassNotFoundException error when unserializing the version
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        setVersion((String) in.readObject());
     }
 }

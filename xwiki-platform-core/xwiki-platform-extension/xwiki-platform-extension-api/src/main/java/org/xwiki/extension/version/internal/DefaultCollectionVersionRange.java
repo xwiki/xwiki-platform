@@ -19,15 +19,18 @@
  */
 package org.xwiki.extension.version.internal;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.extension.version.CollectionVersionRange;
 import org.xwiki.extension.version.InvalidVersionRangeException;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.VersionRange;
+import org.xwiki.extension.version.VersionRangeCollection;
 
 /**
  * A collection of {@link VersionRange} linked with OR logic operation.
@@ -39,8 +42,13 @@ import org.xwiki.extension.version.VersionRange;
  * @see org.sonatype.aether.util.version.GenericVersionScheme#parseVersionConstraint(String)
  * @version $Id$
  */
-public class DefaultCollectionVersionRange implements CollectionVersionRange
+public class DefaultCollectionVersionRange implements VersionRangeCollection
 {
+    /**
+     * Serialization identifier.
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * The character used to separated version ranges.
      */
@@ -62,15 +70,7 @@ public class DefaultCollectionVersionRange implements CollectionVersionRange
      */
     public DefaultCollectionVersionRange(String rawRanges) throws InvalidVersionRangeException
     {
-        this.value = rawRanges;
-
-        // Parse
-
-        if (StringUtils.isEmpty(rawRanges)) {
-            throw new InvalidVersionRangeException("Range can't be empty");
-        }
-
-        parseRanges(this.value);
+        setRanges(rawRanges);
     }
 
     /**
@@ -84,6 +84,23 @@ public class DefaultCollectionVersionRange implements CollectionVersionRange
     }
 
     /**
+     * @param rawRanges the range collection string representation
+     * @throws InvalidVersionRangeException error when parsing version range
+     */
+    private void setRanges(String rawRanges) throws InvalidVersionRangeException
+    {
+        this.value = rawRanges;
+
+        // Parse
+
+        if (StringUtils.isEmpty(rawRanges)) {
+            throw new InvalidVersionRangeException("Range can't be empty");
+        }
+
+        parseRanges(this.value);
+    }
+
+    /**
      * @param rawRanges the ranges to parse
      * @throws InvalidVersionRangeException invalid ranges syntax
      */
@@ -91,7 +108,7 @@ public class DefaultCollectionVersionRange implements CollectionVersionRange
     {
         String currentRanges = rawRanges;
 
-        while (startsWith(currentRanges, '[') || startsWith(currentRanges, '(')) {
+        while (VersionUtils.startsWith(currentRanges, '[') || VersionUtils.startsWith(currentRanges, '(')) {
             int index1 = currentRanges.indexOf(')');
             int index2 = currentRanges.indexOf(']');
 
@@ -106,7 +123,7 @@ public class DefaultCollectionVersionRange implements CollectionVersionRange
 
             currentRanges = parseRange(currentRanges, index, rawRanges);
 
-            if (startsWith(currentRanges, RANGE_SEPARATOR)) {
+            if (VersionUtils.startsWith(currentRanges, RANGE_SEPARATOR)) {
                 currentRanges = currentRanges.substring(1).trim();
             }
         }
@@ -143,16 +160,6 @@ public class DefaultCollectionVersionRange implements CollectionVersionRange
         return this.ranges;
     }
 
-    /**
-     * @param str the string to look at
-     * @param c the character to search in the provided string
-     * @return true of the provided character is the first character of the provided string
-     */
-    private boolean startsWith(String str, char c)
-    {
-        return str.length() > 0 && str.charAt(0) == c;
-    }
-
     @Override
     public boolean containsVersion(Version version)
     {
@@ -187,7 +194,24 @@ public class DefaultCollectionVersionRange implements CollectionVersionRange
     @Override
     public boolean isCompatible(VersionRange otherRange)
     {
-        // TODO Auto-generated method stub
+        if (equals(otherRange)) {
+            return true;
+        }
+
+        for (VersionRange versionRange : this.ranges) {
+            boolean compatible;
+
+            if (otherRange instanceof VersionRangeCollection) {
+                compatible = ((VersionRangeCollection) otherRange).isCompatible(versionRange);
+            } else {
+                compatible = versionRange.isCompatible(otherRange);
+            }
+
+            if (compatible) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -219,5 +243,28 @@ public class DefaultCollectionVersionRange implements CollectionVersionRange
     public int hashCode()
     {
         return this.ranges.hashCode();
+    }
+
+    // Serializable
+
+    /**
+     * @param out the stream
+     * @throws IOException error when serializing the version
+     */
+    private void writeObject(ObjectOutputStream out) throws IOException
+    {
+        out.writeObject(getValue());
+    }
+
+    /**
+     * @param in the stream
+     * @throws IOException error when unserializing the version range collection
+     * @throws ClassNotFoundException error when unserializing the version range collection
+     * @throws InvalidVersionRangeException error when unserializing the version range collection
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException,
+        InvalidVersionRangeException
+    {
+        setRanges((String) in.readObject());
     }
 }

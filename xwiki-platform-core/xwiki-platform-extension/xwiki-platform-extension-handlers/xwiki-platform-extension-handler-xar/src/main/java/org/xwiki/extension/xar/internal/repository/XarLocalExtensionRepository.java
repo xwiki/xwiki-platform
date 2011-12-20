@@ -37,6 +37,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
@@ -172,6 +173,20 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
 
         if (extension == null) {
             throw new ResolveException("Extension [" + extensionId + "] does not exists or is not a xar extension");
+        }
+
+        return extension;
+    }
+
+    @Override
+    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    {
+        Extension extension = this.localRepository.resolve(extensionDependency);
+        extension = this.extensions.get(extension.getId());
+
+        if (extension == null) {
+            throw new ResolveException("Extension [" + extensionDependency
+                + "] does not exists or is not a xar extension");
         }
 
         return extension;

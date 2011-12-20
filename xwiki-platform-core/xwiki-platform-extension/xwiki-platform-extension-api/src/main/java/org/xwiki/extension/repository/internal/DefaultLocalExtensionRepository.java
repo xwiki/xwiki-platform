@@ -196,7 +196,7 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
             if (!localExtension.isInstalled(namespace)) {
                 return;
             }
-            
+
             if (this.coreExtensionRepository.exists(localExtension.getId().getId())) {
                 // Impossible to overwrite core extensions
                 localExtension.setInstalled(false, namespace);
@@ -459,14 +459,16 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
     {
         List<DefaultLocalExtension> versions = this.extensionsById.get(extensionDependency.getId());
 
-        for (DefaultLocalExtension extension : versions) {
-            if (extensionDependency.getVersionConstraint().containsVersion(extension.getId().getVersion())) {
-                // Return the higher version which satisfy the version constraint
-                return extension;
+        if (versions != null) {
+            for (DefaultLocalExtension extension : versions) {
+                if (extensionDependency.getVersionConstraint().containsVersion(extension.getId().getVersion())) {
+                    // Return the higher version which satisfy the version constraint
+                    return extension;
+                }
             }
         }
 
-        return null;
+        throw new ResolveException("Can't find extension dependency [" + extensionDependency + "]");
     }
 
     @Override

@@ -26,7 +26,7 @@ import java.util.Collection;
  * 
  * @version $Id$
  */
-public interface CollectionVersionRange extends VersionRange
+public interface VersionRangeCollection extends VersionRange
 {
     /**
      * Gets the version ranges.

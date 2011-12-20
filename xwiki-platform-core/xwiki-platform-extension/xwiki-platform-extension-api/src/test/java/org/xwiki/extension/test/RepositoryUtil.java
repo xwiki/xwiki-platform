@@ -23,6 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
@@ -31,9 +34,12 @@ import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
+import org.xwiki.component.annotation.ComponentAnnotationLoader;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.handler.ExtensionInitializer;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryException;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
@@ -64,6 +70,8 @@ public class RepositoryUtil
     private ComponentManager componentManager;
 
     private ExtensionPackager extensionPackager;
+
+    private ComponentAnnotationLoader componentLoader;
 
     public RepositoryUtil(String name, MockConfigurationSource configurationSource, ComponentManager componentManager)
     {
@@ -116,9 +124,15 @@ public class RepositoryUtil
         return MAVENREPOSITORY_ID;
     }
 
-    public void setup() throws IOException, ComponentLookupException, ExtensionRepositoryException, URISyntaxException
+    public void setup() throws Exception
     {
         clean();
+
+        // add default test core extension
+
+        registerComponent(ConfigurableDefaultCoreExtensionRepository.class);
+        ((ConfigurableDefaultCoreExtensionRepository) this.componentManager.lookup(CoreExtensionRepository.class))
+            .addExtensions("coreextension", "version");
 
         // copy
 
@@ -157,27 +171,43 @@ public class RepositoryUtil
         this.componentManager.lookup(ExtensionInitializer.class).initialize();
     }
 
+    private void registerComponent(Class< ? > componentClass) throws Exception
+    {
+        if (this.componentLoader == null) {
+            this.componentLoader = new ComponentAnnotationLoader();
+        }
+
+        List<ComponentDescriptor> descriptors = this.componentLoader.getComponentsDescriptors(componentClass);
+
+        for (ComponentDescriptor descriptor : descriptors) {
+            this.componentManager.registerComponent(descriptor);
+        }
+    }
+
     public int copyResourceFolder(File targetFolder, String resourcePackage) throws IOException
     {
         int nb = 0;
 
         targetFolder.mkdirs();
 
-        Reflections reflections =
-            new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner())
-                .setUrls(ClasspathHelper.forPackage(""))
-                .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(resourcePackage))));
+        Set<URL> urls = ClasspathHelper.forPackage(resourcePackage);
 
-        for (String resource : reflections.getResources(Pattern.compile(".*"))) {
-            File targetFile = new File(targetFolder, resource.substring(resourcePackage.length() + 1));
+        if (!urls.isEmpty()) {
+            Reflections reflections =
+                new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner()).setUrls(urls)
+                    .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(resourcePackage))));
 
-            InputStream resourceStream = getClass().getResourceAsStream("/" + resource);
+            for (String resource : reflections.getResources(Pattern.compile(".*"))) {
+                File targetFile = new File(targetFolder, resource.substring(resourcePackage.length() + 1));
 
-            try {
-                FileUtils.copyInputStreamToFile(resourceStream, targetFile);
-                ++nb;
-            } finally {
-                resourceStream.close();
+                InputStream resourceStream = getClass().getResourceAsStream("/" + resource);
+
+                try {
+                    FileUtils.copyInputStreamToFile(resourceStream, targetFile);
+                    ++nb;
+                } finally {
+                    resourceStream.close();
+                }
             }
         }
 

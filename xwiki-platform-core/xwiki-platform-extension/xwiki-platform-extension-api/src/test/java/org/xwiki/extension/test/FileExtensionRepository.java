@@ -79,7 +79,7 @@ public class FileExtensionRepository extends AbstractExtensionRepository impleme
 
     String getPathSuffix(ExtensionId extensionId, String type)
     {
-        return extensionId.getId() + '-' + extensionId.getVersion() + '.' + type;
+        return extensionId.getId() + '-' + extensionId.getVersion().getValue() + '.' + type;
     }
 
     public Extension resolve(ExtensionId extensionId) throws ResolveException

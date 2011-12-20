@@ -19,12 +19,14 @@
  */
 package org.xwiki.extension.version;
 
+import java.io.Serializable;
+
 /**
  * An extension version.
  * 
  * @version $Id$
  */
-public interface Version extends Comparable<Version>
+public interface Version extends Comparable<Version>, Serializable
 {
     /**
      * @return the string representation of this version constraint

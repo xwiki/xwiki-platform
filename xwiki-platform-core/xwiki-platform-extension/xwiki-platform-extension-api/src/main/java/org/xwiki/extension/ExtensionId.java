@@ -70,7 +70,7 @@ public class ExtensionId implements Serializable
      */
     public String getId()
     {
-        return id;
+        return this.id;
     }
 
     /**
@@ -78,14 +78,9 @@ public class ExtensionId implements Serializable
      */
     public Version getVersion()
     {
-        return version;
+        return this.version;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -98,22 +93,12 @@ public class ExtensionId implements Serializable
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode()
     {
         return toString().hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {

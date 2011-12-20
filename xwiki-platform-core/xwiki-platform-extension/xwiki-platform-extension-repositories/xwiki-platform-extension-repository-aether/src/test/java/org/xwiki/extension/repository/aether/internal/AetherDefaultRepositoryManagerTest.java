@@ -52,6 +52,8 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
 
     private ExtensionId extensionId;
 
+    private ExtensionId extensionDependencyId;
+
     private ExtensionId extensionIdClassifier;
 
     private ExtensionDependency dependencyExtensionId;
@@ -74,11 +76,13 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         this.repositoryUtil.setup();
 
         this.extensionId = new ExtensionId(GROUPID + ':' + ARTIfACTID, "version");
+        this.extensionDependencyId = new ExtensionId("dgroupid:dartifactid", "dversion");
+        
         this.extensionIdClassifier = new ExtensionId(GROUPID + ':' + ARTIfACTID + ":classifier", "version");
         this.dependencyExtensionId =
-            new DefaultExtensionDependency("dgroupid:dartifactid", new DefaultVersionConstraint("dversion"));
+            new DefaultExtensionDependency(this.extensionDependencyId.getId(), new DefaultVersionConstraint(this.extensionDependencyId.getVersion().getValue()));
         this.dependencyExtensionIdRange =
-            new DefaultExtensionDependency("dgroupid:dartifactid", new DefaultVersionConstraint("[dversion,)"));
+            new DefaultExtensionDependency(this.extensionDependencyId.getId(), new DefaultVersionConstraint("[dversion,)"));
 
         this.bundleExtensionId = new ExtensionId("groupid:bundleartifactid", "version");
 
@@ -116,16 +120,17 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         extension = this.repositoryManager.resolve(this.extensionId);
         Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), extension.getRepository().getId().getId());
 
-        /*
-         * // TODO: see http://jira.xwiki.org/browse/XWIKI-7163 // Modify the file on the descriptor on the repository
-         * File pomFile = new File(this.repositoryUtil.getMavenRepository(), this.extensionId.getId().replace('.', '/')
-         * .replace(':', '/') + '/' + this.extensionId.getVersion() + '/' + ARTIfACTID + '-' +
-         * this.extensionId.getVersion() + ".pom"); FileUtils.writeStringToFile(pomFile,
-         * FileUtils.readFileToString(pomFile, "UTF-8").replace("<description>summary</description>",
-         * "<description>modified summary</description>"), "UTF-8"); extension =
-         * this.repositoryManager.resolve(this.extensionId); Assert.assertEquals("modified description",
-         * extension.getSummary());
-         */
+        // TODO: see http://jira.xwiki.org/browse/XWIKI-7163 // Modify the file on the descriptor on the repository
+        // File pomFile =
+        // new File(this.repositoryUtil.getMavenRepository(), this.extensionId.getId().replace('.', '/')
+        // .replace(':', '/')
+        // + '/' + this.extensionId.getVersion() + '/' + ARTIfACTID + '-' + this.extensionId.getVersion() + ".pom");
+        // FileUtils.writeStringToFile(
+        // pomFile,
+        // FileUtils.readFileToString(pomFile, "UTF-8").replace("<description>summary</description>",
+        // "<description>modified summary</description>"), "UTF-8");
+        // extension = this.repositoryManager.resolve(this.extensionId);
+        // Assert.assertEquals("modified description", extension.getSummary());
     }
 
     @Test
@@ -144,8 +149,9 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         Extension extension = this.repositoryManager.resolve(this.dependencyExtensionIdRange);
 
         Assert.assertNotNull(extension);
-        Assert.assertEquals(this.dependencyExtensionId.getId(), extension.getId().getId());
-        Assert.assertEquals(this.dependencyExtensionId.getVersionConstraint(), extension.getId().getVersion());
+        Assert.assertEquals(this.extensionDependencyId.getId(), extension.getId().getId());
+        Assert.assertEquals(this.extensionDependencyId.getVersion(), extension.getId()
+            .getVersion());
     }
 
     @Test

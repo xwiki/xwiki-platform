@@ -43,8 +43,6 @@ public class UninstallJobTest extends AbstractExtensionHandlerTest
 
     private TestExtensionHandler handler;
 
-    private ConfigurableDefaultCoreExtensionRepository coreRepository;
-
     @Override
     public void setUp() throws Exception
     {
@@ -62,15 +60,6 @@ public class UninstallJobTest extends AbstractExtensionHandlerTest
         this.existingExtension = (LocalExtension) this.localExtensionRepository.resolve(this.existingExtensionId);
         this.existingExtensionDependency =
             (LocalExtension) this.localExtensionRepository.resolve(this.existingExtensionDependencyId);
-    }
-
-    @Override
-    protected void beforeRepositoryUtil() throws Exception
-    {
-        // repositoryUtil lookup the local repository and one of the local extension require a core extension
-        this.coreRepository =
-            (ConfigurableDefaultCoreExtensionRepository) getComponentManager().lookup(CoreExtensionRepository.class);
-        this.coreRepository.addExtensions("coreextension", "version");
     }
 
     @Test

@@ -19,12 +19,14 @@
  */
 package org.xwiki.extension.version;
 
+import java.io.Serializable;
+
 /**
  * A range of versions.
  * 
  * @version $Id$
  */
-public interface VersionRange
+public interface VersionRange extends Serializable
 {
     /**
      * Indicate if the provided version is part of this range.

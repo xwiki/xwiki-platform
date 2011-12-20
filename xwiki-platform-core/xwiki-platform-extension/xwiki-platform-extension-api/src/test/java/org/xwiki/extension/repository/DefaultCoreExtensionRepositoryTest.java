@@ -72,7 +72,7 @@ public class DefaultCoreExtensionRepositoryTest extends AbstractComponentTestCas
 
         Assert.assertNotNull(extension);
         Assert.assertEquals("existingextension", extension.getId().getId());
-        Assert.assertEquals("version", extension.getId().getVersion());
+        Assert.assertEquals("version", extension.getId().getVersion().getValue());
     }
 
     /**
@@ -103,6 +103,6 @@ public class DefaultCoreExtensionRepositoryTest extends AbstractComponentTestCas
 
         Assert.assertNotNull(extension);
         Assert.assertEquals("existingextension", extension.getId().getId());
-        Assert.assertEquals("version", extension.getId().getVersion());
+        Assert.assertEquals("version", extension.getId().getVersion().getValue());
     }
 }

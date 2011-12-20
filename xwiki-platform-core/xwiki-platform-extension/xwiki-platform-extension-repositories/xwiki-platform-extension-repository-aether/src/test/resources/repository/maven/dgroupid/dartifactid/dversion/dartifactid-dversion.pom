@@ -8,5 +8,5 @@
   <version>dversion</version>
   <packaging>type</packaging>
   <name>dependency name</name>
-  <description>dependency description</description>
+  <description>dependency summary</description>
 </project>

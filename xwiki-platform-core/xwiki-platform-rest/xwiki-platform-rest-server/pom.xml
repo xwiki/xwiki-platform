@@ -27,40 +27,44 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rest</artifactId>
-    <version>3.3-SNAPSHOT</version>
+    <version>3.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rest-server</artifactId>
   <packaging>jar</packaging>
   <name>XWiki Platform - REST - Server</name>
   <description>Service for accessing XWiki through a RESTful API</description>
-  <properties>
-    <restlet.version>1.1.10</restlet.version>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.restlet</groupId>
+      <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet</artifactId>
       <version>${restlet.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.restlet</groupId>
+      <groupId>org.restlet.jee</groupId>
+      <artifactId>org.restlet.ext.servlet</artifactId>
+      <version>${restlet.version}</version>
+      <exclusions>
+        <!-- Restlet API is already provided above -->
+        <exclusion>
+          <groupId>org.restlet.jee</groupId>
+          <artifactId>org.restlet</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.jaxrs</artifactId>
       <version>${restlet.version}</version>
       <exclusions>
       	<exclusion>
-      		<artifactId>jaxb-api</artifactId>
-      		<groupId>javax.xml.bind</groupId>
+      	  <artifactId>jaxb-api</artifactId>
+      	  <groupId>javax.xml.bind</groupId>
       	</exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.noelios.restlet</groupId>
-      <artifactId>com.noelios.restlet.ext.servlet</artifactId>
-      <version>${restlet.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

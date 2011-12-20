@@ -41,7 +41,7 @@ import org.xwiki.component.annotation.Component;
 @Component(roles = {HTMLFilter.class })
 @Named("lineBreak")
 @Singleton
-public class LineBreakFilter implements HTMLFilter
+public class LineBreakFilter extends AbstractHTMLFilter
 {
     @Override
     public void filter(Document document, Map<String, String> parameters)
@@ -58,5 +58,12 @@ public class LineBreakFilter implements HTMLFilter
             Element br = emptyLineBRs.get(i);
             br.getParentNode().removeChild(br);
         }
+    }
+
+    @Override
+    public int getPriority()
+    {
+        // Make sure this filter is applied before the rest (EmptyLineFilter and StandAloneMacroFilter depend on it).
+        return super.getPriority() - 1;
     }
 }

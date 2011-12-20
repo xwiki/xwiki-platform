@@ -57,8 +57,11 @@ public interface LocalExtensionRepository extends ExtensionRepository
     Collection<LocalExtension> getInstalledExtensions();
 
     /**
-     * Return all the extensions available for the provide namespace. This also include root extension since namespaces
+     * Return all the extensions available for the provided namespace. This also include root extension since namespaces
      * inherit from root.
+     * <p>
+     * Note that {@link #getInstalledExtensions()} return all the extensions installed in all namespaces while
+     * {@link #getInstalledExtensions(String)} with <code>null</code> return only those that are globally available.
      * 
      * @param namespace the namespace where to search for installed extensions, null mean installed in all namespaces
      *            (root namespace)

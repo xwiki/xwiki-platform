@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1304002820000</creationDate>
-<date>1322142318000</date>
-<contentUpdateDate>1322142318000</contentUpdateDate>
+<date>1323442354000</date>
+<contentUpdateDate>1323442354000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -33,7 +33,7 @@
 <validationScript></validationScript>
 <authors>
 <cache>0</cache>
-<customDisplay>{{include document="ExtensionCode.ExtensionAuthorsDisplayer"/}}</customDisplay>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
 <displayType>input</displayType>
 <multiSelect>1</multiSelect>
@@ -270,7 +270,7 @@
 </class>
 <object>
 <class>
-<name>XWiki.SheetClass</name>
+<name>XWiki.ClassSheetBinding</name>
 <customClass></customClass>
 <customMapping></customMapping>
 <defaultViewSheet></defaultViewSheet>
@@ -278,22 +278,26 @@
 <defaultWeb></defaultWeb>
 <nameField></nameField>
 <validationScript></validationScript>
-<defaultEditMode>
+<sheet>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
-<name>defaultEditMode</name>
+<name>sheet</name>
 <number>1</number>
-<prettyName>Default Edit Mode</prettyName>
-<size>15</size>
+<picker>0</picker>
+<prettyName>Sheet</prettyName>
+<size>30</size>
 <unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</defaultEditMode>
+</sheet>
 </class>
 <name>ExtensionCode.ExtensionClass</name>
 <number>0</number>
-<className>XWiki.SheetClass</className>
-<guid>45fcbdb7-1780-4803-931d-41146a5391fe</guid>
+<className>XWiki.ClassSheetBinding</className>
+<guid>3b8efbcb-ecec-4be1-ad78-34ff59766b6f</guid>
 <property>
-<defaultEditMode>inline</defaultEditMode>
+<sheet>ExtensionCode.ExtensionSheet</sheet>
 </property>
 </object>
 <content>{{include document="XWiki.ClassSheet"/}}</content></xwikidoc>

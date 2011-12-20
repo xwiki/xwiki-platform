@@ -27,11 +27,11 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-store</artifactId>
-    <version>3.3-SNAPSHOT</version>
+    <version>3.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-store-locks</artifactId>
   <name>XWiki Platform - Store - Locks</name>
-  <version>3.3-SNAPSHOT</version>
+  <version>3.4-SNAPSHOT</version>
   <description>Locking mechanisms and supporting code for XWiki storage engine.</description>
   <dependencies>
     <dependency>

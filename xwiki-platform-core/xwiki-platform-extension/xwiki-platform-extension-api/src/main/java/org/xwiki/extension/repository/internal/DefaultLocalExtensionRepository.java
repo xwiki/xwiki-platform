@@ -137,7 +137,9 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
                 .hasPrevious();) {
                 DefaultLocalExtension localExtension = it.previous();
 
-                validateExtension(localExtension, validatedExtension);
+                if (localExtension.isInstalled()) {
+                    validateExtension(localExtension, validatedExtension);
+                }
             }
         }
     }
@@ -191,10 +193,17 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
         String namespace)
     {
         try {
-            if (!localExtension.isInstalled(namespace)
-                || this.coreExtensionRepository.exists(localExtension.getId().getId())) {
+            if (!localExtension.isInstalled(namespace)) {
+                return;
+            }
+            
+            if (this.coreExtensionRepository.exists(localExtension.getId().getId())) {
                 // Impossible to overwrite core extensions
                 localExtension.setInstalled(false, namespace);
+
+                this.logger.error("Found local extension [" + localExtension
+                    + "] is invalid. Impossible to overwrite core extensions.");
+
                 return;
             }
 
@@ -223,6 +232,11 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
 
                 if (!enabled) {
                     localExtension.setInstalled(false, namespace);
+
+                    this.logger.error("Found local extension [" + localExtension
+                        + "] is invalid. One of it's dependency ([" + dependency
+                        + "]) is not valid and is not a core extension.");
+
                     return;
                 }
             }
@@ -294,13 +308,16 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
     {
         // Clean provided extension dependencies backward dependencies
         for (ExtensionDependency dependency : localExtension.getDependencies()) {
-            DefaultInstalledExtension installedExtension =
-                getInstalledExtensionFromCache(dependency.getId(), namespace);
+            if (this.coreExtensionRepository.getCoreExtension(dependency.getId()) == null) {
+                DefaultInstalledExtension installedExtension =
+                    getInstalledExtensionFromCache(dependency.getId(), namespace);
 
-            if (installedExtension.getBackwardDependencies().remove(localExtension)) {
-                // That should never happen so lets log it
-                this.logger.warn("Extension [" + localExtension + "] was not regisistered as backward dependency of ["
-                    + installedExtension.getExtension() + "]");
+                if (installedExtension == null || installedExtension.getBackwardDependencies().remove(localExtension)) {
+                    // That should never happen so lets log it
+                    this.logger.warn("Extension [" + localExtension
+                        + "] was not regisistered as backward dependency of [" + installedExtension.getExtension()
+                        + "]");
+                }
             }
         }
     }

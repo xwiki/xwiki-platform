@@ -49,6 +49,8 @@ import com.xpn.xwiki.doc.merge.MergeConfiguration;
 @Named("xar")
 public class XarExtensionHandler extends AbstractExtensionHandler
 {
+    private static final String WIKI_NAMESPACEPREFIX = "wiki:";
+
     @Inject
     private Packager packager;
 
@@ -60,8 +62,20 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     private Logger logger;
 
     // TODO: support question/answer with the UI to resolve conflicts
-    public void install(LocalExtension localExtension, String wiki) throws InstallException
+    @Override
+    public void install(LocalExtension localExtension, String namespace) throws InstallException
     {
+        String wiki = namespace;
+
+        if (wiki != null) {
+            if (wiki.startsWith(WIKI_NAMESPACEPREFIX)) {
+                wiki = wiki.substring(WIKI_NAMESPACEPREFIX.length());
+            } else {
+                throw new InstallException("Unsupported namespace [" + namespace + "], only " + WIKI_NAMESPACEPREFIX
+                    + "wikiid format is supported");
+            }
+        }
+
         install(null, localExtension, wiki);
     }
 
@@ -70,6 +84,17 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace)
         throws InstallException
     {
+        String wiki = namespace;
+
+        if (wiki != null) {
+            if (wiki.startsWith(WIKI_NAMESPACEPREFIX)) {
+                wiki = wiki.substring(WIKI_NAMESPACEPREFIX.length());
+            } else {
+                throw new InstallException("Unsupported namespace [" + namespace + "], only " + WIKI_NAMESPACEPREFIX
+                    + "wikiid format is supported");
+            }
+        }
+
         // TODO
         // 1) find all modified pages between old and new version
         // 2) compare old version and wiki (to find pages modified by user)
@@ -90,7 +115,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
 
         // Install new pages
-        install(previousXarExtension, newLocalExtension, namespace);
+        install(previousXarExtension, newLocalExtension, wiki);
 
         // Uninstall old version pages not anymore in the new version
         Set<XarEntry> previousPages = new HashSet<XarEntry>(previousXarExtension.getPages());
@@ -113,13 +138,13 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
 
         try {
-            this.packager.unimportPages(previousPages, namespace);
+            this.packager.unimportPages(previousPages, wiki);
         } catch (Exception e) {
             this.logger.warn("Exception when cleaning pages removed since previous xar extension version", e);
         }
     }
 
-    public void install(XarLocalExtension previousExtension, LocalExtension localExtension, String wiki)
+    private void install(XarLocalExtension previousExtension, LocalExtension localExtension, String wiki)
         throws InstallException
     {
         // TODO: should be configurable
@@ -135,8 +160,20 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
     }
 
+    @Override
     public void uninstall(LocalExtension localExtension, String namespace) throws UninstallException
     {
+        String wiki = namespace;
+
+        if (wiki != null) {
+            if (wiki.startsWith(WIKI_NAMESPACEPREFIX)) {
+                wiki = wiki.substring(WIKI_NAMESPACEPREFIX.length());
+            } else {
+                throw new UninstallException("Unsupported namespace [" + namespace + "], only " + WIKI_NAMESPACEPREFIX
+                    + "wikiid format is supported");
+            }
+        }
+
         // TODO: delete pages from the wiki which belong only to this extension (several extension could have some
         // common pages which will cause all sort of other issues but still could happen technically)
 
@@ -147,7 +184,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             XarLocalExtension xarLocalExtension =
                 (XarLocalExtension) this.xarRepository.resolve(localExtension.getId());
             List<XarEntry> pages = xarLocalExtension.getPages();
-            this.packager.unimportPages(pages, namespace);
+            this.packager.unimportPages(pages, wiki);
         } catch (Exception e) {
             // Not supposed to be possible
             throw new UninstallException("Failed to get xar extension [" + localExtension.getId()

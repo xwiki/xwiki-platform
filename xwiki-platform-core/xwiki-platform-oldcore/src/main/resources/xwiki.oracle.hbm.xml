@@ -26,10 +26,14 @@
 <hibernate-mapping auto-import="true">
 
     <!-- This file is a copy of xwiki.hbm.xml with the following modification:
-         - For medium strings (i.e. when size > 255) the property type was changed to text,
-           as otherwise Hibernate uses VARCHAR, which are limited to 255 chars
-         - For large strings (i.e. when size > 32K) the property type was changed to materialized_clob,
-           as otherwise Hibernate uses VARCHAR, which are limited to 32K
+         - When using "text" or "string" types:
+           - When size <= 2000 Hibernate maps it to CHAR
+           - When size > 2000 and <= 4000 Hibernates maps it to VARCHAR2
+           - When size > 4000 Hibernates maps it to LONG. However LONG is deprecated in Oracle and shouldn't be used
+             since Oracle imposes a limitation on it: there can be only be one LONG column per table. Thus when
+             size > 4000 chars we must use a "materialized_clob" type
+             See https://hibernate.onjira.com/browse/HHH-5569
+         - Thus, use the followig strategy: use the "string" type when size<4000 and materialized_clob when size>40000
          - Lots of columns have not-null="false", since Oracle treats the empty string as NULL
          - Numeric index columns have an explicit sql-type="integer"
     -->
@@ -42,9 +46,13 @@
      fullName should map to a column called fullname
     -->
 
-<!--
-    <typedef name="clob" class="org.chilli.tools.hibernate.StringClobType" />
--->
+    <!-- JDBC driver will try to map a materialized_clob type to a java.sql.Clob Java type when loading objects from
+         the DB thus causing a Class Cast Exception since we use String types in Java and not java.sql.Clob
+         (see https://hibernate.onjira.com/browse/HHH-5659).
+         Thus we need to tell Hibernate to map materialized_clob to String.
+    -->
+    <typedef name="materialized_clob" class="org.hibernate.type.StringClobType" />
+	
     <!-- com.xpn.xwiki.doc.XWikiDocument root -->
     <class name="com.xpn.xwiki.doc.XWikiDocument" table="xwikidoc">
         <id name="id" type="long" unsaved-value="undefined">
@@ -317,8 +325,8 @@
              implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
              name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
              (new stats) -->
-        <property name="className" type="string" column="XWR_CLASSNAME" not-null="true" length="255" />
-        <property name="referer" type="text" column="XWR_REFERER" not-null="true" length="8192" />
+        <property name="className" type="string" column="XWR_CLASSNAME" length="255" />
+        <property name="referer" type="materialized_clob" column="XWR_REFERER" not-null="true" length="8192" />
         <property name="pageViews" type="integer" column="XWR_PAGE_VIEWS" index="XWRS_PAGE_VIEWS" not-null="false" />
         <property name="period" type="integer" column="XWR_PERIOD" index="XWRS_PERIOD" not-null="false" />
     </class>
@@ -334,10 +342,10 @@
              implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
              name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
              (new stats) -->
-        <property name="className" type="string" column="XWV_CLASSNAME" not-null="true" length="255" />
+        <property name="className" type="string" column="XWV_CLASSNAME" length="255" />
         <property name="IP" type="string" column="XWV_IP" not-null="true" length="255" index="XWVS_IP" />
-        <property name="userAgent" type="text" column="XWV_USER_AGENT" not-null="true" length="8192" />
-        <property name="cookie" type="text" column="XWV_COOKIE" not-null="true" length="8192" />
+        <property name="userAgent" type="materialized_clob" column="XWV_USER_AGENT" not-null="true" length="8192" />
+        <property name="cookie" type="materialized_clob" column="XWV_COOKIE" not-null="true" length="8192" />
         <property name="uniqueID" type="string" column="XWV_UNIQUE_ID" index="XWVS_UNIQUE_ID" not-null="true" length="255" />
         <property name="pageViews" type="integer" column="XWV_PAGE_VIEWS" index="XWVS_PAGE_VIEWS" not-null="false" />
         <property name="pageSaves" type="integer" column="XWV_PAGE_SAVES" index="XWVS_PAGE_SAVES" not-null="false" />
@@ -366,13 +374,13 @@
         <property name="webcopyright" type="string" column="XWP_WEBCOPYRIGHT" length="255" />
         <property name="title" type="string" column="XWP_TITLE" length="255" />
         <property name="version" type="string" column="XWP_VERSION" length="255" />
-        <property name="meta" type="text" column="XWP_META" length="30000" />
+        <property name="meta" type="materialized_clob" column="XWP_META" length="30000" />
         <property name="use_email_verification" type="integer" column="XWP_USE_EMAIL_VERIFICATION" />
         <property name="smtp_server" type="string" column="XWP_SMTP_SERVER" length="255" />
         <property name="admin_email" type="string" column="XWP_ADMIN_EMAIL" length="255" />
-        <property name="validation_email_content" type="text" column="XWP_VALIDATION_EMAIL_CONTENT" length="30000" />
-        <property name="confirmation_email_content" type="text" column="XWP_CONFIRMATION_EMAIL_CONTENT" length="30000" />
-        <property name="invitation_email_content" type="text" column="XWP_INVITATION_EMAIL_CONTENT" length="30000" />
+		<property name="validation_email_content" type="materialized_clob" column="XWP_VALIDATION_EMAIL_CONTENT" length="30000" />
+        <property name="confirmation_email_content" type="materialized_clob" column="XWP_CONFIRMATION_EMAIL_CONTENT" length="30000" />
+        <property name="invitation_email_content" type="materialized_clob" column="XWP_INVITATION_EMAIL_CONTENT" length="30000" />
         <property name="leftPanels" type="string" column="XWP_LEFT_PANELS" length="2000" />
         <property name="rightPanels" type="string" column="XWP_RIGHT_PANELS" length="2000" />
         <property name="showLeftPanels" type="integer" column="XWP_SHOW_LEFT_PANELS" />

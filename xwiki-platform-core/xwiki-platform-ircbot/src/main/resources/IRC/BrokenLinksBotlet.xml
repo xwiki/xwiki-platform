@@ -10,9 +10,9 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1320518208000</creationDate>
-<date>1320582288000</date>
-<contentUpdateDate>1320582288000</contentUpdateDate>
+<creationDate>1323347519000</creationDate>
+<date>1323360543000</date>
+<contentUpdateDate>1323360543000</contentUpdateDate>
 <version>1.1</version>
 <title>Broken Links Botlet</title>
 <template></template>
@@ -214,7 +214,7 @@ if (!services.get("linkchecker") || !services.get("rendering")?.getDefaultTransf
     return
 }
 
-if (request.action == "start") {
+if (request.action == "start" || xcontext.get("botAction") == "start") {
 
     // Register against the component manager as an IRCBotlet
     DefaultComponentDescriptor descriptor = new DefaultComponentDescriptor()
@@ -234,7 +234,7 @@ if (request.action == "start") {
     observation.removeListener("invalidurlevent")
     observation.addListener(botlet)
 
-} else if (request.action == "stop") {
+} else if (request.action == "stop" || xcontext.get("botAction") == "stop") {
 
     // Unregister from the Observation Manager
     def observation = Utils.getComponent(ObservationManager.class)

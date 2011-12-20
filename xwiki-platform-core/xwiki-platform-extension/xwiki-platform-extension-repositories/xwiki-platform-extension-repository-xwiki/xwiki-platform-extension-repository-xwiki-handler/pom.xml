@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension-repository-xwiki</artifactId>
-    <version>3.3-SNAPSHOT</version>
+    <version>3.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-repository-xwiki-handler</artifactId>
   <name>XWiki Platform - Extension - Repository - XWiki handler</name>
@@ -45,14 +45,15 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.restlet</groupId>
+      <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.jaxrs</artifactId>
-      <version>1.1.10</version>
+      <version>${restlet.version}</version>
+      <scope>provided</scope>
       <exclusions>
         <!-- Included in Java6 -->
       	<exclusion>
-      		<artifactId>jaxb-api</artifactId>
-      		<groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+      	  <groupId>javax.xml.bind</groupId>
       	</exclusion>
       </exclusions>
     </dependency>

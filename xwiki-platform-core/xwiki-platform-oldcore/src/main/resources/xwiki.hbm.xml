@@ -301,7 +301,7 @@
              implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
              name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
              (new stats) -->
-        <property name="className" type="string" column="XWR_CLASSNAME" not-null="true" length="255" />
+        <property name="className" type="string" column="XWR_CLASSNAME" length="255" />
         <property name="referer" type="string" column="XWR_REFERER" not-null="true" length="8192" />
         <property name="pageViews" type="integer" column="XWR_PAGE_VIEWS" index="XWRS_PAGE_VIEWS" not-null="false" />
         <property name="period" type="integer" column="XWR_PERIOD" index="XWRS_PERIOD" not-null="false" />
@@ -318,7 +318,7 @@
              implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
              name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
              (new stats) -->
-        <property name="className" type="string" column="XWV_CLASSNAME" not-null="true" length="255" />
+        <property name="className" type="string" column="XWV_CLASSNAME" length="255" />
         <property name="IP" type="string" column="XWV_IP" not-null="true" length="255" index="XWVS_IP" />
         <property name="userAgent" type="string" column="XWV_USER_AGENT" not-null="true" length="8192" />
         <property name="cookie" type="string" column="XWV_COOKIE" not-null="true" length="8192" />

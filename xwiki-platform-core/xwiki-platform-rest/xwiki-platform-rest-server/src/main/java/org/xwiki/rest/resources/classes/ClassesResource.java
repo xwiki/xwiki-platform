@@ -70,7 +70,7 @@ public class ClassesResource extends XWikiResource /* extends XWikiResource */
 
             return classes;
         } finally {
-            Utils.getXWiki(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
     }
 }

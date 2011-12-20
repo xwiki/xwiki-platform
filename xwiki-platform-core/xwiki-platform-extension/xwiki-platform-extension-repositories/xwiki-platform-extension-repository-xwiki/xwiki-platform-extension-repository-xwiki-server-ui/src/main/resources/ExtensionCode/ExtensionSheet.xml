@@ -11,10 +11,10 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1312816151000</creationDate>
-<date>1323166788000</date>
-<contentUpdateDate>1323166788000</contentUpdateDate>
+<date>1323442595000</date>
+<contentUpdateDate>1323442595000</contentUpdateDate>
 <version>1.1</version>
-<title></title>
+<title>#if($doc.getObject('ExtensionCode.ExtensionClass'))$doc.getObject('ExtensionCode.ExtensionClass').getProperty('name').value#{else}Extension sheet#end</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -22,34 +22,6 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.1</syntaxId>
 <hidden>false</hidden>
-<object>
-<class>
-<name>XWiki.SheetClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<defaultEditMode>
-<disabled>0</disabled>
-<name>defaultEditMode</name>
-<number>1</number>
-<prettyName>Default Edit Mode</prettyName>
-<size>15</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</defaultEditMode>
-</class>
-<name>ExtensionCode.ExtensionSheet</name>
-<number>0</number>
-<className>XWiki.SheetClass</className>
-<guid>433d9016-169c-4522-99d2-c09d9711e7d5</guid>
-<property>
-<defaultEditMode></defaultEditMode>
-</property>
-</object>
 <object>
 <class>
 <name>XWiki.StyleSheetExtension</name>
@@ -201,13 +173,6 @@
     #set($extensionTypeObject = $xwiki.getDocument($extensionTypeDocumentName).getObject("ExtensionCode.ExtensionTypeClass"))
   #end
 #end
-
-#if ($repositoryConfigObj)
-  #set($defaultIdPrefix = $repositoryConfigObj.getProperty('defaultIdPrefix').value)
-#end
-#if (!$defaultIdPrefix)
-  #set($defaultIdPrefix = '')
-#end
 {{/velocity}}
 
 {{velocity}}
@@ -218,9 +183,9 @@
     (% class="extensionSummary" %)
     #set($icon = $doc.getValue("icon"))
     #if ("$!{icon.trim()}" != "")
-      |[[image:${doc.getValue('icon')}]]|**$doc.getValue("summary")**
+      |[[image:${doc.getValue('icon')}]]|**{{{$doc.getValue("summary")}}}**
     #else
-      |[[image:icon:cog]]|**$doc.getValue("summary")**
+      |[[image:icon:cog]]|**{{{$doc.getValue("summary")}}}**
     #end
 
     ## Viewing

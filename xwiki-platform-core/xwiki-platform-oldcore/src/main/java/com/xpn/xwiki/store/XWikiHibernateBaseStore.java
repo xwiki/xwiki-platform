@@ -671,10 +671,23 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     protected String escapeSchema(String schema, XWikiContext context)
     {
+        String escapedSchema;
         Dialect dialect = Dialect.getDialect(getConfiguration().getProperties());
 
-        String closeQuote = String.valueOf(dialect.closeQuote());
-        String escapedSchema = dialect.openQuote() + schema.replace(closeQuote, closeQuote + closeQuote) + closeQuote;
+        // - Oracle converts user names in uppercase when no quotes is used.
+        // For example: "create user xwiki identified by xwiki;" creates a user named XWIKI (uppercase)
+        // - In Hibernate.cfg.xml we just specify: <property name="connection.username">xwiki</property> and Hibernate
+        // seems to be passing this username as is to Oracle which converts it to uppercase.
+        //
+        // Thus for Oracle we don't escape the schema.
+        // TODO: Remove this when https://hibernate.onjira.com/browse/HHH-6888 is fixed
+        DatabaseProduct databaseProduct = getDatabaseProductName(context);
+        if (DatabaseProduct.ORACLE == databaseProduct) {
+            escapedSchema = schema;
+        } else {
+            String closeQuote = String.valueOf(dialect.closeQuote());
+            escapedSchema = dialect.openQuote() + schema.replace(closeQuote, closeQuote + closeQuote) + closeQuote;
+        }
 
         return escapedSchema;
     }

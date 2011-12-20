@@ -43,7 +43,7 @@ import org.xwiki.component.annotation.Component;
 @Component(roles = { HTMLFilter.class })
 @Named("nestedAnchors")
 @Singleton
-public class NestedAnchorsFilter implements HTMLFilter
+public class NestedAnchorsFilter extends AbstractHTMLFilter
 {
     /**
      * Logger.

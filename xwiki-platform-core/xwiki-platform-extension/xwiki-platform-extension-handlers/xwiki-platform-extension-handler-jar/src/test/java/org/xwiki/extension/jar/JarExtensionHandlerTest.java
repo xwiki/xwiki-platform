@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.HashMap;
 
 import org.junit.Test;
+import org.xwiki.component.internal.StackingComponentEventManager;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
@@ -36,6 +37,7 @@ import org.xwiki.extension.test.AbstractExtensionHandlerTest;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationManager;
 
 import junit.framework.Assert;
 import packagefile.jarextension.DefaultTestComponent;
@@ -81,6 +83,13 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
         this.jarExtensionClassLoader = getComponentManager().lookup(JarExtensionClassLoader.class);
         this.modelContext = getComponentManager().lookup(ModelContext.class);
         this.execution = getComponentManager().lookup(Execution.class);
+
+        // Make sure to fully enable ObservationManager to test EventListener live registration
+        ObservationManager manager = getComponentManager().lookup(ObservationManager.class);
+        StackingComponentEventManager componentEventManager = new StackingComponentEventManager();
+        componentEventManager.shouldStack(false);
+        componentEventManager.setObservationManager(manager);
+        getComponentManager().setComponentEventManager(componentEventManager);
     }
 
     /**
@@ -687,6 +696,144 @@ public class JarExtensionHandlerTest extends AbstractExtensionHandlerTest
         Class<?> extensionDep6 = checkJarExtensionAvailability(TestComponent.class,
             DefaultTestComponent.class, namespace1);
         Assert.assertSame(extensionDep3, extensionDep6);
+    }
+
+    @Test
+    public void testMultipleInstallOnANamespaceAndUninstallDependency() throws Throwable
+    {
+        final ExtensionId extensionId = new ExtensionId("org.xwiki.test:test-extension-with-deps", "test");
+        final ExtensionId dependencyId = new ExtensionId("org.xwiki.test:test-extension", "test");
+        final String namespace1 = "namespace1";
+        final String namespace2 = "namespace2";
+
+        LocalExtension localExtension = install(extensionId, namespace1);
+
+        checkInstallStatus(localExtension, namespace1);
+
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension("feature-with-deps", namespace1));
+        Class<?> extensionRole1 = checkJarExtensionAvailability(TestComponentWithDeps.class,
+            DefaultTestComponentWithDeps.class, namespace1);
+        Class<?> extensionDep1 = checkJarExtensionAvailability(TestComponent.class,
+            DefaultTestComponent.class, namespace1);
+
+        localExtension = install(extensionId, namespace2);
+
+        checkInstallStatus(localExtension, namespace2);
+
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension("feature-with-deps", namespace2));
+        Class<?> extensionRole2 = checkJarExtensionAvailability(TestComponentWithDeps.class,
+            DefaultTestComponentWithDeps.class, namespace2);
+        Class<?> extensionDep2 = checkJarExtensionAvailability(TestComponent.class,
+            DefaultTestComponent.class, namespace2);
+        Assert.assertNotSame(extensionRole1, extensionRole2);
+        Assert.assertNotSame(extensionDep1, extensionDep2);
+
+        // actual uninstall test
+        localExtension = uninstall(dependencyId, namespace1);
+
+        ckeckUninstallStatus(localExtension);
+
+        checkJarExtensionUnavailability(TestComponent.class, namespace1);
+        checkJarExtensionUnavailability(TestComponentWithDeps.class, namespace1);
+
+        Class<?> extensionRole3 = checkJarExtensionAvailability(TestComponentWithDeps.class,
+            DefaultTestComponentWithDeps.class, namespace2);
+        Class<?> extensionDep3 = checkJarExtensionAvailability(TestComponent.class,
+            DefaultTestComponent.class, namespace2);
+        Assert.assertSame(extensionRole2, extensionRole3);
+        Assert.assertSame(extensionDep2, extensionDep3);
+
+        // actual uninstall test
+        localExtension = uninstall(dependencyId, namespace2);
+
+        ckeckUninstallStatus(localExtension);
+
+        checkJarExtensionUnavailability(TestComponent.class, namespace2);
+        checkJarExtensionUnavailability(TestComponentWithDeps.class, namespace2);
+    }
+
+    @Test
+    public void testMultipleInstallOnANamespaceAndUninstallAll() throws Throwable
+    {
+        final ExtensionId extensionId = new ExtensionId("org.xwiki.test:test-extension-with-deps", "test");
+        final String namespace1 = "namespace1";
+        final String namespace2 = "namespace2";
+
+        LocalExtension localExtension = install(extensionId, namespace1);
+
+        checkInstallStatus(localExtension, namespace1);
+
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension("feature-with-deps", namespace1));
+        Class<?> extensionRole1 = checkJarExtensionAvailability(TestComponentWithDeps.class,
+            DefaultTestComponentWithDeps.class, namespace1);
+        Class<?> extensionDep1 = checkJarExtensionAvailability(TestComponent.class,
+            DefaultTestComponent.class, namespace1);
+
+        localExtension = install(extensionId, namespace2);
+
+        checkInstallStatus(localExtension, namespace2);
+
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension("feature-with-deps", namespace2));
+        Class<?> extensionRole2 = checkJarExtensionAvailability(TestComponentWithDeps.class,
+            DefaultTestComponentWithDeps.class, namespace2);
+        Class<?> extensionDep2 = checkJarExtensionAvailability(TestComponent.class,
+            DefaultTestComponent.class, namespace2);
+        Assert.assertNotSame(extensionRole1, extensionRole2);
+        Assert.assertNotSame(extensionDep1, extensionDep2);
+
+        // actual uninstall test
+        localExtension = uninstall(extensionId);
+
+        ckeckUninstallStatus(localExtension);
+
+        checkJarExtensionUnavailability(TestComponentWithDeps.class, namespace1);
+        Class<?> extensionDep3 = checkJarExtensionAvailability(TestComponent.class,
+            DefaultTestComponent.class, namespace1);
+        Assert.assertNotSame(extensionDep1, extensionDep3);
+        Class<?> extensionDep4 = checkJarExtensionAvailability(TestComponent.class,
+            DefaultTestComponent.class, namespace2);
+        Assert.assertNotSame(extensionDep2, extensionDep4);
+    }
+
+    @Test
+    public void testMultipleInstallOnANamespaceAndUninstallDependencyAll() throws Throwable
+    {
+        final ExtensionId extensionId = new ExtensionId("org.xwiki.test:test-extension-with-deps", "test");
+        final ExtensionId dependencyId = new ExtensionId("org.xwiki.test:test-extension", "test");
+        final String namespace1 = "namespace1";
+        final String namespace2 = "namespace2";
+
+        LocalExtension localExtension = install(extensionId, namespace1);
+
+        checkInstallStatus(localExtension, namespace1);
+
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension("feature-with-deps", namespace1));
+        Class<?> extensionRole1 = checkJarExtensionAvailability(TestComponentWithDeps.class,
+            DefaultTestComponentWithDeps.class, namespace1);
+        Class<?> extensionDep1 = checkJarExtensionAvailability(TestComponent.class,
+            DefaultTestComponent.class, namespace1);
+
+        localExtension = install(extensionId, namespace2);
+
+        checkInstallStatus(localExtension, namespace2);
+
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension("feature-with-deps", namespace2));
+        Class<?> extensionRole2 = checkJarExtensionAvailability(TestComponentWithDeps.class,
+            DefaultTestComponentWithDeps.class, namespace2);
+        Class<?> extensionDep2 = checkJarExtensionAvailability(TestComponent.class,
+            DefaultTestComponent.class, namespace2);
+        Assert.assertNotSame(extensionRole1, extensionRole2);
+        Assert.assertNotSame(extensionDep1, extensionDep2);
+
+        // actual uninstall test
+        localExtension = uninstall(dependencyId);
+
+        ckeckUninstallStatus(localExtension);
+
+        checkJarExtensionUnavailability(TestComponent.class, namespace1);
+        checkJarExtensionUnavailability(TestComponentWithDeps.class, namespace1);
+        checkJarExtensionUnavailability(TestComponent.class, namespace2);
+        checkJarExtensionUnavailability(TestComponentWithDeps.class, namespace2);
     }
 
     @Test

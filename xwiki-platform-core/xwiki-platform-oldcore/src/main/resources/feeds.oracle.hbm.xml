@@ -29,8 +29,8 @@
             <column name="agg_id" not-null="true" />
             <generator class="assigned" />
         </id>
-        <property name="name" type="text" column="agg_name" length="2000" />
-        <property name="url" type="text" column="agg_url" length="2000" />
+        <property name="name" type="string" column="agg_name" length="2000" />
+        <property name="url" type="string" column="agg_url" length="2000" />
         <list name="group" table="feeds_aggregatorurlgroups" lazy="false">
             <key><column name="agl_id" /></key>
             <index column="agl_number" />
@@ -62,12 +62,12 @@
             <column name="fee_id" not-null="true" />
             <generator class="assigned" />
         </id>
-        <property name="title" type="text" column="fee_title" length="2000" />
-        <property name="author" type="text" column="fee_author" length="2000" />
-        <property name="feedurl" type="text" column="fee_feedurl" length="2000" />
-        <property name="feedname" type="text" column="fee_feedname" length="2000" />
-        <property name="url" type="text" column="fee_url" length="2000" />
-        <property name="category" type="text" column="fee_category" length="2000" />
+        <property name="title" type="string" column="fee_title" length="2000" />
+        <property name="author" type="string" column="fee_author" length="2000" />
+        <property name="feedurl" type="string" column="fee_feedurl" length="2000" />
+        <property name="feedname" type="string" column="fee_feedname" length="2000" />
+        <property name="url" type="string" column="fee_url" length="2000" />
+        <property name="category" type="string" column="fee_category" length="2000" />
         <property name="content" type="materialized_clob" column="fee_content" length="30000" />
         <property name="fullContent" type="materialized_clob" column="fee_fullcontent" length="30000" />
         <property name="xml" type="materialized_clob" column="fee_xml" length="30000" />

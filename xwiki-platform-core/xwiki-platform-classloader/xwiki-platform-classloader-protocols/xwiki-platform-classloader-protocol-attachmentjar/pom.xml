@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-classloader-protocols</artifactId>
-    <version>3.3-SNAPSHOT</version>
+    <version>3.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-classloader-protocol-attachmentjar</artifactId>
   <name>XWiki Platform - ClassLoader - Protocols - Attachment JAR</name>

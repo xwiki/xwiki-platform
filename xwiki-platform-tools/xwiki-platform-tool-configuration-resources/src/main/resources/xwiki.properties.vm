@@ -389,10 +389,12 @@ container.persistentDirectory=$xwikiPropertiesContainerPersistentDirectory
 #-# 
 #-# The default is:
 # extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
+# extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xwiki/rest/
 
 #-# [Since 2.5]
 #-# The directory where extensions are stored after being downloaded.
 #-# 
 #-# The default is extension/repository in whatever is the general persistent directory.
+#-# See container.persistentDirectory.
 # extension.localRepository=extension/repository
 

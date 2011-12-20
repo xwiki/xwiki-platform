@@ -103,7 +103,7 @@ public class DocumentStatsStoreItem extends AbstractStatsStoreItem
             store.loadXWikiCollection(documentStat, context, true);
         } catch (XWikiException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Failed to load document statictics object [" + getId() + "]");
+                LOGGER.debug("Failed to load document statistics object [{}]", getId(), e);
             }
         }
 
@@ -122,7 +122,7 @@ public class DocumentStatsStoreItem extends AbstractStatsStoreItem
             // TODO Fix use of deprecated call.
             store.saveXWikiCollection(documentStat, context, true);
         } catch (XWikiException e) {
-            LOGGER.error("Failed to save document statictics object [" + getId() + "]");
+            LOGGER.error("Failed to save document statistics object [{}]", getId(), e);
         }
     }
 }

@@ -138,7 +138,7 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
                         + mavenModel.getArtifactId(), version), packagingToType(mavenModel.getPackaging()));
 
                 coreExtension.setName(mavenModel.getName());
-                coreExtension.setDescription(mavenModel.getDescription());
+                coreExtension.setSummary(mavenModel.getDescription());
                 for (Developer developer : mavenModel.getDevelopers()) {
                     URL authorURL = null;
                     if (developer.getUrl() != null) {
@@ -185,12 +185,14 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
                     if (mavenDependency.getGroupId().equals("${project.groupId}")) {
                         mavenDependency.setGroupId(groupId);
                     }
+
                     if (mavenDependency.getVersion() == null) {
                         mavenDependency.setVersion(UNKNOWN);
                     } else if (mavenDependency.getVersion().equals("${project.version}")
                         || mavenDependency.getVersion().equals("${pom.version}")) {
                         mavenDependency.setVersion(version);
                     }
+
                     dependencies.add(mavenDependency);
                 }
 

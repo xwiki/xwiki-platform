@@ -14,5 +14,9 @@
       <id>existingextensiondependency</id>
       <version>version</version>
     </dependency>
+    <dependency>
+      <id>coreextension</id>
+      <version>version</version>
+    </dependency>
   </dependencies>
 </extension>

@@ -59,6 +59,10 @@ import org.xwiki.script.service.ScriptService;
 
 /**
  * Entry point of extension manager from scripts.
+ * <p>
+ * Namespaces are ways to isolate extensions in a particular context, they are generally prefixed with the type of
+ * context. For example to install an extension in a namespace linked to a particular wiki the namespace is prefixed
+ * with <code>wiki:</code> which gives for the wiki <code>wiki1</code>: <code>wiki:wiki1</code>.
  * 
  * @version $Id$
  */
@@ -160,7 +164,7 @@ public class ExtensionManagerScriptService implements ScriptService
      * <p>
      * This doesn't include core extensions, only extension installed through the API.
      * 
-     * @param namespace the target namespace (virtual wiki name) for which to retrieve the list of installed extensions
+     * @param namespace the target namespace for which to retrieve the list of installed extensions
      * @return a list of read-only handlers corresponding to the installed extensions, an empty list if nothing is
      *         installed in the target namespace
      */
@@ -178,7 +182,7 @@ public class ExtensionManagerScriptService implements ScriptService
      * description, its license...
      * 
      * @param feature the extension id or provided feature (virtual extension) of the extension to resolve
-     * @param namespace the optional namespace (wiki name) where the extension should be installed
+     * @param namespace the optional namespace where the extension should be installed
      * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension isn't
      *         installed in the target namespace
      */
@@ -224,12 +228,12 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
-     * Get all the installed extensions that depend on the specified extension. The results are grouped by wiki name, so
-     * the same extension can appear multiple times, once for each wiki where it is installed.
+     * Get all the installed extensions that depend on the specified extension. The results are grouped by namespace, so
+     * the same extension can appear multiple times, once for each namespace where it is installed.
      * 
      * @param feature the extension id or provided feature (virtual extension) of the extension to resolve
      * @param version the specific version to check
-     * @return a map wiki name -&gt; list of dependent extensions, or {@code null} if any error occurs while computing
+     * @return a map namespace -&gt; list of dependent extensions, or {@code null} if any error occurs while computing
      *         the result, in which case {@link #getLastError()} contains the failure reason
      */
     public Map<String, Collection<LocalExtension>> getBackwardDependencies(String feature, String version)
@@ -259,13 +263,12 @@ public class ExtensionManagerScriptService implements ScriptService
      * 
      * @param id the identifier of the extension to add
      * @param version the version to install
-     * @param wiki the (optional) virtual wiki where to install the extension; if {@code null} or empty, the extension
-     *            will be installed globally; not all types of extensions can be installed in only one wiki and will be
-     *            installed globally regardless of the passed value
+     * @param namespace the (optional) namespace where to install the extension; if {@code null} or empty, the extension
+     *            will be installed globally
      * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
      *         {@code null} in case of failure
      */
-    public Job install(String id, String version, String wiki)
+    public Job install(String id, String version, String namespace)
     {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
             setError(new JobException("Need programming right to install an extension"));
@@ -277,8 +280,8 @@ public class ExtensionManagerScriptService implements ScriptService
 
         InstallRequest installRequest = new InstallRequest();
         installRequest.addExtension(new ExtensionId(id, version));
-        if (StringUtils.isNotBlank(wiki)) {
-            installRequest.addNamespace(wiki);
+        if (StringUtils.isNotBlank(namespace)) {
+            installRequest.addNamespace(namespace);
         }
 
         Job task;

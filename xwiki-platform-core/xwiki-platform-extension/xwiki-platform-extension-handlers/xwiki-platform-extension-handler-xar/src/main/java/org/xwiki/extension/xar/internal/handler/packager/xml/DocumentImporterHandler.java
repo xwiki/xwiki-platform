@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -48,7 +49,7 @@ public class DocumentImporterHandler extends DocumentHandler
     private DefaultPackager packager;
 
     private XarEntryMergeResult mergeResult;
-    
+
     private MergeConfiguration mergeConfiguration;
 
     public DocumentImporterHandler(DefaultPackager packager, ComponentManager componentManager, String wiki)
@@ -70,7 +71,15 @@ public class DocumentImporterHandler extends DocumentHandler
 
     public XarEntryMergeResult getMergeResult()
     {
-        return mergeResult;
+        return this.mergeResult;
+    }
+
+    private void saveDocument(XWikiDocument document, String comment, XWikiContext context) throws XWikiException
+    {
+        document.setAuthorReference(context.getUserReference());
+        document.setContentAuthorReference(context.getUserReference());
+
+        context.getWiki().saveDocument(document, comment, context);
     }
 
     private void saveDocument(String comment) throws SAXException
@@ -82,20 +91,26 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiDocument dbDocument = getDatabaseDocument().clone();
             XWikiDocument previousDocument = getPreviousDocument();
 
-            if (previousDocument != null && !dbDocument.isNew()) {
-                MergeResult documentMergeResult = dbDocument.merge(previousDocument, document, this.mergeConfiguration, context);
-                if (documentMergeResult.isModified()) {
-                    context.getWiki().saveDocument(dbDocument, comment, context);
+            // Merge and save
+            if (dbDocument != null && !dbDocument.isNew()) {
+                if (previousDocument != null) {
+                    MergeResult documentMergeResult =
+                        dbDocument.merge(previousDocument, document, this.mergeConfiguration, context);
+                    if (documentMergeResult.isModified()) {
+                        saveDocument(dbDocument, comment, context);
+                    }
+                    this.mergeResult =
+                        new XarEntryMergeResult(new XarEntry(dbDocument.getDocumentReference(),
+                            dbDocument.getLanguage()), documentMergeResult);
+                } else {
+                    if (dbDocument.apply(document)) {
+                        saveDocument(dbDocument, comment, context);
+                    }
                 }
-                this.mergeResult =
-                    new XarEntryMergeResult(new XarEntry(dbDocument.getDocumentReference(), dbDocument.getLanguage()),
-                        documentMergeResult);
             } else {
-                if (!dbDocument.isNew()) {
-                    document.setVersion(dbDocument.getVersion());
-                }
+                document.setCreatorReference(context.getUserReference());
 
-                context.getWiki().saveDocument(document, comment, context);
+                saveDocument(document, comment, context);
             }
         } catch (Exception e) {
             throw new SAXException("Failed to save document", e);
@@ -108,7 +123,20 @@ public class DocumentImporterHandler extends DocumentHandler
         XWikiDocument document = getDocument();
 
         XWikiDocument existingDocument = context.getWiki().getDocument(document.getDocumentReference(), context);
-        existingDocument = existingDocument.getTranslatedDocument(document.getLanguage(), context);
+
+        if (StringUtils.isNotEmpty(document.getLanguage())) {
+            String defaultLanguage = existingDocument.getDefaultLanguage();
+            XWikiDocument translatedDocument = existingDocument.getTranslatedDocument(document.getLanguage(), context);
+
+            if (translatedDocument == existingDocument) {
+                translatedDocument = new XWikiDocument(document.getDocumentReference());
+                translatedDocument.setDefaultLanguage(defaultLanguage);
+                translatedDocument.setTranslation(1);
+                translatedDocument.setLanguage(document.getLanguage());
+            }
+
+            existingDocument = translatedDocument;
+        }
 
         return existingDocument;
     }
@@ -118,7 +146,7 @@ public class DocumentImporterHandler extends DocumentHandler
     {
         XWikiDocument previousDocument = null;
 
-        if (previousXarFile != null) {
+        if (this.previousXarFile != null) {
             XWikiDocument document = getDocument();
 
             DocumentHandler documentHandler = new DocumentHandler(getComponentManager(), document.getWikiName());
@@ -140,6 +168,13 @@ public class DocumentImporterHandler extends DocumentHandler
     {
         try {
             XWikiContext context = getXWikiContext();
+
+            // Set proper author
+            // TODO: add a setAuthorReference in XWikiAttachment
+            XWikiDocument document = getDocument();
+            document.setAuthorReference(context.getUserReference());
+            attachment.setAuthor(document.getAuthor());
+
             XWikiDocument dbDocument = getDatabaseDocument();
 
             XWikiAttachment dbAttachment = dbDocument.getAttachment(attachment.getFilename());

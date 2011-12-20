@@ -21,6 +21,8 @@ package org.xwiki.wysiwyg.server.internal.cleaner;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -56,6 +58,16 @@ public class DefaultHTMLCleaner implements HTMLCleaner
     @Override
     public String clean(String dirtyHTML)
     {
+        // Sort the list of specific filters based on their priority.
+        Collections.sort(specificFilters, new Comparator<HTMLFilter>()
+        {
+            @Override
+            public int compare(HTMLFilter alice, HTMLFilter bob)
+            {
+                return alice.getPriority() - bob.getPriority();
+            }
+        });
+
         // We have to remove or replace the HTML elements that were added by the WYSIWYG editor only for internal
         // reasons, before any cleaning filter is applied. Otherwise cleaning filters might transform these
         // WYSIWYG-specific HTML elements making their removal difficult. We cannot transform the WYSIWYG output on the

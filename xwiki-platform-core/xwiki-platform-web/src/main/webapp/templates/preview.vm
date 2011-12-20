@@ -7,7 +7,7 @@ $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
 <div id="document-title"><h1>$!{escapetool.xml($tdoc.renderedTitle($tdoc.getSyntax().toIdString()))}</h1></div>
 #template("shortcuts.vm")
 <div id="xwikicontent">
-$tdoc.getRenderedContent($tdoc.content, $tdoc.getSyntax().toIdString())
+$tdoc.getRenderedContent()
 </div> ## xwikicontent
 <div class="bottombuttons">#template("previewactions.vm")</div>
 </div> ## mainContentArea

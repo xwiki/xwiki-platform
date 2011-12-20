@@ -21,21 +21,25 @@ package com.xpn.xwiki.internal.macro;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.jfree.util.Log;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionFinishedEvent;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionStartsEvent;
 
+import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -54,6 +58,11 @@ public class WikiMacroExecutionEventListener implements EventListener
      * The name of the listener.
      */
     private static final String NAME = "WikiMacroExecutionEventListener";
+
+    /**
+     * The context key which is used to store the property to signify that permissions have been dropped.
+     */
+    private static final String DROPPED_PERMISSIONS_BACKUP = "wikimacro.backup.hasDroppedPermissions";
 
     /**
      * The events to match.
@@ -78,6 +87,12 @@ public class WikiMacroExecutionEventListener implements EventListener
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
     @Override
     public List<Event> getEvents()
     {
@@ -93,37 +108,105 @@ public class WikiMacroExecutionEventListener implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        XWikiContext xwikiContext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        if (event instanceof WikiMacroExecutionStartsEvent) {
+            onWikiMacroExecutionStartsEvent((WikiMacro) source);
+        } else {
+            onWikiMacroExecutionFinishedEvent();
+        }
+    }
+
+    /**
+     * Called when receiving a {@link WikiMacroExecutionStartsEvent} event.
+     * 
+     * @param wikiMacro the wiki macro sending the event
+     */
+    public void onWikiMacroExecutionStartsEvent(WikiMacro wikiMacro)
+    {
+        ExecutionContext context = this.execution.getContext();
+        XWikiContext xwikiContext = (XWikiContext) context.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
         XWikiDocument contextDoc = xwikiContext.getDoc();
 
-        if (event instanceof WikiMacroExecutionStartsEvent) {
+        // Set context document content author as macro author so that programming right is tested on the right
+        // user
+        XWikiDocument wikiMacroDocument;
+        try {
+            wikiMacroDocument = (XWikiDocument) this.documentAccessBridge.getDocument(wikiMacro.getDocumentReference());
+
             // Set context document content author as macro author so that programming right is tested on the right
-            // user
-            WikiMacro wikiMacro = (WikiMacro) source;
-            XWikiDocument wikiMacroDocument;
-            try {
-                wikiMacroDocument =
-                    (XWikiDocument) this.documentAccessBridge.getDocument(wikiMacro.getDocumentReference());
+            // user. It's cloned to make sure it not really modifying the real document but only do that for the
+            // current context.
+            contextDoc = contextDoc.clone();
+            contextDoc.setContentAuthorReference(wikiMacroDocument.getContentAuthorReference());
 
-                // Set context document content author as macro author so that programming right is tested on the right
-                // user. It's cloned to make sure it not really modifying the real document but only do that for the
-                // current context.
-                contextDoc = contextDoc.clone();
-                contextDoc.setContentAuthorReference(wikiMacroDocument.getContentAuthorReference());
+            xwikiContext.setDoc(contextDoc);
+        } catch (Exception e) {
+            Log.error("Failed to setup context before wiki macro execution");
+        }
 
-                xwikiContext.setDoc(contextDoc);
-            } catch (Exception e) {
-                Log.error("Failed to setup context before wiki macro execution");
+        // Make sure to disable XWikiContext#dropPermission hack
+        Object droppedPermission = xwikiContext.remove(XWikiConstant.DROPPED_PERMISSIONS);
+
+        // Put it in an hidden context property to restore it later
+        // Use a stack in case a wiki macro calls another wiki macro
+        Stack<Object> permissionBackup = (Stack<Object>) xwikiContext.get(DROPPED_PERMISSIONS_BACKUP);
+        if (permissionBackup == null) {
+            permissionBackup = new Stack<Object>();
+            xwikiContext.put(DROPPED_PERMISSIONS_BACKUP, permissionBackup);
+        }
+        permissionBackup.push(droppedPermission);
+
+        // Make sure to disable Document#dropPermission hack
+        droppedPermission = context.getProperty(XWikiConstant.DROPPED_PERMISSIONS);
+        context.removeProperty(XWikiConstant.DROPPED_PERMISSIONS);
+
+        // Put it in an hidden context property to restore it later
+        // Use a stack in case a wiki macro calls another wiki macro
+        permissionBackup = (Stack<Object>) context.getProperty(DROPPED_PERMISSIONS_BACKUP);
+        if (permissionBackup == null) {
+            permissionBackup = new Stack<Object>();
+            context.setProperty(DROPPED_PERMISSIONS_BACKUP, permissionBackup);
+        }
+        permissionBackup.push(droppedPermission);
+    }
+
+    /**
+     * Called when receiving a {@link WikiMacroExecutionFinishedEvent} event.
+     */
+    public void onWikiMacroExecutionFinishedEvent()
+    {
+        ExecutionContext context = this.execution.getContext();
+        XWikiContext xwikiContext = (XWikiContext) context.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        XWikiDocument contextDoc = xwikiContext.getDoc();
+
+        // Restore context document
+        try {
+            contextDoc = (XWikiDocument) this.documentAccessBridge.getDocument(contextDoc.getDocumentReference());
+
+            xwikiContext.setDoc(contextDoc);
+        } catch (Exception e) {
+            Log.error("Failed to setup context after wiki macro execution");
+        }
+
+        // Restore XWikiContext#dropPermission hack
+        Stack<Object> permissionBackup = (Stack<Object>) xwikiContext.get(DROPPED_PERMISSIONS_BACKUP);
+        if (permissionBackup != null && !permissionBackup.isEmpty()) {
+            Object droppedPermission = permissionBackup.pop();
+            if (droppedPermission != null) {
+                xwikiContext.put(XWikiConstant.DROPPED_PERMISSIONS, droppedPermission);
             }
         } else {
-            // Restore context document
-            try {
-                contextDoc = (XWikiDocument) this.documentAccessBridge.getDocument(contextDoc.getDocumentReference());
+            this.logger.error("Can't find any backuped dropPersmission information in XWikiContext");
+        }
 
-                xwikiContext.setDoc(contextDoc);
-            } catch (Exception e) {
-                Log.error("Failed to setup context after wiki macro execution");
+        // Restore Document#dropPermission hack
+        permissionBackup = (Stack<Object>) context.getProperty(DROPPED_PERMISSIONS_BACKUP);
+        if (permissionBackup != null && !permissionBackup.isEmpty()) {
+            Object droppedPermission = permissionBackup.pop();
+            if (droppedPermission != null) {
+                context.setProperty(XWikiConstant.DROPPED_PERMISSIONS, droppedPermission);
             }
+        } else {
+            this.logger.error("Can't find any backuped dropPersmission information in ExecutionContext");
         }
     }
 }

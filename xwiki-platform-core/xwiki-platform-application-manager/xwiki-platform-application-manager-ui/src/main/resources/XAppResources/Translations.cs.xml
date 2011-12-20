@@ -23,5 +23,32 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language cs generated from http://www.l10n.xwiki.org
-#Mon Oct 24 18:49:14 CEST 2011
+#Fri Dec 16 04:52:07 CET 2011
+xapp.action.exportrecurse=Export
+xapp.action.reloadapp=Aktualizace
+xapp.answer.deleteapp.msg=Opravdu chcete smazat aplikaci "{0}" ?
+xapp.answer.deleteapp.title=Smazání aplikace "{0}"
+xapp.answer.exportapp.title=Export aplikace "{0}"
+xapp.answer.exportapp.withdetails=Včetně historie
+xapp.appmanager=Správce aplikací
+xapp.appname=Název aplikace
+xapp.availablefilestoimport=Dostupné soubory pro import
+xapp.createapplication=Vytvořit novou aplikaci
+xapp.description=Popis
+xapp.docname=Název dokumentu
+xapp.errorcreateapp=Došlo k chybě při vytváření aplikace "{0}" (kód "{1}").
+xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=Aplikace "{0}" již existuje. Zvolte jiný název.
+xapp.errordeleteapp=Došlo k chybě při mazání aplikace "{0}" (kód "{1}").
+xapp.errorexportapp=Došlo k chybě při exportu aplikace "{0}" (kód "{1}").
+xapp.errorimportapp=Došlo k chybě při importu aplikace "{0}" (kód "{1}").
+xapp.errorreloadapp=Došlo k chybě při reloadu aplikace "{0}" (kód "{1}").
+xapp.legend.application=Aplikace
+xapp.legend.validate=Potvrdit
+xapp.pluginnotenabled=Zásuvný modul správce aplikace není povolen. Tato stránka nebude pracovat správně. Ujistěte se, že "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" je uveden mezi xwiki.plugins v xwiki.cfg souboru.
+xapp.successcreateapp=Aplikace "{0}" byla vytvořena. Přístup k ní je na [{1}].
+xapp.successdeleteapp=Úspěšné smazání aplikace "{0}".
+xapp.successexportapp=Úspěšný export aplikace "{0}".
+xapp.successimportapp=Úspěšný import aplikace "{0}".
+xapp.successreloadapp=Úspěšný reload aplikace "{0}".
+xapp.totalnumberofapp=Celkový počet aplikací
 </content></xwikidoc>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>IRC</web>
+<name>IRCBotJob</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Scheduler.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1323347519000</creationDate>
+<date>1323360175000</date>
+<contentUpdateDate>1323360175000</contentUpdateDate>
+<version>1.1</version>
+<title>IRC Bot Scheduler Job</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.SchedulerJobClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<contextDatabase>
+<disabled>0</disabled>
+<name>contextDatabase</name>
+<number>9</number>
+<prettyName>Job execution context database</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</contextDatabase>
+<contextLang>
+<disabled>0</disabled>
+<name>contextLang</name>
+<number>8</number>
+<prettyName>Job execution context lang</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</contextLang>
+<contextUser>
+<disabled>0</disabled>
+<name>contextUser</name>
+<number>7</number>
+<prettyName>Job execution context user</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</contextUser>
+<cron>
+<disabled>0</disabled>
+<name>cron</name>
+<number>5</number>
+<prettyName>Cron Expression</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</cron>
+<jobClass>
+<disabled>0</disabled>
+<name>jobClass</name>
+<number>3</number>
+<prettyName>Job Class</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</jobClass>
+<jobDescription>
+<disabled>0</disabled>
+<name>jobDescription</name>
+<number>2</number>
+<prettyName>Job Description</prettyName>
+<rows>10</rows>
+<size>45</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</jobDescription>
+<jobName>
+<disabled>0</disabled>
+<name>jobName</name>
+<number>1</number>
+<prettyName>Job Name</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</jobName>
+<script>
+<disabled>0</disabled>
+<editor>PureText</editor>
+<name>script</name>
+<number>6</number>
+<prettyName>Job Script</prettyName>
+<rows>10</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</script>
+<status>
+<disabled>0</disabled>
+<name>status</name>
+<number>4</number>
+<prettyName>Status</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</status>
+</class>
+<name>IRC.IRCBotJob</name>
+<number>0</number>
+<className>XWiki.SchedulerJobClass</className>
+<guid>57a47f18-0fa4-412c-aab2-8526fe81bd2f</guid>
+<property>
+<contextDatabase>xwiki</contextDatabase>
+</property>
+<property>
+<contextLang>en</contextLang>
+</property>
+<property>
+<contextUser>XWiki.Admin</contextUser>
+</property>
+<property>
+<cron>0 * * * * ?</cron>
+</property>
+<property>
+<jobClass>com.xpn.xwiki.plugin.scheduler.GroovyJob</jobClass>
+</property>
+<property>
+<jobDescription>Starts the IRC bot if it's not already started.</jobDescription>
+</property>
+<property>
+<jobName>IRC Bot Scheduler Job</jobName>
+</property>
+<property>
+<script>if (context.getEngineContext().getAttribute("ircbot") == null) {
+    context.put("botAction", "start")
+    def ircBotDoc = xwiki.getDocument("IRC.IRCBot")
+    // Make sure we use the right getRenderedContent() API so that it's executed in the context of the target doc
+    ircBotDoc.getRenderedContent(ircBotDoc.getContent(), "xwiki/2.0", "plain/1.0")
+}
+</script></property><property><status>Normal</status>
+</property>
+</object>
+<content>{{include document="XWiki.SchedulerJobSheet"/}}</content></xwikidoc>

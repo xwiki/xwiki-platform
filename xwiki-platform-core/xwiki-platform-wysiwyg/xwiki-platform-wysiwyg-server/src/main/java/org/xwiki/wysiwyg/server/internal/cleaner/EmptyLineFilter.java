@@ -40,7 +40,7 @@ import org.xwiki.component.annotation.Component;
 @Component(roles = {HTMLFilter.class })
 @Named("emptyLine")
 @Singleton
-public class EmptyLineFilter implements HTMLFilter
+public class EmptyLineFilter extends AbstractHTMLFilter
 {
     @Override
     public void filter(Document document, Map<String, String> parameters)

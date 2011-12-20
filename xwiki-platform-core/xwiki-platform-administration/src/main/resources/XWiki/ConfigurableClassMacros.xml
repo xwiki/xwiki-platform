@@ -195,7 +195,9 @@
       #else
         ##
         ## If there is no section for this configurable, then we will have to add one.
-        #set ($appSection = {'id' : $displayInSection, 'name' : $msg.get("admin.${displayInSection.toLowerCase()}"), 'url': $xwiki.getURL($currentDoc, $adminAction, "${query}&amp;amp;section=$escapetool.url(${displayInSection})"), 'configurable' : true})
+        #set($key = "admin.${displayInSection.toLowerCase()}")
+        #if($msg.get($key) != $key) #set($name = $msg.get($key)) #else #set($name = $displayInSection) #end
+        #set ($appSection = {'id' : $displayInSection, 'name' : $name, 'url': $xwiki.getURL($currentDoc, $adminAction, "${query}&amp;amp;section=$escapetool.url(${displayInSection})"), 'configurable' : true})
         #if ($app.getValue('configureGlobally', $configurableObject) != 1)
           #set ($appSection.perSpace = true)
         #end

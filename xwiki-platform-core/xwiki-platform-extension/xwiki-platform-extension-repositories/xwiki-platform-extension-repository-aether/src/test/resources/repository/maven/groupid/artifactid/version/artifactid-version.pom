@@ -8,7 +8,7 @@
 	<name>name</name>
 	<version>version</version>
 	<packaging>type</packaging>
-	<description>description</description>
+	<description>summary</description>
 	<url>http://website</url>
     <developers>
       <developer>

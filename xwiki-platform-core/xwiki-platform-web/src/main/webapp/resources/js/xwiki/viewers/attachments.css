@@ -49,7 +49,6 @@
 }
 .add-file-input {
   color: $theme.linkColor;
-  margin-left: 10px;
   background-position: 2px top;
   background-image: url("$xwiki.getSkinFile('icons/silk/textfield_add.gif')");
 }
@@ -59,7 +58,7 @@
   text-indent: 30px;
 }
 .uploadFileInput {
-  margin: 5px 10px !important; /* !important is needed for Toucan. */
+  margin: 5px 10px 5px 0 !important; /* !important is needed for Toucan. */
 }
 /* Attachment "toolbox" style */
 .attachment .xwikibuttonlinks a {
@@ -83,4 +82,7 @@
 }
 #AddAttachment {
   border-top: 1px solid $theme.borderColor;
+}
+#AddAttachment legend {
+  font-size: 1em;
 }

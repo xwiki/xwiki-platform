@@ -313,7 +313,7 @@ AABJRU5ErkJggg==
 }
 
 #allAnnotations .annotationHeader, #allAnnotations .annotationContent {
-  margin-left: 55px;
+  margin-left: 60px;
 }
 #allAnnotations .annotationTitle * {
   line-height: 1.4em;

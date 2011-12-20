@@ -55,7 +55,6 @@ import static org.xwiki.security.Right.ADMIN;
 import static org.xwiki.security.Right.COMMENT;
 import static org.xwiki.security.Right.DELETE;
 import static org.xwiki.security.Right.EDIT;
-import static org.xwiki.security.Right.ILLEGAL;
 import static org.xwiki.security.Right.PROGRAM;
 import static org.xwiki.security.Right.REGISTER;
 
@@ -92,22 +91,6 @@ public class DefaultRightService implements RightService
     /** Serializer. */
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    /**
-     * Convert an action to a right.
-     * @param action String representation of action.
-     * @return The corresponding right, or {@link org.xwiki.security.Right.ILLEGAL}.
-     */
-    protected final Right actionToRight(String action)
-    {
-        Right right = Right.actionToRight(action);
-        if (right == ILLEGAL)
-        {
-            Formatter f = new Formatter();
-            this.logger.error(f.format("No action named '%s'", action).toString());
-        }
-        return right;
-    }
 
     /**
      * @param right Right to authenticate.
@@ -182,11 +165,9 @@ public class DefaultRightService implements RightService
     }
     
     @Override
-    public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
+    public boolean checkAccess(Right right, XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        this.logger.debug("checkAccess for action " + action);
-
-        Right right = actionToRight(action);
+        this.logger.debug("checkAccess for action " + right);
 
         boolean userWasAuthenticated = context.getUser() != null;
 
@@ -228,17 +209,16 @@ public class DefaultRightService implements RightService
     }
 
     @Override
-    public boolean hasAccessLevel(String rightname, String username, String docname, XWikiContext context)
+    public boolean hasAccessLevel(Right right, String username, String docname, XWikiContext context)
         throws XWikiException
     {
         WikiReference wikiReference = new WikiReference(context.getDatabase());
         DocumentReference document = resolveDocName(docname, wikiReference);
         this.logger.debug("Resolved '" + docname + "' into " + document);
         DocumentReference user = resolveUserName(username, wikiReference);
-        Right right = Right.toRight(rightname);
         if (right == Right.ILLEGAL) {
             Formatter f = new Formatter();
-            this.logger.error(f.format("No such right: '%s'", rightname).toString());
+            this.logger.error(f.format("No such right: '%s'", right).toString());
         }
         return checkAccess(right, user, document, context);
     }

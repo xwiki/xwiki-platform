@@ -84,29 +84,6 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     private static final List<String> UNMODIFIABLE_ALL_RIGHTS = Collections.unmodifiableList(ALL_RIGHTS);
 
     /**
-     * Specialized map with a chainable put action to avoid exceeding code complexity during initialization.
-     */
-    private static class ActionMap extends HashMap<String, Right>
-    {
-        /** Serialization identifier for conformance to Serializable. */
-        private static final long serialVersionUID = 1;
-
-        /** Allow filling the map in the initializer without exceeding code complexity.
-         * @param action the action name
-         * @param right the corresponding right required
-         * @return this action map to allow code chaining
-         */
-        public ActionMap putAction(String action, Right right)
-        {
-            put(action, right);
-            return this;
-        }
-    }
-
-    /** Map containing all known actions. */
-    private static final ActionMap ACTION_MAP = new ActionMap();
-
-    /**
      * The enabled rights by entity types.  There is a special case hardcoded : The PROGRAM
      * right should only be enabled for the main wiki, not for wikis in general.
      */
@@ -137,58 +114,6 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
             Arrays.asList(EntityType.WIKI));
         
         ILLEGAL  = new Right("illegal",     DENY,   DENY,  false, null, null                          );
-
-        ACTION_MAP
-            .putAction(LOGIN.getName(), LOGIN)
-            .putAction(VIEW.getName(), VIEW)
-            .putAction(DELETE.getName(), DELETE)
-            .putAction(ADMIN.getName(), ADMIN)
-            .putAction(PROGRAM.getName(), PROGRAM)
-            .putAction(EDIT.getName(), EDIT)
-            .putAction(REGISTER.getName(), REGISTER)
-            .putAction("logout", LOGIN)
-            .putAction("loginerror", LOGIN)
-            .putAction("loginsubmit", LOGIN)
-            .putAction("viewrev", VIEW)
-            .putAction("get", VIEW)
-            // .putAction("downloadrev", "download"); Huh??
-            .putAction("downloadrev", VIEW)
-            .putAction("plain", VIEW)
-            .putAction("raw", VIEW)
-            .putAction("attach", VIEW)
-            .putAction("charting", VIEW)
-            .putAction("skin", VIEW)
-            .putAction("download", VIEW)
-            .putAction("dot", VIEW)
-            .putAction("svg", VIEW)
-            .putAction("pdf", VIEW)
-            .putAction("deleteversions", ADMIN)
-            // .putAction("undelete", "undelete"); Huh??
-            .putAction("undelete", EDIT)
-            .putAction("reset", DELETE)
-            .putAction("commentadd", COMMENT)
-            .putAction("redirect", VIEW)
-            .putAction("export", VIEW)
-            .putAction("import", ADMIN)
-            .putAction("jsx", VIEW)
-            .putAction("ssx", VIEW)
-            .putAction("tex", VIEW)
-            .putAction("unknown", VIEW)
-            .putAction("save", EDIT)
-            .putAction("preview", EDIT)
-            .putAction("lock", EDIT)
-            .putAction("cancel", EDIT)
-            .putAction("delattachment", EDIT)
-            .putAction("inline", EDIT)
-            .putAction("propadd", EDIT)
-            .putAction("propupdate", EDIT)
-            .putAction("propdelete", EDIT)
-            .putAction("objectadd", EDIT)
-            .putAction("objectremove", EDIT)
-            .putAction("objectsync", EDIT)
-            .putAction("rollback", EDIT)
-            .putAction("upload", EDIT)
-            .putAction("create", EDIT);
     }
 
     /** The numeric value of this access right. */
@@ -305,21 +230,6 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
             }
         }
         return ILLEGAL;
-    }
-
-    /**
-     * Map an action represented by a string to a right.
-     * @param action String representation of action.
-     * @return right The corresponding Right instance, or
-     * {@code ILLEGAL}.
-     */
-    public static Right actionToRight(String action)
-    {
-        Right right = ACTION_MAP.get(action);
-        if (right == null) {
-            return ILLEGAL;
-        }
-        return right;
     }
 
     /**

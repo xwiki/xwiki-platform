@@ -65,7 +65,7 @@ public interface RightService
      * Checks if the wiki current user has the right to execute (@code action} on the document {@code doc}, along with
      * redirecting to the login if it's not the case and there is no logged in user (the user is the guest user).
      * 
-     * @param action the action to be executed on the document
+     * @param right the right needed for execution on the document
      * @param doc the document to perform action on
      * @param context the xwiki context in which to perform the verification (from which to get the user, for example)
      * @return {@code true} if the user has right to execute {@code action} on {@code doc}, {@code false} otherwise
@@ -73,7 +73,7 @@ public interface RightService
      *         case of a form authenticator, for example) when no user is logged in. </strong>
      * @throws XWikiException if something goes wrong during the rights checking process
      */
-    boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException;
+    boolean checkAccess(Right right, XWikiDocument doc, XWikiContext context) throws XWikiException;
 
     /**
      * Verifies if the user identified by {@code username} has the access level identified by {@code right} on the
@@ -86,7 +86,7 @@ public interface RightService
      * @return {@code true} if the user has the specified right on the document, {@code false} otherwise
      * @throws XWikiException if something goes wrong during the rights checking process
      */
-    boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)
+    boolean hasAccessLevel(Right right, String username, String docname, XWikiContext context)
         throws XWikiException;
 
     /**

@@ -507,7 +507,7 @@ public class XWiki implements EventListener
 
         // In path-based multi-wiki, the wiki name is an element of the request path.
         // The url is in the form /xwiki (app name)/wiki (servlet name)/wikiname/
-        if ("1".equals(xwiki.Param("xwiki.virtual.usepath", "0"))) {
+        if ("1".equals(xwiki.Param("xwiki.virtual.usepath", "1"))) {
             String uri = request.getRequestURI();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Request uri is: " + uri);
@@ -4845,7 +4845,7 @@ public class XWiki implements EventListener
         String serverurl = null;
 
         // In virtual wiki path mode the server is the standard one
-        if ("1".equals(Param("xwiki.virtual.usepath", "0"))) {
+        if ("1".equals(Param("xwiki.virtual.usepath", "1"))) {
             return null;
         }
 
@@ -4892,7 +4892,7 @@ public class XWiki implements EventListener
     public String getServletPath(String wikiName, XWikiContext context)
     {
         // unless we are in virtual wiki path mode we should return null
-        if (!context.getMainXWiki().equalsIgnoreCase(wikiName) && "1".equals(Param("xwiki.virtual.usepath", "0"))) {
+        if (!context.getMainXWiki().equalsIgnoreCase(wikiName) && "1".equals(Param("xwiki.virtual.usepath", "1"))) {
             String database = context.getDatabase();
             try {
                 context.setDatabase(context.getMainXWiki());
@@ -5142,7 +5142,7 @@ public class XWiki implements EventListener
                 path = stripSegmentFromPath(path, servletPath);
 
                 // We need to get rid of the wiki name in case of a XEM in usepath mode
-                if ("1".equals(Param("xwiki.virtual.usepath", "0"))
+                if ("1".equals(Param("xwiki.virtual.usepath", "1"))
                     && servletPath.equals("/" + Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
                     // Virtual mode, skip the wiki name
                     if (path.indexOf('/', 1) < 0) {

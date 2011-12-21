@@ -324,7 +324,7 @@ function prettyNameChanged()
   #if ("$!ALIASSUFFIX" != '')
     #set ($alias = "${alias}.${ALIASSUFFIX}")
   #else
-    #set ($usePath = $xwiki.xWiki.Param('xwiki.virtual.usepath', '0'))
+    #set ($usePath = $xwiki.xWiki.Param('xwiki.virtual.usepath', '1'))
     #if ($usePath == '0')
       #set ($serverURL = $xcontext.getURLFactory().getServerURL($xcontext.context))
       #set ($alias = "${alias}.$serverURL.host")

@@ -256,11 +256,6 @@ public class UploadAction extends XWikiAction
             return null;
         }
 
-        // Issues fixed by the clearName :
-        // 1) Attaching images with a name containing special characters generates bugs
-        // (image are not displayed), XWIKI-2090.
-        // 2) Attached files that we can't delete or link in the Wiki pages, XWIKI-2087.
-        filename = context.getWiki().clearName(filename, false, true, context);
         return filename;
     }
 

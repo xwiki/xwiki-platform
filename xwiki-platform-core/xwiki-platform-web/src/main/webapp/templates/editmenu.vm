@@ -1,3 +1,5 @@
+<div class="gradientfilterIE"></div>
+<div class="componentcontainer">
 <strong id="xwikicontentmenutitle" class="hidden">$msg.get('core.menu.content.title')</strong>
 <div id="contenteditmenu" class="leftmenu">
 #if($hasEdit && !$isReadOnly)
@@ -39,4 +41,5 @@
     </script>
   #end
 #end
+</div>
 </div>

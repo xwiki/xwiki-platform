@@ -159,6 +159,7 @@ html>body thead.xwiki-livetable-display-header  td.xwiki-livetable-display-heade
 }
 thead.xwiki-livetable-display-header td.xwiki-livetable-display-header-filter input,
 thead.xwiki-livetable-display-header td.xwiki-livetable-display-header-filter select {
+  box-shadow: none;
   width: 100%;
   border: 1px solid $theme.backgroundSecondaryColor;
   color: $theme.textPrimaryColor;

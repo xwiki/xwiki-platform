@@ -1,3 +1,5 @@
+<div class="gradientfilterIE"></div>
+<div class="componentcontainer">
 <strong id="xwikicontentmenutitle" class="hidden">$msg.get('core.menu.content.title')</strong>
 <div class="rightmenu">
 </div>
@@ -66,4 +68,5 @@
   #submenuitem($doc.getURL('view', "viewer=code") $msg.get('core.menu.view.source') 'tmViewSource', '')
   #xwikitopmenuentryend()
 #end
+</div>
 </div>

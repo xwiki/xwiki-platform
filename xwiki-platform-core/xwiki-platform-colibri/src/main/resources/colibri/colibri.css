@@ -141,18 +141,39 @@ dt {
 }
 
 input[type="text"], input[type="password"] {
-  background-color: $theme.pageContentBackgroundColor ;
+  background-color: $theme.pageContentBackgroundColor;
+  background-image: -moz-linear-gradient(top , $theme.pageContentBackgroundColor 0%, $theme.pageBackgroundColor 1px, $theme.pageContentBackgroundColor 8px); /* FF3.6+ */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageContentBackgroundColor), color-stop(1px,$theme.pageBackgroundColor), color-stop(8px,$theme.pageContentBackgroundColor)); /* Chrome,Safari4+ */
+  background-image: -webkit-linear-gradient(top, $theme.pageContentBackgroundColor 0%, $theme.pageBackgroundColor 1px, $theme.pageContentBackgroundColor 8px); /* Chrome10+,Safari5.1+ */
+  background-image: -o-linear-gradient(top, $theme.pageContentBackgroundColor 0%, $theme.pageBackgroundColor 1px, $theme.pageContentBackgroundColor 8px); /* Opera 11.10+ */
+  background-image: -ms-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.pageBackgroundColor 1px,$theme.pageContentBackgroundColor 8px); /* IE10+ */
+  background-image: linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.pageBackgroundColor 1px,$theme.pageContentBackgroundColor 8px); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.pageBackgroundColor', endColorstr='$theme.pageContentBackgroundColor',GradientType=0 ); /* IE6-9 */
   border: 1px solid $theme.borderColor;
+  border-radius: 3px 3px 3px 3px;
+  box-shadow: 0px 1px 2px $theme.borderColor;
   color: $theme.textColor;
 }
 /* Duplicated because IE6 chokes on the first two selectors. Don't recombine! */
 textarea, select {
-  background-color: $theme.pageContentBackgroundColor ;
+  background-color: $theme.pageContentBackgroundColor;
+  background-image: -moz-linear-gradient(top , $theme.pageContentBackgroundColor 0%, $theme.pageBackgroundColor 1px, $theme.pageContentBackgroundColor 8px); /* FF3.6+ */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageContentBackgroundColor), color-stop(1px,$theme.pageBackgroundColor), color-stop(8px,$theme.pageContentBackgroundColor)); /* Chrome,Safari4+ */
+  background-image: -webkit-linear-gradient(top, $theme.pageContentBackgroundColor 0%, $theme.pageBackgroundColor 1px, $theme.pageContentBackgroundColor 8px); /* Chrome10+,Safari5.1+ */
+  background-image: -o-linear-gradient(top, $theme.pageContentBackgroundColor 0%, $theme.pageBackgroundColor 1px, $theme.pageContentBackgroundColor 8px); /* Opera 11.10+ */
+  background-image: -ms-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.pageBackgroundColor 1px,$theme.pageContentBackgroundColor 8px); /* IE10+ */
+  background-image: linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.pageBackgroundColor 1px,$theme.pageContentBackgroundColor 8px); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.pageBackgroundColor', endColorstr='$theme.pageContentBackgroundColor',GradientType=0 ); /* IE6-9 */
   border: 1px solid $theme.borderColor;
+  border-radius: 3px 3px 3px 3px;
+  box-shadow: 0px 1px 2px $theme.borderColor;
   color: $theme.textColor;
 }
 textarea {
   max-width: 100%; /* Prevent resizing beyond the visible area in modern browsers */
+}
+input, textarea {
+  padding: .3em;
 }
 /* IE7 will shrink floated textareas continuously if we set a max-width,
    since 100% max-width is computed within the border, while the current width includes the border.
@@ -1395,20 +1416,36 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {
   background-color: $theme.buttonPrimaryBackgroundColor;
-  background-image: none;
+  background-image: -moz-linear-gradient(top, $theme.linkColor 0%, $theme.buttonPrimaryBackgroundColor 100%); /* FF3.6+ */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.linkColor), color-stop(100%,$theme.buttonPrimaryBackgroundColor)); /* Chrome,Safari4+ */
+  background-image: -webkit-linear-gradient(top, $theme.linkColor 0%,$theme.buttonPrimaryBackgroundColor 100%); /* Chrome10+,Safari5.1+ */
+  background-image: -o-linear-gradient(top, $theme.linkColor 0%,$theme.buttonPrimaryBackgroundColor 100%); /* Opera 11.10+ */
+  background-image: -ms-linear-gradient(top, $theme.linkColor 0%,$theme.buttonPrimaryBackgroundColor 100%); /* IE10+ */
+  background-image: linear-gradient(top, $theme.linkColor 0%,$theme.buttonPrimaryBackgroundColor 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.linkColor', endColorstr='$theme.buttonPrimaryBackgroundColor',GradientType=0 ); /* IE6-9 */
   border: 1px solid $theme.buttonPrimaryBackgroundColor;
+  border-radius: 3px 3px 3px 3px;
   color: $theme.buttonPrimaryTextColor;
   cursor: pointer;
   display: inline-block;
   font: normal normal 700 .8em/140% "Helvetica",sans-serif;
   margin: 0;
   padding: 2px 3px;
+  text-shadow: 0px 1px 0px $theme.titleColor;
   text-transform: uppercase;
 }
 
-input.button:hover , .buttonwrapper  a:hover{
-  background-color: $theme.buttonSecondaryBackgroundColor;
-  color: $theme.buttonSecondaryTextColor;
+input.button:hover, .buttonwrapper a:hover{
+  background-color: $theme.buttonPrimaryBackgroundColor;
+  background-image: -moz-linear-gradient(top, $theme.buttonPrimaryBackgroundColor 0%, $theme.linkColor 100%); /* FF3.6+ */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.buttonPrimaryBackgroundColor), color-stop(100%,$theme.linkColor)); /* Chrome,Safari4+ */
+  background-image: -webkit-linear-gradient(top, $theme.buttonPrimaryBackgroundColor 0%,$theme.linkColor 100%); /* Chrome10+,Safari5.1+ */
+  background-image: -o-linear-gradient(top, $theme.buttonPrimaryBackgroundColor 0%,$theme.linkColor 100%); /* Opera 11.10+ */
+  background-image: -ms-linear-gradient(top, $theme.buttonPrimaryBackgroundColor 0%,$theme.linkColor 100%); /* IE10+ */
+  background-image: linear-gradient(top, $theme.buttonPrimaryBackgroundColor 0%,$theme.linkColor 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.buttonPrimaryBackgroundColor', endColorstr='$theme.linkColor',GradientType=0 ); /* IE6-9 */
+  box-shadow: 0px 2px 2px $theme.borderColor;
+  color: $theme.buttonPrimaryTextColor;
   text-decoration: none;
 }
 
@@ -1416,7 +1453,21 @@ input.button:hover , .buttonwrapper  a:hover{
 .buttonwrapper a.secondary:link, .buttonwrapper a.secondary:visited,
 .buttonwrapper a.secondary:active /* Needed for IE6 */ {
   background-color: $theme.buttonSecondaryBackgroundColor;
+  background-image: -moz-linear-gradient(top, $theme.pageContentBackgroundColor 0%, $theme.buttonSecondaryBackgroundColor 100%); /* FF3.6+ */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageContentBackgroundColor), color-stop(100%,$theme.buttonSecondaryBackgroundColor)); /* Chrome,Safari4+ */
+  background-image: -webkit-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Chrome10+,Safari5.1+ */
+  background-image: -o-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Opera 11.10+ */
+  background-image: -ms-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* IE10+ */
+  background-image: linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.pageContentBackgroundColor', endColorstr='$theme.buttonSecondaryBackgroundColor',GradientType=0 ); /* IE6-9 */
+  border-color: $theme.buttonSecondaryBackgroundColor;
+  border-radius: 3px 3px 3px 3px;
   color: $theme.buttonSecondaryTextColor;
+  text-shadow: 0px 1px 0px $theme.pageContentBackgroundColor;
+}
+
+input.secondary:hover, .buttonwrapper a.secondary:hover {
+  box-shadow: 0px 2px 2px $theme.borderColor;
 }
 
 /* @group VERTICAL MENU */
@@ -1458,6 +1509,12 @@ input.button:hover , .buttonwrapper  a:hover{
 /* Section titles */
 .vertical-menu .group {
   background-color: $theme.panelCollapsedBackgroundColor;
+  background-image: -moz-linear-gradient(top, $theme.pageContentBackgroundColor 0%, $theme.buttonSecondaryBackgroundColor 100%); /* FF3.6+ */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageContentBackgroundColor), color-stop(100%,$theme.buttonSecondaryBackgroundColor)); /* Chrome,Safari4+ */
+  background-image: -webkit-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Chrome10+,Safari5.1+ */
+  background-image: -o-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Opera 11.10+ */
+  background-image: -ms-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* IE10+ */
+  background-image: linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* W3C */
   font-weight: 700;
   font-variant: small-caps;
 }
@@ -1471,6 +1528,12 @@ input.button:hover , .buttonwrapper  a:hover{
 }
 .vertical-menu .group:hover {
   background-color: $theme.panelHeaderBackgroundColor;
+  background-image: -moz-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%, $theme.menuBackgroundColor 50%); /* FF3.6+ */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageHeaderBackgroundColor), color-stop(50%,$theme.menuBackgroundColor)); /* Chrome,Safari4+ */
+  background-image: -webkit-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Chrome10+,Safari5.1+ */
+  background-image: -o-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Opera 11.10+ */
+  background-image: -ms-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* IE10+ */
+  background-image: linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* W3C */
 }
 .vertical-menu .group:hover * {
   color: $theme.panelHeaderTextColor;
@@ -1483,6 +1546,12 @@ input.button:hover , .buttonwrapper  a:hover{
 }
 .vertical-menu .current-group {
   background-color: $theme.panelHeaderBackgroundColor;
+  background-image: -moz-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%, $theme.menuBackgroundColor 50%); /* FF3.6+ */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageHeaderBackgroundColor), color-stop(50%,$theme.menuBackgroundColor)); /* Chrome,Safari4+ */
+  background-image: -webkit-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Chrome10+,Safari5.1+ */
+  background-image: -o-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Opera 11.10+ */
+  background-image: -ms-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* IE10+ */
+  background-image: linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* W3C */
   color: $theme.panelHeaderTextColor;
 }
 .vertical-menu .current-group *, .vertical-menu .current-group *:visited, .vertical-menu .current-group *:active {
@@ -1545,14 +1614,14 @@ input.button:hover , .buttonwrapper  a:hover{
 
 h1.xwikipaneltitle {
   background-color: $theme.panelHeaderBackgroundColor;
-  border-bottom: 1px dotted $theme.borderColor;
+  border-bottom: 0;
   color: $theme.panelHeaderTextColor;
   cursor: pointer;
   font-size: .8em;
   font-weight: 700;
   letter-spacing: 0;
   margin: 0;
-  padding: 6px 20px 6px 15px;
+  padding: 5px 20px 5px 15px;
   text-align: left;
   text-transform: uppercase;
 }
@@ -1624,6 +1693,157 @@ h1.xwikipaneltitle {
 
 .DocumentInformation table td {
   border-top: 1px dotted $theme.borderColor;
+}
+
+/* @group CONTAINERS GENERAL STYLING */
+/* --------------------------------------------------------------
+  * General rules that applied to different types of containers
+-------------------------------------------------------------- */
+/* -------------- Containers borders -----------------*/
+#contentmenu, #editmenu,
+.xwikipanelcontents, h1.xwikipaneltitle,
+#mainContentArea, #mainEditArea,
+#xdocFooter,
+#docextrapanes, ul.xwikitabbar {
+  border: 1px solid $theme.borderColor;
+}
+
+#docextrapanes {
+  box-shadow: 0px -1px 0px $theme.borderColor; /* #docExtraTabs bottom border */
+}
+
+#contentmenu, #editmenu {
+  border-width: 1px 0 0;
+}
+
+#mainContentArea, #mainEditArea {
+  border-width: 1px;
+}
+
+ul.xwikitabbar {
+  border-width: 1px 1px 0;
+}
+
+.xwikipanelcontents, #docextrapanes, #xdocFooter {
+  border-width: 0 1px 1px;
+  border-radius: 0 0 4px 4px;
+}
+
+.collapsed h1.xwikipaneltitle {
+  border-radius: 4px 4px 4px 4px;
+}
+
+.xwikitabbar li.active a, .xwikitabbar li.active a:active, .xwikitabbar li.active a:visited {
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0px -1px 1px $theme.borderColor;
+}
+
+/* -------------- Containers gradients -----------------*/
+#contentmenu, #editmenu, h1.xwikipaneltitle, ul.xwikitabbar {
+  background-color: $theme.pageBackgroundColor;
+  background-image: -moz-linear-gradient(top, $theme.pageContentBackgroundColor 0%, $theme.buttonSecondaryBackgroundColor 100%); /* FF3.6+ */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageContentBackgroundColor), color-stop(100%,$theme.buttonSecondaryBackgroundColor)); /* Chrome,Safari4+ */
+  background-image: -webkit-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Chrome10+,Safari5.1+ */
+  background-image: -o-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Opera 11.10+ */
+  background-image: -ms-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* IE10+ */
+  background-image: linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* W3C */
+  border-radius: 4px 4px 0 0;
+}
+
+h1.xwikipaneltitle,
+#contentmenu.actionmenu a, #contentmenu.actionmenu a:visited, #contentmenu .menuarrow, #contentmenu .tmetype,
+#editmenu.actionmenu a, #editmenu.actionmenu a:visited, #editmenu .menuarrow, #editmenu .tmetype,
+.xwikitabbar li a, .xwikitabbar li a:visited, .xwikitabbar li a:active  {
+  color: $theme.buttonSecondaryTextColor;
+  text-shadow: 0 1px 0 $theme.pageContentBackgroundColor;
+}
+
+#contentmenu.actionmenu .submenuitem a ,
+#editmenu.actionmenu .submenuitem a {
+  text-shadow: none;
+}
+
+#contentmenu.actionmenu .submenu,
+#editmenu.actionmenu .submenu {
+  background-color: $theme.pageBackgroundColor;
+}
+
+#mainmenu {
+  background-image: -moz-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%, $theme.menuBackgroundColor 50%); /* FF3.6+ */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, $theme.pageHeaderBackgroundColor), color-stop(50%,$theme.menuBackgroundColor)); /* Chrome,Safari4+ */
+  background-image: -webkit-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%, $theme.menuBackgroundColor 50%); /* Chrome10+,Safari5.1+ */
+  background-image: -o-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%, $theme.menuBackgroundColor 50%); /* Opera 11.10+ */
+  background-image: -ms-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%, $theme.menuBackgroundColor 50%); /* IE10+ */
+  background-image: linear-gradient(top, $theme.pageHeaderBackgroundColor 0%, $theme.menuBackgroundColor 50%); /* W3C */
+  box-shadow: 0px 1px 2px $theme.linkColor;
+}
+
+#mainmenu .tmetype, #mainmenu .tme {
+  text-shadow: 0 1px 0 $theme.pageHeaderBackgroundColor;
+}
+
+#mainmenu .tmCreate .tme {
+  text-shadow: none;
+}
+
+#contentmenu .submenu  {
+  box-shadow: 0px 1px 2px $theme.buttonSecondaryBackgroundColor;
+}
+
+#mainmenu .submenu {
+  box-shadow: 0px 1px 1px $theme.textSecondaryColor;
+}
+
+.actionmenu .submenu {
+  border-radius: 0 0 10px 10px;
+}
+
+/* Gradients containers for IE browsers */
+/* IE6-9 doesn't have support for CSS3 properties. Filters affect also child elements, so we can't apply filters on #mainmenu or #content because it will make the submenus inaccesible. The solution is a container that only holds the gradient colors. */
+#mainmenu .gradientfilterIE, #contentmenu .gradientfilterIE, #editmenu .gradientfilterIE {
+  min-height: 22px;
+  width: 100%;
+}
+
+#mainmenu .gradientfilterIE {
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.pageHeaderBackgroundColor', endColorstr='$theme.menuBackgroundColor',GradientType=0 ); /* IE6-9 */
+}
+
+#contentmenu .gradientfilterIE, #editmenu .gradientfilterIE, h1.xwikipaneltitle, ul.xwikitabbar  {
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.pageContentBackgroundColor', endColorstr='$theme.buttonSecondaryBackgroundColor',GradientType=0 ); /* IE6-9 */
+ }
+ 
+#mainmenu .componentcontainer, #contentmenu .componentcontainer, #editmenu .componentcontainer {
+  margin-top: -22px;
+}
+
+/* Gradients for tmCreate */
+.actionmenu .tmCreate {
+  border-radius: 4px 4px 4px 4px;
+  padding-left: 0;
+}
+
+.actionmenu .tmCreate:hover {
+  border-radius: 4px 4px 0px 0px;
+}
+
+.actionmenu .tmCreate:hover .tme-extensible, .tmCreate  .tme-extensible {
+  background: -moz-linear-gradient(top, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(236,236,236,0.3)), color-stop(30%,rgba(236,236,236,0))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, rgba(236,236,236,0.3) 0%,rgba(236,236,236,0) 30%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, rgba(236,236,236,0.3) 0%,rgba(236,236,236,0) 30%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, rgba(236,236,236,0.3) 0%,rgba(236,236,236,0) 30%); /* IE10+ */
+  background: linear-gradient(top, rgba(236,236,236,0.3) 0%,rgba(236,236,236,0) 30%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4dececec', endColorstr='#00ececec',GradientType=0 ); /* IE6-9 */
+}
+
+.tmCreate  .tme-extensible {
+  padding-left: 10px;
+}
+
+.tmCreate .submenu {
+  border-radius: 0 10px 10px 10px;
+  border: 2px solid $theme.menuAddEntryBackgroundColor;
 }
 
 /* @group COMPONENTS*/

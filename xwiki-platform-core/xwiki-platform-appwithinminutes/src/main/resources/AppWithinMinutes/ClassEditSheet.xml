@@ -1703,7 +1703,7 @@ return XWiki;
     #set($field = $xclass.get($fieldName))
     #set($valuesFromRequest = $xcontext.context.getForm().getObject("field-$fieldName"))
     #set($discard = $field.getxWikiClass().fromMap($valuesFromRequest, $field))
-    #if($field.name.matches('^[\w\.\-]+$'))
+    #if($field.name.matches('^[a-zA-Z_][\w:\-\.]*$'))
       #if($fieldName != $field.name)
         ## The field name has changed.
         #if($xclass.get($field.name))

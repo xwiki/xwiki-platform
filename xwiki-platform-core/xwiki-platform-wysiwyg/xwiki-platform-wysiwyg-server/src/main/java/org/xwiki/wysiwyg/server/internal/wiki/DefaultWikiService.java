@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
@@ -53,12 +52,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class DefaultWikiService extends AbstractWikiService
 {
-    /**
-     * Logger.
-     */
-    @Inject
-    protected Logger logger;
-
     /** Execution context handler, needed for accessing the XWikiContext. */
     @Inject
     private Execution execution;
@@ -164,40 +157,6 @@ public class DefaultWikiService extends AbstractWikiService
             }
         }
         return wikiPages;
-    }
-
-    @Override
-    public Attachment getAttachment(org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference attachmentReference)
-    {
-        XWikiContext context = getXWikiContext();
-        // Clean attachment filename to be synchronized with all attachment operations.
-        String cleanedFileName = context.getWiki().clearName(attachmentReference.getFileName(), false, true, context);
-        DocumentReference documentReference =
-            entityReferenceConverter.convert(attachmentReference.getWikiPageReference());
-        XWikiDocument doc;
-        try {
-            doc = context.getWiki().getDocument(documentReference, context);
-        } catch (Exception e) {
-            this.logger.error("Failed to get attachment: there was a problem with getting the document on the server.",
-                e);
-            return null;
-        }
-        if (doc.isNew()) {
-            this.logger.warn("Failed to get attachment: [{}] document doesn't exist.", documentReference);
-            return null;
-        }
-        if (doc.getAttachment(cleanedFileName) == null) {
-            this.logger.warn("Failed to get attachment: [{}] not found.", cleanedFileName);
-            return null;
-        }
-
-        org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference foundAttachmentReference = attachmentReference.clone();
-        foundAttachmentReference.setFileName(cleanedFileName);
-
-        Attachment attach = new Attachment();
-        attach.setReference(foundAttachmentReference.getEntityReference());
-        attach.setUrl(doc.getAttachmentURL(cleanedFileName, context));
-        return attach;
     }
 
     @Override

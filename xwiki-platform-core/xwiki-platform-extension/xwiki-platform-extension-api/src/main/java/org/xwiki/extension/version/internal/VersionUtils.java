@@ -19,8 +19,6 @@
  */
 package org.xwiki.extension.version.internal;
 
-import org.xwiki.extension.version.Version;
-
 /**
  * Contain some Version related toolkit methods.
  * 
@@ -34,34 +32,6 @@ public final class VersionUtils
     private VersionUtils()
     {
         // Toolkit class
-    }
-
-    /**
-     * @param upper maximum version of the right range
-     * @param upperInclusive indicate if maximum version is included in the range
-     * @param lower minimum version of the left range
-     * @param lowerInclusive indicate if the minimum version is included in the range
-     * @return true if the two version ranges are compatibles, false otherwise
-     */
-    public static boolean isCompatible(Version upper, boolean upperInclusive, Version lower, boolean lowerInclusive)
-    {
-        boolean compatible = true;
-
-        if (upper != null) {
-            if (lower != null) {
-                int comparison = upper.compareTo(lower);
-
-                if (comparison > 0) {
-                    compatible = false;
-                } else if (comparison < 0) {
-                    compatible = true;
-                } else {
-                    compatible = upperInclusive && lowerInclusive;
-                }
-            }
-        }
-
-        return compatible;
     }
 
     /**

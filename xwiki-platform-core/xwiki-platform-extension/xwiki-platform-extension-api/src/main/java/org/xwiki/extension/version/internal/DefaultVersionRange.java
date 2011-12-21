@@ -263,7 +263,7 @@ public class DefaultVersionRange implements VersionRange
                 compatible = isCompatible((DefaultVersionRange) otherRange);
             } else {
                 try {
-                    compatible = isCompatible(new DefaultVersionRange(((VersionRange) otherRange).getValue()));
+                    compatible = isCompatible(new DefaultVersionRange(otherRange.getValue()));
                 } catch (InvalidVersionRangeException e) {
                     compatible = false;
                 }
@@ -281,10 +281,108 @@ public class DefaultVersionRange implements VersionRange
      */
     public boolean isCompatible(DefaultVersionRange otherRange)
     {
-        return VersionUtils.isCompatible(this.upperBound, this.upperBoundInclusive, otherRange.lowerBound,
-            otherRange.lowerBoundInclusive)
-            || VersionUtils.isCompatible(otherRange.upperBound, otherRange.upperBoundInclusive, this.lowerBound,
-                this.lowerBoundInclusive);
+        int lowerCompare =
+            compareTo(this.lowerBound, this.lowerBoundInclusive, otherRange.lowerBound, otherRange.lowerBoundInclusive,
+                false);
+        int upperCompare =
+            compareTo(this.upperBound, this.upperBoundInclusive, otherRange.upperBound, otherRange.upperBoundInclusive,
+                true);
+
+        // Both ranges have one bound in common
+        if (lowerCompare == 0 || upperCompare == 0) {
+            return true;
+        }
+
+        // This range is included in the provided range
+        if (lowerCompare > 0 && upperCompare < 0) {
+            return true;
+        }
+
+        // The provided range is included in this range
+        if (lowerCompare < 0 && upperCompare > 0) {
+            return true;
+        }
+
+        // Validate intersections
+        return lowerCompare < 0 ? isCompatible(this.upperBound, this.upperBoundInclusive, otherRange.lowerBound,
+            otherRange.lowerBoundInclusive) : isCompatible(otherRange.upperBound, otherRange.upperBoundInclusive,
+                this.lowerBound, this.lowerBoundInclusive);
+    }
+
+    /**
+     * @param version1 the left range version
+     * @param included1 indicate of the left range version is included
+     * @param version2 the right range version
+     * @param included2 indicate of the right range version is included
+     * @param upper indicate the provided version are upper or lower bounds
+     * @return a negative integer, zero, or a positive integer as the left version is less than, equal to, or greater
+     *         than the right version
+     */
+    private int compareTo(Version version1, boolean included1, Version version2, boolean included2, boolean upper)
+    {
+        int compare;
+
+        if (version1 == null) {
+            compare = version2 == null ? 0 : (upper ? 1 : -1);
+        } else {
+            if (version2 == null) {
+                compare = upper ? -1 : 1;
+            } else {
+                compare = compareNotNull(version1, included1, version2, included2, upper);
+            }
+        }
+
+        return compare;
+    }
+
+    /**
+     * @param version1 the left range version
+     * @param included1 indicate of the left range version is included
+     * @param version2 the right range version
+     * @param included2 indicate of the right range version is included
+     * @param upper indicate the provided version are upper or lower bounds
+     * @return a negative integer, zero, or a positive integer as the left version is less than, equal to, or greater
+     *         than the right version
+     */
+    private int compareNotNull(Version version1, boolean included1, Version version2, boolean included2, boolean upper)
+    {
+        int compare = version1.compareTo(version2);
+
+        if (compare == 0) {
+            if (included1 != included2) {
+                compare = included1 ? (upper ? -1 : 1) : (upper ? 1 : -1);
+            }
+        }
+
+        return compare;
+    }
+
+    /**
+     * @param upper maximum version of the right range
+     * @param upperInclusive indicate if maximum version is included in the range
+     * @param lower minimum version of the left range
+     * @param lowerInclusive indicate if the minimum version is included in the range
+     * @return true if the two version ranges are compatibles, false otherwise
+     */
+    private boolean isCompatible(Version upper, boolean upperInclusive, Version lower, boolean lowerInclusive)
+    {
+        boolean compatible = true;
+
+        if (upper != null) {
+            if (lower != null) {
+                int comparison = upper.compareTo(lower);
+
+                if (comparison > 0) {
+                    compatible = true;
+                } else if (comparison < 0) {
+                    compatible = false;
+                } else {
+                    compatible = upperInclusive && lowerInclusive;
+                }
+            }
+        }
+
+        return compatible;
     }
 
     // Object

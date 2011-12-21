@@ -22,6 +22,7 @@ package org.xwiki.extension.version.internal;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,13 +30,13 @@ import java.util.List;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.extension.version.VersionRangeCollection;
 import org.xwiki.extension.version.IncompatibleVersionConstraintException;
 import org.xwiki.extension.version.InvalidVersionConstraintException;
 import org.xwiki.extension.version.InvalidVersionRangeException;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.VersionRange;
+import org.xwiki.extension.version.VersionRangeCollection;
 
 /**
  * Default implementation of {@link VersionConstraint}.
@@ -141,7 +142,7 @@ public class DefaultVersionConstraint implements VersionConstraint
      */
     private List<VersionRangeCollection> parseRanges(String rawConstraint) throws InvalidVersionConstraintException
     {
-        String constraint = this.value;
+        String constraint = rawConstraint;
 
         List<VersionRangeCollection> newRanges = new ArrayList<VersionRangeCollection>();
 
@@ -149,15 +150,16 @@ public class DefaultVersionConstraint implements VersionConstraint
             int index = constraint.indexOf('}');
 
             if (index < 0) {
-                throw new InvalidVersionConstraintException("Unbounded version range [" + rawConstraint + "]");
+                throw new InvalidVersionConstraintException(MessageFormat.format("Unbounded version range [{0}]",
+                    rawConstraint));
             }
 
-            String range = constraint.substring(0, index + 1);
+            String range = constraint.substring(1, index);
             try {
-                newRanges.add(new DefaultCollectionVersionRange(range));
+                newRanges.add(new DefaultVersionRangeCollection(range));
             } catch (InvalidVersionRangeException e) {
-                throw new InvalidVersionConstraintException("Failed to parse version range [" + range
-                    + "] in constraint [" + rawConstraint + "]");
+                throw new InvalidVersionConstraintException(MessageFormat.format(
+                    "Failed to parse version range [{0}] in constraint [{1}]", range, rawConstraint));
             }
 
             constraint = constraint.substring(index + 1).trim();
@@ -167,9 +169,18 @@ public class DefaultVersionConstraint implements VersionConstraint
             }
         }
 
-        if (!constraint.isEmpty() && !newRanges.isEmpty()) {
-            throw new InvalidVersionConstraintException("Invalid version range [" + rawConstraint
-                + "], expected [ or ( but got " + constraint);
+        if (!constraint.isEmpty()) {
+            if (newRanges.isEmpty()) {
+                try {
+                    newRanges.add(new DefaultVersionRangeCollection(constraint));
+                } catch (InvalidVersionRangeException e) {
+                    throw new InvalidVersionConstraintException(MessageFormat.format(
+                        "Failed to parse version range [{0}]", constraint));
+                }
+            } else {
+                throw new InvalidVersionConstraintException(MessageFormat.format(
+                    "Invalid version range [{0}], expected [ or ( but got [{1}]", rawConstraint, constraint));
+            }
         }
 
         return newRanges;
@@ -190,69 +201,104 @@ public class DefaultVersionConstraint implements VersionConstraint
     @Override
     public boolean containsVersion(Version version)
     {
-        boolean contains;
-
         if (this.ranges.isEmpty()) {
-            contains = this.version != null && this.version.equals(version);
+            return this.version != null && this.version.equals(version);
         } else {
-            contains = true;
-
             for (VersionRange range : this.ranges) {
-                contains &= range.containsVersion(version);
+                if (!range.containsVersion(version)) {
+                    return false;
+                }
             }
         }
 
-        return contains;
+        return true;
     }
 
     @Override
-    public DefaultVersionConstraint merge(VersionConstraint versionConstraint)
-        throws IncompatibleVersionConstraintException
+    public VersionConstraint merge(VersionConstraint versionConstraint) throws IncompatibleVersionConstraintException
     {
-        return merge(versionConstraint.getRanges(), versionConstraint.getVersion());
+        if (equals(versionConstraint)) {
+            return this;
+        } else {
+            VersionConstraint mergedConstraint = mergeVersions(versionConstraint);
+
+            return mergedConstraint == null ? mergeRanges(versionConstraint.getRanges()) : mergedConstraint;
+        }
     }
 
     /**
-     * Create a new {@link DefaultVersionConstraint} instance which is the combination of the provided version and
-     * version ranges and this version constraint.
+     * @param versionConstraint the version constraint to merge
+     * @return the version constraint with the upper version or null if both are ranges based
+     * @throws IncompatibleVersionConstraintException version constraints are incompatible
+     */
+    private VersionConstraint mergeVersions(VersionConstraint versionConstraint)
+        throws IncompatibleVersionConstraintException
+    {
+        if (this.version != null) {
+            return mergeVersions(this, versionConstraint);
+        } else if (versionConstraint.getVersion() != null) {
+            return mergeVersions(versionConstraint, this);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param versionConstraintWithVersion the version constraint based on version
+     * @param versionConstraint the version constraint for which we don't know yet if it's based on version or ranges
+     * @return the merged version constraint
+     * @throws IncompatibleVersionConstraintException version constraints are incompatible
+     */
+    private VersionConstraint mergeVersions(VersionConstraint versionConstraintWithVersion,
+        VersionConstraint versionConstraint) throws IncompatibleVersionConstraintException
+    {
+        if (versionConstraint.getVersion() != null) {
+            return versionConstraintWithVersion.getVersion().compareTo(versionConstraint.getVersion()) >= 0
+                ? versionConstraintWithVersion : versionConstraint;
+        } else {
+            if (!versionConstraint.containsVersion(versionConstraintWithVersion.getVersion())) {
+                throw new IncompatibleVersionConstraintException("Version ["
+                    + versionConstraintWithVersion.getVersion() + "] is not part of version constraint ["
+                    + versionConstraint + "]");
+            }
+
+            return versionConstraintWithVersion;
+        }
+    }
+
+    /**
+     * Create a new {@link DefaultVersionConstraint} instance which is the combination of the provided version ranges
+     * and this version ranges.
      * 
      * @param otherRanges the version ranges to merge with this version ranges
-     * @param otherVersion the version to merge with this version
      * @return the new {@link DefaultVersionConstraint}
      * @throws IncompatibleVersionConstraintException the provided version and version ranges are not compatible with
      *             this version constraint
      */
-    public DefaultVersionConstraint merge(Collection<VersionRangeCollection> otherRanges, Version otherVersion)
+    // TODO: some optimizations to do like removing unnecessary ranges and avoid validating twice the same ranges
+    private DefaultVersionConstraint mergeRanges(Collection<VersionRangeCollection> otherRanges)
         throws IncompatibleVersionConstraintException
     {
         // Validate
-        validateCompatibility(otherRanges, otherVersion);
+        validateCompatibility(otherRanges);
 
         Collection<VersionRangeCollection> newRanges =
             new ArrayList<VersionRangeCollection>(this.ranges.size() + otherRanges.size());
         newRanges.addAll(this.ranges);
         newRanges.addAll(otherRanges);
 
-        Version newVersion = this.version.compareTo(otherVersion) >= 0 ? this.version : otherVersion;
-
-        return new DefaultVersionConstraint(newRanges, newVersion);
+        return new DefaultVersionConstraint(newRanges, null);
     }
 
     /**
-     * @param otherRanges the ranges to validate with this ranges and version
-     * @param otherVersion the version to validate with this ranges
-     * @throws IncompatibleVersionConstraintException the provided ranges and recommended version and not compatible
-     *             with this ranges and recommended version
+     * @param otherRanges the ranges to validate with this ranges
+     * @throws IncompatibleVersionConstraintException the provided ranges is not compatible with this ranges
      */
-    private void validateCompatibility(Collection<VersionRangeCollection> otherRanges, Version otherVersion)
+    private void validateCompatibility(Collection<VersionRangeCollection> otherRanges)
         throws IncompatibleVersionConstraintException
     {
         for (VersionRange otherRange : otherRanges) {
-            validateVersionWithRange(this.version, otherRange);
-
             for (VersionRange range : this.ranges) {
-                validateVersionWithRange(otherVersion, range);
-
                 if (!range.isCompatible(otherRange)) {
                     throw new IncompatibleVersionConstraintException("Ranges [" + range + "] and [" + otherRange
                         + "] are incompatibles");
@@ -261,46 +307,30 @@ public class DefaultVersionConstraint implements VersionConstraint
         }
     }
 
-    /**
-     * @param version the version to validate with provided version range
-     * @param versionRange the version range
-     * @throws IncompatibleVersionConstraintException the provided version is not part of provided version range
-     */
-    private void validateVersionWithRange(Version version, VersionRange versionRange)
-        throws IncompatibleVersionConstraintException
-    {
-        if (version != null && !versionRange.containsVersion(version)) {
-            throw new IncompatibleVersionConstraintException("Version [" + this.version
-                + "] is not part of version range [" + versionRange + "]");
-        }
-    }
-
     @Override
     public String getValue()
     {
         if (this.value == null) {
-            StringBuilder buffer = new StringBuilder();
+            StringBuilder builder = new StringBuilder();
 
             if (getVersion() != null) {
-                buffer.append(getVersion());
+                builder.append(getVersion());
             } else {
                 if (this.ranges.size() == 1) {
-                    buffer.append('{');
-                    buffer.append(this.ranges.get(0).getValue());
-                    buffer.append('}');
+                    builder.append(this.ranges.get(0).getValue());
                 } else {
                     for (VersionRange range : getRanges()) {
-                        if (buffer.length() > 0) {
-                            buffer.append(RANGE_SEPARATOR);
+                        if (builder.length() > 0) {
+                            builder.append(RANGE_SEPARATOR);
                         }
-                        buffer.append('{');
-                        buffer.append(range.getValue());
-                        buffer.append('}');
+                        builder.append('{');
+                        builder.append(range.getValue());
+                        builder.append('}');
                     }
                 }
             }
 
-            this.value = buffer.toString();
+            this.value = builder.toString();
         }
 
         return this.value;

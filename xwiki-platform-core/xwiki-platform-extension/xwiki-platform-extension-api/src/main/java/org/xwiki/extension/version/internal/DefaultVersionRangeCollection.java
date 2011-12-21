@@ -42,7 +42,7 @@ import org.xwiki.extension.version.VersionRangeCollection;
  * @see org.sonatype.aether.util.version.GenericVersionScheme#parseVersionConstraint(String)
  * @version $Id$
  */
-public class DefaultCollectionVersionRange implements VersionRangeCollection
+public class DefaultVersionRangeCollection implements VersionRangeCollection
 {
     /**
      * Serialization identifier.
@@ -68,7 +68,7 @@ public class DefaultCollectionVersionRange implements VersionRangeCollection
      * @param rawRanges the version ranges to parse
      * @throws InvalidVersionRangeException error when parsing version range
      */
-    public DefaultCollectionVersionRange(String rawRanges) throws InvalidVersionRangeException
+    public DefaultVersionRangeCollection(String rawRanges) throws InvalidVersionRangeException
     {
         setRanges(rawRanges);
     }
@@ -76,7 +76,7 @@ public class DefaultCollectionVersionRange implements VersionRangeCollection
     /**
      * @param ranges the ranges
      */
-    public DefaultCollectionVersionRange(Collection< ? extends VersionRange> ranges)
+    public DefaultVersionRangeCollection(Collection< ? extends VersionRange> ranges)
     {
         for (VersionRange range : ranges) {
             this.ranges.add(range);
@@ -128,7 +128,7 @@ public class DefaultCollectionVersionRange implements VersionRangeCollection
             }
         }
 
-        if (!currentRanges.isEmpty() && !this.ranges.isEmpty()) {
+        if (!currentRanges.isEmpty()) {
             throw new InvalidVersionRangeException("Invalid version range [" + rawRanges
                 + "], expected [ or ( but got " + currentRanges);
         }
@@ -230,11 +230,11 @@ public class DefaultCollectionVersionRange implements VersionRangeCollection
             return true;
         }
 
-        if (obj == null || !(obj instanceof DefaultCollectionVersionRange)) {
+        if (obj == null || !(obj instanceof DefaultVersionRangeCollection)) {
             return false;
         }
 
-        DefaultCollectionVersionRange versionConstraint = (DefaultCollectionVersionRange) obj;
+        DefaultVersionRangeCollection versionConstraint = (DefaultVersionRangeCollection) obj;
 
         return this.ranges.equals(versionConstraint.getRanges());
     }

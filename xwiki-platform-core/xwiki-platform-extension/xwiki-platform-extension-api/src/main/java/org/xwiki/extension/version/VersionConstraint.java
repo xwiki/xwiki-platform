@@ -60,10 +60,10 @@ public interface VersionConstraint extends Serializable
     boolean containsVersion(Version version);
 
     /**
-     * Merge too version constraint and create a new one.
+     * Merge too version constraints in one.
      * 
      * @param versionConstraint the version constraint to merge with this version constraint
-     * @return the new version constraint
+     * @return the merged version constraint
      * @throws IncompatibleVersionConstraintException the provided version constraint is compatible with the provided
      *             version constraint
      */

@@ -108,8 +108,12 @@ public class DBCPConnectionProvider implements ConnectionProvider
 
             // DriverClass & url
             String jdbcDriverClass = props.getProperty(Environment.DRIVER);
-            String jdbcUrl = props.getProperty(Environment.URL);
             dbcpProperties.put("driverClassName", jdbcDriverClass);
+
+            String jdbcUrl = System.getProperty(Environment.URL);
+            if (jdbcUrl == null) {
+                jdbcUrl = props.getProperty(Environment.URL);
+            }
             dbcpProperties.put("url", jdbcUrl);
 
             // Username / password. Only put username and password if they're not null. This allows

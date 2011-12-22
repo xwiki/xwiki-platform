@@ -22,41 +22,47 @@
  *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-linkchecker</artifactId>
+    <artifactId>xwiki-platform-tools</artifactId>
     <version>3.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-linkchecker-ui</artifactId>
-  <name>XWiki Platform - LinkChecker - UI</name>
-  <packaging>xar</packaging>
-  <description>Displays statuses of external links found in the wiki</description>
+  <artifactId>xwiki-package-sample</artifactId>
+  <packaging>pom</packaging>
+  <name>Maven XWiki Sample Package Plugin</name>
+  <description>Maven XWiki Sample Package Plugin</description>
   <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+      <!-- Overridden configuration data for xwiki.properties -->
+      <xwikiRenderingTransformations>macro, icon, linkchecker</xwikiRenderingTransformations>
   </properties>
   <dependencies>
+    <!-- This XAR will be installed in the packaged XWiki -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-linkchecker-refresher</artifactId>
+      <artifactId>xwiki-platform-linkchecker-ui</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- The Velocity Macro is used in this application's wiki pages -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- The HTML Macro is used in this application's wiki pages -->
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-html</artifactId>
-      <version>${rendering.version}</version>
-      <scope>runtime</scope>
+      <type>xar</type>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <!-- Generate XWiki packaging -->
+      <plugin>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <id>package</id>
+            <goals>
+              <goal>package</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

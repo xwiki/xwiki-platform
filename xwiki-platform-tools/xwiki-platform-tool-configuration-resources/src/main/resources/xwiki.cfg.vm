@@ -531,7 +531,7 @@ xwiki.title.compatibility=1
 #
 
 #-# List of active plugins.
-xwiki.plugins=$xwikiCfgPlugins
+xwiki.plugins=$!xwikiCfgPlugins
 
 #-# Enable light monitoring of the wiki performance. Records various statistics, like number of requests processed,
 #-# time spent in rendering or in the database, medium time for a request, etc. Disable for a minor increase of

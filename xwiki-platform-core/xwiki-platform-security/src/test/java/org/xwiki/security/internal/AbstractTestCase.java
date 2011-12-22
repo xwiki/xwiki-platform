@@ -70,6 +70,7 @@ public abstract class AbstractTestCase extends AbstractComponentTestCase
             uResolver = getComponentManager().lookup(DocumentReferenceResolver.class, "user");
             Execution execution = getComponentManager().lookup(Execution.class);
             xwikiContext = new XWikiContext();
+            execution.getContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xwikiContext);
             xwikiContext.setMainXWiki("xwiki");
             System.out.println("Setting main wiki: " + xwikiContext.getMainXWiki());
             wiki = new MockXWiki("xwiki", null);

@@ -20,14 +20,9 @@
  */
 package org.xwiki.security;
 
-import java.util.List;
-
 import org.xwiki.component.annotation.ComponentRole;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-
-import com.xpn.xwiki.doc.XWikiDocument;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * This is the API for checking the access rights of users on wiki documents.
@@ -52,86 +47,38 @@ public interface RightService
     String SUPERADMIN_USER_FULLNAME = XWIKI_SPACE_PREFIX + SUPERADMIN_USER;
 
     /**
-     * The Guest username.
-     */
-    String GUEST_USER = "XWikiGuest";
-    
-    /**
-     * The Guest full name.
-     */
-    String GUEST_USER_FULLNAME = XWIKI_SPACE_PREFIX + GUEST_USER;
-
-    /**
-     * Checks if the wiki current user has the right to execute (@code action} on the document {@code doc}, along with
-     * redirecting to the login if it's not the case and there is no logged in user (the user is the guest user).
-     * 
+     * Check if an action requiring the right identified by {@code right} is allowed to be executed on the current
+     * document by the current user. This function should be used at security checkpoints.
+     *
      * @param right the right needed for execution on the document
-     * @param doc the document to perform action on
-     * @param context the xwiki context in which to perform the verification (from which to get the user, for example)
-     * @return {@code true} if the user has right to execute {@code action} on {@code doc}, {@code false} otherwise
-     *         <strong> and requests the login from the authentication service (redirecting to the login page in the
-     *         case of a form authenticator, for example) when no user is logged in. </strong>
-     * @throws XWikiException if something goes wrong during the rights checking process
+     * @throws InsufficientAuthenticationException if the context does not provide expected user authentication
+     * @throws AccessDeniedException if the action should be denied
      */
-    boolean checkAccess(Right right, XWikiDocument doc, XWikiContext context) throws XWikiException;
+    void checkUserAccess(Right right) throws InsufficientAuthenticationException, AccessDeniedException;
 
     /**
-     * Verifies if the user identified by {@code username} has the access level identified by {@code right} on the
-     * document with the name {@code docname}.
+     * Check if an action requiring the right identified by {@code right} is allowed to be executed on the current
+     * document by this document content author. This function should be used at security checkpoints.
+     *
+     * @param right the right needed for execution on the document
+     * @throws InsufficientAuthenticationException if the context does not provide expected author authentication
+     * @throws AccessDeniedException if the action should be denied
+     */
+    void checkAuthorAccess(Right right) throws InsufficientAuthenticationException, AccessDeniedException;
+
+    /**
+     * Verifies if the user identified by {@code userReference} has the access level identified by {@code right} on the
+     * entity identified by {@code entityReference}. Note that some rights may be checked higher in hierarchy of the
+     * provided entity if such right is not enabled at lowest hierarchy level provided. 
+     * This function should be used for interface matters, use {@link checkUserAccess} or {@link checkAuthorAccess}
+     * at security checkpoints.
      * 
      * @param right the access level to check (for example, 'view' or 'edit' or 'comment').
-     * @param username the name of the user to check the right for
-     * @param docname the document on which to check the right
-     * @param context the xwiki context in which to perform the verification
-     * @return {@code true} if the user has the specified right on the document, {@code false} otherwise
-     * @throws XWikiException if something goes wrong during the rights checking process
+     * @param userReference the user to check the right for
+     * @param entityReference the entity on which to check the right
+     * @return {@code true} if the user has the specified right on the entity, {@code false} otherwise
      */
-    boolean hasAccessLevel(Right right, String username, String docname, XWikiContext context)
-        throws XWikiException;
-
-    /**
-     * Checks if the author of the context document (last editor of the content of the document) has programming rights
-     * (used to determine if the protected calls in the script contained in the document should be executed or not).
-     * 
-     * @param context the xwiki context of this request
-     * @return {@code true} if the author of the context document has programming rights, {@code false} otherwise.
-     */
-    boolean hasProgrammingRights(XWikiContext context);
-
-    /**
-     * Checks if the author of the passed document (last editor of the content of the document) has programming rights
-     * (used to determine if the protected calls in the script contained in the document should be executed or not).
-     * 
-     * @param doc the document to check programming rights for
-     * @param context the xwiki context of this request
-     * @return {@code true} if the author of {@code doc} has programming rights, {@code false} otherwise.
-     */
-    boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context);
-
-    /**
-     * Checks that the current user in the context (the currently authenticated user) has administration rights on the
-     * current space.
-     * 
-     * @param context the xwiki context of this request
-     * @return {@code true} if the current user in the context has the {@code admin} right, {@code false} otherwise
-     */
-    boolean hasAdminRights(XWikiContext context);
-
-    /**
-     * Checks that the current user in the context (the currently authenticated user) has administration rights on the
-     * current space.
-     *
-     * @param context the xwiki context of this request
-     * @return {@code true} if the current user in the context has the {@code admin} right, {@code false} otherwise
-     */
-    boolean hasWikiAdminRights(XWikiContext context);
-
-    /**
-     * @param context the xwiki context of this request
-     * @return the list of all the known access levels
-     * @throws XWikiException if something goes wrong during the rights checking process
-     */
-    List<String> listAllLevels(XWikiContext context) throws XWikiException;
+    boolean hasAccess(Right right, DocumentReference userReference, EntityReference entityReference);
 
     /**
      * Register a new custom {@link Right}.
@@ -139,5 +86,5 @@ public interface RightService
      * @return the created {@link Right}
      * @throws UnableToRegisterRightException if an error prevent creation
      */
-    Right registerRight(RightDescription rightDescription) throws UnableToRegisterRightException;
+    Right register(RightDescription rightDescription) throws UnableToRegisterRightException;
 }

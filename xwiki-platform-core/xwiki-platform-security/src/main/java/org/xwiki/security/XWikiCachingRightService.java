@@ -20,21 +20,55 @@
  */
 package org.xwiki.security;
 
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Class for plugging in to xwiki.
+ * Legacy bridge aimed to replace the current Right Service until the new API is used in all places.
  * @version $Id$
  */
 public class XWikiCachingRightService implements XWikiRightService
 {
+    /**
+     * The Guest username.
+     */
+    public static String GUEST_USER = "XWikiGuest";
+
+    /**
+     * The Guest full name.
+     */
+    public static String GUEST_USER_FULLNAME = RightService.XWIKI_SPACE_PREFIX + GUEST_USER;
+
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiCachingRightService.class);
+
+    /** Resolver for document references. */
+    private DocumentReferenceResolver<String> documentReferenceResolver
+        = Utils.getComponent(DocumentReferenceResolver.class);
+
+    /** Resolver for user and group document references. */
+    private DocumentReferenceResolver<String> userAndGroupReferenceResolver
+        = Utils.getComponent(DocumentReferenceResolver.class, "user");
+
+    /** The actual right service compoennt. */
+    private final RightService rightService
+        = Utils.getComponent(RightServiceConfigurationManager.class).getConfiguredRightService();
+
     /**
      * Specialized map with a chainable put action to avoid exceeding code complexity during initialization.
      */
@@ -55,9 +89,8 @@ public class XWikiCachingRightService implements XWikiRightService
         }
     }
 
-    /** 
+    /**
      * Map containing all known actions. 
-     * TODO: Remove this mapping here, since each action should know about itself
      */
     private static final ActionMap ACTION_MAP = new ActionMap();
     
@@ -130,57 +163,203 @@ public class XWikiCachingRightService implements XWikiRightService
         return right;
     }
 
-    /** The actual right service compoennt. */
-    private final RightService rightService;
-
+    /**
+     * @param username name as a string.
+     * @param wikiReference default wiki, if not explicitly specified in the username.
+     * @return A document reference that uniquely identifies the user.
+     */
+    private DocumentReference resolveUserName(String username, WikiReference wikiReference)
     {
-        RightServiceConfigurationManager m;
-        m = Utils.getComponent(RightServiceConfigurationManager.class);
-        rightService = m.getConfiguredRightService();
+        return userAndGroupReferenceResolver.resolve(username, wikiReference);
+    }
+
+    /**
+     * @param docname name of the document as string.
+     * @param wikiReference the default wiki where the document will be
+     * assumed do be located, unless explicitly specified in docname.
+     * @return the document reference.
+     */
+    private DocumentReference resolveDocName(String docname, WikiReference wikiReference)
+    {
+        return documentReferenceResolver.resolve(docname, wikiReference);
+    }
+
+    /**
+     * Show the login page, unless the wiki is configured otherwise.
+     * @param context the context
+     */
+    private void showLogin(XWikiContext context)
+    {
+        try {
+            if (context.getRequest() != null
+                && !context.getWiki().Param("xwiki.hidelogin", "false").equalsIgnoreCase("true")) {
+                context.getWiki().getAuthService().showLogin(context);
+            }
+        } catch (XWikiException e) {
+            LOGGER.error("Failed to show login page.", e);
+        }
+    }
+
+    /**
+     * @param right Right to authenticate.
+     * @param entityReference Document that is being accessed.
+     * @return a {@link DocumentReference} that uniquely identifies
+     * the user, if the authentication was successful.  {@code null}
+     * on failure.
+     */
+    private DocumentReference authenticateUser(Right right, EntityReference entityReference, XWikiContext context)
+    {
+        XWikiUser user = context.getXWikiUser();
+        boolean needsAuth;
+        if (user == null) {
+            needsAuth = needsAuth(right, context);
+            try {
+                if (context.getMode() != XWikiContext.MODE_XMLRPC) {
+                    user = context.getWiki().checkAuth(context);
+                } else {
+                    user = new XWikiUser(GUEST_USER_FULLNAME);
+                }
+
+                if ((user == null) && (needsAuth)) {
+                    LOGGER.info("Authentication needed for right " + right + " and entity " + entityReference + ".");
+                    return null;
+                }
+            } catch (XWikiException e) {
+                LOGGER.error("Caught exception while authenticating user.", e);
+            }
+
+            String username;
+            if (user == null) {
+                username = GUEST_USER_FULLNAME;
+            } else {
+                username = user.getUser();
+            }
+            context.setUser(username);
+            return resolveUserName(username, new WikiReference(context.getDatabase()));
+        } else {
+            return resolveUserName(user.getUser(), new WikiReference(context.getDatabase()));
+        }
+
+    }
+
+    /**
+     * @param value a {@code String} value
+     * @return a {@code Boolean} value
+     */
+    private Boolean checkNeedsAuthValue(String value)
+    {
+        if (value != null && !value.equals("")) {
+            if (value.toLowerCase().equals("yes")) {
+                return true;
+            }
+            try {
+                if (Integer.parseInt(value) > 0) {
+                    return true;
+                }
+            } catch (NumberFormatException e) {
+                Formatter f = new Formatter();
+                LOGGER.warn(f.format("Failed to parse preference value: '%s'", value).toString());
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param right the right to check.
+     * @return {@code true} if the given right requires authentication.
+     */
+    private boolean needsAuth(Right right, XWikiContext context)
+    {
+        String prefName = "authenticate_" + right.getName();
+
+        String value = context.getWiki().getXWikiPreference(prefName, "", context);
+        Boolean result = checkNeedsAuthValue(value);
+        if (result != null) {
+            return result;
+        }
+
+        value = context.getWiki().getSpacePreference(prefName, "", context).toLowerCase();
+        result = checkNeedsAuthValue(value);
+        if (result != null) {
+            return result;
+        }
+
+        return false;
     }
 
     @Override
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context)
         throws XWikiException
     {
-        return rightService.checkAccess(actionToRight(action), doc, context);
+        Right right = actionToRight(action);
+        EntityReference entityReference = doc.getDocumentReference();
+
+        LOGGER.debug("checkAccess for action " + right + " on entity " + entityReference + ".");
+
+        DocumentReference userReference = authenticateUser(right, entityReference, context);
+        if (userReference == null) {
+            showLogin(context);
+            return false;
+        }
+        return rightService.hasAccess(right, userReference, entityReference);
     }
  
     @Override
     public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)
         throws XWikiException
     {
-        return rightService.hasAccessLevel(Right.toRight(right), username, docname, context);
+        WikiReference wikiReference = new WikiReference(context.getDatabase());
+        DocumentReference document = resolveDocName(docname, wikiReference);
+        LOGGER.debug("Resolved '" + docname + "' into " + document);
+        DocumentReference user = resolveUserName(username, wikiReference);
+
+        return rightService.hasAccess(Right.toRight(right), user, document);
     }
 
     @Override
     public boolean hasProgrammingRights(XWikiContext context)
     {
-        return rightService.hasProgrammingRights(context);
+        XWikiDocument sdoc = (XWikiDocument) context.get("sdoc");
+        return hasProgrammingRights((sdoc != null) ? sdoc : context.getDoc(), context);
     }
 
     @Override
     public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
     {
-        return rightService.hasProgrammingRights(doc, context);
+        DocumentReference user;
+        WikiReference wiki;
+
+        if (doc != null) {
+            user = doc.getContentAuthorReference();
+            wiki = doc.getDocumentReference().getWikiReference();
+        } else {
+            user = context.getUserReference();
+            wiki = new WikiReference(context.getDatabase());
+        }
+
+        return rightService.hasAccess(Right.PROGRAM, user, wiki);
     }
 
     @Override
     public boolean hasAdminRights(XWikiContext context)
     {
-        return rightService.hasAdminRights(context);
+        DocumentReference user = context.getUserReference();
+        DocumentReference document = context.getDoc().getDocumentReference();
+        return rightService.hasAccess(Right.ADMIN, user, document);
     }
 
     @Override
     public boolean hasWikiAdminRights(XWikiContext context)
     {
-        return rightService.hasWikiAdminRights(context);
+        DocumentReference user = context.getUserReference();
+        WikiReference wiki = new WikiReference(context.getDatabase());
+        return rightService.hasAccess(Right.ADMIN, user, wiki);
     }
 
     @Override
     public List<String> listAllLevels(XWikiContext context)
         throws XWikiException
     {
-        return rightService.listAllLevels(context);
+        return Right.getAllRightsAsString();
     }
 }

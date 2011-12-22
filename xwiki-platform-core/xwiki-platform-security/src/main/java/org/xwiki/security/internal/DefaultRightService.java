@@ -21,20 +21,19 @@
 package org.xwiki.security.internal;
 
 import java.util.Formatter;
-import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.AccessDeniedException;
 import org.xwiki.security.AccessLevel;
+import org.xwiki.security.InsufficientAuthenticationException;
 import org.xwiki.security.Right;
 import org.xwiki.security.RightCache;
 import org.xwiki.security.RightCacheEntry;
@@ -47,16 +46,14 @@ import org.xwiki.security.RightState;
 import org.xwiki.security.UnableToRegisterRightException;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.user.api.XWikiUser;
 
-import static org.xwiki.security.Right.ADMIN;
 import static org.xwiki.security.Right.COMMENT;
 import static org.xwiki.security.Right.DELETE;
 import static org.xwiki.security.Right.EDIT;
-import static org.xwiki.security.Right.PROGRAM;
 import static org.xwiki.security.Right.REGISTER;
+import static org.xwiki.security.RightState.ALLOW;
+import static org.xwiki.security.RightState.DENY;
 
 /**
  * The default right service.
@@ -71,6 +68,10 @@ public class DefaultRightService implements RightService
     @Inject
     private Logger logger;
     
+    /** Execution to retrieve the XWiki context if needed */
+    @Inject
+    private Execution execution;
+    
     /** The cached rights. */
     @Inject
     private RightCache rightCache;
@@ -79,271 +80,123 @@ public class DefaultRightService implements RightService
     @Inject
     private RightLoader rightLoader;
 
-    /** Resolver for document references. */
-    @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
-
-    /** Resolver for user and group document references. */
-    @Inject
-    @Named("user")
-    private DocumentReferenceResolver<String> userAndGroupReferenceResolver;
-
     /** Serializer. */
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
-     * @param right Right to authenticate.
-     * @param doc Document that is being accessed.
-     * @param context The current context
-     * @return a {@link DocumentReference} that uniquely identifies
-     * the user, if the authentication was successful.  {@code null}
-     * on failure.
+     * @return the current {@code XWikiContext}
      */
-    private DocumentReference authenticateUser(Right right, XWikiDocument doc, XWikiContext context)
-    {
-        XWikiUser user = context.getXWikiUser();
-        boolean needsAuth;
-        if (user == null) {
-            needsAuth = needsAuth(right, context);
-            try {
-
-                if (context.getMode() != XWikiContext.MODE_XMLRPC) {
-                    user = context.getWiki().checkAuth(context);
-                } else {
-                    user = new XWikiUser(RightService.GUEST_USER_FULLNAME);
-                }
-
-                if ((user == null) && (needsAuth)) {
-                    logDeny(null, doc.getDocumentReference(), right, "Authentication needed");
-                    return null;
-                }
-            } catch (XWikiException e) {
-                this.logger.error("Caught exception while authenticating user.", e);
-                return null;
-            }
-
-            String username;
-            if (user == null) {
-                username = RightService.GUEST_USER_FULLNAME;
-            } else {
-                username = user.getUser();
-            }
-            context.setUser(username);
-            return resolveUserName(username, new WikiReference(context.getDatabase()));
-        } else {
-            return resolveUserName(user.getUser(), new WikiReference(context.getDatabase()));
-        }
-
+    private XWikiContext getXWikiContext() {
+        return ((XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY));
     }
 
     /**
-     * Show the login page, unless the wiki is configured otherwise.
-     * @param context the context
+     * @param context the current {@code XWikiContext}
+     * @return the current document in context used for security checks
      */
-    private void showLogin(XWikiContext context)
+    private XWikiDocument getCurrentDocument(XWikiContext context)
     {
-        try {
-            if (context.getRequest() != null
-                && !context.getWiki().Param("xwiki.hidelogin", "false").equalsIgnoreCase("true")) {
-                context.getWiki().getAuthService().showLogin(context);
-            }
-        } catch (XWikiException e) {
-            this.logger.error("Failed to show login page.", e);
-        }
-    }
-
-    /**
-     * @param userRef a reference to a user profile document.
-     * @return {@code true} if and only if the user is a guest.
-     */
-    private boolean userIsGuest(DocumentReference userRef)
-    {
-        return userRef.getName().equals(GUEST_USER)
-            && userRef.getSpaceReferences().size() == 1
-            && XWIKI_SPACE_PREFIX.startsWith(userRef.getLastSpaceReference().getName());
-    }
-    
-    @Override
-    public boolean checkAccess(Right right, XWikiDocument doc, XWikiContext context) throws XWikiException
-    {
-        this.logger.debug("checkAccess for action " + right);
-
-        boolean userWasAuthenticated = context.getUser() != null;
-
-        DocumentReference document = doc.getDocumentReference();
-        DocumentReference user = authenticateUser(right, doc, context);
-
-        boolean allow = false;
-
-        if (user != null) {
-            allow = checkAccess(right, user, document, context);
-        }
-
-        if (!allow && !userWasAuthenticated) {
-            showLogin(context);
-        }
-
-        return allow;
-    }
-
-    /**
-     * @param username name as a string.
-     * @param wikiReference default wiki, if not explicitly specified in the username.
-     * @return A document reference that uniquely identifies the user.
-     */
-    private DocumentReference resolveUserName(String username, WikiReference wikiReference)
-    {
-        return userAndGroupReferenceResolver.resolve(username, wikiReference);
-    }
-
-    /**
-     * @param docname name of the document as string.
-     * @param wikiReference the default wiki where the document will be
-     * assumed do be located, unless explicitly specified in docname.
-     * @return the document reference.
-     */
-    private DocumentReference resolveDocName(String docname, WikiReference wikiReference)
-    {
-        return documentReferenceResolver.resolve(docname, wikiReference);
-    }
-
-    @Override
-    public boolean hasAccessLevel(Right right, String username, String docname, XWikiContext context)
-        throws XWikiException
-    {
-        WikiReference wikiReference = new WikiReference(context.getDatabase());
-        DocumentReference document = resolveDocName(docname, wikiReference);
-        this.logger.debug("Resolved '" + docname + "' into " + document);
-        DocumentReference user = resolveUserName(username, wikiReference);
-        if (right == Right.ILLEGAL) {
-            Formatter f = new Formatter();
-            this.logger.error(f.format("No such right: '%s'", right).toString());
-        }
-        return checkAccess(right, user, document, context);
-    }
-
-    @Override
-    public boolean hasProgrammingRights(XWikiContext context)
-    {
+        // TODO: Is there still a sdoc in the context sometimes ?
         XWikiDocument sdoc = (XWikiDocument) context.get("sdoc");
-        if (sdoc == null) {
-            sdoc = context.getDoc();
-        }
-
-        return hasProgrammingRights(sdoc, context);
+        return (sdoc != null) ? sdoc : context.getDoc();
     }
 
-    @Override
-    public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
-    {
-        DocumentReference user;
-        WikiReference wikiReference;
-
-        if (doc != null) {
-            String username = doc.getContentAuthor();
-            if (username == null || username.equals("")) {
-                logDeny(null, doc.getDocumentReference(), PROGRAM, "No content author.");
-                return false;
-            }
-            wikiReference = doc.getDocumentReference().getWikiReference();
-            user = resolveUserName(username, wikiReference);
-        } else {
-            user = getUserReference(context);
-            wikiReference = new WikiReference(context.getDatabase());
-        }
-
-        return checkAccess(PROGRAM, user, wikiReference, context);
-    }
-
-    
     /**
-     * @param right The right that will be checked.
-     * @param user The user that will be checked
-     * @param entity The document that will be checked.
-     * @param context The current context.
-     * @return {@code true} if and only if the given user have the
-     * given right on the given document.
+     * @param right the right to check
+     * @param context the current {@code XWikiContext}
+     * @throws AccessDeniedException if the access should be denied due to a readonly wiki
      */
-    private boolean checkAccess(Right right,
-                                DocumentReference user,
-                                EntityReference entity,
-                                XWikiContext context)
+    private void checkReadOnlyWiki(Right right, XWikiContext context) throws AccessDeniedException
     {
-        AccessLevel accessLevel;
-        try {
-            accessLevel = getAccessLevel(user, entity);
-        } catch (Exception e) {
-            this.logger.error("Failed to check admin right for user [" + context.getUser() + "]", e);
-            return false;
-        }
-
         if (context.getWiki().isReadOnly()) {
             if (right == EDIT || right == DELETE || right == COMMENT || right == REGISTER) {
-                logDeny(user, entity, right, "server in read-only mode");
-                return true;
+                throw new AccessDeniedException("server in read-only mode");
             }
         }
+    }
 
-        if (accessLevel.get(right) == RightState.ALLOW) {
-            logAllow(user, entity, right, "");
-            return true;
-        } else {
-            logDeny(user, entity, right, "");
+    @Override
+    public void checkUserAccess(Right right) throws InsufficientAuthenticationException, AccessDeniedException
+    {
+        XWikiContext context = getXWikiContext();
+        DocumentReference userReference = context.getUserReference();
+        if (userReference == null) {
+            throw new InsufficientAuthenticationException();
+        }
+
+        checkReadOnlyWiki(right, context);
+
+
+        try {
+            if (!hasAccessLevel(right, userReference, getCurrentDocument(context).getDocumentReference())) {
+                throw new AccessDeniedException();
+            }
+        } catch(Exception e) {
+            throw new AccessDeniedException(e);
+        }
+    }
+
+    @Override
+    public void checkAuthorAccess(Right right) throws InsufficientAuthenticationException, AccessDeniedException
+    {
+        XWikiContext context = getXWikiContext();
+        XWikiDocument document = getCurrentDocument(context);
+        DocumentReference userReference = document.getAuthorReference();
+        if (userReference == null) {
+            throw new InsufficientAuthenticationException();
+        }
+
+        checkReadOnlyWiki(right, context);
+
+        try {
+            if (!hasAccessLevel(right, userReference, document.getDocumentReference())) {
+                throw new AccessDeniedException();
+            }
+        } catch(Exception e) {
+            throw new AccessDeniedException(e);
+        }
+    }
+
+    @Override
+    public boolean hasAccess(Right right, DocumentReference userReference, EntityReference entityReference)
+    {
+        try{
+            return hasAccessLevel(right, userReference, entityReference);
+        } catch (Exception e) {
+            this.logger.error("Failed to load rights for user " + userReference + ".", e);
             return false;
         }
     }
-
-    @Override
-    public boolean hasAdminRights(XWikiContext context)
+    
+    private boolean hasAccessLevel(Right right, DocumentReference userReference, EntityReference entityReference)
+        throws RightServiceException
     {
-        DocumentReference user = getUserReference(context);
-        DocumentReference document = context.getDoc().getDocumentReference();
-        return checkAccess(ADMIN, user, document, context);
+        if (userReference == null) {
+            logDeny(userReference, entityReference, right, "no user");
+            return false;
+        }
+
+        if (right == Right.ILLEGAL) {
+            logDeny(userReference, entityReference, right, "no such right");
+            return false;
+        }
+
+        AccessLevel accessLevel = getAccessLevel(userReference, entityReference);
+
+        RightState access = accessLevel.get(right); 
+        logAccess(access, userReference, entityReference, right, "access checked");
+        return access == ALLOW;
     }
 
     @Override
-    public boolean hasWikiAdminRights(XWikiContext context)
-    {
-        DocumentReference user = getUserReference(context);
-        // TODO: to be improved
-        DocumentReference document = new DocumentReference(context.getDatabase(), XWikiUtils.WIKI_SPACE,
-            XWikiUtils.WIKI_DOC);
-        return checkAccess(ADMIN, user, document, context);
-    }
-
-    @Override
-    public List<String> listAllLevels(XWikiContext context) throws XWikiException
-    {
-        return Right.getAllRightsAsString();
-    }
-
-    @Override
-    public Right registerRight(RightDescription rightDescription) throws UnableToRegisterRightException
+    public Right register(RightDescription rightDescription) throws UnableToRegisterRightException
     {
         try {
             return new Right(rightDescription);
         } catch(Throwable e) {
             throw new UnableToRegisterRightException(rightDescription, e);
         }
-    }
-
-    /**
-     * @param context The current context
-     * @return A document reference uniquely identifying the current
-     * user.
-     */
-    private DocumentReference getUserReference(XWikiContext context)
-    {
-        XWikiUser user = context.getXWikiUser();
-        String username;
-        this.logger.debug("Getting user from context: " + user);
-        if (user == null) {
-            username = GUEST_USER_FULLNAME;
-        } else {
-            username = user.getUser();
-        }
-        return resolveUserName(username, new WikiReference(context.getDatabase()));
     }
 
     /**
@@ -391,11 +244,11 @@ public class DefaultRightService implements RightService
                             return (AccessLevel) entry;
                         } else {
                             Formatter f = new Formatter();
-                            this.logger.error(f.format("The cached entry for '%s' at '$s' was of incorrect type: %s", 
+                            this.logger.error(f.format("The cached entry for '%s' at '%s' was of incorrect type: %s",
                                                        user.toString(),
                                                        ref.toString(),
                                                        entry.getType().toString()).toString());
-                            throw new RuntimeException();
+                            throw new InternalError();
                         }
                     }
                 case HAVE_NO_OBJECTS:
@@ -405,7 +258,7 @@ public class DefaultRightService implements RightService
                     this.logger.error(f.format("The cached entry for '%s' was of incorrect type: %s", 
                                                ref.toString(),
                                                entry.getType().toString()).toString());
-                    throw new RuntimeException();
+                    throw new InternalError();
             }
         }
 
@@ -415,19 +268,25 @@ public class DefaultRightService implements RightService
 
     /**
      * Log allow conclusion.
+     * @param access The ALLOW or DENY state
      * @param user The user name that was checked.
      * @param entity The page that was checked.
      * @param right The action that was requested.
      * @param info Additional information.
      */
-    private void logAllow(DocumentReference user, EntityReference entity, Right right, String info)
+    private void logAccess(RightState access, DocumentReference user, EntityReference entity, Right right, String info)
     {
-        if (this.logger.isDebugEnabled()) {
-            String userName = entityReferenceSerializer.serialize(user);
-            String docName = entityReferenceSerializer.serialize(entity);
+        if ((access == ALLOW && this.logger.isDebugEnabled()) || (access != ALLOW && this.logger.isInfoEnabled())) {
+            String userName = (user != null) ? entityReferenceSerializer.serialize(user) : "no user";
+            String docName = (entity != null) ?entityReferenceSerializer.serialize(entity) : "no entity";
             Formatter f = new Formatter();
-            this.logger.debug(f.format("Access has been granted for (%s,%s,%s): %s",
-                                       userName, docName, right.getName(), info).toString());
+            if (access == ALLOW) {
+                this.logger.debug(f.format("Access has been granted for (%s,%s,%s): %s",
+                    userName, docName, right.getName(), info).toString());
+            } else {
+                this.logger.info(f.format("Access has been denied for (%s,%s,%s): %s",
+                    userName, docName, right.getName(), info).toString());
+            }
         }
     }
 
@@ -440,76 +299,6 @@ public class DefaultRightService implements RightService
      */
     protected void logDeny(DocumentReference user, EntityReference entity,  Right right, String info)
     {
-        if (this.logger.isInfoEnabled()) {
-            String userName = entityReferenceSerializer.serialize(user);
-            String docName = entityReferenceSerializer.serialize(entity);
-            Formatter f = new Formatter();
-            this.logger.info(f.format("Access has been denied for (%s,%s,%s): %s",
-                                      userName, docName, right.getName(), info).toString());
-        }
+        logAccess(DENY, user, entity, right, info);
     }
-    
-    /**
-     * Log deny conclusion.
-     * @param name The user name that was checked.
-     * @param resourceKey The page that was checked.
-     * @param accessLevel The action that was requested.
-     * @param info Additional information.
-     * @param e Exception that was caught.
-     */
-    protected void logDeny(String name, String resourceKey, String accessLevel, String info, Exception e)
-    {
-        if (this.logger.isDebugEnabled()) {
-            Formatter f = new Formatter();
-            this.logger.debug(f.format("Access has been denied for (%s,%s,%s) at %s",
-                                       name, resourceKey, accessLevel, info).toString(), e);
-        }
-    }
-
-    /**
-     * @param value a {@code String} value
-     * @return a {@code Boolean} value
-     */
-    private Boolean checkNeedsAuthValue(String value)
-    {
-        if (value != null && !value.equals("")) {
-            if (value.toLowerCase().equals("yes")) {
-                return true;
-            }
-            try {
-                if (Integer.parseInt(value) > 0) {
-                    return true;
-                }
-            } catch (NumberFormatException e) {
-                Formatter f = new Formatter();
-                this.logger.warn(f.format("Failed to interpete preference value: '%s'", value).toString());
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @param right the right to check.
-     * @param context the current context. 
-     * @return {@code true} if the given right requires authentication.
-     */
-    private boolean needsAuth(Right right, XWikiContext context)
-    {
-        String prefName = "authenticate_" + right.getName();
-
-        String value = context.getWiki().getXWikiPreference(prefName, "", context);
-        Boolean result = checkNeedsAuthValue(value);
-        if (result != null) {
-            return result;
-        }
-
-        value = context.getWiki().getSpacePreference(prefName, "", context).toLowerCase();
-        result = checkNeedsAuthValue(value);
-        if (result != null) {
-            return result;
-        }
-
-        return false;
-    }
-
 }

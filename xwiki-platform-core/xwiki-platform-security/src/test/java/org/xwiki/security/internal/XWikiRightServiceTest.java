@@ -174,7 +174,7 @@ public class XWikiRightServiceTest extends AbstractTestCase
 
         mockery.checking(new Expectations() {{
             allowing(mockGroupService)
-                .getAllGroupsNamesForMember("xwiki:" + RightService.GUEST_USER_FULLNAME, Integer.MAX_VALUE, 0, xwikiContext);
+                .getAllGroupsNamesForMember("xwiki:" + XWikiCachingRightService.GUEST_USER_FULLNAME, Integer.MAX_VALUE, 0, xwikiContext);
             will(returnValue(Collections.emptyList()));
             allowing(mockGroupService)
                 .getAllGroupsNamesForMember("xwiki:XWiki.Programmer", Integer.MAX_VALUE, 0, xwikiContext);
@@ -196,7 +196,7 @@ public class XWikiRightServiceTest extends AbstractTestCase
         assertTrue(rightService.hasProgrammingRights(getContext()));
 
         // Guests should not have PR
-        getContext().setUser(RightService.GUEST_USER_FULLNAME);
+        getContext().setUser(XWikiCachingRightService.GUEST_USER_FULLNAME);
         assertFalse(rightService.hasProgrammingRights(getContext()));
 
         // superadmin should always have PR

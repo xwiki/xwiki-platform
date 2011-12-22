@@ -973,9 +973,14 @@ if (request.action == "start" || xcontext.get("botAction") == "start") {
     // Register all Botlets
     xwiki.searchDocuments(", BaseObject as obj where obj.name=doc.fullName and obj.className='IRC.IRCBotlet' order by doc.name").each() {
         try {
-            // Make sure we use the right getRenderedContent() API so that it's executed in the context of the target doc
             def itDoc = xwiki.getDocument(it)
-            itDoc.getRenderedContent(itDoc.getTranslatedContent(), "xwiki/2.0", "plain/1.0")
+            // If the botlet is disabled then lets not start it.
+            isDisabled = itDoc.getObject('IRC.IRCBotlet').getProperty('disabled')
+            if (isDisabled == null || isDisabled.getValue() == 0) {
+                // Make sure we use the right getRenderedContent() API
+                // so that it's executed in the context of the target doc
+                itDoc.getRenderedContent(itDoc.getTranslatedContent(), "xwiki/2.0", "plain/1.0")
+            }
         } catch (e) {
             // Prevent the exception from registering other botlets
             e.printStackTrace()

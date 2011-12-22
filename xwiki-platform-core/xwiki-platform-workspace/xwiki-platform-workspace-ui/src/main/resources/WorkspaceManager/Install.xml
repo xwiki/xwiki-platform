@@ -308,7 +308,6 @@
         #if ($xwiki.exists($documentReferenceToRemove))
           #set ($documentToRemove = $xwiki.getDocument($documentReferenceToRemove))
           #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
-          ## #set ($discard = $templateLocalAdminDocument.delete())
           ## Make sure not to leave anything in the recycle bin so don`t send to trash.
           #set ($discard = $xwiki.xWiki.deleteDocument($documentToRemove.document, false, $xcontext.context))
           #set ($discard = $xcontext.setDatabase($currentDatabase))
@@ -331,6 +330,18 @@
       ##
       #set ($templateLocalAdminDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'Admin'))
       #permanentlyDeleteDocument($templateLocalAdminDocumentReference)
+      ##
+      ## 12. Fix wiki macro authors (user current admin user) so that they are correctly registered.
+      ##
+      #set ($currentDatabase = $xcontext.database)
+      #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
+      #set ($wikiMacroClassDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'WikiMacroClass'))
+      #set ($wikiMacroDocumentNames = $services.query.xwql("from doc.object(XWiki.WikiMacroClass) as macros").execute())
+      #foreach ($wikiMacroDocumentName in $wikiMacroDocumentNames)
+        #set ($wikiMacroDocument = $xwiki.getDocument($wikiMacroDocumentName))
+        #set ($discard = $wikiMacroDocument.save('Fixed macro registration.', true))
+      #end
+      #set ($discard = $xcontext.setDatabase($currentDatabase))
 
       {{success}}Workspace template features successfully installed.{{/success}}
     #end

@@ -102,7 +102,13 @@ Lightbox = Class.create({
         }
       }
       try {
-        clones[i].innerHTML = treatSpecially[i].innerHTML;
+        var cloneContent = treatSpecially[i].innerHTML;
+        if (cloneContent.startsWith('//<![CDATA[') && cloneContent.endsWith('//]]>')) {
+          // IE drops the entire CDATA section when we set the inner HTML of the clone. In order to preserve the code we
+          // have to unwrap it.
+          cloneContent = cloneContent.substring(11, cloneContent.length - 5);
+        }
+        clones[i].innerHTML = cloneContent;
         // Remove element from content.
         treatSpecially[i].parentNode.removeChild(treatSpecially[i]);
       } catch (ie) {

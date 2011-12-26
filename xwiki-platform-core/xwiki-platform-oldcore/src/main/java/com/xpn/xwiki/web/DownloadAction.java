@@ -285,6 +285,8 @@ public class DownloadAction extends XWikiAction
         if ("1".equals(request.getParameter("force-download"))) {
             dispType = "attachment";
         }
+        // Use RFC 2231 for encoding filenames, since the normal HTTP headers only allows ASCII characters.
+        // See http://tools.ietf.org/html/rfc2231 for more details.
         response.addHeader("Content-disposition", dispType + "; filename*=utf-8''" + ofilename);
 
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());

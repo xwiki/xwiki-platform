@@ -108,17 +108,138 @@ public class ExtensionUpdaterListener implements EventListener
         XWikiDocument document = (XWikiDocument) source;
         XWikiContext context = (XWikiContext) data;
 
-        // TODO: improve this to do only one save
-
         BaseObject extensionObject = document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
 
         if (extensionObject != null) {
-            XWikiDocument modifiedDocument = updateLastVersion(document, extensionObject, context);
-            validateExtension(modifiedDocument, extensionObject, context);
+            try {
+                validateExtension(document, extensionObject, context);
+            } catch (XWikiException e) {
+                this.logger.error("Failed to validate extension in document [{}]", document.getDocumentReference(), e);
+            }
         }
     }
 
     private void validateExtension(XWikiDocument document, BaseObject extensionObject, XWikiContext context)
+        throws XWikiException
+    {
+        boolean needSave = false;
+
+        XWikiDocument documentToSave = null;
+        BaseObject extensionObjectToSave = null;
+
+        // Update last version field
+        String lastVersion = findLastVersion(document);
+
+        if (lastVersion != null
+            && !StringUtils.equals(lastVersion,
+                extensionObject.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION))) {
+            // FIXME: We can't save directly the provided document coming from the event
+            documentToSave = context.getWiki().getDocument(document, context);
+            extensionObjectToSave = documentToSave.getXObject(extensionObject.getReference());
+
+            extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, lastVersion, context);
+
+            needSave = true;
+        }
+
+        // Update valid extension field
+
+        boolean valid = isValid(document, extensionObject, context);
+
+        int currentValue = extensionObject.getIntValue(XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, 0);
+
+        if ((currentValue == 1) != valid) {
+            if (documentToSave == null) {
+                // FIXME: We can't save directly the provided document coming from the event
+                documentToSave = context.getWiki().getDocument(document, context);
+                extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+            }
+
+            extensionObjectToSave.setIntValue(XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, valid ? 1 : 0);
+
+            needSave = true;
+        }
+
+        // Make sure all searched fields are set in valid extensions (otherwise they won't appear in the search result).
+        // Would probably be cleaner and safer to do a left join instead but can't find a standard way to do it trough
+        // XWQL or HSQL.
+
+        if (valid) {
+            if (extensionObject.safeget(XWikiRepositoryModel.PROP_EXTENSION_SUMMARY) == null) {
+                if (extensionObjectToSave == null) {
+                    documentToSave = context.getWiki().getDocument(document, context);
+                    extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+                }
+
+                extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, "", context);
+                needSave = true;
+            }
+            if (extensionObject.safeget(XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION) == null) {
+                if (extensionObjectToSave == null) {
+                    documentToSave = context.getWiki().getDocument(document, context);
+                    extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+                }
+
+                extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION, "", context);
+                needSave = true;
+            }
+            if (extensionObject.safeget(XWikiRepositoryModel.PROP_EXTENSION_WEBSITE) == null) {
+                if (extensionObjectToSave == null) {
+                    documentToSave = context.getWiki().getDocument(document, context);
+                    extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+                }
+
+                extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_WEBSITE, "", context);
+                needSave = true;
+            }
+            if (extensionObject.safeget(XWikiRepositoryModel.PROP_EXTENSION_AUTHORS) == null) {
+                if (extensionObjectToSave == null) {
+                    documentToSave = context.getWiki().getDocument(document, context);
+                    extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+                }
+
+                extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_AUTHORS, "", context);
+                needSave = true;
+            }
+            if (extensionObject.safeget(XWikiRepositoryModel.PROP_EXTENSION_FEATURES) == null) {
+                if (extensionObjectToSave == null) {
+                    documentToSave = context.getWiki().getDocument(document, context);
+                    extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+                }
+
+                extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_FEATURES, "", context);
+                needSave = true;
+            }
+            if (extensionObject.safeget(XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME) == null) {
+                if (extensionObjectToSave == null) {
+                    documentToSave = context.getWiki().getDocument(document, context);
+                    extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+                }
+
+                extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME, "", context);
+                needSave = true;
+            }
+        }
+
+        // Save document
+
+        if (needSave) {
+            context.getWiki().saveDocument(documentToSave, "Validated extension", true, context);
+        }
+    }
+
+    private DocumentReference getClassReference(XWikiDocument document, EntityReference localReference)
+    {
+        return this.referenceResolver.resolve(localReference, document.getDocumentReference().getWikiReference());
+    }
+
+    /**
+     * @param document the extension document
+     * @param extensionObject the extension object
+     * @param context the XWiki context
+     * @return true if the extension is valid from Extension Manager point of view
+     */
+    private boolean isValid(XWikiDocument document, BaseObject extensionObject, XWikiContext context)
     {
         String extensionId = extensionObject.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_ID);
         boolean valid = !StringUtils.isBlank(extensionId);
@@ -182,49 +303,7 @@ public class ExtensionUpdaterListener implements EventListener
             valid &= nbVersions > 0;
         }
 
-        int currentValue = extensionObject.getIntValue(XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, 0);
-
-        if ((currentValue == 1) != valid) {
-            try {
-                // FIXME: We can't save directly the provided document coming from the event
-                document = context.getWiki().getDocument(document, context);
-                extensionObject = document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
-
-                extensionObject.setIntValue(XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, valid ? 1 : 0);
-
-                context.getWiki().saveDocument(document, "Validated extension", true, context);
-            } catch (XWikiException e) {
-                this.logger.error("Failed to validate extension [{}]", document, e);
-            }
-        }
-    }
-
-    private XWikiDocument updateLastVersion(XWikiDocument document, BaseObject extensionObject, XWikiContext context)
-    {
-        String lastVersion = findLastVersion(document);
-
-        if (lastVersion != null
-            && !StringUtils.equals(lastVersion,
-                extensionObject.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION))) {
-            try {
-                // FIXME: We can't save directly the provided document coming from the event
-                document = context.getWiki().getDocument(document, context);
-                extensionObject = document.getXObject(extensionObject.getReference());
-
-                extensionObject.setStringValue(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, lastVersion);
-
-                context.getWiki().saveDocument(document, "Update extension last version", context);
-            } catch (XWikiException e) {
-                this.logger.error("Failed to update extension [{}] last version", document, e);
-            }
-        }
-
-        return document;
-    }
-
-    private DocumentReference getClassReference(XWikiDocument document, EntityReference localReference)
-    {
-        return this.referenceResolver.resolve(localReference, document.getDocumentReference().getWikiReference());
+        return valid;
     }
 
     /**

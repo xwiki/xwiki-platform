@@ -47,8 +47,6 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.search.SearchResult;
 import org.xwiki.extension.unmodifiable.UnmodifiableJobStatus;
 import org.xwiki.extension.unmodifiable.UnmodifiableUtils;
-import org.xwiki.extension.version.InvalidVersionConstraintException;
-import org.xwiki.extension.version.InvalidVersionRangeException;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.VersionRange;
@@ -96,7 +94,7 @@ public class ExtensionManagerScriptService implements ScriptService
 
     /** Handles and provides status feedback on extension operations (installation, upgrade, removal). */
     @Inject
-    private JobManager taskManager;
+    private JobManager jobManager;
 
     /** Provides access to the current context. */
     @Inject
@@ -284,16 +282,16 @@ public class ExtensionManagerScriptService implements ScriptService
             installRequest.addNamespace(namespace);
         }
 
-        Job task;
+        Job job;
         try {
-            task = this.taskManager.install(installRequest);
+            job = this.jobManager.install(installRequest);
         } catch (JobException e) {
             setError(e);
 
-            task = null;
+            job = null;
         }
 
-        return task;
+        return job;
     }
 
     /**
@@ -318,16 +316,16 @@ public class ExtensionManagerScriptService implements ScriptService
         UninstallRequest uninstallRequest = new UninstallRequest();
         uninstallRequest.addExtension(new ExtensionId(id, version));
 
-        Job task;
+        Job job;
         try {
-            task = this.taskManager.uninstall(uninstallRequest);
+            job = this.jobManager.uninstall(uninstallRequest);
         } catch (Exception e) {
             setError(e);
 
-            task = null;
+            job = null;
         }
 
-        return task;
+        return job;
     }
 
     // Jobs
@@ -340,10 +338,10 @@ public class ExtensionManagerScriptService implements ScriptService
     public Job getCurrentJob()
     {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
-            setError(new JobException("Need programming right to get current task"));
+            setError(new JobException("Need programming right to get current job"));
             return null;
         }
-        return this.taskManager.getCurrentJob();
+        return this.jobManager.getCurrentJob();
     }
 
     /**
@@ -353,7 +351,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public JobStatus getCurrentJobStatus()
     {
-        Job job = this.taskManager.getCurrentJob();
+        Job job = this.jobManager.getCurrentJob();
         JobStatus jobStatus;
         if (job != null) {
             jobStatus = job.getStatus();

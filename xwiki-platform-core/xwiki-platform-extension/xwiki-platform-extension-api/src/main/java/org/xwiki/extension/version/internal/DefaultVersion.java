@@ -46,7 +46,7 @@ public class DefaultVersion implements Version
     /**
      * Used to parse the version.
      */
-    private static final GenericVersionScheme VERSIONSCHEME = new GenericVersionScheme();
+    private static final GenericVersionScheme AETHERVERSIONSCHEME = new GenericVersionScheme();
 
     /**
      * The parsed version.
@@ -85,12 +85,22 @@ public class DefaultVersion implements Version
     private void setVersion(String rawVersion)
     {
         try {
-            this.aetherVersion = VERSIONSCHEME.parseVersion(rawVersion);
+            this.aetherVersion = AETHERVERSIONSCHEME.parseVersion(rawVersion);
         } catch (InvalidVersionSpecificationException e) {
             // Should never happen since org.sonatype.aether.util.version.GenericVersion does not really produce any
             // exception but can't use it directly since it's package protected
         }
     }
+
+    /**
+     * @return the real Version implementation.
+     */
+    public org.sonatype.aether.version.Version getAetherVersion()
+    {
+        return this.aetherVersion;
+    }
+
+    // Version
 
     @Override
     public int compareTo(Version version)

@@ -23,7 +23,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +46,8 @@ import org.sonatype.aether.resolution.VersionRangeRequest;
 import org.sonatype.aether.resolution.VersionRangeResolutionException;
 import org.sonatype.aether.resolution.VersionRangeResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
-import org.sonatype.aether.version.Version;
+import org.sonatype.aether.util.version.GenericVersionScheme;
+import org.sonatype.aether.version.InvalidVersionSpecificationException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.DefaultExtensionAuthor;
 import org.xwiki.extension.DefaultExtensionDependency;
@@ -57,6 +60,10 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
+import org.xwiki.extension.version.Version;
+import org.xwiki.extension.version.VersionConstraint;
+import org.xwiki.extension.version.VersionRange;
+import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.properties.ConverterManager;
 
@@ -65,6 +72,11 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
     public static final String MPKEYPREFIX = "xwiki.extension.";
 
     public static final String MPKEY_FEATURES = MPKEYPREFIX + "features";
+
+    /**
+     * Used to parse the version.
+     */
+    private static final GenericVersionScheme AETHERVERSIONSCHEME = new GenericVersionScheme();
 
     private ComponentManager componentManager;
 
@@ -152,46 +164,126 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
         }
     }
 
-    public Version resolveVersionRange(Artifact artifact, RepositorySystemSession session) throws ResolveException
+    private org.sonatype.aether.version.Version getAetherVersion(Version version)
+        throws InvalidVersionSpecificationException
     {
-        VersionRangeResult rangeResult;
-        try {
-            VersionRangeRequest rangeRequest = new VersionRangeRequest();
-            rangeRequest.setArtifact(artifact);
-            rangeRequest.addRepository(this.remoteRepository);
+        org.sonatype.aether.version.Version aetherVersion;
 
-            rangeResult = this.versionRangeResolver.resolveVersionRange(session, rangeRequest);
+        if (version instanceof DefaultVersion) {
+            aetherVersion = ((DefaultVersion) version).getAetherVersion();
+        } else {
+            aetherVersion = AETHERVERSIONSCHEME.parseVersion(version.getValue());
+        }
 
-            if (rangeResult.getVersions().isEmpty()) {
-                throw new VersionRangeResolutionException(rangeResult, "No versions available for " + artifact
-                    + " within specified range");
+        return aetherVersion;
+    }
+
+    private org.sonatype.aether.version.Version resolveVersionConstraint(String id,
+        VersionConstraint versionConstraint, RepositorySystemSession session) throws ResolveException
+    {
+        if (versionConstraint.getVersion() != null) {
+            try {
+                return getAetherVersion(versionConstraint.getVersion());
+            } catch (InvalidVersionSpecificationException e) {
+                throw new ResolveException("Invalid version [" + versionConstraint.getVersion() + "]", e);
             }
+        }
+
+        List<org.sonatype.aether.version.Version> commonVersions = null;
+
+        for (VersionRange range : versionConstraint.getRanges()) {
+            List<org.sonatype.aether.version.Version> versions = resolveVersionRange(id, range, session);
+
+            if (commonVersions == null) {
+                commonVersions =
+                    versionConstraint.getRanges().size() > 1 ? new ArrayList<org.sonatype.aether.version.Version>(
+                        versions) : versions;
+            } else {
+                // Find commons versions between all the ranges of the constraint
+                for (Iterator<org.sonatype.aether.version.Version> it = commonVersions.iterator(); it.hasNext();) {
+                    org.sonatype.aether.version.Version version = it.next();
+                    if (!versions.contains(version)) {
+                        it.remove();
+                    }
+                }
+            }
+        }
+
+        if (commonVersions.isEmpty()) {
+            throw new ResolveException("No versions available for id [" + id + "] and version constraint ["
+                + versionConstraint + "]");
+        }
+
+        return commonVersions.get(commonVersions.size() - 1);
+    }
+
+    private org.sonatype.aether.version.Version resolveVersion(Artifact artifact, RepositorySystemSession session)
+        throws ResolveException
+    {
+        try {
+            List<org.sonatype.aether.version.Version> versions = resolveVersions(artifact, session);
+
+            if (versions.isEmpty()) {
+                throw new ResolveException("No versions available for artifact [" + artifact + "]");
+            }
+
+            return versions.get(versions.size() - 1);
         } catch (VersionRangeResolutionException e) {
             throw new ResolveException("Failed to resolve version range", e);
         }
+    }
 
-        return rangeResult.getVersions().get(rangeResult.getVersions().size() - 1);
+    private List<org.sonatype.aether.version.Version> resolveVersionRange(String id, VersionRange versionRange,
+        RepositorySystemSession session) throws ResolveException
+    {
+        Artifact artifact = AetherUtils.createArtifact(id, versionRange.getValue());
+
+        try {
+            List<org.sonatype.aether.version.Version> versions = resolveVersions(artifact, session);
+
+            if (versions.isEmpty()) {
+                throw new ResolveException("No versions available for id [" + id + "] and version range ["
+                    + versionRange + "]");
+            }
+
+            return versions;
+        } catch (VersionRangeResolutionException e) {
+            throw new ResolveException("Failed to resolve version range", e);
+        }
+    }
+
+    private List<org.sonatype.aether.version.Version> resolveVersions(Artifact artifact, RepositorySystemSession session)
+        throws VersionRangeResolutionException
+    {
+        VersionRangeRequest rangeRequest = new VersionRangeRequest();
+        rangeRequest.setArtifact(artifact);
+        rangeRequest.addRepository(this.remoteRepository);
+
+        VersionRangeResult rangeResult = this.versionRangeResolver.resolveVersionRange(session, rangeRequest);
+
+        return rangeResult.getVersions();
     }
 
     public AetherExtension resolveMaven(ExtensionDependency extensionDependency) throws ResolveException
     {
         RepositorySystemSession session = createRepositorySystemSession();
 
+        // Get artifact and resolve version
+
         Artifact artifact;
         if (extensionDependency instanceof AetherExtensionDependency) {
             artifact = ((AetherExtensionDependency) extensionDependency).getAetherDependency().getArtifact();
+            artifact = artifact.setVersion(resolveVersion(artifact, session).toString());
         } else {
             artifact =
                 AetherUtils.createArtifact(extensionDependency.getId(), extensionDependency.getVersionConstraint()
                     .getValue());
+            artifact =
+                artifact.setVersion(resolveVersionConstraint(extensionDependency.getId(),
+                    extensionDependency.getVersionConstraint(), session).toString());
         }
 
-        // Resolve version range
-
-        Version version = resolveVersionRange(artifact, session);
-        artifact = artifact.setVersion(version.toString());
-
-        // Get descriptor
+        // Get Maven descriptor
 
         Model model;
         try {

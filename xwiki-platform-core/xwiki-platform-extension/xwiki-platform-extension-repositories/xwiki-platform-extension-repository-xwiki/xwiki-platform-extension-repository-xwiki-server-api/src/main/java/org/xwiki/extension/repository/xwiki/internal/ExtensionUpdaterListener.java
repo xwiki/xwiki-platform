@@ -32,6 +32,7 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.internal.VersionManager;
+import org.xwiki.extension.repository.xwiki.internal.resources.AbstractExtensionRESTResource;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
@@ -165,59 +166,18 @@ public class ExtensionUpdaterListener implements EventListener
         // XWQL or HSQL.
 
         if (valid) {
-            if (extensionObject.safeget(XWikiRepositoryModel.PROP_EXTENSION_SUMMARY) == null) {
-                if (extensionObjectToSave == null) {
-                    documentToSave = context.getWiki().getDocument(document, context);
-                    extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
-                }
+            for (String fieldName : AbstractExtensionRESTResource.EPROPERTIES_EXTRA) {
+                if (extensionObject.safeget(fieldName) == null) {
+                    if (extensionObjectToSave == null) {
+                        // FIXME: We can't save directly the provided document coming from the event
+                        documentToSave = context.getWiki().getDocument(document, context);
+                        extensionObjectToSave =
+                            documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+                    }
 
-                extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, "", context);
-                needSave = true;
-            }
-            if (extensionObject.safeget(XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION) == null) {
-                if (extensionObjectToSave == null) {
-                    documentToSave = context.getWiki().getDocument(document, context);
-                    extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+                    extensionObjectToSave.set(fieldName, "", context);
+                    needSave = true;
                 }
-
-                extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION, "", context);
-                needSave = true;
-            }
-            if (extensionObject.safeget(XWikiRepositoryModel.PROP_EXTENSION_WEBSITE) == null) {
-                if (extensionObjectToSave == null) {
-                    documentToSave = context.getWiki().getDocument(document, context);
-                    extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
-                }
-
-                extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_WEBSITE, "", context);
-                needSave = true;
-            }
-            if (extensionObject.safeget(XWikiRepositoryModel.PROP_EXTENSION_AUTHORS) == null) {
-                if (extensionObjectToSave == null) {
-                    documentToSave = context.getWiki().getDocument(document, context);
-                    extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
-                }
-
-                extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_AUTHORS, "", context);
-                needSave = true;
-            }
-            if (extensionObject.safeget(XWikiRepositoryModel.PROP_EXTENSION_FEATURES) == null) {
-                if (extensionObjectToSave == null) {
-                    documentToSave = context.getWiki().getDocument(document, context);
-                    extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
-                }
-
-                extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_FEATURES, "", context);
-                needSave = true;
-            }
-            if (extensionObject.safeget(XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME) == null) {
-                if (extensionObjectToSave == null) {
-                    documentToSave = context.getWiki().getDocument(document, context);
-                    extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
-                }
-
-                extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME, "", context);
-                needSave = true;
             }
         }
 

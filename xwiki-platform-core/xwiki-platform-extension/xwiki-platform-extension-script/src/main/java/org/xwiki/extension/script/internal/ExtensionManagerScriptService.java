@@ -32,6 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.LocalExtension;
@@ -137,6 +138,30 @@ public class ExtensionManagerScriptService implements ScriptService
             extension =
                 UnmodifiableUtils.unmodifiableExtension(this.extensionManager.resolveExtension(new ExtensionId(id,
                     version)));
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return extension;
+    }
+
+    /**
+     * Get the extension handler corresponding to the given extension ID and version. The returned handler can be used
+     * to get more information about the extension, such as the authors, an extension description, its license...
+     * 
+     * @param extensionDependency the extension dependency to resolve
+     * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension couldn't
+     *         be resolved, in which case {@link #getLastError()} contains the failure reason
+     */
+    public Extension resolve(ExtensionDependency extensionDependency)
+    {
+        setError(null);
+
+        Extension extension = null;
+
+        try {
+            extension =
+                UnmodifiableUtils.unmodifiableExtension(this.extensionManager.resolveExtension(extensionDependency));
         } catch (Exception e) {
             setError(e);
         }
@@ -389,7 +414,7 @@ public class ExtensionManagerScriptService implements ScriptService
      * @param version the string to parse
      * @return the {@link Version} instance
      */
-    public Version createVersion(String version)
+    public Version parseVersion(String version)
     {
         return new DefaultVersion(version);
     }
@@ -398,7 +423,7 @@ public class ExtensionManagerScriptService implements ScriptService
      * @param versionRange the string to parse
      * @return the {@link VersionRange} instance
      */
-    public VersionRange createVersionRange(String versionRange)
+    public VersionRange parseVersionRange(String versionRange)
     {
         try {
             return new DefaultVersionRange(versionRange);
@@ -408,12 +433,12 @@ public class ExtensionManagerScriptService implements ScriptService
 
         return null;
     }
-    
+
     /**
      * @param versionConstraint the string to parse
      * @return the {@link VersionConstraint} instance
      */
-    public VersionConstraint createVersionConstraint(String versionConstraint)
+    public VersionConstraint parseVersionConstraint(String versionConstraint)
     {
         try {
             return new DefaultVersionConstraint(versionConstraint);

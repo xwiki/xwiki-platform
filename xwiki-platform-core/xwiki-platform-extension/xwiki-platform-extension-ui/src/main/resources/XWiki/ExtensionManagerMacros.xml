@@ -1066,7 +1066,6 @@ ul.repositories .addRepository:hover  {
 $xwiki.ssx.use('ExtensionManagerMacros')
 $xwiki.jsx.use('ExtensionManagerMacros')
 #set ($extensionManager = $services.extension)
-#set ($versionManager = $extensionManager.versionManager)
 #if ($request.extensionwiki &amp;&amp; $request.extensionwiki.trim() != '')
   #set($extensionwiki = $request.extensionwiki)
   #set($extensionnamespace = "wiki:${extensionwiki}")
@@ -1209,16 +1208,16 @@ $xwiki.jsx.use('ExtensionManagerMacros')
       (% class="extension-body-dependencies extension-body-section" %)(((
         $msg.get('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])
         #foreach ($dependency in $extension.dependencies)
-          #set ($dependencyExtension = $extensionManager.resolve($dependency.id, $dependency.version))
+          #set ($dependencyExtension = $extensionManager.resolve($dependency))
           #set ($dependencyClass = "$!{dependencyExtension.class}")
           #if ($dependencyExtension)
             * [[#displayExtensionName($dependencyExtension)&gt;&gt;##
             #if ($dependencyClass.endsWith('CoreExtension'))
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.version}&amp;section=XWiki.CoreExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-core"]]
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.versionConstraint}&amp;section=XWiki.CoreExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-core"]]
             #elseif ($dependencyClass.endsWith('LocalExtension'))
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.version}&amp;section=XWiki.InstalledExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-installed"]]
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.versionConstraint}&amp;section=XWiki.InstalledExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-installed"]]
             #else
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.version}&amp;section=XWiki.AddExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-remote"]]
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.versionConstraint}&amp;section=XWiki.AddExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-remote"]]
             #end
           #else
             * (% class="dependency-type-unknown" %)${dependency.id}
@@ -1258,14 +1257,14 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   #if (!$extensionclass.endsWith('CoreExtension'))
     #if (!$extension.isInstalled($extensionwiki))
       #set($installedExtension = $extensionManager.getInstalledExtension($extensionid, $extensionwiki))
-      #if ($installedExtension &amp;&amp; $versionManager.compareVersions($installedExtension.id.version, $extensionversion) &gt; 0)
+      #if ($installedExtension &amp;&amp; $installedExtension.id.version.compareTo($extensionversion) &gt; 0)
         #set($extensionsToUpgrade[$extension.id] = $extension)
       #else
         #set($extensionsToInstall[$extension.id] = $extension)
       #end
       #prepareInstallDependencies($extension, $extensionsToInstall, $extensionsToUpgrade, $extensionsSuggested, $coreExtensionsConflicts)
     #end
-  #elseif ($versionManager.compareVersions($extensionversion, $extension.id.version) &gt; 0)
+  #elseif ($extensionversion.compareTo($extension.id.version) &gt; 0)
     #set($coreExtensionsConflicts[$extension.id] = [$extension, $extensionversion])
   #end
 #end

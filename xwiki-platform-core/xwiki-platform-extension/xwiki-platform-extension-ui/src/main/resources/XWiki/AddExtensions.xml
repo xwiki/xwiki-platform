@@ -200,7 +200,7 @@ bOgK9Cz44w32Cfjt5Xb7Qse/TsjlX79O6AT0E/p/8v1MS0rb84IAAAAASUVORK5CYII=
     #set($extensionsToUpgrade = {})
     #set($extensionsSuggested = {})
     #set($coreExtensionsConflicts = {})
-    #prepareInstall($request.extensionid $request.extensionversion $extensionsToInstall $extensionsToUpgrade $extensionsSuggested, $coreExtensionsConflicts)
+    #prepareInstall($request.extensionid $extensionManager.parseVersion($request.extensionversion) $extensionsToInstall $extensionsToUpgrade $extensionsSuggested, $coreExtensionsConflicts)
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
       {{error}}Can't resolve extension with id $request.extensionid and version $request.extensionversion: $lasterror.message{{/error}}

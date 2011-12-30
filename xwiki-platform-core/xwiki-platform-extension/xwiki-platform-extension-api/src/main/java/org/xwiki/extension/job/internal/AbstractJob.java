@@ -24,13 +24,13 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.job.Job;
-import org.xwiki.extension.job.JobStatus;
-import org.xwiki.extension.job.PopLevelProgressEvent;
-import org.xwiki.extension.job.PushLevelProgressEvent;
 import org.xwiki.extension.job.Request;
-import org.xwiki.extension.job.StepProgressEvent;
 import org.xwiki.extension.job.event.JobFinishedEvent;
 import org.xwiki.extension.job.event.JobStartedEvent;
+import org.xwiki.extension.job.event.status.JobStatus;
+import org.xwiki.extension.job.event.status.PopLevelProgressEvent;
+import org.xwiki.extension.job.event.status.PushLevelProgressEvent;
+import org.xwiki.extension.job.event.status.StepProgressEvent;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
 
@@ -88,7 +88,7 @@ public abstract class AbstractJob<R extends Request> implements Job
     {
         this.observationManager.notify(new JobStartedEvent(getId(), request), this);
 
-        this.status = new DefaultJobStatus<R>((R) request, getId(), this.observationManager, this.loggerManager);
+        this.status = createNewStatus((R) request);
 
         this.status.startListening();
 
@@ -105,6 +105,15 @@ public abstract class AbstractJob<R extends Request> implements Job
 
             this.observationManager.notify(new JobFinishedEvent(getId(), request), this, exception);
         }
+    }
+
+    /**
+     * @param request contains information related to the job to execute
+     * @return the status of the job
+     */
+    protected DefaultJobStatus<R> createNewStatus(R request)
+    {
+        return new DefaultJobStatus<R>((R) request, getId(), this.observationManager, this.loggerManager);
     }
 
     /**

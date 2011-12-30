@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <extension>
-  <id>existingextension</id>
+  <id>installedextension</id>
   <version>version</version>
   <type>type</type>
   <dependency>false</dependency>
@@ -11,7 +11,7 @@
   <website>http://website</website>
   <dependencies>
     <dependency>
-      <id>existingextensiondependency</id>
+      <id>installedextensiondependency</id>
       <version>version</version>
     </dependency>
     <dependency>

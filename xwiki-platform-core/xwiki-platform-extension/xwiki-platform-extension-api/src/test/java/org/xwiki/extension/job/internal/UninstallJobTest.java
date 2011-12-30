@@ -22,24 +22,15 @@ package org.xwiki.extension.job.internal;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.TestResources;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.ExtensionHandler;
-import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.test.AbstractExtensionHandlerTest;
-import org.xwiki.extension.test.ConfigurableDefaultCoreExtensionRepository;
 import org.xwiki.extension.test.TestExtensionHandler;
 
 public class UninstallJobTest extends AbstractExtensionHandlerTest
 {
-    private ExtensionId existingExtensionId;
-
-    private ExtensionId existingExtensionDependencyId;
-
-    private LocalExtension existingExtension;
-
-    private LocalExtension existingExtensionDependency;
+    private TestResources resources;
 
     private TestExtensionHandler handler;
 
@@ -54,47 +45,43 @@ public class UninstallJobTest extends AbstractExtensionHandlerTest
 
         // resources
 
-        this.existingExtensionId = new ExtensionId("existingextension", "version");
-        this.existingExtensionDependencyId = new ExtensionId("existingextensiondependency", "version");
-
-        this.existingExtension = (LocalExtension) this.localExtensionRepository.resolve(this.existingExtensionId);
-        this.existingExtensionDependency =
-            (LocalExtension) this.localExtensionRepository.resolve(this.existingExtensionDependencyId);
+        this.resources = new TestResources();
+        resources.init(this.localExtensionRepository);
     }
 
     @Test
     public void testUninstall() throws Throwable
     {
-        uninstall(this.existingExtensionId);
+        uninstall(TestResources.INSTALLED_ID, null);
 
-        Assert.assertFalse(this.handler.getExtensions().get(null).contains(this.existingExtension));
-        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(this.existingExtensionId.getId(), null));
+        Assert.assertFalse(this.handler.getExtensions().get(null).contains(this.resources.installed));
+        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(TestResources.INSTALLED_ID.getId(), null));
 
-        Assert.assertTrue(this.handler.getExtensions().get(null).contains(this.existingExtensionDependency));
+        Assert.assertTrue(this.handler.getExtensions().get(null).contains(this.resources.installedDependency));
         Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(
-            this.existingExtensionDependencyId.getId(), null));
+            TestResources.INSTALLED_DEPENDENCY_ID.getId(), null));
     }
 
     @Test
     public void testUninstallWithBackwarDepencency() throws Throwable
     {
-        uninstall(this.existingExtensionDependencyId);
+        uninstall(TestResources.INSTALLED_DEPENDENCY_ID, null);
 
-        Assert.assertFalse(this.handler.getExtensions().get(null).contains(this.existingExtension));
-        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(this.existingExtensionId.getId(), null));
+        Assert.assertFalse(this.handler.getExtensions().get(null).contains(this.resources.installed));
+        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(TestResources.INSTALLED_ID.getId(), null));
 
-        Assert.assertFalse(this.handler.getExtensions().get(null).contains(this.existingExtensionDependency));
-        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(
-            this.existingExtensionDependencyId.getId(), null));
+        Assert.assertFalse(this.handler.getExtensions().get(null).contains(this.resources.installedDependency));
+        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(TestResources.INSTALLED_DEPENDENCY_ID.getId(),
+            null));
     }
 
     @Test
     public void testUninstallTwice() throws Throwable
     {
-        uninstall(this.existingExtensionId);
+        uninstall(TestResources.INSTALLED_ID, null);
 
         try {
-            uninstall(this.existingExtensionId);
+            uninstall(TestResources.INSTALLED_ID, null);
         } catch (UninstallException expected) {
             // expected
         }
@@ -105,20 +92,20 @@ public class UninstallJobTest extends AbstractExtensionHandlerTest
     {
         // prepare
 
-        uninstall(this.existingExtensionDependencyId);
-        install(this.existingExtensionId, "namespace1");
-        install(this.existingExtensionId, "namespace2");
+        uninstall(TestResources.INSTALLED_DEPENDENCY_ID, null);
+        install(TestResources.INSTALLED_ID, "namespace1");
+        install(TestResources.INSTALLED_ID, "namespace2");
 
         // actual test
 
-        uninstall(this.existingExtensionId, "namespace1");
+        uninstall(TestResources.INSTALLED_ID, "namespace1");
 
-        Assert.assertFalse(this.handler.getExtensions().get("namespace1").contains(this.existingExtension));
-        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(this.existingExtensionId.getId(),
-            "namespace1"));
+        Assert.assertFalse(this.handler.getExtensions().get("namespace1").contains(this.resources.installed));
+        Assert
+            .assertNull(this.localExtensionRepository.getInstalledExtension(TestResources.INSTALLED_ID.getId(), "namespace1"));
 
-        Assert.assertTrue(this.handler.getExtensions().get("namespace2").contains(this.existingExtension));
-        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(this.existingExtensionId.getId(),
+        Assert.assertTrue(this.handler.getExtensions().get("namespace2").contains(this.resources.installed));
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(TestResources.INSTALLED_ID.getId(),
             "namespace2"));
     }
 
@@ -127,26 +114,26 @@ public class UninstallJobTest extends AbstractExtensionHandlerTest
     {
         // prepare
 
-        uninstall(this.existingExtensionDependencyId);
-        install(this.existingExtensionId, "namespace1");
-        install(this.existingExtensionId, "namespace2");
+        uninstall(TestResources.INSTALLED_DEPENDENCY_ID, null);
+        install(TestResources.INSTALLED_ID, "namespace1");
+        install(TestResources.INSTALLED_ID, "namespace2");
 
         // actual test
 
-        uninstall(this.existingExtensionDependencyId, "namespace1");
+        uninstall(TestResources.INSTALLED_DEPENDENCY_ID, "namespace1");
 
-        Assert.assertFalse(this.handler.getExtensions().get("namespace1").contains(this.existingExtension));
-        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(this.existingExtensionId.getId(),
-            "namespace1"));
-        Assert.assertFalse(this.handler.getExtensions().get("namespace1").contains(this.existingExtensionDependency));
-        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(this.existingExtensionDependencyId.getId(),
+        Assert.assertFalse(this.handler.getExtensions().get("namespace1").contains(this.resources.installed));
+        Assert
+            .assertNull(this.localExtensionRepository.getInstalledExtension(TestResources.INSTALLED_ID.getId(), "namespace1"));
+        Assert.assertFalse(this.handler.getExtensions().get("namespace1").contains(this.resources.installedDependency));
+        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(TestResources.INSTALLED_DEPENDENCY_ID.getId(),
             "namespace1"));
 
-        Assert.assertTrue(this.handler.getExtensions().get("namespace2").contains(this.existingExtension));
-        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(this.existingExtensionId.getId(),
+        Assert.assertTrue(this.handler.getExtensions().get("namespace2").contains(this.resources.installed));
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(TestResources.INSTALLED_ID.getId(),
             "namespace2"));
-        Assert.assertTrue(this.handler.getExtensions().get("namespace2").contains(this.existingExtension));
-        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(this.existingExtensionId.getId(),
+        Assert.assertTrue(this.handler.getExtensions().get("namespace2").contains(this.resources.installed));
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(TestResources.INSTALLED_ID.getId(),
             "namespace2"));
     }
 
@@ -155,20 +142,20 @@ public class UninstallJobTest extends AbstractExtensionHandlerTest
     {
         // prepare
 
-        uninstall(this.existingExtensionDependencyId);
-        install(this.existingExtensionId, "namespace1");
-        install(this.existingExtensionId, "namespace2");
+        uninstall(TestResources.INSTALLED_DEPENDENCY_ID, null);
+        install(TestResources.INSTALLED_ID, "namespace1");
+        install(TestResources.INSTALLED_ID, "namespace2");
 
         // actual test
 
-        uninstall(this.existingExtensionId);
+        uninstall(TestResources.INSTALLED_ID, null);
 
-        Assert.assertFalse(this.handler.getExtensions().get("namespace1").contains(this.existingExtension));
-        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(this.existingExtensionId.getId(),
-            "namespace1"));
+        Assert.assertFalse(this.handler.getExtensions().get("namespace1").contains(this.resources.installed));
+        Assert
+            .assertNull(this.localExtensionRepository.getInstalledExtension(TestResources.INSTALLED_ID.getId(), "namespace1"));
 
-        Assert.assertFalse(this.handler.getExtensions().get("namespace2").contains(this.existingExtension));
-        Assert.assertNull(this.localExtensionRepository.getInstalledExtension(this.existingExtensionId.getId(),
-            "namespace2"));
+        Assert.assertFalse(this.handler.getExtensions().get("namespace2").contains(this.resources.installed));
+        Assert
+            .assertNull(this.localExtensionRepository.getInstalledExtension(TestResources.INSTALLED_ID.getId(), "namespace2"));
     }
 }

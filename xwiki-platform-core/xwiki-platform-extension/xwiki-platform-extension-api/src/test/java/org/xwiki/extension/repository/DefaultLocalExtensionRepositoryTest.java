@@ -34,6 +34,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.TestResources;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.test.ConfigurableDefaultCoreExtensionRepository;
 import org.xwiki.extension.test.RepositoryUtil;
@@ -53,22 +54,17 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
 
     private ExtensionId existingExtensionDependencyId;
 
-    private ConfigurableDefaultCoreExtensionRepository coreRepository;
-
     private LocalExtension existingExtension;
 
     private LocalExtension existingExtensionDependency;
+
+    private TestResources resources;
 
     @Override
     public void setUp() throws Exception
     {
         super.setUp();
 
-        // repositoryUtil lookup the local repository and one of the local extension require a core extension
-        this.coreRepository =
-            (ConfigurableDefaultCoreExtensionRepository) getComponentManager().lookup(CoreExtensionRepository.class);
-        this.coreRepository.addExtensions("coreextension", "version");
-        
         this.repositoryUtil =
             new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());
         this.repositoryUtil.setup();
@@ -81,13 +77,8 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
 
         // resources
 
-        this.remoteExtensionId = new ExtensionId("remoteextension", "version");
-        this.existingExtensionId = new ExtensionId("existingextension", "version");
-        this.existingExtensionDependencyId = new ExtensionId("existingextensiondependency", "version");
-
-        this.existingExtension = (LocalExtension) this.localExtensionRepository.resolve(this.existingExtensionId);
-        this.existingExtensionDependency =
-            (LocalExtension) this.localExtensionRepository.resolve(this.existingExtensionDependencyId);
+        this.resources = new TestResources();
+        resources.init(this.localExtensionRepository);
     }
 
     @Override
@@ -149,13 +140,13 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     public void testInstallTwice() throws ResolveException, InstallException
     {
         // Change status
-        this.localExtensionRepository.installExtension(this.existingExtension, "namespace",
-            !this.existingExtension.isDependency());
+        this.localExtensionRepository.installExtension(this.resources.installed, "namespace",
+            !this.resources.installed.isDependency());
 
         // Try to install again with the same status
         try {
-            this.localExtensionRepository.installExtension(this.existingExtension, "namespace",
-                this.existingExtension.isDependency());
+            this.localExtensionRepository.installExtension(this.resources.installed, "namespace",
+                this.resources.installed.isDependency());
             Assert.fail("Install should have failed");
         } catch (InstallException expected) {
             // expected
@@ -166,23 +157,25 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     public void testStoreExtensionAndInstall() throws ResolveException, LocalExtensionRepositoryException,
         InstallException
     {
-        Extension extension = this.repositoryManager.resolve(this.remoteExtensionId);
+        Extension extension = this.repositoryManager.resolve(TestResources.REMOTE_SIMPLE_ID);
 
         // store
 
         this.localExtensionRepository.storeExtension(extension);
 
-        LocalExtension localExtension = (LocalExtension) this.localExtensionRepository.resolve(this.remoteExtensionId);
+        LocalExtension localExtension =
+            (LocalExtension) this.localExtensionRepository.resolve(TestResources.REMOTE_SIMPLE_ID);
 
-        Assert.assertEquals(this.remoteExtensionId, localExtension.getId());
+        Assert.assertEquals(TestResources.REMOTE_SIMPLE_ID, localExtension.getId());
         Assert.assertFalse(localExtension.isInstalled());
 
         // install
 
         this.localExtensionRepository.installExtension(localExtension, null, false);
 
-        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(this.remoteExtensionId.getId(), null));
-        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(this.remoteExtensionId.getId(),
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(TestResources.REMOTE_SIMPLE_ID.getId(),
+            null));
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(TestResources.REMOTE_SIMPLE_ID.getId(),
             "namespace"));
         Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension("feature", null));
     }
@@ -193,94 +186,90 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     {
         // uninstall from root
 
-        this.localExtensionRepository.uninstallExtension(this.existingExtension, null);
-        this.localExtensionRepository.uninstallExtension(this.existingExtensionDependency, null);
+        this.localExtensionRepository.uninstallExtension(this.resources.installed, null);
+        this.localExtensionRepository.uninstallExtension(this.resources.installedDependency, null);
 
         // uninstall from namespace
 
-        this.localExtensionRepository.installExtension(this.existingExtensionDependency, "namespace", false);
-        this.localExtensionRepository.installExtension(this.existingExtension, "namespace", false);
-        this.localExtensionRepository.uninstallExtension(this.existingExtension, "namespace");
-        this.localExtensionRepository.uninstallExtension(this.existingExtensionDependency, "namespace");
+        this.localExtensionRepository.installExtension(this.resources.installedDependency, "namespace", false);
+        this.localExtensionRepository.installExtension(this.resources.installed, "namespace", false);
+        this.localExtensionRepository.uninstallExtension(this.resources.installed, "namespace");
+        this.localExtensionRepository.uninstallExtension(this.resources.installedDependency, "namespace");
 
         // uninstall from namespace with dependency on root
 
-        this.localExtensionRepository.installExtension(this.existingExtensionDependency, null, false);
-        this.localExtensionRepository.installExtension(this.existingExtension, "namespace", false);
-        this.localExtensionRepository.uninstallExtension(this.existingExtension, "namespace");
-        this.localExtensionRepository.uninstallExtension(this.existingExtensionDependency, null);
+        this.localExtensionRepository.installExtension(this.resources.installedDependency, null, false);
+        this.localExtensionRepository.installExtension(this.resources.installed, "namespace", false);
+        this.localExtensionRepository.uninstallExtension(this.resources.installed, "namespace");
+        this.localExtensionRepository.uninstallExtension(this.resources.installedDependency, null);
     }
 
     @Test
     public void testBackwardDependenciesAfterUninstall() throws ResolveException, UninstallException
     {
-        this.localExtensionRepository.uninstallExtension(this.existingExtension, null);
+        this.localExtensionRepository.uninstallExtension(this.resources.installed, null);
 
         Assert.assertEquals(Collections.EMPTY_LIST,
-            this.localExtensionRepository.getBackwardDependencies(this.existingExtensionDependencyId.getId(), null));
+            this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID.getId(), null));
     }
 
     @Test
     public void testBackwardDependenciesWithExtensionAndDepOnRoot() throws ResolveException
     {
         Assert.assertEquals(
-            Arrays.asList(this.existingExtension),
-            new ArrayList(this.localExtensionRepository.getBackwardDependencies(
-                this.existingExtensionDependencyId.getId(), null)));
+            Arrays.asList(this.resources.installed),
+            new ArrayList(this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID.getId(),
+                null)));
 
         Assert.assertEquals(
             Arrays.asList(),
-            new ArrayList(this.localExtensionRepository.getBackwardDependencies(
-                this.existingExtensionDependencyId.getId(), "namespace")));
+            new ArrayList(this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID.getId(),
+                "namespace")));
 
-        Assert
-            .assertEquals(
-                Arrays.asList(),
-                new ArrayList(this.localExtensionRepository.getBackwardDependencies(this.existingExtensionId.getId(),
-                    null)));
+        Assert.assertEquals(Arrays.asList(),
+            new ArrayList(this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_ID.getId(), null)));
 
         Map<String, Collection<LocalExtension>> map = new HashMap<String, Collection<LocalExtension>>();
-        map.put(null, Arrays.asList(this.existingExtension));
+        map.put(null, Arrays.asList(this.resources.installed));
 
-        Assert.assertEquals(map,
-            this.localExtensionRepository.getBackwardDependencies(this.existingExtensionDependencyId));
+        Assert.assertEquals(map, this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID));
 
         Assert.assertEquals(Collections.EMPTY_MAP,
-            this.localExtensionRepository.getBackwardDependencies(this.existingExtensionId));
+            this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_ID));
     }
 
     @Test
     public void testBackwardDependenciesWithExtensionOnNamespaceAndDepOnNamespace() throws InstallException,
         ResolveException, UninstallException
     {
-        this.localExtensionRepository.uninstallExtension(this.existingExtension, null);
+        this.localExtensionRepository.uninstallExtension(this.resources.installed, null);
 
-        this.localExtensionRepository.installExtension(this.existingExtension, "namespace", true);
-
-        Assert.assertEquals(Collections.EMPTY_LIST,
-            this.localExtensionRepository.getBackwardDependencies(this.existingExtensionDependencyId.getId(), null));
-
-        Assert.assertEquals(Arrays.asList(this.existingExtension), this.localExtensionRepository
-            .getBackwardDependencies(this.existingExtensionDependencyId.getId(), "namespace"));
+        this.localExtensionRepository.installExtension(this.resources.installed, "namespace", true);
 
         Assert.assertEquals(Collections.EMPTY_LIST,
-            this.localExtensionRepository.getBackwardDependencies(this.existingExtensionId.getId(), "namespace"));
+            this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID.getId(), null));
+
+        Assert.assertEquals(Arrays.asList(this.resources.installed),
+            this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID.getId(), "namespace"));
+
+        Assert.assertEquals(Collections.EMPTY_LIST,
+            this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_ID.getId(), "namespace"));
     }
 
     @Test
     public void testBackwardDependenciesWithExtensionAndDepOnNamespace() throws InstallException, ResolveException,
         UninstallException
     {
-        this.localExtensionRepository.uninstallExtension(this.existingExtension, null);
-        this.localExtensionRepository.uninstallExtension(this.existingExtensionDependency, null);
+        this.localExtensionRepository.uninstallExtension(this.resources.installed, null);
+        this.localExtensionRepository.uninstallExtension(this.resources.installedDependency, null);
 
-        this.localExtensionRepository.installExtension(this.existingExtensionDependency, "namespace", true);
-        this.localExtensionRepository.installExtension(this.existingExtension, "namespace", true);
+        this.localExtensionRepository.installExtension(this.resources.installedDependency, "namespace", true);
+        this.localExtensionRepository.installExtension(this.resources.installed, "namespace", true);
 
-        Assert.assertEquals(Arrays.asList(this.existingExtension), this.localExtensionRepository
-            .getBackwardDependencies(this.existingExtensionDependencyId.getId(), "namespace"));
+        Assert.assertEquals(Arrays.asList(this.resources.installed),
+            this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID.getId(), "namespace"));
 
         Assert.assertEquals(Collections.EMPTY_LIST,
-            this.localExtensionRepository.getBackwardDependencies(this.existingExtensionId.getId(), "namespace"));
+            this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_ID.getId(), "namespace"));
     }
 }

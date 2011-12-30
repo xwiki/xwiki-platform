@@ -51,8 +51,7 @@ import org.xwiki.extension.version.VersionConstraint;
 /**
  * Extension installation related task.
  * <p>
- * This task is taking care of discovering automatically if the extension need to be upgraded instead of installed. It
- * also generated related events.
+ * This task generates related events.
  * 
  * @version $Id$
  */

@@ -29,7 +29,7 @@ import org.xwiki.extension.ExtensionId;
  * 
  * @version $Id$
  */
-public abstract class AbstractExtensionRequest extends AbstractRequest
+public abstract class AbstractExtensionRequest extends AbstractRequest implements ExtensionRequest
 {
     /**
      * Serialization identifier.
@@ -46,25 +46,19 @@ public abstract class AbstractExtensionRequest extends AbstractRequest
      */
     private List<String> namespaces;
 
-    /**
-     * @return the extension on which to apply the task.
-     */
+    @Override
     public List<ExtensionId> getExtensions()
     {
         return this.extensions;
     }
 
-    /**
-     * @return the namespaces on which to apply the task.
-     */
+    @Override
     public List<String> getNamespaces()
     {
         return this.namespaces;
     }
 
-    /**
-     * @return indicate if the request is applied on specific namespace or all of them
-     */
+    @Override
     public boolean hasNamespaces()
     {
         return this.namespaces != null && !this.namespaces.isEmpty();

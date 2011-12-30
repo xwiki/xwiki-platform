@@ -17,38 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.job;
+package org.xwiki.extension.job.event.status;
 
 import org.xwiki.observation.event.Event;
 
 /**
- * Indicate to the progress listener that a new step level is starting.
+ * Indicate to the progress listener that a new step is starting.
  * 
  * @version $Id$
  */
-public class PushLevelProgressEvent implements Event
+public class StepProgressEvent implements Event
 {
-    /**
-     * Number of sub steps.
-     */
-    private int steps;
-
-    /**
-     * Matches any {@link PushLevelProgressEvent}.
-     */
-    public PushLevelProgressEvent()
-    {
-
-    }
-
-    /**
-     * @param steps the number of sub steps.
-     */
-    public PushLevelProgressEvent(int steps)
-    {
-        this.steps = steps;
-    }
-
     /**
      * {@inheritDoc}
      * 
@@ -58,13 +37,5 @@ public class PushLevelProgressEvent implements Event
     public boolean matches(Object arg0)
     {
         return true;
-    }
-
-    /**
-     * @return the number of sub steps
-     */
-    public int getSteps()
-    {
-        return steps;
     }
 }

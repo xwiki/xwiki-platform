@@ -20,9 +20,9 @@
 package org.xwiki.extension.job.internal;
 
 import org.junit.Test;
-import org.xwiki.extension.job.PopLevelProgressEvent;
-import org.xwiki.extension.job.PushLevelProgressEvent;
-import org.xwiki.extension.job.StepProgressEvent;
+import org.xwiki.extension.job.event.status.PopLevelProgressEvent;
+import org.xwiki.extension.job.event.status.PushLevelProgressEvent;
+import org.xwiki.extension.job.event.status.StepProgressEvent;
 import org.xwiki.extension.test.RepositoryUtil;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.AbstractComponentTestCase;

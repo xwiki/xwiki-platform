@@ -19,30 +19,29 @@
  */
 package org.xwiki.extension.job;
 
-import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.extension.job.event.status.JobStatus;
+import java.util.List;
+
+import org.xwiki.extension.ExtensionId;
 
 /**
+ * Extension manipulation related {@link Request}.
+ * 
  * @version $Id$
  */
-@ComponentRole
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public interface Job
+public interface ExtensionRequest extends Request
 {
     /**
-     * @return the status of the job
+     * @return the extension on which to apply the task.
      */
-    JobStatus getStatus();
+    List<ExtensionId> getExtensions();
 
     /**
-     * @return the job request
+     * @return the namespaces on which to apply the task.
      */
-    Request getRequest();
+    List<String> getNamespaces();
 
     /**
-     * @param request start the job with provided request
+     * @return indicate if the request is applied on specific namespace or all of them
      */
-    void start(Request request);
+    boolean hasNamespaces();
 }

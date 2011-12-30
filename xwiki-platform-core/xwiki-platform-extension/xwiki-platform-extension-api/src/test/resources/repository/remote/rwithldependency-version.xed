@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <extension>
-  <id>remoteextension</id>
+  <id>rwithldependency</id>
   <version>version</version>
   <type>type</type>
   <features>
@@ -9,11 +9,7 @@
   </features>
   <dependencies>
     <dependency>
-      <id>coreextension</id>
-      <version>version</version>
-    </dependency>
-    <dependency>
-      <id>remoteextensiondependency</id>
+      <id>installedextension</id>
       <version>version</version>
     </dependency>
   </dependencies>

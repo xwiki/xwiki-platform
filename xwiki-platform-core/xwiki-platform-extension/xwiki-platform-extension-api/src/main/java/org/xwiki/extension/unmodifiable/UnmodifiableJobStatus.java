@@ -21,9 +21,9 @@ package org.xwiki.extension.unmodifiable;
 
 import java.util.List;
 
-import org.xwiki.extension.job.JobProgress;
-import org.xwiki.extension.job.JobStatus;
 import org.xwiki.extension.job.Request;
+import org.xwiki.extension.job.event.status.JobProgress;
+import org.xwiki.extension.job.event.status.JobStatus;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogQueue;
 import org.xwiki.logging.event.LogEvent;

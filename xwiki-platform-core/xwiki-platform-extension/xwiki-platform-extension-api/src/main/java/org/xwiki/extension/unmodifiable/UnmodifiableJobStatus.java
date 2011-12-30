@@ -47,6 +47,14 @@ public class UnmodifiableJobStatus implements JobStatus
     {
         this.status = status;
     }
+    
+    /**
+     * @return the wrapped job status
+     */
+    protected JobStatus getJobStatus()
+    {
+        return this.status;
+    }
 
     @Override
     public State getState()

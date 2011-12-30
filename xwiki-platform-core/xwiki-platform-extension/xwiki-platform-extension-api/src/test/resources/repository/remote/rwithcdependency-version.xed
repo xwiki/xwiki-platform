@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <extension>
-  <id>rwithrandcdependencies</id>
+  <id>rwithcdependency</id>
   <version>version</version>
   <type>type</type>
   <features>
@@ -10,10 +10,6 @@
   <dependencies>
     <dependency>
       <id>coreextension</id>
-      <version>version</version>
-    </dependency>
-    <dependency>
-      <id>rsimple</id>
       <version>version</version>
     </dependency>
   </dependencies>

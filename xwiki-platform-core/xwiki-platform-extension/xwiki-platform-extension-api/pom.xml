@@ -159,7 +159,7 @@
               **/DefaultExtensionSerializer.java,
               **/DefaultLocalExtensionRepository.java,
               **/UnmodifiableUtils.java,
-              **/InstallJob.java
+              **/InstallPlanJob.java
           </excludes>
         </configuration>
       </plugin>

@@ -30,6 +30,7 @@ import org.xwiki.extension.job.JobManager;
 import org.xwiki.extension.job.Request;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.plan.ExtensionPlan;
+import org.xwiki.extension.job.plan.internal.DefaultExtensionPlan;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
@@ -93,11 +94,11 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
         return (LocalExtension) this.localExtensionRepository.resolve(extensionId);
     }
 
-    protected ExtensionPlan<InstallRequest> installPlan(ExtensionId extensionId, String namespace) throws Throwable
+    protected ExtensionPlan installPlan(ExtensionId extensionId, String namespace) throws Throwable
     {
         Job installJob = install("installplan", extensionId, namespace);
 
-        return (ExtensionPlan<InstallRequest>) installJob.getStatus();
+        return (ExtensionPlan) installJob.getStatus();
     }
 
     protected Job install(String jobId, ExtensionId extensionId, String namespace) throws Throwable
@@ -118,11 +119,12 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
         return (LocalExtension) this.localExtensionRepository.resolve(extensionId);
     }
 
-    protected ExtensionPlan<UninstallRequest> uninstallPlan(ExtensionId extensionId, String namespace) throws Throwable
+    protected DefaultExtensionPlan<UninstallRequest> uninstallPlan(ExtensionId extensionId, String namespace)
+        throws Throwable
     {
         Job uninstallJob = uninstall("installplan", extensionId, namespace);
 
-        return (ExtensionPlan<UninstallRequest>) uninstallJob.getStatus();
+        return (DefaultExtensionPlan<UninstallRequest>) uninstallJob.getStatus();
     }
 
     protected Job uninstall(String jobId, ExtensionId extensionId, String namespace) throws Throwable

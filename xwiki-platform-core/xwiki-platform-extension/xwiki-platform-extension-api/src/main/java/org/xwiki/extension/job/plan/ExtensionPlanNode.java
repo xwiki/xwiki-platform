@@ -1,42 +1,40 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.extension.job.plan;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
-public class ExtensionPlanNode
+/**
+ * A node in the extension plan tree.
+ * 
+ * @version $Id$
+ */
+public interface ExtensionPlanNode
 {
-    private ExtensionPlanAction action;
+    /**
+     * @return the action to perform for this node
+     */
+    ExtensionPlanAction getAction();
 
-    private Collection<ExtensionPlanNode> children;
-
-    public ExtensionPlanNode(ExtensionPlanNode node)
-    {
-        this(node.getAction(), node.getChildren());
-    }
-
-    public ExtensionPlanNode(ExtensionPlanAction action)
-    {
-        this(action, null);
-    }
-
-    public ExtensionPlanNode(ExtensionPlanAction action, Collection<ExtensionPlanNode> children)
-    {
-        this.action = action;
-        if (children != null) {
-            this.children = new ArrayList<ExtensionPlanNode>(children);
-        } else {
-            this.children = Collections.emptyList();
-        }
-    }
-
-    public ExtensionPlanAction getAction()
-    {
-        return this.action;
-    }
-
-    public Collection<ExtensionPlanNode> getChildren()
-    {
-        return this.children;
-    }
+    /**
+     * @return the children of this node
+     */
+    Collection<ExtensionPlanNode> getChildren();
 }

@@ -21,10 +21,11 @@ import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.job.InstallRequest;
-import org.xwiki.extension.job.plan.ExtensionPlan;
-import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.extension.job.plan.ExtensionPlanAction.Action;
 import org.xwiki.extension.job.plan.ExtensionPlanNode;
+import org.xwiki.extension.job.plan.internal.DefaultExtensionPlan;
+import org.xwiki.extension.job.plan.internal.DefaultExtensionPlanAction;
+import org.xwiki.extension.job.plan.internal.DefaultExtensionPlanNode;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
@@ -49,7 +50,7 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
 
         // can change
 
-        public ExtensionPlanAction action;
+        public DefaultExtensionPlanAction action;
 
         public List<ModifableExtensionPlanNode> children;
 
@@ -128,7 +129,7 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
     @Override
     protected DefaultJobStatus<InstallRequest> createNewStatus(InstallRequest request)
     {
-        return new ExtensionPlan<InstallRequest>(request, getId(), this.observationManager, this.loggerManager,
+        return new DefaultExtensionPlan<InstallRequest>(request, getId(), this.observationManager, this.loggerManager,
             this.finalExtensionTree);
     }
 
@@ -183,12 +184,12 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
             }
 
             // Set the initial dependency version constraint
-            ExtensionPlanAction action =
-                new ExtensionPlanAction(node.action.getExtension(), node.action.getPreviousExtension(),
+            DefaultExtensionPlanAction action =
+                new DefaultExtensionPlanAction(node.action.getExtension(), node.action.getPreviousExtension(),
                     node.action.getAction(), node.action.getNamespace(), node.initialDependency != null
                         ? node.initialDependency.getVersionConstraint() : null);
 
-            finalTree.add(new ExtensionPlanNode(action, children));
+            finalTree.add(new DefaultExtensionPlanNode(action, children));
         }
 
         return finalTree;
@@ -238,7 +239,7 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
      * 
      * @param extensionId the identifier of the extension to install
      * @param namespace the namespace where to install the extension
-     * @param parentBranch the children of the parent {@link ExtensionPlanNode}
+     * @param parentBranch the children of the parent {@link DefaultExtensionPlanNode}
      * @throws InstallException error when trying to install provided extension
      */
     private void installExtension(ExtensionId extensionId, String namespace,
@@ -253,7 +254,7 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
      * @param extensionId the identifier of the extension to install
      * @param dependency indicate if the extension is installed as a dependency
      * @param namespace the namespace where to install the extension
-     * @param parentBranch the children of the parent {@link ExtensionPlanNode}
+     * @param parentBranch the children of the parent {@link DefaultExtensionPlanNode}
      * @throws InstallException error when trying to install provided extension
      */
     private void installExtension(ExtensionId extensionId, boolean dependency, String namespace,
@@ -307,7 +308,7 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
     {
         boolean compatible = true;
 
-        if (versionConstraint.getVersion() != null) {
+        if (versionConstraint.getVersion() == null) {
             compatible = versionConstraint.containsVersion(existingVersion);
         } else {
             compatible = existingVersion.compareTo(versionConstraint.getVersion()) >= 0;
@@ -321,9 +322,9 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
         CoreExtension coreExtension = this.coreExtensionRepository.getCoreExtension(extensionDependency.getId());
 
         if (coreExtension != null) {
-            if (isCompatible(coreExtension.getId().getVersion(), extensionDependency.getVersionConstraint())) {
+            if (!isCompatible(coreExtension.getId().getVersion(), extensionDependency.getVersionConstraint())) {
                 throw new InstallException("Dependency [" + extensionDependency
-                    + "] is not compatible with code extension [" + coreExtension + "]");
+                    + "] is not compatible with core extension [" + coreExtension + "]");
             }
         }
 
@@ -335,7 +336,7 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
      * 
      * @param extensionDependency the extension dependency to install
      * @param namespace the namespace where to install the extension
-     * @param parentBranch the children of the parent {@link ExtensionPlanNode}
+     * @param parentBranch the children of the parent {@link DefaultExtensionPlanNode}
      * @throws InstallException error when trying to install provided extension
      */
     private void installExtensionDependency(ExtensionDependency extensionDependency, String namespace,
@@ -356,7 +357,7 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
                 coreExtension, extensionDependency);
 
             ModifableExtensionPlanNode node = new ModifableExtensionPlanNode(extensionDependency);
-            node.action = new ExtensionPlanAction(coreExtension, null, Action.NONE, namespace, versionContraint);
+            node.action = new DefaultExtensionPlanAction(coreExtension, null, Action.NONE, namespace, versionContraint);
             node.initialDependency = extensionDependency;
 
             parentBranch.add(node);
@@ -395,13 +396,13 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
         LocalExtension installedExtension =
             this.localExtensionRepository.getInstalledExtension(extensionDependency.getId(), namespace);
         if (installedExtension != null) {
-            if (versionContraint.containsVersion(installedExtension.getId().getVersion())) {
+            if (isCompatible(installedExtension.getId().getVersion(), versionContraint)) {
                 this.logger.info("There is already an installed extension [{}] covering extension dependency [{}]",
                     coreExtension, extensionDependency);
 
                 ModifableExtensionPlanNode node = new ModifableExtensionPlanNode(extensionDependency);
                 node.action =
-                    new ExtensionPlanAction(installedExtension, null, Action.NONE, namespace, versionContraint);
+                    new DefaultExtensionPlanAction(installedExtension, null, Action.NONE, namespace, versionContraint);
                 node.initialDependency = extensionDependency;
 
                 addExtensionNode(node);
@@ -474,7 +475,7 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
                 return installExtension(previousExtension, extension, dependency, namespace,
                     targetDependency.getVersionConstraint());
             } catch (Exception e) {
-                throw new InstallException("Failed to install extension dependency", e);
+                throw new InstallException("Failed to resolve extension dependency", e);
             }
         } finally {
             notifyPopLevelProgress();
@@ -554,7 +555,7 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
             try {
                 return installExtension(previousExtension, extension, dependency, namespace, null);
             } catch (Exception e) {
-                throw new InstallException("Failed to install extension", e);
+                throw new InstallException("Failed to resolve extension", e);
             }
         } finally {
             notifyPopLevelProgress();
@@ -643,8 +644,8 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
 
             node.children = children;
             node.action =
-                new ExtensionPlanAction(extension, previousExtension, previousExtension != null
-                    ? ExtensionPlanAction.Action.UPGRADE : ExtensionPlanAction.Action.INSTALL, namespace,
+                new DefaultExtensionPlanAction(extension, previousExtension, previousExtension != null
+                    ? DefaultExtensionPlanAction.Action.UPGRADE : DefaultExtensionPlanAction.Action.INSTALL, namespace,
                     initialConstraint);
 
             return node;

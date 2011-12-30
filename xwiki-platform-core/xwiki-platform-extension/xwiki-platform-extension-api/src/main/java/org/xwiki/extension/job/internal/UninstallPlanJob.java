@@ -13,10 +13,11 @@ import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.job.UninstallRequest;
-import org.xwiki.extension.job.plan.ExtensionPlan;
-import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.extension.job.plan.ExtensionPlanAction.Action;
 import org.xwiki.extension.job.plan.ExtensionPlanNode;
+import org.xwiki.extension.job.plan.internal.DefaultExtensionPlan;
+import org.xwiki.extension.job.plan.internal.DefaultExtensionPlanAction;
+import org.xwiki.extension.job.plan.internal.DefaultExtensionPlanNode;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 
 /**
@@ -50,8 +51,8 @@ public class UninstallPlanJob extends AbstractJob<UninstallRequest>
     @Override
     protected DefaultJobStatus<UninstallRequest> createNewStatus(UninstallRequest request)
     {
-        return new ExtensionPlan<UninstallRequest>(request, getId(), this.observationManager, this.loggerManager,
-            this.extensionTree);
+        return new DefaultExtensionPlan<UninstallRequest>(request, getId(), this.observationManager,
+            this.loggerManager, this.extensionTree);
     }
 
     @Override
@@ -93,7 +94,7 @@ public class UninstallPlanJob extends AbstractJob<UninstallRequest>
     /**
      * @param extensionId the identifier of the extension to uninstall
      * @param namespaces the namespaces from where to uninstall the extension
-     * @param parentBranch the children of the parent {@link ExtensionPlanNode}
+     * @param parentBranch the children of the parent {@link DefaultExtensionPlanNode}
      * @throws UninstallException error when trying to uninstall provided extensions
      */
     private void uninstallExtension(String extensionId, Collection<String> namespaces,
@@ -115,7 +116,7 @@ public class UninstallPlanJob extends AbstractJob<UninstallRequest>
     /**
      * @param extensionId the identifier of the extension to uninstall
      * @param namespace the namespace from where to uninstall the extension
-     * @param parentBranch the children of the parent {@link ExtensionPlanNode}
+     * @param parentBranch the children of the parent {@link DefaultExtensionPlanNode}
      * @throws UninstallException error when trying to uninstall provided extension
      */
     private void uninstallExtension(String extensionId, String namespace, List<ExtensionPlanNode> parentBranch)
@@ -137,7 +138,7 @@ public class UninstallPlanJob extends AbstractJob<UninstallRequest>
     /**
      * @param localExtension the extension to uninstall
      * @param namespaces the namespaces from where to uninstall the extension
-     * @param parentBranch the children of the parent {@link ExtensionPlanNode}
+     * @param parentBranch the children of the parent {@link DefaultExtensionPlanNode}
      * @throws UninstallException error when trying to uninstall provided extension
      */
     private void uninstallExtension(LocalExtension localExtension, Collection<String> namespaces,
@@ -151,7 +152,7 @@ public class UninstallPlanJob extends AbstractJob<UninstallRequest>
     /**
      * @param extensions the local extensions to uninstall
      * @param namespace the namespaces from where to uninstall the extensions
-     * @param parentBranch the children of the parent {@link ExtensionPlanNode}
+     * @param parentBranch the children of the parent {@link DefaultExtensionPlanNode}
      * @throws UninstallException error when trying to uninstall provided extensions
      */
     private void uninstallExtensions(Collection<LocalExtension> extensions, String namespace,
@@ -208,9 +209,9 @@ public class UninstallPlanJob extends AbstractJob<UninstallRequest>
 
             notifyStepPropress();
 
-            ExtensionPlanAction action =
-                new ExtensionPlanAction(localExtension, null, Action.UNINSTALL, namespace, null);
-            parentBranch.add(new ExtensionPlanNode(action, children));
+            DefaultExtensionPlanAction action =
+                new DefaultExtensionPlanAction(localExtension, null, Action.UNINSTALL, namespace, null);
+            parentBranch.add(new DefaultExtensionPlanNode(action, children));
         } finally {
             notifyPopLevelProgress();
         }

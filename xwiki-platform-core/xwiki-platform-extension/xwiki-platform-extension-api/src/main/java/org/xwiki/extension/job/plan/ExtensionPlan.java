@@ -1,57 +1,42 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.extension.job.plan;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
-import org.xwiki.extension.job.ExtensionRequest;
-import org.xwiki.extension.job.internal.DefaultJobStatus;
-import org.xwiki.logging.LoggerManager;
-import org.xwiki.observation.ObservationManager;
+import org.xwiki.extension.job.event.status.JobStatus;
 
-public class ExtensionPlan<R extends ExtensionRequest> extends DefaultJobStatus<R>
+/**
+ * A plan of extensions related actions to perform.
+ * 
+ * @version $Id$
+ */
+public interface ExtensionPlan extends JobStatus
 {
-    private List<ExtensionPlanNode> extensionTree = new ArrayList<ExtensionPlanNode>();
+    /**
+     * @return the tree representation of the plan
+     */
+    Collection<ExtensionPlanNode> getTree();
 
-    private List<ExtensionPlanAction> extensionActions;
-
-    public ExtensionPlan(R request, String id, ObservationManager observationManager, LoggerManager loggerManager,
-        List<ExtensionPlanNode> extensionTree)
-    {
-        super(request, id, observationManager, loggerManager);
-
-        this.extensionTree = extensionTree;
-    }
-
-    private void fillExtensionActions(List<ExtensionPlanAction> extensions, Collection<ExtensionPlanNode> nodes)
-    {
-        for (ExtensionPlanNode node : nodes) {
-            fillExtensionActions(extensions, node.getChildren());
-
-            extensions.add(node.getAction());
-        }
-    }
-
-    public Collection<ExtensionPlanAction> getExtensionActions()
-    {
-        if (getState() != State.FINISHED) {
-            List<ExtensionPlanAction> extensions = new ArrayList<ExtensionPlanAction>();
-            fillExtensionActions(extensions, this.extensionTree);
-
-            return extensions;
-        } else {
-            if (this.extensionActions == null) {
-                this.extensionActions = new ArrayList<ExtensionPlanAction>();
-                fillExtensionActions(this.extensionActions, this.extensionTree);
-            }
-
-            return Collections.unmodifiableCollection(this.extensionActions);
-        }
-    }
-
-    public Collection<ExtensionPlanNode> getExtensionTree()
-    {
-        return Collections.unmodifiableCollection(this.extensionTree);
-    }
+    /**
+     * @return an ordered representation of all the actions to perform
+     */
+    Collection<ExtensionPlanAction> getActions();
 }

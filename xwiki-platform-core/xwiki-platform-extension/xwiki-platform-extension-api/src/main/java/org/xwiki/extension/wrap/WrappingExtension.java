@@ -19,7 +19,6 @@
  */
 package org.xwiki.extension.wrap;
 
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -40,11 +39,6 @@ import org.xwiki.extension.repository.ExtensionRepository;
  */
 public class WrappingExtension<T extends Extension> implements Extension
 {
-    /**
-     * The format of the {@link #toString} output.
-     */
-    private static final MessageFormat TOSTRING_FORMAT = new MessageFormat("{0} ({1})");
-
     /**
      * @see #getExtension()
      */
@@ -152,9 +146,23 @@ public class WrappingExtension<T extends Extension> implements Extension
         return getExtension().getProperty(key);
     }
 
+    // Object
+
+    @Override
+    public int hashCode()
+    {
+        return getExtension().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        return getExtension().equals(obj);
+    }
+
     @Override
     public String toString()
     {
-        return TOSTRING_FORMAT.format(new Object[] {getName(), getId()});
+        return getExtension().toString();
     }
 }

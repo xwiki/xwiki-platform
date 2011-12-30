@@ -39,6 +39,7 @@ import java.util.jar.JarInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -174,6 +175,13 @@ public class PackageMojo extends AbstractMojo
       */
     private VelocityComponent velocity;
 
+    /**
+     * List of skin artifacts to include in the packaging.
+     *
+     * @parameter
+     */
+    private List<SkinArtifactItem> skinArtifactItems;
+    
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -220,17 +228,61 @@ public class PackageMojo extends AbstractMojo
         Artifact hsqldbArtifact = resolveHSQLDBArtifact();
         copyFile(hsqldbArtifact.getFile(), libDirectory);
 
-        // Step 7: Unzip the Colibri Skin
-        getLog().info("Copying Colibri Skin ...");
+        // Step 7: Unzip the specified Skins. If no skin is specified then unzip the Colibri skin only.
+        getLog().info("Copying Skins ...");
         File skinsDirectory = new File(xwikiWebappDirectory, "skins");
-        Artifact colibriArtifact = resolveColibriArtifact();
-        unzip(colibriArtifact.getFile(), skinsDirectory);
+        if (this.skinArtifactItems != null) {
+            for (SkinArtifactItem skinArtifactItem : this.skinArtifactItems) {
+                Artifact skinArtifact = resolveArtifactItem(skinArtifactItem);
+                unzip(skinArtifact.getFile(), skinsDirectory);
+            }
+        } else {
+            Artifact colibriArtifact = resolveArtifact("org.xwiki.platform", "xwiki-platform-colibri",
+                this.project.getVersion(), "zip");
+            unzip(colibriArtifact.getFile(), skinsDirectory);
+        }
 
         // Step 8: Import specified XAR files into the database
         getLog().info("Import XAR dependencies ...");
         importXARs(webInfDirectory);
     }
 
+    private Artifact resolveArtifactItem(ArtifactItem artifactItem) throws MojoExecutionException
+    {
+        // Resolve the version and the type:
+        // - if specified in the artifactItem, use them
+        // - if not specified look for them in the project dependencies
+        String version = artifactItem.getVersion();
+        String type = artifactItem.getType();
+        if (version == null || type == null) {
+            Map<String, Artifact> artifacts = this.project.getArtifactMap();
+            String key = ArtifactUtils.versionlessKey(artifactItem.getGroupId(), artifactItem.getArtifactId()); 
+            if (artifacts.containsKey(key)) {
+                if (version == null) {
+                    version = artifacts.get(key).getVersion();
+                }
+                if (type == null) {
+                    type = artifacts.get(key).getType();
+                }
+            } else {
+                // Default to the project's version
+                if (version == null) {
+                    version = this.project.getVersion();
+                }
+                // Default to JAR
+                if (type == null) {
+                    type = "jar";
+                }
+            }
+        }
+
+        // Resolve the artifact
+        Artifact artifact = this.factory.createArtifact(artifactItem.getGroupId(), artifactItem.getArtifactId(),
+            version, "", type);
+        resolveArtifact(artifact);
+        return artifact;
+    }
+    
     private void generateConfigurationFiles(File configurationFileTargetDirectory) throws MojoExecutionException
     {
         VelocityContext context = createVelocityContext();
@@ -307,14 +359,6 @@ public class PackageMojo extends AbstractMojo
         return xarArtifacts;
     }
     
-    private Artifact resolveColibriArtifact() throws MojoExecutionException
-    {
-        Artifact colibriArtifact = this.factory.createArtifact("org.xwiki.platform", "xwiki-platform-colibri",
-            this.project.getVersion(), "", "zip");
-        resolveArtifact(colibriArtifact);
-        return colibriArtifact;
-    }
-
     private Artifact resolveHSQLDBArtifact() throws MojoExecutionException
     {
         Artifact hsqldbArtifact = null;
@@ -576,7 +620,7 @@ public class PackageMojo extends AbstractMojo
                 source, targetDirectory), e);
         }
     }
-    
+
     private void resolveArtifact(Artifact artifact) throws MojoExecutionException
     {
         try {
@@ -584,6 +628,14 @@ public class PackageMojo extends AbstractMojo
         } catch (Exception e) {
             throw new MojoExecutionException(String.format("Failed to resolve artifact [%s]", artifact), e);
         }
+    }
+    
+    private Artifact resolveArtifact(String groupId, String artifactId, String version, String type)
+        throws MojoExecutionException
+    {
+        Artifact artifact = this.factory.createArtifact(groupId, artifactId, version, "", type);
+        resolveArtifact(artifact);
+        return artifact;
     }
 
     private VelocityContext createVelocityContext()

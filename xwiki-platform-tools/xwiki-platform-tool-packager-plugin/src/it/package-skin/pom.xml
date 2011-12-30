@@ -30,21 +30,16 @@
     <artifactId>xwiki-platform-tools</artifactId>
     <version>3.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-package-sample</artifactId>
+  <artifactId>xwiki-package-skin-sample</artifactId>
   <packaging>pom</packaging>
-  <name>Maven XWiki Sample Package Plugin</name>
-  <description>Maven XWiki Sample Package Plugin</description>
-  <properties>
-      <!-- Overridden configuration data for xwiki.properties -->
-      <xwikiRenderingTransformations>macro, icon, linkchecker</xwikiRenderingTransformations>
-  </properties>
+  <name>Maven XWiki Sample Skin Package Plugin</name>
+  <description>Maven XWiki Sample Skin Package Plugin</description>
   <dependencies>
-    <!-- This XAR will be installed in the packaged XWiki -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-linkchecker-ui</artifactId>
+      <artifactId>xwiki-platform-toucan</artifactId>
       <version>${project.version}</version>
-      <type>xar</type>
+      <type>zip</type>
     </dependency>
   </dependencies>
   <build>
@@ -62,6 +57,14 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <skinArtifactItems>
+            <skinArtifactItem>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-toucan</artifactId>
+            </skinArtifactItem>
+          </skinArtifactItems>
+        </configuration>
       </plugin>
     </plugins>
   </build>

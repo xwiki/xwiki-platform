@@ -44,8 +44,8 @@ public class UtilTest
         Assert.assertTrue(Util.isValidXMLElementName("myprop"));
         Assert.assertTrue(Util.isValidXMLElementName("my_prop"));
         Assert.assertTrue(Util.isValidXMLElementName("my_prop-1"));
-        Assert.assertTrue(Util.isValidXMLElementName("ns:my_prop-1"));
-        Assert.assertTrue(Util.isValidXMLElementName("ns:my_prop-1.1"));
+        Assert.assertTrue(Util.isValidXMLElementName("my_prop-1.1"));
+        Assert.assertFalse(Util.isValidXMLElementName("ns:my_prop-1"));
         Assert.assertFalse(Util.isValidXMLElementName("1prop"));
         Assert.assertFalse(Util.isValidXMLElementName("xmlprop"));
         Assert.assertFalse(Util.isValidXMLElementName("XMLprop"));

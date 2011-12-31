@@ -24,7 +24,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
-import org.xwiki.extension.version.VersionConstraint;
 
 /**
  * An action to perform as part of an extension plan.
@@ -54,25 +53,25 @@ public class DefaultExtensionPlanAction implements ExtensionPlanAction
     private String namespace;
 
     /**
-     * @see #getVersionConstraint()
+     * @see #isDependency()
      */
-    private VersionConstraint versionConstraint;
+    private boolean dependency;
 
     /**
      * @param extension the extension on which to perform the action
      * @param previousExtension the currently installed extension. Used when upgrading
      * @param action the action to perform
      * @param namespace the namespace in which the action should be executed
-     * @param versionConstraint the version constraint that has been used to resolve the extension
+     * @param dependency indicate indicate if the extension is a dependency of another one only in the plan
      */
     public DefaultExtensionPlanAction(Extension extension, LocalExtension previousExtension, Action action,
-        String namespace, VersionConstraint versionConstraint)
+        String namespace, boolean dependency)
     {
         this.extension = extension;
         this.previousExtension = previousExtension;
         this.action = action;
         this.namespace = namespace;
-        this.versionConstraint = versionConstraint;
+        this.dependency = dependency;
     }
 
     @Override
@@ -100,9 +99,9 @@ public class DefaultExtensionPlanAction implements ExtensionPlanAction
     }
 
     @Override
-    public VersionConstraint getVersionConstraint()
+    public boolean isDependency()
     {
-        return this.versionConstraint;
+        return this.dependency;
     }
 
     // Object
@@ -136,5 +135,21 @@ public class DefaultExtensionPlanAction implements ExtensionPlanAction
         }
 
         return equals;
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(this.extension);
+
+        if (this.namespace != null) {
+            builder.append('(');
+            builder.append(this.namespace);
+            builder.append(')');
+        }
+
+        return builder.toString();
     }
 }

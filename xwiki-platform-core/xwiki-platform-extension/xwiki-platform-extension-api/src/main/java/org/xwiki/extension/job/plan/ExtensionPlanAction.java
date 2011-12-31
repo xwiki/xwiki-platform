@@ -21,7 +21,6 @@ package org.xwiki.extension.job.plan;
 
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.version.VersionConstraint;
 
 /**
  * An action to perform as part of an extension plan.
@@ -79,7 +78,8 @@ public interface ExtensionPlanAction
     String getNamespace();
 
     /**
-     * @return the version constraint that has been used to resolve the extension
+     * @return indicate indicate if the extension is a dependency of another one only in the plan
      */
-    VersionConstraint getVersionConstraint();
+    boolean isDependency();
+
 }

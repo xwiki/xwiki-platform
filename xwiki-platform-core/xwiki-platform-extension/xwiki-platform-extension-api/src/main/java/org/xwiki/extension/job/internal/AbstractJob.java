@@ -22,6 +22,8 @@ package org.xwiki.extension.job.internal;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.job.Job;
 import org.xwiki.extension.job.Request;
@@ -40,6 +42,7 @@ import org.xwiki.observation.ObservationManager;
  * @param <R> the request type associated to the task
  * @version $Id$
  */
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public abstract class AbstractJob<R extends Request> implements Job
 {
     /**

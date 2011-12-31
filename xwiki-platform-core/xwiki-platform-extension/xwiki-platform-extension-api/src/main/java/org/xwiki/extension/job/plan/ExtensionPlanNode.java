@@ -21,6 +21,8 @@ package org.xwiki.extension.job.plan;
 
 import java.util.Collection;
 
+import org.xwiki.extension.version.VersionConstraint;
+
 /**
  * A node in the extension plan tree.
  * 
@@ -32,6 +34,11 @@ public interface ExtensionPlanNode
      * @return the action to perform for this node
      */
     ExtensionPlanAction getAction();
+
+    /**
+     * @return the initial version constraint before resolving the extension
+     */
+    VersionConstraint getInitialVersionConstraint();
 
     /**
      * @return the children of this node

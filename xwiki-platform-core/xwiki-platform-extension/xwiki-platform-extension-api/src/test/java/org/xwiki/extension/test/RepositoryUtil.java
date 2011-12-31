@@ -40,6 +40,7 @@ import org.xwiki.extension.handler.ExtensionInitializer;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
+import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.test.MockConfigurationSource;
 
 public class RepositoryUtil
@@ -129,7 +130,7 @@ public class RepositoryUtil
 
         registerComponent(ConfigurableDefaultCoreExtensionRepository.class);
         ((ConfigurableDefaultCoreExtensionRepository) this.componentManager.lookup(CoreExtensionRepository.class))
-            .addExtensions("coreextension", "version");
+            .addExtensions("coreextension", new DefaultVersion("version"));
 
         // copy
 

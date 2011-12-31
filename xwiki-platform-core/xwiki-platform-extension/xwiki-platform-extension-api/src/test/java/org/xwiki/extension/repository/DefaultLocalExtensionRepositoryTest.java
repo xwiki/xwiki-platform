@@ -50,14 +50,6 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
 
     private ExtensionId remoteExtensionId;
 
-    private ExtensionId existingExtensionId;
-
-    private ExtensionId existingExtensionDependencyId;
-
-    private LocalExtension existingExtension;
-
-    private LocalExtension existingExtensionDependency;
-
     private TestResources resources;
 
     @Override
@@ -100,14 +92,17 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     {
         Assert.assertNull(this.localExtensionRepository.getInstalledExtension("unexistingextension", null));
 
-        Extension extension = this.localExtensionRepository.getInstalledExtension("existingextension", null);
+        Extension extension =
+            this.localExtensionRepository.getInstalledExtension(TestResources.INSTALLED_ID.getId(), null);
 
         Assert.assertNotNull(extension);
-        Assert.assertEquals("existingextension", extension.getId().getId());
-        Assert.assertEquals("version", extension.getId().getVersion().getValue());
+        Assert.assertEquals(TestResources.INSTALLED_ID, extension.getId());
         Assert.assertEquals("type", extension.getType());
-        Assert.assertEquals("existingextensiondependency", extension.getDependencies().get(0).getId());
-        Assert.assertEquals("version", extension.getDependencies().get(0).getVersionConstraint().getValue());
+        Assert.assertEquals(Arrays.asList(TestResources.INSTALLED_ID.getId() + "-feature"), new ArrayList<String>(
+            extension.getFeatures()));
+        Assert.assertEquals(TestResources.INSTALLED_DEPENDENCY_ID.getId(), extension.getDependencies().get(0).getId());
+        Assert.assertEquals(TestResources.INSTALLED_DEPENDENCY_ID.getVersion(), extension.getDependencies().get(0)
+            .getVersionConstraint().getVersion());
     }
 
     @Test
@@ -122,18 +117,17 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
         }
 
         try {
-            this.localExtensionRepository.resolve(new ExtensionId("existingextension", "wrongversion"));
+            this.localExtensionRepository.resolve(new ExtensionId(TestResources.INSTALLED_ID.getId(), "wrongversion"));
 
             Assert.fail("Resolve should have failed");
         } catch (ResolveException expected) {
             // expected
         }
 
-        Extension extension = this.localExtensionRepository.resolve(new ExtensionId("existingextension", "version"));
+        Extension extension = this.localExtensionRepository.resolve(TestResources.INSTALLED_ID);
 
         Assert.assertNotNull(extension);
-        Assert.assertEquals("existingextension", extension.getId().getId());
-        Assert.assertEquals("version", extension.getId().getVersion().getValue());
+        Assert.assertEquals(TestResources.INSTALLED_ID, extension.getId());
     }
 
     @Test
@@ -173,11 +167,12 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
 
         this.localExtensionRepository.installExtension(localExtension, null, false);
 
-        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(TestResources.REMOTE_SIMPLE_ID.getId(),
-            null));
-        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(TestResources.REMOTE_SIMPLE_ID.getId(),
-            "namespace"));
-        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension("feature", null));
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(
+            TestResources.REMOTE_SIMPLE_ID.getId(), null));
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(
+            TestResources.REMOTE_SIMPLE_ID.getId(), "namespace"));
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(TestResources.REMOTE_SIMPLE_ID.getId()
+            + "-feature", null));
     }
 
     @Test
@@ -218,21 +213,24 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     {
         Assert.assertEquals(
             Arrays.asList(this.resources.installed),
-            new ArrayList(this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID.getId(),
-                null)));
+            new ArrayList(this.localExtensionRepository.getBackwardDependencies(
+                TestResources.INSTALLED_DEPENDENCY_ID.getId(), null)));
 
         Assert.assertEquals(
             Arrays.asList(),
-            new ArrayList(this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID.getId(),
-                "namespace")));
+            new ArrayList(this.localExtensionRepository.getBackwardDependencies(
+                TestResources.INSTALLED_DEPENDENCY_ID.getId(), "namespace")));
 
-        Assert.assertEquals(Arrays.asList(),
-            new ArrayList(this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_ID.getId(), null)));
+        Assert.assertEquals(
+            Arrays.asList(),
+            new ArrayList(this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_ID.getId(),
+                null)));
 
         Map<String, Collection<LocalExtension>> map = new HashMap<String, Collection<LocalExtension>>();
         map.put(null, Arrays.asList(this.resources.installed));
 
-        Assert.assertEquals(map, this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID));
+        Assert.assertEquals(map,
+            this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID));
 
         Assert.assertEquals(Collections.EMPTY_MAP,
             this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_ID));
@@ -249,8 +247,8 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
         Assert.assertEquals(Collections.EMPTY_LIST,
             this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID.getId(), null));
 
-        Assert.assertEquals(Arrays.asList(this.resources.installed),
-            this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID.getId(), "namespace"));
+        Assert.assertEquals(Arrays.asList(this.resources.installed), this.localExtensionRepository
+            .getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID.getId(), "namespace"));
 
         Assert.assertEquals(Collections.EMPTY_LIST,
             this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_ID.getId(), "namespace"));
@@ -266,8 +264,8 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
         this.localExtensionRepository.installExtension(this.resources.installedDependency, "namespace", true);
         this.localExtensionRepository.installExtension(this.resources.installed, "namespace", true);
 
-        Assert.assertEquals(Arrays.asList(this.resources.installed),
-            this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID.getId(), "namespace"));
+        Assert.assertEquals(Arrays.asList(this.resources.installed), this.localExtensionRepository
+            .getBackwardDependencies(TestResources.INSTALLED_DEPENDENCY_ID.getId(), "namespace"));
 
         Assert.assertEquals(Collections.EMPTY_LIST,
             this.localExtensionRepository.getBackwardDependencies(TestResources.INSTALLED_ID.getId(), "namespace"));

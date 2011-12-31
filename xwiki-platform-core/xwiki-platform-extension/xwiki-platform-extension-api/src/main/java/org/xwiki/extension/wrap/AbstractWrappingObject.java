@@ -19,58 +19,52 @@
  */
 package org.xwiki.extension.wrap;
 
-import java.util.Collection;
-
-import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.LocalExtensionFile;
-
 /**
- * Wrap a local extension.
+ * Wrap an Object.
  * 
- * @param <T> the extension type
+ * @param <T> the type of the wrapped object
  * @version $Id$
  */
-public class WrappingLocalExtension<T extends LocalExtension> extends WrappingExtension<T> implements LocalExtension
+public abstract class AbstractWrappingObject<T>
 {
     /**
-     * @param localExtension the wrapped local extension
+     * @see #getWrapped()
      */
-    public WrappingLocalExtension(T localExtension)
+    private T wrapped;
+
+    /**
+     * @param wrapped the wrapped object
+     */
+    public AbstractWrappingObject(T wrapped)
     {
-        super(localExtension);
+        this.wrapped = wrapped;
     }
 
-    // Extension
-
-    @Override
-    public LocalExtensionFile getFile()
+    /**
+     * @return the wrapped object
+     */
+    protected T getWrapped()
     {
-        return (LocalExtensionFile) super.getFile();
+        return this.wrapped;
     }
 
-    // LocalExtension
+    // Object
 
     @Override
-    public boolean isInstalled()
+    public int hashCode()
     {
-        return getWrapped().isInstalled();
-    }
-
-    @Override
-    public boolean isInstalled(String namespace)
-    {
-        return getWrapped().isInstalled(namespace);
-    }
-
-    @Override
-    public boolean isDependency()
-    {
-        return getWrapped().isDependency();
+        return getWrapped().hashCode();
     }
 
     @Override
-    public Collection<String> getNamespaces()
+    public boolean equals(Object obj)
     {
-        return getWrapped().getNamespaces();
+        return getWrapped().equals(obj);
+    }
+
+    @Override
+    public String toString()
+    {
+        return getWrapped().toString();
     }
 }

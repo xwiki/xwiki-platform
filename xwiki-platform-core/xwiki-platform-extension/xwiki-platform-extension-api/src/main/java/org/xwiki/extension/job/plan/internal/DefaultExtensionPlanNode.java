@@ -25,6 +25,7 @@ import java.util.Collections;
 
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.extension.job.plan.ExtensionPlanNode;
+import org.xwiki.extension.version.VersionConstraint;
 
 /**
  * A node in the extension plan tree.
@@ -44,26 +45,34 @@ public class DefaultExtensionPlanNode implements ExtensionPlanNode
     private Collection<ExtensionPlanNode> children;
 
     /**
+     * @see #getVersionConstraint()
+     */
+    private VersionConstraint initialVersionConstraint;
+
+    /**
      * @param node a node to copy
      */
     public DefaultExtensionPlanNode(ExtensionPlanNode node)
     {
-        this(node.getAction(), node.getChildren());
+        this(node.getAction(), node.getChildren(), node.getInitialVersionConstraint());
     }
 
     /**
      * @param action the action to perform for this node
+     * @param initialVersionConstraint the initial version constraint before resolving the extension
      */
-    public DefaultExtensionPlanNode(ExtensionPlanAction action)
+    public DefaultExtensionPlanNode(ExtensionPlanAction action, VersionConstraint initialVersionConstraint)
     {
-        this(action, null);
+        this(action, null, initialVersionConstraint);
     }
 
     /**
      * @param action the action to perform for this node
      * @param children the children of this node
+     * @param initialVersionConstraint the initial version constraint before resolving the extension
      */
-    public DefaultExtensionPlanNode(ExtensionPlanAction action, Collection<ExtensionPlanNode> children)
+    public DefaultExtensionPlanNode(ExtensionPlanAction action, Collection<ExtensionPlanNode> children,
+        VersionConstraint initialVersionConstraint)
     {
         this.action = action;
         if (children != null) {
@@ -71,6 +80,7 @@ public class DefaultExtensionPlanNode implements ExtensionPlanNode
         } else {
             this.children = Collections.emptyList();
         }
+        this.initialVersionConstraint = initialVersionConstraint;
     }
 
     @Override
@@ -83,5 +93,11 @@ public class DefaultExtensionPlanNode implements ExtensionPlanNode
     public Collection<ExtensionPlanNode> getChildren()
     {
         return this.children;
+    }
+
+    @Override
+    public VersionConstraint getInitialVersionConstraint()
+    {
+        return this.initialVersionConstraint;
     }
 }

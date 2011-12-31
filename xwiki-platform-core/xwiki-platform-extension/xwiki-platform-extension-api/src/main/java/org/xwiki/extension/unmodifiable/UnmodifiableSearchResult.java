@@ -23,6 +23,7 @@ import java.util.Iterator;
 
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.repository.search.SearchResult;
+import org.xwiki.extension.wrap.AbstractWrappingObject;
 
 /**
  * Provide a readonly access to a search result.
@@ -30,43 +31,39 @@ import org.xwiki.extension.repository.search.SearchResult;
  * @param <E> the extension type
  * @version $Id$
  */
-public class UnmodifiableSearchResult<E extends Extension> implements SearchResult<E>
+public class UnmodifiableSearchResult<E extends Extension> extends AbstractWrappingObject<SearchResult<E>> implements
+    SearchResult<E>
 {
-    /**
-     * The wrapped result.
-     */
-    private SearchResult<E> result;
-
     /**
      * @param result the wrapped result
      */
     public UnmodifiableSearchResult(SearchResult<E> result)
     {
-        this.result = result;
+        super(result);
     }
 
     @Override
     public Iterator<E> iterator()
     {
-        return new UnmodifiableExtensionIterator<E>(result.iterator());
+        return new UnmodifiableExtensionIterator<E>(getWrapped().iterator());
     }
 
     @Override
     public int getTotalHits()
     {
-        return this.result.getTotalHits();
+        return getWrapped().getTotalHits();
     }
 
     @Override
     public int getOffset()
     {
-        return this.result.getOffset();
+        return getWrapped().getOffset();
     }
 
     @Override
     public int getSize()
     {
-        return this.result.getSize();
+        return getWrapped().getSize();
     }
 
 }

@@ -4,6 +4,9 @@
   <id>installedextensiondependency</id>
   <version>version</version>
   <type>type</type>
+  <features>
+    <feature>installedextensiondependency-feature</feature>
+  </features>
   <dependency>true</dependency>
   <installed>true</installed>
   <description>description</description>

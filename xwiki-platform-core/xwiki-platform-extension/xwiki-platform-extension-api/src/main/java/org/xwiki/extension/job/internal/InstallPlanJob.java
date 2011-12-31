@@ -46,7 +46,7 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
     {
         // never change
 
-        private ExtensionDependency initialDependency;
+        private final ExtensionDependency initialDependency;
 
         // can change
 
@@ -54,28 +54,28 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
 
         public List<ModifableExtensionPlanNode> children;
 
+        public VersionConstraint versionConstraint;
+
         public final List<ModifableExtensionPlanNode> duplicates = new ArrayList<ModifableExtensionPlanNode>();
 
         // helpers
 
         public ModifableExtensionPlanNode()
         {
-
+            this.initialDependency = null;
         }
 
-        public ModifableExtensionPlanNode(ExtensionDependency initialDependency)
+        public ModifableExtensionPlanNode(ExtensionDependency initialDependency, VersionConstraint versionConstraint)
         {
             this.initialDependency = initialDependency;
+            this.versionConstraint = versionConstraint;
         }
 
         public ModifableExtensionPlanNode(ExtensionDependency initialDependency, ModifableExtensionPlanNode node)
         {
             this.initialDependency = initialDependency;
-        }
 
-        public ExtensionDependency getInitialDependency()
-        {
-            return initialDependency;
+            set(node);
         }
 
         public void set(ModifableExtensionPlanNode node)
@@ -186,10 +186,10 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
             // Set the initial dependency version constraint
             DefaultExtensionPlanAction action =
                 new DefaultExtensionPlanAction(node.action.getExtension(), node.action.getPreviousExtension(),
-                    node.action.getAction(), node.action.getNamespace(), node.initialDependency != null
-                        ? node.initialDependency.getVersionConstraint() : null);
+                    node.action.getAction(), node.action.getNamespace(), node.initialDependency != null);
 
-            finalTree.add(new DefaultExtensionPlanNode(action, children));
+            finalTree.add(new DefaultExtensionPlanNode(action, children, node.initialDependency != null
+                ? node.initialDependency.getVersionConstraint() : null));
         }
 
         return finalTree;
@@ -317,7 +317,8 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
         return compatible;
     }
 
-    private CoreExtension checkCoreExtension(ExtensionDependency extensionDependency) throws InstallException
+    private boolean checkCoreExtension(ExtensionDependency extensionDependency,
+        List<ModifableExtensionPlanNode> parentBranch) throws InstallException
     {
         CoreExtension coreExtension = this.coreExtensionRepository.getCoreExtension(extensionDependency.getId());
 
@@ -325,10 +326,112 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
             if (!isCompatible(coreExtension.getId().getVersion(), extensionDependency.getVersionConstraint())) {
                 throw new InstallException("Dependency [" + extensionDependency
                     + "] is not compatible with core extension [" + coreExtension + "]");
+            } else {
+                this.logger.info("There is already a core extension [{}] covering extension dependency [{}]",
+                    coreExtension, extensionDependency);
+
+                ModifableExtensionPlanNode node =
+                    new ModifableExtensionPlanNode(extensionDependency, extensionDependency.getVersionConstraint());
+                node.action = new DefaultExtensionPlanAction(coreExtension, null, Action.NONE, null, true);
+
+                parentBranch.add(node);
+
+                return true;
             }
         }
 
-        return coreExtension;
+        return false;
+    }
+
+    private VersionConstraint checkExistingPlanNode(ExtensionDependency extensionDependency, String namespace,
+        List<ModifableExtensionPlanNode> parentBranch, VersionConstraint previousVersionConstraint)
+        throws InstallException
+    {
+        VersionConstraint versionConstraint = previousVersionConstraint;
+
+        ModifableExtensionPlanNode existingNode = getExtensionNode(extensionDependency.getId(), namespace);
+        if (existingNode != null) {
+            if (isCompatible(existingNode.action.getExtension().getId().getVersion(), versionConstraint)) {
+                ModifableExtensionPlanNode node = new ModifableExtensionPlanNode(extensionDependency, existingNode);
+                addExtensionNode(node);
+                parentBranch.add(node);
+
+                return null;
+            } else {
+                if (existingNode.versionConstraint != null) {
+                    try {
+                        versionConstraint = versionConstraint.merge(existingNode.versionConstraint);
+                    } catch (IncompatibleVersionConstraintException e) {
+                        throw new InstallException("Dependency [" + extensionDependency
+                            + "] is incompatible with current containt [" + existingNode.versionConstraint + "]", e);
+                    }
+                } else {
+                    throw new InstallException("Dependency [" + extensionDependency + "] incompatible with extension ["
+                        + existingNode.action.getExtension() + "]");
+                }
+            }
+        }
+
+        return versionConstraint;
+    }
+
+    private ExtensionDependency checkInstalledExtension(LocalExtension installedExtension,
+        ExtensionDependency extensionDependency, VersionConstraint versionConstraint, String namespace,
+        List<ModifableExtensionPlanNode> parentBranch) throws InstallException
+    {
+        ExtensionDependency targetDependency = extensionDependency;
+
+        if (installedExtension != null) {
+            if (isCompatible(installedExtension.getId().getVersion(), versionConstraint)) {
+                this.logger.info("There is already an installed extension [{}] covering extension dependency [{}]",
+                    installedExtension, extensionDependency);
+
+                ModifableExtensionPlanNode node =
+                    new ModifableExtensionPlanNode(extensionDependency, versionConstraint);
+                node.action =
+                    new DefaultExtensionPlanAction(installedExtension, null, Action.NONE, namespace,
+                        installedExtension.isDependency());
+
+                addExtensionNode(node);
+                parentBranch.add(node);
+
+                return null;
+            }
+
+            VersionConstraint mergedVersionContraint;
+            try {
+                if (installedExtension.isInstalled(null)) {
+                    Map<String, Collection<LocalExtension>> backwardDependencies =
+                        this.localExtensionRepository.getBackwardDependencies(installedExtension.getId());
+
+                    mergedVersionContraint =
+                        mergeVersionConstraints(backwardDependencies.get(null), extensionDependency.getId(),
+                            versionConstraint);
+                    if (namespace != null) {
+                        mergedVersionContraint =
+                            mergeVersionConstraints(backwardDependencies.get(namespace), extensionDependency.getId(),
+                                mergedVersionContraint);
+                    }
+                } else {
+                    Collection<LocalExtension> backwardDependencies =
+                        this.localExtensionRepository.getBackwardDependencies(installedExtension.getId().getId(),
+                            namespace);
+
+                    mergedVersionContraint =
+                        mergeVersionConstraints(backwardDependencies, extensionDependency.getId(), versionConstraint);
+                }
+            } catch (IncompatibleVersionConstraintException e) {
+                throw new InstallException("Provided depency is incompatible with already installed extensions", e);
+            } catch (ResolveException e) {
+                throw new InstallException("Failed to resolve backward dependencies", e);
+            }
+
+            if (mergedVersionContraint != versionConstraint) {
+                targetDependency = new DefaultExtensionDependency(extensionDependency, mergedVersionContraint);
+            }
+        }
+
+        return targetDependency;
     }
 
     /**
@@ -348,103 +451,35 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
             this.logger.info("Resolving extension dependency [{}]", extensionDependency);
         }
 
-        VersionConstraint versionContraint = extensionDependency.getVersionConstraint();
+        VersionConstraint versionConstraint = extensionDependency.getVersionConstraint();
 
         // Make sure the dependency is not already a core extension
-        CoreExtension coreExtension = checkCoreExtension(extensionDependency);
-        if (coreExtension != null) {
-            this.logger.info("There is already a core extension [{}] covering extension dependency [{}]",
-                coreExtension, extensionDependency);
-
-            ModifableExtensionPlanNode node = new ModifableExtensionPlanNode(extensionDependency);
-            node.action = new DefaultExtensionPlanAction(coreExtension, null, Action.NONE, namespace, versionContraint);
-            node.initialDependency = extensionDependency;
-
-            parentBranch.add(node);
-
+        if (checkCoreExtension(extensionDependency, parentBranch)) {
+            // Already exists and added to the tree by #checkExistingPlan
             return;
         }
 
         // Make sure the dependency is not already in the current plan
-        ModifableExtensionPlanNode existingNode = getExtensionNode(extensionDependency.getId(), namespace);
-        if (existingNode != null) {
-            if (isCompatible(existingNode.action.getExtension().getId().getVersion(), versionContraint)) {
-                ModifableExtensionPlanNode node = new ModifableExtensionPlanNode(extensionDependency, existingNode);
-                addExtensionNode(node);
-                parentBranch.add(node);
-
-                return;
-            } else {
-                if (existingNode.action.getVersionConstraint() != null) {
-                    try {
-                        versionContraint = versionContraint.merge(existingNode.action.getVersionConstraint());
-                    } catch (IncompatibleVersionConstraintException e) {
-                        throw new InstallException("Dependency [" + extensionDependency
-                            + "] is incompatible with current containt [" + existingNode.action.getVersionConstraint()
-                            + "]", e);
-                    }
-                } else {
-                    throw new InstallException("Dependency [" + extensionDependency + "] incompatible with extension ["
-                        + existingNode.action.getExtension() + "]");
-                }
-            }
+        versionConstraint = checkExistingPlanNode(extensionDependency, namespace, parentBranch, versionConstraint);
+        if (versionConstraint == null) {
+            // Already exists and added to the tree by #checkExistingPlan
+            return;
         }
 
-        LocalExtension previousExtension = null;
-
-        ExtensionDependency targetDependency = extensionDependency;
-        LocalExtension installedExtension =
+        // Check local extensions
+        LocalExtension previousExtension =
             this.localExtensionRepository.getInstalledExtension(extensionDependency.getId(), namespace);
-        if (installedExtension != null) {
-            if (isCompatible(installedExtension.getId().getVersion(), versionContraint)) {
-                this.logger.info("There is already an installed extension [{}] covering extension dependency [{}]",
-                    coreExtension, extensionDependency);
-
-                ModifableExtensionPlanNode node = new ModifableExtensionPlanNode(extensionDependency);
-                node.action =
-                    new DefaultExtensionPlanAction(installedExtension, null, Action.NONE, namespace, versionContraint);
-                node.initialDependency = extensionDependency;
-
-                addExtensionNode(node);
-                parentBranch.add(node);
-
-                return;
-            }
-
-            VersionConstraint mergedVersionContraint;
-            try {
-                if (installedExtension.isInstalled(null)) {
-                    Map<String, Collection<LocalExtension>> backwardDependencies =
-                        this.localExtensionRepository.getBackwardDependencies(installedExtension.getId());
-
-                    mergedVersionContraint =
-                        mergeVersionConstraints(backwardDependencies.get(null), extensionDependency.getId(),
-                            versionContraint);
-                    if (namespace != null) {
-                        mergedVersionContraint =
-                            mergeVersionConstraints(backwardDependencies.get(namespace), extensionDependency.getId(),
-                                mergedVersionContraint);
-                    }
-                } else {
-                    Collection<LocalExtension> backwardDependencies =
-                        this.localExtensionRepository.getBackwardDependencies(installedExtension.getId().getId(),
-                            namespace);
-
-                    mergedVersionContraint =
-                        mergeVersionConstraints(backwardDependencies, extensionDependency.getId(), versionContraint);
-                }
-            } catch (IncompatibleVersionConstraintException e) {
-                throw new InstallException("Provided depency is incompatible with already installed extensions", e);
-            } catch (ResolveException e) {
-                throw new InstallException("Failed to resolve backward dependencies", e);
-            }
-
-            if (mergedVersionContraint != versionContraint) {
-                targetDependency = new DefaultExtensionDependency(extensionDependency, mergedVersionContraint);
-            }
+        ExtensionDependency targetDependency =
+            checkInstalledExtension(previousExtension, extensionDependency, versionConstraint, namespace, parentBranch);
+        if (targetDependency == null) {
+            // Already exists and added to the tree by #checkExistingPlan
+            return;
         }
 
+        // Not found locally, search it remotely
         ModifableExtensionPlanNode node = installExtension(previousExtension, targetDependency, true, namespace);
+
+        node.versionConstraint = versionConstraint;
 
         addExtensionNode(node);
         parentBranch.add(node);
@@ -466,14 +501,13 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
         notifyPushLevelProgress(2);
 
         try {
-            // Check is the extension is already in local repository
+            // Check if the extension is already in local repository
             Extension extension = resolveExtension(targetDependency);
 
             notifyStepPropress();
 
             try {
-                return installExtension(previousExtension, extension, dependency, namespace,
-                    targetDependency.getVersionConstraint());
+                return installExtension(previousExtension, extension, dependency, namespace, targetDependency);
             } catch (Exception e) {
                 throw new InstallException("Failed to resolve extension dependency", e);
             }
@@ -619,11 +653,11 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
      * @param dependency indicate if the extension is installed as a dependency
      * @param namespace the namespace where to install the extension
      * @return the install plan node for the provided extension
-     * @param initialConstraint the initial constraint used to resolve the extension
+     * @param initialDependency the initial dependency used to resolve the extension
      * @throws InstallException error when trying to install provided extension
      */
     private ModifableExtensionPlanNode installExtension(LocalExtension previousExtension, Extension extension,
-        boolean dependency, String namespace, VersionConstraint initialConstraint) throws InstallException
+        boolean dependency, String namespace, ExtensionDependency initialDependency) throws InstallException
     {
         List< ? extends ExtensionDependency> dependencies = extension.getDependencies();
 
@@ -640,13 +674,15 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
                 }
             }
 
-            ModifableExtensionPlanNode node = new ModifableExtensionPlanNode();
+            ModifableExtensionPlanNode node =
+                initialDependency != null ? new ModifableExtensionPlanNode(initialDependency,
+                    initialDependency.getVersionConstraint()) : new ModifableExtensionPlanNode();
 
             node.children = children;
             node.action =
                 new DefaultExtensionPlanAction(extension, previousExtension, previousExtension != null
                     ? DefaultExtensionPlanAction.Action.UPGRADE : DefaultExtensionPlanAction.Action.INSTALL, namespace,
-                    initialConstraint);
+                    dependency);
 
             return node;
         } finally {

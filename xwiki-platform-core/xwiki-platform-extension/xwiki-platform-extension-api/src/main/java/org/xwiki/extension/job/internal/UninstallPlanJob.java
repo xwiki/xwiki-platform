@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
@@ -25,6 +27,8 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
  * 
  * @version $Id$
  */
+@Component
+@Named("uninstallplan")
 public class UninstallPlanJob extends AbstractJob<UninstallRequest>
 {
     /**
@@ -210,8 +214,8 @@ public class UninstallPlanJob extends AbstractJob<UninstallRequest>
             notifyStepPropress();
 
             DefaultExtensionPlanAction action =
-                new DefaultExtensionPlanAction(localExtension, null, Action.UNINSTALL, namespace, null);
-            parentBranch.add(new DefaultExtensionPlanNode(action, children));
+                new DefaultExtensionPlanAction(localExtension, null, Action.UNINSTALL, namespace, false);
+            parentBranch.add(new DefaultExtensionPlanNode(action, children, null));
         } finally {
             notifyPopLevelProgress();
         }

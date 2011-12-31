@@ -22,75 +22,51 @@ package org.xwiki.extension.unmodifiable;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
-import org.xwiki.extension.version.VersionConstraint;
+import org.xwiki.extension.wrap.AbstractWrappingObject;
 
 /**
  * Provide a readonly access to an extension plan action.
  * 
  * @version $Id$
  */
-public class UnmodifiableExtensionPlanAction implements ExtensionPlanAction
+public class UnmodifiableExtensionPlanAction extends AbstractWrappingObject<ExtensionPlanAction> implements
+    ExtensionPlanAction
 {
-    /**
-     * The wrapped action.
-     */
-    private ExtensionPlanAction wrappedAction;
-
     /**
      * @param action the wrapped action
      */
     public UnmodifiableExtensionPlanAction(ExtensionPlanAction action)
     {
-        this.wrappedAction = action;
+        super(action);
     }
 
     @Override
     public Extension getExtension()
     {
-        return UnmodifiableUtils.unmodifiableExtension(this.wrappedAction.getExtension());
+        return UnmodifiableUtils.unmodifiableExtension(getWrapped().getExtension());
     }
 
     @Override
     public LocalExtension getPreviousExtension()
     {
-        return UnmodifiableUtils.unmodifiableExtension(this.wrappedAction.getPreviousExtension());
+        return UnmodifiableUtils.unmodifiableExtension(getWrapped().getPreviousExtension());
     }
 
     @Override
     public Action getAction()
     {
-        return this.wrappedAction.getAction();
+        return getWrapped().getAction();
     }
 
     @Override
     public String getNamespace()
     {
-        return this.wrappedAction.getNamespace();
+        return getWrapped().getNamespace();
     }
 
     @Override
-    public VersionConstraint getVersionConstraint()
+    public boolean isDependency()
     {
-        return this.wrappedAction.getVersionConstraint();
-    }
-
-    // Object
-
-    @Override
-    public int hashCode()
-    {
-        return this.wrappedAction.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        return this.wrappedAction.equals(obj);
-    }
-
-    @Override
-    public String toString()
-    {
-        return this.wrappedAction.toString();
+        return getWrapped().isDependency();
     }
 }

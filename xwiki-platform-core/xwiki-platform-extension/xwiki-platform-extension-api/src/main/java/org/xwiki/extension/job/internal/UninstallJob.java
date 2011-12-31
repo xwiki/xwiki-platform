@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
@@ -83,7 +82,7 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
 
             List<LogEvent> log = plan.getLog(LogLevel.ERROR);
             if (!log.isEmpty()) {
-                throw new InstallException("Failed to create install plan: " + log.get(0).getFormattedMessage(), log
+                throw new UninstallException("Failed to create install plan: " + log.get(0).getFormattedMessage(), log
                     .get(0).getThrowable());
             }
 

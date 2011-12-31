@@ -25,19 +25,17 @@ import java.util.Collections;
 
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.extension.job.plan.ExtensionPlanNode;
+import org.xwiki.extension.version.VersionConstraint;
+import org.xwiki.extension.wrap.AbstractWrappingObject;
 
 /**
  * Provide a readonly access to an extension plan node.
  * 
  * @version $Id$
  */
-public class UnmodifiableExtensionPlanNode implements ExtensionPlanNode
+public class UnmodifiableExtensionPlanNode extends AbstractWrappingObject<ExtensionPlanNode> implements
+    ExtensionPlanNode
 {
-    /**
-     * The wrapped node.
-     */
-    private ExtensionPlanNode wrappedNode;
-
     /**
      * @see #getChildren()
      */
@@ -48,20 +46,20 @@ public class UnmodifiableExtensionPlanNode implements ExtensionPlanNode
      */
     public UnmodifiableExtensionPlanNode(ExtensionPlanNode node)
     {
-        this.wrappedNode = node;
+        super(node);
     }
 
     @Override
     public ExtensionPlanAction getAction()
     {
-        return new UnmodifiableExtensionPlanAction(this.wrappedNode.getAction());
+        return new UnmodifiableExtensionPlanAction(getWrapped().getAction());
     }
 
     @Override
     public Collection<ExtensionPlanNode> getChildren()
     {
         if (this.wrappedChildren == null) {
-            Collection<ExtensionPlanNode> nodes = this.wrappedNode.getChildren();
+            Collection<ExtensionPlanNode> nodes = getWrapped().getChildren();
             if (nodes.isEmpty()) {
                 this.wrappedChildren = Collections.emptyList();
             } else {
@@ -75,23 +73,9 @@ public class UnmodifiableExtensionPlanNode implements ExtensionPlanNode
         return this.wrappedChildren;
     }
 
-    // Object
-
     @Override
-    public int hashCode()
+    public VersionConstraint getInitialVersionConstraint()
     {
-        return this.wrappedNode.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        return this.wrappedNode.equals(obj);
-    }
-
-    @Override
-    public String toString()
-    {
-        return this.wrappedNode.toString();
+        return getWrapped().getInitialVersionConstraint();
     }
 }

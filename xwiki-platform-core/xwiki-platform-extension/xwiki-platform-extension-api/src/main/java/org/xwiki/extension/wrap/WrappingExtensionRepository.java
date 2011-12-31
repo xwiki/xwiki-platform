@@ -32,19 +32,15 @@ import org.xwiki.extension.repository.ExtensionRepositoryId;
  * @param <T>
  * @version $Id$
  */
-public class WrappingExtensionRepository<T extends ExtensionRepository> implements ExtensionRepository
+public class WrappingExtensionRepository<T extends ExtensionRepository> extends AbstractWrappingObject<T> implements
+    ExtensionRepository
 {
-    /**
-     * @see #getRepository()
-     */
-    private T repository;
-
     /**
      * @param repository the wrapped repository
      */
     public WrappingExtensionRepository(T repository)
     {
-        this.repository = repository;
+        super(repository);
     }
 
     /**
@@ -52,7 +48,7 @@ public class WrappingExtensionRepository<T extends ExtensionRepository> implemen
      */
     protected T getRepository()
     {
-        return this.repository;
+        return getWrapped();
     }
 
     // ExtensionRepository

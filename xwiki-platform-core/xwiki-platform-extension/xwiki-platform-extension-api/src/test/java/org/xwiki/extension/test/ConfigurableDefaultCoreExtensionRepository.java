@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.internal.DefaultCoreExtension;
 import org.xwiki.extension.repository.internal.DefaultCoreExtensionRepository;
+import org.xwiki.extension.version.Version;
 
 @Component
 @Singleton
@@ -35,7 +36,7 @@ public class ConfigurableDefaultCoreExtensionRepository extends DefaultCoreExten
         this.extensions.put(extension.getId().getId(), extension);
     }
 
-    public void addExtensions(String id, String version)
+    public void addExtensions(String id, Version version)
     {
         this.extensions.put(id, new DefaultCoreExtension(null, null, new ExtensionId(id, version), "unknown"));
     }

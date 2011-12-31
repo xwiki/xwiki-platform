@@ -32,7 +32,7 @@ import org.xwiki.extension.job.plan.ExtensionPlanNode;
  * 
  * @version $Id$
  */
-public class UnmodifiableExtensionPlan extends UnmodifiableJobStatus implements ExtensionPlan
+public class UnmodifiableExtensionPlan extends UnmodifiableJobStatus<ExtensionPlan> implements ExtensionPlan
 {
     /**
      * @see #getTree()
@@ -52,19 +52,11 @@ public class UnmodifiableExtensionPlan extends UnmodifiableJobStatus implements 
         super(plan);
     }
 
-    /**
-     * @return the wrapped extension plan
-     */
-    protected ExtensionPlan getExtensionPlan()
-    {
-        return (ExtensionPlan) getJobStatus();
-    }
-
     @Override
     public Collection<ExtensionPlanNode> getTree()
     {
         if (this.wrappedTree == null) {
-            Collection<ExtensionPlanNode> nodes = getExtensionPlan().getTree();
+            Collection<ExtensionPlanNode> nodes = getWrapped().getTree();
             if (nodes.isEmpty()) {
                 this.wrappedTree = Collections.emptyList();
             } else {
@@ -82,7 +74,7 @@ public class UnmodifiableExtensionPlan extends UnmodifiableJobStatus implements 
     public Collection<ExtensionPlanAction> getActions()
     {
         if (this.wrappedActions == null) {
-            Collection<ExtensionPlanAction> actions = getExtensionPlan().getActions();
+            Collection<ExtensionPlanAction> actions = getWrapped().getActions();
             if (actions.isEmpty()) {
                 this.wrappedActions = Collections.emptyList();
             } else {
@@ -94,25 +86,5 @@ public class UnmodifiableExtensionPlan extends UnmodifiableJobStatus implements 
         }
 
         return this.wrappedActions;
-    }
-
-    // Object
-
-    @Override
-    public int hashCode()
-    {
-        return getExtensionPlan().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        return getExtensionPlan().equals(obj);
-    }
-
-    @Override
-    public String toString()
-    {
-        return getExtensionPlan().toString();
     }
 }

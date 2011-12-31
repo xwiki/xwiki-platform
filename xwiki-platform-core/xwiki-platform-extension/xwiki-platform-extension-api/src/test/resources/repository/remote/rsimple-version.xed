@@ -4,4 +4,7 @@
   <id>rsimple</id>
   <version>version</version>
   <type>type</type>
+  <features>
+    <feature>rsimple-feature</feature>
+  </features>
 </extension>

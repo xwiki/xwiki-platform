@@ -192,8 +192,7 @@ public class InstallJob extends AbstractJob<InstallRequest>
             notifyStepPropress();
 
             // Install
-            installExtension(localExtension, action.getPreviousExtension(), namespace,
-                action.getVersionConstraint() != null);
+            installExtension(localExtension, action.getPreviousExtension(), namespace, action.isDependency());
 
             if (namespace != null) {
                 this.logger.info("Successfully installed extension [{}] on namespace [{}]", localExtension, namespace);

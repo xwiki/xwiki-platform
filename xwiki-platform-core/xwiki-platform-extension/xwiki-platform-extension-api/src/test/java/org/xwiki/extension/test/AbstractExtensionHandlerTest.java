@@ -27,7 +27,10 @@ import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.Job;
 import org.xwiki.extension.job.JobManager;
+import org.xwiki.extension.job.Request;
 import org.xwiki.extension.job.UninstallRequest;
+import org.xwiki.extension.job.plan.ExtensionPlan;
+import org.xwiki.extension.job.plan.internal.DefaultExtensionPlan;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
@@ -72,47 +75,66 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
         registerComponent(ConfigurableDefaultCoreExtensionRepository.class);
     }
 
-    protected LocalExtension install(ExtensionId extensionId) throws Throwable
+    protected Job executeJob(String jobId, Request request) throws Throwable
     {
-        return install(extensionId, null);
-    }
-
-    protected LocalExtension install(ExtensionId extensionId, String namespace) throws Throwable
-    {
-        InstallRequest installRequest = new InstallRequest();
-        installRequest.addExtension(extensionId);
-        if (namespace != null) {
-            installRequest.addNamespace(namespace);
-        }
-        Job installJob = this.jobManager.install(installRequest);
+        Job installJob = this.jobManager.executeJob(jobId, request);
 
         List<LogEvent> errors = installJob.getStatus().getLog(LogLevel.ERROR);
         if (!errors.isEmpty()) {
             throw errors.get(0).getThrowable();
         }
 
+        return installJob;
+    }
+
+    protected LocalExtension install(ExtensionId extensionId, String namespace) throws Throwable
+    {
+        install("install", extensionId, namespace);
+
         return (LocalExtension) this.localExtensionRepository.resolve(extensionId);
     }
 
-    protected LocalExtension uninstall(ExtensionId extensionId) throws Throwable
+    protected ExtensionPlan installPlan(ExtensionId extensionId, String namespace) throws Throwable
     {
-        return uninstall(extensionId, null);
+        Job installJob = install("installplan", extensionId, namespace);
+
+        return (ExtensionPlan) installJob.getStatus();
+    }
+
+    protected Job install(String jobId, ExtensionId extensionId, String namespace) throws Throwable
+    {
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.addExtension(extensionId);
+        if (namespace != null) {
+            installRequest.addNamespace(namespace);
+        }
+
+        return executeJob(jobId, installRequest);
     }
 
     protected LocalExtension uninstall(ExtensionId extensionId, String namespace) throws Throwable
+    {
+        uninstall("uninstall", extensionId, namespace);
+
+        return (LocalExtension) this.localExtensionRepository.resolve(extensionId);
+    }
+
+    protected DefaultExtensionPlan<UninstallRequest> uninstallPlan(ExtensionId extensionId, String namespace)
+        throws Throwable
+    {
+        Job uninstallJob = uninstall("installplan", extensionId, namespace);
+
+        return (DefaultExtensionPlan<UninstallRequest>) uninstallJob.getStatus();
+    }
+
+    protected Job uninstall(String jobId, ExtensionId extensionId, String namespace) throws Throwable
     {
         UninstallRequest uninstallRequest = new UninstallRequest();
         uninstallRequest.addExtension(extensionId);
         if (namespace != null) {
             uninstallRequest.addNamespace(namespace);
         }
-        Job uninstallJob = this.jobManager.uninstall(uninstallRequest);
 
-        List<LogEvent> errors = uninstallJob.getStatus().getLog(LogLevel.ERROR);
-        if (!errors.isEmpty()) {
-            throw errors.get(0).getThrowable();
-        }
-
-        return (LocalExtension) this.localExtensionRepository.resolve(extensionId);
+        return executeJob(jobId, uninstallRequest);
     }
 }

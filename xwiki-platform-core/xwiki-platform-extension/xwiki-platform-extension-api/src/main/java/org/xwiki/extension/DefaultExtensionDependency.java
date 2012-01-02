@@ -19,6 +19,10 @@
  */
 package org.xwiki.extension;
 
+import java.util.Map;
+
+import org.xwiki.extension.version.VersionConstraint;
+
 /**
  * Default implementation of {@link ExtensionDependency}.
  * 
@@ -27,11 +31,32 @@ package org.xwiki.extension;
 public class DefaultExtensionDependency extends AbstractExtensionDependency
 {
     /**
-     * @param id the id of the extension
-     * @param version the version of the extension
+     * @param id the id of the extension dependency
+     * @param versionConstraint the version constraint of the extension dependency
      */
-    public DefaultExtensionDependency(String id, String version)
+    public DefaultExtensionDependency(String id, VersionConstraint versionConstraint)
     {
-        super(id, version);
+        super(id, versionConstraint);
+    }
+
+    /**
+     * @param id the id of the extension dependency
+     * @param versionConstraint the version constraint of the extension dependency
+     * @param properties the custom properties of the extension dependency
+     */
+    public DefaultExtensionDependency(String id, VersionConstraint versionConstraint, Map<String, Object> properties)
+    {
+        super(id, versionConstraint, properties);
+    }
+
+    /**
+     * Create new instance by cloning the provided one with different version constraint.
+     * 
+     * @param dependency the extension dependency to copy
+     * @param versionConstraint the version constraint to set
+     */
+    public DefaultExtensionDependency(ExtensionDependency dependency, VersionConstraint versionConstraint)
+    {
+        super(dependency, versionConstraint);
     }
 }

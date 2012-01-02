@@ -32,22 +32,28 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.internal.VersionManager;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.Job;
 import org.xwiki.extension.job.JobException;
 import org.xwiki.extension.job.JobManager;
-import org.xwiki.extension.job.JobStatus;
 import org.xwiki.extension.job.UninstallRequest;
+import org.xwiki.extension.job.event.status.JobStatus;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
-import org.xwiki.extension.repository.search.SearchResult;
+import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.unmodifiable.UnmodifiableJobStatus;
 import org.xwiki.extension.unmodifiable.UnmodifiableUtils;
+import org.xwiki.extension.version.Version;
+import org.xwiki.extension.version.VersionConstraint;
+import org.xwiki.extension.version.VersionRange;
+import org.xwiki.extension.version.internal.DefaultVersion;
+import org.xwiki.extension.version.internal.DefaultVersionConstraint;
+import org.xwiki.extension.version.internal.DefaultVersionRange;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -71,10 +77,6 @@ public class ExtensionManagerScriptService implements ScriptService
     @Inject
     private ExtensionManager extensionManager;
 
-    /** Also exposed by the brige. */
-    @Inject
-    private VersionManager versionManager;
-
     /** Needed for checking programming rights. */
     @Inject
     private DocumentAccessBridge documentAccessBridge;
@@ -93,21 +95,11 @@ public class ExtensionManagerScriptService implements ScriptService
 
     /** Handles and provides status feedback on extension operations (installation, upgrade, removal). */
     @Inject
-    private JobManager taskManager;
+    private JobManager jobManager;
 
     /** Provides access to the current context. */
     @Inject
     private Execution execution;
-
-    /**
-     * Gives access to the {@link VersionManager} for version utility methods.
-     * 
-     * @return the default version manager
-     */
-    public VersionManager getVersionManager()
-    {
-        return this.versionManager;
-    }
 
     // Extensions
 
@@ -122,7 +114,7 @@ public class ExtensionManagerScriptService implements ScriptService
      * @return the found extensions descriptors, empty list if nothing could be found
      * @see org.xwiki.extension.repository.search.Searchable
      */
-    public SearchResult<Extension> search(String pattern, int offset, int nb)
+    public IterableResult<Extension> search(String pattern, int offset, int nb)
     {
         return this.repositoryManager.search(pattern, offset, nb);
     }
@@ -146,6 +138,30 @@ public class ExtensionManagerScriptService implements ScriptService
             extension =
                 UnmodifiableUtils.unmodifiableExtension(this.extensionManager.resolveExtension(new ExtensionId(id,
                     version)));
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return extension;
+    }
+
+    /**
+     * Get the extension handler corresponding to the given extension ID and version. The returned handler can be used
+     * to get more information about the extension, such as the authors, an extension description, its license...
+     * 
+     * @param extensionDependency the extension dependency to resolve
+     * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension couldn't
+     *         be resolved, in which case {@link #getLastError()} contains the failure reason
+     */
+    public Extension resolve(ExtensionDependency extensionDependency)
+    {
+        setError(null);
+
+        Extension extension = null;
+
+        try {
+            extension =
+                UnmodifiableUtils.unmodifiableExtension(this.extensionManager.resolveExtension(extensionDependency));
         } catch (Exception e) {
             setError(e);
         }
@@ -188,7 +204,7 @@ public class ExtensionManagerScriptService implements ScriptService
      * The returned handler can be used to get more information about the extension, such as the authors, an extension
      * description, its license...
      * 
-     * @param id the extension id or provided feature (virtual extension) of the extension to resolve
+     * @param feature the extension id or provided feature (virtual extension) of the extension to resolve
      * @param namespace the optional namespace where the extension should be installed
      * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension isn't
      *         installed in the target namespace
@@ -213,13 +229,13 @@ public class ExtensionManagerScriptService implements ScriptService
      * Get the extension handler corresponding to the given core extension ID. The returned handler can be used to get
      * more information about the extension, such as the authors, an extension description, its license...
      * 
-     * @param id the extension id or provided feature (virtual extension) of the extension to resolve
+     * @param feature the extension id or provided feature (virtual extension) of the extension to resolve
      * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension isn't
      *         provided by the platform
      */
-    public CoreExtension getCoreExtension(String id)
+    public CoreExtension getCoreExtension(String feature)
     {
-        return UnmodifiableUtils.unmodifiableExtension(this.coreExtensionRepository.getCoreExtension(id));
+        return UnmodifiableUtils.unmodifiableExtension(this.coreExtensionRepository.getCoreExtension(feature));
     }
 
     /**
@@ -238,12 +254,12 @@ public class ExtensionManagerScriptService implements ScriptService
      * Get all the installed extensions that depend on the specified extension. The results are grouped by namespace, so
      * the same extension can appear multiple times, once for each namespace where it is installed.
      * 
-     * @param id the extension id or provided feature (virtual extension) of the extension to resolve
+     * @param feature the extension id or provided feature (virtual extension) of the extension to resolve
      * @param version the specific version to check
      * @return a map namespace -&gt; list of dependent extensions, or {@code null} if any error occurs while computing
      *         the result, in which case {@link #getLastError()} contains the failure reason
      */
-    public Map<String, Collection<LocalExtension>> getBackwardDependencies(String id, String version)
+    public Map<String, Collection<LocalExtension>> getBackwardDependencies(String feature, String version)
     {
         setError(null);
 
@@ -252,7 +268,7 @@ public class ExtensionManagerScriptService implements ScriptService
         try {
             extensions =
                 UnmodifiableUtils.unmodifiableExtensions(this.localExtensionRepository
-                    .getBackwardDependencies(new ExtensionId(id, version)));
+                    .getBackwardDependencies(new ExtensionId(feature, version)));
         } catch (Exception e) {
             setError(e);
 
@@ -291,16 +307,16 @@ public class ExtensionManagerScriptService implements ScriptService
             installRequest.addNamespace(namespace);
         }
 
-        Job task;
+        Job job;
         try {
-            task = this.taskManager.install(installRequest);
+            job = this.jobManager.install(installRequest);
         } catch (JobException e) {
             setError(e);
 
-            task = null;
+            job = null;
         }
 
-        return task;
+        return job;
     }
 
     /**
@@ -325,16 +341,16 @@ public class ExtensionManagerScriptService implements ScriptService
         UninstallRequest uninstallRequest = new UninstallRequest();
         uninstallRequest.addExtension(new ExtensionId(id, version));
 
-        Job task;
+        Job job;
         try {
-            task = this.taskManager.uninstall(uninstallRequest);
+            job = this.jobManager.uninstall(uninstallRequest);
         } catch (Exception e) {
             setError(e);
 
-            task = null;
+            job = null;
         }
 
-        return task;
+        return job;
     }
 
     // Jobs
@@ -347,10 +363,11 @@ public class ExtensionManagerScriptService implements ScriptService
     public Job getCurrentJob()
     {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
-            setError(new JobException("Need programming right to get current task"));
+            setError(new JobException("Need programming right to get current job"));
             return null;
         }
-        return this.taskManager.getCurrentJob();
+
+        return this.jobManager.getCurrentJob();
     }
 
     /**
@@ -360,16 +377,17 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public JobStatus getCurrentJobStatus()
     {
-        Job job = this.taskManager.getCurrentJob();
+        Job job = this.jobManager.getCurrentJob();
         JobStatus jobStatus;
         if (job != null) {
             jobStatus = job.getStatus();
             if (!this.documentAccessBridge.hasProgrammingRights()) {
-                jobStatus = new UnmodifiableJobStatus(jobStatus);
+                jobStatus = new UnmodifiableJobStatus<JobStatus>(jobStatus);
             }
         } else {
             jobStatus = null;
         }
+
         return jobStatus;
     }
 
@@ -392,5 +410,44 @@ public class ExtensionManagerScriptService implements ScriptService
     private void setError(Exception e)
     {
         this.execution.getContext().setProperty(EXTENSIONERROR_KEY, e);
+    }
+
+    /**
+     * @param version the string to parse
+     * @return the {@link Version} instance
+     */
+    public Version parseVersion(String version)
+    {
+        return new DefaultVersion(version);
+    }
+
+    /**
+     * @param versionRange the string to parse
+     * @return the {@link VersionRange} instance
+     */
+    public VersionRange parseVersionRange(String versionRange)
+    {
+        try {
+            return new DefaultVersionRange(versionRange);
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param versionConstraint the string to parse
+     * @return the {@link VersionConstraint} instance
+     */
+    public VersionConstraint parseVersionConstraint(String versionConstraint)
+    {
+        try {
+            return new DefaultVersionConstraint(versionConstraint);
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
     }
 }

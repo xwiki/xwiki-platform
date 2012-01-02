@@ -19,7 +19,6 @@
  */
 package org.xwiki.extension.repository.aether.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -28,7 +27,6 @@ import java.util.Arrays;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +39,7 @@ import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.test.RepositoryUtil;
+import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.test.AbstractComponentTestCase;
 
 public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCase
@@ -52,6 +51,8 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
     private ExtensionRepositoryManager repositoryManager;
 
     private ExtensionId extensionId;
+
+    private ExtensionId extensionDependencyId;
 
     private ExtensionId extensionIdClassifier;
 
@@ -75,9 +76,13 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         this.repositoryUtil.setup();
 
         this.extensionId = new ExtensionId(GROUPID + ':' + ARTIfACTID, "version");
+        this.extensionDependencyId = new ExtensionId("dgroupid:dartifactid", "dversion");
+        
         this.extensionIdClassifier = new ExtensionId(GROUPID + ':' + ARTIfACTID + ":classifier", "version");
-        this.dependencyExtensionId = new DefaultExtensionDependency("dgroupid:dartifactid", "dversion");
-        this.dependencyExtensionIdRange = new DefaultExtensionDependency("dgroupid:dartifactid", "[dversion,)");
+        this.dependencyExtensionId =
+            new DefaultExtensionDependency(this.extensionDependencyId.getId(), new DefaultVersionConstraint(this.extensionDependencyId.getVersion().getValue()));
+        this.dependencyExtensionIdRange =
+            new DefaultExtensionDependency(this.extensionDependencyId.getId(), new DefaultVersionConstraint("[dversion,)"));
 
         this.bundleExtensionId = new ExtensionId("groupid:bundleartifactid", "version");
 
@@ -109,27 +114,23 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
 
         ExtensionDependency dependency = extension.getDependencies().get(0);
         Assert.assertEquals(this.dependencyExtensionId.getId(), dependency.getId());
-        Assert.assertEquals(this.dependencyExtensionId.getVersion(), dependency.getVersion());
+        Assert.assertEquals(this.dependencyExtensionId.getVersionConstraint(), dependency.getVersionConstraint());
 
         // check that a new resolve of an already resolved extension provide the proper repository
         extension = this.repositoryManager.resolve(this.extensionId);
         Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), extension.getRepository().getId().getId());
 
-        /*
-        // TODO: see http://jira.xwiki.org/browse/XWIKI-7163
-        // Modify the file on the descriptor on the repository
-
-        File pomFile =
-            new File(this.repositoryUtil.getMavenRepository(), this.extensionId.getId().replace('.', '/')
-                .replace(':', '/')
-                + '/' + this.extensionId.getVersion() + '/' + ARTIfACTID + '-' + this.extensionId.getVersion() + ".pom");
-
-        FileUtils.writeStringToFile(pomFile, FileUtils.readFileToString(pomFile, "UTF-8").replace("<description>summary</description>", "<description>modified summary</description>"), "UTF-8");
-
-        extension = this.repositoryManager.resolve(this.extensionId);
-
-        Assert.assertEquals("modified description", extension.getSummary());
-        */
+        // TODO: see http://jira.xwiki.org/browse/XWIKI-7163 // Modify the file on the descriptor on the repository
+        // File pomFile =
+        // new File(this.repositoryUtil.getMavenRepository(), this.extensionId.getId().replace('.', '/')
+        // .replace(':', '/')
+        // + '/' + this.extensionId.getVersion() + '/' + ARTIfACTID + '-' + this.extensionId.getVersion() + ".pom");
+        // FileUtils.writeStringToFile(
+        // pomFile,
+        // FileUtils.readFileToString(pomFile, "UTF-8").replace("<description>summary</description>",
+        // "<description>modified summary</description>"), "UTF-8");
+        // extension = this.repositoryManager.resolve(this.extensionId);
+        // Assert.assertEquals("modified description", extension.getSummary());
     }
 
     @Test
@@ -148,8 +149,9 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         Extension extension = this.repositoryManager.resolve(this.dependencyExtensionIdRange);
 
         Assert.assertNotNull(extension);
-        Assert.assertEquals(this.dependencyExtensionId.getId(), extension.getId().getId());
-        Assert.assertEquals(this.dependencyExtensionId.getVersion(), extension.getId().getVersion());
+        Assert.assertEquals(this.extensionDependencyId.getId(), extension.getId().getId());
+        Assert.assertEquals(this.extensionDependencyId.getVersion(), extension.getId()
+            .getVersion());
     }
 
     @Test

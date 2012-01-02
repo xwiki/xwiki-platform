@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<extension>
+  <id>installedextension</id>
+  <version>version</version>
+  <type>type</type>
+  <features>
+    <feature>installedextension-feature</feature>
+  </features>
+  <dependency>false</dependency>
+  <installed>true</installed>
+  <description>description</description>
+  <author>author</author>
+  <website>http://website</website>
+  <dependencies>
+    <dependency>
+      <id>installedextensiondependency</id>
+      <version>version</version>
+    </dependency>
+    <dependency>
+      <id>coreextension</id>
+      <version>version</version>
+    </dependency>
+  </dependencies>
+</extension>

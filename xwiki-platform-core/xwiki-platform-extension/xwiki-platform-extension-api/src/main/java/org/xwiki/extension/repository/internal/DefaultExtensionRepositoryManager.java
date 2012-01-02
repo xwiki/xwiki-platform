@@ -40,10 +40,10 @@ import org.xwiki.extension.repository.ExtensionRepositoryException;
 import org.xwiki.extension.repository.ExtensionRepositoryFactory;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
-import org.xwiki.extension.repository.search.AggregatedSearchResult;
-import org.xwiki.extension.repository.search.CollectionSearchResult;
+import org.xwiki.extension.repository.result.AggregatedIterableResult;
+import org.xwiki.extension.repository.result.CollectionIterableResult;
+import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.SearchException;
-import org.xwiki.extension.repository.search.SearchResult;
 import org.xwiki.extension.repository.search.Searchable;
 
 /**
@@ -122,7 +122,7 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
             } catch (ResolveException e) {
                 if (this.logger.isDebugEnabled()) {
                     this.logger.debug("Could not find extension [{}] in repository [{}]", new Object[] {extensionId,
-                            repository.getId(), e});
+                        repository.getId(), e});
                 }
             }
         }
@@ -153,9 +153,9 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
     }
 
     @Override
-    public SearchResult<Extension> search(String pattern, int offset, int nb)
+    public IterableResult<Extension> search(String pattern, int offset, int nb)
     {
-        SearchResult<Extension> searchResult = null;
+        IterableResult<Extension> searchResult = null;
 
         int currentOffset = offset > 0 ? offset : 0;
         int currentNb = nb;
@@ -186,7 +186,7 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
             }
         }
 
-        return searchResult != null ? searchResult : new CollectionSearchResult<Extension>(0, offset,
+        return searchResult != null ? searchResult : new CollectionIterableResult<Extension>(0, offset,
             Collections.<Extension> emptyList());
     }
 
@@ -201,10 +201,10 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
      * @return the updated maximum number of search results to return
      * @throws SearchException error while searching on provided repository
      */
-    private SearchResult<Extension> search(ExtensionRepository repository, String pattern, int offset, int nb,
-        SearchResult<Extension> previousSearchResult) throws SearchException
+    private IterableResult<Extension> search(ExtensionRepository repository, String pattern, int offset, int nb,
+        IterableResult<Extension> previousSearchResult) throws SearchException
     {
-        SearchResult<Extension> result;
+        IterableResult<Extension> result;
 
         if (repository instanceof Searchable) {
             Searchable searchableRepository = (Searchable) repository;
@@ -226,15 +226,15 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
      * @param result the new search result to append
      * @return the new aggregated search result
      */
-    private AggregatedSearchResult appendSearchResults(SearchResult<Extension> previousSearchResult,
-        SearchResult<Extension> result)
+    private AggregatedIterableResult<Extension> appendSearchResults(IterableResult<Extension> previousSearchResult,
+        IterableResult<Extension> result)
     {
-        AggregatedSearchResult newResult;
+        AggregatedIterableResult<Extension> newResult;
 
-        if (previousSearchResult instanceof AggregatedSearchResult) {
-            newResult = ((AggregatedSearchResult) previousSearchResult);
+        if (previousSearchResult instanceof AggregatedIterableResult) {
+            newResult = ((AggregatedIterableResult<Extension>) previousSearchResult);
         } else {
-            newResult = new AggregatedSearchResult(previousSearchResult.getOffset());
+            newResult = new AggregatedIterableResult<Extension>(previousSearchResult.getOffset());
             newResult.addSearchResult(previousSearchResult);
         }
 

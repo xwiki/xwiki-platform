@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.xwiki.extension.ExtensionFile;
+import org.xwiki.extension.wrap.AbstractWrappingObject;
 
 /**
  * Provide a readonly access to an extension file.
@@ -30,27 +31,15 @@ import org.xwiki.extension.ExtensionFile;
  * @param <T> the extension type
  * @version $Id$
  */
-public class UnmodifiableExtensionFile<T extends ExtensionFile> implements ExtensionFile
+public class UnmodifiableExtensionFile<T extends ExtensionFile> extends AbstractWrappingObject<T> implements
+    ExtensionFile
 {
-    /**
-     * The wrapped file.
-     */
-    private T file;
-
     /**
      * @param file he wrapped file
      */
     public UnmodifiableExtensionFile(T file)
     {
-        this.file = file;
-    }
-
-    /**
-     * @return the wrapped file
-     */
-    protected T getFile()
-    {
-        return this.file;
+        super(file);
     }
 
     // ExtensionFile
@@ -58,12 +47,12 @@ public class UnmodifiableExtensionFile<T extends ExtensionFile> implements Exten
     @Override
     public long getLength()
     {
-        return getFile().getLength();
+        return getWrapped().getLength();
     }
 
     @Override
     public InputStream openStream() throws IOException
     {
-        return getFile().openStream();
+        return getWrapped().openStream();
     }
 }

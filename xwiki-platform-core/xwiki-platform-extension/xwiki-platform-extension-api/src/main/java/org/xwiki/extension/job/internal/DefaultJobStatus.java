@@ -22,9 +22,9 @@ package org.xwiki.extension.job.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xwiki.extension.job.JobProgress;
-import org.xwiki.extension.job.JobStatus;
 import org.xwiki.extension.job.Request;
+import org.xwiki.extension.job.event.status.JobProgress;
+import org.xwiki.extension.job.event.status.JobStatus;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogQueue;
 import org.xwiki.logging.LoggerManager;
@@ -96,7 +96,10 @@ public class DefaultJobStatus<R extends Request> implements JobStatus
      */
     void startListening()
     {
+        // Register progress listener
         this.observationManager.addListener(this.progress);
+
+        // Isolate log for the job status
         this.loggerManager.pushLogListener(new LogQueueListener(LogQueueListener.class.getName() + '_' + this.id,
             this.logs));
     }
@@ -115,7 +118,7 @@ public class DefaultJobStatus<R extends Request> implements JobStatus
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.extension.job.JobStatus#getState()
+     * @see org.xwiki.extension.job.event.status.JobStatus#getState()
      */
     @Override
     public State getState()

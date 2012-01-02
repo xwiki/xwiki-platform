@@ -21,15 +21,19 @@ package org.xwiki.extension.repository.aether.internal;
 
 import org.sonatype.aether.graph.Dependency;
 import org.xwiki.extension.AbstractExtensionDependency;
+import org.xwiki.extension.version.InvalidVersionRangeException;
+import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 
 public class AetherExtensionDependency extends AbstractExtensionDependency
 {
     private Dependency aetherDependency;
 
-    public AetherExtensionDependency(Dependency aetherDependency)
+    public AetherExtensionDependency(Dependency aetherDependency) throws InvalidVersionRangeException
     {
-        super(AetherUtils.createExtensionId(aetherDependency.getArtifact()).getId(), aetherDependency.getArtifact()
-            .getVersion());
+        super(AetherUtils.createExtensionId(aetherDependency.getArtifact()).getId(), new DefaultVersionConstraint(
+            aetherDependency.getArtifact().getVersion()));
+
+        this.aetherDependency = aetherDependency;
     }
 
     public Dependency getAetherDependency()

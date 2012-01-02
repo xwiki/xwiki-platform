@@ -45,6 +45,6 @@ public class UnmodifiableCoreExtensionFile<T extends CoreExtensionFile> extends 
     @Override
     public URL getURL()
     {
-        return getFile().getURL();
+        return getWrapped().getURL();
     }
 }

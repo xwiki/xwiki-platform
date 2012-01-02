@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<extension>
+  <id>rwithrdependency</id>
+  <version>version</version>
+  <type>type</type>
+  <features>
+    <feature>rwithrdependency-feature</feature>
+  </features>
+  <dependencies>
+    <dependency>
+      <id>rsimple</id>
+      <version>version</version>
+    </dependency>
+  </dependencies>
+</extension>

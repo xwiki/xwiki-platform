@@ -360,15 +360,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         return author;
     }
 
-    protected Extensions getExtensionSummaries(Query query) throws QueryException
-    {
-        Extensions extensions = this.objectFactory.createExtensions();
-
-        getExtensionSummaries(extensions.getExtensionSummaries(), query);
-
-        return extensions;
-    }
-
     protected void getExtensions(List<ExtensionVersion> extensions, Query query) throws QueryException
     {
         List<Object[]> entries = query.execute();

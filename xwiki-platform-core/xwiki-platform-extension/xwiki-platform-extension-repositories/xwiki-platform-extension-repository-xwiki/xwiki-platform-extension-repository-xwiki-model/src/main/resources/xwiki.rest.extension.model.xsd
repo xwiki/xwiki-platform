@@ -85,6 +85,8 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
+            <element name="totalHits" type="int"></element>
+            <element name="offset" type="int"></element>
             <element name="extensionSummary" type="extension:ExtensionSummary"
               minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
@@ -98,6 +100,8 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
+            <element name="totalHits" type="int"></element>
+            <element name="offset" type="int"></element>
             <element name="extensionVersionSummary" type="extension:ExtensionVersionSummary"
               minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>

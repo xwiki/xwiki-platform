@@ -25,6 +25,8 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
+import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.version.Version;
 
 /**
  * Wrap an {@link ExtensionRepository}.
@@ -32,27 +34,15 @@ import org.xwiki.extension.repository.ExtensionRepositoryId;
  * @param <T>
  * @version $Id$
  */
-public class WrappingExtensionRepository<T extends ExtensionRepository> implements ExtensionRepository
+public class WrappingExtensionRepository<T extends ExtensionRepository> extends AbstractWrappingObject<T> implements
+    ExtensionRepository
 {
-    /**
-     * @see #getRepository()
-     */
-    private T repository;
-
     /**
      * @param repository the wrapped repository
      */
     public WrappingExtensionRepository(T repository)
     {
-        this.repository = repository;
-    }
-
-    /**
-     * @return the wrapped repository
-     */
-    protected T getRepository()
-    {
-        return this.repository;
+        super(repository);
     }
 
     // ExtensionRepository
@@ -60,24 +50,30 @@ public class WrappingExtensionRepository<T extends ExtensionRepository> implemen
     @Override
     public ExtensionRepositoryId getId()
     {
-        return getRepository().getId();
+        return getWrapped().getId();
     }
 
     @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
-        return getRepository().resolve(extensionId);
+        return getWrapped().resolve(extensionId);
     }
 
     @Override
     public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
     {
-        return getRepository().resolve(extensionDependency);
+        return getWrapped().resolve(extensionDependency);
     }
 
     @Override
     public boolean exists(ExtensionId extensionId)
     {
-        return getRepository().exists(extensionId);
+        return getWrapped().exists(extensionId);
+    }
+
+    @Override
+    public IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException
+    {
+        return getWrapped().resolveVersions(id, offset, nb);
     }
 }

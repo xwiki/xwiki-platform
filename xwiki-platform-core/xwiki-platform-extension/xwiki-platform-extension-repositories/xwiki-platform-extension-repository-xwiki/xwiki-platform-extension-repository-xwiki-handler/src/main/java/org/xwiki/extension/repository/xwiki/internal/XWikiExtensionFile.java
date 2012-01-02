@@ -45,7 +45,7 @@ public class XWikiExtensionFile implements ExtensionFile
         try {
             getMethod =
                 this.repository.getRESTResource(this.repository.getExtensionFileUriBuider(), this.id.getId(),
-                    this.id.getVersion());
+                    this.id.getVersion().getValue());
         } catch (IOException e) {
             throw new RuntimeException("Failed to acess extension [" + this + "]");
         }
@@ -61,6 +61,6 @@ public class XWikiExtensionFile implements ExtensionFile
     public InputStream openStream() throws IOException
     {
         return this.repository.getRESTResourceAsStream(this.repository.getExtensionFileUriBuider(), this.id.getId(),
-            this.id.getVersion());
+            this.id.getVersion().getValue());
     }
 }

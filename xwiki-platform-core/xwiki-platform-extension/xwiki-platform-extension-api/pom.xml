@@ -78,6 +78,13 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     
+    <!-- Used for version management implementation -->
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-util</artifactId>
+      <version>${aether.version}</version>
+    </dependency>
+
     <!-- Core extensions -->
     <dependency>
       <groupId>org.reflections</groupId>
@@ -151,7 +158,8 @@
               **/DefaultCoreExtensionScanner.java,
               **/DefaultExtensionSerializer.java,
               **/DefaultLocalExtensionRepository.java,
-              **/UnmodifiableUtils.java
+              **/UnmodifiableUtils.java,
+              **/InstallPlanJob.java
           </excludes>
         </configuration>
       </plugin>

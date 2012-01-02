@@ -31,8 +31,8 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.internal.VersionManager;
 import org.xwiki.extension.repository.xwiki.internal.resources.AbstractExtensionRESTResource;
+import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
@@ -58,12 +58,6 @@ public class ExtensionUpdaterListener implements EventListener
      */
     private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentCreatedEvent(),
         new DocumentUpdatedEvent());
-
-    /**
-     * Used to find last version.
-     */
-    @Inject
-    private VersionManager versionManager;
 
     /**
      * Get the reference of the class in the current wiki.
@@ -279,13 +273,14 @@ public class ExtensionUpdaterListener implements EventListener
 
         List<BaseObject> versionObjects = document.getXObjects(versionClassReference);
 
-        String lastVersion = null;
+        DefaultVersion lastVersion = null;
         if (versionObjects != null) {
             for (BaseObject versionObject : versionObjects) {
                 if (versionObject != null) {
-                    String version = versionObject.getStringValue(XWikiRepositoryModel.PROP_VERSION_VERSION);
-                    if (version != null) {
-                        if (lastVersion == null || this.versionManager.compareVersions(version, lastVersion) > 0) {
+                    String versionString = versionObject.getStringValue(XWikiRepositoryModel.PROP_VERSION_VERSION);
+                    if (versionString != null) {
+                        DefaultVersion version = new DefaultVersion(versionString);
+                        if (lastVersion == null || version.compareTo(lastVersion) > 0) {
                             lastVersion = version;
                         }
                     }
@@ -293,6 +288,6 @@ public class ExtensionUpdaterListener implements EventListener
             }
         }
 
-        return lastVersion;
+        return lastVersion != null ? lastVersion.getValue() : null;
     }
 }

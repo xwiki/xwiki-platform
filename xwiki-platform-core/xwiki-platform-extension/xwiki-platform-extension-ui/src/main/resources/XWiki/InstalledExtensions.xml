@@ -180,7 +180,7 @@ xHK69dZf45Of/OTPybOUL8vlF1eXoSul+MXQZf0/5jXQOJ2yhBwAAAAASUVORK5CYII=
   #if (!$request.extensionid || !$request.extensionversion)
     {{error}}You have to provide both extension id and version.{{/error}}
   #elseif ($request.confirm)
-    #set($uninstallJob = $extensionManager.uninstall($request.extensionid, $request.extensionversion))
+    #set($uninstallJob = $extensionManager.uninstall($request.extensionid, null))
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
       {{error}}

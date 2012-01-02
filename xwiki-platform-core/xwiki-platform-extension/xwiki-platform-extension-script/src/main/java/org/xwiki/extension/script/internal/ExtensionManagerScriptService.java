@@ -42,10 +42,12 @@ import org.xwiki.extension.job.JobException;
 import org.xwiki.extension.job.JobManager;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.event.status.JobStatus;
+import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.unmodifiable.UnmodifiableExtensionPlan;
 import org.xwiki.extension.unmodifiable.UnmodifiableJobStatus;
 import org.xwiki.extension.unmodifiable.UnmodifiableUtils;
 import org.xwiki.extension.version.Version;
@@ -284,7 +286,7 @@ public class ExtensionManagerScriptService implements ScriptService
      * Start the asynchronous installation process for an extension if the context document has programming rights and
      * no other job is in progress already.
      * 
-     * @param id the identifier of the extension to add
+     * @param id the identifier of the extension to install
      * @param version the version to install
      * @param namespace the (optional) namespace where to install the extension; if {@code null} or empty, the extension
      *            will be installed globally
@@ -320,15 +322,49 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
+     * Start the asynchronous installation plan creation process for an extension if no other job is in progress
+     * already.
+     * 
+     * @param id the identifier of the extension to install
+     * @param version the version to install
+     * @param namespace the (optional) namespace where to install the extension; if {@code null} or empty, the extension
+     *            will be installed globally
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
+     */
+    public ExtensionPlan createInstallPlan(String id, String version, String namespace)
+    {
+        setError(null);
+
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.addExtension(new ExtensionId(id, version));
+        if (StringUtils.isNotBlank(namespace)) {
+            installRequest.addNamespace(namespace);
+        }
+
+        ExtensionPlan status;
+        try {
+            status = (ExtensionPlan) this.jobManager.executeJob("installplan", installRequest).getStatus();
+        } catch (JobException e) {
+            setError(e);
+
+            status = null;
+        }
+
+        return new UnmodifiableExtensionPlan(status);
+    }
+
+    /**
      * Start the asynchronous uninstall process for an extension if the context document has programming rights and no
      * other job is in progress already.
      * 
      * @param id the identifier of the extension to remove
-     * @param version the version to remove
+     * @param namespace the (optional) namespace from where to uninstall the extension; if {@code null} or empty, the
+     *            extension will be installed globally
      * @return the {@link Job} object which can be used to monitor the progress of the uninstallation process, or
      *         {@code null} in case of failure
      */
-    public Job uninstall(String id, String version)
+    public Job uninstall(String id, String namespace)
     {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
             setError(new JobException("Need programming right to uninstall an extension"));
@@ -339,7 +375,10 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         UninstallRequest uninstallRequest = new UninstallRequest();
-        uninstallRequest.addExtension(new ExtensionId(id, version));
+        uninstallRequest.addExtension(new ExtensionId(id, (Version) null));
+        if (StringUtils.isNotBlank(namespace)) {
+            uninstallRequest.addNamespace(namespace);
+        }
 
         Job job;
         try {
@@ -351,6 +390,38 @@ public class ExtensionManagerScriptService implements ScriptService
         }
 
         return job;
+    }
+
+    /**
+     * Start the asynchronous uninstallation plan creation process for an extension if no other job is in progress
+     * already.
+     * 
+     * @param id the identifier of the extension to install
+     * @param namespace the (optional) namespace from where to uninstall the extension; if {@code null} or empty, the
+     *            extension will be installed globally
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
+     */
+    public ExtensionPlan createUninstallPlan(String id, String namespace)
+    {
+        setError(null);
+
+        UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest.addExtension(new ExtensionId(id, (Version) null));
+        if (StringUtils.isNotBlank(namespace)) {
+            uninstallRequest.addNamespace(namespace);
+        }
+
+        ExtensionPlan status;
+        try {
+            status = (ExtensionPlan) this.jobManager.executeJob("uninstallplan", uninstallRequest).getStatus();
+        } catch (JobException e) {
+            setError(e);
+
+            status = null;
+        }
+
+        return new UnmodifiableExtensionPlan(status);
     }
 
     // Jobs

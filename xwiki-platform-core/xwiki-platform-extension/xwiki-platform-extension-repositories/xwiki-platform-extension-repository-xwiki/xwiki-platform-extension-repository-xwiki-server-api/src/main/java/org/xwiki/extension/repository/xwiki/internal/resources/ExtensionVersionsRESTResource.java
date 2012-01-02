@@ -20,15 +20,25 @@
 
 package org.xwiki.extension.repository.xwiki.internal.resources;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.xwiki.Resources;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersionSummary;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersions;
+import org.xwiki.extension.version.InvalidVersionRangeException;
+import org.xwiki.extension.version.VersionConstraint;
+import org.xwiki.extension.version.internal.DefaultVersion;
+import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 
@@ -43,15 +53,48 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
     @GET
     public ExtensionVersions getExtensionVersions(@PathParam("extensionId") String extensionId,
         @QueryParam(Resources.QPARAM_LIST_START) @DefaultValue("-1") int offset,
-        @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number) throws QueryException
+        @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number,
+        @QueryParam(Resources.QPARAM_VERSIONS_RANGES) String ranges) throws QueryException,
+        InvalidVersionRangeException
     {
-        Query query = createExtensionsSummariesQuery(null, "extension.id = :extensionId", offset, number, true);
+        Query query = createExtensionsSummariesQuery(null, "extension.id = :extensionId", 0, -1, true);
 
         query.bindValue("extensionId", extensionId);
 
         ExtensionVersions extensions = this.objectFactory.createExtensionVersions();
 
         getExtensionSummaries(extensions.getExtensionVersionSummaries(), query);
+
+        // Filter by ranges
+        if (StringUtils.isNotBlank(ranges)) {
+            VersionConstraint constraint = new DefaultVersionConstraint(ranges);
+
+            if (constraint.getVersion() != null) {
+                throw new InvalidVersionRangeException("Invalid ranges syntax [" + ranges + "]");
+            }
+
+            for (Iterator<ExtensionVersionSummary> it = extensions.getExtensionVersionSummaries().iterator(); it
+                .hasNext();) {
+                if (!constraint.containsVersion(new DefaultVersion(it.next().getVersion()))) {
+                    it.remove();
+                }
+            }
+        }
+
+        extensions.setTotalHits(extensions.getExtensionVersionSummaries().size());
+        extensions.setOffset(offset);
+
+        if (offset > 0 || (number > -1 && offset + number < extensions.getExtensionVersionSummaries().size())) {
+            if (offset >= extensions.getExtensionVersionSummaries().size() || number == 0) {
+                extensions.getExtensionVersionSummaries().clear();
+            } else {
+                List<ExtensionVersionSummary> limited =
+                    new ArrayList<ExtensionVersionSummary>(extensions.getExtensionVersionSummaries());
+                extensions.getExtensionVersionSummaries().clear();
+                extensions.withExtensionVersionSummaries(limited.subList(offset < 0 ? 0 : offset, number < 0
+                    ? extensions.getExtensionVersionSummaries().size() : offset + number));
+            }
+        }
 
         return extensions;
     }

@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-platform-messagestream</artifactId>
   <name>XWiki Platform - Message Stream</name>
-  <description>Publish and display user status messages in different streams.</description>
+  <description>Publish and display user status messages in different streams</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

@@ -162,6 +162,13 @@ public class PdfExportImpl implements PdfExport
         }
 
         // ----------------------------------------------------------------------
+        // CSS4J configuration
+        // ----------------------------------------------------------------------
+        XHTMLDocumentFactory xdf = (XHTMLDocumentFactory) XHTMLDocumentFactory.getInstance();
+        // Override the default stylesheet with an empty one
+        xdf.setUserAgentStyleSheet((DOM4JCSSStyleSheet) xdf.getCSSStyleSheetFactory().createStyleSheet());
+
+        // ----------------------------------------------------------------------
         // FOP configuration
         // ----------------------------------------------------------------------
         fopFactory = FopFactory.newInstance();
@@ -535,7 +542,6 @@ public class PdfExportImpl implements PdfExport
             XHTMLDocument document = (XHTMLDocument) reader.read(source);
 
             // Apply the style sheet
-            document.setDefaultStyleSheet(new DOM4JCSSStyleSheet(null, null, null));
             document.addStyleSheet(new org.w3c.css.sac.InputSource(new StringReader(css)));
             applyInlineStyle(document.getRootElement());
             OutputFormat outputFormat = new OutputFormat("", false);

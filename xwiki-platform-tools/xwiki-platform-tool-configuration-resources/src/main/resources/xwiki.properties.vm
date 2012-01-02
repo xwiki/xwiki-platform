@@ -145,7 +145,11 @@ container.persistentDirectory=$xwikiPropertiesContainerPersistentDirectory
 #-# Note that the Macro transformation is a special transformation that replaces macro markers by the result of the
 #-# macro execution. If you don't list it, macros won't get executed.
 #-# The default value is: macro, icon
+#if ($xwikiRenderingTransformations)
+rendering.transformations = $xwikiRenderingTransformations
+#else
 # rendering.transformations = macro, icon
+#end
 
 #-# [Since 2.6RC1]
 #-# Icon Transformation Configuration

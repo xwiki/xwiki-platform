@@ -31,6 +31,7 @@ import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.ExecTask;
@@ -48,6 +49,8 @@ import org.slf4j.LoggerFactory;
 public class XWikiExecutor
 {
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiExecutor.class);
+
+    public static final String BASEDIR = System.getProperty("basedir");
 
     public static final String DEFAULT_PORT = System.getProperty("xwikiPort", "8080");
 
@@ -119,6 +122,9 @@ public class XWikiExecutor
         this.executionDirectory = System.getProperty("xwikiExecutionDirectory" + index);
         if (this.executionDirectory == null) {
             this.executionDirectory = DEFAULT_EXECUTION_DIRECTORY;
+            if (this.executionDirectory == null) {
+                this.executionDirectory = BASEDIR + "/target/xwiki";
+            }
             if (index > 0) {
                 this.executionDirectory += "-" + index;
             }
@@ -211,11 +217,7 @@ public class XWikiExecutor
                 execTask.addEnv(optsVariable);
             }
 
-            String startCommand = START_COMMAND;
-            startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(getPort()));
-            startCommand = startCommand.replaceFirst(DEFAULT_STOPPORT, String.valueOf(getStopPort()));
-            startCommand = startCommand.replaceFirst(DEFAULT_RMIPORT, String.valueOf(getRMIPort()));
-
+            String startCommand = getDefaultStartCommand(getPort(), getStopPort(), getRMIPort());
             Commandline commandLine = new Commandline(startCommand);
             execTask.setCommand(commandLine);
 
@@ -233,9 +235,7 @@ public class XWikiExecutor
             execTask = (ExecTask) this.project.createTask("exec");
             execTask.setDir(new File(getExecutionDirectory()));
 
-            String stopCommand = STOP_COMMAND;
-            stopCommand = stopCommand.replaceFirst(DEFAULT_STOPPORT, String.valueOf(getStopPort()));
-
+            String stopCommand = getDefaultStopCommand(getStopPort());
             Commandline commandLine = new Commandline(stopCommand);
             execTask.setCommand(commandLine);
         } else {
@@ -385,6 +385,43 @@ public class XWikiExecutor
 
     private String getURL()
     {
-        return "http://localhost:" + getPort() + "/xwiki/bin/view/Main/WebHome";
+        // We use "xpage=plain" for 2 reasons:
+        // 1) the page loads faster since it doesn't need to display the skin
+        // 2) if the page doesn't exist it won't return a 404 HTTP Response code
+        return "http://localhost:" + getPort() + "/xwiki/bin/view/Main?xpage=plain";
+    }
+
+    private String getDefaultStartCommand(int port, int stopPort, int rmiPort)
+    {
+        String startCommand = START_COMMAND;
+        if (startCommand == null) {
+            if (SystemUtils.IS_OS_WINDOWS) {
+                startCommand = String.format("cmd /c start_xwiki.bat %s %s", port, stopPort);
+            } else {
+                startCommand = String.format("sh -f start_xwiki.sh %s %s", port, stopPort);
+            }
+        } else {
+            startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(port));
+            startCommand = startCommand.replaceFirst(DEFAULT_STOPPORT, String.valueOf(stopPort));
+            startCommand = startCommand.replaceFirst(DEFAULT_RMIPORT, String.valueOf(rmiPort));
+        }
+
+        return startCommand;
+    }
+
+    private String getDefaultStopCommand(int stopPort)
+    {
+        String stopCommand = STOP_COMMAND;
+        if (stopCommand == null) {
+            if (SystemUtils.IS_OS_WINDOWS) {
+                stopCommand = String.format("cmd /c stop_xwiki.bat %s", stopPort);
+            } else {
+                stopCommand = String.format("sh -f stop_xwiki.sh %s", stopPort);
+            }
+        } else {
+            stopCommand = stopCommand.replaceFirst(DEFAULT_STOPPORT, String.valueOf(stopPort));
+        }
+
+        return stopCommand;
     }
 }

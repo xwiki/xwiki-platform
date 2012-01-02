@@ -273,7 +273,7 @@ public class DownloadAction extends XWikiAction
         response.setCharacterEncoding("");
 
         String ofilename =
-            Util.encodeURI(attachment.getFilename(), context).replaceAll("\\+", " ");
+            Util.encodeURI(attachment.getFilename(), context).replaceAll("\\+", "%20");
 
         // The inline attribute of Content-Disposition tells the browser that they should display
         // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more
@@ -285,7 +285,9 @@ public class DownloadAction extends XWikiAction
         if ("1".equals(request.getParameter("force-download"))) {
             dispType = "attachment";
         }
-        response.addHeader("Content-disposition", dispType + "; filename=\"" + ofilename + "\"");
+        // Use RFC 2231 for encoding filenames, since the normal HTTP headers only allows ASCII characters.
+        // See http://tools.ietf.org/html/rfc2231 for more details.
+        response.addHeader("Content-disposition", dispType + "; filename*=utf-8''" + ofilename);
 
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());
         // Advertise that downloads can be resumed

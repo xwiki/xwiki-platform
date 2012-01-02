@@ -27,7 +27,7 @@
   <stylesheet src="stylesheets/Wysiwyg.css" />
   <entry-point class="org.xwiki.gwt.wysiwyg.client.Wysiwyg" />
 
-  <extend-property name="locale" values="ca,de,es,fr,it,lv,ru,sk,sv,zh,zh_TW" />
+  <extend-property name="locale" values="ca,cs,de,es,fr,it,lv,ru,sk,sv,zh,zh_TW" />
 
   <!-- Custom linker that adds the document type declaration to the generated permutations. -->
   <define-linker name="StandardsMode" class="org.xwiki.gwt.core.linker.StandardsModeIFrameLinker" />

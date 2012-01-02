@@ -1451,14 +1451,14 @@ ${Msz}Mb##
     if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
       // Make sure the Livetable widgets exists (It does not in the WYSIWYG for example).
     #if($callback)
-      $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{
+      window["$jsName"] = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{
                            "maxPages":$maxPages
                         ,"limit":$count
        #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end
        #if($hasPageSize && "$!pageSizeBounds" != ''),"pageSizeBounds" : $pageSizeBounds#end
               });
     #else
-      $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix), {
+      window["$jsName"] = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix), {
                            "maxPages":$maxPages
                         ,"limit":$count
        #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end

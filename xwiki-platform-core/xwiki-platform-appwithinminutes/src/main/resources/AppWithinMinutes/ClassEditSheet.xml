@@ -1703,7 +1703,7 @@ return XWiki;
     #set($field = $xclass.get($fieldName))
     #set($valuesFromRequest = $xcontext.context.getForm().getObject("field-$fieldName"))
     #set($discard = $field.getxWikiClass().fromMap($valuesFromRequest, $field))
-    #if($field.name.matches('^[\w\.\-]+$'))
+    #if($field.name.matches('^[a-zA-Z_][\w:\-\.]*$'))
       #if($fieldName != $field.name)
         ## The field name has changed.
         #if($xclass.get($field.name))
@@ -1767,6 +1767,7 @@ return XWiki;
     #end
     #set($templateRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Template"))
     #set($templateDoc = $xwiki.getDocument($templateRef))
+    #set($discard = $templateDoc.setParent($doc.name))
     #set($discard = $templateDoc.updateObjectFromRequest($doc.fullName))
     #set($discard = $templateDoc.save($msg.get('platform.appwithinminutes.classEditorTemplateSaveComment'), $minorEdit))
   #end
@@ -1792,6 +1793,7 @@ return XWiki;
     #if($sheetReference)
       #set($sheetDoc = $xwiki.getDocument($sheetReference))
       #set($sheetGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassSheetGenerator'))
+      #set($discard = $sheetDoc.setParent($doc.name))
       #set($discard = $sheetDoc.setContent($doc.getRenderedContent($sheetGeneratorDoc.content, $sheetGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
       #set($discard = $sheetDoc.save($msg.get('platform.appwithinminutes.classEditorSheetSaveComment'), $minorEdit))
     #end

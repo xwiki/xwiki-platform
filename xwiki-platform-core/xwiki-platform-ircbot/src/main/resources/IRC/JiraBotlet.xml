@@ -268,6 +268,13 @@ class JiraBotlet implements IRCBotlet
 }
 
 if (request.action == "start" || xcontext.get("botAction") == "start") {
+
+    // If this is being started by the start button, set it to enabled.
+    if (request.action == "start") {
+        doc.getObject("IRC.IRCBotlet").set("disabled", 0)
+        doc.saveAsAuthor("Enabling botlet.")
+    }
+
     // Register against the component manager
     DefaultComponentDescriptor descriptor = new DefaultComponentDescriptor()
     descriptor.setImplementation(JiraBotlet.class)
@@ -281,6 +288,13 @@ if (request.action == "start" || xcontext.get("botAction") == "start") {
     ircconfigdoc.use(doc.fullName)
     botlet.init(ircconfigdoc.getValue("jiraURL"), ircconfigdoc.getValue("jiraPattern"))
 } else if (request.action == "stop" || xcontext.get("botAction") == "stop") {
+
+    // If this is being started by the stop button, set it to disabled.
+    if (request.action == "stop") {
+        doc.getObject("IRC.IRCBotlet").set("disabled", 1)
+        doc.saveAsAuthor("Disabling botlet.")
+    }
+
     Utils.getComponentManager().unregisterComponent(IRCBotlet.class, "jira")
 }
 {{/groovy}}

@@ -197,7 +197,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         }
 
         setRequestExpectations("/xwiki/bin/download/space/page/file.2.txt", "5", null, null, -1l);
-        setResponseExpectations(d.getTime(), 1, "text/plain", "inline; filename=\"file.5.txt\"");
+        setResponseExpectations(d.getTime(), 1, "text/plain", "inline; filename*=utf-8''file.5.txt");
         getMockery().checking(new Expectations()
         {
             {
@@ -260,7 +260,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         final Date d = new Date();
         createAttachment(d, "file.png");
         setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l);
-        setResponseExpectations(d.getTime(), this.fileContent.length, "image/png", "inline; filename=\"file.png\"");
+        setResponseExpectations(d.getTime(), this.fileContent.length, "image/png", "inline; filename*=utf-8''file.png");
         setOutputExpectations(0, this.fileContent.length);
         getMockery().checking(new Expectations()
         {
@@ -278,7 +278,8 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, "1", null, -1l);
-        setResponseExpectations(d.getTime(), this.fileContent.length, "text/plain", "attachment; filename=\"file.txt\"");
+        setResponseExpectations(d.getTime(), this.fileContent.length,
+            "text/plain", "attachment; filename*=utf-8''file.txt");
         setOutputExpectations(0, this.fileContent.length);
         Assert.assertNull(this.action.render(getContext()));
     }
@@ -301,7 +302,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         createAttachment(d, "file name.txt");
         setRequestExpectations("/xwiki/bin/download/space/page/file+name.txt", null, null, null, -1l);
         setResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
-            "inline; filename=\"file name.txt\"");
+            "inline; filename*=utf-8''file%20name.txt");
         setOutputExpectations(0, this.fileContent.length);
         getMockery().checking(new Expectations()
         {
@@ -320,7 +321,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         createAttachment(d, "file name.txt");
         setRequestExpectations("/xwiki/bin/download/space/page/file%20name.txt", null, "1", null, -1l);
         setResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
-            "attachment; filename=\"file name.txt\"");
+            "attachment; filename*=utf-8''file%20name.txt");
         setOutputExpectations(0, this.fileContent.length);
         getMockery().checking(new Expectations()
         {
@@ -339,7 +340,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         createAttachment(d, "file\u021B.txt");
         setRequestExpectations("/xwiki/bin/download/space/page/file%C8%9B.txt", null, "1", null, -1l);
         setResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
-            "attachment; filename=\"file%C8%9B.txt\"");
+            "attachment; filename*=utf-8''file%C8%9B.txt");
         setOutputExpectations(0, this.fileContent.length);
         getMockery().checking(new Expectations()
         {
@@ -649,7 +650,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
 
     private void setResponseExpectations(final long modified, final int length)
     {
-        setResponseExpectations(modified, length, "text/plain", "inline; filename=\"file.txt\"");
+        setResponseExpectations(modified, length, "text/plain", "inline; filename*=utf-8''file.txt");
     }
 
     private void setResponseExpectations(final long modified, final int length, final String mime,

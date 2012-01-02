@@ -32,6 +32,7 @@
 <nameField></nameField>
 <validationScript></validationScript>
 <description>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
 <name>description</name>
 <number>1</number>
@@ -43,7 +44,22 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </description>
+<disabled>
+<customDisplay></customDisplay>
+<defaultValue></defaultValue>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType></displayType>
+<name>disabled</name>
+<number>3</number>
+<prettyName>Botlet Disabled</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</disabled>
 <usage>
+<customDisplay></customDisplay>
 <disabled>0</disabled>
 <name>usage</name>
 <number>2</number>
@@ -83,7 +99,7 @@
 <displayType>select</displayType>
 <multiSelect>1</multiSelect>
 <name>groups</name>
-<number>1</number>
+<number>4</number>
 <prettyName>Groups</prettyName>
 <relationalStorage>0</relationalStorage>
 <separator> </separator>
@@ -98,7 +114,7 @@
 <displayType>select</displayType>
 <multiSelect>1</multiSelect>
 <name>levels</name>
-<number>2</number>
+<number>4</number>
 <prettyName>Levels</prettyName>
 <relationalStorage>0</relationalStorage>
 <separator> </separator>
@@ -112,7 +128,7 @@
 <displayType>select</displayType>
 <multiSelect>1</multiSelect>
 <name>users</name>
-<number>3</number>
+<number>4</number>
 <prettyName>Users</prettyName>
 <relationalStorage>0</relationalStorage>
 <separator> </separator>
@@ -144,5 +160,4 @@ interface IRCBotlet
     List handleMessage(String channel, String sender, String login, String hostname, String message, XWiki xwiki, XWikiContext context)
 }
 def dummy
-{{/groovy}}</content>
-</xwikidoc>
+{{/groovy}}</content></xwikidoc>

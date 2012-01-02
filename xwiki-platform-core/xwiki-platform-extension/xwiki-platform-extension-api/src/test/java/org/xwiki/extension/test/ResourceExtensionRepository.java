@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Collections;
 
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -35,6 +36,9 @@ import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.internal.DefaultLocalExtension;
 import org.xwiki.extension.repository.internal.ExtensionSerializer;
+import org.xwiki.extension.repository.result.CollectionIterableResult;
+import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.internal.DefaultVersion;
 
 public class ResourceExtensionRepository extends AbstractExtensionRepository implements ExtensionRepository
@@ -97,7 +101,7 @@ public class ResourceExtensionRepository extends AbstractExtensionRepository imp
             throw new ResolveException("Failed to parse descriptor for extension [" + extensionId + "]", e);
         }
     }
-    
+
     @Override
     public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
     {
@@ -112,5 +116,11 @@ public class ResourceExtensionRepository extends AbstractExtensionRepository imp
         } catch (UnsupportedEncodingException e) {
             return false;
         }
+    }
+
+    @Override
+    public IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException
+    {
+        return new CollectionIterableResult<Version>(0, offset, Collections.<Version> emptyList());
     }
 }

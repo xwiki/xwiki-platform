@@ -50,6 +50,8 @@ import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
+import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.version.Version;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -164,7 +166,7 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
         }
     }
 
-    // LocalExtensionRepository
+    // ExtensionRepository
 
     @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
@@ -197,6 +199,14 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
     {
         return this.extensions.containsKey(extensionId);
     }
+
+    @Override
+    public IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException
+    {
+        return this.localRepository.resolveVersions(id, offset, nb);
+    }
+
+    // LocalExtensionRepository
 
     @Override
     public int countExtensions()

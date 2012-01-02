@@ -17,26 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.search;
+package org.xwiki.extension.repository.result;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.xwiki.extension.Extension;
-
 /**
- * Make several search results look like one.
+ * Make several iterable results look like one.
  * 
+ * @param <T> the type
  * @version $Id$
  */
-public class AggregatedSearchResult implements SearchResult<Extension>
+public class AggregatedIterableResult<T> implements IterableResult<T>
 {
     /**
-     * The aggregated search results.
+     * The aggregated iterable results.
      */
-    private List<SearchResult<Extension>> results = new ArrayList<SearchResult<Extension>>();
+    private List<IterableResult<T>> results = new ArrayList<IterableResult<T>>();
 
     /**
      * @see #getOffset()
@@ -56,17 +55,17 @@ public class AggregatedSearchResult implements SearchResult<Extension>
     /**
      * @param offset the initial offset
      */
-    public AggregatedSearchResult(int offset)
+    public AggregatedIterableResult(int offset)
     {
         this.offset = offset;
     }
 
     /**
-     * @param result a search result instance to append
+     * @param result a iterable result instance to append
      */
-    public void addSearchResult(SearchResult< ? extends Extension> result)
+    public void addSearchResult(IterableResult<T> result)
     {
-        this.results.add((SearchResult<Extension>) result);
+        this.results.add(result);
 
         // Reset caches
         this.totalHits = null;
@@ -74,14 +73,14 @@ public class AggregatedSearchResult implements SearchResult<Extension>
     }
 
     @Override
-    public Iterator<Extension> iterator()
+    public Iterator<T> iterator()
     {
-        Collection<Iterator<Extension>> resultItarators = new ArrayList<Iterator<Extension>>();
-        for (SearchResult<Extension> result : this.results) {
-            resultItarators.add(result.iterator());
+        Collection<Iterator<T>> resultIterators = new ArrayList<Iterator<T>>();
+        for (IterableResult<T> result : this.results) {
+            resultIterators.add(result.iterator());
         }
 
-        return new AggregatedIterator<Extension>(resultItarators.iterator());
+        return new AggregatedIterator<T>(resultIterators.iterator());
     }
 
     @Override
@@ -89,7 +88,7 @@ public class AggregatedSearchResult implements SearchResult<Extension>
     {
         if (this.totalHits == null) {
             this.totalHits = 0;
-            for (SearchResult<Extension> result : this.results) {
+            for (IterableResult<T> result : this.results) {
                 this.totalHits += result.getTotalHits();
             }
         }
@@ -108,7 +107,7 @@ public class AggregatedSearchResult implements SearchResult<Extension>
     {
         if (this.size == null) {
             this.size = 0;
-            for (SearchResult<Extension> result : this.results) {
+            for (IterableResult<T> result : this.results) {
                 this.size += result.getTotalHits();
             }
         }

@@ -17,29 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.search;
-
-import org.xwiki.extension.Extension;
-import org.xwiki.extension.repository.result.IterableResult;
+package org.xwiki.extension.repository.result;
 
 /**
- * A repository can implements it to provide search capabilities.
+ * The result of a query.
  * 
+ * @param <T> the type
  * @version $Id$
  */
-// TODO: add more complete query support
-public interface Searchable
+public interface IterableResult<T> extends Iterable<T>
 {
     /**
-     * Search extension based of the provided pattern.
-     * <p>
-     * The pattern is a simple character chain.
-     * 
-     * @param pattern the pattern to search
-     * @param offset the offset from where to start returning search results
-     * @param nb the maximum number of search results to return
-     * @return the found extensions descriptors, empty list if nothing could be found
-     * @throws SearchException error when trying to search provided pattern
+     * @return the total number of possible results without offset or maximum results limits
      */
-    IterableResult<Extension> search(String pattern, int offset, int nb) throws SearchException;
+    int getTotalHits();
+
+    /**
+     * @return the index in the total number of possible search result where this extract starts
+     */
+    int getOffset();
+
+    /**
+     * @return the number of found extensions
+     */
+    int getSize();
 }

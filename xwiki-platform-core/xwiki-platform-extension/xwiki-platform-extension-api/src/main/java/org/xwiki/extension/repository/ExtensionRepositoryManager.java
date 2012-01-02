@@ -24,7 +24,7 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
-import org.xwiki.extension.repository.search.SearchResult;
+import org.xwiki.extension.repository.result.IterableResult;
 
 /**
  * Proxy behind remote repositories.
@@ -99,5 +99,5 @@ public interface ExtensionRepositoryManager
      * @return the found extensions descriptors, empty list if nothing could be found
      * @see org.xwiki.extension.repository.search.Searchable
      */
-    SearchResult<Extension> search(String pattern, int offset, int nb);
+    IterableResult<Extension> search(String pattern, int offset, int nb);
 }

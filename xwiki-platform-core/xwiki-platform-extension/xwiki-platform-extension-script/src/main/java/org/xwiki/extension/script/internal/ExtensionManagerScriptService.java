@@ -45,7 +45,7 @@ import org.xwiki.extension.job.event.status.JobStatus;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
-import org.xwiki.extension.repository.search.SearchResult;
+import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.unmodifiable.UnmodifiableJobStatus;
 import org.xwiki.extension.unmodifiable.UnmodifiableUtils;
 import org.xwiki.extension.version.Version;
@@ -114,7 +114,7 @@ public class ExtensionManagerScriptService implements ScriptService
      * @return the found extensions descriptors, empty list if nothing could be found
      * @see org.xwiki.extension.repository.search.Searchable
      */
-    public SearchResult<Extension> search(String pattern, int offset, int nb)
+    public IterableResult<Extension> search(String pattern, int offset, int nb)
     {
         return this.repositoryManager.search(pattern, offset, nb);
     }
@@ -366,6 +366,7 @@ public class ExtensionManagerScriptService implements ScriptService
             setError(new JobException("Need programming right to get current job"));
             return null;
         }
+
         return this.jobManager.getCurrentJob();
     }
 
@@ -381,11 +382,12 @@ public class ExtensionManagerScriptService implements ScriptService
         if (job != null) {
             jobStatus = job.getStatus();
             if (!this.documentAccessBridge.hasProgrammingRights()) {
-                jobStatus = new UnmodifiableJobStatus(jobStatus);
+                jobStatus = new UnmodifiableJobStatus<JobStatus>(jobStatus);
             }
         } else {
             jobStatus = null;
         }
+
         return jobStatus;
     }
 

@@ -17,17 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.search;
-
-import org.xwiki.extension.Extension;
+package org.xwiki.extension.repository.result;
 
 /**
- * Utility base class for {@link SearchResult} implementations.
+ * Utility base class for {@link IterableResult} implementations.
  * 
- * @param <E> the extension type
+ * @param <T> the type
  * @version $Id$
  */
-public abstract class AbstractSearchResult<E extends Extension> implements SearchResult<E>
+public abstract class AbstractSearchResult<T> implements IterableResult<T>
 {
     /**
      * @see #getTotalHits()

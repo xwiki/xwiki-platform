@@ -22,7 +22,7 @@ package org.xwiki.extension.unmodifiable;
 import java.util.Iterator;
 
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.repository.search.SearchResult;
+import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.wrap.AbstractWrappingObject;
 
 /**
@@ -31,13 +31,13 @@ import org.xwiki.extension.wrap.AbstractWrappingObject;
  * @param <E> the extension type
  * @version $Id$
  */
-public class UnmodifiableSearchResult<E extends Extension> extends AbstractWrappingObject<SearchResult<E>> implements
-    SearchResult<E>
+public class UnmodifiableSearchResult<E extends Extension> extends AbstractWrappingObject<IterableResult<E>> implements
+    IterableResult<E>
 {
     /**
      * @param result the wrapped result
      */
-    public UnmodifiableSearchResult(SearchResult<E> result)
+    public UnmodifiableSearchResult(IterableResult<E> result)
     {
         super(result);
     }

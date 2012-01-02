@@ -40,13 +40,15 @@ import org.xwiki.extension.InvalidExtensionException;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
-import org.xwiki.extension.repository.search.CollectionSearchResult;
+import org.xwiki.extension.repository.result.CollectionIterableResult;
+import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.SearchException;
-import org.xwiki.extension.repository.search.SearchResult;
 import org.xwiki.extension.repository.search.Searchable;
 import org.xwiki.extension.repository.xwiki.Resources;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
+import org.xwiki.extension.version.Version;
+import org.xwiki.extension.version.internal.DefaultVersion;
 
 /**
  * @version $Id$
@@ -60,6 +62,8 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
     private final UriBuilder extensionVersionUriBuider;
 
     private final UriBuilder extensionVersionFileUriBuider;
+
+    private final UriBuilder extensionVersionsUriBuider;
 
     private final UriBuilder searchUriBuider;
 
@@ -75,6 +79,7 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         // Uri builders
         this.extensionVersionUriBuider = createUriBuilder(Resources.EXTENSION_VERSION);
         this.extensionVersionFileUriBuider = createUriBuilder(Resources.EXTENSION_VERSION_FILE);
+        extensionVersionsUriBuider = createUriBuilder(Resources.EXTENSION_VERSIONS);
         this.searchUriBuider = createUriBuilder(Resources.SEARCH);
     }
 
@@ -114,16 +119,27 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         return getRESTResource(builder, values).getResponseBodyAsStream();
     }
 
+    private HttpClient createClient()
+    {
+        HttpClient httpClient = new HttpClient();
+
+        return httpClient;
+    }
+
+    private UriBuilder createUriBuilder(String path)
+    {
+        return UriBuilder.fromUri(getId().getURI()).path(path);
+    }
+
     // ExtensionRepository
 
     @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
         try {
-            return new XWikiExtension(this,
-                (ExtensionVersion) this.repositoryFactory.getUnmarshaller().unmarshal(
-                    getRESTResourceAsStream(this.extensionVersionUriBuider, extensionId.getId(),
-                        extensionId.getVersion().getValue())), this.licenseManager);
+            return new XWikiExtension(this, (ExtensionVersion) this.repositoryFactory.getUnmarshaller().unmarshal(
+                getRESTResourceAsStream(this.extensionVersionUriBuider, extensionId.getId(), extensionId.getVersion()
+                    .getValue())), this.licenseManager);
         } catch (Exception e) {
             throw new ResolveException("Failed to create extension object for extension [" + extensionId + "]", e);
         }
@@ -142,22 +158,36 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         }
     }
 
-    private HttpClient createClient()
+    @Override
+    public IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException
     {
-        HttpClient httpClient = new HttpClient();
+        UriBuilder builder = this.searchUriBuider.clone();
 
-        return httpClient;
-    }
+        builder.queryParam(Resources.QPARAM_LIST_START, offset);
+        builder.queryParam(Resources.QPARAM_LIST_NUMBER, nb);
 
-    private UriBuilder createUriBuilder(String path)
-    {
-        return UriBuilder.fromUri(getId().getURI()).path(path);
+        ExtensionsSearchResult restExtensions;
+        try {
+            restExtensions =
+                (ExtensionsSearchResult) this.repositoryFactory.getUnmarshaller().unmarshal(
+                    getRESTResourceAsStream(builder));
+        } catch (Exception e) {
+            throw new ResolveException("Failed to find version for extension id [" + id + "]", e);
+        }
+
+        List<Version> versions = new ArrayList<Version>(restExtensions.getExtensions().size());
+        for (ExtensionVersion restExtension : restExtensions.getExtensions()) {
+            versions.add(new DefaultVersion(restExtension.getVersion()));
+        }
+
+        return new CollectionIterableResult<Version>(restExtensions.getTotalHits(), restExtensions.getOffset(),
+            versions);
     }
 
     // Searchable
 
     @Override
-    public SearchResult<Extension> search(String pattern, int offset, int nb) throws SearchException
+    public IterableResult<Extension> search(String pattern, int offset, int nb) throws SearchException
     {
         UriBuilder builder = this.searchUriBuider.clone();
 
@@ -183,7 +213,7 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
             }
         }
 
-        return new CollectionSearchResult<Extension>(restExtensions.getTotalHits(), restExtensions.getOffset(),
+        return new CollectionIterableResult<Extension>(restExtensions.getTotalHits(), restExtensions.getOffset(),
             extensions);
     }
 }

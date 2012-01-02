@@ -31,6 +31,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -56,6 +57,11 @@ import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
+import org.xwiki.extension.repository.result.CollectionIterableResult;
+import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.repository.search.SearchException;
+import org.xwiki.extension.repository.search.Searchable;
+import org.xwiki.extension.version.Version;
 
 /**
  * Default implementation of {@link LocalExtensionRepository}.
@@ -66,7 +72,7 @@ import org.xwiki.extension.repository.LocalExtensionRepositoryException;
 @Singleton
 // TODO: make it threadsafe bulletproofs
 public class DefaultLocalExtensionRepository extends AbstractExtensionRepository implements LocalExtensionRepository,
-    Initializable
+    Initializable, Searchable
 {
     /**
      * Used to get repository path.
@@ -95,7 +101,7 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
     private ExtensionStorage storage;
 
     /**
-     * the local extensions.
+     * The local extensions.
      */
     private Map<ExtensionId, DefaultLocalExtension> extensions =
         new ConcurrentHashMap<ExtensionId, DefaultLocalExtension>();
@@ -477,6 +483,32 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
         return this.extensions.containsKey(extensionId);
     }
 
+    @Override
+    public IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException
+    {
+        List<DefaultLocalExtension> versions = this.extensionsById.get(id);
+
+        if (versions == null) {
+            throw new ResolveException("Can't find extension with id [" + id + "]");
+        }
+
+        if (nb == 0 || offset >= versions.size()) {
+            return new CollectionIterableResult<Version>(versions.size(), offset, Collections.<Version> emptyList());
+        }
+
+        int fromId = offset < 0 ? 0 : offset;
+        int toId = offset + nb > versions.size() || nb < 0 ? versions.size() - 1 : offset + nb;
+
+        List<Version> result = new ArrayList<Version>(toId - fromId);
+
+        // Invert to sort in ascendent order
+        for (int i = toId - 1; i >= fromId; --i) {
+            result.add(versions.get(i).getId().getVersion());
+        }
+
+        return new CollectionIterableResult<Version>(versions.size(), offset, result);
+    }
+
     // LocalRepository
 
     @Override
@@ -681,5 +713,29 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
         }
 
         return result;
+    }
+
+    // Searchable
+
+    @Override
+    public IterableResult<Extension> search(String pattern, int offset, int nb) throws SearchException
+    {
+        Pattern patternMatcher = Pattern.compile(".*" + pattern + ".*");
+
+        List<Extension> result = new ArrayList<Extension>();
+
+        for (List<DefaultLocalExtension> versions : this.extensionsById.values()) {
+            Extension extension = versions.get(0);
+
+            if (patternMatcher.matcher(extension.getId().getId()).matches()
+                || patternMatcher.matcher(extension.getDescription()).matches()
+                || patternMatcher.matcher(extension.getSummary()).matches()
+                || patternMatcher.matcher(extension.getName()).matches()
+                || patternMatcher.matcher(extension.getFeatures().toString()).matches()) {
+                result.add(extension);
+            }
+        }
+
+        return new CollectionIterableResult<Extension>(this.extensionsById.size(), offset, result);
     }
 }

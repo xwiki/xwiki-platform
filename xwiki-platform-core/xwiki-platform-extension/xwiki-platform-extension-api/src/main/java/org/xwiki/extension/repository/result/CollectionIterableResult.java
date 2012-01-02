@@ -17,30 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.search;
+package org.xwiki.extension.repository.result;
 
-import org.xwiki.extension.Extension;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
- * The result of a search of extensions.
+ * A simple collection based {@link IterableResult}.
  * 
- * @param <E> the extension type
+ * @param <T> the type
  * @version $Id$
  */
-public interface SearchResult<E extends Extension> extends Iterable<E>
+public class CollectionIterableResult<T> extends AbstractSearchResult<T>
 {
     /**
-     * @return the total number of possible results without offset or maximum results limits
+     * The wrapped result.
      */
-    int getTotalHits();
+    private Collection<T> result;
 
     /**
-     * @return the index in the total number of possible search result where this extract starts
+     * @param totalHits the total number of possible results without offset or maximum results limits
+     * @param offset the index in the total number of possible search result where this extract starts
+     * @param result the actual results
      */
-    int getOffset();
+    public CollectionIterableResult(int totalHits, int offset, Collection<T> result)
+    {
+        super(totalHits, offset);
 
-    /**
-     * @return the number of found extensions
-     */
-    int getSize();
+        this.result = result;
+    }
+
+    @Override
+    public Iterator<T> iterator()
+    {
+        return this.result.iterator();
+    }
+
+    @Override
+    public int getSize()
+    {
+        return this.result.size();
+    }
 }

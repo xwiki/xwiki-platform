@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -60,6 +61,8 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
+import org.xwiki.extension.repository.result.CollectionIterableResult;
+import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.VersionRange;
@@ -162,6 +165,37 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
             // FIXME: impossible to resolve extension type as well as most of the information with pure Aether API
             throw new ResolveException("Unsupported");
         }
+    }
+
+    @Override
+    public IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException
+    {
+        Artifact artifact = AetherUtils.createArtifact(id, "(,)");
+
+        List<org.sonatype.aether.version.Version> versions;
+        try {
+            versions = resolveVersions(artifact, createRepositorySystemSession());
+
+            if (versions.isEmpty()) {
+                throw new ResolveException("No versions available for id [" + id + "]");
+            }
+        } catch (VersionRangeResolutionException e) {
+            throw new ResolveException("Failed to resolve versions for id [" + id + "]", e);
+        }
+
+        if (nb == 0 || offset >= versions.size()) {
+            return new CollectionIterableResult<Version>(versions.size(), offset, Collections.<Version> emptyList());
+        }
+
+        int fromId = offset < 0 ? 0 : offset;
+        int toId = offset + nb > versions.size() || nb < 0 ? versions.size() - 1 : offset + nb;
+
+        List<Version> result = new ArrayList<Version>(toId - fromId);
+        for (int i = fromId; i < toId; ++i) {
+            result.add(new DefaultVersion(versions.get(i)));
+        }
+
+        return new CollectionIterableResult<Version>(versions.size(), offset, result);
     }
 
     private org.sonatype.aether.version.Version getAetherVersion(Version version)

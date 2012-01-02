@@ -46,8 +46,11 @@ import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.repository.search.Searchable;
 import org.xwiki.extension.repository.xwiki.Resources;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersionSummary;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersions;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
 import org.xwiki.extension.version.Version;
+import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.internal.DefaultVersion;
 
 /**
@@ -79,7 +82,7 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         // Uri builders
         this.extensionVersionUriBuider = createUriBuilder(Resources.EXTENSION_VERSION);
         this.extensionVersionFileUriBuider = createUriBuilder(Resources.EXTENSION_VERSION_FILE);
-        extensionVersionsUriBuider = createUriBuilder(Resources.EXTENSION_VERSIONS);
+        this.extensionVersionsUriBuider = createUriBuilder(Resources.EXTENSION_VERSIONS);
         this.searchUriBuider = createUriBuilder(Resources.SEARCH);
     }
 
@@ -148,13 +151,51 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
     @Override
     public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
     {
+        VersionConstraint constraint = extensionDependency.getVersionConstraint();
+
         try {
+            Version version;
+            if (!constraint.getRanges().isEmpty()) {
+                ExtensionVersions versions =
+                    resolveExtensionVersions(extensionDependency.getId(), constraint, 0, -1, false);
+                if (versions.getExtensionVersionSummaries().isEmpty()) {
+                    throw new ResolveException("Can't find any version with id [" + extensionDependency.getId()
+                        + "] matching version constraint [" + extensionDependency.getVersionConstraint() + "]");
+                }
+
+                version =
+                    new DefaultVersion(versions.getExtensionVersionSummaries()
+                        .get(versions.getExtensionVersionSummaries().size() - 1).getVersion());
+            } else {
+                version = constraint.getVersion();
+            }
+
             return new XWikiExtension(this, (ExtensionVersion) this.repositoryFactory.getUnmarshaller().unmarshal(
-                getRESTResourceAsStream(this.extensionVersionUriBuider, extensionDependency.getId(),
-                    extensionDependency.getVersionConstraint().getValue())), this.licenseManager);
+                getRESTResourceAsStream(this.extensionVersionUriBuider, extensionDependency.getId(), version)),
+                this.licenseManager);
         } catch (Exception e) {
             throw new ResolveException("Failed to create extension object for extension dependency ["
                 + extensionDependency + "]", e);
+        }
+    }
+
+    private ExtensionVersions resolveExtensionVersions(String id, VersionConstraint constraint, int offset, int nb,
+        boolean requireTotalHits) throws ResolveException
+    {
+        UriBuilder builder = this.searchUriBuider.clone();
+
+        builder.queryParam(Resources.QPARAM_LIST_REQUIRETOTALHITS, requireTotalHits);
+        builder.queryParam(Resources.QPARAM_LIST_START, offset);
+        builder.queryParam(Resources.QPARAM_LIST_NUMBER, nb);
+        if (constraint != null) {
+            builder.queryParam(Resources.QPARAM_VERSIONS_RANGES, constraint.getValue());
+        }
+
+        try {
+            return (ExtensionVersions) this.repositoryFactory.getUnmarshaller().unmarshal(
+                getRESTResourceAsStream(builder));
+        } catch (Exception e) {
+            throw new ResolveException("Failed to find version for extension id [" + id + "]", e);
         }
     }
 
@@ -166,17 +207,10 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         builder.queryParam(Resources.QPARAM_LIST_START, offset);
         builder.queryParam(Resources.QPARAM_LIST_NUMBER, nb);
 
-        ExtensionsSearchResult restExtensions;
-        try {
-            restExtensions =
-                (ExtensionsSearchResult) this.repositoryFactory.getUnmarshaller().unmarshal(
-                    getRESTResourceAsStream(builder));
-        } catch (Exception e) {
-            throw new ResolveException("Failed to find version for extension id [" + id + "]", e);
-        }
+        ExtensionVersions restExtensions = resolveExtensionVersions(id, null, offset, nb, true);
 
-        List<Version> versions = new ArrayList<Version>(restExtensions.getExtensions().size());
-        for (ExtensionVersion restExtension : restExtensions.getExtensions()) {
+        List<Version> versions = new ArrayList<Version>(restExtensions.getExtensionVersionSummaries().size());
+        for (ExtensionVersionSummary restExtension : restExtensions.getExtensionVersionSummaries()) {
             versions.add(new DefaultVersion(restExtension.getVersion()));
         }
 

@@ -61,5 +61,12 @@
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+        <version>${project.version}</version>
+      </plugin>
+    </plugins>
   </build>
 </project>

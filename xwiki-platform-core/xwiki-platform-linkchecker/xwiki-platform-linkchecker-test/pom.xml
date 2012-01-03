@@ -62,9 +62,9 @@
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
-      <!-- We explicitely define the packager plugin here in order to be able to specify its version as otherwise
+      <!-- We explicitly define the packager plugin here in order to be able to specify its version as otherwise
            Maven will pick the latest released version (3.3 when this comment was written).
-           TODO: Remove this when we release platform 3.4 -->
+           TODO: Remove this when we release platform 3.4M1 -->
       <plugin>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-packager-plugin</artifactId>

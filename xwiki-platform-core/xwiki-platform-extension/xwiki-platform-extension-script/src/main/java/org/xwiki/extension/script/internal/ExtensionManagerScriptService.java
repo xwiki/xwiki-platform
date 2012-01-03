@@ -369,14 +369,16 @@ public class ExtensionManagerScriptService implements ScriptService
 
         ExtensionPlan status;
         try {
-            status = (ExtensionPlan) this.jobManager.executeJob("installplan", installRequest).getStatus();
+            status =
+                new UnmodifiableExtensionPlan((ExtensionPlan) this.jobManager.executeJob("installplan", installRequest)
+                    .getStatus());
         } catch (JobException e) {
             setError(e);
 
             status = null;
         }
 
-        return new UnmodifiableExtensionPlan(status);
+        return status;
     }
 
     /**
@@ -439,14 +441,16 @@ public class ExtensionManagerScriptService implements ScriptService
 
         ExtensionPlan status;
         try {
-            status = (ExtensionPlan) this.jobManager.executeJob("uninstallplan", uninstallRequest).getStatus();
+            status =
+                new UnmodifiableExtensionPlan((ExtensionPlan) this.jobManager.executeJob("uninstallplan",
+                    uninstallRequest).getStatus());
         } catch (JobException e) {
             setError(e);
 
             status = null;
         }
 
-        return new UnmodifiableExtensionPlan(status);
+        return status;
     }
 
     // Jobs

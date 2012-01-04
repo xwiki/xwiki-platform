@@ -33,7 +33,7 @@
   <description>An extension of the GWT DOM API, providing W3C Range and Selection support, depth-first pre-order iterator and lots of DOM utility methods</description>
   <dependencies>
     <dependency>
-      <!-- This dependency is required for the custom linker (StandardsModeIFrameLinker.kava). -->
+      <!-- This dependency is required for the custom linker (StandardsModeIFrameLinker.java). -->
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
       <version>${gwt.version}</version>

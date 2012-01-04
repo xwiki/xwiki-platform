@@ -3080,110 +3080,122 @@ document.observe('xwiki:dom:loaded', function() {
 
 #set ($configurationIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/wrench.gif')${escapetool.S})")
 .admin-menu .group.configurationIcon {
-  background-image: $configurationIcon, -moz-linear-gradient(top, $theme.pageContentBackgroundColor 0%, $theme.buttonSecondaryBackgroundColor 100%); /* FF3.6+ */
-  background-image: $configurationIcon, -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageContentBackgroundColor), color-stop(100%,$theme.buttonSecondaryBackgroundColor)); /* Chrome,Safari4+ */
-  background-image: $configurationIcon, -webkit-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Chrome10+,Safari5.1+ */
-  background-image: $configurationIcon, -o-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Opera 11.10+ */
-  background-image: $configurationIcon, -ms-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* IE10+ */
-  background-image: $configurationIcon, linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* W3C */
+  #css3_backgroundIconAndLinearGradient($configurationIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
+      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+    ]
+  })
 }
 .admin-menu .group.configurationIcon:hover , .admin-menu .current.configurationIcon {
-  background-image: $configurationIcon, -moz-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%, $theme.menuBackgroundColor 50%); /* FF3.6+ */
-  background-image: $configurationIcon, -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageHeaderBackgroundColor), color-stop(50%,$theme.menuBackgroundColor)); /* Chrome,Safari4+ */
-  background-image: $configurationIcon, -webkit-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Chrome10+,Safari5.1+ */
-  background-image: $configurationIcon, -o-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Opera 11.10+ */
-  background-image: $configurationIcon, -ms-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* IE10+ */
-  background-image: $configurationIcon, linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* W3C */
+  #css3_backgroundIconAndLinearGradient($configurationIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
 }
 
 #set ($lfIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/layout_content.gif')${escapetool.S})")
 .admin-menu .group.lfIcon {
-  background-image: $lfIcon, -moz-linear-gradient(top, $theme.pageContentBackgroundColor 0%, $theme.buttonSecondaryBackgroundColor 100%); /* FF3.6+ */
-  background-image: $lfIcon, -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageContentBackgroundColor), color-stop(100%,$theme.buttonSecondaryBackgroundColor)); /* Chrome,Safari4+ */
-  background-image: $lfIcon, -webkit-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Chrome10+,Safari5.1+ */
-  background-image: $lfIcon, -o-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Opera 11.10+ */
-  background-image: $lfIcon, -ms-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* IE10+ */
-  background-image: $lfIcon, linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* W3C */
+  #css3_backgroundIconAndLinearGradient($lfIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
+      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+    ]
+  })
 }
 .admin-menu .group.lfIcon:hover , .admin-menu .current.lfIcon {
-  background-image: $lfIcon, -moz-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%, $theme.menuBackgroundColor 50%); /* FF3.6+ */
-  background-image: $lfIcon, -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageHeaderBackgroundColor), color-stop(50%,$theme.menuBackgroundColor)); /* Chrome,Safari4+ */
-  background-image: $lfIcon, -webkit-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Chrome10+,Safari5.1+ */
-  background-image: $lfIcon, -o-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Opera 11.10+ */
-  background-image: $lfIcon, -ms-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* IE10+ */
-  background-image: $lfIcon, linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* W3C */
+  #css3_backgroundIconAndLinearGradient($lfIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
 }
 
 #set ($usersgroupsIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/group.gif')${escapetool.S})")
 .admin-menu .group.usersgroupsIcon {
-  background-image: $usersgroupsIcon, -moz-linear-gradient(top, $theme.pageContentBackgroundColor 0%, $theme.buttonSecondaryBackgroundColor 100%); /* FF3.6+ */
-  background-image: $usersgroupsIcon, -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageContentBackgroundColor), color-stop(100%,$theme.buttonSecondaryBackgroundColor)); /* Chrome,Safari4+ */
-  background-image: $usersgroupsIcon, -webkit-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Chrome10+,Safari5.1+ */
-  background-image: $usersgroupsIcon, -o-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Opera 11.10+ */
-  background-image: $usersgroupsIcon, -ms-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* IE10+ */
-  background-image: $usersgroupsIcon, linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* W3C */
+  #css3_backgroundIconAndLinearGradient($usersgroupsIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
+      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+    ]
+  })
 }
 .admin-menu .group.usersgroupsIcon:hover , .admin-menu .current.usersgroupsIcon {
-  background-image: $usersgroupsIcon, -moz-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%, $theme.menuBackgroundColor 50%); /* FF3.6+ */
-  background-image: $usersgroupsIcon, -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageHeaderBackgroundColor), color-stop(50%,$theme.menuBackgroundColor)); /* Chrome,Safari4+ */
-  background-image: $usersgroupsIcon, -webkit-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Chrome10+,Safari5.1+ */
-  background-image: $usersgroupsIcon, -o-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Opera 11.10+ */
-  background-image: $usersgroupsIcon, -ms-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* IE10+ */
-  background-image: $usersgroupsIcon, linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* W3C */
+  #css3_backgroundIconAndLinearGradient($usersgroupsIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
 }
 
 #set ($contentIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/folder_page.gif')${escapetool.S})")
 .admin-menu .group.contentIcon {
-  background-image: $contentIcon, -moz-linear-gradient(top, $theme.pageContentBackgroundColor 0%, $theme.buttonSecondaryBackgroundColor 100%); /* FF3.6+ */
-  background-image: $contentIcon, -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageContentBackgroundColor), color-stop(100%,$theme.buttonSecondaryBackgroundColor)); /* Chrome,Safari4+ */
-  background-image: $contentIcon, -webkit-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Chrome10+,Safari5.1+ */
-  background-image: $contentIcon, -o-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Opera 11.10+ */
-  background-image: $contentIcon, -ms-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* IE10+ */
-  background-image: $contentIcon, linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* W3C */
+  #css3_backgroundIconAndLinearGradient($contentIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
+      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+    ]
+  })
 }
 .admin-menu .group.contentIcon:hover , .admin-menu .current.contentIcon {
-  background-image: $contentIcon, -moz-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%, $theme.menuBackgroundColor 50%); /* FF3.6+ */
-  background-image: $contentIcon, -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageHeaderBackgroundColor), color-stop(50%,$theme.menuBackgroundColor)); /* Chrome,Safari4+ */
-  background-image: $contentIcon, -webkit-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Chrome10+,Safari5.1+ */
-  background-image: $contentIcon, -o-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Opera 11.10+ */
-  background-image: $contentIcon, -ms-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* IE10+ */
-  background-image: $contentIcon, linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* W3C */
+  #css3_backgroundIconAndLinearGradient($contentIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
 }
 
 #set ($applicationsIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/plugin.gif')${escapetool.S})")
 .admin-menu .group.applicationsIcon {
-  background-image: $applicationsIcon, -moz-linear-gradient(top, $theme.pageContentBackgroundColor 0%, $theme.buttonSecondaryBackgroundColor 100%); /* FF3.6+ */
-  background-image: $applicationsIcon, -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageContentBackgroundColor), color-stop(100%,$theme.buttonSecondaryBackgroundColor)); /* Chrome,Safari4+ */
-  background-image: $applicationsIcon, -webkit-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Chrome10+,Safari5.1+ */
-  background-image: $applicationsIcon, -o-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Opera 11.10+ */
-  background-image: $applicationsIcon, -ms-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* IE10+ */
-  background-image: $applicationsIcon, linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* W3C */
+  #css3_backgroundIconAndLinearGradient($applicationsIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
+      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+    ]
+  })
 }
 .admin-menu .group.applicationsIcon:hover , .admin-menu .current.applicationsIcon {
-  background-image: $applicationsIcon, -moz-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%, $theme.menuBackgroundColor 50%); /* FF3.6+ */
-  background-image: $applicationsIcon, -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageHeaderBackgroundColor), color-stop(50%,$theme.menuBackgroundColor)); /* Chrome,Safari4+ */
-  background-image: $applicationsIcon, -webkit-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Chrome10+,Safari5.1+ */
-  background-image: $applicationsIcon, -o-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Opera 11.10+ */
-  background-image: $applicationsIcon, -ms-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* IE10+ */
-  background-image: $applicationsIcon, linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* W3C */
+  #css3_backgroundIconAndLinearGradient($applicationsIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
 }
 
 #set ($readOnlyIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/error.gif')${escapetool.S})")
 .admin-menu .group.readOnly {
-  background-image: $readOnlyIcon, -moz-linear-gradient(top, $theme.pageContentBackgroundColor 0%, $theme.buttonSecondaryBackgroundColor 100%); /* FF3.6+ */
-  background-image: $readOnlyIcon, -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageContentBackgroundColor), color-stop(100%,$theme.buttonSecondaryBackgroundColor)); /* Chrome,Safari4+ */
-  background-image: $readOnlyIcon, -webkit-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Chrome10+,Safari5.1+ */
-  background-image: $readOnlyIcon, -o-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* Opera 11.10+ */
-  background-image: $readOnlyIcon, -ms-linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* IE10+ */
-  background-image: $readOnlyIcon, linear-gradient(top, $theme.pageContentBackgroundColor 0%,$theme.buttonSecondaryBackgroundColor 100%); /* W3C */
+  #css3_backgroundIconAndLinearGradient($readOnlyIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
+      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+    ]
+  })
 }
 .admin-menu .group.readOnly:hover , .admin-menu .current.readOnly {
-  background-image: $readOnlyIcon, -moz-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%, $theme.menuBackgroundColor 50%); /* FF3.6+ */
-  background-image: $readOnlyIcon, -webkit-gradient(linear, left top, left bottom, color-stop(0%,$theme.pageHeaderBackgroundColor), color-stop(50%,$theme.menuBackgroundColor)); /* Chrome,Safari4+ */
-  background-image: $readOnlyIcon, -webkit-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Chrome10+,Safari5.1+ */
-  background-image: $readOnlyIcon, -o-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* Opera 11.10+ */
-  background-image: $readOnlyIcon, -ms-linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* IE10+ */
-  background-image: $readOnlyIcon, linear-gradient(top, $theme.pageHeaderBackgroundColor 0%,$theme.menuBackgroundColor 50%); /* W3C */
+  #css3_backgroundIconAndLinearGradient($readOnlyIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
 }
 .admin-menu .group.readOnly, .admin-menu .group.readOnly:hover , .admin-menu .current.readOnly  {
   background-position: 5px 50%, top center;

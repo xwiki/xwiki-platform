@@ -2217,3 +2217,37 @@ Wysiwyg.onModuleLoad(function() {
     #end
   #end
 #end
+
+#**
+ * Sets a gradient-based styling for CSS backgrounds
+ *
+ *
+ * @param $icon the path to an additional icon image
+ * @param $gradientData a map of gradients, where the following entries are currently used:
+ *        'angle' :  an angle of direction for the gradient
+ *        'colors':  a list of maps of color-stops for the gradient, where the following entries are currently used: 
+ *                'color'    : color value
+ *                'position' : stop position for the color (between 0% and 100% or a lenght)
+ *#
+#macro (css3_backgroundIconAndLinearGradient $icon $gradientData)
+  #set ($browserVariants = ['-moz-', '-webkit-', '-o-', '-ms-', ''])
+  #set ($colors = '')
+  #if ($gradientData.angle)
+    #set ($position = "$!{gradientData.angle}")
+  #elseif ($gradientData.to)
+    #set ($position = "$!{gradientData.to}")
+  #end
+  #foreach ($colorEntry in $gradientData.colors)
+    #set ($colors = "$!{colors}, $!{colorEntry.color} $!{colorEntry.position}")
+  #end
+  #if ("$!{colors}" != '' && "$!{position}" == '')
+    #set ($colors = $colors.substring(2))
+  #end
+  #foreach ($bvar in $browserVariants)
+    background-image:#if ("$!{icon}" != '') $icon,#end ${bvar}linear-gradient($!{position}$!{colors});
+  #end
+#end
+##
+#macro (css3_backgroundLinearGradient $gradientData)
+  #css3_backgroundIconAndLinearGradient ('' $gradientData)
+#end

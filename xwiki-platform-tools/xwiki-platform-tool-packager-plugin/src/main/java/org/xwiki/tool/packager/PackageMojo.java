@@ -537,7 +537,8 @@ public class PackageMojo extends AbstractMojo
                 "log4j:log4j")));
 
             ArtifactResolutionResult arr = this.resolver.resolveTransitively(mandatoryTopLevelArtifacts,
-                this.project.getArtifact(), this.local, this.remoteRepos, this.metadataSource, filter);
+                this.project.getArtifact(), this.project.getManagedVersionMap(), this.local, this.remoteRepos,
+                this.metadataSource, filter);
             mandatoryArtifacts.addAll(arr.getArtifacts());
         } catch (Exception e) {
             throw new MojoExecutionException("Failed to resolve mandatory artifacts", e);

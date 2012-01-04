@@ -36,6 +36,7 @@
       <!-- This dependency is required for the custom linker. -->
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
+      <!-- Only needed at build time -->
       <scope>provided</scope>
     </dependency>
   </dependencies>

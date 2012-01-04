@@ -482,14 +482,14 @@ public class PackageMojo extends AbstractMojo
         }
         
         // Add mandatory dependencies if they're not explicitly specified.
-        jarArtifacts.addAll(getMandatoryJarDependencies());
+        jarArtifacts.addAll(getMandatoryJarArtifacts());
 
-        return jarArtifacts;
+        // Resolve all artifacts transitively in one go.
+        return resolveTransitively(jarArtifacts);
     }
 
-    private Set<Artifact> getMandatoryJarDependencies() throws MojoExecutionException
+    private Set<Artifact> getMandatoryJarArtifacts() throws MojoExecutionException
     {
-        Set<Artifact> mandatoryArtifacts = new HashSet<Artifact>();
         Set<Artifact> mandatoryTopLevelArtifacts = new HashSet<Artifact>();
 
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform", "xwiki-platform-oldcore",
@@ -522,6 +522,12 @@ public class PackageMojo extends AbstractMojo
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.slf4j", "log4j-over-slf4j",
             getDependencyManagementVersion(pomProject, "org.slf4j", "log4j-over-slf4j"), null, "jar"));
 
+        return mandatoryTopLevelArtifacts;
+    }
+
+    private Set<Artifact> resolveTransitively(Set<Artifact> artifacts) throws MojoExecutionException
+    {
+        Set<Artifact> resolvedArtifacts = new HashSet<Artifact>();
         try {
             AndArtifactFilter filter = new AndArtifactFilter();
             filter.add(new ScopeArtifactFilter("runtime"));
@@ -536,15 +542,15 @@ public class PackageMojo extends AbstractMojo
                 "commons-logging:commons-logging-api",
                 "log4j:log4j")));
 
-            ArtifactResolutionResult arr = this.resolver.resolveTransitively(mandatoryTopLevelArtifacts,
+            ArtifactResolutionResult arr = this.resolver.resolveTransitively(artifacts,
                 this.project.getArtifact(), this.project.getManagedVersionMap(), this.local, this.remoteRepos,
                 this.metadataSource, filter);
-            mandatoryArtifacts.addAll(arr.getArtifacts());
+            resolvedArtifacts.addAll(arr.getArtifacts());
         } catch (Exception e) {
             throw new MojoExecutionException("Failed to resolve mandatory artifacts", e);
         }
 
-        return mandatoryArtifacts;
+        return resolvedArtifacts;
     }
 
     private MavenProject getTopLevelPOMProject() throws MojoExecutionException

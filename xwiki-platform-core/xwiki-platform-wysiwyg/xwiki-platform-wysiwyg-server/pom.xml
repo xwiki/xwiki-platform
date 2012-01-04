@@ -32,6 +32,10 @@
   <packaging>jar</packaging>
   <description>The server side of XWiki's WYSIWYG editor.</description>
   <dependencies>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
     <!-- GWT core dependencies -->
     <dependency>
       <groupId>com.google.gwt</groupId>

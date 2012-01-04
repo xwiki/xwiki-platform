@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.model.reference.AttachmentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -69,10 +70,11 @@ public class XWikiAttachment implements Cloneable
     private XWikiAttachmentArchive attachment_archive;
 
     private boolean isMetaDataDirty = false;
+    
+    private AttachmentReference reference;
 
     public XWikiAttachment(XWikiDocument doc, String filename)
     {
-        this();
         setDoc(doc);
         setFilename(filename);
     }
@@ -84,6 +86,15 @@ public class XWikiAttachment implements Cloneable
         this.author = "";
         this.comment = "";
         this.date = new Date();
+    }
+
+    public AttachmentReference getReference()
+    {
+        if (this.reference == null) {
+            this.reference = new AttachmentReference(this.filename, doc.getDocumentReference());
+        }
+        
+        return this.reference;
     }
 
     public long getId()
@@ -193,6 +204,7 @@ public class XWikiAttachment implements Cloneable
             setMetaDataDirty(true);
             this.filename = filename;
         }
+        this.reference = null;
     }
 
     public String getAuthor()
@@ -264,6 +276,7 @@ public class XWikiAttachment implements Cloneable
     public void setDoc(XWikiDocument doc)
     {
         this.doc = doc;
+        this.reference = null;
     }
 
     public Date getDate()
@@ -429,7 +442,7 @@ public class XWikiAttachment implements Cloneable
 
     /**
      * Retrieve XML representation of attachment's metadata into an {@link Element}. You should prefer
-     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, com.xpn.xwiki.XWikiContext)
+     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, com.xpn.xwiki.XWikiContext)}
      * to avoid memory loads when appropriate.
      *
      * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)

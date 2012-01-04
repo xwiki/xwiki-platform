@@ -33,6 +33,7 @@ import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @version $Id$
@@ -46,11 +47,13 @@ public class ExtensionVersionRESTResource extends AbstractExtensionRESTResource
     public ExtensionVersion getExtensionVersion(@PathParam("extensionId") String extensionId,
         @PathParam("extensionVersion") String extensionVersion) throws XWikiException, QueryException
     {
-        Document extensionDocument = getExtensionDocument(extensionId);
+        XWikiDocument extensionDocument = this.repositoryManager.getExtensionDocumentById(extensionId);
 
         if (extensionDocument.isNew()) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
+        
+        checkRights(extensionDocument);
 
         return createExtension(extensionDocument, extensionVersion);
     }

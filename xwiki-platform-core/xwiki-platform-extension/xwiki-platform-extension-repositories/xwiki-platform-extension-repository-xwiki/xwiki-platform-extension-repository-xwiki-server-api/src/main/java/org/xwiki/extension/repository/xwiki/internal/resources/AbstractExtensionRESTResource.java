@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
+import org.xwiki.extension.repository.xwiki.internal.RepositoryManager;
 import org.xwiki.extension.repository.xwiki.internal.XWikiRepositoryModel;
 import org.xwiki.extension.repository.xwiki.model.jaxb.AbstractExtension;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionAuthor;
@@ -42,20 +43,18 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionSummary;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersionSummary;
-import org.xwiki.extension.repository.xwiki.model.jaxb.Extensions;
 import org.xwiki.extension.repository.xwiki.model.jaxb.License;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ObjectFactory;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Attachment;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.Property;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.ListClass;
 
 /**
@@ -114,6 +113,9 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
      */
     @Inject
     protected Execution execution;
+
+    @Inject
+    protected RepositoryManager repositoryManager;
 
     /**
      * The object factory for model objects to be used when creating representations.
@@ -223,39 +225,20 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         return query;
     }
 
-    protected Document getExtensionDocument(String extensionId) throws XWikiException, QueryException
-    {
-        Query query =
-            this.queryManager.createQuery("from doc.object(" + XWikiRepositoryModel.EXTENSION_CLASSNAME
-                + ") as extension where extension." + XWikiRepositoryModel.PROP_EXTENSION_ID + " = :extensionId",
-                Query.XWQL);
-
-        query.bindValue("extensionId", extensionId);
-
-        List<String> documentNames = query.execute();
-
-        if (documentNames.isEmpty()) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
-
-        return Utils.getXWikiApi(this.componentManager).getDocument(documentNames.get(0));
-    }
-
-    protected com.xpn.xwiki.api.Object getExtensionObject(Document extensionDocument)
+    protected BaseObject getExtensionObject(XWikiDocument extensionDocument)
     {
         return extensionDocument.getObject(XWikiRepositoryModel.EXTENSION_CLASSNAME);
     }
 
-    protected com.xpn.xwiki.api.Object getExtensionObject(String extensionId) throws XWikiException, QueryException
+    protected BaseObject getExtensionObject(String extensionId) throws XWikiException, QueryException
     {
-        return getExtensionObject(getExtensionDocument(extensionId));
+        return getExtensionObject(this.repositoryManager.getExtensionDocumentById(extensionId));
     }
 
-    protected com.xpn.xwiki.api.Object getExtensionVersionObject(Document extensionDocument, String version)
+    protected BaseObject getExtensionVersionObject(XWikiDocument extensionDocument, String version)
     {
         if (version == null) {
-            Vector<com.xpn.xwiki.api.Object> objects =
-                extensionDocument.getObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME);
+            Vector<BaseObject> objects = extensionDocument.getObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME);
 
             if (objects.isEmpty()) {
                 return null;
@@ -267,15 +250,15 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         return extensionDocument.getObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME, "version", version, false);
     }
 
-    protected com.xpn.xwiki.api.Object getExtensionVersionObject(String extensionId, String version)
-        throws XWikiException, QueryException
+    protected BaseObject getExtensionVersionObject(String extensionId, String version) throws XWikiException,
+        QueryException
     {
-        return getExtensionVersionObject(getExtensionDocument(extensionId), version);
+        return getExtensionVersionObject(this.repositoryManager.getExtensionDocumentById(extensionId), version);
     }
 
-    protected <E extends AbstractExtension> E createExtension(Document extensionDocument, String version)
+    protected <E extends AbstractExtension> E createExtension(XWikiDocument extensionDocument, String version)
     {
-        com.xpn.xwiki.api.Object extensionObject = getExtensionObject(extensionDocument);
+        BaseObject extensionObject = getExtensionObject(extensionDocument);
 
         if (extensionObject == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -287,7 +270,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             extension = this.objectFactory.createExtension();
             extensionVersion = null;
         } else {
-            com.xpn.xwiki.api.Object extensionVersionObject = getExtensionVersionObject(extensionDocument, version);
+            BaseObject extensionVersionObject = getExtensionVersionObject(extensionDocument, version);
 
             if (extensionVersionObject == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
@@ -310,7 +293,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setName((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_NAME));
         extension.setWebsite(StringUtils.defaultIfEmpty(
             (String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE),
-            extensionDocument.getExternalURL()));
+            extensionDocument.getExternalURL("view", getXWikiContext())));
 
         for (String authorId : (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS)) {
             extension.getAuthors().add(resolveExtensionAuthor(authorId));
@@ -320,18 +303,26 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_FEATURES));
 
         if (extensionVersion != null) {
-            for (com.xpn.xwiki.api.Object dependencyObject : extensionDocument.getObjects(
-                XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME,
-                XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, version)) {
-                if (dependencyObject != null) {
-                    ExtensionDependency dependency = new ExtensionDependency();
-                    dependency.setId((String) getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_ID));
-                    dependency.setVersion((String) getValue(dependencyObject,
-                        XWikiRepositoryModel.PROP_DEPENDENCY_VERSION));
+            Vector<BaseObject> dependencies =
+                extensionDocument.getObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME);
+            if (dependencies != null) {
+                for (BaseObject dependencyObject : dependencies) {
+                    if (dependencyObject != null) {
+                        if (StringUtils.equals(
+                            getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION,
+                                (String) null), version)) {
+                            ExtensionDependency dependency = new ExtensionDependency();
+                            dependency.setId((String) getValue(dependencyObject,
+                                XWikiRepositoryModel.PROP_DEPENDENCY_ID));
+                            dependency.setVersion((String) getValue(dependencyObject,
+                                XWikiRepositoryModel.PROP_DEPENDENCY_VERSION));
 
-                    extensionVersion.getDependencies().add(dependency);
+                            extensionVersion.getDependencies().add(dependency);
+                        }
+                    }
                 }
             }
+
         }
 
         return (E) extension;
@@ -443,14 +434,14 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         return extension;
     }
 
-    protected Object getValue(com.xpn.xwiki.api.Object object, String field)
+    protected <T> T getValue(BaseObject object, String field)
     {
-        return getValue(object, field, null);
+        return getValue(object, field, (T) null);
     }
 
-    protected <T> T getValue(com.xpn.xwiki.api.Object object, String field, T def)
+    protected <T> T getValue(BaseObject object, String field, T def)
     {
-        Property property = object.getProperty(field);
+        BaseProperty< ? > property = (BaseProperty< ? >) object.safeget(field);
 
         return property != null ? (T) property.getValue() : def;
     }
@@ -461,7 +452,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 
-    protected ResponseBuilder getAttachmentResponse(Attachment xwikiAttachment) throws XWikiException
+    protected ResponseBuilder getAttachmentResponse(XWikiAttachment xwikiAttachment) throws XWikiException
     {
         if (xwikiAttachment == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -469,11 +460,22 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         ResponseBuilder response = Response.ok();
 
-        response = response.type(xwikiAttachment.getMimeType());
-        response = response.entity(xwikiAttachment.getContent());
+        XWikiContext xcontext = getXWikiContext();
+
+        response = response.type(xwikiAttachment.getMimeType(xcontext));
+        response = response.entity(xwikiAttachment.getContent(xcontext));
         response =
             response.header("content-disposition", "attachment; filename=\"" + xwikiAttachment.getFilename() + "\"");
 
         return response;
+    }
+
+    protected void checkRights(XWikiDocument document) throws XWikiException
+    {
+        XWikiContext xcontext = getXWikiContext();
+        if (!xcontext.getWiki().getRightService()
+            .hasAccessLevel("view", xcontext.getUser(), document.getPrefixedFullName(), xcontext)) {
+            throw new WebApplicationException(Status.FORBIDDEN);
+        }
     }
 }

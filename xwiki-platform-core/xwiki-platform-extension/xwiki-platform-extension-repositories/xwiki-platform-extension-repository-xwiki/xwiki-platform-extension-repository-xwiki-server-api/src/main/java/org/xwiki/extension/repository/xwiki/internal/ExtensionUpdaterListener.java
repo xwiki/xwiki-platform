@@ -23,28 +23,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.repository.xwiki.internal.resources.AbstractExtensionRESTResource;
-import org.xwiki.extension.version.internal.DefaultVersion;
-import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.AttachmentReferenceResolver;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.listener.reference.ResourceType;
-import org.xwiki.rendering.parser.ResourceReferenceParser;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -60,30 +47,13 @@ public class ExtensionUpdaterListener implements EventListener
         new DocumentUpdatedEvent());
 
     /**
-     * Get the reference of the class in the current wiki.
-     */
-    @Inject
-    @Named("default/reference")
-    private DocumentReferenceResolver<EntityReference> referenceResolver;
-
-    /**
      * The logger to log.
      */
     @Inject
     private Logger logger;
 
-    /**
-     * Used to validate download reference.
-     */
     @Inject
-    @Named("link")
-    private ResourceReferenceParser resourceReferenceParser;
-
-    /**
-     * Used to validate download reference.
-     */
-    @Inject
-    private AttachmentReferenceResolver<String> attachmentResolver;
+    private RepositoryManager repositoryManager;
 
     @Override
     public List<Event> getEvents()
@@ -101,193 +71,16 @@ public class ExtensionUpdaterListener implements EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         XWikiDocument document = (XWikiDocument) source;
-        XWikiContext context = (XWikiContext) data;
 
         BaseObject extensionObject = document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
 
         if (extensionObject != null) {
             try {
-                validateExtension(document, extensionObject, context);
+                this.repositoryManager.validateExtension(document, true);
             } catch (XWikiException e) {
                 this.logger.error("Failed to validate extension in document [{}]", document.getDocumentReference(), e);
             }
         }
     }
 
-    private void validateExtension(XWikiDocument document, BaseObject extensionObject, XWikiContext context)
-        throws XWikiException
-    {
-        boolean needSave = false;
-
-        XWikiDocument documentToSave = null;
-        BaseObject extensionObjectToSave = null;
-
-        // Update last version field
-        String lastVersion = findLastVersion(document);
-
-        if (lastVersion != null
-            && !StringUtils.equals(lastVersion,
-                extensionObject.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION))) {
-            // FIXME: We can't save directly the provided document coming from the event
-            documentToSave = context.getWiki().getDocument(document, context);
-            extensionObjectToSave = documentToSave.getXObject(extensionObject.getReference());
-
-            extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, lastVersion, context);
-
-            needSave = true;
-        }
-
-        // Update valid extension field
-
-        boolean valid = isValid(document, extensionObject, context);
-
-        int currentValue = extensionObject.getIntValue(XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, 0);
-
-        if ((currentValue == 1) != valid) {
-            if (documentToSave == null) {
-                // FIXME: We can't save directly the provided document coming from the event
-                documentToSave = context.getWiki().getDocument(document, context);
-                extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
-            }
-
-            extensionObjectToSave.setIntValue(XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, valid ? 1 : 0);
-
-            needSave = true;
-        }
-
-        // Make sure all searched fields are set in valid extensions (otherwise they won't appear in the search result).
-        // Would probably be cleaner and safer to do a left join instead but can't find a standard way to do it trough
-        // XWQL or HSQL.
-
-        if (valid) {
-            for (String fieldName : AbstractExtensionRESTResource.EPROPERTIES_EXTRA) {
-                if (extensionObject.safeget(fieldName) == null) {
-                    if (extensionObjectToSave == null) {
-                        // FIXME: We can't save directly the provided document coming from the event
-                        documentToSave = context.getWiki().getDocument(document, context);
-                        extensionObjectToSave =
-                            documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
-                    }
-
-                    extensionObjectToSave.set(fieldName, "", context);
-                    needSave = true;
-                }
-            }
-        }
-
-        // Save document
-
-        if (needSave) {
-            context.getWiki().saveDocument(documentToSave, "Validated extension", true, context);
-        }
-    }
-
-    private DocumentReference getClassReference(XWikiDocument document, EntityReference localReference)
-    {
-        return this.referenceResolver.resolve(localReference, document.getDocumentReference().getWikiReference());
-    }
-
-    /**
-     * @param document the extension document
-     * @param extensionObject the extension object
-     * @param context the XWiki context
-     * @return true if the extension is valid from Extension Manager point of view
-     */
-    private boolean isValid(XWikiDocument document, BaseObject extensionObject, XWikiContext context)
-    {
-        String extensionId = extensionObject.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_ID);
-        boolean valid = !StringUtils.isBlank(extensionId);
-        if (valid) {
-            int nbVersions = 0;
-            List<BaseObject> extensionVersions =
-                document.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
-            if (extensionVersions != null) {
-                for (BaseObject extensionVersionObject : extensionVersions) {
-                    if (extensionVersionObject != null) {
-                        // Has a version
-                        String extensionVersion =
-                            extensionVersionObject.getStringValue(XWikiRepositoryModel.PROP_VERSION_VERSION);
-                        if (StringUtils.isBlank(extensionVersion)) {
-                            valid = false;
-                            break;
-                        }
-
-                        // The download reference seems ok
-                        String download =
-                            extensionVersionObject.getStringValue(XWikiRepositoryModel.PROP_VERSION_DOWNLOAD);
-
-                        if (StringUtils.isNotEmpty(download)) {
-                            ResourceReference resourceReference = this.resourceReferenceParser.parse(download);
-
-                            if (ResourceType.ATTACHMENT.equals(resourceReference.getType())) {
-                                AttachmentReference attachmentReference =
-                                    this.attachmentResolver.resolve(resourceReference.getReference(),
-                                        document.getDocumentReference());
-
-                                XWikiDocument attachmentDocument;
-                                try {
-                                    attachmentDocument =
-                                        context.getWiki().getDocument(attachmentReference.getDocumentReference(),
-                                            context);
-
-                                    valid = attachmentDocument.getAttachment(attachmentReference.getName()) != null;
-                                } catch (XWikiException e) {
-                                    valid = false;
-                                }
-                            } else if (ResourceType.URL.equals(resourceReference.getType())) {
-                                valid = true;
-                            } else {
-                                valid = false;
-                            }
-                        } else {
-                            valid =
-                                document.getAttachment(extensionId + "-" + extensionVersion + "."
-                                    + extensionObject.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_TYPE)) != null;
-                        }
-
-                        ++nbVersions;
-                    }
-
-                    if (!valid) {
-                        break;
-                    }
-                }
-            }
-
-            valid &= nbVersions > 0;
-        }
-
-        return valid;
-    }
-
-    /**
-     * Compare all version located in a document to find the last one.
-     * 
-     * @param document the extension document
-     * @return the last version
-     */
-    private String findLastVersion(XWikiDocument document)
-    {
-        DocumentReference versionClassReference =
-            getClassReference(document, XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
-
-        List<BaseObject> versionObjects = document.getXObjects(versionClassReference);
-
-        DefaultVersion lastVersion = null;
-        if (versionObjects != null) {
-            for (BaseObject versionObject : versionObjects) {
-                if (versionObject != null) {
-                    String versionString = versionObject.getStringValue(XWikiRepositoryModel.PROP_VERSION_VERSION);
-                    if (versionString != null) {
-                        DefaultVersion version = new DefaultVersion(versionString);
-                        if (lastVersion == null || version.compareTo(lastVersion) > 0) {
-                            lastVersion = version;
-                        }
-                    }
-                }
-            }
-        }
-
-        return lastVersion != null ? lastVersion.getValue() : null;
-    }
 }

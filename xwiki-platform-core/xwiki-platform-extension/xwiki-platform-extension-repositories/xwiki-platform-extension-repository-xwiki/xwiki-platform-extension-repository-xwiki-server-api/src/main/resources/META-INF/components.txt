@@ -1,4 +1,6 @@
+org.xwiki.extension.repository.xwiki.internal.DefaultRepositoryManager
 org.xwiki.extension.repository.xwiki.internal.ExtensionUpdaterListener
+org.xwiki.extension.repository.xwiki.internal.RepositoryScriptService
 org.xwiki.extension.repository.xwiki.internal.resources.ExtensionRESTResource
 org.xwiki.extension.repository.xwiki.internal.resources.ExtensionsRESTResource
 org.xwiki.extension.repository.xwiki.internal.resources.ExtensionVersionFileRESTResource

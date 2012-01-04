@@ -144,7 +144,7 @@ public class XWikiServletResponse implements XWikiResponse
 
     public void setLocale(Locale locale)
     {
-        this.response.setLocale(locale);
+        //this.response.setLocale(locale);
     }
 
     public Locale getLocale()

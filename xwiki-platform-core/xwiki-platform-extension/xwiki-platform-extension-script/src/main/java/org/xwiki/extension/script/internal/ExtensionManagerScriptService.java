@@ -74,7 +74,7 @@ import org.xwiki.script.service.ScriptService;
 public class ExtensionManagerScriptService implements ScriptService
 {
     /** The key under which the last encountered error is stored in the current execution context. */
-    private static final String EXTENSIONERROR_KEY = "extensionerror";
+    private static final String EXTENSIONERROR_KEY = "scriptservice.extension.error";
 
     /** The real extension manager bridged by this script service. */
     @Inject
@@ -462,6 +462,8 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Job getCurrentJob()
     {
+        setError(null);
+
         if (!this.documentAccessBridge.hasProgrammingRights()) {
             setError(new JobException("Need programming right to get current job"));
             return null;
@@ -527,6 +529,8 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public VersionRange parseVersionRange(String versionRange)
     {
+        setError(null);
+
         try {
             return new DefaultVersionRange(versionRange);
         } catch (Exception e) {
@@ -542,6 +546,8 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public VersionConstraint parseVersionConstraint(String versionConstraint)
     {
+        setError(null);
+
         try {
             return new DefaultVersionConstraint(versionConstraint);
         } catch (Exception e) {

@@ -191,7 +191,7 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
                 }
             } catch (SearchException e) {
                 this.logger.error("Failed to search on repository [{}] with pattern=[{}], offset=[{}] and nb=[{}]."
-                    + " Ignore and got to next repository.", new Object[] {repository, pattern, offset, nb, e});
+                    + " Ignore and go to next repository.", new Object[] {repository, pattern, offset, nb, e});
             }
         }
 

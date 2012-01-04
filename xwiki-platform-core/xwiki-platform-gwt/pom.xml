@@ -43,6 +43,8 @@
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
+      <!-- Only needed at build time -->
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>

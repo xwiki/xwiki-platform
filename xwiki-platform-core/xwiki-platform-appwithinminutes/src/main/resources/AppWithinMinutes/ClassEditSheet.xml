@@ -1326,7 +1326,9 @@ return XWiki;
 }
 
 #fields .inherit {
+  background-image: none;
   border: 0 none;
+  box-shadow: none;
   color: inherit;
   font-family: inherit;
   font-size: inherit;

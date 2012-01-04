@@ -72,3 +72,41 @@ table.xwikilogintable input#j_password , table.xwikilogintable input#j_username{
 *+html #changes-info-box-to {
   margin-left: 0;
 }
+
+/* ----------------CSS3 adjustments----------------*/
+input[type="text"], input[type="password"] {
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.pageBackgroundColor', endColorstr='$theme.pageContentBackgroundColor',GradientType=0 );
+}
+textarea, select {
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.pageBackgroundColor', endColorstr='$theme.pageContentBackgroundColor',GradientType=0 );
+}
+input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.linkColor', endColorstr='$theme.buttonPrimaryBackgroundColor',GradientType=0 );
+}
+input.button:hover, .buttonwrapper a:hover{
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.buttonPrimaryBackgroundColor', endColorstr='$theme.linkColor',GradientType=0 );
+}
+.buttonwrapper input.secondary, .buttonwrapper a.secondary, 
+.buttonwrapper a.secondary:link, .buttonwrapper a.secondary:visited,
+.buttonwrapper a.secondary:active /* Needed for IE6 */ {
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.pageContentBackgroundColor', endColorstr='$theme.buttonSecondaryBackgroundColor',GradientType=0 );
+}
+.actionmenu .tmCreate:hover .tme-extensible, .tmCreate  .tme-extensible {
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4dececec', endColorstr='#00ececec',GradientType=0 );
+}
+/* Gradients containers for IE browsers */
+/* IE6-9 doesn't have support for CSS3 properties. Filters affect also child elements, so we can't apply filters on #mainmenu or #content because it will make the submenus inaccesible. The solution is a container that only holds the gradient colors. */
+#mainmenu .gradientfilterIE, #contentmenu .gradientfilterIE, #editmenu .gradientfilterIE {
+  min-height: 22px;
+  width: 100%;
+}
+#mainmenu .gradientfilterIE {
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.pageHeaderBackgroundColor', endColorstr='$theme.menuBackgroundColor',GradientType=0 );
+}
+#contentmenu .gradientfilterIE, #editmenu .gradientfilterIE, h1.xwikipaneltitle, ul.xwikitabbar  {
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.pageContentBackgroundColor', endColorstr='$theme.buttonSecondaryBackgroundColor',GradientType=0 );
+ }
+#mainmenu .componentcontainer, #contentmenu .componentcontainer, #editmenu .componentcontainer {
+  margin-top: -22px;
+}
+/* end IE gradient containers rules*/

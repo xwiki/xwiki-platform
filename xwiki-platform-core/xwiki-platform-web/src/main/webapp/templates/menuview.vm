@@ -1,5 +1,7 @@
 #if ($isInServletMode)## Visible only in a page
 <div id="mainmenu" class="layoutsubsection actionmenu">
+<div class="gradientfilterIE"></div>
+<div class="componentcontainer">
 <strong id="xwikimenutitle" class="hidden">$msg.get('core.menu.main.title')</strong>
 <div class="rightmenu">
 #set ($workspaceManagerMainDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'WebHome'))
@@ -299,6 +301,7 @@
     </script>
   #end
 #end
+</div>
 </div>
 </div>
 #end

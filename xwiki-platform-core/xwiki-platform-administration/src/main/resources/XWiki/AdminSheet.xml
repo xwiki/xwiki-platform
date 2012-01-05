@@ -3074,30 +3074,131 @@ document.observe('xwiki:dom:loaded', function() {
   display: block;
 }
 
-.admin-menu .configurationIcon  {
-  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.gif')");
+.admin-menu .group, .admin-menu .group:hover  {
+  background-position: 7px 50%, top center;
 }
 
-.admin-menu .lfIcon {
-  background-image: url("$xwiki.getSkinFile('icons/silk/layout_content.gif')");
+#set ($configurationIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/wrench.gif')${escapetool.S})")
+.admin-menu .group.configurationIcon {
+  #css3_backgroundIconAndLinearGradient($configurationIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
+      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+    ]
+  })
+}
+.admin-menu .group.configurationIcon:hover , .admin-menu .current.configurationIcon {
+  #css3_backgroundIconAndLinearGradient($configurationIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
 }
 
-.admin-menu .usersgroupsIcon  {
-  background-image: url("$xwiki.getSkinFile('icons/silk/group.gif')");
+#set ($lfIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/layout_content.gif')${escapetool.S})")
+.admin-menu .group.lfIcon {
+  #css3_backgroundIconAndLinearGradient($lfIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
+      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+    ]
+  })
+}
+.admin-menu .group.lfIcon:hover , .admin-menu .current.lfIcon {
+  #css3_backgroundIconAndLinearGradient($lfIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
 }
 
-.admin-menu .contentIcon  {
-  background-image: url("$xwiki.getSkinFile('icons/silk/folder_page.gif')");
+#set ($usersgroupsIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/group.gif')${escapetool.S})")
+.admin-menu .group.usersgroupsIcon {
+  #css3_backgroundIconAndLinearGradient($usersgroupsIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
+      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+    ]
+  })
+}
+.admin-menu .group.usersgroupsIcon:hover , .admin-menu .current.usersgroupsIcon {
+  #css3_backgroundIconAndLinearGradient($usersgroupsIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
 }
 
-.admin-menu .applicationsIcon  {
-  background-image: url("$xwiki.getSkinFile('icons/silk/plugin.gif')");
+#set ($contentIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/folder_page.gif')${escapetool.S})")
+.admin-menu .group.contentIcon {
+  #css3_backgroundIconAndLinearGradient($contentIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
+      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+    ]
+  })
+}
+.admin-menu .group.contentIcon:hover , .admin-menu .current.contentIcon {
+  #css3_backgroundIconAndLinearGradient($contentIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
 }
 
-.admin-menu .readOnly {
-  background-image: url("$xwiki.getSkinFile('icons/silk/error.gif')");
-  background-position: 5px;
-  background-repeat: no-repeat;
+#set ($applicationsIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/plugin.gif')${escapetool.S})")
+.admin-menu .group.applicationsIcon {
+  #css3_backgroundIconAndLinearGradient($applicationsIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
+      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+    ]
+  })
+}
+.admin-menu .group.applicationsIcon:hover , .admin-menu .current.applicationsIcon {
+  #css3_backgroundIconAndLinearGradient($applicationsIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
+}
+
+#set ($readOnlyIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/error.gif')${escapetool.S})")
+.admin-menu .group.readOnly {
+  #css3_backgroundIconAndLinearGradient($readOnlyIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
+      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+    ]
+  })
+}
+.admin-menu .group.readOnly:hover , .admin-menu .current.readOnly {
+  #css3_backgroundIconAndLinearGradient($readOnlyIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
+}
+.admin-menu .group.readOnly, .admin-menu .group.readOnly:hover , .admin-menu .current.readOnly  {
+  background-position: 5px 50%, top center;
 }
 
 /* Override general table styles. */

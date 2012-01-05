@@ -306,7 +306,7 @@ document.observe('xwiki:annotations:settings:loaded', function() {
 <code>#template('colorThemeInit.vm')
 
 .annotationsettings .plainmessage {
-  background-image: url($xwiki.getSkinFile('icons/silk/add.gif'));
+  background-image: url($xwiki.getSkinFile('icons/silk/add.png'));
   float: right;
   width: 30%;
   margin: 0 0 12px 4px;
@@ -339,10 +339,10 @@ document.observe('xwiki:annotations:settings:loaded', function() {
 .criterion {
   margin: 2px 0;
   padding: 0 0 0 14px;
-  background: transparent url($xwiki.getSkinFile('icons/silk/bullet_toggle_minus.gif')) top left no-repeat;
+  background: transparent url($xwiki.getSkinFile('icons/silk/bullet_toggle_minus.png')) top left no-repeat;
 }
 .criteria .collapsed {
-  background-image: url($xwiki.getSkinFile('icons/silk/bullet_toggle_plus.gif'));
+  background-image: url($xwiki.getSkinFile('icons/silk/bullet_toggle_plus.png'));
 }
 .criteria .collapsed .criterion-option-list {
   display: none;

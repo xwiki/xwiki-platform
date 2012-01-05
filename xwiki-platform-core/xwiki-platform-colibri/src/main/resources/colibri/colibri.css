@@ -1930,6 +1930,8 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 .errormessage, .warningmessage, .infomessage, .successmessage, .plainmessage {
   background: $theme.backgroundSecondaryColor 6px 8px no-repeat;
   border: 1px dotted $theme.borderColor;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15) inset;
   margin: 4px 0;
   overflow: auto;
   padding: 8px 28px;

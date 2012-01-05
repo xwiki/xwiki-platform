@@ -1540,7 +1540,13 @@ document.observe("xwiki:dom:loaded", function() {
       var menuWidth = content.getWidth();
       var menuLeft = content.cumulativeOffset().left;
       makeFixed(menu, 0, menuLeft, menuWidth);
-      makeFixed(menu.__fm_extra, menuHeight, menuLeft, (menuWidth - 50)); // magic number 50 = left+right padding
+      if (menu.__fm_extra) {
+        makeFixed(menu.__fm_extra, menuHeight, menuLeft, (menuWidth -
+          menu.__fm_extra.getStyle('border-left-width').replace(/[^0-9]/g,'') -
+          menu.__fm_extra.getStyle('border-right-width').replace(/[^0-9]/g,'') -
+          menu.__fm_extra.getStyle('padding-right').replace(/[^0-9]/g,'') -
+          menu.__fm_extra.getStyle('padding-left').replace(/[^0-9]/g,'')));
+      }
     } else if (document.viewport.getScrollOffsets().top >= menuMaxTop) {
       makeAbsolute(menu, menuMaxTop);
       makeAbsolute(menu.__fm_extra, menuMaxTop + menuHeight);

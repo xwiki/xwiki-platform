@@ -90,18 +90,18 @@ public class DefaultCoreConfiguration implements CoreConfiguration
         String syntaxId = this.configuration.getProperty(key, String.class);
 
         if (StringUtils.isEmpty(syntaxId)) {
-            syntaxId = this.xwikiPropertiesConfiguration.getProperty(key, Syntax.XWIKI_2_0.toIdString());
+            syntaxId = this.xwikiPropertiesConfiguration.getProperty(key, Syntax.XWIKI_2_1.toIdString());
         }
 
-        // Try to parse the syntax and if it fails defaults to the XWiki Syntax 2.0
+        // Try to parse the syntax and if it fails defaults to the XWiki Syntax 2.1
         Syntax syntax;
         try {
             syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
         } catch (ParseException e) {
             this.logger.warn(
-                "Invalid default document Syntax [" + syntaxId + "], defaulting to [" + Syntax.XWIKI_2_0.toIdString()
+                "Invalid default document Syntax [" + syntaxId + "], defaulting to [" + Syntax.XWIKI_2_1.toIdString()
                     + "] instead", e);
-            syntax = Syntax.XWIKI_2_0;
+            syntax = Syntax.XWIKI_2_1;
         }
 
         return syntax;

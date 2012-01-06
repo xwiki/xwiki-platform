@@ -175,6 +175,7 @@ textarea {
   max-width: 100%; /* Prevent resizing beyond the visible area in modern browsers */
 }
 input, textarea {
+  #css3_boxSizing('border-box')
   padding: .3em;
 }
 /* IE7 will shrink floated textareas continuously if we set a max-width,

@@ -220,6 +220,7 @@ AABJRU5ErkJggg==
   /* Padding, margin and bg-position are adjusted in order to give this element
      the 'tab' look when active and the settings panel is displayed */
   background-position: 5px 1px;
+  border-radius: 4px 4px 0 0;
   padding-left: 6px !important;
   padding-right: 5px !important;
   padding-top: 0 !important;

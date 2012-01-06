@@ -2251,3 +2251,17 @@ Wysiwyg.onModuleLoad(function() {
 #macro (css3_backgroundLinearGradient $gradientData)
   #css3_backgroundIconAndLinearGradient ('' $gradientData)
 #end
+#**
+ * Macro that adds the prefixes for box-sizing CSS property that alters the default CSS box model used to calculate widths and heights of elements
+ *
+ *
+ * @param $value should take the following values: content-box | padding-box | border-box
+ *#
+#macro (css3_boxSizing $value)
+  #if ("$!{value}" != '')
+    #set ($browserVariants = ['-moz-', '-webkit-', ''])
+    #foreach ($bvar in $browserVariants)
+      ${bvar}box-sizing: $value;
+    #end
+  #end
+#end

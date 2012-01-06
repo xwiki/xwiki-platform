@@ -331,17 +331,40 @@
       #set ($templateLocalAdminDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'Admin'))
       #permanentlyDeleteDocument($templateLocalAdminDocumentReference)
       ##
-      ## 12. Fix wiki macro authors (user current admin user) so that they are correctly registered.
+      ## Macro to be used for setting the document author of documents requiring an existing user as author or a user with admin/programming rights.
       ##
-      #set ($currentDatabase = $xcontext.database)
-      #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
-      #set ($wikiMacroClassDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'WikiMacroClass'))
-      #set ($wikiMacroDocumentNames = $services.query.xwql("from doc.object(XWiki.WikiMacroClass) as macros").execute())
-      #foreach ($wikiMacroDocumentName in $wikiMacroDocumentNames)
-        #set ($wikiMacroDocument = $xwiki.getDocument($wikiMacroDocumentName))
-        #set ($discard = $wikiMacroDocument.save('Fixed macro registration.', true))
+      #set ($documentNamesAlreadyFixed = [])
+      #macro(fixDocumentAuthor $className $comment $documentNamesAlreadyFixed)
+        #set ($currentDatabase = $xcontext.database)
+        #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
+        #set ($documentNamesToFix = $services.query.xwql("from doc.object($className) as theObject").execute())
+        #foreach ($documentNameToFix in $documentNamesToFix)
+          #if (!$documentNamesAlreadyFixed.contains($documentNameToFix))
+            #set ($documentReferencetoFix = $services.model.resolveDocument($documentNameToFix))
+            #set ($documentToFix = $xwiki.getDocument($documentReferencetoFix))
+            #set ($discard = $documentToFix.save($comment, true))
+            #set ($discard = $documentNamesAlreadyFixed.add($documentNameToFix))
+          #end
+        #end
+        #set ($discard = $xcontext.setDatabase($currentDatabase))
       #end
-      #set ($discard = $xcontext.setDatabase($currentDatabase))
+      ##
+      ## 12. Fix the author of wiki macro documents (use the current admin user) so that they are correctly registered.
+      ##
+      #fixDocumentAuthor('XWiki.WikiMacroClass', 'Fixed macro registration.', $documentNamesAlreadyFixed)
+      ##
+      ## 13. Fix the author of configuration pages for each application (use the current admin user) so that they are correctly registered and accessible in the workspace Administration section.
+      ##
+      #fixDocumentAuthor('XWiki.ConfigurableClass', 'Fixed Configurable Class registration issues.', $documentNamesAlreadyFixed)
+      ##
+      ## 14. Fix the author of SSX and JSX extensions.
+      ##
+      #fixDocumentAuthor('XWiki.StyleSheetExtension', 'Fixed SSX registration issues.', $documentNamesAlreadyFixed)
+      #fixDocumentAuthor('XWiki.JavaScriptExtension', 'Fixed JSX registration issues.', $documentNamesAlreadyFixed)
+      ##
+      ## 15. Fix the author of documents with RequiredRightClass declarations.
+      ##
+      #fixDocumentAuthor('XWiki.RequiredRightClass', 'Fixed RequiredRightClass requests.', $documentNamesAlreadyFixed)
 
       {{success}}Workspace template features successfully installed.{{/success}}
     #end

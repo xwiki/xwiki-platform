@@ -34,7 +34,7 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Extension - Parent POM</description>
   <properties>
-    <aether.version>1.13</aether.version>
+    <aether.version>1.13.1</aether.version>
     <maven.version>3.0.3</maven.version>
 
     <!-- Extension Manager is still in experimental sate and change very often -->

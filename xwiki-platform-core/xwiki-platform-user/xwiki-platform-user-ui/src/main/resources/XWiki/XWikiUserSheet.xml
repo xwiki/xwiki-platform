@@ -186,6 +186,7 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
   userprofile : {
 
     init : function() {
+      this.crtCategory = '';
       this.tabsContainer = $('vertical-tabs');
       if (!this.tabsContainer) {
         return;
@@ -200,9 +201,11 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
         }.bindAsEventListener(this));
       }.bind(this));
       this.tabsContainer.select('.vertical-tab.active').each(function (activeTab) {
+        this.updateCategoryFields(activeTab.__name);
         document.fire('xwiki:profile:switchedCategory', {'category' : activeTab.__name});
-      });
+      }.bind(this));
       XWiki.userprofile.adjustTabsContainerHeight();
+      this.handleCancelAction();
     },
 
     /*
@@ -236,7 +239,34 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
       });
       $(tab + 'Tab').addClassName('active');
       XWiki.userprofile.adjustTabsContainerHeight();
+      this.updateCategoryFields(tab);
       document.fire('xwiki:profile:switchedCategory', {'category' : tab});
+    },
+
+    updateCategoryFields : function (category) {
+      this.crtCategory = category;
+      this.updateField('xredirect', XWiki.currentDocument.getURL('view', 'category=' + category));
+      this.updateField('xcontinue', XWiki.currentDocument.getURL('edit', 'editor=inline&amp;category=' + category));
+      this.updateField('category', category);
+    },
+
+    updateField : function (fieldName, value) {
+      var element = $$('input[name=' + fieldName + ']');
+      if (element &amp;&amp; element.size() &gt; 0) {
+        element[0].value = value;
+      }
+    },
+
+    handleCancelAction : function() {
+      var elements = $$('form .buttons input[type=submit][name=action_cancel]');
+      if (elements &amp;&amp; elements.size() &gt; 0) {
+        var button = elements[0];
+        Event.stopObserving(button, 'click');
+        button.observe('click', function(event){
+          event.stop();
+          window.location = XWiki.currentDocument.getURL('view', 'category=' + this.crtCategory)
+        }.bindAsEventListener(this));
+      }
     }
   }
 });
@@ -648,6 +678,9 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
 
 {{html clean="false"}}
       &lt;/div&gt;
+    #end
+    #if($xcontext.action == 'edit' || $xcontext.action == 'inline')
+      &lt;input type='hidden' name='category' value="$!{currentCategory}" /&gt;
     #end
     &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
   &lt;/div&gt;

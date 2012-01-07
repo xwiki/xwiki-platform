@@ -1534,9 +1534,8 @@ document.observe("xwiki:dom:loaded", function() {
       extraHeight = menu.__fm_extra.getHeight();
     }
     var menuHeight = menu.getHeight();
-    var menuMaxTop = content.cumulativeOffset().top + content.getHeight() - menuHeight - extraHeight;
-    var menuMinTop = content.cumulativeOffset().top - menuHeight - extraHeight;
-    if (document.viewport.getScrollOffsets().top >= menuMinTop && document.viewport.getScrollOffsets().top < menuMaxTop) {
+    var menuMinTop = content.cumulativeOffset().top - extraHeight;
+    if (document.viewport.getScrollOffsets().top >= menuMinTop) {
       var menuWidth = content.getWidth();
       var menuLeft = content.cumulativeOffset().left;
       makeFixed(menu, 0, menuLeft, menuWidth);
@@ -1547,9 +1546,6 @@ document.observe("xwiki:dom:loaded", function() {
           menu.__fm_extra.getStyle('padding-right').replace(/[^0-9]/g,'') -
           menu.__fm_extra.getStyle('padding-left').replace(/[^0-9]/g,'')));
       }
-    } else if (document.viewport.getScrollOffsets().top >= menuMaxTop) {
-      makeAbsolute(menu, menuMaxTop);
-      makeAbsolute(menu.__fm_extra, menuMaxTop + menuHeight);
     } else {
       makeScrollable(menu);
       makeScrollable(menu.__fm_extra);
@@ -1580,6 +1576,7 @@ document.observe("xwiki:dom:loaded", function() {
    */
   function makeFixed(element, top, left, width) {
     if (element) {
+      element.addClassName('floating-menu');
       element.style.position = 'fixed';
       element.style.top = top + 'px';
       element.style.left = left + 'px';
@@ -1588,20 +1585,11 @@ document.observe("xwiki:dom:loaded", function() {
     }
   }
   /**
-   * Keeps the provided element at a certain position inside the document.
-   */
-  function makeAbsolute(element, top) {
-    if (element) {
-      element.style.position = 'absolute';
-      element.style.top = top + 'px';
-      element.__fm_ghost.show();
-    }
-  }
-  /**
    * Restores the provided element to its original position in the document.
    */
   function makeScrollable(element) {
     if (element) {
+      element.removeClassName('floating-menu');
       element.style.position = '';
       element.style.top = '';
       element.style.left = '';

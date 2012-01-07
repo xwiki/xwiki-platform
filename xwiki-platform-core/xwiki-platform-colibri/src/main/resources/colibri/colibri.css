@@ -1293,6 +1293,33 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url("$xwiki.getSkinFile('icons/silk/application_view_tile.gif')");
 }
 
+/* Styles for the floating menu, when scrolling down the page. */
+.floating-menu {
+  margin-top: -18px;
+}
+.floating-menu:hover {
+  margin-top: 0;
+}
+.floating-menu:after {
+  bottom: 0;
+  color: $theme.buttonSecondaryTextColor;
+  background: inherit;
+  content: ".......";
+  display: block;
+  font-size: 0.6em;
+  height: 0.5em;
+  letter-spacing: 0.2em;
+  line-height: 0.3em;
+  padding: 0 0 0.1em;
+  position: absolute;
+  text-align: center;
+  text-shadow: 0 1px 0 $theme.pageContentBackgroundColor;
+  width: 100%;
+}
+.floating-menu:hover:after {
+  content: "";
+  display: none;
+}
 /* @group FORMS */
 /* --------------------------------------------------------------
   * forms components

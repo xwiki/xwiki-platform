@@ -250,6 +250,22 @@ AABJRU5ErkJggg==
   position: relative;
   z-index: 998; /* Right below the submenu. */
 }
+.floating-menu + .annotationsettings.floating-menu {
+  visibility: hidden;
+}
+.floating-menu:hover + .annotationsettings.floating-menu {
+  margin-top: 0;
+  visibility: visible;
+}
+.annotationsettings.floating-menu:hover {
+  margin-top: -18px;
+  visibility: visible;
+}
+.annotationsettings.floating-menu:after {
+  content: "";
+  display: none;
+}
+
 .annotationsettings label {
   font-weight: bold;
 }

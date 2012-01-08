@@ -1336,7 +1336,7 @@ document.observe('xwiki:dom:loaded', function() {
         "documents" : {
             script: XWiki.Document.getRestSearchURL("scope=name&number=10&media=json&"),
             varname: "q",
-            icon: "$xwiki.getSkinFile('icons/silk/page_white_text.gif')",
+            icon: "$xwiki.getSkinFile('icons/silk/page_white_text.png')",
             noresults: "Document not found",
             json: true,
             resultsParameter : "searchResults",
@@ -1347,7 +1347,7 @@ document.observe('xwiki:dom:loaded', function() {
         "spaces" : {
             script: XWiki.Document.getRestSearchURL("scope=spaces&number=10&media=json&"),
             varname: "q",
-            icon: "$xwiki.getSkinFile('icons/silk/folder.gif')",
+            icon: "$xwiki.getSkinFile('icons/silk/folder.png')",
             noresults: "Space not found",
             json: true,
             resultsParameter : "searchResults",
@@ -1358,13 +1358,13 @@ document.observe('xwiki:dom:loaded', function() {
         "users" : {
             script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&classname=XWiki.XWikiUsers&wiki=local&uorg=user&'),
             varname: "input",
-            icon: "$xwiki.getSkinFile('icons/silk/user.gif')",
+            icon: "$xwiki.getSkinFile('icons/silk/user.png')",
             noresults: "User not found"
         },
         "groups" : {
             script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&classname=XWiki.XWikiGroups&wiki=local&uorg=group&'),
             varname: "input",
-            icon: "$xwiki.getSkinFile('icons/silk/group.gif')",
+            icon: "$xwiki.getSkinFile('icons/silk/group.png')",
             noresults: "Group not found"
         }
     };

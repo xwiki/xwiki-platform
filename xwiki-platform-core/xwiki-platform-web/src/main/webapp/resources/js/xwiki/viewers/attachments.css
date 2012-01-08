@@ -50,10 +50,10 @@
 .add-file-input {
   color: $theme.linkColor;
   background-position: 2px top;
-  background-image: url("$xwiki.getSkinFile('icons/silk/textfield_add.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/textfield_add.png')");
 }
 .remove-file-input {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
   width: 16px;
   text-indent: 30px;
 }
@@ -72,13 +72,13 @@
   margin: 0 0 0 4px;
 }
 .attachment .xwikibuttonlinks a.deletelink {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
 .attachment .xwikibuttonlinks a.editlink {
-  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')");
 }
 .attachment .xwikibuttonlinks a.viewlink {
-  background-image: url("$xwiki.getSkinFile('icons/silk/eye.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/eye.png')");
 }
 #AddAttachment {
   border-top: 1px solid $theme.borderColor;

@@ -106,16 +106,16 @@ ul.commentreplies, .reply {
   width: 16px;
 }
 .comment-permalink a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/link.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/link.png')");
 }
 .commentdelete a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
 .commentreply a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/comments_add.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/comments_add.png')");
 }
 .commentedit a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.gif')"); /*comment_edit*/
+  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')"); /*comment_edit*/
 }
 /* Form */
 #AddComment {
@@ -164,7 +164,7 @@ ul.commentreplies, .reply {
 }
 /* Permalink box */
 .permalinkBox .xdialog-box-confirmation .question {
-  background-image: url("$xwiki.getSkinFile('icons/silk/link.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/link.png')");
   padding-left: 0;
   text-indent: 22px;
 }

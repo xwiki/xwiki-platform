@@ -213,7 +213,7 @@ widgets.FullScreen = Class.create({
       'class': 'fullScreenEditButton',
       title: "$msg.get('core.editors.fullscreen.editFullScreen')",
       alt: "$msg.get('core.editors.fullscreen.editFullScreen')",
-      src: "$xwiki.getSkinFile('icons/silk/arrow_out.gif')"
+      src: "$xwiki.getSkinFile('icons/silk/arrow_out.png')"
     });
     // Add functionality
     fullScreenActivator.observe('click', this.makeFullScreen.bind(this, targetElement));
@@ -252,7 +252,7 @@ widgets.FullScreen = Class.create({
       'class': 'fullScreenCloseButton',
       title: "$msg.get('core.editors.fullscreen.exitFullScreen')",
       alt: "$msg.get('core.editors.fullscreen.exitFullScreen')",
-      src: "$xwiki.getSkinFile('icons/silk/arrow_in.gif')"
+      src: "$xwiki.getSkinFile('icons/silk/arrow_in.png')"
     });
     // Add functionality
     this.closeButton.observe('click', this.closeFullScreen.bind(this));

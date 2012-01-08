@@ -397,7 +397,7 @@ $xwiki.getUserName("xwiki:${username}")
       #set ($text = 'attachment')
     #end
   #end
-  <img src="${xwiki.getSkinFile("icons/silk/${image}.gif")}" alt="${msg.get("core.viewers.attachments.mime.${text}")}" title="${msg.get("core.viewers.attachments.mime.${text}")}"/>
+  <img src="${xwiki.getSkinFile("icons/silk/${image}.png")}" alt="${msg.get("core.viewers.attachments.mime.${text}")}" title="${msg.get("core.viewers.attachments.mime.${text}")}"/>
 #end
 ###
 ###    packName

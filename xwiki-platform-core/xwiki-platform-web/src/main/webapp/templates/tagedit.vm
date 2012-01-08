@@ -93,7 +93,7 @@
     #set($seps = $xwiki.getDocument("XWiki.TagClass").xWikiClass.tags.getProperty('separators').value)
     <dl>
     <dt><label for="tags">$msg.get("core.tagedit.title")</label></dt>
-    <dd><input type="text" id="tags" name="tags" onfocus="new XWiki.widgets.Suggest(this, {script:'$script', varname: 'input', seps:'$seps', offsety: 13, icon:'${xwiki.getSkinFile('icons/silk/tag_yellow.gif')}'});" value="$!tdoc.tags"/></dd>
+    <dd><input type="text" id="tags" name="tags" onfocus="new XWiki.widgets.Suggest(this, {script:'$script', varname: 'input', seps:'$seps', offsety: 13, icon:'${xwiki.getSkinFile('icons/silk/tag_yellow.png')}'});" value="$!tdoc.tags"/></dd>
     </dl>
   #end
 #end

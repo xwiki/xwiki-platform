@@ -828,7 +828,7 @@ div.buttonwrapper {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/parent_edit.gif')");
 }
 .edit-meta-tools a.hide-edit-parent {
-  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
 }
 
 /* Parent editing area */
@@ -920,7 +920,7 @@ table.xRichTextEditorTabPanel td {
 }
 
 .xwikirenderingerror {
-  background: $theme.backgroundSecondaryColor url("$xwiki.getSkinFile('icons/silk/exclamation.gif')") no-repeat 8px 50%;
+  background: $theme.backgroundSecondaryColor url("$xwiki.getSkinFile('icons/silk/exclamation.png')") no-repeat 8px 50%;
   border: 1px dotted $theme.borderColor;
   color: $theme.notificationErrorColor;
   display: block;
@@ -1154,40 +1154,40 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 
 /* Icons */
 .actionmenu .tmCreate {
-  background-image: url("$xwiki.getSkinFile('icons/silk/add.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
   background-position:  10px 3px;
 }
 
 .actionmenu .tmWiki {
-  background-image: url("$xwiki.getSkinFile('icons/silk/world.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/world.png')");
 }
 
 .actionmenu .tmAdminWiki {
-  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
 }
 
 .actionmenu .tmCreateSpace {
-  background-image: url("$xwiki.getSkinFile('icons/silk/folder_add.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/folder_add.png')");
 }
 
 .actionmenu .tmSpace {
-  background-image: url("$xwiki.getSkinFile('icons/silk/folder.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/folder.png')");
 }
 
 .actionmenu .tmAdminSpace {
-  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
 }
 
 .actionmenu .tmPage {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_text.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_text.png')");
 }
 
 .actionmenu .tmCreatePage, .actionmenu .tmCreatePageFromOffice {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_add.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_add.png')");
 }
 
 .actionmenu .tmCreateComment {
-  background-image: url("$xwiki.getSkinFile('icons/silk/comment_add.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/comment_add.png')");
 }
 
 .actionmenu .tmCreateAttachment{
@@ -1195,35 +1195,35 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .actionmenu .tmEdit {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.png')");
 }
 
 .actionmenu .tmEditWiki, .actionmenu .tmViewSource {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_code.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_code.png')");
 }
 
 .actionmenu .tmEditWysiwyg {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.png')");
 }
 
 .actionmenu .tmEditInline {
-  background-image: url("$xwiki.getSkinFile('icons/silk/application_form.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/application_form.png')");
 }
 
 .actionmenu .tmEditRights {
-  background-image: url("$xwiki.getSkinFile('icons/silk/lock.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/lock.png')");
 }
 
 .actionmenu .tmEditObject {
-  background-image: url("$xwiki.getSkinFile('icons/silk/brick.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/brick.png')");
 }
 
 .actionmenu .tmEditClass {
-  background-image: url("$xwiki.getSkinFile('icons/silk/box.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/box.png')");
 }
 
 .actionmenu .tmExportPdf {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_acrobat.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_acrobat.png')");
 }
 
 .actionmenu .tmExportOdt {
@@ -1231,47 +1231,47 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .actionmenu .tmExportRtf {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_word.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_word.png')");
 }
 
 .actionmenu .tmExportHtml {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_world.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_world.png')");
 }
 
 .actionmenu .tmExportXar {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_compressed.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_compressed.png')");
 }
 
 .actionmenu .tmPrintPreview {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_magnify.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_magnify.png')");
 }
 
 .actionmenu .tmActionDelete {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
 
 .actionmenu .tmActionRename {
-  background-image: url("$xwiki.getSkinFile('icons/silk/textfield_rename.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/textfield_rename.png')");
 }
 
 .actionmenu #tmActionShare {
-  background-image: url("$xwiki.getSkinFile('icons/silk/email_go.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/email_go.png')");
 }
 
 .actionmenu .tmActionCopy {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_copy.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_copy.png')");
 }
 
 .actionmenu .tmUser {
-  background-image: url("$xwiki.getSkinFile('icons/silk/user.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/user.png')");
 }
 
 .actionmenu .tmProfile {
-  background-image: url("$xwiki.getSkinFile('icons/silk/vcard.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/vcard.png')");
 }
 
 .actionmenu .tmUserPreferences {
-  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
 }
 
 .actionmenu .tmWatchWiki, .actionmenu .tmWatchSpace, .actionmenu .tmWatchDocument {
@@ -1283,14 +1283,14 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .actionmenu .tmWikiDocumentIndex, .actionmenu .tmSpaceDocumentIndex {
-  background-image: url("$xwiki.getSkinFile('icons/silk/book_open.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/book_open.png')");
 }
 .actionmenu .tmUserNetwork {
-  background-image: url("$xwiki.getSkinFile('icons/silk/group.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/group.png')");
 }
 
 .actionmenu .tmUserDashboard {
-  background-image: url("$xwiki.getSkinFile('icons/silk/application_view_tile.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/application_view_tile.png')");
 }
 
 /* Styles for the floating menu, when scrolling down the page. */
@@ -1407,7 +1407,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .xform .xHelp {
-  background: transparent url("$xwiki.getSkinFile('icons/silk/information.gif')") 0 0 no-repeat;
+  background: transparent url("$xwiki.getSkinFile('icons/silk/information.png')") 0 0 no-repeat;
   float: right;
   height: 16px;
   line-height: 250px; /* Push the text away. */
@@ -1895,24 +1895,24 @@ ul.xlist li.space, ul.xlist li.page, ul.xlist li.comment, ul.xlist li.attachment
 }
 
 ul.xlist li.space {
-  background-image: url("$xwiki.getSkinFile('icons/silk/folder.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/folder.png')");
 }
 
 ul.xlist li.page {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_text.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_text.png')");
 }
 
 ul.xlist li.comment {
-  background-image: url("$xwiki.getSkinFile('icons/silk/comment.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/comment.png')");
 }
 
 ul.xlist li.attachment {
-  background-image: url("$xwiki.getSkinFile('icons/silk/attach.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/attach.png')");
   padding-bottom: 0;
 }
 
 ul.xlist li.create a {
-  background: url("$xwiki.getSkinFile('icons/silk/bullet_add.gif')") 7px 3px no-repeat;
+  background: url("$xwiki.getSkinFile('icons/silk/bullet_add.png')") 7px 3px no-repeat;
   color: $theme.textSecondaryColor;
   text-decoration: none;
   padding-left: 1.5em;
@@ -1967,22 +1967,22 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 }
 
 .infomessage {
-  background-image: url("$xwiki.getSkinFile('icons/silk/information.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/information.png')");
   color: $theme.notificationInfoColor;
 }
 
 .warningmessage {
-  background-image: url("$xwiki.getSkinFile('icons/silk/error.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/error.png')");
   color: $theme.notificationWarningColor;
 }
 
 .errormessage {
-  background-image: url("$xwiki.getSkinFile('icons/silk/exclamation.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/exclamation.png')");
   color: $theme.notificationErrorColor;
 }
 
 .successmessage {
-  background-image: url("$xwiki.getSkinFile('icons/silk/tick.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/tick.png')");
   color: $theme.notificationSuccessColor;
 }
 

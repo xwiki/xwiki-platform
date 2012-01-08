@@ -46,15 +46,15 @@
 }
 
 .gadget .gadget-title .settings-menu .remove {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
 
 .gadget .gadget-title .settings-menu .edit {
-  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')");
 }
 
 .gadget .gadget-title .settings {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cog.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
   background-position: center;
   background-repeat: no-repeat;
   cursor: pointer;
@@ -93,7 +93,7 @@
 
 /* Add button decoration */
 .dashboard-edit .addgadget, .dashboard-edit .addcontainer {
-  background: url($xwiki.getSkinFile("icons/silk/add.gif")) no-repeat 3px center $theme.menuAddEntryBackgroundColor;
+  background: url($xwiki.getSkinFile("icons/silk/add.png")) no-repeat 3px center $theme.menuAddEntryBackgroundColor;
   #__css3('border-radius: 4px')
   color: $theme.menuAddEntryLinkColor;
   cursor: pointer;

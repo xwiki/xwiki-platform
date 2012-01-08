@@ -1178,6 +1178,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
 }
 
+.actionmenu .tmSpaceDelete {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
+}
+
 .actionmenu .tmPage {
   background-image: url("$xwiki.getSkinFile('icons/silk/page_white_text.png')");
 }

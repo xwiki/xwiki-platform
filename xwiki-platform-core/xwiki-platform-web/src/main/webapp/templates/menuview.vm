@@ -250,6 +250,14 @@
     #submenuitem($spaceIndexUrl $msg.get('core.menu.space.documentindex') 'tmSpaceDocumentIndex' '')
     #set ($hasPreviousMenuSection = true)
   #end
+  #if ($hasSpaceAdmin)
+    #if ($hasPreviousMenuSection)
+      #submenuseparator()
+    #end
+    #set ($spaceDeleteUrl = $!xwiki.getURL("${doc.space}.WebHome", 'deletespace'))
+    #submenuitem($spaceDeleteUrl $msg.get('core.menu.space.delete') 'tmSpaceDelete' '')
+    #set ($hasPreviousMenuSection = true)
+  #end
   #xwikitopmenuentryend()
 #end
 ##

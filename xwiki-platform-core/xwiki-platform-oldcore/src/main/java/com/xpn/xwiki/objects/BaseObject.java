@@ -334,6 +334,9 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         if (cel != null) {
             bclass.fromXML(cel);
             setClassName(bclass.getName());
+        } else {
+            // We need at least to set the class name to avoid some NullPointerExceptions
+            setClassName(oel.elementText("className"));
         }
 
         setName(oel.element("name").getText());

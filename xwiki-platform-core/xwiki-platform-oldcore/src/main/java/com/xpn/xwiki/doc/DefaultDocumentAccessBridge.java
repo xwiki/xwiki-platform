@@ -340,19 +340,16 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
-        DocumentReference oldParentReference = doc.getParentReference();
         doc.setParentReference(parentReference);
-        saveDocument(doc,
-            String.format("Changed document syntax from [%s] to [%s].", oldParentReference, parentReference), true);
+        saveDocument(doc, String.format("Changed document parent to [%s].", parentReference), true);
     }
 
     public void setDocumentTitle(DocumentReference documentReference, String title) throws Exception
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
-        String oldTitle = doc.getTitle();
         doc.setTitle(title);
-        saveDocument(doc, String.format("Changed document syntax from [%s] to [%s].", oldTitle, title), true);
+        saveDocument(doc, String.format("Changed document title to [%s].", title), true);
     }
 
     /**

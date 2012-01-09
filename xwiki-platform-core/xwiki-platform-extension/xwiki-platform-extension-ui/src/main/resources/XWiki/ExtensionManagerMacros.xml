@@ -1322,6 +1322,9 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #macro (printJobLog $job)
   #foreach ($log in $job.status.log)
     #set ($logLevel = $log.level.toString().toLowerCase())
+    #if ($logLevel == 'warn')
+      #set ($logLevel = 'warning')
+    #end
     {{$logLevel}}
       $log.formattedMessage
       #if ($log.throwable)

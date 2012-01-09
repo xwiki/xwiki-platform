@@ -22,21 +22,16 @@ package org.xwiki.gwt.wysiwyg.client.syntax.internal;
 import org.xwiki.gwt.wysiwyg.client.syntax.AbstractSyntaxValidatorTest;
 import org.xwiki.gwt.wysiwyg.client.syntax.SyntaxValidator;
 
-
 /**
- * Unit test for {@link XWikiSyntaxValidator}.
+ * Unit test for {@link DefaultSyntaxValidator}.
  * 
  * @version $Id$
  */
-public class XWikiSyntaxValidatorTest extends AbstractSyntaxValidatorTest
+public class DefaultSyntaxValidatorTest extends AbstractSyntaxValidatorTest
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSyntaxValidatorTest#newSyntaxValidator()
-     */
+    @Override
     protected SyntaxValidator newSyntaxValidator()
     {
-        return new XWikiSyntaxValidator();
+        return new DefaultSyntaxValidator("mock");
     }
 }

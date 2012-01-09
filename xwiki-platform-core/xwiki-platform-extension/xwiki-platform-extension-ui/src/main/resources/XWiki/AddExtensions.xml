@@ -300,7 +300,7 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
     &lt;fieldset id="advancedextensionsearch"&gt;
       &lt;div id="advancedextensionsearch-body"&gt;&lt;/div&gt;
       &lt;legend&gt;&lt;a href="#advancedextensionsearch-body"&gt;Advanced install&lt;/a&gt;&lt;/legend&gt;
-      &lt;div class="half"&gt;
+      &lt;div class="plainmessage half hidden"&gt;
         &lt;input type="hidden" name="xback" value="$escapetool.xml($doc.getURL($xcontext.action, $request.queryString))" /&gt;
         &lt;dl&gt;
         &lt;dt&gt;&lt;label for="advancedextensionsearch-id"&gt;Extension ID&lt;/label&gt;&lt;/dt&gt;
@@ -308,7 +308,8 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
         &lt;dt&gt;&lt;label for="advancedextensionsearch-version"&gt;Version&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;&lt;input type="text" name="extensionversion" id="advancedextensionsearch-version" value="" /&gt;&lt;/dd&gt;
         &lt;/dl&gt;
-        &lt;p&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" name="actioninstall" value="Install" class="button" /&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" name="actioninstall" value="Install" class="button" /&gt;&lt;/span&gt;
+           &lt;span class="buttonwrapper"&gt;&lt;a href="#searchextension" class="actioncancel secondary button"/&gt;Cancel&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;
       &lt;/div&gt;
     &lt;/fieldset&gt;
   &lt;/form&gt;

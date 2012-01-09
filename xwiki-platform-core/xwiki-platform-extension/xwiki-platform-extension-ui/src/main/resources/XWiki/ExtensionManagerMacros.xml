@@ -123,6 +123,7 @@
      */ 
     initialize : function () {
       $$(this.extensionItemSelector + " form input[name='actionshowdetails']").invoke("observe", "click", this.loadExtensionDetails.bindAsEventListener(this));
+      this.prepareAdvancedInstall();
     },
     /**
      * Ajax loading of Extension details
@@ -252,6 +253,35 @@
       $(menuLink.getAttribute('href').substring(1)).next(this.extensionDetailsSectionSelector).setStyle({'display' : 'block'});
       // ... also marking the clicked menu item as current
       menuLink.up(this.extensionMenuItemSelector).addClassName(this.crtExtensionMenuItemMarker);
+    },
+
+    prepareAdvancedInstall : function() {
+      var advancedSearchBox = $('advancedextensionsearch');
+      if (!advancedSearchBox) {
+        return;
+      }
+      var advancedSearchTrigger = advancedSearchBox.down('legend a');//ry :)
+      if (advancedSearchTrigger) {
+        var target = advancedSearchTrigger.up('legend').next();
+        if (target) {
+          advancedSearchTrigger.observe('click', function(event) {
+            event.stop();
+            advancedSearchTrigger.blur();
+            target.toggleClassName('hidden');
+            advancedSearchTrigger.toggleClassName('expanded');
+          });
+          var cancelTrigger = target.down('a.actioncancel');
+          if (cancelTrigger) {
+            cancelTrigger.observe('click', function(event) {
+              event.stop();
+              cancelTrigger.up('form').select('input[type=text]').each(function(input) {
+                input.value = '';
+              });
+              advancedSearchTrigger.click();
+          });
+         }
+        }
+      }
     }
   });
 
@@ -481,19 +511,22 @@
   background-image: url("$xwiki.getSkinFile('icons/silk/plugin_error.png')");
 }
 
-#advancedextensionsearch div {
-  display: none;
-}
 #advancedextensionsearch legend {
-  font-size: .8em;
+  font-size: .875em;
+  margin: 0;
+  border: 0 none;
 }
+
 #advancedextensionsearch legend a:after {
-  content: "&gt;&gt;";
+  content: " \bb";
+}
+#advancedextensionsearch legend a.expanded:after {
+  content: "";
 }
 #advancedextensionsearch-body {
   display: none;
 }
-#advancedextensionsearch-body:target ~ div {
+#advancedextensionsearch-body:target ~ div.hidden {
   display: block;
 }
 /****************************** &lt;Inner Menu&gt; *************************/

@@ -37,6 +37,15 @@ import javax.ws.rs.core.Response.Status;
 import org.restlet.data.MediaType;
 import org.restlet.representation.InputRepresentation;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionFile;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.internal.reference.ExtensionResourceReference;
+import org.xwiki.extension.repository.ExtensionRepository;
+import org.xwiki.extension.repository.ExtensionRepositoryFactory;
+import org.xwiki.extension.repository.ExtensionRepositoryId;
+import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.xwiki.Resources;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
@@ -61,10 +70,13 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
     @Inject
     private AttachmentReferenceResolver<String> attachmentResolver;
 
+    @Inject
+    private ExtensionRepositoryManager extensionRepositoryManager;
+
     @GET
     public Response downloadExtension(@PathParam(Resources.PPARAM_EXTENSIONID) String extensionId,
         @PathParam(Resources.PPARAM_EXTENSIONVERSION) String extensionVersion) throws XWikiException, QueryException,
-        URISyntaxException, IOException
+        URISyntaxException, IOException, ResolveException
     {
         XWikiDocument extensionDocument = getExistingExtensionDocumentById(extensionId);
 
@@ -112,6 +124,57 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
             InputRepresentation content =
                 new InputRepresentation(connection.getInputStream(), new MediaType(connection.getContentType()),
                     connection.getContentLength());
+            response.entity(content);
+        } else if (ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
+            ExtensionResourceReference extensionResource;
+            if (resourceReference instanceof ExtensionResourceReference) {
+                extensionResource = (ExtensionResourceReference) resourceReference;
+            } else {
+                extensionResource = new ExtensionResourceReference(resourceReference.getReference());
+            }
+
+            ExtensionRepository repository = null;
+            if (extensionResource.getRepositoryId() != null) {
+                repository = this.extensionRepositoryManager.getRepository(extensionResource.getRepositoryId());
+            }
+
+            if (repository == null && extensionResource.getRepositoryType() != null
+                && extensionResource.getRepositoryURI() != null) {
+                ExtensionRepositoryId repositoryId =
+                    new ExtensionRepositoryId("tmp", extensionResource.getRepositoryType(),
+                        extensionResource.getRepositoryURI());
+                try {
+                    ExtensionRepositoryFactory repositoryFactory =
+                        this.componentManager.lookup(ExtensionRepositoryFactory.class, repositoryId.getType());
+
+                    repository = repositoryFactory.createRepository(repositoryId);
+                } catch (Exception e) {
+                    // Ignore invalid repository
+                    this.logger.warning("Invalid repository in download link [" + resourceReference + "] in document ["
+                        + extensionDocument + "]");
+                }
+
+            }
+
+            // Resolve extension
+            Extension downloadExtension;
+            if (repository == null) {
+                downloadExtension =
+                    this.extensionRepositoryManager.resolve(new ExtensionId(extensionResource.getExtensionId(),
+                        extensionResource.getExtensionVersion()));
+            } else {
+                downloadExtension =
+                    repository.resolve(new ExtensionId(extensionResource.getExtensionId(), extensionResource
+                        .getExtensionVersion()));
+            }
+
+            // Get file
+            // TODO: find media type
+            ExtensionFile extensionFile = downloadExtension.getFile();
+            long length = extensionFile.getLength();
+            InputRepresentation content = new InputRepresentation(extensionFile.openStream(), MediaType.ALL, length);
+
+            response = Response.ok();
             response.entity(content);
         } else {
             throw new WebApplicationException(Status.NOT_FOUND);

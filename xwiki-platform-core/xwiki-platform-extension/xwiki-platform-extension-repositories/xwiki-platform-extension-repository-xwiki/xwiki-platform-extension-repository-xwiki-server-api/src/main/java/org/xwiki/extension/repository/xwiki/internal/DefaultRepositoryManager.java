@@ -300,7 +300,8 @@ public class DefaultRepositoryManager implements RepositoryManager
                                 } catch (XWikiException e) {
                                     valid = false;
                                 }
-                            } else if (ResourceType.URL.equals(resourceReference.getType())) {
+                            } else if (ResourceType.URL.equals(resourceReference.getType())
+                                || ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
                                 valid = true;
                             } else {
                                 valid = false;

@@ -385,7 +385,7 @@
   font-size: 1.2em;
   font-weight: 700;
   border: none;
-  background: url("$xwiki.getSkinFile('icons/silk/cog.gif')") no-repeat scroll 0.2em 0.3em transparent;
+  background: url("$xwiki.getSkinFile('icons/silk/cog.png')") no-repeat scroll 0.2em 0.3em transparent;
   margin: 0 0 0 -1.8em;
   padding: 2px 0 2px 1.8em;
 }
@@ -469,16 +469,16 @@
   list-style-type: none;
 }
 .dependency-type-core {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cog.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
 }
 .dependency-type-installed {
-  background-image: url("$xwiki.getSkinFile('icons/silk/plugin.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/plugin.png')");
 }
 .dependency-type-remote {
-  background-image: url("$xwiki.getSkinFile('icons/silk/world.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/world.png')");
 }
 .dependency-type-unknown {
-  background-image: url("$xwiki.getSkinFile('icons/silk/plugin_error.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/plugin_error.png')");
 }
 
 #advancedextensionsearch div {
@@ -671,7 +671,7 @@
 }
 
 .changedRight {
-    background: url("/xwiki/resources/icons/silk/bullet_black.gif") no-repeat scroll 0 center transparent;
+    background: url("$xwiki.getSkinFile('icons/silk/bullet_black.png')") no-repeat scroll 0 center transparent;
     font-weight: bold;
 }
 
@@ -730,7 +730,7 @@
 }
 
 .type {
-  background: url("/xwiki/resources/icons/silk/bricks.gif") no-repeat scroll 0 0 transparent;
+  background: url("$xwiki.getSkinFile('icons/silk/bricks.png')") no-repeat scroll 0 0 transparent;
 }
 
 .extFilter {
@@ -804,23 +804,23 @@
 }
 
 .typeApp{
-  background-image: url("/xwiki/resources/icons/silk/application.gif");
+  background-image: url("$xwiki.getSkinFile('icons/silk/application.png')");
 }
 
 .typeModule{
-  background-image: url("/xwiki/resources/icons/silk/connect.gif");
+  background-image: url("$xwiki.getSkinFile('icons/silk/connect.png')");
 }
 
 .typeSkin{
-  background-image: url("/xwiki/resources/icons/silk/layout_content.gif");
+  background-image: url("$xwiki.getSkinFile('icons/silk/layout_content.png')");
 }
 
 .typeMacro{
-  background-image: url("/xwiki/resources/icons/silk/cog.gif");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
 }
 
 .typePlugin{
-  background-image: url("/xwiki/resources/icons/silk/plugin.gif");
+  background-image: url("$xwiki.getSkinFile('icons/silk/plugin.png')");
 }
 
 .extItem.statusInstalled  {

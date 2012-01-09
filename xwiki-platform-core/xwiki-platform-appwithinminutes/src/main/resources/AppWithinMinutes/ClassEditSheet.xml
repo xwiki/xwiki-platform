@@ -461,7 +461,7 @@ XWiki.FormField = Class.create({
     if (fieldConfig.visible()) {
       fieldConfig.hide();
       icon.alt = icon.title = '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorConfigureFieldLabel'))';
-      icon.src = '$xwiki.getSkinFile('icons/silk/bullet_wrench.gif')';
+      icon.src = '$xwiki.getSkinFile('icons/silk/bullet_wrench.png')';
       this._maybePreview();
     } else {
       fieldConfig.show();
@@ -1095,7 +1095,7 @@ return XWiki;
 }
 
 #canvas .hint {
-  background: url($xwiki.getSkinFile('icons/silk/application_form_add.gif')) no-repeat scroll left center transparent;
+  background: url("$xwiki.getSkinFile('icons/silk/application_form_add.png')") no-repeat scroll left center transparent;
   color: $theme.textSecondaryColor;
   display: none;
   font-style: italic;

@@ -413,13 +413,13 @@ div.editProfileCategory a {
   display:block;
   width: 16px;
   height: 16px;
-  background: url($xwiki.getSkinFile('icons/silk/pencil.gif')) no-repeat;
+  background: url("$xwiki.getSkinFile('icons/silk/pencil.png')") no-repeat;
 }
 
 /* Watchlist */
 
 #watchlistRssLink {
-  background: url($xwiki.getSkinFile('icons/xwiki/rss-medium.png')) no-repeat;
+  background: url("$xwiki.getSkinFile('icons/xwiki/rss-medium.png')") no-repeat;
   padding-left: 18px;
   font-weight: bold;
 }
@@ -431,15 +431,15 @@ span.wikiWatchlistType, span.spaceWatchlistType, span.pageWatchlistType {
 }
 
 span.wikiWatchlistType {
-  background: url($xwiki.getSkinFile('icons/silk/world.gif')) no-repeat;
+  background: url("$xwiki.getSkinFile('icons/silk/world.png')") no-repeat;
 }
 
 span.spaceWatchlistType {
-  background: url($xwiki.getSkinFile('icons/silk/folder.gif')) no-repeat;
+  background: url("$xwiki.getSkinFile('icons/silk/folder.png')") no-repeat;
 }
 
 span.pageWatchlistType {
-  background: url($xwiki.getSkinFile('icons/silk/page_white_text.gif')) no-repeat;
+  background: url("$xwiki.getSkinFile('icons/silk/page_white_text.png')") no-repeat;
 }
 
 /* Tabs */
@@ -569,7 +569,7 @@ span#avatarUpload {
 }
 
 .attachment-picker-start {
-  background: url("$xwiki.getSkinFile('icons/silk/picture_edit.gif')") no-repeat center center $theme.pageContentBackgroundColor !important;
+  background: url("$xwiki.getSkinFile('icons/silk/picture_edit.png')") no-repeat center center $theme.pageContentBackgroundColor !important;
   border: 0 none !important;
   border-bottom-left-radius: 8px;
   -moz-border-radius-bottomleft: 8px;
@@ -612,24 +612,24 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
 ## Categories
 ##
 #set($categories = $util.arrayList)
-#set($discard = $categories.add(['profile', $msg.get('platform.core.profile.category.profile'), 'XWiki.XWikiUserProfileSheet', 'icons/silk/vcard.gif']))
+#set($discard = $categories.add(['profile', $msg.get('platform.core.profile.category.profile'), 'XWiki.XWikiUserProfileSheet', 'icons/silk/vcard.png']))
 #set($isMyProfile = ($services.model.resolveDocument($xcontext.user) == $doc.documentReference))
 #if($isMyProfile || $hasAdmin)
-  #set($discard = $categories.add(['preferences', $msg.get('platform.core.profile.category.preferences'), 'XWiki.XWikiUserPreferencesSheet', 'icons/silk/wrench.gif']))
+  #set($discard = $categories.add(['preferences', $msg.get('platform.core.profile.category.preferences'), 'XWiki.XWikiUserPreferencesSheet', 'icons/silk/wrench.png']))
 #end
 ## TODO: add APIs to be able to display users watchlists to admins
 #if($isMyProfile &amp;&amp; $hasWatch)
-  #set($discard = $categories.add(['watchlist', $msg.get('platform.core.profile.category.watchlist'), 'XWiki.XWikiUserWatchListSheet', 'icons/silk/star.gif']))
+  #set($discard = $categories.add(['watchlist', $msg.get('platform.core.profile.category.watchlist'), 'XWiki.XWikiUserWatchListSheet', 'icons/silk/star.png']))
 #end
 #if ($isMyProfile)
-  #set ($discard = $categories.add(['network', $msg.get('platform.core.profile.category.network'), 'XWiki.XWikiUserNetworkSheet', 'icons/silk/group.gif']))
+  #set ($discard = $categories.add(['network', $msg.get('platform.core.profile.category.network'), 'XWiki.XWikiUserNetworkSheet', 'icons/silk/group.png']))
 #end
 #set ($userWorkspaceSheet = 'WorkspaceManager.UserWorkspaceSheet')
 #if ($xcontext.isMainWiki() &amp;&amp; $xwiki.exists($userWorkspaceSheet))
-  #set ($discard = $categories.add(['workspaces', $msg.get('workspacemanager.profile.category.workspaces'), $userWorkspaceSheet, 'icons/silk/chart_organisation.gif']))
+  #set ($discard = $categories.add(['workspaces', $msg.get('workspacemanager.profile.category.workspaces'), $userWorkspaceSheet, 'icons/silk/chart_organisation.png']))
 #end
 #if ($isMyProfile &amp;&amp; $hasDashboard)
-  #set ($discard = $categories.add(['dashboard', $msg.get('platform.core.profile.category.dashboard'), 'Dashboard.XWikiUserDashboardSheet', 'icons/silk/application_view_tile.gif']))
+  #set ($discard = $categories.add(['dashboard', $msg.get('platform.core.profile.category.dashboard'), 'Dashboard.XWikiUserDashboardSheet', 'icons/silk/application_view_tile.png']))
 #end
 ##
 ## Current category

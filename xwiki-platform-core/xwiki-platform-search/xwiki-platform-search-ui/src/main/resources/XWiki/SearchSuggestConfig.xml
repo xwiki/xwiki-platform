@@ -562,7 +562,7 @@ AAAAAElFTkSuQmCC</content></attachment>
 <highlight>1</highlight>
 </property>
 <property>
-<icon>$xwiki.getSkinFile('icons/silk/page_white_text.gif')</icon>
+<icon>$xwiki.getSkinFile('icons/silk/page_white_text.png')</icon>
 </property>
 <property>
 <name>Document name</name>
@@ -685,7 +685,7 @@ AAAAAElFTkSuQmCC</content></attachment>
 <highlight>0</highlight>
 </property>
 <property>
-<icon>$xwiki.getSkinFile('icons/silk/page_white_text.gif')</icon>
+<icon>$xwiki.getSkinFile('icons/silk/page_white_text.png')</icon>
 </property>
 <property>
 <name>Document content</name>
@@ -808,7 +808,7 @@ AAAAAElFTkSuQmCC</content></attachment>
 <highlight>1</highlight>
 </property>
 <property>
-<icon>$xwiki.getSkinFile('icons/silk/attach.gif')</icon>
+<icon>$xwiki.getSkinFile('icons/silk/attach.png')</icon>
 </property>
 <property>
 <name>Attachment name</name>
@@ -931,7 +931,7 @@ AAAAAElFTkSuQmCC</content></attachment>
 <highlight>0</highlight>
 </property>
 <property>
-<icon>$xwiki.getSkinFile('icons/silk/attach.gif')</icon>
+<icon>$xwiki.getSkinFile('icons/silk/attach.png')</icon>
 </property>
 <property>
 <name>Attachment content</name>
@@ -1054,7 +1054,7 @@ AAAAAElFTkSuQmCC</content></attachment>
 <highlight>0</highlight>
 </property>
 <property>
-<icon>$xwiki.getSkinFile('icons/silk/page_white_picture.gif')</icon>
+<icon>$xwiki.getSkinFile('icons/silk/page_white_picture.png')</icon>
 </property>
 <property>
 <name>Blog Posts</name>
@@ -1177,7 +1177,7 @@ AAAAAElFTkSuQmCC</content></attachment>
 <highlight>0</highlight>
 </property>
 <property>
-<icon>$xwiki.getSkinFile('icons/silk/user.gif')</icon>
+<icon>$xwiki.getSkinFile('icons/silk/user.png')</icon>
 </property>
 <property>
 <name>Users</name>

@@ -129,7 +129,7 @@
 }
 
 .activity-follow .unfollow {
-  background: transparent 0 center url("$xwiki.getSkinFile('icons/silk/cross.gif')") no-repeat;
+  background: transparent 0 center url("$xwiki.getSkinFile('icons/silk/cross.png')") no-repeat;
   color: $theme.notificationErrorColor;
   display: inline-block;
   overflow: hidden;
@@ -145,7 +145,7 @@
 }
 
 .activity-follow .follow, .activity-follow .following {
-  background: $theme.menuAddEntryBackgroundColor 2px center url("$xwiki.getSkinFile('icons/silk/accept.gif')") no-repeat;
+  background: $theme.menuAddEntryBackgroundColor 2px center url("$xwiki.getSkinFile('icons/silk/accept.png')") no-repeat;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
@@ -157,7 +157,7 @@
   padding: 3px 6px 3px 22px;
 }
 .activity-follow .follow {
-  background-image: url("$xwiki.getSkinFile('icons/silk/add.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
 }</code>
 </property>
 <property>

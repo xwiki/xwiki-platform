@@ -64,7 +64,7 @@
       #set ($discard = $searchSuggestConfigObject.set('url', $suggestUrl))
       #set ($discard = $searchSuggestConfigObject.set('activated', 1))
       #set ($discard = $searchSuggestConfigObject.set('highlight', 1))
-      #set ($suggestIcon = '$xwiki.getSkinFile(' + $escapetool.singleQuote + 'icons/silk/chart_organisation.gif' + $escapetool.singleQuote + ')')
+      #set ($suggestIcon = '$xwiki.getSkinFile(' + $escapetool.singleQuote + 'icons/silk/chart_organisation.png' + $escapetool.singleQuote + ')')
       #set ($discard = $searchSuggestConfigObject.set('icon', $suggestIcon))
       ##
       #set ($discard = $searchSuggestConfigDocument.save('Automatically registered workspace search suggestions.', true))

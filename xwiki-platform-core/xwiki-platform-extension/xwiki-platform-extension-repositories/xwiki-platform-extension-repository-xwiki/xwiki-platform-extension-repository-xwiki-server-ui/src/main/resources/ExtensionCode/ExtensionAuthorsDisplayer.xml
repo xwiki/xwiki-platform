@@ -110,7 +110,7 @@ function removePage(nb, tag, page, pageTitle) {
    tag.parentNode.parentNode.removeChild(tag.parentNode);
    updatePageList(nb);
 }
-  
+
 function addPage(nb, obj) {
     var page = obj.info;
     var pageTitle = obj.value;
@@ -118,8 +118,7 @@ function addPage(nb, obj) {
   }
 
 function addPage(nb, page, pageTitle) {
-   var el = $("pagepicker-" 
-+ nb + "-items");
+   var el = $("pagepicker-" + nb + "-items");
    var spage = escapeForXML(page);
    var spageTitle = escapeForXML(pageTitle);
    var li = document.createElement("li");
@@ -128,7 +127,7 @@ function addPage(nb, page, pageTitle) {
    span.className = "pagepicker-" + nb + "-item";
    span.value = page;
    var img = document.createElement("img");
-   img.src = "$xwiki.getSkinFile('icons/silk/cross.gif')";
+   img.src = "$xwiki.getSkinFile('icons/silk/cross.png')";
    img.onclick = function() { removePage(nb, this, spage, spageTitle); };
    li.appendChild(span);
    li.appendChild(img);

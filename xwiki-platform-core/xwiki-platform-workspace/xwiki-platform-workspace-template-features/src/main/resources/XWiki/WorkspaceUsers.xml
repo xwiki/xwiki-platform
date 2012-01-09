@@ -393,7 +393,7 @@ Comment: $message")
             $('errMsg').innerHTML = "";
             suggesturl = "${doc.getURL('view', 'xpage=uorgsuggest&amp;classname=XWiki.XWikiUsers')}";
             suggesturl += "&amp;uorg=user&amp;wiki=global" + "&amp;";
-            icon = "$xwiki.getSkinFile('icons/silk/user.gif')";
+            icon = "$xwiki.getSkinFile('icons/silk/user.png')";
 
             return new XWiki.widgets.Suggest(input, { script: suggesturl, varname:'input', icon:icon });
           },

@@ -188,7 +188,7 @@ public class PdfURLFactory extends XWikiServletURLFactory
      * location.
      * 
      * @param resourceName the name of the file to copy, possibly including a path to it, for example
-     *            {@code icons/silk/add.gif}
+     *            {@code icons/silk/add.png}
      * @param key the collision-free identifier of the resource
      * @param usedFiles the mapping of resource keys to temporary files where to put the resulting temporary file
      * @param context the current request context
@@ -239,7 +239,7 @@ public class PdfURLFactory extends XWikiServletURLFactory
     /**
      * Computes a safe identifier for a resource file, guaranteed to be collision-free.
      * 
-     * @param filename the name of the file, possibly including a path to it, for example {@code icons/silk/add.gif}
+     * @param filename the name of the file, possibly including a path to it, for example {@code icons/silk/add.png}
      * @return an identifier for this file
      */
     private String getResourceKey(String filename)

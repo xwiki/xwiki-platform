@@ -103,35 +103,35 @@
 </property>
 <property>
 <code>.actionmenu #tmCreateWorkspace {
-  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation_add.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation_add.png')");
 }
 
 .actionmenu #tmMainWiki {
-  background-image: url("$xwiki.getSkinFile('icons/silk/building.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/building.png')");
 }
 
 .actionmenu #tmAdminMainWiki {
-  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
 }
 
 .actionmenu #tmWorkspaceIndex {
-  background-image: url("$xwiki.getSkinFile('icons/silk/text_list_bullets.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/text_list_bullets.png')");
 }
 
 .actionmenu #tmMainWikiDocumentIndex {
-  background-image: url("$xwiki.getSkinFile('icons/silk/book_open.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/book_open.png')");
 }
 
 .actionmenu #tmWorkspace {
-  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
 }
 
 .actionmenu #tmDeleteWorkspace {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
 
 .actionmenu #tmUserWorkspaces {
-  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
 }</code>
 </property>
 <property>

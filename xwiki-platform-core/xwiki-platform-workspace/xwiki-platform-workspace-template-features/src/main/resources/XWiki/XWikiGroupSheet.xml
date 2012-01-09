@@ -266,11 +266,11 @@ return XWiki;
 </property>
 <property>
 <code>.actionfollow {
-  background-image: url("$xwiki.getSkinFile('icons/silk/add.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
 }
 
 .actionunfollow {
-  background-image: url("$xwiki.getSkinFile('icons/silk/delete.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/delete.png')");
 }</code>
 </property>
 <property>
@@ -401,10 +401,10 @@ $xwiki.jsx.use('XWiki.XWikiGroupSheet')
 
             if (uorg == "user") {
               suggesturl += "&amp;uorg=user&amp;wiki=" + ($('addUserScope') ? $('addUserScope').value : "local") + "&amp;";
-              icon = "$xwiki.getSkinFile('icons/silk/user.gif')";
+              icon = "$xwiki.getSkinFile('icons/silk/user.png')";
             } else {
               suggesturl += "&amp;uorg=group&amp;wiki=" + ($('addGroupScope') ? $('addGroupScope').value  : "local") + "&amp;";
-              icon = "$xwiki.getSkinFile('icons/silk/group.gif')";
+              icon = "$xwiki.getSkinFile('icons/silk/group.png')";
             }
             return new XWiki.widgets.Suggest(input, { script: suggesturl, varname:'input', icon:icon });
           },

@@ -69,7 +69,7 @@ public interface XWikiRepositoryModel
 
     public static final String PROP_DEPENDENCY_ID = "id";
 
-    public static final String PROP_DEPENDENCY_VERSION = "version";
+    public static final String PROP_DEPENDENCY_CONSTRAINT = "constraint";
 
     // Consolidation
 

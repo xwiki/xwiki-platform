@@ -130,6 +130,17 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         this.objectFactory = new ObjectFactory();
     }
 
+    public XWikiDocument getExistingExtensionDocumentById(String extensionId) throws QueryException, XWikiException
+    {
+        XWikiDocument document = this.repositoryManager.getExistingExtensionDocumentById(extensionId);
+
+        if (document == null) {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
+
+        return document;
+    }
+
     protected Query createExtensionsCountQuery(String from, String where) throws QueryException
     {
         // select
@@ -232,7 +243,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
     protected BaseObject getExtensionObject(String extensionId) throws XWikiException, QueryException
     {
-        return getExtensionObject(this.repositoryManager.getExtensionDocumentById(extensionId));
+        return getExtensionObject(getExistingExtensionDocumentById(extensionId));
     }
 
     protected BaseObject getExtensionVersionObject(XWikiDocument extensionDocument, String version)
@@ -253,7 +264,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     protected BaseObject getExtensionVersionObject(String extensionId, String version) throws XWikiException,
         QueryException
     {
-        return getExtensionVersionObject(this.repositoryManager.getExtensionDocumentById(extensionId), version);
+        return getExtensionVersionObject(getExistingExtensionDocumentById(extensionId), version);
     }
 
     protected <E extends AbstractExtension> E createExtension(XWikiDocument extensionDocument, String version)
@@ -295,13 +306,16 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             (String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE),
             extensionDocument.getExternalURL("view", getXWikiContext())));
 
+        // Authors
         for (String authorId : (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS)) {
             extension.getAuthors().add(resolveExtensionAuthor(authorId));
         }
 
+        // Features
         extension.getFeatures().addAll(
             (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_FEATURES));
 
+        // Dependencies
         if (extensionVersion != null) {
             Vector<BaseObject> dependencies =
                 extensionDocument.getObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME);
@@ -311,18 +325,17 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
                         if (StringUtils.equals(
                             getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION,
                                 (String) null), version)) {
-                            ExtensionDependency dependency = new ExtensionDependency();
+                            ExtensionDependency dependency = objectFactory.createExtensionDependency();
                             dependency.setId((String) getValue(dependencyObject,
                                 XWikiRepositoryModel.PROP_DEPENDENCY_ID));
-                            dependency.setVersion((String) getValue(dependencyObject,
-                                XWikiRepositoryModel.PROP_DEPENDENCY_VERSION));
+                            dependency.setConstraint((String) getValue(dependencyObject,
+                                XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT));
 
                             extensionVersion.getDependencies().add(dependency);
                         }
                     }
                 }
             }
-
         }
 
         return (E) extension;

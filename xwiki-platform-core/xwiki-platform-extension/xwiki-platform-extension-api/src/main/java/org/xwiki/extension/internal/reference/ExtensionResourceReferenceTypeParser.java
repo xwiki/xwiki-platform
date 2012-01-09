@@ -17,47 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.version;
+package org.xwiki.extension.internal.reference;
 
-import java.io.Serializable;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.internal.parser.reference.AbstractURIResourceReferenceTypeParser;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
- * An extension version.
- * 
+ * Parses a resource reference to an extension.
+ *
  * @version $Id$
  */
-public interface Version extends Comparable<Version>, Serializable
+@Component
+@Named("extension")
+@Singleton
+public class ExtensionResourceReferenceTypeParser extends AbstractURIResourceReferenceTypeParser
 {
-    /**
-     * The type of version.
-     * 
-     * @version $Id$
-     */
-    enum Type
+    @Override
+    public ResourceType getType()
     {
-        /**
-         * A not released build.
-         */
-        SNAPSHOT,
-
-        /**
-         * A released but not stable version.
-         */
-        BETA,
-
-        /**
-         * A stable version.
-         */
-        STABLE
+        return ExtensionResourceReference.TYPE;
     }
 
-    /**
-     * @return the string representation of this version constraint
-     */
-    String getValue();
-
-    /**
-     * @return the type of version
-     */
-    Type getType();
+    @Override
+    public ResourceReference parse(String reference)
+    {
+        return new ExtensionResourceReference(reference);
+    }
 }

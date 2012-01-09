@@ -23,8 +23,6 @@ package org.xwiki.extension.repository.xwiki.internal.resources;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.xwiki.Resources;
@@ -32,7 +30,6 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -47,12 +44,8 @@ public class ExtensionVersionRESTResource extends AbstractExtensionRESTResource
     public ExtensionVersion getExtensionVersion(@PathParam("extensionId") String extensionId,
         @PathParam("extensionVersion") String extensionVersion) throws XWikiException, QueryException
     {
-        XWikiDocument extensionDocument = this.repositoryManager.getExtensionDocumentById(extensionId);
+        XWikiDocument extensionDocument = getExistingExtensionDocumentById(extensionId);
 
-        if (extensionDocument.isNew()) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
-        
         checkRights(extensionDocument);
 
         return createExtension(extensionDocument, extensionVersion);

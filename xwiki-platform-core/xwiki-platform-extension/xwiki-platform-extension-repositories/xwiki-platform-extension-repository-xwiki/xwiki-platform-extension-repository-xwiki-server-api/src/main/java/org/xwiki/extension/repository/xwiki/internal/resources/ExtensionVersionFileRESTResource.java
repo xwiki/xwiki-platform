@@ -66,11 +66,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
         @PathParam(Resources.PPARAM_EXTENSIONVERSION) String extensionVersion) throws XWikiException, QueryException,
         URISyntaxException, IOException
     {
-        XWikiDocument extensionDocument = this.repositoryManager.getExtensionDocumentById(extensionId);
-
-        if (extensionDocument.isNew()) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
+        XWikiDocument extensionDocument = getExistingExtensionDocumentById(extensionId);
 
         checkRights(extensionDocument);
 

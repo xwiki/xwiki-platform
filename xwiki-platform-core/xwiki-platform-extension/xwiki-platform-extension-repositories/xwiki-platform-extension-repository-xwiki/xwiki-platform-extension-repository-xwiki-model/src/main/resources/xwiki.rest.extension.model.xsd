@@ -35,7 +35,7 @@
   <complexType name="ExtensionDependency">
     <sequence>
       <element name="id" type="string" maxOccurs="1" minOccurs="1"></element>
-      <element name="version" type="string" maxOccurs="1"
+      <element name="constraint" type="string" maxOccurs="1"
         minOccurs="1"></element>
     </sequence>
   </complexType>

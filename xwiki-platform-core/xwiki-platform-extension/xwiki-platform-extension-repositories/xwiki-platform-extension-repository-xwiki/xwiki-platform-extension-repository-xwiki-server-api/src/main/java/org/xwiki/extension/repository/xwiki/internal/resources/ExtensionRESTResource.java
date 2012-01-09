@@ -45,11 +45,7 @@ public class ExtensionRESTResource extends AbstractExtensionRESTResource
     @GET
     public Extension getExtension(@PathParam("extensionId") String extensionId) throws XWikiException, QueryException
     {
-        XWikiDocument extensionDocument = this.repositoryManager.getExtensionDocumentById(extensionId);
-
-        if (extensionDocument.isNew()) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
+        XWikiDocument extensionDocument = getExistingExtensionDocumentById(extensionId);
 
         checkRights(extensionDocument);
 

@@ -17,16 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.internal;
+package org.xwiki.extension.internal.reference;
 
 import org.xwiki.extension.ExtensionException;
 
 /**
- * Error when trying to parse extension manager configuration.
+ * Error when trying to parse {@link ExtensionResourceReference} reference.
  * 
  * @version $Id$
  */
-public class ExtensionManagerConfigurationException extends ExtensionException
+public class ExtensionResourceSyntaxException extends ExtensionException
 {
     /**
      * Constructs a new exception with the specified detail message. The cause is not initialized, and may subsequently
@@ -34,7 +34,7 @@ public class ExtensionManagerConfigurationException extends ExtensionException
      * 
      * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
      */
-    public ExtensionManagerConfigurationException(String message)
+    public ExtensionResourceSyntaxException(String message)
     {
         super(message);
     }
@@ -46,7 +46,7 @@ public class ExtensionManagerConfigurationException extends ExtensionException
      * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is
      *            permitted, and indicates that the cause is nonexistent or unknown
      */
-    public ExtensionManagerConfigurationException(String message, Throwable cause)
+    public ExtensionResourceSyntaxException(String message, Throwable cause)
     {
         super(message, cause);
     }

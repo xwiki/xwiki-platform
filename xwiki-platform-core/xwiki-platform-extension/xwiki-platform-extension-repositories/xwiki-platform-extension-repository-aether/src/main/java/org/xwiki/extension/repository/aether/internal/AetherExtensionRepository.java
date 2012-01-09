@@ -192,24 +192,10 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
 
         List<Version> result = new ArrayList<Version>(toId - fromId);
         for (int i = fromId; i < toId; ++i) {
-            result.add(new DefaultVersion(versions.get(i)));
+            result.add(new DefaultVersion(versions.get(i).toString()));
         }
 
         return new CollectionIterableResult<Version>(versions.size(), offset, result);
-    }
-
-    private org.sonatype.aether.version.Version getAetherVersion(Version version)
-        throws InvalidVersionSpecificationException
-    {
-        org.sonatype.aether.version.Version aetherVersion;
-
-        if (version instanceof DefaultVersion) {
-            aetherVersion = ((DefaultVersion) version).getAetherVersion();
-        } else {
-            aetherVersion = AETHERVERSIONSCHEME.parseVersion(version.getValue());
-        }
-
-        return aetherVersion;
     }
 
     private org.sonatype.aether.version.Version resolveVersionConstraint(String id,
@@ -217,7 +203,7 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
     {
         if (versionConstraint.getVersion() != null) {
             try {
-                return getAetherVersion(versionConstraint.getVersion());
+                return AETHERVERSIONSCHEME.parseVersion(versionConstraint.getVersion().getValue());
             } catch (InvalidVersionSpecificationException e) {
                 throw new ResolveException("Invalid version [" + versionConstraint.getVersion() + "]", e);
             }

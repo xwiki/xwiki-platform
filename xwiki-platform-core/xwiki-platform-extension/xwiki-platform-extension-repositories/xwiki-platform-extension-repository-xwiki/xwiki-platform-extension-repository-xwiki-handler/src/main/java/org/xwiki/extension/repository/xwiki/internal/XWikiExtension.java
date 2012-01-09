@@ -97,7 +97,7 @@ public class XWikiExtension extends AbstractExtension
 
         for (ExtensionDependency dependency : extension.getDependencies()) {
             addDependency(new DefaultExtensionDependency(dependency.getId(), new DefaultVersionConstraint(
-                dependency.getVersion())));
+                dependency.getConstraint())));
         }
 
         // File

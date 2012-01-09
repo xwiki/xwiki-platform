@@ -7208,6 +7208,28 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * @since 3.4M1
+     */
+    public BaseObject getXObject(EntityReference classReference, boolean create, XWikiContext context)
+    {
+        try {
+            BaseObject obj = getXObject(classReference);
+
+            if ((obj == null) && create) {
+                return newXObject(classReference, context);
+            }
+
+            if (obj == null) {
+                return null;
+            } else {
+                return obj;
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
      * @deprecated since 2.2M2 use {@link #getXObject(DocumentReference, boolean, XWikiContext)}
      */
     @Deprecated
@@ -7725,10 +7747,14 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private DocumentReference resolveClassReference(EntityReference reference)
     {
-        DocumentReference defaultReference =
-            new DocumentReference(getDocumentReference().getWikiReference().getName(), XWiki.SYSTEM_SPACE,
-                getDocumentReference().getName());
-        return this.explicitReferenceDocumentReferenceResolver.resolve(reference, defaultReference);
+        if (reference instanceof DocumentReference) {
+            return (DocumentReference) reference;
+        } else {
+            DocumentReference defaultReference =
+                new DocumentReference(getDocumentReference().getWikiReference().getName(), XWiki.SYSTEM_SPACE,
+                    getDocumentReference().getName());
+            return this.explicitReferenceDocumentReferenceResolver.resolve(reference, defaultReference);
+        }
     }
 
     /**

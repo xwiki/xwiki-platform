@@ -33,6 +33,9 @@
   <name>XWiki Platform - Extension - Repository - Aether</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Extension - Repository - Aether</description>
+  <properties>
+    <aether.version>1.13.1</aether.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

@@ -9,15 +9,15 @@
 <div id="xwikimessage">$message</div>
 #end
 #if($xwiki.hasRecycleBin())
-  #set ($confirmationMessage = $msg.get('core.space.recyclebin.done', ["<em>${doc.space}</em>"]))
+  #set ($confirmationMessage = $msg.get('core.space.recyclebin.done', ["<em>${escapetool.xml($doc.space)}</em>"]))
   #set ($recyclebinViewer = $xwiki.getDocument('Main.AllDocs'))
   #if (!$recyclebinViewer.isNew())
-    #set ($recyclebinViewer = $recyclebinViewer.getURL('view', "view=deletedDocs#|t=documentsTrash&s=ddoc.fullName&d=asc&ddoc.fullName=${doc.space}."))
+    #set ($recyclebinViewer = $recyclebinViewer.getURL('view', "view=deletedDocs#|t=documentsTrash&s=ddoc.fullName&d=asc&ddoc.fullName=${escapetool.url($doc.space)}."))
     #set ($recyclebinLink = "<a href='$recyclebinViewer' title='$msg.get('core.space.recyclebin.show')'>$msg.get('core.space.recyclebin.show')</a>")
     #set ($confirmationMessage = "$confirmationMessage $recyclebinLink")
   #end
 #else
-  #set($confirmationMessage = $msg.get('core.space.delete.done', ["<em>${doc.space}</em>"]))
+  #set($confirmationMessage = $msg.get('core.space.delete.done', ["<em>${escapetool.xml($doc.space)}</em>"]))
 #end
 #xwikimessageboxstart($msg.get("delete") $!{confirmationMessage})
 #xwikimessageboxend()

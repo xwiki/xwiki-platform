@@ -142,7 +142,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
       #set($jsSpaceInclusionValidationContainer = $util.getArrayList())
       <dl>
         <dt>
-          <label for="page">$msg.get('core.create.template')</label>
+          <label>$msg.get('core.create.template')</label>
           <span class="xHint">$msg.get("core.create.$!{tocreate}.template.hint")</span>
         </dt>
         <dd>

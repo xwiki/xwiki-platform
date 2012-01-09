@@ -3078,7 +3078,7 @@ document.observe('xwiki:dom:loaded', function() {
   background-position: 7px 50%, top center;
 }
 
-#set ($configurationIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/wrench.gif')${escapetool.S})")
+#set ($configurationIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/wrench.png')${escapetool.S})")
 .admin-menu .group.configurationIcon {
   #css3_backgroundIconAndLinearGradient($configurationIcon, {
      'angle': 'top',
@@ -3098,7 +3098,7 @@ document.observe('xwiki:dom:loaded', function() {
   })
 }
 
-#set ($lfIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/layout_content.gif')${escapetool.S})")
+#set ($lfIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/layout_content.png')${escapetool.S})")
 .admin-menu .group.lfIcon {
   #css3_backgroundIconAndLinearGradient($lfIcon, {
      'angle': 'top',
@@ -3118,7 +3118,7 @@ document.observe('xwiki:dom:loaded', function() {
   })
 }
 
-#set ($usersgroupsIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/group.gif')${escapetool.S})")
+#set ($usersgroupsIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/group.png')${escapetool.S})")
 .admin-menu .group.usersgroupsIcon {
   #css3_backgroundIconAndLinearGradient($usersgroupsIcon, {
      'angle': 'top',
@@ -3138,7 +3138,7 @@ document.observe('xwiki:dom:loaded', function() {
   })
 }
 
-#set ($contentIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/folder_page.gif')${escapetool.S})")
+#set ($contentIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/folder_page.png')${escapetool.S})")
 .admin-menu .group.contentIcon {
   #css3_backgroundIconAndLinearGradient($contentIcon, {
      'angle': 'top',
@@ -3158,7 +3158,7 @@ document.observe('xwiki:dom:loaded', function() {
   })
 }
 
-#set ($applicationsIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/plugin.gif')${escapetool.S})")
+#set ($applicationsIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/plugin.png')${escapetool.S})")
 .admin-menu .group.applicationsIcon {
   #css3_backgroundIconAndLinearGradient($applicationsIcon, {
      'angle': 'top',
@@ -3178,7 +3178,7 @@ document.observe('xwiki:dom:loaded', function() {
   })
 }
 
-#set ($readOnlyIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/error.gif')${escapetool.S})")
+#set ($readOnlyIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/error.png')${escapetool.S})")
 .admin-menu .group.readOnly {
   #css3_backgroundIconAndLinearGradient($readOnlyIcon, {
      'angle': 'top',

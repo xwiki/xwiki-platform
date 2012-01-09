@@ -3158,6 +3158,26 @@ document.observe('xwiki:dom:loaded', function() {
   })
 }
 
+#set ($extensionmanagerIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/xwiki/plugin_wrench.png')${escapetool.S})")
+.admin-menu .group.extensionmanagerIcon {
+  #css3_backgroundIconAndLinearGradient($extensionmanagerIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
+      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+    ]
+  })
+}
+.admin-menu .group.extensionmanagerIcon:hover , .admin-menu .current.extensionmanagerIcon {
+  #css3_backgroundIconAndLinearGradient($extensionmanagerIcon, {
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
+}
+
 #set ($applicationsIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/plugin.png')${escapetool.S})")
 .admin-menu .group.applicationsIcon {
   #css3_backgroundIconAndLinearGradient($applicationsIcon, {

@@ -181,7 +181,7 @@ XWiki.SyntaxConverter = Class.create({
         // Conversion in WYSIWYG mode does not yet support conversion of the current content
         if (XWiki.docisnew || confirm("Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will reset the syntax to the previous one and do nothing. Note that if you choose 'ok' you will loose modifications and this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.")) {
           this.disableEditingArea();
-          var url = '$doc.getURL('view', "action=convertSyntax&amp;xpage=plain&amp;outputSyntax=plain&amp;form_token=$!{services.csrf.getToken()}&amp;documentName=")' + encodeURIComponent(this.name) + '&amp;oldSyntaxId=' + encodeURIComponent(this.originalSyntax) + '&amp;newSyntaxId=' + encodeURIComponent(syntax);
+          var url = '$doc.getURL('view', "action=convertSyntax&amp;xpage=plain&amp;outputSyntax=plain&amp;documentName=")' + encodeURIComponent(this.name) + '&amp;oldSyntaxId=' + encodeURIComponent(this.originalSyntax) + '&amp;newSyntaxId=' + encodeURIComponent(syntax) + '&amp;form_token=' + encodeURIComponent($$('meta[name=form_token]')[0].content);
           new Ajax.Request(
             url,
             {
@@ -205,7 +205,7 @@ XWiki.SyntaxConverter = Class.create({
                 action: 'convertSyntax',
                 xpage: 'plain',
                 outputSyntax: 'plain',
-                form_token: '$!{services.csrf.getToken()}',
+                form_token: $$('meta[name=form_token]')[0].content,
                 documentName: this.name,
                 oldSyntaxId: this.originalSyntax,
                 newSyntaxId: syntax,

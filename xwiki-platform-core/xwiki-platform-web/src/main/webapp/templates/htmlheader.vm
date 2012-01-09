@@ -62,6 +62,7 @@
     <meta name="page" content="$escapetool.xml($doc.name)"/>
     <meta name="version" content="$doc.version"/>
     <meta name="restURL" content="${request.contextPath}/rest/wikis/${xcontext.database}/spaces/$escapetool.url(${doc.space})/pages/$escapetool.url(${doc.name})"/>
+    <meta name="form_token" content="$!{services.csrf.token}"/>
     ## ---------------------------------------------------------------------------------------------------------------
     ## Localize GWT applications.
     ## ---------------------------------------------------------------------------------------------------------------

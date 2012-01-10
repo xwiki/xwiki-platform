@@ -39,6 +39,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
 
 /**
@@ -87,6 +88,18 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
     @Override
     public void initialize() throws InitializationException
     {
+        // Container
+        // Note that the reason we lazy load the container is because we want to be able to use the Cache in
+        // environments when there's no container.
+
+        try {
+            this.container = this.componentManager.lookup(Container.class);
+        } catch (ComponentLookupException e) {
+            this.logger.debug("Can't find any Container", e);
+        }
+
+        // Infinispan initialization
+
         InputStream configurationStream = getConfigurationFileAsStream();
 
         if (configurationStream != null) {
@@ -105,17 +118,9 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
             this.cacheManager = new DefaultCacheManager();
         }
 
-        // save the real default configuration to be able to restore it
+        // Save the real default configuration to be able to restore it
 
         this.defaultConfiguration = this.cacheManager.getDefaultConfiguration().clone();
-
-        // container
-
-        try {
-            this.container = this.componentManager.lookup(Container.class);
-        } catch (ComponentLookupException e) {
-            this.logger.debug("Can't find any Container", e);
-        }
     }
 
     /**
@@ -123,12 +128,13 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
      */
     private InputStream getConfigurationFileAsStream()
     {
-        InputStream is;
+        InputStream is = null;
 
-        if (this.container != null && this.container.getApplicationContext() != null) {
-            is = this.container.getApplicationContext().getResourceAsStream(DEFAULT_CONFIGURATION_FILE);
-        } else {
-            is = null;
+        if (this.container != null) {
+            ApplicationContext applicationContext = this.container.getApplicationContext();
+            if (applicationContext != null) {
+                is = applicationContext.getResourceAsStream(DEFAULT_CONFIGURATION_FILE);
+            }
         }
 
         return is;

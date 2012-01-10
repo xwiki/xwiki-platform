@@ -20,8 +20,8 @@
 package org.xwiki.extension.repository.xwiki.internal;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.extension.Extension;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.version.Version;
 import org.xwiki.query.QueryException;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -43,6 +43,6 @@ public interface RepositoryManager
 
     ResourceReference getDownloadReference(XWikiDocument document, BaseObject extensionVersionObject);
 
-    void importExtension(Extension extension, boolean allVersions, Version.Type type) throws QueryException,
-        XWikiException, ResolveException;
+    void importExtension(String extensionId, ExtensionRepository repository, Version.Type type)
+        throws QueryException, XWikiException, ResolveException;
 }

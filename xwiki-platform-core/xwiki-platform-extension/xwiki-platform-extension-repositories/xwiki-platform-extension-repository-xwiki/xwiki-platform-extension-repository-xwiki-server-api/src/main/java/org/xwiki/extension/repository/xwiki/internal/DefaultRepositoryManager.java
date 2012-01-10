@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.repository.xwiki.internal;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.internal.reference.ExtensionResourceReference;
+import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.xwiki.internal.resources.AbstractExtensionRESTResource;
 import org.xwiki.extension.version.Version;
@@ -381,21 +383,26 @@ public class DefaultRepositoryManager implements RepositoryManager
     }
 
     @Override
-    public void importExtension(Extension extension, boolean allVersions, Type type) throws QueryException,
+    public void importExtension(String extensionId, ExtensionRepository repository, Type type) throws QueryException,
         XWikiException, ResolveException
     {
-        IterableResult<Version> versions;
-        if (allVersions) {
-            versions = extension.getRepository().resolveVersions(extension.getId().getId(), 0, -1);
-        } else {
-            versions = null;
+        IterableResult<Version> versionsIterable = repository.resolveVersions(extensionId, 0, -1);
+
+        List<Version> versions = new ArrayList<Version>(versionsIterable.getSize());
+        for (Version version : versionsIterable) {
+            versions.add(version);
         }
+
+        // Get last version
+        Version lastVersion = versions.get(versions.size() - 1);
+
+        Extension extension = repository.resolve(new ExtensionId(extensionId, lastVersion));
 
         XWikiContext xcontext = getXWikiContext();
 
         boolean needSave = false;
 
-        XWikiDocument document = getExistingExtensionDocumentById(extension.getId().getId());
+        XWikiDocument document = getExistingExtensionDocumentById(extensionId);
 
         if (document == null) {
             // Create document
@@ -421,43 +428,34 @@ public class DefaultRepositoryManager implements RepositoryManager
             needSave = true;
         }
 
-        if (!StringUtils.equals(extension.getId().getId(),
+        if (!StringUtils.equals(extensionId,
             getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ID, (String) null))) {
-            extensionObject.set(XWikiRepositoryModel.PROP_EXTENSION_ID, extension.getId().getId(), xcontext);
+            extensionObject.set(XWikiRepositoryModel.PROP_EXTENSION_ID, extensionId, xcontext);
             needSave = true;
         }
 
-        if (versions == null) {
-            updateExtension(extension, extensionObject, xcontext);
+        // Update extension informations
 
-            // Update version related informations
-            needSave |= updateExtensionVersion(document, extension);
-        } else {
-            for (Iterator<Version> it = versions.iterator(); it.hasNext();) {
-                Version version = it.next();
-                try {
-                    Extension versionExtension =
-                        extension.getRepository().resolve(new ExtensionId(extension.getId().getId(), version));
+        needSave |= updateExtension(extension, extensionObject, xcontext);
 
-                    if (!it.hasNext()) {
-                        // Last version
-                        needSave |= updateExtension(versionExtension, extensionObject, xcontext);
-                    }
+        // Update versions
 
-                    // Update version related informations
-                    needSave |= updateExtensionVersion(document, versionExtension);
-                } catch (Exception e) {
-                    this.logger.error("Failed to resolve extension wuth id [" + extension.getId().getId()
-                        + "] and version [" + version + "] on repository [" + extension.getRepository() + "]", e);
-                }
+        for (Iterator<Version> it = versionsIterable.iterator(); it.hasNext();) {
+            Version version = it.next();
+            try {
+                Extension versionExtension = repository.resolve(new ExtensionId(extensionId, version));
+
+                // Update version related informations
+                needSave |= updateExtensionVersion(document, versionExtension);
+            } catch (Exception e) {
+                this.logger.error("Failed to resolve extension with id [" + extensionId + "] and version [" + version
+                    + "] on repository [" + repository + "]", e);
             }
         }
 
-        updateExtensionVersion(document, extension);
-
         if (needSave) {
             xcontext.getWiki().saveDocument(document,
-                "Imported extension from repository [" + extension.getRepository() + "]", true, xcontext);
+                "Imported extension [" + extensionId + "] from repository [" + repository + "]", true, xcontext);
         }
     }
 

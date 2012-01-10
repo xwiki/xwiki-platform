@@ -24,19 +24,30 @@ import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.extension.ExtensionException;
+import org.xwiki.extension.repository.ExtensionRepository;
+import org.xwiki.extension.repository.ExtensionRepositoryManager;
+import org.xwiki.extension.version.Version;
 import org.xwiki.script.service.ScriptService;
 
 @Component
 @Named("repository")
 public class RepositoryScriptService implements ScriptService
 {
-    /** The key under which the last encountered error is stored in the current execution context. */
+    /**
+     * The key under which the last encountered error is stored in the current execution context.
+     */
     private static final String REPOSITORYERROR_KEY = "scriptservice.repository.error";
 
     @Inject
     private RepositoryManager repositoryManager;
 
-    /** Provides access to the current context. */
+    @Inject
+    private ExtensionRepositoryManager extensionRepositoryManager;
+
+    /**
+     * Provides access to the current context.
+     */
     @Inject
     private Execution execution;
 
@@ -67,6 +78,23 @@ public class RepositoryScriptService implements ScriptService
 
         try {
             this.repositoryManager.validateExtensions();
+        } catch (Exception e) {
+            setError(e);
+        }
+    }
+
+    public void importExtension(String extensionId, String repositoryId)
+    {
+        setError(null);
+
+        try {
+            ExtensionRepository repository = this.extensionRepositoryManager.getRepository(repositoryId);
+
+            if (repository == null) {
+                throw new ExtensionException("Can't find any registered repository with id [" + repositoryId + "]");
+            }
+
+            this.repositoryManager.importExtension(extensionId, repository, Version.Type.STABLE);
         } catch (Exception e) {
             setError(e);
         }

@@ -1165,8 +1165,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
           ${author.name}##
         #end
         #if ($foreach.hasNext), ##
-        #else
-        )))
+        #else )))
 
         #end
       #end

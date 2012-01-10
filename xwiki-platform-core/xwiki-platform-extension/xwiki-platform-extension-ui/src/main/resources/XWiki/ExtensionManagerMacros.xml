@@ -517,19 +517,29 @@
   font-size: .875em;
   margin: 0;
   border: 0 none;
+  text-align: right;
 }
 
 #advancedextensionsearch legend a:after {
   content: " \bb";
 }
 #advancedextensionsearch legend a.expanded:after {
-  content: "";
+  color: transparent;
 }
 #advancedextensionsearch-body {
   display: none;
 }
 #advancedextensionsearch-body:target ~ div.hidden {
   display: block;
+}
+div.advancedsearchpopup {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+  padding: .3em .5em;
+  position: absolute;
+  right: 0;
+  text-align: left;
+  width: 95%;
+  z-index: 200;
 }
 /****************************** &lt;Inner Menu&gt; *************************/
 
@@ -740,6 +750,14 @@
 
 .extHeaderLeft {
   float: left;
+  width: 50%;
+}
+.extHeaderLeft .xform label {
+  display: block;
+  font-weight: bold;
+}
+.extHeaderLeft .xform .globalsearch {
+  text-align: left;
 }
 
 .extHeaderBottom  .extHeaderLeft{
@@ -751,6 +769,8 @@
   float: right;
   cursor: pointer;
   margin: 3px 0 -3px;
+  position: relative;
+  width: 40%;
 }
 
 .extHeaderBottom  .extHeaderRight {
@@ -1110,10 +1130,32 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   (% class="extHeader" %)(((
     (% class="extHeaderLeft" %)(((
       {{html}}
-      &lt;form action="$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1').replaceAll('(^|&amp;)(extension(id|version)=[^&amp;]++&amp;?+)+', '$1').replaceAll('(^|&amp;)section=[^&amp;]++', '$1section=XWiki.AddExtensions').replaceAll('(^|&amp;)searchextension=[^&amp;]++&amp;?', '$1'))" method="post"&gt;
+      &lt;form class="xform half" action="$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1').replaceAll('(^|&amp;)(extension(id|version)=[^&amp;]++&amp;?+)+', '$1').replaceAll('(^|&amp;)section=[^&amp;]++', '$1section=XWiki.AddExtensions').replaceAll('(^|&amp;)searchextension=[^&amp;]++&amp;?', '$1'))" method="post"&gt;
         &lt;div class="globalsearch extHeaderLeftSearch"&gt;
-          &lt;label class="hidden" for="extensionsearchinput"&gt;$msg.get('extensions.search.submit')&lt;/label&gt;&lt;input type="text" class="globalsearchinput#if ("$!request.searchextension" == '') withTip#end extHeaderLeftInput" id="extensionsearchinput" name="searchextension" value="#if ("$!request.searchextension" != '')${request.searchextension}#{else}$msg.get('extensions.search.tip')#{end}" size="60"&gt;&lt;input type="image" class="button" value="$msg.get('panels.search.submit')" alt="$msg.get('panels.search.submit')" src="$xwiki.getSkinFile('icons/xwiki/search.png')"&gt;
+          &lt;label class="label" for="extensionsearchinput"&gt;$msg.get('extensions.search.title')&lt;/label&gt;&lt;input type="text" class="globalsearchinput#if ("$!request.searchextension" == '') withTip#end extHeaderLeftInput" id="extensionsearchinput" name="searchextension" value="#if ("$!request.searchextension" != '')${request.searchextension}#{else}$msg.get('extensions.search.tip')#{end}" size="60"&gt;&lt;input type="image" class="button" value="$msg.get('panels.search.submit')" alt="$msg.get('panels.search.submit')" src="$xwiki.getSkinFile('icons/xwiki/search.png')"&gt;
         &lt;/div&gt;
+      &lt;/form&gt;
+      {{/html}}
+    )))
+    (% class="extHeaderRight" %)(((
+      ## Advanced search form
+      {{html clean="false"}}
+      &lt;form action="$escapetool.xml($doc.getURL($xcontext.action, $request.getQueryString()))" method="post" class="xform"&gt;
+        &lt;fieldset id="advancedextensionsearch"&gt;
+          &lt;div id="advancedextensionsearch-body"&gt;&lt;/div&gt;
+          &lt;legend&gt;&lt;a href="#advancedextensionsearch-body"&gt;$msg.get('extensions.advancedSearch.title')&lt;/a&gt;&lt;/legend&gt;
+          &lt;div class="plainmessage advancedsearchpopup hidden"&gt;
+            &lt;input type="hidden" name="xback" value="$escapetool.xml($doc.getURL($xcontext.action, $request.queryString))" /&gt;
+            &lt;dl&gt;
+            &lt;dt&gt;&lt;label for="advancedextensionsearch-id"&gt;$msg.get('extensions.advancedSearch.id.label')&lt;/label&gt;&lt;/dt&gt;
+            &lt;dd&gt;&lt;input type="text" name="extensionid" id="advancedextensionsearch-id" value="" /&gt;&lt;/dd&gt;
+            &lt;dt&gt;&lt;label for="advancedextensionsearch-version"&gt;$msg.get('extensions.advancedSearch.version.label')&lt;/label&gt;&lt;/dt&gt;
+            &lt;dd&gt;&lt;input type="text" name="extensionversion" id="advancedextensionsearch-version" value="" /&gt;&lt;/dd&gt;
+            &lt;/dl&gt;
+            &lt;p&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" name="actioninstall" value="$msg.get('extensions.advancedSearch.actions.submit')" class="button" /&gt;&lt;/span&gt;
+               &lt;span class="buttonwrapper"&gt;&lt;a href="#searchextension" class="actioncancel secondary button"&gt;$msg.get('extensions.advancedSearch.actions.cancel')&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/fieldset&gt;
       &lt;/form&gt;
       {{/html}}
     )))

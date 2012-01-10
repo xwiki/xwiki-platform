@@ -194,9 +194,9 @@ KBfuuaQu/iwAAAAASUVORK5CYII=
 #else
 ##
 (% class="full column" %)(((
-= $msg.get('extensions.core.title')
-
 #displayExtensionSearchBar()
+
+= $msg.get('extensions.core.title')
 
 #if ($request.extensionid &amp;&amp; $request.extensionversion)
   #set ($extensions = [$extensionManager.resolve($request.extensionid, $request.extensionversion)])

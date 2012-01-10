@@ -244,9 +244,9 @@ RU5ErkJggg==
     #end
   #end
 #else
-= $msg.get('extensions.installed.title')
-
 #displayExtensionSearchBar()
+
+= $msg.get('extensions.installed.title')
 
 #if ($request.extensionid &amp;&amp; $request.extensionversion)
   #set ($extensions = [$extensionManager.resolve($request.extensionid, $request.extensionversion)])

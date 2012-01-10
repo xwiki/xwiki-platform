@@ -1110,7 +1110,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
       {{html}}
       &lt;form action="$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1').replaceAll('(^|&amp;)(extension(id|version)=[^&amp;]++&amp;?+)+', '$1').replaceAll('(^|&amp;)section=[^&amp;]++', '$1section=XWiki.AddExtensions').replaceAll('(^|&amp;)searchextension=[^&amp;]++&amp;?', '$1'))" method="post"&gt;
         &lt;div class="globalsearch extHeaderLeftSearch"&gt;
-          &lt;label class="hidden" for="extensionsearchinput"&gt;Search&lt;/label&gt;&lt;input type="text" class="globalsearchinput#if ("$!request.searchextension" == '') withTip#end extHeaderLeftInput" id="extensionsearchinput" name="searchextension" value="#if ("$!request.searchextension" != '')$request.searchextension#{else}search extension...#{end}" size="60"&gt;&lt;input type="image" class="button" value="Go" alt="Go" src="/xwiki/resources/icons/xwiki/search.png"&gt;
+          &lt;label class="hidden" for="extensionsearchinput"&gt;$msg.get('extensions.search.submit')&lt;/label&gt;&lt;input type="text" class="globalsearchinput#if ("$!request.searchextension" == '') withTip#end extHeaderLeftInput" id="extensionsearchinput" name="searchextension" value="#if ("$!request.searchextension" != '')${request.searchextension}#{else}$msg.get('extensions.search.tip')#{end}" size="60"&gt;&lt;input type="image" class="button" value="$msg.get('panels.search.submit')" alt="$msg.get('panels.search.submit')" src="$xwiki.getSkinFile('icons/xwiki/search.png')"&gt;
         &lt;/div&gt;
       &lt;/form&gt;
       {{/html}}
@@ -1155,10 +1155,10 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 
     #if ($extension.authors.size() &gt; 0)
       (% class="extension-authors" %)(((
-      $msg.get('by:') ##
+      $msg.get('extensions.info.authors') ##
       #foreach ($author in $extension.authors)
         #if ($author.name == 'devs')
-          [[$msg.get('XWiki Development Team')&gt;&gt;http://www.xwiki.org/]]##
+          [[$msg.get('extensions.info.authors.xwikiorg')&gt;&gt;http://www.xwiki.org/]]##
         #elseif ("$!author.url" != '' &amp;&amp; "$!author.name" != '')
           [[${author.name}&gt;&gt;${author.url}]]##
         #else
@@ -1186,12 +1186,12 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     #end
     (% class="extension-body" %)(((
       (% class="innerMenu" %)
-      * [[Description&gt;&gt;||anchor="extension-body-description-${extension.id.id}-${extension.id.version}"]]
+      * [[$msg.get('extensions.info.category.description')&gt;&gt;||anchor="extension-body-description-${extension.id.id}-${extension.id.version}"]]
       #if ("$!{extension.releaseNotes}" != '')
-        * [[Release Notes&gt;&gt;||anchor="extension-body-relnotes-${extension.id.id}-${extension.id.version}"]]
+        * [[$msg.get('extensions.info.category.releaseNotes')&gt;&gt;||anchor="extension-body-relnotes-${extension.id.id}-${extension.id.version}"]]
       #end
       #if ($extension.dependencies.size() &gt; 0 || $backwardDependencies.size() &gt; 0)
-        * [[Dependencies&gt;&gt;||anchor="extension-body-dependencies-${extension.id.id}-${extension.id.version}"]]
+        * [[$msg.get('extensions.info.category.dependencies')&gt;&gt;||anchor="extension-body-dependencies-${extension.id.id}-${extension.id.version}"]]
       #end
 
       {{id name="extension-body-description-${extension.id.id}-${extension.id.version}" /}}
@@ -1271,7 +1271,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
               path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.AddExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-remote"]]##
             #end
             #if ("$!{namespace.key}" != '')
-              (in wiki $namespace.key)
+              $msg.get('extensions.info.dependency.wiki', [$namespace.key])
             #else
 
             #end

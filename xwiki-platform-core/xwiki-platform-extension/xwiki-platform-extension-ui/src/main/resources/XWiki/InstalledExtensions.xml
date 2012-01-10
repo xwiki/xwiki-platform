@@ -184,27 +184,28 @@ RU5ErkJggg==
 #if ($request.extensionid &amp;&amp; $request.extensionversion &amp;&amp; $request.ajax)
   #set ($actions = [])
   #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""Show details"" class=""button visibilityAction""/&gt;&lt;/span&gt;"))
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""Hide details"" class=""button visibilityAction""/&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction""/&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction""/&gt;&lt;/span&gt;"))
   #end
   #if ($hasProgramming)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionuninstall"" value=""Uninstall"" class=""button""/&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionuninstall"" value=""$msg.get('extensions.actions.uninstall')"" class=""button""/&gt;&lt;/span&gt;"))
   #end
   #displayExtension($extensionManager.resolve($request.extensionid, $request.extensionversion) $actions)
 #else
 ##
 (% class="full column" %)(((
 #if ($request.actionuninstall)
-  = Uninstall
+  = $msg.get('extensions.uninstall.title')
 
   #if (!$request.extensionid || !$request.extensionversion)
-    {{error}}You have to provide both extension id and version.{{/error}}
+    {{error}}$msg.get('extensions.uninstall.error.missingIdOrVersion'){{/error}}
   #elseif ($request.confirm)
     #set($uninstallJob = $extensionManager.uninstall($request.extensionid, null))
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
       {{error}}
-        Failed to uninstall extension with id $request.extensionid and version $request.extensionversion: #printThrowable($lasterror)
+        $msg.get('extensions.uninstall.error.uninstallFailure', [$request.extensionid, $request.extensionversion]) ##
+        #printThrowable($lasterror)
       {{/error}}
     #else
       {{box}}
@@ -216,11 +217,11 @@ RU5ErkJggg==
     #prepareUninstall($request.extensionid $request.extensionversion $extensionsToUninstall)
     #set ($lasterror = $extensionManager.lastError)
     #if ($lasterror)
-      {{error}}Failed to prepare uninstalling extension with id $request.extensionid and version $request.extensionversion: $lasterror.message{{/error}}
+      {{error}}$msg.get('extensions.uninstall.error.prepareFailure', [$request.extensionid, $request.extensionversion, $lasterror.message]){{/error}}
     #elseif ($extensionsToUninstall.empty)
-      Extension does not exists
+      {{info}}$msg.get('extensions.uninstall.error.notInstalled'){{/info}}
     #else
-      The following extensions will be removed:
+      $msg.get('extensions.uninstall.list')
       #foreach ($extensionid in $extensionsToUninstall)
         * $extensionid
       #end
@@ -232,9 +233,9 @@ RU5ErkJggg==
           &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;
           &lt;input name="actionuninstall" type="hidden" /&gt;
           &lt;p&gt;
-            &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
+            &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('extensions.uninstall.actions.submit')" name="confirm" class="button"/&gt;&lt;/span&gt;
             #if ("$!{request.xback}" != '')
-              &lt;span class="buttonwrapper"&gt;&lt;a href="${request.xback}" class="secondary button"&gt;Cancel&lt;/a&gt;&lt;/span&gt;
+              &lt;span class="buttonwrapper"&gt;&lt;a href="${request.xback}" class="secondary button"&gt;$msg.get('extensions.uninstall.actions.cancel')&lt;/a&gt;&lt;/span&gt;
             #end
           &lt;/p&gt;
         &lt;/div&gt;
@@ -243,7 +244,7 @@ RU5ErkJggg==
     #end
   #end
 #else
-= Installed extensions
+= $msg.get('extensions.installed.title')
 
 #displayExtensionSearchBar()
 
@@ -253,7 +254,7 @@ RU5ErkJggg==
   #set($extensions = $extensionManager.getInstalledExtensions())
 #end
 #if ($extensions.isEmpty())
-  {{info}}No extension installed.{{/info}}##
+  {{info}}$msg.get('extensions.installed.noExtensions'){{/info}}##
 #else
   #if ($extensions.size() &gt; 1)
     #set ($hasPagination = true)
@@ -264,12 +265,12 @@ RU5ErkJggg==
   #set ($actions = [])
   #computeXBack()
   #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;Back to list&lt;/a&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;$msg.get('extensions.actions.back')&lt;/a&gt;&lt;/span&gt;"))
   #else
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""Show details"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
   #end
   #if ($hasProgramming)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionuninstall"" value=""Uninstall"" class=""button""/&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionuninstall"" value=""$msg.get('extensions.actions.uninstall')"" class=""button""/&gt;&lt;/span&gt;"))
   #end
   #foreach($extension in $extensions)
     #displayExtension($extension $actions)

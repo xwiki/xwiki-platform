@@ -187,14 +187,14 @@ KBfuuaQu/iwAAAAASUVORK5CYII=
 #if ($request.extensionid &amp;&amp; $request.extensionversion &amp;&amp; $request.ajax)
   #set ($actions = [])
   #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""Show details"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""Hide details"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
   #end
   #displayExtension($extensionManager.resolve($request.extensionid, $request.extensionversion) $actions)
 #else
 ##
 (% class="full column" %)(((
-= Core extensions
+= $msg.get('extensions.core.title')
 
 #displayExtensionSearchBar()
 
@@ -204,7 +204,7 @@ KBfuuaQu/iwAAAAASUVORK5CYII=
   #set($extensions = $extensionManager.getCoreExtensions())
 #end
 #if ($extensions.isEmpty())
-  {{info}}No extension installed.{{/info}}##
+  {{info}}$msg.get('extensions.core.noExtensions'){{/info}}##
 #else
   #if ($extensions.size() &gt; 1)
     #set ($paginationParams = {'totalItems': $extensions.size(), 'url': $doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)firstIndex=[^&amp;]++&amp;?', '$1'))})
@@ -214,9 +214,9 @@ KBfuuaQu/iwAAAAASUVORK5CYII=
   #set ($actions = [])
   #computeXBack()
   #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;Back to list&lt;/a&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;$msg.get('extensions.actions.back')&lt;/a&gt;&lt;/span&gt;"))
   #else
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""Show details"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
   #end
   #foreach($extension in $extensions)
     #displayExtension($extension $actions)

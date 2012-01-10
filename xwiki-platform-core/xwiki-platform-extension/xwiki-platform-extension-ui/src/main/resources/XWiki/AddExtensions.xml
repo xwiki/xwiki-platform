@@ -185,11 +185,11 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
 #if ($request.extensionid &amp;&amp; $request.extensionversion &amp;&amp; $request.ajax)
   #set ($actions = [])
   #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""Show details"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""Hide details"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
   #end
   #if ($hasProgramming)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actioninstall"" value=""Install"" class=""button"" /&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actioninstall"" value=""$msg.get('extensions.actions.install')"" class=""button"" /&gt;&lt;/span&gt;"))
   #end
   #displayExtension($extensionManager.resolve($request.extensionid, $request.extensionversion) $actions)
 #else
@@ -197,15 +197,20 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
 (% class="full column" %)(((
 #if($request.actioninstall)
   #displayExtensionSearchBar()
-  = Install
+  = $msg.get('extensions.install.title')
 
   #if (!$request.extensionid || !$request.extensionversion)
-    {{error}}You have to provide both extension id and version.{{/error}}
+    {{error}}$msg.get('extensions.install.error.missingIdOrVersion'){{/error}}
   #elseif ($request.confirm)
     #set($installJob = $extensionManager.install($request.extensionid, $request.extensionversion, $extensionwiki))
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
-      {{error}}Failed to install extension with id $request.extensionid and version $request.extensionversion#if($extensionwiki) on wiki $extensionwiki#end: #printThrowable($lasterror){{/error}}
+      #if($extensionwiki)
+        {{error}}$msg.get('extensions.install.error.installFailure.onWiki', [$request.extensionid, $request.extensionversion, $extensionwiki]) ##
+      #else
+        {{error}}$msg.get('extensions.install.error.installFailure', [$request.extensionid, $request.extensionversion]) ##
+      #end
+      #printThrowable($lasterror){{/error}}
     #else
       {{box}}#printJobLog($installJob){{/box}}
     #end
@@ -217,26 +222,26 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
     #prepareInstall($request.extensionid $extensionManager.parseVersion($request.extensionversion) $extensionsToInstall $extensionsToUpgrade $extensionsSuggested, $coreExtensionsConflicts)
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
-      {{error}}Can't resolve extension with id $request.extensionid and version $request.extensionversion: $lasterror.message{{/error}}
+      {{error}}$msg.get('extensions.install.error.prepareFailure', [$request.extensionid, $request.extensionversion, $lasterror.message]){{/error}}
     #elseif ($extensionsToInstall.isEmpty() &amp;&amp; $extensionsToUpgrade.isEmpty())
-      Already installed
+      {{info}}$msg.get('extensions.install.error.alreadyInstalled'){{/info}}
     #else
       #if (!$extensionsToInstall.isEmpty())
-        The following new extensions will be installed:
+        $msg.get('extensions.install.list.new')
         #foreach ($extension in $extensionsToInstall.values())
           * $extension.id.id ($extension.id.version)
         #end
 
       #end
       #if (!$extensionsToUpgrade.isEmpty())
-        The following extensions will be upgraded:
+        $msg.get('extensions.install.list.upgrade')
         #foreach ($extension in $extensionsToUpgrade.values())
           * $extension.id.id ($extension.id.version)
         #end
 
       #end
       #if (!$extensionsSuggested.isEmpty())
-        Suggested:
+        $msg.get('extensions.install.list.suggested')
         #foreach ($extension in $extensionsSuggested.values())
           * $extension.id.id ($extension.id.version)
         #end
@@ -244,9 +249,9 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
       #end
       #if (!$coreExtensionsConflicts.isEmpty())
         {{error}}
-          Conflict with core extensions:
+          $msg.get('extensions.install.list.conflict')
           #foreach ($conflict in $coreExtensionsConflicts.values())
-            * extension **$conflict.get(0).id.id** is needed in version **$conflict.get(1)** but core extension has version **$conflict.get(0).id.version**
+            * $msg.get('extensions.install.error.conflictingExtension', ["**${conflict.get(0).id.id}**", "**${conflict.get(1)}**", "**${conflict.get(0).id.version}**"])
           #end
         {{/error}}
 
@@ -262,9 +267,9 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
             #end
             &lt;input name="actioninstall" type="hidden" /&gt;
             &lt;p&gt;
-              &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
+              &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('extensions.install.actions.submit')" name="confirm" class="button"/&gt;&lt;/span&gt;
               #if ("$!{request.xback}" != '')
-                &lt;span class="buttonwrapper"&gt;&lt;a href="${request.xback}" class="secondary button"&gt;Cancel&lt;/a&gt;&lt;/span&gt;
+                &lt;span class="buttonwrapper"&gt;&lt;a href="${request.xback}" class="secondary button"&gt;$msg.get('extensions.install.actions.cancel')&lt;/a&gt;&lt;/span&gt;
               #end
             &lt;/p&gt;
           &lt;/div&gt;
@@ -289,34 +294,35 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
   #set ($extensions = false)
 #end
 #if (!$extensions)
+  ## Display the search form
   {{html clean="false"}}
   &lt;form action="$escapetool.xml($doc.getURL($xcontext.action, $request.getQueryString()))" method="post" class="xform"&gt;
     &lt;fieldset&gt;
-      &lt;label for="searchextension"&gt;What would you like to add?&lt;br /&gt;&lt;input type="text" name="searchextension" id="searchextension" /&gt;&lt;/label&gt;
-      &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Search" class="button" /&gt;&lt;/span&gt;
+      &lt;label for="searchextension"&gt;$msg.get('extensions.search.title')&lt;br /&gt;&lt;input type="text" name="searchextension" id="searchextension" /&gt;&lt;/label&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('extensions.search.submit')" class="button" /&gt;&lt;/span&gt;
     &lt;/fieldset&gt;
   &lt;/form&gt;
   &lt;form action="$escapetool.xml($doc.getURL($xcontext.action, $request.getQueryString()))" method="post" class="xform"&gt;
     &lt;fieldset id="advancedextensionsearch"&gt;
       &lt;div id="advancedextensionsearch-body"&gt;&lt;/div&gt;
-      &lt;legend&gt;&lt;a href="#advancedextensionsearch-body"&gt;Advanced install&lt;/a&gt;&lt;/legend&gt;
+      &lt;legend&gt;&lt;a href="#advancedextensionsearch-body"&gt;$msg.get('extensions.advancedSearch.title')&lt;/a&gt;&lt;/legend&gt;
       &lt;div class="plainmessage half hidden"&gt;
         &lt;input type="hidden" name="xback" value="$escapetool.xml($doc.getURL($xcontext.action, $request.queryString))" /&gt;
         &lt;dl&gt;
-        &lt;dt&gt;&lt;label for="advancedextensionsearch-id"&gt;Extension ID&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt&gt;&lt;label for="advancedextensionsearch-id"&gt;$msg.get('extensions.advancedSearch.id.label')&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;&lt;input type="text" name="extensionid" id="advancedextensionsearch-id" value="" /&gt;&lt;/dd&gt;
-        &lt;dt&gt;&lt;label for="advancedextensionsearch-version"&gt;Version&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt&gt;&lt;label for="advancedextensionsearch-version"&gt;$msg.get('extensions.advancedSearch.version.label')&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;&lt;input type="text" name="extensionversion" id="advancedextensionsearch-version" value="" /&gt;&lt;/dd&gt;
         &lt;/dl&gt;
-        &lt;p&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" name="actioninstall" value="Install" class="button" /&gt;&lt;/span&gt;
-           &lt;span class="buttonwrapper"&gt;&lt;a href="#searchextension" class="actioncancel secondary button"/&gt;Cancel&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" name="actioninstall" value="$msg.get('extensions.advancedSearch.actions.submit')" class="button" /&gt;&lt;/span&gt;
+           &lt;span class="buttonwrapper"&gt;&lt;a href="#searchextension" class="actioncancel secondary button"/&gt;$msg.get('extensions.advancedSearch.actions.cancel')&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;
       &lt;/div&gt;
     &lt;/fieldset&gt;
   &lt;/form&gt;
   {{/html}}
 
 #elseif ($extensions.size == 0)
-  {{info}}No extension found.{{/info}}##
+  {{info}}$msg.get('extensions.search.noResults'){{/info}}##
 #else
   #if ($extensions.totalHits &amp;&amp; $extensions.totalHits &gt; $paginationParams.itemsPerPage)
     #set ($hasPagination = true)
@@ -331,12 +337,12 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
   #set ($actions = [])
   #computeXBack()
   #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;Back to list&lt;/a&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;$msg.get('extensions.actions.back')&lt;/a&gt;&lt;/span&gt;"))
   #else
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""Show details"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
   #end
   #if ($hasProgramming)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actioninstall"" value=""Install"" class=""button""/&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actioninstall"" value=""$msg.get('extensions.actions.install')"" class=""button""/&gt;&lt;/span&gt;"))
   #end
   #foreach($extension in $extensions)
     #displayExtension($extension $actions)

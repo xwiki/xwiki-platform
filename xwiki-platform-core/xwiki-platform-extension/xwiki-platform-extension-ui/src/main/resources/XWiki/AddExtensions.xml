@@ -315,7 +315,7 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
         &lt;dd&gt;&lt;input type="text" name="extensionversion" id="advancedextensionsearch-version" value="" /&gt;&lt;/dd&gt;
         &lt;/dl&gt;
         &lt;p&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" name="actioninstall" value="$msg.get('extensions.advancedSearch.actions.submit')" class="button" /&gt;&lt;/span&gt;
-           &lt;span class="buttonwrapper"&gt;&lt;a href="#searchextension" class="actioncancel secondary button"/&gt;$msg.get('extensions.advancedSearch.actions.cancel')&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;
+           &lt;span class="buttonwrapper"&gt;&lt;a href="#searchextension" class="actioncancel secondary button"&gt;$msg.get('extensions.advancedSearch.actions.cancel')&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;
       &lt;/div&gt;
     &lt;/fieldset&gt;
   &lt;/form&gt;

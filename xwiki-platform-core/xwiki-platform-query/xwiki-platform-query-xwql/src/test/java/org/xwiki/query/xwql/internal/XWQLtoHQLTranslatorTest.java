@@ -117,14 +117,14 @@ public class XWQLtoHQLTranslatorTest
     @Test
     public void testShort() throws Exception
     {
-        assertTranslate("", "select distinct doc.fullName from XWikiDocument as doc");
+        assertTranslate("", "select doc.fullName from XWikiDocument as doc");
         assertTranslate("where doc.title like '%test'",
-            "select distinct doc.fullName from XWikiDocument as doc where doc.title like '%test'");
+            "select doc.fullName from XWikiDocument as doc where doc.title like '%test'");
         assertTranslate("from doc.object('XWiki.XWikiUsers') as user",
-            "select distinct doc.fullName from XWikiDocument as doc , BaseObject as user " +
+            "select doc.fullName from XWikiDocument as doc , BaseObject as user " +
                 "where 1=1 and doc.fullName=user.name and user.className='XWiki.XWikiUsers'");
         assertTranslate("from doc.object('XWiki.XWikiUsers') as user where user.email = 'some'",
-            "select distinct doc.fullName from XWikiDocument as doc , BaseObject as user , StringProperty as user_email1 " +
+            "select doc.fullName from XWikiDocument as doc , BaseObject as user , StringProperty as user_email1 " +
                 "where ( user_email1.value = 'some' ) and doc.fullName=user.name and user.className='XWiki.XWikiUsers' and user_email1.id.id=user.id and user_email1.id.name='email'");
     }
 
@@ -132,7 +132,7 @@ public class XWQLtoHQLTranslatorTest
     public void testObjDeclInWhere() throws Exception
     {
         assertTranslate("where doc.object('XWiki.XWikiUsers').email = 'some'",
-            "select distinct doc.fullName from XWikiDocument as doc , BaseObject as _o1, StringProperty as _o1_email2 " +
+            "select doc.fullName from XWikiDocument as doc , BaseObject as _o1, StringProperty as _o1_email2 " +
                 "where ( _o1_email2.value = 'some' ) and doc.fullName=_o1.name and _o1.className='XWiki.XWikiUsers' and _o1_email2.id.id=_o1.id and _o1_email2.id.name='email'");
     }
 
@@ -140,9 +140,9 @@ public class XWQLtoHQLTranslatorTest
     public void testOrderBy() throws Exception
     {
         assertTranslate("order by doc.fullName",
-            "select distinct doc.fullName from XWikiDocument as doc order by doc.fullName");
+            "select doc.fullName from XWikiDocument as doc order by doc.fullName");
         assertTranslate("from doc.object('XWiki.XWikiUsers') as user order by user.firstname",
-            "select distinct doc.fullName from XWikiDocument as doc , BaseObject as user , StringProperty as user_firstname1 " +
+            "select doc.fullName from XWikiDocument as doc , BaseObject as user , StringProperty as user_firstname1 " +
                 "where 1=1 and doc.fullName=user.name and user.className='XWiki.XWikiUsers' and user_firstname1.id.id=user.id and user_firstname1.id.name='firstname' order by user_firstname1.value");
     }
 
@@ -159,11 +159,11 @@ public class XWQLtoHQLTranslatorTest
     {
         // DBStringListProperty
         assertTranslate("from doc.object('XWiki.ArticleClass') as a where :cat member of a.category",
-            "select distinct doc.fullName from XWikiDocument as doc , BaseObject as a , DBStringListProperty as a_category1" +
+            "select doc.fullName from XWikiDocument as doc , BaseObject as a , DBStringListProperty as a_category1" +
                 " where ( :cat in elements( a_category1.list ) ) and doc.fullName=a.name and a.className='XWiki.ArticleClass' and a_category1.id.id=a.id and a_category1.id.name='category'");
         // StringListProperty
         assertTranslate("from doc.object('XWiki.Class') as c where c.stringlist like '%some%'",
-            "select distinct doc.fullName from XWikiDocument as doc , BaseObject as c , StringListProperty as c_stringlist1" +
+            "select doc.fullName from XWikiDocument as doc , BaseObject as c , StringListProperty as c_stringlist1" +
                 " where ( c_stringlist1.textValue like '%some%' ) and doc.fullName=c.name and c.className='XWiki.Class' and c_stringlist1.id.id=c.id and c_stringlist1.id.name='stringlist'");
         // return DBStringListProperty
         assertTranslate("select distinct a.category from Document as doc, doc.object('XWiki.ArticleClass') as a",

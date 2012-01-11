@@ -94,6 +94,7 @@ Thus it is forbidden to depend on the HTML Macro.
   </build>
   <modules>
     <module>xwiki-platform-rendering-macro-include</module>
+    <module>xwiki-platform-rendering-macro-display</module>
     <module>xwiki-platform-rendering-macro-script</module>
     <module>xwiki-platform-rendering-macro-velocity</module>
     <module>xwiki-platform-rendering-macro-groovy</module>

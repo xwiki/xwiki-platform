@@ -94,14 +94,14 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     public void testIncludeMacroWithNewContextShowsVelocityMacrosAreIsolated() throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.page]]\n"
+            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[wiki:Space.IncludedPage][base]=[wiki:Space.IncludedPage]]\n"
             + "beginMacroMarkerStandalone [velocity] [] [#testmacro]\n"
             + "beginParagraph\n"
             + "onSpecialSymbol [#]\n"
             + "onWord [testmacro]\n"
             + "endParagraph\n"
             + "endMacroMarkerStandalone [velocity] [] [#testmacro]\n"
-            + "endMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.page]]\n"
+            + "endMetaData [[syntax]=[XWiki 2.0][source]=[wiki:Space.IncludedPage][base]=[wiki:Space.IncludedPage]]\n"
             + "endDocument";
 
         // We verify that a Velocity macro set in the including page is not seen in the included page.
@@ -115,9 +115,9 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     public void testIncludeMacroWithCurrentContextShowsVelocityMacrosAreShared() throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.page]]\n"
+            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[wiki:Space.IncludedPage]]\n"
             + "onMacroStandalone [velocity] [] [#testmacro]\n"
-            + "endMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.page]]\n"
+            + "endMetaData [[syntax]=[XWiki 2.0][source]=[wiki:Space.IncludedPage]]\n"
             + "endDocument";
 
         // We verify that a Velocity macro set in the including page is seen in the included page.
@@ -136,7 +136,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
             this.includeMacro.execute(parameters, null, createMacroTransformationContext("whatever", false));
             Assert.fail("An exception should have been thrown");
         } catch (MacroExecutionException expected) {
-            Assert.assertEquals("You must specify a 'document' parameter pointing to the document to include.",
+            Assert.assertEquals("You must specify a 'reference' parameter pointing to the entity to include.",
                 expected.getMessage());
         }
     }
@@ -148,7 +148,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     public void testIncludeMacroWhenIncludingDocumentWithRelativeReferences() throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[includedWiki:includedSpace.includedPage]]\n"
+            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[includedWiki:includedSpace.includedPage][base]=[includedWiki:includedSpace.includedPage]]\n"
             + "beginParagraph\n"
             + "beginLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
             + "endLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
@@ -158,7 +158,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
             + "onSpace\n"
             + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true]\n"
             + "endParagraph\n"
-            + "endMetaData [[syntax]=[XWiki 2.0][source]=[includedWiki:includedSpace.includedPage]]\n"
+            + "endMetaData [[syntax]=[XWiki 2.0][source]=[includedWiki:includedSpace.includedPage][base]=[includedWiki:includedSpace.includedPage]]\n"
             + "endDocument";
 
         setUpDocumentMock("includedWiki:includedSpace.includedPage",
@@ -171,7 +171,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         }});
         
         IncludeMacroParameters parameters = new IncludeMacroParameters();
-        parameters.setDocument("includedWiki:includedSpace.includedPage");
+        parameters.setReference("includedWiki:includedSpace.includedPage");
         parameters.setContext(Context.NEW);
 
         List<Block> blocks = this.includeMacro.execute(parameters, null,
@@ -195,11 +195,11 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
         // Add an Include Macro MarkerBlock as a parent of the include Macro block since this is what would have
         // happened if an Include macro is included in another Include macro.
-        new MacroMarkerBlock("include", Collections.singletonMap("document", "space.page"),
+        new MacroMarkerBlock("include", Collections.singletonMap("reference", "space.page"),
             Collections.<Block>singletonList(macroContext.getCurrentMacroBlock()), false);
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
-        parameters.setDocument("wiki:space.page");
+        parameters.setReference("wiki:space.page");
         parameters.setContext(Context.CURRENT);
         
         try {
@@ -217,20 +217,20 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[relativePage]]\n"
+            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.relativePage]]\n"
             + "beginParagraph\n"
             + "onWord [content]\n"
             + "endParagraph\n"
-            + "endMetaData [[syntax]=[XWiki 2.0][source]=[relativePage]]\n"
+            + "endMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.relativePage]]\n"
             + "endDocument";
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
-        parameters.setDocument("relativePage");
+        parameters.setReference("relativePage");
 
         MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
         // Add a Source MetaData Block as a parent of the include Macro block.
         new MetaDataBlock(Collections.<Block>singletonList(macroContext.getCurrentMacroBlock()),
-            new MetaData(Collections.<String, Object>singletonMap(MetaData.SOURCE, "wiki:space.page")));
+            new MetaData(Collections.<String, Object>singletonMap(MetaData.BASE, "wiki:space.page")));
 
         final DocumentReference sourceReference = new DocumentReference("wiki", "space", "page");
         final DocumentReference resolvedReference = new DocumentReference("wiki", "space", "relativePage");
@@ -256,18 +256,18 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     public void testIncludeMacroWhenSectionSpecified() throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[document]]\n"
+            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.document]]\n"
             + "beginHeader [1, Hsection]\n"
             + "onWord [section]\n"
             + "endHeader [1, Hsection]\n"
             + "beginParagraph\n"
             + "onWord [content2]\n"
             + "endParagraph\n"
-            + "endMetaData [[syntax]=[XWiki 2.0][source]=[document]]\n"
+            + "endMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.document]]\n"
             + "endDocument";
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
-        parameters.setDocument("document");
+        parameters.setReference("document");
         parameters.setSection("Hsection");
 
         final DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
@@ -293,7 +293,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     public void testIncludeMacroWhenInvalidSectionSpecified() throws Exception
     {
         IncludeMacroParameters parameters = new IncludeMacroParameters();
-        parameters.setDocument("document");
+        parameters.setReference("document");
         parameters.setSection("unknown");
 
         final DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
@@ -323,7 +323,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     {
         MacroTransformationContext context = new MacroTransformationContext();
         MacroBlock includeMacro =
-            new MacroBlock("include", Collections.singletonMap("document", documentName), isInline);
+            new MacroBlock("include", Collections.singletonMap("reference", documentName), isInline);
         context.setCurrentMacroBlock(includeMacro);
         return context;
     }
@@ -379,7 +379,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         this.includeMacro.setDocumentAccessBridge(this.mockSetup.bridge);
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
-        parameters.setDocument(includedDocStringRef);
+        parameters.setReference(includedDocStringRef);
         parameters.setContext(context);
 
         // Create a Macro transformation context with the Macro transformation object defined so that the include

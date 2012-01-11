@@ -170,10 +170,9 @@ public class CreateAction extends XWikiAction
             // re-requests the page and space, else create the document and redirect to edit
             if (!isEmptyDocument(newDoc)) {
                 Object[] args = {space, page};
-                XWikiException documentAlreadyExists =
-                    new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
-                        "Cannot create document {0}.{1} because it already has content", null, args);
+                XWikiException documentAlreadyExists = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
+                    "Cannot create document {0}.{1} because it already has content", null, args);
                 ((VelocityContext) context.get(VELOCITY_CONTEXT_KEY)).put(EXCEPTION, documentAlreadyExists);
             } else {
                 // create is finally valid, can be executed
@@ -348,10 +347,9 @@ public class CreateAction extends XWikiAction
             if (allowedSpaces.size() > 0 && !allowedSpaces.contains(space)) {
                 // put an exception on the context, for create.vm to know to display an error
                 Object[] args = {templateProvider.getStringValue(TEMPLATE), space, page};
-                XWikiException exception =
-                    new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
-                        "Template {0} cannot be used in space {1} when creating page {2}", null, args);
+                XWikiException exception = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
+                    "Template {0} cannot be used in space {1} when creating page {2}", null, args);
                 VelocityContext vcontext = (VelocityContext) context.get(VELOCITY_CONTEXT_KEY);
                 vcontext.put(EXCEPTION, exception);
                 vcontext.put("createAllowedSpaces", allowedSpaces);
@@ -428,9 +426,8 @@ public class CreateAction extends XWikiAction
 
         // get the template from the template parameter, to allow creation directly from template, without
         // forcing to create a template provider for each template creation
-        String template =
-            (templateProvider != null) ? templateProvider.getStringValue(TEMPLATE) : (request.getParameterMap()
-                .containsKey(TEMPLATE) ? request.getParameter(TEMPLATE) : "");
+        String template = (templateProvider != null) ? templateProvider.getStringValue(TEMPLATE)
+            : (request.getParameterMap().containsKey(TEMPLATE) ? request.getParameter(TEMPLATE) : "");
 
         // from the template provider, find out if the document should be saved before edited
         boolean toSave = getSaveBeforeEdit(templateProvider);

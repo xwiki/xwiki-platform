@@ -26,13 +26,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-rendering-macros</artifactId>
+    <artifactId>xwiki-platform-display</artifactId>
     <version>3.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-rendering-macro-display</artifactId>
-  <name>XWiki Platform - Rendering - Macro - Display</name>
-  <description>XWiki Platform - Rendering - Macro - Display</description>
+  <artifactId>xwiki-platform-display-macro</artifactId>
+  <name>XWiki Platform - Display - Macro</name>
+  <description>XWiki Platform - Display - Macro</description>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-api</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-transformation-macro</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-context</artifactId>
@@ -50,7 +60,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-display</artifactId>
+      <artifactId>xwiki-platform-display-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -90,6 +100,30 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-observation-local</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xwiki2</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-default</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-test</artifactId>
+      <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

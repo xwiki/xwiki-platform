@@ -485,7 +485,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-display</artifactId>
+      <artifactId>xwiki-platform-display-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

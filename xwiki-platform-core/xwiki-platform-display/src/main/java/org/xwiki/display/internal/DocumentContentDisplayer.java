@@ -216,7 +216,7 @@ public class DocumentContentDisplayer implements DocumentDisplayer
             documentAccessBridge.pushDocumentInContext(backupObjects, document.getDocumentReference());
             return display(document, nameSpace, parameters);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage(), e);
         } finally {
             documentAccessBridge.popDocumentFromContext(backupObjects);
         }

@@ -49,7 +49,7 @@
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-transformation-linkchecker</artifactId>
-      <version>${project.version}</version>
+      <version>${rendering.version}</version>
     </dependency>
     <!-- This XAR will be installed in the packaged XWiki for the test -->
     <dependency>

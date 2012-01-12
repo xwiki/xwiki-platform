@@ -20,7 +20,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -249,7 +249,8 @@ function prettyNameChanged()
 <use>onDemand</use>
 </property>
 </object>
-<content>$xwiki.jsx.use($doc.fullName, {'minify' : false})
+<content>{{velocity}}
+#set ($discard = $xwiki.jsx.use($doc.fullName))
 ############################################################################################
 ## TRANLSATIONS AUTOMATIC REGISTRATION
 #set ($WORKSPACE_MANAGER_TRANSLATIONS_PAGE = 'WorkspaceManager.Translations')
@@ -261,28 +262,28 @@ function prettyNameChanged()
   #set ($temp = $xwikiPreferencesDocument.set('documentBundles', $documentBundlesValue))
   ## Save the preferences page using programming rights of the current document.
   #set ($temp = $xwiki.getXWiki().saveDocument($xwikiPreferencesDocument.document, "Added $WORKSPACE_MANAGER_TRANSLATIONS_PAGE to the list of document bundles.", true, $xcontext.context))
-  #info($msg.get("workspacemanager.install.translations"))
+  {{info}}$msg.get('workspacemanager.install.translations'){{/info}}
 #end
 ############################################################################################
 ## PLUGINS DEPENDANCIES
 #set ($WorkspaceManager = $services.workspace)
 #if (!$WorkspaceManager)
-  #error($msg.get("workspacemanager.pluginnotenabled"))
+  {{error}}$msg.get('workspacemanager.pluginnotenabled'){{/error}}
 #end
 #set ($WikiManager = $services.wikimanager)
 #if (!$WikiManager)
-  #error($msg.get("workspacemanager.dependencies.wikimanager.missing"))
+  {{error}}$msg.get('workspacemanager.dependencies.wikimanager.missing'){{/error}}
 #end
 #if (!$services.applicationmanager)
-  #error($msg.get("workspacemanager.dependencies.applicationmanager.missing"))
+  {{error}}$msg.get('workspacemanager.dependencies.applicationmanager.missing'){{/error}}
 #end
 #if(!$xwiki.isVirtualMode())
-  #error($msg.get("workspacemanager.error.notinvirtualmode"))
+  {{error}}$msg.get('workspacemanager.error.notinvirtualmode'){{/error}}
 #end
 ############################################################################################
 ## WORKSPACE INSTALLATION STATUS CHECK
 #if ("$!{services.wikimanager.getWikiTemplateDocument('workspacetemplate')}" == '')
-  #warning($msg.get('workspacemanager.template.install.notYetComplete', ['WorkspaceManager.Install']))
+  {{warning}}$msg.get('workspacemanager.template.install.notYetComplete', ['WorkspaceManager.Install']){{/warning}}
 #end
 ############################################################################################
 ## MACROS
@@ -339,7 +340,7 @@ function prettyNameChanged()
 #set ($discard = $members.remove($wikidocument.owner))
 #############################################################################
 ##
-#if ($action &amp;&amp; $action == "create")
+#if ($action &amp;&amp; $action == 'create')
   #set ($discard = $WorkspaceManager.createWorkspace($wikiname, $wikidocument))
   ##
   #if ("$!WorkspaceManager.lastException" == '')
@@ -362,22 +363,23 @@ function prettyNameChanged()
     ## Redirect to the new workspace's homepage.
     #set($temp = $response.sendRedirect("$wikidocument.getHomePageUrl()"))
   #else
-    #error($msg.get("workspacemanager.errorcreatewiki", [$wikiname, $WorkspaceManager.lastException]))
+    {{error}}$msg.get('workspacemanager.errorcreatewiki', [$wikiname, $WorkspaceManager.lastException]){{/error}}
   #end
 #end
+{{html clean='false'}}
 ##
 #############################################################################
 ##
-&lt;form method="post" action="" id="wikicreationform" class="xform third"&gt;
+&lt;form method='post' action='' id='wikicreationform' class='xform third'&gt;
   &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label  for="wikiname"&gt;$msg.get("workspacemanager.prop.wiki.wikiname") &lt;span class="xRequired"&gt;(Required)&lt;/span&gt;&lt;/label&gt;
-      &lt;span class="xHint"&gt;$msg.get("workspacemanager.doc.createwiki.wikiname")&lt;/span&gt;
-      &lt;span id='wikinamevalidation' class="xErrorMsg"&gt;&lt;/span&gt;
+      &lt;label for='wikiname'&gt;$msg.get('workspacemanager.prop.wiki.wikiname') &lt;span class='xRequired'&gt;(Required)&lt;/span&gt;&lt;/label&gt;
+      &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.wikiname')&lt;/span&gt;
+      &lt;span id='wikinamevalidation' class='xErrorMsg'&gt;&lt;/span&gt;
     &lt;/dt&gt;
 
     &lt;dd&gt;
-      &lt;input size="60" id="wikiname" name="wikiname" type="text" onchange="wikiNameChanged();" onkeyup="wikiNameChanged();" /&gt;
+      &lt;input size='60' id='wikiname' name='wikiname' type='text' onchange='wikiNameChanged();' onkeyup='wikiNameChanged();' /&gt;
     &lt;/dd&gt;
   &lt;/dl&gt;
   ##
@@ -385,19 +387,19 @@ function prettyNameChanged()
   ##
   &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label for="XWiki.XWikiServerClass_0_wikiprettyname"&gt;$msg.get("workspacemanager.prop.wiki.wikiprettyname") &lt;span class="xRequired"&gt;(Required)&lt;/span&gt;&lt;/label&gt;
-      &lt;span class="xHint"&gt;$msg.get("workspacemanager.doc.createwiki.desc.wikiprettyname")&lt;/span&gt;
-      &lt;span id='wikiprettynamevalidation' class="xErrorMsg"&gt;&lt;/span&gt;
+      &lt;label for='XWiki.XWikiServerClass_0_wikiprettyname'&gt;$msg.get('workspacemanager.prop.wiki.wikiprettyname') &lt;span class='xRequired'&gt;(Required)&lt;/span&gt;&lt;/label&gt;
+      &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.desc.wikiprettyname')&lt;/span&gt;
+      &lt;span id='wikiprettynamevalidation' class='xErrorMsg'&gt;&lt;/span&gt;
     &lt;/dt&gt;
-    &lt;dd&gt;&lt;input size="60" id="XWiki.XWikiServerClass_0_wikiprettyname" name="XWiki.XWikiServerClass_0_wikiprettyname" type="text" onchange="prettyNameChanged();" onkeyup="prettyNameChanged();" /&gt;&lt;/dd&gt;
+    &lt;dd&gt;&lt;input size='60' id='XWiki.XWikiServerClass_0_wikiprettyname' name='XWiki.XWikiServerClass_0_wikiprettyname' type='text' onchange='prettyNameChanged();' onkeyup='prettyNameChanged();' /&gt;&lt;/dd&gt;
   &lt;/dl&gt;
 
   &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label for="XWiki.XWikiServerClass_0_description"&gt;$msg.get("workspacemanager.prop.wiki.description")&lt;/label&gt;
-      &lt;span class="xHint"&gt;$msg.get("workspacemanager.doc.createwiki.desc.description")&lt;/span&gt;
+      &lt;label for='XWiki.XWikiServerClass_0_description'&gt;$msg.get('workspacemanager.prop.wiki.description')&lt;/label&gt;
+      &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.desc.description')&lt;/span&gt;
     &lt;/dt&gt;
-    &lt;dd&gt;$wikidocument.display("description", "edit")&lt;/dd&gt;
+    &lt;dd&gt;&lt;textarea id='XWiki.XWikiServerClass_0_description' name='XWiki.XWikiServerClass_0_description' rows='3'&gt;&lt;/textarea&gt;&lt;/dd&gt;
   &lt;/dl&gt;
 
   #set ($rightsmanager = $xwiki.rightsmanager)
@@ -407,11 +409,11 @@ function prettyNameChanged()
   #if ($hasAdmin)
   &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label for="XWiki.XWikiServerClass_0_owner"&gt;$msg.get("workspacemanager.prop.wiki.owner") &lt;span class="xRequired"&gt;(Required)&lt;/span&gt;&lt;/label&gt;
-      &lt;span class='xHint'&gt;$msg.get("workspacemanager.doc.createwiki.desc.owner")&lt;/span&gt;
+      &lt;label for='XWiki.XWikiServerClass_0_owner'&gt;$msg.get('workspacemanager.prop.wiki.owner') &lt;span class='xRequired'&gt;(Required)&lt;/span&gt;&lt;/label&gt;
+      &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.desc.owner')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
-      &lt;select name="XWiki.XWikiServerClass_0_owner" id="XWiki.XWikiServerClass_0_owner" size='4'&gt;
+      &lt;select name='XWiki.XWikiServerClass_0_owner' id='XWiki.XWikiServerClass_0_owner' size='4'&gt;
         #foreach ($user in $users))
           ## Skip the guest user.
           #if ($user != 'XWiki.XWikiGuest')
@@ -424,18 +426,18 @@ function prettyNameChanged()
     &lt;/dd&gt;
   &lt;/dl&gt;
   #else
-  &lt;input id="XWiki.XWikiServerClass_0_owner" name="XWiki.XWikiServerClass_0_owner" type="hidden" value="${xcontext.mainWikiName}:${xcontext.user}" /&gt;
+  &lt;input id='XWiki.XWikiServerClass_0_owner' name='XWiki.XWikiServerClass_0_owner' type='hidden' value="${xcontext.mainWikiName}:${xcontext.user}" /&gt;
   #end
   ##
   #############################################################################
   ##
   &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label for="members"&gt;$msg.get("workspacemanager.members")&lt;/label&gt;
-      &lt;span class='xHint'&gt;$msg.get("workspacemanager.doc.createwiki.members")&lt;/span&gt;
+      &lt;label for='members'&gt;$msg.get('workspacemanager.members')&lt;/label&gt;
+      &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.members')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
-      &lt;select name="members" id="members" multiple="multiple"&gt;
+      &lt;select name='members' id='members' multiple='multiple'&gt;
         #foreach ($user in $users)
           ## Skip the current user if the user is not an admin. The current user is made owner by default and,
           ## thus, a member of the workspace. However, an admin can choose a different owner.
@@ -456,8 +458,8 @@ function prettyNameChanged()
   #set($membershipTypeDetailsMap = $membershipTypeProperty.getMapValues())
   &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label for="membershipType"&gt;$msg.get("workspacemanager.prop.workspace.membershipType.label")&lt;/label&gt;
-      &lt;span class='xHint'&gt;$msg.get("workspacemanager.prop.workspace.membershipType.hint")&lt;/span&gt;
+      &lt;label for='membershipType'&gt;$msg.get('workspacemanager.prop.workspace.membershipType.label')&lt;/label&gt;
+      &lt;span class='xHint'&gt;$msg.get('workspacemanager.prop.workspace.membershipType.hint')&lt;/span&gt;
     &lt;/dt&gt;
 
     #foreach($membershipTypeValue in $membershipTypeValues)
@@ -470,10 +472,12 @@ function prettyNameChanged()
   #############################################################################
   ##
   &lt;div&gt;
-    &lt;div id="actioncreate"&gt;
-      &lt;br /&gt;
-      &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-      &lt;input class="button" type="submit" id="actioncreatebutton" name="actioncreate" value="${msg.get("create")}" onclick="return validate();" /&gt;
+    &lt;div id='actioncreate'&gt;
+      &lt;br/&gt;
+      &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
+      &lt;input class='button' type='submit' id='actioncreatebutton' name='actioncreate' value="${msg.get('create')}" onclick='return validate();' /&gt;
     &lt;/div&gt;
   &lt;/div&gt;
-&lt;/form&gt;</content></xwikidoc>
+&lt;/form&gt;
+{{/html}}
+{{/velocity}}</content></xwikidoc>

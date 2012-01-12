@@ -20,7 +20,6 @@
 
 package com.xpn.xwiki.store.migration.hibernate;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.inject.Named;
@@ -76,80 +75,105 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
             return ver;
         }
 
+        final XWikiContext context = getXWikiContext();
+        final XWikiHibernateBaseStore store = getStore();
+
+        final Session originalSession = store.getSession(context);
+        final Transaction originalTransaction = store.getTransaction(context);
+        store.setSession(null, context);
+        store.setTransaction(null, context);
+
         try {
-            XWikiHibernateBaseStore store = getStore();
-            return store.executeRead(getXWikiContext(), store.getTransaction(getXWikiContext()) == null,
-                new HibernateCallback<XWikiDBVersion>()
-                {
-                    @Override
-                    public XWikiDBVersion doInHibernate(Session session) throws HibernateException
+            try {
+                ver = store.executeRead(context, true,
+                    new HibernateCallback<XWikiDBVersion>()
                     {
-                        XWikiDBVersion result = null;
-                        try {
+                        @Override
+                        public XWikiDBVersion doInHibernate(Session session) throws HibernateException
+                        {
                             // Retrieve the version from the database
-                            result = (XWikiDBVersion) session.createCriteria(XWikiDBVersion.class).uniqueResult();
-                        } catch (HibernateException ignored) {
-                            // ignore exception since missing schema will cause them
+                            return (XWikiDBVersion) session.createCriteria(XWikiDBVersion.class).uniqueResult();
                         }
-                        if (result == null) {
-                            // if it fails, return version 0 if there is some documents in the database, else null
-                            try {
+                    });
+            }
+            catch (Exception ignored) {
+                // ignore exception since missing schema will cause them
+            }
+            if (ver == null) {
+                try {
+                    ver = store.executeRead(getXWikiContext(), true,
+                        new HibernateCallback<XWikiDBVersion>()
+                        {
+                            @Override
+                            public XWikiDBVersion doInHibernate(Session session) throws HibernateException
+                            {
+                                // if it fails, return version 0 if there is some documents in the database, else null
                                 if (((Number) session.createCriteria(XWikiDocument.class)
-                                        .setProjection(Projections.rowCount())
-                                        .uniqueResult()).longValue() > 0)
+                                    .setProjection(Projections.rowCount())
+                                    .uniqueResult()).longValue() > 0)
                                 {
-                                    result = new XWikiDBVersion(0);
+                                    return new XWikiDBVersion(0);
                                 }
-                            } catch (HibernateException ignored) {
-                                // ignore exception since missing schema will cause them
+                                return null;
                             }
-                        }
-                        return result;
-                    }
-                });
+                        });
+                }
+                catch (Exception ignored) {
+                    // ignore exception since missing schema will cause them
+                }
+            }
         } catch (Exception e) {
             throw new DataMigrationException(String.format("Unable to retrieve data version from database %s",
                 getXWikiContext().getDatabase()), e);
+        }
+        finally {
+            store.setSession(originalSession, context);
+            store.setTransaction(originalTransaction, context);
+        }
+
+        return ver;
+    }
+
+    @Override
+    protected void initializeEmptyDB() throws DataMigrationException {
+        final XWikiContext context = getXWikiContext();
+        final XWikiHibernateBaseStore store = getStore();
+
+        final Session originalSession = store.getSession(context);
+        final Transaction originalTransaction = store.getTransaction(context);
+        store.setSession(null, context);
+        store.setTransaction(null, context);
+
+        try {
+            updateSchema();
+            setDBVersion(getLatestVersion());
+        } finally {
+            store.setSession(originalSession, context);
+            store.setTransaction(originalTransaction, context);
         }
     }
 
     @Override
     protected void setDBVersionToDatabase(final XWikiDBVersion version) throws DataMigrationException
     {
-        XWikiContext context = getXWikiContext();
-        XWikiHibernateBaseStore store = getStore();
+        final XWikiContext context = getXWikiContext();
+        final XWikiHibernateBaseStore store = getStore();
         final boolean bTransaction = store.getTransaction(context) == null;
-        boolean doCommit = bTransaction;
 
         try {
-            getStore().executeWrite(getXWikiContext(), bTransaction, new HibernateCallback<Object>()
+            getStore().executeWrite(context, bTransaction, new HibernateCallback<Object>()
             {
                 @Override
                 public Object doInHibernate(Session session) throws HibernateException
                 {
                     session.createQuery("delete from " + XWikiDBVersion.class.getName()).executeUpdate();
                     session.save(version);
-
-                    // ensure version is committed
-                    if (!bTransaction) {
-                        session.flush();
-                        try {
-                            session.connection().commit();
-                        } catch (SQLException e) {
-                            throw new HibernateException(e);
-                        }
-                    }
                     return null;
                 }
             });
         } catch (Exception e) {
-            doCommit = false;
             throw new DataMigrationException(String.format("Unable to store data version into database %s",
                 context.getDatabase()), e);
-        } finally {
-            if (bTransaction) {
-                store.endTransaction(context, doCommit);
-            }
         }
     }
 

@@ -303,12 +303,16 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     public synchronized void initNewDB() throws DataMigrationException {
         lock.lock();
         try {
-            updateSchema();
-            setDBVersion(getLatestVersion());
+            initializeEmptyDB();
         } finally {
             lock.unlock();
         }
     }
+
+    /**
+     * @throws DataMigrationException if any error
+     */
+    protected abstract void initializeEmptyDB() throws DataMigrationException;
 
     /**
      * @param version to set

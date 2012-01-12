@@ -20,7 +20,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -104,7 +104,8 @@
 <category>Information</category>
 </property>
 <property>
-<content>#panelheader($msg.get('workspacemanager.panel.title'))
+<content>{{velocity}}
+#panelheader($msg.get('workspacemanager.panel.title'))
 #set ($currentWiki = $xcontext.database)
 #set ($currentUser = $services.model.serialize($xcontext.userReference, 'default'))
 #set ($WorkspaceManager = $services.workspace)
@@ -113,15 +114,15 @@
 ##
 #set ($workspace = $WorkspaceManager.getWorkspace($currentWiki))
 #if (!$workspace)
-  #error("The current wiki is not a workspace.")
+  {{error}}The current wiki is not a workspace.{{/error}}
 #else
   #set($wikiDescriptor = $workspace.wikiDescriptor)
-  *Name*\\
-  $wikiDescriptor.wikiPrettyName\\
+  **Name**
+  $wikiDescriptor.wikiPrettyName
   #set ($workspaceDescription = $wikiDescriptor.description)
   #if ("$!workspaceDescription" != '')
-    *Description*\\
-    $workspaceDescription\\
+    **Description**
+    $workspaceDescription
   #end
   ----
   ## Join/Leave
@@ -168,21 +169,21 @@
         #end
       #end
       ## Display
-      $joinText\\
+      $joinText
       #if ($membershipType != 'invite' || "$!{existingInvitationOrRequest.getProperty('type').value}" == 'invitation')
-        &lt;span class='buttonwrapper'&gt;&lt;a href="$actionUrl" class='button'&gt;$actionLabel&lt;a/&gt;&lt;/span&gt;
+        {{html clean='false'}}&lt;span class='buttonwrapper'&gt;&lt;a href="$actionUrl" class='button'&gt;$actionLabel&lt;a/&gt;&lt;/span&gt;{{/html}}
       #end
     #elseif (!$hasOwner)
-      You are a member of this workspace\\
+      You are a member of this workspace
       #set ($leavePageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'LeaveWorkspaceCode'))
       #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiPrettyName}"))
-      &lt;span class='buttonwrapper'&gt;&lt;a href="$leaveUrl" class='button'&gt;Leave Workspace&lt;a/&gt;&lt;/span&gt;
+      {{html clean='false'}}&lt;span class='buttonwrapper'&gt;&lt;a href="$leaveUrl" class='button'&gt;Leave Workspace&lt;a/&gt;&lt;/span&gt;{{/html}}
     #else
-      You are the owner of this workspace\\
+      You are the owner of this workspace
     #end
   #end
   ----
-  *Members*\\
+  **Members**
   #set ($workspaceGroupDocument = $workspace.groupDocument)
   #set ($workspaceGroupMemberObjects = $workspaceGroupDocument.getObjects('XWiki.XWikiGroups'))
   #set ($totalNrOfUsers = $workspaceGroupMemberObjects.size())
@@ -197,16 +198,16 @@
     #set ($randomMember = "$!{randomMemberObject.getProperty('member').value}")
     #if ("$!randomMember" != '')
       #if ("$!randomMember" != 'XWiki.XWikiGuest')
-        &lt;a href="$xwiki.getURL($randomMember)"&gt;#smallUserAvatar($randomMember)&lt;/a&gt;
-      #else
-        #smallUserAvatar($randomMember)
-      #end
+        {{html clean='false'}}&lt;a href="$xwiki.getURL($randomMember)"&gt;#smallUserAvatar($randomMember)&lt;/a&gt;{{/html}} #else
+        #smallUserAvatar($randomMember) #end
+      ## end-if. The above else/end statements at the end of line are intentional, otherwise a &lt;br/&gt; will be generated.
     #end
     ## Avoid repeating the same user.
     #set ($discard = $workspaceGroupMemberObjects.remove($randomMemberIndex))
   #end
 #end
-#panelfooter()</content>
+#panelfooter()
+{{/velocity}}</content>
 </property>
 <property>
 <description>Provides information about the current workspace.</description>
@@ -218,4 +219,4 @@
 <type>view</type>
 </property>
 </object>
-<content>#includeForm("Panels.PanelSheet")</content></xwikidoc>
+<content>{{include document="Panels.PanelSheet"}}</content></xwikidoc>

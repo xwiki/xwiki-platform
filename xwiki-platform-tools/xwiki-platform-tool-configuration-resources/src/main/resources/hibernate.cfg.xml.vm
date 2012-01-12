@@ -126,6 +126,10 @@
 
     <!-- PostgreSQL configuration.
          Uncomment if you want to use PostgreSQL and comment out other database configurations.
+         Notes:
+           - "jdbc.use_streams_for_binary" needs to be set to "false",
+             see https://community.jboss.org/wiki/HibernateCoreMigrationGuide36
+
     <property name="connection.url">jdbc:postgresql:xwiki</property>
     <property name="connection.username">xwiki</property>
     <property name="connection.password">xwiki</property>
@@ -134,6 +138,7 @@
     <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
     <property name="connection.pool_size">2</property>
     <property name="statement_cache.size">2</property>
+    <property name="jdbc.use_streams_for_binary">false</property>
     <mapping resource="xwiki.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
@@ -150,7 +155,7 @@
          Uncomment if you want to use Oracle and comment out other database configurations.
          Note: the 2 properties named "hibernate.connection.SetBigStringTryClob" and
          "hibernate.jdbc.batch_size". They are required to tell Oracle to allow CLOBs larger than
-         32K. 
+         32K.
     <property name="connection.url">jdbc:oracle:thin:@localhost:1521:XE</property>
     <property name="connection.username">xwiki</property>
     <property name="connection.password">xwiki</property>

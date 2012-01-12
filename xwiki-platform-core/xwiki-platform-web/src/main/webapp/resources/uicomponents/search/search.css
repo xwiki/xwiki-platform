@@ -8,16 +8,22 @@
   width: 100%;
 }
 .resultItem {
-  clear: both;
   display: block;
-  padding-top: 1em;
+  margin-top: 1em;
+  padding: .2em 0;
 }
-.resultContainer {
+.resultItem:after{
   clear: both;
-  width: 100%;
+  content: ".";
+  display: block;
+  height: 0;
+  visibility: hidden;
+}
+.resultItem:hover {
+  background-color: $theme.highlightColor;
 }
 .itemDescription {
-  background: transparent url("$xwiki.getSkinFile('icons/silk/page_white_text.png')") no-repeat left top;
+  background: url("$xwiki.getSkinFile('icons/silk/page_white_text.png')") no-repeat left 3px transparent;
   display: inline-block;
   float: left;
   padding-left: 20px;
@@ -30,6 +36,7 @@
   background-image: url("$xwiki.getSkinFile('icons/silk/attach.png')");
 }
 .itemTitle {
+  border: 0;
   font-weight: bold;
   font-size: 1em;
   margin: 0;
@@ -111,7 +118,7 @@
   float: right;
   height: 8px;
   list-style: none;
-  margin: 5px 0 0 0 !important;
+  margin: 3px 0 0 0;
   overflow: hidden;
   padding: 0 !important;
   position: relative;
@@ -173,6 +180,7 @@
   border: 2px solid $theme.borderColor;
   color: $theme.textColor;
   font-size: 1.1em;
+  padding: .25em;
 }
 #searchBar .searchQuery {
   background: transparent url("$xwiki.getSkinFile('icons/xwiki/search.png')") left center no-repeat;
@@ -184,14 +192,9 @@
   width: 400px;
 }
 #searchBar .searchButton {
-  background-color: $theme.buttonPrimaryBackgroundColor;
-  border: 2px solid $theme.buttonPrimaryBackgroundColor;
-  color: $theme.buttonPrimaryTextColor;
-  font-size: 90%;
-  font-variant: small-caps;
-  font-weight: bold;
-  height: 2em;
-  line-height: 1em;
+  height: 2.4em;
+  position: relative;
+  top: -2px;
 }
 .searchHelp {
   font-size: 80%;

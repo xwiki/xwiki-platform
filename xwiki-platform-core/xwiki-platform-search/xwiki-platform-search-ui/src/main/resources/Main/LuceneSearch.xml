@@ -163,7 +163,9 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
       #wikisselect($request.wikinames $allwikinamelist)
     #end
     #spaceselect($selectedSpace $spaces)
-    &lt;input type="submit" class="searchButton" value="$msg.get('search.page.bar.submit')" title="$msg.get('search.page.bar.submit.title')"/&gt;
+    &lt;span class='buttonwrapper'&gt;
+      &lt;input type="submit" class="button searchButton" value="$msg.get('search.page.bar.submit')" title="$msg.get('search.page.bar.submit.title')"/&gt;
+    &lt;/span&gt;
     &lt;div class="searchHelp"&gt;$msg.get('search.page.bar.querytip')&lt;/div&gt;
   &lt;/div&gt;
 &lt;/form&gt;
@@ -245,7 +247,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
         #end
 
         {{html}}
-          &lt;a href="${rssURL}"&gt;&lt;img src="$xwiki.getSkinFile("icons/silk/feed.png")" alt="RSS icon"/&gt;$msg.get("search.rss", ["[$escapetool.xml($query)]"])&lt;/a&gt;
+          &lt;img src="$xwiki.getSkinFile("icons/silk/feed.png")" alt="RSS icon" class='icon'/&gt; &lt;a href="${rssURL}"&gt;$msg.get("search.rss", ["[$escapetool.xml($query)]"])&lt;/a&gt;
         {{/html}}
       #end
     #end

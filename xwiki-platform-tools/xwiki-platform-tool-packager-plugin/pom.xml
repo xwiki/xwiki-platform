@@ -120,21 +120,6 @@
       <version>2.4</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Dependencies used during integration tests -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-toucan</artifactId>
-      <version>${project.version}</version>
-      <type>zip</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-linkchecker-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>

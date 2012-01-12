@@ -30,42 +30,16 @@
     <artifactId>xwiki-platform-tools</artifactId>
     <version>3.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-package-skin-sample</artifactId>
+  <artifactId>xwiki-platform-tool-packager-plugin-it-skin</artifactId>
   <packaging>pom</packaging>
-  <name>Maven XWiki Sample Skin Package Plugin</name>
-  <description>Maven XWiki Sample Skin Package Plugin</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-toucan</artifactId>
-      <version>${project.version}</version>
-      <type>zip</type>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <!-- Generate XWiki packaging -->
-      <plugin>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-        <version>${project.version}</version>
-        <executions>
-          <execution>
-            <id>package</id>
-            <goals>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <skinArtifactItems>
-            <skinArtifactItem>
-              <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-toucan</artifactId>
-            </skinArtifactItem>
-          </skinArtifactItems>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+  <name>XWiki Platform - Tools - Packager - Test - Skin</name>
+  <description>XWiki Platform - Tools - Packager - Test - Skin</description>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
+  <modules>
+    <module>dependency</module>
+    <module>package</module>
+  </modules>
 </project>

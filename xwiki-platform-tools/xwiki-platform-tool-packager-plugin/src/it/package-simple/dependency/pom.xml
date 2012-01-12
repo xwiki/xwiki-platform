@@ -27,29 +27,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-tools</artifactId>
+    <artifactId>xwiki-platform-tool-packager-plugin-it-simple</artifactId>
     <version>3.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-tool-packager-plugin-it-simple</artifactId>
-  <packaging>pom</packaging>
-  <name>XWiki Platform - Tools - Packager - Test - Simple</name>
-  <description>XWiki Platform - Tools - Packager - Test - Simple</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
-  <modules>
-    <module>dependency</module>
-    <module>package</module>
-  </modules>
-  <build>
-    <extensions>
-      <!-- Needed to add support for the "xar" packaging -->
-      <extension>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
-        <version>${commons.version}</version>
-      </extension>
-    </extensions>
-  </build>
+  <artifactId>xwiki-platform-tool-packager-plugin-it-simple-dependency</artifactId>
+  <packaging>xar</packaging>
+  <name>XWiki Platform - Tools - Packager - Test - Simple - Dependency</name>
+  <description>XWiki Platform - Tools - Packager - Test - Simple - Dependency</description>
 </project>

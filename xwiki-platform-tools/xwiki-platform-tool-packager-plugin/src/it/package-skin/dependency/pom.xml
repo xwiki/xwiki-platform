@@ -27,29 +27,33 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-tools</artifactId>
+    <artifactId>xwiki-platform-tool-packager-plugin-it-skin</artifactId>
     <version>3.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-tool-packager-plugin-it-simple</artifactId>
+  <artifactId>xwiki-platform-tool-packager-plugin-it-skin-dependency</artifactId>
   <packaging>pom</packaging>
-  <name>XWiki Platform - Tools - Packager - Test - Simple</name>
-  <description>XWiki Platform - Tools - Packager - Test - Simple</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
-  <modules>
-    <module>dependency</module>
-    <module>package</module>
-  </modules>
+  <name>XWiki Platform - Tools - Packager - Test - Skin - Dependency</name>
+  <description>XWiki Platform - Tools - Packager - Test - Skin - Dependency</description>
   <build>
-    <extensions>
-      <!-- Needed to add support for the "xar" packaging -->
-      <extension>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
-        <version>${commons.version}</version>
-      </extension>
-    </extensions>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <appendAssemblyId>false</appendAssemblyId>
+          <descriptors>
+            <descriptor>${basedir}/src/assemble/skin.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 </project>

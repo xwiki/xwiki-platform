@@ -27,29 +27,38 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-tools</artifactId>
+    <artifactId>xwiki-platform-tool-packager-plugin-it-simple</artifactId>
     <version>3.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-tool-packager-plugin-it-simple</artifactId>
+  <artifactId>xwiki-platform-tool-packager-plugin-it-simple-package</artifactId>
   <packaging>pom</packaging>
-  <name>XWiki Platform - Tools - Packager - Test - Simple</name>
-  <description>XWiki Platform - Tools - Packager - Test - Simple</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
-  <modules>
-    <module>dependency</module>
-    <module>package</module>
-  </modules>
+  <name>XWiki Platform - Tools - Packager - Test - Simple - Package</name>
+  <description>XWiki Platform - Tools - Packager - Test - Simple - Package</description>
+  <dependencies>
+    <!-- This XAR will be installed in the packaged XWiki -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tool-packager-plugin-it-simple-dependency</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+  </dependencies>
   <build>
-    <extensions>
-      <!-- Needed to add support for the "xar" packaging -->
-      <extension>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
-        <version>${commons.version}</version>
-      </extension>
-    </extensions>
+    <plugins>
+      <!-- Generate XWiki packaging -->
+      <plugin>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <id>package</id>
+            <goals>
+              <goal>package</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 </project>

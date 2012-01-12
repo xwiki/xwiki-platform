@@ -142,10 +142,10 @@
    -->
 
    <default>
-      <eviction 
+      <!-- <eviction 
          maxEntries="10000"
          strategy="LRU"
-      />
+      /> -->
    
       <!--
          Tunes the locking and concurrency characteristics of the cache.
@@ -224,23 +224,25 @@
    -->
 
    <!-- Image plugin cache -->
-   <namedCache name="xwiki.plugin.image">
+   <!-- <namedCache name="xwiki.plugin.image">
       <loaders passivation="true">
          <loader class="org.infinispan.loaders.file.FileCacheStore">
-           <!-- Let XWiki cache module set the proper location -->
+           Let XWiki cache module set the proper location
          </loader>
       </loaders>
    </namedCache>
+    -->
 
    <!-- Equation plugin cache -->
+   <!-- 
    <namedCache name="xwiki.plugin.equation">
       <loaders passivation="true">
          <loader class="org.infinispan.loaders.file.FileCacheStore">
-           <!-- Let XWiki cache module set the proper location -->
+           Let XWiki cache module set the proper location
          </loader>
       </loaders>
    </namedCache>
-
+ -->
    <!--
       A cache configured with eviction.
 
@@ -328,40 +330,6 @@
             <properties>
                <property name="location" value="${java.io.tmpdir}"/>
             </properties>
-         </loader>
-      </loaders>
-   </namedCache>
-   -->
-
-   <!-- 
-      A write behind cache is one where data is stored in a backend store in a separate process, making cache
-      calls return very fast while at the same time persisting data permanently. This type of caches are
-      particularly interesting for stores with high latency such as cloud based store, or very remote databases. 
-
-      See:
-         http://docs.jboss.org/infinispan/4.2/apidocs/org/infinispan/loaders/cloud/CloudCacheStoreConfig.html        
-   -->
-   <!--
-   <namedCache name="writeBehindToCloudCache">
-      <loaders passivation="false" shared="false" preload="true">
-         <loader class="org.infinispan.loaders.cloud.CloudCacheStore"
-                 fetchPersistentState="false"
-                 ignoreModifications="false"
-                 purgeOnStartup="false">
-            <properties>
-               <property name="identity" value="${ec2.access_key}"/>
-               <property name="password" value="${ec2.access_secret}"/>
-               <property name="bucketPrefix" value="${ec2.bucket}"/>
-               <property name="requestTimeout" value="20000"/>
-               <property name="cloudService" value="s3"/>
-               <property name="secure" value="true"/>
-               <property name="compress" value="true"/>
-            </properties>
-            <async
-               enabled="true"
-               flushLockTimeout="15000"
-               threadPoolSize="10"
-            />
          </loader>
       </loaders>
    </namedCache>

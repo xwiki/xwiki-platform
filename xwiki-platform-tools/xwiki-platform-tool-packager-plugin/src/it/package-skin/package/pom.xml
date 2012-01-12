@@ -27,7 +27,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-tool-packager-plugin-it-simple</artifactId>
+    <artifactId>xwiki-platform-tool-packager-plugin-it-skin</artifactId>
     <version>3.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-packager-plugin-it-skin-package</artifactId>

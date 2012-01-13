@@ -323,52 +323,6 @@
                 <exclude>org/xwiki/rest/XWikiRestletServlet</exclude>
                 <exclude>org/xwiki/rest/XWikiSetupCleanupFilter</exclude>
                 <exclude>org/xwiki/rest/resources/BrowserAuthenticationResource</exclude>
-                <!-- To be removed when we release 3.3 -->
-                <exclude>org/xwiki/annotation/reference/IndexedObjectReference</exclude>
-                <exclude>org/xwiki/cache/eviction/EntryEvictionConfiguration</exclude>
-                <exclude>org/xwiki/workspace/WorkspaceManagerException</exclude>
-                <exclude>org/xwiki/model/reference/AttachmentReference</exclude>
-                <exclude>org/xwiki/model/reference/ClassPropertyReference</exclude>
-                <exclude>org/xwiki/model/reference/EntityReference</exclude>
-                <exclude>org/xwiki/model/reference/DocumentReference</exclude>
-                <exclude>org/xwiki/model/reference/ObjectReference</exclude>
-                <exclude>org/xwiki/model/reference/ObjectReferenceResolver</exclude>
-                <exclude>org/xwiki/model/reference/ObjectPropertyReference</exclude>
-                <exclude>org/xwiki/model/reference/ObjectPropertyReferenceResolver</exclude>
-                <exclude>org/xwiki/model/reference/SpaceReference</exclude>
-                <exclude>org/xwiki/model/reference/WikiReference</exclude>
-                <exclude>com/xpn/xwiki/doc/DeletedFilesystemAttachment</exclude>
-                <exclude>com/xpn/xwiki/doc/FilesystemAttachmentContent</exclude>
-                <exclude>com/xpn/xwiki/doc/FilesystemAttachmentContent$1LockingFileInputStream</exclude>
-                <exclude>com/xpn/xwiki/doc/ListAttachmentArchive</exclude>
-                <exclude>com/xpn/xwiki/doc/ListAttachmentArchive$XWikiAttachmentVersionComparitor</exclude>
-                <exclude>com/xpn/xwiki/doc/MutableDeletedFilesystemAttachment</exclude>
-                <exclude>com/xpn/xwiki/store/AttachmentArchiveDeleteRunnable</exclude>
-                <exclude>com/xpn/xwiki/store/AttachmentArchiveSaveRunnable</exclude>
-                <exclude>com/xpn/xwiki/store/AttachmentContentStreamProvider</exclude>
-                <exclude>com/xpn/xwiki/store/FilesystemAttachmentRecycleBinStore</exclude>
-                <exclude>com/xpn/xwiki/store/FilesystemAttachmentRecycleBinStore$1</exclude>
-                <exclude>com/xpn/xwiki/store/FilesystemAttachmentRecycleBinStore$2</exclude>
-                <exclude>com/xpn/xwiki/store/FilesystemAttachmentRecycleBinStore$NewestFirstDateComparitor</exclude>
-                <exclude>com/xpn/xwiki/store/FilesystemAttachmentStore</exclude>
-                <exclude>com/xpn/xwiki/store/FilesystemAttachmentStore$1</exclude>
-                <exclude>com/xpn/xwiki/store/FilesystemAttachmentStore$AttachmentDeleteTransactionRunnable</exclude>
-                <exclude>com/xpn/xwiki/store/FilesystemAttachmentStore$AttachmentDeleteTransactionRunnable$1</exclude>
-                <exclude>com/xpn/xwiki/store/FilesystemAttachmentStore$AttachmentSaveTransactionRunnable</exclude>
-                <exclude>com/xpn/xwiki/store/FilesystemAttachmentStore$AttachmentSaveTransactionRunnable$1</exclude>
-                <exclude>com/xpn/xwiki/store/FilesystemAttachmentStore$AttachmentSaveTransactionRunnable$2</exclude>
-                <exclude>com/xpn/xwiki/store/FilesystemAttachmentVersioningStore</exclude>
-                <exclude>com/xpn/xwiki/store/HibernateTransaction</exclude>
-                <exclude>com/xpn/xwiki/store/XWikiHibernateTransaction</exclude>
-                <exclude>com/xpn/xwiki/plugin/applicationmanager/ApplicationManagerPlugin</exclude>
-                <exclude>com/xpn/xwiki/plugin/applicationmanager/ApplicationManagerPlugin$1</exclude>
-                <exclude>org/xwiki/annotation/event/AbstractAnnotationEvent</exclude>
-                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/line/MozillaLinePlugin</exclude>
-                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/link/ui/AbstractExternalLinkWizardStep</exclude>
-                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/link/ui/WebPageLinkWizardStep</exclude>
-                <exclude>org/xwiki/query/QueryExecutorProvider</exclude> <!-- Use new Provider injection -->
-                <!-- Moved to Legacy -->
-                <exclude>com/xpn/xwiki/api/XWiki</exclude>
               </excludes>
             </configuration>
           </plugin>

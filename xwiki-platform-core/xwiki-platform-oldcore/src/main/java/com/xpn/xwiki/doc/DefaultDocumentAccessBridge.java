@@ -338,7 +338,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
         doc.setParentReference(parentReference);
-        saveDocument(doc, String.format("Changed document parent to [%s].", parentReference), true);
+        saveDocument(doc, String.format("Changed document parent to [%s].",
+            this.defaultEntityReferenceSerializer.serialize(parentReference)), true);
     }
 
     public void setDocumentTitle(DocumentReference documentReference, String title) throws Exception

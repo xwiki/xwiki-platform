@@ -581,6 +581,13 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- User by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+
     <!-- Test dependencies -->
 
     <!-- Used to mock XWiki class -->
@@ -638,7 +645,6 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
   <build>
     <plugins>

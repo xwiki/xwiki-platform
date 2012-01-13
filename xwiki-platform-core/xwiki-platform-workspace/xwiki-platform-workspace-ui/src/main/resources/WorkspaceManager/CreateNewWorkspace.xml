@@ -263,27 +263,34 @@ function prettyNameChanged()
   ## Save the preferences page using programming rights of the current document.
   #set ($temp = $xwiki.getXWiki().saveDocument($xwikiPreferencesDocument.document, "Added $WORKSPACE_MANAGER_TRANSLATIONS_PAGE to the list of document bundles.", true, $xcontext.context))
   {{info}}$msg.get('workspacemanager.install.translations'){{/info}}
+
 #end
 ############################################################################################
 ## PLUGINS DEPENDANCIES
 #set ($WorkspaceManager = $services.workspace)
 #if (!$WorkspaceManager)
   {{error}}$msg.get('workspacemanager.pluginnotenabled'){{/error}}
+
 #end
 #set ($WikiManager = $services.wikimanager)
 #if (!$WikiManager)
   {{error}}$msg.get('workspacemanager.dependencies.wikimanager.missing'){{/error}}
+
 #end
 #if (!$services.applicationmanager)
   {{error}}$msg.get('workspacemanager.dependencies.applicationmanager.missing'){{/error}}
+
 #end
 #if(!$xwiki.isVirtualMode())
   {{error}}$msg.get('workspacemanager.error.notinvirtualmode'){{/error}}
+
 #end
 ############################################################################################
 ## WORKSPACE INSTALLATION STATUS CHECK
-#if ("$!{services.wikimanager.getWikiTemplateDocument('workspacetemplate')}" == '')
+#set ($isInstallComplete = "$!{WikiManager.getWikiTemplateDocument('workspacetemplate')}" != '')
+#if (!$isInstallComplete)
   {{warning}}$msg.get('workspacemanager.template.install.notYetComplete', ['WorkspaceManager.Install']){{/warning}}
+
 #end
 ############################################################################################
 ## MACROS
@@ -364,6 +371,7 @@ function prettyNameChanged()
     #set($temp = $response.sendRedirect("$wikidocument.getHomePageUrl()"))
   #else
     {{error}}$msg.get('workspacemanager.errorcreatewiki', [$wikiname, $WorkspaceManager.lastException]){{/error}}
+
   #end
 #end
 {{html clean='false'}}
@@ -379,7 +387,7 @@ function prettyNameChanged()
     &lt;/dt&gt;
 
     &lt;dd&gt;
-      &lt;input size='60' id='wikiname' name='wikiname' type='text' onchange='wikiNameChanged();' onkeyup='wikiNameChanged();' /&gt;
+      &lt;input size='60' id='wikiname' name='wikiname' type='text' onchange='wikiNameChanged();' onkeyup='wikiNameChanged();' #if(!$isInstallComplete)disabled='disabled'#{end} /&gt;
     &lt;/dd&gt;
   &lt;/dl&gt;
   ##
@@ -391,7 +399,7 @@ function prettyNameChanged()
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.desc.wikiprettyname')&lt;/span&gt;
       &lt;span id='wikiprettynamevalidation' class='xErrorMsg'&gt;&lt;/span&gt;
     &lt;/dt&gt;
-    &lt;dd&gt;&lt;input size='60' id='XWiki.XWikiServerClass_0_wikiprettyname' name='XWiki.XWikiServerClass_0_wikiprettyname' type='text' onchange='prettyNameChanged();' onkeyup='prettyNameChanged();' /&gt;&lt;/dd&gt;
+    &lt;dd&gt;&lt;input size='60' id='XWiki.XWikiServerClass_0_wikiprettyname' name='XWiki.XWikiServerClass_0_wikiprettyname' type='text' onchange='prettyNameChanged();' onkeyup='prettyNameChanged();' #if(!$isInstallComplete)disabled='disabled'#{end} /&gt;&lt;/dd&gt;
   &lt;/dl&gt;
 
   &lt;dl&gt;
@@ -399,7 +407,7 @@ function prettyNameChanged()
       &lt;label for='XWiki.XWikiServerClass_0_description'&gt;$msg.get('workspacemanager.prop.wiki.description')&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.desc.description')&lt;/span&gt;
     &lt;/dt&gt;
-    &lt;dd&gt;&lt;textarea id='XWiki.XWikiServerClass_0_description' name='XWiki.XWikiServerClass_0_description' rows='3'&gt;&lt;/textarea&gt;&lt;/dd&gt;
+    &lt;dd&gt;&lt;textarea id='XWiki.XWikiServerClass_0_description' name='XWiki.XWikiServerClass_0_description' rows='3' #if(!$isInstallComplete)disabled='disabled'#{end} &gt;&lt;/textarea&gt;&lt;/dd&gt;
   &lt;/dl&gt;
 
   #set ($rightsmanager = $xwiki.rightsmanager)
@@ -413,7 +421,7 @@ function prettyNameChanged()
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.desc.owner')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
-      &lt;select name='XWiki.XWikiServerClass_0_owner' id='XWiki.XWikiServerClass_0_owner' size='4'&gt;
+      &lt;select name='XWiki.XWikiServerClass_0_owner' id='XWiki.XWikiServerClass_0_owner' size='4' #if(!$isInstallComplete)disabled='disabled'#{end} &gt;
         #foreach ($user in $users))
           ## Skip the guest user.
           #if ($user != 'XWiki.XWikiGuest')
@@ -437,7 +445,7 @@ function prettyNameChanged()
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.members')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
-      &lt;select name='members' id='members' multiple='multiple'&gt;
+      &lt;select name='members' id='members' multiple='multiple' #if(!$isInstallComplete)disabled='disabled'#{end} &gt;
         #foreach ($user in $users)
           ## Skip the current user if the user is not an admin. The current user is made owner by default and,
           ## thus, a member of the workspace. However, an admin can choose a different owner.
@@ -464,7 +472,7 @@ function prettyNameChanged()
 
     #foreach($membershipTypeValue in $membershipTypeValues)
     &lt;dd&gt;
-      &lt;input type='radio' name='WorkspaceManager.WorkspaceClass_0_membershipType' value="$membershipTypeValue" #if($foreach.index==0)checked='checked'#end&gt;$membershipTypeDetailsMap.get($membershipTypeValue).getValue()&lt;/input&gt;
+      &lt;input type='radio' name='WorkspaceManager.WorkspaceClass_0_membershipType' value="$membershipTypeValue" #if($foreach.index==0)checked='checked'#end  #if(!$isInstallComplete)disabled='disabled'#{end} &gt;$membershipTypeDetailsMap.get($membershipTypeValue).getValue()&lt;/input&gt;
     &lt;/dd&gt;
     #end
   &lt;/dl&gt;
@@ -475,7 +483,7 @@ function prettyNameChanged()
     &lt;div id='actioncreate'&gt;
       &lt;br/&gt;
       &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
-      &lt;input class='button' type='submit' id='actioncreatebutton' name='actioncreate' value="${msg.get('create')}" onclick='return validate();' /&gt;
+      &lt;input class='button' type='submit' id='actioncreatebutton' name='actioncreate' value="${msg.get('create')}" #if($isInstallComplete)onclick='return validate();'#{else}disabled='disabled'#{end} /&gt;
     &lt;/div&gt;
   &lt;/div&gt;
 &lt;/form&gt;

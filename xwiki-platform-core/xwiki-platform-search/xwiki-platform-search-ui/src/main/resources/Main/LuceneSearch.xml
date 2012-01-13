@@ -181,7 +181,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
     ## Lucene search
     ## ---------------
     #set($searchresults = $lucene.getSearchResults("${query}${extraClause}", '', $wikinames, $!languages))
-    #if($searchresults.getHitcount() &gt; 0)
+    #if($searchresults &amp;&amp; $searchresults.getHitcount() &gt; 0)
       ## -----------------
       ## Pagination (top)
       ## -----------------

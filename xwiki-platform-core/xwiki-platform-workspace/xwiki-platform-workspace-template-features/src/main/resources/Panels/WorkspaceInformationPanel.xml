@@ -20,7 +20,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
+<syntaxId>xwiki/2.1</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -171,13 +171,13 @@
       ## Display
       $joinText
       #if ($membershipType != 'invite' || "$!{existingInvitationOrRequest.getProperty('type').value}" == 'invitation')
-        {{html clean='false'}}&lt;span class='buttonwrapper'&gt;&lt;a href="$actionUrl" class='button'&gt;$actionLabel&lt;a/&gt;&lt;/span&gt;{{/html}}
+        (% class='buttonwrapper' %)[[$actionLabel&gt;&gt;path:$actionUrl||class='button']](%%)
       #end
     #elseif (!$hasOwner)
       You are a member of this workspace
       #set ($leavePageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'LeaveWorkspaceCode'))
       #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiPrettyName}"))
-      {{html clean='false'}}&lt;span class='buttonwrapper'&gt;&lt;a href="$leaveUrl" class='button'&gt;Leave Workspace&lt;a/&gt;&lt;/span&gt;{{/html}}
+      (% class='buttonwrapper' %)[[Leave Workspace&gt;&gt;path:$leaveUrl||class='button']](%%)
     #else
       You are the owner of this workspace
     #end
@@ -219,4 +219,4 @@
 <type>view</type>
 </property>
 </object>
-<content>{{include document="Panels.PanelSheet"}}</content></xwikidoc>
+<content>{{include document="Panels.PanelSheet" /}}</content></xwikidoc>

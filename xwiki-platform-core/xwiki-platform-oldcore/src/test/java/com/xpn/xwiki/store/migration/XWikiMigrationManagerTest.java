@@ -97,6 +97,11 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
         XWikiDBVersion curversion;
 
         @Override
+        protected void initializeEmptyDB() throws DataMigrationException
+        {
+        }
+
+        @Override
         protected void setDBVersionToDatabase(XWikiDBVersion version)
         {
             this.curversion = version;

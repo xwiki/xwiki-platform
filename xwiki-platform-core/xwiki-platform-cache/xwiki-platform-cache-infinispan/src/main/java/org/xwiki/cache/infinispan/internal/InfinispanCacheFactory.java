@@ -21,13 +21,18 @@ package org.xwiki.cache.infinispan.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.io.IOUtils;
 import org.infinispan.config.Configuration;
+import org.infinispan.config.InfinispanConfiguration;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.slf4j.Logger;
@@ -76,14 +81,15 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
     private Container container;
 
     /**
-     * The original default configuration (generally coming from the configuration file).
-     */
-    private Configuration defaultConfiguration;
-
-    /**
      * Used to create Infinispan caches.
      */
     private EmbeddedCacheManager cacheManager;
+
+    /**
+     * Configurations assigned to specific cache identifiers.
+     */
+    private final ConcurrentMap<String, Configuration> namedConfigurations =
+        new ConcurrentHashMap<String, Configuration>();
 
     @Override
     public void initialize() throws InitializationException
@@ -98,29 +104,43 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
             this.logger.debug("Can't find any Container", e);
         }
 
-        // Infinispan initialization
-
         InputStream configurationStream = getConfigurationFileAsStream();
 
         if (configurationStream != null) {
+            // Configuration file loading
+
+            try {
+                InfinispanConfiguration configuration =
+                    InfinispanConfiguration.newInfinispanConfiguration(configurationStream,
+                        InfinispanConfiguration.findSchemaInputStream());
+
+                Configuration defaultConfiguration = configuration.parseDefaultConfiguration();
+
+                for (Map.Entry<String, Configuration> entry : configuration.parseNamedConfigurations().entrySet()) {
+                    Configuration c = defaultConfiguration.clone();
+                    c.applyOverrides(entry.getValue());
+                    this.namedConfigurations.put(entry.getKey(), c);
+                }
+            } catch (IOException e) {
+                this.logger.error("Failed to load Infinispan configuration file", e);
+            } finally {
+                IOUtils.closeQuietly(configurationStream);
+            }
+
+            // CacheManager initialization
+
+            configurationStream = getConfigurationFileAsStream();
+
             try {
                 this.cacheManager = new DefaultCacheManager(configurationStream);
             } catch (IOException e) {
                 throw new InitializationException("Failed to create Infinispan cache manager", e);
             } finally {
-                try {
-                    configurationStream.close();
-                } catch (IOException e) {
-                    logger.error("Failed to close configuration file stream", e);
-                }
+                IOUtils.closeQuietly(configurationStream);
             }
         } else {
             this.cacheManager = new DefaultCacheManager();
         }
-
-        // Save the real default configuration to be able to restore it
-
-        this.defaultConfiguration = this.cacheManager.getDefaultConfiguration().clone();
     }
 
     /**
@@ -143,28 +163,34 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
     @Override
     public <T> org.xwiki.cache.Cache<T> newCache(CacheConfiguration configuration) throws CacheException
     {
+        Configuration customizedConfiguration = null;
+
         String cacheName = configuration.getConfigurationId();
         if (cacheName == null) {
             // Infinispan require a name for the cache
             cacheName = UUID.randomUUID().toString();
+            configuration.setConfigurationId(cacheName);
+        } else {
+            customizedConfiguration = this.namedConfigurations.get(cacheName);
         }
-        configuration.setConfigurationId(cacheName);
 
-        // set custom configuration
+        // Apply XWiki cache configuration
 
         InfinispanConfigurationLoader loader = new InfinispanConfigurationLoader(configuration);
 
-        boolean configChanged = loader.customize(this.cacheManager.getDefaultConfiguration());
+        if (customizedConfiguration == null) {
+            customizedConfiguration = this.cacheManager.getDefaultConfiguration().clone();
+            loader.customize(customizedConfiguration, true);
+        } else {
+            loader.customize(customizedConfiguration, false);
+        }
+
+        // Set custom configuration
+
+        this.cacheManager.defineConfiguration(cacheName, customizedConfiguration);
 
         // create cache
 
-        try {
-            return new InfinispanCache<T>(this.cacheManager, loader.getCacheConfiguration());
-        } finally {
-            // restore default configuration
-            if (configChanged) {
-                this.cacheManager.getDefaultConfiguration().applyOverrides(this.defaultConfiguration);
-            }
-        }
+        return new InfinispanCache<T>(this.cacheManager, loader.getCacheConfiguration());
     }
 }

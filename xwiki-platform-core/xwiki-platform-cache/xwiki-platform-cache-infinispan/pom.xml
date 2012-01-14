@@ -42,11 +42,9 @@
       <artifactId>xwiki-platform-container-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- We only need this dependency for the Logging API/Implementation part -->
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-default</artifactId>
-      <version>${commons.version}</version>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
     </dependency>
 
     <dependency>

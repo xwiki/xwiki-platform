@@ -93,6 +93,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     public ImagePlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
+
         init(context);
     }
 
@@ -122,6 +123,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     public void init(XWikiContext context)
     {
         super.init(context);
+
         initCache(context);
 
         String defaultQualityParam = context.getWiki().Param("xwiki.plugin.image.defaultQuality");
@@ -142,38 +144,41 @@ public class ImagePlugin extends XWikiDefaultPlugin
      */
     private void initCache(XWikiContext context)
     {
-        CacheConfiguration configuration = new CacheConfiguration();
+        if (this.imageCache == null) {
+            CacheConfiguration configuration = new CacheConfiguration();
 
-        configuration.setConfigurationId("xwiki.plugin.image");
+            configuration.setConfigurationId("xwiki.plugin.image");
 
-        // Set folder to store cache.
-        File tempDir = context.getWiki().getTempDirectory(context);
-        File imgTempDir = new File(tempDir, configuration.getConfigurationId());
-        try {
-            imgTempDir.mkdirs();
-        } catch (Exception ex) {
-            LOG.warn("Cannot create temporary files.", ex);
-        }
-        configuration.put("cache.path", imgTempDir.getAbsolutePath());
-        // Set cache constraints.
-        LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-        configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
-
-        String capacityParam = context.getWiki().Param("xwiki.plugin.image.cache.capacity");
-        if (!StringUtils.isBlank(capacityParam) && StringUtils.isNumeric(capacityParam.trim())) {
+            // Set folder to store cache.
+            File tempDir = context.getWiki().getTempDirectory(context);
+            File imgTempDir = new File(tempDir, configuration.getConfigurationId());
             try {
-                this.capacity = Integer.parseInt(capacityParam.trim());
-            } catch (NumberFormatException e) {
-                LOG.warn(String.format("Failed to parse xwiki.plugin.image.cache.capacity configuration parameter. "
-                    + "Using %s as the cache capacity.", this.capacity), e);
+                imgTempDir.mkdirs();
+            } catch (Exception ex) {
+                LOG.warn("Cannot create temporary files.", ex);
             }
-        }
-        lru.setMaxEntries(this.capacity);
+            configuration.put("cache.path", imgTempDir.getAbsolutePath());
+            // Set cache constraints.
+            LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
+            configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
-        try {
-            this.imageCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
-        } catch (CacheException e) {
-            LOG.error("Error initializing the image cache.", e);
+            String capacityParam = context.getWiki().Param("xwiki.plugin.image.cache.capacity");
+            if (!StringUtils.isBlank(capacityParam) && StringUtils.isNumeric(capacityParam.trim())) {
+                try {
+                    this.capacity = Integer.parseInt(capacityParam.trim());
+                } catch (NumberFormatException e) {
+                    LOG.warn(String.format(
+                        "Failed to parse xwiki.plugin.image.cache.capacity configuration parameter. "
+                            + "Using %s as the cache capacity.", this.capacity), e);
+                }
+            }
+            lru.setMaxEntries(this.capacity);
+
+            try {
+                this.imageCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
+            } catch (CacheException e) {
+                LOG.error("Error initializing the image cache.", e);
+            }
         }
     }
 
@@ -260,9 +265,8 @@ public class ImagePlugin extends XWikiDefaultPlugin
     private XWikiAttachment downloadImage(XWikiAttachment image, int width, int height, float quality,
         XWikiContext context) throws Exception
     {
-        if (this.imageCache == null) {
-            initCache(context);
-        }
+        initCache(context);
+
         boolean keepAspectRatio = Boolean.valueOf(context.getRequest().getParameter("keepAspectRatio"));
         XWikiAttachment thumbnail =
             this.imageCache == null ? shrinkImage(image, width, height, keepAspectRatio, quality, context)

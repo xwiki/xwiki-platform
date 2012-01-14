@@ -142,11 +142,11 @@
    -->
 
    <default>
-      <!-- <eviction 
+      <eviction 
          maxEntries="10000"
          strategy="LRU"
-      /> -->
-   
+      />
+
       <!--
          Tunes the locking and concurrency characteristics of the cache.
 
@@ -224,25 +224,23 @@
    -->
 
    <!-- Image plugin cache -->
-   <!-- <namedCache name="xwiki.plugin.image">
+   <namedCache name="xwiki.plugin.image">
       <loaders passivation="true">
-         <loader class="org.infinispan.loaders.file.FileCacheStore">
-           Let XWiki cache module set the proper location
+         <loader class="org.infinispan.loaders.file.FileCacheStore" purgeOnStartup="true">
+           <!-- Let XWiki cache module set the proper location -->
          </loader>
       </loaders>
    </namedCache>
-    -->
 
    <!-- Equation plugin cache -->
-   <!-- 
    <namedCache name="xwiki.plugin.equation">
       <loaders passivation="true">
-         <loader class="org.infinispan.loaders.file.FileCacheStore">
-           Let XWiki cache module set the proper location
+         <loader class="org.infinispan.loaders.file.FileCacheStore" purgeOnStartup="true">
+           <!-- Let XWiki cache module set the proper location -->
          </loader>
       </loaders>
    </namedCache>
- -->
+
    <!--
       A cache configured with eviction.
 

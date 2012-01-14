@@ -3518,6 +3518,7 @@ document.observe('xwiki:dom:loaded', function() {
 ##
 ## Prepare the Admin menu map for processing
 ##
+#set ($filteredAdminMenu = [])
 #foreach ($category in $adminMenu)
   ## "Standard" URLs and icons for categories
   #set ($category.url = $xwiki.getURL($currentDoc, $adminAction, "category=${mathtool.sub($velocityCount, 1)}"))
@@ -3534,6 +3535,7 @@ document.observe('xwiki:dom:loaded', function() {
   #end
   ##
   ## Process each admin section
+  #set ($filteredCategoryChildren = [])
   #foreach ($section in $category.children)
     #if ($xwiki.exists($section.id) || $xwiki.exists("XWiki.Admin${section.id}Sheet"))
       #if ($crtSectionId == $section.id)
@@ -3572,6 +3574,7 @@ document.observe('xwiki:dom:loaded', function() {
       #if ($msg.get($key) != $key)
         #set ($section.description = $msg.get($key))
       #end
+      #set ($discard = $filteredCategoryChildren.add($section))
     #elseif ($section.configurable)
       #if ($section.readOnly)
         #set ($section.cssClass = 'readOnly')
@@ -3580,9 +3583,15 @@ document.observe('xwiki:dom:loaded', function() {
         #set ($crtSection = $section)
         #set ($crtCategory = $category)
       #end
+      #set ($discard = $filteredCategoryChildren.add($section))
     #end
   #end
+  #set ($category.children = $filteredCategoryChildren)
+  #if ($filteredCategoryChildren.size() &gt; 0)
+    #set ($discard = $filteredAdminMenu.add($category))
+  #end
 #end
+#set ($adminMenu = $filteredAdminMenu)
 
 #**
  * Displays the sections from an administration category

@@ -144,7 +144,7 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
         }
     }
 
-    public RepositorySystemSession createRepositorySystemSession()
+    protected RepositorySystemSession createRepositorySystemSession()
     {
         return this.repositoryFactory.createRepositorySystemSession();
     }
@@ -284,7 +284,7 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
         return rangeResult.getVersions();
     }
 
-    public AetherExtension resolveMaven(ExtensionDependency extensionDependency) throws ResolveException
+    protected AetherExtension resolveMaven(ExtensionDependency extensionDependency) throws ResolveException
     {
         RepositorySystemSession session = createRepositorySystemSession();
 
@@ -412,7 +412,7 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
             artifactDescriptorResult);
     }
 
-    public RemoteRepository getRemoteRepository()
+    protected RemoteRepository getRemoteRepository()
     {
         return this.remoteRepository;
     }

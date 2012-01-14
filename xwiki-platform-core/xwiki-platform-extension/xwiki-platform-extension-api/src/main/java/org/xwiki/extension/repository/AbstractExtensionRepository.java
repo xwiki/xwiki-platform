@@ -54,7 +54,7 @@ public abstract class AbstractExtensionRepository implements ExtensionRepository
     /**
      * @param id the repository identifier
      */
-    public void setId(ExtensionRepositoryId id)
+    protected void setId(ExtensionRepositoryId id)
     {
         this.id = id;
     }

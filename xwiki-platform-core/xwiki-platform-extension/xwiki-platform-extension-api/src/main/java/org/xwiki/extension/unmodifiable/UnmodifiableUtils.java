@@ -126,29 +126,52 @@ public final class UnmodifiableUtils
      * @param <T> the expected output type, should be a generic repository type, like {@link ExtensionRepository},
      *            {@link LocalExtensionRepository} or {@code CoreExtensionRepository}
      * @param <U> the input type, a subtype of T
-     * @param extensionRepository the read-write repository handler to wrap
+     * @param repository the read-write repository handler to wrap
      * @return a read-only wrapper, or {@code null} if the provided instance is {@code null}
      */
-    public static <T extends ExtensionRepository, U extends T> T unmodifiableExtensionRepository(U extensionRepository)
+    public static <T extends ExtensionRepository, U extends T> T unmodifiableExtensionRepository(U repository)
     {
         T wrappedExtensionRepository;
 
-        if (extensionRepository == null) {
+        if (repository == null) {
             wrappedExtensionRepository = null;
-        } else if (extensionRepository instanceof CoreExtensionRepository) {
+        } else if (repository instanceof CoreExtensionRepository) {
             wrappedExtensionRepository =
                 (T) new UnmodifiableCoreExtensionRepository<CoreExtensionRepository>(
-                    (CoreExtensionRepository) extensionRepository);
-        } else if (extensionRepository instanceof LocalExtensionRepository) {
+                    (CoreExtensionRepository) repository);
+        } else if (repository instanceof LocalExtensionRepository) {
             wrappedExtensionRepository =
                 (T) new UnmodifiableLocalExtensionRepository<LocalExtensionRepository>(
-                    (LocalExtensionRepository) extensionRepository);
+                    (LocalExtensionRepository) repository);
         } else {
-            wrappedExtensionRepository =
-                (T) new UnmodifiableExtensionRepository<ExtensionRepository>(extensionRepository);
+            wrappedExtensionRepository = (T) new UnmodifiableExtensionRepository<ExtensionRepository>(repository);
         }
 
         return wrappedExtensionRepository;
+    }
+
+    /**
+     * Wrap a collection of internal (read-write) repository handlers into safe read-only bridges.
+     * 
+     * @param <T> the expected output type, should be a generic repository type, like {@link ExtensionRepository},
+     *            {@link LocalExtensionRepository} or {@code CoreExtensionRepository}
+     * @param <U> the input type, a read-write subtype of T
+     * @param repositories the read-write repository handlers to wrap
+     * @return an equivalent collection of read-only wrappers
+     */
+    public static <T extends ExtensionRepository, U extends T> Collection<T> unmodifiableExtensionRepositories(
+        Collection<U> repositories)
+    {
+        List<T> wrappedRepositories = new ArrayList<T>(repositories.size());
+
+        for (U repository : repositories) {
+            T wrapper = unmodifiableExtensionRepository(repository);
+            if (wrapper != null) {
+                wrappedRepositories.add(wrapper);
+            }
+        }
+
+        return wrappedRepositories;
     }
 
     /**

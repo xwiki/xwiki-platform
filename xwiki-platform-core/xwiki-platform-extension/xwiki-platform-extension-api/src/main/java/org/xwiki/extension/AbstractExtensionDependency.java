@@ -23,6 +23,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.extension.version.VersionConstraint;
 
 /**
@@ -154,5 +157,37 @@ public abstract class AbstractExtensionDependency implements ExtensionDependency
     public String toString()
     {
         return getId() + '-' + getVersionConstraint();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.append(getId());
+        builder.append(getVersionConstraint());
+
+        return builder.toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) {
+            return true;
+        }
+
+        boolean equals;
+
+        if (obj instanceof ExtensionDependency) {
+            ExtensionDependency otherDependency = (ExtensionDependency) obj;
+            equals =
+                StringUtils.equals(getId(), otherDependency.getId())
+                    && ObjectUtils.equals(getVersionConstraint(), otherDependency.getVersionConstraint());
+        } else {
+            equals = false;
+        }
+
+        return equals;
     }
 }

@@ -28,6 +28,7 @@ import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.version.Version;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 @Component
@@ -83,7 +84,7 @@ public class RepositoryScriptService implements ScriptService
         }
     }
 
-    public void importExtension(String extensionId, String repositoryId)
+    public DocumentReference importExtension(String extensionId, String repositoryId)
     {
         setError(null);
 
@@ -94,9 +95,11 @@ public class RepositoryScriptService implements ScriptService
                 throw new ExtensionException("Can't find any registered repository with id [" + repositoryId + "]");
             }
 
-            this.repositoryManager.importExtension(extensionId, repository, Version.Type.STABLE);
+            return this.repositoryManager.importExtension(extensionId, repository, Version.Type.STABLE);
         } catch (Exception e) {
             setError(e);
         }
+
+        return null;
     }
 }

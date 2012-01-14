@@ -41,6 +41,10 @@ public interface XWikiRepositoryModel
     public final static EntityReference EXTENSIONDEPENDENCY_CLASSREFERENCE = new EntityReference(
         "ExtensionDependencyClass", EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
 
+    public final static EntityReference EXTENSION_TEMPLATEREFERENCE = new EntityReference("ExtensionTemplate",
+        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+
+    
     // Properties
 
     public final static String PROP_EXTENSION_ID = "id";

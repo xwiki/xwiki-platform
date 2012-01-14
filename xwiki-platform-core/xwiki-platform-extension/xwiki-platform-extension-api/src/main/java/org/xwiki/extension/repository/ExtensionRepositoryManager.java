@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.repository;
 
+import java.util.Collection;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
@@ -63,6 +65,11 @@ public interface ExtensionRepositoryManager
      * @see ExtensionRepository#getId()
      */
     ExtensionRepository getRepository(String repositoryId);
+
+    /**
+     * @return the repositories
+     */
+    Collection<ExtensionRepository> getRepositories();
 
     /**
      * Get extension descriptor found in one of the repositories.

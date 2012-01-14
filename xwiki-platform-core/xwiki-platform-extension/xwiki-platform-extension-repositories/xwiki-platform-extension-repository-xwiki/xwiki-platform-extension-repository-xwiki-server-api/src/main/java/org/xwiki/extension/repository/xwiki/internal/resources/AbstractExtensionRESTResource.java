@@ -45,6 +45,7 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersionSummary;
 import org.xwiki.extension.repository.xwiki.model.jaxb.License;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ObjectFactory;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.XWikiResource;
@@ -65,8 +66,9 @@ import com.xpn.xwiki.objects.classes.ListClass;
  */
 public abstract class AbstractExtensionRESTResource extends XWikiResource implements Initializable
 {
-    public final static String[] EPROPERTIES_SUMMARY = new String[] {XWikiRepositoryModel.PROP_EXTENSION_ID,
-    XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME};
+    public final static String[] EPROPERTIES_SUMMARY = new String[] {null, null,
+    XWikiRepositoryModel.PROP_EXTENSION_ID, XWikiRepositoryModel.PROP_EXTENSION_TYPE,
+    XWikiRepositoryModel.PROP_EXTENSION_NAME};
 
     public final static String[] EPROPERTIES_EXTRA = new String[] {XWikiRepositoryModel.PROP_EXTENSION_SUMMARY,
     XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE,
@@ -83,16 +85,21 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         {
             StringBuilder pattern = new StringBuilder();
 
+            pattern.append("doc.page");
+            pattern.append(", ");
+            pattern.append("doc.space");
+
             int j = 0;
 
             // Extension summary
             for (int i = 0; i < EPROPERTIES_SUMMARY.length; ++i, ++j) {
-                if (i != 0) {
+                String value = EPROPERTIES_SUMMARY[i];
+                if (value != null) {
                     pattern.append(", ");
+                    pattern.append("extension.");
+                    pattern.append(value);
+                    EPROPERTIES_INDEX.put(value, j);
                 }
-                pattern.append("extension.");
-                pattern.append(EPROPERTIES_SUMMARY[i]);
-                EPROPERTIES_INDEX.put(EPROPERTIES_SUMMARY[i], j);
             }
 
             SELECT_EXTENSIONSUMMARY = pattern.toString();
@@ -388,9 +395,13 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setSummary(this.<String> getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));
         extension.setDescription(this.<String> getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION));
 
-        // TODO: if no website is provided return the page external URL but should absolutely be done without loading
-        // the XWikiDocument
+        // Website
         extension.setWebsite(this.<String> getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE));
+        if (StringUtils.isBlank(extension.getWebsite())) {
+            XWikiContext xcontext = getXWikiContext();
+            extension.setWebsite(xcontext.getWiki().getURL(
+                new DocumentReference(xcontext.getDatabase(), (String) entry[1], (String) entry[0]), "view", xcontext));
+        }
 
         // Authors
         for (String authorId : ListClass.getListFromString(

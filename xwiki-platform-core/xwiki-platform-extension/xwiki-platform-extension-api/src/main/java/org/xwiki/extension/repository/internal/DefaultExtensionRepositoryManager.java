@@ -20,6 +20,7 @@
 package org.xwiki.extension.repository.internal;
 
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -108,6 +109,12 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
     public ExtensionRepository getRepository(String repositoryId)
     {
         return this.repositories.get(repositoryId);
+    }
+
+    @Override
+    public Collection<ExtensionRepository> getRepositories()
+    {
+        return Collections.unmodifiableCollection(this.repositories.values());
     }
 
     @Override

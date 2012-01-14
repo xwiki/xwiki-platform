@@ -86,12 +86,12 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         this.searchUriBuider = createUriBuilder(Resources.SEARCH);
     }
 
-    public UriBuilder getExtensionFileUriBuider()
+    protected UriBuilder getExtensionFileUriBuider()
     {
         return this.extensionVersionFileUriBuider;
     }
 
-    public GetMethod getRESTResource(UriBuilder builder, Object... values) throws IOException, IOException
+    protected GetMethod getRESTResource(UriBuilder builder, Object... values) throws IOException, IOException
     {
         String url;
         try {
@@ -117,7 +117,7 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         return getMethod;
     }
 
-    public InputStream getRESTResourceAsStream(UriBuilder builder, Object... values) throws IOException, IOException
+    protected InputStream getRESTResourceAsStream(UriBuilder builder, Object... values) throws IOException, IOException
     {
         return getRESTResource(builder, values).getResponseBodyAsStream();
     }
@@ -182,7 +182,7 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
     private ExtensionVersions resolveExtensionVersions(String id, VersionConstraint constraint, int offset, int nb,
         boolean requireTotalHits) throws ResolveException
     {
-        UriBuilder builder = this.searchUriBuider.clone();
+        UriBuilder builder = this.extensionVersionsUriBuider.clone();
 
         builder.queryParam(Resources.QPARAM_LIST_REQUIRETOTALHITS, requireTotalHits);
         builder.queryParam(Resources.QPARAM_LIST_START, offset);
@@ -202,11 +202,6 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
     @Override
     public IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException
     {
-        UriBuilder builder = this.searchUriBuider.clone();
-
-        builder.queryParam(Resources.QPARAM_LIST_START, offset);
-        builder.queryParam(Resources.QPARAM_LIST_NUMBER, nb);
-
         ExtensionVersions restExtensions = resolveExtensionVersions(id, null, offset, nb, true);
 
         List<Version> versions = new ArrayList<Version>(restExtensions.getExtensionVersionSummaries().size());

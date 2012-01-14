@@ -45,6 +45,7 @@ import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.event.status.JobStatus;
 import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.repository.CoreExtensionRepository;
+import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.result.IterableResult;
@@ -103,6 +104,16 @@ public class ExtensionManagerScriptService implements ScriptService
     /** Provides access to the current context. */
     @Inject
     private Execution execution;
+
+    // Repositories
+
+    /**
+     * @return all the repositories except core and local repositories
+     */
+    public Collection<ExtensionRepository> getRepositories()
+    {
+        return UnmodifiableUtils.unmodifiableExtensionRepositories(this.repositoryManager.getRepositories());
+    }
 
     // Extensions
 
@@ -493,6 +504,8 @@ public class ExtensionManagerScriptService implements ScriptService
         return jobStatus;
     }
 
+    // Error management
+
     /**
      * Get the error generated while performing the previously called action.
      * 
@@ -513,6 +526,8 @@ public class ExtensionManagerScriptService implements ScriptService
     {
         this.execution.getContext().setProperty(EXTENSIONERROR_KEY, e);
     }
+
+    // Version management
 
     /**
      * @param version the string to parse

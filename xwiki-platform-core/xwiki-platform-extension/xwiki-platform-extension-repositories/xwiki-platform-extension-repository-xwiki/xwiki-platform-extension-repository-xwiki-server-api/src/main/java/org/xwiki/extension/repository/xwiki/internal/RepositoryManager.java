@@ -23,6 +23,7 @@ import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.version.Version;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryException;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 
@@ -43,6 +44,6 @@ public interface RepositoryManager
 
     ResourceReference getDownloadReference(XWikiDocument document, BaseObject extensionVersionObject);
 
-    void importExtension(String extensionId, ExtensionRepository repository, Version.Type type)
+    DocumentReference importExtension(String extensionId, ExtensionRepository repository, Version.Type type)
         throws QueryException, XWikiException, ResolveException;
 }

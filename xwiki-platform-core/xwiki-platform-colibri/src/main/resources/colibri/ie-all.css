@@ -94,7 +94,7 @@ input.button:hover, .buttonwrapper a:hover{
 .actionmenu .tmCreate:hover .tme-extensible, .tmCreate  .tme-extensible {
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4dececec', endColorstr='#00ececec',GradientType=0 );
 }
-.globalsearch input.button {
+.globalsearch input.button, .buttonwrapper a.attachment-picker-start {
   filter: none;
 }
 /* Gradients containers for IE browsers */

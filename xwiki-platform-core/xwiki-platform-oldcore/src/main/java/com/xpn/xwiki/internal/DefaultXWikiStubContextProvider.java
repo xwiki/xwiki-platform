@@ -60,8 +60,6 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
     @Override
     public void initialize(XWikiContext context)
     {
-        // TODO: we need to find a way to create a usable XWikiContext from scratch even if it will not contains
-        // information related to the URL
         this.initialContext = (XWikiContext) context.clone();
 
         this.initialContext.setCacheDuration(0);
@@ -77,11 +75,19 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
         // We are sure the context request is a real servlet request
         // So we force the dummy request with the current host
         if (this.initialContext.getRequest() != null) {
-            XWikiServletRequestStub initialReques = new XWikiServletRequestStub();
-            initialReques.setHost(this.initialContext.getRequest().getHeader("x-forwarded-host"));
-            initialReques.setScheme(this.initialContext.getRequest().getScheme());
-            XWikiServletRequest request = new XWikiServletRequest(initialReques);
+            XWikiServletRequestStub initialRequest = new XWikiServletRequestStub();
+            initialRequest.setHost(this.initialContext.getRequest().getHeader("x-forwarded-host"));
+            initialRequest.setScheme(this.initialContext.getRequest().getScheme());
+            XWikiServletRequest request = new XWikiServletRequest(initialRequest);
             this.initialContext.setRequest(request);
+        }
+
+        // Get rid of the real response
+        if (this.initialContext.getResponse() != null) {
+            XWikiServletResponseStub initialResponse = new XWikiServletResponseStub();
+            // anything to keep ?
+            XWikiServletResponse response = new XWikiServletResponse(initialResponse);
+            this.initialContext.setResponse(response);
         }
 
         this.logger.debug("Stub context initialized.");
@@ -90,33 +96,33 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
     @Override
     public XWikiContext createStubContext()
     {
-        XWikiContext initialContext;
+        XWikiContext stubContext;
 
         if (this.initialContext != null) {
-            initialContext = (XWikiContext) this.initialContext.clone();
+            stubContext = (XWikiContext) this.initialContext.clone();
 
             // We make sure to not share the same Request instance with several threads
             if (this.initialContext.getRequest() != null) {
-                XWikiServletRequestStub dummyRequest = new XWikiServletRequestStub();
-                dummyRequest.setHost(this.initialContext.getRequest().getHeader("x-forwarded-host"));
-                dummyRequest.setScheme(this.initialContext.getRequest().getScheme());
-                XWikiServletRequest request = new XWikiServletRequest(dummyRequest);
-                initialContext.setRequest(request);
+                XWikiServletRequestStub stubRequest = new XWikiServletRequestStub();
+                stubRequest.setHost(this.initialContext.getRequest().getHeader("x-forwarded-host"));
+                stubRequest.setScheme(this.initialContext.getRequest().getScheme());
+                XWikiServletRequest request = new XWikiServletRequest(stubRequest);
+                stubContext.setRequest(request);
             }
 
             // We make sure to not share the same Response instance with several threads
-            if (this.initialContext.getRequest() != null) {
-                XWikiServletResponseStub dumyResponse = new XWikiServletResponseStub();
-                XWikiServletResponse response = new XWikiServletResponse(dumyResponse);
-                initialContext.setResponse(response);
+            if (this.initialContext.getResponse() != null) {
+                XWikiServletResponseStub stubResponse = new XWikiServletResponseStub();
+                XWikiServletResponse response = new XWikiServletResponse(stubResponse);
+                stubContext.setResponse(response);
             }
 
             // We make sure to not share the same document instance with several threads
-            initialContext.setDoc(new XWikiDocument());
+            stubContext.setDoc(new XWikiDocument());
         } else {
-            initialContext = null;
+            stubContext = null;
         }
 
-        return initialContext;
+        return stubContext;
     }
 }

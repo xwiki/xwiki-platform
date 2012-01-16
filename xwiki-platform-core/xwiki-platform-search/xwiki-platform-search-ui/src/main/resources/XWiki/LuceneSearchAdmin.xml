@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1272286749000</creationDate>
-<date>1326729613000</date>
-<contentUpdateDate>1326729613000</contentUpdateDate>
+<date>1326733733000</date>
+<contentUpdateDate>1326733733000</contentUpdateDate>
 <version>1.1</version>
 <title>Lucene search administration</title>
 <template></template>
@@ -112,14 +112,14 @@
 &lt;/p&gt;
 
 &lt;p&gt;
-  #if ($xcontext.isMainWiki())
+  #if ($xwiki.isVirtualMode() &amp;&amp; $xcontext.isMainWiki())
     &lt;label for="indexcustom_wikis"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.wikis')&lt;/label&gt; &lt;input id="indexcustom_wikis" name="wikis" type="text" title="$escapetool.xml($msg.get('search.admin.lucene.indexing.action.indexcustom.wikis.title'))" value="$!wikisString" /&gt;
   #else
     &lt;input id="indexcustom_wikis" name="wikis" value="${xcontext.database}" type="hidden" value="$!wikisString" /&gt;
   #end
 &lt;/p&gt;
 
-  #if ($hasProgramming &amp;&amp; $xcontext.isMainWiki())
+  #if ($hasProgramming)
 &lt;p&gt;
     &lt;label for="indexcustom_hqlFilter"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.hqlfilter')&lt;/label&gt; &lt;input id="indexcustom_hqlFilter" name="hqlFilter" type="text" title="$escapetool.xml($msg.get('search.admin.lucene.indexing.action.indexcustom.hqlfilter.title'))" #if($request.hqlFilter)value="${escapetool.xml($request.hqlFilter)}"#end /&gt;
 &lt;/p&gt;

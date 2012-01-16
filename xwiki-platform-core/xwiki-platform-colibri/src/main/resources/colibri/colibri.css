@@ -1048,6 +1048,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 
 .actionmenu .hasIcon {
   background: no-repeat 0px 3px;
+  padding: 0;
 }
 
 .tme-extensible {
@@ -2128,6 +2129,15 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
 
 .icon {
   vertical-align: middle;
+}
+
+.hasIcon {
+  background: none no-repeat scroll 0 0 transparent;
+  padding-left: 20px;
+}
+
+.iconRSS {
+  background-image: url("$xwiki.getSkinFile('icons/silk/feed.png')");
 }
 
 /* @group MACROS */

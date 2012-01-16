@@ -66,9 +66,8 @@ import com.xpn.xwiki.objects.classes.ListClass;
  */
 public abstract class AbstractExtensionRESTResource extends XWikiResource implements Initializable
 {
-    public final static String[] EPROPERTIES_SUMMARY = new String[] {null, null,
-    XWikiRepositoryModel.PROP_EXTENSION_ID, XWikiRepositoryModel.PROP_EXTENSION_TYPE,
-    XWikiRepositoryModel.PROP_EXTENSION_NAME};
+    public final static String[] EPROPERTIES_SUMMARY = new String[] {XWikiRepositoryModel.PROP_EXTENSION_ID,
+    XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME};
 
     public final static String[] EPROPERTIES_EXTRA = new String[] {XWikiRepositoryModel.PROP_EXTENSION_SUMMARY,
     XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE,
@@ -85,21 +84,20 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         {
             StringBuilder pattern = new StringBuilder();
 
+            int j = 0;
+
             pattern.append("doc.name");
+            EPROPERTIES_INDEX.put("doc.name", j++);
             pattern.append(", ");
             pattern.append("doc.space");
-
-            int j = 0;
+            EPROPERTIES_INDEX.put("doc.space", j++);
 
             // Extension summary
             for (int i = 0; i < EPROPERTIES_SUMMARY.length; ++i, ++j) {
                 String value = EPROPERTIES_SUMMARY[i];
-                if (value != null) {
-                    pattern.append(", ");
-                    pattern.append("extension.");
-                    pattern.append(value);
-                    EPROPERTIES_INDEX.put(value, j);
-                }
+                pattern.append(", extension.");
+                pattern.append(value);
+                EPROPERTIES_INDEX.put(value, j);
             }
 
             SELECT_EXTENSIONSUMMARY = pattern.toString();

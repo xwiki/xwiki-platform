@@ -5,14 +5,14 @@
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent>SearchAdmin</parent>
+<parent>XWiki.SearchAdmin</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1272286749000</creationDate>
-<date>1290789175000</date>
-<contentUpdateDate>1290789175000</contentUpdateDate>
+<date>1326729613000</date>
+<contentUpdateDate>1326729613000</contentUpdateDate>
 <version>1.1</version>
 <title>Lucene search administration</title>
 <template></template>
@@ -96,7 +96,7 @@
 &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 
   ## Does not really make sense to reindex the whole farm from a subwiki
-  #if ($xcontext.isMainWiki())
+  #if ($xwiki.isVirtualMode() &amp;&amp; $xcontext.isMainWiki())
 &lt;p&gt;
     &lt;label for="indexfarm"&gt;&lt;input id="indexfarm" name="action" type="radio" value="indexfarm" #if (!$request.action || $request.action == 'indexfarm')checked="checked" #end/&gt; $msg.get('search.admin.lucene.indexing.action.indexfarm')&lt;/label&gt;
 &lt;/p&gt;

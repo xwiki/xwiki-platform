@@ -24,6 +24,7 @@ import junit.framework.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * JUnit TestSetup extension that starts/stops XWiki using a script passed using System Properties. These properties are
@@ -44,22 +45,31 @@ import java.util.List;
  * </p>
  * 
  * @version $Id$
+ * @deprecated use {@link XWikiExecutorSuite} instead
  */
 public class XWikiTestSetup extends TestSetup
 {
     private List<XWikiExecutor> executors = new ArrayList<XWikiExecutor>();
 
-    public XWikiTestSetup(Test test)
+    public XWikiTestSetup(Test test) throws Exception
     {
         this(test, 1);
     }
 
-    public XWikiTestSetup(Test test, int nb)
+    public XWikiTestSetup(Test test, int nb) throws Exception
     {
         super(test);
 
         for (int i = 0; i < nb; ++i) {
-            this.executors.add(new XWikiExecutor(i));
+            XWikiExecutor executor = new XWikiExecutor(i);
+
+            // Don't set any extension repository since we don't need it and we don't want to require internet
+            // connection for the tests.
+            Properties properties = executor.loadXWikiProperties();
+            properties.setProperty("extension.repositories", "");
+            executor.saveXWikiProperties(properties);
+
+            this.executors.add(executor);
         }
     }
 

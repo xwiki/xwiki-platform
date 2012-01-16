@@ -192,19 +192,22 @@
   #if ($totalNrOfUsers &lt; $MAX_USERS)
     #set ($nrOfUsersToGet = $totalNrOfUsers)
   #end
+  {{html clean='false'}}
   #foreach ($i in [1..$nrOfUsersToGet])
     #set ($randomMemberIndex = $mathtool.random(0, $workspaceGroupMemberObjects.size()))
     #set ($randomMemberObject = $workspaceGroupMemberObjects.get($randomMemberIndex))
     #set ($randomMember = "$!{randomMemberObject.getProperty('member').value}")
     #if ("$!randomMember" != '')
       #if ("$!randomMember" != 'XWiki.XWikiGuest')
-        {{html clean='false'}}&lt;a href="$xwiki.getURL($randomMember)"&gt;#smallUserAvatar($randomMember)&lt;/a&gt;{{/html}} #else
-        #smallUserAvatar($randomMember) #end
-      ## end-if. The above else/end statements at the end of line are intentional, otherwise a &lt;br/&gt; will be generated.
+        &lt;a href="$xwiki.getURL($randomMember)"&gt;#smallUserAvatar($randomMember)&lt;/a&gt;
+      #else
+        #smallUserAvatar($randomMember)
+      #end
     #end
     ## Avoid repeating the same user.
     #set ($discard = $workspaceGroupMemberObjects.remove($randomMemberIndex))
   #end
+  {{/html}}
 #end
 #panelfooter()
 {{/velocity}}</content>

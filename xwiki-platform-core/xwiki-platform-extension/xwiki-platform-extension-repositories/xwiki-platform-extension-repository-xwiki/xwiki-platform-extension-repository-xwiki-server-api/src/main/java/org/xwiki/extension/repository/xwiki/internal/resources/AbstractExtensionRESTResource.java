@@ -85,7 +85,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         {
             StringBuilder pattern = new StringBuilder();
 
-            pattern.append("doc.page");
+            pattern.append("doc.name");
             pattern.append(", ");
             pattern.append("doc.space");
 

@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1321509118000</creationDate>
-<date>1323762399000</date>
-<contentUpdateDate>1323762399000</contentUpdateDate>
+<date>1326741899000</date>
+<contentUpdateDate>1326741899000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -1327,30 +1327,6 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     )))
 #end
 
-#macro (prepareInstall $extensionid $extensionversion $extensionsToInstall $extensionsToUpgrade $extensionsSuggested $coreExtensionsConflicts)
-  #set ($extension = $extensionManager.resolve($extensionid, $extensionversion))
-  #set ($extensionclass = "${extension.class}")
-  #if (!$extensionclass.endsWith('CoreExtension'))
-    #if (!$extension.isInstalled($extensionwiki))
-      #set($installedExtension = $extensionManager.getInstalledExtension($extensionid, $extensionwiki))
-      #if ($installedExtension &amp;&amp; $installedExtension.id.version.compareTo($extensionversion) &gt; 0)
-        #set($extensionsToUpgrade[$extension.id] = $extension)
-      #else
-        #set($extensionsToInstall[$extension.id] = $extension)
-      #end
-      #prepareInstallDependencies($extension, $extensionsToInstall, $extensionsToUpgrade, $extensionsSuggested, $coreExtensionsConflicts)
-    #end
-  #elseif ($extensionversion.compareTo($extension.id.version) &gt; 0)
-    #set($coreExtensionsConflicts[$extension.id] = [$extension, $extensionversion])
-  #end
-#end
-
-#macro (prepareInstallDependencies $extension $extensionsToInstall $extensionsToUpgrade $extensionsSuggested $coreExtensionsConflicts)
-  #foreach ($dependency in $extension.dependencies)
-    #prepareInstall($dependency.id, $dependency.version, $extensionsToInstall, $extensionsToUpgrade, $extensionsSuggested, $coreExtensionsConflicts)
-  #end
-#end
-
 #macro (printThrowable $throwable)
   $throwable.class: #if(!$throwable.message)null#else$throwable.message#end
 
@@ -1363,31 +1339,18 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #end
 
 #macro (printJobLog $job)
-  #foreach ($log in $job.status.log)
+  #printStatusLog($job.status)
+#end
+
+#macro (printStatusLog $status)
+  #foreach ($log in $status.log)
     #set ($logLevel = $log.level.toString().toLowerCase())
-    #if ($logLevel == 'warn')
-      #set ($logLevel = 'warning')
-    #end
     {{$logLevel}}
       $log.formattedMessage
       #if ($log.throwable)
         #printThrowable($log.throwable)
       #end
     {{/$logLevel}}
-  #end
-#end
-
-#macro (prepareUninstall $extensionid $extensionversion $extensionsToUninstall)
-  #set ($discard = $extensionsToUninstall.add("${extensionid}-${extensionversion}"))
-  #set ($backwardDependencies = $extensionManager.getBackwardDependencies($extensionid, $extensionversion))
-  #prepareUninstallBackwardDependencies($backwardDependencies, $extensionsToUninstall)
-#end
-
-#macro(prepareUninstallBackwardDependencies $backwardDependencies $extensionsToUninstall)
-  #foreach ($backwardDependencyMap in $backwardDependencies.values())
-    #foreach ($backwardDependency in $backwardDependencyMap)
-      #prepareUninstall($backwardDependency.id.id, $backwardDependency.id.version, $extensionsToUninstall)
-    #end
   #end
 #end
 

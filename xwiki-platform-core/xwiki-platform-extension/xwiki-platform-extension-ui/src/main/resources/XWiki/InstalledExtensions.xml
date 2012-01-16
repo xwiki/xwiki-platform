@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1321058328000</creationDate>
-<date>1322042708000</date>
-<contentUpdateDate>1322042708000</contentUpdateDate>
+<date>1326742491000</date>
+<contentUpdateDate>1326742491000</contentUpdateDate>
 <version>1.1</version>
 <title>$msg.get("admin.xwiki.installedextensions")</title>
 <template></template>
@@ -179,6 +179,13 @@ RU5ErkJggg==
 </content></attachment>
 <content>{{include document="ExtensionManagerMacros" /}}
 
+{{velocity output="false"}}
+#set($extensionwiki = $request.extensionwiki)
+#if ($extensionwiki)
+  #set($extensionnamespace = "wiki:$extensionwiki")
+#end
+{{/velocity}}
+
 {{velocity}}
 ## Ajax call for a single extension
 #if ($request.extensionid &amp;&amp; $request.extensionversion &amp;&amp; $request.ajax)
@@ -213,34 +220,53 @@ RU5ErkJggg==
       {{/box}}
     #end
   #else
-    #set ($extensionsToUninstall = [])
-    #prepareUninstall($request.extensionid $request.extensionversion $extensionsToUninstall)
-    #set ($lasterror = $extensionManager.lastError)
-    #if ($lasterror)
+    #set($uninstallPlan = $extensionManager.createUninstallPlan($request.extensionid, $extensionnamespace))
+    #if (!$uninstallPlan)
       {{error}}$msg.get('extensions.uninstall.error.prepareFailure', [$request.extensionid, $request.extensionversion, $lasterror.message]){{/error}}
-    #elseif ($extensionsToUninstall.empty)
-      {{info}}$msg.get('extensions.uninstall.error.notInstalled'){{/info}}
     #else
-      $msg.get('extensions.uninstall.list')
-      #foreach ($extensionid in $extensionsToUninstall)
-        * $extensionid
+      #set($hasError = false)
+      #foreach($log in $uninstallPlan.log)
+        #if ($log.level.name() == 'ERROR')
+          #set($hasError = true)
+        #end
       #end
+      ##
+      #if ($hasError)
+        {{box}}#printStatusLog($installPlan){{/box}}
+      #else
+        #set($extensionsToUninstall = [])
+        ##
+        #foreach($planAction in $uninstallPlan.actions)
+          #if ($planAction.action.name() == "UNINSTALL")
+            #set($void = $extensionsToUninstall.add($planAction))
+          #end
+        #end
+        ##
+        #if ($extensionsToUninstall.isEmpty())
+          {{info}}$msg.get('extensions.uninstall.error.notInstalled'){{/info}}
+        #else
+          The following extensions will be removed:
+          #foreach ($planAction in $extensionsToUninstall)
+            * $planAction.extension.id.id ($planAction.extension.id.version)
+          #end
 
-      {{html}}
-      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform"&gt;
-        &lt;div&gt;
-          &lt;input name="extensionid" value="${escapetool.xml($request.extensionid)}" type="hidden" /&gt;
-          &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;
-          &lt;input name="actionuninstall" type="hidden" /&gt;
-          &lt;p&gt;
-            &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('extensions.uninstall.actions.submit')" name="confirm" class="button"/&gt;&lt;/span&gt;
-            #if ("$!{request.xback}" != '')
-              &lt;span class="buttonwrapper"&gt;&lt;a href="${request.xback}" class="secondary button"&gt;$msg.get('extensions.uninstall.actions.cancel')&lt;/a&gt;&lt;/span&gt;
-            #end
-          &lt;/p&gt;
-        &lt;/div&gt;
-      &lt;/form&gt;
-      {{/html}}
+          {{html}}
+            &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform"&gt;
+              &lt;div&gt;
+                &lt;input name="extensionid" value="${escapetool.xml($request.extensionid)}" type="hidden" /&gt;
+                &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;
+                &lt;input name="actionuninstall" type="hidden" /&gt;
+                &lt;p&gt;
+                  &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('extensions.uninstall.actions.submit')" name="confirm" class="button"/&gt;&lt;/span&gt;
+                  #if ("$!{request.xback}" != '')
+                    &lt;span class="buttonwrapper"&gt;&lt;a href="${request.xback}" class="secondary button"&gt;$msg.get('extensions.uninstall.actions.cancel')&lt;/a&gt;&lt;/span&gt;
+                  #end
+                &lt;/p&gt;
+              &lt;/div&gt;
+            &lt;/form&gt;
+          {{/html}}
+        #end
+      #end
     #end
   #end
 #else

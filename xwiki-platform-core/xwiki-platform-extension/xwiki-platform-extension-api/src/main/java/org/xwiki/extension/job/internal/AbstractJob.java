@@ -99,7 +99,7 @@ public abstract class AbstractJob<R extends Request> implements Job
         try {
             start();
         } catch (Exception e) {
-            logger.error("Failed to start job", e);
+            logger.error("Exception thrown during job execution", e);
             exception = e;
         } finally {
             this.status.stopListening();

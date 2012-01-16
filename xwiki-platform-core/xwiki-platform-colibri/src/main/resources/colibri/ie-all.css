@@ -94,6 +94,9 @@ input.button:hover, .buttonwrapper a:hover{
 .actionmenu .tmCreate:hover .tme-extensible, .tmCreate  .tme-extensible {
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4dececec', endColorstr='#00ececec',GradientType=0 );
 }
+.globalsearch input.button {
+  filter: none;
+}
 /* Gradients containers for IE browsers */
 /* IE6-9 doesn't have support for CSS3 properties. Filters affect also child elements, so we can't apply filters on #mainmenu or #content because it will make the submenus inaccesible. The solution is a container that only holds the gradient colors. */
 #mainmenu .gradientfilterIE, #contentmenu .gradientfilterIE, #editmenu .gradientfilterIE {

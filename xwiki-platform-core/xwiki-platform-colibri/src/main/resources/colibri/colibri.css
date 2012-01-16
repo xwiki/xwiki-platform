@@ -418,8 +418,9 @@ th.avatar {
   width: 168px;
 }
 
-.globalsearch input.button {
-  background-color: transparent;
+.globalsearch input.button , .globalsearch input.button:hover{
+  background-color: $theme.pageContentBackgroundColor;
+  background-image: none;
   border: 0;
   height: 16px;
   margin: 0 2px 0 -18px;

@@ -257,9 +257,10 @@ public abstract class XWikiAction extends Action
                 try {
                     XWikiException xex = (XWikiException) e;
                     if (xex.getCode() == XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION) {
-                        // Connection aborted, simply ignore this.
-                        LOGGER.error("Connection aborted");
-                        // We don't write any other message, as the connection is broken, anyway.
+                        // Connection aborted from the client side, there's not much we can do on the server side. We
+                        // simply ignore it.
+                        LOGGER.debug("Connection aborted", e);
+                        // We don't write any other message to the response, as the connection is broken, anyway.
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
                         Utils.parseTemplate(context.getWiki().Param("xwiki.access_exception", "accessdenied"), context);

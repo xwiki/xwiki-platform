@@ -59,11 +59,9 @@
     </dependency>
 
     <!-- Dependencies for the UI test framework -->
-
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
-      <version>2.14.0</version>
     </dependency>
 
     <!-- Make it easy to debug flickering tests by repeating them.

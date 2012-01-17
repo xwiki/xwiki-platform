@@ -495,6 +495,7 @@ th.avatar {
 
 #mainContentArea, #mainEditArea  {
   background: $theme.pageContentBackgroundColor;
+  overflow: auto;
   padding: 10px 25px;
 }
 

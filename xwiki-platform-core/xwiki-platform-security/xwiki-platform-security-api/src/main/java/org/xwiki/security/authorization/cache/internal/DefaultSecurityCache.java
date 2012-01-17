@@ -161,7 +161,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         }
 
         /**
-         * Create a new cache entry for a user access level, linking it to the related entity and user.
+         * Create a new cache entry for a user access, linking it to the related entity and user.
          * @param entry the security access entry to cache.
          * @throws ParentEntryEvictedException if the parents required are no more available in the cache.
          */

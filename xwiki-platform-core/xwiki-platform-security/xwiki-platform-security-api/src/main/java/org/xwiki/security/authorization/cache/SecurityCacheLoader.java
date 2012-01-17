@@ -39,7 +39,7 @@ public interface SecurityCacheLoader
 {
     /**
      * Load the cache with the required entries to look up the access
-     * level for a given user on a given entity.
+     * for a given user on a given entity.
      *
      * @param user The user to check access for.
      * @param entity The entity to check access to.

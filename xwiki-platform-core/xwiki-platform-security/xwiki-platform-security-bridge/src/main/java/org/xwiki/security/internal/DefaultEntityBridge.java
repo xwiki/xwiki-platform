@@ -20,13 +20,11 @@
 package org.xwiki.security.internal;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
 
@@ -43,11 +41,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class DefaultEntityBridge implements EntityBridge
 {
-    /** Document reference resolver for user and group. */
-    @Inject
-    @Named("user")
-    private DocumentReferenceResolver<String> resolver;
-
     /** Execution object. */
     @Inject
     private Execution execution;

@@ -35,6 +35,7 @@ import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityRule;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 
+import static org.xwiki.security.authorization.RuleState.ALLOW;
 import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
 
 /**
@@ -56,10 +57,10 @@ public class PrioritizingAuthorizationSettler extends AbstractAuthorizationSettl
     private static final int ALL_GROUP_PRIORITY = 0;
 
     @Override
-    protected void settle(UserSecurityReference user, Collection<GroupSecurityReference> groups,
-        SecurityRuleEntry entry, XWikiAccessLevel accessLevel)
+    protected XWikiSecurityAccess settle(UserSecurityReference user, Collection<GroupSecurityReference> groups,
+        SecurityRuleEntry entry, Policies policies)
     {
-        XWikiAccessLevel currentLevel = new XWikiAccessLevel();
+        XWikiSecurityAccess access = new XWikiSecurityAccess();
         Map<Right, Integer> priorities = new RightMap<Integer>();
         SecurityReference reference = entry.getReference();
         Set<Right> enabledRights = Right.getEnabledRights(reference.getSecurityType());
@@ -68,54 +69,69 @@ public class PrioritizingAuthorizationSettler extends AbstractAuthorizationSettl
         for (Right right : enabledRights) {
             for (SecurityRule obj : entry.getRules()) {
                 if (obj.match(right)) {
-                    resolveLevel(right, user, groups, obj, reference, priorities, currentLevel);
-                }
-            }
-        }
-
-        // Implies rights for current level
-        // FIXME: ensure proper tie resolution on implied rights
-        for (Right right : enabledRights) {
-            if (currentLevel.get(right) == RuleState.ALLOW) {
-                Set<Right> impliedRights = right.getImpliedRightsSet();
-                if (impliedRights != null) {
-                    for (Right enabledRight : enabledRights) {
-                        if (impliedRights.contains(enabledRight)) {
-                            currentLevel.allow(enabledRight);
-                        }
+                    resolveLevel(right, user, groups, obj, access, policies, priorities);
+                    if (access.get(right) == ALLOW) {
+                        implyRights(right, access, reference, policies, priorities);
                     }
                 }
             }
         }
 
-        // Inherit rules to lower level
-        mergeLevels(currentLevel, accessLevel, reference);
+        return access;
     }
 
+    /**
+     * Add implied rights of the given right into the current access.
+     *
+     * @param right the right to imply right for.
+     * @param access the access to be augmented (modified and returned).
+     * @param reference the reference to imply rights for.
+     * @param policies the current security policies.
+     * @param priorities A map of current priorities of each rights in the current accumulated access result.
+     */
+    private void implyRights(Right right, XWikiSecurityAccess access, SecurityReference reference,
+        Policies policies, Map<Right, Integer> priorities)
+    {
+        Set<Right> impliedRights = right.getImpliedRightsSet();
+        if (impliedRights != null) {
+            for (Right enabledRight : Right.getEnabledRights(reference.getSecurityType())) {
+                if (impliedRights.contains(enabledRight)) {
+                    // set the policies of the implied right to the policies of the original right
+                    policies.set(enabledRight, right);
+                    resolveConflict(ALLOW, enabledRight, access, policies, priorities.get(right), priorities);
+                }
+            }
+        }
+    }
 
     /**
-     * Update the resulting {@code accessLevel} to include the rule state defined by the given {@link SecurityRule}
-     * for the given user and group, and the requested {@link Right}. The evaluated entity is provided here to
-     * allow the special case of programming right that should not be evaluated in subwikis.
+     * Update the resulting {@code access} to include the rule state defined by the given {@link SecurityRule}
+     * for the given user and group, and the requested {@link Right}.
      *
      * @param right The right to settle.
      * @param user The user to check.
      * @param groups The groups where the user is a member.
      * @param rule The currently considered rule.
-     * @param reference An entity reference that represents the current level in the document hierarchy.
-     * @param priorities A map of current priorities of each rights in the current accumulated access level.
-     * @param accessLevel The accumulated result at the current level.
+     * @param access The accumulated access result during interpretation of rules.
+     * @param policies the current security policies.
+     * @param priorities A map of current priorities of each rights in the current accumulated access result.
+     *
      */
     private void resolveLevel(Right right,
         UserSecurityReference user, Collection<GroupSecurityReference> groups, SecurityRule rule,
-        SecurityReference reference, Map<Right, Integer> priorities, XWikiAccessLevel accessLevel)
+        XWikiSecurityAccess access, Policies policies, Map<Right, Integer> priorities)
     {
+        RuleState state = rule.getState();
+        if (state == UNDETERMINED) {
+            return;
+        }
+
         if (rule.match(user)) {
-            resolveConflict(rule.getState(), right, USER_PRIORITY, priorities, accessLevel);
+            resolveConflict(state, right, access, policies, USER_PRIORITY, priorities);
         } else {
             for (GroupSecurityReference group : groups) {
                 if (rule.match(group)) {
-                    resolveConflict(rule.getState(), right, getPriority(group), priorities, accessLevel);
+                    resolveConflict(state, right, access, policies, getPriority(group), priorities);
                     break;
                 }
             }
@@ -127,30 +143,25 @@ public class PrioritizingAuthorizationSettler extends AbstractAuthorizationSettl
      *
      * @param state The state to consider setting.
      * @param right The right that is being concerned.
+     * @param access The accumulated access result.
+     * @param policies the current security policies.
      * @param priority The priority to use for this particular right match.
      * @param priorities A map of current priorities of each rights in the current accumulated access level.
-     * @param accessLevel The accumulated result.
      */
-    private void resolveConflict(RuleState state,
-                                 Right right,
-                                 int priority,
-                                 Map<Right, Integer> priorities,
-                                 XWikiAccessLevel accessLevel)
+    private void resolveConflict(RuleState state, Right right, XWikiSecurityAccess access, Policies policies,
+        int priority, Map<Right, Integer> priorities)
     {
-        if (state == UNDETERMINED) {
-            return;
-        }
-        if (accessLevel.get(right) == UNDETERMINED) {
-            accessLevel.set(right, state);
+        if (access.get(right) == UNDETERMINED) {
+            access.set(right, state);
             priorities.put(right, priority);
             return;
         }
-        if (accessLevel.get(right) != state) {
+        if (access.get(right) != state) {
             if (priority > priorities.get(right)) {
-                accessLevel.set(right, state);
+                access.set(right, state);
                 priorities.put(right, priority);
             } else {
-                accessLevel.set(right, right.getTieResolutionPolicy());
+                access.set(right, policies.getTieResolutionPolicy(right));
             }
         }
     }

@@ -47,7 +47,7 @@ public interface AuthorizationManager
     String SUPERADMIN_USER = "superadmin";
 
     /**
-     * Check if the user identified by {@code userReference} has the access level identified by {@code right} on the
+     * Check if the user identified by {@code userReference} has the access identified by {@code right} on the
      * entity identified by {@code entityReference}. Note that some rights may be checked higher in hierarchy of the
      * provided entity if such right is not enabled at lowest hierarchy level provided.
      * This function should be used at security checkpoint.
@@ -61,7 +61,7 @@ public interface AuthorizationManager
         throws AccessDeniedException;
 
     /**
-     * Verifies if the user identified by {@code userReference} has the access level identified by {@code right} on the
+     * Verifies if the user identified by {@code userReference} has the access identified by {@code right} on the
      * entity identified by {@code entityReference}. Note that some rights may be checked higher in hierarchy of the
      * provided entity if such right is not enabled at lowest hierarchy level provided. 
      * This function should be used for interface matters, use {@link #checkAccess} at security checkpoints.
@@ -75,9 +75,11 @@ public interface AuthorizationManager
 
     /**
      * Register a new custom {@link Right}.
+     *
      * @param rightDescription the full description of the new {@link Right}
      * @return the created {@link Right}
-     * @throws UnableToRegisterRightException if an error prevent creation
+     * @throws UnableToRegisterRightException if an error prevent creation of the new right. Registering exactly
+     * the same right does not cause an exception and return the existing right.
      */
     Right register(RightDescription rightDescription) throws UnableToRegisterRightException;
 }

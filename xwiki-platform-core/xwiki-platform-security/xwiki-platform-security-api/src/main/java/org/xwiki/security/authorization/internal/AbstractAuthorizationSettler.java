@@ -30,7 +30,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
-import org.xwiki.security.authorization.AccessLevel;
+import org.xwiki.security.authorization.SecurityAccess;
 import org.xwiki.security.authorization.AuthorizationSettler;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RuleState;
@@ -45,15 +45,20 @@ import org.xwiki.security.internal.XWikiBridge;
  */
 abstract class AbstractAuthorizationSettler implements AuthorizationSettler
 {
-    /**
-     * Entity bridge used to check entity creator.
-     */
+    /** Cache the initial tie resolution. */
+    private static RightSet initialAllowTie;
+
+    /** Cache the initial no override inheritance policy. */
+    private static RightSet initialNoOverride;
+
+    /** The initial policy size. Check to update initial policies if a new Right is added. */
+    private static int initialPolicySize;
+
+    /** Entity bridge used to check entity creator. */
     @Inject
     private EntityBridge entityBridge;
 
-    /**
-     * XWiki bridge used to check wiki owner.
-     */
+    /** XWiki bridge used to check wiki owner. */
     @Inject
     private XWikiBridge wikiBridge;
 
@@ -68,19 +73,20 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
         /** Entity reference. */
         private final SecurityReference reference;
 
-        /** Access level. */
-        private final AccessLevel accessLevel;
+        /** Security access. */
+        private final SecurityAccess access;
 
         /**
          * @param user User reference
          * @param reference Entity reference
-         * @param accessLevel Access level
+         * @param access access
          */
-        InternalSecurityAccessEntry(UserSecurityReference user, SecurityReference reference, AccessLevel accessLevel)
+        InternalSecurityAccessEntry(UserSecurityReference user, SecurityReference reference,
+            SecurityAccess access)
         {
             this.userReference = user;
             this.reference = reference;
-            this.accessLevel = accessLevel;
+            this.access = access;
         }
 
         @Override
@@ -90,9 +96,9 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
         }
 
         @Override
-        public AccessLevel getAccessLevel()
+        public SecurityAccess getAccess()
         {
-            return this.accessLevel;
+            return this.access;
         }
 
         @Override
@@ -102,95 +108,213 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
         }
     }
 
+    /**
+     * Current policies helper.
+     */
+    protected final class Policies
+    {
+        /** Current right which has an allow tie. */
+        private Set<Right> allowTie;
+
+        /** Current right which has an no override inheritance policy. */
+        private Set<Right> noOverride;
+
+        /**
+         * Create Policies based on default initial policies.
+         */
+        Policies() {
+            try {
+                if (initialAllowTie == null || Right.size() != initialPolicySize) {
+                    initialPolicySize = Right.size();
+                    allowTie = new RightSet();
+                    noOverride = new RightSet();
+                    for (Right right : Right.values()) {
+                        set(right, right);
+                    }
+                    initialAllowTie = ((RightSet) allowTie).clone();
+                    initialNoOverride = ((RightSet) noOverride).clone();
+                } else {
+                    allowTie = initialAllowTie.clone();
+                    noOverride = initialNoOverride.clone();
+                }
+            } catch (CloneNotSupportedException ignored) {
+                // unexpected
+            }
+        }
+
+        /**
+         * Set the current tie and inheritance policy of an implied right
+         * to the policies of the original right.
+         * Once allowed, the resolution policy could not be denied.
+         * Once a no override policy set, it could not be revoked.
+         *
+         * @param impliedRight the implied right to set
+         * @param originalRight the original right to get
+         */
+        public void set(Right impliedRight, Right originalRight) {
+            if (originalRight.getTieResolutionPolicy() == RuleState.ALLOW) {
+                allowTie.add(impliedRight);
+            }
+            if (!originalRight.getInheritanceOverridePolicy()) {
+                noOverride.add(impliedRight);
+            }
+        }
+
+        /**
+         * @param right the right to check.
+         * @return the current tie resolution policy of this right.
+         */
+        public RuleState getTieResolutionPolicy(Right right) {
+            return (allowTie.contains(right)) ? RuleState.ALLOW : RuleState.DENY;
+        }
+
+        /**
+         * @param right the right to check.
+         * @return the current tie resolution policy of this right.
+         */
+        public boolean getInheritanceOverridePolicy(Right right) {
+            return !noOverride.contains(right);
+        }
+    }
+    
+
     @Override
     public SecurityAccessEntry settle(UserSecurityReference user,
         Collection<GroupSecurityReference> groups, Deque<SecurityRuleEntry> ruleEntries)
     {
-        XWikiAccessLevel accessLevel = new XWikiAccessLevel();
+        XWikiSecurityAccess access = new XWikiSecurityAccess();
         SecurityReference reference = ruleEntries.getFirst().getReference();
+        Policies policies = new Policies();
 
         for (SecurityRuleEntry entry : ruleEntries) {
-            settle(user, groups, entry, accessLevel);
+            SecurityReference currentReference = entry.getReference();
+            access =
+                // Merge access with previous access result
+                merge(
+                    // Imply additional rights
+                    implyRights(
+                        // Settle right on current entity
+                        settle(user, groups, entry, policies), currentReference, policies),
+                    access, currentReference, policies);
         }
 
-        postProcess(user, reference, accessLevel);
-
-        return new InternalSecurityAccessEntry(user, reference, accessLevel.getExistingInstance());
+        return new InternalSecurityAccessEntry(user, reference,
+            // Check special users and apply defaults
+            postProcess(user, reference, access));
     }
 
     /**
-     * Fill out default values and add implied rights.
+     * Check the special user and apply default values for undetermined rights.
      *
      * @param user The user, whose rights are to be determined.
      * @param reference The entity, which the user wants to access.
-     * @param accessLevel The accumulated result.
+     * @param access The accumulated access result (modified and returned).
+     * @return the accumulated access result.
      */
-    protected void postProcess(UserSecurityReference user, SecurityReference reference, XWikiAccessLevel accessLevel)
+    protected XWikiSecurityAccess postProcess(UserSecurityReference user, SecurityReference reference,
+        XWikiSecurityAccess access)
     {
         // Wiki owner is granted admin rights.
         if (wikiBridge.isWikiOwner(user, new WikiReference(reference.extractReference(EntityType.WIKI)))) {
-            accessLevel.allow(Right.ADMIN);
+            access.allow(Right.ADMIN);
             // Implies rights for current level
             Set<Right> impliedRights = Right.ADMIN.getImpliedRightsSet();
             for (Right enabledRight : Right.getEnabledRights(EntityType.WIKI)) {
                 if (impliedRights.contains(enabledRight)) {
-                    accessLevel.allow(enabledRight);
+                    access.allow(enabledRight);
                 }
             }
         } else {
             // Creator is granted delete-rights.
-            if (accessLevel.get(Right.DELETE) == RuleState.UNDETERMINED
-                && Right.getEnabledRights(reference.getSecurityType()).contains(Right.DELETE)
+            if (Right.getEnabledRights(reference.getSecurityType()).contains(Right.DELETE)
                 && entityBridge.isDocumentCreator(user, reference)) {
-                accessLevel.allow(Right.DELETE);
+                access.allow(Right.DELETE);
             }
         }
 
         for (Right right : Right.values()) {
-            if (accessLevel.get(right) == RuleState.UNDETERMINED) {
+            if (access.get(right) == RuleState.UNDETERMINED) {
                 if (!user.getOriginalReference().getWikiReference()
                         .equals(reference.extractReference(EntityType.WIKI))) {
                     /*
                      * Deny all by default for users from another wiki.
                      */
-                    accessLevel.deny(right);
+                    access.deny(right);
                 } else {
-                    accessLevel.set(right, right.getDefaultState());
+                    access.set(right, right.getDefaultState());
                 }
             }
         }
+
+        return access;
     }
 
     /**
-     * Compute the access level of a particular document hierarchy level.
+     * Compute the access of a particular document hierarchy level.
      * @param user The user.
      * @param groups The groups where the user is a member.
      * @param entry The security entry to settle.
-     * @param accessLevel The accumulated result.
+     * @param policies the current security policies.
+     * @return the resulting access for the user/group based on the given rules.
      */
-    protected abstract void settle(UserSecurityReference user, Collection<GroupSecurityReference> groups,
-        SecurityRuleEntry entry, XWikiAccessLevel accessLevel);
+    protected abstract XWikiSecurityAccess settle(UserSecurityReference user, Collection<GroupSecurityReference> groups,
+        SecurityRuleEntry entry, Policies policies);
 
     /**
-     * Merge the current levels with the result from previous ones.
-     * @param currentLevel The access level computed at the current level in the document hierarchy.
-     * @param accessLevel The resulting access levels previously computed.
-     * @param reference {@link org.xwiki.security.SecurityReference} that specifies the current level in the document hierarchy.
+     * Add implied rights for the current access.
+     * @param access the access to be augmented (modified and returned).
+     * @param reference the reference to imply rights for.
+     * @param policies the current security policies.
+     * @return the updated access.
      */
-    protected void mergeLevels(AccessLevel currentLevel, XWikiAccessLevel accessLevel, SecurityReference reference)
+    protected XWikiSecurityAccess implyRights(XWikiSecurityAccess access, SecurityReference reference, 
+        Policies policies)
+    {
+        Set<Right> enabledRights = Right.getEnabledRights(reference.getSecurityType());
+
+        for (Right right : enabledRights) {
+            if (access.get(right) == RuleState.ALLOW) {
+                Set<Right> impliedRights = right.getImpliedRightsSet();
+                if (impliedRights != null) {
+                    for (Right enabledRight : enabledRights) {
+                        if (impliedRights.contains(enabledRight)) {
+                            access.allow(enabledRight);
+                            // set the policies of the implied right to the policies of the original right
+                            policies.set(enabledRight, right);
+                        }
+                    }
+                }
+            }
+        }
+
+        return access;
+    }
+
+    /**
+     * Merge the current access with the result from previous ones.
+     * @param currentAccess The access computed at the current entity in the document hierarchy.
+     * @param access The resulting access previously computed (modified and returned).
+     * @param reference the current entity in the document hierarchy.
+     * @param policies the current security policies.
+     * @return the updated access.
+     */
+    protected XWikiSecurityAccess merge(SecurityAccess currentAccess, XWikiSecurityAccess access,
+        SecurityReference reference, Policies policies)
     {
         for (Right right : Right.getEnabledRights(reference.getSecurityType())) {
             // Skip undetermined rights
-            if (currentLevel.get(right) == RuleState.UNDETERMINED) {
+            if (currentAccess.get(right) == RuleState.UNDETERMINED) {
                 continue;
             }
-            if (accessLevel.get(right) == RuleState.UNDETERMINED) {
-                accessLevel.set(right, currentLevel.get(right));
+            if (access.get(right) == RuleState.UNDETERMINED) {
+                access.set(right, currentAccess.get(right));
                 continue;
             }
-            if (currentLevel.get(right) == RuleState.ALLOW && !right.getInheritanceOverridePolicy()) {
-                accessLevel.allow(right);
+            if (currentAccess.get(right) == RuleState.ALLOW && !policies.getInheritanceOverridePolicy(right)) {
+                access.allow(right);
             }
         }
+
+        return access;
     }
 }

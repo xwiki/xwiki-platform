@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization.internal;
+package org.xwiki.security.authorization;
 
 import java.util.Formatter;
 
@@ -33,18 +33,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.UserSecurityReference;
-import org.xwiki.security.authorization.AccessDeniedException;
-import org.xwiki.security.authorization.AccessLevel;
-import org.xwiki.security.authorization.AuthorizationException;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
-import org.xwiki.security.authorization.RightDescription;
-import org.xwiki.security.authorization.RuleState;
-import org.xwiki.security.authorization.SecurityAccessEntry;
-import org.xwiki.security.authorization.SecurityRuleEntry;
-import org.xwiki.security.authorization.UnableToRegisterRightException;
 import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
+import org.xwiki.security.authorization.internal.XWikiSecurityAccess;
 import org.xwiki.security.internal.XWikiBridge;
 
 /**
@@ -101,7 +92,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         throws AccessDeniedException
     {
         try {
-            if (!hasAccessLevel(right, userReference, entityReference)) {
+            if (!hasSecurityAccess(right, userReference, entityReference)) {
                 throw new AccessDeniedException();
             }
         } catch (Exception e) {
@@ -113,7 +104,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     public boolean hasAccess(Right right, DocumentReference userReference, EntityReference entityReference)
     {
         try {
-            return hasAccessLevel(right, userReference, entityReference);
+            return hasSecurityAccess(right, userReference, entityReference);
         } catch (Exception e) {
             this.logger.error("Failed to load rights for user " + userReference + ".", e);
             return false;
@@ -121,7 +112,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     }
 
     /**
-     * Verifies if the user identified by {@code userReference} has the access level identified by {@code right} on the
+     * Verifies if the user identified by {@code userReference} has the access identified by {@code right} on the
      * entity identified by {@code entityReference}. Note that some rights may be checked higher in hierarchy of the
      * provided entity if such right is not enabled at lowest hierarchy level provided.
      * This function should be used for interface matters, use {@link #checkAccess} at security checkpoints.
@@ -132,7 +123,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
      * @return {@code true} if the user has the specified right on the entity.
      * @throws AuthorizationException if an error occurs.
      */
-    private boolean hasAccessLevel(Right right, DocumentReference userReference, EntityReference entityReference)
+    private boolean hasSecurityAccess(Right right, DocumentReference userReference, EntityReference entityReference)
         throws AuthorizationException
     {
         if (userReference == null) {
@@ -144,7 +135,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             return true;
         }
 
-        if (right == Right.ILLEGAL) {
+        if (right == null || right == Right.ILLEGAL) {
             logDeny(userReference, entityReference, right, "no such right");
             return false;
         }
@@ -153,12 +144,12 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             return false;
         }
         
-        AccessLevel accessLevel = getAccessLevel(
+        SecurityAccess securityAccess = getAccess(
             securityReferenceFactory.newUserReference(userReference),
             securityReferenceFactory.newEntityReference(entityReference)
         );
 
-        RuleState access = accessLevel.get(right);
+        RuleState access = securityAccess.get(right);
         logAccess(access, userReference, entityReference, right, "access checked");
         return access == RuleState.ALLOW;
     }
@@ -167,65 +158,72 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     public Right register(RightDescription rightDescription) throws UnableToRegisterRightException
     {
         try {
-            return new Right(rightDescription);
+            Right newRight = new Right(rightDescription);
+            // cleanup the cache since a new right scheme enter in action
+            securityCache.remove(securityReferenceFactory.newEntityReference(xwikiBridge.getMainWikiReference()));
+            return newRight;
         } catch (Throwable e) {
+            Right right = Right.toRight(rightDescription.getName());
+            if (right != Right.ILLEGAL && right.like(rightDescription)) {
+                return right;
+            }
             throw new UnableToRegisterRightException(rightDescription, e);
         }
     }
 
     /**
-     * Obtain the access level for the user on the given entity and load it into the cache if unavailable.
+     * Obtain the access for the user on the given entity and load it into the cache if unavailable.
      *
      * @param user The user identity.
      * @param entity The entity.  May be of type DOCUMENT, WIKI, or SPACE.
-     * @return the cached access level object.
+     * @return the cached access entry.
      * @exception org.xwiki.security.authorization.AuthorizationException if an error occurs
      */
-    private AccessLevel getAccessLevel(UserSecurityReference user, SecurityReference entity)
+    private SecurityAccess getAccess(UserSecurityReference user, SecurityReference entity)
         throws AuthorizationException
     {
 
         for (SecurityReference ref = entity; ref != null; ref = ref.getParentSecurityReference()) {
             SecurityRuleEntry entry = securityCache.get(ref);
             if (entry == null) {
-                AccessLevel level = securityCacheLoader.load(user, entity).getAccessLevel();
+                SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
                 if (logger.isDebugEnabled()) {
                     Formatter f = new Formatter();
                     this.logger.debug(f.format("1. Loaded a new entry for %s@%s into cache: %s",
                                                entityReferenceSerializer.serialize(user),
                                                entityReferenceSerializer.serialize(entity),
-                                               level).toString());
+                        access).toString());
                 }
-                return level;
+                return access;
             }
             if (!entry.isEmpty()) {
-                SecurityAccessEntry access = securityCache.get(user, ref);
-                if (access == null) {
-                    AccessLevel level = securityCacheLoader.load(user, entity).getAccessLevel();
+                SecurityAccessEntry accessEntry = securityCache.get(user, ref);
+                if (accessEntry == null) {
+                    SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
                     if (logger.isDebugEnabled()) {
                         Formatter f = new Formatter();
                         logger.debug(f.format("2. Loaded a new entry for %s@%s into cache: %s",
                             entityReferenceSerializer.serialize(user),
                             entityReferenceSerializer.serialize(entity),
-                            level).toString());
+                            access).toString());
                     }
-                    return level;
+                    return access;
                 } else {
-                    AccessLevel level = access.getAccessLevel();
+                    SecurityAccess access = accessEntry.getAccess();
                     if (logger.isDebugEnabled()) {
                         Formatter f = new Formatter();
                         logger.debug(f.format("3. Got entry for %s@%s from cache: %s",
                             entityReferenceSerializer.serialize(user),
                             entityReferenceSerializer.serialize(entity),
-                            level).toString());
+                            access).toString());
                     }
-                    return level;
+                    return access;
                 }
             } 
         }
 
-        logger.debug("6. Returning default access level.");
-        return XWikiAccessLevel.getDefaultAccessLevel();
+        logger.debug("4. Returning default access level.");
+        return XWikiSecurityAccess.getDefaultAccess();
     }
 
     /**

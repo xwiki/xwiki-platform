@@ -32,7 +32,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
-import org.xwiki.security.authorization.AccessLevel;
+import org.xwiki.security.authorization.SecurityAccess;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.SecurityRule;
 import org.xwiki.security.authorization.SecurityRuleEntry;
@@ -86,16 +86,17 @@ public class DefaultSecuritySettlerTest extends AbstractTestCase
             pageRights.add(o);
             docLevel.push(new TestSecurityRuleEntry(doc, pageRights));
 
-            AccessLevel level = settler.settle(userX, new LinkedList<GroupSecurityReference>(), docLevel).getAccessLevel();
-            Assert.assertEquals(XWikiAccessLevel.getDefaultAccessLevel(), level);
+            SecurityAccess
+                access = settler.settle(userX, new LinkedList<GroupSecurityReference>(), docLevel).getAccess();
+            Assert.assertEquals(XWikiSecurityAccess.getDefaultAccess(), access);
 
-            level = settler.settle(userY, groups, docLevel).getAccessLevel();
-            XWikiAccessLevel delete = XWikiAccessLevel.getDefaultAccessLevel().clone();
+            access = settler.settle(userY, groups, docLevel).getAccess();
+            XWikiSecurityAccess delete = XWikiSecurityAccess.getDefaultAccess().clone();
             delete.allow(DELETE);
-            Assert.assertEquals(delete,level);
+            Assert.assertEquals(delete, access);
 
-            level = settler.settle(userY, new LinkedList<GroupSecurityReference>(), docLevel).getAccessLevel();
-            Assert.assertEquals(delete,level);
+            access = settler.settle(userY, new LinkedList<GroupSecurityReference>(), docLevel).getAccess();
+            Assert.assertEquals(delete, access);
 
             Deque<SecurityRuleEntry> spaceLevel = new LinkedList<SecurityRuleEntry>();
             spaceLevel.push(new TestSecurityRuleEntry(doc.getParentSecurityReference().getParentSecurityReference(),
@@ -105,17 +106,17 @@ public class DefaultSecuritySettlerTest extends AbstractTestCase
             spaceLevel.push(new TestSecurityRuleEntry(doc.getParentSecurityReference(), spaceRights));
             spaceLevel.push(new TestSecurityRuleEntry(doc, new LinkedList<SecurityRule>()));
 
-            level = settler.settle(userX, new LinkedList<GroupSecurityReference>(), spaceLevel).getAccessLevel();
-            XWikiAccessLevel expected = XWikiAccessLevel.getDefaultAccessLevel().clone();
+            access = settler.settle(userX, new LinkedList<GroupSecurityReference>(), spaceLevel).getAccess();
+            XWikiSecurityAccess expected = XWikiSecurityAccess.getDefaultAccess().clone();
             expected.allow(ADMIN);
             expected.allow(DELETE);
-            Assert.assertEquals(expected,level);
+            Assert.assertEquals(expected, access);
 
-            level = settler.settle(userY, groups, spaceLevel).getAccessLevel();
-            Assert.assertEquals(expected,level);
+            access = settler.settle(userY, groups, spaceLevel).getAccess();
+            Assert.assertEquals(expected, access);
 
-            level = settler.settle(userY, new LinkedList<GroupSecurityReference>(), spaceLevel).getAccessLevel();
-            Assert.assertEquals(delete,level);
+            access = settler.settle(userY, new LinkedList<GroupSecurityReference>(), spaceLevel).getAccess();
+            Assert.assertEquals(delete, access);
 
             Deque<SecurityRuleEntry> wikiLevel = new LinkedList<SecurityRuleEntry>();
             Collection<SecurityRule> wikiRights = new LinkedList<SecurityRule>();
@@ -126,15 +127,15 @@ public class DefaultSecuritySettlerTest extends AbstractTestCase
                 new LinkedList<SecurityRule>()));
             wikiLevel.push(new TestSecurityRuleEntry(doc, new LinkedList<SecurityRule>()));
 
-            level = settler.settle(userX, new LinkedList<GroupSecurityReference>(), wikiLevel).getAccessLevel();
+            access = settler.settle(userX, new LinkedList<GroupSecurityReference>(), wikiLevel).getAccess();
             //expected.allow(PROGRAM);
-            Assert.assertEquals(expected,level);
+            Assert.assertEquals(expected, access);
 
-            level = settler.settle(userY, groups, wikiLevel).getAccessLevel();
-            Assert.assertEquals(expected,level);
+            access = settler.settle(userY, groups, wikiLevel).getAccess();
+            Assert.assertEquals(expected, access);
 
-            level = settler.settle(userY, new LinkedList<GroupSecurityReference>(), wikiLevel).getAccessLevel();
-            Assert.assertEquals(delete,level);
+            access = settler.settle(userY, new LinkedList<GroupSecurityReference>(), wikiLevel).getAccess();
+            Assert.assertEquals(delete, access);
         } catch (Exception e) {
             LOG.error("Caught exception!", e);
             assert false;

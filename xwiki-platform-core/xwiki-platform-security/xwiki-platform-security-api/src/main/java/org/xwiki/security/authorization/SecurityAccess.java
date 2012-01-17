@@ -24,7 +24,7 @@ package org.xwiki.security.authorization;
  *
  * @version $Id$
  */
-public interface AccessLevel extends Cloneable, Comparable<AccessLevel>
+public interface SecurityAccess extends Cloneable
 {
     /**
      * Return the rule state of a given {@link Right}.

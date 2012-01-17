@@ -43,7 +43,7 @@ public abstract class AbstractSecurityAccessEntry implements SecurityAccessEntry
 
         return this.getUserReference().equals(other.getUserReference())
             && this.getReference().equals(other.getReference())
-            && this.getAccessLevel().equals(other.getAccessLevel());
+            && this.getAccess().equals(other.getAccess());
     }
 
     @Override
@@ -52,7 +52,7 @@ public abstract class AbstractSecurityAccessEntry implements SecurityAccessEntry
         return new HashCodeBuilder()
             .append(this.getUserReference())
             .append(this.getReference())
-            .append(this.getAccessLevel())
+            .append(this.getAccess())
             .toHashCode();
     }
 }

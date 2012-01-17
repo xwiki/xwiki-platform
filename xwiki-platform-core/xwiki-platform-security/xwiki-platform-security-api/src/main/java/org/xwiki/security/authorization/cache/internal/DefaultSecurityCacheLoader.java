@@ -129,7 +129,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
      * 
      * @param user The user to check access for.
      * @param entity The entity to check access to.
-     * @return The resulting access level for the user at the entity.
+     * @return The resulting access for the user at the entity.
      * @throws ParentEntryEvictedException If one of the parent
      * entries are evicted before the load is completed.
      * @throws ConflictingInsertionException When different threads
@@ -167,7 +167,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
      * @param user The user to check access for.
      * @param entity The entity to check access to.
      * @param ruleEntries The rule entries loaded from the cache, may be null if not yet available.
-     * @return The resulting access level for the user at the entity.
+     * @return The resulting access for the user at the entity.
      * @throws ParentEntryEvictedException If one of the parent
      * entries are evicted before the load is completed.
      * @throws ConflictingInsertionException When different threads

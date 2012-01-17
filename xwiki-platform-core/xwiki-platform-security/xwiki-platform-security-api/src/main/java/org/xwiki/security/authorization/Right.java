@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.security.authorization.internal.RightSet;
 
@@ -153,10 +154,12 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
 
     /**
      * Construct a new Right from its description.
+     * This is a package private constructor, the registration of a new right should be done using
+     * the {@link AuthorizationManager}
      *
      * @param description Description of the right to create.
      */
-    public Right(RightDescription description)
+    Right(RightDescription description)
     {
         this(description.getName(), description.getDefaultState(), description.getTieResolutionPolicy(),
             description.getInheritanceOverridePolicy(), description.getImpliedRights(),
@@ -342,6 +345,9 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         return getName();
     }
 
+    /**
+     * @return the set of rights implied by this right.
+     */
     public Set<Right> getImpliedRightsSet()
     {
         return impliedRights;
@@ -350,6 +356,9 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     @Override
     public List<Right> getImpliedRights()
     {
+        if (impliedRights == null) {
+            return null;
+        }
         List<Right> rights = new ArrayList<Right>();
         for (Right right : impliedRights) {
             rights.add(right);
@@ -400,5 +409,21 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     public int compareTo(Right other)
     {
         return this.ordinal() - other.ordinal();
+    }
+
+    /**
+     * @param description a right description to compare this right to.
+     * @return true if the right is equivalent to the provided description.
+     */
+    boolean like(RightDescription description)
+    {
+        return new EqualsBuilder()
+            .append(this.isReadOnly(), description.isReadOnly())
+            .append(this.getDefaultState(), description.getDefaultState())
+            .append(this.getTieResolutionPolicy(), description.getTieResolutionPolicy())
+            .append(this.getInheritanceOverridePolicy(), description.getInheritanceOverridePolicy())
+            .append(this.getTargetedEntityType(), description.getTargetedEntityType())
+            .append(this.getImpliedRights(), description.getImpliedRights())
+            .isEquals();
     }
 }

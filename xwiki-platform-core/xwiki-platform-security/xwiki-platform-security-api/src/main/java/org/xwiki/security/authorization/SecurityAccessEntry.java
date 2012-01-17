@@ -22,7 +22,7 @@ package org.xwiki.security.authorization;
 import org.xwiki.security.UserSecurityReference;
 
 /**
- * A security access entry is the association of a user, an entity and an access level that represent an authorization
+ * A security access entry is the association of a user, an entity and a security access that represent an authorization
  * settler decision.
  *
  * @see org.xwiki.security.authorization.internal.AbstractSecurityAccessEntry
@@ -36,7 +36,7 @@ public interface SecurityAccessEntry extends SecurityEntry
     UserSecurityReference getUserReference();
 
     /**
-     * @return the access level defined by this security access rule.
+     * @return the access defined by this security access rule.
      */
-    AccessLevel getAccessLevel();
+    SecurityAccess getAccess();
 }

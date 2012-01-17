@@ -17,18 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization;
+package org.xwiki.security.authorization.internal;
 
-import org.xwiki.security.authorization.internal.XWikiAccessLevel;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.RuleState;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-public class AccessLevelTest extends TestCase
+public class SecurityAccessTest extends TestCase
 {
     public static void assertDefaultAccessLevel()
     {
-        Assert.assertEquals(new XWikiAccessLevel()
+        Assert.assertEquals(new XWikiSecurityAccess()
         {
             {
                 allow(Right.VIEW);
@@ -41,14 +42,14 @@ public class AccessLevelTest extends TestCase
                 deny(Right.PROGRAM);
                 deny(Right.ILLEGAL);
             }
-        },XWikiAccessLevel.getDefaultAccessLevel());
+        }, XWikiSecurityAccess.getDefaultAccess());
     }
 
     public void testAccessLevel() throws Exception
     {
         assertDefaultAccessLevel();
 
-        XWikiAccessLevel l = XWikiAccessLevel.getDefaultAccessLevel().clone();
+        XWikiSecurityAccess l = XWikiSecurityAccess.getDefaultAccess().clone();
 
         Assert.assertEquals(RuleState.ALLOW, l.get(Right.VIEW));
         Assert.assertEquals(RuleState.ALLOW, l.get(Right.EDIT));
@@ -134,14 +135,10 @@ public class AccessLevelTest extends TestCase
 
     public void testClone() throws Exception
     {
-        XWikiAccessLevel l = XWikiAccessLevel.getDefaultAccessLevel().clone();
-        XWikiAccessLevel k = l.clone();
+        XWikiSecurityAccess l = XWikiSecurityAccess.getDefaultAccess().clone();
+        XWikiSecurityAccess k = l.clone();
         Assert.assertEquals(l,k);
         Assert.assertNotSame(l,k);
-        l = l.getExistingInstance();
-        k = k.getExistingInstance();
-        Assert.assertSame(l,k);
-
         assertDefaultAccessLevel();
     }
 }

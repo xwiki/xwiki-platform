@@ -23,13 +23,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReferenceFactory;
@@ -37,7 +35,6 @@ import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.AuthorizationException;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 
 /**
@@ -53,15 +50,6 @@ public class DefaultUserBridge implements UserBridge
     @Inject
     private SecurityReferenceFactory factory;
 
-    /** Entity reference serializer. */
-    @Inject
-    private EntityReferenceSerializer<String> serializer;
-
-    /** Document reference resolver for users and groups. */
-    @Inject
-    @Named("user")
-    private DocumentReferenceResolver<String> resolver;
-
     /** Execution object. */
     @Inject
     private Execution execution;
@@ -76,25 +64,44 @@ public class DefaultUserBridge implements UserBridge
     @Override
     public Collection<GroupSecurityReference> getAllGroupsFor(UserSecurityReference user) throws AuthorizationException
     {
-        Collection<String> groupNames;
-        try {
-            XWikiContext xwikiContext = getXWikiContext();
-            XWikiGroupService groupService = xwikiContext.getWiki().getGroupService(xwikiContext);
-            String userName = serializer.serialize(user);
-            groupNames = groupService.getAllGroupsNamesForMember(userName, Integer.MAX_VALUE, 0, xwikiContext);
-        } catch (XWikiException e) {
-            throw new AuthorizationException("Failed to generate the group names.",  e);
-        }
-        /*
-        * The groups inherit the wiki of the user, unless the wiki
-        * name is explicitly given.
-        */
-        WikiReference wikiReference = user.getOriginalReference().getWikiReference();
-        Collection<GroupSecurityReference> groups = new ArrayList<GroupSecurityReference>(groupNames.size());
-        for (String groupName : groupNames) {
-            GroupSecurityReference group = factory.newGroupReference(resolver.resolve(groupName, wikiReference));
+        Collection<DocumentReference> groupRefs = getGroupsReferencesFor(user.getOriginalReference().getWikiReference(),
+            user.getOriginalReference());
+
+        Collection<GroupSecurityReference> groups = new ArrayList<GroupSecurityReference>(groupRefs.size());
+        for (DocumentReference groupRef : groupRefs) {
+            GroupSecurityReference group = factory.newGroupReference(groupRef);
             groups.add(group);
         }
         return groups;
+    }
+
+    /**
+     * Get all groups in a given wiki where a given user or group is a member of.
+     * @param wiki the wiki to search groups containing the user/group
+     * @param userOrGroupDocumentReference the user/group document reference
+     * @return the list of group where the user/group is a member
+     * @throws AuthorizationException when an issue arise during retrieval.
+     */
+    private Collection<DocumentReference> getGroupsReferencesFor(WikiReference wiki,
+        DocumentReference userOrGroupDocumentReference) throws AuthorizationException
+    {
+        XWikiContext xwikiContext = getXWikiContext();
+        XWikiGroupService groupService;
+        try {
+            groupService = xwikiContext.getWiki().getGroupService(xwikiContext);
+        } catch (Exception e) {
+            throw new AuthorizationException("Failed to access the group service.",  e);
+        }
+
+        String currentWiki = xwikiContext.getDatabase();
+        try {
+            xwikiContext.setDatabase(wiki.getName());
+            return groupService.getAllGroupsReferencesForMember(userOrGroupDocumentReference, 0, 0, xwikiContext);
+        } catch (Exception e) {
+            throw new AuthorizationException("Failed to get groups for user or group [" + userOrGroupDocumentReference
+                + "] in wiki [" + wiki + "]",  e);
+        } finally {
+            xwikiContext.setDatabase(currentWiki);
+        }
     }
 }

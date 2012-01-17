@@ -27,7 +27,7 @@ import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.UserSecurityReference;
 
 /**
- * An AuthorizationSettler compute the resulting access levels for a given user,
+ * An AuthorizationSettler compute the resulting access for a given user,
  * a list of groups, and a hierarchy of rights objects defining rights on a given entity.
  *
  * @version $Id$
@@ -36,10 +36,9 @@ import org.xwiki.security.UserSecurityReference;
 public interface AuthorizationSettler
 {
     /**
-     * Compute the current access level for the user that is a member
+     * Compute the current access for the user that is a member
      * of the given groups and on an entity which is protected by the
      * given hierarchy of rights objects.
-     *
      *
      * @param user a user identifier.
      * @param groups a collection of groups.
@@ -49,7 +48,7 @@ public interface AuthorizationSettler
      * any, preceded by space and subspaces if any, preceded by the
      * document rules.  The levels of this hierarchy
      * match the structure of the entity reference reported by the first SecurityRuleEntry.
-     * @return the computed access level for the given user.
+     * @return the computed access for the given user.
      */
     SecurityAccessEntry settle(UserSecurityReference user,
         Collection<GroupSecurityReference> groups,

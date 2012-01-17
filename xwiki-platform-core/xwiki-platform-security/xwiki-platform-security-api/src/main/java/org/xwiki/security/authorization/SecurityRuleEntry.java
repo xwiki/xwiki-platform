@@ -23,7 +23,7 @@ import java.util.Collection;
 
 /**
  * A security entry is the association of an entity and a set of security rules that constitute a elementary
- * declarative information for the security settler to compute the security level of user.
+ * declarative information for the security settler to compute the security access of users.
  *
  * @see org.xwiki.security.authorization.internal.AbstractSecurityRuleEntry
  * @version $Id$

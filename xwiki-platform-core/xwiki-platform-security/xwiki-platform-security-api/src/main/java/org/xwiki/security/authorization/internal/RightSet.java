@@ -271,7 +271,7 @@ public class RightSet extends AbstractSet<Right> implements Cloneable, java.io.S
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException
+    protected RightSet clone() throws CloneNotSupportedException
     {
         RightSet clone = (RightSet) super.clone();
         clone.rights = rights;

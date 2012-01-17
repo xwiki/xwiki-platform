@@ -23,9 +23,10 @@ import java.util.Collections;
 
 import org.jmock.Expectations;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.security.UserSecurityReference;
-import org.xwiki.security.authorization.AccessLevel;
+import org.xwiki.security.authorization.SecurityAccess;
 import org.xwiki.security.authorization.SecurityEntry;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.cache.SecurityCache;
@@ -43,8 +44,8 @@ public class DefaultSecurityCacheLoaderTest extends AbstractTestCase
     @Test 
     public void testSecurityCacheLoader() throws Exception
     {
-        UserSecurityReference userX = referenceFactory.newUserReference(docRefResolver.resolve("wikiY:XWiki.userX"));
-        UserSecurityReference userY = referenceFactory.newUserReference(docRefResolver.resolve("wikiY:XWiki.userY"));
+        final UserSecurityReference userX = referenceFactory.newUserReference(docRefResolver.resolve("wikiY:XWiki.userX"));
+        final UserSecurityReference userY = referenceFactory.newUserReference(docRefResolver.resolve("wikiY:XWiki.userY"));
 
         MockDocument wikiDocument = new MockDocument("xwiki:XWiki.XWikiPreferences", "xwiki:XWiki.Admin");
         MockDocument allGroupDocument = MockDocument.newGroupDocument("xwiki:XWiki.XWikiAllGroup", 
@@ -64,27 +65,27 @@ public class DefaultSecurityCacheLoaderTest extends AbstractTestCase
         getMockery().checking(new Expectations()
         {{
                 allowing(mockGroupService)
-                    .getAllGroupsNamesForMember("wikiY:XWiki.userX", Integer.MAX_VALUE, 0, xwikiContext);
-                will(Expectations.returnValue(asList("XWiki.XWikiAllGroup")));
+                    .getAllGroupsReferencesForMember(userX.getOriginalReference(), 0, 0, xwikiContext);
+                will(Expectations.returnValue(asList(new DocumentReference("wikiY","XWiki","XWikiAllGroup"))));
                 allowing(mockGroupService)
-                    .getAllGroupsNamesForMember("wikiY:XWiki.userY", Integer.MAX_VALUE, 0, xwikiContext);
-                will(Expectations.returnValue(asList("XWiki.XWikiAllGroup")));
+                    .getAllGroupsReferencesForMember(userY.getOriginalReference(), 0, 0, xwikiContext);
+                will(Expectations.returnValue(asList(new DocumentReference("wikiY","XWiki","XWikiAllGroup"))));
             }});
 
         SecurityCacheLoader loader = getComponentManager().lookup(SecurityCacheLoader.class);
         SecurityCache cache  = getComponentManager().lookup(SecurityCache.class);
         SecurityCacheRulesInvalidator rulesInvalidator = getComponentManager().lookup(SecurityCacheRulesInvalidator.class);
 
-        XWikiAccessLevel edit = XWikiAccessLevel.getDefaultAccessLevel().clone();
+        XWikiSecurityAccess edit = XWikiSecurityAccess.getDefaultAccess().clone();
         edit.allow(EDIT);
 
-        AccessLevel level = loader.load(userX, userX).getAccessLevel();
-        System.out.println("Level is " + level + ", expected " + edit);
-        Assert.assertEquals(edit,level);
+        SecurityAccess access = loader.load(userX, userX).getAccess();
+        System.out.println("Level is " + access + ", expected " + edit);
+        Assert.assertEquals(edit, access);
 
         SecurityEntry entry = cache.get(userX, userX);
         Assert.assertNotNull(entry);
-        Assert.assertEquals(new TestSecurityAccessEntry(userX, userX, level), entry);
+        Assert.assertEquals(new TestSecurityAccessEntry(userX, userX, access), entry);
 
         entry = cache.get(userX);
         Assert.assertNotNull(entry);
@@ -116,10 +117,10 @@ public class DefaultSecurityCacheLoaderTest extends AbstractTestCase
                                 Collections.<String>emptyList(),
                                 asList("wikiY:XWiki.XWikiAllGroup"));
 
-        XWikiAccessLevel editNoComment = edit.clone();
+        XWikiSecurityAccess editNoComment = edit.clone();
         editNoComment.deny(COMMENT);
-        level = loader.load(userX, userX).getAccessLevel();
-        Assert.assertEquals(editNoComment,level);
+        access = loader.load(userX, userX).getAccess();
+        Assert.assertEquals(editNoComment, access);
 
         getMockery().checking(new Expectations()
         {{

@@ -21,7 +21,7 @@ package org.xwiki.security.authorization.internal;
 
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
-import org.xwiki.security.authorization.AccessLevel;
+import org.xwiki.security.authorization.SecurityAccess;
 
 /**
  * Please comment here
@@ -32,13 +32,13 @@ public class TestSecurityAccessEntry extends AbstractSecurityAccessEntry
 {
     private final UserSecurityReference userReference;
     private final SecurityReference reference;
-    private final AccessLevel accessLevel;
+    private final SecurityAccess securityAccess;
 
-    public TestSecurityAccessEntry(UserSecurityReference user, SecurityReference reference, AccessLevel accessLevel)
+    public TestSecurityAccessEntry(UserSecurityReference user, SecurityReference reference, SecurityAccess securityAccess)
     {
         this.userReference = user;
         this.reference = reference;
-        this.accessLevel = accessLevel;
+        this.securityAccess = securityAccess;
     }
 
     @Override
@@ -48,9 +48,9 @@ public class TestSecurityAccessEntry extends AbstractSecurityAccessEntry
     }
 
     @Override
-    public AccessLevel getAccessLevel()
+    public SecurityAccess getAccess()
     {
-        return this.accessLevel;
+        return this.securityAccess;
     }
 
     @Override

@@ -79,15 +79,15 @@ public class XWikiRightServiceTest extends AbstractTestCase
         MockDocument preferences = new MockDocument("wiki2:XWiki.XWikiPreferences", "xwiki:XWiki.Admin");
         final XWikiRightService rightService = new XWikiCachingRightService();
 
-        XWikiDocument user = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user"));
-        XWikiDocument group = new XWikiDocument(new DocumentReference("wiki", "XWiki", "group"));
+        final XWikiDocument user = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user"));
+        final XWikiDocument group = new XWikiDocument(new DocumentReference("wiki", "XWiki", "group"));
 
         wiki.add(doc).add(preferences);
 
         getMockery().checking(new Expectations() {{
             allowing(mockGroupService)
-                .getAllGroupsNamesForMember("wiki:XWiki.user", Integer.MAX_VALUE, 0, xwikiContext);
-            will(Expectations.returnValue(asList("wiki:XWiki.group")));
+                .getAllGroupsReferencesForMember(user.getDocumentReference(), 0, 0, xwikiContext);
+            will(Expectations.returnValue(asList(group.getDocumentReference())));
         }});
 
         getContext().setDatabase("wiki");
@@ -195,14 +195,19 @@ public class XWikiRightServiceTest extends AbstractTestCase
 
         getMockery().checking(new Expectations() {{
             allowing(mockGroupService)
-                .getAllGroupsNamesForMember("xwiki:" + XWikiConstants.GUEST_USER_FULLNAME, Integer.MAX_VALUE, 0,
-                    xwikiContext);
+                .getAllGroupsReferencesForMember(
+                    new DocumentReference("xwiki", XWikiConstants.WIKI_SPACE, XWikiConstants.GUEST_USER),
+                    0, 0, xwikiContext);
             will(Expectations.returnValue(Collections.emptyList()));
             allowing(mockGroupService)
-                .getAllGroupsNamesForMember("xwiki:XWiki.Programmer", Integer.MAX_VALUE, 0, xwikiContext);
+                .getAllGroupsReferencesForMember(
+                    new DocumentReference("xwiki", XWikiConstants.WIKI_SPACE, "Programmer"),
+                    0, 0, xwikiContext);
             will(Expectations.returnValue(Collections.emptyList()));
             allowing(mockGroupService)
-                .getAllGroupsNamesForMember("xwiki:XWiki.superadmin", Integer.MAX_VALUE, 0, xwikiContext);
+                .getAllGroupsReferencesForMember(
+                    new DocumentReference("xwiki", XWikiConstants.WIKI_SPACE, "superadmin"),
+                    0, 0, xwikiContext);
             will(Expectations.returnValue(Collections.emptyList()));
         }});
 

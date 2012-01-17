@@ -187,15 +187,8 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
         Policies policies = new Policies();
 
         for (SecurityRuleEntry entry : ruleEntries) {
-            SecurityReference currentReference = entry.getReference();
-            access =
-                // Merge access with previous access result
-                merge(
-                    // Imply additional rights
-                    implyRights(
-                        // Settle right on current entity
-                        settle(user, groups, entry, policies), currentReference, policies),
-                    access, currentReference, policies);
+            // Merge access with previous access result
+            access = merge(settle(user, groups, entry, policies), access, entry.getReference(), policies);
         }
 
         return new InternalSecurityAccessEntry(user, reference,
@@ -259,36 +252,6 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
      */
     protected abstract XWikiSecurityAccess settle(UserSecurityReference user, Collection<GroupSecurityReference> groups,
         SecurityRuleEntry entry, Policies policies);
-
-    /**
-     * Add implied rights for the current access.
-     * @param access the access to be augmented (modified and returned).
-     * @param reference the reference to imply rights for.
-     * @param policies the current security policies.
-     * @return the updated access.
-     */
-    protected XWikiSecurityAccess implyRights(XWikiSecurityAccess access, SecurityReference reference, 
-        Policies policies)
-    {
-        Set<Right> enabledRights = Right.getEnabledRights(reference.getSecurityType());
-
-        for (Right right : enabledRights) {
-            if (access.get(right) == RuleState.ALLOW) {
-                Set<Right> impliedRights = right.getImpliedRightsSet();
-                if (impliedRights != null) {
-                    for (Right enabledRight : enabledRights) {
-                        if (impliedRights.contains(enabledRight)) {
-                            access.allow(enabledRight);
-                            // set the policies of the implied right to the policies of the original right
-                            policies.set(enabledRight, right);
-                        }
-                    }
-                }
-            }
-        }
-
-        return access;
-    }
 
     /**
      * Merge the current access with the result from previous ones.

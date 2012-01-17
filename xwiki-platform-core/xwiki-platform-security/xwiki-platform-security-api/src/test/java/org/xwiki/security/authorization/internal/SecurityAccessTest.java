@@ -21,28 +21,26 @@ package org.xwiki.security.authorization.internal;
 
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RuleState;
+import org.xwiki.security.authorization.SecurityAccess;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
+
 public class SecurityAccessTest extends TestCase
 {
-    public static void assertDefaultAccessLevel()
+    private void assertDefaultAccessLevel()
     {
-        Assert.assertEquals(new XWikiSecurityAccess()
-        {
-            {
-                allow(Right.VIEW);
-                allow(Right.EDIT);
-                allow(Right.COMMENT);
-                allow(Right.LOGIN);
-                allow(Right.REGISTER);
-                deny(Right.DELETE);
-                deny(Right.ADMIN);
-                deny(Right.PROGRAM);
-                deny(Right.ILLEGAL);
+        SecurityAccess access = XWikiSecurityAccess.getDefaultAccess();
+        for (Right right : Right.values()) {
+            if (access.get(right) != UNDETERMINED) {
+                assertThat("Right(" + right.getName() + ")",
+                    access.get(right), equalTo(right.getDefaultState()));
             }
-        }, XWikiSecurityAccess.getDefaultAccess());
+        }
     }
 
     public void testAccessLevel() throws Exception

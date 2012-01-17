@@ -147,7 +147,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     @Override
     public int hashCode()
     {
-        return rights.hashCode();
+        return rights.isEmpty() ? 0 : rights.hashCode();
     }
 
     @Override
@@ -176,6 +176,9 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     @SuppressWarnings("unchecked")
     private V updateValue(int index, Object newValue)
     {
+        if (index < 0) {
+            return null;
+        }
         if (rights.size() <= index) {
             ((ArrayList) rights).ensureCapacity(Right.size() + 1);
             while (rights.size() <= Right.size()) {
@@ -376,7 +379,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
 
             Map.Entry entry = (Map.Entry) o;
             if (contains(entry)) {
-                updateValue(((Right) entry.getKey()).ordinal(), entry.getValue());
+                updateValue(((Right) entry.getKey()).ordinal(), null);
                 return true;
             }
             return false;
@@ -477,7 +480,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
                 throw new NoSuchElementException();
             }
             lastIndex = index++;
-            return Right.get(index);
+            return Right.get(lastIndex);
         }
     }
 

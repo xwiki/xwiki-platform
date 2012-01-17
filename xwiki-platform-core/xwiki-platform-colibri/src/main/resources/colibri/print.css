@@ -58,6 +58,7 @@
 }
 
 #xdocFooter, #docextrapanes {
+  border: 0;
   padding-left: 10px;
   padding-right: 10px;
 }
@@ -68,6 +69,7 @@
 
 #docExtraTabs ul.xwikitabbar {
   background: white;
+  border: 0;
   padding: 0px;
 }
 
@@ -76,6 +78,7 @@
 }
 
 #docextrapanes { /* display all comments */
+  box-shadow: none;
   float: none !important;
   overflow: visible !important;
 }

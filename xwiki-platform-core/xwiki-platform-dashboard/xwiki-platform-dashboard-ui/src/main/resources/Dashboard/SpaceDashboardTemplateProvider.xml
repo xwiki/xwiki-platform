@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+<xwikidoc>
+<web>Dashboard</web>
+<name>SpaceDashboardTemplateProvider</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.TemplateProviderClass</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1326065840000</creationDate>
+<date>1326066582000</date>
+<contentUpdateDate>1326066582000</contentUpdateDate>
+<version>1.1</version>
+<title>SpaceDashboardTemplateProvider</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.TemplateProviderClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<action>
+<cache>0</cache>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>action</name>
+<number>5</number>
+<picker>0</picker>
+<prettyName>Action on create</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values>edit|saveandedit</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</action>
+<name>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<spaces>
+<cache>0</cache>
+<classname></classname>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<displayType>checkbox</displayType>
+<idField></idField>
+<multiSelect>1</multiSelect>
+<name>spaces</name>
+<number>4</number>
+<picker>0</picker>
+<prettyName>spaces</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators></separators>
+<size>10</size>
+<sort>none</sort>
+<sql>select distinct doc.web from XWikiDocument doc order by doc.web</sql>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<valueField></valueField>
+<classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+</spaces>
+<template>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<name>template</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>template</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</template>
+<type>
+<cache>0</cache>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>type</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values>page|space</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
+</class>
+<name>Dashboard.SpaceDashboardTemplateProvider</name>
+<number>0</number>
+<className>XWiki.TemplateProviderClass</className>
+<guid>e3129547-c67a-42e7-bd31-1255a9ddbeb9</guid>
+<property>
+<action>edit</action>
+</property>
+<property>
+<name>platform.dashboard.space.templateName</name>
+</property>
+<property>
+<spaces/>
+</property>
+<property>
+<template>Dashboard.SpaceDashboardTemplate</template>
+</property>
+<property>
+<type>space</type>
+</property>
+</object>
+<content>{{include document="XWiki.TemplateProviderSheet"/}}
+</content></xwikidoc>

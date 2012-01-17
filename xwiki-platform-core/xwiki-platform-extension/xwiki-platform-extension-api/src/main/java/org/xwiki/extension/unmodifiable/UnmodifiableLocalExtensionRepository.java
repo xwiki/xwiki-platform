@@ -53,31 +53,31 @@ public class UnmodifiableLocalExtensionRepository<T extends LocalExtensionReposi
     @Override
     public int countExtensions()
     {
-        return getRepository().countExtensions();
+        return getWrapped().countExtensions();
     }
 
     @Override
     public Collection<LocalExtension> getLocalExtensions()
     {
-        return UnmodifiableUtils.unmodifiableExtensions(getRepository().getLocalExtensions());
+        return UnmodifiableUtils.unmodifiableExtensions(getWrapped().getLocalExtensions());
     }
 
     @Override
     public Collection<LocalExtension> getInstalledExtensions()
     {
-        return UnmodifiableUtils.unmodifiableExtensions(getRepository().getInstalledExtensions());
+        return UnmodifiableUtils.unmodifiableExtensions(getWrapped().getInstalledExtensions());
     }
 
     @Override
     public Collection<LocalExtension> getInstalledExtensions(String namespace)
     {
-        return UnmodifiableUtils.unmodifiableExtensions(getRepository().getInstalledExtensions(namespace));
+        return UnmodifiableUtils.unmodifiableExtensions(getWrapped().getInstalledExtensions(namespace));
     }
 
     @Override
     public LocalExtension getInstalledExtension(String feature, String namespace)
     {
-        return UnmodifiableUtils.unmodifiableExtension(getRepository().getInstalledExtension(feature, namespace));
+        return UnmodifiableUtils.unmodifiableExtension(getWrapped().getInstalledExtension(feature, namespace));
     }
 
     @Override
@@ -108,14 +108,14 @@ public class UnmodifiableLocalExtensionRepository<T extends LocalExtensionReposi
     @Override
     public Collection<LocalExtension> getBackwardDependencies(String feature, String namespace) throws ResolveException
     {
-        return UnmodifiableUtils.unmodifiableExtensions(getRepository().getBackwardDependencies(feature, namespace));
+        return UnmodifiableUtils.unmodifiableExtensions(getWrapped().getBackwardDependencies(feature, namespace));
     }
 
     @Override
     public Map<String, Collection<LocalExtension>> getBackwardDependencies(ExtensionId extensionId)
         throws ResolveException
     {
-        return UnmodifiableUtils.unmodifiableExtensions(getRepository().getBackwardDependencies(extensionId));
+        return UnmodifiableUtils.unmodifiableExtensions(getWrapped().getBackwardDependencies(extensionId));
     }
 
 }

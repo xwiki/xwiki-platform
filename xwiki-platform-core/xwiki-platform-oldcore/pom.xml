@@ -217,12 +217,12 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
-      <version>3.6.7.Final</version>
+      <version>3.6.9.Final</version>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-c3p0</artifactId>
-      <version>3.6.7.Final</version>
+      <version>3.6.9.Final</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -485,7 +485,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-display</artifactId>
+      <artifactId>xwiki-platform-display-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -581,6 +581,13 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- User by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+
     <!-- Test dependencies -->
 
     <!-- Used to mock XWiki class -->
@@ -638,7 +645,6 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
   <build>
     <plugins>
@@ -997,13 +1003,15 @@
               **/store/DBCPConnectionProvider.java,
               **/store/hibernate/DefaultHibernateSessionFactory.java,
               **/store/hibernate/HibernateSessionFactory.java,
-              **/store/migration/AbstractXWikiMigrationManager.java,
-              **/store/migration/hibernate/AbstractXWikiHibernateMigrator.java,
-              **/store/migration/hibernate/R4340XWIKI883Migrator.java,
-              **/store/migration/hibernate/R4359XWIKI1459Migrator.java,
-              **/store/migration/hibernate/R6079XWIKI1878Migrator.java,
-              **/store/migration/hibernate/R7350XWIKI2079Migrator.java,
-              **/store/migration/hibernate/XWikiHibernateMigrationManager.java,
+              <!-- AbstractDataMigrationManager has a fan out complexity of 25 that may needs to be investigated. -->
+              **/store/migration/AbstractDataMigrationManager.java,
+              <!-- Hibernate migrations use anonymous inner class (doInHibernate) that exceeds the 20 lines limit. -->
+              **/store/migration/hibernate/HibernateDataMigrationManager.java,
+              **/store/migration/hibernate/LegacyDataMigration.java,
+              **/store/migration/hibernate/R4340XWIKI883DataMigration.java,
+              **/store/migration/hibernate/R4359XWIKI1459DataMigration.java,
+              **/store/migration/hibernate/R6079XWIKI1878DataMigration.java,
+              **/store/migration/hibernate/R7350XWIKI2079DataMigration.java,
               **/store/XWikiAttachmentStoreInterface.java,
               **/store/XWikiBatcherFactory.java,
               **/store/XWikiBatcher.java,

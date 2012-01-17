@@ -19,8 +19,6 @@
  */
 package org.xwiki.extension.repository;
 
-import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 
@@ -56,7 +54,7 @@ public abstract class AbstractExtensionRepository implements ExtensionRepository
     /**
      * @param id the repository identifier
      */
-    public void setId(ExtensionRepositoryId id)
+    protected void setId(ExtensionRepositoryId id)
     {
         this.id = id;
     }
@@ -67,12 +65,6 @@ public abstract class AbstractExtensionRepository implements ExtensionRepository
     public ExtensionRepositoryId getId()
     {
         return this.id;
-    }
-
-    @Override
-    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
-    {
-        return resolve(new ExtensionId(extensionDependency.getId(), extensionDependency.getVersion()));
     }
 
     @Override

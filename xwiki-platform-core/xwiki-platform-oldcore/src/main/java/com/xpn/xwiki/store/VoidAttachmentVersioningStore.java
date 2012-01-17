@@ -21,6 +21,9 @@ package com.xpn.xwiki.store;
 
 import java.util.Date;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
@@ -38,7 +41,9 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
  * @version $Id$
  * @since 1.4M2
  */
-@Component("void")
+@Component
+@Named("void")
+@Singleton
 public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
 {
     /**

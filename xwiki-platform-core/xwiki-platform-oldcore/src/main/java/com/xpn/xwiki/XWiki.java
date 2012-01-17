@@ -167,7 +167,6 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.store.migration.AbstractXWikiMigrationManager;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -507,7 +506,7 @@ public class XWiki implements EventListener
 
         // In path-based multi-wiki, the wiki name is an element of the request path.
         // The url is in the form /xwiki (app name)/wiki (servlet name)/wikiname/
-        if ("1".equals(xwiki.Param("xwiki.virtual.usepath", "0"))) {
+        if ("1".equals(xwiki.Param("xwiki.virtual.usepath", "1"))) {
             String uri = request.getRequestURI();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Request uri is: " + uri);
@@ -754,7 +753,7 @@ public class XWiki implements EventListener
         // Prepare the store
         setConfig(config);
 
-        XWikiStoreInterface basestore = Utils.getComponent(XWikiStoreInterface.class, Param("xwiki.store.main.hint"));
+        XWikiStoreInterface basestore = Utils.getComponent(XWikiStoreInterface.class, Param("xwiki.store.main.hint","hibernate"));
 
         // Check if we need to use the cache store..
         boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
@@ -769,39 +768,22 @@ public class XWiki implements EventListener
             "com.xpn.xwiki.criteria.impl.XWikiCriteriaServiceImpl", context));
 
         setAttachmentStore(Utils
-            .getComponent(XWikiAttachmentStoreInterface.class, Param("xwiki.store.attachment.hint")));
+            .getComponent(XWikiAttachmentStoreInterface.class, Param("xwiki.store.attachment.hint","hibernate")));
 
         setVersioningStore(Utils
-            .getComponent(XWikiVersioningStoreInterface.class, Param("xwiki.store.versioning.hint")));
+            .getComponent(XWikiVersioningStoreInterface.class, Param("xwiki.store.versioning.hint","hibernate")));
 
         setAttachmentVersioningStore(Utils.getComponent(AttachmentVersioningStore.class,
-            hasAttachmentVersioning(context) ? Param("xwiki.store.attachment.versioning.hint") : "void"));
+            hasAttachmentVersioning(context) ? Param("xwiki.store.attachment.versioning.hint","hibernate") : "void"));
 
         if (hasRecycleBin(context)) {
             setRecycleBinStore(Utils.getComponent(XWikiRecycleBinStoreInterface.class,
-                Param("xwiki.store.recyclebin.hint")));
+                Param("xwiki.store.recyclebin.hint","hibernate")));
         }
 
         if (hasAttachmentRecycleBin(context)) {
             setAttachmentRecycleBinStore(Utils.getComponent(AttachmentRecycleBinStore.class,
-                Param("xwiki.store.attachment.recyclebin.hint")));
-        }
-
-        // Run migrations
-        if ("1".equals(Param("xwiki.store.migration", "0"))) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Running storage migrations");
-            }
-            AbstractXWikiMigrationManager manager =
-                (AbstractXWikiMigrationManager) createClassFromConfig("xwiki.store.migration.manager.class",
-                    "com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager", context);
-            manager.startMigrations(context);
-            if ("1".equals(Param("xwiki.store.migration.exitAfterEnd", "0"))) {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("Exiting because xwiki.store.migration.exitAfterEnd is set");
-                }
-                System.exit(0);
-            }
+                Param("xwiki.store.attachment.recyclebin.hint","hibernate")));
         }
 
         resetRenderingEngine(context);
@@ -930,10 +912,6 @@ public class XWiki implements EventListener
             synchronized (wikiName) {
                 if (!wikiList.contains(wikiName)) {
                     wikiList.add(wikiName);
-                    XWikiHibernateStore store = getHibernateStore();
-                    if (store != null) {
-                        store.updateSchema(context, force);
-                    }
 
                     // Make sure these classes exists
                     if (initClasses) {
@@ -4845,7 +4823,7 @@ public class XWiki implements EventListener
         String serverurl = null;
 
         // In virtual wiki path mode the server is the standard one
-        if ("1".equals(Param("xwiki.virtual.usepath", "0"))) {
+        if ("1".equals(Param("xwiki.virtual.usepath", "1"))) {
             return null;
         }
 
@@ -4892,7 +4870,7 @@ public class XWiki implements EventListener
     public String getServletPath(String wikiName, XWikiContext context)
     {
         // unless we are in virtual wiki path mode we should return null
-        if (!context.getMainXWiki().equalsIgnoreCase(wikiName) && "1".equals(Param("xwiki.virtual.usepath", "0"))) {
+        if (!context.getMainXWiki().equalsIgnoreCase(wikiName) && "1".equals(Param("xwiki.virtual.usepath", "1"))) {
             String database = context.getDatabase();
             try {
                 context.setDatabase(context.getMainXWiki());
@@ -5142,7 +5120,7 @@ public class XWiki implements EventListener
                 path = stripSegmentFromPath(path, servletPath);
 
                 // We need to get rid of the wiki name in case of a XEM in usepath mode
-                if ("1".equals(Param("xwiki.virtual.usepath", "0"))
+                if ("1".equals(Param("xwiki.virtual.usepath", "1"))
                     && servletPath.equals("/" + Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
                     // Virtual mode, skip the wiki name
                     if (path.indexOf('/', 1) < 0) {

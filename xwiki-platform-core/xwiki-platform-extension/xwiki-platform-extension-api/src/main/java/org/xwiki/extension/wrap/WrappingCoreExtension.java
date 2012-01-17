@@ -20,6 +20,7 @@
 package org.xwiki.extension.wrap;
 
 import org.xwiki.extension.CoreExtension;
+import org.xwiki.extension.CoreExtensionFile;
 
 /**
  * Wrap a Core extension.
@@ -38,8 +39,14 @@ public class WrappingCoreExtension<T extends CoreExtension> extends WrappingExte
     }
 
     @Override
+    public CoreExtensionFile getFile()
+    {
+        return (CoreExtensionFile) super.getFile();
+    }
+
+    @Override
     public boolean isGuessed()
     {
-        return getExtension().isGuessed();
+        return getWrapped().isGuessed();
     }
 }

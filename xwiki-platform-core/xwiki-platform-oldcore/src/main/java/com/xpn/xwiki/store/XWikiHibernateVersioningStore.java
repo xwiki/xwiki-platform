@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
@@ -49,6 +50,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
  * @version $Id$
  */
 @Component
+@Named("hibernate")
 @Singleton
 public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore implements XWikiVersioningStoreInterface
 {

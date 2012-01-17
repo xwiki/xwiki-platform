@@ -66,7 +66,7 @@ public class ScriptMacroParameters
      *            it's put in a verbatim block.
      * @since 2.0M1
      */
-    @PropertyDescription("Specifies whether wiki syntax in the script execution result will be rendered or not")
+    @PropertyDescription("Specifies whether the macro content will be considered as wiki syntax or not")
     public void setWiki(boolean wiki)
     {
         this.wiki = wiki;

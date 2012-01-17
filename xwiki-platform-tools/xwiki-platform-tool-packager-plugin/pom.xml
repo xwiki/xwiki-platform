@@ -38,12 +38,46 @@
    </description>
   <properties>
     <platform.core.version>2.6.1</platform.core.version>
+    <mavenVersion>2.0.9</mavenVersion>
   </properties>
   <dependencies>
+    <!-- maven -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>${mavenVersion}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+    <!-- plexus -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-archiver</artifactId>
       <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-velocity</artifactId>
+      <version>1.1.8</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -56,6 +90,11 @@
           <artifactId>log4j</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>1.8.0.7</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -73,6 +112,14 @@
       <artifactId>logback-classic</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!-- We need the Servlet API dep since it's used by the Packager and since it has
+         a provided scope in XWiki core it's not inherited as part of transitive deps -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -86,7 +133,9 @@
         <configuration>
           <excludes>
               **/ImportMojo.java,
-              **/ExportMojo.java
+              **/ExportMojo.java,
+              **/PackageMojo.java,
+              **/ArtifactItem.java
           </excludes>
         </configuration>
       </plugin>

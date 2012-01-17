@@ -69,7 +69,7 @@ public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoade
      */
     @Inject
     @Named("attachmentjar")
-    private ExtendedURLStreamHandler attachmentJarHander;
+    private ExtendedURLStreamHandler attachmentJarHandler;
     
     /**
      * {@inheritDoc}
@@ -88,7 +88,7 @@ public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoade
     public void extendAttachmentClassLoader(String jarURLs, ExtendedURLClassLoader source) throws Exception
     {
         for (URI uri : extractURIs(jarURLs)) {
-            if (uri.getScheme().equalsIgnoreCase(this.attachmentJarHander.getProtocol())) {
+            if (uri.getScheme().equalsIgnoreCase(this.attachmentJarHandler.getProtocol())) {
                 source.addURL(new URL(null, uri.toString(), 
                     this.streamHandlerFactory.createURLStreamHandler(uri.getScheme())));
             } else {
@@ -144,6 +144,6 @@ public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoade
             throw new RuntimeException("Failed to URL encode [" + uriBody + "] using UTF-8.", e);
         }
 
-        return new URI(this.attachmentJarHander.getProtocol() + "://" + uriBody);
+        return new URI(this.attachmentJarHandler.getProtocol() + "://" + uriBody);
     }
 }

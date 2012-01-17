@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1321509118000</creationDate>
-<date>1323762399000</date>
-<contentUpdateDate>1323762399000</contentUpdateDate>
+<date>1326741899000</date>
+<contentUpdateDate>1326741899000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -123,6 +123,7 @@
      */ 
     initialize : function () {
       $$(this.extensionItemSelector + " form input[name='actionshowdetails']").invoke("observe", "click", this.loadExtensionDetails.bindAsEventListener(this));
+      this.prepareAdvancedInstall();
     },
     /**
      * Ajax loading of Extension details
@@ -252,6 +253,35 @@
       $(menuLink.getAttribute('href').substring(1)).next(this.extensionDetailsSectionSelector).setStyle({'display' : 'block'});
       // ... also marking the clicked menu item as current
       menuLink.up(this.extensionMenuItemSelector).addClassName(this.crtExtensionMenuItemMarker);
+    },
+
+    prepareAdvancedInstall : function() {
+      var advancedSearchBox = $('advancedextensionsearch');
+      if (!advancedSearchBox) {
+        return;
+      }
+      var advancedSearchTrigger = advancedSearchBox.down('legend a');//ry :)
+      if (advancedSearchTrigger) {
+        var target = advancedSearchTrigger.up('legend').next();
+        if (target) {
+          advancedSearchTrigger.observe('click', function(event) {
+            event.stop();
+            advancedSearchTrigger.blur();
+            target.toggleClassName('hidden');
+            advancedSearchTrigger.toggleClassName('expanded');
+          });
+          var cancelTrigger = target.down('a.actioncancel');
+          if (cancelTrigger) {
+            cancelTrigger.observe('click', function(event) {
+              event.stop();
+              cancelTrigger.up('form').select('input[type=text]').each(function(input) {
+                input.value = '';
+              });
+              advancedSearchTrigger.click();
+          });
+         }
+        }
+      }
     }
   });
 
@@ -385,7 +415,7 @@
   font-size: 1.2em;
   font-weight: 700;
   border: none;
-  background: url("$xwiki.getSkinFile('icons/silk/cog.gif')") no-repeat scroll 0.2em 0.3em transparent;
+  background: url("$xwiki.getSkinFile('icons/silk/cog.png')") no-repeat scroll 0.2em 0.3em transparent;
   margin: 0 0 0 -1.8em;
   padding: 2px 0 2px 1.8em;
 }
@@ -427,6 +457,8 @@
 
 .extension-description {
   font-size: .9em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 .extension-body {
   background-color: $theme.highlightColor;
@@ -469,32 +501,45 @@
   list-style-type: none;
 }
 .dependency-type-core {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cog.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
 }
 .dependency-type-installed {
-  background-image: url("$xwiki.getSkinFile('icons/silk/plugin.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/plugin.png')");
 }
 .dependency-type-remote {
-  background-image: url("$xwiki.getSkinFile('icons/silk/world.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/world.png')");
 }
 .dependency-type-unknown {
-  background-image: url("$xwiki.getSkinFile('icons/silk/plugin_error.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/plugin_error.png')");
 }
 
-#advancedextensionsearch div {
-  display: none;
-}
 #advancedextensionsearch legend {
-  font-size: .8em;
+  font-size: .875em;
+  margin: 0;
+  border: 0 none;
+  text-align: right;
 }
+
 #advancedextensionsearch legend a:after {
-  content: "&gt;&gt;";
+  content: " \bb";
+}
+#advancedextensionsearch legend a.expanded:after {
+  color: transparent;
 }
 #advancedextensionsearch-body {
   display: none;
 }
-#advancedextensionsearch-body:target ~ div {
+#advancedextensionsearch-body:target ~ div.hidden {
   display: block;
+}
+div.advancedsearchpopup {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+  padding: .3em .5em;
+  position: absolute;
+  right: 0;
+  text-align: left;
+  width: 95%;
+  z-index: 200;
 }
 /****************************** &lt;Inner Menu&gt; *************************/
 
@@ -671,7 +716,7 @@
 }
 
 .changedRight {
-    background: url("/xwiki/resources/icons/silk/bullet_black.gif") no-repeat scroll 0 center transparent;
+    background: url("$xwiki.getSkinFile('icons/silk/bullet_black.png')") no-repeat scroll 0 center transparent;
     font-weight: bold;
 }
 
@@ -705,6 +750,14 @@
 
 .extHeaderLeft {
   float: left;
+  width: 50%;
+}
+.extHeaderLeft .xform label {
+  display: block;
+  font-weight: bold;
+}
+.extHeaderLeft .xform .globalsearch {
+  text-align: left;
 }
 
 .extHeaderBottom  .extHeaderLeft{
@@ -716,6 +769,8 @@
   float: right;
   cursor: pointer;
   margin: 3px 0 -3px;
+  position: relative;
+  width: 40%;
 }
 
 .extHeaderBottom  .extHeaderRight {
@@ -730,7 +785,7 @@
 }
 
 .type {
-  background: url("/xwiki/resources/icons/silk/bricks.gif") no-repeat scroll 0 0 transparent;
+  background: url("$xwiki.getSkinFile('icons/silk/bricks.png')") no-repeat scroll 0 0 transparent;
 }
 
 .extFilter {
@@ -804,23 +859,23 @@
 }
 
 .typeApp{
-  background-image: url("/xwiki/resources/icons/silk/application.gif");
+  background-image: url("$xwiki.getSkinFile('icons/silk/application.png')");
 }
 
 .typeModule{
-  background-image: url("/xwiki/resources/icons/silk/connect.gif");
+  background-image: url("$xwiki.getSkinFile('icons/silk/connect.png')");
 }
 
 .typeSkin{
-  background-image: url("/xwiki/resources/icons/silk/layout_content.gif");
+  background-image: url("$xwiki.getSkinFile('icons/silk/layout_content.png')");
 }
 
 .typeMacro{
-  background-image: url("/xwiki/resources/icons/silk/cog.gif");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
 }
 
 .typePlugin{
-  background-image: url("/xwiki/resources/icons/silk/plugin.gif");
+  background-image: url("$xwiki.getSkinFile('icons/silk/plugin.png')");
 }
 
 .extItem.statusInstalled  {
@@ -1066,7 +1121,6 @@ ul.repositories .addRepository:hover  {
 $xwiki.ssx.use('ExtensionManagerMacros')
 $xwiki.jsx.use('ExtensionManagerMacros')
 #set ($extensionManager = $services.extension)
-#set ($versionManager = $extensionManager.versionManager)
 #if ($request.extensionwiki &amp;&amp; $request.extensionwiki.trim() != '')
   #set($extensionwiki = $request.extensionwiki)
   #set($extensionnamespace = "wiki:${extensionwiki}")
@@ -1076,10 +1130,32 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   (% class="extHeader" %)(((
     (% class="extHeaderLeft" %)(((
       {{html}}
-      &lt;form action="$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1').replaceAll('(^|&amp;)(extension(id|version)=[^&amp;]++&amp;?+)+', '$1').replaceAll('(^|&amp;)section=[^&amp;]++', '$1section=XWiki.AddExtensions').replaceAll('(^|&amp;)searchextension=[^&amp;]++&amp;?', '$1'))" method="post"&gt;
+      &lt;form class="xform half" action="$doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++&amp;?', '$1').replaceAll('(^|&amp;)(extension(id|version)=[^&amp;]++&amp;?+)+', '$1').replaceAll('(^|&amp;)section=[^&amp;]++', '$1section=XWiki.AddExtensions').replaceAll('(^|&amp;)searchextension=[^&amp;]++&amp;?', '$1'))" method="post"&gt;
         &lt;div class="globalsearch extHeaderLeftSearch"&gt;
-          &lt;label class="hidden" for="extensionsearchinput"&gt;Search&lt;/label&gt;&lt;input type="text" class="globalsearchinput#if ("$!request.searchextension" == '') withTip#end extHeaderLeftInput" id="extensionsearchinput" name="searchextension" value="#if ("$!request.searchextension" != '')$request.searchextension#{else}search extension...#{end}" size="60"&gt;&lt;input type="image" class="button" value="Go" alt="Go" src="/xwiki/resources/icons/xwiki/search.png"&gt;
+          &lt;label class="label" for="extensionsearchinput"&gt;$msg.get('extensions.search.title')&lt;/label&gt;&lt;input type="text" class="globalsearchinput#if ("$!request.searchextension" == '') withTip#end extHeaderLeftInput" id="extensionsearchinput" name="searchextension" value="#if ("$!request.searchextension" != '')${request.searchextension}#{else}$msg.get('extensions.search.tip')#{end}" size="60"&gt;&lt;input type="image" class="button" value="$msg.get('panels.search.submit')" alt="$msg.get('panels.search.submit')" src="$xwiki.getSkinFile('icons/xwiki/search.png')"&gt;
         &lt;/div&gt;
+      &lt;/form&gt;
+      {{/html}}
+    )))
+    (% class="extHeaderRight" %)(((
+      ## Advanced search form
+      {{html clean="false"}}
+      &lt;form action="$escapetool.xml($doc.getURL($xcontext.action, $request.getQueryString()))" method="post" class="xform"&gt;
+        &lt;fieldset id="advancedextensionsearch"&gt;
+          &lt;div id="advancedextensionsearch-body"&gt;&lt;/div&gt;
+          &lt;legend&gt;&lt;a href="#advancedextensionsearch-body"&gt;$msg.get('extensions.advancedSearch.title')&lt;/a&gt;&lt;/legend&gt;
+          &lt;div class="plainmessage advancedsearchpopup hidden"&gt;
+            &lt;input type="hidden" name="xback" value="$escapetool.xml($doc.getURL($xcontext.action, $request.queryString))" /&gt;
+            &lt;dl&gt;
+            &lt;dt&gt;&lt;label for="advancedextensionsearch-id"&gt;$msg.get('extensions.advancedSearch.id.label')&lt;/label&gt;&lt;/dt&gt;
+            &lt;dd&gt;&lt;input type="text" name="extensionid" id="advancedextensionsearch-id" value="" /&gt;&lt;/dd&gt;
+            &lt;dt&gt;&lt;label for="advancedextensionsearch-version"&gt;$msg.get('extensions.advancedSearch.version.label')&lt;/label&gt;&lt;/dt&gt;
+            &lt;dd&gt;&lt;input type="text" name="extensionversion" id="advancedextensionsearch-version" value="" /&gt;&lt;/dd&gt;
+            &lt;/dl&gt;
+            &lt;p&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" name="actioninstall" value="$msg.get('extensions.advancedSearch.actions.submit')" class="button" /&gt;&lt;/span&gt;
+               &lt;span class="buttonwrapper"&gt;&lt;a href="#searchextension" class="actioncancel secondary button"&gt;$msg.get('extensions.advancedSearch.actions.cancel')&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/fieldset&gt;
       &lt;/form&gt;
       {{/html}}
     )))
@@ -1123,18 +1199,17 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 
     #if ($extension.authors.size() &gt; 0)
       (% class="extension-authors" %)(((
-      $msg.get('by:') ##
+      $msg.get('extensions.info.authors') ##
       #foreach ($author in $extension.authors)
         #if ($author.name == 'devs')
-          [[$msg.get('XWiki Development Team')&gt;&gt;http://www.xwiki.org/]]##
+          [[$msg.get('extensions.info.authors.xwikiorg')&gt;&gt;http://www.xwiki.org/]]##
         #elseif ("$!author.url" != '' &amp;&amp; "$!author.name" != '')
           [[${author.name}&gt;&gt;${author.url}]]##
         #else
           ${author.name}##
         #end
         #if ($foreach.hasNext), ##
-        #else
-        )))
+        #else )))
 
         #end
       #end
@@ -1155,12 +1230,12 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     #end
     (% class="extension-body" %)(((
       (% class="innerMenu" %)
-      * [[Description&gt;&gt;||anchor="extension-body-description-${extension.id.id}-${extension.id.version}"]]
+      * [[$msg.get('extensions.info.category.description')&gt;&gt;||anchor="extension-body-description-${extension.id.id}-${extension.id.version}"]]
       #if ("$!{extension.releaseNotes}" != '')
-        * [[Release Notes&gt;&gt;||anchor="extension-body-relnotes-${extension.id.id}-${extension.id.version}"]]
+        * [[$msg.get('extensions.info.category.releaseNotes')&gt;&gt;||anchor="extension-body-relnotes-${extension.id.id}-${extension.id.version}"]]
       #end
       #if ($extension.dependencies.size() &gt; 0 || $backwardDependencies.size() &gt; 0)
-        * [[Dependencies&gt;&gt;||anchor="extension-body-dependencies-${extension.id.id}-${extension.id.version}"]]
+        * [[$msg.get('extensions.info.category.dependencies')&gt;&gt;||anchor="extension-body-dependencies-${extension.id.id}-${extension.id.version}"]]
       #end
 
       {{id name="extension-body-description-${extension.id.id}-${extension.id.version}" /}}
@@ -1209,16 +1284,16 @@ $xwiki.jsx.use('ExtensionManagerMacros')
       (% class="extension-body-dependencies extension-body-section" %)(((
         $msg.get('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])
         #foreach ($dependency in $extension.dependencies)
-          #set ($dependencyExtension = $extensionManager.resolve($dependency.id, $dependency.version))
+          #set ($dependencyExtension = $extensionManager.resolve($dependency))
           #set ($dependencyClass = "$!{dependencyExtension.class}")
           #if ($dependencyExtension)
             * [[#displayExtensionName($dependencyExtension)&gt;&gt;##
             #if ($dependencyClass.endsWith('CoreExtension'))
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.version}&amp;section=XWiki.CoreExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-core"]]
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.versionConstraint}&amp;section=XWiki.CoreExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-core"]]
             #elseif ($dependencyClass.endsWith('LocalExtension'))
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.version}&amp;section=XWiki.InstalledExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-installed"]]
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.versionConstraint}&amp;section=XWiki.InstalledExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-installed"]]
             #else
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.version}&amp;section=XWiki.AddExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-remote"]]
+              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.versionConstraint}&amp;section=XWiki.AddExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-remote"]]
             #end
           #else
             * (% class="dependency-type-unknown" %)${dependency.id}
@@ -1240,7 +1315,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
               path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.AddExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-remote"]]##
             #end
             #if ("$!{namespace.key}" != '')
-              (in wiki $namespace.key)
+              $msg.get('extensions.info.dependency.wiki', [$namespace.key])
             #else
 
             #end
@@ -1250,30 +1325,6 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     )))
     #end
     )))
-#end
-
-#macro (prepareInstall $extensionid $extensionversion $extensionsToInstall $extensionsToUpgrade $extensionsSuggested $coreExtensionsConflicts)
-  #set ($extension = $extensionManager.resolve($extensionid, $extensionversion))
-  #set ($extensionclass = "${extension.class}")
-  #if (!$extensionclass.endsWith('CoreExtension'))
-    #if (!$extension.isInstalled($extensionwiki))
-      #set($installedExtension = $extensionManager.getInstalledExtension($extensionid, $extensionwiki))
-      #if ($installedExtension &amp;&amp; $versionManager.compareVersions($installedExtension.id.version, $extensionversion) &gt; 0)
-        #set($extensionsToUpgrade[$extension.id] = $extension)
-      #else
-        #set($extensionsToInstall[$extension.id] = $extension)
-      #end
-      #prepareInstallDependencies($extension, $extensionsToInstall, $extensionsToUpgrade, $extensionsSuggested, $coreExtensionsConflicts)
-    #end
-  #elseif ($versionManager.compareVersions($extensionversion, $extension.id.version) &gt; 0)
-    #set($coreExtensionsConflicts[$extension.id] = [$extension, $extensionversion])
-  #end
-#end
-
-#macro (prepareInstallDependencies $extension $extensionsToInstall $extensionsToUpgrade $extensionsSuggested $coreExtensionsConflicts)
-  #foreach ($dependency in $extension.dependencies)
-    #prepareInstall($dependency.id, $dependency.version, $extensionsToInstall, $extensionsToUpgrade, $extensionsSuggested, $coreExtensionsConflicts)
-  #end
 #end
 
 #macro (printThrowable $throwable)
@@ -1288,7 +1339,11 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #end
 
 #macro (printJobLog $job)
-  #foreach ($log in $installJob.status.log)
+  #printStatusLog($job.status)
+#end
+
+#macro (printStatusLog $status)
+  #foreach ($log in $status.log)
     #set ($logLevel = $log.level.toString().toLowerCase())
     {{$logLevel}}
       $log.formattedMessage
@@ -1296,20 +1351,6 @@ $xwiki.jsx.use('ExtensionManagerMacros')
         #printThrowable($log.throwable)
       #end
     {{/$logLevel}}
-  #end
-#end
-
-#macro (prepareUninstall $extensionid $extensionversion $extensionsToUninstall)
-  #set ($discard = $extensionsToUninstall.add("${extensionid}-${extensionversion}"))
-  #set ($backwardDependencies = $extensionManager.getBackwardDependencies($extensionid, $extensionversion))
-  #prepareUninstallBackwardDependencies($backwardDependencies, $extensionsToUninstall)
-#end
-
-#macro(prepareUninstallBackwardDependencies $backwardDependencies $extensionsToUninstall)
-  #foreach ($backwardDependencyMap in $backwardDependencies.values())
-    #foreach ($backwardDependency in $backwardDependencyMap)
-      #prepareUninstall($backwardDependency.id.id, $backwardDependency.id.version, $extensionsToUninstall)
-    #end
   #end
 #end
 

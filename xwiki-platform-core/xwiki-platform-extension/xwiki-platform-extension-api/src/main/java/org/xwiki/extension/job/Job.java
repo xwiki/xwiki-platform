@@ -20,28 +20,26 @@
 package org.xwiki.extension.job;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.extension.job.event.status.JobStatus;
 
 /**
  * @version $Id$
  */
 @ComponentRole
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public interface Job
 {
     /**
-     * @return the status of the task
+     * @return the status of the job
      */
     JobStatus getStatus();
 
     /**
-     * @return the task request
+     * @return the job request
      */
     Request getRequest();
 
     /**
-     * @param request start the task with provided request
+     * @param request start the job with provided request
      */
     void start(Request request);
 }

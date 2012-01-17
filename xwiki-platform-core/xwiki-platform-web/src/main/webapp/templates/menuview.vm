@@ -1,5 +1,7 @@
 #if ($isInServletMode)## Visible only in a page
 <div id="mainmenu" class="layoutsubsection actionmenu">
+<div class="gradientfilterIE"></div>
+<div class="componentcontainer">
 <strong id="xwikimenutitle" class="hidden">$msg.get('core.menu.main.title')</strong>
 <div class="rightmenu">
 #set ($workspaceManagerMainDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'WebHome'))
@@ -35,7 +37,7 @@
     #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=watchlist') $msg.get('core.menu.watchlist.management') 'tmWatchlistManager', '')
     #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=network') $msg.get('core.menu.network') 'tmUserNetwork', '')
   #end
-  #if ($isWorkspaceManagerAppInstalled)
+  #if ($isWorkspaceManagerAppInstalled && $isMainWikiUser)
     #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=workspaces') $msg.get('workspacemanager.menu.user.workspaces') 'tmUserWorkspaces', '')
   #end
   #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=dashboard') $msg.get('core.menu.userDashboard') 'tmUserDashboard', '')
@@ -47,7 +49,7 @@
 ##
 ## Create
 ##
-## Note: In order to know if the user has the right to create a workspace we compute a name that doesn't exist  
+## Note: In order to know if the user has the right to create a workspace we compute a name that doesn't exist
 #set ($hasCreateWorkspace = $isWorkspaceManagerAppInstalled && $isMainWikiUser &&
   $services.workspace.canCreateWorkspace($xcontext.user, "workspace0reserved0for0internal0xwiki0usage${mathtool.random(0, 999)}"))
 #set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $hasComment || $hasCreateWorkspace)
@@ -141,6 +143,7 @@
       #end
     #xwikitopmenuentryend()
   #end
+  #xwikitopmenuseparator()
 #end
 ##
 ## Wiki
@@ -164,9 +167,6 @@
     #set ($wikiName = $xcontext.getDatabase())
   #end
   #set ($wikiEntryText = "${wikiEntryText}__SEPARATOR__${wikiName}")
-#end
-#if (!$xcontext.isMainWiki())
-  #xwikitopmenuseparator()
 #end
 #if (!$displayWikiSubmenu)
   #xwikitopmenuentry($xwiki.getURL('Main.WebHome', 'view') $wikiEntryText $wikiEntryId 'hasIcon')
@@ -250,6 +250,14 @@
     #submenuitem($spaceIndexUrl $msg.get('core.menu.space.documentindex') 'tmSpaceDocumentIndex' '')
     #set ($hasPreviousMenuSection = true)
   #end
+  #if ($hasSpaceAdmin)
+    #if ($hasPreviousMenuSection)
+      #submenuseparator()
+    #end
+    #set ($spaceDeleteUrl = $!xwiki.getURL("${doc.space}.WebHome", 'deletespace'))
+    #submenuitem($spaceDeleteUrl $msg.get('core.menu.space.delete') 'tmSpaceDelete' '')
+    #set ($hasPreviousMenuSection = true)
+  #end
   #xwikitopmenuentryend()
 #end
 ##
@@ -301,6 +309,7 @@
     </script>
   #end
 #end
+</div>
 </div>
 </div>
 #end

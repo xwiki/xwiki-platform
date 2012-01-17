@@ -232,10 +232,11 @@ $xwiki.getUserName("xwiki:${username}")
     #if (!$profiledoc.isNew())
       #if($profiledoc.attachmentList.size() != 0)
         #set($profileobj = $profiledoc.getObject('XWiki.XWikiUsers', 0))
-        #if($profileobj.avatar && $profileobj.avatar != "")
+        #set($avatarFileName = $profileobj.getProperty('avatar').value)
+        #if("$!avatarFileName" != "")
           #foreach ($attach in $profiledoc.attachmentList)
-            #if($attach.filename == $profileobj.avatar)
-              #set($pictureurl = $profiledoc.getAttachmentURL($profileobj.avatar))
+            #if($attach.filename == $avatarFileName)
+              #set($pictureurl = $profiledoc.getAttachmentURL($avatarFileName))
               #set($picture = "<img src='")
               #set($picture = $picture.concat($pictureurl))
               #if ($size > 0)
@@ -397,7 +398,7 @@ $xwiki.getUserName("xwiki:${username}")
       #set ($text = 'attachment')
     #end
   #end
-  <img src="${xwiki.getSkinFile("icons/silk/${image}.gif")}" alt="${msg.get("core.viewers.attachments.mime.${text}")}" title="${msg.get("core.viewers.attachments.mime.${text}")}"/>
+  <img src="${xwiki.getSkinFile("icons/silk/${image}.png")}" alt="${msg.get("core.viewers.attachments.mime.${text}")}" title="${msg.get("core.viewers.attachments.mime.${text}")}"/>
 #end
 ###
 ###    packName
@@ -1451,14 +1452,14 @@ ${Msz}Mb##
     if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
       // Make sure the Livetable widgets exists (It does not in the WYSIWYG for example).
     #if($callback)
-      $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{
+      window["$jsName"] = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{
                            "maxPages":$maxPages
                         ,"limit":$count
        #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end
        #if($hasPageSize && "$!pageSizeBounds" != ''),"pageSizeBounds" : $pageSizeBounds#end
               });
     #else
-      $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix), {
+      window["$jsName"] = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix), {
                            "maxPages":$maxPages
                         ,"limit":$count
        #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end
@@ -2214,6 +2215,54 @@ Wysiwyg.onModuleLoad(function() {
   #if ($hasChildren)
     #foreach ($child in $item.children)
       #verticalNavigationItem($child $level.concat('*') $options)
+    #end
+  #end
+#end
+
+#**
+ * Sets a gradient-based styling for CSS backgrounds
+ *
+ *
+ * @param $icon the path to an additional icon image
+ * @param $gradientData a map of gradients, where the following entries are currently used:
+ *        'angle' :  an angle of direction for the gradient
+ *        'colors':  a list of maps of color-stops for the gradient, where the following entries are currently used: 
+ *                'color'    : color value
+ *                'position' : stop position for the color (between 0% and 100% or a lenght)
+ *#
+#macro (css3_backgroundIconAndLinearGradient $icon $gradientData)
+  #set ($browserVariants = ['-moz-', '-webkit-', '-o-', '-ms-', ''])
+  #set ($colors = '')
+  #if ($gradientData.angle)
+    #set ($position = "$!{gradientData.angle}")
+  #elseif ($gradientData.to)
+    #set ($position = "$!{gradientData.to}")
+  #end
+  #foreach ($colorEntry in $gradientData.colors)
+    #set ($colors = "$!{colors}, $!{colorEntry.color} $!{colorEntry.position}")
+  #end
+  #if ("$!{colors}" != '' && "$!{position}" == '')
+    #set ($colors = $colors.substring(2))
+  #end
+  #foreach ($bvar in $browserVariants)
+    background-image:#if ("$!{icon}" != '') $icon,#end ${bvar}linear-gradient($!{position}$!{colors});
+  #end
+#end
+##
+#macro (css3_backgroundLinearGradient $gradientData)
+  #css3_backgroundIconAndLinearGradient ('' $gradientData)
+#end
+#**
+ * Macro that adds the prefixes for box-sizing CSS property that alters the default CSS box model used to calculate widths and heights of elements
+ *
+ *
+ * @param $value should take the following values: content-box | padding-box | border-box
+ *#
+#macro (css3_boxSizing $value)
+  #if ("$!{value}" != '')
+    #set ($browserVariants = ['-moz-', '-webkit-', ''])
+    #foreach ($bvar in $browserVariants)
+      ${bvar}box-sizing: $value;
     #end
   #end
 #end

@@ -20,6 +20,7 @@
 package org.xwiki.extension.repository.search;
 
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.repository.result.IterableResult;
 
 /**
  * A repository can implements it to provide search capabilities.
@@ -40,5 +41,5 @@ public interface Searchable
      * @return the found extensions descriptors, empty list if nothing could be found
      * @throws SearchException error when trying to search provided pattern
      */
-    SearchResult<Extension> search(String pattern, int offset, int nb) throws SearchException;
+    IterableResult<Extension> search(String pattern, int offset, int nb) throws SearchException;
 }

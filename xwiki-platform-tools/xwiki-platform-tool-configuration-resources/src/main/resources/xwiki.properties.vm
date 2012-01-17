@@ -29,8 +29,8 @@
 
 #-# [Since 1.8RC2]
 #-# Specifies the default syntax to use when creating new documents.
-#-# Default value is xwiki/2.0.
-# core.defaultDocumentSyntax = xwiki/1.0
+#-# Default value is xwiki/2.1.
+# core.defaultDocumentSyntax = xwiki/2.1
 
 #-# [Since 2.4M1]
 #-# Indicate if the rendering cache is enabled.
@@ -145,7 +145,11 @@ container.persistentDirectory=$xwikiPropertiesContainerPersistentDirectory
 #-# Note that the Macro transformation is a special transformation that replaces macro markers by the result of the
 #-# macro execution. If you don't list it, macros won't get executed.
 #-# The default value is: macro, icon
+#if ($xwikiRenderingTransformations)
+rendering.transformations = $xwikiRenderingTransformations
+#else
 # rendering.transformations = macro, icon
+#end
 
 #-# [Since 2.6RC1]
 #-# Icon Transformation Configuration

@@ -53,24 +53,24 @@ public class WrappingLocalExtension<T extends LocalExtension> extends WrappingEx
     @Override
     public boolean isInstalled()
     {
-        return getExtension().isInstalled();
+        return getWrapped().isInstalled();
     }
 
     @Override
     public boolean isInstalled(String namespace)
     {
-        return getExtension().isInstalled(namespace);
+        return getWrapped().isInstalled(namespace);
     }
 
     @Override
     public boolean isDependency()
     {
-        return getExtension().isDependency();
+        return getWrapped().isDependency();
     }
 
     @Override
     public Collection<String> getNamespaces()
     {
-        return getExtension().getNamespaces();
+        return getWrapped().getNamespaces();
     }
 }

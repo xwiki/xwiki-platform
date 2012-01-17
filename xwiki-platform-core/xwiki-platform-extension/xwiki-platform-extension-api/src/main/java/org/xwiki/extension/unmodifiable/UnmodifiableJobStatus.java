@@ -21,9 +21,10 @@ package org.xwiki.extension.unmodifiable;
 
 import java.util.List;
 
-import org.xwiki.extension.job.JobProgress;
-import org.xwiki.extension.job.JobStatus;
 import org.xwiki.extension.job.Request;
+import org.xwiki.extension.job.event.status.JobProgress;
+import org.xwiki.extension.job.event.status.JobStatus;
+import org.xwiki.extension.wrap.AbstractWrappingObject;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogQueue;
 import org.xwiki.logging.event.LogEvent;
@@ -31,50 +32,46 @@ import org.xwiki.logging.event.LogEvent;
 /**
  * Provide a readonly access to a job status.
  * 
+ * @param <J> the type of the job status
  * @version $Id$
  */
-public class UnmodifiableJobStatus implements JobStatus
+public class UnmodifiableJobStatus<J extends JobStatus> extends AbstractWrappingObject<J> implements JobStatus
 {
-    /**
-     * The wrapped job status.
-     */
-    private JobStatus status;
-
     /**
      * @param status the wrapped job status
      */
-    public UnmodifiableJobStatus(JobStatus status)
+    public UnmodifiableJobStatus(J status)
     {
-        this.status = status;
+        super(status);
     }
 
     @Override
     public State getState()
     {
-        return this.status.getState();
+        return getWrapped().getState();
     }
 
     @Override
     public Request getRequest()
     {
-        return this.status.getRequest();
+        return getWrapped().getRequest();
     }
 
     @Override
     public LogQueue getLog()
     {
-        return this.status.getLog();
+        return getWrapped().getLog();
     }
 
     @Override
     public List<LogEvent> getLog(LogLevel level)
     {
-        return this.status.getLog(level);
+        return getWrapped().getLog(level);
     }
 
     @Override
     public JobProgress getProgress()
     {
-        return this.status.getProgress();
+        return getWrapped().getProgress();
     }
 }

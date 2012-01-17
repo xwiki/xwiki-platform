@@ -29,9 +29,9 @@ import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.Job;
 import org.xwiki.extension.job.JobException;
 import org.xwiki.extension.job.JobManager;
-import org.xwiki.extension.job.JobStatus;
 import org.xwiki.extension.job.Request;
 import org.xwiki.extension.job.UninstallRequest;
+import org.xwiki.extension.job.event.status.JobStatus;
 
 /**
  * Default implementation of {@link JobManager}.

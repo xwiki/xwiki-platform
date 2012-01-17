@@ -19,7 +19,6 @@
  */
 package org.xwiki.extension.wrap;
 
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -38,32 +37,14 @@ import org.xwiki.extension.repository.ExtensionRepository;
  * @param <T> the extension type
  * @version $Id$
  */
-public class WrappingExtension<T extends Extension> implements Extension
+public class WrappingExtension<T extends Extension> extends AbstractWrappingObject<T> implements Extension
 {
-    /**
-     * The format of the {@link #toString} output.
-     */
-    private static final MessageFormat TOSTRING_FORMAT = new MessageFormat("{0} ({1})");
-
-    /**
-     * @see #getExtension()
-     */
-    private T extension;
-
     /**
      * @param extension the wrapped extension
      */
     public WrappingExtension(T extension)
     {
-        this.extension = extension;
-    }
-
-    /**
-     * @return the wrapped extension
-     */
-    protected T getExtension()
-    {
-        return this.extension;
+        super(extension);
     }
 
     // Extension
@@ -71,90 +52,84 @@ public class WrappingExtension<T extends Extension> implements Extension
     @Override
     public ExtensionId getId()
     {
-        return getExtension().getId();
+        return getWrapped().getId();
     }
 
     @Override
     public Collection<String> getFeatures()
     {
-        return getExtension().getFeatures();
+        return getWrapped().getFeatures();
     }
 
     @Override
     public String getType()
     {
-        return getExtension().getType();
+        return getWrapped().getType();
     }
 
     @Override
     public String getName()
     {
-        return getExtension().getName();
+        return getWrapped().getName();
     }
 
     @Override
     public Collection<ExtensionLicense> getLicenses()
     {
-        return getExtension().getLicenses();
+        return getWrapped().getLicenses();
     }
 
     @Override
     public String getSummary()
     {
-        return getExtension().getSummary();
+        return getWrapped().getSummary();
     }
 
     @Override
     public String getDescription()
     {
-        return getExtension().getDescription();
+        return getWrapped().getDescription();
     }
 
     @Override
     public String getWebSite()
     {
-        return getExtension().getWebSite();
+        return getWrapped().getWebSite();
     }
 
     @Override
     public List<ExtensionAuthor> getAuthors()
     {
-        return getExtension().getAuthors();
+        return getWrapped().getAuthors();
     }
 
     @Override
     public List< ? extends ExtensionDependency> getDependencies()
     {
-        return getExtension().getDependencies();
+        return getWrapped().getDependencies();
     }
 
     @Override
     public ExtensionFile getFile()
     {
-        return getExtension().getFile();
+        return getWrapped().getFile();
     }
 
     @Override
     public ExtensionRepository getRepository()
     {
-        return getExtension().getRepository();
+        return getWrapped().getRepository();
     }
 
     @Override
     public Map<String, Object> getProperties()
     {
-        return getExtension().getProperties();
+        return getWrapped().getProperties();
     }
 
     @Override
     public Object getProperty(String key)
     {
-        return getExtension().getProperty(key);
-    }
-
-    @Override
-    public String toString()
-    {
-        return TOSTRING_FORMAT.format(new Object[] {getName(), getId()});
+        return getWrapped().getProperty(key);
     }
 }

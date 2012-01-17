@@ -57,6 +57,6 @@
  * @param $imgName The name of the icon to use (without the extension).
  * @param alt The alternate text that should be displayed when images are not viewable.
  *#
-#macro(toolImage $imgName $alt)&lt;img class="icon-manage" src="$xwiki.getSkinFile("icons/silk/${imgName}.gif")" alt="${alt}"/&gt;#end
+#macro(toolImage $imgName $alt)&lt;img class="icon-manage" src="$xwiki.getSkinFile("icons/silk/${imgName}.png")" alt="${alt}"/&gt;#end
 {{/velocity}}</content>
 </xwikidoc>

@@ -110,13 +110,13 @@ XWiki.Blog = {
   blogToolsValues: {
     show: {
       title: "This blog post is not visible to other users. Make it visible",
-      imageSrc: "$xwiki.getSkinFile('icons/silk/lock_open.gif')",
+      imageSrc: "$xwiki.getSkinFile('icons/silk/lock_open.png')",
       imageAlt: "show",
       comment: "Made%20entry%20visible"
     },
     hide: {
       title: "Hide this blog post from other users",
-      imageSrc: "$xwiki.getSkinFile('icons/silk/lock.gif')",
+      imageSrc: "$xwiki.getSkinFile('icons/silk/lock.png')",
       imageAlt: "hide",
       comment: "Hidden%20entry"
     },

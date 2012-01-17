@@ -24,6 +24,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
@@ -32,6 +34,7 @@ import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPage;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiService;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -51,6 +54,12 @@ public abstract class AbstractWikiService implements WikiService
      * The object used to convert between client and server entity reference.
      */
     protected final EntityReferenceConverter entityReferenceConverter = new EntityReferenceConverter();
+
+    /**
+     * Logger.
+     */
+    @Inject
+    protected Logger logger;
 
     /**
      * The component used to create queries.
@@ -205,6 +214,26 @@ public abstract class AbstractWikiService implements WikiService
         org.xwiki.gwt.wysiwyg.client.wiki.EntityReference baseReference)
     {
         return linkService.parseLinkReference(linkReference, baseReference);
+    }
+
+    @Override
+    public Attachment getAttachment(org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference clientAttachmentReference)
+    {
+        AttachmentReference attachmentReference = entityReferenceConverter.convert(clientAttachmentReference);
+        try {
+            if (StringUtils.isBlank(documentAccessBridge.getAttachmentVersion(attachmentReference))) {
+                logger.warn("Failed to get attachment: [{}] not found.", attachmentReference.getName());
+                return null;
+            }
+        } catch (Exception e) {
+            logger.error("Failed to get attachment: there was a problem with getting the document on the server.", e);
+            return null;
+        }
+
+        Attachment attach = new Attachment();
+        attach.setReference(clientAttachmentReference.getEntityReference());
+        attach.setUrl(documentAccessBridge.getAttachmentURL(attachmentReference, false));
+        return attach;
     }
 
     @Override

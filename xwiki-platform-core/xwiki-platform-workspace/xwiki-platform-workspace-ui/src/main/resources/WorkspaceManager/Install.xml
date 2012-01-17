@@ -64,7 +64,7 @@
       #set ($discard = $searchSuggestConfigObject.set('url', $suggestUrl))
       #set ($discard = $searchSuggestConfigObject.set('activated', 1))
       #set ($discard = $searchSuggestConfigObject.set('highlight', 1))
-      #set ($suggestIcon = '$xwiki.getSkinFile(' + $escapetool.singleQuote + 'icons/silk/chart_organisation.gif' + $escapetool.singleQuote + ')')
+      #set ($suggestIcon = '$xwiki.getSkinFile(' + $escapetool.singleQuote + 'icons/silk/chart_organisation.png' + $escapetool.singleQuote + ')')
       #set ($discard = $searchSuggestConfigObject.set('icon', $suggestIcon))
       ##
       #set ($discard = $searchSuggestConfigDocument.save('Automatically registered workspace search suggestions.', true))
@@ -308,7 +308,6 @@
         #if ($xwiki.exists($documentReferenceToRemove))
           #set ($documentToRemove = $xwiki.getDocument($documentReferenceToRemove))
           #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
-          ## #set ($discard = $templateLocalAdminDocument.delete())
           ## Make sure not to leave anything in the recycle bin so don`t send to trash.
           #set ($discard = $xwiki.xWiki.deleteDocument($documentToRemove.document, false, $xcontext.context))
           #set ($discard = $xcontext.setDatabase($currentDatabase))
@@ -331,6 +330,41 @@
       ##
       #set ($templateLocalAdminDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'Admin'))
       #permanentlyDeleteDocument($templateLocalAdminDocumentReference)
+      ##
+      ## Macro to be used for setting the document author of documents requiring an existing user as author or a user with admin/programming rights.
+      ##
+      #set ($documentNamesAlreadyFixed = [])
+      #macro(fixDocumentAuthor $className $comment $documentNamesAlreadyFixed)
+        #set ($currentDatabase = $xcontext.database)
+        #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
+        #set ($documentNamesToFix = $services.query.xwql("from doc.object($className) as theObject").execute())
+        #foreach ($documentNameToFix in $documentNamesToFix)
+          #if (!$documentNamesAlreadyFixed.contains($documentNameToFix))
+            #set ($documentReferencetoFix = $services.model.resolveDocument($documentNameToFix))
+            #set ($documentToFix = $xwiki.getDocument($documentReferencetoFix))
+            #set ($discard = $documentToFix.save($comment, true))
+            #set ($discard = $documentNamesAlreadyFixed.add($documentNameToFix))
+          #end
+        #end
+        #set ($discard = $xcontext.setDatabase($currentDatabase))
+      #end
+      ##
+      ## 12. Fix the author of wiki macro documents (use the current admin user) so that they are correctly registered.
+      ##
+      #fixDocumentAuthor('XWiki.WikiMacroClass', 'Fixed macro registration.', $documentNamesAlreadyFixed)
+      ##
+      ## 13. Fix the author of configuration pages for each application (use the current admin user) so that they are correctly registered and accessible in the workspace Administration section.
+      ##
+      #fixDocumentAuthor('XWiki.ConfigurableClass', 'Fixed Configurable Class registration issues.', $documentNamesAlreadyFixed)
+      ##
+      ## 14. Fix the author of SSX and JSX extensions.
+      ##
+      #fixDocumentAuthor('XWiki.StyleSheetExtension', 'Fixed SSX registration issues.', $documentNamesAlreadyFixed)
+      #fixDocumentAuthor('XWiki.JavaScriptExtension', 'Fixed JSX registration issues.', $documentNamesAlreadyFixed)
+      ##
+      ## 15. Fix the author of documents with RequiredRightClass declarations.
+      ##
+      #fixDocumentAuthor('XWiki.RequiredRightClass', 'Fixed RequiredRightClass requests.', $documentNamesAlreadyFixed)
 
       {{success}}Workspace template features successfully installed.{{/success}}
     #end

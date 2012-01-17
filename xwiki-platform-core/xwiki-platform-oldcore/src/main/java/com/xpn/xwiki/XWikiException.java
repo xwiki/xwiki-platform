@@ -363,4 +363,10 @@ public class XWikiException extends Exception
         pwriter.flush();
         return swriter.getBuffer().toString();
     }
+
+    @Override
+    public Throwable getCause()
+    {
+        return this.exception;
+    }
 }

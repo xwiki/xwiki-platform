@@ -36,6 +36,7 @@ import java.util.StringTokenizer;
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -100,6 +101,7 @@ import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.stats.impl.XWikiStats;
+import com.xpn.xwiki.store.migration.MigrationRequiredException;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
@@ -109,6 +111,7 @@ import com.xpn.xwiki.web.Utils;
  * @version $Id$
  */
 @Component
+@Named("hibernate")
 @Singleton
 public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWikiStoreInterface
 {
@@ -242,7 +245,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 available = false;
             } catch (XWikiException e) {
                 // Failed to switch to database. Assume it means database does not exists.
-                available = true;
+                available = !(e.getException() instanceof MigrationRequiredException);
             }
         } catch (Exception e) {
             Object[] args = {wikiName};

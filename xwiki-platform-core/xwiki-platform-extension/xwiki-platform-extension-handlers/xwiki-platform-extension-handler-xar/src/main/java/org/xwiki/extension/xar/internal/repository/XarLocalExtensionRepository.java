@@ -37,6 +37,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
@@ -49,6 +50,8 @@ import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
+import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.version.Version;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -163,7 +166,7 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
         }
     }
 
-    // LocalExtensionRepository
+    // ExtensionRepository
 
     @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
@@ -178,10 +181,32 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
     }
 
     @Override
+    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    {
+        Extension extension = this.localRepository.resolve(extensionDependency);
+        extension = this.extensions.get(extension.getId());
+
+        if (extension == null) {
+            throw new ResolveException("Extension [" + extensionDependency
+                + "] does not exists or is not a xar extension");
+        }
+
+        return extension;
+    }
+
+    @Override
     public boolean exists(ExtensionId extensionId)
     {
         return this.extensions.containsKey(extensionId);
     }
+
+    @Override
+    public IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException
+    {
+        return this.localRepository.resolveVersions(id, offset, nb);
+    }
+
+    // LocalExtensionRepository
 
     @Override
     public int countExtensions()

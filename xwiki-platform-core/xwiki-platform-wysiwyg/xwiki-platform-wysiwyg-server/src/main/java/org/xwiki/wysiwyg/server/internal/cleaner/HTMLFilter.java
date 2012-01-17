@@ -29,4 +29,11 @@ import org.xwiki.component.annotation.ComponentRole;
 @ComponentRole
 public interface HTMLFilter extends org.xwiki.xml.html.filter.HTMLFilter
 {
+    /**
+     * The filter priority is used to determine the order in which filters are applied. The lower the returned value the
+     * higher the priority. 0 is top priority.
+     * 
+     * @return the priority of this filter
+     */
+    int getPriority();
 }

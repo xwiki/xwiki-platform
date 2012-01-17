@@ -1336,7 +1336,7 @@ document.observe('xwiki:dom:loaded', function() {
         "documents" : {
             script: XWiki.Document.getRestSearchURL("scope=name&number=10&media=json&"),
             varname: "q",
-            icon: "$xwiki.getSkinFile('icons/silk/page_white_text.gif')",
+            icon: "$xwiki.getSkinFile('icons/silk/page_white_text.png')",
             noresults: "Document not found",
             json: true,
             resultsParameter : "searchResults",
@@ -1347,7 +1347,7 @@ document.observe('xwiki:dom:loaded', function() {
         "spaces" : {
             script: XWiki.Document.getRestSearchURL("scope=spaces&number=10&media=json&"),
             varname: "q",
-            icon: "$xwiki.getSkinFile('icons/silk/folder.gif')",
+            icon: "$xwiki.getSkinFile('icons/silk/folder.png')",
             noresults: "Space not found",
             json: true,
             resultsParameter : "searchResults",
@@ -1358,13 +1358,13 @@ document.observe('xwiki:dom:loaded', function() {
         "users" : {
             script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&classname=XWiki.XWikiUsers&wiki=local&uorg=user&'),
             varname: "input",
-            icon: "$xwiki.getSkinFile('icons/silk/user.gif')",
+            icon: "$xwiki.getSkinFile('icons/silk/user.png')",
             noresults: "User not found"
         },
         "groups" : {
             script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&classname=XWiki.XWikiGroups&wiki=local&uorg=group&'),
             varname: "input",
-            icon: "$xwiki.getSkinFile('icons/silk/group.gif')",
+            icon: "$xwiki.getSkinFile('icons/silk/group.png')",
             noresults: "Group not found"
         }
     };
@@ -1534,16 +1534,18 @@ document.observe("xwiki:dom:loaded", function() {
       extraHeight = menu.__fm_extra.getHeight();
     }
     var menuHeight = menu.getHeight();
-    var menuMaxTop = content.cumulativeOffset().top + content.getHeight() - menuHeight - extraHeight;
-    var menuMinTop = content.cumulativeOffset().top - menuHeight - extraHeight;
-    if (document.viewport.getScrollOffsets().top >= menuMinTop && document.viewport.getScrollOffsets().top < menuMaxTop) {
+    var menuMinTop = content.cumulativeOffset().top - extraHeight;
+    if (document.viewport.getScrollOffsets().top >= menuMinTop) {
       var menuWidth = content.getWidth();
       var menuLeft = content.cumulativeOffset().left;
       makeFixed(menu, 0, menuLeft, menuWidth);
-      makeFixed(menu.__fm_extra, menuHeight, menuLeft, (menuWidth - 50)); // magic number 50 = left+right padding
-    } else if (document.viewport.getScrollOffsets().top >= menuMaxTop) {
-      makeAbsolute(menu, menuMaxTop);
-      makeAbsolute(menu.__fm_extra, menuMaxTop + menuHeight);
+      if (menu.__fm_extra) {
+        makeFixed(menu.__fm_extra, menuHeight, menuLeft, (menuWidth -
+          menu.__fm_extra.getStyle('border-left-width').replace(/[^0-9]/g,'') -
+          menu.__fm_extra.getStyle('border-right-width').replace(/[^0-9]/g,'') -
+          menu.__fm_extra.getStyle('padding-right').replace(/[^0-9]/g,'') -
+          menu.__fm_extra.getStyle('padding-left').replace(/[^0-9]/g,'')));
+      }
     } else {
       makeScrollable(menu);
       makeScrollable(menu.__fm_extra);
@@ -1574,6 +1576,7 @@ document.observe("xwiki:dom:loaded", function() {
    */
   function makeFixed(element, top, left, width) {
     if (element) {
+      element.addClassName('floating-menu');
       element.style.position = 'fixed';
       element.style.top = top + 'px';
       element.style.left = left + 'px';
@@ -1582,20 +1585,11 @@ document.observe("xwiki:dom:loaded", function() {
     }
   }
   /**
-   * Keeps the provided element at a certain position inside the document.
-   */
-  function makeAbsolute(element, top) {
-    if (element) {
-      element.style.position = 'absolute';
-      element.style.top = top + 'px';
-      element.__fm_ghost.show();
-    }
-  }
-  /**
    * Restores the provided element to its original position in the document.
    */
   function makeScrollable(element) {
     if (element) {
+      element.removeClassName('floating-menu');
       element.style.position = '';
       element.style.top = '';
       element.style.left = '';

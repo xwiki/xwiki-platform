@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+<xwikidoc>
+<web>XWiki</web>
+<name>XWikiUserProfileSheet</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.XWikiUserSheet</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1262856167000</creationDate>
+<date>1262856167000</date>
+<contentUpdateDate>1262856167000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.XWikiUserProfileSheet</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>69c76935-fbd0-4167-af11-8ad356c88ba9</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>#template('colorThemeInit.vm')
+
+.activity-follow {
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.activity-follow .unfollow {
+  background: transparent 0 center url("$xwiki.getSkinFile('icons/silk/cross.png')") no-repeat;
+  color: $theme.notificationErrorColor;
+  display: inline-block;
+  overflow: hidden;
+  font-size: 83.3%;
+  text-indent: 17px;
+  vertical-align: middle;
+  width: 16px;
+}
+.activity-follow .unfollow:hover {
+  overflow: visible;
+  text-decoration: none;
+  width: auto;
+}
+
+.activity-follow .follow, .activity-follow .following {
+  background: $theme.menuAddEntryBackgroundColor 2px center url("$xwiki.getSkinFile('icons/silk/accept.png')") no-repeat;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  color: $theme.menuAddEntryLinkColor !important;
+  display: inline-block;
+  font-size: 83.3%;
+  line-height: 1.6em;
+  min-height: 16px;
+  padding: 3px 6px 3px 22px;
+}
+.activity-follow .follow {
+  background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
+}</code>
+</property>
+<property>
+<name>'Follow' css</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>currentPage</use>
+</property>
+</object>
+<content>{{velocity}}
+#set($obj = $doc.getObject("XWiki.XWikiUsers"))
+## Allow $obfuscateEmail to be set in some other place.
+#if("$!obfuscateEmail" == '')
+  #set($obfuscateEmail = true)
+#end
+#if(!$obj)
+= $msg.get('xe.admin.users.sheet') =
+
+{{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}##
+#else
+$doc.use($obj)
+{{html clean="false" wiki="true"}}
+#set($username = $xwiki.getUserName($doc.fullName, false))
+= $msg.get('platform.core.profile.title', [$username]) =
+
+#if($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit')
+  &lt;div class="vcard"&gt;
+  &lt;span class="fn hidden"&gt;$username&lt;/span&gt;
+#end
+$xwiki.ssx.use("XWiki.XWikiUserSheet")##
+  &lt;div class="#if($context.action == 'view')half #{else}full #{end}column"&gt;
+    &lt;div class="userInfo"&gt;
+      #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
+        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=profile')"&gt;&lt;span class="hidden"&gt;$msg.get('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+      #end
+      ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
+      &lt;h1&gt;$msg.get('platform.core.profile.section.personal')&lt;/h1&gt;
+      &lt;dl&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.firstname')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd#if ($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit') class="given-name"#end&gt;$doc.display('first_name')&lt;/dd&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.lastname')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd#if ($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit') class="family-name"#end&gt;$doc.display('last_name')&lt;/dd&gt;
+        #if(($obj.getProperty('company') &amp;&amp; $obj.getProperty('company').getValue() != '') || $xcontext.action != 'view')
+          &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.company')&lt;/label&gt;&lt;/dt&gt;
+          &lt;dd#if ($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit') class="org"#end&gt;$doc.display('company')&lt;/dd&gt;
+        #end
+        #if (("$!{obj.getProperty('comment').value}" != '') || $xcontext.action != 'view')
+          &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.about')&lt;/label&gt;&lt;/dt&gt;
+          &lt;dd #if($xcontext.action == 'view')class="note"#end&gt;$doc.display('comment')&lt;/dd&gt;
+        #end
+      &lt;/dl&gt;
+      &lt;h1&gt;$msg.get('platform.core.profile.section.contact')&lt;/h1&gt;
+      &lt;dl&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.email')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd#if ($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit') class="email"#end&gt;#if ($xcontext.action == 'inline' || $xcontext.action == 'edit' || !$obfuscateEmail)$doc.display('email')#else $doc.display('email').replaceAll('@.*', '@ ~-~-~-~-~-~-')#end&lt;/dd&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.phone')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd#if ($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit') class="tel"#end&gt;$doc.display('phone')&lt;/dd&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.address')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd#if ($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit') class="adr"#end&gt;$doc.display('address')&lt;/dd&gt;
+      &lt;/dl&gt;
+      #set ($hasBlog = ("$!{obj.getProperty('blog').getValue()}" != ''))
+      #set ($hasBlogFeed = ("$!{obj.getProperty('blogfeed').getValue()}" != ''))
+      #if ($hasBlog || $hasBlogFeed || $xcontext.action == 'inline' || $xcontext.action == 'edit')
+       &lt;h1&gt;$msg.get('platform.core.profile.section.links')&lt;/h1&gt;
+        &lt;dl&gt;
+          #if ($hasBlog || $xcontext.action == 'inline' || $xcontext.action == 'edit')
+            &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.blog')&lt;/label&gt;&lt;/dt&gt;
+            &lt;dd&gt;$doc.display('blog')&lt;/dd&gt;
+          #end
+          #if ($hasBlogFeed || $xcontext.action == 'inline' || $xcontext.action == 'edit')
+            &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.blogFeed')&lt;/label&gt;&lt;/dt&gt;
+            &lt;dd&gt;$doc.display('blogfeed')&lt;/dd&gt;
+          #end
+        &lt;/dl&gt;
+      #end
+    &lt;/div&gt;
+  &lt;/div&gt;
+  #if ($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit')
+    &lt;div class="half column"&gt;
+      &lt;div class="userRecentChanges"&gt;
+      #if ($context.user == $doc.fullName)
+        &lt;h1&gt;$msg.get('platform.core.profile.section.activity')&lt;/h1&gt;
+      #else
+        &lt;h1&gt;$msg.get('platform.core.profile.section.activityof', [$xwiki.getUserName($doc.fullName, false)])&lt;/h1&gt;
+        #if ($hasWatch)
+        $xwiki.ssx.use('XWiki.XWikiUserProfileSheet')##
+        &lt;div class="activity-follow"&gt;
+          #set ($xredirect = $doc.getURL($context.action, $request.queryString))
+          #if ($xwiki.watchlist.isUserWatched(${doc.prefixedFullName}))
+          &lt;span class="following"&gt;$msg.get('xe.activity.messages.following')&lt;/span&gt;
+          &lt;a class="action unfollow" href="$doc.getURL('view', "xpage=watch&amp;amp;do=removeuser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$msg.get('xe.activity.messages.unfollow')&lt;/a&gt;
+          #else
+          &lt;a class="action follow" href="$doc.getURL('view', "xpage=watch&amp;amp;do=adduser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$msg.get('xe.activity.messages.follow')&lt;/a&gt;
+          #end
+        &lt;/div&gt;
+        #end
+      #end
+{{/html}}
+
+{{activity authors="${doc.fullName},${doc.prefixedFullName}" /}}
+
+{{html clean="false"}}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  #end
+  &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
+#if($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit')
+  ## Close the vcard
+  &lt;/div&gt;
+#end
+{{/html}}##
+#end
+{{/velocity}}</content>
+</xwikidoc>

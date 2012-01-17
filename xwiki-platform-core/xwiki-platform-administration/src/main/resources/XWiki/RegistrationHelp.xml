@@ -157,7 +157,7 @@ ul.showCircles li {
 
 {{id name=loginButton_enabled/}}
 * **Enable login button** (Default: Yes)
-** When the user has registered, we provide a button for them to click which will post their username and passoerd to the login action and get them logged in right away. This however causes the username and password to be passed back in the HTML which may be unacceptable depending on your security needs.
+** When the user has registered, we provide a button for them to click which will post their username and password to the login action and get them logged in right away. This however causes the username and password to be passed back in the HTML which may be unacceptable depending on your security needs.
 
 {{id name=loginButton_autoLogin_enabled/}}
 * **Enable automatic login** (Default: No)

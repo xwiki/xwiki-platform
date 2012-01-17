@@ -19,12 +19,15 @@
  */
 package org.xwiki.extension.repository;
 
+import java.util.Collection;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
-import org.xwiki.extension.repository.search.SearchResult;
+import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.version.Version;
 
 /**
  * Proxy behind remote repositories.
@@ -64,6 +67,11 @@ public interface ExtensionRepositoryManager
     ExtensionRepository getRepository(String repositoryId);
 
     /**
+     * @return the repositories
+     */
+    Collection<ExtensionRepository> getRepositories();
+
+    /**
      * Get extension descriptor found in one of the repositories.
      * <p>
      * The proxy search in all repositories and return the first extension it could find.
@@ -90,6 +98,17 @@ public interface ExtensionRepositoryManager
     Extension resolve(ExtensionDependency extensionDependency) throws ResolveException;
 
     /**
+     * Return ordered (ascendent) versions for the provided extension id.
+     * 
+     * @param id the id of the extensions for which to return versions
+     * @param offset the offset from where to start returning versions
+     * @param nb the maximum number of versions to return
+     * @return the versions of the provided extension id
+     * @throws ResolveException fail to find extension for provided id
+     */
+    IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException;
+
+    /**
      * Search among all repository implementing {@link org.xwiki.extension.repository.search.Searchable} interface.
      * 
      * @param pattern the pattern to search
@@ -99,5 +118,5 @@ public interface ExtensionRepositoryManager
      * @return the found extensions descriptors, empty list if nothing could be found
      * @see org.xwiki.extension.repository.search.Searchable
      */
-    SearchResult<Extension> search(String pattern, int offset, int nb);
+    IterableResult<Extension> search(String pattern, int offset, int nb);
 }

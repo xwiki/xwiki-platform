@@ -325,7 +325,7 @@ isc.XWEResultTree.addMethods({
             space: node.space,
             title: isc.XWEResultTree.formatTitle(isc.XWEResultTree.constants.addPageTitle, hint),
             parentId: node.id,
-            icon: "$xwiki.getSkinFile('icons/silk/bullet_add.gif')",
+            icon: "$xwiki.getSkinFile('icons/silk/bullet_add.png')",
             resource: node.resource,
             isNewPage: true,
             isNewAttachment: false,
@@ -357,7 +357,7 @@ isc.XWEResultTree.addMethods({
             space: node.space,
             title: isc.XWEResultTree.formatTitle(isc.XWEResultTree.constants.addAttachmentTitle, hint),
             parentId: node.id,
-            icon: "$xwiki.getSkinFile('icons/silk/bullet_add.gif')",
+            icon: "$xwiki.getSkinFile('icons/silk/bullet_add.png')",
             resource: node.resource,
             isNewPage: false,
             isNewAttachment: true,
@@ -427,7 +427,7 @@ isc.XWEResultTree.addMethods({
                 parentId: node.id,
                 xwikiRelativeURL: node.xwikiRelativeURL + XWiki.constants.anchorSeparator +
                                   XWiki.constants.docextraAttachmentsAnchor,
-                icon: "$xwiki.getSkinFile('icons/silk/page_white_zip.gif')",
+                icon: "$xwiki.getSkinFile('icons/silk/page_white_zip.png')",
                 resource: XWiki.resource.get(node.id + XWiki.constants.anchorSeparator +
                                             XWiki.constants.docextraAttachmentsAnchor),
                 isXWikiAttachment: true,
@@ -488,13 +488,17 @@ isc.XWEDataSource.addProperties({
     /*
      * XWiki Explorer (XWE) per-DataSource type (will be overriden) options.
      */
-    icon : "$xwiki.getSkinFile('icons/silk/database.gif')",
+    icon : "$xwiki.getSkinFile('icons/silk/database.png')",
 
     /**
      * Properties passed to the RPCManager when request are performed.
      */
     requestProperties : {
-        promptStyle: "cursor"
+        promptStyle: "cursor",
+        // Prevent the RPCManager from displaying a warning message every time a request fails. This is especially
+        // annoying when we try to open the tree to a page that doesn't exist.
+        // See http://www.smartclient.com/smartgwtee/javadoc/com/smartgwt/client/rpc/RPCRequest.html#getWillHandleError()
+        willHandleError: true
     },
 
     /**
@@ -560,7 +564,7 @@ isc.XWEWikiDataSource.addProperties({
         { name:"title", type: "text" },
         { name:"xwikiRelativeUrl", type: "text" }
     ],
-    icon : "$xwiki.getSkinFile('icons/silk/folder.gif')"
+    icon : "$xwiki.getSkinFile('icons/silk/folder.png')"
 });
 
 isc.XWEWikiDataSource.addMethods({
@@ -609,7 +613,7 @@ isc.XWESpaceDataSource.addProperties({
         { name:"xwikiRelativeUrl", type: "text" },
         { name:"link", propertiesOnly: true }
     ],
-    icon : "$xwiki.getSkinFile('icons/silk/page_white_text.gif')"
+    icon : "$xwiki.getSkinFile('icons/silk/page_white_text.png')"
 });
 
 isc.XWESpaceDataSource.addMethods({
@@ -667,7 +671,7 @@ isc.XWEPageDataSource.addProperties({
         { name:"parent", required: true, type: "text" },
         { name:"link", propertiesOnly: true }
     ],
-    icon : "$xwiki.getSkinFile('icons/silk/page_white_text.gif')"
+    icon : "$xwiki.getSkinFile('icons/silk/page_white_text.png')"
 });
 
 isc.XWEPageDataSource.addMethods({
@@ -705,7 +709,7 @@ isc.XWEAttachmentsDataSource.addProperties({
         { name:"title", type: "text" },
         { name:"xwikiRelativeUrl", type: "text" }
     ],
-    icon : "$xwiki.getSkinFile('icons/silk/attach.gif')"
+    icon : "$xwiki.getSkinFile('icons/silk/attach.png')"
 });
 
 isc.XWEAttachmentsDataSource.addMethods({
@@ -745,7 +749,7 @@ isc.XWETreeGrid.addProperties({
     },
     // Style:
     showHeader: false, // Hide the sort header.
-    folderIcon : "$xwiki.getSkinFile('icons/silk/database.gif')", // Icon to use, will be overriden by datasources.
+    folderIcon : "$xwiki.getSkinFile('icons/silk/database.png')", // Icon to use, will be overriden by datasources.
     position : "relative", // CSS position.
     dropIconSuffix : "", // Keep the same icon for all states (opened, closed, etc).
     openIconSuffix : "", // Keep the same icon for all states (opened, closed, etc).

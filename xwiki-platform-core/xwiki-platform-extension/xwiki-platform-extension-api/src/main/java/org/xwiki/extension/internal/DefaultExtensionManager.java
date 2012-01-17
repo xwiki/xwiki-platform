@@ -24,7 +24,6 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -117,26 +116,16 @@ public class DefaultExtensionManager implements ExtensionManager, Initializable
     public Extension resolveExtension(ExtensionDependency extensionDependency) throws ResolveException
     {
         Extension extension = null;
+
         String initialId = extensionDependency.getId();
-        String initialVersion = extensionDependency.getVersion();
 
         extension = this.coreExtensionRepository.getCoreExtension(initialId);
 
         if (extension == null) {
             try {
-                extension = this.localExtensionRepository.resolve(new ExtensionId(initialId, initialVersion));
+                extension = this.localExtensionRepository.resolve(extensionDependency);
             } catch (ResolveException e) {
                 extension = this.repositoryManager.resolve(extensionDependency);
-
-                // Check if remote repository change the extension id (version range resolution, etc.) retry searching
-                // it in the local repository
-                if (!StringUtils.equals(initialVersion, extension.getId().getVersion())) {
-                    try {
-                        extension = this.localExtensionRepository.resolve(extension.getId());
-                    } catch (ResolveException e2) {
-                        // Keep remote extension
-                    }
-                }
             }
         }
 

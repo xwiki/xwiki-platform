@@ -35,6 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -50,6 +51,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.5M2
  */
+// TODO: add support for others entity types (not only document). Mainly require more generic displayer API.
 @Component
 @Named("include")
 @Singleton
@@ -121,12 +123,12 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         throws MacroExecutionException
     {
         // Step 1: Perform checks.
-        if (parameters.getDocument() == null) {
+        if (parameters.getReference() == null && parameters.getDocument() == null) {
             throw new MacroExecutionException(
-                "You must specify a 'document' parameter pointing to the document to include.");
+                "You must specify a 'reference' parameter pointing to the entity to include.");
         }
 
-        DocumentReference includedReference = resolve(context.getCurrentMacroBlock(), parameters.getDocument());
+        DocumentReference includedReference = resolve(context.getCurrentMacroBlock(), parameters);
 
         checkRecursiveInclusion(context.getCurrentMacroBlock(), includedReference);
 
@@ -162,15 +164,19 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         displayParameters.setTransformationContextIsolated(displayParameters.isContentTransformed());
         XDOM result;
         try {
-            result = documentDisplayer.display(documentBridge, displayParameters);
+            result = this.documentDisplayer.display(documentBridge, displayParameters);
         } catch (Exception e) {
             throw new MacroExecutionException(e.getMessage(), e);
         }
 
-        // Step 4: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that potential relative
-        // links/images are resolved correctly at render time.
+        // Step 4: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
+        // content comes and "base" meta data so that reference are properly resolved
         MetaDataBlock metadata = new MetaDataBlock(result.getChildren(), result.getMetaData());
-        metadata.getMetaData().addMetaData(MetaData.SOURCE, parameters.getDocument());
+        String source = this.defaultEntityReferenceSerializer.serialize(includedReference);
+        metadata.getMetaData().addMetaData(MetaData.SOURCE, source);
+        if (parametersContext == Context.NEW) {
+            metadata.getMetaData().addMetaData(MetaData.BASE, source);
+        }
 
         return Arrays.<Block> asList(metadata);
     }
@@ -208,12 +214,16 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * @param documentReference the document reference to compare to
      * @return true if the documents are the same
      */
+    // TODO: Add support for any kind of macro including content linked to a reference
     private boolean isRecursive(MacroMarkerBlock parentMacro, DocumentReference documentReference)
     {
         if (parentMacro.getId().equals("include")) {
-            DocumentReference parentDocumentReference = resolve(parentMacro, parentMacro.getParameter("document"));
+            String reference = parentMacro.getParameter("reference");
+            if (reference == null) {
+                reference = parentMacro.getParameter("document");
+            }
 
-            return documentReference.equals(parentDocumentReference);
+            return documentReference.equals(resolve(parentMacro, reference));
         }
 
         return false;
@@ -230,19 +240,31 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     {
         DocumentReference result;
 
-        MetaDataBlock metaDataBlock =
-            block.getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE), Block.Axes.ANCESTOR);
+        MetaDataBlock metaDataBlock = block.getFirstBlock(new MetadataBlockMatcher(MetaData.BASE), Block.Axes.ANCESTOR);
 
         // If no Source MetaData was found resolve against the current document as a failsafe solution.
         if (metaDataBlock == null) {
             result = this.currentDocumentReferenceResolver.resolve(documentName);
         } else {
-            String sourceMetaData = (String) metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE);
+            String sourceMetaData = (String) metaDataBlock.getMetaData().getMetaData(MetaData.BASE);
             result =
                 this.currentDocumentReferenceResolver.resolve(documentName,
                     this.currentDocumentReferenceResolver.resolve(sourceMetaData));
         }
 
         return result;
+    }
+
+    private DocumentReference resolve(MacroBlock block, IncludeMacroParameters parameters)
+        throws MacroExecutionException
+    {
+        String reference = parameters.getReference();
+
+        if (reference == null) {
+            throw new MacroExecutionException(
+                "You must specify a 'reference' parameter pointing to the entity to include.");
+        }
+
+        return resolve(block, reference);
     }
 }

@@ -43,12 +43,12 @@ public class UnmodifiableLocalExtensionFile<T extends LocalExtensionFile> extend
     @Override
     public String getName()
     {
-        return getFile().getName();
+        return getWrapped().getName();
     }
 
     @Override
     public String getAbsolutePath()
     {
-        return getFile().getAbsolutePath();
+        return getWrapped().getAbsolutePath();
     }
 }

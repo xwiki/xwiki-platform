@@ -42,7 +42,7 @@ import org.xwiki.component.annotation.Component;
 @Component(roles = { HTMLFilter.class })
 @Named("emptyAttribute")
 @Singleton
-public class EmptyAttributeFilter implements HTMLFilter
+public class EmptyAttributeFilter extends AbstractHTMLFilter
 {
     /**
      * Logger.

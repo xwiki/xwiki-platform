@@ -209,7 +209,7 @@ AABJRU5ErkJggg==
 #template('colorThemeInit.vm')
 
 ## Generate reference to background image
-#macro(imgURL $name) url($xwiki.getSkinFile("icons/silk/${name}.gif")) #end
+#macro(imgURL $name) url($xwiki.getSkinFile("icons/silk/${name}.png")) #end
 
 ## Generate reference to background image
 #macro(attImgURL $name) url($doc.getAttachmentURL("${name}.png")) #end
@@ -219,10 +219,11 @@ AABJRU5ErkJggg==
   background-image: #imgURL('note') !important;
   /* Padding, margin and bg-position are adjusted in order to give this element
      the 'tab' look when active and the settings panel is displayed */
-  background-position: 0 1px;
+  background-position: 5px 1px;
+  border-radius: 4px 4px 0 0;
+  padding-left: 6px !important;
   padding-right: 5px !important;
   padding-top: 0 !important;
-  padding-bottom: 4px;
   margin-right: 5px !important;
   margin-top: 2px !important;
 }
@@ -231,6 +232,7 @@ AABJRU5ErkJggg==
 }
 .actionmenu .active {
   background-color: $theme.pageContentBackgroundColor; ##$theme.backgroundSecondaryColor;
+  box-shadow: 0 -1px 1px $theme.buttonSecondaryBackgroundColor;
 }
 .actionmenu .active a {
   color: $theme.menuSelectedEntryLinkColor !important;
@@ -238,12 +240,32 @@ AABJRU5ErkJggg==
 
 /* Settings panel */
 .annotationsettings {
-  border: 2px solid $theme.menuBackgroundColor;
-  border-top: none;
   background: $theme.pageContentBackgroundColor; ## $theme.backgroundSecondaryColor;
-  padding: 8px 23px; /* Padding left,right = padding of the page content - width of the panel's border (25-2) */
+  border: 1px solid $theme.borderColor;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 2px 2px -1px $theme.buttonSecondaryBackgroundColor;
+  margin-bottom: -8px;
+  padding: 8px 25px; /* Padding left, right = padding of the page content */
+  position: relative;
   z-index: 998; /* Right below the submenu. */
 }
+.floating-menu + .annotationsettings.floating-menu {
+  visibility: hidden;
+}
+.floating-menu:hover + .annotationsettings.floating-menu {
+  margin-top: 0;
+  visibility: visible;
+}
+.annotationsettings.floating-menu:hover {
+  margin-top: -18px;
+  visibility: visible;
+}
+.annotationsettings.floating-menu:after {
+  content: "";
+  display: none;
+}
+
 .annotationsettings label {
   font-weight: bold;
 }
@@ -313,7 +335,7 @@ AABJRU5ErkJggg==
 }
 
 #allAnnotations .annotationHeader, #allAnnotations .annotationContent {
-  margin-left: 55px;
+  margin-left: 60px;
 }
 #allAnnotations .annotationTitle * {
   line-height: 1.4em;

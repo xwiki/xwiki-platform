@@ -103,6 +103,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * 
      * @see com.xpn.xwiki.objects.BaseElement#createReference()
      */
+    @Override
     protected BaseObjectReference createReference()
     {
         return new BaseObjectReference(getXClassReference(), getNumber(), getDocumentReference());
@@ -239,7 +240,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      */
     public BaseObject duplicate()
     {
-        BaseObject object = (BaseObject) clone();
+        BaseObject object = clone();
         // Set a new GUID for the duplicate
         object.setGuid(UUID.randomUUID().toString());
 
@@ -334,6 +335,9 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         if (cel != null) {
             bclass.fromXML(cel);
             setClassName(bclass.getName());
+        } else {
+            // We need at least to set the class name to avoid some NullPointerExceptions
+            setClassName(oel.elementText("className"));
         }
 
         setName(oel.element("name").getText());

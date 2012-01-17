@@ -22,23 +22,15 @@ package org.xwiki.extension.job.internal;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.TestResources;
 import org.xwiki.extension.handler.ExtensionHandler;
-import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.test.AbstractExtensionHandlerTest;
-import org.xwiki.extension.test.ConfigurableDefaultCoreExtensionRepository;
 import org.xwiki.extension.test.TestExtensionHandler;
 
 public class InstallJobTest extends AbstractExtensionHandlerTest
 {
-    private ExtensionId remoteExtensionId;
-
-    private ExtensionId remoteExtensionDependencyId;
-
     private TestExtensionHandler handler;
-
-    private ConfigurableDefaultCoreExtensionRepository coreRepository;
 
     @Override
     public void setUp() throws Exception
@@ -47,52 +39,43 @@ public class InstallJobTest extends AbstractExtensionHandlerTest
 
         // lookup
 
-        this.coreRepository =
-            (ConfigurableDefaultCoreExtensionRepository) getComponentManager().lookup(CoreExtensionRepository.class);
         this.handler = (TestExtensionHandler) getComponentManager().lookup(ExtensionHandler.class, "type");
-
-        // resources
-
-        this.remoteExtensionId = new ExtensionId("remoteextension", "version");
-        this.remoteExtensionDependencyId = new ExtensionId("remoteextensiondependency", "version");
     }
 
     @Test
     public void testInstallOnRoot() throws Throwable
     {
-        // the installed extension depends on this core extension
-        this.coreRepository.addExtensions("coreextension", "version");
-        
-        install(this.remoteExtensionId);
+        install(TestResources.REMOTE_WITHRANDCDEPENDENCIES_ID, null);
 
         LocalExtension installedExtension =
-            this.localExtensionRepository.getInstalledExtension(this.remoteExtensionId.getId(), null);
+            this.localExtensionRepository.getInstalledExtension(TestResources.REMOTE_WITHRANDCDEPENDENCIES_ID.getId(),
+                null);
         Assert.assertNotNull(installedExtension);
         Assert.assertTrue(this.handler.getExtensions().get(null).contains(installedExtension));
-        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(this.remoteExtensionId.getId(), "namespace"));
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(
+            TestResources.REMOTE_WITHRANDCDEPENDENCIES_ID.getId(), "namespace"));
 
         installedExtension =
-            this.localExtensionRepository.getInstalledExtension(this.remoteExtensionDependencyId.getId(), null);
+            this.localExtensionRepository.getInstalledExtension(TestResources.REMOTE_SIMPLE_ID.getId(), null);
         Assert.assertNotNull(installedExtension);
         Assert.assertTrue(this.handler.getExtensions().get(null).contains(installedExtension));
-        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(this.remoteExtensionDependencyId.getId(), "namespace"));
+        Assert.assertNotNull(this.localExtensionRepository.getInstalledExtension(
+            TestResources.REMOTE_SIMPLE_ID.getId(), "namespace"));
     }
 
     @Test
     public void testInstallOnNamespace() throws Throwable
     {
-        // the installed extension depends on this core extension
-        this.coreRepository.addExtensions("coreextension", "version");
-        
-        install(this.remoteExtensionId, "namespace");
+        install(TestResources.REMOTE_WITHRANDCDEPENDENCIES_ID, "namespace");
 
         LocalExtension installedExtension =
-            this.localExtensionRepository.getInstalledExtension(this.remoteExtensionId.getId(), "namespace");
+            this.localExtensionRepository.getInstalledExtension(TestResources.REMOTE_WITHRANDCDEPENDENCIES_ID.getId(),
+                "namespace");
         Assert.assertNotNull(installedExtension);
         Assert.assertTrue(this.handler.getExtensions().get("namespace").contains(installedExtension));
 
         installedExtension =
-            this.localExtensionRepository.getInstalledExtension(this.remoteExtensionDependencyId.getId(), "namespace");
+            this.localExtensionRepository.getInstalledExtension(TestResources.REMOTE_SIMPLE_ID.getId(), "namespace");
         Assert.assertNotNull(installedExtension);
         Assert.assertTrue(this.handler.getExtensions().get("namespace").contains(installedExtension));
     }

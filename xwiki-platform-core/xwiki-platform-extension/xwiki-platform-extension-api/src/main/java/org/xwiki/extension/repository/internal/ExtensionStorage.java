@@ -213,7 +213,7 @@ public class ExtensionStorage
      */
     private String getFileName(ExtensionId id, String fileExtension)
     {
-        String fileName = id.getId() + "-" + id.getVersion() + "." + fileExtension;
+        String fileName = id.getId() + "-" + id.getVersion().getValue() + "." + fileExtension;
         try {
             return URLEncoder.encode(fileName, "UTF-8");
         } catch (UnsupportedEncodingException e) {

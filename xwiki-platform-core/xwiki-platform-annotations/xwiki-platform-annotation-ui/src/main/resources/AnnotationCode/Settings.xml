@@ -55,6 +55,7 @@
 <validationScript></validationScript>
 <cache>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>cache</name>
@@ -69,6 +70,7 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </cache>
 <code>
+<disabled>0</disabled>
 <name>code</name>
 <number>2</number>
 <prettyName>Code</prettyName>
@@ -78,6 +80,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </code>
 <name>
+<disabled>0</disabled>
 <name>name</name>
 <number>1</number>
 <prettyName>Name</prettyName>
@@ -86,6 +89,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
 <parse>
+<disabled>0</disabled>
 <displayFormType>select</displayFormType>
 <displayType>yesno</displayType>
 <name>parse</name>
@@ -96,6 +100,7 @@
 </parse>
 <use>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>use</name>
@@ -106,7 +111,7 @@
 <separators> ,|</separators>
 <size>1</size>
 <unmodifiable>0</unmodifiable>
-<values>onDemand=On demand|always=Always</values>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </use>
 </class>
@@ -240,6 +245,7 @@ document.observe('xwiki:annotations:settings:loaded', function() {
 <validationScript></validationScript>
 <cache>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>cache</name>
@@ -254,6 +260,7 @@ document.observe('xwiki:annotations:settings:loaded', function() {
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </cache>
 <code>
+<disabled>0</disabled>
 <name>code</name>
 <number>2</number>
 <prettyName>Code</prettyName>
@@ -263,6 +270,7 @@ document.observe('xwiki:annotations:settings:loaded', function() {
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </code>
 <name>
+<disabled>0</disabled>
 <name>name</name>
 <number>1</number>
 <prettyName>Name</prettyName>
@@ -271,6 +279,7 @@ document.observe('xwiki:annotations:settings:loaded', function() {
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
 <parse>
+<disabled>0</disabled>
 <displayFormType>select</displayFormType>
 <displayType>yesno</displayType>
 <name>parse</name>
@@ -281,6 +290,7 @@ document.observe('xwiki:annotations:settings:loaded', function() {
 </parse>
 <use>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>use</name>
@@ -291,7 +301,7 @@ document.observe('xwiki:annotations:settings:loaded', function() {
 <separators> ,|</separators>
 <size>1</size>
 <unmodifiable>0</unmodifiable>
-<values>onDemand=On demand|always=Always</values>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </use>
 </class>
@@ -306,7 +316,7 @@ document.observe('xwiki:annotations:settings:loaded', function() {
 <code>#template('colorThemeInit.vm')
 
 .annotationsettings .plainmessage {
-  background-image: url($xwiki.getSkinFile('icons/silk/add.gif'));
+  background-image: url($xwiki.getSkinFile('icons/silk/add.png'));
   float: right;
   width: 30%;
   margin: 0 0 12px 4px;
@@ -339,10 +349,10 @@ document.observe('xwiki:annotations:settings:loaded', function() {
 .criterion {
   margin: 2px 0;
   padding: 0 0 0 14px;
-  background: transparent url($xwiki.getSkinFile('icons/silk/bullet_toggle_minus.gif')) top left no-repeat;
+  background: transparent url($xwiki.getSkinFile('icons/silk/bullet_toggle_minus.png')) top left no-repeat;
 }
 .criteria .collapsed {
-  background-image: url($xwiki.getSkinFile('icons/silk/bullet_toggle_plus.gif'));
+  background-image: url($xwiki.getSkinFile('icons/silk/bullet_toggle_plus.png'));
 }
 .criteria .collapsed .criterion-option-list {
   display: none;

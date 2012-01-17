@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1312816151000</creationDate>
-<date>1323442595000</date>
-<contentUpdateDate>1323442595000</contentUpdateDate>
+<date>1326117389000</date>
+<contentUpdateDate>1326117389000</contentUpdateDate>
 <version>1.1</version>
 <title>#if($doc.getObject('ExtensionCode.ExtensionClass'))$doc.getObject('ExtensionCode.ExtensionClass').getProperty('name').value#{else}Extension sheet#end</title>
 <template></template>
@@ -357,9 +357,9 @@
             #set($dependencyDocumentName = $dependencyDocumentNames.get(0))
           #end
           #if ($dependencyDocumentName)
-            * [[$extensionDependency.id&gt;&gt;$dependencyDocumentName]] $extensionDependency.version
+            * [[$extensionDependency.id&gt;&gt;$dependencyDocumentName]] $extensionDependency.constraint
           #else
-            * $extensionDependency.id $extensionDependency.version
+            * $extensionDependency.id $extensionDependency.constraint
           #end
         #end
       #end

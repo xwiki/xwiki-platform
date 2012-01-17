@@ -111,7 +111,7 @@ XWiki.EntryNamePopup = Class.create(XWiki.widgets.ModalPopup, {
     this.urlTemplate = trigger.up().next('input[type=hidden]').value;
 
     this.input = new Element('input', {type: 'text'});
-    this.addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.gif')', alt: '$escapetool.javascript($msg.get('platform.appwithinminutes.appHomePageAddEntryLabel'))'});
+    this.addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.png')', alt: '$escapetool.javascript($msg.get('platform.appwithinminutes.appHomePageAddEntryLabel'))'});
 
     var container = new Element('div', {id: 'entryNamePopup'});
     container.insert(this.input);
@@ -268,11 +268,11 @@ return XWiki;
 }
 
 #actionBox .action.edit {
-  background-image: url("$xwiki.getSkinFile('icons/silk/application_edit.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/application_edit.png')");
 }
 
 #actionBox .action.add {
-  background-image: url("$xwiki.getSkinFile('icons/silk/add.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
 }
 
 #entryNamePopup {

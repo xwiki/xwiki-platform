@@ -166,7 +166,7 @@ XWiki.LiveTableEditor = Class.create({
     this.columnsSelect = $('availableColumns');
     this.columnsSelect.selectedIndex = -1;
 
-    var addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.gif')', alt: '$escapetool.javascript($msg.get('platform.appwithinminutes.liveTableEditorAddColumnHint'))'});
+    var addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.png')', alt: '$escapetool.javascript($msg.get('platform.appwithinminutes.liveTableEditorAddColumnHint'))'});
     addButton.observe('click', this._onAddColumn.bindAsEventListener(this));
 
     var picker = new Element('div', {'class': 'columnPicker'}).insert(this.columnsSelect).insert(addButton);

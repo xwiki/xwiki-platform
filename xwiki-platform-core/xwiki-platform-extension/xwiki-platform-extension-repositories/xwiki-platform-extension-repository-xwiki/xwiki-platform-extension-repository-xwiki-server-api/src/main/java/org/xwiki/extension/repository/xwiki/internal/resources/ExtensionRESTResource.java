@@ -32,7 +32,7 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.Extension;
 import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @version $Id$
@@ -45,11 +45,9 @@ public class ExtensionRESTResource extends AbstractExtensionRESTResource
     @GET
     public Extension getExtension(@PathParam("extensionId") String extensionId) throws XWikiException, QueryException
     {
-        Document extensionDocument = getExtensionDocument(extensionId);
+        XWikiDocument extensionDocument = getExistingExtensionDocumentById(extensionId);
 
-        if (extensionDocument.isNew()) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
+        checkRights(extensionDocument);
 
         return createExtension(extensionDocument, null);
     }

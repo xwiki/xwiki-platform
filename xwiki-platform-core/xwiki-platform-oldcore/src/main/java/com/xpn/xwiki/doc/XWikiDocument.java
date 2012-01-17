@@ -7208,6 +7208,28 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * @since 3.4M1
+     */
+    public BaseObject getXObject(EntityReference classReference, boolean create, XWikiContext context)
+    {
+        try {
+            BaseObject obj = getXObject(classReference);
+
+            if ((obj == null) && create) {
+                return newXObject(classReference, context);
+            }
+
+            if (obj == null) {
+                return null;
+            } else {
+                return obj;
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
      * @deprecated since 2.2M2 use {@link #getXObject(DocumentReference, boolean, XWikiContext)}
      */
     @Deprecated
@@ -7672,15 +7694,15 @@ public class XWikiDocument implements DocumentModelBridge
 
     private Syntax getDefaultDocumentSyntax()
     {
-        // If there's no parser available for the specified syntax default to XWiki 2.0 syntax
+        // If there's no parser available for the specified syntax default to XWiki 2.1 syntax
         Syntax syntax = Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax();
 
         try {
             Utils.getComponent(Parser.class, syntax.toIdString());
         } catch (Exception e) {
             LOGGER.warn("Failed to find parser for the default syntax [" + syntax.toIdString()
-                + "]. Defaulting to xwiki/2.0 syntax.");
-            syntax = Syntax.XWIKI_2_0;
+                + "]. Defaulting to xwiki/2.1 syntax.");
+            syntax = Syntax.XWIKI_2_1;
         }
 
         return syntax;
@@ -7725,10 +7747,14 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private DocumentReference resolveClassReference(EntityReference reference)
     {
-        DocumentReference defaultReference =
-            new DocumentReference(getDocumentReference().getWikiReference().getName(), XWiki.SYSTEM_SPACE,
-                getDocumentReference().getName());
-        return this.explicitReferenceDocumentReferenceResolver.resolve(reference, defaultReference);
+        if (reference instanceof DocumentReference) {
+            return (DocumentReference) reference;
+        } else {
+            DocumentReference defaultReference =
+                new DocumentReference(getDocumentReference().getWikiReference().getName(), XWiki.SYSTEM_SPACE,
+                    getDocumentReference().getName());
+            return this.explicitReferenceDocumentReferenceResolver.resolve(reference, defaultReference);
+        }
     }
 
     /**
@@ -8029,7 +8055,7 @@ public class XWikiDocument implements DocumentModelBridge
         for (List<BaseObject> objects : document.getXObjects().values()) {
             for (BaseObject newObj : objects) {
                 if (newObj != null) {
-                    BaseObject originalObj = document.getXObject(newObj.getXClassReference(), newObj.getNumber());
+                    BaseObject originalObj = getXObject(newObj.getXClassReference(), newObj.getNumber());
                     if (ObjectUtils.notEqual(newObj, originalObj)) {
                         // The object added or modified
                         setXObject(newObj.getNumber(), newObj);

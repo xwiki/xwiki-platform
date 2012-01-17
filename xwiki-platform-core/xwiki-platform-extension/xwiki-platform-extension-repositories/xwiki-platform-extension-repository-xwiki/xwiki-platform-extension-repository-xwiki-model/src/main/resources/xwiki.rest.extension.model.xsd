@@ -35,7 +35,7 @@
   <complexType name="ExtensionDependency">
     <sequence>
       <element name="id" type="string" maxOccurs="1" minOccurs="1"></element>
-      <element name="version" type="string" maxOccurs="1"
+      <element name="constraint" type="string" maxOccurs="1"
         minOccurs="1"></element>
     </sequence>
   </complexType>
@@ -85,6 +85,8 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
+            <element name="totalHits" type="int"></element>
+            <element name="offset" type="int"></element>
             <element name="extensionSummary" type="extension:ExtensionSummary"
               minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
@@ -98,6 +100,8 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
+            <element name="totalHits" type="int"></element>
+            <element name="offset" type="int"></element>
             <element name="extensionVersionSummary" type="extension:ExtensionVersionSummary"
               minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>

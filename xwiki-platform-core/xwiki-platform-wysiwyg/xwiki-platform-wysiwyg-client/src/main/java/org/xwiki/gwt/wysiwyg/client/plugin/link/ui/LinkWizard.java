@@ -125,7 +125,6 @@ public class LinkWizard extends Wizard
         LinkConfig linkConfig = (LinkConfig) data;
         ResourceReference destination = new ResourceReference();
         destination.setType(LINK_TYPE_TO_RESOURCE_TYPE_MAP.get(linkConfig.getType()));
-        destination.setTyped(destination.getType() != ResourceType.URL);
 
         super.start(startStep, new EntityLink<LinkConfig>(origin.getEntityReference(), destination, linkConfig));
     }

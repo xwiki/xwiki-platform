@@ -169,7 +169,7 @@ th.avatar {
 /* Used to signify a rendering error in the rendered page. Valid only with new rendering */
 .xwikirenderingerror {
   background-color: #eee; 
-  background-image: url($xwiki.getSkinFile("icons/silk/exclamation.gif"));
+  background-image: url($xwiki.getSkinFile("icons/silk/exclamation.png"));
   background-position: 2px 50%;
   background-repeat: no-repeat;
   color: #e14726;
@@ -1338,7 +1338,7 @@ Space header, footer
   background-image: url("$xwiki.getSkinFile('icons/xwiki/parent_edit.gif')");
 }
 .edit-meta-tools a.hide-edit-parent {
-  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
 }
 
 /* Parent editing area */
@@ -3923,19 +3923,19 @@ ul.xlist li.space, ul.xlist li.page, ul.xlist li.comment, ul.xlist li.attachment
 }
 
 ul.xlist li.space {
-  background-image: url( ../../resources/icons/silk/folder.gif );
+  background-image: url( ../../resources/icons/silk/folder.png );
 }
 
 ul.xlist li.page {
-  background-image: url( ../../resources/icons/silk/page_white_text.gif );
+  background-image: url( ../../resources/icons/silk/page_white_text.png );
 }
 
 ul.xlist li.comment {
-  background-image: url( ../../resources/icons/silk/comment.gif );
+  background-image: url( ../../resources/icons/silk/comment.png );
 }
 
 ul.xlist li.attachment {
-  background-image: url( ../../resources/icons/silk/attach.gif );
+  background-image: url( ../../resources/icons/silk/attach.png );
 }
 
 ul.xlist li.xitem div.xitemcontainer {
@@ -3999,15 +3999,15 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
   color: #555;
 }
 .infomessage {
-  background-image: url( $xwiki.getSkinFile('icons/silk/information.gif') );
+  background-image: url( $xwiki.getSkinFile('icons/silk/information.png') );
   color: #369;
 }
 .warningmessage {
-  background-image: url( $xwiki.getSkinFile('icons/silk/error.gif') );
+  background-image: url( $xwiki.getSkinFile('icons/silk/error.png') );
   color: #D5A13D;
 }
 .errormessage {
-  background-image: url( $xwiki.getSkinFile('icons/silk/exclamation.gif') );
+  background-image: url( $xwiki.getSkinFile('icons/silk/exclamation.png') );
   color: #e14726;
 }
 

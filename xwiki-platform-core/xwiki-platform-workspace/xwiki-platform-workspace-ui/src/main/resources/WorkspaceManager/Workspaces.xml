@@ -104,12 +104,12 @@
 <property>
 <code>#template('colorThemeInit.vm')
 #spWorkspaceCreateItem {
-  background-image: url($xwiki.getSkinFile("icons/silk/chart_organisation_add.gif"));
+  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation_add.png')");
   background-repeat:no-repeat;
 }
 
 #spWorkspaceItem {
-  background-image: url($xwiki.getSkinFile("icons/silk/chart_organisation.gif"));
+  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
   background-repeat:no-repeat;
 }
 

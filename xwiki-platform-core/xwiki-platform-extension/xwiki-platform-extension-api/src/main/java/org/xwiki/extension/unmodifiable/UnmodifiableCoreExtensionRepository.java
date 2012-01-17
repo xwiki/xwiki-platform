@@ -46,24 +46,24 @@ public class UnmodifiableCoreExtensionRepository<T extends CoreExtensionReposito
     @Override
     public int countExtensions()
     {
-        return getRepository().countExtensions();
+        return getWrapped().countExtensions();
     }
 
     @Override
     public Collection<CoreExtension> getCoreExtensions()
     {
-        return UnmodifiableUtils.unmodifiableExtensions(getRepository().getCoreExtensions());
+        return UnmodifiableUtils.unmodifiableExtensions(getWrapped().getCoreExtensions());
     }
 
     @Override
     public CoreExtension getCoreExtension(String id)
     {
-        return UnmodifiableUtils.unmodifiableExtension(getRepository().getCoreExtension(id));
+        return UnmodifiableUtils.unmodifiableExtension(getWrapped().getCoreExtension(id));
     }
 
     @Override
     public boolean exists(String id)
     {
-        return getRepository().exists(id);
+        return getWrapped().exists(id);
     }
 }

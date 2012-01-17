@@ -40,7 +40,7 @@
     #if($imgName.indexOf("/") >= 0)
       #set($imgUrl = $xwiki.getSkinFile($imgName))
     #else
-      #set($imgUrl = $xwiki.getSkinFile("icons/silk/${imgName}.gif"))
+      #set($imgUrl = $xwiki.getSkinFile("icons/silk/${imgName}.png"))
     #end
   #end
 /** $notificationType */

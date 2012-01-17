@@ -10,7 +10,7 @@
  *      ], 
  *      { // options
  *         numbered: false,
- *         icon: "$xwiki.getSkinFile('icons/silk/sport_basketball.gif')",
+ *         icon: "$xwiki.getSkinFile('icons/silk/sport_basketball.png')",
  *         classes : "myListExtraClass",
  *         itemClasses : "myListItemExtraClasses",
  *         eventListeners : {
@@ -25,7 +25,7 @@
  *
  * xlist.addItem(
  *   new XWiki.widgets.XListItem('A fifth element added later', {
- *     icon : "$xwiki.getSkinFile('icons/silk/bomb.gif')", // this overrides the one defined for the whole list
+ *     icon : "$xwiki.getSkinFile('icons/silk/bomb.png')", // this overrides the one defined for the whole list
  *     eventListeners: {
  *       // Event listeners defined just for this specific list item
  *       'mouseout' : function() { console.log('just this list item is bound to this event', this); }

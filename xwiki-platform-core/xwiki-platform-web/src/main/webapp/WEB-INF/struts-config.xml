@@ -165,7 +165,7 @@
             <forward name="edit" path="/templates/rollback.vm"/>
             <forward name="rollback" path="/templates/rollback.vm"/>
         </action>
-        
+
         <action path="/deleteversions/"
                 type="com.xpn.xwiki.web.DeleteVersionsAction"
                 name="deleteversions"
@@ -185,6 +185,12 @@
                 scope="request">
             <forward name="delete" path="/templates/delete.vm"/>
             <forward name="deleted" path="/templates/deleted.vm"/>
+        </action>
+
+        <action path="/deletespace/"
+                type="com.xpn.xwiki.web.DeleteSpaceAction"
+                name="deletespace"
+                scope="request">
         </action>
 
         <action path="/undelete/"

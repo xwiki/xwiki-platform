@@ -47,7 +47,7 @@ public class XWikiRequestProcessor extends org.apache.struts.action.RequestProce
     {
         String result = super.processPath(httpServletRequest, httpServletResponse);
 
-        if ("1".equals(XWikiConfigurationService.getProperty("xwiki.virtual.usepath", "0", getServletContext()))) {
+        if ("1".equals(XWikiConfigurationService.getProperty("xwiki.virtual.usepath", "1", getServletContext()))) {
             // Remove /wikiname part if the struts action is /wiki
             if (httpServletRequest.getServletPath().equals(
                 "/"

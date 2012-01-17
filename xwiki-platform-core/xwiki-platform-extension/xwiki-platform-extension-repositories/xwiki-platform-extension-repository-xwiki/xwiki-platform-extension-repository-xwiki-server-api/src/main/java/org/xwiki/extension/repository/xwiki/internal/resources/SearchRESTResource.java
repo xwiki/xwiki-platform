@@ -49,7 +49,7 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
     public ExtensionsSearchResult search(@QueryParam(Resources.QPARAM_SEARCH_QUERY) @DefaultValue("") String pattern,
         @QueryParam(Resources.QPARAM_LIST_START) @DefaultValue("0") int offset,
         @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number,
-        @QueryParam(Resources.QPARAM_SEARCH_REQUIRETOTALHITS) @DefaultValue("true") boolean requireTotalHits)
+        @QueryParam(Resources.QPARAM_LIST_REQUIRETOTALHITS) @DefaultValue("true") boolean requireTotalHits)
         throws QueryException
     {
         ExtensionsSearchResult result = this.objectFactory.createExtensionsSearchResult();

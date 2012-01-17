@@ -35,7 +35,7 @@
 #-# [Since 1.6RC1] Defines the list of supported syntaxes
 #-# Available syntaxes are: 
 #-#    xwiki/1.0, xwiki/2.0, xwiki/2.1, confluence/1.0, jspwiki/1.0, creole/1.0,  mediawiki/1.0, twiki/1.0, xhtml/1.0,
-#-#    html/4.01, plain/1.0, docbook/4.4
+#-#    html/4.01, plain/1.0, docbook/4.4, markdown/1.0
 xwiki.rendering.syntaxes = xwiki/1.0, xwiki/2.0, xwiki/2.1
 
 #-# List of groups that a new user should be added to by default after registering. Comma-separated list of group
@@ -75,18 +75,20 @@ xwiki.tags=1
 #-# one of the storages, implement the appropriate interface and declare it in a components.xml file (using a role-hint
 #-# other than 'default') and put its hint here.
 #
-#-# The main (documents) storage.
-# xwiki.store.main.hint=default
-#-# The attachment storage.
-# xwiki.store.attachment.hint=default
-#-# The document versioning storage.
-# xwiki.store.versioning.hint=default
-#-# The attachment versioning storage. Use 'void' to disable attachment versioning.
-# xwiki.store.attachment.versioning.hint=default
-#-# The document recycle bin storage.
-# xwiki.store.recyclebin.hint=default
-#-# The attachment recycle bin storage.
-# xwiki.store.attachment.recyclebin.hint=default
+#-# The main (documents) storage. [Since 3.4M1] default is hibernate.
+# xwiki.store.main.hint=hibernate
+#-# The attachment storage. [Since 3.4M1] default is hibernate.
+# xwiki.store.attachment.hint=hibernate
+#-# The document versioning storage. [Since 3.4M1] default is hibernate.
+# xwiki.store.versioning.hint=hibernate
+#-# The attachment versioning storage. Use 'void' to disable attachment versioning. [Since 3.4M1] default is hibernate.
+# xwiki.store.attachment.versioning.hint=hibernate
+#-# The document recycle bin storage. [Since 3.4M1] default is hibernate.
+# xwiki.store.recyclebin.hint=hibernate
+#-# The attachment recycle bin storage. [Since 3.4M1] default is hibernate.
+# xwiki.store.attachment.recyclebin.hint=hibernate
+#-# [Since 3.4M1] The Migration manager.
+# xwiki.store.migration.manager.hint=hibernate
 
 #-# Whether the document recycle bin feature is activated or not
 # xwiki.recyclebin=1
@@ -102,9 +104,7 @@ xwiki.tags=1
 #-# The path to the hibernate configuration file.
 # xwiki.store.hibernate.path=/WEB-INF/hibernate.cfg.xml
 
-#-# Whether to update the database schema on startup. Useful when upgrading XWiki. as the mapping could change between
-#-# versions, and this allows to automatically update the database. Should be disabled (=0) during normal operation to
-#-# improve the startup time.
+#-# [Since 3.3M1] Deprecated, use xwiki.store.migration
 # xwiki.store.hibernate.updateschema=1
 
 #-# Allow or disable custom mapping for particular XClasses. Custom mapping may increase the performance of certain
@@ -130,18 +130,16 @@ xwiki.tags=1
 
 
 #---------------------------------------
-# Data migrations
+# Data migrations and schema updates
 #
-# Similar to schema updates, this manipulates the actual data, and not just the layout of the database. Useful for
-# migrating data to new formats, correct errors introduced in older versions, or even for schema updates that are not
-# handled by velocity.
+# [Since 3.3M1] Migration and schema updates are now done together. Data migration manipulates the actual data,
+# and schema updates change the layout of the database. Schema updates are require for proper database access
+# and migration are useful for migrating data to new formats, correct errors introduced in older versions, or
+# even for schema updates which are not backward compatible.
 
-#-# Whether migrations are enabled or not. Should be enabled when upgrading, but for a better startup time it is better
-#-# to disable them in production.
+#-# Whether schema updates and migrations are enabled or not. Should be enabled when upgrading, but for a better
+#-# startup time it is better to disable them in production.
 xwiki.store.migration=1
-
-#-# Migration manager class. The default works with a Hibernate storage.
-# xwiki.store.migration.manager.class=com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager
 
 #-# Whether to exit after migration. Useful when a server should handle migrations for a large database, without going
 #-# live afterwards.
@@ -151,7 +149,8 @@ xwiki.store.migration=1
 #-# to upgrade all wikis database set xwiki.store.migration.databases=all
 #-# to upgrade just some wikis databases set xwiki.store.migration.databases=xwiki,wiki1,wiki2
 #-# Note: the main wiki is always migrated whatever the configuration.
-# xwiki.store.migration.databases=
+#-# [Since 3.3M1] default to migrate all databases
+# xwiki.store.migration.databases=all
 
 #---------------------------------------
 # Internationalization
@@ -179,14 +178,14 @@ xwiki.virtual.redirect=http://127.0.0.1:9080/xwiki/bin/Main/ThisWikiDoesNotExist
 #-# Forbidden names that should not be allowed when creating a new wiki.
 # xwiki.virtual.reserved_wikis=
 
-#-# How virtual wikis are mapped to different URLs. If set to 0 (the default), then virtual wikis have different domain
-#-# names, in the format http://wikiname.myfarm.net/. If set to 1, then the domain is common for the entire farm, but
+#-# How virtual wikis are mapped to different URLs. If set to 0, then virtual wikis have different domain
+#-# names, in the format http://wikiname.myfarm.net/. If set to 1 (the default), then the domain is common for the entire farm, but
 #-# the path contains the wiki name, in the format http://myfarm.net/xwiki/wiki/wikiname/.
 #-# Note that you can configure the "/wiki/" part with xwiki.virtual.usepath.servletpath property.
 #if ($xwikiCfgVirtualUsepath)
 xwiki.virtual.usepath=$xwikiCfgVirtualUsepath
 #else
-# xwiki.virtual.usepath=0
+# xwiki.virtual.usepath=1
 #end
 
 #-# Configure the servlet action identifier for url path based multiwiki. It has also to be modified in web.xml.
@@ -531,7 +530,7 @@ xwiki.title.compatibility=1
 #
 
 #-# List of active plugins.
-xwiki.plugins=$xwikiCfgPlugins
+xwiki.plugins=$!xwikiCfgPlugins
 
 #-# Enable light monitoring of the wiki performance. Records various statistics, like number of requests processed,
 #-# time spent in rendering or in the database, medium time for a request, etc. Disable for a minor increase of

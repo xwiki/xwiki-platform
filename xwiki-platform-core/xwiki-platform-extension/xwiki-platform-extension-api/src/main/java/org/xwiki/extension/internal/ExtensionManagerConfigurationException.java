@@ -22,7 +22,7 @@ package org.xwiki.extension.internal;
 import org.xwiki.extension.ExtensionException;
 
 /**
- * Error whenn trying to parse extension manager configuration.
+ * Error when trying to parse extension manager configuration.
  * 
  * @version $Id$
  */

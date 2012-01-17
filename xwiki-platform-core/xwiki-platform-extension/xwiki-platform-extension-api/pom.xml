@@ -65,6 +65,11 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-api</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-container-api</artifactId>
       <version>${project.version}</version>
@@ -77,7 +82,7 @@
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
-    
+
     <!-- Core extensions -->
     <dependency>
       <groupId>org.reflections</groupId>
@@ -151,7 +156,9 @@
               **/DefaultCoreExtensionScanner.java,
               **/DefaultExtensionSerializer.java,
               **/DefaultLocalExtensionRepository.java,
-              **/UnmodifiableUtils.java
+              **/UnmodifiableUtils.java,
+              **/InstallPlanJob.java,
+              **/DefaultVersion.java
           </excludes>
         </configuration>
       </plugin>

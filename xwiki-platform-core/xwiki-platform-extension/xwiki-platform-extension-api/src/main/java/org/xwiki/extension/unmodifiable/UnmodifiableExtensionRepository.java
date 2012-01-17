@@ -20,6 +20,7 @@
 package org.xwiki.extension.unmodifiable;
 
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -47,5 +48,11 @@ public class UnmodifiableExtensionRepository<T extends ExtensionRepository> exte
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
         return UnmodifiableUtils.unmodifiableExtension(super.resolve(extensionId));
+    }
+
+    @Override
+    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    {
+        return UnmodifiableUtils.unmodifiableExtension(super.resolve(extensionDependency));
     }
 }

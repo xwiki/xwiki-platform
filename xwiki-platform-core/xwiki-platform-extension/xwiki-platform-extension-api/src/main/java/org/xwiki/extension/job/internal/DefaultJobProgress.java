@@ -23,10 +23,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
-import org.xwiki.extension.job.JobProgress;
-import org.xwiki.extension.job.PopLevelProgressEvent;
-import org.xwiki.extension.job.PushLevelProgressEvent;
-import org.xwiki.extension.job.StepProgressEvent;
+import org.xwiki.extension.job.event.status.JobProgress;
+import org.xwiki.extension.job.event.status.PopLevelProgressEvent;
+import org.xwiki.extension.job.event.status.PushLevelProgressEvent;
+import org.xwiki.extension.job.event.status.StepProgressEvent;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 

@@ -495,18 +495,23 @@ public class TestUtils
      */
     public void recacheSecretToken()
     {
-        // the registration form uses secret token
+        // Save the current URL to be able to get back after we cache the secret token. We're not using the browser's
+        // Back button because if the current page is the result of a POST request then by going back we are re-sending
+        // the POST data which can have unexpected results. Moreover, some browsers pop up a modal confirmation box
+        // which blocks the test.
+        String previousURL = getDriver().getCurrentUrl();
+        // Go to the registration page because the registration form uses secret token.
         getDriver().get(getURL("XWiki", "Register", "register"));
         try {
             WebElement tokenInput = getDriver().findElement(By.xpath("//input[@name='form_token']"));
             this.secretToken = tokenInput.getAttribute("value");
         } catch (NoSuchElementException exception) {
-            // something is really wrong if this happens
+            // Something is really wrong if this happens.
             System.out.println("Warning: Failed to cache anti-CSRF secret token, some tests might fail!");
             exception.printStackTrace();
         }
-        // return to the previous page
-        getDriver().navigate().back();
+        // Return to the previous page.
+        getDriver().get(previousURL);
     }
 
     /**

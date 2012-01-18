@@ -37,7 +37,7 @@
     <gwt.version>2.4.0</gwt.version>
     <gwt.maven.plugin.version>2.4.0</gwt.maven.plugin.version>
     <smartgwt.version>3.0</smartgwt.version>
-    <restlet.version>2.0.10</restlet.version>
+    <restlet.version>2.0.11</restlet.version>
   </properties>
   <dependencies>
     <dependency>

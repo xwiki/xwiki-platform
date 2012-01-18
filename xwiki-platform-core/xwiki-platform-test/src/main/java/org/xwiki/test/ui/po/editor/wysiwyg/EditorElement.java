@@ -43,6 +43,11 @@ public class EditorElement extends BaseElement
      * The menu bar.
      */
     private MenuBarElement menuBar;
+    
+    /**
+     * The tool bar.
+     */
+    private ToolBarElement toolBar;
 
     /**
      * Creates a new instance that can be used to control the WYSIWYG editor that replaced the specified form field.
@@ -63,6 +68,17 @@ public class EditorElement extends BaseElement
             menuBar = new MenuBarElement(getContainer().findElement(By.className("gwt-MenuBar-horizontal")));
         }
         return menuBar;
+    }
+
+    /**
+     * @return the tool bar
+     */
+    public ToolBarElement getToolBar()
+    {
+        if (toolBar == null) {
+            toolBar = new ToolBarElement(getContainer().findElement(By.className("xToolbar")));
+        }
+        return toolBar;
     }
 
     /**

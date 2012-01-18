@@ -20,6 +20,7 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
@@ -119,6 +120,13 @@ public class BasePage extends BaseElement
      */
     protected void clickContentMenuTopEntry(String id)
     {
+        // Starting with 3.4M1 the floating content/edit action menu is minimized to a thin line when scrolling down the
+        // page. The menu is maximized when the thin line at the top of the window (page view port) is hovered with the
+        // mouse. As a consequence, we can't click directly on the menu entries; we have to make them visible. Since
+        // WebDriver doesn't handle very well the hover action (it doesn't trigger the :hover CSS pseudo-class) a quick
+        // fix is to simply scroll the page to the top by pressing the Home key.
+        // See http://jira.xwiki.org/browse/XWIKI-6018
+        sendKeys(Keys.HOME);
         getDriver().findElement(By.xpath("//div[@id='" + id + "']//strong")).click();
     }
 
@@ -179,6 +187,7 @@ public class BasePage extends BaseElement
     /**
      * Can be overridden to return extended {@link InlinePage}.
      */
+    @SuppressWarnings("unchecked")
     protected <T extends InlinePage> T createInlinePage()
     {
         return (T) new InlinePage();

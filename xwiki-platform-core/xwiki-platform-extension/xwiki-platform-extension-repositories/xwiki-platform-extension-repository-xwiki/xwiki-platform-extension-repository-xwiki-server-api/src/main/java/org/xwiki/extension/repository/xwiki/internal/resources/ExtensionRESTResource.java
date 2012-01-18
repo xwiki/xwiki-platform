@@ -23,8 +23,6 @@ package org.xwiki.extension.repository.xwiki.internal.resources;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.xwiki.Resources;

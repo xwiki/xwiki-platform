@@ -7,3 +7,4 @@ org.xwiki.extension.repository.xwiki.internal.resources.ExtensionVersionFileREST
 org.xwiki.extension.repository.xwiki.internal.resources.ExtensionVersionRESTResource
 org.xwiki.extension.repository.xwiki.internal.resources.ExtensionVersionsRESTResource
 org.xwiki.extension.repository.xwiki.internal.resources.SearchRESTResource
+org.xwiki.extension.repository.xwiki.internal.xhtml.ExtensionXHTMLLinkTypeRenderer

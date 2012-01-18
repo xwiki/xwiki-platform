@@ -154,11 +154,12 @@
         <configuration>
           <excludes>
               **/DefaultCoreExtensionScanner.java,
+              **/DefaultExtensionRepositoryManager.java,
               **/DefaultExtensionSerializer.java,
               **/DefaultLocalExtensionRepository.java,
-              **/UnmodifiableUtils.java,
+              **/DefaultVersion.java,
               **/InstallPlanJob.java,
-              **/DefaultVersion.java
+              **/UnmodifiableUtils.java
           </excludes>
         </configuration>
       </plugin>

@@ -22,6 +22,7 @@ package org.xwiki.extension.repository.internal;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,6 +33,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
@@ -41,6 +44,7 @@ import org.xwiki.extension.repository.ExtensionRepositoryException;
 import org.xwiki.extension.repository.ExtensionRepositoryFactory;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
+import org.xwiki.extension.repository.ExtensionRepositorySource;
 import org.xwiki.extension.repository.result.AggregatedIterableResult;
 import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.result.IterableResult;
@@ -55,7 +59,7 @@ import org.xwiki.extension.version.Version;
  */
 @Component
 @Singleton
-public class DefaultExtensionRepositoryManager implements ExtensionRepositoryManager
+public class DefaultExtensionRepositoryManager implements ExtensionRepositoryManager, Initializable
 {
     /**
      * Used to lookup {@link ExtensionRepositoryFactory}s.
@@ -70,9 +74,30 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
     private Logger logger;
 
     /**
+     * Used to initialize {@link #repositoryManager}.
+     */
+    @Inject
+    private List<ExtensionRepositorySource> repositoriesSources;
+
+    /**
      * The registered repositories.
      */
     private Map<String, ExtensionRepository> repositories = new ConcurrentHashMap<String, ExtensionRepository>();
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        // Load extension repositories
+        for (ExtensionRepositorySource repositoriesSource : this.repositoriesSources) {
+            for (ExtensionRepositoryId repositoryId : repositoriesSource.getExtensionRepositories()) {
+                try {
+                    addRepository(repositoryId);
+                } catch (ExtensionRepositoryException e) {
+                    this.logger.error("Failed to add repository [" + repositoryId + "]", e);
+                }
+            }
+        }
+    }
 
     @Override
     public ExtensionRepository addRepository(ExtensionRepositoryId repositoryId) throws ExtensionRepositoryException

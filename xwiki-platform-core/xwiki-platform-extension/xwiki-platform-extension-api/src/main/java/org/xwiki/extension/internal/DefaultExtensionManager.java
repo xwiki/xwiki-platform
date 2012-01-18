@@ -19,25 +19,17 @@
  */
 package org.xwiki.extension.internal;
 
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.CoreExtensionRepository;
-import org.xwiki.extension.repository.ExtensionRepositoryException;
-import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
-import org.xwiki.extension.repository.ExtensionRepositorySource;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 
 /**
@@ -47,19 +39,13 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
  */
 @Component
 @Singleton
-public class DefaultExtensionManager implements ExtensionManager, Initializable
+public class DefaultExtensionManager implements ExtensionManager
 {
     /**
      * Used to manipulate remote repositories.
      */
     @Inject
     private ExtensionRepositoryManager repositoryManager;
-
-    /**
-     * Used to initialize {@link #repositoryManager}.
-     */
-    @Inject
-    private List<ExtensionRepositorySource> repositoriesSources;
 
     /**
      * Used to manipulate core extensions.
@@ -72,27 +58,6 @@ public class DefaultExtensionManager implements ExtensionManager, Initializable
      */
     @Inject
     private LocalExtensionRepository localExtensionRepository;
-
-    /**
-     * The logger to log.
-     */
-    @Inject
-    private Logger logger;
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        // Load extension repositories
-        for (ExtensionRepositorySource repositoriesSource : this.repositoriesSources) {
-            for (ExtensionRepositoryId repositoryId : repositoriesSource.getExtensionRepositories()) {
-                try {
-                    this.repositoryManager.addRepository(repositoryId);
-                } catch (ExtensionRepositoryException e) {
-                    this.logger.error("Failed to add repository [" + repositoryId + "]", e);
-                }
-            }
-        }
-    }
 
     @Override
     public Extension resolveExtension(ExtensionId extensionId) throws ResolveException

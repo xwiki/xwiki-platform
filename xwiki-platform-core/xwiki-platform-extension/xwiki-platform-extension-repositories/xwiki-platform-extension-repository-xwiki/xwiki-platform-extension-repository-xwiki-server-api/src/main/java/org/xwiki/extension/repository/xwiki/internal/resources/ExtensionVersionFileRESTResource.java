@@ -21,6 +21,7 @@ package org.xwiki.extension.repository.xwiki.internal.resources;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -29,6 +30,7 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -75,8 +77,30 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
 
     @GET
     public Response downloadExtension(@PathParam(Resources.PPARAM_EXTENSIONID) String extensionId,
-        @PathParam(Resources.PPARAM_EXTENSIONVERSION) String extensionVersion) throws XWikiException, QueryException,
-        URISyntaxException, IOException, ResolveException
+        @PathParam(Resources.PPARAM_EXTENSIONVERSION) String extensionVersion,
+        @QueryParam(ExtensionResourceReference.PARAM_REPOSITORYID) String repositoryId,
+        @QueryParam(ExtensionResourceReference.PARAM_REPOSITORYTYPE) String repositoryType,
+        @QueryParam(ExtensionResourceReference.PARAM_REPOSITORYURI) String repositoryURI) throws XWikiException,
+        QueryException, URISyntaxException, IOException, ResolveException
+    {
+        ResponseBuilder response;
+
+        if (repositoryId != null) {
+            response =
+                downloadRemoteExtension(new ExtensionResourceReference(extensionId, extensionVersion, repositoryId));
+        } else if (repositoryType != null && repositoryURI != null) {
+            response =
+                downloadRemoteExtension(new ExtensionResourceReference(extensionId, extensionVersion, repositoryType,
+                    new URI(repositoryURI)));
+        } else {
+            response = downloadLocalExtension(extensionId, extensionVersion);
+        }
+
+        return response.build();
+    }
+
+    public ResponseBuilder downloadLocalExtension(String extensionId, String extensionVersion) throws ResolveException,
+        IOException, QueryException, XWikiException
     {
         XWikiDocument extensionDocument = getExistingExtensionDocumentById(extensionId);
 
@@ -133,53 +157,60 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
                 extensionResource = new ExtensionResourceReference(resourceReference.getReference());
             }
 
-            ExtensionRepository repository = null;
-            if (extensionResource.getRepositoryId() != null) {
-                repository = this.extensionRepositoryManager.getRepository(extensionResource.getRepositoryId());
-            }
-
-            if (repository == null && extensionResource.getRepositoryType() != null
-                && extensionResource.getRepositoryURI() != null) {
-                ExtensionRepositoryId repositoryId =
-                    new ExtensionRepositoryId("tmp", extensionResource.getRepositoryType(),
-                        extensionResource.getRepositoryURI());
-                try {
-                    ExtensionRepositoryFactory repositoryFactory =
-                        this.componentManager.lookup(ExtensionRepositoryFactory.class, repositoryId.getType());
-
-                    repository = repositoryFactory.createRepository(repositoryId);
-                } catch (Exception e) {
-                    // Ignore invalid repository
-                    this.logger.warning("Invalid repository in download link [" + resourceReference + "] in document ["
-                        + extensionDocument + "]");
-                }
-
-            }
-
-            // Resolve extension
-            Extension downloadExtension;
-            if (repository == null) {
-                downloadExtension =
-                    this.extensionRepositoryManager.resolve(new ExtensionId(extensionResource.getExtensionId(),
-                        extensionResource.getExtensionVersion()));
-            } else {
-                downloadExtension =
-                    repository.resolve(new ExtensionId(extensionResource.getExtensionId(), extensionResource
-                        .getExtensionVersion()));
-            }
-
-            // Get file
-            // TODO: find media type
-            ExtensionFile extensionFile = downloadExtension.getFile();
-            long length = extensionFile.getLength();
-            InputRepresentation content = new InputRepresentation(extensionFile.openStream(), MediaType.ALL, length);
-
-            response = Response.ok();
-            response.entity(content);
+            response = downloadRemoteExtension(extensionResource);
         } else {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        return response.build();
+        return response;
+    }
+
+    public ResponseBuilder downloadRemoteExtension(ExtensionResourceReference extensionResource)
+        throws ResolveException, IOException
+    {
+        ExtensionRepository repository = null;
+        if (extensionResource.getRepositoryId() != null) {
+            repository = this.extensionRepositoryManager.getRepository(extensionResource.getRepositoryId());
+        }
+
+        if (repository == null && extensionResource.getRepositoryType() != null
+            && extensionResource.getRepositoryURI() != null) {
+            ExtensionRepositoryId repositoryId =
+                new ExtensionRepositoryId("tmp", extensionResource.getRepositoryType(),
+                    extensionResource.getRepositoryURI());
+            try {
+                ExtensionRepositoryFactory repositoryFactory =
+                    this.componentManager.lookup(ExtensionRepositoryFactory.class, repositoryId.getType());
+
+                repository = repositoryFactory.createRepository(repositoryId);
+            } catch (Exception e) {
+                // Ignore invalid repository
+                this.logger.warning("Invalid repository in download link [" + extensionResource + "]");
+            }
+
+        }
+
+        // Resolve extension
+        Extension downloadExtension;
+        if (repository == null) {
+            downloadExtension =
+                this.extensionRepositoryManager.resolve(new ExtensionId(extensionResource.getExtensionId(),
+                    extensionResource.getExtensionVersion()));
+        } else {
+            downloadExtension =
+                repository.resolve(new ExtensionId(extensionResource.getExtensionId(), extensionResource
+                    .getExtensionVersion()));
+        }
+
+        // Get file
+        // TODO: find media type
+        ExtensionFile extensionFile = downloadExtension.getFile();
+        long length = extensionFile.getLength();
+        InputRepresentation content = new InputRepresentation(extensionFile.openStream(), MediaType.ALL, length);
+
+        ResponseBuilder response = Response.ok();
+        response.entity(content);
+
+        return response;
     }
 }

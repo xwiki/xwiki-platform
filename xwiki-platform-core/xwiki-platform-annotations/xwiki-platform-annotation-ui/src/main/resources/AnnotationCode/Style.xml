@@ -303,6 +303,28 @@ AABJRU5ErkJggg==
   width: 280px;
   position: absolute;
   z-index: 2;
+  border-radius: 0 10px 10px 10px;
+  box-shadow: 0 2px 4px -1px $theme.linkColor;
+  margin-left: 20px;
+}
+
+.annotation-bubble:before, .annotation-bubble:after {
+  content: "";
+  display: block;
+  position: absolute;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+}
+
+.annotation-bubble:before {
+  top: -1px;
+  left: -11px;
+  border-right-color: $theme.borderColor;
+}
+.annotation-bubble:after {
+  top: 0;
+  left: -10px;
+  border-right-color: $theme.backgroundSecondaryColor;
 }
 
 .annotation-box {

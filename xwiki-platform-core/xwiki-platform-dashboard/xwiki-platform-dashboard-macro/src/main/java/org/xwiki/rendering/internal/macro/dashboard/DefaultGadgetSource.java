@@ -271,8 +271,8 @@ public class DefaultGadgetSource implements GadgetSource
     @Override
     public boolean isEditing()
     {
-        // get the XWiki context and look at the action. if it's inline, it's edit mode
+        // get the XWiki context and look at the action. if it's "inline" or "edit", it's edit mode
         XWikiContext context = getXWikiContext();
-        return "inline".equals(context.getAction());
+        return "inline".equals(context.getAction()) || "edit".equals(context.getAction());
     }
 }

@@ -305,12 +305,13 @@ span.wikicreatelink a:after {
 
 .edit_section a {
   background: transparent url("$xwiki.getSkinFile('icons/xwiki/edit-section.png')") no-repeat left top;
-  line-height: 999px;
+  height: 20px;
   margin: 0;
   overflow: hidden;
   padding: 0;
   position: absolute;
   right: 0;
+  text-indent: -1000em;
   top: 0;
   visibility:visible;
   width: 20px;

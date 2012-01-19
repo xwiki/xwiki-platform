@@ -583,11 +583,16 @@
 
     <!-- User by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.0.0</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-logging-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-logging-logback</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Test dependencies -->
 
     <!-- Used to mock XWiki class -->

@@ -22,6 +22,7 @@ package com.xpn.xwiki.store.migration.hibernate;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -29,10 +30,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.logging.LoggerManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -43,8 +43,6 @@ import com.xpn.xwiki.store.migration.AbstractDataMigrationManager;
 import com.xpn.xwiki.store.migration.DataMigration;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
-
-import ch.qos.logback.classic.Level;
 
 /**
  * Migration manager for hibernate store.
@@ -57,6 +55,10 @@ import ch.qos.logback.classic.Level;
 @Singleton
 public class HibernateDataMigrationManager extends AbstractDataMigrationManager
 {
+    /** LoggerManager to suspend logging during normal faulty SQL operation. */
+    @Inject
+    private LoggerManager loggerManager;
+
     /**
      * @return store system for execute store-specific actions.
      * @throws DataMigrationException if the store could not be reached
@@ -68,54 +70,6 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         } catch (ComponentLookupException e) {
             throw new DataMigrationException(String.format("Unable to reach the store for database %s",
                 getXWikiContext().getDatabase()), e);
-        }
-    }
-
-    /**
-     * Utility class to suspend JDBCExceptionReporter logging.
-     *
-     * Workaround hibernate issues HHH-722 (https://hibernate.onjira.com/browse/HHH-722) and
-     * similar recent issue HHH-5837.
-     *
-     * JDBCExceptionReporter log an error and throw at the same time, which does not leave the decision to the
-     * caller on how the exception should be handled.
-     */
-    private class HibernateLoggingSuspender
-    {
-        private Level hibernateLogLevel;
-
-        /**
-         * Suspend JDBCExceptionReporter logging.
-         */
-        private void suspendHibernateLogging()
-        {
-            Logger hibernateLogger = LoggerFactory.getLogger(org.hibernate.util.JDBCExceptionReporter.class);
-            if (hibernateLogger instanceof ch.qos.logback.classic.Logger)
-            {
-                ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) hibernateLogger;
-                hibernateLogLevel = logger.getLevel();
-                if (hibernateLogLevel == Level.OFF) {
-                    hibernateLogLevel = null;
-                    return;
-                }
-                logger.setLevel(Level.OFF);
-            }
-        }
-
-        /**
-         * Resume JDBCExceptionReporter logging to its previous level.
-         */
-        private void resumeHibernateLogging()
-        {
-            if (hibernateLogLevel == null) {
-                return;
-            }
-
-            Logger hibernateLogger = LoggerFactory.getLogger(org.hibernate.util.JDBCExceptionReporter.class);
-            if (hibernateLogger instanceof ch.qos.logback.classic.Logger)
-            {
-                ((ch.qos.logback.classic.Logger) hibernateLogger).setLevel(hibernateLogLevel);
-            }
         }
     }
 
@@ -136,9 +90,8 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         store.setTransaction(null, context);
 
         // Prevent JDBCExceptionReporter from logging an error for below accepted exception.
-        // We want to return a DB version what ever it happens and not log an error.
-        HibernateLoggingSuspender hibernateLoggingSuspender = new HibernateLoggingSuspender();
-        hibernateLoggingSuspender.suspendHibernateLogging();
+        // We want to return a DB version what ever it happens and not log any error.
+        loggerManager.pushLogListener(null);
         try {
             // Try retrieving a version from the database
             try {
@@ -180,7 +133,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
                 }
             }
         } finally {
-            hibernateLoggingSuspender.resumeHibernateLogging();
+            loggerManager.popLogListener();
             store.setSession(originalSession, context);
             store.setTransaction(originalTransaction, context);
         }

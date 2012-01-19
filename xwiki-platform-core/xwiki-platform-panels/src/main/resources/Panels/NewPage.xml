@@ -124,7 +124,7 @@
     #set ($pageInputId = "page$!{panelId}")
     #set ($pageText = $msg.get('core.create.pageText'))
     ; {{html}}&lt;label for="$spaceInputId"&gt;$msg.get('core.create.space')&lt;/label&gt;{{/html}}
-    : {{html}}&lt;input type="text" id="$spaceInputId" name="space" value="$!space" /&gt;{{/html}}
+    : {{html}}&lt;input type="text" id="$spaceInputId" name="space" value="$!space" class="suggestSpaces" /&gt;{{/html}}
     ; {{html}}&lt;label for="$pageInputId"&gt;$msg.get('core.create.page')&lt;/label&gt;{{/html}}
     : {{html}}&lt;input type="text" id="$pageInputId" class="withTip" name="page" value="$pageText" /&gt;{{/html}}
 

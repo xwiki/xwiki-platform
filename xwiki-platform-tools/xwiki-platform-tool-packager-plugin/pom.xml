@@ -108,8 +108,9 @@
     </dependency>
     <!-- Make sure we provide a default implementation of SLF4J when executing this plugin -->
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-logging-logback</artifactId>
+      <version>${commons.version}</version>
       <scope>runtime</scope>
     </dependency>
     <!-- We need the Servlet API dep since it's used by the Packager and since it has

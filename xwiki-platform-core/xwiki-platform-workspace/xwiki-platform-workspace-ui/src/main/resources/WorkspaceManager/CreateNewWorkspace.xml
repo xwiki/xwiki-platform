@@ -407,7 +407,7 @@ function prettyNameChanged()
       &lt;label for='XWiki.XWikiServerClass_0_description'&gt;$msg.get('workspacemanager.prop.wiki.description')&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.desc.description')&lt;/span&gt;
     &lt;/dt&gt;
-    &lt;dd&gt;&lt;textarea id='XWiki.XWikiServerClass_0_description' name='XWiki.XWikiServerClass_0_description' rows='3' #if(!$isInstallComplete)disabled='disabled'#{end} &gt;&lt;/textarea&gt;&lt;/dd&gt;
+    &lt;dd&gt;&lt;textarea id='XWiki.XWikiServerClass_0_description' name='XWiki.XWikiServerClass_0_description' rows='7' cols='45' #if(!$isInstallComplete)disabled='disabled'#{end} &gt;&lt;/textarea&gt;&lt;/dd&gt;
   &lt;/dl&gt;
 
   #set ($rightsmanager = $xwiki.rightsmanager)
@@ -434,7 +434,9 @@ function prettyNameChanged()
     &lt;/dd&gt;
   &lt;/dl&gt;
   #else
-  &lt;input id='XWiki.XWikiServerClass_0_owner' name='XWiki.XWikiServerClass_0_owner' type='hidden' value="${xcontext.mainWikiName}:${xcontext.user}" /&gt;
+  &lt;div&gt;
+    &lt;input id='XWiki.XWikiServerClass_0_owner' name='XWiki.XWikiServerClass_0_owner' type='hidden' value="${xcontext.mainWikiName}:${xcontext.user}" #if(!$isInstallComplete)disabled='disabled'#{end} /&gt;
+  &lt;/div&gt;
   #end
   ##
   #############################################################################
@@ -466,15 +468,21 @@ function prettyNameChanged()
   #set($membershipTypeDetailsMap = $membershipTypeProperty.getMapValues())
   &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label for='membershipType'&gt;$msg.get('workspacemanager.prop.workspace.membershipType.label')&lt;/label&gt;
+      &lt;label&gt;$msg.get('workspacemanager.prop.workspace.membershipType.label')&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.prop.workspace.membershipType.hint')&lt;/span&gt;
     &lt;/dt&gt;
 
-    #foreach($membershipTypeValue in $membershipTypeValues)
     &lt;dd&gt;
-      &lt;input type='radio' name='WorkspaceManager.WorkspaceClass_0_membershipType' value="$membershipTypeValue" #if($foreach.index==0)checked='checked'#end  #if(!$isInstallComplete)disabled='disabled'#{end} &gt;$membershipTypeDetailsMap.get($membershipTypeValue).getValue()&lt;/input&gt;
-    &lt;/dd&gt;
+    #foreach($membershipTypeValue in $membershipTypeValues)
+      #set ($membershipTypeValueId = "WorkspaceManager.WorkspaceClass_0_membershipType${foreach.index}")
+      &lt;div&gt;
+        &lt;label for="$membershipTypeValueId"&gt;
+          &lt;input type='radio' id="$membershipTypeValueId" name='WorkspaceManager.WorkspaceClass_0_membershipType' value="$membershipTypeValue" #if($foreach.index==0)checked='checked'#end  #if(!$isInstallComplete)disabled='disabled'#{end} /&gt;
+          $membershipTypeDetailsMap.get($membershipTypeValue).getValue()
+        &lt;/label&gt;
+      &lt;/div&gt;
     #end
+    &lt;/dd&gt;
   &lt;/dl&gt;
   ##
   #############################################################################

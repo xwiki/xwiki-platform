@@ -108,15 +108,6 @@
   background-repeat:no-repeat;
 }
 
-#spWorkspaceItem {
-  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
-  background-repeat:no-repeat;
-}
-
-ul.xlist li.workspace div.spWorkspaceName {
-  float: left;
-}
-
 #spWorkspaceCreateLabel a {
   color: $theme.textSecondaryColor;
   text-decoration: none;
@@ -126,6 +117,15 @@ ul.xlist li.workspace div.spWorkspaceName {
   background-color: $theme.highlightColor;
   border-top: 1px dashed $theme.borderColor;
   padding: .5em 0;
+}
+
+.spWorkspaceItem {
+  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
+  background-repeat:no-repeat;
+}
+
+ul.xlist li.workspace div.spWorkspaceName {
+  float: left;
 }
 
 /*  Hidden elements in lists that are show on hover  */
@@ -291,7 +291,7 @@ There are currently no workspaces created.
   #foreach($workspaceDocumentName in $workspaceDocumentsList)
     #set ($workspaceWikiDocument = $services.wikimanager.getWikiFromDocumentName($workspaceDocumentName))
     #set ($workspaceWikiDescriptor = $workspaceWikiDocument.firstWikiAlias)
-      &lt;li id='spWorkspaceItem' class='xitem xunderline xhighlight workspace'&gt;
+      &lt;li class='xitem xunderline xhighlight workspace spWorkspaceItem'&gt;
         &lt;div class='xitemcontainer'&gt;
           &lt;div class='spWorkspaceName'&gt;{{html}}&lt;a href="${workspaceWikiDescriptor.homePageUrl}"&gt;${workspaceWikiDescriptor.wikiPrettyName}&lt;/a&gt;{{/html}}&lt;/div&gt;  
           &lt;div class='xspacer'&gt;&amp;nbsp;&lt;/div&gt;

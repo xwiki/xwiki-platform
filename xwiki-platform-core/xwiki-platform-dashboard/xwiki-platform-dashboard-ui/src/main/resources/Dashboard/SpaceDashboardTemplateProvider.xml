@@ -149,7 +149,7 @@
 <className>XWiki.TemplateProviderClass</className>
 <guid>e3129547-c67a-42e7-bd31-1255a9ddbeb9</guid>
 <property>
-<action>edit</action>
+<action>saveandedit</action>
 </property>
 <property>
 <name>platform.dashboard.space.templateName</name>

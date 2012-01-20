@@ -261,6 +261,7 @@
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-legacy</module>
     <module>xwiki-platform-linkchecker</module>
+    <module>xwiki-platform-livetable</module>
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-model</module>

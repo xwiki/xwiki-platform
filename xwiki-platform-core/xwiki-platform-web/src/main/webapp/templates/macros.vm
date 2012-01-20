@@ -1305,8 +1305,8 @@ ${Msz}Mb##
     <div id="${divid}-tagcloud" class="xwiki-livetable-tagcloud-tip hidden #if($hasTopFilters)splitted#end">
       <div>
         <div class="xwiki-livetable-tagcloud-container">
-          <h2>$msg.get('xe.livetable.tags.help')
-	        <span>$msg.get('xe.livetable.tags.help.cancel')</span>
+          <h2>$msg.get('platform.livetable.tagsHelp')
+	        <span>$msg.get('platform.livetable.tagsHelpCancel')</span>
           </h2>
           <div class="xwiki-livetable-tagcloud"></div>
         </div>
@@ -1325,19 +1325,19 @@ ${Msz}Mb##
         <span id="${divid}-limits" class="xwiki-livetable-limits"></span>
   #if($hasPageSize)
         <span id="${divid}-pagesize" class="xwiki-livetable-pagesize">
-            <span>$msg.get('xe.livetable.pagesize.label')</span>
+            <span>$msg.get('platform.livetable.pagesizeLabel')</span>
             <span class="xwiki-livetable-pagesize-content" ></span>
         </span>
   #end
         <span id="${divid}-ajax-loader" class="xwiki-livetable-loader hidden">
-          <img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('xe.livetable.loading')" title="" />
+          <img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('platform.livetable.loading')" title="" />
         </span>
         <span class="controlPagination">
-          <a title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination" href="#"><span class="hidden">$msg.get('xe.pagination.page.prev.title')</span></a>
-          <a title="$msg.get('xe.pagination.page.next.title')" class="nextPagination" href="#"><span class="hidden">$msg.get('xe.pagination.page.next.title')</span></a>
+          <a title="$msg.get('platform.livetable.paginationPagePrevTitle')" class="prevPagination" href="#"><span class="hidden">$msg.get('platform.livetable.paginationPagePrevTitle')</span></a>
+          <a title="$msg.get('platform.livetable.paginationPageNextTitle')" class="nextPagination" href="#"><span class="hidden">$msg.get('platform.livetable.paginationPageNextTitle')</span></a>
         </span>
         <span class="pagination">
-          <span class="xwiki-livetable-pagination-text">$msg.get("xe.pagination.page")</span>
+          <span class="xwiki-livetable-pagination-text">$msg.get("platform.livetable.paginationPage")</span>
           <span class="xwiki-livetable-pagination-content" ></span>
         </span>
       </td>
@@ -1399,7 +1399,7 @@ ${Msz}Mb##
                 #set($class = $xwiki.getDocument($propClassName).getxWikiClass())
                 #set($list = '')
                 #set($list = $class.get($colname).getListValues())
-                <select id="xwiki-livetable-${divid}-filter-${velocityCount}" name='${colname}'><option value=''>$msg.get('xe.livetable.select.all')</option>
+                <select id="xwiki-livetable-${divid}-filter-${velocityCount}" name='${colname}'><option value=''>$msg.get('platform.livetable.selectAll')</option>
                 #set($map = $class.get($colname).getMapValues())
                 #foreach($listitem in $list)
                   #set ($l10n_key = "${propClassName}_${colname}_${listitem}")
@@ -1412,7 +1412,7 @@ ${Msz}Mb##
                 </select>
                 </td>
               #elseif(("$!colprop.type" == 'text' || "$!colprop.type" == 'number') && $isFilterable)
-                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${divid}-filter-${velocityCount}" name="${colname}" type="text" #if("!$colprop.size" != '') size="${colprop.size}" title="$msg.get('xe.livetable.filters.title', [$msg.get("${transprefix}${colname}")])"#end /></td>
+                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${divid}-filter-${velocityCount}" name="${colname}" type="text" #if("!$colprop.size" != '') size="${colprop.size}" title="$msg.get('platform.livetable.filtersTitle', [$msg.get("${transprefix}${colname}")])"#end /></td>
               #elseif("$!colprop.type" == 'hidden')
               #elseif($colname != '_actions' || $hasAdmin)
               <td class="xwiki-livetable-display-header-filter"></td>
@@ -1421,7 +1421,7 @@ ${Msz}Mb##
             </tr>
             <tr class="xwiki-livetable-initial-message">
               <td colspan="${columnCount}">
-                <div class="warningmessage">$msg.get('xe.livetable.environmentCannotLoadTableMessage')</div>
+                <div class="warningmessage">$msg.get('platform.livetable.environmentCannotLoadTableMessage')</div>
               </td>
             </tr>
           </thead>
@@ -1432,11 +1432,11 @@ ${Msz}Mb##
     <tr>
       <td class="xwiki-livetable-pagination">
         <span class="controlPagination">
-          <a title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination" href="#"><span class="hidden">$msg.get('xe.pagination.page.prev.title')</span></a>
-          <a title="$msg.get('xe.pagination.page.next.title')" class="nextPagination" href="#"><span class="hidden">$msg.get('xe.pagination.page.next.title')</span></a>
+          <a title="$msg.get('platform.livetable.paginationPagePrevTitle')" class="prevPagination" href="#"><span class="hidden">$msg.get('platform.livetable.paginationPagePrevTitle')</span></a>
+          <a title="$msg.get('platform.livetable.paginationPageNextTitle')" class="nextPagination" href="#"><span class="hidden">$msg.get('platform.livetable.paginationPageNextTitle')</span></a>
         </span>
         <span class="pagination">
-          <span class="xwiki-livetable-pagination-text">$msg.get('xe.pagination.page')</span>
+          <span class="xwiki-livetable-pagination-text">$msg.get('platform.livetable.paginationPage')</span>
           <span class="xwiki-livetable-pagination-content" ></span>
         </span>
       </td>
@@ -1564,8 +1564,8 @@ function (row, i, table) {
             #end
             #if($transprefix != '' && $msg.get("${transprefix}_actions.${action}") != "${transprefix}_actions.${action}")
               #set($text = $msg.get("${transprefix}_actions.${action}"))
-            #elseif($msg.get("xe.livetable._actions.${action}") != "xe.livetable._actions.${action}")
-              #set($text = $msg.get("xe.livetable._actions.${action}"))
+            #elseif($msg.get("platform.livetable._actions.${action}") != "platform.livetable._actions.${action}")
+              #set($text = $msg.get("platform.livetable._actions.${action}"))
             #else
               #set($text = "$action")
             #end
@@ -1780,7 +1780,7 @@ function (row, i, table) {
       #set($contextFirstPage = $parameters.pageCount - $contextWidth)
     #end
   #end
-  <span class="pagination">$msg.get('xe.pagination.page')
+  <span class="pagination">$msg.get('platform.livetable.paginationPage')
   #if($contextFirstPage != 0)
     #paginationPageLink(0 $parameters)
   #end
@@ -1808,7 +1808,7 @@ function (row, i, table) {
   #if($pageNumber == $parameters.crtPage)
   <span class="currentPage">$displayedPageNumber</span>
   #else
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$msg.get('xe.pagination.page.title', [$displayedPageNumber])">$displayedPageNumber</a>
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$msg.get('platform.livetable.paginationPageTitle', [$displayedPageNumber])">$displayedPageNumber</a>
   #end
 #end
 #**
@@ -1837,7 +1837,7 @@ function (row, i, table) {
   #if($parameters.crtPage > 0)
     #set($prevPage = $parameters.crtPage - 1)
     #set($firstItem = $prevPage * $parameters.itemsPerPage)
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination">$msg.get('xe.pagination.page.previous')</a>
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$msg.get('platform.livetable.paginationPagePrevTitle')" class="prevPagination">$msg.get('platform.livetable.paginationPagePrevious')</a>
   #else
     <span class="noPrevPagination"> </span>
   #end
@@ -1854,7 +1854,7 @@ function (row, i, table) {
   #if($parameters.crtPage < $parameters.lastPage)
     #set($nextPage = $parameters.crtPage + 1)
     #set($firstItem = $nextPage * $parameters.itemsPerPage)
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$msg.get('xe.pagination.page.next.title')" class="nextPagination">$msg.get('xe.pagination.page.next')</a>
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$msg.get('platform.livetable.paginationPageNextTitle')" class="nextPagination">$msg.get('platform.livetable.paginationPageNext')</a>
   #else
     <span class="noNextPagination"> </span>
   #end
@@ -1875,13 +1875,13 @@ function (row, i, table) {
   #end
   <span class="resultsNo">
   #if($parameters.totalItems == 0)
-    <span class='currentResultsNo'>$msg.get('xe.pagination.results.none')</span>
+    <span class='currentResultsNo'>$msg.get('platform.livetable.paginationResultsNone')</span>
   #elseif($parameters.totalItems == 1)
-    <span class='currentResultsNo'>$msg.get('xe.pagination.results.one')</span>
+    <span class='currentResultsNo'>$msg.get('platform.livetable.paginationResultsOne')</span>
   #elseif($from == $parameters.totalItems)
-    $msg.get('xe.pagination.results.single', [$from, $parameters.totalItems])
+    $msg.get('platform.livetable.paginationResultsSingle', [$from, $parameters.totalItems])
   #else
-    $msg.get('xe.pagination.results.many', [$from, $to, $parameters.totalItems])
+    $msg.get('platform.livetable.paginationResultsMany', [$from, $to, $parameters.totalItems])
   #end
   </span>
 #end

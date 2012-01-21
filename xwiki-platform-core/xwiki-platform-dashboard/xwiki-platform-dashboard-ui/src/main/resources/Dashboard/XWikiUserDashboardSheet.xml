@@ -76,8 +76,10 @@
     &lt;/div&gt;
   &lt;/div&gt;
   {{/html}}
-  
-  {{dashboard/}}
+  #if ("$!{request.xpage}" != 'edituser')
+
+    {{dashboard/}}
+  #end
 #end
 {{/velocity}}
 </content></xwikidoc>

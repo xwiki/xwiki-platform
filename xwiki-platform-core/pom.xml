@@ -255,6 +255,7 @@
     <module>xwiki-platform-faq</module>
     <module>xwiki-platform-formula</module>
     <module>xwiki-platform-gwt</module>
+    <module>xwiki-platform-index</module>
     <module>xwiki-platform-invitation</module>
     <module>xwiki-platform-ircbot</module>
     <module>xwiki-platform-jira</module>

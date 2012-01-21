@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>OrphanedPages</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>Main.AllDocs</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1252454400000</creationDate>
+<date>1253012587000</date>
+<contentUpdateDate>1253012587000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get("platform.index.orphaned")</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+#set($collist = ["doc.name", "doc.space","doc.date", "doc.author", "_actions"])
+#set($colprops = {
+                   "doc.name" : { "type" : "text" , "size" : 30, "link" : "view"}, 
+                   "doc.space" : { "type" : "text", "link" : "space"},
+                   "doc.date" : { "type" : "date" },
+                   "doc.author" : { "type" : "text", "link" : "author"},
+                   "_actions" : { "actions": ["copy","delete","rename","rights"]}
+                 })
+#set($options = { "translationPrefix" : "platform.index.",
+                  "extraParams" : "&amp;orphaned=1" })
+#livetable("orphanedpages" $collist $colprops $options)
+{{/velocity}}</content>
+</xwikidoc>

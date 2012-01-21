@@ -1212,7 +1212,7 @@ ${Msz}Mb##
  *                  "_avatar" : { "type" : "none" , "size" : 20, "link" : "none", "html" : "true", "sortable":false }
  *                })
  * #set($options = {  "className":"XWiki.XWikiUsers",
- *                    "translationPrefix" : "xe.index.users.",
+ *                    "translationPrefix" : "platform.index.",
  *                    "tagCloud" : true,
  *                    "rowCount": 15,
  *                    "javascriptName" : "MyModule.myTable",

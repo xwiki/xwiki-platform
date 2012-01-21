@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>Treeview</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>Main.AllDocs</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1252454400000</creationDate>
+<date>1252454400000</date>
+<contentUpdateDate>1252454400000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get("platform.index.tree")</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity output="false"}}
+## Smartclient
+$xwiki.jsfx.use('js/smartclient/initsc.js', {'forceSkinAction' : true, 'defer' : false})##
+$xwiki.jsfx.use('js/smartclient/modules/ISC_Core.js', {'defer' : false})##
+## TODO: remove this line
+## when http://forums.smartclient.com/showthread.php?t=3097 will be fixed
+$xwiki.jsfx.use('js/smartclient/overwritesc.js', {'defer' : false})##
+$xwiki.jsfx.use('js/smartclient/modules/ISC_Foundation.js', {'defer' : false})##
+$xwiki.jsfx.use('js/smartclient/modules/ISC_Containers.js', {'defer' : false})##
+$xwiki.jsfx.use('js/smartclient/modules/ISC_Grids.js', {'defer' : false})##
+$xwiki.jsfx.use('js/smartclient/modules/ISC_Forms.js', {'defer' : false})##
+$xwiki.jsfx.use('js/smartclient/modules/ISC_DataBinding.js', {'defer' : false})##
+$xwiki.jsfx.use('js/smartclient/skins/Enterprise/load_skin.js', {'defer' : false})##
+## XWikiExplorer
+$xwiki.jsfx.use('js/xwiki/xwikiexplorer/xwikiexplorer.js', {'forceSkinAction' : true, 'defer' : false})##
+{{/velocity}}
+
+{{html}}
+&lt;div id="XWEWrapper" style="height:300px;margin-right:20px;padding-bottom:30px;"&gt;&lt;/div&gt;
+&lt;script type="text/javascript"&gt;
+isc.XWETreeGrid.create({
+  ID: "Treeview",
+  // Example of default values:
+  // defaultValue: "Main.WebHome",
+  // defaultValue: "Main.RecentChanges@lquo.gif",
+  defaultValue: "",
+  htmlElement: "XWEWrapper", // Mandatory HTML wrapper.
+  matchElement: true, // Make the widget match HTML wrapper size.
+  // Example of data sources:
+  // dataSource: isc.XWEDataSource.create({}),
+  // dataSource: isc.XWESpaceDataSource.create({ space: "Main" }),
+  dataSource: isc.XWEWikiDataSource.create({}),
+  displaySuggest: true, // Display the input at the bottom.
+  displayLinks: true, // Node titles are HTML links.
+  displayAttachments: true, // Display pages attachments.
+  displayAttachmentsOnTop: true // Display attachments before page children.
+}).draw();
+&lt;/script&gt;
+{{/html}}</content></xwikidoc>

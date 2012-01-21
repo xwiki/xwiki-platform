@@ -226,12 +226,6 @@
         <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
         <version>${commons.version}</version>
       </extension>
-      <!-- Needed to add support for the "functional-test" packaging -->
-      <extension>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-tool-functional-test-lifecycle</artifactId>
-        <version>${project.version}</version>
-      </extension>
     </extensions>
   </build>
   <modules>

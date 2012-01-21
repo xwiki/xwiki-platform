@@ -61,15 +61,13 @@
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
-    <plugins>
-      <!-- We explicitly define the packager plugin here in order to be able to specify its version as otherwise
-           Maven will pick the latest released version (3.3 when this comment was written).
-           TODO: Remove this when we release platform 3.4M1 -->
-      <plugin>
+    <extensions>
+      <!-- Needed to add support for the "functional-test" packaging -->
+      <extension>
         <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+        <artifactId>xwiki-platform-tool-functional-test-lifecycle</artifactId>
         <version>${project.version}</version>
-      </plugin>
-    </plugins>
+      </extension>
+    </extensions>
   </build>
 </project>

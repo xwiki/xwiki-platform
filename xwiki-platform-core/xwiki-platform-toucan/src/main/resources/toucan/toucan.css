@@ -68,11 +68,17 @@ ul {
     margin-left: 2em;
 }
 
-/* Tables still need 'cellspacing="0"' in the markup. */
 caption, th, td {
     text-align: left;
     font-weight: normal;
     border-width: 1px;
+}
+
+table {
+  vertical-align: middle;
+}
+thead, tbody, tfoot {
+  vertical-align: inherit;
 }
 
 blockquote { 
@@ -431,7 +437,6 @@ table td {
   border: 1px solid #CCC;
   color: #444;
   padding: 3px 4px;
-  vertical-align: middle;
 }
 
 .mceContentBody table tr td em,

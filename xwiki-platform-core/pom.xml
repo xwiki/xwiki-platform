@@ -91,9 +91,9 @@
       </dependency>
       <!-- JFreeChart -->
       <dependency>
-        <groupId>jfree</groupId>
+        <groupId>org.jfree</groupId>
         <artifactId>jfreechart</artifactId>
-        <version>1.0.13</version>
+        <version>1.0.14</version>
       </dependency>
       <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
       <dependency>

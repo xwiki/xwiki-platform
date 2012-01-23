@@ -32,7 +32,7 @@ import org.xwiki.test.ui.po.LiveTableElement;
  * @version $Id$
  * @since 3.4M1
  */
-public class LinkcheckerTest extends AbstractTest
+public class LinkCheckerTest extends AbstractTest
 {
     @Test
     public void testLinkChecker()

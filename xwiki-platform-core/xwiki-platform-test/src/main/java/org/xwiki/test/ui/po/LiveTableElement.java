@@ -47,7 +47,8 @@ public class LiveTableElement extends BaseElement
      */
     public boolean isReady()
     {
-        return (Boolean) executeJavascript("return Element.hasClassName('" + livetableId + "-ajax-loader','hidden')");
+        Object result = executeJavascript("return Element.hasClassName('" + livetableId + "-ajax-loader','hidden')");
+        return result instanceof Boolean ? (Boolean) result : false;
     }
 
     /**

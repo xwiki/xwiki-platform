@@ -34,8 +34,10 @@
   <packaging>functional-test</packaging>
   <description>Functional UI Tests for the Link Checker feature</description>
   <properties>
-    <!-- Don't run CLIRR here since we don't care about backward compatibility for tests -->
+    <!-- Don't run CLIRR in test modules since we don't care about backward compatibility for tests -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
     <!-- Overridden configuration data for xwiki.properties to activate the Link Checker transformation -->
     <xwikiRenderingTransformations>macro, icon, linkchecker</xwikiRenderingTransformations>
   </properties>
@@ -61,6 +63,16 @@
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
+    <plugins>
+      <!-- Even though the functional-test packaging ensures that the packager plugin will execute we still need to
+           redefine it here in order to make sure the right version is used as otherwise Maven will use the last
+           released version which may be the wrong one. -->
+      <plugin>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+        <version>${project.version}</version>
+      </plugin>
+    </plugins>
     <extensions>
       <!-- Needed to add support for the "functional-test" packaging -->
       <extension>

@@ -39,6 +39,16 @@
   </properties>
   <dependencies>
     <dependency>
+      <!-- The LinkChecker UI adds a new tab to the AllDocs page. We make it optional since it works even if the
+           AllDocs page is not present -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-linkchecker-refresher</artifactId>
       <version>${project.version}</version>

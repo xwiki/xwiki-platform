@@ -20,7 +20,11 @@
 package org.xwiki.test.ui.linkchecker;
 
 import org.junit.Test;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.xwiki.linkchecker.test.po.LinkCheckerAllDocsPage;
 import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
  * UI tests for the Link Checker feature.
@@ -33,9 +37,25 @@ public class LinkcheckerTest extends AbstractTest
     @Test
     public void testLinkChecker()
     {
-        // Navigate to the page listing the state of all links
-        getUtil().gotoPage("XWiki", "ExternalLinks");
+        getUtil().deletePage(getClass().getSimpleName(), getTestMethodName());
+        getUtil().createPage(getClass().getSimpleName(), getTestMethodName(), "http://doesntexist", getTestClassName());
 
-        // TODO: Continue test once we have moved the AllDocs page to a platform module.
+        // Navigate to the Index page and click on the "External Links" tab
+        final LinkCheckerAllDocsPage page = LinkCheckerAllDocsPage.gotoPage();
+
+        // Since the LinkChecker works asynchronously there's small possibility that the link hasn't been added
+        // before the livetable displays, thus we wait till we get the link state.
+        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            public Boolean apply(WebDriver driver)
+            {
+                LiveTableElement livetable = page.clickLinkCheckerTab();
+                if (livetable.hasRow("Link", "http://doesntexist")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
     }
 }

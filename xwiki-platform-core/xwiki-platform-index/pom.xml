@@ -30,20 +30,25 @@
     <version>3.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-index</artifactId>
-  <name>XWiki Platform - Index</name>
-  <packaging>xar</packaging>
-  <description>An Index of all pages, attachments, deleted pages, etc found in the wiki.</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-livetable</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
+  <name>XWiki Platform - Index - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>XWiki Platform - Index - Parent POM</description>
+  <modules>
+    <module>xwiki-platform-index-ui</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>ci</id>
+      <activation>
+        <!-- This property is automatically defined by the Maven release plugin when executing
+             a release. Thus this profile will be automatically enabled when releasing -->
+        <property>
+          <name>performRelease</name>
+        </property>
+      </activation>
+      <modules>
+        <module>xwiki-platform-index-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

@@ -26,21 +26,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-linkchecker</artifactId>
+    <artifactId>xwiki-platform-index-test</artifactId>
     <version>3.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-linkchecker-test</artifactId>
-  <name>XWiki Platform - LinkChecker - Tests - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - LinkChecker - Tests - Parent POM</description>
-  <properties>
-    <!-- Don't run CLIRR in test modules since we don't care about backward compatibility for tests -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- Don't run Checkstyle in test modules -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-  </properties>
-  <modules>
-    <module>xwiki-platform-linkchecker-test-pageobjects</module>
-    <module>xwiki-platform-linkchecker-test-tests</module>
-  </modules>
+  <artifactId>xwiki-platform-index-test-pageobjects</artifactId>
+  <name>XWiki Platform - Index - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Index - Tests - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

@@ -20,6 +20,8 @@
 
 package org.xwiki.extension.repository.xwiki.internal.resources;
 
+import java.util.Locale;
+
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -39,8 +41,8 @@ import org.xwiki.query.QueryException;
 @Path(Resources.SEARCH)
 public class SearchRESTResource extends AbstractExtensionRESTResource
 {
-    private static final String WHERE = "extension.id like :pattern or extension.name like :pattern"
-        + " or extension.summary like :pattern or extension.description like :pattern";
+    private static final String WHERE = "lower(extension.id) like :pattern or lower(extension.name) like :pattern"
+        + " or lower(extension.summary) like :pattern or lower(extension.description) like :pattern";
 
     /**
      * @since 3.3M2
@@ -55,11 +57,11 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         ExtensionsSearchResult result = this.objectFactory.createExtensionsSearchResult();
 
         result.setOffset(offset);
-
+        
         if (requireTotalHits) {
             Query query = createExtensionsCountQuery(null, WHERE);
 
-            query.bindValue("pattern", '%' + pattern + '%');
+            query.bindValue("pattern", '%' + pattern.toLowerCase() + '%');
 
             result.setTotalHits((int) getExtensionsCountResult(query));
         } else {
@@ -69,7 +71,7 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         if (number != 0 && (result.getTotalHits() == -1 || offset < result.getTotalHits())) {
             Query query = createExtensionsQuery(null, WHERE, offset, number);
 
-            query.bindValue("pattern", '%' + pattern + '%');
+            query.bindValue("pattern", '%' + pattern.toLowerCase() + '%');
 
             getExtensions(result.getExtensions(), query);
         }

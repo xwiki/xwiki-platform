@@ -2289,20 +2289,6 @@ but still maintain the 300 px width when used as a Macro from the WYSIWYG Editor
   padding: 0;
 }
 
-/* Overwrites usersandgroups.css */
-#tdAddNewUserOrGroup .buttonwrapper  a{
-  background-image: none;
-  display: inline;
-  font-size: .8em;
-  height: auto;
-  width: auto;
-}
-
-/* Overwrites usersandgroups.css */
-#tdAddNewUserOrGroup .buttonwrapper  a:hover {
-  color: $theme.buttonSecondaryTextColor;
-}
-
 #addNewMember table {
   border-collapse: separate;
 }

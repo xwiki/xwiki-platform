@@ -40,6 +40,7 @@ import org.xwiki.extension.handler.ExtensionInitializer;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
+import org.xwiki.extension.repository.ExtensionRepositorySource;
 import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.test.MockConfigurationSource;
 
@@ -126,6 +127,11 @@ public class RepositoryUtil
     {
         clean();
 
+        // disable default configuration
+        // TODO: probably mean that this default configuration should not be at this level
+
+        unregisterComponent(ExtensionRepositorySource.class, "default");
+
         // add default test core extension
 
         registerComponent(ConfigurableDefaultCoreExtensionRepository.class);
@@ -169,17 +175,27 @@ public class RepositoryUtil
         this.componentManager.lookup(ExtensionInitializer.class).initialize();
     }
 
-    private void registerComponent(Class< ? > componentClass) throws Exception
+    public ComponentAnnotationLoader getComponentLoader()
     {
         if (this.componentLoader == null) {
             this.componentLoader = new ComponentAnnotationLoader();
         }
 
-        List<ComponentDescriptor> descriptors = this.componentLoader.getComponentsDescriptors(componentClass);
+        return this.componentLoader;
+    }
+
+    private void registerComponent(Class< ? > componentClass) throws Exception
+    {
+        List<ComponentDescriptor> descriptors = getComponentLoader().getComponentsDescriptors(componentClass);
 
         for (ComponentDescriptor descriptor : descriptors) {
             this.componentManager.registerComponent(descriptor);
         }
+    }
+
+    private void unregisterComponent(Class<?> role, String hint)
+    {
+        this.componentManager.unregisterComponent(role, hint);
     }
 
     public int copyResourceFolder(File targetFolder, String resourcePackage) throws IOException

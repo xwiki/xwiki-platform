@@ -313,12 +313,7 @@
             <configuration>
               <excludes>
                 <exclude>**/internal/**</exclude>
-                <!-- To be removed when we release 3.4 -->
-                <exclude>org/xwiki/rest/XWikiAuthentication</exclude>
-                <exclude>org/xwiki/rest/XWikiRestletJaxRsApplication</exclude>
-                <exclude>org/xwiki/rest/XWikiRestletServlet</exclude>
-                <exclude>org/xwiki/rest/XWikiSetupCleanupFilter</exclude>
-                <exclude>org/xwiki/rest/resources/BrowserAuthenticationResource</exclude>
+                <!-- Remove the following excludes after we release 3.5 -->
               </excludes>
             </configuration>
           </plugin>

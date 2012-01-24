@@ -27,10 +27,12 @@ import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.restlet.data.MediaType;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
@@ -91,7 +93,7 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
         return this.extensionVersionFileUriBuider;
     }
 
-    protected GetMethod getRESTResource(UriBuilder builder, Object... values) throws IOException, IOException
+    protected HttpResponse getRESTResource(UriBuilder builder, Object... values) throws IOException, IOException
     {
         String url;
         try {
@@ -102,29 +104,31 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
 
         HttpClient httpClient = createClient();
 
-        GetMethod getMethod = new GetMethod(url.toString());
-        getMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML.toString());
+        HttpGet getMethod = new HttpGet(url.toString());
+        getMethod.addHeader("Accept", MediaType.APPLICATION_XML.toString());
+        HttpResponse response;
         try {
-            httpClient.executeMethod(getMethod);
+            response = httpClient.execute(getMethod);
         } catch (Exception e) {
             throw new IOException("Failed to request [" + getMethod.getURI() + "]", e);
         }
 
-        if (getMethod.getStatusCode() != HttpStatus.SC_OK) {
-            throw new IOException("Invalid answer (" + getMethod.getStatusCode() + ") fo the server when requesting");
+        if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+            throw new IOException("Invalid answer (" + response.getStatusLine().getStatusCode()
+                + ") fo the server when requesting");
         }
 
-        return getMethod;
+        return response;
     }
 
     protected InputStream getRESTResourceAsStream(UriBuilder builder, Object... values) throws IOException, IOException
     {
-        return getRESTResource(builder, values).getResponseBodyAsStream();
+        return getRESTResource(builder, values).getEntity().getContent();
     }
 
     private HttpClient createClient()
     {
-        HttpClient httpClient = new HttpClient();
+        HttpClient httpClient = new DefaultHttpClient();
 
         return httpClient;
     }

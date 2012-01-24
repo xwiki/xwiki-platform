@@ -22,7 +22,9 @@ package org.xwiki.extension.repository.xwiki.internal;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.xwiki.extension.ExtensionFile;
 import org.xwiki.extension.ExtensionId;
 
@@ -41,18 +43,24 @@ public class XWikiExtensionFile implements ExtensionFile
     @Override
     public long getLength()
     {
-        GetMethod getMethod;
+        HttpResponse response;
         try {
-            getMethod =
-                this.repository.getRESTResource(this.repository.getExtensionFileUriBuider(), this.id.getId(),
-                    this.id.getVersion().getValue());
+            response =
+                this.repository.getRESTResource(this.repository.getExtensionFileUriBuider(), this.id.getId(), this.id
+                    .getVersion().getValue());
         } catch (IOException e) {
             throw new RuntimeException("Failed to acess extension [" + this + "]");
         }
 
-        long size = getMethod.getResponseContentLength();
+        HttpEntity entity = response.getEntity();
 
-        getMethod.abort();
+        long size = entity.getContentLength();
+
+        try {
+            EntityUtils.consume(entity);
+        } catch (Exception e) {
+            // Ignore
+        }
 
         return size;
     }

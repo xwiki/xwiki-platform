@@ -34,7 +34,7 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Extension - Parent POM</description>
   <properties>
-    <maven.version>3.0.3</maven.version>
+    <maven.version>3.0.4</maven.version>
 
     <!-- Extension Manager is still in experimental sate and change very often -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>

@@ -130,6 +130,7 @@
      */
     loadExtensionDetails : function(event) {
       var form = event.element().form;
+      var originalAction = form.action;
 
       event.stop();
       // Ignore consecutive requests, just handle the first one
@@ -173,6 +174,7 @@
                 var newExtensionItem = originalExtensionItem.next();
                 originalExtensionItem.remove();
                 // Attach behavior to the new element
+                newExtensionItem.down('form').action = originalAction;
                 this.addExtensionElementBehavior(newExtensionItem);
               }.bind(this),
               onFailure : function (response) {
@@ -189,7 +191,9 @@
                 // In the end: re-enable the button
                 form.__disabled = false;
                 // Remove the loading marker if it's still there (i.e. fetching failed)
-                form.down(".extension-body.loading").remove();
+                if (form &amp;&amp; form.down(".extension-body.loading")) {
+                  form.down(".extension-body.loading").remove();
+                }
               }
             }
           );

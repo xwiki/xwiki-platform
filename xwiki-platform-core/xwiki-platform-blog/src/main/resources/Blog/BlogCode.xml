@@ -874,5 +874,20 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #set ($propertyValue = $util.null)
   #setVariable ("$propertyValue" $result)
 #end
-{{/velocity}}</content>
-</xwikidoc>
+
+#**
+ * If an error occurs when executing an action, set a specific response status and display an error message.
+ * 
+ * @param status The response status.
+ * @param text The user readable error to be displayed. Can be a translation key.
+ * @param parameters The parameters to use when decoding the translation key.
+ *###
+#macro(blog__actionResponseError $status $text $parameters)
+  $response.setStatus($status)
+  #if($request.ajax)
+    $msg.get($text, $!parameters)
+  #else
+    {{error}}$msg.get($text, $!parameters){{/error}}
+  #end
+#end
+{{/velocity}}</content></xwikidoc>

@@ -535,7 +535,8 @@ XWiki.FormField = Class.create({
     var preview = this.getViewer().down('dd');
     if (preview) {
       preview.addClassName('loading');
-      new Ajax.Request('', {
+      // Firefox 3.6 doesn't resolve the empty string to the current page URL so we have to explicitly specify it.
+      new Ajax.Request(window.location.href, {
         parameters: data.toQueryString(),
         onSuccess: function(response) {
           preview.removeClassName('loading');
@@ -882,7 +883,9 @@ return XWiki;
       return false;
     }
     // Let the sheet handle the form submit.
-    form.action = '';
+    // NOTE: The code that handles Save&amp;Continue uses this URL to make the AJAX request and Firefox 3.6 doesn't resolve
+    // the empty string to the current page URL so we have to explicitly specify it.
+    form.action = window.location.href;
 
     // Apply the vertical form layout standard.
     form.addClassName('xform');

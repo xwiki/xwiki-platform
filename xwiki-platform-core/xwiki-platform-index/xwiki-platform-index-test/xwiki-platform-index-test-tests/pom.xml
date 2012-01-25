@@ -26,45 +26,54 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-index</artifactId>
+    <artifactId>xwiki-platform-index-test</artifactId>
     <version>3.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-index-ui</artifactId>
-  <name>XWiki Platform - Index - UI</name>
-  <packaging>xar</packaging>
-  <description>An Index of all pages, attachments, deleted pages, etc found in the wiki.</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
+  <artifactId>xwiki-platform-index-test-tests</artifactId>
+  <name>XWiki Platform - Index - Tests - Functional Tests</name>
+  <packaging>functional-test</packaging>
+  <description>XWiki Platform - Index - Tests - Functional Tests</description>
   <dependencies>
+    <!-- These XARs will be installed in the packaged XWiki for the test -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-livetable</artifactId>
+        <artifactId>xwiki-platform-index-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
-      <scope>runtime</scope>
     </dependency>
-    <!-- The Velocity Macro is used in this application's wiki pages -->
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
+      <artifactId>xwiki-platform-test</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
+      <scope>test</scope>
     </dependency>
-    <!-- The HTML Macro is used in this application's wiki pages -->
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-html</artifactId>
-      <version>${commons.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- The AllDocs page uses the include macro -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-include</artifactId>
+      <artifactId>xwiki-platform-index-test-pageobjects</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
+      <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <testSourceDirectory>src/test/it</testSourceDirectory>
+    <plugins>
+      <!-- Even though the functional-test packaging ensures that the packager plugin will execute we still need to
+           redefine it here in order to make sure the right version is used as otherwise Maven will use the last
+           released version which may be the wrong one. -->
+      <plugin>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+        <version>${project.version}</version>
+      </plugin>
+    </plugins>
+    <extensions>
+      <!-- Needed to add support for the "functional-test" packaging -->
+      <extension>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tool-functional-test-lifecycle</artifactId>
+        <version>${project.version}</version>
+      </extension>
+    </extensions>
+  </build>
 </project>

@@ -41,5 +41,6 @@
   </properties>
   <modules>
     <module>xwiki-platform-index-test-pageobjects</module>
+    <module>xwiki-platform-index-test-tests</module>
   </modules>
 </project>

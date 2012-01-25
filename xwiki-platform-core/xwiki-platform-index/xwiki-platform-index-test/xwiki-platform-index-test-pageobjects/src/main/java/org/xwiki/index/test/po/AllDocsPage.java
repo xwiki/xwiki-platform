@@ -44,6 +44,11 @@ public class AllDocsPage extends ViewPage
         return new AllDocsPage();
     }
 
+    public String getURL()
+    {
+        return getUtil().getURL("Main", "AllDocs");
+    }
+
     public LiveTableElement clickIndexTab()
     {
         this.indexTab.click();

@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -402,16 +403,19 @@ public class TestUtils
      */
     public String getURL(String space, String page, String action, String queryString)
     {
-        StringBuilder builder = new StringBuilder(this.BASE_BIN_URL);
+        return getURL(new String[] {space, page}, action, queryString);
+    }
+
+    private String getURL(String[] path, String action, String queryString)
+    {
+        StringBuilder builder = new StringBuilder(TestUtils.BASE_BIN_URL);
 
         builder.append(action);
-        builder.append('/');
-        builder.append(escapeURL(space));
-        builder.append('/');
-        builder.append(escapeURL(page));
+        for (int i = 0; i < path.length; i++) {
+            builder.append('/').append(escapeURL(path[i]));
+        }
 
-        boolean needToAddSecretToken =
-            !("view".equals(action) || "register".equals(action) || "download".equals(action));
+        boolean needToAddSecretToken = !Arrays.asList("view", "register", "download").contains(action);
         if (needToAddSecretToken || !StringUtils.isEmpty(queryString)) {
             builder.append('?');
         }
@@ -446,15 +450,40 @@ public class TestUtils
         return getURL(space, page, action, builder.toString());
     }
 
+    /**
+     * @param space the name of the space that contains the page with the specified attachment
+     * @param page the name of the page that holds the attachment
+     * @param attachment the attachment name
+     * @param action the action to perform on the attachment
+     * @param queryString the URL query string
+     * @return the URL that performs the specified action on the specified attachment
+     */
+    public String getAttachmentURL(String space, String page, String attachment, String action, String queryString)
+    {
+        return getURL(new String[] {space, page, attachment}, action, queryString);
+    }
+
+    /**
+     * @param space the name of the space that contains the page with the specified attachment
+     * @param page the name of the page that holds the attachment
+     * @param attachment the attachment name
+     * @param action the action to perform on the attachment
+     * @return the URL that performs the specified action on the specified attachment
+     */
+    public String getAttachmentURL(String space, String page, String attachment, String action)
+    {
+        return getAttachmentURL(space, page, attachment, action, "");
+    }
+
+    /**
+     * @param space the name of the space that contains the page with the specified attachment
+     * @param page the name of the page that holds the attachment
+     * @param attachment the attachment name
+     * @return the URL to download the specified attachment
+     */
     public String getAttachmentURL(String space, String page, String attachment)
     {
-        StringBuilder builder = new StringBuilder();
-
-        builder.append(getURL(space, page, "download"));
-        builder.append('/');
-        builder.append(escapeURL(attachment));
-
-        return builder.toString();
+        return getAttachmentURL(space, page, attachment, "download");
     }
 
     /**

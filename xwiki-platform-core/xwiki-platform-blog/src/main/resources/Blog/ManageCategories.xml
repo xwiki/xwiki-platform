@@ -690,10 +690,12 @@ input.category-name-input {
   #end
 #elseif("$!request.xaction" == 'create')
   #set($title = "$!{request.newCategoryName}")
+  #set($name = "${doc.space}.${title}")
   #if ($title.trim().equals(''))
     #blog__actionResponseError(400, 'xe.blog.manageCategories.create.error.emptyName', [])
+  #elseif (!$xwiki.getDocument($name).isNew())
+    #blog__actionResponseError(409, 'xe.blog.manageCategories.create.error.alreadyExists', [])
   #else
-    #set($name = "${doc.space}.${title}")
     #set($title = $util.encodeURI($title))
     #set($newCategoryParent = $util.encodeURI($request.newCategoryParent))
     #if($request.ajax)
@@ -722,7 +724,7 @@ input.category-name-input {
   #addCategoryForm()
 #elseif ("$!request.display" == 'renameForm')
   #renameCategoryForm()
-#else
+#elseif (!$request.ajax)
 ##
 $xwiki.ssx.use('Blog.ManageCategories')##
 $xwiki.jsx.use('Blog.ManageCategories', {'minify':false})##

@@ -21,9 +21,6 @@ package com.xpn.xwiki.objects;
 
 import java.io.Serializable;
 
-import org.suigeneris.jrcs.diff.Diff;
-import org.suigeneris.jrcs.diff.Revision;
-import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -68,11 +65,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.class, "local");
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ElementInterface#getReference()
-     */
+    @Override
     public R getReference()
     {
         if (this.referenceCache == null) {
@@ -90,12 +83,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ElementInterface#getDocumentReference()
-     * @since 2.2M2
-     */
+    @Override
     public DocumentReference getDocumentReference()
     {
         // Object using name without setting a reference are not allowed to retrieve the reference
@@ -112,6 +100,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      * 
      * @see com.xpn.xwiki.objects.ElementInterface#getName()
      */
+    @Override
     public String getName()
     {
         // If the name is null then serialize the reference as a string.
@@ -122,12 +111,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         return this.name;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ElementInterface#setDocumentReference(DocumentReference)
-     * @since 2.2M2
-     */
+    @Override
     public void setDocumentReference(DocumentReference reference)
     {
         // If the name is already set then reset it since we're now using a reference
@@ -141,6 +125,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      * 
      * @see com.xpn.xwiki.objects.ElementInterface#setName(java.lang.String)
      */
+    @Override
     public void setName(String name)
     {
         // If a reference is already set, then you cannot set a name
@@ -162,11 +147,6 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         this.prettyName = name;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object el)
     {
@@ -209,11 +189,6 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#clone()
-     */
     @Override
     public BaseElement clone()
     {
@@ -237,13 +212,6 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         return element;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ElementInterface#merge(com.xpn.xwiki.objects.ElementInterface,
-     *      com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.doc.merge.MergeConfiguration,
-     *      com.xpn.xwiki.XWikiContext, com.xpn.xwiki.doc.merge.MergeResult)
-     */
     @Override
     public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult)

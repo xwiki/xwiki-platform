@@ -52,9 +52,14 @@ import org.xwiki.logging.event.LogEvent;
  * @version $Id$
  */
 @Component
-@Named("install")
+@Named(InstallJob.JOBID)
 public class InstallJob extends AbstractJob<InstallRequest>
 {
+    /**
+     * The id of the job.
+     */
+    public static final String JOBID = "install";
+
     /**
      * Used to manipulate local extension repository.
      */

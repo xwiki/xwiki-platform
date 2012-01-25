@@ -58,9 +58,14 @@ import org.xwiki.extension.version.VersionConstraint;
  * @version $Id$
  */
 @Component
-@Named("installplan")
+@Named(InstallPlanJob.JOBID)
 public class InstallPlanJob extends AbstractJob<InstallRequest>
 {
+    /**
+     * The id of the job.
+     */
+    public static final String JOBID = "installplan";
+
     private static class ModifableExtensionPlanNode
     {
         // never change

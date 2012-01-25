@@ -47,9 +47,14 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
  * @version $Id$
  */
 @Component
-@Named("uninstallplan")
+@Named(UninstallPlanJob.JOBID)
 public class UninstallPlanJob extends AbstractJob<UninstallRequest>
 {
+    /**
+     * The id of the job.
+     */
+    public static final String JOBID = "uninstallplan";
+
     /**
      * Error message used in exception throw when trying to uninstall an extension which is not installed.
      */

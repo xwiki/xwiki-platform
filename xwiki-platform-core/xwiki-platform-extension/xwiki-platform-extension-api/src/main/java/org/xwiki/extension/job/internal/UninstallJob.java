@@ -46,9 +46,14 @@ import org.xwiki.logging.event.LogEvent;
  * @version $Id$
  */
 @Component
-@Named("uninstall")
+@Named(UninstallJob.JOBID)
 public class UninstallJob extends AbstractJob<UninstallRequest>
 {
+    /**
+     * The id of the job.
+     */
+    public static final String JOBID = "uninstall";
+
     /**
      * Used to manipulate local repository.
      */

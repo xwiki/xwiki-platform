@@ -91,7 +91,7 @@ public abstract class AbstractJob<R extends Request> implements Job
     {
         this.observationManager.notify(new JobStartedEvent(getId(), request), this);
 
-        this.status = createNewStatus((R) request);
+        this.status = createNewStatus(castRequest(request));
 
         this.status.startListening();
 
@@ -108,6 +108,17 @@ public abstract class AbstractJob<R extends Request> implements Job
 
             this.observationManager.notify(new JobFinishedEvent(getId(), request), this, exception);
         }
+    }
+
+    /**
+     * Should be overridden if R is not Request.
+     * 
+     * @param request the request
+     * @return the request in the proper extended type
+     */
+    protected R castRequest(Request request)
+    {
+        return (R) request;
     }
 
     /**

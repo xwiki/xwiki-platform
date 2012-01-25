@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.sonatype.aether.ConfigurationProperties;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.repository.LocalRepository;
@@ -34,6 +35,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryException;
 import org.xwiki.extension.repository.ExtensionRepositoryFactory;
@@ -54,6 +56,9 @@ public class AetherExtensionRepositoryFactory implements ExtensionRepositoryFact
 
     @Inject
     private AetherConfiguration aetherConfiguration;
+
+    @Inject
+    private ExtensionManagerConfiguration configuration;
 
     private LocalRepositoryManager localRepositoryManager;
 
@@ -79,6 +84,7 @@ public class AetherExtensionRepositoryFactory implements ExtensionRepositoryFact
         session.setIgnoreMissingArtifactDescriptor(false);
         session.setIgnoreInvalidArtifactDescriptor(false);
         session.setUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
+        session.setConfigProperty(ConfigurationProperties.USER_AGENT, this.configuration.getUserAgent());
 
         return session;
     }

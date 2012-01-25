@@ -30,6 +30,7 @@ import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
 import org.xwiki.extension.job.Job;
+import org.xwiki.extension.job.Request;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
@@ -47,7 +48,7 @@ import org.xwiki.logging.event.LogEvent;
  */
 @Component
 @Named(UninstallJob.JOBID)
-public class UninstallJob extends AbstractJob<UninstallRequest>
+public class UninstallJob extends AbstractExtensionJob<UninstallRequest>
 {
     /**
      * The id of the job.
@@ -70,8 +71,21 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
      * Used to generate the install plan.
      */
     @Inject
-    @Named("uninstallplan")
+    @Named(UninstallPlanJob.JOBID)
     private Job uninstallPlanJob;
+
+    @Override
+    protected UninstallRequest castRequest(Request request)
+    {
+        UninstallRequest uninstallRequest;
+        if (request instanceof UninstallRequest) {
+            uninstallRequest = (UninstallRequest) request;
+        } else {
+            uninstallRequest = new UninstallRequest(request);
+        }
+
+        return uninstallRequest;
+    }
 
     @Override
     protected void start() throws Exception
@@ -138,7 +152,7 @@ public class UninstallJob extends AbstractJob<UninstallRequest>
 
         try {
             // Unload extension
-            this.extensionHandlerManager.uninstall(localExtension, namespace);
+            this.extensionHandlerManager.uninstall(localExtension, namespace, getExtraHandlerParameters());
 
             notifyStepPropress();
 

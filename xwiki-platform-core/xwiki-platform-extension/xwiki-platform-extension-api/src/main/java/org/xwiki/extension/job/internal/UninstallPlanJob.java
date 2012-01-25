@@ -33,6 +33,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
+import org.xwiki.extension.job.Request;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.plan.ExtensionPlanAction.Action;
 import org.xwiki.extension.job.plan.ExtensionPlanNode;
@@ -48,7 +49,7 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
  */
 @Component
 @Named(UninstallPlanJob.JOBID)
-public class UninstallPlanJob extends AbstractJob<UninstallRequest>
+public class UninstallPlanJob extends AbstractExtensionJob<UninstallRequest>
 {
     /**
      * The id of the job.
@@ -84,9 +85,22 @@ public class UninstallPlanJob extends AbstractJob<UninstallRequest>
     }
 
     @Override
+    protected UninstallRequest castRequest(Request request)
+    {
+        UninstallRequest uninstallRequest;
+        if (request instanceof UninstallRequest) {
+            uninstallRequest = (UninstallRequest) request;
+        } else {
+            uninstallRequest = new UninstallRequest(request);
+        }
+
+        return uninstallRequest;
+    }
+
+    @Override
     protected void start() throws Exception
     {
-        List<ExtensionId> extensions = getRequest().getExtensions();
+        Collection<ExtensionId> extensions = getRequest().getExtensions();
 
         notifyPushLevelProgress(extensions.size());
 

@@ -36,6 +36,7 @@ import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.Job;
+import org.xwiki.extension.job.Request;
 import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.extension.job.plan.ExtensionPlanAction.Action;
@@ -53,7 +54,7 @@ import org.xwiki.logging.event.LogEvent;
  */
 @Component
 @Named(InstallJob.JOBID)
-public class InstallJob extends AbstractJob<InstallRequest>
+public class InstallJob extends AbstractExtensionJob<InstallRequest>
 {
     /**
      * The id of the job.
@@ -76,8 +77,21 @@ public class InstallJob extends AbstractJob<InstallRequest>
      * Used to generate the install plan.
      */
     @Inject
-    @Named("installplan")
+    @Named(InstallPlanJob.JOBID)
     private Job installPlanJob;
+
+    @Override
+    protected InstallRequest castRequest(Request request)
+    {
+        InstallRequest installRequest;
+        if (request instanceof InstallRequest) {
+            installRequest = (InstallRequest) request;
+        } else {
+            installRequest = new InstallRequest(request);
+        }
+
+        return installRequest;
+    }
 
     @Override
     protected void start() throws Exception
@@ -173,13 +187,13 @@ public class InstallJob extends AbstractJob<InstallRequest>
         boolean dependency) throws InstallException
     {
         if (previousExtension == null) {
-            this.extensionHandlerManager.install(extension, namespace);
+            this.extensionHandlerManager.install(extension, namespace, getExtraHandlerParameters());
 
             this.localExtensionRepository.installExtension(extension, namespace, dependency);
 
             this.observationManager.notify(new ExtensionInstalledEvent(extension.getId()), extension);
         } else {
-            this.extensionHandlerManager.upgrade(previousExtension, extension, namespace);
+            this.extensionHandlerManager.upgrade(previousExtension, extension, namespace, getExtraHandlerParameters());
 
             try {
                 this.localExtensionRepository.uninstallExtension(previousExtension, namespace);

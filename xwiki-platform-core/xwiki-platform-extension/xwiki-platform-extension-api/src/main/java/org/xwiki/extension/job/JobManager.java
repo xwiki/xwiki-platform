@@ -65,4 +65,14 @@ public interface JobManager
      * @throws JobException error when trying to run the job
      */
     Job executeJob(String jobId, Request request) throws JobException;
+
+    /**
+     * Add a new job in the queue of jobs to execute.
+     * 
+     * @param jobId the role hint of the job component
+     * @param request the request
+     * @return the created job
+     * @throws JobException error when trying to run the job
+     */
+    Job addJob(String jobId, Request request) throws JobException;
 }

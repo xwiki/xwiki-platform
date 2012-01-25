@@ -40,6 +40,7 @@ import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.job.InstallRequest;
+import org.xwiki.extension.job.Request;
 import org.xwiki.extension.job.plan.ExtensionPlanAction.Action;
 import org.xwiki.extension.job.plan.ExtensionPlanNode;
 import org.xwiki.extension.job.plan.internal.DefaultExtensionPlan;
@@ -59,7 +60,7 @@ import org.xwiki.extension.version.VersionConstraint;
  */
 @Component
 @Named(InstallPlanJob.JOBID)
-public class InstallPlanJob extends AbstractJob<InstallRequest>
+public class InstallPlanJob extends AbstractExtensionJob<InstallRequest>
 {
     /**
      * The id of the job.
@@ -158,16 +159,29 @@ public class InstallPlanJob extends AbstractJob<InstallRequest>
     }
 
     @Override
+    protected InstallRequest castRequest(Request request)
+    {
+        InstallRequest installRequest;
+        if (request instanceof InstallRequest) {
+            installRequest = (InstallRequest) request;
+        } else {
+            installRequest = new InstallRequest(request);
+        }
+
+        return installRequest;
+    }
+
+    @Override
     protected void start() throws Exception
     {
-        List<ExtensionId> extensions = getRequest().getExtensions();
+        Collection<ExtensionId> extensions = getRequest().getExtensions();
 
         notifyPushLevelProgress(extensions.size());
 
         try {
             for (ExtensionId extensionId : extensions) {
                 if (getRequest().hasNamespaces()) {
-                    List<String> namespaces = getRequest().getNamespaces();
+                    Collection<String> namespaces = getRequest().getNamespaces();
 
                     notifyPushLevelProgress(namespaces.size());
 

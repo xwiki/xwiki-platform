@@ -17,31 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.job;
+package org.xwiki.extension.job.internal;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.job.ExtensionRequest;
 
 /**
- * Extension manipulation related {@link Request}.
+ * Base class for any Job dealing with extensions.
  * 
+ * @param <R> the type of the request
  * @version $Id$
  */
-public interface ExtensionRequest extends Request
+public abstract class AbstractExtensionJob<R extends ExtensionRequest> extends AbstractJob<R>
 {
     /**
-     * @return the extension on which to apply the task.
+     * @see #getExtraHandlerParameters()
      */
-    Collection<ExtensionId> getExtensions();
+    private Map<String, Object> extra;
 
     /**
-     * @return the namespaces on which to apply the task.
+     * @return extra parameters used in {@link org.xwiki.extension.handler.ExtensionHandler} methods
      */
-    Collection<String> getNamespaces();
+    protected Map<String, ? > getExtraHandlerParameters()
+    {
+        if (this.extra == null) {
+            this.extra = new HashMap<String, Object>();
 
-    /**
-     * @return indicate if the request is applied on specific namespace or all of them
-     */
-    boolean hasNamespaces();
+            R request = getRequest();
+            for (String key : request.getPropertyNames()) {
+                this.extra.put(key, request.getProperty(key));
+            }
+        }
+
+        return this.extra;
+    }
 }

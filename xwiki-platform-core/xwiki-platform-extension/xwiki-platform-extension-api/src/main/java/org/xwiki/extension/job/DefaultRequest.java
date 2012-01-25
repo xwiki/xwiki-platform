@@ -19,29 +19,26 @@
  */
 package org.xwiki.extension.job;
 
-import java.util.Collection;
-
-import org.xwiki.extension.ExtensionId;
-
 /**
- * Extension manipulation related {@link Request}.
+ * Default implementation of {@link Request}.
  * 
  * @version $Id$
  */
-public interface ExtensionRequest extends Request
+public class DefaultRequest extends AbstractRequest
 {
     /**
-     * @return the extension on which to apply the task.
+     * Default constructor.
      */
-    Collection<ExtensionId> getExtensions();
+    public DefaultRequest()
+    {
+
+    }
 
     /**
-     * @return the namespaces on which to apply the task.
+     * @param request the request to copy
      */
-    Collection<String> getNamespaces();
+    public DefaultRequest(Request request)
+    {
 
-    /**
-     * @return indicate if the request is applied on specific namespace or all of them
-     */
-    boolean hasNamespaces();
+    }
 }

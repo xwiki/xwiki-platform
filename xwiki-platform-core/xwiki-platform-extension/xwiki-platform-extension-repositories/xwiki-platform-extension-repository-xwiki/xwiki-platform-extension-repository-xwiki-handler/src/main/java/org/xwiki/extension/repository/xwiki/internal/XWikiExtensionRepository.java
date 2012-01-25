@@ -33,11 +33,14 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.params.CoreProtocolPNames;
 import org.restlet.data.MediaType;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicenseManager;
+import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.InvalidExtensionException;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
@@ -64,6 +67,8 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
 
     private final ExtensionLicenseManager licenseManager;
 
+    private final ExtensionManagerConfiguration configuration;
+
     private final UriBuilder extensionVersionUriBuider;
 
     private final UriBuilder extensionVersionFileUriBuider;
@@ -73,13 +78,15 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
     private final UriBuilder searchUriBuider;
 
     public XWikiExtensionRepository(ExtensionRepositoryId repositoryId,
-        XWikiExtensionRepositoryFactory repositoryFactory, ExtensionLicenseManager licenseManager) throws Exception
+        XWikiExtensionRepositoryFactory repositoryFactory, ExtensionLicenseManager licenseManager,
+        ExtensionManagerConfiguration configuration) throws Exception
     {
         super(repositoryId.getURI().getPath().endsWith("/") ? new ExtensionRepositoryId(repositoryId.getId(),
             repositoryId.getType(), new URI(StringUtils.chop(repositoryId.getURI().toString()))) : repositoryId);
 
         this.repositoryFactory = repositoryFactory;
         this.licenseManager = licenseManager;
+        this.configuration = configuration;
 
         // Uri builders
         this.extensionVersionUriBuider = createUriBuilder(Resources.EXTENSION_VERSION);
@@ -129,6 +136,10 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
     private HttpClient createClient()
     {
         HttpClient httpClient = new DefaultHttpClient();
+
+        httpClient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, this.configuration.getUserAgent());
+        httpClient.getParams().setIntParameter(CoreConnectionPNames.SO_TIMEOUT, 60000);
+        httpClient.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 10000);
 
         return httpClient;
     }

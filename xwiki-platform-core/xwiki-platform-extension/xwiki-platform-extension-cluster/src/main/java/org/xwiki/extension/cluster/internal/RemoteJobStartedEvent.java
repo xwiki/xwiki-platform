@@ -17,31 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.job;
+package org.xwiki.extension.cluster.internal;
 
-import java.util.Collection;
-
-import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.job.Request;
+import org.xwiki.extension.job.event.JobStartedEvent;
 
 /**
- * Extension manipulation related {@link Request}.
+ * Internal event used to start a new job.
  * 
  * @version $Id$
  */
-public interface ExtensionRequest extends Request
+public class RemoteJobStartedEvent extends JobStartedEvent
 {
     /**
-     * @return the extension on which to apply the task.
+     * Match any {@link RemoteJobStartedEvent}.
      */
-    Collection<ExtensionId> getExtensions();
+    public RemoteJobStartedEvent()
+    {
+
+    }
 
     /**
-     * @return the namespaces on which to apply the task.
+     * @param jobId the event related job id
+     * @param request the event related job request
      */
-    Collection<String> getNamespaces();
+    public RemoteJobStartedEvent(String jobId, Request request)
+    {
+        super(jobId, request);
+    }
 
     /**
-     * @return indicate if the request is applied on specific namespace or all of them
+     * @param jobEvent the event to copy
      */
-    boolean hasNamespaces();
+    public RemoteJobStartedEvent(JobStartedEvent jobEvent)
+    {
+        super(jobEvent);
+    }
+
 }

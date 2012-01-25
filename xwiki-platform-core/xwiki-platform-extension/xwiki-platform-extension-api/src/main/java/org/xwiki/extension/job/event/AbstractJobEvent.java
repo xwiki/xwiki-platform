@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.job.event;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.extension.job.Request;
 
 /**
@@ -84,6 +85,6 @@ abstract class AbstractJobEvent implements JobEvent
     public boolean matches(Object event)
     {
         return this.getClass() == event.getClass()
-            && (this.jobId == null || this.jobId.equals(((JobEvent) event).getJobId()));
+            && (this.jobId == null || StringUtils.equals(this.jobId, ((JobEvent) event).getJobId()));
     }
 }

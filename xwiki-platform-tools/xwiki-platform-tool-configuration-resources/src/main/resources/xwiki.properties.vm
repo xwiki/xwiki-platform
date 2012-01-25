@@ -402,3 +402,8 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# See container.persistentDirectory.
 # extension.localRepository=extension/repository
 
+#-# [Since 3.4]
+#-# The user agent to use when communication with external services (generally repositories).
+#-# 
+#-# The default is:
+# extension.userAgent=ExtensionMannager

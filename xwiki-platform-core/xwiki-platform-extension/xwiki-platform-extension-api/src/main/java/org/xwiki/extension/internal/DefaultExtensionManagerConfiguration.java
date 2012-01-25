@@ -65,6 +65,11 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     private static final String TYPE_XWIKI = "xwiki";
 
     /**
+     * The default user agent.
+     */
+    private static final String DEFAULT_USERAGENT = "Extension Manager";
+
+    /**
      * Used to manipulate xwiki.properties files.
      */
     @Inject
@@ -168,5 +173,12 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
 
         throw new ExtensionManagerConfigurationException("Don't match repository configuration [" + repositoryString
             + "]");
+    }
+
+    @Override
+    public String getUserAgent()
+    {
+        // TODO: add version (need a way to get platform version first)
+        return this.configurationSource.getProperty("extension.userAgent", DEFAULT_USERAGENT);
     }
 }

@@ -24,7 +24,7 @@ import org.xwiki.observation.event.BeginEvent;
 
 /**
  * Job started event launched when a new job start.
- *
+ * 
  * @version $Id$
  */
 public class JobStartedEvent extends AbstractJobEvent implements BeginEvent
@@ -57,5 +57,13 @@ public class JobStartedEvent extends AbstractJobEvent implements BeginEvent
     public JobStartedEvent(String jobId, Request request)
     {
         super(jobId, request);
+    }
+
+    /**
+     * @param jobEvent the event to copy
+     */
+    public JobStartedEvent(JobStartedEvent jobEvent)
+    {
+        super(jobEvent.getJobId(), jobEvent.getRequest());
     }
 }

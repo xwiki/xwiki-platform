@@ -45,7 +45,7 @@ public class TestExtensionHandler extends AbstractExtensionHandler
     }
 
     @Override
-    public void install(LocalExtension localExtension, String namespace) throws InstallException
+    public void install(LocalExtension localExtension, String namespace, Map<String, ? > extra) throws InstallException
     {
         Set<LocalExtension> namespaceExtensions = this.extensions.get(namespace);
         if (namespaceExtensions == null) {
@@ -57,7 +57,8 @@ public class TestExtensionHandler extends AbstractExtensionHandler
     }
 
     @Override
-    public void uninstall(LocalExtension localExtension, String namespace) throws UninstallException
+    public void uninstall(LocalExtension localExtension, String namespace, Map<String, ? > extra)
+        throws UninstallException
     {
         this.extensions.get(namespace).remove(localExtension);
     }
@@ -65,6 +66,6 @@ public class TestExtensionHandler extends AbstractExtensionHandler
     @Override
     public void initialize(LocalExtension localExtension, String namespace) throws ExtensionException
     {
-        install(localExtension, namespace);
+        install(localExtension, namespace, null);
     }
 }

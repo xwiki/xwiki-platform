@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.handler.internal;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -42,15 +44,15 @@ public abstract class AbstractExtensionHandler implements ExtensionHandler
     protected Logger logger;
 
     @Override
-    public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace)
-        throws InstallException
+    public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace,
+        Map<String, ? > extra) throws InstallException
     {
         try {
-            uninstall(previousLocalExtension, namespace);
+            uninstall(previousLocalExtension, namespace, extra);
         } catch (UninstallException e) {
             throw new InstallException("Failed to uninstall previous extension [" + previousLocalExtension + "]");
         }
-        install(newLocalExtension, namespace);
+        install(newLocalExtension, namespace, null);
     }
 
     @Override

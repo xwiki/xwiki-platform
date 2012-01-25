@@ -19,6 +19,10 @@
  */
 package org.xwiki.extension.job;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Base class for {@link Request} implementations.
  * 
@@ -27,7 +31,68 @@ package org.xwiki.extension.job;
 public abstract class AbstractRequest implements Request
 {
     /**
-     * Serialization identifier.
+     * The properties.
      */
-    private static final long serialVersionUID = 1L;
+    private Map<String, Object> properties = new HashMap<String, Object>();
+
+    /**
+     * Default constructor.
+     */
+    public AbstractRequest()
+    {
+
+    }
+
+    /**
+     * @param request the request to copy
+     */
+    public AbstractRequest(Request request)
+    {
+        for (String key : request.getPropertyNames()) {
+            setProperty(key, request.getProperty(key));
+        }
+    }
+
+    @Override
+    public boolean isRemote()
+    {
+        return this.<Boolean> getProperty(PROPERTY_REMOTE, false);
+    }
+
+    /**
+     * @param remote indicate if the job has been triggered by a remote event
+     */
+    public void setRemote(boolean remote)
+    {
+        setProperty(PROPERTY_REMOTE, remote);
+    }
+
+    /**
+     * @param key the name of the property
+     * @param value the value of the property
+     */
+    public void setProperty(String key, Object value)
+    {
+        this.properties.put(key, value);
+    }
+
+    @Override
+    public <T> T getProperty(String key)
+    {
+        return getProperty(key, null);
+    }
+
+    @Override
+    public <T> T getProperty(String key, T def)
+    {
+        Object value = this.properties.get(key);
+
+        return value != null ? (T) value : def;
+    }
+
+    @Override
+    public Collection<String> getPropertyNames()
+    {
+        return this.properties.keySet();
+    }
 }

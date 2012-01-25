@@ -19,6 +19,12 @@
  */
 package org.xwiki.extension.version.internal;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -26,6 +32,21 @@ import org.xwiki.extension.version.Version;
 
 public class DefaultVersionTest
 {
+    private void validateSerialize(Version version) throws IOException, ClassNotFoundException
+    {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(outputStream);
+        out.writeObject(version);
+        out.close();
+        outputStream.close();
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+        ObjectInputStream in = new ObjectInputStream(inputStream);
+        Assert.assertEquals(version, in.readObject());
+        in.close();
+        inputStream.close();
+    }
+
     @Test
     public void testCompareTo()
     {
@@ -44,6 +65,12 @@ public class DefaultVersionTest
         Assert.assertEquals(Version.Type.SNAPSHOT, new DefaultVersion("1.1-SNAPSHOT").getType());
         Assert.assertEquals(Version.Type.BETA, new DefaultVersion("1.1-milestone-1").getType());
         Assert.assertEquals(Version.Type.STABLE, new DefaultVersion("1.1").getType());
-        
+    }
+
+    @Test
+    public void testSerialize() throws IOException, ClassNotFoundException
+    {
+        validateSerialize(new DefaultVersion("1.1"));
+        validateSerialize(new DefaultVersion("1.1-milestone-1"));
     }
 }

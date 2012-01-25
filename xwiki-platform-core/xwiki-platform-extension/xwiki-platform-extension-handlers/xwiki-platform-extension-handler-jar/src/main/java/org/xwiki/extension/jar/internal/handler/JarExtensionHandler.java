@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -71,7 +72,7 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
     @Override
     public void initialize(LocalExtension localExtension, String namespace) throws ExtensionException
     {
-        install(localExtension, namespace);
+        install(localExtension, namespace, null);
     }
 
     private static URL getExtensionURL(LocalExtension localExtension) throws MalformedURLException
@@ -80,7 +81,7 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
     }
 
     @Override
-    public void install(LocalExtension localExtension, String namespace) throws InstallException
+    public void install(LocalExtension localExtension, String namespace, Map<String, ? > extra) throws InstallException
     {
         ExtensionURLClassLoader classLoader = this.jarExtensionClassLoader.getURLClassLoader(namespace, true);
 
@@ -96,7 +97,8 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
     }
 
     @Override
-    public void uninstall(LocalExtension localExtension, String namespace) throws UninstallException
+    public void uninstall(LocalExtension localExtension, String namespace, Map<String, ? > extra)
+        throws UninstallException
     {
         ExtensionURLClassLoader classLoader = this.jarExtensionClassLoader.getURLClassLoader(namespace, false);
 

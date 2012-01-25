@@ -30,4 +30,19 @@ public class UninstallRequest extends AbstractExtensionRequest
      * Serialization identifier.
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Default constructor.
+     */
+    public UninstallRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     */
+    public UninstallRequest(Request request)
+    {
+        super(request);
+    }
 }

@@ -1,4 +1,3 @@
-
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
@@ -27,26 +26,38 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-extension</artifactId>
     <version>3.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-extension</artifactId>
-  <name>XWiki Platform - Extension - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Extension - Parent POM</description>
-  <properties>
-    <maven.version>3.0.4</maven.version>
+  <artifactId>xwiki-platform-extension-cluster</artifactId>
+  <name>XWiki Platform - Extension - Cluster</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Extension - Cluster</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-observation-remote</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
 
-    <!-- Extension Manager is still in experimental sate and change very often -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
-  <modules>
-    <module>xwiki-platform-extension-api</module>
-    <module>xwiki-platform-extension-handlers</module>
-    <module>xwiki-platform-extension-repositories</module>
-    <module>xwiki-platform-extension-cluster</module>
-    <module>xwiki-platform-extension-script</module>
-    <module>xwiki-platform-extension-ui</module>
-  </modules>
+    <!-- Scripting -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-bridge</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-test</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>
-

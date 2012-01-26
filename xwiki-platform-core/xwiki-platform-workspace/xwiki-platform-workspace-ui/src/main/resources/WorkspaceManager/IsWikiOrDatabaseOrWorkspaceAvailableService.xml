@@ -5,7 +5,7 @@
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent>WikiCode.WebHome</parent>
+<parent>WorkspaceManager.WebHome</parent>
 <creator>xwiki:XWiki.Admin</creator>
 <author>xwiki:XWiki.Admin</author>
 <customClass></customClass>

@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1304962886000</creationDate>
-<date>1323442563000</date>
-<contentUpdateDate>1323442563000</contentUpdateDate>
+<date>1326443874000</date>
+<contentUpdateDate>1326443874000</contentUpdateDate>
 <version>1.1</version>
 <title>Extensions</title>
 <template></template>
@@ -22,12 +22,11 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>{{velocity output="false"}}
-## If this page is called with createExtension=true then create a new page using the ExtensionTemplate template
-#if ($request.createExtension == "true")
-  $response.sendRedirect($xwiki.getURL("Extension.${request.name}", "inline", "$!{request.queryString}"))
-#end
-{{/velocity}}
+<content>{{include document="ExtensionCode.RepositoryCode"/}}
+
+{{include document="ExtensionCode.ImportExtension"/}}
+
+{{include document="ExtensionCode.CreateExtension"/}}
 
 (% class="centered" %) (((
 
@@ -55,15 +54,46 @@ Contribute Extension...
 {{velocity}}
 {{html}}
 #if ($isGuest)
-  You need first to &lt;a href="${escapetool.xml($xwiki.getURL("Main.WebHome", "login", "xredirect=$doc.externalURL"))}"&gt;log in&lt;/a&gt; or &lt;a href="${escapetool.xml($xwiki.getURL("xwiki:Main.WebHome", "register", "xredirect=$doc.externalURL"))}"&gt;register&lt;/a&gt;.
+  You need first to &lt;a href="${escapetool.xml($xwiki.getURL('Main.WebHome', 'login', "xredirect=$doc.externalURL"))}"&gt;log in&lt;/a&gt; or &lt;a href="${escapetool.xml($xwiki.getURL("xwiki:Main.WebHome", "register", "xredirect=$doc.externalURL"))}"&gt;register&lt;/a&gt;.
 #else
-&lt;form action="" id="newextension"&gt;
+&lt;form action="" id="createextension"&gt;
   &lt;input type="hidden" name="parent" value="Extension.WebHome" /&gt;
   &lt;input type="hidden" name="template" value="ExtensionCode.ExtensionTemplate" /&gt;
   &lt;input type="hidden" name="createExtension" value="true" /&gt;
   &lt;input class="withTip" type="text" name="name" value="extension name..."  size="25" id="contributeNameInput"/&gt;
   &lt;span class="buttonwrapper"&gt;
     &lt;input class="button" type="submit" value="Add" id="contributeSubmit"/&gt;
+  &lt;/span&gt;
+&lt;/form&gt;
+{{/html}}
+#end
+{{/velocity}}
+)))
+)))
+
+(% class="extension-link import-extension" %)(((
+Import Extension...
+
+(((
+{{velocity}}
+{{html}}
+#if ($isGuest)
+  You need first to &lt;a href="${escapetool.xml($xwiki.getURL("Main.WebHome", "login", "xredirect=$doc.externalURL"))}"&gt;log in&lt;/a&gt; or &lt;a href="${escapetool.xml($xwiki.getURL("xwiki:Main.WebHome", "register", "xredirect=$doc.externalURL"))}"&gt;register&lt;/a&gt;.
+#else
+&lt;form action="" id="importextension"&gt;
+  &lt;input type="hidden" name="parent" value="Extension.WebHome" /&gt;
+  &lt;input type="hidden" name="template" value="ExtensionCode.ExtensionTemplate" /&gt;
+  &lt;input type="hidden" name="importExtension" value="true" /&gt;
+  &lt;input class="withTip" type="text" name="extensionId" value="extension id..."  size="25" id="importExtensionIdInput"/&gt;
+  &lt;select name="repositoryId" id="importRepositoryIdInput"&gt;
+    #foreach($repository in $extensionManager.repositories)
+      #if ($repository.id.type != 'xwiki')
+        &lt;option value="$escapetool.xml($repository.id.id)"&gt;$escapetool.html($repository.id.id)&lt;/option&gt;
+      #end
+    #end
+  &lt;/select&gt;
+  &lt;span class="buttonwrapper"&gt;
+    &lt;input class="button" type="submit" value="Import" id="importSubmit"/&gt;
   &lt;/span&gt;
 &lt;/form&gt;
 {{/html}}

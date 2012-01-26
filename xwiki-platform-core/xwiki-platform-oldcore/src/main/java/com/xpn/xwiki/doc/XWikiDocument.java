@@ -1221,6 +1221,10 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setAuthorReference(DocumentReference authorReference)
     {
+        if (!ObjectUtils.equals(authorReference, getAuthorReference())) {
+            setMetaDataDirty(true);
+        }
+
         this.authorReference = authorReference;
     }
 
@@ -1259,11 +1263,6 @@ public class XWikiDocument implements DocumentModelBridge
                     this.xClassEntityReferenceResolver.resolve(author, EntityType.DOCUMENT), getDocumentReference());
         }
 
-        if ((getAuthorReference() == null && authorReference != null)
-            || (getAuthorReference() != null && !getAuthorReference().equals(authorReference))) {
-            setMetaDataDirty(true);
-        }
-
         setAuthorReference(authorReference);
     }
 
@@ -1280,6 +1279,10 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setContentAuthorReference(DocumentReference contentAuthorReference)
     {
+        if (!ObjectUtils.equals(contentAuthorReference, getContentAuthorReference())) {
+            setMetaDataDirty(true);
+        }
+
         this.contentAuthorReference = contentAuthorReference;
     }
 
@@ -1320,11 +1323,6 @@ public class XWikiDocument implements DocumentModelBridge
                     getDocumentReference());
         }
 
-        if ((getContentAuthorReference() == null && contentAuthorReference != null)
-            || (getContentAuthorReference() != null && !getContentAuthorReference().equals(contentAuthorReference))) {
-            setMetaDataDirty(true);
-        }
-
         setContentAuthorReference(contentAuthorReference);
     }
 
@@ -1341,6 +1339,10 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setCreatorReference(DocumentReference creatorReference)
     {
+        if (!ObjectUtils.equals(creatorReference, getCreatorReference())) {
+            setMetaDataDirty(true);
+        }
+
         this.creatorReference = creatorReference;
     }
 
@@ -1377,11 +1379,6 @@ public class XWikiDocument implements DocumentModelBridge
             creatorReference =
                 this.explicitReferenceDocumentReferenceResolver.resolve(
                     this.xClassEntityReferenceResolver.resolve(creator, EntityType.DOCUMENT), getDocumentReference());
-        }
-
-        if ((getCreatorReference() == null && creatorReference != null)
-            || (getCreatorReference() != null && !getCreatorReference().equals(creatorReference))) {
-            setMetaDataDirty(true);
         }
 
         setCreatorReference(creatorReference);

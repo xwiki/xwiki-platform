@@ -1344,4 +1344,52 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         Assert.assertEquals(Arrays.asList(this.baseObject), document.getXObjects(this.baseObject.getXClassReference()));
     }
+
+    /**
+     * Verify that setting a new creator will create a new revision (we verify that that metadata dirty flag is set
+     * to true).
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     */
+    public void testSetCreatorReferenceSetsMetadataDirtyFlag()
+    {
+        // Make sure we set the flag to false to verify it's changed
+        this.document.setMetaDataDirty(false);
+
+        DocumentReference creator = new DocumentReference("Wiki", "XWiki", "Creator");
+        this.document.setCreatorReference(creator);
+
+        assertEquals(true, this.document.isMetaDataDirty());
+    }
+
+    /**
+     * Verify that setting a new author will create a new revision (we verify that that metadata dirty flag is set
+     * to true).
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     */
+    public void testSetAuthorReferenceSetsMetadataDirtyFlag()
+    {
+        // Make sure we set the flag to false to verify it's changed
+        this.document.setMetaDataDirty(false);
+
+        DocumentReference author = new DocumentReference("Wiki", "XWiki", "Author");
+        this.document.setAuthorReference(author);
+
+        assertEquals(true, this.document.isMetaDataDirty());
+    }
+
+    /**
+     * Verify that setting a new content author will create a new revision (we verify that that metadata dirty flag is
+     * set to true).
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     */
+    public void testSetContentAuthorReferenceSetsMetadataDirtyFlag()
+    {
+        // Make sure we set the flag to false to verify it's changed
+        this.document.setMetaDataDirty(false);
+
+        DocumentReference contentAuthor = new DocumentReference("Wiki", "XWiki", "ContentAuthor");
+        this.document.setContentAuthorReference(contentAuthor);
+
+        assertEquals(true, this.document.isMetaDataDirty());
+    }
 }

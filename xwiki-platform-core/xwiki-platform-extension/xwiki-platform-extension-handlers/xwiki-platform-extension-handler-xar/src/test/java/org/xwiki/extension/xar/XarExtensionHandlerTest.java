@@ -35,6 +35,8 @@ import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.Job;
 import org.xwiki.extension.job.JobManager;
 import org.xwiki.extension.job.UninstallRequest;
+import org.xwiki.extension.job.internal.InstallJob;
+import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.test.RepositoryUtil;
 import org.xwiki.extension.xar.internal.repository.XarLocalExtension;
@@ -233,7 +235,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         if (wiki != null) {
             installRequest.addNamespace("wiki:" + wiki);
         }
-        Job installJob = this.taskManager.install(installRequest);
+        Job installJob = this.taskManager.executeJob(InstallJob.JOBTYPE, installRequest);
 
         List<LogEvent> errors = installJob.getStatus().getLog(LogLevel.ERROR);
         if (!errors.isEmpty()) {
@@ -250,7 +252,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         if (wiki != null) {
             uninstallRequest.addNamespace("wiki:" + wiki);
         }
-        Job uninstallJob = this.taskManager.uninstall(uninstallRequest);
+        Job uninstallJob = this.taskManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
 
         List<LogEvent> errors = uninstallJob.getStatus().getLog(LogLevel.ERROR);
         if (!errors.isEmpty()) {
@@ -308,7 +310,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         Assert.assertNotNull("Document wiki:space.page has not been saved in the database", translated);
         Assert.assertFalse("Document wiki:space.page has not been saved in the database", translated.isNew());
-        
+
         Assert.assertEquals("Wrong content", "translated content", translated.getContent());
         Assert.assertEquals("Wrong author", this.contextUser, translated.getAuthorReference());
         Assert.assertEquals("Wrong versions", "1.1", translated.getVersion());

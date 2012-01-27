@@ -39,7 +39,7 @@ import org.xwiki.observation.ObservationManager;
 /**
  * Base class for {@link Job} implementations.
  * 
- * @param <R> the request type associated to the task
+ * @param <R> the request type associated to the job
  * @version $Id$
  */
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
@@ -89,7 +89,7 @@ public abstract class AbstractJob<R extends Request> implements Job
     @Override
     public void start(Request request)
     {
-        this.observationManager.notify(new JobStartedEvent(getId(), request), this);
+        this.observationManager.notify(new JobStartedEvent(getId(), getType(), request), this);
 
         this.status = createNewStatus(castRequest(request));
 
@@ -106,7 +106,7 @@ public abstract class AbstractJob<R extends Request> implements Job
 
             this.status.setState(JobStatus.State.FINISHED);
 
-            this.observationManager.notify(new JobFinishedEvent(getId(), request), this, exception);
+            this.observationManager.notify(new JobFinishedEvent(getId(), getType(), request), this, exception);
         }
     }
 
@@ -131,13 +131,13 @@ public abstract class AbstractJob<R extends Request> implements Job
     }
 
     /**
-     * @return unique id for the task
+     * @return unique id for the job
      */
     protected String getId()
     {
         return getClass().getName() + "_" + Integer.toHexString(hashCode());
     }
-
+    
     /**
      * Push new progression level.
      * 
@@ -167,7 +167,7 @@ public abstract class AbstractJob<R extends Request> implements Job
     /**
      * Should be implemented by {@link Job} implementations.
      * 
-     * @throws Exception errors during task execution
+     * @throws Exception errors during job execution
      */
     protected abstract void start() throws Exception;
 }

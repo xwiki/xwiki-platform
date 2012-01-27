@@ -29,6 +29,11 @@ import org.xwiki.extension.job.event.status.JobStatus;
 public interface Job
 {
     /**
+     * @return the type of the job
+     */
+    String getType();
+
+    /**
      * @return the status of the job
      */
     JobStatus getStatus();

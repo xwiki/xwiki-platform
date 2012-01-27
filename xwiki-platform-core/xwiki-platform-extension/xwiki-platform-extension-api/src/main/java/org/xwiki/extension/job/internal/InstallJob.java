@@ -53,13 +53,13 @@ import org.xwiki.logging.event.LogEvent;
  * @version $Id$
  */
 @Component
-@Named(InstallJob.JOBID)
+@Named(InstallJob.JOBTYPE)
 public class InstallJob extends AbstractExtensionJob<InstallRequest>
 {
     /**
      * The id of the job.
      */
-    public static final String JOBID = "install";
+    public static final String JOBTYPE = "install";
 
     /**
      * Used to manipulate local extension repository.
@@ -77,8 +77,14 @@ public class InstallJob extends AbstractExtensionJob<InstallRequest>
      * Used to generate the install plan.
      */
     @Inject
-    @Named(InstallPlanJob.JOBID)
+    @Named(InstallPlanJob.JOBTYPE)
     private Job installPlanJob;
+
+    @Override
+    public String getType()
+    {
+        return JOBTYPE;
+    }
 
     @Override
     protected InstallRequest castRequest(Request request)
@@ -191,7 +197,7 @@ public class InstallJob extends AbstractExtensionJob<InstallRequest>
 
             this.localExtensionRepository.installExtension(extension, namespace, dependency);
 
-            this.observationManager.notify(new ExtensionInstalledEvent(extension.getId()), extension);
+            this.observationManager.notify(new ExtensionInstalledEvent(extension.getId(), namespace), extension);
         } else {
             this.extensionHandlerManager.upgrade(previousExtension, extension, namespace, getExtraHandlerParameters());
 
@@ -203,7 +209,8 @@ public class InstallJob extends AbstractExtensionJob<InstallRequest>
 
             this.localExtensionRepository.installExtension(extension, namespace, dependency);
 
-            this.observationManager.notify(new ExtensionUpgradedEvent(extension.getId()), extension, previousExtension);
+            this.observationManager.notify(new ExtensionUpgradedEvent(extension.getId(), namespace), extension,
+                previousExtension);
         }
     }
 

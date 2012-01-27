@@ -39,9 +39,10 @@ public class ExtensionInstalledEvent extends AbstractExtensionEvent
      * Matches only the specified extension id or/and version.
      * 
      * @param extensionId the extension identifier
+     * @param namespace the namespace on which the event happened
      */
-    public ExtensionInstalledEvent(ExtensionId extensionId)
+    public ExtensionInstalledEvent(ExtensionId extensionId, String namespace)
     {
-        super(extensionId);
+        super(extensionId, namespace);
     }
 }

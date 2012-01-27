@@ -45,6 +45,11 @@ abstract class AbstractJobEvent implements JobEvent
     private String jobId;
 
     /**
+     * Related job type.
+     */
+    private String jobType;
+
+    /**
      * Default constructor.
      */
     public AbstractJobEvent()
@@ -52,20 +57,22 @@ abstract class AbstractJobEvent implements JobEvent
     }
 
     /**
-     * @param jobId the event related job id
+     * @param jobType the event related job type
      */
-    protected AbstractJobEvent(String jobId)
+    protected AbstractJobEvent(String jobType)
     {
-        this.jobId = jobId;
+        this.jobType = jobType;
     }
 
     /**
      * @param jobId the event related job id
+     * @param jobType the event related job type
      * @param request the event related job request
      */
-    protected AbstractJobEvent(String jobId, Request request)
+    protected AbstractJobEvent(String jobId, String jobType, Request request)
     {
         this.jobId = jobId;
+        this.jobType = jobType;
         this.request = request;
     }
 
@@ -73,6 +80,12 @@ abstract class AbstractJobEvent implements JobEvent
     public String getJobId()
     {
         return this.jobId;
+    }
+
+    @Override
+    public String getJobType()
+    {
+        return this.jobType;
     }
 
     @Override
@@ -84,7 +97,25 @@ abstract class AbstractJobEvent implements JobEvent
     @Override
     public boolean matches(Object event)
     {
-        return this.getClass() == event.getClass()
-            && (this.jobId == null || StringUtils.equals(this.jobId, ((JobEvent) event).getJobId()));
+        return this.getClass() == event.getClass() && matchesJobId((JobEvent) event)
+            && matchesJobType((JobEvent) event);
+    }
+
+    /**
+     * @param event the event to match
+     * @return <code>true</code> if the passed event matches this event, <code>false</code> otherwise.
+     */
+    private boolean matchesJobId(JobEvent event)
+    {
+        return this.jobId == null || StringUtils.equals(this.jobId, event.getJobId());
+    }
+
+    /**
+     * @param event the event to match
+     * @return <code>true</code> if the passed event matches this event, <code>false</code> otherwise.
+     */
+    private boolean matchesJobType(JobEvent event)
+    {
+        return this.jobId == null || StringUtils.equals(this.jobId, event.getJobId());
     }
 }

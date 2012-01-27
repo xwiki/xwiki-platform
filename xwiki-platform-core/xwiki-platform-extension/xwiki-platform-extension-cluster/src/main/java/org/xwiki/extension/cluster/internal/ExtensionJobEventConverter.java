@@ -48,8 +48,8 @@ public class ExtensionJobEventConverter extends AbstractEventConverter
     private static final Set<String> JOBS = new HashSet<String>()
     {
         {
-            add(UninstallJob.JOBID);
-            add(InstallJob.JOBID);
+            add(UninstallJob.JOBTYPE);
+            add(InstallJob.JOBTYPE);
         }
     };
 

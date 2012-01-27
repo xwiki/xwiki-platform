@@ -24,9 +24,9 @@ import org.xwiki.extension.job.Request;
 import org.xwiki.observation.event.EndEvent;
 
 /**
- * Job finished event launched when a job is finished.
- * Additional data may contains an exception if the job has not been finished with success.
- *
+ * Job finished event launched when a job is finished. Additional data may contains an exception if the job has not been
+ * finished with success.
+ * 
  * @version $Id$
  */
 public class JobFinishedEvent extends AbstractJobEvent implements EndEvent
@@ -54,10 +54,11 @@ public class JobFinishedEvent extends AbstractJobEvent implements EndEvent
 
     /**
      * @param jobId the event related job id
+     * @param jobType the event related job type
      * @param request the event related job request
      */
-    public JobFinishedEvent(String jobId, Request request)
+    public JobFinishedEvent(String jobId, String jobType, Request request)
     {
-        super(jobId, request);
+        super(jobId, jobType, request);
     }
 }

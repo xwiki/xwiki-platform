@@ -28,6 +28,7 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.UninstallException;
+import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
 import org.xwiki.extension.job.Job;
 import org.xwiki.extension.job.Request;
@@ -47,13 +48,13 @@ import org.xwiki.logging.event.LogEvent;
  * @version $Id$
  */
 @Component
-@Named(UninstallJob.JOBID)
+@Named(UninstallJob.JOBTYPE)
 public class UninstallJob extends AbstractExtensionJob<UninstallRequest>
 {
     /**
      * The id of the job.
      */
-    public static final String JOBID = "uninstall";
+    public static final String JOBTYPE = "uninstall";
 
     /**
      * Used to manipulate local repository.
@@ -71,8 +72,14 @@ public class UninstallJob extends AbstractExtensionJob<UninstallRequest>
      * Used to generate the install plan.
      */
     @Inject
-    @Named(UninstallPlanJob.JOBID)
+    @Named(UninstallPlanJob.JOBTYPE)
     private Job uninstallPlanJob;
+
+    @Override
+    public String getType()
+    {
+        return JOBTYPE;
+    }
 
     @Override
     protected UninstallRequest castRequest(Request request)
@@ -158,6 +165,9 @@ public class UninstallJob extends AbstractExtensionJob<UninstallRequest>
 
             // Uninstall from local repository
             this.localExtensionRepository.uninstallExtension(localExtension, namespace);
+
+            this.observationManager.notify(new ExtensionUninstalledEvent(localExtension.getId(), namespace),
+                localExtension);
 
             if (namespace != null) {
                 this.logger

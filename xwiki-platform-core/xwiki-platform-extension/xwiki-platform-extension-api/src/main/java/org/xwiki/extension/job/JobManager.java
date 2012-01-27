@@ -35,44 +35,22 @@ public interface JobManager
     Job getCurrentJob();
 
     /**
-     * Start an extension installation job.
-     * <p>
-     * It's the same as calling {@link #executeJob(String, Request)} with identifier "install".
-     * 
-     * @param request the request
-     * @return the created install job
-     * @throws JobException error when trying to run install job
-     */
-    Job install(InstallRequest request) throws JobException;
-
-    /**
-     * Start an extension uninstall job.
-     * <p>
-     * It's the same as calling {@link #executeJob(String, Request)} with identifier "uninstall".
-     * 
-     * @param request the request
-     * @return the created uninstall job
-     * @throws JobException error when trying to run uninstall job
-     */
-    Job uninstall(UninstallRequest request) throws JobException;
-
-    /**
      * Start a new job with the provided identifier.
      * 
-     * @param jobId the role hint of the job component
+     * @param jobType the role hint of the job component
      * @param request the request
      * @return the created job
      * @throws JobException error when trying to run the job
      */
-    Job executeJob(String jobId, Request request) throws JobException;
+    Job executeJob(String jobType, Request request) throws JobException;
 
     /**
      * Add a new job in the queue of jobs to execute.
      * 
-     * @param jobId the role hint of the job component
+     * @param jobType the role hint of the job component
      * @param request the request
      * @return the created job
      * @throws JobException error when trying to run the job
      */
-    Job addJob(String jobId, Request request) throws JobException;
+    Job addJob(String jobType, Request request) throws JobException;
 }

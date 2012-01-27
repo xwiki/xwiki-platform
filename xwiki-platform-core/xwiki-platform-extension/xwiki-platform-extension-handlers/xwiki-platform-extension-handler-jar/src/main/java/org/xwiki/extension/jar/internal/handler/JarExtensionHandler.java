@@ -205,12 +205,12 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
                             componentDescriptor.getRole(), componentDescriptor.getRoleHint());
                     }
                 } catch (ClassNotFoundException e) {
-                    this.logger
-                        .error("Failed to load class [{}]", componentDeclaration.getImplementationClassName(), e);
+                    this.logger.warn("Can't find any existing component with class [{}]. Ignoring it.",
+                        componentDeclaration.getImplementationClassName());
                 }
             }
         } catch (Exception e) {
-            throw new UninstallException("Failed to load jar file components", e);
+            throw new UninstallException("Failed to unload jar file components", e);
         }
     }
 }

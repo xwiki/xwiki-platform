@@ -20,24 +20,31 @@
 
 package org.xwiki.extension.jar.internal.handler;
 
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.Stack;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.handler.ExtensionInitializer;
-import org.xwiki.extension.job.Request;
-import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.event.JobFinishedEvent;
+import org.xwiki.extension.job.event.JobStartedEvent;
+import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
 /**
  * Listen to job finished events to properly refresh extension ClassLoader when an uninstall job has been executed.
- *
+ * 
  * @version $Id$
  */
 @Component
@@ -45,10 +52,32 @@ import org.xwiki.observation.event.Event;
 @Named("JarExtensionJobFinishedListener")
 public class JarExtensionJobFinishedListener implements EventListener
 {
+    private static final class UninstalledExtensionCollection
+    {
+        boolean rootNamespace = false;
+
+        public Set<String> namespaces;
+
+        public void add(String namespace)
+        {
+            if (!this.rootNamespace) {
+                if (namespace != null) {
+                    if (this.namespaces == null) {
+                        this.namespaces = new HashSet<String>();
+                    }
+                    this.namespaces.add(namespace);
+                } else {
+                    this.rootNamespace = true;
+                }
+            }
+        }
+    }
+
     /**
      * The list of events observed.
      */
-    private static final List<Event> EVENTS = Collections.<Event> singletonList(new JobFinishedEvent());
+    private static final List<Event> EVENTS = Arrays.asList(new ExtensionUninstalledEvent(), new JobStartedEvent(
+        UninstallJob.JOBTYPE), new JobFinishedEvent(UninstallJob.JOBTYPE));
 
     /**
      * Jar extension ClassLoader that will be properly refreshed.
@@ -62,6 +91,8 @@ public class JarExtensionJobFinishedListener implements EventListener
     @Inject
     private ExtensionInitializer extensionInitializer;
 
+    @Inject
+    private Execution execution;
 
     @Override
     public String getName()
@@ -75,22 +106,108 @@ public class JarExtensionJobFinishedListener implements EventListener
         return EVENTS;
     }
 
+    private void pushUninstallLevel()
+    {
+        ExecutionContext context = this.execution.getContext();
+
+        if (context != null) {
+            Stack<UninstalledExtensionCollection> extensions =
+                (Stack<UninstalledExtensionCollection>) context.getProperty("extension.jar.uninstalledExtensions");
+
+            if (extensions == null) {
+                extensions = new Stack<JarExtensionJobFinishedListener.UninstalledExtensionCollection>();
+                context.setProperty("extension.jar.uninstalledExtensions", extensions);
+            }
+
+            extensions.push(null);
+        }
+    }
+
+    private void popUninstallLevel()
+    {
+        ExecutionContext context = this.execution.getContext();
+
+        if (context != null) {
+            Stack<UninstalledExtensionCollection> extensions =
+                (Stack<UninstalledExtensionCollection>) context.getProperty("extension.jar.uninstalledExtensions");
+
+            if (extensions != null) {
+                extensions.pop();
+            }
+        }
+    }
+
+    private UninstalledExtensionCollection getCurrentJobUninstalledExtensions(boolean create)
+    {
+        ExecutionContext context = this.execution.getContext();
+
+        if (context != null) {
+            Stack<UninstalledExtensionCollection> extensions =
+                (Stack<UninstalledExtensionCollection>) context.getProperty("extension.jar.uninstalledExtensions");
+
+            if (extensions != null) {
+                UninstalledExtensionCollection collection = extensions.peek();
+
+                if (collection == null) {
+                    collection = new UninstalledExtensionCollection();
+                    extensions.set(extensions.size() - 1, collection);
+                }
+
+                return collection;
+            }
+        }
+
+        return null;
+    }
+
+    private void addUninstalledExtension(ExtensionId id, String namespace)
+    {
+        UninstalledExtensionCollection collection = getCurrentJobUninstalledExtensions(true);
+
+        if (collection != null) {
+            collection.add(namespace);
+        }
+    }
+
     @Override
     public void onEvent(Event event, Object o, Object o1)
     {
-        JobFinishedEvent jobEvent = (JobFinishedEvent) event;
-        Request request = jobEvent.getRequest();
+        if (event instanceof ExtensionUninstalledEvent) {
+            onExtensionUninstalledEvent(event);
+        } else if (event instanceof JobStartedEvent) {
+            onJobStartedEvent(event);
+        } else {
+            onJobFinishedEvent(event);
+        }
+    }
 
-        if (request instanceof UninstallRequest) {
-            UninstallRequest uninstallRequest = (UninstallRequest) request;
-            if (uninstallRequest.hasNamespaces()) {
-                for (String namespace : uninstallRequest.getNamespaces()) {
-                    jarExtensionClassLoader.dropURLClassLoader(namespace);
-                    extensionInitializer.initialize(namespace,  "jar");
+    private void onExtensionUninstalledEvent(Event event)
+    {
+        ExtensionUninstalledEvent uninstallEvent = (ExtensionUninstalledEvent) event;
+
+        addUninstalledExtension(uninstallEvent.getExtensionId(), uninstallEvent.getNamespace());
+    }
+
+    private void onJobStartedEvent(Event event)
+    {
+        pushUninstallLevel();
+    }
+
+    private void onJobFinishedEvent(Event event)
+    {
+        UninstalledExtensionCollection collection = getCurrentJobUninstalledExtensions(false);
+
+        popUninstallLevel();
+
+        if (collection != null) {
+            if (collection.rootNamespace) {
+                this.jarExtensionClassLoader.dropURLClassLoaders();
+                this.extensionInitializer.initialize(null, "jar");
+            } else if (collection.namespaces != null) {
+                for (String namespace : collection.namespaces) {
+                    this.jarExtensionClassLoader.dropURLClassLoader(namespace);
+                    this.extensionInitializer.initialize(namespace, "jar");
                 }
-            } else {
-                jarExtensionClassLoader.dropURLClassLoaders();
-                extensionInitializer.initialize(null, "jar");
             }
         }
     }

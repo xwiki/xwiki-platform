@@ -43,6 +43,10 @@ import org.xwiki.extension.job.JobException;
 import org.xwiki.extension.job.JobManager;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.event.status.JobStatus;
+import org.xwiki.extension.job.internal.InstallJob;
+import org.xwiki.extension.job.internal.InstallPlanJob;
+import org.xwiki.extension.job.internal.UninstallJob;
+import org.xwiki.extension.job.internal.UninstallPlanJob;
 import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -347,7 +351,7 @@ public class ExtensionManagerScriptService implements ScriptService
 
         Job job;
         try {
-            job = this.jobManager.install(installRequest);
+            job = this.jobManager.executeJob(InstallJob.JOBTYPE, installRequest);
         } catch (JobException e) {
             setError(e);
 
@@ -381,8 +385,8 @@ public class ExtensionManagerScriptService implements ScriptService
         ExtensionPlan status;
         try {
             status =
-                new UnmodifiableExtensionPlan((ExtensionPlan) this.jobManager.executeJob("installplan", installRequest)
-                    .getStatus());
+                new UnmodifiableExtensionPlan((ExtensionPlan) this.jobManager.executeJob(InstallPlanJob.JOBTYPE,
+                    installRequest).getStatus());
         } catch (JobException e) {
             setError(e);
 
@@ -420,7 +424,7 @@ public class ExtensionManagerScriptService implements ScriptService
 
         Job job;
         try {
-            job = this.jobManager.uninstall(uninstallRequest);
+            job = this.jobManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
         } catch (Exception e) {
             setError(e);
 
@@ -453,7 +457,7 @@ public class ExtensionManagerScriptService implements ScriptService
         ExtensionPlan status;
         try {
             status =
-                new UnmodifiableExtensionPlan((ExtensionPlan) this.jobManager.executeJob("uninstallplan",
+                new UnmodifiableExtensionPlan((ExtensionPlan) this.jobManager.executeJob(UninstallPlanJob.JOBTYPE,
                     uninstallRequest).getStatus());
         } catch (JobException e) {
             setError(e);

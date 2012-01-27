@@ -59,13 +59,13 @@ import org.xwiki.extension.version.VersionConstraint;
  * @version $Id$
  */
 @Component
-@Named(InstallPlanJob.JOBID)
+@Named(InstallPlanJob.JOBTYPE)
 public class InstallPlanJob extends AbstractExtensionJob<InstallRequest>
 {
     /**
      * The id of the job.
      */
-    public static final String JOBID = "installplan";
+    public static final String JOBTYPE = "installplan";
 
     private static class ModifableExtensionPlanNode
     {
@@ -150,6 +150,12 @@ public class InstallPlanJob extends AbstractExtensionJob<InstallRequest>
      */
     private Map<String, Map<String, ModifableExtensionPlanNode>> extensionsNodeCache =
         new HashMap<String, Map<String, ModifableExtensionPlanNode>>();
+
+    @Override
+    public String getType()
+    {
+        return JOBTYPE;
+    }
 
     @Override
     protected DefaultJobStatus<InstallRequest> createNewStatus(InstallRequest request)

@@ -38,12 +38,12 @@ public class RemoteJobStartedEvent extends JobStartedEvent
     }
 
     /**
-     * @param jobId the event related job id
+     * @param jobType the event related job type
      * @param request the event related job request
      */
-    public RemoteJobStartedEvent(String jobId, Request request)
+    public RemoteJobStartedEvent(String jobType, Request request)
     {
-        super(jobId, request);
+        super(null, jobType, request);
     }
 
     /**

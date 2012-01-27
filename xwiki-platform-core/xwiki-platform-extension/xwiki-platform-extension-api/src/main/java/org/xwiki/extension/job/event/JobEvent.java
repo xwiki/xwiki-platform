@@ -27,7 +27,7 @@ import org.xwiki.observation.event.Event;
 
 /**
  * Common interface for job events.
- *
+ * 
  * @version $Id$
  */
 public interface JobEvent extends Event, Serializable
@@ -36,6 +36,11 @@ public interface JobEvent extends Event, Serializable
      * @return the job id of the source job of this event
      */
     String getJobId();
+
+    /**
+     * @return the job type of the source job of this event
+     */
+    String getJobType();
 
     /**
      * @return the request related to the source job of this event

@@ -43,20 +43,21 @@ public class JobStartedEvent extends AbstractJobEvent implements BeginEvent
     }
 
     /**
-     * @param jobId the event related job id
+     * @param jobType the event related job type
      */
-    public JobStartedEvent(String jobId)
+    public JobStartedEvent(String jobType)
     {
-        super(jobId);
+        super(jobType);
     }
 
     /**
-     * @param jobId the event related job id
+     * @param jobId the event related job unique id
+     * @param jobType the event related job type
      * @param request the event related job request
      */
-    public JobStartedEvent(String jobId, Request request)
+    public JobStartedEvent(String jobId, String jobType, Request request)
     {
-        super(jobId, request);
+        super(jobId, jobType, request);
     }
 
     /**
@@ -64,6 +65,6 @@ public class JobStartedEvent extends AbstractJobEvent implements BeginEvent
      */
     public JobStartedEvent(JobStartedEvent jobEvent)
     {
-        super(jobEvent.getJobId(), jobEvent.getRequest());
+        super(jobEvent.getJobId(), jobEvent.getJobType(), jobEvent.getRequest());
     }
 }

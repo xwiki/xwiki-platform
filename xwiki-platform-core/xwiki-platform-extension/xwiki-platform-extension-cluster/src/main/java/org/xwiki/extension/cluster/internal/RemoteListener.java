@@ -86,7 +86,7 @@ public class RemoteListener implements EventListener
         RemoteJobStartedEvent jobEvent = (RemoteJobStartedEvent) event;
 
         try {
-            Job job = this.jobManager.addJob(jobEvent.getJobId(), jobEvent.getRequest());
+            Job job = this.jobManager.addJob(jobEvent.getJobType(), jobEvent.getRequest());
 
             for (LogEvent log : job.getStatus().getLog(LogLevel.ERROR)) {
                 this.logger.error(log.getMessage(), log.getArgumentArray());

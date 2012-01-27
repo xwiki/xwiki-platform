@@ -39,9 +39,10 @@ public class ExtensionUpgradedEvent extends AbstractExtensionEvent
      * Matches only the specified extension id or/and version.
      * 
      * @param extensionId the extension identifier
+     * @param namespace the namespace on which the event happened
      */
-    public ExtensionUpgradedEvent(ExtensionId extensionId)
+    public ExtensionUpgradedEvent(ExtensionId extensionId, String namespace)
     {
-        super(extensionId);
+        super(extensionId, namespace);
     }
 }

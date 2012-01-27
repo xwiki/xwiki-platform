@@ -30,12 +30,10 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.Job;
 import org.xwiki.extension.job.JobException;
 import org.xwiki.extension.job.JobManager;
 import org.xwiki.extension.job.Request;
-import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.event.status.JobStatus;
 
 /**
@@ -133,37 +131,25 @@ public class DefaultJobManager implements JobManager, Runnable, Initializable
         return this.currentJob;
     }
 
-    @Override
-    public Job install(InstallRequest request) throws JobException
-    {
-        return executeJob("install", request);
-    }
-
-    @Override
-    public Job uninstall(UninstallRequest request) throws JobException
-    {
-        return executeJob("uninstall", request);
-    }
-
     /**
-     * @param jobId the job id
+     * @param jobType the job id
      * @return a new job
-     * @throws JobException failed to create a job for the provided id
+     * @throws JobException failed to create a job for the provided type
      */
-    private Job createJob(String jobId) throws JobException
+    private Job createJob(String jobType) throws JobException
     {
         Job job;
         try {
-            job = this.componentManager.lookup(Job.class, jobId);
+            job = this.componentManager.lookup(Job.class, jobType);
         } catch (ComponentLookupException e) {
-            throw new JobException("Failed to lookup any Job for role hint [" + jobId + "]", e);
+            throw new JobException("Failed to lookup any Job for role hint [" + jobType + "]", e);
         }
 
         return job;
     }
 
     @Override
-    public synchronized Job executeJob(String jobId, Request request) throws JobException
+    public synchronized Job executeJob(String jobType, Request request) throws JobException
     {
         if (this.jobQueue.isEmpty()
             && (this.currentJob != null && this.currentJob.getStatus().getState() != JobStatus.State.FINISHED)) {
@@ -172,7 +158,7 @@ public class DefaultJobManager implements JobManager, Runnable, Initializable
 
         // The lock is used to block the explicit job queue thread
         synchronized (this) {
-            this.currentJob = createJob(jobId);
+            this.currentJob = createJob(jobType);
 
             this.currentJob.start(request);
         }
@@ -181,9 +167,9 @@ public class DefaultJobManager implements JobManager, Runnable, Initializable
     }
 
     @Override
-    public Job addJob(String jobId, Request request) throws JobException
+    public Job addJob(String jobType, Request request) throws JobException
     {
-        Job job = createJob(jobId);
+        Job job = createJob(jobType);
 
         this.jobQueue.add(new JobElement(job, request));
 

@@ -135,6 +135,7 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
                     stackingComponentEventManager = new StackingComponentEventManager();
                     componentManager.setComponentEventManager(stackingComponentEventManager);
                 }
+                stackingComponentEventManager.shouldStack(true);
 
                 this.jarLoader.initialize(componentManager, classLoader, componentDeclarations);
             } finally {

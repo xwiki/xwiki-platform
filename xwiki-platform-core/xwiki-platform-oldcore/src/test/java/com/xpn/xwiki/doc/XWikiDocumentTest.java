@@ -1362,6 +1362,24 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     }
 
     /**
+     * Verify that setting a new creator that is the same as the currenet creator doesn't create a new revision
+     * (we verify that the metadata dirty flag is not set).
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     */
+    public void testSetCreatorReferenceWithSameCreatorDoesntSetMetadataDirtyFlag()
+    {
+        // Make sure we set the metadata dirty flag to false to verify it's not changed thereafter
+        DocumentReference creator = new DocumentReference("Wiki", "XWiki", "Creator");
+        this.document.setCreatorReference(creator);
+        this.document.setMetaDataDirty(false);
+
+        // Set the creator with the same reference to verify it doesn't change the flag
+        this.document.setCreatorReference(new DocumentReference("Wiki", "XWiki", "Creator"));
+
+        assertEquals(false, this.document.isMetaDataDirty());
+    }
+
+    /**
      * Verify that setting a new author will create a new revision (we verify that that metadata dirty flag is set
      * to true).
      * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
@@ -1378,6 +1396,24 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     }
 
     /**
+     * Verify that setting a new author that is the same as the currenet creator doesn't create a new revision
+     * (we verify that the metadata dirty flag is not set).
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     */
+    public void testSetAuthorReferenceWithSameAuthorDoesntSetMetadataDirtyFlag()
+    {
+        // Make sure we set the metadata dirty flag to false to verify it's not changed thereafter
+        DocumentReference author = new DocumentReference("Wiki", "XWiki", "Author");
+        this.document.setAuthorReference(author);
+        this.document.setMetaDataDirty(false);
+
+        // Set the author with the same reference to verify it doesn't change the flag
+        this.document.setAuthorReference(new DocumentReference("Wiki", "XWiki", "Author"));
+
+        assertEquals(false, this.document.isMetaDataDirty());
+    }
+
+    /**
      * Verify that setting a new content author will create a new revision (we verify that that metadata dirty flag is
      * set to true).
      * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
@@ -1391,5 +1427,23 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setContentAuthorReference(contentAuthor);
 
         assertEquals(true, this.document.isMetaDataDirty());
+    }
+
+    /**
+     * Verify that setting a new content author that is the same as the currenet creator doesn't create a new revision
+     * (we verify that the metadata dirty flag is not set).
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     */
+    public void testSetContentAuthorReferenceWithSameContentAuthorDoesntSetMetadataDirtyFlag()
+    {
+        // Make sure we set the metadata dirty flag to false to verify it's not changed thereafter
+        DocumentReference contentAuthor = new DocumentReference("Wiki", "XWiki", "ContentAuthor");
+        this.document.setContentAuthorReference(contentAuthor);
+        this.document.setMetaDataDirty(false);
+
+        // Set the content author with the same reference to verify it doesn't change the flag
+        this.document.setContentAuthorReference(new DocumentReference("Wiki", "XWiki", "ContentAuthor"));
+
+        assertEquals(false, this.document.isMetaDataDirty());
     }
 }

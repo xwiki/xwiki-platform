@@ -20,10 +20,8 @@ $cdoc.getRenderedContent()
 ## CSRF prevention
 <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
 </form>
-## add link to the complete profile of the currently logged user
-#if($xcontext.user == $doc.getFullName())
+## add link to the complete profile of the user
 $msg.get("rightsmanager.edituserprofile")&nbsp;&nbsp;<a href="$doc.getURL()">$msg.get("rightsmanager.userprofile")</a>
-#end
 <br /><br />
 <span class="buttonwrapper"><input class="button" type="submit" name="formactionsave" value="$msg.get("save")" onclick=" window.lb.lbSaveForm();"/></span>
 <span class="buttonwrapper"><input class="button secondary" type="submit" name="formactioncancel" value="$msg.get("cancel")" onclick=" window.lb.lbHide(); window.lb.lbClearData(); return false;"/></span>

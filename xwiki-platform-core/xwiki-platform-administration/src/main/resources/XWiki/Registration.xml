@@ -51,6 +51,7 @@
 <nameField></nameField>
 <validationScript></validationScript>
 <defaultRedirect>
+<disabled>0</disabled>
 <name>defaultRedirect</name>
 <number>7</number>
 <picker>0</picker>
@@ -62,6 +63,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </defaultRedirect>
 <heading>
+<disabled>0</disabled>
 <name>heading</name>
 <number>1</number>
 <picker>0</picker>
@@ -73,6 +75,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </heading>
 <liveValidation_defaultFieldOkMessage>
+<disabled>0</disabled>
 <name>liveValidation_defaultFieldOkMessage</name>
 <number>4</number>
 <picker>0</picker>
@@ -85,6 +88,7 @@
 </liveValidation_defaultFieldOkMessage>
 <liveValidation_enabled>
 <defaultValue></defaultValue>
+<disabled>0</disabled>
 <displayFormType>checkbox</displayFormType>
 <displayType></displayType>
 <name>liveValidation_enabled</name>
@@ -97,6 +101,7 @@
 </liveValidation_enabled>
 <loginButton_autoLogin_enabled>
 <defaultValue></defaultValue>
+<disabled>0</disabled>
 <displayFormType>checkbox</displayFormType>
 <displayType></displayType>
 <name>loginButton_autoLogin_enabled</name>
@@ -109,6 +114,7 @@
 </loginButton_autoLogin_enabled>
 <loginButton_enabled>
 <defaultValue></defaultValue>
+<disabled>0</disabled>
 <displayFormType>checkbox</displayFormType>
 <displayType></displayType>
 <name>loginButton_enabled</name>
@@ -120,6 +126,7 @@
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </loginButton_enabled>
 <registrationSuccessMessage>
+<disabled>0</disabled>
 <editor>PureText</editor>
 <name>registrationSuccessMessage</name>
 <number>9</number>
@@ -134,6 +141,7 @@
 </registrationSuccessMessage>
 <requireCaptcha>
 <defaultValue></defaultValue>
+<disabled>0</disabled>
 <displayFormType>checkbox</displayFormType>
 <displayType></displayType>
 <name>requireCaptcha</name>
@@ -145,6 +153,7 @@
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </requireCaptcha>
 <welcomeMessage>
+<disabled>0</disabled>
 <editor>PureText</editor>
 <name>welcomeMessage</name>
 <number>2</number>
@@ -637,6 +646,10 @@ $heading
     &lt;form id="register" action="" method="post" class="xform half"&gt;
     &lt;div&gt;
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+    #set ($userDirectoryReference = $services.model.createDocumentReference('', 'Main', 'UserDirectory'))
+    #if ($xwiki.exists($userDirectoryReference))
+      &lt;input type="hidden" name="parent" value="$!{services.model.serialize($userDirectoryReference, 'default')}" /&gt;
+    #end
     #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams)
     &lt;div class="wikimodel-emptyline"&gt;&lt;/div&gt;
     &lt;span class="buttonwrapper"&gt;

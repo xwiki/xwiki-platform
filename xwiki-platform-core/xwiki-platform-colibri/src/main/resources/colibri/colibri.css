@@ -1519,11 +1519,17 @@ input.icon-button {
   text-indent: -9999px;
   width: 16px;
 }
-input.add-button {
+.icon-button.add-button {
   background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
 }
-input.remove-button {
+.icon-button.remove-button {
   background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
+}
+.icon-button.accept-button {
+  background-image: url("$xwiki.getSkinFile('icons/silk/accept.png')");
+}
+.icon-button.search-button {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/search.png')");
 }
 
 *:disabled, input.disabled, .buttonwrapper a.disabled {

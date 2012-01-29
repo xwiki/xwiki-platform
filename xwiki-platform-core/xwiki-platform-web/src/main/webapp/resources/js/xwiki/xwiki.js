@@ -1598,3 +1598,38 @@ document.observe("xwiki:dom:loaded", function() {
     }
   }
 });
+
+/*
+ * Warn users when they navigate away from this page without submitting the form, if the data changed.
+ */
+document.observe('xwiki:dom:loaded', function() {
+  // Only do this in edit mode
+  // TODO Add a classname to the main forms so that we can use a simple classname instead of this complex selection
+  var form = $('edit') || $('inline') || $('admin-page-content') && $('admin-page-content').down('form');
+  if (!form) {
+    return;
+  }
+
+  // What the form initially looked like (further updated whenever the form is saved)
+  var originalFormData = '';
+  var initFormData = function () {
+    originalFormData = form.serialize();
+  }
+  initFormData();
+  // Update the stored data whenever saving the form
+  form.observe('submit', initFormData);
+  document.observe('xwiki:actions:save', initFormData);
+  // A voluntary click on Cancel should be allowed as well
+  document.observe('xwiki:actions:cancel', initFormData);
+
+  // The cleaner way of doing this is:
+  //   Event.observe(window, 'beforeunload', function(event) {
+  // But it's not yet supported by Chrome (16). So we do it the uglier way:
+  window.onbeforeunload = function(event) {
+    if (originalFormData != form.serialize()) {
+      event.returnValue = "$msg.get('core.editors.confirmLeaveWithUnsavedChanges')";
+      Event.stop(event);
+      return "$msg.get('core.editors.confirmLeaveWithUnsavedChanges')";
+    }
+  };
+});

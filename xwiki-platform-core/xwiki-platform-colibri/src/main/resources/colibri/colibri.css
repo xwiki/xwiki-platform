@@ -1508,6 +1508,24 @@ input.secondary:hover, .buttonwrapper a.secondary:hover {
   box-shadow: 0px 2px 2px $theme.borderColor;
 }
 
+/* Small icon buttons */
+input.icon-button {
+  background: transparent none center center no-repeat;
+  border: 0 none;
+  font-size: 80%;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  text-indent: -9999px;
+  width: 16px;
+}
+input.add-button {
+  background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
+}
+input.remove-button {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
+}
+
 *:disabled, input.disabled, .buttonwrapper a.disabled {
   opacity: .5;
   cursor: default;

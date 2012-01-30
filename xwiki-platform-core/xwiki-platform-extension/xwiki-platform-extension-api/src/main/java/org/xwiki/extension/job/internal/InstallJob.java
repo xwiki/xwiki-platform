@@ -24,7 +24,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
@@ -55,7 +54,6 @@ import org.xwiki.logging.event.LogEvent;
  */
 @Component
 @Named(InstallJob.JOBTYPE)
-@Singleton
 public class InstallJob extends AbstractExtensionJob<InstallRequest>
 {
     /**

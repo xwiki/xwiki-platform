@@ -27,7 +27,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionId;
@@ -50,7 +49,6 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
  */
 @Component
 @Named(UninstallPlanJob.JOBTYPE)
-@Singleton
 public class UninstallPlanJob extends AbstractExtensionJob<UninstallRequest>
 {
     /**

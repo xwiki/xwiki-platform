@@ -31,7 +31,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.management.MBeanServer;
 
-import org.jgroups.ChannelException;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
 import org.jgroups.conf.ConfiguratorFactory;
@@ -82,11 +81,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
      */
     private Map<String, JChannel> channels = new ConcurrentHashMap<String, JChannel>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.NetworkAdapter#send(org.xwiki.observation.remote.RemoteEventData)
-     */
+    @Override
     public void send(RemoteEventData remoteEvent)
     {
         this.logger.debug("Send JGroups remote event [" + remoteEvent + "]");
@@ -94,7 +89,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
         // Send the message to the whole group
         Message message = new Message(null, null, remoteEvent);
 
-        // Send message to jgroups channels
+        // Send message to JGroups channels
         for (Map.Entry<String, JChannel> entry : this.channels.entrySet()) {
             try {
                 entry.getValue().send(message);
@@ -105,11 +100,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.NetworkAdapter#startChannel(java.lang.String)
-     */
+    @Override
     public void startChannel(String channelId) throws RemoteEventException
     {
         if (this.channels.containsKey(channelId)) {
@@ -137,11 +128,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
         this.logger.info("Channel [{}] started", channelId);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.NetworkAdapter#stopChannel(java.lang.String)
-     */
+    @Override
     public void stopChannel(String channelId) throws RemoteEventException
     {
         JChannel channel = this.channels.get(channelId);
@@ -170,18 +157,12 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
      * 
      * @param channelId the identifier of the channel to create
      * @return the new channel
-     * @throws ComponentLookupException failed to get default {@link JGroupsReceiver}
-     * @throws ChannelException failed to create channel
+     * @throws Exception failed to create new channel
      */
-    private JChannel createChannel(String channelId) throws ComponentLookupException, ChannelException
+    private JChannel createChannel(String channelId) throws Exception
     {
         // load configuration
-        ProtocolStackConfigurator channelConf;
-        try {
-            channelConf = loadChannelConfiguration(channelId);
-        } catch (IOException e) {
-            throw new ChannelException("Failed to load configuration for the channel [" + channelId + "]", e);
-        }
+        ProtocolStackConfigurator channelConf = loadChannelConfiguration(channelId);
 
         // get Receiver
         JGroupsReceiver channelReceiver;
@@ -195,7 +176,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
         JChannel channel = new JChannel(channelConf);
 
         channel.setReceiver(channelReceiver);
-        channel.setOpt(JChannel.LOCAL, false);
+        channel.setDiscardOwnMessages(true);
 
         return channel;
     }
@@ -206,9 +187,8 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
      * @param channelId the identifier of the channel
      * @return the channel configuration
      * @throws IOException failed to load configuration file
-     * @throws ChannelException failed to creation channel configuration
      */
-    private ProtocolStackConfigurator loadChannelConfiguration(String channelId) throws IOException, ChannelException
+    private ProtocolStackConfigurator loadChannelConfiguration(String channelId) throws IOException
     {
         String channelFile = channelId + ".xml";
         String path = "/WEB-INF/" + CONFIGURATION_PATH + channelFile;
@@ -226,7 +206,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
         }
 
         if (is == null) {
-            // Fallback on JGroups standard configuraton locations
+            // Fallback on JGroups standard configuration locations
             is = ConfiguratorFactory.getConfigStream(channelFile);
 
             if (is == null && !JChannel.DEFAULT_PROTOCOL_STACK.equals(channelFile)) {
@@ -238,11 +218,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
         return XmlConfigurator.getInstance(is);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.NetworkAdapter#stopAllChannels()
-     */
+    @Override
     public void stopAllChannels() throws RemoteEventException
     {
         for (Map.Entry<String, JChannel> channelEntry : this.channels.entrySet()) {

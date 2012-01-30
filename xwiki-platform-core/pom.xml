@@ -99,7 +99,7 @@
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>2.12.2.Final</version>
+        <version>3.0.3.Final</version>
       </dependency>
       <!-- Standard dependencies used in GWT modules -->
       <dependency>

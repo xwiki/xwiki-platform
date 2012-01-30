@@ -22,6 +22,8 @@ package org.xwiki.extension.cluster.internal;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.job.AbstractRequest;
 import org.xwiki.extension.job.DefaultRequest;
@@ -39,6 +41,7 @@ import org.xwiki.observation.remote.converter.AbstractEventConverter;
  * @version $Id$
  */
 @Component
+@Singleton
 public class ExtensionJobEventConverter extends AbstractEventConverter
 {
     /**

@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -64,6 +65,7 @@ import org.xwiki.extension.version.internal.DefaultVersionConstraint;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultExtensionSerializer implements ExtensionSerializer
 {
     private static final String ELEMENT_ID = "id";

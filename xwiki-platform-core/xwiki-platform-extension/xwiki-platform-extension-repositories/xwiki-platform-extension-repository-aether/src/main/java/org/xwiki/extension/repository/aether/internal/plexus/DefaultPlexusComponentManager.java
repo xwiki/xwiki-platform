@@ -20,6 +20,7 @@
 package org.xwiki.extension.repository.aether.internal.plexus;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
@@ -35,6 +36,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.repository.aether.internal.XWikiLoggerManager;
 
 @Component
+@Singleton
 public class DefaultPlexusComponentManager implements PlexusComponentManager, Initializable
 {
     /**

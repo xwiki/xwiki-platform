@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.InstallException;
@@ -35,6 +37,7 @@ import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
  * Basic handler used for tests.
  */
 @Component("type")
+@Singleton
 public class TestExtensionHandler extends AbstractExtensionHandler
 {
     private Map<String, Set<LocalExtension>> extensions = new HashMap<String, Set<LocalExtension>>();

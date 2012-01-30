@@ -30,6 +30,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -50,6 +51,7 @@ import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
 
 @Component("jar")
+@Singleton
 public class JarExtensionHandler extends AbstractExtensionHandler implements Initializable
 {
     @Inject

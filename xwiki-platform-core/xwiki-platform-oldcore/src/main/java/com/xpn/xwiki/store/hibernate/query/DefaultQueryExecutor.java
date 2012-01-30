@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
@@ -37,6 +38,7 @@ import org.xwiki.query.QueryExecutor;
  * @since 3.2M2
  */
 @Component
+@Singleton
 public class DefaultQueryExecutor implements QueryExecutor
 {
     /** The Hibernate HQL query executor. */

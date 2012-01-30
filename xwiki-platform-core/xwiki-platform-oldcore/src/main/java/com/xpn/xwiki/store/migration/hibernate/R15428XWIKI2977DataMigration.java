@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -45,6 +46,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  */
 @Component
 @Named("R15428XWIKI2977")
+@Singleton
 public class R15428XWIKI2977DataMigration extends AbstractHibernateDataMigration
 {
     @Override

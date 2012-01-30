@@ -20,6 +20,7 @@
 
 package org.xwiki.extension.repository.xwiki.internal.resources;
 
+import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -37,6 +38,7 @@ import org.xwiki.query.QueryException;
  */
 @Component("org.xwiki.extension.repository.xwiki.internal.resources.ExtensionsRESTResource")
 @Path(Resources.EXTENSIONS)
+@Singleton
 public class ExtensionsRESTResource extends AbstractExtensionRESTResource
 {
     @GET

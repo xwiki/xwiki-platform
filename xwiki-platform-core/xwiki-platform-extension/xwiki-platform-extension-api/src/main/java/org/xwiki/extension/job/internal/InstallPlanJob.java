@@ -29,6 +29,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.CoreExtension;
@@ -60,6 +61,7 @@ import org.xwiki.extension.version.VersionConstraint;
  */
 @Component
 @Named(InstallPlanJob.JOBTYPE)
+@Singleton
 public class InstallPlanJob extends AbstractExtensionJob<InstallRequest>
 {
     /**

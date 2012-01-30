@@ -23,9 +23,12 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 
 @Component
+@Singleton
 public class DefaultJarExtensionClassLoader implements JarExtensionClassLoader
 {
     private ExtensionURLClassLoader rootClassLoader;

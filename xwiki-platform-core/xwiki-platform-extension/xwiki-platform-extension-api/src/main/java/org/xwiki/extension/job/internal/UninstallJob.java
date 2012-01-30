@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.LocalExtension;
@@ -49,6 +50,7 @@ import org.xwiki.logging.event.LogEvent;
  */
 @Component
 @Named(UninstallJob.JOBTYPE)
+@Singleton
 public class UninstallJob extends AbstractExtensionJob<UninstallRequest>
 {
     /**

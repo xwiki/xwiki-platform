@@ -22,6 +22,7 @@ package org.xwiki.extension.repository.xwiki.internal.resources;
 
 import java.util.Locale;
 
+import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -39,6 +40,7 @@ import org.xwiki.query.QueryException;
  */
 @Component("org.xwiki.extension.repository.xwiki.internal.resources.SearchRESTResource")
 @Path(Resources.SEARCH)
+@Singleton
 public class SearchRESTResource extends AbstractExtensionRESTResource
 {
     private static final String WHERE = "lower(extension.id) like :pattern or lower(extension.name) like :pattern"

@@ -57,7 +57,18 @@ public class CommonsConfigurationSource implements ConfigurationSource
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String key, T defaultValue)
     {
-        return getProperty(key, defaultValue, (Class<T>) defaultValue.getClass());
+        T result;
+        if (containsKey(key)) {
+            if (defaultValue != null) {
+                return getProperty(key, (Class<T>) defaultValue.getClass());
+            } else {
+                return getProperty(key);
+            }
+        } else {
+            result = defaultValue;
+        }
+
+        return result;
     }
 
     @Override
@@ -116,14 +127,5 @@ public class CommonsConfigurationSource implements ConfigurationSource
     public boolean isEmpty()
     {
         return this.configuration.isEmpty();
-    }
-
-    private <T> T getProperty(String key, T defaultValue, Class<T> valueClass)
-    {
-        T result = getProperty(key, valueClass);
-        if (result == null) {
-            result = defaultValue;
-        }
-        return result;
     }
 }

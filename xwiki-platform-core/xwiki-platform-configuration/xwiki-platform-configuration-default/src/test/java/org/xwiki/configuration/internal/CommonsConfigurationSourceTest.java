@@ -49,6 +49,7 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
+
         this.source = new CommonsConfigurationSource();
         ConverterManager converterManager = getComponentManager().lookup(ConverterManager.class);
         ReflectionUtils.setFieldValue(source, "converterManager", converterManager);
@@ -103,6 +104,8 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
 
         Assert.assertEquals(true, source.getProperty("boolean"));
         Assert.assertEquals(true, source.getProperty("boolean", Boolean.class));
+        Assert.assertEquals(true, source.getProperty("unknown", true));
+        Assert.assertEquals(false, source.getProperty("unknown", false));
     }
 
     @Test
@@ -122,6 +125,7 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
         Assert.assertEquals(expected, source.getProperty("list", List.class));
 
         Assert.assertTrue(source.getProperty("unknown", List.class).isEmpty());
+        Assert.assertEquals(Arrays.asList("toto"), source.getProperty("unknown", Arrays.asList("toto")));
     }
 
     @Test

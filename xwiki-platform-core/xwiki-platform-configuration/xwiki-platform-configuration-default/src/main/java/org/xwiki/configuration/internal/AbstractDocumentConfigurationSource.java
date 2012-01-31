@@ -82,6 +82,7 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
         if (this.modelContext.getCurrentEntityReference() != null) {
             return (WikiReference) this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
         }
+
         return new WikiReference(this.modelConfig.getDefaultReferenceValue(EntityType.WIKI));
     }
 
@@ -92,10 +93,7 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
      */
     public boolean containsKey(String key)
     {
-        DocumentReference documentReference = getFailsafeDocumentReference();
-        DocumentReference classReference = getFailsafeClassReference();
-        return (documentReference != null && classReference != null)
-            && getDocumentAccessBridge().getProperty(documentReference, classReference, key) != null;
+        return getPropertyObject(key) != null;
     }
 
     /**
@@ -113,10 +111,14 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
      * 
      * @see ConfigurationSource#getProperty(String, Object)
      */
-    @SuppressWarnings("unchecked")
     public <T> T getProperty(String key, T defaultValue)
     {
-        return getProperty(key, defaultValue, (Class<T>) defaultValue.getClass());
+        T result = getProperty(key);
+        if (result == null) {
+            result = defaultValue;
+        }
+
+        return result;
     }
 
     /**
@@ -126,21 +128,15 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
      */
     public <T> T getProperty(String key, Class<T> valueClass)
     {
-        T result = null;
+        T result = getProperty(key);
 
-        DocumentReference documentReference = getFailsafeDocumentReference();
-        DocumentReference classReference = getFailsafeClassReference();
-        if (documentReference != null && classReference != null) {
-            result = valueClass.cast(getDocumentAccessBridge().getProperty(documentReference, classReference, key));
-
-            // Make sure we don't return null values for List and Properties (they must return empty elements
-            // when using the typed API).
-            if (result == null) {
-                if (List.class.isAssignableFrom(valueClass)) {
-                    result = valueClass.cast(Collections.emptyList());
-                } else if (Properties.class.isAssignableFrom(valueClass)) {
-                    result = valueClass.cast(new Properties());
-                }
+        // Make sure we don't return null values for List and Properties (they must return empty elements
+        // when using the typed API).
+        if (result == null) {
+            if (List.class.isAssignableFrom(valueClass)) {
+                result = valueClass.cast(Collections.emptyList());
+            } else if (Properties.class.isAssignableFrom(valueClass)) {
+                result = valueClass.cast(new Properties());
             }
         }
 
@@ -152,13 +148,22 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
      * 
      * @see ConfigurationSource#getProperty(String)
      */
+    @SuppressWarnings("unchecked")
     public <T> T getProperty(String key)
     {
-        T result = null;
+        return (T) getPropertyObject(key);
+    }
+
+    private Object getPropertyObject(String key)
+    {
+        Object result;
+
         DocumentReference documentReference = getFailsafeDocumentReference();
         DocumentReference classReference = getFailsafeClassReference();
         if (documentReference != null && classReference != null) {
-            result = (T) getDocumentAccessBridge().getProperty(documentReference, classReference, key);
+            result = getDocumentAccessBridge().getProperty(documentReference, classReference, key);
+        } else {
+            result = null;
         }
 
         return result;
@@ -172,15 +177,6 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
     public boolean isEmpty()
     {
         return getKeys().isEmpty();
-    }
-
-    private <T> T getProperty(String key, T defaultValue, Class<T> valueClass)
-    {
-        T result = getProperty(key, valueClass);
-        if (result == null) {
-            result = defaultValue;
-        }
-        return result;
     }
 
     private DocumentReference getFailsafeDocumentReference()

@@ -188,7 +188,7 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
         }
 
         int fromId = offset < 0 ? 0 : offset;
-        int toId = offset + nb > versions.size() || nb < 0 ? versions.size() - 1 : offset + nb;
+        int toId = offset + nb > versions.size() || nb < 0 ? versions.size() : offset + nb;
 
         List<Version> result = new ArrayList<Version>(toId - fromId);
         for (int i = fromId; i < toId; ++i) {

@@ -459,7 +459,12 @@ public class DefaultRepositoryManager implements RepositoryManager
         for (Iterator<Version> it = versionsIterable.iterator(); it.hasNext();) {
             Version version = it.next();
             try {
-                Extension versionExtension = repository.resolve(new ExtensionId(extensionId, version));
+                Extension versionExtension;
+                if (version.equals(extension.getId().getVersion())) {
+                    versionExtension = extension;
+                } else {
+                    versionExtension = repository.resolve(new ExtensionId(extensionId, version));
+                }
 
                 // Update version related informations
                 needSave |= updateExtensionVersion(document, versionExtension);

@@ -64,6 +64,7 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
 
         Assert.assertEquals("default", source.getProperty("unknown", "default"));
         Assert.assertEquals("value", source.getProperty("string", "default"));
+        Assert.assertEquals(null, source.getProperty("unknown", (String) null));
     }
 
     @Test

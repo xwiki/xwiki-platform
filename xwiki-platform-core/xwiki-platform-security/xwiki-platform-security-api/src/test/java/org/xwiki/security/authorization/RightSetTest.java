@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization.internal;
+package org.xwiki.security.authorization;
 
 import java.util.List;
 import java.util.Set;
@@ -26,6 +26,7 @@ import java.util.TreeSet;
 import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.RightSet;
 
 import com.google.common.collect.testing.SampleElements;
 import com.google.common.collect.testing.SetTestSuiteBuilder;

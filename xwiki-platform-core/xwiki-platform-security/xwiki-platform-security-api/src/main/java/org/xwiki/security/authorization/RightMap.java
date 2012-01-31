@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization.internal;
+package org.xwiki.security.authorization;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -33,8 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-
-import org.xwiki.security.authorization.Right;
 
 /**
  * Optimized map implementation with a key of type Right.

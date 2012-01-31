@@ -31,6 +31,7 @@ import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.RightMap;
 import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityRule;
 import org.xwiki.security.authorization.SecurityRuleEntry;
@@ -92,7 +93,7 @@ public class PrioritizingAuthorizationSettler extends AbstractAuthorizationSettl
     private void implyRights(Right right, XWikiSecurityAccess access, SecurityReference reference,
         Policies policies, Map<Right, Integer> priorities)
     {
-        Set<Right> impliedRights = right.getImpliedRightsSet();
+        Set<Right> impliedRights = right.getImpliedRights();
         if (impliedRights != null) {
             for (Right enabledRight : Right.getEnabledRights(reference.getSecurityType())) {
                 if (impliedRights.contains(enabledRight)) {

@@ -30,6 +30,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
+import org.xwiki.security.authorization.RightSet;
 import org.xwiki.security.authorization.SecurityAccess;
 import org.xwiki.security.authorization.AuthorizationSettler;
 import org.xwiki.security.authorization.Right;
@@ -211,7 +212,7 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
         if (wikiBridge.isWikiOwner(user, new WikiReference(reference.extractReference(EntityType.WIKI)))) {
             access.allow(Right.ADMIN);
             // Implies rights for current level
-            Set<Right> impliedRights = Right.ADMIN.getImpliedRightsSet();
+            Set<Right> impliedRights = Right.ADMIN.getImpliedRights();
             for (Right enabledRight : Right.getEnabledRights(EntityType.WIKI)) {
                 if (impliedRights.contains(enabledRight)) {
                     access.allow(enabledRight);

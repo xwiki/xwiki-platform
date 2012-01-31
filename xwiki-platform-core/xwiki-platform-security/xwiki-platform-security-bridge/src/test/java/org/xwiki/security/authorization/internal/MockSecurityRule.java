@@ -22,6 +22,7 @@ package org.xwiki.security.authorization.internal;
 import java.util.Set;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.RightSet;
 import org.xwiki.security.authorization.RuleState;
 
 public class MockSecurityRule extends XWikiSecurityRule

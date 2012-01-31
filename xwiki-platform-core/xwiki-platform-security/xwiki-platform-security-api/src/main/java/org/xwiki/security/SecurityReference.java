@@ -27,7 +27,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.security.authorization.Right;
 
 /**
  * A reference to a security entity.
@@ -37,6 +36,9 @@ import org.xwiki.security.authorization.Right;
  */
 public class SecurityReference extends EntityReference
 {
+    /** EntityType for the main wiki. */
+    public static final EntityType FARM = null;
+
     /** Serialization identifier. */
     private static final long serialVersionUID = 1L;
 
@@ -106,7 +108,7 @@ public class SecurityReference extends EntityReference
         if (type != EntityType.WIKI || !this.equals(this.mainWikiReference)) {
             return type;
         }
-        return Right.FARM;
+        return FARM;
     }
 
     /**

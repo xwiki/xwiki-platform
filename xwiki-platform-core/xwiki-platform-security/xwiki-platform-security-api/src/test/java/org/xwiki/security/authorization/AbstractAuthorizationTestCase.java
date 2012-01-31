@@ -21,6 +21,7 @@ package org.xwiki.security.authorization;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.xwiki.model.EntityType;
@@ -42,7 +43,7 @@ public class AbstractAuthorizationTestCase extends AbstractSecurityTestCase
         RuleState defaultState;
         RuleState tieResolution;
         boolean override;
-        List<Right> impliedRights;
+        Set<Right> impliedRights;
         
         TestRightDescription(String name, RuleState defaultState, RuleState tieResolution, boolean override)
         {
@@ -53,7 +54,7 @@ public class AbstractAuthorizationTestCase extends AbstractSecurityTestCase
         }
 
         TestRightDescription(String name, RuleState defaultState, RuleState tieResolution, boolean override, 
-            List<Right> impliedRights)
+            Set<Right> impliedRights)
         {
             this(name, defaultState, tieResolution, override);
             this.impliedRights = impliedRights;
@@ -84,13 +85,13 @@ public class AbstractAuthorizationTestCase extends AbstractSecurityTestCase
         }
 
         @Override
-        public List<Right> getImpliedRights()
+        public Set<Right> getImpliedRights()
         {
             return impliedRights;
         }
 
         @Override
-        public List<EntityType> getTargetedEntityType()
+        public Set<EntityType> getTargetedEntityType()
         {
             return Right.WIKI_SPACE_DOCUMENT;
         }
@@ -119,8 +120,10 @@ public class AbstractAuthorizationTestCase extends AbstractSecurityTestCase
         allTestRights.add(getNewTestRight("DenyDenyTrue", DENY, DENY, true));
         allTestRights.add(getNewTestRight("DenyDenyFalse", DENY, DENY, false));
 
-        impliedTestRightsADT = new Right(new TestRightDescription("impliedTestRightsADT", ALLOW, DENY, true, allTestRights));
-        impliedTestRightsDAF = new Right(new TestRightDescription("impliedTestRightsDAF", DENY, ALLOW, false, allTestRights));
+        Set<Right> allTestRightSet = new RightSet(allTestRights);
+        
+        impliedTestRightsADT = new Right(new TestRightDescription("impliedTestRightsADT", ALLOW, DENY, true, allTestRightSet));
+        impliedTestRightsDAF = new Right(new TestRightDescription("impliedTestRightsDAF", DENY, ALLOW, false, allTestRightSet));
     }
     
     public static Right getNewTestRight(String name, RuleState defaultValue, RuleState tieResolution, boolean overridePolicy) {

@@ -19,7 +19,7 @@
  */
 package org.xwiki.security.authorization;
 
-import java.util.List;
+import java.util.Set;
 
 import org.xwiki.model.EntityType;
 
@@ -55,15 +55,15 @@ public interface RightDescription
     boolean getInheritanceOverridePolicy();
 
     /**
-     * @return Additional rights implied by this right.
+     * @return a set of additional rights implied by this right.
      */
-    List<Right> getImpliedRights();
+    Set<Right> getImpliedRights();
 
     /**
-     * @return The list of entity type for which this right should be enabled. Special type Right.FARM (==null) could
+     * @return a set of entity type for which this right should be enabled. Special type Right.FARM (==null) could
      * be used to target the EntityType.WIKI for the main wiki only (i.e. PROGRAM)
      */
-    List<EntityType> getTargetedEntityType();
+    Set<EntityType> getTargetedEntityType();
 
     /**
      * Used to check if this right should be allowed when the wiki is in read-only mode.

@@ -17,11 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization.internal;
+package org.xwiki.security.authorization;
 
 import java.util.Map;
 
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.RightMap;
 
 import com.google.common.collect.testing.MapInterfaceTest;
 

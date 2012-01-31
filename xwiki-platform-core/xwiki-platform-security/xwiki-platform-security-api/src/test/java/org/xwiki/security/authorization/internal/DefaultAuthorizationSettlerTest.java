@@ -714,7 +714,7 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
     public void testSettleAllowAdminToWikiOwner() throws Exception
     {
         XWikiSecurityAccess allowAdmin = defaultAccess.clone();
-        Set<Right> implied = Right.ADMIN.getImpliedRightsSet();
+        Set<Right> implied = Right.ADMIN.getImpliedRights();
         allowAdmin.allow(Right.ADMIN);
         for (Right right : Right.getEnabledRights(EntityType.DOCUMENT)) {
             if (implied.contains(right)) {

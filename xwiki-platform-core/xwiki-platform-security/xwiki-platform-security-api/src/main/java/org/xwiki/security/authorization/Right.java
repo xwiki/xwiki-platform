@@ -21,8 +21,8 @@ package org.xwiki.security.authorization;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,8 +31,8 @@ import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.xwiki.model.EntityType;
-import org.xwiki.security.authorization.internal.RightSet;
 
+import static org.xwiki.security.SecurityReference.FARM;
 import static org.xwiki.security.authorization.RuleState.ALLOW;
 import static org.xwiki.security.authorization.RuleState.DENY;
 import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
@@ -70,22 +70,18 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     /** Illegal value. */
     public static final Right ILLEGAL;
 
-    /** EntityType to target the main wiki in a farm and not sub-wikis. */
-    public static final EntityType FARM = null;
-
     /** Targeted entity type list to target only the main wiki. */
-    public static final List<EntityType> FARM_ONLY = Arrays.asList(FARM);
+    public static final Set<EntityType> FARM_ONLY = null;
 
     /** Targeted entity type list to target only wikis (including main wiki). */
-    public static final List<EntityType> WIKI_ONLY = Arrays.asList(EntityType.WIKI);
+    public static final Set<EntityType> WIKI_ONLY = EnumSet.of(EntityType.WIKI);
 
     /** Targeted entity type list to target wikis and spaces. */
-    public static final List<EntityType> WIKI_SPACE
-        = Arrays.asList(EntityType.WIKI, EntityType.SPACE);
+    public static final Set<EntityType> WIKI_SPACE = EnumSet.of(EntityType.WIKI, EntityType.SPACE);
 
     /** Targeted entity type list to target wikis, spaces and documents. */
-    public static final List<EntityType> WIKI_SPACE_DOCUMENT
-        = Arrays.asList(EntityType.WIKI, EntityType.SPACE, EntityType.DOCUMENT);
+    public static final Set<EntityType> WIKI_SPACE_DOCUMENT
+        = EnumSet.of(EntityType.WIKI, EntityType.SPACE, EntityType.DOCUMENT);
 
     /** Serialization identifier. */
     private static final long serialVersionUID = 1L;
@@ -123,10 +119,10 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         COMMENT  = new Right("comment",     ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT, false);
 
         PROGRAM  = new Right("programming", DENY,   ALLOW, false,
-            Arrays.asList(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT), FARM_ONLY         , true);
+            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT), FARM_ONLY         , true);
 
         ADMIN    = new Right("admin",       DENY,   ALLOW, false,
-            Arrays.asList(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT, PROGRAM), WIKI_SPACE, true);
+            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT, PROGRAM), WIKI_SPACE, true);
 
         ILLEGAL  = new Right("illegal",     DENY,   DENY,  false, null, null               , false);
     }
@@ -162,7 +158,8 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     Right(RightDescription description)
     {
         this(description.getName(), description.getDefaultState(), description.getTieResolutionPolicy(),
-            description.getInheritanceOverridePolicy(), description.getImpliedRights(),
+            description.getInheritanceOverridePolicy(),
+            description.getImpliedRights(),
             description.getTargetedEntityType(), description.isReadOnly());
     }
 
@@ -177,7 +174,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      * @param isReadOnly If true, this right could be allowed when the wiki is in read-only mode.
      */
     private Right(String name, RuleState defaultState, RuleState tieResolutionPolicy,
-        boolean inheritanceOverridePolicy, List<Right> impliedRights, List<EntityType> validEntityTypes,
+        boolean inheritanceOverridePolicy, Set<Right> impliedRights, Set<EntityType> validEntityTypes,
         boolean isReadOnly)
     {
         checkIllegalArguments(name, defaultState, tieResolutionPolicy);
@@ -200,10 +197,13 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
                 for (EntityType type : validEntityTypes) {
                     if (type == EntityType.WIKI) {
                         // If enabled on a wiki, enable also on main wiki.
-                        enableFor(null);
+                        enableFor(FARM);
                     }
                     enableFor(type);
                 }
+            } else {
+                // If enabled on a wiki, enable also on main wiki.
+                enableFor(FARM);
             }
         }
     }
@@ -252,15 +252,15 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      * @param impliedRights the collection of rights to clone.
      * @return the cloned collection or null if no valid implied right has been provided.
      */
-    private Set<Right> cloneImpliedRights(List<Right> impliedRights)
+    private Set<Right> cloneImpliedRights(Set<Right> impliedRights)
     {
-        if (impliedRights != null && !impliedRights.isEmpty() && impliedRights.get(0) != null) {
-            Set<Right> implied = new RightSet();
-            for (Right right : impliedRights) {
-                if (right != null) {
-                    implied.add(right);
-                }
-            }
+        if (impliedRights == null || impliedRights.size() == 0) {
+            return null;
+        }
+
+        Set<Right> implied = new RightSet(impliedRights);
+
+        if (implied.size() > 0) {
             return Collections.unmodifiableSet(implied);
         } else {
             return null;
@@ -345,29 +345,14 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         return getName();
     }
 
-    /**
-     * @return the set of rights implied by this right.
-     */
-    public Set<Right> getImpliedRightsSet()
+    @Override
+    public Set<Right> getImpliedRights()
     {
         return impliedRights;
     }
 
     @Override
-    public List<Right> getImpliedRights()
-    {
-        if (impliedRights == null) {
-            return null;
-        }
-        List<Right> rights = new ArrayList<Right>();
-        for (Right right : impliedRights) {
-            rights.add(right);
-        }
-        return rights;
-    }
-
-    @Override
-    public List<EntityType> getTargetedEntityType()
+    public Set<EntityType> getTargetedEntityType()
     {
         List<EntityType> levels = new ArrayList<EntityType>();
         for (Map.Entry<EntityType, Set<Right>> entry : ENABLED_RIGHTS.entrySet()) {
@@ -377,8 +362,10 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         }
         if (levels.contains(null) && levels.contains(EntityType.WIKI)) {
             levels.remove(null);
+        } else {
+            return null;
         }
-        return levels;
+        return EnumSet.copyOf(levels);
     }
 
     @Override

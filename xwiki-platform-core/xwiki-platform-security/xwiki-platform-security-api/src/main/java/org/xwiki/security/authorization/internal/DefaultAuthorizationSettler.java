@@ -28,6 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.RightSet;
 import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityRule;
 import org.xwiki.security.authorization.SecurityRuleEntry;
@@ -92,7 +93,7 @@ public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
     private void implyRights(Right right, XWikiSecurityAccess access, Set<Right> enabledRights, Policies policies,
         Set<Right> fromUser)
     {
-        Set<Right> impliedRights = right.getImpliedRightsSet();
+        Set<Right> impliedRights = right.getImpliedRights();
         if (impliedRights != null) {
             for (Right enabledRight : enabledRights) {
                 if (impliedRights.contains(enabledRight)) {

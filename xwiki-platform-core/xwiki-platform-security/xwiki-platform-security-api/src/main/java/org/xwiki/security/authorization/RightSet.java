@@ -17,14 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization.internal;
+package org.xwiki.security.authorization;
 
 import java.util.AbstractSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-import org.xwiki.security.authorization.Right;
 
 /**
  * Optimized set of {@link Right}.
@@ -58,6 +57,19 @@ public class RightSet extends AbstractSet<Right> implements Cloneable, java.io.S
             throw new IllegalStateException();
         }
         this.addAll(rights);
+    }
+
+    /**
+     * Create a new initialized set.
+     * @param rights the rights you want in the set
+     */
+    public RightSet(Right... rights)
+    {
+        if (Right.size() > 64) {
+            throw new IllegalStateException();
+        }
+
+        Collections.addAll(this, rights);
     }
 
     @Override
@@ -271,7 +283,7 @@ public class RightSet extends AbstractSet<Right> implements Cloneable, java.io.S
     }
 
     @Override
-    protected RightSet clone() throws CloneNotSupportedException
+    public RightSet clone() throws CloneNotSupportedException
     {
         RightSet clone = (RightSet) super.clone();
         clone.rights = rights;

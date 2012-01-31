@@ -240,13 +240,14 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             || (access != RuleState.ALLOW && logger.isInfoEnabled())) {
             String userName = (user != null) ? entityReferenceSerializer.serialize(user) : "no user";
             String docName = (entity != null) ? entityReferenceSerializer.serialize(entity) : "no entity";
+            String rightName = (right != null) ? right.getName() : "no right";
             Formatter f = new Formatter();
             if (access == RuleState.ALLOW) {
                 logger.debug(f.format("Access has been granted for (%s,%s,%s): %s",
-                    userName, docName, right.getName(), info).toString());
+                    userName, docName, rightName, info).toString());
             } else {
                 logger.info(f.format("Access has been denied for (%s,%s,%s): %s",
-                    userName, docName, right.getName(), info).toString());
+                    userName, docName, rightName, info).toString());
             }
         }
     }

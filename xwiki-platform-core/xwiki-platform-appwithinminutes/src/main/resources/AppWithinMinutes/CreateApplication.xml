@@ -376,14 +376,6 @@ return XWiki;
   {{/html}}
 #end
 
-#macro(toXMLName $string)
-  ## Keep only Unicode letters and digits plus the hyphen and the underscore characters.
-  #set($string = $string.replaceAll('[^\p{L}\p{N}_\-]+', ''))
-  ## Make sure the string doesn't start with a number or the hyphen character.
-  #set($string = $string.replaceAll('^[\p{N}\-]+', ''))
-  $string##
-#end
-
 #macro(processStep)
   #set($classRef = $services.model.createDocumentReference($doc.wiki, $request.appName, "#toXMLName($request.appName)Class"))
   #set($queryString = 'wizard=true')

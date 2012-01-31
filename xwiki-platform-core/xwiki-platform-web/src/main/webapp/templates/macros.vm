@@ -2266,3 +2266,17 @@ Wysiwyg.onModuleLoad(function() {
     #end
   #end
 #end
+
+#**
+ * Transforms the given string to an XML name by filtering all the characters that are not allowed in an XML name. If
+ * the given string contains only invalid characters then the result is the empty string.
+ *
+ * @param $string the string to be transformed to an XML name
+ *#
+#macro(toXMLName $string)
+## Keep only Unicode letters and digits plus the hyphen and the underscore characters.
+#set($string = $string.replaceAll('[^\p{L}\p{N}_\-]+', ''))
+## Make sure the string doesn't start with a number or the hyphen character.
+#set($string = $string.replaceAll('^[\p{N}\-]+', ''))
+$string##
+#end

@@ -35,6 +35,8 @@ import java.util.zip.ZipEntry;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
+import junit.framework.Assert;
+
 /**
  * Unit tests for the {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin} class.
  * 
@@ -54,32 +56,33 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
     {
         byte txtbuf[] = {0x00, 0x01, 0x02, 0x03, 0x06, 0x07};
         ByteArrayInputStream txtBais = new ByteArrayInputStream(txtbuf);
-        assertFalse(this.plugin.isZipFile(txtBais));
+        Assert.assertFalse(this.plugin.isZipFile(txtBais));
 
         byte tinybuf[] = {0x00};
         ByteArrayInputStream tinyBais = new ByteArrayInputStream(tinybuf);
-        assertFalse(this.plugin.isZipFile(tinyBais));
+        Assert.assertFalse(this.plugin.isZipFile(tinyBais));
 
         byte zipbuf[] = createZipFile("test");
         ByteArrayInputStream zipBais = new ByteArrayInputStream(zipbuf);
-        assertTrue(this.plugin.isZipFile(zipBais));
+        Assert.assertTrue(this.plugin.isZipFile(zipBais));
 
     }
 
     public void testIsValidZipURL()
     {
-        assertTrue(this.plugin.isValidZipURL(
+        Assert.assertTrue(this.plugin.isValidZipURL(
             "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/File.txt", "download"));
-        assertFalse(this.plugin.isValidZipURL(
+        Assert.assertFalse(this.plugin.isValidZipURL(
             "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/File.txt", "view"));
-        assertFalse(this.plugin.isValidZipURL("http://server/xwiki/bin/download/Main/Document/zipfile.zip", "download"));
-        assertFalse(this.plugin.isValidZipURL("http://server/xwiki/bin/download/Main/Document", "download"));
+        Assert.assertFalse(
+            this.plugin.isValidZipURL("http://server/xwiki/bin/download/Main/Document/zipfile.zip", "download"));
+        Assert.assertFalse(this.plugin.isValidZipURL("http://server/xwiki/bin/download/Main/Document", "download"));
 
         // These tests should normally fail but we haven't implemented the check to verify if the
         // ZIP URL points to a file rather than a dir.
-        assertTrue(this.plugin.isValidZipURL(
+        Assert.assertTrue(this.plugin.isValidZipURL(
             "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/Dir2/", "download"));
-        assertTrue(this.plugin.isValidZipURL(
+        Assert.assertTrue(this.plugin.isValidZipURL(
             "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/Dir2", "download"));
     }
 
@@ -91,7 +94,7 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
 
         XWikiAttachment newAttachment = this.plugin.downloadAttachment(originalAttachment, context);
 
-        assertSame(originalAttachment, newAttachment);
+        Assert.assertSame(originalAttachment, newAttachment);
     }
 
     public void testDownloadAttachment() throws Exception
@@ -106,10 +109,10 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
 
         XWikiAttachment newAttachment = this.plugin.downloadAttachment(originalAttachment, context);
 
-        assertEquals("Directory/File.txt", newAttachment.getFilename());
-        assertEquals(zipFileContent.length(), newAttachment.getFilesize());
-        assertEquals(zipFileContent.length(), newAttachment.getContentSize(context));
-        assertEquals(zipFileContent, new String(newAttachment.getContent(context)));
+        Assert.assertEquals("Directory/File.txt", newAttachment.getFilename());
+        Assert.assertEquals(zipFileContent.length(), newAttachment.getFilesize());
+        Assert.assertEquals(zipFileContent.length(), newAttachment.getContentSize(context));
+        Assert.assertEquals(zipFileContent, new String(newAttachment.getContent(context)));
     }
 
     public void testDownloadAttachmentWhenURLIsNotZipFile() throws Exception
@@ -121,7 +124,7 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
 
         XWikiAttachment newAttachment = this.plugin.downloadAttachment(originalAttachment, context);
 
-        assertSame(originalAttachment, newAttachment);
+        Assert.assertSame(originalAttachment, newAttachment);
     }
 
     public void testDownloadAttachmentWhenURLIsZipButNotPointingInsideZip() throws Exception
@@ -133,7 +136,7 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
 
         XWikiAttachment newAttachment = this.plugin.downloadAttachment(originalAttachment, context);
 
-        assertSame(originalAttachment, newAttachment);
+        Assert.assertSame(originalAttachment, newAttachment);
     }
 
     public void testGetFileList() throws Exception
@@ -142,9 +145,9 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
 
         List<String> entries = this.plugin.getFileList(new Document(document, null), "zipfile.zip", null);
 
-        assertEquals(2, entries.size());
-        assertEquals("Directory/File.txt", entries.get(0));
-        assertEquals("File2.txt", entries.get(1));
+        Assert.assertEquals(2, entries.size());
+        Assert.assertEquals("Directory/File.txt", entries.get(0));
+        Assert.assertEquals("File2.txt", entries.get(1));
     }
 
     public void testGetFileTreeList() throws Exception
@@ -153,19 +156,19 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
 
         List<ListItem> entries = this.plugin.getFileTreeList(new Document(document, null), "zipfile.zip", null);
 
-        assertEquals(3, entries.size());
+        Assert.assertEquals(3, entries.size());
 
-        assertEquals("Directory/", entries.get(0).getId());
-        assertEquals("Directory", entries.get(0).getValue());
-        assertEquals("", entries.get(0).getParent());
+        Assert.assertEquals("Directory/", entries.get(0).getId());
+        Assert.assertEquals("Directory", entries.get(0).getValue());
+        Assert.assertEquals("", entries.get(0).getParent());
 
-        assertEquals("Directory/File.txt", entries.get(1).getId());
-        assertEquals("File.txt", entries.get(1).getValue());
-        assertEquals("Directory/", entries.get(1).getParent());
+        Assert.assertEquals("Directory/File.txt", entries.get(1).getId());
+        Assert.assertEquals("File.txt", entries.get(1).getValue());
+        Assert.assertEquals("Directory/", entries.get(1).getParent());
 
-        assertEquals("File2.txt", entries.get(2).getId());
-        assertEquals("File2.txt", entries.get(2).getValue());
-        assertEquals("", entries.get(2).getParent());
+        Assert.assertEquals("File2.txt", entries.get(2).getId());
+        Assert.assertEquals("File2.txt", entries.get(2).getValue());
+        Assert.assertEquals("", entries.get(2).getParent());
     }
 
     public void testGetFileLink() throws Exception
@@ -177,7 +180,7 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
 
         String link = this.plugin.getFileLink(document, "zipfile.zip", "filename", null);
 
-        assertEquals("http://server/xwiki/bin/download/Main/Document/zipfile.zip/filename", link);
+        Assert.assertEquals("http://server/xwiki/bin/download/Main/Document/zipfile.zip/filename", link);
     }
 
     public void testGetFileLocationFromZipURL()

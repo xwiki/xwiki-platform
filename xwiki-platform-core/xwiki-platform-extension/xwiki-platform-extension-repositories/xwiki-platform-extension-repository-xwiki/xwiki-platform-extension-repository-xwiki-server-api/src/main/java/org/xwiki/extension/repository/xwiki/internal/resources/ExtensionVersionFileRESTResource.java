@@ -37,6 +37,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.restlet.data.Disposition;
 import org.restlet.data.MediaType;
 import org.restlet.representation.InputRepresentation;
 import org.xwiki.component.annotation.Component;
@@ -50,6 +51,7 @@ import org.xwiki.extension.repository.ExtensionRepositoryFactory;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.xwiki.Resources;
+import org.xwiki.extension.repository.xwiki.internal.XWikiRepositoryModel;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.query.QueryException;
@@ -101,13 +103,14 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
         return response.build();
     }
 
-    public ResponseBuilder downloadLocalExtension(String extensionId, String extensionVersion) throws ResolveException,
-        IOException, QueryException, XWikiException
+    private ResponseBuilder downloadLocalExtension(String extensionId, String extensionVersion)
+        throws ResolveException, IOException, QueryException, XWikiException
     {
         XWikiDocument extensionDocument = getExistingExtensionDocumentById(extensionId);
 
         checkRights(extensionDocument);
 
+        BaseObject extensionObject = getExtensionObject(extensionDocument);
         BaseObject extensionVersionObject = getExtensionVersionObject(extensionDocument, extensionVersion);
 
         ResponseBuilder response = null;
@@ -135,9 +138,6 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
             // It's an URL
             URL url = new URL(resourceReference.getReference());
 
-            // TODO: find a proper way to do a perfect proxy of the URL without directly using Restlet classes.
-            // Should probably use javax.ws.rs.ext.MessageBodyWriter
-
             URLConnection connection = url.openConnection();
 
             if (connection instanceof HttpURLConnection) {
@@ -147,9 +147,18 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
                 response = Response.ok();
             }
 
+            // TODO: find a proper way to do a perfect proxy of the URL without directly using Restlet classes.
+            // Should probably use javax.ws.rs.ext.MessageBodyWriter
             InputRepresentation content =
                 new InputRepresentation(connection.getInputStream(), new MediaType(connection.getContentType()),
                     connection.getContentLength());
+
+            String type = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
+
+            Disposition disposition = new Disposition(Disposition.TYPE_ATTACHMENT);
+            disposition.setFilename(extensionId + '-' + extensionVersion + '.' + type);
+            content.setDisposition(disposition);
+
             response.entity(content);
         } else if (ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
             ExtensionResourceReference extensionResource;
@@ -167,7 +176,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
         return response;
     }
 
-    public ResponseBuilder downloadRemoteExtension(ExtensionResourceReference extensionResource)
+    private ResponseBuilder downloadRemoteExtension(ExtensionResourceReference extensionResource)
         throws ResolveException, IOException
     {
         ExtensionRepository repository = null;
@@ -208,7 +217,14 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
         // TODO: find media type
         ExtensionFile extensionFile = downloadExtension.getFile();
         long length = extensionFile.getLength();
+
+        // TODO: find a proper way to do a perfect proxy of the URL without directly using Restlet classes.
+        // Should probably use javax.ws.rs.ext.MessageBodyWriter
         InputRepresentation content = new InputRepresentation(extensionFile.openStream(), MediaType.ALL, length);
+
+        Disposition disposition = new Disposition(Disposition.TYPE_ATTACHMENT);
+        disposition.setFilename(downloadExtension.getId().toString() + '.' + downloadExtension.getType());
+        content.setDisposition(disposition);
 
         ResponseBuilder response = Response.ok();
         response.entity(content);

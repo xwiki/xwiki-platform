@@ -190,15 +190,9 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
 {{velocity}}
 ## Ajax call for a single extension
 #if ($request.extensionid &amp;&amp; $request.extensionversion &amp;&amp; $request.ajax)
-  #set ($actions = [])
-  #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
-  #end
-  #if ($hasProgramming)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actioninstall"" value=""$msg.get('extensions.actions.install')"" class=""button"" /&gt;&lt;/span&gt;"))
-  #end
   #displayExtension($extensionManager.resolve($request.extensionid, $request.extensionversion) $actions)
+#elseif ($request.actionuninstall)
+  #handleUninstallExtensionRequest()
 #elseif($request.actioninstall)
   #handleInstallExtensionRequest()
 #else
@@ -232,16 +226,6 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
       #set($paginationParams.totalItems = $extensions.totalHits)
       #set($paginationParams.url = $paginationURL)
       {{html}}#pagination($paginationParams){{/html}}
-    #end
-    #set ($actions = [])
-    #computeXBack()
-    #if ($request.actionshowdetails)
-      #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;$msg.get('extensions.actions.back')&lt;/a&gt;&lt;/span&gt;"))
-    #else
-      #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
-    #end
-    #if ($hasProgramming)
-      #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actioninstall"" value=""$msg.get('extensions.actions.install')"" class=""button""/&gt;&lt;/span&gt;"))
     #end
     #foreach($extension in $extensions)
       #displayExtension($extension $actions)

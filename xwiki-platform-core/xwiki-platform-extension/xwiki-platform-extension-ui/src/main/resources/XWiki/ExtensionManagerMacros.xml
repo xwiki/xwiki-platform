@@ -1179,6 +1179,16 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #end
 
 #macro (displayExtension $extension)
+    #determineExtensionStatus($extension.id, $extensionnamespace, $extensionStatus)
+    #set ($actions = [])
+    #computeXBack()
+    #if ($extensionStatus == 'core')
+      #getCoreExtensionButtons($actions)
+    #elseif ($extensionStatus == 'installed')
+      #getInstalledExtensionButtons($actions)
+    #elseif ($extensionStatus == 'remote')
+      #getRemoteExtensionButtons($actions)
+    #end
     (% class="extension-item" %)(((
     (% class="extension-header" %)(((
     (% class="extension-name" %)
@@ -1419,7 +1429,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   )))
 #end
 
-#macro(handleUninstallExtensionRequest)
+#macro (handleUninstallExtensionRequest)
   (% class="full column" %)(((
   = $msg.get('extensions.uninstall.title', ["//#displayExtensionName($extensionManager.resolve($request.extensionid, $request.extensionversion))//"]) =
 
@@ -1521,7 +1531,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   #end
 #end
 
-#macro(computeXBack)
+#macro (computeXBack)
   #set ($xback = "$!{request.xback}")
   #if ($xback == '')
     #set ($params = '')
@@ -1537,5 +1547,56 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     #end
     #set ($xback = $doc.getURL($xcontext.action, $params))
   #end
+#end
+
+#macro (getCoreExtensionButtons $actions)
+  #if ($request.extensionid &amp;&amp; $request.extensionversion &amp;&amp; $request.ajax)
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
+  #elseif ($request.actionshowdetails)
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;$msg.get('extensions.actions.back')&lt;/a&gt;&lt;/span&gt;"))
+  #else
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
+  #end
+#end
+
+#macro (getInstalledExtensionButtons $actions)
+  #if ($request.extensionid &amp;&amp; $request.extensionversion &amp;&amp; $request.ajax)
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction""/&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction""/&gt;&lt;/span&gt;"))
+  #elseif ($request.actionshowdetails)
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;$msg.get('extensions.actions.back')&lt;/a&gt;&lt;/span&gt;"))
+  #else
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
+  #end
+  #if ($hasProgramming)
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionuninstall"" value=""$msg.get('extensions.actions.uninstall')"" class=""button secondary""/&gt;&lt;/span&gt;"))
+  #end
+#end
+
+#macro (getRemoteExtensionButtons $actions)
+  #if ($request.extensionid &amp;&amp; $request.extensionversion &amp;&amp; $request.ajax)
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
+  #elseif ($request.actionshowdetails)
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;$msg.get('extensions.actions.back')&lt;/a&gt;&lt;/span&gt;"))
+  #else
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
+  #end
+  #if ($hasProgramming)
+    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actioninstall"" value=""$msg.get('extensions.actions.install')"" class=""button""/&gt;&lt;/span&gt;"))
+  #end
+#end
+
+#macro (determineExtensionStatus $extensionId $namespace $extensionStatus)
+ #if ($extensionManager.getInstalledExtension($extensionId.id, $namespace))
+   #set ($result = 'installed')
+ #elseif ($extensionManager.getCoreExtension($extensionId.id))
+   #set ($result = 'core')
+ #else
+   #set ($result = 'remote')
+ #end
+ #set ($extensionStatus = $NULL)
+ #setVariable ("$extensionStatus" $result)
 #end
 {{/velocity}}</content></xwikidoc>

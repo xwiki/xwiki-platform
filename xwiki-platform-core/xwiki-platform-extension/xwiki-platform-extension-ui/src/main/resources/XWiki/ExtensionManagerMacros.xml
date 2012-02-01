@@ -1334,7 +1334,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #macro (handleInstallExtensionRequest)
   (% class="full column" %)(((
   #displayExtensionSearchBar()
-  = $msg.get('extensions.install.title')
+  = $msg.get('extensions.install.title', ["//#displayExtensionName($extensionManager.resolve($request.extensionid, $request.extensionversion))//"]) =
 
   #if (!$request.extensionid || !$request.extensionversion)
     {{error}}$msg.get('extensions.install.error.missingIdOrVersion'){{/error}}
@@ -1421,7 +1421,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 
 #macro(handleUninstallExtensionRequest)
   (% class="full column" %)(((
-  = $msg.get('extensions.uninstall.title')
+  = $msg.get('extensions.uninstall.title', ["//#displayExtensionName($extensionManager.resolve($request.extensionid, $request.extensionversion))//"]) =
 
   #if (!$request.extensionid || !$request.extensionversion)
     {{error}}$msg.get('extensions.uninstall.error.missingIdOrVersion'){{/error}}

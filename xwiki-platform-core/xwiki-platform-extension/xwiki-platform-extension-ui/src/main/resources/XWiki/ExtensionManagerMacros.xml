@@ -398,13 +398,26 @@
 .extension-item {
   border-color: $theme.borderColor $theme.pageContentBackgroundColor $theme.pageContentBackgroundColor $theme.borderColor;
   border-style: solid solid solid;
-  border-width: 1px 1px 1px 1px;
+  border-width: 1px 4px 1px 1px;
   display: block;
   -moz-box-shadow: 1px 0 0 $theme.borderColor;
   -webkit-box-shadow:  1px 0 0 $theme.borderColor;
   box-shadow:  1px 0 0 $theme.borderColor;
   margin-right: 1px;
   position: relative;
+}
+.extension-item-installed {
+  border-right-color: $theme.notificationSuccessColor;
+}
+.extension-item-update-available {
+  border-right-color: $theme.notificationWarningColor;
+}
+.extension-item-incompatible {
+  border-right-color: $theme.notificationErrorColor;
+}
+.extension-item-disabled {
+  border-right-color: $theme.borderColor;
+  opacity: .7;
 }
 .extension-item &gt; * {
   padding: 0.8em 1em 1em 2.7em;
@@ -1189,7 +1202,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     #elseif ($extensionStatus == 'remote')
       #getRemoteExtensionButtons($actions)
     #end
-    (% class="extension-item" %)(((
+    (% class="extension-item# extension-item-${extensionStatus}" %)(((
     (% class="extension-header" %)(((
     (% class="extension-name" %)
     ==#displayExtensionName($extension) (% class="extension-version %)$extension.id.version==

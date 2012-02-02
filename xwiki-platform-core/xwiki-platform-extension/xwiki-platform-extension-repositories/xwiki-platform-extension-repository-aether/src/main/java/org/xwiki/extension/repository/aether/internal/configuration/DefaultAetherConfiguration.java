@@ -22,7 +22,7 @@ package org.xwiki.extension.repository.aether.internal.configuration;
 import java.io.File;
 
 import javax.inject.Inject;
-import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -34,8 +34,7 @@ import org.xwiki.container.Container;
 public class DefaultAetherConfiguration implements AetherConfiguration
 {
     @Inject
-    @Named("xwikiproperties")
-    private ConfigurationSource configurationSource;
+    private Provider<ConfigurationSource> configurationSource;
 
     @Inject
     private Container container;
@@ -43,7 +42,7 @@ public class DefaultAetherConfiguration implements AetherConfiguration
     @Override
     public File getLocalRepository()
     {
-        String localRepositoryPath = this.configurationSource.getProperty("extension.aether.localRepository");
+        String localRepositoryPath = this.configurationSource.get().getProperty("extension.aether.localRepository");
 
         File directory;
         if (localRepositoryPath == null) {

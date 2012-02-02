@@ -26,6 +26,7 @@ import java.util.ResourceBundle;
  * Localization helper.
  * 
  * @version $Id$
+ * @since 3.5M1
  */
 public final class Messages
 {

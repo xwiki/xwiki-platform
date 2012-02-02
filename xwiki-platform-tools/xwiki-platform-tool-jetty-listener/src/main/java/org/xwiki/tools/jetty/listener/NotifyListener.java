@@ -26,9 +26,11 @@ import org.eclipse.jetty.util.component.AbstractLifeCycle.AbstractLifeCycleListe
 import org.eclipse.jetty.util.log.Log;
 
 /**
- * Jetty lifecycle listener that prints a message to open a browser when the server was started.
+ * Jetty lifecycle listener that prints a message to open a browser when the server is started.
+ * This is to provide information to newbies so that they know what to do after the server is started.
  * 
  * @version $Id$
+ * @since 3.5M1
  */
 public class NotifyListener extends AbstractLifeCycleListener
 {

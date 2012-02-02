@@ -22,6 +22,7 @@ package org.xwiki.extension.cluster.internal;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -42,6 +43,7 @@ import org.xwiki.observation.remote.converter.AbstractEventConverter;
  */
 @Component
 @Singleton
+@Named("ExtensionJob")
 public class ExtensionJobEventConverter extends AbstractEventConverter
 {
     /**

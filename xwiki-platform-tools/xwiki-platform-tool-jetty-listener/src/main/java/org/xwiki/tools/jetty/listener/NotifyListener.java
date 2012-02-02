@@ -34,10 +34,15 @@ import org.eclipse.jetty.util.log.Log;
  */
 public class NotifyListener extends AbstractLifeCycleListener
 {
+    /**
+     * Delimiter to print to make the message stand out in the console/logs.
+     */
+    private static final String DELIMITER = "----------------------------------";
+
     @Override
     public void lifeCycleStarted(LifeCycle event)
     {
-        Log.info("----------------------------------");
+        Log.info(DELIMITER);
         try {
             String serverUrl = "http://" + java.net.Inet4Address.getLocalHost().getCanonicalHostName() + ":"
                 + System.getProperty("jetty.port", "8080") + "/";
@@ -45,6 +50,6 @@ public class NotifyListener extends AbstractLifeCycleListener
         } catch (UnknownHostException ex) {
             // Shouldn't happen, localhost should be available
         }
-        Log.info("==================================");
+        Log.info(DELIMITER);
     }
 }

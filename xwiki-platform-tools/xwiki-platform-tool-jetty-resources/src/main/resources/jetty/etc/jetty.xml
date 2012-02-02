@@ -73,6 +73,12 @@
     </Arg>
   </Call>
 
+  <Call name="addLifeCycleListener">
+    <Arg>
+      <New class="org.xwiki.tools.jetty.listener.NotifyListener" />
+    </Arg>
+  </Call>
+
   <!-- =========================================================== -->
   <!-- Set handler Collection Structure                            -->
   <!-- =========================================================== -->

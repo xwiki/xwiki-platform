@@ -102,48 +102,11 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
         return new File(this.container.getApplicationContext().getPermanentDirectory(), "extension/");
     }
 
-    /**
-     * @return the configuration
-     */
-    private ConfigurationSource getConfigurationSource()
-    {
-        ConfigurationSource configurationSource;
-        try {
-            configurationSource = this.configuration.get();
-        } catch (Exception e) {
-            this.logger.debug("No configuration source provided", e);
-
-            configurationSource = null;
-        }
-
-        return configurationSource;
-    }
-
-    /**
-     * @param <T> the value type
-     * @param key the property key for which we want the value
-     * @param defaultValue the value to use if the key isn't found
-     * @return the property value is found or the default value if the key wasn't found
-     */
-    private <T> T getProperty(String key, T defaultValue)
-    {
-        T value;
-
-        ConfigurationSource configurationSource = getConfigurationSource();
-        if (configurationSource != null) {
-            value = configurationSource.getProperty(key, defaultValue);
-        } else {
-            value = defaultValue;
-        }
-
-        return value;
-    }
-
     @Override
     public File getLocalRepository()
     {
         if (this.localRepository == null) {
-            String localRepositoryPath = getProperty("extension.localRepository", null);
+            String localRepositoryPath = this.configuration.get().getProperty("extension.localRepository", null);
 
             if (localRepositoryPath == null) {
                 this.localRepository = new File(getHome(), "repository/");
@@ -160,7 +123,8 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     {
         List<ExtensionRepositoryId> repositories = new ArrayList<ExtensionRepositoryId>();
 
-        List<String> repositoryStrings = getProperty("extension.repositories", Collections.<String> emptyList());
+        List<String> repositoryStrings =
+            this.configuration.get().getProperty("extension.repositories", Collections.<String> emptyList());
 
         if (repositoryStrings != null && !repositoryStrings.isEmpty()) {
             for (String repositoryString : repositoryStrings) {
@@ -214,6 +178,6 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     public String getUserAgent()
     {
         // TODO: add version (need a way to get platform version first)
-        return getProperty("extension.userAgent", DEFAULT_USERAGENT);
+        return this.configuration.get().getProperty("extension.userAgent", DEFAULT_USERAGENT);
     }
 }

@@ -29,7 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
-import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -70,13 +70,6 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     private static final String DEFAULT_USERAGENT = "Extension Manager";
 
     /**
-     * Used to manipulate xwiki.properties files.
-     */
-    @Inject
-    @Named("xwikiproperties")
-    private ConfigurationSource configurationSource;
-
-    /**
      * The logger to log.
      */
     @Inject
@@ -87,6 +80,12 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
      */
     @Inject
     private Container container;
+
+    /**
+     * The configuration.
+     */
+    @Inject
+    private Provider<ConfigurationSource> configuration;
 
     // Cache
 
@@ -103,11 +102,48 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
         return new File(this.container.getApplicationContext().getPermanentDirectory(), "extension/");
     }
 
+    /**
+     * @return the configuration
+     */
+    private ConfigurationSource getConfigurationSource()
+    {
+        ConfigurationSource configurationSource;
+        try {
+            configurationSource = this.configuration.get();
+        } catch (Exception e) {
+            this.logger.debug("No configuration source provided", e);
+
+            configurationSource = null;
+        }
+
+        return configurationSource;
+    }
+
+    /**
+     * @param <T> the value type
+     * @param key the property key for which we want the value
+     * @param defaultValue the value to use if the key isn't found
+     * @return the property value is found or the default value if the key wasn't found
+     */
+    private <T> T getProperty(String key, T defaultValue)
+    {
+        T value;
+
+        ConfigurationSource configurationSource = getConfigurationSource();
+        if (configurationSource != null) {
+            value = configurationSource.getProperty(key, defaultValue);
+        } else {
+            value = defaultValue;
+        }
+
+        return value;
+    }
+
     @Override
     public File getLocalRepository()
     {
         if (this.localRepository == null) {
-            String localRepositoryPath = this.configurationSource.getProperty("extension.localRepository");
+            String localRepositoryPath = getProperty("extension.localRepository", null);
 
             if (localRepositoryPath == null) {
                 this.localRepository = new File(getHome(), "repository/");
@@ -124,8 +160,7 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     {
         List<ExtensionRepositoryId> repositories = new ArrayList<ExtensionRepositoryId>();
 
-        List<String> repositoryStrings =
-            this.configurationSource.getProperty("extension.repositories", Collections.<String> emptyList());
+        List<String> repositoryStrings = getProperty("extension.repositories", Collections.<String> emptyList());
 
         if (repositoryStrings != null && !repositoryStrings.isEmpty()) {
             for (String repositoryString : repositoryStrings) {
@@ -179,6 +214,6 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     public String getUserAgent()
     {
         // TODO: add version (need a way to get platform version first)
-        return this.configurationSource.getProperty("extension.userAgent", DEFAULT_USERAGENT);
+        return getProperty("extension.userAgent", DEFAULT_USERAGENT);
     }
 }

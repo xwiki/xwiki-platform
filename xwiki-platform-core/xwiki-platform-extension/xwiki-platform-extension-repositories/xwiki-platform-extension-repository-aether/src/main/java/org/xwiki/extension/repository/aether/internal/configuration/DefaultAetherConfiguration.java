@@ -22,6 +22,7 @@ package org.xwiki.extension.repository.aether.internal.configuration;
 import java.io.File;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -34,6 +35,7 @@ import org.xwiki.container.Container;
 public class DefaultAetherConfiguration implements AetherConfiguration
 {
     @Inject
+    @Named("configurationSource")
     private Provider<ConfigurationSource> configurationSource;
 
     @Inject

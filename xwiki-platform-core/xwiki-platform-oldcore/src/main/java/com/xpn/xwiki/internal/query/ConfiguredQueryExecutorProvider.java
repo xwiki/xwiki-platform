@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.query;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -39,6 +40,7 @@ import com.xpn.xwiki.XWikiContext;
  * @since 3.2M2
  */
 @Component
+@Named("queryExecutor")
 @Singleton
 public class ConfiguredQueryExecutorProvider implements Provider<QueryExecutor>
 {

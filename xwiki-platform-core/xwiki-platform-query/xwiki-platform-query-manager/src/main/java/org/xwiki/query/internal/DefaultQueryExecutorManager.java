@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -57,6 +58,7 @@ public class DefaultQueryExecutorManager implements QueryExecutorManager
      * This provider will give us an executor which is native to the type of storage engine used.
      */
     @Inject
+    @Named("queryExecutor")
     private Provider<QueryExecutor> namedQueryExecutorProvider;
 
     /**

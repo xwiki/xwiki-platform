@@ -24,7 +24,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -32,6 +31,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.internal.reference.ExtensionResourceReference;
 import org.xwiki.extension.repository.xwiki.Resources;
+import org.xwiki.extension.repository.xwiki.UriBuilder;
 import org.xwiki.rendering.internal.renderer.xhtml.link.AbstractXHTMLLinkTypeRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -75,7 +75,7 @@ public class ExtensionXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRendere
 
         // Create an URI (because the API only produces URIs) with a stub context we will then remove since we actually
         // want a relative HREF
-        UriBuilder builder = UriBuilder.fromUri("stubscheme:" + prefix).path(Resources.EXTENSION_VERSION_FILE);
+        UriBuilder builder = new UriBuilder("stubscheme:" + prefix, Resources.EXTENSION_VERSION_FILE);
 
         ExtensionResourceReference extensionReference = (ExtensionResourceReference) reference;
 

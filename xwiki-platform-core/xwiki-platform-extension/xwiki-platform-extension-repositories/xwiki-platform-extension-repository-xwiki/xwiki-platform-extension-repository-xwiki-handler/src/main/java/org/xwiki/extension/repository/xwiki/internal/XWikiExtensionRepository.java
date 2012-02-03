@@ -25,8 +25,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.UriBuilder;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -50,6 +48,7 @@ import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.repository.search.Searchable;
 import org.xwiki.extension.repository.xwiki.Resources;
+import org.xwiki.extension.repository.xwiki.UriBuilder;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersionSummary;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersions;
@@ -146,7 +145,7 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
 
     private UriBuilder createUriBuilder(String path)
     {
-        return UriBuilder.fromUri(getId().getURI()).path(path);
+        return new UriBuilder(getId().getURI(), path);
     }
 
     // ExtensionRepository

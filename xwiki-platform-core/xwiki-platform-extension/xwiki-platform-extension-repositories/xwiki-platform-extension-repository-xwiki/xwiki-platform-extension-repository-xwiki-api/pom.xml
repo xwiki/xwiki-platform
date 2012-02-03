@@ -34,8 +34,8 @@
   <packaging>jar</packaging>
   <description>Contains stuff common to server and client</description>
   <dependencies>
-  <dependency>
-    <groupId>org.xwiki.platform</groupId>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-repository-xwiki-model</artifactId>
       <version>${project.version}</version>
     </dependency>

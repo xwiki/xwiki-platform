@@ -19,22 +19,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-wiki-stream</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>1.0</version>
   </parent>
   <artifactId>xwiki-wiki-stream-api</artifactId>
   <name>XWiki WikiStream API</name>
   <packaging>jar</packaging>
   <dependencies>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-transformation-macro</artifactId>
@@ -45,13 +35,6 @@
       <artifactId>xwiki-commons-properties</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <!-- Test Dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-
   </dependencies>
 
   <build>

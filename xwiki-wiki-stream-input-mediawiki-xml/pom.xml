@@ -4,7 +4,7 @@
   <parent>
     <artifactId>xwiki-wiki-stream</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>3.2-SNAPSHOT</version>
+    <version>1.0</version>
   </parent>
   <artifactId>xwiki-wiki-stream-input-mediawiki-xml</artifactId>
   <name>MediaWiki Xml InputStream</name>
@@ -16,15 +16,20 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
+    	<groupId>org.xwiki.commons</groupId>
+    	<artifactId>xwiki-commons-properties</artifactId>
+    	<version>${commons.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-wiki-stream-api</artifactId>
-      <version>3.2-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-wiki-stream-api</artifactId>
-      <version>3.2-SNAPSHOT</version>
+      <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>

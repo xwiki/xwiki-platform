@@ -17,10 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream;
+package org.xwiki.wikistream.input;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.listener.Listener;
+import org.xwiki.wikistream.WikiStream;
+import org.xwiki.wikistream.WikiStreamException;
 
 /**
  * @param <P>

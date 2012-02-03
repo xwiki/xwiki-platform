@@ -24,9 +24,9 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.wikistream.AbstractInputWikiStream;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.mediawiki.xml.MediaWikiXmlParameters;
+import org.xwiki.wikistream.internal.input.xml.AbstractXMLInputWikiStream;
 import org.xwiki.wikistream.type.WikiStreamType;
 
 /**
@@ -35,7 +35,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
 @Component
 @Singleton
 @Named("mediawiki-xml")
-public class InputWikiStreamMediaWikiXml extends AbstractInputWikiStream<MediaWikiXmlParameters>
+public class InputWikiStreamMediaWikiXml extends AbstractXMLInputWikiStream<MediaWikiXmlParameters>
 {
 
     /**
@@ -62,7 +62,7 @@ public class InputWikiStreamMediaWikiXml extends AbstractInputWikiStream<MediaWi
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.wikistream.InputWikiStream#parse(java.lang.Object, org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.wikistream.input.InputWikiStream#parse(java.lang.Object, org.xwiki.rendering.listener.Listener)
      */
     @Override
     public void parse(MediaWikiXmlParameters parametersBean, Listener wikiEventListener) throws WikiStreamException

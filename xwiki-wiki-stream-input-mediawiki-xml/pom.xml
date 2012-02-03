@@ -39,5 +39,10 @@
       <version>3.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+    	<groupId>com.thoughtworks.xstream</groupId>
+    	<artifactId>xstream</artifactId>
+    	<version>1.4.2</version>
+    </dependency>
   </dependencies>
 </project>

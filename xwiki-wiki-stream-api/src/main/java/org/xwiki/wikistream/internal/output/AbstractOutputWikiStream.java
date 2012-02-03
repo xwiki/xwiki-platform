@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream;
+package org.xwiki.wikistream.internal.output;
 
 import javax.inject.Inject;
 
@@ -25,6 +25,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
+import org.xwiki.wikistream.output.OutputWikiStream;
 
 /**
  * @version $Id$

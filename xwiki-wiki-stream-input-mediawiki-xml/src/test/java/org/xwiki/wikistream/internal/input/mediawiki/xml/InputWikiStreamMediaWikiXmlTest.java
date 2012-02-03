@@ -23,7 +23,7 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.wikistream.InputWikiStream;
+import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.mediawiki.xml.MediaWikiXmlParameters;
 import org.xwiki.wikistream.test.AbstractWikiStreamTest;
 

@@ -225,4 +225,8 @@ public class User
         this.blogFeed = blogFeed;
     }
 
+    @Override
+    public String toString(){
+        return firstName+" "+lastName;
+    }
 }

@@ -43,22 +43,12 @@ public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigu
 
     private static final String CLASS_PAGE_NAME = "XWikiPreferences";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.configuration.internal.AbstractDocumentConfigurationSource#getClassReference()
-     */
     @Override
     protected DocumentReference getClassReference()
     {
         return new DocumentReference(getCurrentWikiReference().getName(), CLASS_SPACE_NAME, CLASS_PAGE_NAME);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractDocumentConfigurationSource#getDocumentReference()
-     */
     @Override
     protected DocumentReference getDocumentReference()
     {

@@ -61,12 +61,7 @@ public class AllConfigurationSource extends CompositeConfigurationSource impleme
     @Inject
     @Named("user")
     private ConfigurationSource userPreferencesSource;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         // First source is searched first when a property value is requested.

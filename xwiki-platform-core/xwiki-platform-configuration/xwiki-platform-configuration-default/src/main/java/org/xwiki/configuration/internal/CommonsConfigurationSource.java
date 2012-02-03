@@ -106,14 +106,14 @@ public class CommonsConfigurationSource implements ConfigurationSource
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<String> getKeys()
     {
         List<String> keysList = new ArrayList<String>();
-        Iterator keys = this.configuration.getKeys();
+        Iterator<String> keys = (Iterator<String>) this.configuration.getKeys();
         while (keys.hasNext()) {
-            keysList.add((String) keys.next());
+            keysList.add(keys.next());
         }
+
         return keysList;
     }
 

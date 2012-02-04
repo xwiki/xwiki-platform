@@ -94,34 +94,36 @@ public class UriBuilder
 
     private void path(String path)
     {
-        StringBuilder stringBuilder;
-        if (this.path != null) {
-            if (this.path instanceof String) {
-                stringBuilder = new StringBuilder(this.path);
+        if (path != null && !path.isEmpty()) {
+            StringBuilder stringBuilder;
+            if (this.path != null) {
+                if (this.path instanceof String) {
+                    stringBuilder = new StringBuilder(this.path);
+                    this.path = stringBuilder;
+                } else {
+                    stringBuilder = (StringBuilder) this.path;
+                }
+            } else {
+                stringBuilder = new StringBuilder();
                 this.path = stringBuilder;
-            } else {
-                stringBuilder = (StringBuilder) this.path;
-            }
-        } else {
-            stringBuilder = new StringBuilder();
-            this.path = stringBuilder;
-        }
-
-        if (this.path.length() == 0 || this.path.charAt(this.path.length() - 1) != '/') {
-            if (path.charAt(0) != '/') {
-                stringBuilder.append('/');
             }
 
-            stringBuilder.append(path);
-        } else {
-            int i = 0;
-            for (; i < path.length() && path.charAt(i) == '/'; ++i)
-                ;
+            if (this.path.length() == 0 || this.path.charAt(this.path.length() - 1) != '/') {
+                if (path.charAt(0) != '/') {
+                    stringBuilder.append('/');
+                }
 
-            if (i > 0) {
-                stringBuilder.append(path.substring(i));
-            } else {
                 stringBuilder.append(path);
+            } else {
+                int i = 0;
+                for (; i < path.length() && path.charAt(i) == '/'; ++i)
+                    ;
+
+                if (i > 0) {
+                    stringBuilder.append(path.substring(i));
+                } else {
+                    stringBuilder.append(path);
+                }
             }
         }
     }

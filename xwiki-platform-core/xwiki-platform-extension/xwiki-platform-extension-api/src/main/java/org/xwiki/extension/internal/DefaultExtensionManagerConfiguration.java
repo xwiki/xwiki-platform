@@ -23,7 +23,6 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -108,7 +107,7 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     public File getLocalRepository()
     {
         if (this.localRepository == null) {
-            String localRepositoryPath = this.configuration.get().getProperty("extension.localRepository", null);
+            String localRepositoryPath = this.configuration.get().getProperty("extension.localRepository");
 
             if (localRepositoryPath == null) {
                 this.localRepository = new File(getHome(), "repository/");
@@ -125,10 +124,9 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     {
         List<ExtensionRepositoryId> repositories = new ArrayList<ExtensionRepositoryId>();
 
-        List<String> repositoryStrings =
-            this.configuration.get().getProperty("extension.repositories", Collections.<String> emptyList());
+        List<String> repositoryStrings = this.configuration.get().getProperty("extension.repositories");
 
-        if (repositoryStrings != null && !repositoryStrings.isEmpty()) {
+        if (!repositoryStrings.isEmpty()) {
             for (String repositoryString : repositoryStrings) {
                 if (StringUtils.isNotBlank(repositoryString)) {
                     try {

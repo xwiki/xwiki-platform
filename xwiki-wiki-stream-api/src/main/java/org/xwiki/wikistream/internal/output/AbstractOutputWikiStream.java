@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.properties.BeanManager;
+import org.xwiki.wikistream.descriptor.DefaultWikiStreamDescriptor;
 import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 import org.xwiki.wikistream.output.OutputWikiStream;
 
@@ -50,11 +51,11 @@ public abstract class AbstractOutputWikiStream<P> implements OutputWikiStream<P>
      */
     private Class< ? > parametersBeanClass;
 
-    public AbstractOutputWikiStream(String name, String description, WikiStreamDescriptor descriptor)
+    public AbstractOutputWikiStream(String name, String description,  Class< ? > parameterBeanClass)
     {
-        this.setName(name);
-        this.setDescription(description);
-        this.setDescriptor(descriptor);
+        this.name = name;
+        this.description = description;
+        this.parametersBeanClass = parameterBeanClass;
     }
 
     /**
@@ -64,8 +65,11 @@ public abstract class AbstractOutputWikiStream<P> implements OutputWikiStream<P>
      */
     public void initialize() throws InitializationException
     {
-        // TODO Auto-generated method stub
+        // Initialise WikiStream Descriptor.
+        DefaultWikiStreamDescriptor descriptor =
+            new DefaultWikiStreamDescriptor(name, description, beanManager.getBeanDescriptor(parametersBeanClass));
 
+        setDescriptor(descriptor);
     }
 
     /**

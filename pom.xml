@@ -10,13 +10,11 @@
 	more details. * * You should have received a copy of the GNU Lesser General 
 	Public * License along with this software; if not, write to the Free * Software 
 	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA * 02110-1301 USA, 
-	or see the FSF site: http://www.fsf.org. * --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	or see the FSF site: http://www.fsf.org. * -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.xwiki.platform</groupId>
-		<artifactId>xwiki-platform-core</artifactId>
-		<version>3.5-SNAPSHOT</version>
-	</parent>
+	<groupId>org.xwiki.contrib</groupId>
 	<artifactId>xwiki-wiki-stream</artifactId>
 	<packaging>pom</packaging>
 	<name>XWiki Platform - Wiki Stream</name>
@@ -25,30 +23,37 @@
 		<maven.version>3.0.3</maven.version>
 		<xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
 		<xwiki.clirr.skip>true</xwiki.clirr.skip>
+		<commons.version>3.4</commons.version>
 	</properties>
 	<modules>
 		<module>xwiki-wiki-stream-api</module>
 		<module>xwiki-wiki-stream-input-mediawiki-xml</module>
-    <module>xwiki-wiki-stream-output-xml</module>
-  </modules>
+		<module>xwiki-wiki-stream-output-xml</module>
+	</modules>
 	<dependencies>
 		<dependency>
 			<groupId>org.xwiki.commons</groupId>
 			<artifactId>xwiki-commons-component-api</artifactId>
 			<version>${commons.version}</version>
 		</dependency>
+		<!-- Only needed if some of the component's APIs must be made visible to 
+			scripting in wiki pages -->
 		<dependency>
-			<groupId>org.xwiki.rendering</groupId>
-			<artifactId>xwiki-rendering-api</artifactId>
+			<groupId>org.xwiki.commons</groupId>
+			<artifactId>xwiki-commons-script</artifactId>
 			<version>${commons.version}</version>
 		</dependency>
-		<!-- Testing Dependencies -->
+		<dependency>
+			<groupId>org.xwiki.commons</groupId>
+			<artifactId>xwiki-commons-properties</artifactId>
+			<version>${commons.version}</version>
+		</dependency>
+		<!-- Testing dependencies -->
 		<dependency>
 			<groupId>org.xwiki.commons</groupId>
 			<artifactId>xwiki-commons-test</artifactId>
 			<version>${commons.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 </project>

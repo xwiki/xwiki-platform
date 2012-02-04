@@ -19,9 +19,12 @@
  */
 package org.xwiki.wikistream.internal.output.xml;
 
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 import org.xwiki.wikistream.internal.output.AbstractOutputWikiStream;
 import org.xwiki.wikistream.listener.Listener;
 import org.xwiki.wikistream.type.WikiStreamType;
@@ -30,18 +33,25 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * 
  * @version $Id$
  */
-@Component("wiki-xml")
-public class XMLOutputWikiStream extends AbstractOutputWikiStream<XMLParameters>
+@Component
+@Named("wiki-xml")
+@Singleton
+public class OutputWikiStreamWikiXML extends AbstractOutputWikiStream<WikiXMLParameters>
 {
+    /**
+     * The description of the wiki stream
+     */
+    private static final String DESCRIPTION = "Generates wiki events from MediaWiki XML inputstream.";
 
-    public XMLOutputWikiStream(String name, String description, WikiStreamDescriptor descriptor)
+
+    public OutputWikiStreamWikiXML()
     {
-        super(name, description, descriptor);
+        super("Wiki XML output stream", DESCRIPTION, WikiXMLParameters.class);
         // TODO Auto-generated constructor stub
     }
 
     @Override
-    public Listener createListener(XMLParameters parameters) throws WikiStreamException
+    public Listener createListener(WikiXMLParameters parameters) throws WikiStreamException
     {
         // TODO Auto-generated method stub
         return null;

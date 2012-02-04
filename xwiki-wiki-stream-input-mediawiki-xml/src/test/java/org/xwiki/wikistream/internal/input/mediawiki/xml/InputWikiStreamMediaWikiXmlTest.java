@@ -21,40 +21,54 @@ package org.xwiki.wikistream.internal.input.mediawiki.xml;
 
 import junit.framework.Assert;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.xwiki.test.AbstractComponentTestCase;
 import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.mediawiki.xml.MediaWikiXmlParameters;
-import org.xwiki.wikistream.test.AbstractWikiStreamTest;
+import org.xwiki.wikistream.internal.output.xml.OutputWikiStreamWikiXML;
+import org.xwiki.wikistream.output.OutputWikiStream;
 
 
 /**
  * 
  * @version $Id: 5c213c4c836ba7a506c7fae073a3c2eee28e20be $
  */
-public class InputWikiStreamMediaWikiXmlTest extends AbstractWikiStreamTest
+public class InputWikiStreamMediaWikiXmlTest extends AbstractComponentTestCase
 {
 
-    private InputWikiStreamMediaWikiXml mediaWikiXmlInput=null;
+    private InputWikiStreamMediaWikiXml mediaWikiXmlInputStream=null;
     private MediaWikiXmlParameters parametersBean=null;
+    
+    private OutputWikiStreamWikiXML outputWikiStream=null;
 
     @Before
-    @Override
     public void setUp() throws Exception
     {
-        super.setUp();
-        mediaWikiXmlInput=(InputWikiStreamMediaWikiXml) getComponentManager().lookup(InputWikiStream.class,"mediawiki-xml");        
+        mediaWikiXmlInputStream=(InputWikiStreamMediaWikiXml) getComponentManager().lookup(InputWikiStream.class,"mediawiki-xml");        
         parametersBean=new MediaWikiXmlParameters();
         parametersBean.setDefaultSpace("MediaWiki");
-        parametersBean.setSrcPath(this.getClass().getResource("/MediaWikiXML.xml").getPath());
+        parametersBean.setSrcPath(this.getClass().getResource("/MediaWikiXML.xml").getPath()); 
+
+        outputWikiStream=(OutputWikiStreamWikiXML) getComponentManager().lookup(OutputWikiStream.class,"wiki-xml");
     }
     
     @Test
     public void testBasicConfiguration(){
-        Assert.assertEquals(mediaWikiXmlInput.getName(), "MediaWiki XML InputWikiStream");
-        Assert.assertEquals(mediaWikiXmlInput.getDescription(), "Generates wiki events from MediaWiki XML inputstream.");
-        Assert.assertNotNull(mediaWikiXmlInput.getDescriptor());
-        
+        Assert.assertNotNull(mediaWikiXmlInputStream);
+        Assert.assertNotNull(outputWikiStream);
+        Assert.assertEquals(mediaWikiXmlInputStream.getName(), "MediaWiki XML InputWikiStream");
+        Assert.assertEquals(mediaWikiXmlInputStream.getDescription(), "Generates wiki events from MediaWiki XML inputstream.");
+        Assert.assertNotNull(mediaWikiXmlInputStream.getDescriptor());
     }
+   
+    @After
+    public void tearDown(){
+        mediaWikiXmlInputStream=null;
+    }
+
 
 }

@@ -23,7 +23,7 @@ package org.xwiki.wikistream.internal.output.xml;
  * 
  * @version $Id$
  */
-public class XMLParameters
+public class WikiXMLParameters
 {
 
 }

@@ -23,6 +23,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -124,9 +125,19 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     {
         List<ExtensionRepositoryId> repositories = new ArrayList<ExtensionRepositoryId>();
 
-        List<String> repositoryStrings = this.configuration.get().getProperty("extension.repositories");
+        List<String> repositoryStrings =
+            this.configuration.get().getProperty("extension.repositories", Collections.<String> emptyList());
 
-        if (repositoryStrings != null && !repositoryStrings.isEmpty()) {
+        if (repositoryStrings.isEmpty()) {
+            try {
+                repositories.add(new ExtensionRepositoryId("maven-xwiki", TYPE_MAVEN, new URI(
+                    "http://nexus.xwiki.org/nexus/content/groups/public")));
+                repositories.add(new ExtensionRepositoryId("extensions.xwiki.org", TYPE_XWIKI, new URI(
+                    "http://extensions.xwiki.org/xwiki/rest/")));
+            } catch (Exception e) {
+                // Should never happen
+            }
+        } else {
             for (String repositoryString : repositoryStrings) {
                 if (StringUtils.isNotBlank(repositoryString)) {
                     try {
@@ -138,15 +149,6 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
                 } else {
                     this.logger.debug("Empty repository id found in the configuration");
                 }
-            }
-        } else {
-            try {
-                repositories.add(new ExtensionRepositoryId("maven-xwiki", TYPE_MAVEN, new URI(
-                    "http://nexus.xwiki.org/nexus/content/groups/public")));
-                repositories.add(new ExtensionRepositoryId("extensions.xwiki.org", TYPE_XWIKI, new URI(
-                    "http://extensions.xwiki.org/xwiki/rest/")));
-            } catch (Exception e) {
-                // Should never happen
             }
         }
 

@@ -126,7 +126,7 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
 
         List<String> repositoryStrings = this.configuration.get().getProperty("extension.repositories");
 
-        if (!repositoryStrings.isEmpty()) {
+        if (repositoryStrings != null && !repositoryStrings.isEmpty()) {
             for (String repositoryString : repositoryStrings) {
                 if (StringUtils.isNotBlank(repositoryString)) {
                     try {

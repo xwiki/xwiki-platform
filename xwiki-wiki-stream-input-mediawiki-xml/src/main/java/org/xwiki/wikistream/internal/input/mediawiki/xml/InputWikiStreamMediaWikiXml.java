@@ -19,11 +19,13 @@
  */
 package org.xwiki.wikistream.internal.input.mediawiki.xml;
 
+import java.io.FileReader;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.listener.Listener;
+import org.xwiki.wikistream.listener.Listener;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.mediawiki.xml.MediaWikiXmlParameters;
 import org.xwiki.wikistream.internal.input.xml.AbstractXMLInputWikiStream;
@@ -67,8 +69,13 @@ public class InputWikiStreamMediaWikiXml extends AbstractXMLInputWikiStream<Medi
     @Override
     public void parse(MediaWikiXmlParameters parametersBean, Listener wikiEventListener) throws WikiStreamException
     {
-        // TODO Auto-generated method stub
-
+        String srcPath=parametersBean.getSrcPath();
+        try{
+            FileReader xmlFileReader=new FileReader(srcPath);
+            parseXML(xmlFileReader, wikiEventListener);
+        }catch(Exception ex){
+            throw new WikiStreamException("Failed to parse the input source", ex);
+        }
     }
 
 }

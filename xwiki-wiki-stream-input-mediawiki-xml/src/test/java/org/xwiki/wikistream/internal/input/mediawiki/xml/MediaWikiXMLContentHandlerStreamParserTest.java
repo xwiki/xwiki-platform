@@ -17,25 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.input;
+package org.xwiki.wikistream.internal.input.mediawiki.xml;
 
-import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.wikistream.listener.Listener;
-import org.xwiki.wikistream.WikiStream;
-import org.xwiki.wikistream.WikiStreamException;
+import org.junit.Assert;
+import org.junit.Test;
+import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.wikistream.input.ContentHandlerParser;
 
 /**
- * @param <P>
+ * 
  * @version $Id$
  */
-@ComponentRole
-public interface InputWikiStream<P> extends WikiStream<P>
+public class MediaWikiXMLContentHandlerStreamParserTest extends AbstractComponentTestCase
 {
-
-    /**
-     * @param parameters
-     * @param listener
-     * @throws InputWikiStreamException
-     */
-    void parse(P parameters, Listener listener) throws WikiStreamException;
+    @Test
+    public void testComponent() throws Exception{
+        Object obj=getComponentManager().lookup(ContentHandlerParser.class, "mediawiki/xml/contenthandler");
+        Assert.assertNotNull(obj);
+        
+    }
 }

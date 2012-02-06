@@ -31,9 +31,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.wikistream.listener.Listener;
 import org.xwiki.wikistream.structure.User;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
-import com.thoughtworks.xstream.io.xml.StaxWriter;
 
 /**
  * A Basic XML Serializer implementation.
@@ -160,7 +158,7 @@ public class WikiXMLListener implements Listener
     @Override
     public void beginFormat(Format format, Map<String, String> parameters)
     {
-        //TODO Handle format tag
+        // TODO Handle format tag
     }
 
     @Override
@@ -184,13 +182,13 @@ public class WikiXMLListener implements Listener
     @Override
     public void beginList(ListType listType, Map<String, String> parameters)
     {
-        //TODO Handle List
+        // TODO Handle List
     }
 
     @Override
     public void beginDefinitionList(Map<String, String> parameters)
     {
-        //TODO Handle Definition list
+        // TODO Handle Definition list
     }
 
     @Override

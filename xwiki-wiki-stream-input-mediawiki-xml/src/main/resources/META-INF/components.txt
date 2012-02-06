@@ -1,1 +1,3 @@
 org.xwiki.wikistream.internal.input.mediawiki.xml.InputWikiStreamMediaWikiXml
+
+org.xwiki.wikistream.internal.input.mediawiki.xml.MediaWikiXMLContentHandlerParser

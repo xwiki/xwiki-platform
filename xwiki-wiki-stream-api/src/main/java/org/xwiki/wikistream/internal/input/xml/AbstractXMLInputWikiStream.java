@@ -33,10 +33,9 @@ import org.xml.sax.XMLReader;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.parser.xml.ContentHandlerStreamParser;
+import org.xwiki.wikistream.input.ContentHandlerParser;
 import org.xwiki.wikistream.internal.input.AbstractInputWikiStream;
-
+import org.xwiki.wikistream.listener.Listener;
 /**
  * 
  * @version $Id$
@@ -68,14 +67,14 @@ public abstract class AbstractXMLInputWikiStream<P> extends AbstractInputWikiStr
     }
     
 
-    public ContentHandlerStreamParser createParser(Listener listener)
+    public ContentHandlerParser createParser(Listener listener)
     {
-        ContentHandlerStreamParser parser=null;
+        ContentHandlerParser parser=null;
         try {
-            parser = this.componentManager.lookup(ContentHandlerStreamParser.class, getType().toIdString());
+            parser = this.componentManager.lookup(ContentHandlerParser.class, getType().toIdString()+"/contenthandler");
         } catch (ComponentLookupException e) {
-           //TODO throw new RuntimeException(
-            //    "Failed to create [" + getSyntax().toString() + "] ContentHandler stream parser", e);
+           throw new RuntimeException(
+                "Failed to create [" + getType().toString() + "] ContentHandler parser", e);
         }
 
         parser.setListener(listener);
@@ -96,7 +95,7 @@ public abstract class AbstractXMLInputWikiStream<P> extends AbstractInputWikiStr
         SAXParser saxParser = this.parserFactory.newSAXParser();
         XMLReader xmlReader = saxParser.getXMLReader();
 
-        ContentHandlerStreamParser parser = createParser(listener);
+        ContentHandlerParser parser = createParser(listener);
         xmlReader.setContentHandler(parser);
 
         xmlReader.parse(new InputSource(source));

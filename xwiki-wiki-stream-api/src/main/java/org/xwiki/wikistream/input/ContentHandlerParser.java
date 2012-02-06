@@ -19,23 +19,26 @@
  */
 package org.xwiki.wikistream.input;
 
+import org.xml.sax.ContentHandler;
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.listener.Listener;
-import org.xwiki.wikistream.WikiStream;
-import org.xwiki.wikistream.WikiStreamException;
 
 /**
- * @param <P>
  * @version $Id$
  */
 @ComponentRole
-public interface InputWikiStream<P> extends WikiStream<P>
+public interface ContentHandlerParser extends ContentHandler
 {
 
     /**
-     * @param parameters
-     * @param listener
-     * @throws InputWikiStreamException
+     * @return The {@link WikiStreamType}, which identifies a wiki stream input and output components using a role hint.
      */
-    void parse(P parameters, Listener listener) throws WikiStreamException;
+    WikiStreamType getType();
+
+    /**
+     * set the wiki listener, which has wiki specific events.
+     * @param listener
+     */
+    void setListener(Listener listener);
 }

@@ -176,7 +176,7 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     }
 
     @Test
-    public void testUninsatllExtension() throws ResolveException, LocalExtensionRepositoryException,
+    public void testUninstallExtension() throws ResolveException, LocalExtensionRepositoryException,
         UninstallException, InstallException
     {
         // uninstall from root

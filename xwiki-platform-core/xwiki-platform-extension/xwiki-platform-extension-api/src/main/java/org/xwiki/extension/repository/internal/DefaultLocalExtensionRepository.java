@@ -19,7 +19,7 @@
  */
 package org.xwiki.extension.repository.internal;
 
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,7 +37,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -565,7 +564,7 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
     {
         DefaultLocalExtension localExtension = new DefaultLocalExtension(this, extension);
 
-        localExtension.setFile(this.storage.getExtensionFile(localExtension.getId(), localExtension.getType()));
+        localExtension.setFile(this.storage.getNewExtensionFile(localExtension.getId(), localExtension.getType()));
 
         return localExtension;
     }
@@ -585,17 +584,11 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
             try {
                 localExtension = createExtension(extension);
 
-                // Store extension in the local repository
-                FileOutputStream fos = FileUtils.openOutputStream(localExtension.getFile().getFile());
+                InputStream is = extension.getFile().openStream();
                 try {
-                    InputStream is = extension.getFile().openStream();
-                    try {
-                        IOUtils.copy(is, fos);
-                    } finally {
-                        is.close();
-                    }
+                    FileUtils.copyInputStreamToFile(is, localExtension.getFile().getFile());
                 } finally {
-                    fos.close();
+                    is.close();
                 }
                 this.storage.saveDescriptor(localExtension);
 
@@ -618,9 +611,15 @@ public class DefaultLocalExtensionRepository extends AbstractExtensionRepository
     @Override
     public void removeExtension(LocalExtension extension) throws ResolveException
     {
-        LocalExtension localExtension = (LocalExtension) resolve(extension.getId());
+        DefaultLocalExtension localExtension = (DefaultLocalExtension) resolve(extension.getId());
 
-        this.storage.removeExtension(localExtension);
+        try {
+            this.storage.removeExtension(localExtension);
+        } catch (IOException e) {
+            // Should not happen if the local extension exists
+
+            this.logger.error("Failed to remove extension [" + extension + "]", e);
+        }
     }
 
     @Override

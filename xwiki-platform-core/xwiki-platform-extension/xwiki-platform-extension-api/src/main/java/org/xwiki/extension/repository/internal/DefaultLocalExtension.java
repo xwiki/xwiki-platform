@@ -37,9 +37,14 @@ import org.xwiki.extension.LocalExtension;
 public class DefaultLocalExtension extends AbstractExtension implements LocalExtension
 {
     /**
-     * The namespace in which extension is installed.
+     * @see #getNamespaces()
      */
     private Set<String> namespaces;
+
+    /**
+     * @see #getDescriptorFile()
+     */
+    private File descriptorFile;
 
     /**
      * @param repository the repository where this extension comes from
@@ -60,6 +65,32 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
     public DefaultLocalExtension(DefaultLocalExtensionRepository repository, Extension extension)
     {
         super(repository, extension);
+    }
+
+    /**
+     * @return the file containing the extension description
+     */
+    public File getDescriptorFile()
+    {
+        return this.descriptorFile;
+    }
+
+    /**
+     * @param descriptorFile file containing the extension description
+     */
+    public void setDescriptorFile(File descriptorFile)
+    {
+        this.descriptorFile = descriptorFile;
+    }
+
+    /**
+     * @param file the extension file in the filesystem
+     * @see #getFile()
+     */
+    public void setFile(File file)
+    {
+        setFile(new DefaultLocalExtensionFile(file));
+        putProperty(PKEY_FILE, file);
     }
 
     // LocalExtension
@@ -97,16 +128,6 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
     public DefaultLocalExtensionFile getFile()
     {
         return (DefaultLocalExtensionFile) super.getFile();
-    }
-
-    /**
-     * @param file the extension file in the filesystem
-     * @see #getFile()
-     */
-    public void setFile(File file)
-    {
-        setFile(new DefaultLocalExtensionFile(file));
-        putProperty(PKEY_FILE, file);
     }
 
     @Override

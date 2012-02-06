@@ -130,10 +130,10 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
 
         if (repositoryStrings.isEmpty()) {
             try {
-                repositories.add(new ExtensionRepositoryId("maven-xwiki", TYPE_MAVEN, new URI(
-                    "http://nexus.xwiki.org/nexus/content/groups/public")));
                 repositories.add(new ExtensionRepositoryId("extensions.xwiki.org", TYPE_XWIKI, new URI(
                     "http://extensions.xwiki.org/xwiki/rest/")));
+                repositories.add(new ExtensionRepositoryId("maven-xwiki", TYPE_MAVEN, new URI(
+                    "http://nexus.xwiki.org/nexus/content/groups/public")));
             } catch (Exception e) {
                 // Should never happen
             }

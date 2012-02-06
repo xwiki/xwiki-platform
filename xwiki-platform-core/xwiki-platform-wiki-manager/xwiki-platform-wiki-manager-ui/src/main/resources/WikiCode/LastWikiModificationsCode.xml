@@ -42,7 +42,7 @@
   #set($usermodificationswiki = $request.userwiki)
 #end
 #############################################################################
-#set($WikiManager = $xwiki.wikimanager)
+#set($WikiManager = $services.wikimanager)
 #if(!$WikiManager)
   #error($msg.get("wikimanager.pluginnotenabled"))
 #end

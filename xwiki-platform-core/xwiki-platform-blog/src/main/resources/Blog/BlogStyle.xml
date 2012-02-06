@@ -217,11 +217,11 @@
 }
 /* Pseudo-tools visible in the edit mode */
 div.publish-message {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_world.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_world.png')");
   background-position: 6px center;
 }
 div.hide-message {
-  background-image: url("$xwiki.getSkinFile('icons/silk/lock_open.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/lock_open.png')");
   background-position: 6px center;
 }
 div.edit-categories {
@@ -234,7 +234,7 @@ div.edit-categories {
   font-weight: bold;
 }
 .createPost {
-  background: transparent url("$xwiki.getSkinFile('icons/silk/add.gif')") no-repeat scroll left center; 
+  background: transparent url("$xwiki.getSkinFile('icons/silk/add.png')") no-repeat scroll left center;
   font-size: 80%; 
   font-weight: bold;
   padding-left: 18px;

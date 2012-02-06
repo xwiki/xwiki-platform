@@ -91,9 +91,7 @@ public interface WikiService extends RemoteService
     EntityConfig getEntityConfig(EntityReference origin, ResourceReference destination);
 
     /**
-     * Returns information about the referenced attachment. Note that the {@code EntityReference#getFileName()} name
-     * will be cleaned to match the attachment names cleaning rules, and the returned attachment serialized reference
-     * and access URL will be generated with the cleaned name.
+     * Returns information about the referenced attachment.
      * 
      * @param attachmentReference an attachment reference
      * @return an {@link Attachment} containing the serialized reference and the access URL of the specified attachment,

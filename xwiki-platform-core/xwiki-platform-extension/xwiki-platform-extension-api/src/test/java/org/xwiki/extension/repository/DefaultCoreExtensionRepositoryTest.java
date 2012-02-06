@@ -26,6 +26,7 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.test.ConfigurableDefaultCoreExtensionRepository;
+import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.test.AbstractComponentTestCase;
 
 public class DefaultCoreExtensionRepositoryTest extends AbstractComponentTestCase
@@ -66,13 +67,13 @@ public class DefaultCoreExtensionRepositoryTest extends AbstractComponentTestCas
     {
         Assert.assertNull(this.coreExtensionRepository.getCoreExtension("unexistingextension"));
 
-        this.coreExtensionRepository.addExtensions("existingextension", "version");
+        this.coreExtensionRepository.addExtensions("existingextension", new DefaultVersion("version"));
 
         Extension extension = this.coreExtensionRepository.getCoreExtension("existingextension");
 
         Assert.assertNotNull(extension);
         Assert.assertEquals("existingextension", extension.getId().getId());
-        Assert.assertEquals("version", extension.getId().getVersion());
+        Assert.assertEquals("version", extension.getId().getVersion().getValue());
     }
 
     /**
@@ -89,7 +90,7 @@ public class DefaultCoreExtensionRepositoryTest extends AbstractComponentTestCas
             // expected
         }
 
-        this.coreExtensionRepository.addExtensions("existingextension", "version");
+        this.coreExtensionRepository.addExtensions("existingextension", new DefaultVersion("version"));
 
         try {
             this.coreExtensionRepository.resolve(new ExtensionId("existingextension", "wrongversion"));
@@ -103,6 +104,6 @@ public class DefaultCoreExtensionRepositoryTest extends AbstractComponentTestCas
 
         Assert.assertNotNull(extension);
         Assert.assertEquals("existingextension", extension.getId().getId());
-        Assert.assertEquals("version", extension.getId().getVersion());
+        Assert.assertEquals("version", extension.getId().getVersion().getValue());
     }
 }

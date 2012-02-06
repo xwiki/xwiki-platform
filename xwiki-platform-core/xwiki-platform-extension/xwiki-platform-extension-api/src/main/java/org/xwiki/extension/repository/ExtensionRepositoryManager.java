@@ -19,12 +19,15 @@
  */
 package org.xwiki.extension.repository;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.version.Version;
 
 /**
  * Proxy behind remote repositories.
@@ -64,6 +67,11 @@ public interface ExtensionRepositoryManager
     ExtensionRepository getRepository(String repositoryId);
 
     /**
+     * @return the repositories
+     */
+    Collection<ExtensionRepository> getRepositories();
+
+    /**
      * Get extension descriptor found in one of the repositories.
      * <p>
      * The proxy search in all repositories and return the first extension it could find.
@@ -75,13 +83,40 @@ public interface ExtensionRepositoryManager
     Extension resolve(ExtensionId extensionId) throws ResolveException;
 
     /**
-     * Search among all repository implementing {@link Searchable} interface.
+     * Get extension descriptor found in one of the repositories.
+     * <p>
+     * The proxy search in all repositories and return the first extension it could find.
+     * <p>
+     * This method takes {@link ExtensionDependency} instead of {@link ExtensionId} to allow any implementation of
+     * {@link ExtensionRepository} to extension dependencies with filter not supported yet by Extension Manage. As an
+     * example Aether implementation add support from classifiers, excludes and version ranges.
+     * 
+     * @param extensionDependency the extension dependency
+     * @return the found extension descriptor
+     * @throws ResolveException failed to find extension in the repository
+     */
+    Extension resolve(ExtensionDependency extensionDependency) throws ResolveException;
+
+    /**
+     * Return ordered (ascendent) versions for the provided extension id.
+     * 
+     * @param id the id of the extensions for which to return versions
+     * @param offset the offset from where to start returning versions
+     * @param nb the maximum number of versions to return
+     * @return the versions of the provided extension id
+     * @throws ResolveException fail to find extension for provided id
+     */
+    IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException;
+
+    /**
+     * Search among all repository implementing {@link org.xwiki.extension.repository.search.Searchable} interface.
      * 
      * @param pattern the pattern to search
-     * @param offset the offset from where to start returning search results
-     * @param nb the maximum number of search results to return
+     * @param offset the offset from where to start returning search results, 0-based
+     * @param nb the maximum number of search results to return. -1 indicate no limit. 0 indicate that no result will be
+     *            returned but it can be used to get the total hits.
      * @return the found extensions descriptors, empty list if nothing could be found
-     * @see Searchable
+     * @see org.xwiki.extension.repository.search.Searchable
      */
-    List<Extension> search(String pattern, int offset, int nb);
+    IterableResult<Extension> search(String pattern, int offset, int nb);
 }

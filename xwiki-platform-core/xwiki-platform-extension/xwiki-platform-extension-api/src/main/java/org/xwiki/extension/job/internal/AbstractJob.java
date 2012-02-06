@@ -22,22 +22,27 @@ package org.xwiki.extension.job.internal;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.job.Job;
-import org.xwiki.extension.job.JobStatus;
-import org.xwiki.extension.job.PopLevelProgressEvent;
-import org.xwiki.extension.job.PushLevelProgressEvent;
 import org.xwiki.extension.job.Request;
-import org.xwiki.extension.job.StepProgressEvent;
+import org.xwiki.extension.job.event.JobFinishedEvent;
+import org.xwiki.extension.job.event.JobStartedEvent;
+import org.xwiki.extension.job.event.status.JobStatus;
+import org.xwiki.extension.job.event.status.PopLevelProgressEvent;
+import org.xwiki.extension.job.event.status.PushLevelProgressEvent;
+import org.xwiki.extension.job.event.status.StepProgressEvent;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
 
 /**
  * Base class for {@link Job} implementations.
  * 
- * @param <R> the request type associated to the task
+ * @param <R> the request type associated to the job
  * @version $Id$
  */
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public abstract class AbstractJob<R extends Request> implements Job
 {
     /**
@@ -84,29 +89,55 @@ public abstract class AbstractJob<R extends Request> implements Job
     @Override
     public void start(Request request)
     {
-        this.status = new DefaultJobStatus<R>((R) request, getId(), this.observationManager, this.loggerManager);
+        this.observationManager.notify(new JobStartedEvent(getId(), getType(), request), this);
+
+        this.status = createNewStatus(castRequest(request));
 
         this.status.startListening();
 
+        Exception exception = null;
         try {
             start();
         } catch (Exception e) {
-            logger.error("Failed to start job", e);
+            logger.error("Exception thrown during job execution", e);
+            exception = e;
         } finally {
             this.status.stopListening();
 
             this.status.setState(JobStatus.State.FINISHED);
+
+            this.observationManager.notify(new JobFinishedEvent(getId(), getType(), request), this, exception);
         }
     }
 
     /**
-     * @return unique id for the task
+     * Should be overridden if R is not Request.
+     * 
+     * @param request the request
+     * @return the request in the proper extended type
+     */
+    protected R castRequest(Request request)
+    {
+        return (R) request;
+    }
+
+    /**
+     * @param request contains information related to the job to execute
+     * @return the status of the job
+     */
+    protected DefaultJobStatus<R> createNewStatus(R request)
+    {
+        return new DefaultJobStatus<R>((R) request, getId(), this.observationManager, this.loggerManager);
+    }
+
+    /**
+     * @return unique id for the job
      */
     protected String getId()
     {
         return getClass().getName() + "_" + Integer.toHexString(hashCode());
     }
-
+    
     /**
      * Push new progression level.
      * 
@@ -136,7 +167,7 @@ public abstract class AbstractJob<R extends Request> implements Job
     /**
      * Should be implemented by {@link Job} implementations.
      * 
-     * @throws Exception errors during task execution
+     * @throws Exception errors during job execution
      */
     protected abstract void start() throws Exception;
 }

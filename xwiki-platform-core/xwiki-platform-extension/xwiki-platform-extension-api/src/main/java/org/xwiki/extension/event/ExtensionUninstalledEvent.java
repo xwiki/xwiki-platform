@@ -39,9 +39,10 @@ public class ExtensionUninstalledEvent extends AbstractExtensionEvent
      * Matches only the specified extension id or/and version.
      * 
      * @param extensionId the extension identifier
+     * @param namespace the namespace from which the extensions has been uninstalled
      */
-    public ExtensionUninstalledEvent(ExtensionId extensionId)
+    public ExtensionUninstalledEvent(ExtensionId extensionId, String namespace)
     {
-        super(extensionId);
+        super(extensionId, namespace);
     }
 }

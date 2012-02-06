@@ -43,4 +43,9 @@ public interface ExtensionManagerConfiguration
      * @return the configured repositories
      */
     List<ExtensionRepositoryId> getRepositories();
+
+    /**
+     * @return the user agent to declare when communication with external services (generally repositories)
+     */
+    String getUserAgent();
 }

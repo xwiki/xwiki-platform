@@ -30,8 +30,10 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
@@ -59,11 +61,14 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     private static final String TYPE_MAVEN = "maven";
 
     /**
-     * Used to manipulate xwiki.properties files.
+     * The type identifier for a xwiki repository.
      */
-    @Inject
-    @Named("xwikiproperties")
-    private ConfigurationSource configurationSource;
+    private static final String TYPE_XWIKI = "xwiki";
+
+    /**
+     * The default user agent.
+     */
+    private static final String DEFAULT_USERAGENT = "Extension Manager";
 
     /**
      * The logger to log.
@@ -76,6 +81,13 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
      */
     @Inject
     private Container container;
+
+    /**
+     * The configuration.
+     */
+    @Inject
+    @Named("configurationSource")
+    private Provider<ConfigurationSource> configuration;
 
     // Cache
 
@@ -96,7 +108,7 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     public File getLocalRepository()
     {
         if (this.localRepository == null) {
-            String localRepositoryPath = this.configurationSource.getProperty("extension.localRepository");
+            String localRepositoryPath = this.configuration.get().getProperty("extension.localRepository");
 
             if (localRepositoryPath == null) {
                 this.localRepository = new File(getHome(), "repository/");
@@ -114,23 +126,29 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
         List<ExtensionRepositoryId> repositories = new ArrayList<ExtensionRepositoryId>();
 
         List<String> repositoryStrings =
-            this.configurationSource.getProperty("extension.repositories", Collections.<String> emptyList());
+            this.configuration.get().getProperty("extension.repositories", Collections.<String> emptyList());
 
-        if (repositoryStrings != null && !repositoryStrings.isEmpty()) {
-            for (String repositoryString : repositoryStrings) {
-                try {
-                    ExtensionRepositoryId extensionRepositoryId = parseRepository(repositoryString);
-                    repositories.add(extensionRepositoryId);
-                } catch (Exception e) {
-                    this.logger.warn("Faild to parse repository [" + repositoryString + "] from configuration", e);
-                }
-            }
-        } else {
+        if (repositoryStrings.isEmpty()) {
             try {
+                repositories.add(new ExtensionRepositoryId("extensions.xwiki.org", TYPE_XWIKI, new URI(
+                    "http://extensions.xwiki.org/xwiki/rest/")));
                 repositories.add(new ExtensionRepositoryId("maven-xwiki", TYPE_MAVEN, new URI(
                     "http://nexus.xwiki.org/nexus/content/groups/public")));
             } catch (Exception e) {
                 // Should never happen
+            }
+        } else {
+            for (String repositoryString : repositoryStrings) {
+                if (StringUtils.isNotBlank(repositoryString)) {
+                    try {
+                        ExtensionRepositoryId extensionRepositoryId = parseRepository(repositoryString);
+                        repositories.add(extensionRepositoryId);
+                    } catch (Exception e) {
+                        this.logger.warn("Faild to parse repository [" + repositoryString + "] from configuration", e);
+                    }
+                } else {
+                    this.logger.debug("Empty repository id found in the configuration");
+                }
             }
         }
 
@@ -156,5 +174,12 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
 
         throw new ExtensionManagerConfigurationException("Don't match repository configuration [" + repositoryString
             + "]");
+    }
+
+    @Override
+    public String getUserAgent()
+    {
+        // TODO: add version (need a way to get platform version first)
+        return this.configuration.get().getProperty("extension.userAgent", DEFAULT_USERAGENT);
     }
 }

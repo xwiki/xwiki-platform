@@ -53,7 +53,7 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
     /**
      * The events supported by this converter.
      */
-    private Set<Class< ? extends Event>> events = new HashSet<Class< ? extends Event>>()
+    private static final Set<Class< ? extends Event>> EVENTS = new HashSet<Class< ? extends Event>>()
     {
         {
             add(DocumentDeletedEvent.class);
@@ -65,7 +65,7 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
     @Override
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
     {
-        if (this.events.contains(localEvent.getEvent().getClass())) {
+        if (EVENTS.contains(localEvent.getEvent().getClass())) {
             // fill the remote event
             remoteEvent.setEvent((Serializable) localEvent.getEvent());
             remoteEvent.setSource(serializeXWikiDocument((XWikiDocument) localEvent.getSource()));
@@ -80,7 +80,7 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
     @Override
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
-        if (this.events.contains(remoteEvent.getEvent().getClass())) {
+        if (EVENTS.contains(remoteEvent.getEvent().getClass())) {
             // fill the local event
             XWikiContext context = unserializeXWikiContext(remoteEvent.getData());
 

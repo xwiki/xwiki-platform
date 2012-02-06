@@ -141,10 +141,10 @@ thead.xwiki-livetable-display-header th.sortable {
   cursor: pointer;
 }
 thead.xwiki-livetable-display-header th.desc {
-  background: $theme.backgroundSecondaryColor url("$xwiki.getSkinFile('icons/silk/bullet_arrow_down.gif')") no-repeat scroll right center;
+  background: $theme.backgroundSecondaryColor url("$xwiki.getSkinFile('icons/silk/bullet_arrow_down.png')") no-repeat scroll right center;
 }
 thead.xwiki-livetable-display-header th.asc {
-  background: $theme.backgroundSecondaryColor url("$xwiki.getSkinFile('icons/silk/bullet_arrow_up.gif')") no-repeat scroll right center;
+  background: $theme.backgroundSecondaryColor url("$xwiki.getSkinFile('icons/silk/bullet_arrow_up.png')") no-repeat scroll right center;
 }
 thead.xwiki-livetable-display-header th.selected {
   color: $theme.textColor;
@@ -159,6 +159,7 @@ html>body thead.xwiki-livetable-display-header  td.xwiki-livetable-display-heade
 }
 thead.xwiki-livetable-display-header td.xwiki-livetable-display-header-filter input,
 thead.xwiki-livetable-display-header td.xwiki-livetable-display-header-filter select {
+  box-shadow: none;
   width: 100%;
   border: 1px solid $theme.backgroundSecondaryColor;
   color: $theme.textPrimaryColor;
@@ -226,19 +227,19 @@ tbody.xwiki-livetable-display-body td a.action:hover {
   text-decoration: underline;
 }
 tbody.xwiki-livetable-display-body td a.actioncopy {
-  background-image: url($xwiki.getSkinFile("icons/silk/page_white_copy.gif"));
+  background-image: url($xwiki.getSkinFile("icons/silk/page_white_copy.png"));
 }
 tbody.xwiki-livetable-display-body td a.actionrename {
-  background-image: url($xwiki.getSkinFile("icons/silk/textfield_rename.gif"));
+  background-image: url($xwiki.getSkinFile("icons/silk/textfield_rename.png"));
 }
 tbody.xwiki-livetable-display-body td a.actiondelete {
-  background-image: url($xwiki.getSkinFile("icons/silk/cross.gif"));
+  background-image: url($xwiki.getSkinFile("icons/silk/cross.png"));
 }
 tbody.xwiki-livetable-display-body td a.actionrights {
-  background-image: url($xwiki.getSkinFile("icons/silk/lock_edit.gif"));
+  background-image: url($xwiki.getSkinFile("icons/silk/lock_edit.png"));
 }
 tbody.xwiki-livetable-display-body td a.actionedit {
-  background-image: url($xwiki.getSkinFile("icons/silk/page_white_edit.gif"));
+  background-image: url($xwiki.getSkinFile("icons/silk/page_white_edit.png"));
 }
 /* </ Live Table Body> */
 /* <Dialog Box> */
@@ -290,7 +291,7 @@ div.xwikigwt-editfield tr.dialogMiddle td.dialogMiddleCenter div.xwikigwt-editfi
   margin-top: 10px;
 }
 .xwiki-livetable-tagcloud-container h2 {
-  background: url("$xwiki.getSkinFile('icons/silk/tag_yellow.gif')") no-repeat;
+  background: url("$xwiki.getSkinFile('icons/silk/tag_yellow.png')") no-repeat;
   font-size: 1em;
   color: $theme.textPrimaryColor;
   padding-left: 25px;
@@ -359,7 +360,7 @@ div.tipfilters div.splitted {
 /* <Compatibility> */
 /* This section contains rules for backward compatibility with the deprecated (since 1.9M2) ASSTable */
 div.xwiki-livetable-pagination-content {
-  background: url("$xwiki.getSkinFile('icons/silk/page_white_copy.gif')") no-repeat;
+  background: url("$xwiki.getSkinFile('icons/silk/page_white_copy.png')") no-repeat;
   padding-left: 20px;
   padding-bottom: 2px;
   display: inline;

@@ -19,7 +19,6 @@
  */
 package org.xwiki.extension;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +64,7 @@ public interface Extension
      * @return a short description of the extension
      */
     String getSummary();
-    
+
     /**
      * @return a description of the extension
      */
@@ -79,7 +78,7 @@ public interface Extension
     /**
      * @return the extension authors
      */
-    List<String> getAuthors();
+    List<ExtensionAuthor> getAuthors();
 
     /**
      * @return the dependencies of the extension
@@ -87,12 +86,11 @@ public interface Extension
     List< ? extends ExtensionDependency> getDependencies();
 
     /**
-     * Download the extension in the provided file.
+     * Return extension file descriptor. Also allows to get the content of the file.
      * 
-     * @param file the file where to save the extension
-     * @throws ExtensionException error when downloading the extension
+     * @return the file of the extension
      */
-    void download(File file) throws ExtensionException;
+    ExtensionFile getFile();
 
     /**
      * @return the repository of the extension

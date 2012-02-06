@@ -20,7 +20,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
+<syntaxId>xwiki/2.1</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -114,7 +114,7 @@
   #panelheader($msg.get('xe.blog.unpublished.entries'))
   #foreach ($entryDoc in $xwiki.wrapDocs($unpublishedEntries))
     #getEntryObject($entryDoc $entryObj)
-    * [[$!{entryDoc.display('title', 'view', $entryObj)}&gt;&gt;$!{entryDoc.fullName}]]
+    * [[$!{entryDoc.display('title', 'view', $entryObj).replaceAll('(\[|\]|\||&gt;)', '~~$1')}&gt;&gt;$!{services.model.serialize($entryDoc.documentReference).replaceAll('(\[|\]|\||&gt;)', '~$1')}]]
   #end
 
   [[$msg.get('xe.blog.unpublished.viewall') (% class="itemCount" %)($xwiki.countDocuments($query))(%%)&gt;&gt;Blog.Unpublished]]

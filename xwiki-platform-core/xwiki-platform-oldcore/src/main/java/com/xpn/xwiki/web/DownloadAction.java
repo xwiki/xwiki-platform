@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.IllegalCharsetNameException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +32,7 @@ import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -270,10 +272,14 @@ public class DownloadAction extends XWikiAction
         // Choose the right content type
         String mimetype = attachment.getMimeType(context);
         response.setContentType(mimetype);
-        response.setCharacterEncoding("");
+        try {
+            response.setCharacterEncoding("");
+        } catch (IllegalCharsetNameException ex) {
+            response.setCharacterEncoding(XWiki.DEFAULT_ENCODING);
+        }
 
         String ofilename =
-            Util.encodeURI(attachment.getFilename(), context).replaceAll("\\+", " ");
+            Util.encodeURI(attachment.getFilename(), context).replaceAll("\\+", "%20");
 
         // The inline attribute of Content-Disposition tells the browser that they should display
         // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more
@@ -285,7 +291,9 @@ public class DownloadAction extends XWikiAction
         if ("1".equals(request.getParameter("force-download"))) {
             dispType = "attachment";
         }
-        response.addHeader("Content-disposition", dispType + "; filename=\"" + ofilename + "\"");
+        // Use RFC 2231 for encoding filenames, since the normal HTTP headers only allows ASCII characters.
+        // See http://tools.ietf.org/html/rfc2231 for more details.
+        response.addHeader("Content-disposition", dispType + "; filename*=utf-8''" + ofilename);
 
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());
         // Advertise that downloads can be resumed

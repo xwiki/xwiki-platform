@@ -112,8 +112,10 @@ public class DefaultExtensionLicenseManager implements ExtensionLicenseManager, 
 
                     content = content.subList(aliases.size() - 1, content.size());
 
+                    ExtensionLicense license = new ExtensionLicense(name, content);
+                    
                     for (String alias : aliases) {
-                        this.licenses.put(alias.toLowerCase(), new ExtensionLicense(name, content));
+                        this.licenses.put(alias.toLowerCase(), license);
                     }
                 } finally {
                     is.close();

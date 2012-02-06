@@ -34,6 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -87,11 +88,10 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         DocumentReference reference = getDocumentReference();
 
         if (reference != null) {
-            // Make sure to not modify a reference that could comes from somewhere else
-            reference = new DocumentReference(reference);
             EntityReference relativeReference = this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
-            reference.getLastSpaceReference().setName(relativeReference.extractReference(EntityType.SPACE).getName());
-            reference.setName(relativeReference.extractReference(EntityType.DOCUMENT).getName());
+            reference = new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
+                new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(),
+                    reference.getParent().getParent()));
         } else {
             reference = this.currentMixedDocumentReferenceResolver.resolve(name);
         }
@@ -103,6 +103,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * 
      * @see com.xpn.xwiki.objects.BaseElement#createReference()
      */
+    @Override
     protected BaseObjectReference createReference()
     {
         return new BaseObjectReference(getXClassReference(), getNumber(), getDocumentReference());
@@ -239,7 +240,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      */
     public BaseObject duplicate()
     {
-        BaseObject object = (BaseObject) clone();
+        BaseObject object = clone();
         // Set a new GUID for the duplicate
         object.setGuid(UUID.randomUUID().toString());
 
@@ -334,6 +335,9 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         if (cel != null) {
             bclass.fromXML(cel);
             setClassName(bclass.getName());
+        } else {
+            // We need at least to set the class name to avoid some NullPointerExceptions
+            setClassName(oel.elementText("className"));
         }
 
         setName(oel.element("name").getText());

@@ -1197,7 +1197,8 @@ public class XWikiLDAPUtils
         // Check if the default profile document is available
         for (int i = 0; true; ++i) {
             if (i > 0) {
-                userReference.setName(validXWikiUserName + "_" + i);
+                userReference = new DocumentReference(context.getDatabase(), XWIKI_USER_SPACE,
+                    validXWikiUserName + "_" + i);
             }
 
             XWikiDocument doc = context.getWiki().getDocument(userReference, context);

@@ -91,16 +91,14 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         display().insert(urlPanel, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init(Object data, final AsyncCallback< ? > cb)
     {
         super.init(data, new AsyncCallback<Boolean>()
         {
             public void onSuccess(Boolean result)
             {
-                urlTextBox.setText(getData().getData().getUrl());
+                setURL(getData().getData().getUrl());
                 cb.onSuccess(null);
             }
 
@@ -111,9 +109,6 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void setFocus()
     {
@@ -123,9 +118,6 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         Scheduler.get().scheduleDeferred(new FocusCommand(focusable));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean validateForm()
     {
@@ -139,15 +131,10 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LinkConfigWizardStep#saveForm(AsyncCallback)
-     */
     @Override
     protected void saveForm(final AsyncCallback<Boolean> callback)
     {
-        EntityReference destinationEntityReference = new URIReference(buildURL()).getEntityReference();
+        EntityReference destinationEntityReference = new URIReference(getURL()).getEntityReference();
         if (!destinationEntityReference.equals(getData().getDestination().getEntityReference())) {
             getData().getDestination().setEntityReference(destinationEntityReference);
             // Reset the link configuration.
@@ -181,14 +168,23 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     protected abstract String getURLErrorMessage();
 
     /**
-     * Builds an URL to the external resource to be linked from the user input, adding protocols, parsing user input,
-     * etc.
+     * Subclasses can overwrite this method to adjust the URL the user has set.
      * 
-     * @return the URL to the external resource from the user input.
+     * @return the value of the URL text box
      */
-    protected String buildURL()
+    protected String getURL()
     {
         return urlTextBox.getText().trim();
+    }
+
+    /**
+     * Fills the URL text box with the given URL. Subclasses can overwrite this method to adjust the URL.
+     * 
+     * @param url the URL to fill the text box with
+     */
+    protected void setURL(String url)
+    {
+        urlTextBox.setText(url);
     }
 
     /**
@@ -199,9 +195,6 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         return "";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void hideErrors()
     {

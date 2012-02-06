@@ -47,7 +47,7 @@ div.loading {
 }
 
 .package-upload {
-  background: transparent url($xwiki.getSkinFile('icons/silk/package_add.gif')) no-repeat scroll 0 5px;
+  background: transparent url($xwiki.getSkinFile('icons/silk/package_add.png')) no-repeat scroll 0 5px;
   padding-left: 20px;
 }
 
@@ -56,7 +56,7 @@ div.loading {
 }
 
 #packagelist .xitemcontainer {
-  background: transparent url($xwiki.getSkinFile('icons/silk/package.gif')) no-repeat scroll 5px 0.5em;
+  background: transparent url($xwiki.getSkinFile('icons/silk/package.png')) no-repeat scroll 5px 0.5em;
   font-size: .85em;
   margin-bottom: .2em;
   padding: .3em 0 .3em 1em;
@@ -82,7 +82,7 @@ div.loading {
 }
 
 #packagelistcontainer .deletelink {
-  background: url($xwiki.getSkinFile('icons/silk/cross.gif')) no-repeat left 0.2em;
+  background: url($xwiki.getSkinFile('icons/silk/cross.png')) no-repeat left 0.2em;
   display: block;
   height: 1.4em;
   width: 16px;
@@ -164,7 +164,7 @@ ul.package li.xitem div.xitemcontainer img {
 }
 
 ul.package li.xitem div.xitemcontainer div.spacename {
-  background: transparent url($xwiki.getSkinFile('icons/silk/folder.gif')) no-repeat scroll 0 .1em ;
+  background: transparent url($xwiki.getSkinFile('icons/silk/folder.png')) no-repeat scroll 0 .1em ;
   cursor: pointer;
   font-weight: bold;
 }
@@ -186,7 +186,7 @@ ul.pages li.xitem {
 }
 
 .documentName{
-  background: transparent url($xwiki.getSkinFile('icons/silk/page_white_text.gif')) no-repeat scroll 0 0;
+  background: transparent url($xwiki.getSkinFile('icons/silk/page_white_text.png')) no-repeat scroll 0 0;
   padding-left: 20px;
 }
 

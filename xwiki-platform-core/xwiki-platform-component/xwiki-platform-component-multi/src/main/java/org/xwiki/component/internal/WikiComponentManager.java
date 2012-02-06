@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -65,6 +66,6 @@ public class WikiComponentManager extends AbstractGenericComponentManager implem
     @Override
     protected String getKey()
     {
-        return this.documentAccessBridge.getCurrentWiki();
+        return "wiki:" + this.documentAccessBridge.getCurrentWiki();
     }
 }

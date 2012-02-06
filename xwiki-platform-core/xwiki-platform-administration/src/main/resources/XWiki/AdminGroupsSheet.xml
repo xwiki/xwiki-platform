@@ -68,9 +68,9 @@
     &lt;tr&gt;
       &lt;td class="xwiki-livetable-pagination" colspan="2"&gt;
         &lt;span id="groupstable-limits" class="xwiki-livetable-limits"&gt;&lt;/span&gt;
-        &lt;span id="groupstable-ajax-loader" class="xwiki-livetable-loader"&gt;&lt;img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('xe.livetable.loading')" title="" /&gt;$msg.get("xe.livetable.loading")&lt;/span&gt;
+        &lt;span id="groupstable-ajax-loader" class="xwiki-livetable-loader"&gt;&lt;img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('platform.livetable.loading')" title="" /&gt;$msg.get("platform.livetable.loading")&lt;/span&gt;
         &lt;span class="pagination"&gt;
-          &lt;span id="groupstable-pagination-text" class="xwiki-livetable-pagination-text"&gt;$msg.get("xe.pagination.page")&lt;/span&gt;
+          &lt;span id="groupstable-pagination-text" class="xwiki-livetable-pagination-text"&gt;$msg.get("platform.livetable.paginationPage")&lt;/span&gt;
           &lt;span id="groupstable-pagination" class="xwiki-livetable-pagination-content" &gt;&lt;/span&gt;
         &lt;/span&gt;
       &lt;/td&gt;

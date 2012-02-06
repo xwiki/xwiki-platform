@@ -815,9 +815,9 @@ public class Util
     /**
      * Validate a XML element name. XML elements must follow these naming rules :
      * <ul>
-     * <li>Names can contain letters, numbers, and the following characters [., -, _, :].</li>
+     * <li>Names can contain letters, numbers, and the following characters [., -, _].</li>
      * <li>Names must not start with a number or punctuation character.</li>
-     * <li>Names must not start with the letters xml (or XML, or Xml, etc).</li>
+     * <li>Names must not start (case-insensitive) with the letters xml.</li>
      * <li>Names cannot contain spaces.</li>
      * </ul>
      * 
@@ -827,7 +827,7 @@ public class Util
     public static boolean isValidXMLElementName(String elementName)
     {
         if (elementName == null || elementName.equals("") || elementName.matches("(?i)^(xml).*")
-            || !elementName.matches("(^[a-zA-Z\\-\\_]+[\\w\\.\\-\\_\\:]*$)")) {
+            || !elementName.matches("(^[a-zA-Z\\_]+[\\w\\.\\-]*$)")) {
             return false;
         }
 

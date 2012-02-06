@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>Panels</web>
+<name>WorkspaceInformationPanel</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Panels.WebHome</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1303410076000</creationDate>
+<date>1303424637000</date>
+<contentUpdateDate>1303424637000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.1</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>Panels.PanelClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<category>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>category</name>
+<number>5</number>
+<prettyName>Category</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>Information|Navigation|Tools|Administration|Other</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</category>
+<content>
+<disabled>0</disabled>
+<editor>Text</editor>
+<name>content</name>
+<number>4</number>
+<prettyName>Content</prettyName>
+<rows>25</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<description>
+<disabled>0</disabled>
+<editor>Text</editor>
+<name>description</name>
+<number>3</number>
+<prettyName>Description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<type>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>type</name>
+<number>2</number>
+<prettyName>Panel type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>view|edit</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
+</class>
+<name>Panels.WorkspaceInformationPanel</name>
+<number>0</number>
+<className>Panels.PanelClass</className>
+<guid>7fabd475-d8b1-4491-a2f4-0042652659db</guid>
+<property>
+<category>Information</category>
+</property>
+<property>
+<content>{{velocity}}
+#panelheader($msg.get('workspacemanager.panel.title'))
+#set ($currentWiki = $xcontext.database)
+#set ($currentUser = $services.model.serialize($xcontext.userReference, 'default'))
+#set ($WorkspaceManager = $services.workspace)
+##
+## TODO: use a dependency check macro.
+##
+#set ($workspace = $WorkspaceManager.getWorkspace($currentWiki))
+#if (!$workspace)
+  {{error}}The current wiki is not a workspace.{{/error}}
+#else
+  #set($wikiDescriptor = $workspace.wikiDescriptor)
+  **Name**
+  $wikiDescriptor.wikiPrettyName
+  #set ($workspaceDescription = $wikiDescriptor.description)
+  #if ("$!workspaceDescription" != '')
+    **Description**
+    $workspaceDescription
+  #end
+  ----
+  ## Join/Leave
+  #if ($isGuest)
+    To join this workspace you need to be logged in.
+  #else
+    #set ($hasOwner = ($wikiDescriptor.owner.equals($currentUser)))
+    #set ($workspaceGroupDocument = $workspace.groupDocument)
+    #set ($groupsClass = "$currentWiki:XWiki.XWikiGroups")
+    #set ($currentUserGroupObject = $workspaceGroupDocument.getObject($groupsClass, 'member', $currentUser))
+    #set ($currentUserIsMember = ("$!currentUserGroupObject" != ''))
+    #if (!$currentUserIsMember)
+      ## Determine if, regardless of membership type, an existing invitation or join request exists for the current user.
+      #set ($candidateMembers = $workspaceGroupDocument.getObjects('XWiki.WorkspaceCandidateMemberClass', 'userName', $currentUser))
+      #set ($existingInvitationOrRequest = false)
+      #foreach ($candidateMember in $candidateMembers)
+        ## Use getProperty because it's an api Object.
+        #if ("$!{candidateMember.getProperty('status').value}" == 'pending')
+          ## Remember the existing invitation.
+          #set ($existingInvitationOrRequest = $candidateMember)
+          ## Stop the search.
+          #break
+        #end
+      #end
+      #set ($membershipType = $wikiDescriptor.getObject('WorkspaceManager.WorkspaceClass').getProperty('membershipType').value)
+      #set ($joinPageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'JoinWorkspaceCode'))
+      #set ($joinText = $wikiDescriptor.display('membershipType', 'view'))
+      #set ($actionLabel = false)
+      #set ($actionUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}"))
+      #if ($existingInvitationOrRequest)
+        #if ("$!{existingInvitationOrRequest.getProperty('type').value}" == 'invitation')
+          #set ($joinText = 'You have been invited to join this workspace')
+          #set ($actionLabel = 'View Invitation')
+        #else
+          #set ($joinText = 'You have requested to join this workspace')
+          #set ($actionLabel = 'Cancel Request')
+          #set ($actionUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;cancelJoinRequest=1"))
+        #end
+      #else
+        #if ($membershipType == 'request')
+          #set ($actionLabel = 'Request Join')
+        #elseif ($membershipType == 'open')
+          #set ($actionLabel = 'Join')
+        #end
+      #end
+      ## Display
+      $joinText
+      #if ($membershipType != 'invite' || "$!{existingInvitationOrRequest.getProperty('type').value}" == 'invitation')
+        (% class='buttonwrapper' %)[[$actionLabel&gt;&gt;path:$actionUrl||class='button']](%%)
+      #end
+    #elseif (!$hasOwner)
+      You are a member of this workspace
+      #set ($leavePageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'LeaveWorkspaceCode'))
+      #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiPrettyName}"))
+      (% class='buttonwrapper' %)[[Leave Workspace&gt;&gt;path:$leaveUrl||class='button']](%%)
+    #else
+      You are the owner of this workspace
+    #end
+  #end
+  ----
+  **Members**
+  #set ($workspaceGroupDocument = $workspace.groupDocument)
+  #set ($workspaceGroupMemberObjects = $workspaceGroupDocument.getObjects('XWiki.XWikiGroups'))
+  #set ($totalNrOfUsers = $workspaceGroupMemberObjects.size())
+  #set ($MAX_USERS = 12)
+  #set ($nrOfUsersToGet = $MAX_USERS)
+  #if ($totalNrOfUsers &lt; $MAX_USERS)
+    #set ($nrOfUsersToGet = $totalNrOfUsers)
+  #end
+  {{html clean='false'}}
+  #foreach ($i in [1..$nrOfUsersToGet])
+    #set ($randomMemberIndex = $mathtool.random(0, $workspaceGroupMemberObjects.size()))
+    #set ($randomMemberObject = $workspaceGroupMemberObjects.get($randomMemberIndex))
+    #set ($randomMember = "$!{randomMemberObject.getProperty('member').value}")
+    #if ("$!randomMember" != '')
+      #if ("$!randomMember" != 'XWiki.XWikiGuest')
+        &lt;a href="$xwiki.getURL($randomMember)"&gt;#smallUserAvatar($randomMember)&lt;/a&gt;
+      #else
+        #smallUserAvatar($randomMember)
+      #end
+    #end
+    ## Avoid repeating the same user.
+    #set ($discard = $workspaceGroupMemberObjects.remove($randomMemberIndex))
+  #end
+  {{/html}}
+#end
+#panelfooter()
+{{/velocity}}</content>
+</property>
+<property>
+<description>Provides information about the current workspace.</description>
+</property>
+<property>
+<name>Workspace Information</name>
+</property>
+<property>
+<type>view</type>
+</property>
+</object>
+<content>{{include document="Panels.PanelSheet" /}}</content></xwikidoc>

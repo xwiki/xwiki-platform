@@ -170,7 +170,7 @@ public class ActionFilter implements Filter
         int index = path.indexOf(PATH_SEPARATOR, 1);
 
         // We need to also get rid of the wiki name in case of a XEM in usepath mode
-        if ("1".equals(XWikiConfigurationService.getProperty("xwiki.virtual.usepath", "0", this.servletContext))) {
+        if ("1".equals(XWikiConfigurationService.getProperty("xwiki.virtual.usepath", "1", this.servletContext))) {
             if (servletPath.equals(PATH_SEPARATOR
                 + XWikiConfigurationService.getProperty("xwiki.virtual.usepath.servletpath", "wiki",
                     this.servletContext))) {

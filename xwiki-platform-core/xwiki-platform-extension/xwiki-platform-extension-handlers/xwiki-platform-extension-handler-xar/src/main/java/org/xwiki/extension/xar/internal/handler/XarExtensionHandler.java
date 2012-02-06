@@ -19,15 +19,18 @@
  */
 package org.xwiki.extension.xar.internal.handler;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.InstallException;
@@ -35,6 +38,7 @@ import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
+import org.xwiki.extension.job.Request;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
@@ -48,6 +52,8 @@ import com.xpn.xwiki.doc.merge.MergeConfiguration;
 @Named("xar")
 public class XarExtensionHandler extends AbstractExtensionHandler
 {
+    private static final String WIKI_NAMESPACEPREFIX = "wiki:";
+
     @Inject
     private Packager packager;
 
@@ -58,67 +64,98 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     @Inject
     private Logger logger;
 
-    // TODO: support question/answer with the UI to resolve conflicts
-    public void install(LocalExtension localExtension, String wiki) throws InstallException
+    /**
+     * @param extra the extra parameters associated to the action
+     * @return true of the installation of the xar extension has been triggered by a remote event
+     */
+    private boolean isRemote(Map<String, ? > extra)
     {
-        install(null, localExtension, wiki);
+        return ObjectUtils.equals(extra.get(Request.PROPERTY_REMOTE), Boolean.TRUE);
     }
 
     // TODO: support question/answer with the UI to resolve conflicts
     @Override
-    public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace)
-        throws InstallException
+    public void install(LocalExtension localExtension, String namespace, Map<String, ? > extra) throws InstallException
     {
-        // TODO
-        // 1) find all modified pages between old and new version
-        // 2) compare old version and wiki (to find pages modified by user)
-        // 3) delete pages removed in new version (even if modified ?)
-        // 4) merge xar
-        // 4.1) merge modified pages in wiki with diff between old/new version
-        // 4.2) update unmodified pages different between old and new version
+        // Only import XAR when it's a local order (otherwise it will be imported several times and the wiki will
+        // probably not be in an expected state)
+        if (!isRemote(extra)) {
+            String wiki = namespace;
 
-        // CURRENT
-
-        XarLocalExtension previousXarExtension;
-        try {
-            previousXarExtension = (XarLocalExtension) this.xarRepository.resolve(previousLocalExtension.getId());
-        } catch (ResolveException e) {
-            // Not supposed to be possible
-            throw new InstallException("Failed to get xar extension [" + previousLocalExtension.getId()
-                + "] from xar repository", e);
-        }
-
-        // Install new pages
-        install(previousXarExtension, newLocalExtension, namespace);
-
-        // Uninstall old version pages not anymore in the new version
-        Set<XarEntry> previousPages = new HashSet<XarEntry>(previousXarExtension.getPages());
-
-        List<XarEntry> newPages;
-        try {
-            XarLocalExtension newXarExtension =
-                (XarLocalExtension) this.xarRepository.resolve(newLocalExtension.getId());
-            newPages = newXarExtension.getPages();
-        } catch (ResolveException e) {
-            try {
-                newPages = this.packager.getEntries(newLocalExtension.getFile());
-            } catch (IOException e1) {
-                throw new InstallException("Failed to get xar extension [" + newLocalExtension.getId() + "] pages", e);
+            if (wiki != null) {
+                if (wiki.startsWith(WIKI_NAMESPACEPREFIX)) {
+                    wiki = wiki.substring(WIKI_NAMESPACEPREFIX.length());
+                } else {
+                    throw new InstallException("Unsupported namespace [" + namespace + "], only "
+                        + WIKI_NAMESPACEPREFIX + "wikiid format is supported");
+                }
             }
-        }
 
-        for (XarEntry entry : newPages) {
-            previousPages.remove(entry);
-        }
-
-        try {
-            this.packager.unimportPages(previousPages, namespace);
-        } catch (Exception e) {
-            this.logger.warn("Exception when cleaning pages removed since previous xar extension version", e);
+            install(null, localExtension, wiki);
         }
     }
 
-    public void install(XarLocalExtension previousExtension, LocalExtension localExtension, String wiki)
+    // TODO: support question/answer with the UI to resolve conflicts
+    @Override
+    public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace,
+        Map<String, ? > extra) throws InstallException
+    {
+        // Only import XAR when it's a local order (otherwise it will be imported several times and the wiki will
+        // probably not be in an expected state)
+        if (!isRemote(extra)) {
+            String wiki = namespace;
+
+            if (wiki != null) {
+                if (wiki.startsWith(WIKI_NAMESPACEPREFIX)) {
+                    wiki = wiki.substring(WIKI_NAMESPACEPREFIX.length());
+                } else {
+                    throw new InstallException("Unsupported namespace [" + namespace + "], only "
+                        + WIKI_NAMESPACEPREFIX + "wikiid format is supported");
+                }
+            }
+
+            XarLocalExtension previousXarExtension;
+            try {
+                previousXarExtension = (XarLocalExtension) this.xarRepository.resolve(previousLocalExtension.getId());
+            } catch (ResolveException e) {
+                // Not supposed to be possible
+                throw new InstallException("Failed to get xar extension [" + previousLocalExtension.getId()
+                    + "] from xar repository", e);
+            }
+
+            // Install new pages
+            install(previousXarExtension, newLocalExtension, wiki);
+
+            // Uninstall old version pages not anymore in the new version
+            Set<XarEntry> previousPages = new HashSet<XarEntry>(previousXarExtension.getPages());
+
+            List<XarEntry> newPages;
+            try {
+                XarLocalExtension newXarExtension =
+                    (XarLocalExtension) this.xarRepository.resolve(newLocalExtension.getId());
+                newPages = newXarExtension.getPages();
+            } catch (ResolveException e) {
+                try {
+                    newPages = this.packager.getEntries(new File(newLocalExtension.getFile().getAbsolutePath()));
+                } catch (IOException e1) {
+                    throw new InstallException("Failed to get xar extension [" + newLocalExtension.getId() + "] pages",
+                        e);
+                }
+            }
+
+            for (XarEntry entry : newPages) {
+                previousPages.remove(entry);
+            }
+
+            try {
+                this.packager.unimportPages(previousPages, wiki);
+            } catch (Exception e) {
+                this.logger.warn("Exception when cleaning pages removed since previous xar extension version", e);
+            }
+        }
+    }
+
+    private void install(XarLocalExtension previousExtension, LocalExtension localExtension, String wiki)
         throws InstallException
     {
         // TODO: should be configurable
@@ -126,30 +163,48 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
         // import xar into wiki (add new version when the page already exists)
         try {
-            this.packager.importXAR(previousExtension != null ? new XarFile(previousExtension.getFile(),
-                previousExtension.getPages()) : null, localExtension.getFile(), wiki, mergeConfiguration);
+            this.packager.importXAR(previousExtension != null ? new XarFile(new File(previousExtension.getFile()
+                .getAbsolutePath()), previousExtension.getPages()) : null, new File(localExtension.getFile()
+                .getAbsolutePath()), wiki, mergeConfiguration);
         } catch (Exception e) {
             throw new InstallException("Failed to import xar for extension [" + localExtension + "]", e);
         }
     }
 
-    public void uninstall(LocalExtension localExtension, String namespace) throws UninstallException
+    @Override
+    public void uninstall(LocalExtension localExtension, String namespace, Map<String, ? > extra)
+        throws UninstallException
     {
-        // TODO: delete pages from the wiki which belong only to this extension (several extension could have some
-        // common pages which will cause all sort of other issues but still could happen technically)
+        // Only remove XAR when it's a local order (otherwise it will be deleted several times and the wiki will
+        // probably not be in an expected state)
+        if (!isRemote(extra)) {
+            String wiki = namespace;
 
-        // TODO: maybe remove only unmodified page ? At least ask for sure when question/answer system will be
-        // implemented
+            if (wiki != null) {
+                if (wiki.startsWith(WIKI_NAMESPACEPREFIX)) {
+                    wiki = wiki.substring(WIKI_NAMESPACEPREFIX.length());
+                } else {
+                    throw new UninstallException("Unsupported namespace [" + namespace + "], only "
+                        + WIKI_NAMESPACEPREFIX + "wikiid format is supported");
+                }
+            }
 
-        try {
-            XarLocalExtension xarLocalExtension =
-                (XarLocalExtension) this.xarRepository.resolve(localExtension.getId());
-            List<XarEntry> pages = xarLocalExtension.getPages();
-            this.packager.unimportPages(pages, namespace);
-        } catch (Exception e) {
-            // Not supposed to be possible
-            throw new UninstallException("Failed to get xar extension [" + localExtension.getId()
-                + "] from xar repository", e);
+            // TODO: delete pages from the wiki which belong only to this extension (several extension could have some
+            // common pages which will cause all sort of other issues but still could happen technically)
+
+            // TODO: maybe remove only unmodified page ? At least ask for sure when question/answer system will be
+            // implemented
+
+            try {
+                XarLocalExtension xarLocalExtension =
+                    (XarLocalExtension) this.xarRepository.resolve(localExtension.getId());
+                List<XarEntry> pages = xarLocalExtension.getPages();
+                this.packager.unimportPages(pages, wiki);
+            } catch (Exception e) {
+                // Not supposed to be possible
+                throw new UninstallException("Failed to get xar extension [" + localExtension.getId()
+                    + "] from xar repository", e);
+            }
         }
     }
 }

@@ -51,7 +51,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .more-actions .edit-all {
   display: block;
   padding: 2px 18px;
-  background: transparent url("$xwiki.getSkinFile('icons/silk/pencil.gif')") left top no-repeat;
+  background: transparent url("$xwiki.getSkinFile('icons/silk/pencil.png')") left top no-repeat;
 }
 
 /* Object editor */
@@ -120,11 +120,11 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 }
 .xobject-title .delete {
   right: 0;
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
 .xobject-title .edit {
   right: 16px;
-  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')");
 }
 
 /* XProperty definition */
@@ -184,20 +184,20 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 #body .collapsable .xobject-title h3,
 #body .collapsable .xclass-title,
 #body .collapsable .xproperty-title {
-  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_minus.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_minus.png')");
   background-position: 0px center;
   background-repeat: no-repeat;
 }
 #body .collapsed .xobject-title h3,
 #body .collapsed .xclass-title,
 #body .collapsed .xproperty-title {
-  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_plus.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_plus.png')");
 }
 .xclass.collapsed .xclass-content, .xobject.collapsed .xobject-content, .xproperty.collapsed .xproperty-content {
   display: none;
 }
 .collapsable dt .collapser {
-  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_minus.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_minus.png')");
   background-position: -4px center;
   background-repeat: no-repeat;
   cursor: default;
@@ -213,7 +213,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   margin-left: -10px;
 }
 .collapsable dt .collapsed {
-  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_plus.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_plus.png')");
 }
 /* Disabled/Deprecated */
 .disabled {
@@ -229,7 +229,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   font-weight: 900;
   display: inline-block;
   padding: 2px 0 2px 22px;
-  background: transparent url("$xwiki.getSkinFile('icons/silk/cross.gif')") left center no-repeat;
+  background: transparent url("$xwiki.getSkinFile('icons/silk/cross.png')") left center no-repeat;
   margin-left: -22px;
 }
 /* XProperty tools */
@@ -248,7 +248,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   text-indent: -9999px;
 }
 .xproperty-title .tools .delete {
-  background-image: url($xwiki.getSkinFile('icons/silk/cross.gif'));
+  background-image: url($xwiki.getSkinFile('icons/silk/cross.png'));
 }
 .xproperty-title .tools .move {
   background-image: url($xwiki.getSkinFile('icons/datamodel/move.png'));
@@ -295,7 +295,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   background-image: url("$xwiki.getSkinFile('icons/datamodel/password.png')");
 }
 #add_xproperty {
-  background: transparent url("$xwiki.getSkinFile('icons/silk/bullet_add.gif')") left center no-repeat;
+  background: transparent url("$xwiki.getSkinFile('icons/silk/bullet_add.png')") left center no-repeat;
   padding-left: 14px;
   margin-left: 16px;
 }
@@ -329,7 +329,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .add_xobject-title {
   width: auto;
   font-style: italic;
-  background: transparent url("$xwiki.getSkinFile('icons/silk/bullet_add.gif')") no-repeat left center;
+  background: transparent url("$xwiki.getSkinFile('icons/silk/bullet_add.png')") no-repeat left center;
   display: inline;
   color: $theme.linkColor;
   font-size: 80%;

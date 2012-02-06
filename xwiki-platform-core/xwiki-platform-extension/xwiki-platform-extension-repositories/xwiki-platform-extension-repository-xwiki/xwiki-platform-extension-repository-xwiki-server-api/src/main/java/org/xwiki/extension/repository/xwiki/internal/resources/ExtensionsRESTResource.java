@@ -20,6 +20,7 @@
 
 package org.xwiki.extension.repository.xwiki.internal.resources;
 
+import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -28,6 +29,7 @@ import javax.ws.rs.QueryParam;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.xwiki.Resources;
 import org.xwiki.extension.repository.xwiki.model.jaxb.Extensions;
+import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 
 /**
@@ -36,12 +38,31 @@ import org.xwiki.query.QueryException;
  */
 @Component("org.xwiki.extension.repository.xwiki.internal.resources.ExtensionsRESTResource")
 @Path(Resources.EXTENSIONS)
+@Singleton
 public class ExtensionsRESTResource extends AbstractExtensionRESTResource
 {
     @GET
     public Extensions getExtensions(@QueryParam(Resources.QPARAM_LIST_START) @DefaultValue("0") Integer offset,
-        @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number) throws QueryException
+        @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number,
+        @QueryParam(Resources.QPARAM_LIST_REQUIRETOTALHITS) @DefaultValue("true") boolean requireTotalHits)
+        throws QueryException
     {
-        return getExtensionSummaries(createExtensionsSummariesQuery(null, null, offset, number, false));
+        Extensions extensions = this.objectFactory.createExtensions();
+
+        if (requireTotalHits) {
+            Query countQuery = createExtensionsCountQuery(null, null);
+
+            extensions.setTotalHits((int) getExtensionsCountResult(countQuery));
+        } else {
+            extensions.setTotalHits(-1);
+        }
+
+        extensions.setOffset(offset);
+
+        Query query = createExtensionsSummariesQuery(null, null, offset, number, false);
+
+        getExtensionSummaries(extensions.getExtensionSummaries(), query);
+
+        return extensions;
     }
 }

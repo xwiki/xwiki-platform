@@ -27,11 +27,7 @@ package org.xwiki.observation.remote.converter;
  */
 public abstract class AbstractEventConverter implements LocalEventConverter, RemoteEventConverter
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.LocalEventConverter#getPriority()
-     */
+    @Override
     public int getPriority()
     {
         return 1000;

@@ -22,7 +22,7 @@ package org.xwiki.extension.job;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Proxy used to simplify execution of tasks.
+ * Proxy used to simplify execution of jobs.
  * 
  * @version $Id$
  */
@@ -30,39 +30,27 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface JobManager
 {
     /**
-     * @return the task currently running or the lastest task
+     * @return the job currently running or the latest job
      */
     Job getCurrentJob();
 
     /**
-     * Start an extension installation task.
-     * <p>
-     * It's the same as calling {@link #executeJob(String, Request)} with identifier "install".
+     * Start a new job with the provided identifier.
      * 
+     * @param jobType the role hint of the job component
      * @param request the request
-     * @return the created install task
-     * @throws JobException error when trying to run install task
+     * @return the created job
+     * @throws JobException error when trying to run the job
      */
-    Job install(InstallRequest request) throws JobException;
+    Job executeJob(String jobType, Request request) throws JobException;
 
     /**
-     * Start an extension uninstall task.
-     * <p>
-     * It's the same as calling {@link #executeJob(String, Request)} with identifier "uninstall".
+     * Add a new job in the queue of jobs to execute.
      * 
+     * @param jobType the role hint of the job component
      * @param request the request
-     * @return the created uninstall task
-     * @throws JobException error when trying to run uninstall task
+     * @return the created job
+     * @throws JobException error when trying to run the job
      */
-    Job uninstall(UninstallRequest request) throws JobException;
-
-    /**
-     * Start a new task with teh provided identifier.
-     * 
-     * @param taskId the role hint of the task component
-     * @param request the request
-     * @return the created task
-     * @throws JobException error when trying to run the task
-     */
-    Job executeJob(String taskId, Request request) throws JobException;
+    Job addJob(String jobType, Request request) throws JobException;
 }

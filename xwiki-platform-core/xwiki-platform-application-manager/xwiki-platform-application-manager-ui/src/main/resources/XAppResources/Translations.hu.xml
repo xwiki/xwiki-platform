@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XAppResources</web>
+<name>Translations</name>
+<language>hu</language>
+<defaultLanguage>en</defaultLanguage>
+<translation>1</translation>
+<parent>XAppResources.WebHome</parent>
+<creator></creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1192218584000</creationDate>
+<date>1278346254000</date>
+<contentUpdateDate>1278346254000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>## XWiki Translation for language hu generated from http://www.l10n.xwiki.org
+#Wed Dec 07 22:47:25 CET 2011
+</content></xwikidoc>

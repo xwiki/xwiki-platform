@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -64,13 +65,9 @@ public class UserComponentManager extends AbstractGenericComponentManager implem
         setInternalParent(this.wikiComponentManager);
     }
 
-    /**
-     * {@inheritDoc}
-     * @see AbstractGenericComponentManager#getKey()
-     */
     @Override
     protected String getKey()
     {
-        return this.documentAccessBridge.getCurrentUser();
+        return "user:" + this.documentAccessBridge.getCurrentUser();
     }
 }

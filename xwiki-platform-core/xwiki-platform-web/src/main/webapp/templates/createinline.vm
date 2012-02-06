@@ -124,7 +124,101 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
 ## ---------------------------------------------------------------------------------------------------------
 ## Get the list of available template providers, computed in the action and set on the context
 ## ---------------------------------------------------------------------------------------------------------
-#set($availableTemplateProviders = $createAvailableTemplates)
+#set($availableTemplateProviders = $util.getArrayList())
+#foreach($tpDoc in $createAvailableTemplates)
+  #set ($tpObj = $tpDoc.getObject('XWiki.TemplateProviderClass'))
+  #if ("$!{tpObj.getProperty('type').value}" == $tocreate || ("$!{tpObj.getProperty('type').value}" == '' && $tocreate == 'page'))
+    #set ($discard = $availableTemplateProviders.add($tpDoc))
+  #end
+#end
+## ---------------------------------------------------------------------------------------------------------
+## Macro for displaying the available templates and changing target space rules accordingly
+## ---------------------------------------------------------------------------------------------------------
+#macro (displayTemplateChoice)
+    ## ---------------------------------------------------------------------------------------------------------
+    ## Template field
+    ## ---------------------------------------------------------------------------------------------------------
+    #if(!$availableTemplateProviders.isEmpty() && $templateProvider == '' && $template == '')
+      #set($jsSpaceInclusionValidationContainer = $util.getArrayList())
+      <dl>
+        <dt>
+          <label>$msg.get('core.create.template')</label>
+          <span class="xHint">$msg.get("core.create.$!{tocreate}.template.hint")</span>
+        </dt>
+        <dd>
+          <label for="xwiki-create-form-0" class="xwiki-form-listclass">
+            <input id="xwiki-create-form-0" type="radio" name="templateprovider" value="" checked="checked"/>
+            $msg.get("core.create.${tocreate}.template.empty")
+          </label>
+          #set($discard = $jsSpaceInclusionValidationContainer.add(['xwiki-create-form-0', [], '']))
+          #foreach($tpdoc in $availableTemplateProviders)
+            #set ($tpobj = $tpdoc.getObject('XWiki.TemplateProviderClass'))
+            #set($inputId = "xwiki-create-form-${velocityCount}")
+            <label for="$inputId" class="xwiki-form-listclass">
+              ## pass the template provider to the create action. Prepare the template provider reference
+              #set($tpdocRef = $services.model.serialize($tpdoc.documentReference, 'local'))
+              <input id="$inputId" type="radio" name="templateprovider" value="$escapetool.xml(${tpdocRef})"/>
+              ## use the template name as a translation key, to allow i18n
+              $escapetool.xml($msg.get($tpobj.getProperty('name').value))
+            </label>
+            #set($jsAllowedSpacesArray = '')## Reset previous value
+            #if ($tocreate == 'space')
+              ## TODO remove this when XWiki starts supporting nested spaces
+              #set($allowedSpaces = $util.getArrayList())
+            #else
+              #set($allowedSpaces = $tpobj.getProperty('spaces').getValue())
+              #if($space == '' && !$allowedSpaces.isEmpty())
+                #foreach($allowedSpace in $allowedSpaces)
+                  #if($velocityCount == 1)
+                    #set($jsAllowedSpacesArray = "'${allowedSpace}'")
+                  #else
+                    #set($jsAllowedSpacesArray = "$!{jsAllowedSpacesArray}, '${allowedSpace}'")
+                  #end
+                #end
+              #end
+              #if($allowedSpaces.isEmpty())
+                #set($message = '')
+              #elseif($allowedSpaces.size() == 1)
+                #set($message = $msg.get('core.create.template.allowedspace.inline', [$tpobj.getProperty('name').getValue(), $jsAllowedSpacesArray]))
+              #else
+                #set($message = $msg.get('core.create.template.allowedspaces.inline', [$tpobj.getProperty('name').getValue(), $jsAllowedSpacesArray]))
+              #end
+              #set($discard = $jsSpaceInclusionValidationContainer.add([$inputId, "[${jsAllowedSpacesArray}]", $message]))
+            #end
+          #end
+        </dd>
+      </dl>
+      ## ---------------------------------------------------------------------------------------------------------
+      ## Output JavaScript code that will update validation rules for document space (depends on template)
+      ## ---------------------------------------------------------------------------------------------------------
+      #if ($tocreate != 'space')
+        ## TODO Remove condition once XWiki supports nested spaces
+        <script type="text/javascript">
+        //<![CDATA[
+        Event.observe(document, 'xwiki:dom:loaded', function() {
+          #foreach($validator in $jsSpaceInclusionValidationContainer)
+            $("$validator.get(0)").observe('click', function() {
+              XWiki.createPage.updateSpaceValidator($validator.get(1), "$validator.get(2)");
+            }.bindAsEventListener(XWiki.createPage));
+          #end
+        });
+        //]]>
+        </script>
+      #end
+    #else
+      #if ($templateProvider != '')
+        ## if a template provider is set (e.g. when this page is displayed as a result of an error), put it in the form
+        <input type="hidden" id="template" name="templateprovider" value="$!{escapetool.xml($templateProvider)}" />
+      #elseif ($template != '')
+        ## if a template is set (to allow to get the create form from a template directly, without having to choose 
+        ## the template provider), use that template
+        <input type="hidden" id="template" name="template" value="$!{escapetool.xml($template)}" />
+      #else
+        ## finally, if none of these are set, put an empty template provider
+        <input type="hidden" id="templateprovider" name="templateprovider" value="" />
+      #end
+    #end
+#end
 ## ---------------------------------------------------------------------------------------------------------
 ## Display the form.
 ## ---------------------------------------------------------------------------------------------------------
@@ -140,78 +234,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
     ## ---------------------------------------------------------------------------------------------------------
     ## Template field
     ## ---------------------------------------------------------------------------------------------------------
-    #if(!$availableTemplateProviders.isEmpty() && $templateProvider == '' && $template == '')
-      #set($jsSpaceInclusionValidationContainer = $util.getArrayList())
-      <dl>
-        <dt>
-          <label for="page">$msg.get('core.create.template')</label>
-          <span class="xHint">$msg.get('core.create.page.template.hint')</span>
-        </dt>
-        <dd>
-          <label for="xwiki-create-form-0" class="xwiki-form-listclass">
-            <input id="xwiki-create-form-0" type="radio" name="templateprovider" value="" checked="checked"/>
-            $msg.get('core.create.template.empty')
-          </label>
-          #set($discard = $jsSpaceInclusionValidationContainer.add(['xwiki-create-form-0', [], '']))
-          #foreach($tpdoc in $availableTemplateProviders)
-            #set ($tpobj = $tpdoc.getObject('XWiki.TemplateProviderClass'))          
-            #set($inputId = "xwiki-create-form-${velocityCount}")
-            <label for="$inputId" class="xwiki-form-listclass">
-              ## pass the template provider to the create action. Prepare the template provider reference
-              #set($tpdocRef = $services.model.serialize($tpdoc.documentReference, 'local'))
-              <input id="$inputId" type="radio" name="templateprovider" value="$escapetool.xml(${tpdocRef})"/>
-              ## use the template name as a translation key, to allow i18n
-              $escapetool.xml($msg.get($tpobj.getProperty('name').value))
-            </label>
-            #set($jsAllowedSpacesArray = '')## Reset previous value
-            #set($allowedSpaces = $tpobj.getProperty('spaces').getValue())
-            #if($space == '' && !$allowedSpaces.isEmpty())
-              #foreach($allowedSpace in $allowedSpaces)
-                #if($velocityCount == 1)
-                  #set($jsAllowedSpacesArray = "'${allowedSpace}'")
-                #else
-                  #set($jsAllowedSpacesArray = "$!{jsAllowedSpacesArray}, '${allowedSpace}'")
-                #end
-              #end
-            #end
-            #if($allowedSpaces.isEmpty())
-              #set($message = '')
-            #elseif($allowedSpaces.size() == 1)
-              #set($message = $msg.get('core.create.template.allowedspace.inline', [$tpobj.getProperty('name').getValue(), $jsAllowedSpacesArray]))
-            #else
-              #set($message = $msg.get('core.create.template.allowedspaces.inline', [$tpobj.getProperty('name').getValue(), $jsAllowedSpacesArray]))
-            #end
-            #set($discard = $jsSpaceInclusionValidationContainer.add([$inputId, "[${jsAllowedSpacesArray}]", $message]))
-          #end
-        </dd>
-      </dl>
-      ## ---------------------------------------------------------------------------------------------------------
-      ## Output JavaScript code that will update validation rules for document space (depends on template)
-      ## ---------------------------------------------------------------------------------------------------------
-      <script type="text/javascript">
-      //<![CDATA[
-        Event.observe(document, 'xwiki:dom:loaded', function() {
-          #foreach($validator in $jsSpaceInclusionValidationContainer)
-            $("$validator.get(0)").observe('click', function() {
-              XWiki.createPage.updateSpaceValidator($validator.get(1), "$validator.get(2)");
-            }.bindAsEventListener(XWiki.createPage));
-          #end
-        });
-      //]]>
-      </script>
-    #else
-      #if ($templateProvider != '')
-        ## if a template provider is set (e.g. when this page is displayed as a result of an error), put it in the form
-        <input type="hidden" id="template" name="templateprovider" value="$!{escapetool.xml($templateProvider)}" />
-      #elseif ($template != '')
-        ## if a template is set (to allow to get the create form from a template directly, without having to choose 
-        ## the template provider), use that template
-        <input type="hidden" id="template" name="template" value="$!{escapetool.xml($template)}" />
-      #else
-        ## finally, if none of these are set, put an empty template provider
-        <input type="hidden" id="templateprovider" name="templateprovider" value="" />
-      #end
-    #end
+    #displayTemplateChoice()
     ## ---------------------------------------------------------------------------------------------------------
     ## Space field
     ## ---------------------------------------------------------------------------------------------------------        
@@ -273,6 +296,10 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
       </dd>
     </dl>
     <input type="hidden" name="parent" value="$!{escapetool.xml($parent)}"/>
+    ## ---------------------------------------------------------------------------------------------------------
+    ## Template field
+    ## ---------------------------------------------------------------------------------------------------------
+    #displayTemplateChoice()
   #end
   <div class="buttons">
     <span class="buttonwrapper">

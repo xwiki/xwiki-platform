@@ -43,11 +43,19 @@ public class DefaultExtensionManagerConfigurationTest extends AbstractComponentT
     }
 
     @Test
-    public void testGetRepositories() throws URISyntaxException
+    public void testGetRepositoriesWithInvalid() throws URISyntaxException
     {
         getConfigurationSource().setProperty("extension.repositories", Arrays.asList("id:type:http://url", "invalid"));
 
         Assert.assertEquals(Arrays.asList(new ExtensionRepositoryId("id", "type", new URI("http://url"))),
             this.configuration.getRepositories());
+    }
+
+    @Test
+    public void testGetRepositoriesEmpty() throws URISyntaxException
+    {
+        Assert.assertEquals(Arrays.asList(new ExtensionRepositoryId("extensions.xwiki.org", "xwiki", new URI(
+            "http://extensions.xwiki.org/xwiki/rest/")), new ExtensionRepositoryId("maven-xwiki", "maven", new URI(
+            "http://nexus.xwiki.org/nexus/content/groups/public"))), this.configuration.getRepositories());
     }
 }

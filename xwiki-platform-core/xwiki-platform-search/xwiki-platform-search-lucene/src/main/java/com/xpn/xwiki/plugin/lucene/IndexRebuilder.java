@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -145,7 +146,14 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                 if (wikis == null) {
                     this.indexUpdater.cleanIndex();
                 } else {
-                    // TODO: clean wikis listed in wikis
+                    try {
+                        IndexWriter writer = this.indexUpdater.openWriter(false);
+                        for (String wiki : wikis) {
+                            writer.deleteDocuments(new Term(IndexFields.DOCUMENT_WIKI, wiki));
+                        }
+                    } catch (IOException ex) {
+                        LOGGER.warn("Failed to clean wiki index: {}", ex.getMessage());
+                    }
                 }
             }
 

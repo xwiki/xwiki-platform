@@ -19,14 +19,15 @@
  */
 package org.xwiki.extension.job.internal;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
-import org.xwiki.extension.job.PopLevelProgressEvent;
-import org.xwiki.extension.job.PushLevelProgressEvent;
-import org.xwiki.extension.job.StepProgressEvent;
+import org.xwiki.extension.job.event.status.PopLevelProgressEvent;
+import org.xwiki.extension.job.event.status.PushLevelProgressEvent;
+import org.xwiki.extension.job.event.status.StepProgressEvent;
+import org.xwiki.extension.test.RepositoryUtil;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.AbstractComponentTestCase;
+
+import junit.framework.Assert;
 
 public class DefaultJobProgressTest extends AbstractComponentTestCase
 {
@@ -34,10 +35,15 @@ public class DefaultJobProgressTest extends AbstractComponentTestCase
 
     private DefaultJobProgress progress;
 
+    private RepositoryUtil repositoryUtil;
+
     @Override
     public void setUp() throws Exception
     {
         super.setUp();
+        this.repositoryUtil =
+            new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());
+        this.repositoryUtil.setup();
 
         this.observation = getComponentManager().lookup(ObservationManager.class);
         this.progress = new DefaultJobProgress("id");

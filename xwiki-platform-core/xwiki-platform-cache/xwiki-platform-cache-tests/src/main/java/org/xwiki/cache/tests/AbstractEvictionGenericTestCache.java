@@ -25,6 +25,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.cache.tests.CacheEntryListenerTest.EventType;
 
 /**
  * Base class for testing cache component implementation. Also test eviction.
@@ -36,11 +37,19 @@ import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 public abstract class AbstractEvictionGenericTestCache extends AbstractGenericTestCache
 {
     /**
-     * @param roleHint the role hint of the cache component implementation to test.
+     * Indicate if the cache implementation send event for evicted entries.
      */
-    protected AbstractEvictionGenericTestCache(String roleHint)
+    private boolean supportEvictionEvent;
+
+    /**
+     * @param roleHint the role hint of the cache component implementation to test.
+     * @param supportEvictionEvent indicate of the cache implementation send eviction related events
+     */
+    protected AbstractEvictionGenericTestCache(String roleHint, boolean supportEvictionEvent)
     {
         super(roleHint);
+
+        this.supportEvictionEvent = supportEvictionEvent;
     }
 
     // ///////////////////////////////////////////////////////::
@@ -63,6 +72,14 @@ public abstract class AbstractEvictionGenericTestCache extends AbstractGenericTe
 
         Cache<Object> cache = factory.newCache(conf);
 
+        CacheEntryListenerTest eventListener;
+        if (this.supportEvictionEvent) {
+            eventListener = new CacheEntryListenerTest();
+            cache.addCacheEntryListener(eventListener);
+        } else {
+            eventListener = null;
+        }
+
         Assert.assertNotNull(cache);
 
         cache.set(KEY, VALUE);
@@ -70,6 +87,12 @@ public abstract class AbstractEvictionGenericTestCache extends AbstractGenericTe
         Assert.assertEquals(VALUE, cache.get(KEY));
 
         cache.set(KEY2, VALUE2);
+
+        if (eventListener != null) {
+            Assert.assertTrue("No value has been evicted from the cache",
+                eventListener.waitForEntryEvent(EventType.REMOVE));
+            Assert.assertSame(VALUE, eventListener.getRemovedEvent().getEntry().getValue());
+        }
 
         Assert.assertNull(cache.get(KEY));
         Assert.assertEquals(VALUE2, cache.get(KEY2));

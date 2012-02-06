@@ -21,19 +21,18 @@ package com.xpn.xwiki.internal.macro;
 
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.converter.Converter;
 import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacro;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
-import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
@@ -43,8 +42,13 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.user.api.XWikiGroupService;
+import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 
 /**
  * Unit tests for {@link DefaultWikiMacro} in the context of XWiki core.
@@ -65,67 +69,122 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
     private WikiMacroManager wikiMacroManager;
 
     private Parser xwiki20Parser;
-    
-    private DocumentAccessBridge mockDocBridge;
-    
+
     private XWikiDocument wikiMacroDocument;
+
+    private XWikiDocument user;
 
     @Override
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
-        
-        // Script setup.
-        ScriptMockSetup scriptMockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
-        this.mockDocBridge = scriptMockSetup.bridge;
     }
-    
+
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
-        
-        final XWiki xwiki = getMockery().mock(XWiki.class);
-        
-        getContext().setWiki(xwiki);
+
+        final XWiki mockXWiki = getMockery().mock(XWiki.class);
+        final XWikiGroupService mockXWikiGroupService = getMockery().mock(XWikiGroupService.class);
+
+        getContext().setWiki(mockXWiki);
 
         this.xwiki20Parser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
 
-        this.wikiMacroDocumentReference = new DocumentReference("wiki", "space", "macroPage");
+        this.wikiMacroDocumentReference = new DocumentReference(getContext().getDatabase(), "space", "macroPage");
         this.wikiMacroManager = getComponentManager().lookup(WikiMacroManager.class);
 
         this.wikiMacroDocument = new XWikiDocument(wikiMacroDocumentReference);
-        
-        getMockery().checking(new Expectations() {{
-            allowing(mockDocBridge).getCurrentWiki(); will(returnValue("wiki"));
-            allowing(mockDocBridge).getCurrentUser(); will(returnValue("dummy"));
 
-            // This is the document containing the wiki macro that will be put in the context available in the macro
-            // Since we're not testing it here, it can be null.
-            allowing(mockDocBridge).getDocument(wikiMacroDocumentReference); will(returnValue(wikiMacroDocument));
-            
-            allowing(xwiki).getDocument(wikiMacroDocumentReference, getContext()); will(returnValue(wikiMacroDocument));
-        }});
+        final XWikiRightService rightService = new XWikiRightServiceImpl();
+
+        this.user = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "user"));
+        this.user.setNew(false);
+        BaseObject userObject = new BaseObject();
+        userObject.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiusers"));
+        this.user.addXObject(userObject);
+
+        this.wikiMacroDocument.setCreatorReference(this.user.getAuthorReference());
+        this.wikiMacroDocument.setAuthorReference(this.user.getAuthorReference());
+        this.wikiMacroDocument.setContentAuthorReference(this.user.getAuthorReference());
+
+        // Setup an XWikiPreferences document granting programming rights to user
+        final XWikiDocument prefs =
+            new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreferences"));
+        final BaseObject mockGlobalRightObj = getMockery().mock(BaseObject.class);
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockXWiki).getDocument(with(equal(wikiMacroDocumentReference)), with(any(XWikiContext.class)));
+                will(returnValue(wikiMacroDocument));
+
+                allowing(mockXWiki).isVirtualMode();
+                will(returnValue(false));
+                allowing(mockXWiki).getLanguagePreference(with(any(XWikiContext.class)));
+                will(returnValue(null));
+                allowing(mockXWiki).getRightService();
+                will(returnValue(rightService));
+                allowing(mockXWiki).getGroupService(with(any(XWikiContext.class)));
+                will(returnValue(mockXWikiGroupService));
+
+                allowing(mockXWikiGroupService).getAllGroupsReferencesForMember(with(any(DocumentReference.class)),
+                    with(any(int.class)), with(any(int.class)), with(any(XWikiContext.class)));
+                will(returnValue(Collections.EMPTY_LIST));
+
+                allowing(mockXWiki).getDocument(with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
+                will(returnValue(prefs));
+                allowing(mockGlobalRightObj).getStringValue("levels");
+                will(returnValue("programming"));
+                allowing(mockGlobalRightObj).getStringValue("users");
+                will(returnValue(user.getFullName()));
+                allowing(mockGlobalRightObj).getIntValue("allow");
+                will(returnValue(1));
+                allowing(mockGlobalRightObj).setNumber(with(any(int.class)));
+                allowing(mockGlobalRightObj).setDocumentReference(with(any(DocumentReference.class)));
+            }
+        });
+
+        prefs.addObject("XWiki.XWikiGlobalRights", mockGlobalRightObj);
+
+        getContext().setUserReference(this.user.getDocumentReference());
     }
 
     @Test
     public void testExecuteWhenWikiMacroBinding() throws Exception
     {
-        registerWikiMacro(
-            "wikimacrobindings",
-            "{{groovy}}"
-            + "print xcontext.macro.doc"
-            + "{{/groovy}}");
+        registerWikiMacro("wikimacrobindings", "{{groovy}}" + "print xcontext.macro.doc" + "{{/groovy}}");
 
         Converter converter = getComponentManager().lookup(Converter.class);
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
-        // Note: We're putting the macro after the "Hello" text to force it as an inline macro.
         converter.convert(new StringReader("{{wikimacrobindings param1=\"value2\" param2=\"value2\"/}}"),
             Syntax.XWIKI_2_0, Syntax.XHTML_1_0, printer);
 
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.
         Assert.assertEquals("<p>" + this.wikiMacroDocument.toString() + "</p>", printer.toString());
+    }
+
+    @Test
+    public void testExecuteWhenWikiRequiringPRAfterDropPermission() throws Exception
+    {
+        registerWikiMacro("wikimacrobindings", "{{groovy}}" + "print xcontext.macro.doc" + "{{/groovy}}");
+
+        Converter converter = getComponentManager().lookup(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+
+        getContext().dropPermissions();
+        this.wikiMacroDocument.newDocument(getContext()).dropPermissions();
+
+        converter.convert(new StringReader("{{wikimacrobindings param1=\"value2\" param2=\"value2\"/}}"),
+            Syntax.XWIKI_2_0, Syntax.XHTML_1_0, printer);
+
+        // Note: We're using XHTML as the output syntax just to make it easy for asserting.
+        Assert.assertEquals("<p>" + this.wikiMacroDocument.toString() + "</p>", printer.toString());
+        Assert.assertTrue("Wiki macro did not properly restord persmission dropping", getContext()
+            .hasDroppedPermissions());
     }
 
     private void registerWikiMacro(String macroId, String macroContent) throws Exception

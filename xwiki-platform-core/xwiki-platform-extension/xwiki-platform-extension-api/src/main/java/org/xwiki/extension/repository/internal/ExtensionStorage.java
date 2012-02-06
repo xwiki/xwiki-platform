@@ -33,9 +33,10 @@ import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InvalidExtensionException;
-import org.xwiki.extension.LocalExtension;
 
 /**
  * Manipulate the extension filesystem repository storage.
@@ -48,6 +49,16 @@ public class ExtensionStorage
      * Logging tool.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionStorage.class);
+
+    /**
+     * The extension of the descriptor files.
+     */
+    private static final String DESCRIPTOR_EXT = "xed";
+
+    /**
+     * The extension of the descriptor files prefixed with dot.
+     */
+    private static final String DESCRIPTOR_SUFFIX = "." + DESCRIPTOR_EXT;
 
     /**
      * The repository.
@@ -65,15 +76,24 @@ public class ExtensionStorage
     private File rootFolder;
 
     /**
+     * Used to lookup the extension serializer.
+     */
+    private ComponentManager componentManager;
+
+    /**
      * @param repository the repository
      * @param rootFolder the repository folder
+     * @param componentManager used to lookup needed components
+     * @throws ComponentLookupException can't find ExtensionSerializer
      */
-    public ExtensionStorage(DefaultLocalExtensionRepository repository, File rootFolder)
+    public ExtensionStorage(DefaultLocalExtensionRepository repository, File rootFolder,
+        ComponentManager componentManager) throws ComponentLookupException
     {
         this.repository = repository;
         this.rootFolder = rootFolder;
+        this.componentManager = componentManager;
 
-        this.extensionSerializer = new ExtensionSerializer();
+        this.extensionSerializer = this.componentManager.lookup(ExtensionSerializer.class);
     }
 
     /**
@@ -97,7 +117,7 @@ public class ExtensionStorage
                 @Override
                 public boolean accept(File dir, String name)
                 {
-                    return name.endsWith(".xed");
+                    return name.endsWith(DESCRIPTOR_SUFFIX);
                 }
             };
 
@@ -136,9 +156,10 @@ public class ExtensionStorage
         try {
             DefaultLocalExtension localExtension = this.extensionSerializer.loadDescriptor(this.repository, fis);
 
-            localExtension.setFile(getExtensionFile(localExtension.getId(), localExtension.getType()));
+            localExtension.setDescriptorFile(descriptor);
+            localExtension.setFile(getFile(descriptor, DESCRIPTOR_EXT, localExtension.getType()));
 
-            if (!localExtension.getFile().exists()) {
+            if (!localExtension.getFile().getFile().exists()) {
                 throw new InvalidExtensionException("Failed to load local extension [" + descriptor + "]: ["
                     + localExtension.getFile() + "] file does not exists");
             }
@@ -161,10 +182,16 @@ public class ExtensionStorage
      * @throws TransformerException error when trying to save the descriptor
      * @throws IOException error when trying to save the descriptor
      */
-    protected void saveDescriptor(LocalExtension extension) throws ParserConfigurationException, TransformerException,
-        IOException
+    protected void saveDescriptor(DefaultLocalExtension extension) throws ParserConfigurationException,
+        TransformerException, IOException
     {
-        File file = getDescriptorFile(extension.getId());
+        File file = extension.getDescriptorFile();
+
+        if (file == null) {
+            file = getNewDescriptorFile(extension.getId());
+            extension.setDescriptorFile(file);
+        }
+
         FileOutputStream fos = new FileOutputStream(file);
 
         try {
@@ -179,18 +206,59 @@ public class ExtensionStorage
      * @param type the extension type
      * @return the file containing the extension
      */
-    protected File getExtensionFile(ExtensionId id, String type)
+    protected File getNewExtensionFile(ExtensionId id, String type)
     {
-        return new File(getRootFolder(), getFileName(id, type));
+        return new File(getRootFolder(), getFilePath(id, type));
     }
 
     /**
      * @param id the extension identifier
      * @return the file containing the extension descriptor
      */
-    private File getDescriptorFile(ExtensionId id)
+    private File getNewDescriptorFile(ExtensionId id)
     {
-        return new File(getRootFolder(), getFileName(id, "xed"));
+        return new File(getRootFolder(), getFilePath(id, DESCRIPTOR_EXT));
+    }
+
+    /**
+     * @param baseFile the extension file
+     * @param baseType the type of the extension
+     * @param type the type of the file to get
+     * @return the extension descriptor file
+     */
+    private File getFile(File baseFile, String baseType, String type)
+    {
+        String baseName = getBaseName(baseFile.getName(), baseType);
+
+        return new File(baseFile.getParent(), baseName + '.' + encode(type));
+    }
+
+    /**
+     * @param fileName the name of the file of the provided type
+     * @param type the type of the file
+     * @return the base name which is the name without the typed extension
+     */
+    private String getBaseName(String fileName, String type)
+    {
+        return fileName.substring(0, fileName.length() - encode(type).length() - 1);
+    }
+
+    /**
+     * @param name the file or directory name to encode
+     * @return the encoding name
+     */
+    private String encode(String name)
+    {
+        String encoded;
+        try {
+            encoded = URLEncoder.encode(name, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // Should never happen
+
+            encoded = name;
+        }
+
+        return encoded;
     }
 
     /**
@@ -200,26 +268,34 @@ public class ExtensionStorage
      * @param fileExtension the file extension
      * @return the encoded file path
      */
-    private String getFileName(ExtensionId id, String fileExtension)
+    private String getFilePath(ExtensionId id, String fileExtension)
     {
-        String fileName = id.getId() + "-" + id.getVersion() + "." + fileExtension;
-        try {
-            return URLEncoder.encode(fileName, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // Should never happen
+        String encodedId = encode(id.getId());
+        String encodedVersion = encode(id.getVersion().toString());
+        String encodedType = encode(fileExtension);
 
-            return fileName;
-        }
+        return encodedId + File.separator + encodedVersion + File.separator + encodedId + '-' + encodedVersion + '.'
+            + encodedType;
     }
 
     /**
      * Remove extension from storage.
      * 
      * @param extension extension to remove
+     * @throws IOException error when deleting the extension
      */
-    protected void removeExtension(LocalExtension extension)
+    protected void removeExtension(DefaultLocalExtension extension) throws IOException
     {
-        getExtensionFile(extension.getId(), extension.getType()).delete();
-        getDescriptorFile(extension.getId()).delete();
+        File descriptorFile = extension.getDescriptorFile();
+
+        if (descriptorFile == null) {
+            throw new IOException("Exception does not exists");
+        }
+
+        descriptorFile.delete();
+
+        DefaultLocalExtensionFile extensionFile = extension.getFile();
+
+        extensionFile.getFile().delete();
     }
 }

@@ -32,7 +32,7 @@ $xwiki.ssfx.use("js/xwiki/table/table.css")##
 #if(!$WikiManager)
   #error($msg.get("wikimanager.pluginnotenabled"))
 #end
-#if(!$xwiki.applicationmanager)
+#if(!$services.applicationmanager)
   #error($msg.get("xapp.pluginnotenabled"))
 #end
 ##

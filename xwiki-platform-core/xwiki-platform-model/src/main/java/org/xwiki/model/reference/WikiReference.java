@@ -38,7 +38,7 @@ public class WikiReference extends EntityReference
      */
     public WikiReference(EntityReference reference)
     {
-        super(reference.getName(), reference.getType());
+        super(reference);
     }
 
     /**
@@ -58,12 +58,29 @@ public class WikiReference extends EntityReference
      * @throws IllegalArgumentException if the passed type is not a wiki type
      */
     @Override
-    public void setType(EntityType type)
+    protected void setType(EntityType type)
     {
         if (type != EntityType.WIKI) {
             throw new IllegalArgumentException("Invalid type [" + type + "] for a wiki reference");
         }
 
         super.setType(EntityType.WIKI);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Overridden in order to verify the validity of the passed parent.
+     * </p>
+     *
+     * @throws IllegalArgumentException if the passed type is not a wiki type
+     */
+    @Override
+    protected void setParent(EntityReference parent)
+    {
+        super.setParent(parent);
+        if (parent != null) {
+            throw new IllegalArgumentException("Unexpected parent [" + parent + "] in a wiki reference");
+        }
     }
 }

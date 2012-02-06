@@ -152,7 +152,7 @@ isc.XWEResultTree.addMethods({
         // manage XWiki dynamic DS instantiation
         // it can't be managed with getChildDataSources since it needs the node to be created.
         var resource = XWiki.resource.get(node.id);
-        node["resource"] = resource;        
+        node["resource"] = resource;
         if (nodeDS.Class == "XWEDataSource") {
             childDSName = isc.XWEWikiDataSource.getOrCreate(resource.wiki).getID();
         } else if (nodeDS.Class == "XWEWikiDataSource") {
@@ -161,7 +161,7 @@ isc.XWEResultTree.addMethods({
             if (node["isXWikiAttachment"] == null) {
                 childDSName = isc.XWESpaceDataSource.getOrCreate(resource.wiki, resource.space).getID();
             } else {
-                childDSName = 
+                childDSName =
                     isc.XWEAttachmentsDataSource.getOrCreate(resource.wiki, resource.space, resource.name).getID();
             }
         } else if (treeRelations) {
@@ -181,14 +181,14 @@ isc.XWEResultTree.addMethods({
      * Implementation of the optional isc.ResultTree.dataArrived callback.
      */
     dataArrived : function(parentNode) {
-            
+
         var parentDS = this.getNodeDataSource(parentNode);
         var childrenDSClass = "";
         // getNodeDataSource returns null when parentNode is the root node.
         if (parentDS == null) {
           parentDS = this.getDataSource();
         }
-        
+
         // Remove blacklisted spaces.
         if (parentDS.Class == "XWEWikiDataSource" && this.displayBlacklistedSpaces == false) {
             this.filterNodesByName(this.getChildren(), XWiki.blacklistedSpaces);
@@ -220,14 +220,14 @@ isc.XWEResultTree.addMethods({
                 isNewPage: false,
                 isNewAttachment: false
             });
-            
+
             if (i == 0) {
                 // Store the children DS Class once
                 childrenDSClass = currentDS.Class;
             }
         }
 
-        if (childrenDSClass == "XWESpaceDataSource" && parentDS.Class == "XWEWikiDataSource" 
+        if (childrenDSClass == "XWESpaceDataSource" && parentDS.Class == "XWEWikiDataSource"
             && this.displayAddPage == true) {
             this.addAddPageNode(parentNode);
         }
@@ -242,7 +242,7 @@ isc.XWEResultTree.addMethods({
         if (parentNode.isXWikiAttachment && this.displayAddAttachment == true) {
             this.addAddAttachmentsNode(parentNode);
         }
-        
+
         // XWiki dataArrived callback handler.
         if (this.callbacks.dataArrived.length > 0) {
             var daCallback = this.callbacks.dataArrived.shift();
@@ -282,7 +282,7 @@ isc.XWEResultTree.addMethods({
             } else if (nodeDS.Class == "XWEAttachmentsDataSource") {
                 // If the node is an attachment it can't have children.
                 return false;
-            }            
+            }
         }
         return true;
     },
@@ -304,13 +304,13 @@ isc.XWEResultTree.addMethods({
 
     /**
      * This method loops over nodes and removes those which titles match an entry of the list of titles to filter.
-     * 
+     *
      * @param nodes Nodes to filter.
      * @param namesToFilter Array of names to filter.
      */
     filterNodesByName : function(nodes, namesToFilter) {
-        for (var i = 0; i < nodes.length; i++) {            
-            if (XWiki.blacklistedSpaces.indexOf(nodes[i].name) != -1) {                
+        for (var i = 0; i < nodes.length; i++) {
+            if (XWiki.blacklistedSpaces.indexOf(nodes[i].name) != -1) {
                 this.remove(nodes[i]);
             }
         }
@@ -325,13 +325,13 @@ isc.XWEResultTree.addMethods({
             space: node.space,
             title: isc.XWEResultTree.formatTitle(isc.XWEResultTree.constants.addPageTitle, hint),
             parentId: node.id,
-            icon: "$xwiki.getSkinFile('icons/silk/bullet_add.gif')",
+            icon: "$xwiki.getSkinFile('icons/silk/bullet_add.png')",
             resource: node.resource,
             isNewPage: true,
             isNewAttachment: false,
             clickCallback: function(viewer, node, recordNum) {
                 node.resource = XWiki.resource.get(node.resource.prefixedSpace);
-                viewer.input.value = "";                
+                viewer.input.value = "";
               }
         };
 
@@ -357,7 +357,7 @@ isc.XWEResultTree.addMethods({
             space: node.space,
             title: isc.XWEResultTree.formatTitle(isc.XWEResultTree.constants.addAttachmentTitle, hint),
             parentId: node.id,
-            icon: "$xwiki.getSkinFile('icons/silk/bullet_add.gif')",
+            icon: "$xwiki.getSkinFile('icons/silk/bullet_add.png')",
             resource: node.resource,
             isNewPage: false,
             isNewAttachment: true,
@@ -427,7 +427,7 @@ isc.XWEResultTree.addMethods({
                 parentId: node.id,
                 xwikiRelativeURL: node.xwikiRelativeURL + XWiki.constants.anchorSeparator +
                                   XWiki.constants.docextraAttachmentsAnchor,
-                icon: "$xwiki.getSkinFile('icons/silk/page_white_zip.gif')",
+                icon: "$xwiki.getSkinFile('icons/silk/page_white_zip.png')",
                 resource: XWiki.resource.get(node.id + XWiki.constants.anchorSeparator +
                                             XWiki.constants.docextraAttachmentsAnchor),
                 isXWikiAttachment: true,
@@ -488,13 +488,17 @@ isc.XWEDataSource.addProperties({
     /*
      * XWiki Explorer (XWE) per-DataSource type (will be overriden) options.
      */
-    icon : "$xwiki.getSkinFile('icons/silk/database.gif')",
+    icon : "$xwiki.getSkinFile('icons/silk/database.png')",
 
     /**
      * Properties passed to the RPCManager when request are performed.
      */
     requestProperties : {
-        promptStyle: "cursor"
+        promptStyle: "cursor",
+        // Prevent the RPCManager from displaying a warning message every time a request fails. This is especially
+        // annoying when we try to open the tree to a page that doesn't exist.
+        // See http://www.smartclient.com/smartgwtee/javadoc/com/smartgwt/client/rpc/RPCRequest.html#getWillHandleError()
+        willHandleError: true
     },
 
     /**
@@ -507,10 +511,19 @@ isc.XWEDataSource.addProperties({
 });
 
 /**
- * Implement optional transformRequest callback to add a random parameter to each request to overcome IE cache. 
+ * Implement optional transformRequest callback to add a random parameter to each request to overcome IE cache.
  */
 isc.XWEDataSource.addMethods({
     transformRequest : function(dsRequest) {
+        // We override ISC default Accept headers because we are hitting this bug in Restlet
+        // JAX-RS extension : http://restlet.tigris.org/issues/show_bug.cgi?id=730
+        // Precisely, the default ISC DataSource AJAX request sends the following accept header :
+        // text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8,application/rdf+xml;q=0.93,text/rdf+n3;q=0.5
+        // And Restlet chokes with "No message body writer found" while it has all the info necessary to use the XML writer.
+        // FIXME Remove this when the issue is fixed upstream in restlet JAX-RS or when we switch to another
+        // JAX-RS implementation.
+        dsRequest.httpHeaders = { "Accept" : "application/xml" };
+
         if (dsRequest.originalData) {
             dsRequest.originalData.r = "" + Math.floor(Math.random() * 1000000);
         }
@@ -550,8 +563,8 @@ isc.XWEWikiDataSource.addProperties({
         { name:"name", required: true, type: "text" },
         { name:"title", type: "text" },
         { name:"xwikiRelativeUrl", type: "text" }
-    ],    
-    icon : "$xwiki.getSkinFile('icons/silk/folder.gif')"
+    ],
+    icon : "$xwiki.getSkinFile('icons/silk/folder.png')"
 });
 
 isc.XWEWikiDataSource.addMethods({
@@ -599,8 +612,8 @@ isc.XWESpaceDataSource.addProperties({
         { name:"parent", required: true, type: "text" },
         { name:"xwikiRelativeUrl", type: "text" },
         { name:"link", propertiesOnly: true }
-    ],    
-    icon : "$xwiki.getSkinFile('icons/silk/page_white_text.gif')"
+    ],
+    icon : "$xwiki.getSkinFile('icons/silk/page_white_text.png')"
 });
 
 isc.XWESpaceDataSource.addMethods({
@@ -658,7 +671,7 @@ isc.XWEPageDataSource.addProperties({
         { name:"parent", required: true, type: "text" },
         { name:"link", propertiesOnly: true }
     ],
-    icon : "$xwiki.getSkinFile('icons/silk/page_white_text.gif')"
+    icon : "$xwiki.getSkinFile('icons/silk/page_white_text.png')"
 });
 
 isc.XWEPageDataSource.addMethods({
@@ -696,7 +709,7 @@ isc.XWEAttachmentsDataSource.addProperties({
         { name:"title", type: "text" },
         { name:"xwikiRelativeUrl", type: "text" }
     ],
-    icon : "$xwiki.getSkinFile('icons/silk/attach.gif')"
+    icon : "$xwiki.getSkinFile('icons/silk/attach.png')"
 });
 
 isc.XWEAttachmentsDataSource.addMethods({
@@ -736,7 +749,7 @@ isc.XWETreeGrid.addProperties({
     },
     // Style:
     showHeader: false, // Hide the sort header.
-    folderIcon : "$xwiki.getSkinFile('icons/silk/database.gif')", // Icon to use, will be overriden by datasources.
+    folderIcon : "$xwiki.getSkinFile('icons/silk/database.png')", // Icon to use, will be overriden by datasources.
     position : "relative", // CSS position.
     dropIconSuffix : "", // Keep the same icon for all states (opened, closed, etc).
     openIconSuffix : "", // Keep the same icon for all states (opened, closed, etc).
@@ -797,7 +810,7 @@ isc.XWETreeGrid.addMethods({
     },
 
     /**
-     * Invalidate Cache needs to be overwritten to also invalidate the input cached value. 
+     * Invalidate Cache needs to be overwritten to also invalidate the input cached value.
      */
     invalidateCache : function() {
         this.Super("invalidateCache", arguments);
@@ -885,7 +898,7 @@ isc.XWETreeGrid.addMethods({
                             this.openParent(rt, parentRes);
                         }
                     } else {
-                        if (this.displayAddPage == true) {                            
+                        if (this.displayAddPage == true) {
                             var addPageNode = this.getData().findById(resource.prefixedSpace
                                     + isc.XWEResultTree.constants.addNodeSuffix);
                             addPageNode.resource = resource;
@@ -894,6 +907,10 @@ isc.XWETreeGrid.addMethods({
                     }
                 }.bind(this);
                 // FetchData call, this method will load the REST resource we've defined above. Note the fetchCallback.
+                pageDS.transformRequest = function(dsRequest) {
+                  // Work around bug in Restlet JAX-RS extension. See XWEDataSource#transformRequest for more details.
+                  dsRequest.httpHeaders = { 'Accept' : 'application/xml' };
+                };
                 pageDS.fetchData(null, fetchCallback, null);
             } else {
                 // Get the parent/child relationship from the cache and open the parent.
@@ -925,32 +942,32 @@ isc.XWETreeGrid.addMethods({
         var resource = XWiki.resource.get(this.input.value);
         var selectedRes = XWiki.resource.get("");
         var rt = this.getData();
-        
+
         // Get selectedResource from the selected node if any.
         if (this.getSelectedRecord() != null) {
             selectedRes = this.getSelectedRecord().resource;
         }
-        
-        // Open wiki node if the tree is displaying multiple wikis.        
-        if (currentDSClass == "XWEDataSource") {            
+
+        // Open wiki node if the tree is displaying multiple wikis.
+        if (currentDSClass == "XWEDataSource") {
             var wikiNode = this.openNode(rt, resource.wiki, true);
             if (wikiNode == null) {
                 return;
             }
         }
-        
-        if (currentDSClass == "XWEDataSource" || currentDSClass == "XWEWikiDataSource") {         
+
+        if (currentDSClass == "XWEDataSource" || currentDSClass == "XWEWikiDataSource") {
             // Unselect previously selected node if space differs.
             if (resource.space != selectedRes.space) {
                 this.deselectRecord(this.getSelectedRecord());
-            }        
-        
+            }
+
             // Open space node.
             var spaceNode = this.openNode(rt, resource.prefixedSpace, true);
             if (spaceNode == null) {
                return;
             }
-        }         
+        }
 
         // Open page node.
         var pageNode = this.openNode(rt, resource.prefixedFullName, true);
@@ -987,7 +1004,7 @@ isc.XWETreeGrid.addMethods({
      */
     inputObserver : function() {
         var inputValue = this.input.value;
-        // If the value of the input has changed during the last 2s.        
+        // If the value of the input has changed during the last 2s.
         if (inputValue != "" && inputValue != this.inputValueCache) {
             // Open nodes.
             this.openNodesFromInput();
@@ -1049,7 +1066,7 @@ isc.XWETreeGrid.addMethods({
                     this.createList(this.aSuggestions);
                 };
             };
-            Event.observe(input, "focus", inputFocus);            
+            Event.observe(input, "focus", inputFocus);
 
             // Call inputObserver for the first time when the first set of data arrives.
             // The method will be called every 2s after that.
@@ -1082,19 +1099,19 @@ isc.XWETreeGrid.addMethods({
         if (node.clickCallback == null) {
             var resId = node.id;
             // If the resource is a wiki, add :Main.WebHome to the resource id.
-            if (!resId.include(XWiki.constants.wikiSpaceSeparator) 
+            if (!resId.include(XWiki.constants.wikiSpaceSeparator)
                     && this.getData().getNodeDataSource(node).Class == "XWEDataSource") {
-                resId = resId + XWiki.constants.wikiSpaceSeparator + "Main" 
+                resId = resId + XWiki.constants.wikiSpaceSeparator + "Main"
                           + XWiki.constants.spacePageSeparator + "WebHome";
-            }            
+            }
             // If the resource is a space, add .WebHome to the resource id.
-            if (!resId.include(XWiki.constants.spacePageSeparator) 
+            if (!resId.include(XWiki.constants.spacePageSeparator)
                     && this.getData().getNodeDataSource(node).Class == "XWEWikiDataSource") {
-                resId = resId + XWiki.constants.spacePageSeparator + "WebHome";             
+                resId = resId + XWiki.constants.spacePageSeparator + "WebHome";
             }
             // If there's only the current wiki in the tree, remove the wiki prefix (ex: "xwiki:").
-            if (this.getDataSource().Class != "XWEDataSource") { 
-                resId = resId.substring(resId.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, resId.length);                
+            if (this.getDataSource().Class != "XWEDataSource") {
+                resId = resId.substring(resId.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, resId.length);
             }
             // If the resource is located in the current space, remove the space prefix (ex: "Main.")
             if (node.resource["space"] == XWiki.currentSpace) {
@@ -1133,7 +1150,7 @@ isc.XWETreeGrid.addMethods({
     },
 
     /**
-     * Get a property from the selected resource (ex: wiki, space, page, etc). 
+     * Get a property from the selected resource (ex: wiki, space, page, etc).
      */
     getSelectedResourceProperty : function(propertyName) {
         var value = this.getValue();

@@ -165,7 +165,7 @@ public class BaseObjectReference extends ObjectReference
      * @see org.xwiki.model.reference.EntityReference#setName(java.lang.String)
      */
     @Override
-    public void setName(String name)
+    protected void setName(String name)
     {
         super.setName(name);
 

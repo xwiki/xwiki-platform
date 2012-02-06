@@ -36,6 +36,9 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 import org.reflections.vfs.Vfs;
 
 import com.google.common.base.Predicates;
@@ -63,13 +66,20 @@ public class ExtensionPackager
 
     public void generateExtensions() throws IOException
     {
-        Reflections reflections = new Reflections(PACKAGEFILE_PACKAGE, new ResourcesScanner());
+        Set<URL> urls = ClasspathHelper.forPackage(PACKAGEFILE_PACKAGE);
 
-        Set<String> descriptors = reflections.getResources(Predicates.equalTo(PACKAGEFILE_DESCRIPTOR));
+        if (!urls.isEmpty()) {
+            Reflections reflections =
+                new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner()).setUrls(urls)
+                    .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(PACKAGEFILE_PACKAGE))));
 
-        for (String descriptor : descriptors) {
-            String classPackageFolder = descriptor.substring(0, descriptor.length() - PACKAGEFILE_DESCRIPTOR.length());
-            generateExtension(classPackageFolder, getClass().getClassLoader().getResource(descriptor));
+            Set<String> descriptors = reflections.getResources(Predicates.equalTo(PACKAGEFILE_DESCRIPTOR));
+
+            for (String descriptor : descriptors) {
+                String classPackageFolder =
+                    descriptor.substring(0, descriptor.length() - PACKAGEFILE_DESCRIPTOR.length());
+                generateExtension(classPackageFolder, getClass().getClassLoader().getResource(descriptor));
+            }
         }
     }
 
@@ -113,11 +123,13 @@ public class ExtensionPackager
             }
 
             packageFile = new File(this.workingDirectory, directory);
-            packageFile.mkdirs();
             packageFile = new File(packageFile, fileName);
         }
 
         // generate
+
+        // Make sure the folder exists
+        packageFile.getParentFile().mkdirs();
 
         FileOutputStream fos = new FileOutputStream(packageFile);
         try {

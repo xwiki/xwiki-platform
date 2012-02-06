@@ -19,17 +19,14 @@
  */
 package org.xwiki.extension.job.internal;
 
-import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionDependency;
-import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
@@ -37,36 +34,32 @@ import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
-import org.xwiki.extension.internal.VersionManager;
 import org.xwiki.extension.job.InstallRequest;
-import org.xwiki.extension.repository.CoreExtensionRepository;
-import org.xwiki.extension.repository.ExtensionRepositoryManager;
+import org.xwiki.extension.job.Job;
+import org.xwiki.extension.job.Request;
+import org.xwiki.extension.job.plan.ExtensionPlan;
+import org.xwiki.extension.job.plan.ExtensionPlanAction;
+import org.xwiki.extension.job.plan.ExtensionPlanAction.Action;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
+import org.xwiki.logging.LogLevel;
+import org.xwiki.logging.event.LogEvent;
 
 /**
  * Extension installation related task.
  * <p>
- * This task is taking care of discovering automatically if the extension need to be upgraded instead of installed. It
- * also generated related events.
+ * This task generates related events.
  * 
  * @version $Id$
  */
 @Component
-@Named("install")
-public class InstallJob extends AbstractJob<InstallRequest>
+@Named(InstallJob.JOBTYPE)
+public class InstallJob extends AbstractExtensionJob<InstallRequest>
 {
     /**
-     * Used to resolve extensions to install.
+     * The id of the job.
      */
-    @Inject
-    private ExtensionRepositoryManager repositoryManager;
-
-    /**
-     * Used to check if extension or its dependencies are already core extensions.
-     */
-    @Inject
-    private CoreExtensionRepository coreExtensionRepository;
+    public static final String JOBTYPE = "install";
 
     /**
      * Used to manipulate local extension repository.
@@ -75,184 +68,91 @@ public class InstallJob extends AbstractJob<InstallRequest>
     private LocalExtensionRepository localExtensionRepository;
 
     /**
-     * Used to compare version of upgraded extensions.
-     */
-    @Inject
-    private VersionManager versionManager;
-
-    /**
      * Used to install the extension itself depending of its type.
      */
     @Inject
     private ExtensionHandlerManager extensionHandlerManager;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.internal.AbstractJob#start()
+     * Used to generate the install plan.
      */
+    @Inject
+    @Named(InstallPlanJob.JOBTYPE)
+    private Job installPlanJob;
+
+    @Override
+    public String getType()
+    {
+        return JOBTYPE;
+    }
+
+    @Override
+    protected InstallRequest castRequest(Request request)
+    {
+        InstallRequest installRequest;
+        if (request instanceof InstallRequest) {
+            installRequest = (InstallRequest) request;
+        } else {
+            installRequest = new InstallRequest(request);
+        }
+
+        return installRequest;
+    }
+
     @Override
     protected void start() throws Exception
     {
-        List<ExtensionId> extensions = getRequest().getExtensions();
-
-        notifyPushLevelProgress(extensions.size());
+        notifyPushLevelProgress(3);
 
         try {
-            for (ExtensionId extensionId : extensions) {
-                if (getRequest().hasNamespaces()) {
-                    List<String> namespaces = getRequest().getNamespaces();
+            // Create the plan
 
-                    notifyPushLevelProgress(namespaces.size());
+            this.installPlanJob.start(getRequest());
 
-                    try {
-                        for (String namespace : namespaces) {
-                            installExtension(extensionId, namespace);
+            ExtensionPlan plan = (ExtensionPlan) this.installPlanJob.getStatus();
 
-                            notifyStepPropress();
-                        }
-                    } finally {
-                        notifyPopLevelProgress();
-                    }
-                } else {
-                    installExtension(extensionId, null);
-                }
-
-                notifyStepPropress();
+            List<LogEvent> log = plan.getLog(LogLevel.ERROR);
+            if (!log.isEmpty()) {
+                throw new InstallException("Failed to create install plan: " + log.get(0).getFormattedMessage(), log
+                    .get(0).getThrowable());
             }
-        } finally {
-            notifyPopLevelProgress();
-        }
-    }
-
-    /**
-     * Install provided extension.
-     * 
-     * @param extensionId the identifier of the extension to install
-     * @param namespace the namespace where to install the extension
-     * @return the newly installed local extension
-     * @throws InstallException error when trying to install provided extension
-     */
-    public LocalExtension installExtension(ExtensionId extensionId, String namespace) throws InstallException
-    {
-        return installExtension(extensionId, false, namespace);
-    }
-
-    /**
-     * Install provided extension.
-     * 
-     * @param extensionId the identifier of the extension to install
-     * @param dependency indicate if the extension is installed as a dependency
-     * @param namespace the namespace where to install the extension
-     * @return the newly installed local extension
-     * @throws InstallException error when trying to install provided extension
-     */
-    private LocalExtension installExtension(ExtensionId extensionId, boolean dependency, String namespace)
-        throws InstallException
-    {
-        if (this.coreExtensionRepository.exists(extensionId.getId())) {
-            throw new InstallException(MessageFormat.format("[{0}]: core extension", extensionId.getId()));
-        }
-
-        if (namespace != null) {
-            this.logger.info("Installing extension [{}] on namespace [{}]", extensionId, namespace);
-        } else {
-            this.logger.info("Installing extension [{}]", extensionId);
-        }
-
-        LocalExtension previousExtension = null;
-
-        LocalExtension localExtension =
-            this.localExtensionRepository.getInstalledExtension(extensionId.getId(), namespace);
-        if (localExtension != null) {
-            int diff =
-                this.versionManager.compareVersions(extensionId.getVersion(), localExtension.getId().getVersion());
-
-            if (diff == 0) {
-                throw new InstallException(MessageFormat.format("[{0}]: already installed", extensionId.getId()));
-            } else if (diff < 0) {
-                throw new InstallException(MessageFormat.format("[{0}]: a more recent version is already installed",
-                    extensionId.getId()));
-            } else {
-                // upgrade
-                previousExtension = localExtension;
-            }
-        }
-
-        LocalExtension installedExtension = installExtension(previousExtension, extensionId, dependency, namespace);
-
-        return installedExtension;
-    }
-
-    // TODO: support version range
-
-    /**
-     * Install provided extension dependency.
-     * 
-     * @param extensionDependency the extension dependency to install
-     * @param namespace the namespace where to install the extension
-     * @return the newly installed local extension
-     * @throws InstallException error when trying to install provided extension
-     */
-    private LocalExtension installExtensionDependency(ExtensionDependency extensionDependency, String namespace)
-        throws InstallException
-    {
-        if (this.coreExtensionRepository.exists(extensionDependency.getId())) {
-            return null;
-        }
-
-        if (namespace != null) {
-            this.logger.info("Installing extension dependency [{}] on namespace [{}]", extensionDependency, namespace);
-        } else {
-            this.logger.info("Installing extension dependency [{}]", extensionDependency);
-        }
-
-        LocalExtension previousExtension = null;
-
-        LocalExtension localExtension =
-            this.localExtensionRepository.getInstalledExtension(extensionDependency.getId(), namespace);
-        if (localExtension != null) {
-            int diff =
-                this.versionManager.compareVersions(extensionDependency.getVersion(), localExtension.getId()
-                    .getVersion());
-
-            if (diff > 0) {
-                // upgrade
-                previousExtension = localExtension;
-            } else {
-                return null;
-            }
-        }
-
-        return installExtension(previousExtension,
-            new ExtensionId(extensionDependency.getId(), extensionDependency.getVersion()), true, namespace);
-    }
-
-    /**
-     * Install provided extension.
-     * 
-     * @param previousExtension the previous installed version of the extension to install
-     * @param extensionId the identifier of the extension to install
-     * @param dependency indicate if the extension is installed as a dependency
-     * @param namespace the namespace where to install the extension
-     * @return the newly installed local extension
-     * @throws InstallException error when trying to install provided extension
-     */
-    private LocalExtension installExtension(LocalExtension previousExtension, ExtensionId extensionId,
-        boolean dependency, String namespace) throws InstallException
-    {
-        notifyPushLevelProgress(2);
-
-        try {
-            // Check is the extension is already in local repository
-            Extension extension = resolveExtension(extensionId);
 
             notifyStepPropress();
 
+            // Apply the plan
+
+            Collection<ExtensionPlanAction> actions = plan.getActions();
+
+            // Download all extensions
+
+            notifyPushLevelProgress(actions.size());
+
             try {
-                return installExtension(previousExtension, extension, dependency, namespace);
-            } catch (Exception e) {
-                throw new InstallException("Failed to install extension", e);
+                for (ExtensionPlanAction action : actions) {
+                    store(action);
+
+                    notifyStepPropress();
+                }
+            } finally {
+                notifyPopLevelProgress();
+            }
+
+            notifyStepPropress();
+
+            // Install all extensions
+
+            notifyPushLevelProgress(actions.size());
+
+            try {
+                for (ExtensionPlanAction action : actions) {
+                    if (action.getAction() != Action.NONE) {
+                        applyAction(action);
+                    }
+
+                    notifyStepPropress();
+                }
+            } finally {
+                notifyPopLevelProgress();
             }
         } finally {
             notifyPopLevelProgress();
@@ -260,89 +160,98 @@ public class InstallJob extends AbstractJob<InstallRequest>
     }
 
     /**
-     * @param extensionId the identifier of the extension to install
-     * @return the extension
-     * @throws InstallException error when trying to resolve extension
+     * @param action the action containing the extension to download
+     * @throws LocalExtensionRepositoryException failed to store extension
+     * @throws InstallException unsupported action
      */
-    private Extension resolveExtension(ExtensionId extensionId) throws InstallException
+    private void store(ExtensionPlanAction action) throws LocalExtensionRepositoryException, InstallException
     {
-        // Check is the extension is already in local repository
-        Extension extension;
-        try {
-            extension = this.localExtensionRepository.resolve(extensionId);
-        } catch (ResolveException e) {
-            this.logger.debug("Can't find extension in local repository, trying to download it.", e);
-
-            // Resolve extension
-            try {
-                extension = this.repositoryManager.resolve(extensionId);
-            } catch (ResolveException e1) {
-                throw new InstallException(MessageFormat.format("Failed to resolve extension [{0}]", extensionId), e1);
-            }
+        if (action.getAction() == Action.INSTALL || action.getAction() == Action.UPGRADE) {
+            storeExtension(action.getExtension());
         }
-
-        return extension;
     }
 
     /**
-     * @param previousExtension the previous installed version of the extension to install
-     * @param extension the new extension to install
-     * @param dependency indicate if the extension is installed as a dependency
-     * @param namespace the namespace where to install the extension
-     * @return the newly installed local extension
-     * @throws ComponentLookupException failed to find proper {@link org.xwiki.extension.handler.ExtensionHandler}
-     * @throws InstallException error when trying to install provided extension
-     * @throws LocalExtensionRepositoryException error when storing extension
+     * @param extension the extension to store
+     * @throws LocalExtensionRepositoryException failed to store extension
      */
-    private LocalExtension installExtension(LocalExtension previousExtension, Extension extension, boolean dependency,
-        String namespace) throws ComponentLookupException, InstallException, LocalExtensionRepositoryException
+    private void storeExtension(Extension extension) throws LocalExtensionRepositoryException
     {
-        for (ExtensionDependency dependencyDependency : extension.getDependencies()) {
-            installExtensionDependency(dependencyDependency, namespace);
+        if (!(extension instanceof LocalExtension)) {
+            this.localExtensionRepository.storeExtension(extension);
+        }
+    }
+
+    /**
+     * @param extension the extension
+     * @param previousExtension the previous extension when upgrading
+     * @param namespace the namespace in which to perform the action
+     * @param dependency indicate if the extension has been installed as dependency
+     * @throws InstallException failed to install extension
+     */
+    private void installExtension(LocalExtension extension, LocalExtension previousExtension, String namespace,
+        boolean dependency) throws InstallException
+    {
+        if (previousExtension == null) {
+            this.extensionHandlerManager.install(extension, namespace, getExtraHandlerParameters());
+
+            this.localExtensionRepository.installExtension(extension, namespace, dependency);
+
+            this.observationManager.notify(new ExtensionInstalledEvent(extension.getId(), namespace), extension);
+        } else {
+            this.extensionHandlerManager.upgrade(previousExtension, extension, namespace, getExtraHandlerParameters());
+
+            try {
+                this.localExtensionRepository.uninstallExtension(previousExtension, namespace);
+            } catch (UninstallException e) {
+                this.logger.error("Failed to uninstall extension [" + previousExtension + "]", e);
+            }
+
+            this.localExtensionRepository.installExtension(extension, namespace, dependency);
+
+            this.observationManager.notify(new ExtensionUpgradedEvent(extension.getId(), namespace), extension,
+                previousExtension);
+        }
+    }
+
+    /**
+     * @param action the action to perform
+     * @throws InstallException failed to install extension
+     * @throws LocalExtensionRepositoryException failed to store extension
+     * @throws ResolveException could not find extension in the local repository
+     */
+    private void applyAction(ExtensionPlanAction action) throws InstallException, LocalExtensionRepositoryException,
+        ResolveException
+    {
+        if (action.getAction() != Action.INSTALL && action.getAction() != Action.UPGRADE) {
+            throw new InstallException("Unsupported action [" + action.getAction() + "]");
+        }
+
+        Extension extension = action.getExtension();
+        String namespace = action.getNamespace();
+
+        if (namespace != null) {
+            this.logger.info("Installing extension [{}] on namespace [{}]", extension, namespace);
+        } else {
+            this.logger.info("Installing extension [{}]", extension);
         }
 
         notifyPushLevelProgress(2);
 
         try {
             // Store extension in local repository
-            LocalExtension localExtension;
-            if (extension instanceof LocalExtension) {
-                localExtension = (LocalExtension) extension;
-            } else {
-                localExtension = this.localExtensionRepository.storeExtension(extension);
-            }
+            LocalExtension localExtension = (LocalExtension) this.localExtensionRepository.resolve(extension.getId());
 
             notifyStepPropress();
 
-            if (previousExtension != null) {
-                this.extensionHandlerManager.upgrade(previousExtension, localExtension, namespace);
-
-                try {
-                    this.localExtensionRepository.uninstallExtension(previousExtension, namespace);
-                } catch (UninstallException e) {
-                    this.logger.error("Failed to uninstall extension [" + previousExtension + "]", e);
-                }
-
-                this.localExtensionRepository.installExtension(localExtension, namespace, dependency);
-
-                this.observationManager.notify(new ExtensionUpgradedEvent(localExtension.getId()), localExtension,
-                    previousExtension);
-            } else {
-                this.extensionHandlerManager.install(localExtension, namespace);
-
-                this.localExtensionRepository.installExtension(localExtension, namespace, dependency);
-
-                this.observationManager.notify(new ExtensionInstalledEvent(localExtension.getId()), localExtension,
-                    previousExtension);
-            }
+            // Install
+            installExtension(localExtension, action.getPreviousExtension(), namespace, action.isDependency());
 
             if (namespace != null) {
                 this.logger.info("Successfully installed extension [{}] on namespace [{}]", localExtension, namespace);
             } else {
                 this.logger.info("Successfully installed extension [{}]", localExtension);
             }
-
-            return localExtension;
         } finally {
             notifyPopLevelProgress();
         }

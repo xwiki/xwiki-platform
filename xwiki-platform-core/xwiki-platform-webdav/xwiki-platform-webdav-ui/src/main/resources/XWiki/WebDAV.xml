@@ -32,8 +32,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1231841324000</creationDate>
-<date>1236074871000</date>
-<contentUpdateDate>1236074871000</contentUpdateDate>
+<date>1325884514000</date>
+<contentUpdateDate>1325884514000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -41,7 +41,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.1</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -55,6 +55,7 @@
 <validationScript></validationScript>
 <cache>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>cache</name>
@@ -69,6 +70,7 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </cache>
 <code>
+<disabled>0</disabled>
 <name>code</name>
 <number>2</number>
 <prettyName>Code</prettyName>
@@ -78,6 +80,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </code>
 <name>
+<disabled>0</disabled>
 <name>name</name>
 <number>1</number>
 <prettyName>Name</prettyName>
@@ -86,6 +89,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
 <parse>
+<disabled>0</disabled>
 <displayFormType>select</displayFormType>
 <displayType>yesno</displayType>
 <name>parse</name>
@@ -96,6 +100,7 @@
 </parse>
 <use>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>use</name>
@@ -106,7 +111,7 @@
 <separators> ,|</separators>
 <size>1</size>
 <unmodifiable>0</unmodifiable>
-<values>onDemand=On demand|always=Always</values>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </use>
 </class>
@@ -170,7 +175,9 @@ XWiki.WebDAV = {
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));</code>
-</property><property><name>WebDAVJSX</name>
+</property>
+<property>
+<name>WebDAVJSX</name>
 </property>
 <property>
 <parse>1</parse>
@@ -179,5 +186,4 @@ return XWiki;
 <use>onDemand</use>
 </property>
 </object>
-<content>#info($msg.get('xe.webdav.info'))</content>
-</xwikidoc>
+<content>{{info}}{{velocity}}$msg.get('xe.webdav.info'){{/velocity}}{{/info}}</content></xwikidoc>

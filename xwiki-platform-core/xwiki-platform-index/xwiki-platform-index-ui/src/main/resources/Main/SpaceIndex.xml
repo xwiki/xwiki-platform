@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>Main</web>
+<name>SpaceIndex</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>Main.WebHome</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1252454400000</creationDate>
+<date>1290173191000</date>
+<contentUpdateDate>1290173191000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get("platform.index.spaceIndex")</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.WikiMacroClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>9</number>
+<prettyName>Macro code</prettyName>
+<rows>20</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<contentDescription>
+<disabled>0</disabled>
+<name>contentDescription</name>
+<number>8</number>
+<prettyName>Content description (Not applicable for "No content" type)</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</contentDescription>
+<contentType>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>contentType</name>
+<number>7</number>
+<prettyName>Macro content type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator>|</separator>
+<separators>|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>Optional|Mandatory|No content</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</contentType>
+<defaultCategory>
+<disabled>0</disabled>
+<name>defaultCategory</name>
+<number>4</number>
+<prettyName>Default category</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultCategory>
+<description>
+<disabled>0</disabled>
+<name>description</name>
+<number>3</number>
+<prettyName>Macro description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<id>
+<disabled>0</disabled>
+<name>id</name>
+<number>1</number>
+<prettyName>Macro id</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</id>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>2</number>
+<prettyName>Macro name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<supportsInlineMode>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>supportsInlineMode</name>
+<number>5</number>
+<prettyName>Supports inline mode</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</supportsInlineMode>
+<visibility>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>visibility</name>
+<number>6</number>
+<prettyName>Macro visibility</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator>|</separator>
+<separators>|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>Current User|Current Wiki|Global</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</visibility>
+</class>
+<name>Main.SpaceIndex</name>
+<number>0</number>
+<className>XWiki.WikiMacroClass</className>
+<guid>3b41888d-d9b1-4f4b-b790-16c880aaf332</guid>
+<property>
+<code>{{velocity}}
+  ## TODO: add me a parameter to specify the style, list or livetable
+  ## get the number of documents to display
+  #set ($limit = $xcontext.macro.params.get('count'))
+  #if ("$!limit" == '')
+    ## 100 documents displayed by default if no value is specified
+    #set ($limit = '100')
+  #end
+  #set ($limit = $util.parseInt($limit))
+  ## get the space to display the documents for
+  #set ($spaceParam = $doc.space)
+  #set ($spaceMacroParam = $xcontext.macro.params.get('space'))
+  #if ("$!spaceMacroParam" != '')
+    #set ($spaceParam = $spaceMacroParam)
+  #end
+  #set ($docNames = $xwiki.searchDocuments('where doc.space=? order by doc.creationDate desc', $limit, 0, [${spaceParam}]))
+  {{html}}
+    #displayDocumentList($docNames false []) 
+    ## Note: we pass an empty blacklistedSpaces list since we are used as a space dashboard, not a global dashboard
+  {{/html}}
+
+  #if ($docNames.size() == $limit)
+    #set ($docCount = $xwiki.countDocuments('where doc.space=?', [${spaceParam}]))
+    #set ($remaining = $mathtool.sub($docCount, $limit))
+    #if ($remaining &gt; 0)
+    (% class="documentListMore" %) (((
+    // $msg.get('xe.dashboard.space.remainingDocumentsInSpace', [$remaining, $spaceParam])
+       [[$msg.get('xe.dashboard.space.visitSpaceIndex')&gt;&gt;Main.SpaceIndex?space=$spaceParam]] //
+    )))
+    #end
+  #end
+  ##
+  ## Document creation.
+  ##
+  ## Only if the current user has edit rights.
+  #if ($hasCreatePage)
+  {{html}}
+    &lt;ul class="xlist"&gt;
+      &lt;li class="page create"&gt;&lt;a href="$doc.getURL('create')"&gt;$msg.get('platform.index.spaceIndexDocumentListCreate')&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  {{/html}}
+  #end
+{{/velocity}}
+</code></property><property><contentDescription></contentDescription></property><property><contentType>No content</contentType>
+</property>
+<property>
+<defaultCategory>Navigation</defaultCategory>
+</property>
+<property>
+<description>Lists the documents in a space.</description>
+</property>
+<property>
+<id>spaceindex</id>
+</property>
+<property>
+<name>Space Index</name>
+</property>
+<property>
+<supportsInlineMode>0</supportsInlineMode>
+</property>
+<property>
+<visibility>Current Wiki</visibility>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.WikiMacroParameterClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultValue>
+<disabled>0</disabled>
+<name>defaultValue</name>
+<number>4</number>
+<prettyName>Parameter default value</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultValue>
+<description>
+<disabled>0</disabled>
+<name>description</name>
+<number>2</number>
+<prettyName>Parameter description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<mandatory>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>mandatory</name>
+<number>3</number>
+<prettyName>Parameter mandatory</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</mandatory>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Parameter name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+</class>
+<name>Main.SpaceIndex</name>
+<number>0</number>
+<className>XWiki.WikiMacroParameterClass</className>
+<guid>c041a13d-a9f3-4625-bce5-fb00d9e22387</guid>
+<property>
+<defaultValue>100</defaultValue>
+</property>
+<property>
+<description>The maximum number of documents to display. By default, up to 100 documents will be listed. If all documents should be displayed, pass 0.</description>
+</property>
+<property>
+<mandatory>0</mandatory>
+</property>
+<property>
+<name>count</name>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.WikiMacroParameterClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultValue>
+<disabled>0</disabled>
+<name>defaultValue</name>
+<number>4</number>
+<prettyName>Parameter default value</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultValue>
+<description>
+<disabled>0</disabled>
+<name>description</name>
+<number>2</number>
+<prettyName>Parameter description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<mandatory>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>mandatory</name>
+<number>3</number>
+<prettyName>Parameter mandatory</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</mandatory>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Parameter name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+</class>
+<name>Main.SpaceIndex</name>
+<number>1</number>
+<className>XWiki.WikiMacroParameterClass</className>
+<guid>8944c531-e4f2-45e0-b3e3-18b5b0aa713a</guid>
+<property>
+<defaultValue></defaultValue>
+</property>
+<property>
+<description>The space to display the list of documents for. If missing, the current space will be used.</description>
+</property>
+<property>
+<mandatory>0</mandatory>
+</property>
+<property>
+<name>space</name>
+</property>
+</object>
+<content>{{velocity}}
+#if("$!request.space" != "") #set($space=$request.space) #else #set($space = $doc.space) #end
+$msg.get('platform.index.spaceIndexDescription', [$space])
+#set($collist = ["doc.name","doc.date", "doc.author", "_actions"])
+#set($colprops = {
+                   "doc.name" : { "type" : "text" , "size" : 30, "link" : "view"}, 
+                   "doc.date" : { "type" : "date" },
+                   "doc.author" : { "type" : "text", "link" : "author"},
+                   "_actions" : {"actions": ["copy","delete","rename","rights"]}
+                 })
+#set($options = { "translationPrefix" : "platform.index.",
+                  "rowCount": 15,
+                  "extraParams" : "&amp;space=$escapetool.url($space)" })
+#livetable("spaceindex" $collist $colprops $options)
+{{/velocity}}</content></xwikidoc>

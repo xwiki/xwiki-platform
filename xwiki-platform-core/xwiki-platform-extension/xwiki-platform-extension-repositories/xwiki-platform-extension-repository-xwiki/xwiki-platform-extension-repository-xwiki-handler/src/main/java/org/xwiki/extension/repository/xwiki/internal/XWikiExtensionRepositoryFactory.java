@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.ExtensionLicenseManager;
+import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryException;
 import org.xwiki.extension.repository.ExtensionRepositoryFactory;
@@ -42,6 +43,9 @@ public class XWikiExtensionRepositoryFactory implements ExtensionRepositoryFacto
 {
     @Inject
     private ExtensionLicenseManager licenseManager;
+
+    @Inject
+    private ExtensionManagerConfiguration configuration;
 
     private Marshaller marshaller;
 
@@ -75,7 +79,7 @@ public class XWikiExtensionRepositoryFactory implements ExtensionRepositoryFacto
     public ExtensionRepository createRepository(ExtensionRepositoryId repositoryId) throws ExtensionRepositoryException
     {
         try {
-            return new XWikiExtensionRepository(repositoryId, this, this.licenseManager);
+            return new XWikiExtensionRepository(repositoryId, this, this.licenseManager, this.configuration);
         } catch (Exception e) {
             throw new ExtensionRepositoryException("Failed to create repository [" + repositoryId + "]", e);
         }

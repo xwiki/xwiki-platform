@@ -25,7 +25,9 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.event.CancelableEvent;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroLookupException;
@@ -53,27 +55,19 @@ public class NestedScriptMacroValidatorListener extends AbstractScriptCheckerLis
     @Inject
     private MacroManager macroManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return "nestedscriptmacrovalidator";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractScriptCheckerListener#check(CancelableEvent, MacroTransformationContext, ScriptMacroParameters)
-     */
     @Override
     protected void check(CancelableEvent event, MacroTransformationContext context, ScriptMacroParameters parameters)
     {
         // Traverse the XDOM tree up to the root
         if (context.getCurrentMacroBlock() != null) {
-            MacroMarkerBlock parent = context.getCurrentMacroBlock().getParentBlockByType(MacroMarkerBlock.class);
+            MacroMarkerBlock parent = context.getCurrentMacroBlock().getFirstBlock(
+                new ClassBlockMatcher(MacroMarkerBlock.class), Block.Axes.ANCESTOR);
             while (parent != null) {
                 String parentId = parent.getId();
                 try {
@@ -92,7 +86,7 @@ public class NestedScriptMacroValidatorListener extends AbstractScriptCheckerLis
                 } catch (MacroLookupException exception) {
                     // Shouldn't happen, the parent macro was already successfully executed earlier
                 }
-                parent = parent.getParentBlockByType(MacroMarkerBlock.class);
+                parent = parent.getFirstBlock(new ClassBlockMatcher(MacroMarkerBlock.class), Block.Axes.ANCESTOR);
             }
         }
     }

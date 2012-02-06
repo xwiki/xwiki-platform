@@ -19,29 +19,25 @@
  */
 package org.xwiki.extension.repository.aether.internal;
 
+import org.sonatype.aether.graph.Dependency;
 import org.xwiki.extension.AbstractExtensionDependency;
+import org.xwiki.extension.version.InvalidVersionRangeException;
+import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 
 public class AetherExtensionDependency extends AbstractExtensionDependency
 {
-    private String groupId;
+    private Dependency aetherDependency;
 
-    private String artifactId;
-
-    public AetherExtensionDependency(String groupId, String artifactId, String version)
+    public AetherExtensionDependency(Dependency aetherDependency) throws InvalidVersionRangeException
     {
-        super(groupId + ':' + artifactId, version);
+        super(AetherUtils.createExtensionId(aetherDependency.getArtifact()).getId(), new DefaultVersionConstraint(
+            aetherDependency.getArtifact().getVersion()));
 
-        this.groupId = groupId;
-        this.artifactId = artifactId;
+        this.aetherDependency = aetherDependency;
     }
 
-    public String getGroupId()
+    public Dependency getAetherDependency()
     {
-        return groupId;
-    }
-
-    public String getArtifactId()
-    {
-        return artifactId;
+        return this.aetherDependency;
     }
 }

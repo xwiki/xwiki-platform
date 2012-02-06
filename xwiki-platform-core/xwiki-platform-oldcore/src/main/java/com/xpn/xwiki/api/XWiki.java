@@ -1480,7 +1480,8 @@ public class XWiki extends Api
      * API to copy a translation of a document to another document of the same name in another wiki additionally
      * resetting the version and overwriting the previous document
      * 
-     * @param docname source document
+     * @param docname source document name
+     * @param targetdocname target document name
      * @param sourceWiki source wiki
      * @param targetWiki target wiki
      * @param wikilanguage language to copy
@@ -1494,12 +1495,14 @@ public class XWiki extends Api
     {
         DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
         if (!StringUtils.isEmpty(sourceWiki)) {
-            sourceDocumentReference.setWikiReference(new WikiReference(sourceWiki));
+            sourceDocumentReference = sourceDocumentReference.replaceParent(
+                sourceDocumentReference.getWikiReference(), new WikiReference(sourceWiki));
         }
 
         DocumentReference targetDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(targetdocname);
         if (!StringUtils.isEmpty(targetWiki)) {
-            targetDocumentReference.setWikiReference(new WikiReference(targetWiki));
+            targetDocumentReference = targetDocumentReference.replaceParent(
+                targetDocumentReference.getWikiReference(), new WikiReference(targetWiki));
         }
 
         return this.copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset, force);

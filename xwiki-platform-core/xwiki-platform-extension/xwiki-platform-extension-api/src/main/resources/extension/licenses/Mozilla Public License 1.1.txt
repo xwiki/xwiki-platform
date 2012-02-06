@@ -1,4 +1,3 @@
-.alias=Mozilla Public License
                           MOZILLA PUBLIC LICENSE
                                 Version 1.1
 

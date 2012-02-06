@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension</artifactId>
-    <version>3.3-SNAPSHOT</version>
+    <version>3.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-api</artifactId>
   <name>XWiki Platform - Extension - API</name>
@@ -65,6 +65,11 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-api</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-container-api</artifactId>
       <version>${project.version}</version>
@@ -77,7 +82,7 @@
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
-    
+
     <!-- Core extensions -->
     <dependency>
       <groupId>org.reflections</groupId>
@@ -115,6 +120,12 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-logging-logback</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   
   <build>
@@ -143,8 +154,12 @@
         <configuration>
           <excludes>
               **/DefaultCoreExtensionScanner.java,
+              **/DefaultExtensionRepositoryManager.java,
+              **/DefaultExtensionSerializer.java,
               **/DefaultLocalExtensionRepository.java,
-              **/ExtensionSerializer.java
+              **/DefaultVersion.java,
+              **/InstallPlanJob.java,
+              **/UnmodifiableUtils.java
           </excludes>
         </configuration>
       </plugin>

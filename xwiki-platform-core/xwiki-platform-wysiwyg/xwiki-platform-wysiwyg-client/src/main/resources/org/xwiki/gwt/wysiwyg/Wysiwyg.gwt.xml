@@ -27,7 +27,7 @@
   <stylesheet src="stylesheets/Wysiwyg.css" />
   <entry-point class="org.xwiki.gwt.wysiwyg.client.Wysiwyg" />
 
-  <extend-property name="locale" values="ca,de,es,fr,it,lv,ru,sk,sv,zh,zh_TW" />
+  <extend-property name="locale" values="ca,cs,de,es,fr,it,lv,ru,sk,sv,zh,zh_TW" />
 
   <!-- Custom linker that adds the document type declaration to the generated permutations. -->
   <define-linker name="StandardsMode" class="org.xwiki.gwt.core.linker.StandardsModeIFrameLinker" />
@@ -46,11 +46,6 @@
   <!-- LinePlugin -->
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />
-  </replace-with>
-
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.MozillaLinePlugin">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />
-    <when-property-is name="user.agent" value="gecko1_8" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.IELinePlugin">

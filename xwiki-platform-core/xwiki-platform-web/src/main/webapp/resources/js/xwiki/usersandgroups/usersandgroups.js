@@ -393,9 +393,9 @@ function displayUsersAndGroups(row, i, table, idx, form_token)
       var td = document.createElement('td');
       td.className = "rights";
       var r = 0;
-      if (allows.indexOf(right) >= 0) {
+      if (allows.match("\\b" + right + "\\b")) {
         r = 1;
-      } else if (denys.indexOf(right) >= 0) {
+      } else if (denys.match("\\b" + right + "\\b")) {
         r = 2;
       }
       var chbx = new MSCheckbox(td, right, saveUrl, r, table, i);

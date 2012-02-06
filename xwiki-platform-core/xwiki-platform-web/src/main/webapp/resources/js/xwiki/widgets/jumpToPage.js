@@ -60,7 +60,7 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
         // Prefixed with & since the current (as of 1.7) Suggest code does not automatically append it.
         varname: "q",
         noresults: "$msg.get('core.viewers.jump.suggest.noResults')",
-        icon: "${xwiki.getSkinFile('icons/silk/page_white_text.gif')}",
+        icon: "${xwiki.getSkinFile('icons/silk/page_white_text.png')}",
         json: true,
         resultsParameter : "searchResults",
         resultId : "id",

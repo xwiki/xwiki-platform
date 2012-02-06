@@ -75,7 +75,7 @@
       ## Less than 40 pages in the wiki, probably a fresh install (16/07/08 : XWiki creates 21 pages at startup)
       #set ($URLhost = 'http://maven.xwiki.org')
       #set ($URLgroup = 'org/xwiki/enterprise')
-      #set ($URLartifact = 'xwiki-enterprise-wiki')
+      #set ($URLartifact = 'xwiki-enterprise-ui-all')
       #set ($URLversion = $xwiki.getVersion())
       #if ($URLversion.endsWith('-SNAPSHOT'))
         #set ($URL = "${URLhost}/snapshots/${URLgroup}/${URLartifact}/$URLversion/")

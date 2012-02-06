@@ -29,7 +29,7 @@ import org.xwiki.observation.event.filter.FixedNameEventFilter;
  * @version $Id$
  * @since 2.6RC2
  */
-public class AbstractAnnotationEvent extends AbstractDocumentEvent
+public abstract class AbstractAnnotationEvent extends AbstractDocumentEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class

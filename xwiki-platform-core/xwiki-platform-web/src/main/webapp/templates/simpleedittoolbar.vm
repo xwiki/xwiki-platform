@@ -2,7 +2,7 @@
 <script type="text/javascript">
 ## Syntax elements is a list of: [identifier, start markup, end markup, image name].
 ## The identifier is used to display the button title, and the sample text.
-## The image is retrieved from /resources/icons/silk/imageName.gif
+## The image is retrieved from /resources/icons/silk/imageName.png
 #set($syntax10Elements = [])
 #set($discard = $syntax10Elements.add(['bold', '*', '*', 'text_bold']))
 #set($discard = $syntax10Elements.add(['italics', '~~', '~~', 'text_italic']))
@@ -47,7 +47,7 @@
 // <![CDATA[
 document.writeln("<div class='leftmenu2'>");
 #foreach($item in $syntaxElements)
-  #set($imageFile = $xwiki.getSkinFile("icons/silk/${item.get(3)}.gif"))
+  #set($imageFile = $xwiki.getSkinFile("icons/silk/${item.get(3)}.png"))
   #set($speedTip = $msg.get("core.edit.wikiToolbar.${item.get(0)}").replaceAll("'", "\\'"))
   #set($tagOpen = ${item.get(1)})
   #set($tagClose = ${item.get(2)})

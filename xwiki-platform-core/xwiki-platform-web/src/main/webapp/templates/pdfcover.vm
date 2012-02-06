@@ -1,6 +1,6 @@
 <div style="text-align: center; width: 100%;">
 <h1>
-#set ($title = "$!pdfdoc.display('title', 'rendered')")
+#set ($title = "$!pdfdoc.display('title', 'rendered', '', $pdfobj)")
 #if ($title == '')
   $escapetool.xml($!tdoc.plainTitle)
 #else
@@ -9,7 +9,7 @@
 </h1>
 <br />
 <br />
-$!xwiki.getUserName($tdoc.author, false)
+<p class="author">$!xwiki.getUserName($tdoc.author, false)</p>
 <br />
-$!xwiki.formatDate($tdoc.date)
+<p class="date">$!xwiki.formatDate($tdoc.date)</p>
 </div>

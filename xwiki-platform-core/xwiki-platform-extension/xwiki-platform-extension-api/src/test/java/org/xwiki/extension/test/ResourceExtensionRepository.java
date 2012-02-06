@@ -23,30 +23,38 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Collections;
 
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.internal.DefaultLocalExtension;
 import org.xwiki.extension.repository.internal.ExtensionSerializer;
+import org.xwiki.extension.repository.result.CollectionIterableResult;
+import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.version.Version;
+import org.xwiki.extension.version.internal.DefaultVersion;
 
-public class ResourceExtensionRepository implements ExtensionRepository
+public class ResourceExtensionRepository extends AbstractExtensionRepository implements ExtensionRepository
 {
     private ExtensionSerializer extensionSerializer;
-
-    private ExtensionRepositoryId repositoryId;
 
     private ClassLoader classLoader;
 
     private String baseResource;
 
-    public ResourceExtensionRepository(ClassLoader classLoader, String baseResource)
+    public ResourceExtensionRepository(ClassLoader classLoader, String baseResource, ComponentManager componentManager)
+        throws ComponentLookupException
     {
-        this.extensionSerializer = new ExtensionSerializer();
+        super(new ExtensionRepositoryId("test-resources", "resources", null));
 
-        this.repositoryId = new ExtensionRepositoryId("test-resources", "resources", null);
+        this.extensionSerializer = componentManager.lookup(ExtensionSerializer.class);
 
         this.classLoader = classLoader;
         this.baseResource = baseResource;
@@ -69,12 +77,7 @@ public class ResourceExtensionRepository implements ExtensionRepository
 
     String getPathSuffix(ExtensionId extensionId, String type)
     {
-        return extensionId.getId() + '-' + extensionId.getVersion() + '.' + type;
-    }
-
-    public ExtensionRepositoryId getId()
-    {
-        return this.repositoryId;
+        return extensionId.getId() + '-' + extensionId.getVersion().getValue() + '.' + type;
     }
 
     public Extension resolve(ExtensionId extensionId) throws ResolveException
@@ -99,6 +102,13 @@ public class ResourceExtensionRepository implements ExtensionRepository
         }
     }
 
+    @Override
+    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    {
+        return resolve(new ExtensionId(extensionDependency.getId(), new DefaultVersion(extensionDependency
+            .getVersionConstraint().getValue())));
+    }
+
     public boolean exists(ExtensionId extensionId)
     {
         try {
@@ -106,5 +116,11 @@ public class ResourceExtensionRepository implements ExtensionRepository
         } catch (UnsupportedEncodingException e) {
             return false;
         }
+    }
+
+    @Override
+    public IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException
+    {
+        return new CollectionIterableResult<Version>(0, offset, Collections.<Version> emptyList());
     }
 }

@@ -169,8 +169,6 @@ XWiki.widgets.LiveTable = Class.create({
       }
       url += self.getSortURLFragment();
 
-      self.loadingStatus.removeClassName("hidden");
-
       // Let code know the table is about to load new entries.
       // 1. Named event (for code interested by that table only)
       document.fire("xwiki:livetable:" + this.domNodeName + ":loadingEntries");
@@ -204,7 +202,6 @@ XWiki.widgets.LiveTable = Class.create({
           }
 
           self.recvReqNo = res.reqNo;
-          self.loadingStatus.addClassName("hidden");
 
           if (self.tagCloud && res.matchingtags) {
             self.tagCloud.updateTagCloud(res.tags, res.matchingtags);
@@ -227,6 +224,10 @@ XWiki.widgets.LiveTable = Class.create({
       });
 
     }
+
+    // Make sure to set show the loading as soon as possible (instead of waiting the delay for the actual ajax request)
+    // so that it really reflect the status of the livetable
+    self.loadingStatus.removeClassName("hidden");
 
     if (typeof delay != 'undefined' && delay > 0) {
       // fire the request after a withdrawal period in which it can be cancelled
@@ -273,10 +274,10 @@ XWiki.widgets.LiveTable = Class.create({
     var f = offset + limit - 1;
     if (f > this.totalRows) f = this.totalRows;
     var off = (this.totalRows > 0) ? offset : 0;
-    var msg = "<strong>" + off + "</strong> - <strong>" + f + "</strong> $msg.get('xe.pagination.results.of') <strong>" + this.totalRows + "</strong>";
+    var msg = "<strong>" + off + "</strong> - <strong>" + f + "</strong> $msg.get('platform.livetable.paginationResultsOf') <strong>" + this.totalRows + "</strong>";
     msg = msg.toLowerCase();
 
-    this.limitsDisplay.innerHTML = "$msg.get('xe.pagination.results') " + msg;
+    this.limitsDisplay.innerHTML = "$msg.get('platform.livetable.paginationResults') " + msg;
     this.clearDisplay();
 
     for (var i = off; i <= f; i++) {
@@ -1085,7 +1086,7 @@ var LiveTableTagCloud = Class.create({
                 self.table.showRows(1, self.table.limit);
             });
          }
-         if (this.selectedTags[tagLabel] != undefined) {
+         if (typeof this.selectedTags[tagLabel] == "object") {
             tag.addClassName("selected");
          }
          var self = this;

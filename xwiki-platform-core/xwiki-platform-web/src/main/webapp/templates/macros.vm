@@ -232,10 +232,11 @@ $xwiki.getUserName("xwiki:${username}")
     #if (!$profiledoc.isNew())
       #if($profiledoc.attachmentList.size() != 0)
         #set($profileobj = $profiledoc.getObject('XWiki.XWikiUsers', 0))
-        #if($profileobj.avatar && $profileobj.avatar != "")
+        #set($avatarFileName = $profileobj.getProperty('avatar').value)
+        #if("$!avatarFileName" != "")
           #foreach ($attach in $profiledoc.attachmentList)
-            #if($attach.filename == $profileobj.avatar)
-              #set($pictureurl = $profiledoc.getAttachmentURL($profileobj.avatar))
+            #if($attach.filename == $avatarFileName)
+              #set($pictureurl = $profiledoc.getAttachmentURL($avatarFileName))
               #set($picture = "<img src='")
               #set($picture = $picture.concat($pictureurl))
               #if ($size > 0)
@@ -397,7 +398,7 @@ $xwiki.getUserName("xwiki:${username}")
       #set ($text = 'attachment')
     #end
   #end
-  <img src="${xwiki.getSkinFile("icons/silk/${image}.gif")}" alt="${msg.get("core.viewers.attachments.mime.${text}")}" title="${msg.get("core.viewers.attachments.mime.${text}")}"/>
+  <img src="${xwiki.getSkinFile("icons/silk/${image}.png")}" alt="${msg.get("core.viewers.attachments.mime.${text}")}" title="${msg.get("core.viewers.attachments.mime.${text}")}"/>
 #end
 ###
 ###    packName
@@ -1211,7 +1212,7 @@ ${Msz}Mb##
  *                  "_avatar" : { "type" : "none" , "size" : 20, "link" : "none", "html" : "true", "sortable":false }
  *                })
  * #set($options = {  "className":"XWiki.XWikiUsers",
- *                    "translationPrefix" : "xe.index.users.",
+ *                    "translationPrefix" : "platform.index.",
  *                    "tagCloud" : true,
  *                    "rowCount": 15,
  *                    "javascriptName" : "MyModule.myTable",
@@ -1248,7 +1249,7 @@ ${Msz}Mb##
   #if("$!options.selectedColumn" != '') #set($selectedColumn = $options.selectedColumn) #end
   #if("$!options.callback" != '') #set($callback = $options.callback) #end
   #if("$!options.tagCloud" == '' || $options.tagCloud == false) #set($tagcloud=false) #else #set($tagcloud = true) #end
-  #if("$!options.javascriptName" != '') #set($jsName = $options.javascriptName) #else #set($jsName = 'livetable') #end
+  #if("$!options.javascriptName" != '') #set($jsName = $options.javascriptName) #else #set($jsName = "livetable_$divid") #end
   #if("$!options.topFilters" != '') #set($topfilters = $options.topFilters) #end
   #if("$options.pageSize" == '' || $!options.pageSize == false) #set($hasPageSize=false) #else #set($hasPageSize = true) #end
   #if("$!options.pageSizeBounds" != '') #set($pageSizeBounds = $options.pageSizeBounds) #end
@@ -1304,8 +1305,8 @@ ${Msz}Mb##
     <div id="${divid}-tagcloud" class="xwiki-livetable-tagcloud-tip hidden #if($hasTopFilters)splitted#end">
       <div>
         <div class="xwiki-livetable-tagcloud-container">
-          <h2>$msg.get('xe.livetable.tags.help')
-	        <span>$msg.get('xe.livetable.tags.help.cancel')</span>
+          <h2>$msg.get('platform.livetable.tagsHelp')
+	        <span>$msg.get('platform.livetable.tagsHelpCancel')</span>
           </h2>
           <div class="xwiki-livetable-tagcloud"></div>
         </div>
@@ -1324,19 +1325,19 @@ ${Msz}Mb##
         <span id="${divid}-limits" class="xwiki-livetable-limits"></span>
   #if($hasPageSize)
         <span id="${divid}-pagesize" class="xwiki-livetable-pagesize">
-            <span>$msg.get('xe.livetable.pagesize.label')</span>
+            <span>$msg.get('platform.livetable.pagesizeLabel')</span>
             <span class="xwiki-livetable-pagesize-content" ></span>
         </span>
   #end
         <span id="${divid}-ajax-loader" class="xwiki-livetable-loader hidden">
-          <img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('xe.livetable.loading')" title="" />
+          <img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('platform.livetable.loading')" title="" />
         </span>
         <span class="controlPagination">
-          <a title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination" href="#"><span class="hidden">$msg.get('xe.pagination.page.prev.title')</span></a>
-          <a title="$msg.get('xe.pagination.page.next.title')" class="nextPagination" href="#"><span class="hidden">$msg.get('xe.pagination.page.next.title')</span></a>
+          <a title="$msg.get('platform.livetable.paginationPagePrevTitle')" class="prevPagination" href="#"><span class="hidden">$msg.get('platform.livetable.paginationPagePrevTitle')</span></a>
+          <a title="$msg.get('platform.livetable.paginationPageNextTitle')" class="nextPagination" href="#"><span class="hidden">$msg.get('platform.livetable.paginationPageNextTitle')</span></a>
         </span>
         <span class="pagination">
-          <span class="xwiki-livetable-pagination-text">$msg.get("xe.pagination.page")</span>
+          <span class="xwiki-livetable-pagination-text">$msg.get("platform.livetable.paginationPage")</span>
           <span class="xwiki-livetable-pagination-content" ></span>
         </span>
       </td>
@@ -1398,7 +1399,7 @@ ${Msz}Mb##
                 #set($class = $xwiki.getDocument($propClassName).getxWikiClass())
                 #set($list = '')
                 #set($list = $class.get($colname).getListValues())
-                <select id="xwiki-livetable-${divid}-filter-${velocityCount}" name='${colname}'><option value=''>$msg.get('xe.livetable.select.all')</option>
+                <select id="xwiki-livetable-${divid}-filter-${velocityCount}" name='${colname}'><option value=''>$msg.get('platform.livetable.selectAll')</option>
                 #set($map = $class.get($colname).getMapValues())
                 #foreach($listitem in $list)
                   #set ($l10n_key = "${propClassName}_${colname}_${listitem}")
@@ -1411,7 +1412,7 @@ ${Msz}Mb##
                 </select>
                 </td>
               #elseif(("$!colprop.type" == 'text' || "$!colprop.type" == 'number') && $isFilterable)
-                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${divid}-filter-${velocityCount}" name="${colname}" type="text" #if("!$colprop.size" != '') size="${colprop.size}" title="$msg.get('xe.livetable.filters.title', [$msg.get("${transprefix}${colname}")])"#end /></td>
+                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${divid}-filter-${velocityCount}" name="${colname}" type="text" #if("!$colprop.size" != '') size="${colprop.size}" title="$msg.get('platform.livetable.filtersTitle', [$msg.get("${transprefix}${colname}")])"#end /></td>
               #elseif("$!colprop.type" == 'hidden')
               #elseif($colname != '_actions' || $hasAdmin)
               <td class="xwiki-livetable-display-header-filter"></td>
@@ -1420,7 +1421,7 @@ ${Msz}Mb##
             </tr>
             <tr class="xwiki-livetable-initial-message">
               <td colspan="${columnCount}">
-                <div class="warningmessage">$msg.get('xe.livetable.environmentCannotLoadTableMessage')</div>
+                <div class="warningmessage">$msg.get('platform.livetable.environmentCannotLoadTableMessage')</div>
               </td>
             </tr>
           </thead>
@@ -1431,11 +1432,11 @@ ${Msz}Mb##
     <tr>
       <td class="xwiki-livetable-pagination">
         <span class="controlPagination">
-          <a title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination" href="#"><span class="hidden">$msg.get('xe.pagination.page.prev.title')</span></a>
-          <a title="$msg.get('xe.pagination.page.next.title')" class="nextPagination" href="#"><span class="hidden">$msg.get('xe.pagination.page.next.title')</span></a>
+          <a title="$msg.get('platform.livetable.paginationPagePrevTitle')" class="prevPagination" href="#"><span class="hidden">$msg.get('platform.livetable.paginationPagePrevTitle')</span></a>
+          <a title="$msg.get('platform.livetable.paginationPageNextTitle')" class="nextPagination" href="#"><span class="hidden">$msg.get('platform.livetable.paginationPageNextTitle')</span></a>
         </span>
         <span class="pagination">
-          <span class="xwiki-livetable-pagination-text">$msg.get('xe.pagination.page')</span>
+          <span class="xwiki-livetable-pagination-text">$msg.get('platform.livetable.paginationPage')</span>
           <span class="xwiki-livetable-pagination-content" ></span>
         </span>
       </td>
@@ -1451,14 +1452,14 @@ ${Msz}Mb##
     if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
       // Make sure the Livetable widgets exists (It does not in the WYSIWYG for example).
     #if($callback)
-      $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{
+      window["$jsName"] = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{
                            "maxPages":$maxPages
                         ,"limit":$count
        #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end
        #if($hasPageSize && "$!pageSizeBounds" != ''),"pageSizeBounds" : $pageSizeBounds#end
               });
     #else
-      $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix), {
+      window["$jsName"] = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix), {
                            "maxPages":$maxPages
                         ,"limit":$count
        #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end
@@ -1499,7 +1500,7 @@ ${Msz}Mb##
 function (row, i, table) {
   // This callback method code has been generated from velocity.
   var tr = new Element("tr");
-  if (row.doc_viewable) {
+  if (row["doc_viewable"]) {
   #foreach($colname in $collist)
     // $colname
     #set($colprop = $colprops.get($colname))
@@ -1516,10 +1517,10 @@ function (row, i, table) {
         var link = #if("$!colprop.link" != "editor") new Element("a"); #else new Element("span"); #end
         ## Automatic: the link url is in JSON results, with key column name + "_url"
         #if("$!colprop.link"=="auto")
-          link.href = (row.${jscolname}_url=="") ? row.doc_url : row.${jscolname}_url;
+          link.href = (row["${jscolname}_url"]=="") ? row["doc_url"] : row["${jscolname}_url"];
         #elseif($colprop.link=="field")
-          if (row.${jscolname}_url != "") {
-            link.href = row.${jscolname}_url;
+          if (row["${jscolname}_url"] != "") {
+            link.href = row["${jscolname}_url"];
           }
         ## Property editor
         #elseif($colprop.link=="editor")
@@ -1532,24 +1533,24 @@ function (row, i, table) {
             var tag = event.element().down("span");
             if (!tag)
              tag = event.element();
-            editProperty(row.doc_fullname, "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
+            editProperty(row["doc_fullname"], "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
           });
         ## Author
         #elseif($colprop.link == "author")
-          link.href = row.doc_author_url;
+          link.href = row["doc_author_url"];
         ## Space URL
         #elseif($colprop.link == "space")
-          link.href = row.doc_space_url;
+          link.href = row["doc_space_url"];
         ## Wiki URL
         #elseif($colprop.link == "wiki")
-          link.href = row.doc_wiki_url;
+          link.href = row["doc_wiki_url"];
         #else
-          link.href = row.doc_url;
+          link.href = row["doc_url"];
         #end
         #if($colprop.html && $colprop.html==true)
-          link.innerHTML = row.${jscolname};
+          link.innerHTML = row["${jscolname}"];
         #else
-          link.update(row.${jscolname});
+          link.update(row["${jscolname}"]);
         #end
         td.appendChild(link);
         tr.appendChild(td);
@@ -1557,18 +1558,18 @@ function (row, i, table) {
         var adminActions = ['admin', 'rename', 'rights'];
         var td = new Element("td", {'class' : 'actions'});
         #foreach($action in $colprop.get("actions"))
-          if (row.doc_has${action} || '${action}' == 'view' || (row.doc_has${action} === undefined && (row.doc_hasadmin || adminActions.indexOf('${action}') < 0))) {
+          if (row["doc_has${action}"] || '${action}' == 'view' || (row["doc_has${action}"] === undefined && (row["doc_hasadmin"] || adminActions.indexOf('${action}') < 0))) {
             #if($velocityCount > 1)
               td.insert(" ");
             #end
             #if($transprefix != '' && $msg.get("${transprefix}_actions.${action}") != "${transprefix}_actions.${action}")
               #set($text = $msg.get("${transprefix}_actions.${action}"))
-            #elseif($msg.get("xe.livetable._actions.${action}") != "xe.livetable._actions.${action}")
-              #set($text = $msg.get("xe.livetable._actions.${action}"))
+            #elseif($msg.get("platform.livetable._actions.${action}") != "platform.livetable._actions.${action}")
+              #set($text = $msg.get("platform.livetable._actions.${action}"))
             #else
               #set($text = "$action")
             #end
-            var link = new Element("a", {"href": row.doc_${action}_url, "class":"action action${action}"}).update("$text");
+            var link = new Element("a", {"href": row["doc_${action}_url"], "class":"action action${action}"}).update("$text");
             #if("$!colprop.ajaxActions.get($action)" == 'true')
               link.observe('click', function(event) {
                 event.stop();
@@ -1587,9 +1588,9 @@ function (row, i, table) {
         #set($tdClass = "${jscolname} link$!{colprop.link} type$!{colprop.type}")
         var fieldel = new Element("td", {'class':"$tdClass"});
         #if($colprop.html && $colprop.html==true)
-          fieldel.innerHTML = row.${jscolname};
+          fieldel.innerHTML = row["${jscolname}"];
         #else
-          fieldel.update(row.${jscolname});
+          fieldel.update(row["${jscolname}"]);
         #end
         tr.appendChild(fieldel);
       #end
@@ -1597,7 +1598,7 @@ function (row, i, table) {
   #end
   }
   else {
-    var page = row.doc_fullname;
+    var page = row["doc_fullname"];
     var dp = page.indexOf(':');
     var p = page.indexOf('.');
     var space = (dp > 0) ? page.substring(dp + 1, p) : page.substring(0, p);
@@ -1671,9 +1672,6 @@ function (row, i, table) {
   #if(!$parameters.url.contains('?'))
     #set($parameters.url = "${parameters.url}?")
   #end
-  #if($util.parseInt("$!{parameters.defaultItemsPerPage}") <= 0)
-    #set($parameters.defaultItemsPerPage = 20)
-  #end
   #if($parameters.position != 'bottom')
     #set($parameters.position = 'top')
   #end
@@ -1706,6 +1704,9 @@ function (row, i, table) {
   ## If the value is missing or invalid, parseInt returns 0, which is the default first item.
   #set($parameters.firstItem = $util.parseInt($parameters.firstItem))
   ## Get number of items per page from request
+  #if($util.parseInt("$!{parameters.defaultItemsPerPage}") <= 0)
+    #set($parameters.defaultItemsPerPage = 20)
+  #end
   #set($parameters.itemsPerPage = "$!{request.get($parameters.itemsPerPageParamName)}")
   #set($parameters.itemsPerPage = $util.parseInt($parameters.itemsPerPage))
   #if($parameters.itemsPerPage <= 0)
@@ -1779,7 +1780,7 @@ function (row, i, table) {
       #set($contextFirstPage = $parameters.pageCount - $contextWidth)
     #end
   #end
-  <span class="pagination">$msg.get('xe.pagination.page')
+  <span class="pagination">$msg.get('platform.livetable.paginationPage')
   #if($contextFirstPage != 0)
     #paginationPageLink(0 $parameters)
   #end
@@ -1807,7 +1808,7 @@ function (row, i, table) {
   #if($pageNumber == $parameters.crtPage)
   <span class="currentPage">$displayedPageNumber</span>
   #else
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$msg.get('xe.pagination.page.title', [$displayedPageNumber])">$displayedPageNumber</a>
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$msg.get('platform.livetable.paginationPageTitle', [$displayedPageNumber])">$displayedPageNumber</a>
   #end
 #end
 #**
@@ -1836,7 +1837,7 @@ function (row, i, table) {
   #if($parameters.crtPage > 0)
     #set($prevPage = $parameters.crtPage - 1)
     #set($firstItem = $prevPage * $parameters.itemsPerPage)
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination">$msg.get('xe.pagination.page.previous')</a>
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$msg.get('platform.livetable.paginationPagePrevTitle')" class="prevPagination">$msg.get('platform.livetable.paginationPagePrevious')</a>
   #else
     <span class="noPrevPagination"> </span>
   #end
@@ -1853,7 +1854,7 @@ function (row, i, table) {
   #if($parameters.crtPage < $parameters.lastPage)
     #set($nextPage = $parameters.crtPage + 1)
     #set($firstItem = $nextPage * $parameters.itemsPerPage)
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$msg.get('xe.pagination.page.next.title')" class="nextPagination">$msg.get('xe.pagination.page.next')</a>
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$msg.get('platform.livetable.paginationPageNextTitle')" class="nextPagination">$msg.get('platform.livetable.paginationPageNext')</a>
   #else
     <span class="noNextPagination"> </span>
   #end
@@ -1874,13 +1875,13 @@ function (row, i, table) {
   #end
   <span class="resultsNo">
   #if($parameters.totalItems == 0)
-    <span class='currentResultsNo'>$msg.get('xe.pagination.results.none')</span>
+    <span class='currentResultsNo'>$msg.get('platform.livetable.paginationResultsNone')</span>
   #elseif($parameters.totalItems == 1)
-    <span class='currentResultsNo'>$msg.get('xe.pagination.results.one')</span>
+    <span class='currentResultsNo'>$msg.get('platform.livetable.paginationResultsOne')</span>
   #elseif($from == $parameters.totalItems)
-    $msg.get('xe.pagination.results.single', [$from, $parameters.totalItems])
+    $msg.get('platform.livetable.paginationResultsSingle', [$from, $parameters.totalItems])
   #else
-    $msg.get('xe.pagination.results.many', [$from, $to, $parameters.totalItems])
+    $msg.get('platform.livetable.paginationResultsMany', [$from, $to, $parameters.totalItems])
   #end
   </span>
 #end
@@ -1977,7 +1978,9 @@ $xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {"forceSkinAction": true
   *#
 #macro(wysiwyg_createCache $parameters)
 #set($ok = $parameters.put('cacheId', "wysiwygCache$!{util.generateRandomString(4)}"))
-<input type="hidden" id="$!{parameters.cacheId}" />
+## HACK: We use a text input hidden through CSS instead of a hidden input because Chrome doesn't cache hidden inputs.
+## See http://code.google.com/p/chromium/issues/detail?id=105362
+<label for="$!{parameters.cacheId}" class="hidden"><input type="text" id="$!{parameters.cacheId}"/></label>
 #end
 
 #**
@@ -2214,4 +2217,66 @@ Wysiwyg.onModuleLoad(function() {
       #verticalNavigationItem($child $level.concat('*') $options)
     #end
   #end
+#end
+
+#**
+ * Sets a gradient-based styling for CSS backgrounds
+ *
+ *
+ * @param $icon the path to an additional icon image
+ * @param $gradientData a map of gradients, where the following entries are currently used:
+ *        'angle' :  an angle of direction for the gradient
+ *        'colors':  a list of maps of color-stops for the gradient, where the following entries are currently used: 
+ *                'color'    : color value
+ *                'position' : stop position for the color (between 0% and 100% or a lenght)
+ *#
+#macro (css3_backgroundIconAndLinearGradient $icon $gradientData)
+  #set ($browserVariants = ['-moz-', '-webkit-', '-o-', '-ms-', ''])
+  #set ($colors = '')
+  #if ($gradientData.angle)
+    #set ($position = "$!{gradientData.angle}")
+  #elseif ($gradientData.to)
+    #set ($position = "$!{gradientData.to}")
+  #end
+  #foreach ($colorEntry in $gradientData.colors)
+    #set ($colors = "$!{colors}, $!{colorEntry.color} $!{colorEntry.position}")
+  #end
+  #if ("$!{colors}" != '' && "$!{position}" == '')
+    #set ($colors = $colors.substring(2))
+  #end
+  #foreach ($bvar in $browserVariants)
+    background-image:#if ("$!{icon}" != '') $icon,#end ${bvar}linear-gradient($!{position}$!{colors});
+  #end
+#end
+##
+#macro (css3_backgroundLinearGradient $gradientData)
+  #css3_backgroundIconAndLinearGradient ('' $gradientData)
+#end
+#**
+ * Macro that adds the prefixes for box-sizing CSS property that alters the default CSS box model used to calculate widths and heights of elements
+ *
+ *
+ * @param $value should take the following values: content-box | padding-box | border-box
+ *#
+#macro (css3_boxSizing $value)
+  #if ("$!{value}" != '')
+    #set ($browserVariants = ['-moz-', '-webkit-', ''])
+    #foreach ($bvar in $browserVariants)
+      ${bvar}box-sizing: $value;
+    #end
+  #end
+#end
+
+#**
+ * Transforms the given string to an XML name by filtering all the characters that are not allowed in an XML name. If
+ * the given string contains only invalid characters then the result is the empty string.
+ *
+ * @param $string the string to be transformed to an XML name
+ *#
+#macro(toXMLName $string)
+## Keep only Unicode letters and digits plus the hyphen and the underscore characters.
+#set($string = $string.replaceAll('[^\p{L}\p{N}_\-]+', ''))
+## Make sure the string doesn't start with a number or the hyphen character.
+#set($string = $string.replaceAll('^[\p{N}\-]+', ''))
+$string##
 #end

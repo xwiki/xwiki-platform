@@ -266,7 +266,9 @@
 </property>
 <property>
 <docstoinclude>
-<value>[%]</value>
+<value>[WikiManager.%]</value>
+<value>[WikiResources.Web%]</value>
+<value>[WikiCode.%]</value>
 </docstoinclude>
 </property>
 <property>

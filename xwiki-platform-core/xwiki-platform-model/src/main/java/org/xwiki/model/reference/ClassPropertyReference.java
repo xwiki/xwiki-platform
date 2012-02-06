@@ -37,7 +37,21 @@ public class ClassPropertyReference extends EntityReference
      */
     public ClassPropertyReference(EntityReference reference)
     {
-        super(reference.getName(), reference.getType(), reference.getParent());
+        super(reference);
+    }
+
+    /**
+     * Clone an ClassPropertyReference, but replace one of the parent in the chain by a new one.
+     *
+     * @param reference the reference that is cloned
+     * @param oldReference the old parent that will be replaced
+     * @param newReference the new parent that will replace oldReference in the chain
+     * @since 3.3M2
+     */
+    protected ClassPropertyReference(EntityReference reference, EntityReference oldReference,
+        EntityReference newReference)
+    {
+        super(reference, oldReference, newReference);
     }
 
     /**
@@ -52,12 +66,13 @@ public class ClassPropertyReference extends EntityReference
     }
 
     /**
+     * Deprecated constructor.
      * @param wiki the wiki of the document where the parent class of this property is
      * @param space the space of the document where the parent class of this property is
      * @param page the document where the parent class of this property is
-     * @param objectName the name of the parent class of this property
      * @param propertyName the name of the property to refer to
      */
+    @Deprecated
     public ClassPropertyReference(String wiki, String space, String page, String propertyName)
     {
         this(propertyName, new DocumentReference(wiki, space, page));
@@ -71,7 +86,7 @@ public class ClassPropertyReference extends EntityReference
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      */
     @Override
-    public void setType(EntityType type)
+    protected void setType(EntityType type)
     {
         if (type != EntityType.CLASS_PROPERTY) {
             throw new IllegalArgumentException("Invalid type [" + type + "] for an class property reference");
@@ -88,13 +103,24 @@ public class ClassPropertyReference extends EntityReference
      * @see org.xwiki.model.reference.EntityReference#setParent(org.xwiki.model.reference.EntityReference)
      */
     @Override
-    public void setParent(EntityReference parent)
+    protected void setParent(EntityReference parent)
     {
+        if (parent instanceof DocumentReference) {
+            super.setParent(parent);
+            return;
+        }
+
         if (parent == null || parent.getType() != EntityType.DOCUMENT) {
             throw new IllegalArgumentException("Invalid parent reference [" + parent + "] for an class property "
                 + "reference");
         }
 
         super.setParent(new DocumentReference(parent));
+    }
+
+    @Override
+    public ClassPropertyReference replaceParent(EntityReference oldParent, EntityReference newParent)
+    {
+        return new ClassPropertyReference(this, oldParent, newParent);
     }
 }

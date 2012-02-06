@@ -76,7 +76,7 @@ public abstract class AbstractExtension implements Extension
     /**
      * @see #getAuthors()
      */
-    protected List<String> authors = new ArrayList<String>();
+    protected List<ExtensionAuthor> authors = new ArrayList<ExtensionAuthor>();
 
     /**
      * @see #getWebSite()
@@ -97,6 +97,11 @@ public abstract class AbstractExtension implements Extension
      * @see #getDependencies()
      */
     protected List<ExtensionDependency> dependencies;
+
+    /**
+     * The file of the extension.
+     */
+    protected ExtensionFile file;
 
     /**
      * @param repository the repository where this extension comes from
@@ -123,9 +128,14 @@ public abstract class AbstractExtension implements Extension
 
         setFeatures(extension.getFeatures());
 
+        setName(extension.getName());
         setDescription(extension.getDescription());
         setAuthors(extension.getAuthors());
         setWebsite(extension.getWebSite());
+        if (extension.getLicenses() != null && !extension.getLicenses().isEmpty()) {
+            setLicenses(extension.getLicenses());
+        }
+        setSummary(extension.getSummary());
 
         List< ? extends ExtensionDependency> newDependencies = extension.getDependencies();
         if (!newDependencies.isEmpty()) {
@@ -210,7 +220,7 @@ public abstract class AbstractExtension implements Extension
     /**
      * @param licenses the licenses of the extension
      */
-    public void setLicense(Collection<ExtensionLicense> licenses)
+    public void setLicenses(Collection<ExtensionLicense> licenses)
     {
         this.licenses = new ArrayList<ExtensionLicense>(licenses);
     }
@@ -254,7 +264,7 @@ public abstract class AbstractExtension implements Extension
     }
 
     @Override
-    public List<String> getAuthors()
+    public List<ExtensionAuthor> getAuthors()
     {
         return this.authors;
     }
@@ -262,17 +272,17 @@ public abstract class AbstractExtension implements Extension
     /**
      * @param authors the authors of the extension
      */
-    public void setAuthors(Collection<String> authors)
+    public void setAuthors(Collection<ExtensionAuthor> authors)
     {
-        this.authors = new ArrayList<String>(authors);
+        this.authors = new ArrayList<ExtensionAuthor>(authors);
     }
 
     /**
      * Add a new author to the extension.
      * 
-     * @param author an author name
+     * @param author an author
      */
-    public void addAuthor(String author)
+    public void addAuthor(ExtensionAuthor author)
     {
         this.authors.add(author);
     }
@@ -334,6 +344,20 @@ public abstract class AbstractExtension implements Extension
     protected void setRepository(ExtensionRepository repository)
     {
         this.repository = repository;
+    }
+
+    @Override
+    public ExtensionFile getFile()
+    {
+        return this.file;
+    }
+
+    /**
+     * @param file the file of the extension
+     */
+    protected void setFile(ExtensionFile file)
+    {
+        this.file = file;
     }
 
     @Override

@@ -19,12 +19,43 @@
  */
 package org.xwiki.extension.job;
 
+import java.io.Serializable;
+import java.util.Collection;
+
 /**
  * A {@link Job} request.
  * 
  * @version $Id$
  */
-public interface Request
+public interface Request extends Serializable
 {
+    /**
+     * @see #isRemote()
+     */
+    String PROPERTY_REMOTE = "remote";
 
+    /**
+     * @return indicate if the job has been triggered by a remote event
+     */
+    boolean isRemote();
+
+    /**
+     * @param key the name of the property
+     * @param <T> the type of the value
+     * @return the value of the property
+     */
+    <T> T getProperty(String key);
+
+    /**
+     * @param key the name of the property
+     * @param def the default value of the property
+     * @param <T> the type of the value
+     * @return the value of the property
+     */
+    <T> T getProperty(String key, T def);
+
+    /**
+     * @return the names of all the properties
+     */
+    Collection<String> getPropertyNames();
 }

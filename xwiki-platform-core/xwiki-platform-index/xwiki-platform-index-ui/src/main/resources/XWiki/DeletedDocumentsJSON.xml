@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>DeletedDocumentsJSON</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.DeletedDocuments</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1301566124000</creationDate>
+<date>1301566365000</date>
+<contentUpdateDate>1301566365000</contentUpdateDate>
+<version>1.1</version>
+<title>JSON Generation for the Deleted Documents Livetable</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.RequiredRightClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<level>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>level</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>level</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values>edit|programming</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</level>
+</class>
+<name>XWiki.DeletedDocumentsJSON</name>
+<number>0</number>
+<className>XWiki.RequiredRightClass</className>
+<guid>9efcced5-2b33-4d59-8db5-d25cf14b8f9c</guid>
+<property>
+<level>programming</level>
+</property>
+</object>
+<content>{{velocity wiki="false"}}
+#if($request.list)
+## ============================================================================================
+## This page is called from live table via Ajax with the argument xpage=plain. It returns a
+## set of results serialized in JSON.
+## @programming This service page needs to be saved by a user with the programming access level
+## to work as expected
+## ============================================================================================
+#if("$!{request.get('xpage')}" == 'plain')
+$response.setContentType('application/json')
+#set($offset = $util.parseInt($request.get('offset')))
+## offset starts from 0 in velocity and 1 in javascript
+#set($offset = $offset - 1)
+#set($limit = $util.parseInt($request.get('limit')))
+#set($docNameFilter = $request.get('ddoc.fullName'))
+#set($deleterFilter = $request.get('ddoc.deleter'))
+#set($sql = '')
+#if("$!{docNameFilter}" != '')
+  #set($sql = "and lower(ddoc.fullName) like '%${docNameFilter.trim().toLowerCase()}%' ")
+#end
+#if("$!{deleterFilter}" != '')
+  #set($sql = $sql + "and lower(ddoc.deleter) like '%${deleterFilter.trim().toLowerCase()}%' ")
+#end
+#if("$!{request.sort}" != '')
+  #set($order = $request.sort)
+#else
+  #set($order = 'ddoc.id')
+#end
+#if("$!{request.dir}" != '')
+  #set($dir = $request.dir)
+#else
+  #set($dir = 'asc')
+#end
+#set($selectSql = "select ddoc.id from XWikiDeletedDocument as ddoc where 1=1 " + $sql + " order by $order $dir")
+#set($countSql = "select count(*) from XWikiDeletedDocument as ddoc where 1=1 " + $sql)
+#set($items = $xwiki.search($selectSql, $limit, $offset))
+#set($totalItems = $xwiki.search($countSql).get(0))
+#set($returnedItems = $items.size())
+## ==============================================
+## json starts
+## ==============================================
+{
+"totalrows": $totalItems,
+"returnedrows": $returnedItems,
+"offset": ${request.get('offset')},
+"reqNo": ${request.reqNo},
+"rows": [
+#foreach($item in $items)
+  #set($ddoc = $xwiki.getDeletedDocument('', '', "$item"))
+  #if($velocityCount &gt; 1) , #end
+  {
+     #set($originalDocument = $ddoc.getDocument())
+     "fullname"  : "$escapetool.javascript($originalDocument.fullName)",
+     "title"  : "$escapetool.javascript($originalDocument.displayTitle)",
+     "url" : "$escapetool.javascript($originalDocument.getURL('view', "viewer=recyclebin&amp;id=${item}"))",
+     "originalUrl" : "$escapetool.javascript($originalDocument.getURL())",
+     "canDelete" : $ddoc.canDelete(),
+     "deleteUrl" : "$escapetool.javascript($originalDocument.getURL('delete', "id=${item}&amp;form_token=$!{services.csrf.getToken()}"))",
+     "canRestore" : $ddoc.canUndelete(),
+     #set ($exists = !$xwiki.getDocument($ddoc.fullName).isNew())
+     "alreadyExists" : ${exists},
+     "restoreUrl" : "$escapetool.javascript($originalDocument.getURL('undelete', "id=${item}&amp;form_token=$!{services.csrf.getToken()}"))",
+     "date" : "$escapetool.javascript($xwiki.formatDate($ddoc.date, $dateFormat))",
+     "deleter" : "$escapetool.javascript($ddoc.deleter)",
+     "deletername" : "$escapetool.javascript($xwiki.getUserName($ddoc.deleter, false))",
+     "deleterurl" : "$escapetool.javascript($xwiki.getURL($ddoc.deleter, 'view'))"
+   }
+#end
+]}
+## ==============================================
+## json ended
+## ==============================================
+#end## xpage=plain
+#end## request.list
+{{/velocity}}</content></xwikidoc>

@@ -20,7 +20,7 @@
 package org.xwiki.extension.job;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import org.xwiki.extension.ExtensionId;
 
@@ -29,40 +29,57 @@ import org.xwiki.extension.ExtensionId;
  * 
  * @version $Id$
  */
-public abstract class AbstractExtensionRequest extends AbstractRequest
+public abstract class AbstractExtensionRequest extends AbstractRequest implements ExtensionRequest
 {
     /**
      * @see #getExtensions()
      */
-    private List<ExtensionId> extensions = new ArrayList<ExtensionId>();
+    public static final String PROPERTY_EXTENSIONS = "extensions";
 
     /**
      * @see #getNamespaces()
      */
-    private List<String> namespaces;
+    public static final String PROPERTY_NAMESPACES = "namespaces";
 
     /**
-     * @return the extension on which to apply the task.
+     * Default constructor.
      */
-    public List<ExtensionId> getExtensions()
+    public AbstractExtensionRequest()
     {
-        return this.extensions;
+        setProperty(PROPERTY_EXTENSIONS, new ArrayList<ExtensionId>());
     }
 
     /**
-     * @return the namespaces on which to apply the task.
+     * @param request the request to copy
      */
-    public List<String> getNamespaces()
+    public AbstractExtensionRequest(Request request)
     {
-        return this.namespaces;
+        super(request);
+
+        Collection<ExtensionId> extensions = getExtensions();
+        if (extensions == null) {
+            setProperty(PROPERTY_EXTENSIONS, new ArrayList<ExtensionId>());
+        }
     }
 
-    /**
-     * @return indicate if the request is applied on specific namespace or all of them
-     */
+    @Override
+    public Collection<ExtensionId> getExtensions()
+    {
+        return getProperty(PROPERTY_EXTENSIONS);
+    }
+
+    @Override
+    public Collection<String> getNamespaces()
+    {
+        return getProperty(PROPERTY_NAMESPACES);
+    }
+
+    @Override
     public boolean hasNamespaces()
     {
-        return this.namespaces != null && !this.namespaces.isEmpty();
+        Collection<String> namespaces = getNamespaces();
+
+        return namespaces != null && !namespaces.isEmpty();
     }
 
     /**
@@ -70,7 +87,7 @@ public abstract class AbstractExtensionRequest extends AbstractRequest
      */
     public void addExtension(ExtensionId extensionId)
     {
-        this.extensions.add(extensionId);
+        getExtensions().add(extensionId);
     }
 
     /**
@@ -78,10 +95,13 @@ public abstract class AbstractExtensionRequest extends AbstractRequest
      */
     public void addNamespace(String namespace)
     {
-        if (this.namespaces == null) {
-            this.namespaces = new ArrayList<String>();
+        Collection<String> namespaces = getNamespaces();
+
+        if (namespaces == null) {
+            namespaces = new ArrayList<String>();
+            setProperty(PROPERTY_NAMESPACES, namespaces);
         }
 
-        this.namespaces.add(namespace);
+        namespaces.add(namespace);
     }
 }

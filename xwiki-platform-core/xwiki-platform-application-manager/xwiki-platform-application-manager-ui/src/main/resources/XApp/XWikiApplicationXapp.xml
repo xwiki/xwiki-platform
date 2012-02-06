@@ -265,7 +265,11 @@
 </property>
 <property>
 <docstoinclude>
-<value>[%]</value>
+<value>[XAppManager.%]</value>
+<value>[XAppResources.Web%]</value>
+<value>[XAppCode.%]</value>
+<value>[XApp.WebPreferences]</value>
+<value>[XApp.WebHome]</value>
 </docstoinclude>
 </property>
 <property>

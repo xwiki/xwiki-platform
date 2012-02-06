@@ -71,7 +71,7 @@ public class Resources
     /**
      * Download extension file.
      */
-    public final static String EXTENSION_VERSION_FILE = EXTENSION_VERSIONS + "/file";
+    public final static String EXTENSION_VERSION_FILE = EXTENSION_VERSION + "/file";
 
     // Search
 
@@ -88,6 +88,11 @@ public class Resources
     public final static String QPARAM_LANGUAGE = "language";
 
     /**
+     * Used to indicate versions ranges to filter versions request.
+     */
+    public final static String QPARAM_VERSIONS_RANGES = "versionRanges";
+
+    /**
      * The search query.
      */
     public final static String QPARAM_SEARCH_QUERY = "q";
@@ -96,6 +101,12 @@ public class Resources
      * Offset from where the search start to return results.
      */
     public final static String QPARAM_LIST_START = "start";
+
+    /**
+     * Indicate if we want to get the total number of possible result without limits in the result. Allow to speed up a
+     * bit the query when we don't care since it generally mean one more query on server side.
+     */
+    public final static String QPARAM_LIST_REQUIRETOTALHITS = "requireTotalHits";
 
     /**
      * Maximum number of results.

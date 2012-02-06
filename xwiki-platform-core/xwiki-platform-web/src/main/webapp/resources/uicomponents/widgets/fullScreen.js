@@ -58,6 +58,9 @@ widgets.FullScreen = Class.create({
         this.makeFullScreen(matches[0]);
       }
     }
+    // Cleanup before the window unloads.
+    this.unloadHandler = this.cleanup.bind(this);
+    Event.observe(window, 'unload', this.unloadHandler);
   },
   /** According to the type of each element being maximized, a button in created and attached to it. */
   addBehavior : function (item) {
@@ -210,7 +213,7 @@ widgets.FullScreen = Class.create({
       'class': 'fullScreenEditButton',
       title: "$msg.get('core.editors.fullscreen.editFullScreen')",
       alt: "$msg.get('core.editors.fullscreen.editFullScreen')",
-      src: "$xwiki.getSkinFile('icons/silk/arrow_out.gif')"
+      src: "$xwiki.getSkinFile('icons/silk/arrow_out.png')"
     });
     // Add functionality
     fullScreenActivator.observe('click', this.makeFullScreen.bind(this, targetElement));
@@ -249,7 +252,7 @@ widgets.FullScreen = Class.create({
       'class': 'fullScreenCloseButton',
       title: "$msg.get('core.editors.fullscreen.exitFullScreen')",
       alt: "$msg.get('core.editors.fullscreen.exitFullScreen')",
-      src: "$xwiki.getSkinFile('icons/silk/arrow_in.gif')"
+      src: "$xwiki.getSkinFile('icons/silk/arrow_in.png')"
     });
     // Add functionality
     this.closeButton.observe('click', this.closeFullScreen.bind(this));
@@ -516,6 +519,12 @@ widgets.FullScreen = Class.create({
   /** onMouseDown handler that prevents dragging the button. */
   preventDrag : function(event) {
     event.stop();
+  },
+  /** Cleans up the DOM tree when the user leaves the current page. */
+  cleanup : function() {
+    Event.stopObserving(window, 'unload', this.unloadHandler);
+    // Remove the "Exit full screen" action button because it can interfere with the browser's back-forward cache.
+    this.actionCloseButtonWrapper.remove();
   }
 });
 

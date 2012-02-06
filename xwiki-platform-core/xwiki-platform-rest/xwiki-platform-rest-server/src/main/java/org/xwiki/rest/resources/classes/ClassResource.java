@@ -57,7 +57,7 @@ public class ClassResource extends XWikiResource
 
             return DomainObjectFactory.createClass(objectFactory, uriInfo.getBaseUri(), wikiName, xwikiClass);
         } finally {
-            Utils.getXWiki(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
     }
 }

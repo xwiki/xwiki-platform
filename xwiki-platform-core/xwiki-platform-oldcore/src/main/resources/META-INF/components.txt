@@ -50,6 +50,14 @@ com.xpn.xwiki.render.XWikiScriptContextInitializer
 com.xpn.xwiki.store.hibernate.DefaultHibernateSessionFactory
 com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor
 com.xpn.xwiki.store.hibernate.query.DefaultQueryExecutor
+com.xpn.xwiki.store.migration.hibernate.HibernateDataMigrationManager
+com.xpn.xwiki.store.migration.hibernate.LegacyDataMigration
+com.xpn.xwiki.store.migration.hibernate.R15428XWIKI2977DataMigration
+com.xpn.xwiki.store.migration.hibernate.R4340XWIKI883DataMigration
+com.xpn.xwiki.store.migration.hibernate.R4359XWIKI1459DataMigration
+com.xpn.xwiki.store.migration.hibernate.R6079XWIKI1878DataMigration
+com.xpn.xwiki.store.migration.hibernate.R6405XWIKI1933DataMigration
+com.xpn.xwiki.store.migration.hibernate.R7350XWIKI2079DataMigration
 com.xpn.xwiki.store.XWikiHibernateStore
 com.xpn.xwiki.store.XWikiHibernateVersioningStore
 com.xpn.xwiki.store.XWikiHibernateAttachmentStore

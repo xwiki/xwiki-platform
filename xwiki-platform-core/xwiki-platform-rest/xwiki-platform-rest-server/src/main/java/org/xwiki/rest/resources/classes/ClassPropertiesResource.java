@@ -74,7 +74,7 @@ public class ClassPropertiesResource extends XWikiResource
 
             return properties;
         } finally {
-            Utils.getXWiki(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
     }
 }

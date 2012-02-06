@@ -19,32 +19,48 @@
  */
 package org.xwiki.extension.repository.aether.internal;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.test.RepositoryUtil;
+import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.test.AbstractComponentTestCase;
 
 public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCase
 {
+    private static final String GROUPID = "groupid";
+
+    private static final String ARTIfACTID = "artifactid";
+
     private ExtensionRepositoryManager repositoryManager;
 
     private ExtensionId extensionId;
 
-    private ExtensionId dependencyExtensionId;
+    private ExtensionId extensionDependencyId;
+
+    private ExtensionId extensionIdClassifier;
+
+    private ExtensionDependency dependencyExtensionId;
+
+    private ExtensionDependency dependencyExtensionIdRange;
+
+    private ExtensionLicenseManager extensionLicenseManager;
 
     private ExtensionId bundleExtensionId;
 
@@ -59,18 +75,25 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
             new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());
         this.repositoryUtil.setup();
 
-        this.extensionId = new ExtensionId("groupid:artifactid", "version");
-        this.dependencyExtensionId = new ExtensionId("dgroupid:dartifactid", "dversion");
+        this.extensionId = new ExtensionId(GROUPID + ':' + ARTIfACTID, "version");
+        this.extensionDependencyId = new ExtensionId("dgroupid:dartifactid", "dversion");
+        
+        this.extensionIdClassifier = new ExtensionId(GROUPID + ':' + ARTIfACTID + ":classifier", "version");
+        this.dependencyExtensionId =
+            new DefaultExtensionDependency(this.extensionDependencyId.getId(), new DefaultVersionConstraint(this.extensionDependencyId.getVersion().getValue()));
+        this.dependencyExtensionIdRange =
+            new DefaultExtensionDependency(this.extensionDependencyId.getId(), new DefaultVersionConstraint("[dversion,)"));
 
         this.bundleExtensionId = new ExtensionId("groupid:bundleartifactid", "version");
 
         // lookup
 
         this.repositoryManager = getComponentManager().lookup(ExtensionRepositoryManager.class);
+        this.extensionLicenseManager = getComponentManager().lookup(ExtensionLicenseManager.class);
     }
 
     @Test
-    public void testResolve() throws ResolveException
+    public void testResolve() throws ResolveException, IOException
     {
         Extension extension = this.repositoryManager.resolve(this.extensionId);
 
@@ -79,17 +102,56 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         Assert.assertEquals(this.extensionId.getVersion(), extension.getId().getVersion());
         Assert.assertEquals("type", extension.getType());
         Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), extension.getRepository().getId().getId());
-        Assert.assertEquals("description", extension.getDescription());
+        Assert.assertEquals("name", extension.getName());
+        Assert.assertEquals("summary", extension.getSummary());
         Assert.assertEquals("http://website", extension.getWebSite());
-        Assert.assertEquals(Arrays.asList("groupid1:feature1", "groupid2:feature2"), new ArrayList<String>(extension.getFeatures()));
+        Assert.assertEquals("Full Name", extension.getAuthors().get(0).getName());
+        Assert.assertEquals(new URL("http://profile"), extension.getAuthors().get(0).getURL());
+        Assert.assertEquals(Arrays.asList("groupid1:feature1", "groupid2:feature2"),
+            new ArrayList<String>(extension.getFeatures()));
+        Assert.assertSame(this.extensionLicenseManager.getLicense("GNU Lesser General Public License 2.1"), extension
+            .getLicenses().iterator().next());
 
         ExtensionDependency dependency = extension.getDependencies().get(0);
         Assert.assertEquals(this.dependencyExtensionId.getId(), dependency.getId());
-        Assert.assertEquals(this.dependencyExtensionId.getVersion(), dependency.getVersion());
+        Assert.assertEquals(this.dependencyExtensionId.getVersionConstraint(), dependency.getVersionConstraint());
 
         // check that a new resolve of an already resolved extension provide the proper repository
         extension = this.repositoryManager.resolve(this.extensionId);
         Assert.assertEquals(this.repositoryUtil.getRemoteRepositoryId(), extension.getRepository().getId().getId());
+
+        // TODO: see http://jira.xwiki.org/browse/XWIKI-7163 // Modify the file on the descriptor on the repository
+        // File pomFile =
+        // new File(this.repositoryUtil.getMavenRepository(), this.extensionId.getId().replace('.', '/')
+        // .replace(':', '/')
+        // + '/' + this.extensionId.getVersion() + '/' + ARTIfACTID + '-' + this.extensionId.getVersion() + ".pom");
+        // FileUtils.writeStringToFile(
+        // pomFile,
+        // FileUtils.readFileToString(pomFile, "UTF-8").replace("<description>summary</description>",
+        // "<description>modified summary</description>"), "UTF-8");
+        // extension = this.repositoryManager.resolve(this.extensionId);
+        // Assert.assertEquals("modified description", extension.getSummary());
+    }
+
+    @Test
+    public void testResolveVersionClassifier() throws ResolveException
+    {
+        Extension extension = this.repositoryManager.resolve(this.extensionIdClassifier);
+
+        Assert.assertNotNull(extension);
+        Assert.assertEquals(this.extensionIdClassifier.getId(), extension.getId().getId());
+        Assert.assertEquals(this.extensionIdClassifier.getVersion(), extension.getId().getVersion());
+    }
+
+    @Test
+    public void testResolveVersionRange() throws ResolveException
+    {
+        Extension extension = this.repositoryManager.resolve(this.dependencyExtensionIdRange);
+
+        Assert.assertNotNull(extension);
+        Assert.assertEquals(this.extensionDependencyId.getId(), extension.getId().getId());
+        Assert.assertEquals(this.extensionDependencyId.getVersion(), extension.getId()
+            .getVersion());
     }
 
     @Test
@@ -97,17 +159,27 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
     {
         Extension extension = this.repositoryManager.resolve(this.extensionId);
 
-        File file = new File(this.repositoryUtil.getWorkingDirectory() + "/downloaded/extension." + extension.getType());
+        InputStream is = extension.getFile().openStream();
 
-        if (file.exists()) {
-            file.delete();
+        try {
+            Assert.assertEquals("content", IOUtils.toString(is));
+        } finally {
+            is.close();
         }
+    }
 
-        extension.download(file);
+    @Test
+    public void testDownloadClassifier() throws ExtensionException, IOException
+    {
+        Extension extension = this.repositoryManager.resolve(this.extensionIdClassifier);
 
-        Assert.assertTrue("File has not been downloaded", file.exists());
+        InputStream is = extension.getFile().openStream();
 
-        Assert.assertEquals("content", FileUtils.readFileToString(file));
+        try {
+            Assert.assertEquals("classifier content", IOUtils.toString(is));
+        } finally {
+            is.close();
+        }
     }
 
     @Test
@@ -115,16 +187,12 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
     {
         Extension extension = this.repositoryManager.resolve(this.bundleExtensionId);
 
-        File file = new File(this.repositoryUtil.getWorkingDirectory() + "/downloaded/bundleextension.jar");
+        InputStream is = extension.getFile().openStream();
 
-        if (file.exists()) {
-            file.delete();
+        try {
+            Assert.assertEquals("content", IOUtils.toString(is));
+        } finally {
+            is.close();
         }
-
-        extension.download(file);
-
-        Assert.assertTrue("File has not been downloaded", file.exists());
-
-        Assert.assertEquals("content", FileUtils.readFileToString(file));
     }
 }

@@ -113,13 +113,13 @@
           #set ($workspaceAdminGroupReference = $services.model.createDocumentReference($workspaceId, 'XWiki', 'XWikiAdminGroup'))
           #set ($temp = $services.messageStream.postMessageToGroup($notificationMessage, $workspaceAdminGroupReference))
           ## Display the proper success info.
-          {{box image="icon:tick"}}
+          {{success}}
           #if ($request.acceptInvitation)
             The user [[$currentUser]] successfully accepted the invitation and joined the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].
           #else
             The user [[$currentUser]] successfully rejected the invitation to join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].
           #end
-          {{/box}}
+          {{/success}}
         #else
           ##
           ## User can decide if to accept or reject the invitation.
@@ -192,7 +192,7 @@
             ##
             #set ($temp = $workspaceGroupDocumentRestricted.removeXObject($pendingRequest))
             #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, "The user $currentUser canceled his join request.", true, $xcontext.context))
-            {{box image="icon:tick"}}The user [[$currentUser]] successfully canceled the request to join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/box}}
+            {{success}}The user [[$currentUser]] successfully canceled the request to join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/success}}
           #end
         #elseif ("$!confirm" != '1')
           ## Join request.
@@ -233,8 +233,7 @@
           #set ($workspaceAdminGroupReference = $services.model.createDocumentReference($workspaceId, 'XWiki', 'XWikiAdminGroup'))
           #set ($notificationMessage = "The user '${xwiki.getUserName($currentUser, false)}' ($currentUser) has requested to join the workspace '${workspaceName}' ($workspaceId).")
           #set ($temp = $services.messageStream.postMessageToGroup($notificationMessage, $workspaceAdminGroupReference))
-          ## FIXME: replace with a success macro when it will be available.
-          {{box image="icon:tick"}}The user [[$currentUser]] successfully sent the request to join workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/box}}
+          {{success}}The user [[$currentUser]] successfully sent the request to join workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/success}}
         #end
       #else
         ## Open membership as default.
@@ -255,8 +254,7 @@
           #set ($newMemberObject = $workspaceGroupDocumentRestricted.newXObject($groupsClassReference, $xcontext.context))
           #set ($temp = $newMemberObject.setStringValue('member', $currentUser))
           #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, "The user $currentUser joined the workspace.", true, $xcontext.context))
-          ## FIXME: replace with a success macro when it will be available.
-          {{box image="icon:tick"}}The user [[$currentUser]] successfully joined workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/box}}
+          {{success}}The user [[$currentUser]] successfully joined workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/success}}
         #end
       #end
     #end

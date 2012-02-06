@@ -19,7 +19,10 @@
  */
 package org.xwiki.extension.handler;
 
+import java.util.Map;
+
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.UninstallException;
@@ -37,18 +40,20 @@ public interface ExtensionHandler
      * 
      * @param localExtension the extension to install
      * @param namespace the namespace where to install the extension
+     * @param extra extra parameters
      * @throws InstallException error when trying to install the extension
      */
-    void install(LocalExtension localExtension, String namespace) throws InstallException;
+    void install(LocalExtension localExtension, String namespace, Map<String, ? > extra) throws InstallException;
 
     /**
      * Uninstall the provided local extension.
      * 
      * @param localExtension the extension to uninstall
      * @param namespace the namespace from where to uninstall the extension
+     * @param extra extra parameters
      * @throws UninstallException error when trying to uninstall the extension
      */
-    void uninstall(LocalExtension localExtension, String namespace) throws UninstallException;
+    void uninstall(LocalExtension localExtension, String namespace, Map<String, ? > extra) throws UninstallException;
 
     /**
      * Upgrade the provided local extension.
@@ -56,8 +61,18 @@ public interface ExtensionHandler
      * @param previousLocalExtension the previous installed version of the extension
      * @param newLocalExtension the extension to install
      * @param namespace the namespace from where to uninstall the extension
+     * @param extra extra parameters
      * @throws InstallException error when trying to upgrade the extension
      */
-    void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace)
-        throws InstallException;
+    void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace,
+        Map<String, ? > extra) throws InstallException;
+
+    /**
+     * Initialize the provided local extension (during application startup, reinitialization...).
+     * 
+     * @param localExtension the extension to install
+     * @param namespace the namespace where to install the extension
+     * @throws ExtensionException error when trying to install the extension
+     */
+    void initialize(LocalExtension localExtension, String namespace) throws ExtensionException;
 }

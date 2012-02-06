@@ -47,7 +47,6 @@ import org.xwiki.gwt.wysiwyg.client.plugin.valign.VerticalAlignPluginFactory;
 import org.xwiki.gwt.wysiwyg.client.syntax.SyntaxValidatorManager;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DefaultSyntaxValidator;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DefaultSyntaxValidatorManager;
-import org.xwiki.gwt.wysiwyg.client.syntax.internal.XWikiSyntaxValidator;
 
 /**
  * Factory for {@link WysiwygEditor}. Holds the responsibility of injecting the {@link PluginFactoryManager} and
@@ -79,9 +78,7 @@ public final class WysiwygEditorFactory
     private WysiwygEditorFactory()
     {
         svm = new DefaultSyntaxValidatorManager();
-        svm.addSyntaxValidator(new DefaultSyntaxValidator("html/4.01"));
         svm.addSyntaxValidator(new DefaultSyntaxValidator("xhtml/1.0"));
-        svm.addSyntaxValidator(new XWikiSyntaxValidator());
         // add additional SyntaxValidator for other syntaxes
 
         pfm = new DefaultPluginFactoryManager();

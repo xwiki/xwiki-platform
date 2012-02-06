@@ -30,7 +30,17 @@ import org.xwiki.observation.event.Event;
 public interface ExtensionEvent extends Event
 {
     /**
-     * @return the event related extension identifier.
+     * @return the event related extension identifier
      */
     ExtensionId getExtensionId();
+
+    /**
+     * @return the namespace on which the event happened, null mean root namespace
+     */
+    String getNamespace();
+
+    /**
+     * @return indicate of the namespace has been set in this event
+     */
+    boolean hasNamespace();
 }

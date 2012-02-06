@@ -27,60 +27,53 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.CESCAPE;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.ESCAPE;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.DBLESCAPE;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.SEPARATORS;
+
 /**
- * Generic implementation deferring default values for unspecified reference parts to extending classes. This allows for
- * example both the Current Entity Reference Resolver and the Default Entity Reference Resolver to share the code from
- * this class.
- * 
+ * Generic implementation deferring default values for unspecified reference parts to extending classes. This allows
+ * for example both the Current Entity Reference Resolver and the Default Entity Reference Resolver to share the code
+ * from this class.
+ *
+ * @see AbstractEntityReferenceResolver
  * @version $Id$
  * @since 2.2M1
  */
-public abstract class AbstractStringEntityReferenceResolver implements EntityReferenceResolver<String>
+public abstract class AbstractStringEntityReferenceResolver  extends AbstractEntityReferenceResolver
+    implements EntityReferenceResolver<String>
 {
-    private static final Map<EntityType, char[]> SEPARATORS = new HashMap<EntityType, char[]>()
-    {
-        {
-            put(EntityType.DOCUMENT, new char[] {'.', ':'});
-            put(EntityType.ATTACHMENT, new char[] {'@', '.', ':'});
-            put(EntityType.SPACE, new char[] {':'});
-            put(EntityType.OBJECT, new char[] {'^', '.', ':'});
-            put(EntityType.OBJECT_PROPERTY, new char[] {'.', '^', '.', ':'});
-            put(EntityType.CLASS_PROPERTY, new char[] {'^', '.', ':'});
-        }
-    };
-
+    /**
+     * Map defining ordered entity types of a proper reference chain for a given entity type.
+     */
     private static final Map<EntityType, EntityType[]> ENTITYTYPES = new HashMap<EntityType, EntityType[]>()
     {
         {
-            put(EntityType.DOCUMENT, new EntityType[] {EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI});
-            put(EntityType.ATTACHMENT, new EntityType[] {EntityType.ATTACHMENT, EntityType.DOCUMENT, EntityType.SPACE,
-            EntityType.WIKI});
-            put(EntityType.SPACE, new EntityType[] {EntityType.SPACE, EntityType.WIKI});
-            put(EntityType.OBJECT, new EntityType[] {EntityType.OBJECT, EntityType.DOCUMENT, EntityType.SPACE,
-            EntityType.WIKI});
-            put(EntityType.OBJECT_PROPERTY, new EntityType[] {EntityType.OBJECT_PROPERTY, EntityType.OBJECT,
-            EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI});
-            put(EntityType.CLASS_PROPERTY, new EntityType[] {EntityType.CLASS_PROPERTY, EntityType.DOCUMENT,
-            EntityType.SPACE, EntityType.WIKI});
+            put(EntityType.DOCUMENT, new EntityType[]{EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI});
+            put(EntityType.ATTACHMENT, new EntityType[]{EntityType.ATTACHMENT, EntityType.DOCUMENT, EntityType.SPACE,
+                EntityType.WIKI});
+            put(EntityType.SPACE, new EntityType[]{EntityType.SPACE, EntityType.WIKI});
+            put(EntityType.OBJECT, new EntityType[]{EntityType.OBJECT, EntityType.DOCUMENT, EntityType.SPACE,
+                EntityType.WIKI});
+            put(EntityType.OBJECT_PROPERTY, new EntityType[]{EntityType.OBJECT_PROPERTY, EntityType.OBJECT,
+                EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI});
+            put(EntityType.CLASS_PROPERTY, new EntityType[]{EntityType.CLASS_PROPERTY, EntityType.DOCUMENT,
+                EntityType.SPACE, EntityType.WIKI});
         }
     };
 
-    private static final String[] ESCAPEMATCHING = new String[] {"\\\\", "\\"};
-
-    private static final String[] ESCAPEMATCHINGREPLACE = new String[] {"\\", ""};
+    /**
+     * Array of character to unescape in entity names.
+     */
+    private static final String[] ESCAPEMATCHING = new String[] {DBLESCAPE, ESCAPE};
 
     /**
-     * @param type the entity type for which to return the default value to use (since the use has not specified it)
-     * @param parameters optional parameters. Their meaning depends on the resolver implementation
-     * @return the default value to use
+     * The replacement array corresponding to the array in {@link #ESCAPEMATCHING} array.
      */
-    protected abstract String getDefaultValue(EntityType type, Object... parameters);
+    private static final String[] ESCAPEMATCHINGREPLACE = new String[] {ESCAPE, StringUtils.EMPTY};
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.model.reference.EntityReferenceResolver#resolve
-     */
+    @Override
     public EntityReference resolve(String entityReferenceRepresentation, EntityType type, Object... parameters)
     {
         // TODO: Once we support nested spaces, handle the possibility of having nested spaces. The format is still
@@ -101,7 +94,6 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
         }
 
         EntityReference reference = null;
-        EntityReference lastReference = null;
         char[] separatorsForType = SEPARATORS.get(type);
         EntityType[] entityTypesForType = ENTITYTYPES.get(type);
 
@@ -110,8 +102,7 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
         for (int i = 0; i < separatorsForType.length; i++) {
             String name;
             if (representation.length() > 0) {
-                char separator = separatorsForType[i];
-                name = lastIndexOf(representation, separator, entityTypesForType[i], parameters);
+                name = getSegmentName(representation, separatorsForType[i], entityTypesForType[i], parameters);
             } else {
                 // There's no definition for the current segment use default values
                 name = resolveDefaultValue(entityTypesForType[i], parameters);
@@ -119,12 +110,10 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
 
             if (name != null) {
                 EntityReference newReference = new EntityReference(name, entityTypesForType[i]);
-                if (lastReference != null) {
-                    lastReference.setParent(newReference);
-                }
-                lastReference = newReference;
-                if (reference == null) {
-                    reference = lastReference;
+                if (reference != null) {
+                    reference = reference.appendParent(newReference);
+                } else {
+                    reference = newReference;
                 }
             }
         }
@@ -139,10 +128,9 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
 
         if (name != null) {
             EntityReference newReference = new EntityReference(name, entityTypesForType[separatorsForType.length]);
-            if (lastReference != null) {
-                lastReference.setParent(newReference);
-            }
-            if (reference == null) {
+            if (reference != null) {
+                reference = reference.appendParent(newReference);
+            } else {
                 reference = newReference;
             }
         }
@@ -150,7 +138,16 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
         return reference;
     }
 
-    private String lastIndexOf(StringBuilder representation, char separator, EntityType entityType,
+    /**
+     * Retrieve a segment name.
+     *
+     * @param representation the current string representation of the reference
+     * @param separator the separator for the segment
+     * @param entityType the type of the segment, used to get a default value if the name is empty
+     * @param parameters optional parameters, forwarded to get a default value
+     * @return the segment name
+     */
+    private String getSegmentName(StringBuilder representation, char separator, EntityType entityType,
         Object... parameters)
     {
         String name = null;
@@ -158,7 +155,8 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
         // Search all characters for a non escaped separator. If found, then consider the part after the character as
         // the reference name and continue parsing the part before the separator.
         boolean found = false;
-        for (int i = representation.length() - 1; i >= 0; --i) {
+        int i = representation.length();
+        while (--i >= 0) {
             char currentChar = representation.charAt(i);
             int nextIndex = i - 1;
             char nextChar = 0;
@@ -167,7 +165,7 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
             }
 
             if (currentChar == separator) {
-                int numberOfBackslashes = getNumberOfCharsBefore('\\', representation, nextIndex);
+                int numberOfBackslashes = getNumberOfCharsBefore(CESCAPE, representation, nextIndex);
 
                 if (numberOfBackslashes % 2 == 0) {
                     // Found a valid separator (not escaped), separate content on its left from content on its right
@@ -184,7 +182,7 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
                     representation.delete(nextIndex, i);
                     --i;
                 }
-            } else if (nextChar == '\\') {
+            } else if (nextChar == CESCAPE) {
                 // Unescape the character
                 representation.delete(nextIndex, i);
                 --i;
@@ -203,6 +201,9 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
     /**
      * Search how many time the provided character is found consecutively started to the provided index and before.
      * 
+     * @param c the character to be searched
+     * @param representation the string being searched
+     * @param currentPosition the current position where the search is started in backward direction
      * @return the number of character in the found group
      */
     private int getNumberOfCharsBefore(char c, StringBuilder representation, int currentPosition)
@@ -214,24 +215,5 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
         }
 
         return currentPosition - position;
-    }
-
-    private String resolveDefaultValue(EntityType type, Object... parameters)
-    {
-        String resolvedDefaultValue = null;
-        if (parameters.length > 0 && parameters[0] instanceof EntityReference) {
-            // Try to extract the type from the passed parameter.
-            EntityReference referenceParameter = (EntityReference) parameters[0];
-            EntityReference extractedReference = referenceParameter.extractReference(type);
-            if (extractedReference != null) {
-                resolvedDefaultValue = extractedReference.getName();
-            }
-        }
-
-        if (resolvedDefaultValue == null) {
-            resolvedDefaultValue = getDefaultValue(type, parameters);
-        }
-
-        return resolvedDefaultValue;
     }
 }

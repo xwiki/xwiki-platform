@@ -25,4 +25,8 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface JarExtensionClassLoader
 {
     ExtensionURLClassLoader getURLClassLoader(String namespace, boolean create);
+
+    void dropURLClassLoaders();
+
+    void dropURLClassLoader(String namespace);
 }

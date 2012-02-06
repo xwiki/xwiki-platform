@@ -52,13 +52,21 @@ public class XWikiServletRequestStub implements XWikiRequest
     /** The scheme used by the runtime instance. This is required for creating URLs from scheduled jobs. */
     private String scheme;
 
+    private String host;
+
+    /** The context path used by the runtime instance. This can be useful if a URL factory is created from within a scheduler job. */
+    private String contextPath;
+    
     public XWikiServletRequestStub()
     {
         this.host = "";
     }
 
-    private String host;
-
+    public void setContextPath(String contextPath)
+    {
+        this.contextPath = contextPath;
+    }
+    
     public void setHost(String host)
     {
         this.host = host;
@@ -189,7 +197,7 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     public String getContextPath()
     {
-        return null;
+        return this.contextPath;
     }
 
     public String getQueryString()

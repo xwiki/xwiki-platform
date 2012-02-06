@@ -20,19 +20,12 @@
 package org.xwiki.extension.repository.internal;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
 
@@ -44,9 +37,14 @@ import org.xwiki.extension.LocalExtension;
 public class DefaultLocalExtension extends AbstractExtension implements LocalExtension
 {
     /**
-     * The namespace in which extension is installed.
+     * @see #getNamespaces()
      */
     private Set<String> namespaces;
+
+    /**
+     * @see #getDescriptorFile()
+     */
+    private File descriptorFile;
 
     /**
      * @param repository the repository where this extension comes from
@@ -56,7 +54,6 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
     public DefaultLocalExtension(DefaultLocalExtensionRepository repository, ExtensionId id, String type)
     {
         super(repository, id, type);
-
     }
 
     /**
@@ -70,44 +67,30 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
         super(repository, extension);
     }
 
-    // Extension
-
-    @Override
-    public void download(File file) throws ExtensionException
+    /**
+     * @return the file containing the extension description
+     */
+    public File getDescriptorFile()
     {
-        InputStream sourceStream = null;
-        OutputStream targetStream = null;
+        return this.descriptorFile;
+    }
 
-        try {
-            sourceStream = new FileInputStream(getFile());
-            targetStream = new FileOutputStream(file);
+    /**
+     * @param descriptorFile file containing the extension description
+     */
+    public void setDescriptorFile(File descriptorFile)
+    {
+        this.descriptorFile = descriptorFile;
+    }
 
-            IOUtils.copy(sourceStream, targetStream);
-        } catch (Exception e) {
-            throw new ExtensionException("Failed to copy file", e);
-        } finally {
-            IOException closeException = null;
-
-            if (sourceStream != null) {
-                try {
-                    sourceStream.close();
-                } catch (IOException e) {
-                    closeException = e;
-                }
-            }
-
-            if (targetStream != null) {
-                try {
-                    targetStream.close();
-                } catch (IOException e) {
-                    closeException = e;
-                }
-            }
-
-            if (closeException != null) {
-                throw new ExtensionException("Failed to close file", closeException);
-            }
-        }
+    /**
+     * @param file the extension file in the filesystem
+     * @see #getFile()
+     */
+    public void setFile(File file)
+    {
+        setFile(new DefaultLocalExtensionFile(file));
+        putProperty(PKEY_FILE, file);
     }
 
     // LocalExtension
@@ -142,18 +125,9 @@ public class DefaultLocalExtension extends AbstractExtension implements LocalExt
     }
 
     @Override
-    public File getFile()
+    public DefaultLocalExtensionFile getFile()
     {
-        return getProperty(PKEY_FILE, null);
-    }
-
-    /**
-     * @param file the extension file in the filesystem
-     * @see #getFile()
-     */
-    public void setFile(File file)
-    {
-        putProperty(PKEY_FILE, file);
+        return (DefaultLocalExtensionFile) super.getFile();
     }
 
     @Override

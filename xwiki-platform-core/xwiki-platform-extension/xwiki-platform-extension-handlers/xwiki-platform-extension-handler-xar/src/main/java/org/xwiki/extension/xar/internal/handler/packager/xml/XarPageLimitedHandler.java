@@ -31,16 +31,14 @@ public class XarPageLimitedHandler extends AbstractHandler
 
     private EntityReference pageReference;
 
-    private EntityReference spaceReference;
-
     public XarPageLimitedHandler(ComponentManager componentManager)
     {
         super(componentManager);
 
         setCurrentBean(this);
 
-        this.spaceReference = new EntityReference("space", EntityType.SPACE);
-        this.pageReference = new EntityReference("page", EntityType.DOCUMENT, this.spaceReference);
+        this.pageReference = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE));
 
         addsupportedElements("name");
         addsupportedElements("web");
@@ -65,11 +63,13 @@ public class XarPageLimitedHandler extends AbstractHandler
                 this.xarEntry.setLanguage(this.value.toString());
             }
         } else if (qName.equals("name")) {
+            this.pageReference = new EntityReference(this.value.toString(), EntityType.DOCUMENT,
+               this.pageReference.getParent());
             this.xarEntry.setDocumentReference(this.pageReference);
-            this.pageReference.setName(this.value.toString());
         } else if (qName.equals("web")) {
+            this.pageReference = this.pageReference.replaceParent(this.pageReference.getParent(),
+               new EntityReference(this.value.toString(), EntityType.SPACE));
             this.xarEntry.setDocumentReference(this.pageReference);
-            this.spaceReference.setName(this.value.toString());
         } else {
             super.endElementInternal(uri, localName, qName);
         }

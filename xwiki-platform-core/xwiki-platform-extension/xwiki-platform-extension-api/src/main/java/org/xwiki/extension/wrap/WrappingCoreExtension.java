@@ -19,9 +19,8 @@
  */
 package org.xwiki.extension.wrap;
 
-import java.net.URL;
-
 import org.xwiki.extension.CoreExtension;
+import org.xwiki.extension.CoreExtensionFile;
 
 /**
  * Wrap a Core extension.
@@ -40,14 +39,14 @@ public class WrappingCoreExtension<T extends CoreExtension> extends WrappingExte
     }
 
     @Override
-    public URL getURL()
+    public CoreExtensionFile getFile()
     {
-        return getExtension().getURL();
+        return (CoreExtensionFile) super.getFile();
     }
 
     @Override
     public boolean isGuessed()
     {
-        return getExtension().isGuessed();
+        return getWrapped().isGuessed();
     }
 }

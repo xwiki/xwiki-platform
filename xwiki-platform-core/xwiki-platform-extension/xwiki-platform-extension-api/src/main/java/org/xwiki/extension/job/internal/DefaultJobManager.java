@@ -19,19 +19,22 @@
  */
 package org.xwiki.extension.job.internal;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.extension.job.InstallRequest;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.job.Job;
 import org.xwiki.extension.job.JobException;
 import org.xwiki.extension.job.JobManager;
-import org.xwiki.extension.job.JobStatus;
 import org.xwiki.extension.job.Request;
-import org.xwiki.extension.job.UninstallRequest;
+import org.xwiki.extension.job.event.status.JobStatus;
 
 /**
  * Default implementation of {@link JobManager}.
@@ -40,8 +43,36 @@ import org.xwiki.extension.job.UninstallRequest;
  */
 @Component
 @Singleton
-public class DefaultJobManager implements JobManager
+public class DefaultJobManager implements JobManager, Runnable, Initializable
 {
+    /**
+     * A hob to execute.
+     * 
+     * @version $Id$
+     */
+    private static class JobElement
+    {
+        /**
+         * The job to execute.
+         */
+        public Job job;
+
+        /**
+         * The request to use to control the job.
+         */
+        public Request request;
+
+        /**
+         * @param job the job to execute
+         * @param request the request to use to control the job
+         */
+        public JobElement(Job job, Request request)
+        {
+            this.job = job;
+            this.request = request;
+        }
+    }
+
     /**
      * Used to lookup {@link Job} implementations.
      */
@@ -51,7 +82,48 @@ public class DefaultJobManager implements JobManager
     /**
      * @see #getCurrentJob()
      */
-    private Job currentJob;
+    private volatile Job currentJob;
+
+    /**
+     * The queue of jobs to execute.
+     */
+    private BlockingQueue<JobElement> jobQueue = new LinkedBlockingQueue<JobElement>();
+
+    /**
+     * The thread on which the job manager is running.
+     */
+    private Thread thread;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        this.thread = new Thread(this);
+        this.thread.setDaemon(true);
+        this.thread.start();
+    }
+
+    // Runnable
+
+    @Override
+    public void run()
+    {
+        while (!this.thread.isInterrupted()) {
+            try {
+                JobElement element = this.jobQueue.take();
+
+                this.currentJob = element.job;
+
+                // Wait in case synchronous job is running
+                synchronized (this) {
+                    this.currentJob.start(element.request);
+                }
+            } catch (InterruptedException e) {
+                // Thread has been stopped
+            }
+        }
+    }
+
+    // JobManager
 
     @Override
     public Job getCurrentJob()
@@ -59,33 +131,48 @@ public class DefaultJobManager implements JobManager
         return this.currentJob;
     }
 
-    @Override
-    public Job install(InstallRequest request) throws JobException
+    /**
+     * @param jobType the job id
+     * @return a new job
+     * @throws JobException failed to create a job for the provided type
+     */
+    private Job createJob(String jobType) throws JobException
     {
-        return executeJob("install", request);
+        Job job;
+        try {
+            job = this.componentManager.lookup(Job.class, jobType);
+        } catch (ComponentLookupException e) {
+            throw new JobException("Failed to lookup any Job for role hint [" + jobType + "]", e);
+        }
+
+        return job;
     }
 
     @Override
-    public Job uninstall(UninstallRequest request) throws JobException
+    public synchronized Job executeJob(String jobType, Request request) throws JobException
     {
-        return executeJob("uninstall", request);
-    }
-
-    @Override
-    public synchronized Job executeJob(String taskId, Request request) throws JobException
-    {
-        if (this.currentJob != null && this.currentJob.getStatus().getState() != JobStatus.State.FINISHED) {
+        if (this.jobQueue.isEmpty()
+            && (this.currentJob != null && this.currentJob.getStatus().getState() != JobStatus.State.FINISHED)) {
             throw new JobException("A task is already running");
         }
 
-        try {
-            this.currentJob = this.componentManager.lookup(Job.class, taskId);
-        } catch (ComponentLookupException e) {
-            throw new JobException("Failed to lookup any Task for role hint [" + taskId + "]", e);
+        // The lock is used to block the explicit job queue thread
+        synchronized (this) {
+            this.currentJob = createJob(jobType);
+
+            this.currentJob.start(request);
         }
 
-        this.currentJob.start(request);
-
         return this.currentJob;
+    }
+
+    @Override
+    public Job addJob(String jobType, Request request) throws JobException
+    {
+        Job job = createJob(jobType);
+
+        this.jobQueue.add(new JobElement(job, request));
+
+        return job;
     }
 }

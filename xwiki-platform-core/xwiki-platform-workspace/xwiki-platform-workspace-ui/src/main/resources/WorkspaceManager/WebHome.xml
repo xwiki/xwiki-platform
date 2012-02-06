@@ -103,23 +103,23 @@
 </property>
 <property>
 <code>.actionjoin {
-  background-image: url($xwiki.getSkinFile("icons/silk/user_add.gif"));
+  background-image: url("$xwiki.getSkinFile('icons/silk/user_add.png')");
 }
 
 .actionleave {
-  background-image: url($xwiki.getSkinFile("icons/silk/user_delete.gif"));
+  background-image: url("$xwiki.getSkinFile('icons/silk/user_delete.png')");
 }
 
 .actionrequestJoin {
-  background-image: url($xwiki.getSkinFile("icons/silk/bell.gif"));
+  background-image: url("$xwiki.getSkinFile('icons/silk/bell.png')");
 }
 
 .actioncancelJoinRequest {
-  background-image: url($xwiki.getSkinFile("icons/silk/bell_delete.gif"));
+  background-image: url("$xwiki.getSkinFile('icons/silk/bell_delete.png')");
 }
 
 .actionviewInvitation {
-  background-image: url($xwiki.getSkinFile("icons/silk/script.gif"));
+  background-image: url("$xwiki.getSkinFile('icons/silk/script.png')");
 }</code>
 </property>
 <property>

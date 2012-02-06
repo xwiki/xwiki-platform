@@ -10,9 +10,9 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1251918749000</creationDate>
-<date>1266580135000</date>
-<contentUpdateDate>1266580135000</contentUpdateDate>
+<creationDate>1323347520000</creationDate>
+<date>1323360608000</date>
+<contentUpdateDate>1323360608000</contentUpdateDate>
 <version>1.1</version>
 <title>Wiki Search Botlet</title>
 <template></template>
@@ -203,7 +203,14 @@ class WikiSearchBotlet implements IRCBotlet
     }
 }
 
-if (request.action == "start") {
+if (request.action == "start" || xcontext.get("botAction") == "start") {
+
+    // If this is being started by the start button, set it to enabled.
+    if (request.action == "start") {
+        doc.getObject("IRC.IRCBotlet").set("disabled", 0)
+        doc.saveAsAuthor("Enabling botlet.")
+    }
+
     // Register against the component manager
     DefaultComponentDescriptor descriptor = new DefaultComponentDescriptor()
     descriptor.setImplementation(WikiSearchBotlet.class)
@@ -212,7 +219,14 @@ if (request.action == "start") {
     Utils.getComponentManager().registerComponent(descriptor)
     // Create the instance of the component to ensure it's initialized
     Utils.getComponent(IRCBotlet.class, "wikisearch")
-} else if (request.action == "stop") {
+} else if (request.action == "stop" || xcontext.get("botAction") == "stop") {
+
+    // If this is being started by the stop button, set it to disabled.
+    if (request.action == "stop") {
+        doc.getObject("IRC.IRCBotlet").set("disabled", 1)
+        doc.saveAsAuthor("Disabling botlet.")
+    }
+
     Utils.getComponentManager().unregisterComponent(IRCBotlet.class, "wikisearch")
 }
 {{/groovy}}
@@ -245,5 +259,4 @@ import org.xwiki.rendering.block.*
 
 // Pretty print the first Groovy macro content.
 println "{{code language=\"none\"}}${doc.getDocument().getXDOM().getChildrenByType(MacroBlock.class, true).get(2).getContent()}{{/code}}"
-{{/groovy}}</content>
-</xwikidoc>
+{{/groovy}}</content></xwikidoc>

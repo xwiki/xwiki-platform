@@ -145,7 +145,7 @@ public class WatchListJobManager
             doc = context.getWiki().getDocument(WATCHLIST_JOB_CLASS, context);
         } catch (Exception e) {
             doc = new XWikiDocument();
-            String[] spaceAndName = StringUtils.split(WATCHLIST_JOB_CLASS, ".");
+            String[] spaceAndName = StringUtils.split(WATCHLIST_JOB_CLASS, '.');
             doc.setSpace(spaceAndName[0]);
             doc.setName(spaceAndName[1]);
             needsUpdate = true;

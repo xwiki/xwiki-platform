@@ -48,39 +48,40 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
      * Customize provided configuration based on XWiki cache configuration.
      * 
      * @param isConfiguration the Infinispan configuration
-     * @return true if the provided configuration has been modified
+     * @param overwite indicate if XWiki configuration has priority over Infinispan configuration
      */
-    public boolean customize(Configuration isConfiguration)
+    public void customize(Configuration isConfiguration, boolean overwite)
     {
-        boolean configChanged = false;
+        // Set custom configuration
 
-        EntryEvictionConfiguration eec =
-            (EntryEvictionConfiguration) getCacheConfiguration().get(EntryEvictionConfiguration.CONFIGURATIONID);
+        if (overwite) {
+            EntryEvictionConfiguration eec =
+                (EntryEvictionConfiguration) getCacheConfiguration().get(EntryEvictionConfiguration.CONFIGURATIONID);
 
-        if (eec != null && eec.getAlgorithm() == EntryEvictionConfiguration.Algorithm.LRU) {
-            if (eec.containsKey(LRUEvictionConfiguration.MAXENTRIES_ID)) {
-                isConfiguration.fluent().eviction().strategy(EvictionStrategy.LRU)
-                    .maxEntries(((Number) eec.get(LRUEvictionConfiguration.MAXENTRIES_ID)).intValue());
-                configChanged = true;
-            }
+            if (eec != null && eec.getAlgorithm() == EntryEvictionConfiguration.Algorithm.LRU) {
+                if (eec.containsKey(LRUEvictionConfiguration.MAXENTRIES_ID)) {
+                    isConfiguration.fluent().eviction().strategy(EvictionStrategy.LRU)
+                        .maxEntries(((Number) eec.get(LRUEvictionConfiguration.MAXENTRIES_ID)).intValue());
+                }
 
-            if (eec.getTimeToLive() > 0) {
-                isConfiguration.fluent().expiration().maxIdle(eec.getTimeToLive() * 1000L);
-                configChanged = true;
+                if (eec.getTimeToLive() > 0) {
+                    isConfiguration.fluent().expiration().maxIdle(eec.getTimeToLive() * 1000L);
+                }
             }
         }
+
+        // Make sure filesystem based caches have a proper location
 
         for (CacheLoaderConfig cacheLoaderConfig : isConfiguration.getCacheLoaders()) {
             if (cacheLoaderConfig instanceof FileCacheStoreConfig) {
                 FileCacheStoreConfig fileCacheLoaderConfig = (FileCacheStoreConfig) cacheLoaderConfig;
                 String location = fileCacheLoaderConfig.getLocation();
 
-                if (StringUtils.isBlank(location)) {
+                // "Infinispan-FileCacheStore" is the default location...
+                if (StringUtils.isBlank(location) || location.equals("Infinispan-FileCacheStore")) {
                     fileCacheLoaderConfig.location(createTempDir());
                 }
             }
         }
-
-        return configChanged;
     }
 }

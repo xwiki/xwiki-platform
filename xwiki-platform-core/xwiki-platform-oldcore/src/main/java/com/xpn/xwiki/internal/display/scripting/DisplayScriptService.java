@@ -20,6 +20,9 @@
 package com.xpn.xwiki.internal.display.scripting;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,6 +40,7 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiContext;
@@ -55,16 +59,14 @@ import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 @Singleton
 public class DisplayScriptService implements ScriptService
 {
+    /**
+     * The key used to store the displayer parameters in the display parameter map.
+     */
+    private static final String DISPLAYER_PARAMETERS_KEY = "displayerParameters";
+
     /** Logging helper object. */
     @Inject
     private Logger logger;
-
-    /**
-     * The component used to display documents.
-     */
-    @Inject
-    @Named("configured")
-    private DocumentDisplayer documentDisplayer;
 
     /**
      * The component manager.
@@ -85,19 +87,50 @@ public class DisplayScriptService implements ScriptService
     private Execution execution;
 
     /**
+     * The component used to create syntax instances from syntax identifiers.
+     */
+    @Inject
+    private SyntaxFactory syntaxFactory;
+
+    /**
      * Displays a document.
      * 
      * @param document the document to display
      * @param parameters the display parameters
-     * @param outputSyntax the output syntax
      * @return the result of displaying the given document
      */
-    public String document(Document document, DocumentDisplayerParameters parameters, Syntax outputSyntax)
+    private String document(Document document, Map<String, Object> parameters)
     {
+        Syntax outputSyntax = (Syntax) parameters.get("outputSyntax");
+        if (outputSyntax == null) {
+            String outputSyntaxId = (String) parameters.get("outputSyntaxId");
+            if (outputSyntaxId != null) {
+                try {
+                    outputSyntax = syntaxFactory.createSyntaxFromIdString(outputSyntaxId);
+                } catch (Exception e) {
+                    logger.error("Failed to parse output syntax ID [{}].", outputSyntaxId, e);
+                    return null;
+                }
+            } else {
+                outputSyntax = Syntax.XHTML_1_0;
+            }
+        }
+
+        DocumentDisplayerParameters displayerParameters =
+            (DocumentDisplayerParameters) parameters.get(DISPLAYER_PARAMETERS_KEY);
+        if (displayerParameters == null) {
+            displayerParameters = new DocumentDisplayerParameters();
+        }
+
+        String displayerHint = (String) parameters.get("displayerHint");
+        if (displayerHint == null) {
+            displayerHint = "configured";
+        }
         try {
-            return renderXDOM(documentDisplayer.display(getDocument(document), parameters), outputSyntax);
+            DocumentDisplayer displayer = componentManager.lookup(DocumentDisplayer.class, displayerHint);
+            return renderXDOM(displayer.display(getDocument(document), displayerParameters), outputSyntax);
         } catch (Exception e) {
-            logger.warn("Failed to display document [{}].", document.getPrefixedFullName(), e);
+            logger.error("Failed to display document [{}].", document.getPrefixedFullName(), e);
             return null;
         }
     }
@@ -112,22 +145,22 @@ public class DisplayScriptService implements ScriptService
 
     /**
      * @param document the document whose content is displayed
-     * @return the result of rendering the content of the given document as XHTML in the context of the current document
-     * @see #content(Document, Syntax)
+     * @return the result of rendering the content of the given document as XHTML using the configured displayer
+     * @see #content(Document, Map)
      */
     public String content(Document document)
     {
-        return content(document, Syntax.XHTML_1_0);
+        return content(document, Collections.<String, Object> emptyMap());
     }
 
     /**
-     * Displays the content of the given document in the context of the current document.
+     * Displays the content of the given document.
      * 
      * @param document the document whose content is displayed
-     * @param outputSyntax the output syntax
-     * @return the result of rendering the content of the given document in the context of the current document
+     * @param parameters the display parameters
+     * @return the result of rendering the content of the given document using the provided parameters
      */
-    public String content(Document document, Syntax outputSyntax)
+    public String content(Document document, Map<String, Object> parameters)
     {
         XWikiContext context = getXWikiContext();
         String content = null;
@@ -139,10 +172,22 @@ public class DisplayScriptService implements ScriptService
         }
         String renderedContent = renderingCache.getRenderedContent(document.getDocumentReference(), content, context);
         if (renderedContent == null) {
-            DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
-            parameters.setTransformationContextIsolated(true);
-            parameters.setContentTranslated(true);
-            renderedContent = document(document, parameters, outputSyntax);
+            Map<String, Object> actualParameters = new HashMap<String, Object>(parameters);
+            DocumentDisplayerParameters displayerParameters =
+                (DocumentDisplayerParameters) parameters.get(DISPLAYER_PARAMETERS_KEY);
+            if (displayerParameters == null) {
+                displayerParameters = new DocumentDisplayerParameters();
+                // Default content display parameters.
+                displayerParameters.setExecutionContextIsolated(true);
+                displayerParameters.setContentTranslated(true);
+            } else if (displayerParameters.isTitleDisplayed()) {
+                // Clone because we have to enforce content display.
+                displayerParameters = displayerParameters.clone();
+            }
+            // Ensure the content is displayed.
+            displayerParameters.setTitleDisplayed(false);
+            actualParameters.put(DISPLAYER_PARAMETERS_KEY, displayerParameters);
+            renderedContent = document(document, actualParameters);
             if (renderedContent != null) {
                 renderingCache.setRenderedContent(document.getDocumentReference(), content, renderedContent, context);
             }
@@ -156,35 +201,36 @@ public class DisplayScriptService implements ScriptService
      * which means it's allowed to use Velocity, Groovy, etc. syntax within a title.
      * 
      * @param document the document whose title is displayed
-     * @param outputSyntax the output syntax
-     * @return the result of rendering the title of the given document in the specified syntax
+     * @param parameters the display parameters
+     * @return the result of displaying the title of the given document
      */
-    public String title(Document document, Syntax outputSyntax)
+    public String title(Document document, Map<String, Object> parameters)
     {
-        DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
-        parameters.setTitleDisplayed(true);
-        parameters.setExecutionContextIsolated(true);
-        return document(document, parameters, outputSyntax);
+        Map<String, Object> actualParameters = new HashMap<String, Object>(parameters);
+        DocumentDisplayerParameters displayerParameters =
+            (DocumentDisplayerParameters) parameters.get(DISPLAYER_PARAMETERS_KEY);
+        if (displayerParameters == null) {
+            displayerParameters = new DocumentDisplayerParameters();
+            // Default title display parameters.
+            displayerParameters.setExecutionContextIsolated(true);
+        } else if (!displayerParameters.isTitleDisplayed()) {
+            // Clone because we have to enforce title display.
+            displayerParameters = displayerParameters.clone();
+        }
+        // Ensure the title is displayed.
+        displayerParameters.setTitleDisplayed(true);
+        actualParameters.put(DISPLAYER_PARAMETERS_KEY, displayerParameters);
+        return document(document, actualParameters);
     }
 
     /**
      * @param document the document whose title is displayed
-     * @return the result of rendering the title of the given document as XHTML
-     * @see #title(Document, Syntax)
+     * @return the result of rendering the title of the given document as XHTML using the configured displayer
+     * @see #title(Document, Map)
      */
     public String title(Document document)
     {
-        return title(document, Syntax.XHTML_1_0);
-    }
-
-    /**
-     * @param document the document whose title is displayed
-     * @return the result of rendering the title of the given document as plain text (all mark-up removed)
-     * @see #title(Document, Syntax)
-     */
-    public String plainTitle(Document document)
-    {
-        return title(document, Syntax.PLAIN_1_0);
+        return title(document, Collections.<String, Object> emptyMap());
     }
 
     /**

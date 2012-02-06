@@ -58,6 +58,11 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     private static final String CONTENT_CHARSET_FRAGMENT = "charset=";
 
     /**
+     * Character used to mark the beginning of the query string in a URL.
+     */
+    private static final String QUERY_STRING_SEPARATOR = "?";
+
+    /**
      * Message resources.
      */
     private ResourceBundle messages = ResourceBundle.getBundle("DutchWebGuidelines");
@@ -953,6 +958,9 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
             String href = getAttributeValue(link, ATTR_HREF);
             if (href != null && href.startsWith(MAILTO)) {
                 String email = StringUtils.substringAfter(href, MAILTO);
+                if (email.contains(QUERY_STRING_SEPARATOR)) {
+                    email = StringUtils.substringBefore(email, QUERY_STRING_SEPARATOR);
+                }
                 assertTrue(Type.ERROR, "rpd8s16.email", link.getTextContent().contains(email));
             }
         }

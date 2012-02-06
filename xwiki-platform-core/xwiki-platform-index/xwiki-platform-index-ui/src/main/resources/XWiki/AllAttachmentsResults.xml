@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>AllAttachmentsResults</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.AllAttachments</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1252454400000</creationDate>
+<date>1297363148000</date>
+<contentUpdateDate>1297363148000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get("platform.index.attachmentsResults")</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.RequiredRightClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<level>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>level</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>level</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values>edit|programming</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</level>
+</class>
+<name>XWiki.AllAttachmentsResults</name>
+<number>0</number>
+<className>XWiki.RequiredRightClass</className>
+<guid>bf8888e5-2c90-47ab-9a47-dec1db8bdd54</guid>
+<property>
+<level>programming</level>
+</property>
+</object>
+<content>{{velocity wiki="false"}}
+## ============================================================================================
+## This page is called from live grids via Ajax with the argument xpage=plain. It returns a
+## set of results serialized in JSON.
+## @programming This service page needs to be saved by a user with the programming access level
+## to work as expected
+## ============================================================================================
+#if ("$!request.get('xpage')" == 'plain')
+  $response.setContentType('application/json')##
+  #set ($offset = $util.parseInt($request.get('offset')))
+  ## offset starts from 0 in velocity and 1 in javascript
+  #set ($off = $offset - 1)
+  #set ($limit = $util.parseInt($request.get('limit')))
+  #set ($title = $request.get('doc.name'))
+  #set ($author = $request.get('author'))
+  #set ($space = $request.get('doc.space'))
+  #set ($filename = $request.filename)
+  #set ($formatDate = 'yyyy MMMM dd, HH:mm')
+  #set ($query = '')
+  #set ($queryParameters = [])
+  #if ($title)
+    #set ($title = $title.trim().toLowerCase())
+    #set ($query = $query + " and lower(doc.name) like ?")
+    #set ($discard = $queryParameters.add("%${title}%"))
+  #end
+  #if ($author)
+    #set ($author = $author.trim().toLowerCase())
+    #set ($query = $query + " and lower(attach.author) like ?")
+    #set ($discard = $queryParameters.add("%${author}%"))
+  #end
+  #if ($filename)
+    #set ($filename = $filename.trim().toLowerCase())
+    #set ($query = $query + " and lower(attach.filename) like ?")
+    #set ($discard = $queryParameters.add("%${filename}%"))
+  #end
+  #if ($space)
+    #set ($space = $space.trim().toLowerCase())
+    #set ($query = $query + " and lower(doc.space) like ?")
+    #set ($discard = $queryParameters.add("%${space}%"))
+  #end
+  ##
+  ## Exclude Blacklisted spaces ($blacklistedSpaces is set in xwikivars.vm)
+  ##
+  #if (!$hasAdmin)
+    #foreach ($blacklistedSpace in $blacklistedSpaces)
+      #set ($query = "${query} and doc.space &lt;&gt; ?")
+      #set ($discard = $queryParameters.add($blacklistedSpace))
+    #end
+  #end
+  #set ($validSortOptions = ['filename', 'doc.name', 'doc.space', 'date', 'author'])
+  #if ($validSortOptions.contains($request.sort))
+    #set ($order = $request.sort)
+  #else
+    #set ($order = 'filename')
+  #end
+  #if (!$order.startsWith('doc.'))
+    #set ($order = "attach.${order}")
+  #end
+  #if ("$!request.dir" == 'desc')
+    #set ($dir = 'desc')
+  #else
+    #set ($dir = 'asc')
+  #end
+  ##
+  ## Compute the final query
+  ##
+  #set ($countQuery = "select count(*) from XWikiDocument as doc, XWikiAttachment as attach where attach.docId=doc.id" + $query)
+  #set ($query = "select doc.fullName, attach from XWikiDocument as doc, XWikiAttachment as attach where attach.docId=doc.id" + $query + " order by $order $dir")
+  #set ($items = $xwiki.search($query, $limit, $off, $queryParameters))
+  #set ($totalItems = $xwiki.search($countQuery, 0, 0, $queryParameters).get(0))
+  #set ($returnedItems = $items.size())
+  ## ==============================================
+  ## json starts
+  ## ==============================================
+{
+"totalrows": $totalItems,
+"returnedrows": #if($returnedItems &lt; $limit) $returnedItems #else $limit #end,
+"offset": $offset,
+"reqNo": $util.parseInt($request.reqNo),
+"rows": [
+#foreach ($item in $items)
+  #set ($docName = $item.get(0))
+  #set ($hasAccess = $xwiki.hasAccessLevel('view', $context.user, $docName))
+  #set ($attachment = $item.get(1))
+  #if ($velocityCount &gt; 1) , #end
+  { "acclev" : $hasAccess,
+  #if ($hasAccess)
+    #set ($document = $xwiki.getDocument($docName))
+    "page" : "$escapetool.javascript($document.name)",
+    "space" : "$escapetool.javascript($document.space)",
+    "fullname" : "$escapetool.javascript($document.fullName)",
+    "filename" : "$escapetool.javascript($attachment.filename)",
+    "fileurl" : "$document.getAttachmentURL($attachment.filename)",
+    "url" : "$document.getURL('view')",
+    "spaceurl" : "$xwiki.getURL("${document.space}.WebHome")",
+    "date" : "$xwiki.formatDate($attachment.date, $formatDate)",
+    "author" : "$!escapetool.javascript($attachment.author)",
+    "authorname" : "$!escapetool.javascript($xwiki.getDocument($attachment.author).name)",
+    "authorurl" : "$xwiki.getURL($attachment.author)",
+    "type" : "$!escapetool.javascript($attachment.getMimeType($context.context))"
+  #else
+    "fullname": "$escapetool.javascript($docName)"
+  #end
+  }
+#end
+]}
+## ==============================================
+## json ended
+## ==============================================
+#end
+{{/velocity}}</content></xwikidoc>

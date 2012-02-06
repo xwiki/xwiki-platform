@@ -187,7 +187,7 @@ XWiki.HSortableList = Class.create({
 XWiki.HSortableListWithInput = Class.create(XWiki.HSortableList, {
   initialize : function($super, values, duplicatesAllowed, possibleValues, inputTip) {
     $super(values, duplicatesAllowed);
-    this.container = new Element('div', {'class': 'hSortableWrapper'}).update('&lt;div&gt;&lt;input type="text" class="withTip"/&gt;&lt;input type="image" class="icon" title="$escapetool.xml($msg.get('wysiwyg.admin.widgets.sortableList.add'))" src="$xwiki.getSkinFile('icons/silk/add.gif')" alt="$escapetool.xml($msg.get('wysiwyg.admin.widgets.sortableList.add'))"/&gt;&lt;/div&gt;');
+    this.container = new Element('div', {'class': 'hSortableWrapper'}).update('&lt;div&gt;&lt;input type="text" class="withTip"/&gt;&lt;input type="image" class="icon" title="$escapetool.xml($msg.get('wysiwyg.admin.widgets.sortableList.add'))" src="$xwiki.getSkinFile('icons/silk/add.png')" alt="$escapetool.xml($msg.get('wysiwyg.admin.widgets.sortableList.add'))"/&gt;&lt;/div&gt;');
     this.container.firstChild.firstChild.value = this.container.firstChild.firstChild.defaultValue = inputTip;
     this.container.appendChild(this.list);
     Event.observe(this.container.firstChild.firstChild, 'keydown', this.onKeyDown.bindAsEventListener(this));
@@ -399,7 +399,7 @@ XWiki.ColorPaletteEditor = Class.create({
     cell.firstChild.style.backgroundColor = this.colorPickerInput.value;
   },
   initializeColorPaletteSizeControls : function() {
-    this.sizeControls = new Element('div', {id: 'colorPaletteSizeControls'}).update('&lt;label for="colorPaletteRowCount"&gt;$escapetool.xml($msg.get('wysiwyg.admin.widgets.colorPaletteEditor.rows')) &lt;/label&gt;&lt;input id="colorPaletteRowCount" type="text" size="3"/&gt; &lt;label for="colorPaletteColumnCount"&gt;$escapetool.xml($msg.get('wysiwyg.admin.widgets.colorPaletteEditor.columns')) &lt;/label&gt;&lt;input id="colorPaletteColumnCount" type="text" size="3"/&gt;&lt;input type="image" class="icon" title="$escapetool.xml($msg.get('wysiwyg.admin.widgets.colorPaletteEditor.refresh'))" src="$xwiki.getSkinFile('icons/silk/arrow_refresh.gif')" alt="$escapetool.xml($msg.get('wysiwyg.admin.widgets.colorPaletteEditor.refresh'))"/&gt;');
+    this.sizeControls = new Element('div', {id: 'colorPaletteSizeControls'}).update('&lt;label for="colorPaletteRowCount"&gt;$escapetool.xml($msg.get('wysiwyg.admin.widgets.colorPaletteEditor.rows')) &lt;/label&gt;&lt;input id="colorPaletteRowCount" type="text" size="3"/&gt; &lt;label for="colorPaletteColumnCount"&gt;$escapetool.xml($msg.get('wysiwyg.admin.widgets.colorPaletteEditor.columns')) &lt;/label&gt;&lt;input id="colorPaletteColumnCount" type="text" size="3"/&gt;&lt;input type="image" class="icon" title="$escapetool.xml($msg.get('wysiwyg.admin.widgets.colorPaletteEditor.refresh'))" src="$xwiki.getSkinFile('icons/silk/arrow_refresh.png')" alt="$escapetool.xml($msg.get('wysiwyg.admin.widgets.colorPaletteEditor.refresh'))"/&gt;');
 
     var rowCountField = this.sizeControls.down('input');
     rowCountField.value = this.getRowCount();
@@ -527,7 +527,7 @@ XWiki.ListBox = Class.create({
   initialize : function(multiple, size, items) {
     this.selectElement = this._createList(items || [], size || 1, !!multiple);
 
-    this.removeButton = new Element('input', {type: "image", 'class': 'icon', title: "$escapetool.javascript($msg.get('wysiwyg.admin.widgets.listBox.delete'))",  src: "$xwiki.getSkinFile('icons/silk/cross.gif')", alt:"$escapetool.javascript($msg.get('wysiwyg.admin.widgets.listBox.delete'))"});
+    this.removeButton = new Element('input', {type: "image", 'class': 'icon', title: "$escapetool.javascript($msg.get('wysiwyg.admin.widgets.listBox.delete'))",  src: "$xwiki.getSkinFile('icons/silk/cross.png')", alt:"$escapetool.javascript($msg.get('wysiwyg.admin.widgets.listBox.delete'))"});
     this.removeButton.observe('click', this._onClickRemove.bindAsEventListener(this));
 
     this.container = new Element('div', {'class': 'listBoxWrapper'});
@@ -650,7 +650,7 @@ XWiki.FontNameListBox = Class.create(XWiki.ListBox, {
   initialize : function($super, fontNames) {
     ${super}(true, 10, fontNames.split(/\s*,\s*/).sort());
 
-    this.inputWrapper = new Element('div').update('&lt;input type="text" class="withTip"/&gt;&lt;input type="image" class="icon" title="$escapetool.xml($msg.get('wysiwyg.admin.widgets.listBox.add'))" src="$xwiki.getSkinFile('icons/silk/add.gif')" alt="$escapetool.xml($msg.get('wysiwyg.admin.widgets.listBox.add'))"/&gt;');
+    this.inputWrapper = new Element('div').update('&lt;input type="text" class="withTip"/&gt;&lt;input type="image" class="icon" title="$escapetool.xml($msg.get('wysiwyg.admin.widgets.listBox.add'))" src="$xwiki.getSkinFile('icons/silk/add.png')" alt="$escapetool.xml($msg.get('wysiwyg.admin.widgets.listBox.add'))"/&gt;');
     this.inputWrapper.firstChild.value = this.inputWrapper.firstChild.defaultValue = '$escapetool.javascript($msg.get('wysiwyg.admin.fontNames.add.hint'))';
     $(this.inputWrapper.firstChild).observe('keydown', this._onKeyDown.bindAsEventListener(this));
     $(this.inputWrapper.lastChild).observe('click', this._onClickAdd.bindAsEventListener(this));

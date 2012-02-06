@@ -19,12 +19,10 @@
  */
 package org.xwiki.extension.repository.internal;
 
-import java.io.File;
 import java.net.URL;
 
 import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.CoreExtension;
-import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
 
 /**
@@ -44,16 +42,12 @@ public class DefaultCoreExtension extends AbstractExtension implements CoreExten
     {
         super(repository, id, type);
 
+        setFile(new DefaultCoreExtensionFile(url));
+
         putProperty(PKEY_URL, url);
     }
 
     // Extension
-
-    @Override
-    public void download(File file) throws ExtensionException
-    {
-        // TODO
-    }
 
     @Override
     public void setId(ExtensionId id)
@@ -61,13 +55,13 @@ public class DefaultCoreExtension extends AbstractExtension implements CoreExten
         super.setId(id);
     }
 
-    // CoreExtension
-
     @Override
-    public URL getURL()
+    public void setType(String type)
     {
-        return getProperty(PKEY_URL, null);
+        super.setType(type);
     }
+    
+    // CoreExtension
 
     @Override
     public boolean isGuessed()

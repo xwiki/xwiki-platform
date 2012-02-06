@@ -42,7 +42,7 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
     /**
      * Logging tools.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentStatsStoreItem.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VisitStatsStoreItem.class);
 
     /**
      * The {@link VisitStats} object to store.
@@ -93,7 +93,7 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
                     store.deleteXWikiCollection(oldVisitStats, this.context, true, true);
                 } catch (Exception e) {
                     if (LOGGER.isWarnEnabled()) {
-                        LOGGER.warn("Failed to delete old visit statistics object from database [" + getId() + "]");
+                        LOGGER.error("Failed to delete old visit statistics object from database [{}]", getId(), e);
                     }
                 }
             }
@@ -101,7 +101,7 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
             // TODO Fix use of deprecated call.
             store.saveXWikiCollection(newVisitStats, this.context, true);
         } catch (XWikiException e) {
-            LOGGER.error("Failed to save visit statictics object [" + getId() + "]");
+            LOGGER.error("Failed to save visit statistics object [{}]", getId(), e);
         }
     }
 }

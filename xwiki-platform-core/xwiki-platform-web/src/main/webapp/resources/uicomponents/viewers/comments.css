@@ -12,7 +12,7 @@ ul.commentreplies, .reply {
 }
 .reply {
   list-style-type: none;
-  padding-left: 55px;
+  padding-left: 60px;
 }
 .reply form.reply {
   padding-left: 0;
@@ -42,7 +42,7 @@ ul.commentreplies, .reply {
 .commentavatar {
   display: inline; /* IE6 bugfix */
   float: left;
-  margin-left: -55px;
+  margin-left: -60px;
   padding-top: 5px;
   position: relative; /* IE6 bugfix */
   text-align: center;
@@ -106,33 +106,35 @@ ul.commentreplies, .reply {
   width: 16px;
 }
 .comment-permalink a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/link.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/link.png')");
 }
 .commentdelete a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
 .commentreply a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/comments_add.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/comments_add.png')");
 }
 .commentedit a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.gif')"); /*comment_edit*/
+  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')"); /*comment_edit*/
 }
 /* Form */
 #AddComment {
   border-top: 1px solid $theme.borderColor;
 }
 #AddComment fieldset {
-  padding-left: 55px;
+  padding-left: 60px;
 }
 .commentthread #AddComment fieldset {
   padding-left: 35px;
 }
 #AddComment label {
   color: $theme.textSecondaryColor;
+  font-size: .9em;
   font-weight: 400;
 }
 #AddComment legend {
-  margin-left: -55px;
+  font-size: 1em;
+  margin-left: -60px;
 }
 .commentthread #AddComment legend {
   display: none;     /* For replies, don't display the legend, because it is unnecessary and does not integrate well. */
@@ -160,12 +162,9 @@ ul.commentreplies, .reply {
   /* fix for IE7 */
   width: 98%;
 }
-#AddComment label {
-  font-weight: bold;
-}
 /* Permalink box */
 .permalinkBox .xdialog-box-confirmation .question {
-  background-image: url("$xwiki.getSkinFile('icons/silk/link.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/link.png')");
   padding-left: 0;
   text-indent: 22px;
 }

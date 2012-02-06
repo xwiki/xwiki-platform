@@ -43,9 +43,9 @@ import org.xwiki.gwt.wysiwyg.client.plugin.style.StyleDescriptorJSONParserTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.style.exec.BlockStyleNameExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.style.exec.InlineStyleNameExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DefaultSyntaxValidatorManagerTest;
+import org.xwiki.gwt.wysiwyg.client.syntax.internal.DefaultSyntaxValidatorTest;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DefaultValidationRuleTest;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DisablingRuleTest;
-import org.xwiki.gwt.wysiwyg.client.syntax.internal.XWikiSyntaxValidatorTest;
 
 import com.google.gwt.junit.tools.GWTTestSuite;
 
@@ -78,7 +78,7 @@ public class WysiwygTestSuite extends GWTTestSuite
         suite.addTestSuite(DefaultSyntaxValidatorManagerTest.class);
         suite.addTestSuite(DefaultValidationRuleTest.class);
         suite.addTestSuite(DisablingRuleTest.class);
-        suite.addTestSuite(XWikiSyntaxValidatorTest.class);
+        suite.addTestSuite(DefaultSyntaxValidatorTest.class);
 
         return suite;
     }

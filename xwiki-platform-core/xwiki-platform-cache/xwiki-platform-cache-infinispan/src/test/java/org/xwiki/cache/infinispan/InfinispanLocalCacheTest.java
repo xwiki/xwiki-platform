@@ -25,6 +25,6 @@ public class InfinispanLocalCacheTest extends AbstractEvictionGenericTestCache
 {
     public InfinispanLocalCacheTest()
     {
-        super("infinispan/local");
+        super("infinispan/local", true);
     }
 }

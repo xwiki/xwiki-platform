@@ -26,10 +26,16 @@
 workspacemanager.pluginnotenabled=The Workspace Manager java component is not installed. This page will not work properly. Make sure that the file 'wiki30-components-workspace-manager-&lt;version&gt;.jar' is present under the 'webapps/xwiki/WEB-INF/lib/' folder.
 workspacemanager.template.install.success=Workspace template has been successfully installed.
 workspacemanager.template.install.error=Error installing workspace template. {0}
-workspacemanager.template.install.error.missingattachment=Error installing the workspace template. The file "{0}" is not attached to the document [[{1}>>{1}]]. Please re-import the [[{1}>>{1}]] document from the Workspaces Application XAR.
+workspacemanager.template.install.error.missingattachment=Error installing the workspace template. The file "{0}" is not attached to the document [[{1}&gt;&gt;{1}]]. Please re-import the [[{1}&gt;&gt;{1}]] document from the Workspaces Application XAR.
+workspacemanager.template.install.error.missingtemplateattachment=Error installing the workspace template. The file "{0}" is not attached to the document [[{1}&gt;&gt;{1}]]. Please attach a base template that will be used for all newly created workspaces. You can download one from [[here&gt;&gt;{2}]] and rename it to "{0}" before attaching it.
+workspacemanager.template.install.notYetComplete=The installation process is not yet complete.\n\
+\n\
+In order to finish the installation process, please log in as Admin and go to the page [[{0}&gt;&gt;{0}]].
 workspacemanager.translations.install.success=Workspace Manager translations have been successfully installed.
 workspacemanager.searchSuggestions.install.success=Workspace search suggestions have been successfully installed.
 workspacemanager.install.notallowed=Admin rights are required to complete the Workspace Manager installation. Please login as Admin to complete the installation.
+workspacemanager.dependencies.wikimanager.missing=The [[Wiki Manager Plugin&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Manager+Plugin]] is not installed. Please install it and try again.
+workspacemanager.dependencies.applicationmanager.missing=The [[Application Manager Plugin&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Application+Manager+Plugin]] is not installed. Please install it and try again.
 
 # LABELS
 workspacemanager.createworkspace=Create a new workspace
@@ -64,13 +70,18 @@ workspacemanager.menu.user.workspaces=Workspaces
 workspacemanager.profile.category.workspaces=Workspaces
 
 # MESSAGES
-workspacemanager.wikiname.error.wikialreadyexists=A workspace with this identifier already exists
 workspacemanager.wikiprettyname.error.empty=Pretty name must not be empty
 workspacemanager.successcreatewiki=Your workspace \"{0}\" has been created. You can access it at the following address: {1}
 workspacemanager.errorcreatewiki=Workspace \"{0}\" creation failed: {1}.
 workspacemanager.errorcreatewiki.ERROR_WM_WIKIALREADYEXISTS=This workspace \"{0}\" already exist. Please choose another name.
 workspacemanager.install.translations=The translations page has been automatically registered in XWiki's preferences.
 workspacemanager.error.workspacedoesnotexist=Workspace [{0}] does not exist
+workspacemanager.wikiname.error.databasealreadyexists=A database with this identifier already exists
+workspacemanager.wikiname.error.wikialreadyexists=A wiki with this identifier already exists
+workspacemanager.wikiname.error.workspacealreadyexists=A workspace with this identifier already exists
+workspacemanager.wikiname.error.empty=Identifier can't be empty
+workspacemanager.wikiname.error.alreadyused=This identifier is already used
+workspacemanager.error.notinvirtualmode=The current XWiki installation is not in virtual mode. This means you can only access the main wiki. Make sure you have &lt;tt&gt;xwiki.virtual=1&lt;/tt&gt; in the &lt;tt&gt;xwiki.cfg&lt;/tt&gt; file.
 
 # PROPERTIES
 workspacemanager.prop.wiki.wikiname=Workspace Identifier

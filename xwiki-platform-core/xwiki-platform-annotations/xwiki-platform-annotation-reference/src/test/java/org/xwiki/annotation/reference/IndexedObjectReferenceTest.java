@@ -19,12 +19,12 @@
  */
 package org.xwiki.annotation.reference;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Tests the {@link IndexedObjectReference} implementation of object names.
@@ -133,39 +133,5 @@ public class IndexedObjectReferenceTest
                     new EntityReference("wiki", EntityType.WIKI)))));
         assertEquals("XWiki.Class[number]", reference.getClassName());
         assertNull(reference.getObjectNumber());
-    }
-
-    /**
-     * Test resetting the name of an indexed object reference, for the case when the object changes from an indexed
-     * object to the default object.
-     */
-    @Test
-    public void testSetNameChangeFromIndexedToDefault()
-    {
-        EntityReference reference =
-            new IndexedObjectReference("XWiki.Class", 2, new EntityReference("Page", EntityType.DOCUMENT,
-                new EntityReference("Space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI))));
-        assertEquals("XWiki.Class", ((IndexedObjectReference) reference).getClassName());
-        assertEquals(new Integer(2), ((IndexedObjectReference) reference).getObjectNumber());
-        reference.setName("NewC.lass");
-        assertEquals("NewC.lass", ((IndexedObjectReference) reference).getClassName());
-        assertNull(((IndexedObjectReference) reference).getObjectNumber());
-    }
-
-    /**
-     * Test resetting the name of an indexed object reference, for the case when the object changes from a default
-     * object to an indexed one.
-     */
-    @Test
-    public void testSetNameChangeFromDefaultToIndexed()
-    {
-        EntityReference reference =
-            new IndexedObjectReference("XWiki.Class", null, new EntityReference("Page", EntityType.DOCUMENT,
-                new EntityReference("Space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI))));
-        assertEquals("XWiki.Class", ((IndexedObjectReference) reference).getClassName());
-        assertNull(((IndexedObjectReference) reference).getObjectNumber());
-        reference.setName("NewC.lass[3]");
-        assertEquals("NewC.lass", ((IndexedObjectReference) reference).getClassName());
-        assertEquals(new Integer(3), ((IndexedObjectReference) reference).getObjectNumber());
     }
 }

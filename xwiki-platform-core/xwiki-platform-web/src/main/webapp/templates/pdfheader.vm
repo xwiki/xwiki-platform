@@ -1,4 +1,4 @@
-#set ($title = "$!{pdfdoc.display('title', 'rendered')}")
+#set ($title = "$!{pdfdoc.display('title', 'rendered', '', $pdfobj)}")
 #if ($title == '')
   $!{escapetool.xml($doc.space)} - $!{escapetool.xml($tdoc.plainTitle)}
 #else

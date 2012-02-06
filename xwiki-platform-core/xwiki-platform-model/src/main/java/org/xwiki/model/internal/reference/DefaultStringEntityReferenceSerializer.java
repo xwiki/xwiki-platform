@@ -19,14 +19,16 @@
  */
 package org.xwiki.model.internal.reference;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.DBLESCAPE;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.ESCAPE;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.ESCAPES;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.REPLACEMENTS;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.WIKISEP;
 
 /**
  * Generate a string representation of an entity reference (eg "wiki:space.page" for a document reference in the "wiki"
@@ -36,86 +38,31 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * @since 2.2M1
  */
 @Component
-public class DefaultStringEntityReferenceSerializer implements EntityReferenceSerializer<String>
+public class DefaultStringEntityReferenceSerializer extends AbstractStringEntityReferenceSerializer
 {
-    /**
-     * The list of strings to escape for each type of entity.
-     */
-    private static final Map<EntityType, String[]> ESCAPES = new HashMap<EntityType, String[]>()
-    {
-        {
-            put(EntityType.ATTACHMENT, new String[] {"@", "\\"});
-            put(EntityType.DOCUMENT, new String[] {".", "\\"});
-            put(EntityType.SPACE, new String[] {":", ".", "\\"});
-            put(EntityType.OBJECT, new String[] {"^", "\\"});
-            put(EntityType.OBJECT_PROPERTY, new String[] {".", "\\"});
-            put(EntityType.CLASS_PROPERTY, new String[] {"^", ".", "\\"});
-        }
-    };
-
-    /**
-     * The replacement list corresponding to the list in {@link #ESCAPES} map.
-     */
-    private static final Map<EntityType, String[]> REPLACEMENTS = new HashMap<EntityType, String[]>()
-    {
-        {
-            put(EntityType.ATTACHMENT, new String[] {"\\@", "\\\\"});
-            put(EntityType.DOCUMENT, new String[] {"\\.", "\\\\"});
-            put(EntityType.SPACE, new String[] {"\\:", "\\.", "\\\\"});
-            put(EntityType.OBJECT, new String[] {"\\^", "\\\\"});
-            put(EntityType.OBJECT_PROPERTY, new String[] {"\\.", "\\\\"});
-            put(EntityType.CLASS_PROPERTY, new String[] {"\\^", "\\.", "\\\\"});
-        }
-    };
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference, Object...)
-     */
-    public String serialize(EntityReference reference, Object... parameters)
-    {
-        if (reference == null) {
-            return null;
-        }
-
-        EntityReference currentReference = reference.getRoot();
-        StringBuilder representation = new StringBuilder();
-
-        // While we still have children and they're not the children of the reference to serialize
-        while (currentReference != null && currentReference != reference.getChild()) {
-            serializeEntityReference(currentReference, representation, currentReference == reference, parameters);
-            currentReference = currentReference.getChild();
-        }
-
-        return representation.toString();
-    }
-
-    /**
-     * Serialize a reference element.
-     * 
-     * @param currentReference the reference to serialize
-     * @param representation the builder where to happen the serialized member
-     * @param isLastReference indicate if it's the last member of the refence
-     * @param parameters optional parameters
-     */
+    @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
         boolean isLastReference, Object... parameters)
     {
-        String[] currentEscapeChars = ESCAPES.get(currentReference.getType());
+        EntityType currentType = currentReference.getType();
+        EntityReference currentParent = currentReference.getParent();
+        String[] currentEscapeChars = ESCAPES.get(currentType);
+
+        // Add my separator if I am not the first one in the representation
+        if (currentParent != null && representation.length() > 0) {
+            if (currentParent.getType() == EntityType.WIKI) {
+                representation.append(WIKISEP);
+            } else {
+                representation.append(currentEscapeChars[0]);
+            }
+        }
 
         // If we're on the Root reference then we don't need to escape anything
         if (currentEscapeChars != null) {
             representation.append(StringUtils.replaceEach(currentReference.getName(), currentEscapeChars,
-                REPLACEMENTS.get(currentReference.getType())));
+                REPLACEMENTS.get(currentType)));
         } else {
-            representation.append(currentReference.getName().replace("\\", "\\\\"));
-        }
-
-        // If the reference is the last one in the chain then don't print the separator char
-        if (!isLastReference && currentReference.getChild() != null) {
-            String separatorChar = ESCAPES.get(currentReference.getChild().getType())[0];
-            representation.append(separatorChar);
+            representation.append(currentReference.getName().replace(ESCAPE, DBLESCAPE));
         }
     }
 }

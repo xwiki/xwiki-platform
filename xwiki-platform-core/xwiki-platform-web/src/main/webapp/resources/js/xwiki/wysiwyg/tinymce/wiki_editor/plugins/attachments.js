@@ -27,7 +27,7 @@ WikiEditor.prototype.ATTACHMENT_CLASS_NAME = "";
 
 WikiEditor.prototype.insertAttachment = function(editor_id, title, name) {
     var text = ((title != null) && this.trimString(title) != "") ? title : name;
-    this.core.execInstanceCommand(editor_id, "mceInsertRawHTML", false, '<a href="wikiattachment:-:' + name + '" class="' + this.ATTACHMENT_CLASS_NAME + '">' + text + '<\/a>');
+    this.core.execInstanceCommand(editor_id, "mceInsertRawHTML", false, '<a href="wikiattachment:-:' + encodeURIComponent(name) + '" class="' + this.ATTACHMENT_CLASS_NAME + '">' + text.escapeHTML() + '<\/a>');
 }
 
 WikiEditor.prototype.convertImageInternal = function(regexp, result, content) {
@@ -47,7 +47,7 @@ WikiEditor.prototype.convertImageInternal = function(regexp, result, content) {
         var imgname_reg = new RegExp(this.getImagePath().replace(/\+/g, '\\+') + "(.*)", "i");
         var r = imgname_reg.exec(href);
         if(r) {
-            var imgname = unescape(r[1]);       
+            var imgname = decodeURIComponent(r[1]);
 			str = "{image:" + imgname;
             var width=att["width"] ? this.trimString(att["width"]) : "";
 			var height=att["height"] ? this.trimString(att["height"]) : "";
@@ -136,13 +136,13 @@ WikiEditor.prototype.getAttachmentsControls = function(button_name) {
 
 WikiEditor.prototype.convertAttachmentExternal = function(regexp, result, content) {
     var href = ((typeof(result[3]) == "undefined") || (this.trimString(result[3]) == "")) ? result[1] : result[3] ;
-    var str = '<a href="wikiattachment:-:' + href + '" class="' + this.ATTACHMENT_CLASS_NAME + '">' + result[1] + '<\/a>';
+    var str = '<a href="wikiattachment:-:' + href + '" class="' + this.ATTACHMENT_CLASS_NAME + '">' + result[1].escapeHTML() + '<\/a>';
     return content.replace(regexp, str);
 }
 
 WikiEditor.prototype.convertAttachmentInternal = function(regexp, result, content) {
-    result[1] = result[1].replace(/%20/gi, " ");
-    result[3] = result[3].replace(/%20/gi, " ");
+    result[1] = decodeURIComponent(result[1].replace(/%20/gi, " "));
+    result[3] = result[3].replace(/%20/gi, " ").unescapeHTML();
     var str;
     if (result[1] == result[3]) str = "{attach:" + result[1] + "}";
     else  if ((result[1] == "undefined") || (this.trimString(result[1]) == "")) str = "{attach:" + result[3] + "}";

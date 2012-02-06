@@ -24,6 +24,7 @@ import org.xwiki.component.annotation.ComponentRole;
 /**
  * Generate a different representation of an Entity Reference (eg as a String).
  *
+ * @param <T> the type of the new representation
  * @version $Id$
  * @since 2.2M1
  */
@@ -31,6 +32,8 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface EntityReferenceSerializer<T>
 {
     /**
+     * Serialize an entity reference into a new representation of type <T>.
+     *
      * @param reference the reference to serialize
      * @param parameters optional parameters. Their meaning depends on the serializer implementation
      * @return the new representation (eg as a String)

@@ -97,6 +97,11 @@ public class CreateAction extends XWikiAction
     private static final String EXCEPTION = "createException";
 
     /**
+     * The property name for the template type (page or spaces) in the template provider object.
+     */
+    private static final String TYPE_PROPERTY = "type";
+
+    /**
      * The property name for the spaces in the template provider object.
      */
     private static final String SPACES_PROPERTY = "spaces";
@@ -149,9 +154,9 @@ public class CreateAction extends XWikiAction
 
         // get the available templates, in the current space, to check if all conditions to create a new document are
         // met
-        List<Document> availableTemplates =
-            getAvailableTemplates(doc.getDocumentReference().getSpaceReferences().get(0).getName(), resolver,
-                templateProviderClassReference, context);
+        List<Document> availableTemplates = getAvailableTemplates(
+            doc.getDocumentReference().getSpaceReferences().get(0).getName(), isSpace, resolver,
+            templateProviderClassReference, context);
         // put the available templates on the context, for the .vm to not compute them again
         ((VelocityContext) context.get(VELOCITY_CONTEXT_KEY)).put("createAvailableTemplates", availableTemplates);
 
@@ -165,10 +170,9 @@ public class CreateAction extends XWikiAction
             // re-requests the page and space, else create the document and redirect to edit
             if (!isEmptyDocument(newDoc)) {
                 Object[] args = {space, page};
-                XWikiException documentAlreadyExists =
-                    new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
-                        "Cannot create document {0}.{1} because it already has content", null, args);
+                XWikiException documentAlreadyExists = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
+                    "Cannot create document {0}.{1} because it already has content", null, args);
                 ((VelocityContext) context.get(VELOCITY_CONTEXT_KEY)).put(EXCEPTION, documentAlreadyExists);
             } else {
                 // create is finally valid, can be executed
@@ -343,10 +347,9 @@ public class CreateAction extends XWikiAction
             if (allowedSpaces.size() > 0 && !allowedSpaces.contains(space)) {
                 // put an exception on the context, for create.vm to know to display an error
                 Object[] args = {templateProvider.getStringValue(TEMPLATE), space, page};
-                XWikiException exception =
-                    new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
-                        "Template {0} cannot be used in space {1} when creating page {2}", null, args);
+                XWikiException exception = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
+                    "Template {0} cannot be used in space {1} when creating page {2}", null, args);
                 VelocityContext vcontext = (VelocityContext) context.get(VELOCITY_CONTEXT_KEY);
                 vcontext.put(EXCEPTION, exception);
                 vcontext.put("createAllowedSpaces", allowedSpaces);
@@ -423,9 +426,8 @@ public class CreateAction extends XWikiAction
 
         // get the template from the template parameter, to allow creation directly from template, without
         // forcing to create a template provider for each template creation
-        String template =
-            (templateProvider != null) ? templateProvider.getStringValue(TEMPLATE) : (request.getParameterMap()
-                .containsKey(TEMPLATE) ? request.getParameter(TEMPLATE) : "");
+        String template = (templateProvider != null) ? templateProvider.getStringValue(TEMPLATE)
+            : (request.getParameterMap().containsKey(TEMPLATE) ? request.getParameter(TEMPLATE) : "");
 
         // from the template provider, find out if the document should be saved before edited
         boolean toSave = getSaveBeforeEdit(templateProvider);
@@ -477,33 +479,37 @@ public class CreateAction extends XWikiAction
 
     /**
      * @param space the space to check if there are available templates for
+     * @param isSpace {@code true} if a space should be created instead of a page
      * @param resolver the resolver to solve template document references
      * @param context the context of the current request
      * @param templateClassReference the reference to the template provider class
      * @return the available templates for the passed space, as {@link Document}s
      */
-    private List<Document> getAvailableTemplates(String space, DocumentReferenceResolver<String> resolver,
-        DocumentReference templateClassReference, XWikiContext context)
+    private List<Document> getAvailableTemplates(String space, boolean isSpace,
+        DocumentReferenceResolver<String> resolver, DocumentReference templateClassReference, XWikiContext context)
     {
         XWiki wiki = context.getWiki();
         List<Document> templates = new ArrayList<Document>();
         try {
             QueryManager queryManager = Utils.getComponent(QueryManager.class, "secure");
-            Query query =
-                queryManager.createQuery("from doc.object(XWiki.TemplateProviderClass) as template "
-                    + "where doc.fullName not like 'XWiki.TemplateProviderTemplate'", Query.XWQL);
+            Query query = queryManager.createQuery("from doc.object(XWiki.TemplateProviderClass) as template "
+                + "where doc.fullName not like 'XWiki.TemplateProviderTemplate'", Query.XWQL);
             List<String> templateProviderDocNames = query.execute();
             for (String templateProviderName : templateProviderDocNames) {
                 // get the document
                 DocumentReference reference = resolver.resolve(templateProviderName);
                 XWikiDocument templateDoc = wiki.getDocument(reference, context);
                 BaseObject templateObject = templateDoc.getXObject(templateClassReference);
-                @SuppressWarnings("unchecked")
-                List<String> allowedSpaces = templateObject.getListValue(SPACES_PROPERTY);
-                // if no space is checked or the current space is in the list of allowed spaces
-                if (allowedSpaces.size() == 0 || allowedSpaces.contains(space)) {
-                    // create a Document and put it in the list
+                if (isSpace && SPACE.equals(templateObject.getStringValue(TYPE_PROPERTY))) {
                     templates.add(new Document(templateDoc, context));
+                } else if (!isSpace && !SPACE.equals(templateObject.getStringValue(TYPE_PROPERTY))) {
+                    @SuppressWarnings("unchecked")
+                    List<String> allowedSpaces = templateObject.getListValue(SPACES_PROPERTY);
+                    // if no space is checked or the current space is in the list of allowed spaces
+                    if (allowedSpaces.size() == 0 || allowedSpaces.contains(space)) {
+                        // create a Document and put it in the list
+                        templates.add(new Document(templateDoc, context));
+                    }
                 }
             }
         } catch (Exception e) {

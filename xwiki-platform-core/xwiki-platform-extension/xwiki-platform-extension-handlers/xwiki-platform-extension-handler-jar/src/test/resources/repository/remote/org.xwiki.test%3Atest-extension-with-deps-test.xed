@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<extension>
+  <id>org.xwiki.test:test-extension-with-deps</id>
+  <version>test</version>
+  <type>jar</type>
+  <features>
+    <feature>feature-with-deps</feature>
+  </features>
+  <dependencies>
+    <dependency>
+      <id>org.xwiki.test:test-extension</id>
+      <version>test</version>
+    </dependency>
+  </dependencies>
+</extension>

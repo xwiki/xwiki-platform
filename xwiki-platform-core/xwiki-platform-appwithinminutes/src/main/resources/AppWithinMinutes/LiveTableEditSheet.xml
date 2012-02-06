@@ -1,0 +1,639 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>AppWithinMinutes</web>
+<name>LiveTableEditSheet</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>AppWithinMinutes.LiveTableClass</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1321279658000</creationDate>
+<date>1321383708000</date>
+<contentUpdateDate>1321383708000</contentUpdateDate>
+<version>1.1</version>
+<title>#if($doc.fullName=='AppWithinMinutes.LiveTableEditSheet')LiveTable Edit Sheet#{else}#evaluate($doc.title)#end</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.LiveTableEditSheet</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>dd545e46-1a0f-494a-a1db-5a45892ad4ab</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>var XWiki = (function (XWiki) {
+
+XWiki.LiveTableEditor = Class.create({
+  initialize : function() {
+    this.columnsInput = $('AppWithinMinutes.LiveTableClass_0_columns');
+    this.columnsInput.hide();
+
+    this._createColumnPicker();
+    this._createDeprecationMessage();
+    this._createColumnList();
+
+    document.observe('xwiki:inline:save', this._onSave.bind(this));
+  },
+  containsColumn : function(name) {
+    var columns = this.list.childElements();
+    for(var i = 0; i &lt; columns.length; i++) {
+      if (columns[i]._name == name) {
+        return true;
+      }
+    }
+    return false;
+  },
+  addColumn : function(name, prettyName, isClassField) {
+    if (!name || this.containsColumn(name)) {
+      return;
+    }
+    var deprecated = !prettyName;
+    prettyName = prettyName || name;
+    var item = new Element('li').update('&lt;span title="$escapetool.xml($msg.get('platform.appwithinminutes.liveTableEditorMoveColumnHint'))"&gt;' + prettyName.escapeHTML() + '&lt;/span&gt;&lt;span title="$escapetool.xml($msg.get('platform.appwithinminutes.liveTableEditorDeleteColumnHint'))" class="delete"&gt;X&lt;/span&gt;');
+    if (deprecated) {
+      item.addClassName('deprecated');
+      this.deprecationMessage.show();
+    }
+    if (isClassField) {
+      item.addClassName('classField');
+    }
+    item._name = name;
+    item.down('.delete').observe('click', this._onDeleteColumn.bindAsEventListener(this));
+    this.list.insert(item);
+    Sortable.create(this.list, {overlap: 'horizontal', constraint: 'horizontal'});
+  },
+  getColumnPrettyName : function(columnName) {
+    var options = this.columnsSelect.options;
+    for(var i = 0; i &lt; options.length; i++) {
+      if (options[i].value == columnName) {
+        return options[i].text;
+      }
+    }
+    return null;
+  },
+  isClassField : function(columnName) {
+    var options = this.columnsSelect.options;
+    for(var i = 0; i &lt; options.length; i++) {
+      if (options[i].value == columnName) {
+        return options[i].up().id == 'classFields';
+      }
+    }
+    return false;
+  },
+  _createColumnPicker : function() {
+    this.columnsSelect = $('availableColumns');
+    this.columnsSelect.selectedIndex = -1;
+
+    var addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.png')', alt: '$escapetool.javascript($msg.get('platform.appwithinminutes.liveTableEditorAddColumnHint'))'});
+    addButton.observe('click', this._onAddColumn.bindAsEventListener(this));
+
+    var picker = new Element('div', {'class': 'columnPicker'}).insert(this.columnsSelect).insert(addButton);
+    this.columnsInput.up().insert(picker);
+  },
+  _onAddColumn : function(event) {
+    event.stop();
+    if (this.columnsSelect.selectedIndex &gt;= 0) {
+      var selectedOption = this.columnsSelect.options[this.columnsSelect.selectedIndex];
+      this.addColumn(selectedOption.value, selectedOption.text, selectedOption.up().id == 'classFields');
+      this.columnsSelect.selectedIndex = -1;
+      this.columnsSelect.focus();
+    }
+  },
+  _onDeleteColumn : function(event) {
+    event.element().up('li').remove();
+    // Hide deprecation message if there are no deprecated columns.
+    if (this.list.select('.deprecated').length == 0) {
+      this.deprecationMessage.hide();
+    }
+  },
+  _createColumnList : function() {
+    this.list = new Element('ul', {'class': 'hList'});
+    this.columnsInput.up().insert(this.list);
+    this.columnsInput.value.split(' ').each(function(columnName) {
+      columnName = columnName.strip();
+      if (columnName != '') {
+        this.addColumn(columnName, this.getColumnPrettyName(columnName), this.isClassField(columnName));
+      }
+    }.bind(this));
+  },
+  _createDeprecationMessage : function() {
+    this.deprecationMessage = new Element('div', {'class': 'warningmessage'}).update('$escapetool.javascript($msg.get('platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning'))');
+    this.columnsInput.up().insert(this.deprecationMessage);
+    this.deprecationMessage.hide();
+    var yes = this.deprecationMessage.down('a');
+    yes.observe('click', this._onRemoveDeprecatedColumns.bindAsEventListener(this));
+    var no = yes.next();
+    no.observe('click', function(event) {
+      event.stop();
+      this.deprecationMessage.hide();
+    }.bindAsEventListener(this));
+  },
+  _onRemoveDeprecatedColumns : function(event) {
+    event.stop();
+    this.list.select('.deprecated').each(function(item) {
+      item.remove();
+    });
+    this.deprecationMessage.hide();
+  },
+  _onSave : function() {
+    var columns = [];
+    this.list.childElements().each(function(item) {
+      columns.push(item._name);
+    });
+    this.columnsInput.value = columns.join(' ');
+  }
+});
+
+function init() {
+  var form = $('inline');
+  if (!form) {
+    return false;
+  }
+  // Let the sheet handle the form submit.
+  form.action = '';
+
+  // Apply the vertical form layout standard.
+  form.addClassName('xform');
+
+  // Remove the preview button.
+  form.down("input[name='action_preview']").up().remove();
+
+  // Rename the save buttons.
+  form.down("input[name='action_save']").name = 'xaction_save';
+  form.down("input[name='action_saveandcontinue']").name = 'xaction_saveandcontinue';
+
+  // Make sure the 'Save &amp; Continue' button is submitted when clicked.
+  document.observe('xwiki:inline:save', function(event) {
+    event = event.memo.originalEvent;
+    if (event.memo['continue']) {
+      var submitButton = event.memo.originalEvent.element();
+      submitButton.insert({after: new Element('input', {type: 'hidden', 'name': submitButton.name})});
+      (function () {
+        submitButton.next().remove();
+      }).defer();
+    }
+  }.bindAsEventListener(window));
+
+  new XWiki.LiveTableEditor();
+
+  return true;
+}
+(XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+
+// Allow widgets to catch the save event before the form is submitted when the 'Save &amp; Continue' button is clicked. We
+// need this hack because the 'Save &amp; Continue' handler from actionbuttons.js is added right after the page is loaded,
+// before any other code can register its own listener.
+document.observe('xwiki:actions:save', function(event) {
+  document.fire('xwiki:inline:save', {originalEvent: event});
+}.bindAsEventListener(window));
+
+return XWiki;
+}(XWiki || {}));</code>
+</property>
+<property>
+<name>Code</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.SheetDescriptorClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<action>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<name>action</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>Action</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</action>
+</class>
+<name>AppWithinMinutes.LiveTableEditSheet</name>
+<number>0</number>
+<className>XWiki.SheetDescriptorClass</className>
+<guid>b4421c7c-8010-487f-aa21-8abb799e011e</guid>
+<property>
+<action>edit</action>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AppWithinMinutes.LiveTableEditSheet</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>d6100cff-9fc3-46be-b56a-0561cadf45f9</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>#template('colorThemeInit.vm')
+#inline .hList {
+  font-size: 90%;
+  list-style: none outside none;
+  margin: 0;
+}
+
+#inline .hList li {
+  border: 1px solid $theme.borderColor;
+  cursor: move;
+  display: inline-block;
+  margin: 0 0.2em 0.2em 0;
+  padding: 0.1em 0.6em;
+}
+
+#inline .hList li:hover {
+  background-color: $theme.highlightColor;
+}
+
+#inline .hList li .delete {
+  color: $theme.pageContentBackgroundColor;
+  cursor: pointer;
+  font-size: 70%;
+  font-weight: bold;
+  position: absolute;
+  text-decoration: none !important;
+  vertical-align: super;
+}
+
+#inline .hList li:hover .delete {
+  color: $theme.textPrimaryColor;
+}
+
+#inline .hList li .delete:hover {
+  color: $theme.notificationErrorColor;
+}
+
+#inline .hList li.deprecated {
+  border: 1px solid $theme.notificationWarningColor;
+}
+
+#inline .hList li.classField {
+  font-weight: bolder;
+}
+
+.columnPicker {
+  margin-bottom: .3em;
+}
+
+.columnPicker select {
+  width: auto;
+}
+
+.columnPicker input[type=image] {
+  margin-left: 2px;
+  vertical-align: text-bottom;
+}
+
+.form-body {
+  margin-right: 19em;
+}
+
+.wizard-help {
+  background-color: $theme.backgroundSecondaryColor;
+  border-bottom: 1px solid $theme.borderColor;
+  color: $theme.textSecondaryColor;
+  float: right;
+  font-size: 0.857em;
+  margin: 0 0 2em 2em;
+  padding: 1em;
+  width: 17em;
+}
+
+.wizard-help dl, .wizard-help p {
+  font-size: 0.9em;
+}
+
+.wizard-help dl {
+  margin-left: 1em;
+}
+
+.wizard-help dt, .wizard-help strong {
+  color: $theme.textColor;
+}
+
+/* Fix WYSIWYG Editor display. */
+#inline .xToolbar div.clearfloats {
+  clear: left;
+}</code>
+</property>
+<property>
+<name>Style</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<content>{{velocity output="false"}}
+#macro(listAvailableColumns)
+  {{html}}
+  &lt;select id="availableColumns"&gt;
+    #set($className = "$!liveTableObj.getProperty('class').value")
+    #set($classFields = $xwiki.getDocument($className).getxWikiClass().properties)
+    #if($classFields.size() &gt; 0)
+      &lt;optgroup label="$escapetool.xml($msg.get('platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel'))" id="classFields"&gt;
+        #foreach($field in $classFields)
+          &lt;option value="$field.name"&gt;$escapetool.xml($field.prettyName)&lt;/option&gt;
+        #end
+      &lt;/optgroup&gt;
+    #end
+    &lt;optgroup label="$escapetool.xml($msg.get('platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel'))"&gt;
+      #foreach($entry in $genericColumns.entrySet())
+        &lt;option value="$entry.key" title="$escapetool.xml($entry.value.get(1))"&gt;$escapetool.xml($entry.value.get(0))&lt;/option&gt;
+      #end
+    &lt;/optgroup&gt;
+  &lt;/select&gt;
+  {{/html}}
+#end
+
+#macro(displayHelpPanel)
+  #set($genericColumns = {
+    'doc.title': [$msg.get('platform.appwithinminutes.liveTableEditorDocTitleColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocTitleColumnDescription')],
+    'doc.name': [$msg.get('platform.appwithinminutes.liveTableEditorDocNameColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocNameColumnDescription')],
+    'doc.author': [$msg.get('platform.appwithinminutes.liveTableEditorDocAuthorColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription')],
+    'doc.creator': [$msg.get('platform.appwithinminutes.liveTableEditorDocCreatorColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription')],
+    'doc.date': [$msg.get('platform.appwithinminutes.liveTableEditorDocDateColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocDateColumnDescription')],
+    'doc.creationDate': [$msg.get('platform.appwithinminutes.liveTableEditorDocCreationDateColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription')],
+    '_actions': [$msg.get('platform.appwithinminutes.liveTableEditorActionsColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorActionsColumnDescription')],
+    '_attachments': [$msg.get('platform.appwithinminutes.liveTableEditorAttachmentsColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription')],
+    '_images': [$msg.get('platform.appwithinminutes.liveTableEditorImagesColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorImagesColumnDescription')]
+  })
+  (% class="wizard-help" %)
+  (((
+    **$msg.get('platform.appwithinminutes.liveTableEditorHelpTitle')** $msg.get('platform.appwithinminutes.liveTableEditorHelpDescription')
+
+    #foreach($columnId in ['doc.name', 'doc.date', 'doc.author', '_actions'])
+      ; {{{$genericColumns.get($columnId).get(0)}}}
+      : {{{$genericColumns.get($columnId).get(1)}}}
+    #end
+  )))
+#end
+
+#macro(displayFormFields)
+  {{html wiki="true"}}
+  (% class="hidden" %)
+  (((
+    ## Make sure that only the sheet content is rendered when the class is saved using AJAX.
+    &lt;input type="hidden" name="xpage" value="plain" /&gt;
+    ## We prevent the class name from being edited directly. The class name can be specified in the URL.
+    $doc.display('class', 'hidden')
+    ## We have to pass the list of available columns to the JavaScript code.
+    #listAvailableColumns()
+  )))
+  ; &lt;label for="AppWithinMinutes.LiveTableClass_0_description"&gt;$doc.displayPrettyName('description', false, false)&lt;/label&gt;##
+    (% class="xHint" %)$msg.get('platform.appwithinminutes.liveTableEditorDescriptionHint')
+  : $doc.display('description')
+  ; &lt;label for="AppWithinMinutes.LiveTableClass_0_columns"&gt;$doc.displayPrettyName('columns', false, false)&lt;/label&gt;##
+    (% class="xHint" %)$msg.get('platform.appwithinminutes.liveTableEditorColumnsHint')
+  : $doc.display('columns')
+  {{/html}}
+#end
+
+#macro(doEdit)
+  #set($liveTableObj = $doc.getObject('AppWithinMinutes.LiveTableClass', true))
+  #set($discard = $doc.use($liveTableObj))
+  #set($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
+  #set($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableEditSheet'))
+  #set($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableEditSheet'))
+  #if("$!request.wizard" == 'true')
+    #appWizardHeader(3)
+
+  #end
+  #displayHelpPanel()
+  (% class="form-body" %)
+  (((
+    #displayFormFields()
+    #if("$!request.wizard" == 'true')
+
+      #appWizardFooter(3)
+    #end
+  )))
+  {{html}}&lt;div class="clearfloats"&gt;&lt;/div&gt;{{/html}}
+#end
+
+#macro(updateAndSaveLiveTable)
+  #set($discard = $doc.updateObjectFromRequest('AppWithinMinutes.LiveTableClass'))
+  #set($liveTableGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.LiveTableGenerator'))
+  #set($discard = $doc.setContent($doc.getRenderedContent($liveTableGeneratorDoc.content, $liveTableGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
+  #set($minorEdit = "$!request.minorEdit" != '')
+  #set($comment = $request.comment)
+  #if("$!comment" == '')
+    #set($comment = $msg.get('platform.appwithinminutes.liveTableEditorSaveComment'))
+  #end
+  #set($discard = $doc.save($comment, $minorEdit))
+#end
+
+#macro(doSave)
+  #updateAndSaveLiveTable()
+  #if($action == 'save')
+    #if($errorMessage)
+      {{error}}{{html}}$errorMessage{{/html}}{{/error}}
+    #else
+      ## Redirect to view mode.
+      $response.sendRedirect($doc.getURL())
+    #end
+  #else
+    #if($errorMessage)
+      $response.sendError(400, $errorMessage)
+    #else
+      $response.setStatus(204)
+    #end
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+#if("$!request.wizard" == 'true')
+  {{include document="AppWithinMinutes.WizardStep" /}}
+#end
+{{/velocity}}
+
+{{velocity}}
+## Determine the action button that triggered the request
+#set($action = $context.action)
+#foreach($paramName in $request.getParameterMap().keySet())
+  #if($paramName.startsWith('xaction_'))
+    #set($action = $paramName.substring(8))
+    #break
+  #end
+#end
+#if($action == 'edit')
+  #doEdit()
+#elseif($action == 'save' || $action == 'saveandcontinue')
+  #if($services.csrf.isTokenValid($request.form_token))
+    #doSave()
+  #else
+    $response.sendRedirect($services.csrf.getResubmissionURL());
+  #end
+#end
+{{/velocity}}</content></xwikidoc>

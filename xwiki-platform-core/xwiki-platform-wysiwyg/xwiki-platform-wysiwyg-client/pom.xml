@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wysiwyg</artifactId>
-    <version>3.3-SNAPSHOT</version>
+    <version>3.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wysiwyg-client</artifactId>
   <name>XWiki Platform - WYSIWYG Editor - Client Side</name>
@@ -34,14 +34,29 @@
   <dependencies>
     <!-- GWT libraries -->
     <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-gwt-dom</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at build time -->
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-gwt-user</artifactId>
       <version>${project.version}</version>
+      <!-- Only needed at build time -->
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wysiwyg-plugin-api</artifactId>
       <version>${project.version}</version>
+      <!-- Only needed at build time -->
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <!-- SmartGWT is used only for its tree widget. -->

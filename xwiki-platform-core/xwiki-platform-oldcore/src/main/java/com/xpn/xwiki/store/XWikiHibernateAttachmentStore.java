@@ -22,6 +22,7 @@ package com.xpn.xwiki.store;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.Query;
@@ -38,6 +39,7 @@ import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
+@Named("hibernate")
 @Singleton
 public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore implements XWikiAttachmentStoreInterface
 {

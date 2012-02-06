@@ -661,8 +661,8 @@ XWiki.Dashboard = Class.create( {
 });
 
 function init() {
-  // editable dashboard only in inline mode
-  if (XWiki.contextaction == 'inline') {
+  // editable dashboard only in inline edit mode
+  if (XWiki.contextaction == 'inline' || (XWiki.contextaction == 'edit' && $('inline'))) {
     // edit first dashboard FIXME: to create a dashboard editor for all dashboards
     var dashboardRootElt = $$('.dashboard')[0];
     if (dashboardRootElt) {

@@ -37,7 +37,21 @@ public class ObjectPropertyReference extends EntityReference
      */
     public ObjectPropertyReference(EntityReference reference)
     {
-        super(reference.getName(), reference.getType(), reference.getParent());
+        super(reference);
+    }
+
+    /**
+     * Clone an ObjectPropertyReference, but replace one of the parent in the chain by a new one.
+     *
+     * @param reference the reference that is cloned
+     * @param oldReference the old parent that will be replaced
+     * @param newReference the new parent that will replace oldReference in the chain
+     * @since 3.3M2
+     */
+    protected ObjectPropertyReference(EntityReference reference, EntityReference oldReference,
+        EntityReference newReference)
+    {
+        super(reference, oldReference, newReference);
     }
 
     /**
@@ -52,12 +66,14 @@ public class ObjectPropertyReference extends EntityReference
     }
 
     /**
+     * Deprecated constructor.
      * @param wiki the wiki of the document where the parent object of this property is
      * @param space the space of the document where the parent object of this property is
      * @param page the document where the parent object of this property is
      * @param objectName the name of the parent object of this property
      * @param propertyName the name of the property to refer to
      */
+    @Deprecated
     public ObjectPropertyReference(String wiki, String space, String page, String objectName, String propertyName)
     {
         this(propertyName, new ObjectReference(wiki, space, page, objectName));
@@ -70,7 +86,7 @@ public class ObjectPropertyReference extends EntityReference
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      */
     @Override
-    public void setType(EntityType type)
+    protected void setType(EntityType type)
     {
         if (type != EntityType.OBJECT_PROPERTY) {
             throw new IllegalArgumentException("Invalid type [" + type + "] for an object property reference");
@@ -86,13 +102,24 @@ public class ObjectPropertyReference extends EntityReference
      * @see org.xwiki.model.reference.EntityReference#setParent(org.xwiki.model.reference.EntityReference)
      */
     @Override
-    public void setParent(EntityReference parent)
+    protected void setParent(EntityReference parent)
     {
+        if (parent instanceof ObjectReference) {
+            super.setParent(parent);
+            return;
+        }
+
         if (parent == null || parent.getType() != EntityType.OBJECT) {
-            throw new IllegalArgumentException("Invalid parent reference [" + parent + "] for an object property "
-                + "reference");
+            throw new IllegalArgumentException("Invalid parent reference [" + parent
+                + "] in an object property reference");
         }
 
         super.setParent(new ObjectReference(parent));
+    }
+
+    @Override
+    public ObjectPropertyReference replaceParent(EntityReference oldParent, EntityReference newParent)
+    {
+        return new ObjectPropertyReference(this, oldParent, newParent);
     }
 }

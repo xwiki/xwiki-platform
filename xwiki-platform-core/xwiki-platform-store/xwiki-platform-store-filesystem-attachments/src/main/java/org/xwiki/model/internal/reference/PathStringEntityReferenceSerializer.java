@@ -25,7 +25,6 @@ import java.net.URLEncoder;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Generate a string representation of an entity reference (eg "Wiki:Space.Page" for a
@@ -35,54 +34,27 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * @since 3.0M2
  */
 @Component("path")
-public class PathStringEntityReferenceSerializer implements EntityReferenceSerializer<String>
+public class PathStringEntityReferenceSerializer extends AbstractStringEntityReferenceSerializer
 {
     /**
      * {@inheritDoc}
      *
-     * @see EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference, Object...)
-     */
-    public String serialize(EntityReference reference, Object... parameters)
-    {
-        if (reference == null) {
-            return null;
-        }
-
-        EntityReference currentReference = reference.getRoot();
-        StringBuilder representation = new StringBuilder();
-        // While we still have children and they're not the children of the reference to serialize
-        while (currentReference != null && currentReference != reference.getChild()) {
-            serializeEntityReference(currentReference,
-                representation,
-                (currentReference == reference),
-                parameters);
-            currentReference = currentReference.getChild();
-        }
-        return representation.toString();
-    }
-
-    /**
      * Add a segment to the path. All non-URL compatible characters are escaped in the URL-escape format
      * (%NN). If this is not the last segment in the reference, append a file separator at the end.
-     *
-     * @param currentReference the current reference segment to append
-     * @param representation the output, where the segment is appended
-     * @param isLastReference is this the last reference segment; if not, append a path separator to the end
-     * @param parameters optional parameters; not used
      */
+    @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
         boolean isLastReference, Object... parameters)
     {
+        if (currentReference.getParent() != null) {
+            representation.append(File.separator);
+        }
+
         try {
             representation.append(
                 URLEncoder.encode(currentReference.getName(), "UTF-8").replace(".", "%2E"));
         } catch (UnsupportedEncodingException ex) {
             // This will never happen, UTF-8 is always available
-        }
-
-        // If the reference is the last one in the chain then don't print the separator char
-        if (!isLastReference && currentReference.getChild() != null) {
-            representation.append(File.separator);
         }
     }
 }

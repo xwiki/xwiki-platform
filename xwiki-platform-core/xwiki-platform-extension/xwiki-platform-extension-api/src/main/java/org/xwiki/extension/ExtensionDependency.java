@@ -19,6 +19,10 @@
  */
 package org.xwiki.extension;
 
+import java.util.Map;
+
+import org.xwiki.extension.version.VersionConstraint;
+
 /**
  * An extension dependency.
  * 
@@ -27,14 +31,28 @@ package org.xwiki.extension;
 public interface ExtensionDependency
 {
     /**
-     * @return the id of the target extension
+     * @return the id (or feature) of the target extension
      */
     String getId();
 
     /**
-     * @return the version of the target extension
+     * @return the version constraint of the target extension
      */
-    String getVersion();
+    VersionConstraint getVersionConstraint();
 
-    // TODO: add version range
+    /**
+     * Extends {@link ExtensionDependency} standard properties.
+     * <p>
+     * Theses are generally provided by specific repositories. For example a AETHER repository will provide AETHER
+     * Dependency representation to avoid conversion when searching for the dependency on a AETHER based repository.
+     * 
+     * @return the properties
+     */
+    Map<String, Object> getProperties();
+
+    /**
+     * @param key the property key
+     * @return the property value
+     */
+    Object getProperty(String key);
 }

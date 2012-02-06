@@ -4,6 +4,8 @@ $response.setStatus(500)##
 #if (!$wrongFileNames && !$failedFiles)
   #set ($parameter = $xwiki.getSpacePreference('upload_maxsize'))
   #if ("$!{parameter}" == '')
+    ## 32MB is the default maximum size used inside the FileUploadPlugin;
+    ## there's no easy way of getting that internal value, so we just assume it didn't change
     #set ($parameter = 33554432)
   #else
     #set ($parameter = $mathtool.toInteger($parameter))

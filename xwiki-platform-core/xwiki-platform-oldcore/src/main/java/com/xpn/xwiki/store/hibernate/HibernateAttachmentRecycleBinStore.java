@@ -22,6 +22,7 @@ package com.xpn.xwiki.store.hibernate;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -47,6 +48,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
  * @since 1.4M1
  */
 @Component
+@Named("hibernate")
 @Singleton
 public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore implements AttachmentRecycleBinStore
 {

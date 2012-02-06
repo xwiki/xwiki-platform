@@ -41,7 +41,7 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
      * @param <C> the type of configuration object returned by the read method
      * @param <E> the type of DOM element being read
      */
-    public static interface ConfigDOMReader<C, E extends com.google.gwt.dom.client.Element>
+    public interface ConfigDOMReader<C, E extends com.google.gwt.dom.client.Element>
     {
         /**
          * Reads the configuration from the given DOM element.
@@ -58,7 +58,7 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
      * @param <C> the type of configuration object that is used to update the DOM element
      * @param <E> the type of DOM element being updated
      */
-    public static interface ConfigDOMWriter<C, E extends com.google.gwt.dom.client.Element>
+    public interface ConfigDOMWriter<C, E extends com.google.gwt.dom.client.Element>
     {
         /**
          * Writes the given configuration to the specified DOM element.
@@ -74,7 +74,7 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
      * 
      * @param <C> the type of configuration object returned by the parse method
      */
-    public static interface ConfigJSONParser<C>
+    public interface ConfigJSONParser<C>
     {
         /**
          * Creates a new configuration object from its JSON representation.
@@ -90,7 +90,7 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
      * 
      * @param <C> the type of configuration object that is being serialized to JSON
      */
-    public static interface ConfigJSONSerializer<C>
+    public interface ConfigJSONSerializer<C>
     {
         /**
          * Serializes the given configuration object to JSON.

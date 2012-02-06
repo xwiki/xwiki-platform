@@ -19,11 +19,11 @@
  */
 package org.xwiki.model.reference;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import org.junit.Test;
 import org.xwiki.model.EntityType;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Unit test for the Object reference ({@link ObjectReference}).
@@ -43,7 +43,6 @@ public class ObjectReferenceTest
             new ObjectReference(new EntityReference("Object", EntityType.OBJECT, new EntityReference("Page",
                 EntityType.DOCUMENT, new EntityReference("Space", EntityType.SPACE, new EntityReference("wiki",
                     EntityType.WIKI)))));
-        assertEquals(reference, new ObjectReference("wiki", "Space", "Page", "Object"));
         assertEquals(reference, new ObjectReference("Object", new DocumentReference("wiki", "Space", "Page")));
     }
 
@@ -65,7 +64,7 @@ public class ObjectReferenceTest
             new ObjectReference(new EntityReference("className", EntityType.OBJECT, null));
             fail("Should have thrown exception");
         } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid parent reference [null] for an object reference", expected.getMessage());
+            assertEquals("Invalid parent reference [null] in an object reference", expected.getMessage());
         }
     }
 
@@ -80,7 +79,7 @@ public class ObjectReferenceTest
                 EntityType.SPACE)));
             fail("Should have thrown exception");
         } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid parent reference [name = [Space], type = [SPACE], parent = [null]] for an object "
+            assertEquals("Invalid parent reference [name = [Space], type = [SPACE], parent = [null]] in an object "
                 + "reference", expected.getMessage());
         }
     }

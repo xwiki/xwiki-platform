@@ -1,40 +1,20 @@
-Follow this steps to integrate the Alfresco plugin on XE 2.7.2:
+Follow this steps to integrate the Alfresco plugin on XE:
 
 1. Copy the following jars to WEB-INF/lib
 
-http://search.maven.org/remotecontent?filepath=org/apache/httpcomponents/httpclient/4.0.2/httpclient-4.0.2.jar (new)
+xwiki-platform-wysiwyg-client-x.y-SNAPSHOT-shared.jar (overwrite existing jar)
 
-http://search.maven.org/remotecontent?filepath=org/apache/httpcomponents/httpcore/4.0.1/httpcore-4.0.1.jar (new)
+xwiki-platform-wysiwyg-server-x.y-SNAPSHOT.jar (overwrite existing jar)
 
-http://maven.xwiki.org/externals/com/google/gwt/gwt-servlet/2.3.0-xwiki-20110506/gwt-servlet-2.3.0-xwiki-20110506.jar (remove existing jar gwt-servlet-2.0.4.jar)
-
-xwiki-platform-wysiwyg-client-3.2-SNAPSHOT-shared.jar (remove existing jar xwiki-web-gwt-wysiwyg-client-2.7.2-shared.jar)
-
-xwiki-web-gwt-wysiwyg-server-2.7.2.jar (overwrite existing jar)
-
-xwiki-platform-wysiwyg-plugin-alfresco-server-3.2-SNAPSHOT.jar (new)
+xwiki-platform-wysiwyg-plugin-alfresco-server-x.y-SNAPSHOT.jar (new)
 
 2. Update resources/js/xwiki/wysiwyg/xwe directory (delete the existing folder and copy the new one from the zip; don't overwrite!)
 
-3. Enable Alfresco WYSIWYG editor plugin. Edit templates/macros.vm and replace this line:
+3. Enable "alfresco" WYSIWYG editor plugin from the administration section (don't forget to save the administration section!).
 
-#set($ok = $parameters.put('plugins', $xwiki.getXWikiPreference('wysiwyg.plugins', "submit line separator embed text valign list indent history format symbol link image table macro import#if($full && $request.sync) sync#end")
-))
+4. Add Alfresco menu entries. For this you have to edit XWiki.WysiwygEditorConfig page in object mode and set the value of the menu property to:
 
-with:
-
-#set($ok = $parameters.put('plugins', $xwiki.getXWikiPreference('wysiwyg.plugins', "submit line separator embed text valign list indent history format symbol link image table macro import alfresco")))
-
-4. Add Alfresco menu entries. Edit templates/macros.vm and replace this line:
-
-#set($ok = $parameters.put('menu', $xwiki.getXWikiPreference('wysiwyg.menu', 'link image table macro import')))
-
-with:
-
-#set($ok = $parameters.put('menu', $xwiki.getXWikiPreference('wysiwyg.menu', '[{"feature": "link", "subMenu":["linkEdit", "linkRemove", "linkWikiPage", "linkAttachment", "|", "linkWebPage", "linkEmail", "alfrescoLink"]}, {"fe
-ature":"image", "subMenu":["imageInsertAttached", "imageInsertURL", "imageEdit", "alfrescoImage", "imageRemove"]}, {"feature":"table", "subMenu":["inserttable", "insertcolbefore", "insertcolafter", "deletecol", "|", "insertro
-wbefore", "insertrowafter", "deleterow", "|", "deletetable"]}, {"feature":"macro", "subMenu":["macroInsert", "macroEdit", "|", "macroRefresh", "|", "macroCollapse", "macroExpand"]}, {"feature":"import", "subMenu":["importOffi
-ce"]}]')))
+[{"feature": "link", "subMenu":["linkEdit", "linkRemove", "linkWikiPage", "linkAttachment", "|", "linkWebPage", "linkEmail", "alfrescoLink"]}, {"feature":"image", "subMenu":["imageInsertAttached", "imageInsertURL", "imageEdit", "alfrescoImage", "imageRemove"]}, {"feature":"table", "subMenu":["inserttable", "insertcolbefore", "insertcolafter", "deletecol", "|", "insertrowbefore", "insertrowafter", "deleterow", "|", "deletetable"]}, {"feature":"macro", "subMenu":["macroInsert", "macroEdit", "|", "macroRefresh", "|", "macroCollapse", "macroExpand"]}, {"feature":"import", "subMenu":["importOffice"]}]
 
 5. Edit xwiki.properties and add the following configuration properties:
 

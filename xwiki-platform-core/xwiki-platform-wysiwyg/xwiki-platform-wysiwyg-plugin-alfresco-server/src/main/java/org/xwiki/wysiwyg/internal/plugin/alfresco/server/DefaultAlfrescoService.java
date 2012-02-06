@@ -26,8 +26,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.gwt.wysiwyg.client.plugin.alfresco.AlfrescoEntity;
 import org.xwiki.gwt.wysiwyg.client.plugin.alfresco.AlfrescoService;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
@@ -60,38 +62,35 @@ public class DefaultAlfrescoService implements AlfrescoService
     /**
      * The component that controls the Alfresco access configuration.
      */
-    @Requirement
+    @Inject
     private AlfrescoConfiguration configuration;
 
     /**
      * The object used to parse the responses received for Alfresco REST requests.
      */
-    @Requirement
+    @Inject
     private AlfrescoResponseParser responseParser;
 
     /**
      * The HTTP client used to make REST requests to Alfresco.
      */
-    @Requirement
+    @Inject
     private SimpleHttpClient httpClient;
 
     /**
      * The object used to parse node references.
      */
-    @Requirement
+    @Inject
     private NodeReferenceParser nodeReferenceParser;
 
     /**
      * The object used to extract the node reference out of an Alfresco URL.
      */
-    @Requirement("url")
+    @Inject
+    @Named("url")
     private NodeReferenceParser urlNodeReferenceParser;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AlfrescoService#getChildren(EntityReference)
-     */
+    @Override
     public List<AlfrescoEntity> getChildren(final EntityReference parentReference)
     {
         String parentPath = createNodeReference(parentReference).asPath();
@@ -113,11 +112,7 @@ public class DefaultAlfrescoService implements AlfrescoService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AlfrescoService#getParent(EntityReference)
-     */
+    @Override
     public AlfrescoEntity getParent(final EntityReference childReference)
     {
         String childPath = createNodeReference(childReference).asPath();

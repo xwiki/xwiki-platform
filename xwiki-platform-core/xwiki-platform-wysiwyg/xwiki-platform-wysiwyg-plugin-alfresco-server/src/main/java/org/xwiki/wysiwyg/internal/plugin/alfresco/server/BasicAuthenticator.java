@@ -19,11 +19,13 @@
  */
 package org.xwiki.wysiwyg.internal.plugin.alfresco.server;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.auth.BasicScheme;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.wysiwyg.plugin.alfresco.server.AlfrescoConfiguration;
 import org.xwiki.wysiwyg.plugin.alfresco.server.Authenticator;
 
@@ -32,20 +34,17 @@ import org.xwiki.wysiwyg.plugin.alfresco.server.Authenticator;
  * 
  * @version $Id$
  */
-@Component("basic")
+@Component
+@Named("basic")
 public class BasicAuthenticator implements Authenticator
 {
     /**
      * The component that specifies the user name and password.
      */
-    @Requirement
+    @Inject
     private AlfrescoConfiguration configuration;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Authenticator#authenticate(HttpRequestBase)
-     */
+    @Override
     public void authenticate(HttpRequestBase request)
     {
         UsernamePasswordCredentials credentials =

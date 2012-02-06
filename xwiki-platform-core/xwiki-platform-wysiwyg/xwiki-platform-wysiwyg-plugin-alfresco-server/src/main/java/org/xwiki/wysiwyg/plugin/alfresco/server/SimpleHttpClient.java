@@ -39,7 +39,7 @@ public interface SimpleHttpClient
      * 
      * @param <T> the type of object read from the response content
      */
-    static interface ResponseHandler<T>
+    interface ResponseHandler<T>
     {
         /**
          * Read the response content stream.

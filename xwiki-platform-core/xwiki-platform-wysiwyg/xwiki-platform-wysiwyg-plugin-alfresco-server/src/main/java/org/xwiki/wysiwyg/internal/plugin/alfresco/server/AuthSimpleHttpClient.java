@@ -21,9 +21,10 @@ package org.xwiki.wysiwyg.internal.plugin.alfresco.server;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+
 import org.apache.http.client.methods.HttpRequestBase;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.wysiwyg.plugin.alfresco.server.AlfrescoConfiguration;
@@ -40,20 +41,15 @@ public class AuthSimpleHttpClient extends NoAuthSimpleHttpClient
     /**
      * The component used to get the authenticator hint.
      */
-    @Requirement
+    @Inject
     private AlfrescoConfiguration configuration;
 
     /**
      * The component used to lookup the authenticator.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see NoAuthSimpleHttpClient#sendRequest(HttpRequestBase, ResponseHandler)
-     */
     @Override
     protected <T> T sendRequest(HttpRequestBase request, ResponseHandler<T> handler) throws IOException
     {

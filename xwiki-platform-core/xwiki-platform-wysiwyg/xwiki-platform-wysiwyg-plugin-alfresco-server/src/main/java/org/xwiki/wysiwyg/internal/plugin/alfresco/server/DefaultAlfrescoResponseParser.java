@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -35,7 +36,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.gwt.wysiwyg.client.plugin.alfresco.AlfrescoEntity;
 import org.xwiki.gwt.wysiwyg.client.wiki.URIReference;
 import org.xwiki.wysiwyg.plugin.alfresco.server.AlfrescoConfiguration;
@@ -64,26 +64,22 @@ public class DefaultAlfrescoResponseParser implements AlfrescoResponseParser
     /**
      * The object used to parse node references.
      */
-    @Requirement
+    @Inject
     private NodeReferenceParser nodeReferenceParser;
 
     /**
      * The component used to get the Alfresco server URL.
      */
-    @Requirement
+    @Inject
     private AlfrescoConfiguration configuration;
 
     /**
      * The component used to resolve XML entities.
      */
-    @Requirement
+    @Inject
     private EntityResolver entityResolver;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AlfrescoResponseParser#parseAuthTicket(InputStream)
-     */
+    @Override
     public String parseAuthTicket(InputStream json)
     {
         try {
@@ -94,11 +90,7 @@ public class DefaultAlfrescoResponseParser implements AlfrescoResponseParser
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AlfrescoResponseParser#parseParent(InputStream)
-     */
+    @Override
     public AlfrescoEntity parseParent(InputStream xml)
     {
         NodeList cmisPropertiesElements = parseXML(xml).getElementsByTagName(CMIS_PROPERTIES_TAG);
@@ -151,11 +143,7 @@ public class DefaultAlfrescoResponseParser implements AlfrescoResponseParser
         return entity;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AlfrescoResponseParser#parseChildren(InputStream)
-     */
+    @Override
     public List<AlfrescoEntity> parseChildren(InputStream xml)
     {
         List<AlfrescoEntity> children = new ArrayList<AlfrescoEntity>();

@@ -24,6 +24,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.http.HttpSession;
 
 import org.apache.http.NameValuePair;
@@ -33,7 +35,6 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.gwt.wysiwyg.client.plugin.alfresco.AlfrescoService;
@@ -48,7 +49,8 @@ import org.xwiki.wysiwyg.plugin.alfresco.server.SimpleHttpClient.ResponseHandler
  * 
  * @version $Id$
  */
-@Component("ticket")
+@Component
+@Named("ticket")
 public class TicketAuthenticator implements Authenticator
 {
     /**
@@ -70,32 +72,29 @@ public class TicketAuthenticator implements Authenticator
     /**
      * The component used to access the HTTP session to store the authentication ticket.
      */
-    @Requirement
+    @Inject
     private Container container;
 
     /**
      * The component that controls the Alfresco access configuration.
      */
-    @Requirement
+    @Inject
     private AlfrescoConfiguration configuration;
 
     /**
      * The component used to request the authentication ticket.
      */
-    @Requirement("noauth")
+    @Inject
+    @Named("noauth")
     private SimpleHttpClient httpClient;
 
     /**
      * The component used to parse the ticket response.
      */
-    @Requirement
+    @Inject
     private AlfrescoResponseParser responseParser;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Authenticator#authenticate(HttpRequestBase)
-     */
+    @Override
     public void authenticate(HttpRequestBase request)
     {
         HttpSession session = ((ServletRequest) container.getRequest()).getHttpServletRequest().getSession();

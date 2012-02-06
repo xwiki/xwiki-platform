@@ -26,13 +26,23 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wysiwyg</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wysiwyg-plugin-alfresco-server</artifactId>
   <name>XWiki Platform - WYSIWYG Editor - Plugins - Alfresco - Server Side</name>
   <packaging>jar</packaging>
   <description>The service used to fetch data from an Alfresco server.</description>
   <dependencies>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+    <!-- GWT core dependencies -->
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-servlet</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <!-- GWT libraries -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -68,7 +78,6 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.0.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

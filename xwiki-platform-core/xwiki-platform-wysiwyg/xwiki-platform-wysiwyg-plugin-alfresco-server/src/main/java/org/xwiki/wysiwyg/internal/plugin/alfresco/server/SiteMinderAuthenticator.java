@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.cookie.ClientCookie;
@@ -30,7 +33,6 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.impl.cookie.BrowserCompatSpec;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.wysiwyg.plugin.alfresco.server.Authenticator;
@@ -40,7 +42,8 @@ import org.xwiki.wysiwyg.plugin.alfresco.server.Authenticator;
  * 
  * @version $Id$
  */
-@Component("siteMinder")
+@Component
+@Named("siteMinder")
 public class SiteMinderAuthenticator implements Authenticator
 {
     /**
@@ -51,14 +54,10 @@ public class SiteMinderAuthenticator implements Authenticator
     /**
      * The component used to access the current HTTP request, from where we copy the SMSESSION cookie.
      */
-    @Requirement
+    @Inject
     private Container container;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Authenticator#authenticate(HttpRequestBase)
-     */
+    @Override
     public void authenticate(HttpRequestBase request)
     {
         List<Cookie> cookies = getSiteMinderCookies();

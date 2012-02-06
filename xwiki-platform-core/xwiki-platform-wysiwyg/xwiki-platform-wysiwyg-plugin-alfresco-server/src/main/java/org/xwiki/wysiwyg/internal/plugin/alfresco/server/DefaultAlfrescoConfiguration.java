@@ -19,8 +19,10 @@
  */
 package org.xwiki.wysiwyg.internal.plugin.alfresco.server;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.wysiwyg.plugin.alfresco.server.AlfrescoConfiguration;
 
@@ -35,44 +37,29 @@ public class DefaultAlfrescoConfiguration implements AlfrescoConfiguration
     /**
      * The configuration source.
      */
-    @Requirement("all")
+    @Inject
+    @Named("all")
     private ConfigurationSource configurationSource;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AlfrescoConfiguration#getServerURL()
-     */
+    @Override
     public String getServerURL()
     {
         return configurationSource.getProperty("alfresco.serverURL", "http://localhost:8080");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AlfrescoConfiguration#getUserName()
-     */
+    @Override
     public String getUserName()
     {
         return configurationSource.getProperty("alfresco.username", "Admin");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AlfrescoConfiguration#getPassword()
-     */
+    @Override
     public String getPassword()
     {
         return configurationSource.getProperty("alfresco.password", "admin");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AlfrescoConfiguration#getDefaultNodeReference()
-     */
+    @Override
     public String getDefaultNodeReference()
     {
         return configurationSource.getProperty("alfresco.defaultNodeRef",

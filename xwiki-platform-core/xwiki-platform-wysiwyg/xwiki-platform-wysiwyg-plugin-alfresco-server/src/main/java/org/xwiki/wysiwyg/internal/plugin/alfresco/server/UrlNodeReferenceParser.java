@@ -24,10 +24,12 @@ import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.wysiwyg.plugin.alfresco.server.NodeReference;
 import org.xwiki.wysiwyg.plugin.alfresco.server.NodeReferenceParser;
 import org.xwiki.wysiwyg.plugin.alfresco.server.StoreReference;
@@ -37,7 +39,8 @@ import org.xwiki.wysiwyg.plugin.alfresco.server.StoreReference;
  * 
  * @version $Id$
  */
-@Component("url")
+@Component
+@Named("url")
 public class UrlNodeReferenceParser implements NodeReferenceParser
 {
     /**
@@ -49,14 +52,10 @@ public class UrlNodeReferenceParser implements NodeReferenceParser
     /**
      * The object used to parse node references.
      */
-    @Requirement
+    @Inject
     private NodeReferenceParser nodeReferenceParser;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see NodeReferenceParser#parse(String)
-     */
+    @Override
     public NodeReference parse(String url)
     {
         String nodeReference = null;

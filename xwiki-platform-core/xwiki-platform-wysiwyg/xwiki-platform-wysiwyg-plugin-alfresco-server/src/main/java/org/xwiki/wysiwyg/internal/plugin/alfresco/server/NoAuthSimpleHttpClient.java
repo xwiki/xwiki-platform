@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.inject.Named;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -50,7 +52,8 @@ import org.xwiki.wysiwyg.plugin.alfresco.server.SimpleHttpClient;
  * 
  * @version $Id$
  */
-@Component("noauth")
+@Component
+@Named("noauth")
 public class NoAuthSimpleHttpClient implements SimpleHttpClient
 {
     /**
@@ -58,11 +61,7 @@ public class NoAuthSimpleHttpClient implements SimpleHttpClient
      */
     private HttpClient httpClient;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SimpleHttpClient#doGet(String, List, ResponseHandler)
-     */
+    @Override
     public <T> T doGet(String url, List<Entry<String, String>> queryStringParameters, ResponseHandler<T> handler)
         throws IOException
     {
@@ -73,11 +72,7 @@ public class NoAuthSimpleHttpClient implements SimpleHttpClient
         return sendRequest(new HttpGet(url + '?' + URLEncodedUtils.format(parameters, "UTF-8")), handler);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SimpleHttpClient#doPost(String, String, String, ResponseHandler)
-     */
+    @Override
     public <T> T doPost(String url, String content, String contentType, ResponseHandler<T> handler) throws IOException
     {
         HttpPost request = new HttpPost(url);

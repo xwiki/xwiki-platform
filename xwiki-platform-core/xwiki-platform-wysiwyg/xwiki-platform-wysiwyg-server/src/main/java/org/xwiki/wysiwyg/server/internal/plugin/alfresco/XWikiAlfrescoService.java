@@ -23,8 +23,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.gwt.wysiwyg.client.plugin.alfresco.AlfrescoEntity;
 import org.xwiki.gwt.wysiwyg.client.plugin.alfresco.AlfrescoService;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
@@ -42,13 +44,14 @@ import org.xwiki.wysiwyg.server.wiki.EntityReferenceConverter;
  * 
  * @version $Id$
  */
-@Component()
+@Component
+@Singleton
 public class XWikiAlfrescoService implements AlfrescoService
 {
     /**
      * The component used to access the wiki.
      */
-    @Requirement
+    @Inject
     private WikiService wikiService;
 
     /**
@@ -56,11 +59,7 @@ public class XWikiAlfrescoService implements AlfrescoService
      */
     private final EntityReferenceConverter entityReferenceConverter = new EntityReferenceConverter();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AlfrescoService#getChildren(EntityReference)
-     */
+    @Override
     public List<AlfrescoEntity> getChildren(EntityReference clientParentReference)
     {
         org.xwiki.model.reference.EntityReference parentReference =
@@ -84,11 +83,7 @@ public class XWikiAlfrescoService implements AlfrescoService
         return children;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AlfrescoService#getParent(EntityReference)
-     */
+    @Override
     public AlfrescoEntity getParent(EntityReference clientChildReference)
     {
         org.xwiki.model.reference.EntityReference childReference =

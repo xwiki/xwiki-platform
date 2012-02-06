@@ -21,7 +21,7 @@ package org.xwiki.wysiwyg.internal.plugin.alfresco.server;
 
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.wysiwyg.plugin.alfresco.server.NodeReference;
 import org.xwiki.wysiwyg.plugin.alfresco.server.NodeReferenceParser;
@@ -42,11 +42,7 @@ public class DefaultNodeReferenceParser implements NodeReferenceParser
      */
     private static final Pattern SEPARATOR = Pattern.compile("(?:\\:\\/)?\\/");
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see NodeReferenceParser#parse(String)
-     */
+    @Override
     public NodeReference parse(String serializedReference)
     {
         if (StringUtils.isEmpty(serializedReference)) {

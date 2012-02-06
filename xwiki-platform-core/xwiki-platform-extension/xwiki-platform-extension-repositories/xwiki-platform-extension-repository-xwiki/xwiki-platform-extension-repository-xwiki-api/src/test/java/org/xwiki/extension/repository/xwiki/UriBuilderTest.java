@@ -75,4 +75,14 @@ public class UriBuilderTest
 
         Assert.assertEquals("http://base/%C3%A9?param=%C3%A9", uriBuilder.build("\u00e9").toString());
     }
+
+    @Test
+    public void testClone()
+    {
+        UriBuilder uriBuilder = new UriBuilder("http://base", "{key}");
+
+        UriBuilder clonedUriBuilder = uriBuilder.clone();
+
+        Assert.assertNotNull(clonedUriBuilder);
+    }
 }

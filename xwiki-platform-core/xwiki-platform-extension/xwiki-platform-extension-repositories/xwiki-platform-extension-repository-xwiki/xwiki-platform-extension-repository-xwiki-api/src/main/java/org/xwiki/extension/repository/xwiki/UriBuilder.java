@@ -30,7 +30,7 @@ import java.net.URISyntaxException;
  * 
  * @version $Id$
  */
-public class UriBuilder
+public class UriBuilder implements Cloneable
 {
     private String scheme;
 

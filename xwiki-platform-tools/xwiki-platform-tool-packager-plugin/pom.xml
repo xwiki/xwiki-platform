@@ -89,7 +89,17 @@
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
         </exclusion>
+        <!-- Exclude Servlet Environment since we want to run our code in a Standard Environment -->
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-environment-servlet</artifactId>
+        </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-environment-standard</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>hsqldb</groupId>

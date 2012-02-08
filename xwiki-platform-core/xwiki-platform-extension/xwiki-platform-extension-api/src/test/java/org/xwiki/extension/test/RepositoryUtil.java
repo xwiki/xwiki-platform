@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.jmock.Mockery;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -35,7 +36,9 @@ import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.environment.Environment;
 import org.xwiki.extension.handler.ExtensionInitializer;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
@@ -123,9 +126,15 @@ public class RepositoryUtil
         return MAVENREPOSITORY_ID;
     }
 
-    public void setup() throws Exception
+    public void setup(Mockery mockery) throws Exception
     {
         clean();
+
+        // Mock Environment
+        Environment environment = mockery.mock(Environment.class);
+        DefaultComponentDescriptor<Environment> dcd = new DefaultComponentDescriptor<Environment>();
+        dcd.setRole(Environment.class);
+        this.componentManager.registerComponent(dcd, environment);
 
         // disable default configuration
         // TODO: probably mean that this default configuration should not be at this level

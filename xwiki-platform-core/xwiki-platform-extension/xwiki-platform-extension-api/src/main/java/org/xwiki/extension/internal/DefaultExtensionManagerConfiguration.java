@@ -37,7 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 
@@ -67,10 +67,10 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     private Logger logger;
 
     /**
-     * Used to get work directory.
+     * Used to get permanent directory.
      */
     @Inject
-    private Container container;
+    private Environment environment;
 
     /**
      * The configuration.
@@ -91,7 +91,7 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
      */
     public File getHome()
     {
-        return new File(this.container.getApplicationContext().getPermanentDirectory(), "extension/");
+        return new File(this.environment.getPermanentDirectory(), "extension/");
     }
 
     @Override

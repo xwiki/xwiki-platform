@@ -37,6 +37,10 @@ public interface ServletContainerInitializer
     void initializeResponse(HttpServletResponse response);
     
     void initializeSession(HttpServletRequest request);
-    
+
+    /**
+     * @deprecated starting with 3.5M1, use the notion of Environment instead
+     */
+    @Deprecated
     void initializeApplicationContext(ServletContext servletContext);
 }

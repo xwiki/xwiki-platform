@@ -42,8 +42,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 import org.xwiki.observation.remote.NetworkAdapter;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.RemoteEventException;
@@ -82,11 +81,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
      */
     private Map<String, JChannel> channels = new ConcurrentHashMap<String, JChannel>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.NetworkAdapter#send(org.xwiki.observation.remote.RemoteEventData)
-     */
+    @Override
     public void send(RemoteEventData remoteEvent)
     {
         this.logger.debug("Send JGroups remote event [" + remoteEvent + "]");
@@ -105,11 +100,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.NetworkAdapter#startChannel(java.lang.String)
-     */
+    @Override
     public void startChannel(String channelId) throws RemoteEventException
     {
         if (this.channels.containsKey(channelId)) {
@@ -137,11 +128,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
         this.logger.info("Channel [{}] started", channelId);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.NetworkAdapter#stopChannel(java.lang.String)
-     */
+    @Override
     public void stopChannel(String channelId) throws RemoteEventException
     {
         JChannel channel = this.channels.get(channelId);
@@ -215,18 +202,15 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
 
         InputStream is = null;
         try {
-            Container container = this.componentManager.lookup(Container.class);
-            ApplicationContext applicationContext = container.getApplicationContext();
-
-            if (applicationContext != null) {
-                is = applicationContext.getResourceAsStream(path);
-            }
+            Environment environment = this.componentManager.lookup(Environment.class);
+            is = environment.getResourceAsStream(path);
         } catch (ComponentLookupException e) {
-            this.logger.debug("Failed to lookup Container component.");
+            // Environment not found, continue by fallbacking on JGroups's standard configuration.
+            this.logger.debug("Failed to lookup the Environment component.", e);
         }
 
         if (is == null) {
-            // Fallback on JGroups standard configuraton locations
+            // Fallback on JGroups standard configuration locations
             is = ConfiguratorFactory.getConfigStream(channelFile);
 
             if (is == null && !JChannel.DEFAULT_PROTOCOL_STACK.equals(channelFile)) {
@@ -238,11 +222,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
         return XmlConfigurator.getInstance(is);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.NetworkAdapter#stopAllChannels()
-     */
+    @Override
     public void stopAllChannels() throws RemoteEventException
     {
         for (Map.Entry<String, JChannel> channelEntry : this.channels.entrySet()) {

@@ -19,10 +19,13 @@
  */
 package com.xpn.xwiki.test;
 
+import javax.servlet.ServletContext;
+
 import org.jmock.Mock;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -66,9 +69,13 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         execution.getContext().setProperty("xwikicontext", this.context);
         getComponentManager().lookup(XWikiStubContextProvider.class).initialize(this.context);
 
-        // Set a simple application context, as some components fail to start without one.
-        Container c = getComponentManager().lookup(Container.class);
-        c.setApplicationContext(new TestApplicationContext());
+        // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
+        // correctly with a Servlet Context.
+        ServletEnvironment environment = (ServletEnvironment) getComponentManager().lookup(Environment.class);
+        Mock mockServletContext = mock(ServletContext.class); 
+        environment.setServletContext((ServletContext) mockServletContext.proxy());
+        mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/cache/infinispan/config.xml"))
+            .will(returnValue(null));
 
         Mock mockCoreConfiguration = registerMockComponent(CoreConfiguration.class);
         mockCoreConfiguration.stubs().method("getDefaultDocumentSyntax").will(returnValue(Syntax.XWIKI_1_0));

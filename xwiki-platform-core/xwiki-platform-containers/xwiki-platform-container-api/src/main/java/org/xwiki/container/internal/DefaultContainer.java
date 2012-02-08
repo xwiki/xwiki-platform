@@ -37,11 +37,20 @@ import org.xwiki.container.Session;
 @Component
 public class DefaultContainer implements Container
 {
+    /**
+     * @deprecated starting with 3.5M1, use the notion of Environment instead
+     */
+    @Deprecated
     private ApplicationContext applicationContext;
+
     private ThreadLocal<Stack<Request>> request = new ThreadLocal<Stack<Request>>();
     private ThreadLocal<Stack<Response>> response = new ThreadLocal<Stack<Response>>();
     private ThreadLocal<Stack<Session>> session = new ThreadLocal<Stack<Session>>();
 
+    /**
+     * @deprecated starting with 3.5M1, use the notion of Environment instead
+     */
+    @Deprecated
     public ApplicationContext getApplicationContext()
     {
         return this.applicationContext;
@@ -125,6 +134,10 @@ public class DefaultContainer implements Container
         }
     }
 
+    /**
+     * @deprecated starting with 3.5M1, use the notion of Environment instead
+     */
+    @Deprecated
     public void setApplicationContext(ApplicationContext context)
     {
         this.applicationContext = context;

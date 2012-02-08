@@ -24,8 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
@@ -46,46 +45,32 @@ public class XWikiPropertiesConfigurationSourceTest extends AbstractComponentTes
     {
         super.setUp();
 
-        final ApplicationContext appContext = getMockery().mock(ApplicationContext.class);
+        final Environment environment = getMockery().mock(Environment.class);
         getMockery().checking(new Expectations() {{
-            oneOf(appContext).getResource("/WEB-INF/xwiki.properties");
+            oneOf(environment).getResource("/WEB-INF/xwiki.properties");
             will(returnValue(null));
         }});
-
-        Container container = getComponentManager().lookup(Container.class);
-        container.setApplicationContext(appContext);
 
         // Set a mock Logger to capture all log outputs and perform verifications
         this.logger = getMockery().mock(Logger.class);
 
         this.source = new XWikiPropertiesConfigurationSource();
-        ReflectionUtils.setFieldValue(this.source, "container", container);
+        ReflectionUtils.setFieldValue(this.source, "environment", environment);
         ReflectionUtils.setFieldValue(this.source, "logger", this.logger);
     }
 
     @Test
-    public void testInitializeWhenNoPropertiesFileAndDebugEnabled() throws Exception
+    public void testInitializeWhenNoPropertiesFile() throws Exception
     {
         getMockery().checking(new Expectations() {{
-            oneOf(logger).isDebugEnabled();
-            will(returnValue(true));
             // This is the test
-            oneOf(logger).debug("No configuration file [/WEB-INF/xwiki.properties] found. "
-                + "Using default configuration values.");
+            oneOf(logger).debug("No configuration file [{}] found. Using default configuration values.",
+                "/WEB-INF/xwiki.properties");
         }});
 
         this.source.initialize();
-    }
 
-    @Test
-    public void testInitializeWhenNoPropertiesFileAndDebugNotEnabled() throws Exception
-    {
-        getMockery().checking(new Expectations() {{
-            oneOf(logger).isDebugEnabled();
-            will(returnValue(false));
-            // This is the test. It shows nothing is logged when the properties file is not available.
-        }});
-
-        this.source.initialize();
+        // Verifies that we can get a property from the source (i.e. that it's correctly initialized)
+        this.source.getProperty("key");
     }
 }

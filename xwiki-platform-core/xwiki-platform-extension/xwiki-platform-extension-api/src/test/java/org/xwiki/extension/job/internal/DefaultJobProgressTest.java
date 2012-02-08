@@ -43,7 +43,7 @@ public class DefaultJobProgressTest extends AbstractComponentTestCase
         super.setUp();
         this.repositoryUtil =
             new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());
-        this.repositoryUtil.setup();
+        this.repositoryUtil.setup(getMockery());
 
         this.observation = getComponentManager().lookup(ObservationManager.class);
         this.progress = new DefaultJobProgress("id");

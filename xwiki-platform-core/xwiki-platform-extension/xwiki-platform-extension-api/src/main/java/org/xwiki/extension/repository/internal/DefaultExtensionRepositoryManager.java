@@ -112,7 +112,7 @@ public class DefaultExtensionRepositoryManager implements ExtensionRepositoryMan
 
             addRepository(repository);
         } catch (ComponentLookupException e) {
-            throw new ExtensionRepositoryException("Unsupported repository type[" + repositoryId.getType() + "]", e);
+            throw new ExtensionRepositoryException("Unsupported repository type [" + repositoryId.getType() + "]", e);
         }
 
         return repository;

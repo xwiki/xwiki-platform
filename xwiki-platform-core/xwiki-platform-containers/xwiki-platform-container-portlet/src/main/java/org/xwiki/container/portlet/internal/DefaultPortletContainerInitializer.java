@@ -63,6 +63,10 @@ public class DefaultPortletContainerInitializer implements PortletContainerIniti
     @Inject
     private ComponentManager componentManager;
 
+    /**
+     * @deprecated starting with 3.5M1, use the notion of Environment instead
+     */
+    @Deprecated
     @Override
     public void initializeApplicationContext(PortletContext portletContext)
     {

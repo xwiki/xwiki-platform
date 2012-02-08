@@ -26,8 +26,10 @@ import org.xwiki.component.annotation.ComponentRole;
  * 
  * @version $Id$
  * @since 1.9M2
+ * @deprecated starting with 3.5M1, use the notion of Environment instead
  */
 @ComponentRole
+@Deprecated
 public interface ApplicationContextListenerManager
 {
     /**
@@ -35,6 +37,7 @@ public interface ApplicationContextListenerManager
      * 
      * @param applicationContext the {@link ApplicationContext}.
      */
+    @Deprecated
     void initializeApplicationContext(ApplicationContext applicationContext);
     
     /**
@@ -42,5 +45,6 @@ public interface ApplicationContextListenerManager
      * 
      * @param applicationContext the {@link ApplicationContext}.
      */
+    @Deprecated
     void destroyApplicationContext(ApplicationContext applicationContext);
 }

@@ -37,8 +37,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -108,11 +107,6 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
      */
     private Cache<OfficeDocumentView> cache;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMockingComponentTestCase#setUp()
-     */
     @Override
     @Before
     public void setUp() throws Exception
@@ -124,11 +118,6 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
         officeDocumentBuilder = getComponentManager().lookup(XDOMOfficeDocumentBuilder.class);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMockingComponentTestCase#configure()
-     */
     @SuppressWarnings("unchecked")
     @Override
     public void configure() throws Exception
@@ -323,16 +312,12 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     @Test
     public void testGetTemporaryDirectory() throws Exception
     {
-        final Container container = getComponentManager().lookup(Container.class);
-        final ApplicationContext applicationContext = getMockery().mock(ApplicationContext.class);
+        final Environment environment = getComponentManager().lookup(Environment.class);
 
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(container).getApplicationContext();
-                will(returnValue(applicationContext));
-
-                oneOf(applicationContext).getTemporaryDirectory();
+                oneOf(environment).getTemporaryDirectory();
                 will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
             }
         });

@@ -54,7 +54,7 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
 
         this.repositoryUtil =
             new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());
-        this.repositoryUtil.setup();
+        this.repositoryUtil.setup(getMockery());
 
         // lookup
 

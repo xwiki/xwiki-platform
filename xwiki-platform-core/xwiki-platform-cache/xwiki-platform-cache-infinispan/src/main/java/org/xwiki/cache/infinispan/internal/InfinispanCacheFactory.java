@@ -44,8 +44,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 
 /**
  * Implements {@link org.xwiki.cache.CacheFactory} based on Infinispan.
@@ -76,9 +75,9 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
     private ComponentManager componentManager;
 
     /**
-     * Optional container used to access configuration files.
+     * Optional Environment used to access configuration files.
      */
-    private Container container;
+    private Environment environment;
 
     /**
      * Used to create Infinispan caches.
@@ -99,9 +98,9 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
         // environments when there's no container.
 
         try {
-            this.container = this.componentManager.lookup(Container.class);
+            this.environment = this.componentManager.lookup(Environment.class);
         } catch (ComponentLookupException e) {
-            this.logger.debug("Can't find any Container", e);
+            this.logger.debug("Can't find any Environment", e);
         }
 
         InputStream configurationStream = getConfigurationFileAsStream();
@@ -150,11 +149,8 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
     {
         InputStream is = null;
 
-        if (this.container != null) {
-            ApplicationContext applicationContext = this.container.getApplicationContext();
-            if (applicationContext != null) {
-                is = applicationContext.getResourceAsStream(DEFAULT_CONFIGURATION_FILE);
-            }
+        if (this.environment != null) {
+            is = this.environment.getResourceAsStream(DEFAULT_CONFIGURATION_FILE);
         }
 
         return is;

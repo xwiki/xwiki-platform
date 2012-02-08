@@ -75,9 +75,8 @@ import org.w3c.dom.ls.LSSerializer;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.InputSource;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -173,8 +172,8 @@ public class PdfExportImpl implements PdfExport
         // ----------------------------------------------------------------------
         fopFactory = FopFactory.newInstance();
         try {
-            ApplicationContext context = Utils.getComponent(Container.class).getApplicationContext();
-            String fontsPath = context.getResource(FONTS_PATH).getPath();
+            Environment environment = Utils.getComponent(Environment.class);
+            String fontsPath = environment.getResource(FONTS_PATH).getPath();
             Execution execution = Utils.getComponent(Execution.class);
             XWikiContext xcontext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
             if (xcontext != null) {

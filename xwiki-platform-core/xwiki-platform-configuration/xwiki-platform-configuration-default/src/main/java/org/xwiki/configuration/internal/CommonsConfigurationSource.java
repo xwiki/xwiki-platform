@@ -48,6 +48,11 @@ public class CommonsConfigurationSource implements ConfigurationSource
     @Inject
     private ConverterManager converterManager;
 
+    protected Configuration getConfiguration()
+    {
+        return this.configuration;
+    }
+
     protected void setConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
@@ -75,7 +80,7 @@ public class CommonsConfigurationSource implements ConfigurationSource
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String key)
     {
-        return (T) this.configuration.getProperty(key);
+        return (T) getConfiguration().getProperty(key);
     }
 
     @Override
@@ -86,11 +91,11 @@ public class CommonsConfigurationSource implements ConfigurationSource
 
         try {
             if (String.class.getName().equals(valueClass.getName())) {
-                result = (T) this.configuration.getString(key);
+                result = (T) getConfiguration().getString(key);
             } else if (List.class.isAssignableFrom(valueClass)) {
-                result = (T) this.configuration.getList(key);
+                result = (T) getConfiguration().getList(key);
             } else if (Properties.class.isAssignableFrom(valueClass)) {
-                result = (T) this.configuration.getProperties(key);
+                result = (T) getConfiguration().getProperties(key);
             } else if (null != getProperty(key)) {
                 result = (T) this.converterManager.convert(valueClass, getProperty(key));
             }
@@ -109,7 +114,7 @@ public class CommonsConfigurationSource implements ConfigurationSource
     public List<String> getKeys()
     {
         List<String> keysList = new ArrayList<String>();
-        Iterator<String> keys = (Iterator<String>) this.configuration.getKeys();
+        Iterator<String> keys = (Iterator<String>) getConfiguration().getKeys();
         while (keys.hasNext()) {
             keysList.add(keys.next());
         }
@@ -120,12 +125,12 @@ public class CommonsConfigurationSource implements ConfigurationSource
     @Override
     public boolean containsKey(String key)
     {
-        return this.configuration.containsKey(key);
+        return getConfiguration().containsKey(key);
     }
 
     @Override
     public boolean isEmpty()
     {
-        return this.configuration.isEmpty();
+        return getConfiguration().isEmpty();
     }
 }

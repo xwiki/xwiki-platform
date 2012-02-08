@@ -36,7 +36,7 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -72,7 +72,7 @@ public abstract class AbstractOfficeViewer implements OfficeViewer, Initializabl
      * Used to access the temporary directory.
      */
     @Inject
-    private Container container;
+    private Environment environment;
 
     /**
      * Used for serializing {@link AttachmentReference}s.
@@ -221,12 +221,12 @@ public abstract class AbstractOfficeViewer implements OfficeViewer, Initializabl
 
         // Create temporary directory.
         String path = String.format("temp/%s/%s/%s/%s/%s/", MODULE_NAME, wiki, space, page, attachmentName);
-        File rootDir = container.getApplicationContext().getTemporaryDirectory();
+        File rootDir = this.environment.getTemporaryDirectory();
         File tempDir = new File(rootDir, path);
         boolean success = (tempDir.exists() || tempDir.mkdirs()) && tempDir.isDirectory() && tempDir.canWrite();
         if (!success) {
-            String message = "Error while creating temporary directory for attachment [%s].";
-            throw new Exception(String.format(message, attachmentName));
+            String message = "Error while creating temporary directory [%s] for attachment [%s].";
+            throw new Exception(String.format(message, tempDir, attachmentName));
         }
         return tempDir;
     }

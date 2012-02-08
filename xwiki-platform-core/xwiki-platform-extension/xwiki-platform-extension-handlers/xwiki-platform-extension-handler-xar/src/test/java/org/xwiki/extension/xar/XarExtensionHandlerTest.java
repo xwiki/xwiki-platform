@@ -84,7 +84,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         this.repositoryUtil =
             new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());
-        this.repositoryUtil.setup();
+        this.repositoryUtil.setup(getMockery());
 
         // mock
 

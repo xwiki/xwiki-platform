@@ -414,9 +414,19 @@
 
     <!-- Other XWiki modules -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-configuration-default</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-environment-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-context</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-script</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -434,14 +444,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-script</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-context</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-configuration-default</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

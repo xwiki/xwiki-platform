@@ -22,9 +22,13 @@ package org.xwiki.velocity;
 import java.io.StringWriter;
 import java.util.Properties;
 
+import javax.servlet.ServletContext;
+
 import org.apache.velocity.VelocityContext;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
@@ -38,6 +42,10 @@ public class XWikiWebappResourceLoaderTest extends AbstractComponentTestCase
     @Test
     public void testVelocityInitialization() throws Exception
     {
+        // Fake the initialization of the Servlet Environment
+        ServletEnvironment environment = (ServletEnvironment) getComponentManager().lookup(Environment.class);
+        environment.setServletContext(getMockery().mock(ServletContext.class));
+        
         Properties properties = new Properties();
         properties.setProperty("resource.loader", "xwiki");
         properties.setProperty("xwiki.resource.loader.class", XWikiWebappResourceLoader.class.getName());

@@ -28,7 +28,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 
 @Component
 @Singleton
@@ -36,19 +36,20 @@ public class DefaultAetherConfiguration implements AetherConfiguration
 {
     @Inject
     @Named("configurationSource")
-    private Provider<ConfigurationSource> configurationSource;
+    private Provider<ConfigurationSource> configurationSourceProvider;
 
     @Inject
-    private Container container;
+    private Environment environment;
 
     @Override
     public File getLocalRepository()
     {
-        String localRepositoryPath = this.configurationSource.get().getProperty("extension.aether.localRepository");
+        String localRepositoryPath =
+            this.configurationSourceProvider.get().getProperty("extension.aether.localRepository");
 
         File directory;
         if (localRepositoryPath == null) {
-            directory = new File(this.container.getApplicationContext().getTemporaryDirectory(), "aether-repository");
+            directory = new File(this.environment.getTemporaryDirectory(), "aether-repository");
         } else {
             directory = new File(localRepositoryPath);
         }

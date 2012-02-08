@@ -20,12 +20,17 @@
 
 package org.xwiki.model.internal.reference;
 
+import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.WIKISEP;
 
 /**
  * Serialize a reference into a unique identifier string within a wiki. Its similar to the
@@ -41,14 +46,51 @@ import org.xwiki.model.reference.EntityReference;
 @Component
 @Named("local/uid")
 @Singleton
-public class LocalUidStringEntityReferenceSerializer extends UidStringEntityReferenceSerializer
+public class LocalUidStringEntityReferenceSerializer implements EntityReferenceSerializer<String>
 {
     @Override
-    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
-        boolean isLastReference, Object... parameters)
+    public String serialize(EntityReference reference, Object... parameters)
     {
-        if (currentReference.getType() != EntityType.WIKI) {
-            super.serializeEntityReference(currentReference, representation, isLastReference, parameters);
+        if (reference == null) {
+            return null;
         }
+
+        StringBuilder representation = new StringBuilder();
+        List<EntityReference> references = reference.getReversedReferenceChain();
+        EntityReference wikiReference = references.get(0);
+        if (wikiReference.getType() == EntityType.WIKI) {
+            references.remove(0);
+        } else {
+            wikiReference = null;
+        }
+
+        for (EntityReference currentReference : references) {
+            serializeEntityReference(currentReference, representation, wikiReference, parameters);
+        }
+
+        return representation.toString();
+    }
+
+    /**
+     * Serialize a single reference element into the representation string builder.
+     *
+     * @param currentReference the reference to serialize
+     * @param representation the builder where to happen the serialized member
+     * @param wikiReference the wiki reference of this entity reference
+     * @param parameters optional parameters
+     */
+    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
+        EntityReference wikiReference, Object... parameters)
+    {
+        String name = currentReference.getName();
+
+        // FIXME: Not really nice to parse here the serialized XClass reference to remove its wiki name when local.
+        // This also why this is not a simple derived class of UidStringEntityReferenceSerializer.
+        if (wikiReference != null && currentReference.getType() == EntityType.OBJECT) {
+            if (name.startsWith(wikiReference.getName() + WIKISEP)) {
+                name = name.substring(wikiReference.getName().length() + 1);
+            }
+        }
+        representation.append(name.length()).append(':').append(name);
     }
 }

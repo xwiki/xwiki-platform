@@ -315,6 +315,7 @@
               <excludes>
                 <exclude>**/internal/**</exclude>
                 <!-- Remove the following excludes after we release 3.5 -->
+                <exclude>org/xwiki/container/ContainerFactory</exclude>
               </excludes>
             </configuration>
           </plugin>

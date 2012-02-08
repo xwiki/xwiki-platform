@@ -316,6 +316,9 @@
                 <exclude>**/internal/**</exclude>
                 <!-- Remove the following excludes after we release 3.5 -->
                 <exclude>org/xwiki/container/ContainerFactory</exclude>
+                <!-- Moved to another module -->
+                <exclude>com/xpn/xwiki/plugin/zipexplorer/ZipExplorerPlugin</exclude>
+                <exclude>com/xpn/xwiki/plugin/zipexplorer/ZipExplorerPluginAPI</exclude>
               </excludes>
             </configuration>
           </plugin>

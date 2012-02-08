@@ -88,33 +88,39 @@ public class LocalUidStringEntityReferenceSerializerTest
     @Test
     public void testSerializeObjectReference()
     {
-        EntityReference reference = resolver.resolve("wiki:space.page^Object", EntityType.OBJECT);
-        Assert.assertEquals("5:space4:page6:Object", serializer.serialize(reference));
+        EntityReference reference = resolver.resolve("wiki:space.page^wiki:space.class[0]", EntityType.OBJECT);
+        Assert.assertEquals("5:space4:page14:space.class[0]", serializer.serialize(reference));
+
+        reference = resolver.resolve("wiki:space.page^xwiki:space.class[0]", EntityType.OBJECT);
+        Assert.assertEquals("5:space4:page20:xwiki:space.class[0]", serializer.serialize(reference));
 
         // test escaping character
-        reference = resolver.resolve("wiki:space.page^Obje\\^ct", EntityType.OBJECT);
-        Assert.assertEquals("5:space4:page7:Obje^ct", serializer.serialize(reference));
+        reference = resolver.resolve("wiki:space.page^wiki:space.cla\\^ss[0]", EntityType.OBJECT);
+        Assert.assertEquals("5:space4:page15:space.cla^ss[0]", serializer.serialize(reference));
 
-        reference = resolver.resolve("wiki:spa^ce.page^Obje\\^ct", EntityType.OBJECT);
-        Assert.assertEquals("6:spa^ce4:page7:Obje^ct", serializer.serialize(reference));
+        reference = resolver.resolve("wiki:spa^ce.page^wiki:space.cla\\^ss[0]", EntityType.OBJECT);
+        Assert.assertEquals("6:spa^ce4:page15:space.cla^ss[0]", serializer.serialize(reference));
     }
 
     /**
-     * Tests resolving and re-serializing an object reference.
+     * Tests resolving and re-serializing an property reference.
      */
     @Test
     public void testSerializeObjectPropertyReference()
     {
-        EntityReference reference = resolver.resolve("wiki:space.page^xwiki.class[0].prop", EntityType.OBJECT_PROPERTY);
-        Assert.assertEquals("5:space4:page14:xwiki.class[0]4:prop", serializer.serialize(reference));
+        EntityReference reference = resolver.resolve("wiki:space.page^wiki:space.class[0].prop", EntityType.OBJECT_PROPERTY);
+        Assert.assertEquals("5:space4:page14:space.class[0]4:prop", serializer.serialize(reference));
+
+        reference = resolver.resolve("wiki:space.page^xwiki:space.class[0].prop", EntityType.OBJECT_PROPERTY);
+        Assert.assertEquals("5:space4:page20:xwiki:space.class[0]4:prop", serializer.serialize(reference));
 
         // test escaping character
-        reference = resolver.resolve("wiki:space.page^xwiki.class[0].prop\\.erty", EntityType.OBJECT_PROPERTY);
-        Assert.assertEquals("5:space4:page14:xwiki.class[0]9:prop.erty", serializer.serialize(reference));
+        reference = resolver.resolve("wiki:space.page^wiki:space.class[0].prop\\.erty", EntityType.OBJECT_PROPERTY);
+        Assert.assertEquals("5:space4:page14:space.class[0]9:prop.erty", serializer.serialize(reference));
     }
 
     /**
-     * Tests resolving and re-serializing an object reference.
+     * Tests resolving and re-serializing an class property reference.
      */
     @Test
     public void testSerializeClassPropertyReference()
@@ -123,8 +129,8 @@ public class LocalUidStringEntityReferenceSerializerTest
         Assert.assertEquals("5:space4:page13:ClassProperty", serializer.serialize(reference));
 
         // test escaping character
-        reference = resolver.resolve("wiki:space.page^Obje\\^ct", EntityType.CLASS_PROPERTY);
-        Assert.assertEquals("5:space4:page7:Obje^ct", serializer.serialize(reference));
+        reference = resolver.resolve("wiki:space.page^ClassPro\\^perty", EntityType.CLASS_PROPERTY);
+        Assert.assertEquals("5:space4:page14:ClassPro^perty", serializer.serialize(reference));
     }
 
     @Test

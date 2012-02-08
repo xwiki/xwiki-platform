@@ -23,8 +23,8 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.repository.internal.DefaultCoreExtension;
-import org.xwiki.extension.repository.internal.DefaultCoreExtensionRepository;
+import org.xwiki.extension.repository.internal.core.DefaultCoreExtension;
+import org.xwiki.extension.repository.internal.core.DefaultCoreExtensionRepository;
 import org.xwiki.extension.version.Version;
 
 @Component

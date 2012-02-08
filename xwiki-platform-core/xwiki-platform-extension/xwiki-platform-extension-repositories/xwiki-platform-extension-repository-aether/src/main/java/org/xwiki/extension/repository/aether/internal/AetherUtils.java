@@ -57,5 +57,4 @@ public final class AetherUtils
 
         return new ExtensionId(builder.toString(), artifact.getVersion());
     }
-
 }

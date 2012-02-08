@@ -20,6 +20,7 @@
 package org.xwiki.extension.repository.xwiki.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -529,7 +530,7 @@ public class DefaultRepositoryManager implements RepositoryManager
         return needSave;
     }
 
-    private boolean updateAuthors(BaseObject extensionObject, List<ExtensionAuthor> authors)
+    private boolean updateAuthors(BaseObject extensionObject, Collection<ExtensionAuthor> authors)
     {
         List<String> authorIds = new ArrayList<String>(authors.size());
 

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.internal;
+package org.xwiki.extension.repository.internal.local;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -378,7 +378,7 @@ public class DefaultExtensionSerializer implements ExtensionSerializer
 
     private void addAuthors(Document document, Element parentElement, Extension extension)
     {
-        List<ExtensionAuthor> authors = extension.getAuthors();
+        Collection<ExtensionAuthor> authors = extension.getAuthors();
         if (!authors.isEmpty()) {
             Element authorsElement = document.createElement(ELEMENT_AUTHORS);
             parentElement.appendChild(authorsElement);

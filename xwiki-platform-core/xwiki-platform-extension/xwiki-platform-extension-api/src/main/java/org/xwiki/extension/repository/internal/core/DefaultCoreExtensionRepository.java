@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.internal;
+package org.xwiki.extension.repository.internal.core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -92,7 +93,23 @@ public class DefaultCoreExtensionRepository extends AbstractExtensionRepository 
     public void initialize() throws InitializationException
     {
         try {
-            this.extensions = this.scanner.loadExtensions(this);
+            this.extensions =
+                new ConcurrentHashMap<String, DefaultCoreExtension>(this.scanner.loadExtensions(this));
+
+            // Start a background thread to get more details about the found extensions
+            Thread thread = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    scanner.updateExtensions(extensions.values());
+                }
+            });
+
+            thread.setPriority(Thread.MIN_PRIORITY);
+            thread.setDaemon(true);
+            thread.setName("Core extension repository updater");
+            thread.start();
         } catch (Exception e) {
             this.logger.warn("Failed to load core extensions", e);
         }

@@ -17,8 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.internal;
+package org.xwiki.extension.repository.xwiki.internal;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,8 +41,8 @@ import org.xwiki.extension.repository.ExtensionRepositorySource;
  */
 @Component
 @Singleton
-@Named("extension.configuration")
-public class ConfigurationExtensionRepositorySource implements ExtensionRepositorySource
+@Named("default.xwiki")
+public class XWikiExtensionRepositorySource implements ExtensionRepositorySource
 {
     /**
      * Used to get configuration properties containing repositories.
@@ -52,6 +55,12 @@ public class ConfigurationExtensionRepositorySource implements ExtensionReposito
     {
         List<ExtensionRepositoryId> repositories = this.configuration.getRepositories();
 
-        return repositories != null ? repositories : Collections.<ExtensionRepositoryId> emptyList();
+        try {
+            return repositories != null ? repositories : Arrays.asList(new ExtensionRepositoryId(
+                "extensions.xwiki.org", "xwiki", new URI("http://extensions.xwiki.org/xwiki/rest/")));
+        } catch (URISyntaxException e) {
+            // Should never happen
+            return Collections.emptyList();
+        }
     }
 }

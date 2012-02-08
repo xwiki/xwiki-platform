@@ -17,33 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.aether.internal;
+package org.xwiki.extension.repository.internal.core;
 
-import org.sonatype.aether.graph.Dependency;
-import org.xwiki.extension.AbstractExtensionDependency;
-import org.xwiki.extension.version.InvalidVersionRangeException;
-import org.xwiki.extension.version.internal.DefaultVersionConstraint;
+import org.apache.maven.model.Dependency;
+import org.xwiki.extension.DefaultExtensionDependency;
+import org.xwiki.extension.version.VersionConstraint;
 
-public class AetherExtensionDependency extends AbstractExtensionDependency
+/**
+ * Extends {@link DefaultExtensionDependency} with Maven related informations.
+ * 
+ * @version $Id$
+ */
+public class MavenCoreExtensionDependency extends DefaultExtensionDependency
 {
-    public static final String PKEY_AETHER_DEPENDENCY = "aether.Dependency";
-
+    /**
+     * The key associated to the Maven dependency object.
+     */
     public static final String PKEY_MAVEN_DEPENDENCY = "maven.Dependency";
 
-    public AetherExtensionDependency(Dependency aetherDependency, org.apache.maven.model.Dependency mavenDependency)
-        throws InvalidVersionRangeException
+    /**
+     * @param extensionId the id of the extension dependency
+     * @param constraint the version constraint of the extension dependency
+     * @param mavenDependency the Maven dependency object
+     */
+    public MavenCoreExtensionDependency(String extensionId, VersionConstraint constraint, Dependency mavenDependency)
     {
-        super(AetherUtils.createExtensionId(aetherDependency.getArtifact()).getId(), new DefaultVersionConstraint(
-            aetherDependency.getArtifact().getVersion()));
+        super(extensionId, constraint);
 
         // custom properties
-        putProperty(PKEY_AETHER_DEPENDENCY, aetherDependency);
         putProperty(PKEY_MAVEN_DEPENDENCY, mavenDependency);
-    }
-
-    public Dependency getAetherDependency()
-    {
-        return (Dependency) this.getProperty(PKEY_AETHER_DEPENDENCY);
     }
 
     /**

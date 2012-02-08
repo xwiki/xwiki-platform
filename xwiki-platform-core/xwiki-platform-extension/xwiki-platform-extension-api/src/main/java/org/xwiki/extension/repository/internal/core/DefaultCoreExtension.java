@@ -17,12 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.internal;
+package org.xwiki.extension.repository.internal.core;
 
 import java.net.URL;
 
 import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.CoreExtension;
+import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 
 /**
@@ -49,6 +50,20 @@ public class DefaultCoreExtension extends AbstractExtension implements CoreExten
 
     // Extension
 
+    /**
+     * @param repository the core extension repository
+     * @param url the core extension URL
+     * @param extension the extension to copy
+     */
+    public DefaultCoreExtension(DefaultCoreExtensionRepository repository, URL url, Extension extension)
+    {
+        super(repository, extension);
+
+        setFile(new DefaultCoreExtensionFile(url));
+
+        putProperty(PKEY_URL, url);
+    }
+
     @Override
     public void setId(ExtensionId id)
     {
@@ -60,7 +75,7 @@ public class DefaultCoreExtension extends AbstractExtension implements CoreExten
     {
         super.setType(type);
     }
-    
+
     // CoreExtension
 
     @Override
@@ -83,5 +98,11 @@ public class DefaultCoreExtension extends AbstractExtension implements CoreExten
     public String toString()
     {
         return getId().toString();
+    }
+
+    @Override
+    public void set(Extension extension)
+    {
+        super.set(extension);
     }
 }

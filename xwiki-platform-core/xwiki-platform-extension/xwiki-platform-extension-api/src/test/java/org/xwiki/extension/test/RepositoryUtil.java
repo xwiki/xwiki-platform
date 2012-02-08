@@ -132,6 +132,12 @@ public class RepositoryUtil
 
         unregisterComponent(ExtensionRepositorySource.class, "default");
 
+        // configuration
+
+        this.configurationSource.setProperty("extension.localRepository", getLocalRepository().getAbsolutePath());
+        this.configurationSource.setProperty("extension.aether.localRepository", getAetherRepository()
+            .getAbsolutePath());
+
         // add default test core extension
 
         registerComponent(ConfigurableDefaultCoreExtensionRepository.class);
@@ -141,12 +147,6 @@ public class RepositoryUtil
         // copy
 
         copyResourceFolder(getLocalRepository(), "repository.local");
-
-        // configuration
-
-        this.configurationSource.setProperty("extension.localRepository", getLocalRepository().getAbsolutePath());
-        this.configurationSource.setProperty("extension.aether.localRepository", getAetherRepository()
-            .getAbsolutePath());
 
         // remote repositories
 

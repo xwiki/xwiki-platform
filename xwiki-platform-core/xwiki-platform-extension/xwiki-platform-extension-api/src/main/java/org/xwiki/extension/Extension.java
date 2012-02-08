@@ -20,7 +20,6 @@
 package org.xwiki.extension;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -41,7 +40,7 @@ public interface Extension
      * The idea is to indicate in an extension a list of provided "functionalities". Then when resolving extensions
      * dependencies the dependencies id could be matched in this list.
      * 
-     * @return the extension ids also provided by this extension
+     * @return the extension ids also provided by this extension, an empty collection if there is none
      */
     Collection<String> getFeatures();
 
@@ -56,7 +55,7 @@ public interface Extension
     String getName();
 
     /**
-     * @return the license of the extension
+     * @return the license of the extension, an empty collection if there is none
      */
     Collection<ExtensionLicense> getLicenses();
 
@@ -76,14 +75,14 @@ public interface Extension
     String getWebSite();
 
     /**
-     * @return the extension authors
+     * @return the extension authors, an empty collection if there is none
      */
-    List<ExtensionAuthor> getAuthors();
+    Collection<ExtensionAuthor> getAuthors();
 
     /**
-     * @return the dependencies of the extension
+     * @return the dependencies of the extension, an empty collection if there is none
      */
-    List< ? extends ExtensionDependency> getDependencies();
+    Collection< ? extends ExtensionDependency> getDependencies();
 
     /**
      * Return extension file descriptor. Also allows to get the content of the file.

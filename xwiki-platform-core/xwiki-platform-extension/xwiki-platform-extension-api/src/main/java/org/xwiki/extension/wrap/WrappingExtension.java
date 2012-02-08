@@ -20,7 +20,6 @@
 package org.xwiki.extension.wrap;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.xwiki.extension.Extension;
@@ -98,13 +97,13 @@ public class WrappingExtension<T extends Extension> extends AbstractWrappingObje
     }
 
     @Override
-    public List<ExtensionAuthor> getAuthors()
+    public Collection<ExtensionAuthor> getAuthors()
     {
         return getWrapped().getAuthors();
     }
 
     @Override
-    public List< ? extends ExtensionDependency> getDependencies()
+    public Collection< ? extends ExtensionDependency> getDependencies()
     {
         return getWrapped().getDependencies();
     }

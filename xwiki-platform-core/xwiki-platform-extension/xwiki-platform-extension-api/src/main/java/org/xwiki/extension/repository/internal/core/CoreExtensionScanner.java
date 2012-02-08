@@ -17,8 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.internal;
+package org.xwiki.extension.repository.internal.core;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
@@ -31,6 +32,14 @@ import org.xwiki.component.annotation.ComponentRole;
 @ComponentRole
 public interface CoreExtensionScanner
 {
+    /**
+     * Try to get informations as complete as possible using remote repositories. This method can take a long time so it
+     * is generally used in a thread started after a short scan to update the list.
+     * 
+     * @param extensions the extensions to update
+     */
+    void updateExtensions(Collection<DefaultCoreExtension> extensions);
+
     /**
      * Scan classpath to find core extensions.
      * 

@@ -11,8 +11,8 @@ org.xwiki.extension.job.internal.InstallPlanJob
 org.xwiki.extension.job.internal.UninstallJob
 org.xwiki.extension.job.internal.UninstallPlanJob
 org.xwiki.extension.repository.internal.ConfigurationExtensionRepositorySource
-org.xwiki.extension.repository.internal.DefaultCoreExtensionRepository
-org.xwiki.extension.repository.internal.DefaultCoreExtensionScanner
 org.xwiki.extension.repository.internal.DefaultExtensionRepositoryManager
-org.xwiki.extension.repository.internal.DefaultExtensionSerializer
-org.xwiki.extension.repository.internal.DefaultLocalExtensionRepository
+org.xwiki.extension.repository.internal.core.DefaultCoreExtensionRepository
+org.xwiki.extension.repository.internal.core.DefaultCoreExtensionScanner
+org.xwiki.extension.repository.internal.local.DefaultExtensionSerializer
+org.xwiki.extension.repository.internal.local.DefaultLocalExtensionRepository

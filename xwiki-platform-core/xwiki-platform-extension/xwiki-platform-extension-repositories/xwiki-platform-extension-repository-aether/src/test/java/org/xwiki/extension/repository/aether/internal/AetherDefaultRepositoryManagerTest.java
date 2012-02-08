@@ -30,8 +30,10 @@ import junit.framework.Assert;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.extension.DefaultExtensionAuthor;
 import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
@@ -105,14 +107,13 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         Assert.assertEquals("name", extension.getName());
         Assert.assertEquals("summary", extension.getSummary());
         Assert.assertEquals("http://website", extension.getWebSite());
-        Assert.assertEquals("Full Name", extension.getAuthors().get(0).getName());
-        Assert.assertEquals(new URL("http://profile"), extension.getAuthors().get(0).getURL());
+        Assert.assertEquals(Arrays.asList(new DefaultExtensionAuthor("Full Name", new URL("http://profile"))), new ArrayList<ExtensionAuthor>(extension.getAuthors()));
         Assert.assertEquals(Arrays.asList("groupid1:feature1", "groupid2:feature2"),
             new ArrayList<String>(extension.getFeatures()));
         Assert.assertSame(this.extensionLicenseManager.getLicense("GNU Lesser General Public License 2.1"), extension
             .getLicenses().iterator().next());
 
-        ExtensionDependency dependency = extension.getDependencies().get(0);
+        ExtensionDependency dependency = extension.getDependencies().iterator().next();
         Assert.assertEquals(this.dependencyExtensionId.getId(), dependency.getId());
         Assert.assertEquals(this.dependencyExtensionId.getVersionConstraint(), dependency.getVersionConstraint());
 

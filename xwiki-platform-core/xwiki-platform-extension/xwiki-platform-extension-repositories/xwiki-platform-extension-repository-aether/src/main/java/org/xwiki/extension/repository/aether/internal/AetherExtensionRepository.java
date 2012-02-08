@@ -365,7 +365,7 @@ public class AetherExtensionRepository extends AbstractExtensionRepository
                 if (!mavenDependency.isOptional()
                     && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime"))) {
                     extension
-                        .addDependency(new AetherExtensionDependency(convertToAether(mavenDependency, stereotypes)));
+                        .addDependency(new AetherExtensionDependency(convertToAether(mavenDependency, stereotypes), mavenDependency));
                 }
             }
         } catch (Exception e) {

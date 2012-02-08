@@ -17,22 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.internal;
+package org.xwiki.extension.repository.internal.core;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Developer;
@@ -40,6 +43,7 @@ import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -49,9 +53,13 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.DefaultExtensionAuthor;
 import org.xwiki.extension.DefaultExtensionDependency;
+import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
 import org.xwiki.extension.ExtensionLicenseManager;
+import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.properties.ConverterManager;
 
@@ -82,10 +90,21 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
     private static final String SNAPSHOTSUFFIX = "-SNAPSHOT";
 
     /**
+     * Used to parse extension id into maven informations.
+     */
+    private static final Pattern PARSER_ID = Pattern.compile("([^: ]+):([^: ]+)(:([^: ]+))?");
+
+    /**
      * The logger to log.
      */
     @Inject
     private Logger logger;
+
+    /**
+     * Used to resolve found core extensions.
+     */
+    @Inject
+    private ExtensionRepositoryManager repositoryManager;
 
     /**
      * Used to parse some custom properties.
@@ -98,6 +117,163 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
      */
     @Inject
     private ExtensionLicenseManager licenseManager;
+
+    private Dependency toDependency(String id, String version, String type) throws ResolveException
+    {
+        Matcher matcher = PARSER_ID.matcher(id);
+        if (!matcher.matches()) {
+            throw new ResolveException("Bad id " + id + ", expected format is <groupId>:<artifactId>[:<classifier>]");
+        }
+
+        Dependency dependency = new Dependency();
+
+        dependency.setGroupId(matcher.group(1));
+        dependency.setArtifactId(matcher.group(2));
+        if (matcher.group(4) != null) {
+            dependency.setClassifier(StringUtils.defaultString(matcher.group(4), ""));
+        }
+
+        if (version != null) {
+            dependency.setVersion(version);
+        }
+
+        if (type != null) {
+            dependency.setType(type);
+        }
+
+        return dependency;
+    }
+
+    private String getArtifactId(DefaultCoreExtension extension) throws ResolveException
+    {
+        Model model = (Model) extension.getProperty(MavenCoreExtension.PKEY_MAVEN_MODEL);
+
+        String artifactId;
+        if (model != null) {
+            artifactId = model.getArtifactId();
+        } else {
+            Matcher matcher = PARSER_ID.matcher(extension.getId().getId());
+            if (!matcher.matches()) {
+                throw new ResolveException("Bad id " + extension.getId().getId()
+                    + ", expected format is <groupId>:<artifactId>[:<classifier>]");
+            }
+            artifactId = matcher.group(2);
+        }
+
+        return artifactId;
+    }
+
+    private String toExtensionId(String groupId, String artifactId, String classifier)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(groupId);
+        builder.append(':');
+        builder.append(artifactId);
+        if (StringUtils.isNotEmpty(classifier)) {
+            builder.append(':');
+            builder.append(classifier);
+        }
+
+        return builder.toString();
+    }
+
+    private URL getExtensionURL(URL descriptorUrl) throws MalformedURLException
+    {
+        String extensionURLStr = descriptorUrl.toString();
+        extensionURLStr =
+            extensionURLStr.substring(0, descriptorUrl.toString().indexOf(MAVENPACKAGE.replace('.', '/')));
+        return new URL(extensionURLStr);
+    }
+
+    private DefaultCoreExtension parseMavenPom(URL descriptorUrl, DefaultCoreExtensionRepository repository)
+        throws IOException, XmlPullParserException
+    {
+        DefaultCoreExtension coreExtension = null;
+
+        InputStream descriptorStream = descriptorUrl.openStream();
+        try {
+            MavenXpp3Reader reader = new MavenXpp3Reader();
+            Model mavenModel = reader.read(descriptorStream);
+
+            String version = resolveVersion(mavenModel.getVersion(), mavenModel, false);
+            String groupId = resolveGroupId(mavenModel.getGroupId(), mavenModel, false);
+
+            URL extensionURL = getExtensionURL(descriptorUrl);
+
+            coreExtension =
+                new MavenCoreExtension(repository, extensionURL, new ExtensionId(groupId + ':'
+                    + mavenModel.getArtifactId(), version), packagingToType(mavenModel.getPackaging()), mavenModel);
+
+            coreExtension.setName(mavenModel.getName());
+            coreExtension.setSummary(mavenModel.getDescription());
+            for (Developer developer : mavenModel.getDevelopers()) {
+                URL authorURL = null;
+                if (developer.getUrl() != null) {
+                    try {
+                        authorURL = new URL(developer.getUrl());
+                    } catch (MalformedURLException e) {
+                        // TODO: log ?
+                    }
+                }
+
+                coreExtension.addAuthor(new DefaultExtensionAuthor(developer.getId(), authorURL));
+            }
+            coreExtension.setWebsite(mavenModel.getUrl());
+
+            // licenses
+            for (License license : mavenModel.getLicenses()) {
+                coreExtension.addLicense(getExtensionLicense(license));
+            }
+
+            // features
+            String featuresString = mavenModel.getProperties().getProperty("xwiki.extension.features");
+            if (StringUtils.isNotBlank(featuresString)) {
+                coreExtension.setFeatures(this.converter.<Collection<String>> convert(List.class, featuresString));
+            }
+
+            // custom properties
+            coreExtension.putProperty("maven.groupId", groupId);
+            coreExtension.putProperty("maven.artifactId", mavenModel.getArtifactId());
+
+            // dependencies
+            for (Dependency mavenDependency : mavenModel.getDependencies()) {
+                if (!mavenDependency.isOptional()
+                    && (mavenDependency.getScope() == null || mavenDependency.getScope().equals("compile") || mavenDependency
+                        .getScope().equals("runtime"))) {
+
+                    String dependencyGroupId = resolveGroupId(mavenDependency.getGroupId(), mavenModel, true);
+                    String dependencyArtifactId = mavenDependency.getArtifactId();
+                    String dependencyClassifier = mavenDependency.getClassifier();
+                    String dependencyVersion = resolveVersion(mavenDependency.getVersion(), mavenModel, true);
+
+                    DefaultExtensionDependency extensionDependency =
+                        new MavenCoreExtensionDependency(toExtensionId(dependencyGroupId, dependencyArtifactId,
+                            dependencyClassifier), new DefaultVersionConstraint(dependencyVersion), mavenDependency);
+
+                    coreExtension.addDependency(extensionDependency);
+                }
+            }
+        } finally {
+            IOUtils.closeQuietly(descriptorStream);
+        }
+
+        return coreExtension;
+    }
+
+    @Override
+    public void updateExtensions(Collection<DefaultCoreExtension> extensions)
+    {
+        for (DefaultCoreExtension extension : extensions) {
+            try {
+                Extension remoteExtension = this.repositoryManager.resolve(extension.getId());
+
+                extension.set(remoteExtension);
+            } catch (ResolveException e) {
+                this.logger.debug("Can't find remote extension with id [" + extension.getId() + "]", e);
+            }
+        }
+    }
 
     @Override
     public Map<String, DefaultCoreExtension> loadExtensions(DefaultCoreExtensionRepository repository)
@@ -115,97 +291,32 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
 
         Map<String, DefaultCoreExtension> extensions = new HashMap<String, DefaultCoreExtension>(descriptors.size());
 
-        List<Dependency> dependencies = new ArrayList<Dependency>();
-        List<Object[]> coreArtefactIds = new ArrayList<Object[]>();
-
         for (String descriptor : descriptors) {
             URL descriptorUrl = getClass().getClassLoader().getResource(descriptor);
-            InputStream descriptorStream = getClass().getClassLoader().getResourceAsStream(descriptor);
+
             try {
-                MavenXpp3Reader reader = new MavenXpp3Reader();
-                Model mavenModel = reader.read(descriptorStream);
-
-                String version = resolveVersion(mavenModel.getVersion(), mavenModel, false);
-                String groupId = resolveGroupId(mavenModel.getGroupId(), mavenModel, false);
-
-                String extensionURLStr = descriptorUrl.toString();
-                extensionURLStr =
-                    extensionURLStr.substring(0, descriptorUrl.toString().indexOf(MAVENPACKAGE.replace('.', '/')));
-                URL extensionURL = new URL(extensionURLStr);
-
-                DefaultCoreExtension coreExtension =
-                    new DefaultCoreExtension(repository, extensionURL, new ExtensionId(groupId + ':'
-                        + mavenModel.getArtifactId(), version), packagingToType(mavenModel.getPackaging()));
-
-                coreExtension.setName(mavenModel.getName());
-                coreExtension.setSummary(mavenModel.getDescription());
-                for (Developer developer : mavenModel.getDevelopers()) {
-                    URL authorURL = null;
-                    if (developer.getUrl() != null) {
-                        try {
-                            authorURL = new URL(developer.getUrl());
-                        } catch (MalformedURLException e) {
-                            // TODO: log ?
-                        }
-                    }
-
-                    coreExtension.addAuthor(new DefaultExtensionAuthor(developer.getId(), authorURL));
-                }
-                coreExtension.setWebsite(mavenModel.getUrl());
-
-                // licenses
-                for (License license : mavenModel.getLicenses()) {
-                    coreExtension.addLicense(getExtensionLicense(license));
-                }
-
-                // features
-                String featuresString = mavenModel.getProperties().getProperty("xwiki.extension.features");
-                if (StringUtils.isNotBlank(featuresString)) {
-                    coreExtension.setFeatures(this.converter.<Collection<String>> convert(List.class, featuresString));
-                }
-
-                // custom properties
-                coreExtension.putProperty("maven.groupId", groupId);
-                coreExtension.putProperty("maven.artifactId", mavenModel.getArtifactId());
+                DefaultCoreExtension coreExtension = parseMavenPom(descriptorUrl, repository);
 
                 extensions.put(coreExtension.getId().getId(), coreExtension);
-                coreArtefactIds.add(new Object[] {mavenModel.getArtifactId(), coreExtension});
-
-                // dependencies
-                for (Dependency mavenDependency : mavenModel.getDependencies()) {
-                    if (!mavenDependency.isOptional()
-                        && (mavenDependency.getScope() == null || mavenDependency.getScope().equals("compile") || mavenDependency
-                            .getScope().equals("runtime"))) {
-                        coreExtension.addDependency(new DefaultExtensionDependency(resolveGroupId(
-                            mavenDependency.getGroupId(), mavenModel, true)
-                            + ':' + mavenDependency.getArtifactId(), new DefaultVersionConstraint(resolveVersion(
-                            mavenDependency.getVersion(), mavenModel, true))));
-                    }
-
-                    if (mavenDependency.getGroupId().equals("${project.groupId}")) {
-                        mavenDependency.setGroupId(groupId);
-                    }
-
-                    if (mavenDependency.getVersion() == null) {
-                        mavenDependency.setVersion(UNKNOWN);
-                    } else if (mavenDependency.getVersion().equals("${project.version}")
-                        || mavenDependency.getVersion().equals("${pom.version}")) {
-                        mavenDependency.setVersion(version);
-                    }
-
-                    dependencies.add(mavenDependency);
-                }
-
             } catch (Exception e) {
-                this.logger.warn("Failed to parse descriptor [" + descriptorUrl
-                    + "], it will be ignored and not found in core extensions.", e);
-            } finally {
-                try {
-                    descriptorStream.close();
-                } catch (IOException e) {
-                    // Should not happen
-                    this.logger.error("Failed to close descriptor stream [" + descriptorUrl + "]", e);
-                }
+                this.logger.warn("Failed to pase extension descriptor [" + descriptorUrl + "]", e);
+            }
+        }
+
+        // Try to find more
+
+        guess(extensions, repository);
+
+        return extensions;
+    }
+
+    private void guess(Map<String, DefaultCoreExtension> extensions, DefaultCoreExtensionRepository repository)
+    {
+        Set<ExtensionDependency> dependencies = new HashSet<ExtensionDependency>();
+
+        for (DefaultCoreExtension coreExtension : extensions.values()) {
+            for (ExtensionDependency dependency : coreExtension.getDependencies()) {
+                dependencies.add(dependency);
             }
         }
 
@@ -249,10 +360,11 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
 
         // Try to resolve version no easy to find from the pom.xml
         try {
-            for (Object[] coreArtefactId : coreArtefactIds) {
-                Object[] artefact = guessedArtefacts.get(coreArtefactId[0]);
+            for (DefaultCoreExtension coreExtension : extensions.values()) {
+                String artifactId = getArtifactId(coreExtension);
 
-                DefaultCoreExtension coreExtension = (DefaultCoreExtension) coreArtefactId[1];
+                Object[] artefact = guessedArtefacts.get(artifactId);
+
                 if (artefact != null) {
                     if (coreExtension.getId().getVersion().getValue().charAt(0) == '$') {
                         coreExtension.setId(new ExtensionId(coreExtension.getId().getId(), (String) artefact[0]));
@@ -267,7 +379,16 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
             }
 
             // Add dependencies that does not provide proper pom.xml resource and can't be found in the classpath
-            for (Dependency dependency : dependencies) {
+            for (ExtensionDependency extensionDependency : dependencies) {
+                Dependency dependency =
+                    (Dependency) extensionDependency.getProperty(MavenCoreExtensionDependency.PKEY_MAVEN_DEPENDENCY);
+
+                if (dependency == null) {
+                    dependency =
+                        toDependency(extensionDependency.getId(),
+                            extensionDependency.getVersionConstraint().getValue(), null);
+                }
+
                 String dependencyId = dependency.getGroupId() + ':' + dependency.getArtifactId();
 
                 DefaultCoreExtension coreExtension = extensions.get(dependencyId);
@@ -301,8 +422,6 @@ public class DefaultCoreExtensionScanner implements CoreExtensionScanner
         } catch (Exception e) {
             this.logger.warn("Failed to guess extra information about some extensions", e);
         }
-
-        return extensions;
     }
 
     private String resolveVersion(String modelVersion, Model mavenModel, boolean dependency)

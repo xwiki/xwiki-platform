@@ -17,31 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.aether.internal;
+package org.xwiki.extension.repository.internal.core;
+
+import java.net.URL;
 
 import org.apache.maven.model.Model;
-import org.sonatype.aether.artifact.Artifact;
-import org.xwiki.extension.AbstractExtension;
-import org.xwiki.extension.repository.aether.internal.plexus.PlexusComponentManager;
+import org.xwiki.extension.ExtensionId;
 
-public class AetherExtension extends AbstractExtension
+/**
+ * Extends {@link DefaultCoreExtension} with Maven related informations.
+ * 
+ * @version $Id$
+ */
+public class MavenCoreExtension extends DefaultCoreExtension
 {
-    public static final String PKEY_AETHER_ATIFACT = "aether.Artifact";
-
+    /**
+     * The associated to the Maven model object.
+     */
     public static final String PKEY_MAVEN_MODEL = "maven.Model";
 
-    public AetherExtension(Artifact artifact, Model mavenModel, AetherExtensionRepository repository,
-        PlexusComponentManager plexusComponentManager)
+    /**
+     * @param repository the core extension repository
+     * @param url the core extension URL
+     * @param id the id/version combination which makes the extension unique
+     * @param type the type of the extension
+     * @param mavenModel the Maven model
+     */
+    public MavenCoreExtension(DefaultCoreExtensionRepository repository, URL url, ExtensionId id, String type,
+        Model mavenModel)
     {
-        super(repository, AetherUtils.createExtensionId(artifact), artifact.getExtension());
+        super(repository, url, id, type);
 
-        setFile(new AetherExtensionFile(artifact, repository, plexusComponentManager, getType()));
-
-        // custom properties
-        putProperty(PKEY_AETHER_ATIFACT, artifact);
         putProperty(PKEY_MAVEN_MODEL, mavenModel);
     }
-
+    
     /**
      * @return the Maven model object
      */

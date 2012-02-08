@@ -17,72 +17,68 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.internal;
+package org.xwiki.extension.repository.internal.local;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 
-import org.xwiki.extension.CoreExtensionFile;
+import org.xwiki.extension.LocalExtensionFile;
 
 /**
- * Default implementation of {@link CoreExtensionFile}.
+ * Default implementation of {@link LocalExtensionFile}.
  * 
  * @version $Id$
  */
-public class DefaultCoreExtensionFile implements CoreExtensionFile
+public class DefaultLocalExtensionFile implements LocalExtensionFile
 {
     /**
-     * @see #getURL()
+     * The filesystem file of the local extension.
      */
-    private URL url;
+    private File file;
 
     /**
-     * @see #getConnection()
+     * @param file the filesystem file of the local extension
      */
-    private URLConnection connection;
-
-    /**
-     * @param url the URL of the core extension
-     */
-    public DefaultCoreExtensionFile(URL url)
+    public DefaultLocalExtensionFile(File file)
     {
-        this.url = url;
+        this.file = file;
     }
 
     /**
-     * @return the URL connection
+     * @return the real file
      */
-    private URLConnection getConnection()
+    public File getFile()
     {
-        if (this.connection == null) {
-            try {
-                this.connection = this.url.openConnection();
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to open URL [" + url + "]");
-            }
-        }
-
-        return this.connection;
+        return file;
     }
+
+    // ExtensionFile
 
     @Override
     public long getLength()
     {
-        return getConnection().getContentLength();
+        return this.file.length();
     }
 
     @Override
     public InputStream openStream() throws IOException
     {
-        return getConnection().getInputStream();
+        return new FileInputStream(this.file);
+    }
+
+    // LocalExtensionFile
+
+    @Override
+    public String getAbsolutePath()
+    {
+        return this.file.getAbsolutePath();
     }
 
     @Override
-    public URL getURL()
+    public String getName()
     {
-        return this.url;
+        return this.file.getName();
     }
-
 }

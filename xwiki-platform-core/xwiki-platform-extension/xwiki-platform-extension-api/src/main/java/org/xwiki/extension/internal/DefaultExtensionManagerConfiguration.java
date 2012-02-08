@@ -56,16 +56,6 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     private static final Pattern REPOSITORYIDPATTERN = Pattern.compile("([^:]+):([^:]+):(.+)");
 
     /**
-     * The type identifier for a maven repository.
-     */
-    private static final String TYPE_MAVEN = "maven";
-
-    /**
-     * The type identifier for a xwiki repository.
-     */
-    private static final String TYPE_XWIKI = "xwiki";
-
-    /**
      * The default user agent.
      */
     private static final String DEFAULT_USERAGENT = "Extension Manager";
@@ -123,21 +113,15 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     @Override
     public List<ExtensionRepositoryId> getRepositories()
     {
-        List<ExtensionRepositoryId> repositories = new ArrayList<ExtensionRepositoryId>();
+        List<ExtensionRepositoryId> repositories;
 
         List<String> repositoryStrings =
             this.configuration.get().getProperty("extension.repositories", Collections.<String> emptyList());
 
         if (repositoryStrings.isEmpty()) {
-            try {
-                repositories.add(new ExtensionRepositoryId("extensions.xwiki.org", TYPE_XWIKI, new URI(
-                    "http://extensions.xwiki.org/xwiki/rest/")));
-                repositories.add(new ExtensionRepositoryId("maven-xwiki", TYPE_MAVEN, new URI(
-                    "http://nexus.xwiki.org/nexus/content/groups/public")));
-            } catch (Exception e) {
-                // Should never happen
-            }
+            repositories = null;
         } else {
+            repositories = new ArrayList<ExtensionRepositoryId>();
             for (String repositoryString : repositoryStrings) {
                 if (StringUtils.isNotBlank(repositoryString)) {
                     try {

@@ -54,8 +54,6 @@ public class DefaultExtensionManagerConfigurationTest extends AbstractComponentT
     @Test
     public void testGetRepositoriesEmpty() throws URISyntaxException
     {
-        Assert.assertEquals(Arrays.asList(new ExtensionRepositoryId("extensions.xwiki.org", "xwiki", new URI(
-            "http://extensions.xwiki.org/xwiki/rest/")), new ExtensionRepositoryId("maven-xwiki", "maven", new URI(
-            "http://nexus.xwiki.org/nexus/content/groups/public"))), this.configuration.getRepositories());
+        Assert.assertEquals(null, this.configuration.getRepositories());
     }
 }

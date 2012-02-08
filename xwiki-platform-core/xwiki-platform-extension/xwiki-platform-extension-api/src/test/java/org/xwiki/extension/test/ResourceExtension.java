@@ -23,7 +23,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.repository.internal.DefaultCoreExtensionFile;
+import org.xwiki.extension.repository.internal.core.DefaultCoreExtensionFile;
 
 public class ResourceExtension extends AbstractExtension
 {

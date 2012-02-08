@@ -30,6 +30,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
@@ -47,8 +48,6 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     private RepositoryUtil repositoryUtil;
 
     private ExtensionRepositoryManager repositoryManager;
-
-    private ExtensionId remoteExtensionId;
 
     private TestResources resources;
 
@@ -100,9 +99,11 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
         Assert.assertEquals("type", extension.getType());
         Assert.assertEquals(Arrays.asList(TestResources.INSTALLED_ID.getId() + "-feature"), new ArrayList<String>(
             extension.getFeatures()));
-        Assert.assertEquals(TestResources.INSTALLED_DEPENDENCY_ID.getId(), extension.getDependencies().get(0).getId());
-        Assert.assertEquals(TestResources.INSTALLED_DEPENDENCY_ID.getVersion(), extension.getDependencies().get(0)
-            .getVersionConstraint().getVersion());
+
+        ExtensionDependency dependency = extension.getDependencies().iterator().next();
+        Assert.assertEquals(TestResources.INSTALLED_DEPENDENCY_ID.getId(), dependency.getId());
+        Assert.assertEquals(TestResources.INSTALLED_DEPENDENCY_ID.getVersion(), dependency.getVersionConstraint()
+            .getVersion());
     }
 
     @Test

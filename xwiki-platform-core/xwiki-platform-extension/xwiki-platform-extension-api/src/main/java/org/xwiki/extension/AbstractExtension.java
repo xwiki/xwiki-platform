@@ -126,21 +126,26 @@ public abstract class AbstractExtension implements Extension
     {
         this(repository, extension.getId(), extension.getType());
 
+        set(extension);
+    }
+
+    /**
+     * Update optional informations based on the provided extension.
+     * 
+     * @param extension the extension from which to get informations
+     */
+    protected void set(Extension extension)
+    {
         setFeatures(extension.getFeatures());
 
         setName(extension.getName());
         setDescription(extension.getDescription());
         setAuthors(extension.getAuthors());
         setWebsite(extension.getWebSite());
-        if (extension.getLicenses() != null && !extension.getLicenses().isEmpty()) {
-            setLicenses(extension.getLicenses());
-        }
+        setLicenses(extension.getLicenses());
         setSummary(extension.getSummary());
 
-        List< ? extends ExtensionDependency> newDependencies = extension.getDependencies();
-        if (!newDependencies.isEmpty()) {
-            this.dependencies = new ArrayList<ExtensionDependency>(extension.getDependencies());
-        }
+        setDependencies(extension.getDependencies());
     }
 
     @Override

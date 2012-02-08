@@ -703,7 +703,7 @@ public class InstallPlanJob extends AbstractExtensionJob<InstallRequest>
     private ModifableExtensionPlanNode installExtension(LocalExtension previousExtension, Extension extension,
         boolean dependency, String namespace, ExtensionDependency initialDependency) throws InstallException
     {
-        List< ? extends ExtensionDependency> dependencies = extension.getDependencies();
+        Collection< ? extends ExtensionDependency> dependencies = extension.getDependencies();
 
         notifyPushLevelProgress(dependencies.size() + 1);
 

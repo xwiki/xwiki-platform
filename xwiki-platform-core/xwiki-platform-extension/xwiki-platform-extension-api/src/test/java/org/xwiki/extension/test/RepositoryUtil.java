@@ -136,11 +136,6 @@ public class RepositoryUtil
         dcd.setRole(Environment.class);
         this.componentManager.registerComponent(dcd, environment);
 
-        // disable default configuration
-        // TODO: probably mean that this default configuration should not be at this level
-
-        unregisterComponent(ExtensionRepositorySource.class, "default");
-
         // configuration
 
         this.configurationSource.setProperty("extension.localRepository", getLocalRepository().getAbsolutePath());

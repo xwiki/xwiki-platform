@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.activitystream.migration.hibernate;
 
 import java.sql.Connection;
@@ -79,7 +78,7 @@ public class R35000XWIKI6691DataMigration extends AbstractHibernateDataMigration
             @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
-                session.doWork(new RequestToGroupRenameWork());
+                session.doWork(new RequestToGroupRenameWork(getDescription(), getVersion().getVersion()));
                 return Boolean.TRUE;
             }
         });
@@ -93,6 +92,15 @@ public class R35000XWIKI6691DataMigration extends AbstractHibernateDataMigration
      */
     private static final class RequestToGroupRenameWork implements Work
     {
+        private String migratorDescription;
+        private int migratorVersion;
+
+        public RequestToGroupRenameWork(String migratorDescription, int migratorVersion)
+        {
+            this.migratorDescription = migratorDescription;
+            this.migratorVersion = migratorVersion;
+        }
+
         @Override
         public void execute(Connection connection) throws SQLException
         {
@@ -104,8 +112,10 @@ public class R35000XWIKI6691DataMigration extends AbstractHibernateDataMigration
             } catch (SQLException ex) {
                 // Ignore, probably the database doesn't need this migration.
                 // Anyway, in case it really can't be performed, report it in the logs.
-                R35000XWIKI6691DataMigration.logger.warn(
-                    "Failed to apply R35000XWIKI6691 Data Migration : {}", ex.getMessage());
+                R35000XWIKI6691DataMigration.logger.warn("Failed to apply the Data migrator for version [{}]({}). "
+                    + "Reason: [{}]. It's likely that the database schema is already up to date and you can safely "
+                        + "ignore this warning.", new Object[] {this.migratorVersion, this.migratorDescription,
+                            ex.getMessage()});
             }
         }
     }

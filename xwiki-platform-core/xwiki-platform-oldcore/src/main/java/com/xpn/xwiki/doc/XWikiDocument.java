@@ -437,6 +437,20 @@ public class XWikiDocument implements DocumentModelBridge
         EntityReferenceSerializer.class, "local");
 
     /**
+     * Used to compute document identifier.
+     */
+    @SuppressWarnings("unchecked")
+    private EntityReferenceSerializer<String>  uidStringEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.class, "uid");
+
+    /**
+     * Used to compute document identifier.
+     */
+    @SuppressWarnings("unchecked")
+    private EntityReferenceSerializer<String>  localUidStringEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.class, "local/uid");
+
+    /**
      * Used to normalize references.
      */
     @SuppressWarnings("unchecked")
@@ -549,6 +563,68 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * Temporary helper to produce a local/uid serialization of this document reference, including the language.
+     * Only translated document will have language appended.
+     * FIXME: when reference contains locale, this is no more needed.
+     *
+     * @return a unique name (in a wiki) (5:space4:name2:lg)
+     */
+    private String getLocalKey()
+    {
+        final String localUid = localUidStringEntityReferenceSerializer.serialize(getDocumentReference());
+        
+        if (StringUtils.isEmpty(this.language)) {
+            return localUid;
+        } else {
+            return appendLanguage(new StringBuilder(64).append(localUid)).toString();
+        }
+    }
+
+    /**
+     * Temporary helper to produce a uid serialization of this document reference, including the language.
+     * Only translated document will have language appended.
+     * FIXME: when reference contains locale, this is no more needed.
+     *
+     * @return a unique name (8:wikiname5:space4:name2:lg or 8:wikiname5:space4:name)
+     * @since 4.0M1
+     */
+    public String getKey()
+    {
+        final String localUid = uidStringEntityReferenceSerializer.serialize(getDocumentReference());
+
+        if (StringUtils.isEmpty(this.language)) {
+            return localUid;
+        } else {
+            return appendLanguage(new StringBuilder(64).append(localUid)).toString();
+        }
+    }
+
+    /**
+     * Temporary helper that append the language of this document to the provide string buffer.
+     * FIXME: when reference contains locale, this is no more needed.
+     *
+     * @param sb a StringBuilder where to append the language key
+     * @return the StringBuilder appended with the language of this document formatted like 2:lg
+     * @see #getLocalKey()
+     */
+    private StringBuilder appendLanguage(StringBuilder sb)
+    {
+        if (StringUtils.isEmpty(this.language)) {
+            return sb;
+        }
+
+        return sb.append(this.language.length())
+            .append(':')
+            .append(this.language);
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return (int) Util.getHash(getLocalKey());
+    }
+
+    /**
      * @return the unique id used to represent the document, as a number. This id is technical and is equivalent to the
      *         Document Reference + the language of the Document. This technical id should only be used for the storage
      *         layer and all user APIs should instead use Document Reference and language as they are model-related
@@ -556,29 +632,16 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public long getId()
     {
-        // TODO: The implemented below doesn't guarantee a unique id since it uses the hashCode() method which doesn't
-        // guarantee unicity. From the JDK's javadoc: "It is not required that if two objects are unequal according to
-        // the equals(java.lang.Object) method, then calling the hashCode method on each of the two objects must
-        // produce distinct integer results.". This needs to be fixed to produce a real unique id since otherwise we
-        // can have clashes in the database.
+        // TODO: Ensure uniqueness of the generated id
+        // The implementation doesn't guarantee a unique id since it uses a hashing method which never guarantee
+        // uniqueness. However, the hash algorithm is really unlikely to collide in a given wiki. This needs to be
+        // fixed to produce a real unique id since otherwise we can have clashes in the database.
 
         // Note: We don't use the wiki name in the document id's computation. The main historical reason is so
         // that all things saved in a given wiki's database are always stored relative to that wiki so that
         // changing that wiki's name is simpler.
-        // It is important to note that a document called "Main.WebHome:es" will have
-        // the same cache ID as the Spanish version of "Main.WebHome".
-        // This is a problem which must be fixed here and in XWikiCacheStore#getKey()
-        // simultaneously.
-        // See: http://jira.xwiki.org/jira/browse/XWIKI-6169
-        if ((this.language == null) || this.language.trim().equals("")) {
-            this.id = this.localEntityReferenceSerializer.serialize(getDocumentReference()).hashCode();
-        } else {
-            this.id =
-                (this.localEntityReferenceSerializer.serialize(getDocumentReference()) + ":" + this.language)
-                    .hashCode();
-        }
 
-        return this.id;
+        return (this.id = Util.getHash(getLocalKey()));
     }
 
     /**

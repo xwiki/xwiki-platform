@@ -29,6 +29,8 @@ import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -917,5 +919,36 @@ public class Util
             LOGGER.warn("Invalid language: " + languageCode);
         }
         return defaultLanguage;
+    }
+
+    /**
+     * Get a likely unique 64bit hash representing the provided uid string. Use the MD5 hashing algorithm.
+     *
+     * @param uid an uid string usually provided by
+     * {@link org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer} or
+     * {@link org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer}
+     * @return 64bit hash
+     * @since 4.0M1
+     */
+    public static long getHash(String uid)
+    {
+        MessageDigest md5 = null;
+        long hash = 0;
+
+        try {
+            md5 = MessageDigest.getInstance("MD5");
+            byte[] digest = md5.digest(uid.getBytes("UTF-8"));
+            for (int l = digest.length, i = Math.max(0, digest.length - 9); i < l; i++) {
+                hash = hash << 8 | ((long) digest[i] & 0xFF);
+            }
+        } catch (NoSuchAlgorithmException ex) {
+            LOGGER.error("Cannot retrieve MD5 provider for hashing", ex);
+            throw new RuntimeException("MD5 hash is required for id hash");
+        } catch (Exception ex) {
+            LOGGER.error("Id computation failed during MD5 processing", ex);
+            throw new RuntimeException("MD5 hash is required for id hash");
+        }
+
+        return hash;
     }
 }

@@ -170,7 +170,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     @Override
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException
     {
-        String key = getKey(doc, context);
+        String key = doc.getKey();
         this.store.saveXWikiDoc(doc, context, bTransaction);
         doc.setStore(this.store);
         // Make sure cache is initialized
@@ -183,7 +183,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 
         /*
          * We do not want to save the document in the cache at this time. If we did, this would introduce the
-         * possibility for cache incoherince if the document is not saved in the database properly. In addition, the
+         * possibility for cache incoherence if the document is not saved in the database properly. In addition, the
          * attachments uploaded to the document stay with it so we want the document in it's current form to be garbage
          * collected as soon as the request is complete.
          */
@@ -214,7 +214,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
                 XWikiDocument doc = (XWikiDocument) source;
                 XWikiContext context = (XWikiContext) data;
 
-                String key = getKey(doc, context);
+                String key = doc.getKey();
 
                 if (getCache() != null) {
                     getCache().remove(key);
@@ -226,42 +226,47 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         }
     }
 
+    @Deprecated
     public String getKey(XWikiDocument doc)
     {
-        return getKey(doc.getWikiName(), doc.getFullName(), doc.getLanguage());
+        return doc.getKey();
     }
 
+    /**
+     * @deprecated since 4.0M1 use {@link com.xpn.xwiki.doc.XWikiDocument#getKey()}
+     */
+    @Deprecated
     public String getKey(XWikiDocument doc, XWikiContext context)
     {
-        return getKey(doc.getFullName(), doc.getLanguage(), context);
+        return doc.getKey();
     }
 
+    /**
+     * @deprecated since 4.0M1 use {@link com.xpn.xwiki.doc.XWikiDocument#getKey()}
+     */
+    @Deprecated
     public String getKey(String fullName, String language, XWikiContext context)
     {
-        return getKey(context.getDatabase(), fullName, language);
+        XWikiDocument doc = new XWikiDocument(null, fullName);
+        doc.setLanguage(language);
+        return doc.getKey();
     }
 
-    public String getKey(String wiki, String fullName, String language)
+    /**
+     * @deprecated since 4.0M1 use {@link com.xpn.xwiki.doc.XWikiDocument#getKey()}
+     */
+    @Deprecated
+    public String getKey(final String wiki, final String fullName, final String language)
     {
-        final String key = (wiki == null ? "" : wiki) + ":" + fullName;
-
-        // This is copied strait from XWikiDocument#getId()
-        // It is important to note that a document called "Main.WebHome:es" will have
-        // the same cache key as the Spanish version of "Main.WebHome".
-        // This is a problem which must be fixed here and in XWikiDocument#getId()
-        // simultaneously.
-        // See: http://jira.xwiki.org/jira/browse/XWIKI-6169
-        if ((language == null) || language.trim().equals("")) {
-            return key;
-        } else {
-            return key + ":" + language;
-        }
+        XWikiDocument doc = new XWikiDocument(wiki, null, fullName);
+        doc.setLanguage(language);
+        return doc.getKey();
     }
 
     @Override
     public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        String key = getKey(doc, context);
+        String key = doc.getKey();
 
         LOGGER.debug("Cache: begin for doc {} in cache", key);
 
@@ -299,7 +304,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     @Override
     public void deleteXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        String key = getKey(doc, context);
+        String key = doc.getKey();
 
         this.store.deleteXWikiDoc(doc, context);
 
@@ -614,7 +619,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     @Override
     public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        String key = getKey(doc, context);
+        String key = doc.getKey();
         initCache(context);
         try {
             Boolean result = getPageExistCache().get(key);

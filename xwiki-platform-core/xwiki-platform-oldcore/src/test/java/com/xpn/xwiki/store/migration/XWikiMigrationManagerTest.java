@@ -108,7 +108,7 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
         }
 
         @Override
-        protected void updateSchema()
+        protected void updateSchema(Collection<XWikiMigration> migrations)
         {
         }
     }

@@ -22,6 +22,7 @@ package org.xwiki.extension.repository;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.xwiki.environment.Environment;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
@@ -37,6 +38,9 @@ public class DefaultCoreExtensionRepositoryTest extends AbstractComponentTestCas
     public void setUp() throws Exception
     {
         super.setUp();
+
+        // Mock Environment
+        registerMockComponent(Environment.class);
 
         this.coreExtensionRepository =
             (ConfigurableDefaultCoreExtensionRepository) getComponentManager().lookup(CoreExtensionRepository.class);

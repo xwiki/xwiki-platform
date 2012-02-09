@@ -56,7 +56,7 @@ public class LegacyDataMigration extends AbstractHibernateDataMigration
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(0);
+        return new XWikiDBVersion(1);
     }
 
     @Override

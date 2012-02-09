@@ -141,7 +141,7 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
         Collection neededMigration = mm.getNeededMigrations();
         assertEquals(0, neededMigration.size());
         mm.startMigrations();
-        assertEquals(457, mm.curversion.getVersion());
+        assertEquals(456, mm.curversion.getVersion());
     }
 
     /**
@@ -150,7 +150,7 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
     public void testMigrationOrderAndIgnore() throws Exception
     {
         XWikiConfig config = getContext().getWiki().getConfig();
-        config.setProperty("xwiki.store.migration.version", "234");
+        config.setProperty("xwiki.store.migration.version", "123");
         config.setProperty("xwiki.store.migration.ignored", "345");
         TestDataMigrationManager mm = (TestDataMigrationManager) getComponentManager().lookup(DataMigrationManager.class,"TestDataMigration");
         Collection neededMigration = mm.getNeededMigrations();

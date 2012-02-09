@@ -244,7 +244,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                 }
             }
 
-            this.targetVersion = (availableMigrations.size() > 0) ? availableMigrations.lastKey().increment()
+            this.targetVersion = (availableMigrations.size() > 0) ? availableMigrations.lastKey()
                                                                   : new XWikiDBVersion(0);
             this.migrations =  availableMigrations.values();
         } catch (Exception e) {
@@ -526,7 +526,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
         Collection<XWikiMigration> neededMigrations = new ArrayList<XWikiMigration>();
 
         for (XWikiMigration migration : this.migrations) {
-            if (migration.isForced || (migration.dataMigration.getVersion().compareTo(curversion) >= 0
+            if (migration.isForced || (migration.dataMigration.getVersion().compareTo(curversion) > 0
                                         && migration.dataMigration.shouldExecute(curversion)))
             {
                 neededMigrations.add(migration);
@@ -585,7 +585,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             migration.dataMigration.migrate();
 
             if (migration.dataMigration.getVersion().compareTo(curversion) > 0) {
-                curversion = migration.dataMigration.getVersion().increment();
+                curversion = migration.dataMigration.getVersion();
                 setDBVersion(curversion);
                 if (logger.isInfoEnabled()) {
                     logger.info("New storage version is now [{}]", getDBVersion());

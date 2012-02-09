@@ -4890,10 +4890,6 @@ public class XWikiDocument implements DocumentModelBridge
 
         String filename = fileName.substring(i + 1);
 
-        // TODO : avoid name clearing when encoding problems will be solved
-        // JIRA : http://jira.xwiki.org/jira/browse/XWIKI-94
-        filename = context.getWiki().clearName(filename, false, true, context);
-
         XWikiAttachment attachment = getAttachment(filename);
         if (attachment == null) {
             attachment = new XWikiAttachment();

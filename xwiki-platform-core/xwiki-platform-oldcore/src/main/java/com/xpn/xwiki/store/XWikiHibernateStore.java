@@ -537,7 +537,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                 // In case the current document has both a class and instances of that class, we have to take care
                 // not to insert duplicate entities in the session
-                Map<Integer, BaseObject> localClassObjects = new HashMap<Integer, BaseObject>();
+                Map<Long, BaseObject> localClassObjects = new HashMap<Long, BaseObject>();
                 if (doc.hasElement(XWikiDocument.HAS_OBJECTS) && doc.getXObjects(doc.getDocumentReference()) != null) {
                     for (BaseObject obj : doc.getXObjects(doc.getDocumentReference())) {
                         if (obj != null) {
@@ -993,7 +993,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } else {
                 query = session.createQuery("select obj.id from BaseObject as obj where obj.id = :id");
             }
-            query.setInteger("id", object.getId());
+            query.setLong("id", object.getId());
             if (query.uniqueResult() == null) {
                 if (stats) {
                     session.save(object);
@@ -1019,7 +1019,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 handledProps = bclass.getCustomMappingPropertyList(context);
                 Session dynamicSession = session.getSession(EntityMode.MAP);
                 query = session.createQuery("select obj.id from " + bclass.getName() + " as obj where obj.id = :id");
-                query.setInteger("id", object.getId());
+                query.setLong("id", object.getId());
                 if (query.uniqueResult() == null) {
                     dynamicSession.save(bclass.getName(), objmap);
                 } else {
@@ -1125,7 +1125,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             if (!alreadyLoaded) {
                 try {
-                    session.load(object, Integer.valueOf(object1.getId()));
+                    session.load(object, object1.getId());
                 } catch (ObjectNotFoundException e) {
                     // There is no object data saved
                     object = null;
@@ -1154,7 +1154,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 try {
                     if ((bclass != null) && (bclass.hasCustomMapping()) && context.getWiki().hasCustomMappings()) {
                         Session dynamicSession = session.getSession(EntityMode.MAP);
-                        Object map = dynamicSession.load(bclass.getName(), Integer.valueOf(object.getId()));
+                        Object map = dynamicSession.load(bclass.getName(), object.getId());
                         // Let's make sure to look for null fields in the dynamic mapping
                         bclass.fromValueMap((Map) map, object);
                         handledProps = bclass.getCustomMappingPropertyList(context);
@@ -1172,7 +1172,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 Query query =
                     session.createQuery("select prop.name, prop.classType from BaseProperty as prop where "
                         + "prop.id.id = :id");
-                query.setInteger("id", object.getId());
+                query.setLong("id", object.getId());
                 for (Object[] result : (List<Object[]>) query.list()) {
                     String name = (String) result[0];
                     // No need to load fields already loaded from
@@ -1286,7 +1286,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if ((bclass != null) && (bclass.hasCustomMapping()) && context.getWiki().hasCustomMappings()) {
                 handledProps = bclass.getCustomMappingPropertyList(context);
                 Session dynamicSession = session.getSession(EntityMode.MAP);
-                Object map = dynamicSession.get(bclass.getName(), Integer.valueOf(object.getId()));
+                Object map = dynamicSession.get(bclass.getName(), object.getId());
                 if (map != null) {
                     if (evict) {
                         dynamicSession.evict(map);
@@ -1442,7 +1442,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             final Query query =
                 session
                     .createQuery("select prop.name from BaseProperty as prop where prop.id.id = :id and prop.id.name= :name");
-            query.setInteger("id", property.getId());
+            query.setLong("id", property.getId());
             query.setString("name", property.getName());
 
             if (query.uniqueResult() == null) {
@@ -2515,8 +2515,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context)
     {
         try {
-            Configuration hibconfig = makeMapping(bclass.getName(), custommapping1);
-            return isValidCustomMapping(bclass.getName(), hibconfig, bclass);
+            Configuration hibconfig = getMapping(bclass.getName(), custommapping1);
+            return isValidCustomMapping(bclass, hibconfig);
         } catch (Exception e) {
             return false;
         }
@@ -2642,41 +2642,56 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return result;
     }
 
-    @Override
-    public boolean injectCustomMapping(BaseClass doc1class, XWikiContext context) throws XWikiException
+    /**
+     * @param className the name of the class to map
+     * @param custommapping the custom mapping to inject for this class
+     * @param context the current XWikiContext
+     * @return a boolean indicating if the mapping has been added to the current hibernate configuration,
+     * and a reload of the factory is required.
+     * @throws XWikiException if an error occurs
+     * @since 4.0M1
+     */
+    public boolean injectCustomMapping(String className, String custommapping, XWikiContext context)
+        throws XWikiException
     {
         // If we haven't turned of dynamic custom mappings we should not inject them
-        if (context.getWiki().hasDynamicCustomMappings() == false) {
-            return false;
-        }
-
-        String custommapping = doc1class.getCustomMapping();
-        if (!doc1class.hasExternalCustomMapping()) {
+        if (!context.getWiki().hasDynamicCustomMappings()) {
             return false;
         }
 
         Configuration config = getConfiguration();
 
         // don't add a mapping that's already there
-        if (config.getClassMapping(doc1class.getName()) != null) {
-            return true;
+        if (config.getClassMapping(className) != null) {
+            return false;
         }
 
-        Configuration mapconfig = makeMapping(doc1class.getName(), custommapping);
-        if (!isValidCustomMapping(doc1class.getName(), mapconfig, doc1class)) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING, "Invalid Custom Mapping");
-        }
-
-        config.addXML(makeMapping(doc1class.getName(), "xwikicustom_" + doc1class.getName().replaceAll("\\.", "_"),
-            custommapping));
+        config.addXML(makeMapping(className, custommapping));
         config.buildMappings();
         return true;
     }
 
-    private boolean isValidCustomMapping(String className, Configuration hibconfig, BaseClass bclass)
+    @Override
+    public boolean injectCustomMapping(BaseClass doc1class, XWikiContext context) throws XWikiException
     {
-        PersistentClass mapping = hibconfig.getClassMapping(className);
+        if (!doc1class.hasExternalCustomMapping()) {
+            return false;
+        }
+
+        if (injectCustomMapping(doc1class.getName(), doc1class.getCustomMapping(), context)) {
+            if (!isValidCustomMapping(doc1class, getConfiguration())) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING, "Invalid Custom Mapping");
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean isValidCustomMapping(BaseClass bclass, Configuration config)
+    {
+        PersistentClass mapping = config.getClassMapping(bclass.getName());
         if (mapping == null) {
             return true;
         }
@@ -2707,7 +2722,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         List<String> list = new ArrayList<String>();
         Configuration hibconfig;
         if (bclass.hasExternalCustomMapping()) {
-            hibconfig = makeMapping(bclass.getName(), bclass.getCustomMapping());
+            hibconfig = getMapping(bclass.getName(), bclass.getCustomMapping());
         } else {
             hibconfig = getConfiguration();
         }

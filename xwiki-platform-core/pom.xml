@@ -320,6 +320,13 @@
                 <exclude>com/xpn/xwiki/plugin/zipexplorer/ZipExplorerPlugin</exclude>
                 <exclude>com/xpn/xwiki/plugin/zipexplorer/ZipExplorerPluginAPI</exclude>
                 <!-- Remove the following excludes after we release 4.0 -->
+                <exclude>com/xpn/xwiki/objects/BaseCollection</exclude>
+                <exclude>com/xpn/xwiki/objects/BaseObject</exclude>
+                <exclude>com/xpn/xwiki/objects/BaseProperty</exclude>
+                <exclude>com/xpn/xwiki/objects/PropertyInterface</exclude>
+                <exclude>com/xpn/xwiki/objects/classes/PropertyClass</exclude>
+                <exclude>com/xpn/xwiki/store/XWikiHibernateBaseStore</exclude>
+                <exclude>com/xpn/xwiki/stats/impl/XWikiStats</exclude>
                 <exclude>com/xpn/xwiki/store/migration/AbstractDataMigrationManager*</exclude>
                 <exclude>com/xpn/xwiki/store/migration/hibernate/HibernateDataMigration*</exclude>
                 <exclude>com/xpn/xwiki/store/migration/hibernate/HibernateDataMigrationManager*</exclude>

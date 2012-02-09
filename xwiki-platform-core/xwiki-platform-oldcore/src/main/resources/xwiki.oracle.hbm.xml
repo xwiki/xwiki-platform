@@ -195,7 +195,9 @@
 
     <class name="com.xpn.xwiki.objects.BaseProperty" table="xwikiproperties">
         <composite-id unsaved-value="undefined">
-            <key-property name="id" column="XWP_ID" type="integer" />
+            <key-property name="id" type="long">
+                <column name="XWP_ID" sql-type="integer" />
+            </key-property>
             <key-property name="name" type="string">
                 <column name="XWP_NAME" index="PROP_NAME" />
             </key-property>
@@ -287,8 +289,8 @@
     </class>
 
     <class name="com.xpn.xwiki.objects.BaseObject" table="xwikiobjects">
-        <id name="id" type="integer" unsaved-value="undefined">
-            <column name="XWO_ID" not-null="true" />
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWO_ID" not-null="true" sql-type="integer"/>
             <generator class="assigned" />
         </id>
         <property name="number" type="integer" column="XWO_NUMBER" index="OBJ_NUMBER" not-null="false" />
@@ -298,8 +300,8 @@
     </class>
 
     <class name="com.xpn.xwiki.stats.impl.DocumentStats" table="xwikistatsdoc">
-        <id name="id" type="integer" unsaved-value="undefined">
-            <column name="XWS_ID" not-null="true" />
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWS_ID" not-null="true" sql-type="integer"/>
             <generator class="assigned" />
         </id>
         <property name="number" type="integer" column="XWS_NUMBER" />
@@ -317,8 +319,8 @@
     </class>
 
     <class name="com.xpn.xwiki.stats.impl.RefererStats" table="xwikistatsreferer">
-        <id name="id" type="integer" unsaved-value="undefined">
-            <column name="XWR_ID" not-null="true" />
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWR_ID" not-null="true" sql-type="integer"/>
             <generator class="assigned" />
         </id>
         <property name="number" type="integer" column="XWR_NUMBER" not-null="false" />
@@ -334,8 +336,8 @@
     </class>
 
     <class name="com.xpn.xwiki.stats.impl.VisitStats" table="xwikistatsvisit">
-        <id name="id" type="integer" unsaved-value="undefined">
-            <column name="XWV_ID" not-null="true" />
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWV_ID" not-null="true" sql-type="integer"/>
             <generator class="assigned" />
         </id>
         <property name="number" type="integer" column="XWV_NUMBER" not-null="false" />
@@ -358,8 +360,8 @@
 
     <!-- XWikiPreferences custom mapping -->
     <class entity-name="XWiki.XWikiPreferences" table="xwikipreferences">
-        <id name="id" type="integer" unsaved-value="undefined">
-            <column name="XWP_ID" not-null="true" />
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWP_ID" not-null="true" sql-type="integer"/>
             <generator class="assigned" />
         </id>
         <property name="language" type="string" column="XWP_LANGUAGE" length="255" />
@@ -399,8 +401,8 @@
 
     <!-- XWikiComments custom mapping -->
     <class entity-name="XWiki.XWikiComments" table="xwikicomments">
-        <id name="id" type="integer" unsaved-value="undefined">
-            <column name="XWC_ID" not-null="true" />
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWC_ID" not-null="true" sql-type="integer"/>
             <generator class="assigned" />
         </id>
         <property name="author" type="string" column="XWC_AUTHOR" length="255" index="COMMENT_AUTHOR" />

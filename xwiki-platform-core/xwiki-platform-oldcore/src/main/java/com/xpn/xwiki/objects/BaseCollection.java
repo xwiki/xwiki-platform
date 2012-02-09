@@ -74,6 +74,13 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseCollection.class);
 
     /**
+     * Used to compute document identifier.
+     */
+    @SuppressWarnings("unchecked")
+    private EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.class, "local/uid");
+
+    /**
      * The meaning of this reference fields depends on the element represented. Examples:
      * <ul>
      * <li>If this BaseCollection instance represents an XObject then refers to the document where the XObject's XClass
@@ -128,26 +135,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      */
     private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.class, "current/reference");
-
-    public int getId()
-    {
-        return hashCode();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode()
-    {
-        return (getName() + getClassName()).hashCode();
-    }
-
-    public void setId(int id)
-    {
-    }
 
     public int getNumber()
     {

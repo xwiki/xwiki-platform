@@ -50,7 +50,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
 {
     private BaseCollection object;
 
-    private int id;
+    private long id;
 
     /**
      * {@inheritDoc}
@@ -116,7 +116,8 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
         return (getId() == ((BaseProperty) el).getId());
     }
 
-    public int getId()
+    @Override
+    public long getId()
     {
         // I hate this.. needed for hibernate to find the object
         // when loading the collections..
@@ -127,23 +128,14 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.PropertyInterface#setId(int)
-     */
-    public void setId(int id)
+    @Override
+    public void setId(long id)
     {
         // I hate this.. needed for hibernate to find the object
         // when loading the collections..
         this.id = id;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode()
     {

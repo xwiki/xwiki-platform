@@ -178,7 +178,7 @@
 
     <class name="com.xpn.xwiki.objects.BaseProperty" table="xwikiproperties">
         <composite-id unsaved-value="undefined">
-            <key-property name="id" column="XWP_ID" type="integer" />
+            <key-property name="id" column="XWP_ID" type="long" />
             <key-property name="name" type="string">
                 <column name="XWP_NAME" index="PROP_NAME" />
             </key-property>
@@ -268,7 +268,7 @@
     </class>
 
     <class name="com.xpn.xwiki.objects.BaseObject" table="xwikiobjects">
-        <id name="id" type="integer" unsaved-value="undefined">
+        <id name="id" type="long" unsaved-value="undefined">
             <column name="XWO_ID" not-null="true" />
             <generator class="assigned" />
         </id>
@@ -279,7 +279,7 @@
     </class>
 
     <class name="com.xpn.xwiki.stats.impl.DocumentStats" table="xwikistatsdoc">
-        <id name="id" type="integer" unsaved-value="undefined">
+        <id name="id" type="long" unsaved-value="undefined">
             <column name="XWS_ID" not-null="true" />
             <generator class="assigned" />
         </id>
@@ -298,7 +298,7 @@
     </class>
 
     <class name="com.xpn.xwiki.stats.impl.RefererStats" table="xwikistatsreferer">
-        <id name="id" type="integer" unsaved-value="undefined">
+        <id name="id" type="long" unsaved-value="undefined">
             <column name="XWR_ID" not-null="true" />
             <generator class="assigned" />
         </id>
@@ -315,7 +315,7 @@
     </class>
 
     <class name="com.xpn.xwiki.stats.impl.VisitStats" table="xwikistatsvisit">
-        <id name="id" type="integer" unsaved-value="undefined">
+        <id name="id" type="long" unsaved-value="undefined">
             <column name="XWV_ID" not-null="true" />
             <generator class="assigned" />
         </id>
@@ -339,7 +339,7 @@
 
     <!-- XWikiPreferences custom mapping -->
     <class entity-name="XWiki.XWikiPreferences" table="xwikipreferences">
-        <id name="id" type="integer" unsaved-value="undefined">
+        <id name="id" type="long" unsaved-value="undefined">
             <column name="XWP_ID" not-null="true" />
             <generator class="assigned" />
         </id>
@@ -380,7 +380,7 @@
 
     <!-- XWikiComments custom mapping -->
     <class entity-name="XWiki.XWikiComments" table="xwikicomments">
-        <id name="id" type="integer" unsaved-value="undefined">
+        <id name="id" type="long" unsaved-value="undefined">
             <column name="XWC_ID" not-null="true" />
             <generator class="assigned" />
         </id>

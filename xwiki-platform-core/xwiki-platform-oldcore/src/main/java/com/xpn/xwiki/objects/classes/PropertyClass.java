@@ -52,7 +52,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
 {
     private BaseClass xclass;
 
-    private int id;
+    private long id;
 
     private PropertyMetaClass pMetaClass;
 
@@ -113,7 +113,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     }
 
     @Override
-    public int getId()
+    public long getId()
     {
         if (getObject() == null) {
             return this.id;
@@ -122,7 +122,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     }
 
     @Override
-    public void setId(int id)
+    public void setId(long id)
     {
         this.id = id;
     }

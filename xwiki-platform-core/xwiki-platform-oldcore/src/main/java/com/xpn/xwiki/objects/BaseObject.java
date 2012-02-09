@@ -137,33 +137,6 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         this.referenceCache = null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#hashCode()
-     */
-    @Override
-    public int hashCode()
-    {
-        String str = getName() + getClassName();
-        int nb = getNumber();
-        if (nb > 0) {
-            str += "_" + nb;
-        }
-
-        return str.hashCode();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#setId(int)
-     */
-    @Override
-    public void setId(int id)
-    {
-    }
-
     public void displayHidden(StringBuffer buffer, String name, String prefix, XWikiContext context)
     {
         ((PropertyClass) getXClass(context).get(name)).displayHidden(buffer, name, prefix, this, context);

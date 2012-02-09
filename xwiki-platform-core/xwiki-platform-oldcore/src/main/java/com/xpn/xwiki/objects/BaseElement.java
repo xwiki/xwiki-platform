@@ -21,6 +21,8 @@ package com.xpn.xwiki.objects;
 
 import java.io.Serializable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -29,6 +31,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.doc.merge.MergeUtils;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -38,6 +41,9 @@ import com.xpn.xwiki.web.Utils;
  */
 public abstract class BaseElement<R extends EntityReference> implements ElementInterface, Serializable
 {
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseElement.class);
+
     /**
      * Full reference of this element.
      * 
@@ -65,6 +71,11 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.class, "local");
 
+    /**
+     * Used to build uid string for the getId() hash.
+     */
+    private EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer;
+
     @Override
     public R getReference()
     {
@@ -76,7 +87,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     }
 
     /**
-     * @since 3.2M1.2M1
+     * @since 3.2M1
      */
     protected R createReference()
     {
@@ -145,6 +156,53 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     public void setPrettyName(String name)
     {
         this.prettyName = name;
+    }
+
+    /**
+     * @return return the LocalUidStringEntityReferenceSerializer to compute ids.
+     * @since 4.0M1
+     */
+    protected EntityReferenceSerializer<String> getLocalUidStringEntityReferenceSerializer() {
+        if (localUidStringEntityReferenceSerializer == null) {
+            localUidStringEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.class, "local/uid");
+        }
+        return localUidStringEntityReferenceSerializer;
+    }
+
+    /**
+     * @return a unique identifier representing this element reference to be used for {@code hashCode()}.
+     * @since 4.0M1
+     */
+    protected String getLocalKey() {
+        // The R40000XWIKI6990DataMigration use the same algorithm to compute object id. It should be properly synced.
+        return getLocalUidStringEntityReferenceSerializer().serialize(getReference());
+    }
+
+    /**
+     * Return an truncated MD5 hash of the local key computed in {@link #getLocalKey()}.
+     *
+     * @return the identifier used by hibernate for storage.
+     * @since 4.0M1
+     */
+    public long getId()
+    {
+        // The R40000XWIKI6990DataMigration use the same algorithm to compute object id. It should be properly synced.
+        return Util.getHash(getLocalKey());
+    }
+
+    /**
+     * Dummy function, do hibernate is always happy.
+     * @param id the identifier assigned by hibernate.
+     * @since 4.0M1
+     */
+    public void setId(long id)
+    {
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return (int) Util.getHash(getLocalKey());
     }
 
     @Override

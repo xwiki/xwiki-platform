@@ -563,7 +563,7 @@ public class XWikiHibernateBaseStore implements Initializable
             return;
         }
 
-        Configuration config = makeMapping(bclass.getName(), custommapping);
+        Configuration config = getMapping(bclass.getName(), custommapping);
         /*
          * if (isValidCustomMapping(bclass.getName(), config, bclass)==false) { throw new XWikiException(
          * XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING, "Cannot update
@@ -1053,27 +1053,62 @@ public class XWikiHibernateBaseStore implements Initializable
         this.nbConnections = nbConnections;
     }
 
-    protected Configuration makeMapping(String className, String custommapping1)
+    /**
+     * Return the name generated for a dynamic mapped object.
+     * 
+     * @param className the classname of the object.
+     * @return a name in the form xwikicustom_space_class
+     * @since 4.0M1
+     */
+    public String dynamicMappingTableName(String className)
+    {
+        return "xwikicustom_" + className.replaceAll("\\.", "_");
+    }
+
+    /**
+     * Build a {@link Configuration} containing the provide mapping.
+     * Before 4.0M1, this function was called makeMapping. In 4.0M1, it enter in conflict with 
+     * {@link #makeMapping(String, String)}
+     * 
+     * @param className the classname of the class to map.
+     * @param customMapping the custom mapping
+     * @return a new {@link Configuration} containing this mapping alone.
+     * @since 4.0M1
+     */
+    protected Configuration getMapping(String className, String customMapping)
     {
         Configuration hibconfig = new Configuration();
         {
-            hibconfig.addXML(makeMapping(className, "xwikicustom_" + className.replaceAll("\\.", "_"), custommapping1));
+            hibconfig.addXML(makeMapping(className, customMapping));
         }
         hibconfig.buildMappings();
         return hibconfig;
     }
 
-    protected String makeMapping(String entityName, String tableName, String custommapping1)
+    /**
+     * Build a new XML string to define the provided mapping.
+     * Since 4.0M1, the ids are longs, and a confitionnal mapping is made for Oracle.
+     *
+     * @param className the name of the class to map.
+     * @param customMapping the custom mapping
+     * @return a XML definition for the given mapping, using XWO_ID column for the object id.
+     */
+    protected String makeMapping(String className, String customMapping)
     {
-        String custommapping =
-            "<?xml version=\"1.0\"?>\n" + "<!DOCTYPE hibernate-mapping PUBLIC\n"
-                + "\t\"-//Hibernate/Hibernate Mapping DTD//EN\"\n"
-                + "\t\"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd\">\n" + "<hibernate-mapping>"
-                + "<class entity-name=\"" + entityName + "\" table=\"" + tableName + "\">\n"
-                + " <id name=\"id\" type=\"integer\" unsaved-value=\"any\">\n"
-                + "   <column name=\"XWO_ID\" not-null=\"true\" />\n" + "   <generator class=\"assigned\" />\n"
-                + " </id>\n" + custommapping1 + "</class>\n" + "</hibernate-mapping>";
-        return custommapping;
+        DatabaseProduct databaseProduct = getDatabaseProductName();
+        return new StringBuilder(2000)
+            .append("<?xml version=\"1.0\"?>\n" + "<!DOCTYPE hibernate-mapping PUBLIC\n")
+            .append("\t\"-//Hibernate/Hibernate Mapping DTD//EN\"\n")
+            .append("\t\"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd\">\n")
+            .append("<hibernate-mapping>")
+            .append("<class entity-name=\"").append(className)
+            .append("\" table=\"").append(dynamicMappingTableName(className)).append("\">\n")
+            .append(" <id name=\"id\" type=\"long\" unsaved-value=\"any\">\n")
+            .append("   <column name=\"XWO_ID\" not-null=\"true\" ")
+            .append((databaseProduct == DatabaseProduct.ORACLE) ? "sql-type=\"integer\" " : "")
+            .append("/>\n   <generator class=\"assigned\" />\n")
+            .append(" </id>\n").append(customMapping).append("</class>\n</hibernate-mapping>")
+            .toString();
     }
 
     /**

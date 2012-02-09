@@ -92,9 +92,20 @@ public class R35000XWIKI6691DataMigration extends AbstractHibernateDataMigration
      */
     private static final class RequestToGroupRenameWork implements Work
     {
+        /**
+         * @see #RequestToGroupRenameWork(String, int)
+         */
         private String migratorDescription;
+
+        /**
+         * @see #RequestToGroupRenameWork(String, int)
+         */
         private int migratorVersion;
 
+        /**
+         * @param migratorDescription the migrator description (used in the warning log if the update fails)
+         * @param migratorVersion the migration version (used in the warning log if the update fails)
+         */
         public RequestToGroupRenameWork(String migratorDescription, int migratorVersion)
         {
             this.migratorDescription = migratorDescription;

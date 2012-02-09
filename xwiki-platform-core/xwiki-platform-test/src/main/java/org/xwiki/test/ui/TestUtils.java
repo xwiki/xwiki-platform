@@ -303,6 +303,9 @@ public class TestUtils
         gotoPage(space, page, action, "");
     }
 
+    /**
+     * @since 3.5M1
+     */
     public void gotoPage(String space, String page, String action, Object... queryParameters)
     {
         gotoPage(space, page, action, toQueryString(queryParameters));
@@ -318,7 +321,7 @@ public class TestUtils
         // Only navigate if the current URL is different from the one to go to, in order to improve performances.
         String url = getURL(space, page, action, queryString);
         if (!getDriver().getCurrentUrl().equals(url)) {
-            // FIXME: find some better nicer way
+            // FIXME: find some nicer way
             // Make sure to disable edit mode popup
             getDriver().executeScript("window.onbeforeunload = null");
 
@@ -737,11 +740,17 @@ public class TestUtils
         return new ClassEditPage();
     }
 
+    /**
+     * @since 3.5M1
+     */
     public String toQueryString(Object... queryParameters)
     {
         return toQueryString(toQueryParameters(queryParameters));
     }
 
+    /**
+     * @since 3.5M1
+     */
     public String toQueryString(Map<String, ? > queryParameters)
     {
         StringBuilder builder = new StringBuilder();
@@ -784,6 +793,9 @@ public class TestUtils
         }
     }
 
+    /**
+     * @since 3.5M1
+     */
     public Map<String, ? > toQueryParameters(Object... properties)
     {
         return toQueryParameters(null, null, properties);

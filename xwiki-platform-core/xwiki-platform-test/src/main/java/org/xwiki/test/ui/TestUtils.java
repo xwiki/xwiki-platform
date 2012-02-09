@@ -303,9 +303,14 @@ public class TestUtils
         gotoPage(space, page, action, "");
     }
 
+    public void gotoPage(String space, String page, String action, Object... queryParameters)
+    {
+        gotoPage(space, page, action, toQueryString(queryParameters));
+    }
+
     public void gotoPage(String space, String page, String action, Map<String, ? > queryParameters)
     {
-        getDriver().get(getURL(space, page, action, queryParameters));
+        gotoPage(space, page, action, toQueryString(queryParameters));
     }
 
     public void gotoPage(String space, String page, String action, String queryString)
@@ -313,6 +318,10 @@ public class TestUtils
         // Only navigate if the current URL is different from the one to go to, in order to improve performances.
         String url = getURL(space, page, action, queryString);
         if (!getDriver().getCurrentUrl().equals(url)) {
+            // FIXME: find some better nicer way
+            // Make sure to disable edit mode popup
+            getDriver().executeScript("window.onbeforeunload = null");
+
             getDriver().get(url);
         }
     }
@@ -441,13 +450,7 @@ public class TestUtils
      */
     public String getURL(String space, String page, String action, Map<String, ? > queryParameters)
     {
-        StringBuilder builder = new StringBuilder();
-        for (Map.Entry<String, ? > entry : queryParameters.entrySet()) {
-            addQueryStringEntry(builder, entry.getKey(), entry.getValue());
-            builder.append('&');
-        }
-
-        return getURL(space, page, action, builder.toString());
+        return getURL(space, page, action, toQueryString(queryParameters));
     }
 
     /**
@@ -487,36 +490,6 @@ public class TestUtils
     }
 
     /**
-     * @sice 3.2M1
-     */
-    public void addQueryStringEntry(StringBuilder builder, String key, Object value)
-    {
-        if (value != null) {
-            if (value instanceof Iterable) {
-                for (Object element : (Iterable< ? >) value) {
-                    addQueryStringEntry(builder, key, element.toString());
-                }
-            } else {
-                addQueryStringEntry(builder, key, value.toString());
-            }
-        } else {
-            addQueryStringEntry(builder, key, (String) null);
-        }
-    }
-
-    /**
-     * @sice 3.2M1
-     */
-    public void addQueryStringEntry(StringBuilder builder, String key, String value)
-    {
-        builder.append(escapeURL(key));
-        if (value != null) {
-            builder.append('=');
-            builder.append(escapeURL(value));
-        }
-    }
-
-    /**
      * (Re)-cache the secret token used for CSRF protection. A user with edit rights on Main.WebHome must be logged in.
      * This method must be called before {@link #getSecretToken()} is called and after each re-login.
      * 
@@ -530,7 +503,7 @@ public class TestUtils
         // which blocks the test.
         String previousURL = getDriver().getCurrentUrl();
         // Go to the registration page because the registration form uses secret token.
-        getDriver().get(getURL("XWiki", "Register", "register"));
+        gotoPage("XWiki", "Register", "register");
         try {
             WebElement tokenInput = getDriver().findElement(By.xpath("//input[@name='form_token']"));
             this.secretToken = tokenInput.getAttribute("value");
@@ -760,12 +733,60 @@ public class TestUtils
 
     public ClassEditPage addClassProperty(String space, String page, String propertyName, String propertyType)
     {
-        Map<String, String> props = new HashMap<String, String>();
-        props.put("propname", propertyName);
-        props.put("proptype", propertyType);
-
-        gotoPage(space, page, "propadd", props);
+        gotoPage(space, page, "propadd", "propname", propertyName, "proptype", propertyType);
         return new ClassEditPage();
+    }
+
+    public String toQueryString(Object... queryParameters)
+    {
+        return toQueryString(toQueryParameters(queryParameters));
+    }
+
+    public String toQueryString(Map<String, ? > queryParameters)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        for (Map.Entry<String, ? > entry : queryParameters.entrySet()) {
+            addQueryStringEntry(builder, entry.getKey(), entry.getValue());
+            builder.append('&');
+        }
+
+        return builder.toString();
+    }
+
+    /**
+     * @sice 3.2M1
+     */
+    public void addQueryStringEntry(StringBuilder builder, String key, Object value)
+    {
+        if (value != null) {
+            if (value instanceof Iterable) {
+                for (Object element : (Iterable< ? >) value) {
+                    addQueryStringEntry(builder, key, element.toString());
+                }
+            } else {
+                addQueryStringEntry(builder, key, value.toString());
+            }
+        } else {
+            addQueryStringEntry(builder, key, (String) null);
+        }
+    }
+
+    /**
+     * @sice 3.2M1
+     */
+    public void addQueryStringEntry(StringBuilder builder, String key, String value)
+    {
+        builder.append(escapeURL(key));
+        if (value != null) {
+            builder.append('=');
+            builder.append(escapeURL(value));
+        }
+    }
+
+    public Map<String, ? > toQueryParameters(Object... properties)
+    {
+        return toQueryParameters(null, null, properties);
     }
 
     public Map<String, ? > toQueryParameters(String className, Integer objectNumber, Object... properties)
@@ -787,7 +808,9 @@ public class TestUtils
     {
         Map<String, Object> queryParameters = new HashMap<String, Object>();
 
-        queryParameters.put("classname", className);
+        if (className != null) {
+            queryParameters.put("classname", className);
+        }
 
         for (Map.Entry<String, ? > entry : properties.entrySet()) {
             queryParameters.put(toQueryParameterKey(className, objectNumber, entry.getKey()), entry.getValue());
@@ -798,15 +821,22 @@ public class TestUtils
 
     public String toQueryParameterKey(String className, Integer objectNumber, String key)
     {
-        StringBuilder keyBuilder = new StringBuilder(className);
-        keyBuilder.append('_');
-        if (objectNumber != null) {
-            keyBuilder.append(objectNumber);
-            keyBuilder.append('_');
-        }
-        keyBuilder.append(key);
+        if (className == null) {
+            return key;
+        } else {
+            StringBuilder keyBuilder = new StringBuilder(className);
 
-        return keyBuilder.toString();
+            keyBuilder.append('_');
+
+            if (objectNumber != null) {
+                keyBuilder.append(objectNumber);
+                keyBuilder.append('_');
+            }
+
+            keyBuilder.append(key);
+
+            return keyBuilder.toString();
+        }
     }
 
     public WebElement findElementWithoutWaiting(WebDriver driver, By by)

@@ -24,19 +24,21 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
-import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
+import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 /**
  * Migration for XWIKI-6691: Change the mapping of the event requestId field to varchar(48). Since the even group ID is
@@ -53,6 +55,10 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 @Singleton
 public class R35000XWIKI6691DataMigration extends AbstractHibernateDataMigration
 {
+    /** Logging helper object. */
+    @Inject
+    private static Logger logger;
+
     @Override
     public String getDescription()
     {
@@ -73,19 +79,34 @@ public class R35000XWIKI6691DataMigration extends AbstractHibernateDataMigration
             @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
-                session.doWork(new Work()
-                {
-                    @Override
-                    public void execute(Connection connection) throws SQLException
-                    {
-                        Statement stmt = connection.createStatement();
-                        stmt.addBatch("UPDATE activitystream_events SET ase_groupid = ase_requestid");
-                        stmt.addBatch("ALTER TABLE activitystream_events DROP COLUMN ase_requestid");
-                        stmt.executeBatch();
-                    }
-                });
+                session.doWork(new RequestToGroupRenameWork());
                 return Boolean.TRUE;
             }
         });
+    }
+
+    /**
+     * Hibernate "Work" class responsible for moving data from the old ase_requestid column to the new ase_groupid
+     * column.
+     * 
+     * @version $Id$
+     */
+    private static final class RequestToGroupRenameWork implements Work
+    {
+        @Override
+        public void execute(Connection connection) throws SQLException
+        {
+            Statement stmt = connection.createStatement();
+            stmt.addBatch("UPDATE activitystream_events SET ase_groupid = ase_requestid");
+            stmt.addBatch("ALTER TABLE activitystream_events DROP COLUMN ase_requestid");
+            try {
+                stmt.executeBatch();
+            } catch (SQLException ex) {
+                // Ignore, probably the database doesn't need this migration.
+                // Anyway, in case it really can't be performed, report it in the logs.
+                R35000XWIKI6691DataMigration.logger.warn(
+                    "Failed to apply R35000XWIKI6691 Data Migration : {}", ex.getMessage());
+            }
+        }
     }
 }

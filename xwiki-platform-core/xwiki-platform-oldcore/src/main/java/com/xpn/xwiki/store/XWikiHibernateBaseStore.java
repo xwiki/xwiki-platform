@@ -37,6 +37,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
+import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.jdbc.BorrowedConnectionProxy;
@@ -85,6 +86,8 @@ public class XWikiHibernateBaseStore implements Initializable
      * Key in XWikiContext for access to current hibernate database name.
      */
     private static String currentDatabaseKey = "hibcurrentdatabase";
+
+    private DatabaseProduct databaseProduct = DatabaseProduct.UNKNOWN;
 
     /**
      * THis allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
@@ -148,18 +151,46 @@ public class XWikiHibernateBaseStore implements Initializable
     }
 
     /**
+     * Retrieve the current database product name. If no current session is available, obtains a connection from the
+     * hibernate connection provider attached to the current session factory.
      * @return the database product name
+     * @since 4.0M1
      */
-    public DatabaseProduct getDatabaseProductName(XWikiContext context)
+    public DatabaseProduct getDatabaseProductName()
     {
-        String productName;
-        try {
-            productName = getSession(context).connection().getMetaData().getDatabaseProductName();
-        } catch (Exception e) {
-            productName = "Unknown";
+        ConnectionProvider connectionProvider = ((SessionFactoryImpl) getSessionFactory()).getConnectionProvider();
+        Connection connection = null;
+        DatabaseProduct product = this.databaseProduct;
+
+        if (product == DatabaseProduct.UNKNOWN) {
+            try {
+                connection = connectionProvider.getConnection();
+                product = DatabaseProduct.toProduct(connection.getMetaData().getDatabaseProductName());
+            } catch (SQLException ignored) {
+                // do not care, return UNKNOWN
+            } finally {
+                if (connection != null) {
+                    try {
+                        connectionProvider.closeConnection(connection);
+                    }
+                    catch (SQLException ignored) {
+                        // do not care, return UNKNOWN
+                    }
+                }
+            }
         }
 
-        return DatabaseProduct.toProduct(productName);
+        return product;
+   }
+
+    /**
+     * @return the database product name
+     * @deprecated since 4.0M1 use #getDatabaseProductName()
+     */
+    @Deprecated
+    public DatabaseProduct getDatabaseProductName(XWikiContext context)
+    {
+        return getDatabaseProductName();
     }
 
     /**

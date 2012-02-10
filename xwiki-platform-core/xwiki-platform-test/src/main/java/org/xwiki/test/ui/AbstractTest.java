@@ -120,6 +120,9 @@ public class AbstractTest
     @AfterClass
     public static void shutdown() throws Exception
     {
+        // This is needed in case the last test leaves a page in edit mode: the page exit confirmation pops up and
+        // prevents the browser from closing.
+        context.getDriver().disablePageExitConfirmation();
         context.shutdown();
     }
 

@@ -73,8 +73,7 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
     {
         super.setUp();
 
-        this.repositoryUtil =
-            new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());
+        this.repositoryUtil = new RepositoryUtil(getConfigurationSource(), getComponentManager());
         this.repositoryUtil.setup(getMockery());
 
         this.extensionId = new ExtensionId(GROUPID + ':' + ARTIfACTID, "version");

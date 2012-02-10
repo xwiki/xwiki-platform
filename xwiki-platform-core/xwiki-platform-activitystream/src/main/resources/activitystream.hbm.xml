@@ -29,7 +29,7 @@
       <column name="ase_eventid" length="48" not-null="true" />
       <generator class="assigned" />
     </id>
-    <property name="requestId" type="string" column="ase_groupid" length="48" index="EVENT_GROUP" />
+    <property name="requestId" type="string" column="ase_requestid" length="2000" />
     <property name="stream" type="string" column="ase_stream" length="255" index="EVENT_STREAM" />
     <property name="date" type="timestamp" column="ase_date" index="EVENT_DATE" />
     <property name="priority" type="integer" column="ase_priority" index="EVENT_PRIORITY" />

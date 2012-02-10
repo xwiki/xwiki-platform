@@ -48,6 +48,12 @@ public class XWikiCachingRightService implements XWikiRightService
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiCachingRightService.class);
 
+    /** The login action. */
+    private static final String DELETE_ACTION = "delete";
+
+    /** The delete action. */
+    private static final String LOGIN_ACTION = "login";
+
     /**
      * Map containing all known actions.
      */
@@ -55,9 +61,9 @@ public class XWikiCachingRightService implements XWikiRightService
 
     static {
         ACTION_MAP
-            .putAction("login", Right.LOGIN)
+            .putAction(LOGIN_ACTION, Right.LOGIN)
             .putAction("view", Right.VIEW)
-            .putAction("delete", Right.DELETE)
+            .putAction(DELETE_ACTION, Right.DELETE)
             .putAction("admin", Right.ADMIN)
             .putAction("programing", Right.PROGRAM)
             .putAction("edit", Right.EDIT)
@@ -296,7 +302,24 @@ public class XWikiCachingRightService implements XWikiRightService
             showLogin(context);
             return false;
         }
-        return authorizationManager.hasAccess(right, userReference, entityReference);
+
+        if (authorizationManager.hasAccess(right, userReference, entityReference)) {
+            return true;
+        }
+
+        // If the right has been denied, and we have guest user, redirect the user to login page
+        // unless the denied is on the login action, which could cause infinite redirection.
+        // FIXME: The hasAccessLevel is broken (do not allow document creator) on the delete action in the old
+        // implementation, so code that simply want to verify if a user can delete (but is not actually deleting)
+        // has to call checkAccess. This happen really often, and this why we should not redirect to login on failed
+        // delete, since it would prevent most user to do anything.
+        if (context.getUserReference() == null && !DELETE_ACTION.equals(action) && !LOGIN_ACTION.equals(action)) {
+            LOGGER.debug("Redirecting guest user to login, since it have been denied " + right + " on "
+                + entityReference + '.');
+            showLogin(context);
+        }
+
+        return false;
     }
  
     @Override

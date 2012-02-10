@@ -321,14 +321,6 @@ public class TestUtils
         // Only navigate if the current URL is different from the one to go to, in order to improve performances.
         String url = getURL(space, page, action, queryString);
         if (!getDriver().getCurrentUrl().equals(url)) {
-            // In http://jira.xwiki.org/jira/browse/XWIKI-6927 we've introduced a feature preventing the user from
-            // leaving the page if he has unsaved content. This results in a popup asking the user confirm that he
-            // wishes to leave the page. We don't want to have this popup in this gotoPage API since this method is
-            // to be used to navigate quickly to a page and not to mimick a user navigating to a page.
-            // We disable this feature by unregistering the onbeforeunload observers.
-            // TODO: Find a nicer and less hack way to achieve the same result
-            getDriver().executeScript("window.onbeforeunload = null");
-
             getDriver().get(url);
         }
     }

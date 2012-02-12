@@ -26,10 +26,10 @@
 #end
 ## IE specific stylesheets
 <!--[if IE]>
-  <link href="$xwiki.getSkinFile('ie-all.css', true)" rel="stylesheet" type="text/css" />
+  <link href="$xwiki.getSkinFile('ie-all.css', true)#if ($themeDoc)?colorTheme=$!{themeDocFullName}#end" rel="stylesheet" type="text/css" />
 <![endif]-->
 <!--[if IE 6]>
-  <link href="$xwiki.getSkinFile('ie-6.css', true)" rel="stylesheet" type="text/css" />
+  <link href="$xwiki.getSkinFile('ie-6.css', true)#if ($themeDoc)?colorTheme=$!{themeDocFullName}#end" rel="stylesheet" type="text/css" />
 <![endif]-->
 ## Hook for inserting CSS skin extensions
 <!-- com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin -->

@@ -594,8 +594,12 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
         }
 
         // If migration is launch on an empty DB, properly set the latest DB version
-        if (curversion == null) {
+        if (curversion == null || getLatestVersion().compareTo(curversion) > 0) {
             setDBVersion(getLatestVersion());
+            if (logger.isInfoEnabled() && curversion != null) {
+                logger.info("Latest migration(s) was unneeded, storage now forced to latest version [{}]",
+                    getDBVersion());
+            }
         }
     }
 

@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1252454400000</creationDate>
-<date>1290173191000</date>
-<contentUpdateDate>1290173191000</contentUpdateDate>
+<date>1329088048000</date>
+<contentUpdateDate>1329088048000</contentUpdateDate>
 <version>1.1</version>
 <title>$msg.get("platform.index.spaceIndex")</title>
 <template></template>
@@ -336,15 +336,7 @@
 <content>{{velocity}}
 #if("$!request.space" != "") #set($space=$request.space) #else #set($space = $doc.space) #end
 $msg.get('platform.index.spaceIndexDescription', [$space])
-#set($collist = ["doc.name","doc.date", "doc.author", "_actions"])
-#set($colprops = {
-                   "doc.name" : { "type" : "text" , "size" : 30, "link" : "view"}, 
-                   "doc.date" : { "type" : "date" },
-                   "doc.author" : { "type" : "text", "link" : "author"},
-                   "_actions" : {"actions": ["copy","delete","rename","rights"]}
-                 })
-#set($options = { "translationPrefix" : "platform.index.",
-                  "rowCount": 15,
-                  "extraParams" : "&amp;space=$escapetool.url($space)" })
-#livetable("spaceindex" $collist $colprops $options)
-{{/velocity}}</content></xwikidoc>
+
+{{documents space="$space" id="spaceindex"/}}
+{{/velocity}}
+</content></xwikidoc>

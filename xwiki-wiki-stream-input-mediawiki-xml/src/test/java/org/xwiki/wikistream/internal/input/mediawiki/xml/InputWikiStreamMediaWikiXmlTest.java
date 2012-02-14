@@ -26,7 +26,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.test.AbstractComponentTestCase;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.input.ContentHandlerParser;
 import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.mediawiki.xml.MediaWikiXmlParameters;
 import org.xwiki.wikistream.internal.output.xml.OutputWikiStreamWikiXML;

@@ -51,7 +51,6 @@ public class OutputWikiStreamWikiXML extends AbstractOutputWikiStream<WikiXMLPar
         super("Wiki XML output stream", DESCRIPTION, WikiXMLParameters.class);
     }
 
-    @Override
     public Listener createListener(WikiXMLParameters parameters) throws WikiStreamException
     {
         //SKIP parameters as of now.
@@ -62,7 +61,7 @@ public class OutputWikiStreamWikiXML extends AbstractOutputWikiStream<WikiXMLPar
         return this.listener;
     }
 
-    @Override
+
     public WikiStreamType getType()
     {
         return WikiStreamType.WIKI_XML;

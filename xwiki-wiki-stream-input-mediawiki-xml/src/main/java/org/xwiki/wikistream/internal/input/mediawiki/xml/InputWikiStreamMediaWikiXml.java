@@ -55,7 +55,6 @@ public class InputWikiStreamMediaWikiXml extends AbstractXMLInputWikiStream<Medi
      * 
      * @see org.xwiki.wikistream.WikiStream#getType()
      */
-    @Override
     public WikiStreamType getType()
     {
         return WikiStreamType.MEDIAWIKI_XML;
@@ -66,7 +65,6 @@ public class InputWikiStreamMediaWikiXml extends AbstractXMLInputWikiStream<Medi
      * 
      * @see org.xwiki.wikistream.input.InputWikiStream#parse(java.lang.Object, org.xwiki.rendering.listener.Listener)
      */
-    @Override
     public void parse(MediaWikiXmlParameters parametersBean, Listener wikiEventListener) throws WikiStreamException
     {
         String srcPath=parametersBean.getSrcPath();

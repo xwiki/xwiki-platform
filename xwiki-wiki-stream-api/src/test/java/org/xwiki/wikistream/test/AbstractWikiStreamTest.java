@@ -20,7 +20,6 @@
 package org.xwiki.wikistream.test;
 
 import org.xwiki.test.AbstractComponentTestCase;
-import org.xwiki.wikistream.output.OutputWikiStream;
 
 /**
  * 

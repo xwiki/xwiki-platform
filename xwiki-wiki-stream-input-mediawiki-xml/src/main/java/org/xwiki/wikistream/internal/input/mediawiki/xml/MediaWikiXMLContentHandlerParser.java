@@ -26,8 +26,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.wikistream.input.ContentHandlerParser;
 import org.xwiki.wikistream.listener.Listener;
 import org.xwiki.wikistream.type.WikiStreamType;
@@ -43,33 +41,33 @@ public class MediaWikiXMLContentHandlerParser extends DefaultHandler implements 
 {
     private Listener listener;
 
-    @Override
+
     public WikiStreamType getType()
     {
         return WikiStreamType.MEDIAWIKI_XML;
     }
 
-    @Override
+
     public void setListener(Listener listener)
     {
         this.listener=listener;
     }
 
-    @Override
+
     public void startDocument() throws SAXException
     {
         // TODO Auto-generated method stub
         System.out.println("Start document");
     }
 
-    @Override
+
     public void endDocument() throws SAXException
     {
         // TODO Auto-generated method stub
         System.out.println("end document");
     }
 
-    @Override
+
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException
     {
         // TODO Auto-generated method stub
@@ -81,11 +79,11 @@ public class MediaWikiXMLContentHandlerParser extends DefaultHandler implements 
         }
         
         if(qName.equalsIgnoreCase("title")){
-            this.listener.onTitle(title);
+            this.listener.onTitle(qName);
         }
     }
 
-    @Override
+
     public void endElement(String uri, String localName, String qName) throws SAXException
     {
         // TODO Auto-generated method stub

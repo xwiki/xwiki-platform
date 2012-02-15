@@ -65,23 +65,8 @@ public class XWikiWrappingDriver implements WebDriver, JavascriptExecutor
         return getWrappedDriver().findElements(by);
     }
 
-    /**
-     * In http://jira.xwiki.org/jira/browse/XWIKI-6927 we've introduced a feature preventing the user from leaving the
-     * page if he has unsaved content. This results in a popup asking the user confirm that he wishes to leave the page.
-     * We don't want to have this popup in this gotoPage API since this method is to be used to navigate quickly to a
-     * page and not to mimic a user navigating to a page. We disable this feature by unregistering the onbeforeunload
-     * observers.
-     * <p>
-     * TODO: Find a nicer and less hack way to achieve the same result
-     */
-    public void disablePageExitConfirmation()
-    {
-        executeScript("window.onbeforeunload = null");
-    }
-
     public void get(String s)
     {
-        disablePageExitConfirmation();
         getWrappedDriver().get(s);
     }
 

@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
+import org.xwiki.logging.LoggerManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -66,6 +67,10 @@ public class XWikiHibernateBaseStore implements Initializable
     private Map<String, String> connections = new ConcurrentHashMap<String, String>();
 
     private int nbConnections = 0;
+
+    /** LoggerManager to suspend logging during normal faulty SQL operation. */
+    @Inject
+    private LoggerManager loggerManager;
 
     @Inject
     private HibernateSessionFactory sessionFactory;
@@ -665,51 +670,59 @@ public class XWikiHibernateBaseStore implements Initializable
     }
 
     /**
-     * Begins a transaction
+     * Begins a transaction if the context does not contains any.
      * 
-     * @param context
-     * @throws XWikiException
+     * @param context the current XWikiContext
+     * @return true if a new transaction has been created, false otherwise.
+     * @throws XWikiException if an error occurs while retrieving or creating a new session and transaction.
      */
     public boolean beginTransaction(XWikiContext context) throws XWikiException
     {
-        return beginTransaction(null, true, context);
+        return beginTransaction(null, context);
     }
 
     /**
      * Begins a transaction
      * 
-     * @param withTransaction
-     * @param context
-     * @throws XWikiException
+     * @param withTransaction this argument is unused
+     * @param context the current XWikiContext
+     * @return true if a new transaction has been created, false otherwise.
+     * @throws XWikiException if an error occurs while retrieving or creating a new session and transaction.
+     * @deprecated since 4.0M1, use {@link #beginTransaction(SessionFactory, XWikiContext)}
      */
+    @Deprecated
     public boolean beginTransaction(boolean withTransaction, XWikiContext context) throws XWikiException
     {
-        return beginTransaction(null, withTransaction, context);
+        return beginTransaction(null, context);
     }
 
     /**
-     * Begins a transaction with a specific SessionFactory
+     * Begins a transaction with a specific SessionFactory.
      * 
-     * @param sfactory
-     * @param context
-     * @throws XWikiException
+     * @param sfactory the session factory used to begin a new session if none are available
+     * @param withTransaction this argument is unused
+     * @param context the current XWikiContext
+     * @return true if a new transaction has been created, false otherwise.
+     * @throws XWikiException if an error occurs while retrieving or creating a new session and transaction.
+     * @deprecated since 4.0M1, use {@link #beginTransaction(SessionFactory, XWikiContext)}
      */
-    public boolean beginTransaction(SessionFactory sfactory, XWikiContext context) throws XWikiException
-    {
-        return beginTransaction(sfactory, true, context);
-    }
-
-    /**
-     * Begins a transaction with a specific SessionFactory
-     * 
-     * @param sfactory
-     * @param withTransaction
-     * @param context
-     * @throws HibernateException
-     * @throws XWikiException
-     */
+    @Deprecated
     public boolean beginTransaction(SessionFactory sfactory, boolean withTransaction, XWikiContext context)
-        throws HibernateException, XWikiException
+        throws XWikiException
+    {
+        return beginTransaction(sfactory, context);
+    }
+
+    /**
+     * Begins a transaction with a specific SessionFactory.
+     *
+     * @param sfactory the session factory used to begin a new session if none are available
+     * @param context the current XWikiContext
+     * @return true if a new transaction has been created, false otherwise.
+     * @throws XWikiException if an error occurs while retrieving or creating a new session and transaction.
+     */
+    public boolean beginTransaction(SessionFactory sfactory, XWikiContext context)
+        throws XWikiException
     {
 
         Transaction transaction = getTransaction(context);
@@ -762,8 +775,8 @@ public class XWikiHibernateBaseStore implements Initializable
         }
         setTransaction(transaction, context);
 
-        // during #setDatabase, the data version may now be checked using this new transaction.
-        // In case of any failure during database switch, the transaction and the session will be closed.
+        // during #setDatabase, the transaction and the session will be closed if the database could not be
+        // safely accessed due to version mismatch
         setDatabase(session, context);
 
         return true;
@@ -830,25 +843,27 @@ public class XWikiHibernateBaseStore implements Initializable
     }
 
     /**
-     * Ends a transaction
+     * Ends a transaction and close the session.
      * 
-     * @param context
-     * @param commit should we commit or not
-     */
-    public void endTransaction(XWikiContext context, boolean commit)
-    {
-        endTransaction(context, commit, false);
-    }
-
-    /**
-     * Ends a transaction
-     * 
-     * @param context
+     * @param context the current XWikiContext
      * @param commit should we commit or not
      * @param withTransaction
      * @throws HibernateException
+     * @deprecated since 4.0M1, use {@link #endTransaction(XWikiContext, boolean)}
      */
+    @Deprecated
     public void endTransaction(XWikiContext context, boolean commit, boolean withTransaction) throws HibernateException
+    {
+        endTransaction(context, commit);
+    }
+    
+    /**
+     * Ends a transaction and close the session.
+     *
+     * @param context the current XWikiContext
+     * @param commit should we commit or not
+     */
+    public void endTransaction(XWikiContext context, boolean commit)
     {
         Session session = null;
         try {
@@ -1050,27 +1065,73 @@ public class XWikiHibernateBaseStore implements Initializable
     /**
      * Execute method for operations in hibernate. spring like.
      * 
-     * @return {@link HibernateCallback#doInHibernate(Session)}
      * @param context - used everywhere.
      * @param bTransaction - should store use old transaction(false) or create new (true)
      * @param doCommit - should store commit changes(if any), or rollback it.
      * @param cb - callback to execute
+     * @return {@link HibernateCallback#doInHibernate(Session)}
      * @throws XWikiException if any error
+     * @deprecated since 4.0M1, use {@link #execute(XWikiContext, boolean, HibernateCallback)} or
+     *                          {@link #failSafeExecute(XWikiContext, boolean, HibernateCallback)}
      */
+    @Deprecated
     public <T> T execute(XWikiContext context, boolean bTransaction, boolean doCommit, HibernateCallback<T> cb)
         throws XWikiException
     {
+        return execute(context, doCommit, cb);
+    }
+
+    /**
+     * Execute method for operations in hibernate in an independent session (but not closing the current one if any).
+     * Never throw any error, but there is no warranty that the operation has been completed successfully.
+     *
+     * @param context - used everywhere.
+     * @param doCommit - should store commit changes(if any), or rollback it.
+     * @param cb - callback to execute
+     * @return {@link HibernateCallback#doInHibernate(Session)}, returns null if the callback throw an error.
+     */
+    public <T> T failSafeExecute(XWikiContext context, boolean doCommit, HibernateCallback<T> cb)
+    {
+        final Session originalSession = getSession(context);
+        final Transaction originalTransaction = getTransaction(context);
+        setSession(null, context);
+        setTransaction(null, context);
+
+        loggerManager.pushLogListener(null);
+        try {
+            return execute(context, doCommit, cb);
+        } catch (Exception ignored) {
+            return null;
+        } finally {
+            loggerManager.popLogListener();
+            setSession(originalSession, context);
+            setTransaction(originalTransaction, context);
+        }
+    }
+
+    /**
+     * Execute method for operations in hibernate. spring like.
+     *
+     * @param context - used everywhere.
+     * @param doCommit - should store commit changes(if any), or rollback it.
+     * @param cb - callback to execute
+     * @return {@link HibernateCallback#doInHibernate(Session)}
+     * @throws XWikiException if any error
+     */
+    public <T> T execute(XWikiContext context, boolean doCommit, HibernateCallback<T> cb)
+        throws XWikiException
+    {
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
+        boolean bTransaction = false;
+
         try {
             // Start monitoring timer
             if (monitor != null) {
                 monitor.startTimer("hibernate");
             }
 
-            if (bTransaction) {
-                checkHibernate(context);
-                bTransaction = beginTransaction(context);
-            }
+            checkHibernate(context);
+            bTransaction = beginTransaction(context);
 
             if (context.getDatabase() != null && !context.getDatabase().equals(getCurrentDatabase(context))) {
                 setDatabase(getSession(context), context);
@@ -1102,33 +1163,95 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Execute method for read-only operations in hibernate. spring like.
-     * 
+     *
      * @return {@link HibernateCallback#doInHibernate(Session)}
-     * @param context - used everywhere.
-     * @param bTransaction - should store to use old transaction(false) or create new (true)
-     * @param cb - callback to execute
+     * @param context the current XWikiContext
+     * @param bTransaction this argument is unused
+     * @param cb the callback to execute
      * @throws XWikiException if any error
-     * @see #execute(XWikiContext, boolean, boolean, com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback)
+     * @see #execute(XWikiContext, boolean, HibernateCallback)
+     * @deprecated since 4.0M1, use {@link #executeRead(XWikiContext, HibernateCallback)} or
+     *                          {@link #executeFailSafeRead(XWikiContext, HibernateCallback)}
      */
+    @Deprecated
     public <T> T executeRead(XWikiContext context, boolean bTransaction, HibernateCallback<T> cb) throws XWikiException
     {
-        return execute(context, bTransaction, false, cb);
+        return execute(context, false, cb);
+    }
+
+    /**
+     * Execute hibernate read-only operation in a independent session (but not closing the current one if any).
+     * Never throw any error, but there is no warranty that the operation has been completed successfully.
+     *
+     * @param context the current XWikiContext
+     * @param cb the callback to execute
+     * @return {@link HibernateCallback#doInHibernate(Session)}, returns null if the callback throw an error.
+     * @see #failSafeExecute(XWikiContext, boolean, HibernateCallback)
+     */
+    public <T> T executeFailSafeRead(XWikiContext context, HibernateCallback<T> cb)
+    {
+        return failSafeExecute(context, false, cb);
+    }
+
+    /**
+     * Execute method for read-only operations in hibernate. spring like.
+     *
+     * @param context - used everywhere.
+     * @param cb - callback to execute
+     * @return {@link HibernateCallback#doInHibernate(Session)}
+     * @throws XWikiException if any error
+     * @see #execute(XWikiContext, boolean, HibernateCallback)
+     */
+    public <T> T executeRead(XWikiContext context, HibernateCallback<T> cb) throws XWikiException
+    {
+        return execute(context, false, cb);
+    }
+
+    /**
+     * Execute method for read-write operations in hibernate. spring like.
+     *
+     * @param context the current XWikiContext
+     * @param bTransaction this argument is unused
+     * @param cb the callback to execute
+     * @return {@link HibernateCallback#doInHibernate(Session)}
+     * @throws XWikiException if any error
+     * @see #execute(XWikiContext, boolean, HibernateCallback)
+     * @deprecated since 4.0M1, use {@link #executeWrite(XWikiContext, HibernateCallback)} or
+     *                          {@link #executeFailSafeWrite(XWikiContext, HibernateCallback)}
+     */
+    @Deprecated
+    public <T> T executeWrite(XWikiContext context, boolean bTransaction, HibernateCallback<T> cb)
+        throws XWikiException
+    {
+        return execute(context, true, cb);
+    }
+
+    /**
+     * Execute hibernate read-only operation in a independent session (but not closing the current one if any).
+     * Never throw any error, but there is no warranty that the operation has been completed successfully.
+     *
+     * @param context the current XWikiContext
+     * @param cb the callback to execute
+     * @return {@link HibernateCallback#doInHibernate(Session)}
+     * @see #execute(XWikiContext, boolean, HibernateCallback)
+     */
+    public <T> T failSafeExecuteWrite(XWikiContext context, HibernateCallback<T> cb)
+    {
+        return failSafeExecute(context, true, cb);
     }
 
     /**
      * Execute method for read-write operations in hibernate. spring like.
      * 
+     * @param context the current XWikiContext
+     * @param cb the callback to execute
      * @return {@link HibernateCallback#doInHibernate(Session)}
-     * @param context - used everywhere.
-     * @param bTransaction - should store to use old transaction(false) or create new (true)
-     * @param cb - callback to execute
      * @throws XWikiException if any error
-     * @see #execute(XWikiContext, boolean, boolean, com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback)
+     * @see #execute(XWikiContext, boolean, HibernateCallback)
      */
-    public <T> T executeWrite(XWikiContext context, boolean bTransaction, HibernateCallback<T> cb)
-        throws XWikiException
+    public <T> T executeWrite(XWikiContext context, HibernateCallback<T> cb) throws XWikiException
     {
-        return execute(context, bTransaction, true, cb);
+        return execute(context, true, cb);
     }
 
     /**

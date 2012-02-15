@@ -31,7 +31,7 @@ import org.xwiki.properties.PropertyDescriptor;
 public class DefaultWikiStreamDescriptor implements WikiStreamDescriptor
 {
 
-     /**
+    /**
      * @see #getName()
      */
     private String name;
@@ -61,22 +61,22 @@ public class DefaultWikiStreamDescriptor implements WikiStreamDescriptor
      * @param description
      * @param parametersBeanDescriptor
      */
-    public DefaultWikiStreamDescriptor( String name, String description,
-        BeanDescriptor parametersBeanDescriptor)
+    public DefaultWikiStreamDescriptor(String name, String description, BeanDescriptor parametersBeanDescriptor)
     {
         super();
         this.name = name;
         this.description = description;
         this.parametersBeanDescriptor = parametersBeanDescriptor;
     }
-    
-    protected void extractParameters(){
+
+    protected void extractParameters()
+    {
         for (PropertyDescriptor propertyDescriptor : parametersBeanDescriptor.getProperties()) {
             DefaultWikiStreamParameterDescriptor desc = new DefaultWikiStreamParameterDescriptor(propertyDescriptor);
             this.parameterDescriptorMap.put(desc.getId().toLowerCase(), desc);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      * 

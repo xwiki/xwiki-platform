@@ -21,7 +21,6 @@ package org.xwiki.wikistream.descriptor;
 
 import java.util.Map;
 
-
 /**
  * Describes a wiki stream.
  * 

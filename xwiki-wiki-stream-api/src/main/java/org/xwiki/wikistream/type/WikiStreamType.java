@@ -32,11 +32,11 @@ public class WikiStreamType
     public static final WikiStreamType CONFLUENCE_XML = new WikiStreamType(WikiType.CONFLUENCE, "XML");
 
     public static final WikiStreamType XWIKI_XAR = new WikiStreamType(WikiType.XWIKI, "XAR");
-    
+
     /**
      * Generic WIKI XML Syntax
      */
-    public static final WikiStreamType WIKI_XML = new WikiStreamType(WikiType.WIKI,"XML");
+    public static final WikiStreamType WIKI_XML = new WikiStreamType(WikiType.WIKI, "XML");
 
     /**
      * Wiki type.

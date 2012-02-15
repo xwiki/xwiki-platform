@@ -24,77 +24,51 @@ import javax.inject.Singleton;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.wikistream.input.ContentHandlerParser;
-import org.xwiki.wikistream.listener.Listener;
-import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.wikistream.internal.input.xml.AbstractContentHandlerParser;
 
 /**
- * 
  * @version $Id$
  */
 @Component
 @Named("mediawiki/xml/contenthandler")
 @Singleton
-public class MediaWikiXMLContentHandlerParser extends DefaultHandler implements ContentHandlerParser
+public class MediaWikiXMLContentHandlerParser extends AbstractContentHandlerParser
 {
-    private Listener listener;
-
-
-    public WikiStreamType getType()
-    {
-        return WikiStreamType.MEDIAWIKI_XML;
-    }
-
-
-    public void setListener(Listener listener)
-    {
-        this.listener=listener;
-    }
-
-
-    public void startDocument() throws SAXException
-    {
-        // TODO Auto-generated method stub
-        System.out.println("Start document");
-    }
-
-
-    public void endDocument() throws SAXException
-    {
-        // TODO Auto-generated method stub
-        System.out.println("end document");
-    }
-
+    private StringBuffer value;
 
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException
     {
-        // TODO Auto-generated method stub
-        super.startElement(uri, localName, qName, attributes);
-        System.out.println(qName);
-        
-        if(qName.equalsIgnoreCase("page")){
-            this.listener.beginDocument(null);
+        if (this.level > 0) {
+            if (getXmlTagParameters() != null && getXmlTagParameters().containsKey(qName)) {
+                this.value=new StringBuffer();
+            }
         }
-        
-        if(qName.equalsIgnoreCase("title")){
-            this.listener.onTitle(qName);
+
+        ++this.level;
+    }
+    
+    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
+     */
+    @Override
+    public void characters(char[] ch, int start, int length) throws SAXException
+    {
+        if(this.value!=null){
+            this.value.append(ch, start, length);
         }
     }
+
 
 
     public void endElement(String uri, String localName, String qName) throws SAXException
     {
-        // TODO Auto-generated method stub
-        super.endElement(uri, localName, qName);
-        System.out.println(qName);
-        
-        if(qName.equalsIgnoreCase("page")){
-            this.listener.endDocument(null);
-        }
+        // Fill in.
+        --this.level;
     }
-
-    
 
 }

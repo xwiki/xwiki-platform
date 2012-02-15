@@ -30,7 +30,8 @@ public interface WikiStreamTypeFactory
 {
 
     /**
-     * Create a specific WikiStream type with given Id as String. (eg : "mediawiki/xml", "xwiki/xar", "wordpress/xmlrpc" .. )
+     * Create a specific WikiStream type with given Id as String. (eg : "mediawiki/xml", "xwiki/xar", "wordpress/xmlrpc"
+     * .. )
      * 
      * @param wikiStreamType Type id as String.
      * @return WikiStreamType

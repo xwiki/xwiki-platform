@@ -51,7 +51,7 @@ public abstract class AbstractOutputWikiStream<P> implements OutputWikiStream<P>
      */
     private Class< ? > parametersBeanClass;
 
-    public AbstractOutputWikiStream(String name, String description,  Class< ? > parameterBeanClass)
+    public AbstractOutputWikiStream(String name, String description, Class< ? > parameterBeanClass)
     {
         this.name = name;
         this.description = description;

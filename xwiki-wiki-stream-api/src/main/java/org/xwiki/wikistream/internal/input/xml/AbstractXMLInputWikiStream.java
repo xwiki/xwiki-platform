@@ -21,6 +21,7 @@ package org.xwiki.wikistream.internal.input.xml;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,8 +37,8 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.wikistream.input.ContentHandlerParser;
 import org.xwiki.wikistream.internal.input.AbstractInputWikiStream;
 import org.xwiki.wikistream.listener.Listener;
+
 /**
- * 
  * @version $Id$
  */
 public abstract class AbstractXMLInputWikiStream<P> extends AbstractInputWikiStream<P>
@@ -59,29 +60,33 @@ public abstract class AbstractXMLInputWikiStream<P> extends AbstractInputWikiStr
         super.initialize();
         this.parserFactory = SAXParserFactory.newInstance();
     }
-    
+
     public AbstractXMLInputWikiStream(String name, String description, Class< ? > parameterBeanClass)
     {
         super(name, description, parameterBeanClass);
         // TODO Fix the constructor
     }
-    
 
     public ContentHandlerParser createParser(Listener listener)
     {
-        ContentHandlerParser parser=null;
+        return this.createParser(listener, null);
+    }
+
+    public ContentHandlerParser createParser(Listener listener, Map<String, String> xmlTagParameters)
+    {
+        ContentHandlerParser parser = null;
         try {
-            parser = this.componentManager.lookup(ContentHandlerParser.class, getType().toIdString()+"/contenthandler");
+            parser =
+                this.componentManager.lookup(ContentHandlerParser.class, getType().toIdString() + "/contenthandler");
         } catch (ComponentLookupException e) {
-           throw new RuntimeException(
-                "Failed to create [" + getType().toString() + "] ContentHandler parser", e);
+            throw new RuntimeException("Failed to create [" + getType().toString() + "] ContentHandler parser", e);
         }
 
         parser.setListener(listener);
-
+        parser.setXmlTagParameters(null);
         return parser;
     }
-    
+
     /**
      * @param source the content to parse
      * @param listener receive event for each element
@@ -92,10 +97,23 @@ public abstract class AbstractXMLInputWikiStream<P> extends AbstractInputWikiStr
     public void parseXML(Reader source, Listener listener) throws ParserConfigurationException, SAXException,
         IOException
     {
+        this.parseXML(source, listener, null);
+    }
+
+    /**
+     * @param source the content to parse
+     * @param listener receive event for each element
+     * @throws ParserConfigurationException error when rendering
+     * @throws SAXException error when rendering
+     * @throws IOException error when rendering
+     */
+    public void parseXML(Reader source, Listener listener, Map<String, String> xmlTagParameters)
+        throws ParserConfigurationException, SAXException, IOException
+    {
         SAXParser saxParser = this.parserFactory.newSAXParser();
         XMLReader xmlReader = saxParser.getXMLReader();
 
-        ContentHandlerParser parser = createParser(listener);
+        ContentHandlerParser parser = createParser(listener, xmlTagParameters);
         xmlReader.setContentHandler(parser);
 
         xmlReader.parse(new InputSource(source));

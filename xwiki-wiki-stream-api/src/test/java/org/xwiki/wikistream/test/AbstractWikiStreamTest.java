@@ -22,7 +22,6 @@ package org.xwiki.wikistream.test;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
- * 
  * @version $Id: 5c213c4c836ba7a506c7fae073a3c2eee28e20be $
  */
 public abstract class AbstractWikiStreamTest extends AbstractComponentTestCase

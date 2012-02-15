@@ -19,6 +19,10 @@
  */
 package org.xwiki.wikistream.input.mediawiki.xml;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.properties.annotation.PropertyName;
@@ -27,109 +31,141 @@ import org.xwiki.properties.annotation.PropertyName;
  * 
  * @version $Id: 5c213c4c836ba7a506c7fae073a3c2eee28e20be $
  */
-public class MediaWikiXmlParameters
-{
-    private String srcPath;
+public class MediaWikiXmlParameters {
+	private String srcPath;
 
-    private String attachmentSrcPath;
+	private String attachmentSrcPath;
 
-    private String attachmentExcludeDirs;
+	private String attachmentExcludeDirs;
 
-    private String defaultSpace = "Main";
+	private String defaultSpace = "Main";
 
-    private String allowedImageExtensions;
+	private String allowedImageExtensions;
 
-    /**
-     * @param srcPath absolute path of the exported xml file.
-     */
-    @PropertyName("Source Path")
-    @PropertyDescription("Absolute Path to Exported XML file")
-    @PropertyMandatory
-    public void setSrcPath(String srcPath)
-    {
-        this.srcPath = srcPath;
-    }
+	private Map<String, String> xmlTagParams;
+	
+	/**
+	 * @param srcPath
+	 *            absolute path of the exported xml file.
+	 */
+	@PropertyName("Source Path")
+	@PropertyDescription("Absolute Path to Exported XML file")
+	@PropertyMandatory
+	public void setSrcPath(String srcPath) {
+		this.srcPath = srcPath;
+	}
 
-    /**
-     * @param attachmentSrcPath absolute path to MediaWiki attachments directory.
-     */
-    @PropertyName("Attachment Path")
-    @PropertyDescription("Absolute Path to MediaWiki Attachments Directory")
-    public void setAttachmentSrcPath(String attachmentSrcPath)
-    {
-        this.attachmentSrcPath = attachmentSrcPath;
-    }
+	/**
+	 * @param attachmentSrcPath
+	 *            absolute path to MediaWiki attachments directory.
+	 */
+	@PropertyName("Attachment Path")
+	@PropertyDescription("Absolute Path to MediaWiki Attachments Directory")
+	public void setAttachmentSrcPath(String attachmentSrcPath) {
+		this.attachmentSrcPath = attachmentSrcPath;
+	}
 
-    /**
-     * @param attachmentExcludeDirs the list of directories to be excluded to search for attachments in the MediaWiki
-     *            Image directory.
-     */
-    @PropertyName("Exclude Directories")
-    @PropertyDescription("Comma seperated list of all directories to be excluded to search for attachments")
-    public void setAttachmentExcludeDirs(String attachmentExcludeDirs)
-    {
-        this.attachmentExcludeDirs = attachmentExcludeDirs;
-    }
+	/**
+	 * @param attachmentExcludeDirs
+	 *            the list of directories to be excluded to search for
+	 *            attachments in the MediaWiki Image directory.
+	 */
+	@PropertyName("Exclude Directories")
+	@PropertyDescription("Comma seperated list of all directories to be excluded to search for attachments")
+	public void setAttachmentExcludeDirs(String attachmentExcludeDirs) {
+		this.attachmentExcludeDirs = attachmentExcludeDirs;
+	}
 
-    /**
-     * @return the srcPath
-     */
-    public String getSrcPath()
-    {
-        return srcPath;
-    }
+	/**
+	 * @return the srcPath
+	 */
+	public String getSrcPath() {
+		return srcPath;
+	}
 
-    /**
-     * @return the attachmentSrcPath
-     */
-    public String getAttachmentSrcPath()
-    {
-        return attachmentSrcPath;
-    }
+	/**
+	 * @return the attachmentSrcPath
+	 */
+	public String getAttachmentSrcPath() {
+		return attachmentSrcPath;
+	}
 
-    /**
-     * @return the attachmentExcludeDirs
-     */
-    public String getAttachmentExcludeDirs()
-    {
-        return attachmentExcludeDirs;
-    }
+	/**
+	 * @return the attachmentExcludeDirs
+	 */
+	public String getAttachmentExcludeDirs() {
+		return attachmentExcludeDirs;
+	}
 
-    /**
-     * @return the defaultSpace
-     */
-    public String getDefaultSpace()
-    {
-        return defaultSpace;
-    }
+	/**
+	 * @return the defaultSpace
+	 */
+	public String getDefaultSpace() {
+		return defaultSpace;
+	}
 
-    /**
-     * @param defaultSpace the defaultSpace to set
-     */
-    @PropertyName("Default Space")
-    @PropertyDescription("Default Space for importing the data.XWiki uses Main as default space")
-    public void setDefaultSpace(String defaultSpace)
-    {
-        this.defaultSpace = defaultSpace;
-    }
+	/**
+	 * @param defaultSpace
+	 *            the defaultSpace to set
+	 */
+	@PropertyName("Default Space")
+	@PropertyDescription("Default Space for importing the data.XWiki uses Main as default space")
+	public void setDefaultSpace(String defaultSpace) {
+		this.defaultSpace = defaultSpace;
+	}
 
-    /**
-     * @return the allowedImageExtensions
-     */
-    public String getAllowedImageExtensions()
-    {
-        return allowedImageExtensions;
-    }
+	/**
+	 * @return the allowedImageExtensions
+	 */
+	public String getAllowedImageExtensions() {
+		return allowedImageExtensions;
+	}
 
-    /**
-     * @param allowedImageExtensions the list of all the image formats to be considered during import
-     */
-    @PropertyName("Image Extensions")
-    @PropertyDescription("Comma seperated list of all the image formats to be considered during import")
-    public void setAllowedImageExtensions(String allowedImageExtensions)
-    {
-        this.allowedImageExtensions = allowedImageExtensions;
-    }
+	/**
+	 * @param allowedImageExtensions
+	 *            the list of all the image formats to be considered during
+	 *            import
+	 */
+	@PropertyName("Image Extensions")
+	@PropertyDescription("Comma seperated list of all the image formats to be considered during import")
+	public void setAllowedImageExtensions(String allowedImageExtensions) {
+		this.allowedImageExtensions = allowedImageExtensions;
+	}
 
+	/**
+	 * @return the xmlTagParams
+	 */
+	public Map<String, String> getXmlTagParams() {
+		if(xmlTagParams==null){
+			xmlTagParams=Collections.unmodifiableMap(getDefaultXmlTagParameters());
+		}
+		return xmlTagParams;
+	}
+
+	/**
+	 * @param xmlTagParams
+	 *            the xmlTagParams to set
+	 */
+	@PropertyName("Source XML tags to events map")
+	@PropertyDescription("Mapping of source xml tags to wiki events.")
+	public void setXmlTagParams(Map<String, String> xmlTagParams) {
+		this.xmlTagParams = xmlTagParams;
+	}
+	
+	
+	private Map<String,String> getDefaultXmlTagParameters(){
+		Map<String,String> defaultXmlTagParams=new HashMap<String, String>();
+		
+		defaultXmlTagParams.put("mediawiki", "wiki");
+		defaultXmlTagParams.put("page", "page");
+		defaultXmlTagParams.put("title", "title");
+		defaultXmlTagParams.put("revision", "revision");
+		defaultXmlTagParams.put("comment", "comment");
+		defaultXmlTagParams.put("username", "author");
+		
+		
+		
+		return defaultXmlTagParams;
+	}
 
 }

@@ -29,13 +29,13 @@ public class WikiType
     public static final WikiType MEDIAWIKI = new WikiType("mediawiki", "MediaWiki");
 
     public static final WikiType CONFLUENCE = new WikiType("confluence", "Confluence");
-    
-    public static final WikiType XWIKI=new WikiType("xwiki","XWiki");
-    
+
+    public static final WikiType XWIKI = new WikiType("xwiki", "XWiki");
+
     /**
      * Generic WIKI
      */
-    public static final WikiType WIKI=new WikiType("wiki","Wiki");
+    public static final WikiType WIKI = new WikiType("wiki", "Wiki");
 
     /**
      * Id of a Wiki

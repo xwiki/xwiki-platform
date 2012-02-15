@@ -37,11 +37,10 @@
     as a Maven2 plugin or directly from the command line.
    </description>
   <properties>
-    <platform.core.version>2.6.1</platform.core.version>
     <mavenVersion>2.0.9</mavenVersion>
   </properties>
   <dependencies>
-    <!-- maven -->
+    <!-- Maven -->
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
@@ -68,7 +67,7 @@
       <artifactId>maven-model</artifactId>
       <version>${mavenVersion}</version>
     </dependency>
-    <!-- plexus -->
+    <!-- Plexus -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-archiver</artifactId>
@@ -128,7 +127,83 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
-      <version>2.4</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- These dependencies are needed at runtime when this plugin executes. We list them here to be sure that any
+         pom.xml that uses this packager plugin is built after those deps are built -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-colibri</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tool-configuration-resources</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-web</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-skin-skinx</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-server</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-client</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webdav-server</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-server</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-gwt-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

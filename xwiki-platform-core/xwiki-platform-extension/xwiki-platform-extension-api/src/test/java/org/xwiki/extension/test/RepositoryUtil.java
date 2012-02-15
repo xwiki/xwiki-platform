@@ -28,7 +28,9 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.jmock.Mockery;
+import org.junit.rules.TemporaryFolder;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -43,15 +45,12 @@ import org.xwiki.extension.handler.ExtensionInitializer;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
-import org.xwiki.extension.repository.ExtensionRepositorySource;
 import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.test.MockConfigurationSource;
 
 public class RepositoryUtil
 {
     private static final String MAVENREPOSITORY_ID = "test-maven";
-
-    private String name = "test";
 
     private MockConfigurationSource configurationSource;
 
@@ -75,13 +74,13 @@ public class RepositoryUtil
 
     private ComponentAnnotationLoader componentLoader;
 
-    public RepositoryUtil(String name, MockConfigurationSource configurationSource, ComponentManager componentManager)
+    public RepositoryUtil(MockConfigurationSource configurationSource,
+        ComponentManager componentManager)
     {
-        this.name = name;
         this.configurationSource = configurationSource;
         this.componentManager = componentManager;
 
-        this.workingDirectory = new File("target/" + this.name + "/");
+        this.workingDirectory = new File("target/extension-repositories/" + RandomStringUtils.randomAlphabetic(10));
         this.repositoriesDirectory = new File(this.workingDirectory, "repository/");
         this.localRepositoryRoot = new File(this.repositoriesDirectory, "local/");
         this.aetherRepositoryRoot = new File(this.repositoriesDirectory, "aether/");
@@ -91,14 +90,9 @@ public class RepositoryUtil
         this.extensionPackager = new ExtensionPackager(this.workingDirectory, this.remoteRepositoryRoot);
     }
 
-    public String getName()
-    {
-        return name;
-    }
-
     public File getWorkingDirectory()
     {
-        return workingDirectory;
+        return this.workingDirectory;
     }
 
     public File getLocalRepository()
@@ -128,8 +122,6 @@ public class RepositoryUtil
 
     public void setup(Mockery mockery) throws Exception
     {
-        clean();
-
         // Mock Environment
         Environment environment = mockery.mock(Environment.class);
         DefaultComponentDescriptor<Environment> dcd = new DefaultComponentDescriptor<Environment>();
@@ -230,12 +222,5 @@ public class RepositoryUtil
         }
 
         return nb;
-    }
-
-    public void clean() throws IOException
-    {
-        if (this.workingDirectory.exists()) {
-            FileUtils.deleteDirectory(this.workingDirectory);
-        }
     }
 }

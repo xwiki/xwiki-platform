@@ -1446,4 +1446,24 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals(false, this.document.isMetaDataDirty());
     }
+
+    /**
+     * @see XWIKI-7515: 'getIncludedPages' in class com.xpn.xwiki.api.Document threw java.lang.NullPointerException
+     */
+    public void testGetIncludedPages()
+    {
+        this.document.setSyntax(Syntax.XWIKI_2_1);
+
+        this.document.setContent("no include");
+        assertTrue(this.document.getIncludedPages(getContext()).isEmpty());
+
+        this.document.setContent("bad {{include/}}");
+        assertTrue(this.document.getIncludedPages(getContext()).isEmpty());
+
+        this.document.setContent("good deprecated {{include document=\"Foo.Bar\"/}}");
+        assertEquals(Arrays.asList("Foo.Bar"), this.document.getIncludedPages(getContext()));
+
+        this.document.setContent("good {{include reference=\"One.Two\"/}}");
+        assertEquals(Arrays.asList("One.Two"), this.document.getIncludedPages(getContext()));
+    }
 }

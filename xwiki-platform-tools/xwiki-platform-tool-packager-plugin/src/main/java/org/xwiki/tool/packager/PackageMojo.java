@@ -366,7 +366,7 @@ public class PackageMojo extends AbstractMojo
         Set<Artifact> artifacts = this.project.getArtifacts();
         if (artifacts != null) {
             for (Artifact artifact : artifacts) {
-                if (artifact.getType().equals("jar") && artifact.getGroupId().equals("hsqldb")
+                if (artifact.getType().equals("jar") && artifact.getGroupId().equals("org.hsqldb")
                     && artifact.getArtifactId().equals("hsqldb"))
                 {
                     hsqldbArtifact = artifact;
@@ -377,7 +377,7 @@ public class PackageMojo extends AbstractMojo
 
         // If the HSQLDB artifact wasn't defined, try to resolve the default HSQLDB JAR artifact
         if (hsqldbArtifact == null) {
-            hsqldbArtifact = this.factory.createArtifact("hsqldb", "hsqldb", "1.8.0.7", "", "jar");
+            hsqldbArtifact = this.factory.createArtifact("org.hsqldb", "hsqldb", "2.2.8", "", "jar");
         }
 
         if (hsqldbArtifact != null) {

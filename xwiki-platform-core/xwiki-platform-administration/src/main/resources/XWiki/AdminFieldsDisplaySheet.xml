@@ -65,6 +65,11 @@
         #if ($title == $field &amp;&amp; $prop)
           #set ($title = $!prop.prettyName)
         #end
+        #if($msg.get("${obj.xWikiClass.name}_${field}") != "${obj.xWikiClass.name}_${field}")
+          #set ($title = $msg.get("${obj.xWikiClass.name}_${field}"))
+        #end
+        #set($hint = $msg.get("${obj.xWikiClass.name}_${field}.hint"))
+        #if($hint == "${obj.xWikiClass.name}_${field}.hint") #set($hint = $util.null) #end
         &lt;dt&gt;
         &lt;label #if($prop)for="${prefsClassName}_${obj.number}_${prop.name}"#end class="$field"&gt;$title
         #if($field == 'skin')
@@ -86,6 +91,7 @@
           #end
           &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'inline')"#if ($colorThemeName.indexOf('.') &lt; 0) class="hidden"#end&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
         #end
+        #if($hint)&lt;span class="xHint"&gt;$hint#end
         &lt;/label&gt;
         &lt;/dt&gt;
         #if ($prop)

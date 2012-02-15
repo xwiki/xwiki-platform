@@ -22,7 +22,6 @@ package com.xpn.xwiki.store.migration.hibernate;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -32,7 +31,6 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.logging.LoggerManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -55,10 +53,6 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 @Singleton
 public class HibernateDataMigrationManager extends AbstractDataMigrationManager
 {
-    /** LoggerManager to suspend logging during normal faulty SQL operation. */
-    @Inject
-    private LoggerManager loggerManager;
-
     /**
      * @return store system for execute store-specific actions.
      * @throws DataMigrationException if the store could not be reached
@@ -84,58 +78,35 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         final XWikiContext context = getXWikiContext();
         final XWikiHibernateBaseStore store = getStore();
 
-        final Session originalSession = store.getSession(context);
-        final Transaction originalTransaction = store.getTransaction(context);
-        store.setSession(null, context);
-        store.setTransaction(null, context);
+        // Try retrieving a version from the database
+        ver = store.executeFailSafeRead(context,
+            new HibernateCallback<XWikiDBVersion>()
+            {
+                @Override
+                public XWikiDBVersion doInHibernate(Session session) throws HibernateException
+                {
+                    // Retrieve the version from the database
+                    return (XWikiDBVersion) session.createCriteria(XWikiDBVersion.class).uniqueResult();
+                }
+            });
 
-        // Prevent JDBCExceptionReporter from logging an error for below accepted exception.
-        // We want to return a DB version what ever it happens and not log any error.
-        loggerManager.pushLogListener(null);
-        try {
-            // Try retrieving a version from the database
-            try {
-                ver = store.executeRead(context, true,
-                    new HibernateCallback<XWikiDBVersion>()
+        // if it fails, return version 0 if there is some documents in the database, else null (empty db?)
+        if (ver == null) {
+            ver = store.executeFailSafeRead(getXWikiContext(),
+                new HibernateCallback<XWikiDBVersion>()
+                {
+                    @Override
+                    public XWikiDBVersion doInHibernate(Session session) throws HibernateException
                     {
-                        @Override
-                        public XWikiDBVersion doInHibernate(Session session) throws HibernateException
+                        if (((Number) session.createCriteria(XWikiDocument.class)
+                            .setProjection(Projections.rowCount())
+                            .uniqueResult()).longValue() > 0)
                         {
-                            // Retrieve the version from the database
-                            return (XWikiDBVersion) session.createCriteria(XWikiDBVersion.class).uniqueResult();
+                            return new XWikiDBVersion(0);
                         }
-                    });
-            }
-            catch (Exception ignored) {
-                // ignore exception since missing schema will cause them
-            }
-            // if it fails, return version 0 if there is some documents in the database, else null (empty db?)
-            if (ver == null) {
-                try {
-                    ver = store.executeRead(getXWikiContext(), true,
-                        new HibernateCallback<XWikiDBVersion>()
-                        {
-                            @Override
-                            public XWikiDBVersion doInHibernate(Session session) throws HibernateException
-                            {
-                                if (((Number) session.createCriteria(XWikiDocument.class)
-                                    .setProjection(Projections.rowCount())
-                                    .uniqueResult()).longValue() > 0)
-                                {
-                                    return new XWikiDBVersion(0);
-                                }
-                                return null;
-                            }
-                        });
-                }
-                catch (Exception ignored) {
-                    // ignore exception since missing schema will cause them
-                }
-            }
-        } finally {
-            loggerManager.popLogListener();
-            store.setSession(originalSession, context);
-            store.setTransaction(originalTransaction, context);
+                        return null;
+                    }
+                });
         }
 
         return ver;

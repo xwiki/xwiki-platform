@@ -260,6 +260,7 @@
     <module>xwiki-platform-ircbot</module>
     <module>xwiki-platform-jira</module>
     <module>xwiki-platform-jodatime</module>
+    <module>xwiki-platform-ldap</module>
     <module>xwiki-platform-legacy</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livetable</module>

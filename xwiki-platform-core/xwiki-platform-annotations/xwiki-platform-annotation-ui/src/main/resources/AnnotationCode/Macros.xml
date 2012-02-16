@@ -53,7 +53,7 @@
 ##
 ##
 ## Do not display these 'internal' properties in the form:
-#set($hiddenProperties = ['selection', 'selectionLeftContext', 'selectionRightContext', 'originalSelection', 'target', 'date', 'author', 'state'])## TODO: 'color'
+#set($hiddenProperties = ['selection', 'selectionLeftContext', 'selectionRightContext', 'originalSelection', 'target', 'date', 'author', 'state', 'replyto', 'highlight'])## TODO: 'color'
 ##
 ##
 #*
@@ -161,6 +161,14 @@
     &lt;/div&gt;
     &lt;div class="annotationContent"&gt;
       #displayAnnotationBody($ann $mode)
+      #if ($mode == 'view')
+        #set($annDocReference = $services.model.createDocumentReference($docWiki, $docSpace, $docPage))
+        #set($annoDoc = $xwiki.getDocument($annDocReference))
+        #set($repliesList = $annoDoc.getObjects('XWiki.XWikiComments', 'replyto', $ann.id))
+        #if($repliesList.size() &gt; 0)
+          &lt;a href="#xwikicomment_${ann.id}"&gt;See thread&lt;/a&gt;
+        #end
+      #end
     &lt;/div&gt;
   &lt;/div&gt;
 #end
@@ -200,6 +208,14 @@
         &lt;span class="tool accept"&gt;&lt;a class="validate" href="${editURL}" title="$msg.get('annotations.action.validate.tooltip')"&gt;$msg.get('annotations.action.validate.text')&lt;/a&gt;&lt;/span&gt;
       #end
       #if ($mode != 'edit')
+        #set($annDocReference = $services.model.createDocumentReference($docWiki, $docSpace, $docPage))
+        #set($annoDoc = $xwiki.getDocument($annDocReference))
+        #set($xredirect = $!escapetool.xml($request.get('xredirect')))
+        #if("$!xredirect" == '')
+          #set($xredirect = "$annoDoc.getURL('view')?$!request.getQueryString()")
+        #end
+        ## add "comment reply" button
+        &lt;span class="tool annotationReply commenttool commentreply"&gt;&lt;a class="commentreply" href="$xredirect.replaceAll('&amp;?replyto=\d++', '')&amp;amp;replyto=${ann.id}#xwikicomment_${ann.id}" title="$msg.get('core.viewers.comments.reply')"&gt;$msg.get('core.viewers.comments.reply')&lt;/a&gt;&lt;/span&gt;      
         ## use an edit url just for the fanciness of it, it won't really be used in this case. An edit form will be loaded
         &lt;span class="tool annotationEdit"&gt;&lt;a class="edit" href="${editURL}" title="$msg.get('annotations.action.edit.tooltip')"&gt;$msg.get('annotations.action.edit.text')&lt;/a&gt;&lt;/span&gt;
       #end
@@ -236,13 +252,20 @@
   #set($properties = $annotationClass.properties)
   #if ($properties.size() == $hiddenProperties.size() + 1)
     ## Do not show property labels if there's only one property to display
-    #set($prop = $annotationClass.get('annotation'))
-    #set($discard = $fakeObj.set($prop.name, "$!{ann.get($prop.name)}"))
+    ## get the only property that is to be displayed
+    #set($onlyProperty = '')
+    #foreach($prop in $properties)
+      #if(!$listtool.contains($hiddenProperties, $prop.name))
+        #set($onlyProperty = $prop)
+        #break
+      #end
+    #end
+    #set($discard = $fakeObj.set($onlyProperty.name, "$!{ann.get($onlyProperty.name)}"))
     &lt;div class="annotationText"&gt;
       #if($mode == 'edit' || $mode == 'create')
-        $doc.displayEdit($prop, '', $fakeObj)
+        $doc.displayEdit($onlyProperty, '', $fakeObj)
       #else
-        $doc.displayView($prop, '', $fakeObj)
+        $doc.displayView($onlyProperty, '', $fakeObj)
       #end
     &lt;/div&gt;
   #else

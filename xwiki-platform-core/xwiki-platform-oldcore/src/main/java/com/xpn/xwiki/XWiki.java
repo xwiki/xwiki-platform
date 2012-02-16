@@ -3348,11 +3348,21 @@ public class XWiki implements EventListener
             return bclass;
         }
 
+        // Comments base fields.
         needsUpdate |= bclass.addTextField("author", "Author", 30);
         needsUpdate |= bclass.addTextAreaField("highlight", "Highlighted Text", 40, 2);
         needsUpdate |= bclass.addNumberField("replyto", "Reply To", 5, "integer");
         needsUpdate |= bclass.addDateField("date", "Date");
         needsUpdate |= bclass.addTextAreaField("comment", "Comment", 40, 5);
+
+        // Annotation specific fields.
+        needsUpdate |= bclass.addTextAreaField("selection", "Selection", 40, 5);
+        needsUpdate |= bclass.addTextAreaField("selectionLeftContext", "Selection Left Context", 40, 5);
+        needsUpdate |= bclass.addTextAreaField("selectionRightContext", "Selection Right Context", 40, 5);
+        needsUpdate |= bclass.addTextAreaField("originalSelection", "Original Selection", 40, 5);
+        needsUpdate |= bclass.addTextField("target", "Target", 30);
+        needsUpdate |= bclass.addTextField("state", "State", 30);
+
         needsUpdate |= setClassDocumentFields(doc, "XWiki Comment Class");
 
         if (needsUpdate) {

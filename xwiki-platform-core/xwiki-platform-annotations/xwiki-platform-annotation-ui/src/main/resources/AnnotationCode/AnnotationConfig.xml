@@ -434,13 +434,13 @@ E6XXiobSRS0opnII3NtUYrLGcq2snWE0lIjrb1v5f0WM9mBc/Mn7AAAAAElFTkSuQmCC</content></
 <activated>1</activated>
 </property>
 <property>
-<annotationClass>AnnotationCode.AnnotationClass</annotationClass>
+<annotationClass>XWiki.XWikiComments</annotationClass>
 </property>
 <property>
 <displayHighlight>1</displayHighlight>
 </property>
 <property>
-<displayed>0</displayed>
+<displayed>1</displayed>
 </property>
 <property>
 <exceptionSpaces/>

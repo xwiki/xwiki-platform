@@ -593,13 +593,83 @@ return XWiki;
 <cache></cache>
 </property>
 <property>
-<code>var XWiki = (function (XWiki) {
+<code>/**
+ * Event.simulate(@element, eventName[, options]) -&gt; Element
+ *
+ * - @element: element to fire event on
+ * - eventName: name of event to fire (only MouseEvents and HTMLEvents interfaces are supported)
+ * - options: optional object to fine-tune event properties - pointerX, pointerY, ctrlKey, etc.
+ *
+ *    $('foo').simulate('click'); // =&gt; fires "click" event on an element with id=foo
+ *
+ * Note: This is taken from https://github.com/kangax/protolicious/blob/master/event.simulate.js which
+ * has an MIT license and should be compatible with LGPL.
+ * FIXME: Find an alternative to Event.simulate. Maybe use a custom event that is triggered on click.
+ **/
+(function(){
+
+  var eventMatchers = {
+    'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
+    'MouseEvents': /^(?:click|mouse(?:down|up|over|move|out))$/
+  }
+  var defaultOptions = {
+    pointerX: 0,
+    pointerY: 0,
+    button: 0,
+    ctrlKey: false,
+    altKey: false,
+    shiftKey: false,
+    metaKey: false,
+    bubbles: true,
+    cancelable: true
+  }
+
+  Event.simulate = function(element, eventName) {
+    var options = Object.extend(defaultOptions, arguments[2] || { });
+    var oEvent, eventType = null;
+
+    element = $(element);
+
+    for (var name in eventMatchers) {
+      if (eventMatchers[name].test(eventName)) { eventType = name; break; }
+    }
+
+    if (!eventType)
+      throw new SyntaxError('Only HTMLEvents and MouseEvents interfaces are supported');
+
+    if (document.createEvent) {
+      oEvent = document.createEvent(eventType);
+      if (eventType == 'HTMLEvents') {
+        oEvent.initEvent(eventName, options.bubbles, options.cancelable);
+      }
+      else {
+        oEvent.initMouseEvent(eventName, options.bubbles, options.cancelable, document.defaultView,
+          options.button, options.pointerX, options.pointerY, options.pointerX, options.pointerY,
+          options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, options.button, element);
+      }
+      element.dispatchEvent(oEvent);
+    }
+    else {
+      options.clientX = options.pointerX;
+      options.clientY = options.pointerY;
+      oEvent = Object.extend(document.createEventObject(), options);
+      element.fireEvent('on' + eventName, oEvent);
+    }
+    return element;
+  }
+
+  Element.addMethods({ simulate: Event.simulate });
+})()
+
+/******************************************************************************************************/
+
+var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 XWiki.Annotation = Class.create({
   // the html element corresponding to the annotated content (where annotations are to be added, displayed, etc)
   annotatedElement : false,
   // tab name of the annotations tab
-  annTabname : 'Annotations',
+  annTabname : 'Comments',
   // whether current displayed doc is the rendered annotated document
   fetchedAnnotations : false,
   // whether the annotations are being displayed; synchronizes with displayAnnotationsCheckbox if that element exists
@@ -644,6 +714,8 @@ XWiki.Annotation = Class.create({
     document.observe('xwiki:docextra:loaded', this.addDeleteListenersInTab.bindAsEventListener(this));
     document.observe('xwiki:docextra:loaded', this.addEditListenersInTab.bindAsEventListener(this));
     document.observe('xwiki:docextra:loaded', this.addValidateListenersInTab.bindAsEventListener(this));
+    // whenever the comments tab is loaded, refresh the document content with annotations on it, if annotations are shown.
+    document.observe('xwiki:annotation:tab:deleted', this.refreshAnnotationsOnCommentDelete.bindAsEventListener(this));
     // register the key shortcuts for adding an annotation
     this.registerAddAnnotationShortcut();
     // register the key shortcuts for toggling annotation visibility
@@ -692,7 +764,7 @@ XWiki.Annotation = Class.create({
       annLink.update("&lt;strong&gt;$msg.get('annotations.title')&lt;/strong&gt;");
       annContainer.insert({top: annLink});
       rightMenu.insert({bottom: annContainer});
-  
+
       annLink.observe('click', this.toggleSettingsPanel.bind(this));
     }
   },
@@ -703,7 +775,7 @@ XWiki.Annotation = Class.create({
       this.displayAnnotationsCheckbox.checked = visibility;
     }
   },
-  
+
   toggleSettingsPanel : function(event) {
     var menu = event.element();
     // prevent link
@@ -804,7 +876,7 @@ XWiki.Annotation = Class.create({
   toggleAnnotationHighlight : function(annotationId, visible) {
     this.annotatedElement.select('.annotation.ID' + annotationId).invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
   },
-  
+
   /**
    * Handles the update of the current filter by re-storing the new filter in this object's state info and re-fetching 
    * the annotations.
@@ -828,7 +900,7 @@ XWiki.Annotation = Class.create({
     // TODO: request for color when it will be used by the annotation displayer and sent by the backend
     return [];
   },
-  
+
   /**
    * Returns a map of fieldName, fieldValue pairs that encode the current filter that needs to be applied to the fetched
    * and rendered annotations.
@@ -838,7 +910,7 @@ XWiki.Annotation = Class.create({
     // return the current filter stored from the last update of the filter
     return this.currentFilter;
   },
-  
+
   /**
    * Enriches the set of annotation parameters with the extra requested fields &amp; the filter. The function alters its 
    * hash parameter and returns the altered value.
@@ -862,7 +934,7 @@ XWiki.Annotation = Class.create({
     for (var i = 0; i &lt; extraFields.length; i++) {
       parametersHash.get('request_field').push(extraFields[i]);
     }
-    
+
     return parametersHash;
   },
 
@@ -915,7 +987,7 @@ XWiki.Annotation = Class.create({
       }.bind(this)
     });
   },
-  
+
   /**
    * Checks if the passed response contains a non-zero response code and, in this case, executes the failure callback 
    * of the response.
@@ -956,7 +1028,7 @@ XWiki.Annotation = Class.create({
       this.toggleAnnotations(true);
     }
   },
-  
+
   reloadTab : function(navigateToPane) {
     var annotationsPane = $( this.annTabname + 'pane');
     if (annotationsPane) {
@@ -965,7 +1037,7 @@ XWiki.Annotation = Class.create({
       annotationsPane.addClassName('empty');
       if (!annotationsPane.hasClassName('hidden')) {
         // reload
-        XWiki.displayDocExtra(this.annTabname, 'annotationsinline.vm', navigateToPane);
+        XWiki.displayDocExtra(this.annTabname, 'commentsinline.vm', navigateToPane);
       }
     }
   },
@@ -984,7 +1056,7 @@ XWiki.Annotation = Class.create({
       this.addEditListener(item, annotationId, container.up());
     }.bind(this));
   },
-  
+
   addValidateListenersInTab : function() {
     $$(".annotation a.validate").each(function(item) {
       var container = item.up('.annotation');
@@ -992,7 +1064,7 @@ XWiki.Annotation = Class.create({
       var annotationId = container.id.substring(16);
       this.addValidateListener(item, annotationId, container);
     }.bind(this));
-  },  
+  },
 
   addDeleteListener : function(item, inBubble, container) {
     item.observe('click', function(event) {
@@ -1039,7 +1111,7 @@ XWiki.Annotation = Class.create({
       }
     }.bindAsEventListener(this));
   },
-  
+
   addValidateListener : function(item, id, container, inBubble) {
     item.observe('click', function(event) {
       item.blur();
@@ -1146,7 +1218,7 @@ XWiki.Annotation = Class.create({
     // and fetch the annotations display in it
     this.fetchAndShowAnnotationDetails(id, newBubble);
   },
-  
+
   fetchAndShowAnnotationDetails : function(annotationId, container) {
     new Ajax.Request('$xwiki.getURL("AnnotationCode.DisplayForm")', {
       parameters: {
@@ -1177,7 +1249,7 @@ XWiki.Annotation = Class.create({
       }.bind(this)
     });
   },
-  
+
   displayLoadingBubble : function(top, left) {
     // create an element with the form
     var bubble = new Element('div', {'class' : 'annotation-bubble'});
@@ -1214,7 +1286,7 @@ XWiki.Annotation = Class.create({
     container.update(content);
     return true;
   },
-  
+
   /**
    * Fills the edit form in the passed container, with the content passed (which should be the edit form) and sets all 
    * listeners for the annotation with the passed id. If inBubble is true, the edit form is in a bubble, not in the 
@@ -1260,7 +1332,7 @@ XWiki.Annotation = Class.create({
         failureText : "$msg.get('annotations.action.edit.loaderror')"
       });
   },
-  
+
   /**
    * Handles the asynchronous update of annotation given by annotatinId, to the specified url, sending the specified 
    * parameters and using the passed messages. Container will pass in loading state while the async call takes place, 
@@ -1341,6 +1413,19 @@ XWiki.Annotation = Class.create({
     var editButton = container.down('a.edit');
     if (editButton) {
       this.addEditListener(editButton, annotationId, container, inBubble);
+    }
+    var replyButton = container.down('a.commentreply');
+    if (replyButton) {
+      // hack: when a click is done on this button, fire a click on the corresponding button in the comments panel
+      // FIXME: if the comments panel is not visible currently we are le screwed
+      replyButton.observe('click', function(event) {
+        replyButton.blur();
+        event.stop();
+        // locate the button in the comments taaaaab
+        var replyButtonInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' a.commentreply')[0];
+        replyButtonInTab.simulate('click');
+        return false;
+      });
     }
   },
 
@@ -1451,7 +1536,7 @@ XWiki.Annotation = Class.create({
           // display the annotation creation form
           this.fillCreateForm(this.createPanel, response.responseText);
         }.bind(this),
-   
+
         onFailure: function(response) {
           var failureReason = response.statusText;
           if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
@@ -1479,7 +1564,7 @@ XWiki.Annotation = Class.create({
     // remove the ctrl + M listeners, so that only one dialog is displayed at one moment
     this.unregisterAddAnnotationShortcut();    
   },
-  
+
   fillCreateForm : function(container, panelContent) {
     // put the content in. Safe update because an escape might have been hit
     if (!this.safeUpdate(this.createPanel, panelContent)) {
@@ -1503,7 +1588,7 @@ XWiki.Annotation = Class.create({
     }
     // and listen to the create shortcut again
     this.registerAddAnnotationShortcut();
-  }, 
+  },
 
   onAnnotationAdd : function(event) {
     // don't submit
@@ -1544,6 +1629,18 @@ XWiki.Annotation = Class.create({
         response.request.options.onFailure(response);
       }
     });
+  },
+
+  /**
+    Handles the refresh of the document content when there are modifications in the annotations tab (comments).
+   */
+  refreshAnnotationsOnCommentDelete : function(event) {
+    // if the annotations are currently visible, re-fetch the annotations and display them
+    // TODO: check what happens if annotations are fetched but hidden. Is this refreshed properly?
+    var visible = this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : false;
+    if (visible) {
+      this.fetchAnnotations(true);
+    }
   }
 });
 // End XWiki augmentation.

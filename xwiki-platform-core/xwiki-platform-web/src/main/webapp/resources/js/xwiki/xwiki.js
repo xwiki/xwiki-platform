@@ -21,9 +21,6 @@ Object.extend(XWiki, {
     /** URL Anchor separator. */
     anchorSeparator: "#",
 
-    /** URL Anchor for page annotations. */
-    docextraAnnotationsAnchor: "Annotations",
-
     /** URL Anchor for page comments. */
     docextraCommentsAnchor: "Comments",
 
@@ -1493,7 +1490,9 @@ document.observe('xwiki:dom:loaded', function() {
 /*
  * JS improvement for keeping the content menu visible on the screen when scrolling down.
  */
-document.observe("xwiki:dom:loaded", function() {
+// hacked this event to not be executed anymore
+// FIXME: Do we need to keep this? (Eduard)
+document.observe("xwiki:dom:loaded:inexistentevent", function() {
   var menu = $('contentmenu') || $('editmenu'); // Both for view and edit
   var content = $('mainContentArea') || $('mainEditArea'); // Both for view and edit
   if (menu && content) {

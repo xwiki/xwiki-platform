@@ -42,7 +42,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
   &lt;select name="space" title="$msg.get('search.page.bar.spaces.title')"&gt;
     &lt;option value="" #if($selectedSpace == '')selected="selected"#end&gt;$msg.get('search.page.bar.spaces.all')&lt;/option&gt;
     #foreach($space in $spaces)
-      #if (!$blacklistedSpaces.contains($space))
+      #if (!$blacklistedSpaces.contains($space) &amp;&amp; $xwiki.hasAccessLevel('view', "${space}.DocumentReservedForInternalXWikiUsage${mathtool.random(0, 999)}"))
         #spaceoption($space $selectedSpace)
       #end
     #end

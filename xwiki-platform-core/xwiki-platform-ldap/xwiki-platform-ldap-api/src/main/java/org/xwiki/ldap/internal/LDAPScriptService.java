@@ -33,7 +33,7 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  */
 @Component("ldap")
-public class LdapScriptService implements ScriptService
+public class LDAPScriptService implements ScriptService
 {
 
     /**
@@ -46,7 +46,7 @@ public class LdapScriptService implements ScriptService
      * @return {@code true} if the currently configured authentication class extends or is an instance of
      *         {@link com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl}. Returns {@code false} otherwise.
      */
-    public boolean isLdapAuthenticationEnabled()
+    public boolean isXWikiLDAPAuthenticator()
     {
         return com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl.class.isAssignableFrom(
             getXWikiContext().getWiki().getAuthService().getClass());

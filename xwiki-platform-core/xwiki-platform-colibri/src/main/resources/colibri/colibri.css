@@ -1373,6 +1373,9 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .xform select, .xform textarea {
   width: 99%;
 }
+.xform textarea {
+  resize: vertical;
+}
 
 .xform dt {
   margin-top: 1.2em;

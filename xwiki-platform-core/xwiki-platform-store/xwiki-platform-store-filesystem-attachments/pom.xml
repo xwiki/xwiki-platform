@@ -93,6 +93,13 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- Used for getting the persistent storage directory in FilesystemStoreTools. -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-environment-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
 
     <!-- Testing Dependencies -->
 

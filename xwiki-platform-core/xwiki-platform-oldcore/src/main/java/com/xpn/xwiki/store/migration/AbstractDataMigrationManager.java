@@ -544,7 +544,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                         (migration.isForced ? " (forced)" : "")});
                 }
             } else {
-                logger.info("No storage migration required since current version is [{}]", curversion.toString());
+                logger.info("No storage migration required since current version is [{}]", curversion);
             }
         }
 

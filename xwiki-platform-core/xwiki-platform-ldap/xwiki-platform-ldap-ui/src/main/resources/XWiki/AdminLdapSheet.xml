@@ -164,9 +164,7 @@
 <className>XWiki.ConfigurableClass</className>
 <guid>f78447aa-c069-4be9-b1e2-62d083f7bd8a</guid>
 <property>
-<codeToExecute>{{include document="XWiki.AdminLdapSheet" /}}
-
-{{include document="XWiki.AdminLdapSyncSheet" /}}</codeToExecute>
+<codeToExecute>{{include document="XWiki.AdminLdapSheet" /}}</codeToExecute>
 </property>
 <property>
 <configurationClass></configurationClass>
@@ -190,7 +188,444 @@
 <propertiesToShow/>
 </property>
 </object>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.AdminLdapSheet</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>b6d4b62c-2ee9-40ed-ba15-60ee3f85e5e8</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>var XWiki = function(XWiki) {
+
+  // Get a hold on the widgets namespace.
+  var widgets = XWiki.widgets = XWiki.widgets || {};
+
+  /**
+   * A properties editor widget that can replace textareas with key/value input properties.
+   */
+  widgets.PropertiesEditor = Class.create({
+
+    options: {
+        separator: "|"
+      , mapsToString: " \u2192 "
+      , newEntryMessage: "New entry"
+    },
+
+    /**
+     * @param {String | NSIDomElement} input the input element selector or element that this properties editor will replace.
+     * @param {Object options} this selector options. Optional. See the default options above.
+     */
+    initialize:function(input, options) {
+      this.input = $(input);
+      this.options = Object.extend(Object.clone(this.options), options || {});
+
+      (this.input.up("dd") || this.input).addClassName("hidden");
+      this.inputContainer = (this.input.up("dd") || this.input).up();
+      this.value = this.input.tagName.toLowerCase() === "textarea" ? this.input.innerHTML : $F(this.input);
+      this.id = Math.random() * Math.pow(10, 17);
+      this.properties = [];
+      (this.input.up("dd") || this.input).insert({'after':
+        new Element("span", {
+          'class' : 'new-entry'
+        }).update(this.options.newEntryMessage).observe("click", this.onNewEntry.bindAsEventListener(this))
+      });
+      (this.input.up("dd") || this.input).insert({'after': this.createPropertyEntry("", "") });
+      this.initializeAndDisplayExistingProperties();
+
+    },
+
+    /**
+     * Callback when the new entry button has been clicked.
+     *
+     * @param {Event} the original click event leading to this callback
+     */
+    onNewEntry: function(event) {
+      (this.inputContainer.select("." + this.id).last() || this.input.up("dd") || this.input).insert({
+        'after' : this.createPropertyEntry("", "")
+      })
+    },
+
+    /**
+     * Initializes a collection of existing properties based on the original input value, and displays them as a pair of two input elements.
+     */
+    initializeAndDisplayExistingProperties: function() {
+      var props = this.value == "" ? [] : this.value.split(this.options.separator);
+      for (var i=0;i&lt;props.length;i++) {
+        var key = props[i].split("=")[0],
+            value = props[i].split("=")[1] || "";
+        this.properties.push( [key, value] );
+      }
+      for (var i=this.properties.length-1;i&gt;=0;i--) {
+        (this.input.up("dd") || this.input).insert({'after': this.createPropertyEntry(this.properties[i][0], this.properties[i][1]) });
+      }
+    },
+
+    /**
+     * Creates and returns the DOM fragment for an property entry for this widget
+     */
+    createPropertyEntry: function(key, value) {
+      return new Element(this.input.up("dd") ? "dd" : "div", {'class' : "property " + this.id})
+                    .insert(new Element("input", {
+                        'type':'text'
+                      , 'class' : 'key'
+                      , 'value' : key
+                      , 'style' : 'width:45%'
+                    }).observe("change", this.updateValue.bind(this)))
+                    .insert(this.options.mapsToString)
+                    .insert(new Element("input", {
+                        'type':'text'
+                      , 'class' : 'value'
+                      , 'value' : value
+                      , 'style' : 'width:45%'
+                    }).observe("change", this.updateValue.bind(this)))
+                    .insert(new Element("span", {
+                      'class':'remove'
+                    }).observe("click", this.onRemoveProperty.bindAsEventListener(this)))
+
+    },
+
+    /**
+     * Callback when user removed a property entry.
+     *
+     * @param {Event} the original click event that led to this callback
+     */
+    onRemoveProperty: function(event) {
+      event.element().up("dd").remove();
+      this.updateValue();
+    },
+
+    /**
+     * Computes the new value for the original underlaying input element (textarea or input text), and updates its value with the result.
+     */
+    updateValue: function() {
+      var value = this.inputContainer.select("." + this.id + " .key[value!='']").collect(function(key){
+        return key.value + "=" + key.next("input").value;
+      }).join(this.options.separator);
+
+      if (this.input.tagName.toLowerCase() === "textarea") {
+        this.input.innerHTML = value;
+      }
+      else {
+        this.input.value = value
+      }
+    }
+  })
+
+  return XWiki;
+
+}(XWiki || {})
+
+document.observe("xwiki:dom:loaded", function(){
+
+  if (browser.isIE6x) {
+    return;
+    // So what ?
+  }
+
+  (function(){
+    $('mainContentArea').select("textarea.properties-editor", "input.properties-editor").each(function(elem){
+      new XWiki.widgets.PropertiesEditor(elem);
+    });
+    // We are defering this to let observers of dom:loaded or xwiki:dom:loaded play with the DOM before deciding which fields
+    // should be augmented. Typically, JS observers could add or remove the properties-editor class name based on some conditions of their own.
+  }).defer();
+
+});</code>
+</property>
+<property>
+<name>Property editor</name>
+</property>
+<property>
+<parse>0</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.AdminLdapSheet</name>
+<number>1</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>78f08751-a251-47cc-a8f9-a37c307d6e76</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>document.observe("dom:loaded", function(){
+
+  $('XWiki.XWikiPreferences_0_ldap_group_mapping','XWiki.XWikiPreferences_0_ldap_fields_mapping').invoke("addClassName", "properties-editor");
+
+});</code>
+</property>
+<property>
+<name></name>
+</property>
+<property>
+<parse></parse>
+</property>
+<property>
+<use>currentPage</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.AdminLdapSheet</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>d00f9e74-d22b-4236-8504-2addd7b49d7f</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>label .xHint {
+  /* We can't keep colibri's default uppercase for hints, there are in the LDAP configuration UI some hints which case is meaningful.
+     For example "cn" should not be displayed/interpreted as "CN".
+   */
+  text-transform: none !important;
+}
+
+dd.property span.remove {
+  display: inline-block;
+  min-height: 30px;
+  min-width: 20px;
+  background:url($xwiki.getSkinFile('icons/silk/cross.png')) no-repeat scroll 4px 15px transparent;
+  cursor:pointer;
+}
+
+span.new-entry {
+  font-size: 0.8em;
+  background:url($xwiki.getSkinFile('icons/silk/add.png')) no-repeat scroll 0 0 transparent;
+  padding-left:20px;
+  display:inline-block;
+  line-height:20px;
+  min-height:20px;
+  margin-top:5px;
+  cursor:pointer;
+}
+
+</code></property><property><name></name></property><property><parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
 <content>{{velocity output="false"}}
+$xwiki.jsx.use('XWiki.AdminLdapSheet')
+$xwiki.ssx.use('XWiki.AdminLdapSheet')
 #set($legend = ['ldap'])
 #set($params = $util.hashMap)
 #set($params.ldap = ['ldap', 'ldap_server', 'ldap_port', 'ldap_bind_DN','ldap_bind_pass', 'ldap_user_group', 'ldap_exclude_group', 'ldap_base_DN', 'ldap_UID_attr', 'ldap_trylocal','ldap_update_user', 'ldap_fields_mapping','ldap_group_mapping', 'ldap_groupcache_expiration', 'ldap_mode_group_sync'])

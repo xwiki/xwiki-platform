@@ -279,7 +279,7 @@
   widgets.PropertiesEditor = Class.create({
 
     options: {
-        separator: "|"
+        separator: ","
       , mapsToString: " \u2192 "
       , newEntryMessage: "New entry"
     },
@@ -294,15 +294,15 @@
 
       (this.input.up("dd") || this.input).addClassName("hidden");
       this.inputContainer = (this.input.up("dd") || this.input).up();
-      this.value = this.input.tagName.toLowerCase() === "textarea" ? this.input.innerHTML : $F(this.input);
+      this.value = $F(this.input);
       this.id = Math.random() * Math.pow(10, 17);
-      this.properties = [];
       (this.input.up("dd") || this.input).insert({'after':
         new Element("span", {
           'class' : 'new-entry'
         }).update(this.options.newEntryMessage).observe("click", this.onNewEntry.bindAsEventListener(this))
       });
       (this.input.up("dd") || this.input).insert({'after': this.createPropertyEntry("", "") });
+      this.properties = [];
       this.initializeAndDisplayExistingProperties();
 
     },
@@ -324,8 +324,8 @@
     initializeAndDisplayExistingProperties: function() {
       var props = this.value == "" ? [] : this.value.split(this.options.separator);
       for (var i=0;i&lt;props.length;i++) {
-        var key = props[i].split("=")[0],
-            value = props[i].split("=")[1] || "";
+        var key = props[i].substring(0, props[i].lastIndexOf("=")),
+            value = props[i].substring(props[i].lastIndexOf("=") + 1) || "";
         this.properties.push( [key, value] );
       }
       for (var i=this.properties.length-1;i&gt;=0;i--) {
@@ -337,24 +337,34 @@
      * Creates and returns the DOM fragment for an property entry for this widget
      */
     createPropertyEntry: function(key, value) {
-      return new Element(this.input.up("dd") ? "dd" : "div", {'class' : "property " + this.id})
+      var result = new Element(this.input.up("dd") ? "dd" : "div", {'class' : "property " + this.id})
                     .insert(new Element("input", {
-                        'type':'text'
+                        'type'  : 'text'
                       , 'class' : 'key'
-                      , 'value' : key
+                      , 'value' : key || this.input.getAttribute("data-key-tip") || ''
                       , 'style' : 'width:45%'
                     }).observe("change", this.updateValue.bind(this)))
                     .insert(this.options.mapsToString)
                     .insert(new Element("input", {
-                        'type':'text'
+                        'type'  : 'text'
                       , 'class' : 'value'
-                      , 'value' : value
+                      , 'value' : value || this.input.getAttribute("data-value-tip") || ''
                       , 'style' : 'width:45%'
                     }).observe("change", this.updateValue.bind(this)))
                     .insert(new Element("span", {
                       'class':'remove'
-                    }).observe("click", this.onRemoveProperty.bindAsEventListener(this)))
+                    }).observe("click", this.onRemoveProperty.bindAsEventListener(this)));
 
+      // If there are tips defined for the key and/or the value, hook their input the "withTip" behavior
+      if (key === "" &amp;&amp; this.input.getAttribute("data-key-tip")) {
+        result.down("input.key").value = this.input.getAttribute("data-key-tip");
+        document.fire("xwiki:addBehavior:withTip", {'element' : result.down("input.key").addClassName("withTip")});
+      }
+      if (value === "" &amp;&amp; this.input.getAttribute("data-value-tip")) {
+        result.down("input.value").value = this.input.getAttribute("data-value-tip");
+        document.fire("xwiki:addBehavior:withTip", {'element' : result.down("input.value").addClassName("withTip")});
+      }
+      return result;
     },
 
     /**
@@ -397,7 +407,11 @@ document.observe("xwiki:dom:loaded", function(){
 
   (function(){
     $('mainContentArea').select("textarea.properties-editor", "input.properties-editor").each(function(elem){
-      new XWiki.widgets.PropertiesEditor(elem);
+      var options = {};
+      if (elem.getAttribute("data-separator")) {
+        options.separator = elem.getAttribute("data-separator")
+      }
+      new XWiki.widgets.PropertiesEditor(elem, options);
     });
     // We are defering this to let observers of dom:loaded or xwiki:dom:loaded play with the DOM before deciding which fields
     // should be augmented. Typically, JS observers could add or remove the properties-editor class name based on some conditions of their own.
@@ -496,8 +510,17 @@ document.observe("xwiki:dom:loaded", function(){
 </property>
 <property>
 <code>document.observe("dom:loaded", function(){
+   var groupMapping = $('XWiki.XWikiPreferences_0_ldap_group_mapping'),
+       fieldMapping = $('XWiki.XWikiPreferences_0_ldap_fields_mapping');
 
-  $('XWiki.XWikiPreferences_0_ldap_group_mapping','XWiki.XWikiPreferences_0_ldap_fields_mapping').invoke("addClassName", "properties-editor");
+  groupMapping.setAttribute("data-key-tip", "${escapetool.javascript($msg.get('platform.ldap.ldapGroupTip'))}")
+  groupMapping.setAttribute("data-value-tip", "${escapetool.javascript($msg.get('platform.ldap.xwikiGroupTip'))}")
+  groupMapping.setAttribute("data-separator", "|")
+  groupMapping.addClassName("properties-editor");
+
+  fieldMapping.setAttribute("data-key-tip", "${escapetool.javascript($msg.get('platform.ldap.xwikiUserField'))}")
+  fieldMapping.setAttribute("data-value-tip", "${escapetool.javascript($msg.get('platform.ldap.ldapUserField'))}")
+  fieldMapping.addClassName("properties-editor");
 
 });</code>
 </property>
@@ -505,7 +528,7 @@ document.observe("xwiki:dom:loaded", function(){
 <name></name>
 </property>
 <property>
-<parse></parse>
+<parse>1</parse>
 </property>
 <property>
 <use>currentPage</use>

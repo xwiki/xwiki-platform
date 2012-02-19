@@ -324,8 +324,8 @@
     initializeAndDisplayExistingProperties: function() {
       var props = this.value == "" ? [] : this.value.split(this.options.separator);
       for (var i=0;i&lt;props.length;i++) {
-        var key = props[i].substring(0, props[i].lastIndexOf("=")),
-            value = props[i].substring(props[i].lastIndexOf("=") + 1) || "";
+        var key = props[i].substring(0, props[i].indexOf("=")),
+            value = props[i].substring(props[i].indexOf("=") + 1) || "";
         this.properties.push( [key, value] );
       }
       for (var i=this.properties.length-1;i&gt;=0;i--) {
@@ -337,23 +337,28 @@
      * Creates and returns the DOM fragment for an property entry for this widget
      */
     createPropertyEntry: function(key, value) {
-      var result = new Element(this.input.up("dd") ? "dd" : "div", {'class' : "property " + this.id})
-                    .insert(new Element("input", {
+      var keyInput = new Element("input", {
                         'type'  : 'text'
                       , 'class' : 'key'
-                      , 'value' : key || this.input.getAttribute("data-key-tip") || ''
+                      , 'value' : this.input.getAttribute("data-key-tip") || ''
                       , 'style' : 'width:45%'
-                    }).observe("change", this.updateValue.bind(this)))
-                    .insert(this.options.mapsToString)
-                    .insert(new Element("input", {
+                    })
+        , valueInput = new Element("input", {
                         'type'  : 'text'
                       , 'class' : 'value'
-                      , 'value' : value || this.input.getAttribute("data-value-tip") || ''
+                      , 'value' : this.input.getAttribute("data-value-tip") || ''
                       , 'style' : 'width:45%'
-                    }).observe("change", this.updateValue.bind(this)))
+                    })
+        , result = new Element(this.input.up("dd") ? "dd" : "div", {'class' : "property " + this.id})
+                    .insert(keyInput).observe("change", this.updateValue.bind(this))
+                    .insert(this.options.mapsToString)
+                    .insert(valueInput).observe("change", this.updateValue.bind(this))
                     .insert(new Element("span", {
                       'class':'remove'
                     }).observe("click", this.onRemoveProperty.bindAsEventListener(this)));
+
+      keyInput.value = key || this.input.getAttribute("data-key-tip") || '';
+      valueInput.value = value || this.input.getAttribute("data-value-tip") || '';
 
       // If there are tips defined for the key and/or the value, hook their input the "withTip" behavior
       if (key === "" &amp;&amp; this.input.getAttribute("data-key-tip")) {
@@ -382,6 +387,9 @@
      */
     updateValue: function() {
       var value = this.inputContainer.select("." + this.id + " .key[value!='']").collect(function(key){
+        if (key.value == key.defaultValue) {
+          return ""
+        }
         return key.value + "=" + key.next("input").value;
       }).join(this.options.separator);
 
@@ -513,8 +521,8 @@ document.observe("xwiki:dom:loaded", function(){
    var groupMapping = $('XWiki.XWikiPreferences_0_ldap_group_mapping'),
        fieldMapping = $('XWiki.XWikiPreferences_0_ldap_fields_mapping');
 
-  groupMapping.setAttribute("data-key-tip", "${escapetool.javascript($msg.get('platform.ldap.ldapGroupTip'))}")
-  groupMapping.setAttribute("data-value-tip", "${escapetool.javascript($msg.get('platform.ldap.xwikiGroupTip'))}")
+  groupMapping.setAttribute("data-key-tip", "${escapetool.javascript($msg.get('platform.ldap.xwikiGroupTip'))}")
+  groupMapping.setAttribute("data-value-tip", "${escapetool.javascript($msg.get('platform.ldap.ldapGroupTip'))}")
   groupMapping.setAttribute("data-separator", "|")
   groupMapping.addClassName("properties-editor");
 

@@ -267,6 +267,9 @@ XWiki.StaticListEditor = Class.create({
       visitor({key: item.key, value: item.down().firstChild.nodeValue});
     });
   },
+  size: function() {
+    return this.container.down('ul').childElements().length;
+  },
   _getItem : function(key) {
     var items = this.container.select('li');
     for(var i = 0; i &lt; items.length; i++) {

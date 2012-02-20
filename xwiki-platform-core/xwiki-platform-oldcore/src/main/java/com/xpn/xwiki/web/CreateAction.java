@@ -446,6 +446,9 @@ public class CreateAction extends XWikiAction
             if (title != null) {
                 newDocument.setTitle(title);
             }
+            DocumentReference currentUserReference = context.getUserReference();
+            newDocument.setAuthorReference(currentUserReference);
+            newDocument.setCreatorReference(currentUserReference);
 
             xwiki.saveDocument(newDocument, context);
             editMode = newDocument.getDefaultEditMode(context);

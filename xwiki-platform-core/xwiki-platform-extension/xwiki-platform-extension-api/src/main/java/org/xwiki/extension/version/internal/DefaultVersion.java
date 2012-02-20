@@ -31,6 +31,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.extension.version.Version;
 
 /**
@@ -50,6 +52,12 @@ public class DefaultVersion implements Version
      * Serialization identifier.
      */
     private static final long serialVersionUID = 1L;
+
+    private static final String MAX_INTEGER_STRING = String.valueOf(Integer.MAX_VALUE);
+
+    private static final int MAX_INTEGER_LENGTH = MAX_INTEGER_STRING.length();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultVersion.class);
 
     /**
      * The original version string representation.
@@ -250,6 +258,18 @@ public class DefaultVersion implements Version
          */
         private Type versionType = Type.STABLE;
 
+        private boolean isInteger(String number)
+        {
+            return number.length() < MAX_INTEGER_LENGTH
+                || (number.length() == MAX_INTEGER_LENGTH && MAX_INTEGER_STRING.compareTo(number) >= 0);
+        }
+
+        public Element(String token)
+        {
+            this.elementType = ElementType.STRING;
+            this.value = token;
+        }
+
         /**
          * @param tokenizer the token from which to create the version element
          */
@@ -257,11 +277,16 @@ public class DefaultVersion implements Version
         {
             String token = tokenizer.getToken();
             if (tokenizer.isNumber()) {
-                try {
-                    this.elementType = ElementType.INT;
-                    this.value = Integer.valueOf(token);
-                } catch (NumberFormatException e) {
-                    throw new IllegalStateException(e);
+                if (isInteger(token)) {
+                    try {
+                        this.elementType = ElementType.INT;
+                        this.value = Integer.valueOf(token);
+                    } catch (NumberFormatException e) {
+                        throw new IllegalStateException(e);
+                    }
+                } else {
+                    this.elementType = ElementType.STRING;
+                    this.value = token;
                 }
             } else {
                 String lowerCaseToken = token.toLowerCase(Locale.ENGLISH);
@@ -403,15 +428,21 @@ public class DefaultVersion implements Version
     {
         this.elements = new ArrayList<Element>();
 
-        for (Tokenizer tokenizer = new Tokenizer(this.rawVersion); tokenizer.next();) {
-            Element element = new Element(tokenizer);
-            this.elements.add(element);
-            if (element.getVersionType() != Type.STABLE) {
-                this.type = element.getVersionType();
+        try {
+            for (Tokenizer tokenizer = new Tokenizer(this.rawVersion); tokenizer.next();) {
+                Element element = new Element(tokenizer);
+                this.elements.add(element);
+                if (element.getVersionType() != Type.STABLE) {
+                    this.type = element.getVersionType();
+                }
             }
-        }
 
-        trimPadding(this.elements);
+            trimPadding(this.elements);
+        } catch (Exception e) {
+            // Make sure to never fail no matter what
+            LOGGER.error("Failed to parse version [" + this.rawVersion + "]", e);
+            this.elements.add(new Element(this.rawVersion));
+        }
     }
 
     /**

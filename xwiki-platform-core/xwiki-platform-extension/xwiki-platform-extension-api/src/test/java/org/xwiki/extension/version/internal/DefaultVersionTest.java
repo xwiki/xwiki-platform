@@ -73,4 +73,10 @@ public class DefaultVersionTest
         validateSerialize(new DefaultVersion("1.1"));
         validateSerialize(new DefaultVersion("1.1-milestone-1"));
     }
+
+    @Test
+    public void testBigInteger()
+    {
+        new DefaultVersion("1.2147483648").getType();
+    }
 }

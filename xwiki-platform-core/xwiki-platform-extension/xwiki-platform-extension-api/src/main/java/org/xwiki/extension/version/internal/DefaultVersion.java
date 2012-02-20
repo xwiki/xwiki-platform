@@ -190,17 +190,14 @@ public class DefaultVersion implements Version
     /**
      * A peace of the version.
      * 
-     * @version $Id$known version element kind ";
-
+     * @version $Id$
+     */
+    static final class Element implements Comparable<Element>
+    {
         /**
-         * The kind of element.
-         * 
-         *  String ERROR_UNKNOWNKIND = "Unknown version element kind ";
-
-        /**
-         * The kind of element.
-         * 
-         *  String ERROR_UNKNOWNKIND = "Unknown version element kind ";
+         * Message used in the exception produced when one of the {@link ElementType} is unknown.
+         */
+        private static final String ERROR_UNKNOWNKIND = "Unknown version element kind ";
 
         /**
          * The kind of element.

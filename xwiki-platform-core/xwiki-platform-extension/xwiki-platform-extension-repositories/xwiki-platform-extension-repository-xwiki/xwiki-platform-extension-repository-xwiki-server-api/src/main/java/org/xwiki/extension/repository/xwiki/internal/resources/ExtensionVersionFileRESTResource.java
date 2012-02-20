@@ -20,11 +20,10 @@
 package org.xwiki.extension.repository.xwiki.internal.resources;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
+import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -37,6 +36,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.ProxySelectorRoutePlanner;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.params.CoreProtocolPNames;
 import org.restlet.data.Disposition;
 import org.restlet.data.MediaType;
 import org.restlet.representation.InputRepresentation;
@@ -138,20 +144,34 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
             // It's an URL
             URL url = new URL(resourceReference.getReference());
 
-            URLConnection connection = url.openConnection();
+            DefaultHttpClient httpClient = new DefaultHttpClient();
 
-            if (connection instanceof HttpURLConnection) {
-                HttpURLConnection httpConnection = (HttpURLConnection) connection;
-                response = Response.status(httpConnection.getResponseCode());
-            } else {
-                response = Response.ok();
+            httpClient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, "XWikiExtensionRepository");
+            httpClient.getParams().setIntParameter(CoreConnectionPNames.SO_TIMEOUT, 60000);
+            httpClient.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 10000);
+
+            ProxySelectorRoutePlanner routePlanner =
+                new ProxySelectorRoutePlanner(httpClient.getConnectionManager().getSchemeRegistry(),
+                    ProxySelector.getDefault());
+            httpClient.setRoutePlanner(routePlanner);
+
+            HttpGet getMethod = new HttpGet(url.toString());
+
+            HttpResponse subResponse;
+            try {
+                subResponse = httpClient.execute(getMethod);
+            } catch (Exception e) {
+                throw new IOException("Failed to request [" + getMethod.getURI() + "]", e);
             }
+
+            response = Response.status(subResponse.getStatusLine().getStatusCode());
 
             // TODO: find a proper way to do a perfect proxy of the URL without directly using Restlet classes.
             // Should probably use javax.ws.rs.ext.MessageBodyWriter
+            HttpEntity entity = subResponse.getEntity();
             InputRepresentation content =
-                new InputRepresentation(connection.getInputStream(), new MediaType(connection.getContentType()),
-                    connection.getContentLength());
+                new InputRepresentation(entity.getContent(), new MediaType(entity.getContentType().getValue()),
+                    entity.getContentLength());
 
             String type = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
 

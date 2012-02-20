@@ -58,7 +58,7 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
     /**
      * The default user agent.
      */
-    private static final String DEFAULT_USERAGENT = "Extension Manager";
+    private static final String DEFAULT_USERAGENT = "XWikiExtensionManager";
 
     /**
      * The logger to log.

@@ -1367,7 +1367,51 @@ return XWiki;
 <use>onDemand</use>
 </property>
 </object>
-<content>{{velocity output="false"}}
+<content>{{groovy}}
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.api.Object;
+import com.xpn.xwiki.api.PropertyClass;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+
+/**
+ * Used to preview class fields that have a custom display associated, before they are actually added/saved to the
+ * class. For instance, when the user drags a Date field from the palette to the field canvas the class editor needs to
+ * display that Date field as if the user would be editing an object with this Date field in "Inline form" edit mode.
+ * This means that if the Date field has a custom display, the custom display should be used (e.g. using a Date picker).
+ */
+class PropertyCustomDisplayer
+{
+    private XWikiContext context;
+
+    public PropertyCustomDisplayer(Context context)
+    {
+        this.context = context.getContext();
+    }
+
+    public String display(PropertyClass property, String prefix, com.xpn.xwiki.api.Object object)
+    {
+        HashMap&lt;String, Object&gt; backup = new HashMap&lt;String, Object&gt;();
+        try {
+            XWikiDocument.backupContext(backup, this.context);
+            return this.displayInternal(property.getPropertyClass(), prefix, object.getXWikiObject());
+        } finally {
+            XWikiDocument.restoreContext(backup, this.context);
+        }
+    }
+
+    private String displayInternal(com.xpn.xwiki.objects.classes.PropertyClass property, String prefix, BaseObject object)
+    {
+        StringBuffer result = new StringBuffer();
+        property.displayCustom(result, property.getName(), prefix, "edit", object, this.context);
+        return result.toString();
+    }
+}
+xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
+{{/groovy}}
+
+{{velocity output="false"}}
 #**
  * Displays the field palette.
  *#
@@ -1538,10 +1582,24 @@ return XWiki;
 #macro(displayFieldProperty $property $prefix $field)
   #set($displayFormType = $property.getProperty('displayFormType'))
   #if($property.type.indexOf('Boolean') != -1 &amp;&amp; (!$displayFormType || $displayFormType.value == 'checkbox'))
-    ; {{html clean="false"}}&lt;label for="$!{prefix}$property.name"&gt;$doc.displayEdit($property, $prefix, $field)$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}
+    ; {{html clean="false"}}&lt;label for="$!{prefix}$property.name"&gt;#displayPropertyEditInput($property, $prefix, $field)$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}
   #else
     ; {{html}}&lt;label for="${prefix}$property.name"&gt;$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}
-    : {{html clean="false"}}$doc.displayEdit($property, $prefix, $field){{/html}}
+    : {{html clean="false"}}#displayPropertyEditInput($property, $prefix, $field){{/html}}
+  #end
+#end
+
+#**
+ * Displays the input used to edit the specified property of the given object. The given object can be either an
+ * instance of an XWiki class or a class field. In the first case the property represents an object field and in the
+ * second case the property represents a field meta property.
+ *#
+#macro(displayPropertyEditInput $property $prefix $object)
+  #set($wrappedProperty = $property.propertyClass)
+  #if("$!wrappedProperty.customDisplay" != '')
+    $xcontext.get('propertyCustomDisplayer').display($property, $prefix, $object)
+  #else
+    $doc.displayEdit($property, $prefix, $object)
   #end
 #end
 
@@ -1614,7 +1672,7 @@ return XWiki;
   ##
   ## Display the field.
   #set($field = $doc.getxWikiClass().get($fieldName))
-  {{html clean="false"}}$doc.displayEdit($field, "${doc.fullName}_0_", $object){{/html}}
+  {{html clean="false"}}#displayPropertyEditInput($field, "${doc.fullName}_0_", $object){{/html}}
 #end
 
 #**

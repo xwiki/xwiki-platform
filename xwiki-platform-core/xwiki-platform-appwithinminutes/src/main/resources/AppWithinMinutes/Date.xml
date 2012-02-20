@@ -1399,19 +1399,21 @@ function init() {
   // This is needed in case this script is loaded asynchronously.
   var fields = $('fields');
   if (fields) {
+    // Class editor.
     fields.childElements().each(function(item) {
       var field = new XWiki.FormField(item);
       if (field.getConfig()) {
         maybeEnhanceField(field);
       }
     });
-  }
-
-  var inlineForm = $('inline');
-  if (inlineForm) {
-    inlineForm.select('input.datetime').each(function(dateTimeInput) {
-      new XWiki.DateTimePicker(dateTimeInput, dateTimeInput.title);
-    });
+  } else {
+    var inlineForm = $('inline');
+    if (inlineForm) {
+      // Inline form edit mode.
+      inlineForm.select('input.datetime').each(function(dateTimeInput) {
+        new XWiki.DateTimePicker(dateTimeInput, dateTimeInput.title);
+      });
+    }
   }
 
   return true;

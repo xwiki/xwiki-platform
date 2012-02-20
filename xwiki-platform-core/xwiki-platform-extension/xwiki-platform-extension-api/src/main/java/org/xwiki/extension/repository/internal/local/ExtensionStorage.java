@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -112,28 +111,29 @@ public class ExtensionStorage
         // Load local extension from repository
 
         if (this.rootFolder.exists()) {
-            FilenameFilter descriptorFilter = new FilenameFilter()
-            {
-                @Override
-                public boolean accept(File dir, String name)
-                {
-                    return name.endsWith(DESCRIPTOR_SUFFIX);
-                }
-            };
-
-            for (File child : this.rootFolder.listFiles(descriptorFilter)) {
-                if (!child.isDirectory()) {
-                    try {
-                        DefaultLocalExtension localExtension = loadDescriptor(child);
-
-                        repository.addLocalExtension(localExtension);
-                    } catch (Exception e) {
-                        LOGGER.warn("Failed to load extension from file [" + child + "] in local repository", e);
-                    }
-                }
-            }
+            loadExtensions(this.rootFolder);
         } else {
             this.rootFolder.mkdirs();
+        }
+    }
+
+    /**
+     * @param folder the folder from where to load the extension
+     */
+    protected void loadExtensions(File folder)
+    {
+        for (File child : folder.listFiles()) {
+            if (child.isDirectory()) {
+                loadExtensions(child);
+            } else if (child.getName().endsWith(DESCRIPTOR_SUFFIX)) {
+                try {
+                    DefaultLocalExtension localExtension = loadDescriptor(child);
+
+                    this.repository.addLocalExtension(localExtension);
+                } catch (Exception e) {
+                    LOGGER.warn("Failed to load extension from file [" + child + "] in local repository", e);
+                }
+            }
         }
     }
 

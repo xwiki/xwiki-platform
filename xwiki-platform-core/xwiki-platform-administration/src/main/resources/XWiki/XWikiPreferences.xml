@@ -2630,7 +2630,7 @@ Your account on ${wikiname} has been successfully activated. You can now login a
 <showRightPanels>1</showRightPanels>
 </property>
 <property>
-<showannotations></showannotations>
+<showannotations>0</showannotations>
 </property>
 <property>
 <showattachments></showattachments>

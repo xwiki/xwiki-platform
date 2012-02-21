@@ -95,7 +95,7 @@
 <relationalStorage>0</relationalStorage>
 <separator> </separator>
 <separators> ,|</separators>
-<size>1</size>
+<size>60</size>
 <sort>none</sort>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>

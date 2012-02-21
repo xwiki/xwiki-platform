@@ -314,11 +314,6 @@
             <configuration>
               <excludes>
                 <exclude>**/internal/**</exclude>
-                <!-- Remove the following excludes after we release 3.5 -->
-                <exclude>org/xwiki/container/ContainerFactory</exclude>
-                <!-- Moved to another module -->
-                <exclude>com/xpn/xwiki/plugin/zipexplorer/ZipExplorerPlugin</exclude>
-                <exclude>com/xpn/xwiki/plugin/zipexplorer/ZipExplorerPluginAPI</exclude>
                 <!-- Remove the following excludes after we release 4.0 -->
                 <exclude>com/xpn/xwiki/objects/BaseCollection</exclude>
                 <exclude>com/xpn/xwiki/objects/BaseObject</exclude>

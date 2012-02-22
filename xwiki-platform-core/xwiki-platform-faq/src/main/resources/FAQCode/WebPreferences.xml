@@ -18,8 +18,8 @@
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment>allow admin right for XWiki.XWikiAdminGroup</comment>
-<minorEdit>true</minorEdit>
+<comment></comment>
+<minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>

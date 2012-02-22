@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -397,13 +398,16 @@ public class DefaultRepositoryManager implements RepositoryManager
     {
         IterableResult<Version> versionsIterable = repository.resolveVersions(extensionId, 0, -1);
 
-        List<Version> versions = new ArrayList<Version>(versionsIterable.getSize());
-        for (Version version : versionsIterable) {
-            versions.add(version);
-        }
+        Version lastVersion = null;
 
-        // Get last version
-        Version lastVersion = versions.get(versions.size() - 1);
+        Set<Version> versions = new LinkedHashSet<Version>(versionsIterable.getSize());
+        for (Version version : versionsIterable) {
+            if (type == null || version.getType() == type) {
+                versions.add(version);
+            }
+
+            lastVersion = version;
+        }
 
         Extension extension = repository.resolve(new ExtensionId(extensionId, lastVersion));
 
@@ -455,10 +459,32 @@ public class DefaultRepositoryManager implements RepositoryManager
 
         needSave |= updateExtension(extension, extensionObject, xcontext);
 
+        // Remove unexisting version
+
+        for (BaseObject versionObject : document.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE)) {
+            if (versionObject != null) {
+                String version = getValue(versionObject, XWikiRepositoryModel.PROP_VERSION_VERSION);
+
+                if (version == null || !versions.contains(new DefaultVersion(version))) {
+                    document.removeXObject(versionObject);
+                    needSave = true;
+                }
+            }
+        }
+        for (BaseObject dependencyObject : document.getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE)) {
+            if (dependencyObject != null) {
+                String version = getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION);
+
+                if (version == null || !versions.contains(new DefaultVersion(version))) {
+                    document.removeXObject(dependencyObject);
+                    needSave = true;
+                }
+            }
+        }
+
         // Update versions
 
-        for (Iterator<Version> it = versionsIterable.iterator(); it.hasNext();) {
-            Version version = it.next();
+        for (Version version : versions) {
             try {
                 Extension versionExtension;
                 if (version.equals(extension.getId().getVersion())) {
@@ -474,6 +500,22 @@ public class DefaultRepositoryManager implements RepositoryManager
                     + "] on repository [" + repository + "]", e);
             }
         }
+
+        // Proxy marker
+
+        BaseObject extensionProxyObject = document.getXObject(XWikiRepositoryModel.EXTENSIONPROXY_CLASSREFERENCE);
+        if (extensionProxyObject == null) {
+            extensionProxyObject = document.newXObject(XWikiRepositoryModel.EXTENSIONPROXY_CLASSREFERENCE, xcontext);
+            needSave = true;
+        }
+
+        needSave |=
+            update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYID, repository.getId().getId());
+        needSave |=
+            update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYTYPE, repository.getId().getType());
+        needSave |=
+            update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYURI, repository.getId().getURI()
+                .toString());
 
         if (needSave) {
             xcontext.getWiki()
@@ -501,7 +543,10 @@ public class DefaultRepositoryManager implements RepositoryManager
         needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, extension.getSummary());
 
         // Website
-        needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE, extension.getWebSite());
+        /*
+         * Don't import website since most of the time we want the new page to be the extension entry point needSave |=
+         * update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE, extension.getWebSite());
+         */
 
         // Description
         if (StringUtils.isEmpty(getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION,

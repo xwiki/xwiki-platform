@@ -32,6 +32,8 @@ public interface XWikiRepositoryModel
 
     public final static String EXTENSIONDEPENDENCY_CLASSNAME = "ExtensionCode.ExtensionDependencyClass";
 
+    public final static String EXTENSIONPROXY_CLASSNAME = "ExtensionCode.ExtensionProxyClass";
+
     public final static EntityReference EXTENSION_CLASSREFERENCE = new EntityReference("ExtensionClass",
         EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
 
@@ -41,10 +43,12 @@ public interface XWikiRepositoryModel
     public final static EntityReference EXTENSIONDEPENDENCY_CLASSREFERENCE = new EntityReference(
         "ExtensionDependencyClass", EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
 
+    public final static EntityReference EXTENSIONPROXY_CLASSREFERENCE = new EntityReference("ExtensionProxyClass",
+        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+
     public final static EntityReference EXTENSION_TEMPLATEREFERENCE = new EntityReference("ExtensionTemplate",
         EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
 
-    
     // Properties
 
     public final static String PROP_EXTENSION_ID = "id";
@@ -74,6 +78,12 @@ public interface XWikiRepositoryModel
     public static final String PROP_DEPENDENCY_ID = "id";
 
     public static final String PROP_DEPENDENCY_CONSTRAINT = "constraint";
+
+    public static final String PROP_PROXY_REPOSITORYID = "repositoryId";
+
+    public static final String PROP_PROXY_REPOSITORYTYPE = "repositoryType";
+
+    public static final String PROP_PROXY_REPOSITORYURI = "repositoryURI";
 
     // Consolidation
 

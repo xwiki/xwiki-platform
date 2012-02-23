@@ -19,13 +19,27 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.servlet.http.HttpSession;
+
 import org.xwiki.csrf.CSRFToken;
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelConfiguration;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
+/**
+ * Action for processing logout requests. The actual logout request processing is done before this action is invoked,
+ * the URL will trigger the authenticator automatically. This action just cleans up the session and redirects to a view
+ * page.
+ * 
+ * @version $Id$
+ */
 public class LogoutAction extends XWikiAction
 {
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
@@ -35,11 +49,17 @@ public class LogoutAction extends XWikiAction
         CSRFToken csrf = Utils.getComponent(CSRFToken.class);
         csrf.clearToken();
 
+        // Process redirect
         String redirect;
         redirect = context.getRequest().getParameter("xredirect");
-        if ((redirect == null) || (redirect.equals("")))
-            redirect =
-                context.getURLFactory().createURL("Main", "WebHome", "view", context).toString();
+        if (StringUtils.isEmpty(redirect)) {
+            ModelConfiguration modelDefaults = Utils.getComponent(ModelConfiguration.class);
+            DocumentReference doc = new DocumentReference(
+                context.getDatabase(),
+                modelDefaults.getDefaultReferenceValue(EntityType.SPACE),
+                modelDefaults.getDefaultReferenceValue(EntityType.DOCUMENT));
+            redirect = context.getWiki().getURL(doc, "view", context);
+        }
         sendRedirect(response, redirect);
         return false;
     }

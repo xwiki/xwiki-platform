@@ -22,8 +22,16 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-public class LoginErrorAction extends XWikiAction {    
-	public String render(XWikiContext context) throws XWikiException {
+/**
+ * Action for re-displaying the login form when the submitted username and password are wrong.
+ * 
+ * @version $Id$
+ */
+public class LoginErrorAction extends XWikiAction
+{
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
         return "login";
-	}
+    }
 }

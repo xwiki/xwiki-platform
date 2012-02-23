@@ -44,6 +44,16 @@ public class LogoutAction extends XWikiAction
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
 
+        // Destroy the current session, if any, so that any private data stored in the session won't be accessible by
+        // the next user on the same computer
+        HttpSession currentSession = request.getSession(false);
+        if (currentSession != null) {
+            synchronized (currentSession) {
+                currentSession.invalidate();
+                request.getSession(true);
+            }
+        }
+
         // Process redirect
         String redirect;
         redirect = context.getRequest().getParameter("xredirect");

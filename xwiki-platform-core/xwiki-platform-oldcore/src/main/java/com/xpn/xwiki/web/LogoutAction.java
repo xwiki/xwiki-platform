@@ -21,7 +21,6 @@ package com.xpn.xwiki.web;
 
 import javax.servlet.http.HttpSession;
 
-import org.xwiki.csrf.CSRFToken;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
@@ -44,10 +43,6 @@ public class LogoutAction extends XWikiAction
     {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
-
-        // clear CSRF token
-        CSRFToken csrf = Utils.getComponent(CSRFToken.class);
-        csrf.clearToken();
 
         // Process redirect
         String redirect;

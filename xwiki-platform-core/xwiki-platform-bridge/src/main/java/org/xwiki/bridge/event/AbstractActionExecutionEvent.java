@@ -21,6 +21,8 @@ package org.xwiki.bridge.event;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Base class for all action execution related events.
  * 
@@ -68,21 +70,27 @@ public abstract class AbstractActionExecutionEvent implements Serializable, Acti
     @Override
     public int hashCode()
     {
+        if (getActionName() == null) {
+            return 0;
+        }
         return getActionName().hashCode();
     }
 
     @Override
     public boolean equals(Object object)
     {
-        if (object instanceof ActionExecutedEvent) {
-            return getActionName().equals(((ActionExecutedEvent) object).getActionName());
+        if (object != null && getClass().isAssignableFrom(object.getClass())) {
+            return StringUtils.equals(getActionName(), ((ActionExecutionEvent) object).getActionName());
         }
-        return getActionName().equals(object);
+        return false;
     }
 
     @Override
     public boolean matches(Object otherEvent)
     {
+        if (otherEvent == null) {
+            return false;
+        }
         boolean isMatching = false;
         if (getClass().isAssignableFrom(otherEvent.getClass())) {
             ActionExecutionEvent actionEvent = (ActionExecutionEvent) otherEvent;

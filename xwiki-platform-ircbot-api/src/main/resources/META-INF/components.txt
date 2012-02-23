@@ -1,0 +1,2 @@
+org.xwiki.ircbot.internal.PircBotIRCBot
+org.xwiki.ircbot.internal.HelpIRCBotListener

@@ -23,6 +23,7 @@ import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -33,7 +34,7 @@ import org.xwiki.test.annotation.MockingRequirement;
 
 public class PircBotIRCBotTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
+    @MockingRequirement(exceptions = {ComponentManager.class})
     private PircBotIRCBot bot;
 
     private Execution execution;

@@ -231,8 +231,11 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
         // We cannot easily control the value of the token, so we just test if it contains any "bad" characters and hope
         // for the best. Since the probability that the token contains some specific character is about 1/3, this test
         // will start to flicker (instead of always failing) if something like XWIKI-5996 is reintroduced
-        String token = this.csrf.getToken();
-        Assert.assertFalse("The token \"" + token + "\" contains a character that might break the layout",
-            token.matches(".*[&?*_/#^,.({\\[\\]})~!=+-].*"));
+        for (int i = 0; i < 30; ++i) {
+            this.csrf.clearToken();
+            String token = this.csrf.getToken();
+            Assert.assertFalse("The token \"" + token + "\" contains a character that might break the layout",
+                token.matches(".*[&?*_/#^,.({\\[\\]})~!=+-].*"));
+        }
     }
 }

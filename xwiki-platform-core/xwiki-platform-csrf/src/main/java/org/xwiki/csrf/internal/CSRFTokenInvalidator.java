@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.ActionExecutingEvent;
@@ -39,6 +40,7 @@ import org.xwiki.observation.event.Event;
  * @since 4.0M1
  */
 @Component
+@Named("CSRF Token invalidator")
 @Singleton
 public class CSRFTokenInvalidator implements EventListener
 {

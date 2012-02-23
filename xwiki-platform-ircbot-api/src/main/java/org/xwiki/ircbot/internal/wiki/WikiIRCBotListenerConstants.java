@@ -35,7 +35,7 @@ public interface WikiIRCBotListenerConstants
      * Constant for representing XWiki.IRCBotListenerEClass xwiki class.
      */
     EntityReference WIKI_BOT_LISTENER_CLASS = new EntityReference("IRCBotListenerClass", EntityType.DOCUMENT,
-        new EntityReference("XWiki", EntityType.SPACE));
+        new EntityReference("IRC", EntityType.SPACE));
 
     /**
      * Constant for representing a listener description property.
@@ -47,7 +47,7 @@ public interface WikiIRCBotListenerConstants
      * per onXXX() methode handled).
      */
     EntityReference WIKI_BOT_LISTENER_EVENT_CLASS = new EntityReference("IRCBotListenerEventClass", EntityType.DOCUMENT,
-        new EntityReference("XWiki", EntityType.SPACE));
+        new EntityReference("IRC", EntityType.SPACE));
 
     /**
      * Constant for representing a listener event property.
@@ -60,4 +60,11 @@ public interface WikiIRCBotListenerConstants
     String EVENT_SCRIPT_PROPERTY = "script";
 
     String ON_CONNECT_EVENT_NAME = "onConnect";
+    String ON_DISCONNECT_EVENT_NAME = "onDisconnect";
+    String ON_JOIN_EVENT_NAME = "onJoin";
+    String ON_MESSAGE_EVENT_NAME = "onMessage";
+    String ON_NICK_CHANGE_EVENT_NAME = "onNickChange";
+    String ON_PART_EVENT_NAME = "onPart";
+    String ON_PRIVATE_MESSAGE_EVENT_NAME = "onPrivateMessage";
+    String ON_QUIT_EVENT_NAME = "onQuit";
 }

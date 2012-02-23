@@ -33,10 +33,11 @@ import org.xwiki.model.reference.DocumentReference;
 public interface WikiIRCBotListenerFactory
 {
     /**
-     * Searches the given document for a listener definition.
+     * Searches the given document for a valid listener definition.
      *
      * @param documentReference name of the document to search for a listener definition.
-     * @return true if the given document contains a listener definition, false otherwise.
+     * @return true if the given document contains a listener class definition and at least one listener event class
+     *         definition, false otherwise.
      */
     boolean containsWikiListener(DocumentReference documentReference);
 

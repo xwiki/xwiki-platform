@@ -119,14 +119,8 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
      */
     private WikiIRCBotListener buildWikiListener(XWikiDocument doc) throws IRCBotException
     {
-        DocumentReference documentReference = doc.getDocumentReference();
-
         // Check whether this document contains a listener definition.
         BaseObject listenerDefinition = doc.getXObject(WIKI_BOT_LISTENER_CLASS);
-        if (null == listenerDefinition) {
-            throw new IRCBotException(String.format("No Bot Listener definition found in document: [%s]",
-                documentReference));
-        }
 
         // Extract listener definition.
         String description = listenerDefinition.getStringValue(DESCRIPTION_PROPERTY);
@@ -168,9 +162,14 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
     {
         boolean result;
         try {
+            // Look for a Listener Class
             XWikiDocument doc = getContext().getWiki().getDocument(documentReference, getContext());
             BaseObject listenerDefinition = doc.getXObject(WIKI_BOT_LISTENER_CLASS);
             result = (null != listenerDefinition);
+
+            // Look for a Listener Event Class
+            List<BaseObject> listenerEventDefinitions = doc.getXObjects(WIKI_BOT_LISTENER_EVENT_CLASS);
+            result = result && (listenerEventDefinitions != null) && (listenerEventDefinitions.size() > 0);
         } catch (XWikiException ex) {
             result = false;
         }

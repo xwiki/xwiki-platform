@@ -70,58 +70,60 @@ public class WikiIRCBotListener implements IRCBotListener, WikiIRCBotListenerCon
     @Override
     public void onConnect()
     {
-        executeScript();
+        executeScript(ON_CONNECT_EVENT_NAME);
     }
 
     @Override
     public void onDisconnect()
     {
-        executeScript();
+        executeScript(ON_DISCONNECT_EVENT_NAME);
     }
 
     @Override
     public void onJoin(String channel, String sender, String login, String hostname)
     {
-        executeScript();
+        executeScript(ON_JOIN_EVENT_NAME);
     }
 
     @Override
     public void onMessage(String channel, String sender, String login, String hostname, String message)
     {
-        executeScript();
+        executeScript(ON_MESSAGE_EVENT_NAME);
     }
 
     @Override
     public void onNickChange(String oldNick, String login, String hostname, String newNick)
     {
-        executeScript();
+        executeScript(ON_NICK_CHANGE_EVENT_NAME);
     }
 
     @Override
     public void onPart(String channel, String sender, String login, String hostname)
     {
-        executeScript();
+        executeScript(ON_PART_EVENT_NAME);
     }
 
     @Override
     public void onPrivateMessage(String sender, String login, String hostname, String message)
     {
-        executeScript();
+        executeScript(ON_PRIVATE_MESSAGE_EVENT_NAME);
     }
 
     @Override
     public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason)
     {
-        executeScript();
+        executeScript(ON_QUIT_EVENT_NAME);
     }
 
     /**
      * Execute the Wiki bot listener written in wiki syntax by executing the Macros and send the result to the IRC
      * server.
+     *
+     * @param eventName the name of the event for which the script needs to be executed
      */
-    private void executeScript()
+    private void executeScript(String eventName)
     {
-        XDOM xdom = this.events.get(ON_CONNECT_EVENT_NAME);
+        XDOM xdom = this.events.get(eventName);
         if (xdom != null) {
             // Note that if a Bot Listener script needs access to the IRC Bot (for example to send a message to the
             // IRC channel), it can access it through the "ircbot" Script Service.

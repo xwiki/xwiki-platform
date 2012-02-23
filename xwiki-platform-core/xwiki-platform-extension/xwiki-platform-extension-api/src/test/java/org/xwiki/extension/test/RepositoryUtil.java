@@ -29,8 +29,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.junit.rules.TemporaryFolder;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -46,21 +46,18 @@ import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.version.internal.DefaultVersion;
-import org.xwiki.test.MockConfigurationSource;
 
 public class RepositoryUtil
 {
     private static final String MAVENREPOSITORY_ID = "test-maven";
 
-    private MockConfigurationSource configurationSource;
+    private File permanentDirectory;
 
-    private File workingDirectory;
+    private File temporaryDirectory;
 
-    private File repositoriesDirectory;
+    private File extensionDirectory;
 
     private File localRepositoryRoot;
-
-    private File aetherRepositoryRoot;
 
     private File mavenRepositoryRoot;
 
@@ -74,35 +71,42 @@ public class RepositoryUtil
 
     private ComponentAnnotationLoader componentLoader;
 
-    public RepositoryUtil(MockConfigurationSource configurationSource,
-        ComponentManager componentManager)
+    public RepositoryUtil(ComponentManager componentManager)
     {
-        this.configurationSource = configurationSource;
         this.componentManager = componentManager;
 
-        this.workingDirectory = new File("target/extension-repositories/" + RandomStringUtils.randomAlphabetic(10));
-        this.repositoriesDirectory = new File(this.workingDirectory, "repository/");
-        this.localRepositoryRoot = new File(this.repositoriesDirectory, "local/");
-        this.aetherRepositoryRoot = new File(this.repositoriesDirectory, "aether/");
-        this.mavenRepositoryRoot = new File(this.repositoriesDirectory, "maven/");
-        this.remoteRepositoryRoot = new File(this.repositoriesDirectory, "remote/");
+        File testDirectory = new File("target/test-" + RandomStringUtils.randomAlphabetic(10));
 
-        this.extensionPackager = new ExtensionPackager(this.workingDirectory, this.remoteRepositoryRoot);
+        this.temporaryDirectory = new File(testDirectory, "temporary-dir");
+
+        this.permanentDirectory = new File(testDirectory, "permanent-dir");
+        this.extensionDirectory = new File(this.permanentDirectory, "extension/");
+        this.localRepositoryRoot = new File(this.extensionDirectory, "repository/");
+
+        this.mavenRepositoryRoot = new File(testDirectory, "maven/");
+        this.remoteRepositoryRoot = new File(testDirectory, "remote/");
+
+        this.extensionPackager = new ExtensionPackager(this.permanentDirectory, this.remoteRepositoryRoot);
     }
 
-    public File getWorkingDirectory()
+    public File getPermanentDirectory()
     {
-        return this.workingDirectory;
+        return this.permanentDirectory;
+    }
+
+    public File getTemporaryDirectory()
+    {
+        return this.temporaryDirectory;
+    }
+
+    public File getExtensionDirectory()
+    {
+        return this.extensionDirectory;
     }
 
     public File getLocalRepository()
     {
         return this.localRepositoryRoot;
-    }
-
-    public File getAetherRepository()
-    {
-        return this.aetherRepositoryRoot;
     }
 
     public File getRemoteRepository()
@@ -123,16 +127,19 @@ public class RepositoryUtil
     public void setup(Mockery mockery) throws Exception
     {
         // Mock Environment
-        Environment environment = mockery.mock(Environment.class);
+        final Environment environment = mockery.mock(Environment.class);
+        mockery.checking(new Expectations()
+        {
+            {
+                allowing(environment).getPermanentDirectory();
+                will(returnValue(getPermanentDirectory()));
+                allowing(environment).getTemporaryDirectory();
+                will(returnValue(getTemporaryDirectory()));
+            }
+        });
         DefaultComponentDescriptor<Environment> dcd = new DefaultComponentDescriptor<Environment>();
         dcd.setRole(Environment.class);
         this.componentManager.registerComponent(dcd, environment);
-
-        // configuration
-
-        this.configurationSource.setProperty("extension.localRepository", getLocalRepository().getAbsolutePath());
-        this.configurationSource.setProperty("extension.aether.localRepository", getAetherRepository()
-            .getAbsolutePath());
 
         // add default test core extension
 
@@ -189,7 +196,7 @@ public class RepositoryUtil
         }
     }
 
-    private void unregisterComponent(Class<?> role, String hint)
+    private void unregisterComponent(Class< ? > role, String hint)
     {
         this.componentManager.unregisterComponent(role, hint);
     }

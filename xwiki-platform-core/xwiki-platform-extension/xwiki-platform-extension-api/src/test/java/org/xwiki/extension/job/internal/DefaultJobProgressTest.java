@@ -41,7 +41,7 @@ public class DefaultJobProgressTest extends AbstractComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        this.repositoryUtil = new RepositoryUtil(getConfigurationSource(), getComponentManager());
+        this.repositoryUtil = new RepositoryUtil(getComponentManager());
         this.repositoryUtil.setup(getMockery());
 
         this.observation = getComponentManager().lookup(ObservationManager.class);

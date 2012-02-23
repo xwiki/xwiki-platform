@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.job.internal;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,17 +39,22 @@ import org.xwiki.observation.ObservationManager;
  * @param <R>
  * @version $Id$
  */
-public class DefaultJobStatus<R extends Request> implements JobStatus
+public class DefaultJobStatus<R extends Request> implements JobStatus, Serializable
 {
+    /**
+     * Serialization identifier.
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Used register itself to receive logging and progress related events.
      */
-    private ObservationManager observationManager;
+    private transient ObservationManager observationManager;
 
     /**
      * Used to isolate job related log.
      */
-    private LoggerManager loggerManager;
+    private transient LoggerManager loggerManager;
 
     /**
      * The unique id of the job.
@@ -61,7 +67,7 @@ public class DefaultJobStatus<R extends Request> implements JobStatus
     private State state;
 
     /**
-     * Request provided when starting thee job.
+     * Request provided when starting the job.
      */
     private R request;
 
@@ -73,7 +79,7 @@ public class DefaultJobStatus<R extends Request> implements JobStatus
     /**
      * Take care of progress related events to produce a progression information usually used in a progress bar.
      */
-    private DefaultJobProgress progress;
+    private transient DefaultJobProgress progress;
 
     /**
      * @param request the request provided when started the job
@@ -115,11 +121,6 @@ public class DefaultJobStatus<R extends Request> implements JobStatus
 
     // JobStatus
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.extension.job.event.status.JobStatus#getState()
-     */
     @Override
     public State getState()
     {

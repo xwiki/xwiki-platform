@@ -102,7 +102,10 @@ public class UninstallJob extends AbstractExtensionJob<UninstallRequest>
         try {
             // Create the plan
 
-            this.uninstallPlanJob.start(getRequest());
+            UninstallRequest planRequest = new UninstallRequest(getRequest());
+            planRequest.setId(null);
+            
+            this.uninstallPlanJob.start(planRequest);
 
             ExtensionPlan plan = (ExtensionPlan) this.uninstallPlanJob.getStatus();
 
@@ -150,9 +153,9 @@ public class UninstallJob extends AbstractExtensionJob<UninstallRequest>
         String namespace = action.getNamespace();
 
         if (namespace != null) {
-            this.logger.info("Uninstalling extension [{}] on namespace [{}]", localExtension, namespace);
+            this.logger.info("Uninstalling extension [{}] on namespace [{}]", localExtension.toString(), namespace);
         } else {
-            this.logger.info("Uninstalling extension [{}]", localExtension);
+            this.logger.info("Uninstalling extension [{}]", localExtension.toString());
         }
 
         notifyPushLevelProgress(2);
@@ -170,10 +173,10 @@ public class UninstallJob extends AbstractExtensionJob<UninstallRequest>
                 localExtension);
 
             if (namespace != null) {
-                this.logger
-                    .info("Successfully uninstalled extension [{}] on namespace [{}]", localExtension, namespace);
+                this.logger.info("Successfully uninstalled extension [{}] on namespace [{}]",
+                    localExtension.toString(), namespace);
             } else {
-                this.logger.info("Successfully uninstalled extension [{}]", localExtension);
+                this.logger.info("Successfully uninstalled extension [{}]", localExtension.toString());
             }
         } finally {
             notifyPopLevelProgress();

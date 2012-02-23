@@ -344,6 +344,7 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         InstallRequest installRequest = new InstallRequest();
+        installRequest.setId(id);
         installRequest.addExtension(new ExtensionId(id, version));
         if (StringUtils.isNotBlank(namespace)) {
             installRequest.addNamespace(namespace);
@@ -417,6 +418,7 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest.setId(id);
         uninstallRequest.addExtension(new ExtensionId(id, (Version) null));
         if (StringUtils.isNotBlank(namespace)) {
             uninstallRequest.addNamespace(namespace);

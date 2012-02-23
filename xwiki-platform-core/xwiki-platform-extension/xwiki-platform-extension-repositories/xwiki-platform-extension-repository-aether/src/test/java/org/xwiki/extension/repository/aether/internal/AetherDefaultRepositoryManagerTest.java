@@ -73,17 +73,19 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
     {
         super.setUp();
 
-        this.repositoryUtil = new RepositoryUtil(getConfigurationSource(), getComponentManager());
+        this.repositoryUtil = new RepositoryUtil(getComponentManager());
         this.repositoryUtil.setup(getMockery());
 
         this.extensionId = new ExtensionId(GROUPID + ':' + ARTIfACTID, "version");
         this.extensionDependencyId = new ExtensionId("dgroupid:dartifactid", "dversion");
-        
+
         this.extensionIdClassifier = new ExtensionId(GROUPID + ':' + ARTIfACTID + ":classifier", "version");
         this.dependencyExtensionId =
-            new DefaultExtensionDependency(this.extensionDependencyId.getId(), new DefaultVersionConstraint(this.extensionDependencyId.getVersion().getValue()));
+            new DefaultExtensionDependency(this.extensionDependencyId.getId(), new DefaultVersionConstraint(
+                this.extensionDependencyId.getVersion().getValue()));
         this.dependencyExtensionIdRange =
-            new DefaultExtensionDependency(this.extensionDependencyId.getId(), new DefaultVersionConstraint("[dversion,)"));
+            new DefaultExtensionDependency(this.extensionDependencyId.getId(), new DefaultVersionConstraint(
+                "[dversion,)"));
 
         this.bundleExtensionId = new ExtensionId("groupid:bundleartifactid", "version");
 
@@ -106,7 +108,8 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         Assert.assertEquals("name", extension.getName());
         Assert.assertEquals("summary", extension.getSummary());
         Assert.assertEquals("http://website", extension.getWebSite());
-        Assert.assertEquals(Arrays.asList(new DefaultExtensionAuthor("Full Name", new URL("http://profile"))), new ArrayList<ExtensionAuthor>(extension.getAuthors()));
+        Assert.assertEquals(Arrays.asList(new DefaultExtensionAuthor("Full Name", new URL("http://profile"))),
+            new ArrayList<ExtensionAuthor>(extension.getAuthors()));
         Assert.assertEquals(Arrays.asList("groupid1:feature1", "groupid2:feature2"),
             new ArrayList<String>(extension.getFeatures()));
         Assert.assertSame(this.extensionLicenseManager.getLicense("GNU Lesser General Public License 2.1"), extension
@@ -150,8 +153,7 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
 
         Assert.assertNotNull(extension);
         Assert.assertEquals(this.extensionDependencyId.getId(), extension.getId().getId());
-        Assert.assertEquals(this.extensionDependencyId.getVersion(), extension.getId()
-            .getVersion());
+        Assert.assertEquals(this.extensionDependencyId.getVersion(), extension.getId().getVersion());
     }
 
     @Test

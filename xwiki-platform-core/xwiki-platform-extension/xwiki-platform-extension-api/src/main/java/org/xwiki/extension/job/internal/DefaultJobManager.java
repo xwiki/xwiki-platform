@@ -25,6 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -46,7 +47,7 @@ import org.xwiki.extension.job.event.status.JobStatus;
 public class DefaultJobManager implements JobManager, Runnable, Initializable
 {
     /**
-     * A hob to execute.
+     * A job to execute.
      * 
      * @version $Id$
      */
@@ -78,6 +79,12 @@ public class DefaultJobManager implements JobManager, Runnable, Initializable
      */
     @Inject
     private ComponentManager componentManager;
+
+    /**
+     * Used to store the results of the jobs execution.
+     */
+    @Inject
+    private JobStatusStorage storage;
 
     /**
      * @see #getCurrentJob()
@@ -174,5 +181,15 @@ public class DefaultJobManager implements JobManager, Runnable, Initializable
         this.jobQueue.add(new JobElement(job, request));
 
         return job;
+    }
+
+    @Override
+    public JobStatus getJobStatus(String id)
+    {
+        if (StringUtils.equals(id, this.currentJob.getRequest().getId())) {
+            return this.currentJob.getStatus();
+        }
+
+        return this.storage.getJobStatus(id);
     }
 }

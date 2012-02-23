@@ -52,7 +52,7 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
 
         beforeRepositoryUtil();
 
-        this.repositoryUtil = new RepositoryUtil(getConfigurationSource(), getComponentManager());
+        this.repositoryUtil = new RepositoryUtil(getComponentManager());
         this.repositoryUtil.setup(getMockery());
 
         // lookup
@@ -80,7 +80,7 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
 
         List<LogEvent> errors = installJob.getStatus().getLog(LogLevel.ERROR);
         if (!errors.isEmpty()) {
-            throw errors.get(0).getThrowable();
+            throw errors.get(0).getThrowable() != null ? errors.get(0).getThrowable() : new Exception(errors.get(0).getFormattedMessage());
         }
 
         return installJob;
@@ -103,6 +103,7 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
     protected Job install(String jobId, ExtensionId extensionId, String namespace) throws Throwable
     {
         InstallRequest installRequest = new InstallRequest();
+        installRequest.setId(extensionId.getId());
         installRequest.addExtension(extensionId);
         if (namespace != null) {
             installRequest.addNamespace(namespace);
@@ -129,6 +130,7 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
     protected Job uninstall(String jobId, ExtensionId extensionId, String namespace) throws Throwable
     {
         UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest.setId(extensionId.getId());
         uninstallRequest.addExtension(extensionId);
         if (namespace != null) {
             uninstallRequest.addNamespace(namespace);

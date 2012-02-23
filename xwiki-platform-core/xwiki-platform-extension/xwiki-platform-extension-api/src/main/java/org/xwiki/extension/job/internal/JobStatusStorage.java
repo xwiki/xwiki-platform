@@ -17,49 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.job;
+package org.xwiki.extension.job.internal;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.extension.job.event.status.JobStatus;
 
 /**
- * Proxy used to simplify execution of jobs.
+ * Store and retrieve {@link JobStatus} instances.
  * 
  * @version $Id$
  */
 @ComponentRole
-public interface JobManager
+public interface JobStatusStorage
 {
     /**
-     * @return the job currently running or the latest job, null if there is no job
-     */
-    Job getCurrentJob();
-
-    /**
-     * Return job status corresponding to the provided id from the current executed job or stored history.
-     * 
      * @param id the id of the job
-     * @return the job status corresponding to the provided job id, null if none can be found
+     * @return the job status
      */
     JobStatus getJobStatus(String id);
 
     /**
-     * Start a new job with the provided identifier.
-     * 
-     * @param jobType the role hint of the job component
-     * @param request the request
-     * @return the created job
-     * @throws JobException error when trying to run the job
+     * @param status the job status
      */
-    Job executeJob(String jobType, Request request) throws JobException;
+    void store(JobStatus status);
 
     /**
-     * Add a new job in the queue of jobs to execute.
-     * 
-     * @param jobType the role hint of the job component
-     * @param request the request
-     * @return the created job
-     * @throws JobException error when trying to run the job
+     * @param id the id of the job
+     * @return the job status
      */
-    Job addJob(String jobType, Request request) throws JobException;
+    JobStatus remove(String id);
 }

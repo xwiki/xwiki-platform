@@ -35,6 +35,12 @@ public interface Request extends Serializable
     String PROPERTY_REMOTE = "remote";
 
     /**
+     * @return identifier used to access the job. If none is provided the job will not be accessible by id and the
+     *         status of the job will not be stored.
+     */
+    String getId();
+
+    /**
      * @return indicate if the job has been triggered by a remote event
      */
     boolean isRemote();

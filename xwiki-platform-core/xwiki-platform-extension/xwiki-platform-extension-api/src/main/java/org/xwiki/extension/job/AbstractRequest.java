@@ -31,6 +31,11 @@ import java.util.Map;
 public abstract class AbstractRequest implements Request
 {
     /**
+     * @see #getId()
+     */
+    private String id;
+
+    /**
      * The properties.
      */
     private Map<String, Object> properties = new HashMap<String, Object>();
@@ -51,6 +56,20 @@ public abstract class AbstractRequest implements Request
         for (String key : request.getPropertyNames()) {
             setProperty(key, request.getProperty(key));
         }
+    }
+
+    @Override
+    public String getId()
+    {
+        return this.id;
+    }
+
+    /**
+     * @param id the identifier used to acccess the job
+     */
+    public void setId(String id)
+    {
+        this.id = id;
     }
 
     @Override

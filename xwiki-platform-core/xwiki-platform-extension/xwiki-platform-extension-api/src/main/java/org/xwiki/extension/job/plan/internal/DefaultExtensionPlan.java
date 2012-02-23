@@ -45,12 +45,14 @@ public class DefaultExtensionPlan<R extends ExtensionRequest> extends DefaultJob
     /**
      * @see #getTree()
      */
-    private List<ExtensionPlanNode> tree = new ArrayList<ExtensionPlanNode>();
+    // TODO: find a way to serialize
+    private transient List<ExtensionPlanNode> tree = new ArrayList<ExtensionPlanNode>();
 
     /**
      * @see #getActions()
      */
-    private Set<ExtensionPlanAction> actions;
+    // TODO: find a way to serialize
+    private transient Set<ExtensionPlanAction> actions;
 
     /**
      * @param request the request provided when started the job

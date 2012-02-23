@@ -107,7 +107,10 @@ public class InstallJob extends AbstractExtensionJob<InstallRequest>
         try {
             // Create the plan
 
-            this.installPlanJob.start(getRequest());
+            InstallRequest planRequest = new InstallRequest(getRequest());
+            planRequest.setId(null);
+
+            this.installPlanJob.start(planRequest);
 
             ExtensionPlan plan = (ExtensionPlan) this.installPlanJob.getStatus();
 
@@ -231,9 +234,9 @@ public class InstallJob extends AbstractExtensionJob<InstallRequest>
         String namespace = action.getNamespace();
 
         if (namespace != null) {
-            this.logger.info("Installing extension [{}] on namespace [{}]", extension, namespace);
+            this.logger.info("Installing extension [{}] on namespace [{}]", extension.toString(), namespace);
         } else {
-            this.logger.info("Installing extension [{}]", extension);
+            this.logger.info("Installing extension [{}]", extension.toString());
         }
 
         notifyPushLevelProgress(2);
@@ -248,9 +251,10 @@ public class InstallJob extends AbstractExtensionJob<InstallRequest>
             installExtension(localExtension, action.getPreviousExtension(), namespace, action.isDependency());
 
             if (namespace != null) {
-                this.logger.info("Successfully installed extension [{}] on namespace [{}]", localExtension, namespace);
+                this.logger.info("Successfully installed extension [{}] on namespace [{}]", localExtension.toString(),
+                    namespace);
             } else {
-                this.logger.info("Successfully installed extension [{}]", localExtension);
+                this.logger.info("Successfully installed extension [{}]", localExtension.toString());
             }
         } finally {
             notifyPopLevelProgress();

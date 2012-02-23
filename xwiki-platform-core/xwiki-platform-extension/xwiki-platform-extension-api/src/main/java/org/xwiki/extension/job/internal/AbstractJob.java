@@ -64,15 +64,32 @@ public abstract class AbstractJob<R extends Request> implements Job
     protected LoggerManager loggerManager;
 
     /**
+     * Used to store the results of the jobs execution.
+     */
+    @Inject
+    protected JobStatusStorage storage;
+
+    /**
      * The logger to log.
      */
     @Inject
     protected Logger logger;
 
     /**
+     * The job request.
+     */
+    protected R request;
+
+    /**
      * @see #getStatus()
      */
     protected DefaultJobStatus<R> status;
+
+    @Override
+    public R getRequest()
+    {
+        return this.request;
+    }
 
     @Override
     public JobStatus getStatus()
@@ -81,17 +98,12 @@ public abstract class AbstractJob<R extends Request> implements Job
     }
 
     @Override
-    public R getRequest()
-    {
-        return this.status.getRequest();
-    }
-
-    @Override
     public void start(Request request)
     {
-        this.observationManager.notify(new JobStartedEvent(getId(), getType(), request), this);
+        this.request = castRequest(request);
+        this.status = createNewStatus(this.request);
 
-        this.status = createNewStatus(castRequest(request));
+        this.observationManager.notify(new JobStartedEvent(getId(), getType(), request), this);
 
         this.status.startListening();
 
@@ -99,7 +111,7 @@ public abstract class AbstractJob<R extends Request> implements Job
         try {
             start();
         } catch (Exception e) {
-            logger.error("Exception thrown during job execution", e);
+            this.logger.error("Exception thrown during job execution", e);
             exception = e;
         } finally {
             this.status.stopListening();
@@ -107,6 +119,14 @@ public abstract class AbstractJob<R extends Request> implements Job
             this.status.setState(JobStatus.State.FINISHED);
 
             this.observationManager.notify(new JobFinishedEvent(getId(), getType(), request), this, exception);
+
+            try {
+                if (request.getId() != null) {
+                    this.storage.store(this.status);
+                }
+            } catch (Exception e) {
+                this.logger.warn("Failed to store job status [{}]", this.status, e);
+            }
         }
     }
 
@@ -135,9 +155,10 @@ public abstract class AbstractJob<R extends Request> implements Job
      */
     protected String getId()
     {
-        return getClass().getName() + "_" + Integer.toHexString(hashCode());
+        return getRequest().getId() != null ? getRequest().getId() : getClass().getName() + "_"
+            + Integer.toHexString(hashCode());
     }
-    
+
     /**
      * Push new progression level.
      * 

@@ -19,6 +19,9 @@
  */
 package org.xwiki.ircbot;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,10 +37,12 @@ import org.xwiki.test.annotation.MockingRequirement;
 
 public class PircBotIRCBotTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement(exceptions = {ComponentManager.class})
+    @MockingRequirement
     private PircBotIRCBot bot;
 
     private Execution execution;
+
+    private ComponentManager componentManager;
 
     @Before
     public void setUp() throws Exception
@@ -45,6 +50,7 @@ public class PircBotIRCBotTest extends AbstractMockingComponentTestCase
         super.setUp();
 
         this.execution = getComponentManager().lookup(Execution.class);
+        this.componentManager = getComponentManager().lookup(ComponentManager.class);
     }
 
     @Test
@@ -57,6 +63,9 @@ public class PircBotIRCBotTest extends AbstractMockingComponentTestCase
             // Return a non null ExecutionContext to simulate a properly set up context
             oneOf(execution).getContext();
                 will(returnValue(new ExecutionContext()));
+            // For this test we don't need to have IRC Bot Listeners
+            oneOf(componentManager).lookupList(IRCBotListener.class);
+                will(returnValue(Collections.emptyList()));
             oneOf(pircBot).isConnected();
                 will(returnValue(false));
             // The test is here: we verify that we reconnect when disconnected
@@ -128,5 +137,29 @@ public class PircBotIRCBotTest extends AbstractMockingComponentTestCase
 
         this.bot.joinChannel("channel");
         this.bot.sendMessage("line");
+    }
+
+    @Test
+    public void onMessage() throws Exception
+    {
+        final PircBotInterface pircBot = getMockery().mock(PircBotInterface.class);
+
+        final IRCBotListener listener = getMockery().mock(IRCBotListener.class);
+
+        getMockery().checking(new Expectations()
+        {{
+            // Return a non null ExecutionContext to simulate a properly set up context
+            oneOf(execution).getContext();
+                will(returnValue(new ExecutionContext()));
+            // Simulate one IRC Bot Listener
+            oneOf(componentManager).lookupList(IRCBotListener.class);
+                will(returnValue(Arrays.asList(listener)));
+            // The test is here: we verify that the Bot listener's onMessage method is called.
+            oneOf(listener).onMessage("channel", "sender", "login", "hostname", "message");
+        }});
+
+        ReflectionUtils.setFieldValue(this.bot, "pircBot", pircBot);
+
+        this.bot.onMessage("channel", "sender", "login", "hostname", "message");
     }
 }

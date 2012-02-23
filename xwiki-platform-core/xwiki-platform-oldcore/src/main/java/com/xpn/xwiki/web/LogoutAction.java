@@ -50,6 +50,8 @@ public class LogoutAction extends XWikiAction
         if (currentSession != null) {
             synchronized (currentSession) {
                 currentSession.invalidate();
+                // Early registration of a new session, so that the client gets to know the new session identifier early
+                // A new session is going to be needed after the redirect anyway
                 request.getSession(true);
             }
         }

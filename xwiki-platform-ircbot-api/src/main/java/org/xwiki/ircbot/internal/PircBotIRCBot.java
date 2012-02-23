@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -55,7 +56,12 @@ public class PircBotIRCBot implements IRCBot
     @Inject
     private ExecutionContextManager executionContextManager;
 
+    /**
+     * Look up IRC Bot Listener both in the wiki component manager and in the root manager since wiki IRC bot
+     * listeners are registered only for the current wiki.
+     */
     @Inject
+    @Named("wiki")
     private ComponentManager componentManager;
 
     private String channel;
@@ -65,7 +71,7 @@ public class PircBotIRCBot implements IRCBot
      */
     private boolean shouldStop;
 
-    private PircBotInterface pircBot = new ExtendedPircBot(this);
+    protected PircBotInterface pircBot = new ExtendedPircBot(this);
 
     @Override
     public void connect(String botName, String hostname) throws IRCBotException

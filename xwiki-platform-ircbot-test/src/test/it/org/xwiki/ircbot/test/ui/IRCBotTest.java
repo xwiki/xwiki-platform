@@ -19,8 +19,10 @@
  */
 package org.xwiki.ircbot.test.ui;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * UI tests for the IRC Bot feature.
@@ -33,18 +35,31 @@ public class IRCBotTest extends AbstractTest
     @Test
     public void testAddWikiBotListener()
     {
-        // TODO: Login a superadmin for now, remove when http://jira.xwiki.org/jira/browse/XWIKI-7581 is fixed
+        // Login as superadmin to have delete rights.
         getDriver().get(getUtil().getURLToLoginAs("superadmin", "pass"));
         getUtil().recacheSecretToken();
 
         getUtil().deletePage(getTestClassName(), getTestMethodName());
+        String simulationPageName = getTestMethodName() + "-SimulateIRCServer";
+        getUtil().deletePage(getTestClassName(), simulationPageName);
 
         getUtil().addObject(getTestClassName(), getTestMethodName(), "IRC.IRCBotListenerClass",
             "description", "bot listener test");
         getUtil().addObject(getTestClassName(), getTestMethodName(), "IRC.IRCBotListenerEventClass",
             "event", "onMessage",
-            "script", "{{velocity}}$services.ircbot.bot.sendMessage('gotcha!'){{/velocity}}");
+            "script", "gotcha!");
 
         // TODO: Go to the page listing all Bot Listeners and verify that our new wiki bot listener is listed!
+
+        // Simulate receiving an IRC Server message and verify that our Bot Listener send the message "gotcha!" back
+        // to the IRC channel
+        ViewPage page = getUtil().createPage(getTestClassName(), simulationPageName,
+            "{{velocity}}\n"
+            + "#set ($bot = $services.ircbot.bot)\n"
+            + "$bot.joinChannel('channel')\n"
+            + "$bot.onMessage('channel', 'sender', 'login', 'hostname', 'message')\n"
+            + "$bot.messages.get(0)\n"
+            + "{{/velocity}}\n", null);
+        Assert.assertEquals("gotcha!", page.getContent());
     }
 }

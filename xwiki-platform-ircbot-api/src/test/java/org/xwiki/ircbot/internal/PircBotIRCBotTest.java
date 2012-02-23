@@ -56,7 +56,7 @@ public class PircBotIRCBotTest extends AbstractMockingComponentTestCase
         super.setUp();
 
         this.execution = getComponentManager().lookup(Execution.class);
-        this.componentManager = getComponentManager().lookup(ComponentManager.class);
+        this.componentManager = getComponentManager().lookup(ComponentManager.class, "wiki");
     }
 
     @Test

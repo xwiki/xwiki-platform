@@ -131,7 +131,7 @@ public class WikiIRCBotListener implements IRCBotListener, WikiIRCBotListenerCon
             // Execute the Macro Transformation on XDOM and send the result to the IRC server
             TransformationContext txContext = new TransformationContext(xdom, this.syntax);
             try {
-                this.macroTransformation.transform(xdom, this.syntax);
+                this.macroTransformation.transform(xdom, txContext);
             } catch (TransformationException e) {
                 // The transformation failed to execute, log an error and continue
                 LOGGER.error("Failed to render Wiki IRC Bot Listener script", e);

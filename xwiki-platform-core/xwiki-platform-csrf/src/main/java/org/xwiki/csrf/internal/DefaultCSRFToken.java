@@ -147,7 +147,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     @Override
     public void clearToken()
     {
-        this.logger.debug("Forgettig CSRF token for [{}]", getTokenKey());
+        this.logger.debug("Forgetting CSRF token for [{}]", getTokenKey());
         this.tokens.remove(getTokenKey());
     }
 

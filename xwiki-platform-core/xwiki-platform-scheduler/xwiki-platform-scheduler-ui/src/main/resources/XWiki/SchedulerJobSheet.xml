@@ -77,7 +77,7 @@ $job.getProperty('script').value
 #if($xcontext.action=="inline")
 {{info}}$msg.get('xe.scheduler.job.scriptexplanation')){{/info}}
 
-{{info}}"Below some example of valid cron expression, from the [[official quartz scheduler documentation&gt;&gt;http://www.opensymphony.com/quartz/api/org/quartz/CronExpression.html&gt;_blank]]:
+{{info}}Below some example of valid cron expression, from the [[official quartz scheduler documentation&gt;&gt;http://www.quartz-scheduler.org/documentation||rel=__blank]]:
 
 |= Cron expression |= Meaning
 | **0 15 10 * * ?** | Fire at 10:15am every day

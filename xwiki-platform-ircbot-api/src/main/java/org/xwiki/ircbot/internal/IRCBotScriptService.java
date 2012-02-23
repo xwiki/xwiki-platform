@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- *
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,26 +16,46 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
--->
+ */
+package org.xwiki.ircbot.internal;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-ircbot</artifactId>
-    <version>4.0-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-ircbot-ui</artifactId>
-  <name>XWiki Platform - IRC Bot - UI</name>
-  <packaging>xar</packaging>
-  <description>UI for the IRC Bot Application</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-ircbot-api</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
-</project>
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.ircbot.IRCBot;
+import org.xwiki.script.service.ScriptService;
+
+import com.xpn.xwiki.XWikiContext;
+
+/**
+ * Allows scripts to easily access IRC Bot APIs.
+ *
+ * @version $Id$
+ * @since 4.0M1
+ */
+@Component
+@Named("ircbot")
+@Singleton
+public class IRCBotScriptService implements ScriptService
+{
+    @Inject
+    private IRCBot bot;
+
+    @Inject
+    private DocumentAccessBridge bridge;
+
+    public IRCBot getBot()
+    {
+        IRCBot bot = null;
+
+        // For protection we're requiring Programming Rights to get access to the Bot
+        if (this.bridge.hasProgrammingRights()) {
+            bot = this.bot;
+        }
+
+        return bot;
+    }
+}

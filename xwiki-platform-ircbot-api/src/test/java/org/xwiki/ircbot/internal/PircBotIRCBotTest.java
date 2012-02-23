@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ircbot;
+package org.xwiki.ircbot.internal;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,11 +30,17 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.ircbot.internal.PircBotIRCBot;
-import org.xwiki.ircbot.internal.PircBotInterface;
+import org.xwiki.ircbot.IRCBotException;
+import org.xwiki.ircbot.IRCBotListener;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
+/**
+ * Unit tests for {@link PircBotIRCBot}.
+ *
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class PircBotIRCBotTest extends AbstractMockingComponentTestCase
 {
     @MockingRequirement

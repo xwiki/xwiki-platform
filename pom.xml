@@ -33,8 +33,27 @@
   <name>XWiki Platform - IRC Bot - Parent POM</name>
   <packaging>pom</packaging>
   <description>IRC Bot Application for XWiki</description>
+  <properties>
+    <!-- TODO: Remove this -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <modules>
     <module>xwiki-platform-ircbot-api</module>
     <module>xwiki-platform-ircbot-ui</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>ci</id>
+      <activation>
+        <!-- This property is automatically defined by the Maven release plugin when executing
+             a release. Thus this profile will be automatically enabled when releasing -->
+        <property>
+          <name>performRelease</name>
+        </property>
+      </activation>
+      <modules>
+        <module>xwiki-platform-ircbot-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

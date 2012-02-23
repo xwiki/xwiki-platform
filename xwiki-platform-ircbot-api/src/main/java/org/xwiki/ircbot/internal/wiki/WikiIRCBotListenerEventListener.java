@@ -138,9 +138,9 @@ public class WikiIRCBotListenerEventListener implements EventListener
 
 
     /**
-     * Unregister wiki macro.
+     * Unregister a wiki Bot listener.
      *
-     * @param documentReference the reference of the document containing the wiki macro to register
+     * @param documentReference the reference of the document containing the wiki listener to unregister
      */
     private void unregisterWikiListener(DocumentReference documentReference)
     {

@@ -1,4 +1,5 @@
 #template('xwikivars.vm')
+#if($mobile=="off")
 #set($parents = $util.arrayList)
 #set($discard = $parents.add($doc.fullName))
 #macro(computeHierarchy $doc $result $level)
@@ -29,4 +30,5 @@
     #end
   #end
   </div>
+#end
 #end

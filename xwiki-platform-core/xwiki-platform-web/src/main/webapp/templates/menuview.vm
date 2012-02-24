@@ -1,3 +1,4 @@
+#if($mobile=="off")
 #if ($isInServletMode)## Visible only in a page
 <div id="mainmenu" class="layoutsubsection actionmenu">
 <div class="gradientfilterIE"></div>
@@ -312,4 +313,5 @@
 </div>
 </div>
 </div>
+#end
 #end

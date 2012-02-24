@@ -1,3 +1,4 @@
+#if($mobile=="off")
 <div class="gradientfilterIE"></div>
 <div class="componentcontainer">
 <strong id="xwikicontentmenutitle" class="hidden">$msg.get('core.menu.content.title')</strong>
@@ -43,3 +44,4 @@
 #end
 </div>
 </div>
+#end

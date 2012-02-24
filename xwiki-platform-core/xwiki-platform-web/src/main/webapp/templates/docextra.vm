@@ -1,4 +1,4 @@
-##
+#if($mobile=="off")
 ## Document footer: tags, creation date, modification date
 ##
 ##
@@ -140,3 +140,4 @@
   </div> ## xwikidatacontents
 #end
 </div>  ## xwikidata
+#end

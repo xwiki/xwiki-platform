@@ -1,7 +1,9 @@
     </div>## contentcolumn
+#if($mobile=="off")
 #template("leftpanels.vm")
   </div>## leftsidecolumns
 #template("rightpanels.vm")
+#end
 <div class="clearfloats"></div>
   </div>## contentcontainerinner
 </div>## contentcontainer

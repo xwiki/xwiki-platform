@@ -1,0 +1,39 @@
+###
+###    Display Panel
+###
+### Extract and display the panel code from the panel object
+###
+#macro(mobiledisplaypanel $name)
+  #set ($pobj = "")
+  ## Since Velocity does not do any assignment if the RHS is null we need to reset the paneldoc
+  ## as otherwise the previously set panel will be displayed. getDocument() returns null if the
+  ## user doesn't have the right to view a document.
+  #set ($paneldoc = "")
+  #set ($paneldoc = $xwiki.getDocument($name))
+  #if ($paneldoc != "")
+    #set ($pobj = $paneldoc.getObject("Panels.PanelClass"))
+    #if (!$pobj)
+      ## discarded
+    #else
+      $!doc.display("content", "view", $pobj)
+    #end
+  #end
+#end
+## TODO: replace with real translations
+<div id="document-title"><h1>$msg.get('admin.panels') $msg.get('xe.search.of') <em><a href="$doc.getURL()">$escapetool.xml($doc.getPlainTitle())</a></em></h1></div>
+  ## ----------------------------
+  ## Display the shortcuts
+  ## ----------------------------
+  #if($displayShortcuts)
+    #template("shortcuts.vm")
+  #end
+#if($showLeftPanels == "1" || $request.getParameter("forceLeftPanels"))
+#foreach($panel in $leftPanels)
+#mobiledisplaypanel($panel.trim())
+#end
+#end
+#if($showRightPanels == "1" || $request.getParameter("forceRightPanels"))
+#foreach($panel in $rightPanels)
+#mobiledisplaypanel($panel.trim())
+#end
+#end

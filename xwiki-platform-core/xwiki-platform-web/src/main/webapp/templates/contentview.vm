@@ -20,6 +20,7 @@
 #else
   #set ($renderedContent = $tdoc.getRenderedContent())
 #end
+#if($mobile=="off")
 ## ----------------------------------------------------------------------------
 ## Compute title to display and modify rendered content accordingly.
 ## ----------------------------------------------------------------------------
@@ -28,6 +29,7 @@
 ## Display the title
 ## ----------------------------
 <div id="document-title"><h1>$titleToDisplay</h1></div>
+#end
 ## --------------------------------------------------------------------------
 ## Drop permissions as they are no longer needed. This allows us not to have
 ## to review the code below for security holes since nothing bad can happen.
@@ -36,8 +38,10 @@ $xcontext.dropPermissions()
 ## ----------------------------
 ## Display the shortcuts
 ## ----------------------------
+#if($mobile=="off")
 #if($displayShortcuts)
   #template("shortcuts.vm")
+#end
 #end
 ## ----------------------------
 ## Display the rendered content

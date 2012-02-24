@@ -17,10 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ircbot.internal.wiki;
+package org.xwiki.ircbot.wiki;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.ircbot.IRCBotException;
+import org.xwiki.ircbot.internal.wiki.WikiIRCBotListener;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
@@ -33,7 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 public interface WikiIRCBotListenerFactory
 {
     /**
-     * Searches the given document for a valid listener definition.
+     * Searches the given document for a valid listener definition and for an active listener.
      *
      * @param documentReference name of the document to search for a listener definition.
      * @return true if the given document contains a listener class definition and at least one listener event class

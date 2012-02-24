@@ -17,10 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ircbot.internal.wiki;
+package org.xwiki.ircbot.wiki;
 
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
 /**
@@ -29,13 +28,15 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 4.0M1
  */
-public interface WikiIRCBotListenerConstants
+public interface WikiIRCBotConstants
 {
+    String SPACE = "IRC";
+
     /**
-     * Constant for representing XWiki.IRCBotListenerEClass xwiki class.
+     * Constant for representing IRC.IRCBotListenerClass xwiki class.
      */
     EntityReference WIKI_BOT_LISTENER_CLASS = new EntityReference("IRCBotListenerClass", EntityType.DOCUMENT,
-        new EntityReference("IRC", EntityType.SPACE));
+        new EntityReference(SPACE, EntityType.SPACE));
 
     /**
      * Constant for representing a listener description property.
@@ -43,11 +44,16 @@ public interface WikiIRCBotListenerConstants
     String DESCRIPTION_PROPERTY = "description";
 
     /**
-     * Constant for representing XWiki.IRCBotListenerEventClass xwiki class. There's one such object per event (i.e.
-     * per onXXX() methode handled).
+     * Whether a Bot Listener or the Bot itself are marked inactive. If so they're not started.
+     */
+    String INACTIVE_PROPERTY = "inactive";
+
+    /**
+     * Constant for representing IRC.IRCBotListenerEventClass xwiki class. There's one such object per event (i.e.
+     * per onXXX() method handled).
      */
     EntityReference WIKI_BOT_LISTENER_EVENT_CLASS = new EntityReference("IRCBotListenerEventClass", EntityType.DOCUMENT,
-        new EntityReference("IRC", EntityType.SPACE));
+        new EntityReference(SPACE, EntityType.SPACE));
 
     /**
      * Constant for representing a listener event property.
@@ -67,4 +73,26 @@ public interface WikiIRCBotListenerConstants
     String ON_PART_EVENT_NAME = "onPart";
     String ON_PRIVATE_MESSAGE_EVENT_NAME = "onPrivateMessage";
     String ON_QUIT_EVENT_NAME = "onQuit";
+
+    /**
+     * Constant for representing IRC.IRCBot xwiki class which is the Bot's configuration class.
+     */
+    EntityReference WIKI_BOT_CONFIGURATION_CLASS = new EntityReference("IRCBot", EntityType.DOCUMENT,
+        new EntityReference(SPACE, EntityType.SPACE));
+
+    String CONFIGURATION_PAGE = "IRCBotConfiguration";
+
+    /**
+     * Bot's name.
+     */
+    String BOTNAME_PROPERTY = "botname";
+
+    /**
+     * Channel to connect to.
+     */
+    String CHANNEL_PROPERTY = "channel";
+
+    String SERVER_PROPERTY = "server";
+
+    String PASSWORD_PROPERTY = "password";
 }

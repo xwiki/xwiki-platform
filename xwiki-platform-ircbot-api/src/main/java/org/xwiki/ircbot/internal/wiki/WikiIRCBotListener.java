@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.IRCBotListener;
+import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -34,7 +35,7 @@ import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 
-public class WikiIRCBotListener implements IRCBotListener, WikiIRCBotListenerConstants
+public class WikiIRCBotListener implements IRCBotListener, WikiIRCBotConstants
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(WikiIRCBotListener.class);
 

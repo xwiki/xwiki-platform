@@ -72,7 +72,8 @@ public class StubPircBot implements PircBotInterface
     @Override
     public boolean isConnected()
     {
-        return true;
+        // We consider that the bot is connected if the connect method has been called.
+        return this.hostname != null;
     }
 
     @Override

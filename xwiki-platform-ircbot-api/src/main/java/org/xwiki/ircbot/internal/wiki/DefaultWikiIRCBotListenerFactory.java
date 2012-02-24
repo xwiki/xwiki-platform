@@ -35,6 +35,8 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
+import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
+import org.xwiki.ircbot.wiki.WikiIRCBotListenerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
@@ -49,14 +51,14 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * The default implementation of {@link WikiIRCBotListenerFactory}.
+ * The default implementation of {@link org.xwiki.ircbot.wiki.WikiIRCBotListenerFactory}.
  * 
  * @version $Id$
  * @since 4.0M1
  */
 @Component
 @Singleton
-public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFactory, WikiIRCBotListenerConstants
+public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFactory, WikiIRCBotConstants
 {
     /**
      * The {@link org.xwiki.component.manager.ComponentManager} component.
@@ -86,16 +88,6 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
 
     @Inject
     private IRCBot bot;
-
-    /**
-     * Utility method for accessing XWikiContext.
-     * 
-     * @return the XWikiContext.
-     */
-    private XWikiContext getContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
-    }
 
     @Override
     public WikiIRCBotListener createWikiListener(DocumentReference documentReference) throws IRCBotException
@@ -167,6 +159,9 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
             BaseObject listenerDefinition = doc.getXObject(WIKI_BOT_LISTENER_CLASS);
             result = (null != listenerDefinition);
 
+            // Only return true if the listener is active
+            result = result && (listenerDefinition.getIntValue(INACTIVE_PROPERTY) != 1);
+
             // Look for a Listener Event Class
             List<BaseObject> listenerEventDefinitions = doc.getXObjects(WIKI_BOT_LISTENER_EVENT_CLASS);
             result = result && (listenerEventDefinitions != null) && (listenerEventDefinitions.size() > 0);
@@ -174,5 +169,15 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
             result = false;
         }
         return result;
+    }
+
+    /**
+     * Utility method for accessing XWikiContext.
+     *
+     * @return the XWikiContext.
+     */
+    private XWikiContext getContext()
+    {
+        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 }

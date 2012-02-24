@@ -22,7 +22,6 @@ package org.xwiki.extension.repository.xwiki.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -116,25 +115,35 @@ public class DefaultRepositoryManager implements RepositoryManager
         return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 
+    public <T> XWikiDocument getDocument(T[] data) throws XWikiException
+    {
+        return getDocument((String) data[0], (String) data[1]);
+    }
+
+    public XWikiDocument getDocument(String space, String name) throws XWikiException
+    {
+        XWikiContext xcontext = getXWikiContext();
+
+        return xcontext.getWiki().getDocument(new DocumentReference(xcontext.getDatabase(), space, name), xcontext);
+    }
+
     @Override
     public XWikiDocument getExistingExtensionDocumentById(String extensionId) throws QueryException, XWikiException
     {
         Query query =
-            this.queryManager.createQuery("from doc.object(" + XWikiRepositoryModel.EXTENSION_CLASSNAME
-                + ") as extension where extension." + XWikiRepositoryModel.PROP_EXTENSION_ID + " = :extensionId",
-                Query.XWQL);
+            this.queryManager.createQuery("select doc.space, doc.name from doc.object("
+                + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension where extension."
+                + XWikiRepositoryModel.PROP_EXTENSION_ID + " = :extensionId", Query.XWQL);
 
         query.bindValue("extensionId", extensionId);
 
-        List<String> documentNames = query.execute();
+        List<Object[]> documentNames = query.execute();
 
         if (documentNames.isEmpty()) {
             return null;
         }
 
-        XWikiContext xcontext = getXWikiContext();
-
-        return xcontext.getWiki().getDocument(documentNames.get(0), xcontext);
+        return getDocument(documentNames.get(0));
     }
 
     public BaseObject getExtensionVersion(XWikiDocument document, Version version)
@@ -341,13 +350,11 @@ public class DefaultRepositoryManager implements RepositoryManager
     public void validateExtensions() throws QueryException, XWikiException
     {
         Query query =
-            this.queryManager.createQuery("from doc.object(" + XWikiRepositoryModel.EXTENSION_CLASSNAME
-                + ") as extension", Query.XWQL);
+            this.queryManager.createQuery("select doc.space, doc.name from doc.object("
+                + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension", Query.XWQL);
 
-        XWikiContext xcontext = getXWikiContext();
-
-        for (String documentFullName : query.<String> execute()) {
-            validateExtension(xcontext.getWiki().getDocument(documentFullName, xcontext), false);
+        for (Object[] documentName : query.<Object[]> execute()) {
+            validateExtension(getDocument(documentName), false);
         }
     }
 
@@ -471,7 +478,8 @@ public class DefaultRepositoryManager implements RepositoryManager
                 }
             }
         }
-        for (BaseObject dependencyObject : document.getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE)) {
+        for (BaseObject dependencyObject : document
+            .getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE)) {
             if (dependencyObject != null) {
                 String version = getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION);
 

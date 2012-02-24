@@ -243,7 +243,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
     protected BaseObject getExtensionObject(XWikiDocument extensionDocument)
     {
-        return extensionDocument.getObject(XWikiRepositoryModel.EXTENSION_CLASSNAME);
+        return extensionDocument.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
     }
 
     protected BaseObject getExtensionObject(String extensionId) throws XWikiException, QueryException
@@ -322,8 +322,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         // Dependencies
         if (extensionVersion != null) {
-            Vector<BaseObject> dependencies =
-                extensionDocument.getObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME);
+            List<BaseObject> dependencies =
+                extensionDocument.getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE);
             if (dependencies != null) {
                 for (BaseObject dependencyObject : dependencies) {
                     if (dependencyObject != null) {

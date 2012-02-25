@@ -5965,6 +5965,9 @@ public class XWikiDocument implements DocumentModelBridge
         loadArchive(context);
 
         XWikiDocument newdoc = duplicate(newDocumentReference);
+        if (StringUtils.equals(newdoc.getTitle(), this.getDocumentReference().getName())) {
+            newdoc.setTitle(newDocumentReference.getName());
+        }
         newdoc.setOriginalDocument(null);
         newdoc.setContentDirty(true);
         newdoc.getXClass().setDocumentReference(newDocumentReference);

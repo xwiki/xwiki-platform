@@ -57,12 +57,12 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 @Singleton
 public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore implements XWikiVersioningStoreInterface
 {
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateVersioningStore.class);
+
     /** Needed for computing the archive cache key. */
     @Inject
     private EntityReferenceSerializer<String> referenceSerializer;
-
-    /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateVersioningStore.class);
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly

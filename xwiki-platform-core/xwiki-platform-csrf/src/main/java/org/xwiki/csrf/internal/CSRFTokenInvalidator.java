@@ -40,7 +40,7 @@ import org.xwiki.observation.event.Event;
  * @since 4.0M1
  */
 @Component
-@Named("CSRF Token invalidator")
+@Named("csrf-token-invalidator")
 @Singleton
 public class CSRFTokenInvalidator implements EventListener
 {
@@ -57,7 +57,7 @@ public class CSRFTokenInvalidator implements EventListener
     @Override
     public String getName()
     {
-        return "CSRF Token invalidator";
+        return "csrf-token-invalidator";
     }
 
     @Override

@@ -137,6 +137,19 @@ public class XWQLtoHQLTranslatorTest
     }
 
     @Test
+    public void testObjDeclInWhereWithTwoInstances() throws Exception
+    {
+        assertTranslate(
+            "where doc.object(XWiki.XWikiUsers).email = 'some' and doc.object(XWiki.XWikiUsers).first_name = 'Name'",
+            "select doc.fullName from XWikiDocument as doc , BaseObject as _o1, " +
+            "StringProperty as _o1_email2, StringProperty as _o1_first_name3 " +
+            "where ( _o1_email2.value = 'some' and _o1_first_name3.value = 'Name' ) " +
+            "and doc.fullName=_o1.name and _o1.className='XWiki.XWikiUsers' " +
+            "and _o1_email2.id.id=_o1.id and _o1_email2.id.name='email' " +
+            "and _o1_first_name3.id.id=_o1.id and _o1_first_name3.id.name='first_name'");
+    }
+
+    @Test
     public void testOrderBy() throws Exception
     {
         assertTranslate("order by doc.fullName",

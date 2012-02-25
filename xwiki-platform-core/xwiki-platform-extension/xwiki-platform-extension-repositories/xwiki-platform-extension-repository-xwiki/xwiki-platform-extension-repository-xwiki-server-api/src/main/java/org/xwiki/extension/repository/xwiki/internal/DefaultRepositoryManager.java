@@ -131,7 +131,7 @@ public class DefaultRepositoryManager implements RepositoryManager
     public XWikiDocument getExistingExtensionDocumentById(String extensionId) throws QueryException, XWikiException
     {
         Query query =
-            this.queryManager.createQuery("select doc.space, doc.name from doc.object("
+            this.queryManager.createQuery("select doc.space, doc.name from Document doc, doc.object("
                 + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension where extension."
                 + XWikiRepositoryModel.PROP_EXTENSION_ID + " = :extensionId", Query.XWQL);
 
@@ -350,7 +350,7 @@ public class DefaultRepositoryManager implements RepositoryManager
     public void validateExtensions() throws QueryException, XWikiException
     {
         Query query =
-            this.queryManager.createQuery("select doc.space, doc.name from doc.object("
+            this.queryManager.createQuery("select doc.space, doc.name from Document doc, doc.object("
                 + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension", Query.XWQL);
 
         for (Object[] documentName : query.<Object[]> execute()) {

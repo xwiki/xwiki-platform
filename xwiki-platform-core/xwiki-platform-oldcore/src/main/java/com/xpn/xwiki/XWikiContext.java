@@ -607,20 +607,45 @@ public class XWikiContext extends Hashtable<Object, Object>
         this.classCache.clear();
     }
 
-    // Used to avoid recursive loading of documents if there are recursives usage of classes
-    public void addDocumentArchive(String key, XWikiDocumentArchive obj)
+    /**
+     * Add a {@link XWikiDocumentArchive document archive} in a cache associated with this context, so that future
+     * access requests for the same document archive don't go through the database again.
+     * 
+     * @param key the key used to identify a document archive in the cache
+     * @param archive the {@link XWikiDocumentArchive document archive} to cache
+     */
+    public void addDocumentArchive(String key, XWikiDocumentArchive archive)
     {
-        this.archiveCache.put(key, obj);
+        this.archiveCache.put(key, archive);
     }
 
-    // Used to avoid recursive loading of documents if there are recursives usage of classes
+    /**
+     * Get the cached {@link XWikiDocumentArchive document archive} from the context, if any.
+     * 
+     * @param key the key used to identify a document archive in the cache
+     * @return the document archive, if it does exist in the context cache, or {@code null} otherwise
+     * @see #addDocumentArchive(String, XWikiDocumentArchive)
+     */
     public XWikiDocumentArchive getDocumentArchive(String key)
     {
         return this.archiveCache.get(key);
     }
 
     /**
-     * Empty the archive cache.
+     * Remove the cached {@link XWikiDocumentArchive document archive} from the context.
+     * 
+     * @param key the key used to identify a document archive in the cache
+     * @see #addDocumentArchive(String, XWikiDocumentArchive)
+     */
+    public void removeDocumentArchive(String key)
+    {
+        this.archiveCache.remove(key);
+    }
+
+    /**
+     * Empty the document archive cache.
+     * 
+     * @see #addDocumentArchive(String, XWikiDocumentArchive)
      */
     public void flushArchiveCache()
     {

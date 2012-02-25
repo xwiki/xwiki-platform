@@ -93,7 +93,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         final XWikiHibernateBaseStore store = getStore();
 
         // Try retrieving a version from the database
-        ver = store.executeFailSafeRead(context,
+        ver = store.failSafeExecuteRead(context,
             new HibernateCallback<XWikiDBVersion>()
             {
                 @Override
@@ -106,7 +106,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
 
         // if it fails, return version 0 if there is some documents in the database, else null (empty db?)
         if (ver == null) {
-            ver = store.executeFailSafeRead(getXWikiContext(),
+            ver = store.failSafeExecuteRead(getXWikiContext(),
                 new HibernateCallback<XWikiDBVersion>()
                 {
                     @Override

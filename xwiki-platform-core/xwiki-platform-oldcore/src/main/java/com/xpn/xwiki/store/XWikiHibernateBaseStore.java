@@ -1237,7 +1237,7 @@ public class XWikiHibernateBaseStore implements Initializable
      * @throws XWikiException if any error
      * @see #execute(XWikiContext, boolean, HibernateCallback)
      * @deprecated since 4.0M1, use {@link #executeRead(XWikiContext, HibernateCallback)} or
-     *                          {@link #executeFailSafeRead(XWikiContext, HibernateCallback)}
+     *                          {@link #failSafeExecuteRead(XWikiContext, HibernateCallback)}
      */
     @Deprecated
     public <T> T executeRead(XWikiContext context, boolean bTransaction, HibernateCallback<T> cb) throws XWikiException
@@ -1254,7 +1254,7 @@ public class XWikiHibernateBaseStore implements Initializable
      * @return {@link HibernateCallback#doInHibernate(Session)}, returns null if the callback throw an error.
      * @see #failSafeExecute(XWikiContext, boolean, HibernateCallback)
      */
-    public <T> T executeFailSafeRead(XWikiContext context, HibernateCallback<T> cb)
+    public <T> T failSafeExecuteRead(XWikiContext context, HibernateCallback<T> cb)
     {
         return failSafeExecute(context, false, cb);
     }
@@ -1283,7 +1283,7 @@ public class XWikiHibernateBaseStore implements Initializable
      * @throws XWikiException if any error
      * @see #execute(XWikiContext, boolean, HibernateCallback)
      * @deprecated since 4.0M1, use {@link #executeWrite(XWikiContext, HibernateCallback)} or
-     *                          {@link #executeFailSafeWrite(XWikiContext, HibernateCallback)}
+     *                          {@link #failSafeExecuteWrite(XWikiContext, HibernateCallback)}
      */
     @Deprecated
     public <T> T executeWrite(XWikiContext context, boolean bTransaction, HibernateCallback<T> cb)

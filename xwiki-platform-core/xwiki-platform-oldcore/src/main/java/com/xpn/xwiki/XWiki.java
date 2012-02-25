@@ -1774,16 +1774,13 @@ public class XWiki implements EventListener
                 }
             }
         } catch (Exception ex) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Exception while parsing template [" + template + "] from skin", ex);
-            }
+            LOGGER.debug("Exception while parsing template [{}] from skin", template, ex);
         }
 
         // Prevent inclusion of templates from other directories
         template = URI.create("/templates/" + template).normalize().toString();
         if (!template.startsWith("/templates/")) {
-            LOGGER.warn("Illegal access, tried to use file [" + template
-                + "] as a template. Possible break-in attempt!");
+            LOGGER.warn("Direct access to template file [{}] refused. Possible break-in attempt!", template);
             return "";
         }
 

@@ -205,7 +205,7 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
                     for (ComponentDescriptor componentDescriptor : this.jarLoader.getComponentsDescriptors(classLoader
                         .loadClass(componentDeclaration.getImplementationClassName()))) {
                         this.componentManagerManager.getComponentManager(namespace, false).unregisterComponent(
-                            componentDescriptor.getRole(), componentDescriptor.getRoleHint());
+                            componentDescriptor);
                     }
                 } catch (ClassNotFoundException e) {
                     this.logger.warn("Can't find any existing component with class [{}]. Ignoring it.",

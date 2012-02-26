@@ -29,7 +29,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -76,7 +75,6 @@ public class DefaultExtensionManagerConfiguration implements ExtensionManagerCon
      * The configuration.
      */
     @Inject
-    @Named("configurationSource")
     private Provider<ConfigurationSource> configuration;
 
     // Cache

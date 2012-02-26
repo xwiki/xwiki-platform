@@ -17,41 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.aether.internal.configuration;
-
-import java.io.File;
+package com.xpn.xwiki.internal.query;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.environment.Environment;
+import org.xwiki.query.QueryExecutor;
 
+/**
+ * Provide the default QueryExecutor provider for the hint "configurationSource".
+ * 
+ * @version $Id$
+ * @since 3.2M2
+ * @deprecated since 4.0M1 use the provider with default hint
+ */
 @Component
+@Named("queryExecutor")
 @Singleton
-public class DefaultAetherConfiguration implements AetherConfiguration
+@Deprecated
+public class DeprecatedConfiguredQueryExecutorProvider implements Provider<QueryExecutor>
 {
     @Inject
-    private Provider<ConfigurationSource> configurationSourceProvider;
-
-    @Inject
-    private Environment environment;
+    private Provider<QueryExecutor> provider;
 
     @Override
-    public File getLocalRepository()
+    public QueryExecutor get()
     {
-        String localRepositoryPath =
-            this.configurationSourceProvider.get().getProperty("extension.aether.localRepository");
-
-        File directory;
-        if (localRepositoryPath == null) {
-            directory = new File(this.environment.getTemporaryDirectory(), "aether-repository");
-        } else {
-            directory = new File(localRepositoryPath);
-        }
-
-        return directory;
+        return this.provider.get();
     }
 }

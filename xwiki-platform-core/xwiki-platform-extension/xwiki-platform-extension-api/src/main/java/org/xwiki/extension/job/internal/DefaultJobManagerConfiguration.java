@@ -22,7 +22,6 @@ package org.xwiki.extension.job.internal;
 import java.io.File;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -50,7 +49,6 @@ public class DefaultJobManagerConfiguration implements JobManagerConfiguration
      * The configuration.
      */
     @Inject
-    @Named("configurationSource")
     private Provider<ConfigurationSource> configuration;
 
     // Cache

@@ -35,7 +35,7 @@ public class AetherExtension extends AbstractExtension
     {
         super(repository, AetherUtils.createExtensionId(artifact), artifact.getExtension());
 
-        setFile(new AetherExtensionFile(artifact, repository, plexusComponentManager, getType()));
+        setFile(new AetherExtensionFile(artifact, repository, plexusComponentManager));
 
         // custom properties
         putProperty(PKEY_AETHER_ATIFACT, artifact);

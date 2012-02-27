@@ -49,6 +49,7 @@ public class TimePlotFactory implements PlotFactory
         return uniqueInstance;
     }
 
+    @Override
     public Plot create(DataSource dataSource, ChartParams params) throws GenerateException, DataSourceException
     {
 

@@ -50,6 +50,7 @@ public class DefaultPlexusComponentManager implements PlexusComponentManager, In
      */
     private MutablePlexusContainer plexusContainer;
 
+    @Override
     public void initialize() throws InitializationException
     {
         try {
@@ -70,6 +71,7 @@ public class DefaultPlexusComponentManager implements PlexusComponentManager, In
         this.plexusContainer.setLoggerManager(new XWikiLoggerManager(this.logger));
     }
 
+    @Override
     public PlexusContainer getPlexus()
     {
         return plexusContainer;

@@ -99,21 +99,13 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         super(name, className, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
-     */
+    @Override
     public String getName()
     {
         return ID;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(XWikiContext)
-     */
+    @Override
     public void init(XWikiContext context)
     {
         super.init(context);
@@ -133,11 +125,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#virtualInit(XWikiContext)
-     */
+    @Override
     public void virtualInit(XWikiContext context)
     {
         super.virtualInit(context);
@@ -148,11 +136,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(XWikiPluginInterface, XWikiContext)
-     */
+    @Override
     public WatchListPluginApi getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new WatchListPluginApi((WatchListPlugin) plugin, context);

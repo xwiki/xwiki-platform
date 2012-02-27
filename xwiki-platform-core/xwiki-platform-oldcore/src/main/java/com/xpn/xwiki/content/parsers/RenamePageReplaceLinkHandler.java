@@ -36,6 +36,7 @@ public class RenamePageReplaceLinkHandler implements ReplaceLinkHandler
      * 
      * @see ReplaceLinkHandler#compare(Link, Link) 
      */
+    @Override
     public boolean compare(Link linkToLookFor, Link linkToReplace)
     {
         boolean result;
@@ -77,8 +78,9 @@ public class RenamePageReplaceLinkHandler implements ReplaceLinkHandler
      * <p>Keep the query string, alias and target in the link to replace if they are not
      * specified in the new link.</p>
      *
-     * @see ReplaceLinkHandler#getReplacementLink(Link, Link)}
+     * @see ReplaceLinkHandler#getReplacementLink(Link, Link)
      */
+    @Override
     public Link getReplacementLink(Link newLink, Link linkToReplace)
     {
         Link replacementLink = new Link();

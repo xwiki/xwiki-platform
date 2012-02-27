@@ -56,7 +56,7 @@ public class DefaultExtensionManagerConfigurationTest extends AbstractComponentT
     }
 
     @Test
-    public void testGetRepositoriesEmpty() throws URISyntaxException
+    public void testGetRepositoriesEmpty()
     {
         Assert.assertEquals(null, this.configuration.getRepositories());
     }

@@ -52,18 +52,22 @@ public abstract class AbstractChartParam implements ChartParam
         this.optional = optional;
     }
 
+    @Override
     public String getName()
     {
         return name;
     }
 
+    @Override
     public boolean isOptional()
     {
         return optional;
     }
 
+    @Override
     public abstract Class getType();
 
+    @Override
     public abstract Object convert(String value) throws ParamException;
 
     @Override

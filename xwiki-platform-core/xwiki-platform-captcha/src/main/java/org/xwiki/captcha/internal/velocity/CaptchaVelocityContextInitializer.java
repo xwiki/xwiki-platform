@@ -48,11 +48,7 @@ public class CaptchaVelocityContextInitializer implements VelocityContextInitial
     @Named("velocity")
     private XWikiCaptchaService service;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.velocity.VelocityContextInitializer#initialize(VelocityContext)
-     */
+    @Override
     public void initialize(VelocityContext context)
     {
         context.put(VELOCITY_CONTEXT_KEY, service);

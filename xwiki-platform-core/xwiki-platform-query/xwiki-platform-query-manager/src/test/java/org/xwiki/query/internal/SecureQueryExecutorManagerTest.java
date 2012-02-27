@@ -42,9 +42,7 @@ public class SecureQueryExecutorManagerTest extends AbstractMockingComponentTest
 
     private DocumentAccessBridge dab;
 
-    /**
-     * @see org.xwiki.test.AbstractMockingComponentTestCase#configure()
-     */
+    @Override
     public void configure() throws Exception
     {
         final QueryExecutorManager nestedQueryExecutorManager =

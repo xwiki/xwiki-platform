@@ -55,66 +55,79 @@ public class XWikiWrappingDriver implements WebDriver, JavascriptExecutor
         return this.driver;
     }
 
+    @Override
     public void close()
     {
         getWrappedDriver().close();
     }
 
+    @Override
     public List<WebElement> findElements(By by)
     {
         return getWrappedDriver().findElements(by);
     }
 
+    @Override
     public void get(String s)
     {
         getWrappedDriver().get(s);
     }
 
+    @Override
     public String getCurrentUrl()
     {
         return getWrappedDriver().getCurrentUrl();
     }
 
+    @Override
     public String getPageSource()
     {
         return getWrappedDriver().getPageSource();
     }
 
+    @Override
     public String getTitle()
     {
         return getWrappedDriver().getTitle();
     }
 
+    @Override
     public String getWindowHandle()
     {
         return getWrappedDriver().getWindowHandle();
     }
 
+    @Override
     public Set<String> getWindowHandles()
     {
         return getWrappedDriver().getWindowHandles();
     }
 
+    @Override
     public Options manage()
     {
         return getWrappedDriver().manage();
     }
 
+    @Override
     public Navigation navigate()
     {
         return getWrappedDriver().navigate();
     }
 
+    @Override
     public void quit()
     {
         getWrappedDriver().quit();
     }
 
+    @Override
     public TargetLocator switchTo()
     {
         return getWrappedDriver().switchTo();
     }
 
+    @Override
     public WebElement findElement(By by)
     {
         try {
@@ -125,11 +138,13 @@ public class XWikiWrappingDriver implements WebDriver, JavascriptExecutor
         }
     }
 
+    @Override
     public Object executeAsyncScript(String s, Object... objects)
     {
         return ((JavascriptExecutor) getWrappedDriver()).executeAsyncScript(s, objects);
     }
 
+    @Override
     public Object executeScript(String s, Object... objects)
     {
         return ((JavascriptExecutor) getWrappedDriver()).executeScript(s, objects);

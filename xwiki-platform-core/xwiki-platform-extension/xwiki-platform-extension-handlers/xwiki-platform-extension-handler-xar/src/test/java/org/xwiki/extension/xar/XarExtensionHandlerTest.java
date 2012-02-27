@@ -76,6 +76,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
     private DocumentReference contextUser;
 
+    @Override
     @Before
     public void setUp() throws Exception
     {
@@ -109,6 +110,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                 allowing(mockXWiki).getDocument(with(any(DocumentReference.class)), with(any(XWikiContext.class)));
                 will(new CustomAction("getDocument")
                 {
+                    @Override
                     public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
                     {
                         Map<String, XWikiDocument> documentLanguages = documents.get(invocation.getParameter(0));
@@ -131,6 +133,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                 allowing(mockStore).loadXWikiDoc(with(any(XWikiDocument.class)), with(any(XWikiContext.class)));
                 will(new CustomAction("loadXWikiDoc")
                 {
+                    @Override
                     public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
                     {
                         XWikiDocument providedDocument = (XWikiDocument) invocation.getParameter(0);
@@ -159,6 +162,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                     with(any(XWikiContext.class)));
                 will(new CustomAction("saveDocument")
                 {
+                    @Override
                     public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
                     {
                         XWikiDocument document = (XWikiDocument) invocation.getParameter(0);
@@ -182,6 +186,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                 allowing(mockXWiki).deleteDocument(with(any(XWikiDocument.class)), with(any(XWikiContext.class)));
                 will(new CustomAction("deleteDocument")
                 {
+                    @Override
                     public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
                     {
                         XWikiDocument document = (XWikiDocument) invocation.getParameter(0);
@@ -199,6 +204,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                 allowing(mockXWiki).getXClass(with(any(DocumentReference.class)), with(any(XWikiContext.class)));
                 will(new CustomAction("getXClass")
                 {
+                    @Override
                     public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
                     {
                         DocumentReference documentReference = (DocumentReference) invocation.getParameter(0);

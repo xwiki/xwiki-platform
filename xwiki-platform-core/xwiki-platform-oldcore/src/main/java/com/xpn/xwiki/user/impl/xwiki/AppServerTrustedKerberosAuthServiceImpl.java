@@ -63,11 +63,6 @@ public class AppServerTrustedKerberosAuthServiceImpl extends XWikiAuthServiceImp
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(AppServerTrustedKerberosAuthServiceImpl.class);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl#checkAuth(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
@@ -87,12 +82,6 @@ public class AppServerTrustedKerberosAuthServiceImpl extends XWikiAuthServiceImp
         return new XWikiUser(user);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl#checkAuth(java.lang.String, java.lang.String,
-     *      java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
         throws XWikiException

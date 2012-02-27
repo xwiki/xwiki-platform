@@ -23,7 +23,6 @@ import java.net.URL;
 
 import junit.framework.Assert;
 
-import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.classloader.URIClassLoader;

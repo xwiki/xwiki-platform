@@ -86,6 +86,7 @@ public class FileExtensionRepository extends AbstractExtensionRepository impleme
         return extensionId.getId() + '-' + extensionId.getVersion().getValue() + '.' + type;
     }
 
+    @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
         InputStream descriptor;
@@ -115,6 +116,7 @@ public class FileExtensionRepository extends AbstractExtensionRepository impleme
             .getVersionConstraint().getValue())));
     }
 
+    @Override
     public boolean exists(ExtensionId extensionId)
     {
         try {

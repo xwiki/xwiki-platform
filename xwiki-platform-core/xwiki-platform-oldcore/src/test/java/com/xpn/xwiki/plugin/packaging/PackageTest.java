@@ -45,6 +45,7 @@ public class PackageTest extends AbstractBridgedXWikiComponentTestCase
 
     private Mock mockXWiki;
 
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();

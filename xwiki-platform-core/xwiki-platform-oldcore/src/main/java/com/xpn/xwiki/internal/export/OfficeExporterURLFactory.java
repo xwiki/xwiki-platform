@@ -38,11 +38,6 @@ import com.xpn.xwiki.pdf.impl.PdfURLFactory;
  */
 public class OfficeExporterURLFactory extends PdfURLFactory
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PdfURLFactory#getURL(URL, XWikiContext)
-     */
     @Override
     public String getURL(URL url, XWikiContext context)
     {

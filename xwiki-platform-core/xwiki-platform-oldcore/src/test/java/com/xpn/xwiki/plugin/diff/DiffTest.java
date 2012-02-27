@@ -34,6 +34,7 @@ public class DiffTest extends org.jmock.cglib.MockObjectTestCase
 {
     private DiffPlugin plugin;
 
+    @Override
     protected void setUp()
     {
         this.plugin = new DiffPlugin("diff", DiffPlugin.class.getName(), null);

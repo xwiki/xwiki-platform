@@ -150,11 +150,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
         this.componentManager = componentManager;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(WikiMacroParameters parameters, String macroContent, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -335,41 +331,31 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public MacroDescriptor getDescriptor()
     {
         return this.descriptor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int getPriority()
     {
         return 1000;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getId()
     {
         return this.descriptor.getId().getId();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DocumentReference getDocumentReference()
     {
         return this.macroDocumentReference;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int compareTo(Macro< ? > macro)
     {
         if (getPriority() != macro.getPriority()) {
@@ -379,9 +365,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
         return this.getClass().getSimpleName().compareTo(macro.getClass().getSimpleName());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return this.supportsInlineMode;

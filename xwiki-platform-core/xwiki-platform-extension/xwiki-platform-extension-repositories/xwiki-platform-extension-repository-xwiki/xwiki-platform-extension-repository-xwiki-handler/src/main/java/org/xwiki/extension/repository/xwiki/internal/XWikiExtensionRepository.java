@@ -41,7 +41,6 @@ import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicenseManager;
 import org.xwiki.extension.ExtensionManagerConfiguration;
-import org.xwiki.extension.InvalidExtensionException;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
@@ -256,11 +255,7 @@ public class XWikiExtensionRepository extends AbstractExtensionRepository implem
 
         List<Extension> extensions = new ArrayList<Extension>(restExtensions.getExtensions().size());
         for (ExtensionVersion restExtension : restExtensions.getExtensions()) {
-            try {
-                extensions.add(new XWikiExtension(this, restExtension, this.licenseManager));
-            } catch (InvalidExtensionException e) {
-                throw new SearchException("Found invalid extension", e);
-            }
+            extensions.add(new XWikiExtension(this, restExtension, this.licenseManager));
         }
 
         return new CollectionIterableResult<Extension>(restExtensions.getTotalHits(), restExtensions.getOffset(),

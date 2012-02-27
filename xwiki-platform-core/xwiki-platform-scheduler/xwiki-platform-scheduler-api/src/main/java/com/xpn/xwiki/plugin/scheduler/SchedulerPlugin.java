@@ -84,11 +84,6 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         super(name, className, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiPluginInterface#init(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public void init(XWikiContext context)
     {
@@ -158,11 +153,6 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         super.init(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiPluginInterface#virtualInit(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public void virtualInit(XWikiContext context)
     {

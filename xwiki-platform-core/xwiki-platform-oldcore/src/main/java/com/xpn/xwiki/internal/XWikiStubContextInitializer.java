@@ -50,11 +50,7 @@ public class XWikiStubContextInitializer implements ExecutionContextInitializer
     @Inject
     private XWikiStubContextProvider stubContextProvider;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.context.ExecutionContextInitializer#initialize(org.xwiki.context.ExecutionContext)
-     */
+    @Override
     public void initialize(ExecutionContext context) throws ExecutionContextException
     {
         XWikiContext xcontext = (XWikiContext) context.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);

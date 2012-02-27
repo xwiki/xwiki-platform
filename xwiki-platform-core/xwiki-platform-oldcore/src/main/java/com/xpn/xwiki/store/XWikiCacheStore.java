@@ -123,6 +123,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         }
     }
 
+    @Override
     public void initCache(int capacity, int pageExistCacheCapacity, XWikiContext context) throws XWikiException
     {
         CacheFactory cacheFactory = context.getWiki().getCacheFactory();
@@ -151,11 +152,13 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         }
     }
 
+    @Override
     public XWikiStoreInterface getStore()
     {
         return this.store;
     }
 
+    @Override
     public void setStore(XWikiStoreInterface store)
     {
         this.store = store;
@@ -212,7 +215,6 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
                 flushCache();
             } else {
                 XWikiDocument doc = (XWikiDocument) source;
-                XWikiContext context = (XWikiContext) data;
 
                 String key = doc.getKey();
 

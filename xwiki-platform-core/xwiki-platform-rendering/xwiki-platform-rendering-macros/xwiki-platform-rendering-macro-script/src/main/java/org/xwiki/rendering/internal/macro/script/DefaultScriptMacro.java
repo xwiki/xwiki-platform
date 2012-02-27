@@ -64,12 +64,6 @@ public class DefaultScriptMacro extends AbstractJSR223ScriptMacro<DefaultScriptM
             DefaultScriptMacroParameters.class);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.script.AbstractJSR223ScriptMacro#getScriptEngineName(org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
     @Override
     protected String getScriptEngineName(DefaultScriptMacroParameters parameters, MacroTransformationContext context)
     {

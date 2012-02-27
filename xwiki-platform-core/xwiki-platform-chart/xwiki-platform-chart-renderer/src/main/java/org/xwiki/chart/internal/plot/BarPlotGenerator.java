@@ -39,9 +39,7 @@ import org.xwiki.chart.model.ChartModel;
  */
 public class BarPlotGenerator implements PlotGenerator
 {
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Plot generate(ChartModel model, Map<String, String> parameters)
     {
         CategoryItemRenderer renderer = new BarRenderer();

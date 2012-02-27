@@ -25,41 +25,50 @@ import com.xpn.xwiki.util.Util;
 
 /**
  * Struts form for {@link DeleteVersionsAction}.
+ * 
  * @version $Id$
  */
 public class DeleteVersionsForm extends XWikiForm
 {
     /** from revision. */
     private Version rev1;
+
     /** to revision. */
     private Version rev2;
+
     /** single version. */
     private Version rev;
+
     /** document language. */
     private String language;
+
     /** is action confirmed. */
     private boolean confirm;
-    /** {@inheritDoc} */
+
+    @Override
     public void readRequest()
     {
         XWikiRequest request = getRequest();
         rev1 = getVersion(request.getParameter("rev1"));
         rev2 = getVersion(request.getParameter("rev2"));
-        rev =  getVersion(request.getParameter("rev"));
+        rev = getVersion(request.getParameter("rev"));
         language = Util.normalizeLanguage(request.getParameter("language"));
         confirm = request.getParameter("confirm") != null;
     }
+
     /**
      * @return {@link Version}, or null if ver is incorrect
      * @param ver string representation of {@link Version}
      */
-    private Version getVersion(String ver) {
+    private Version getVersion(String ver)
+    {
         try {
             return new Version(ver);
         } catch (Exception e) {
             return null;
         }
     }
+
     /**
      * @return from revision
      */
@@ -67,6 +76,7 @@ public class DeleteVersionsForm extends XWikiForm
     {
         return rev1;
     }
+
     /**
      * @return to revision
      */
@@ -74,6 +84,7 @@ public class DeleteVersionsForm extends XWikiForm
     {
         return rev2;
     }
+
     /**
      * @return single revision
      */
@@ -81,6 +92,7 @@ public class DeleteVersionsForm extends XWikiForm
     {
         return rev;
     }
+
     /**
      * @return document language
      */
@@ -88,6 +100,7 @@ public class DeleteVersionsForm extends XWikiForm
     {
         return language;
     }
+
     /**
      * @return is action confirmed
      */

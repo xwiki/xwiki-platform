@@ -99,11 +99,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.class, "relative");
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseElement#getReference()
-     */
     @Override
     public DocumentReference getReference()
     {
@@ -205,22 +200,12 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#get(java.lang.String)
-     */
     @Override
     public PropertyInterface get(String name)
     {
         return safeget(name);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#put(java.lang.String, com.xpn.xwiki.objects.PropertyInterface)
-     */
     @Override
     public void put(String name, PropertyInterface property)
     {
@@ -419,11 +404,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return object;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#clone()
-     */
     @Override
     public BaseClass clone()
     {
@@ -438,11 +418,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return bclass;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -492,11 +467,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#toXML(com.xpn.xwiki.objects.classes.BaseClass)
-     */
     @Override
     public Element toXML(BaseClass bclass)
     {
@@ -1190,11 +1160,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#getDiff(java.lang.Object, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context)
     {

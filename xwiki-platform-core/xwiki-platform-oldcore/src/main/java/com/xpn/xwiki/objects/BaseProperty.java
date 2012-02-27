@@ -52,11 +52,6 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
 
     private long id;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseElement#createReference()
-     */
     @Override
     protected R createReference()
     {
@@ -70,31 +65,18 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
         return reference;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.PropertyInterface#getObject()
-     */
+    @Override
     public BaseCollection getObject()
     {
         return this.object;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.PropertyInterface#setObject(com.xpn.xwiki.objects.BaseCollection)
-     */
+    @Override
     public void setObject(BaseCollection object)
     {
         this.object = object;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseElement#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object el)
     {
@@ -153,11 +135,6 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseElement#clone()
-     */
     @Override
     public BaseProperty clone()
     {
@@ -177,11 +154,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.PropertyInterface#toXML()
-     */
+    @Override
     public Element toXML()
     {
         Element el = new DOMElement(getName());
@@ -191,11 +164,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
         return el;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.PropertyInterface#toFormString()
-     */
+    @Override
     public String toFormString()
     {
         return Utils.formEncode(toText());
@@ -226,11 +195,6 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {
@@ -242,13 +206,6 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
         return getValue();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseElement#merge(com.xpn.xwiki.objects.ElementInterface,
-     *      com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.doc.merge.MergeConfiguration,
-     *      com.xpn.xwiki.XWikiContext, com.xpn.xwiki.doc.merge.MergeResult)
-     */
     @Override
     public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult)

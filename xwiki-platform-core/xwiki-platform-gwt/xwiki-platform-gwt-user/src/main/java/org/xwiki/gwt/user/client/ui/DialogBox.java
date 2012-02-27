@@ -197,11 +197,7 @@ public class DialogBox extends PopupPanel implements DragListener, ClickHandler
         captionBar.insert(icon, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PopupPanel#getWidget()
-     */
+    @Override
     public Widget getWidget()
     {
         if (content.getWidgetCount() > 0) {
@@ -211,22 +207,14 @@ public class DialogBox extends PopupPanel implements DragListener, ClickHandler
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PopupPanel#setWidget(Widget)
-     */
+    @Override
     public void setWidget(Widget widget)
     {
         content.clear();
         content.add(widget);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PopupPanel#onPreviewNativeEvent(NativePreviewEvent)
-     */
+    @Override
     protected void onPreviewNativeEvent(NativePreviewEvent event)
     {
         // We need to preventDefault() on mouseDown events (outside of the
@@ -255,11 +243,7 @@ public class DialogBox extends PopupPanel implements DragListener, ClickHandler
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DragListener#onDragStart(Widget, int, int)
-     */
+    @Override
     public void onDragStart(Widget sender, int x, int y)
     {
         dragStartX = x;
@@ -270,11 +254,7 @@ public class DialogBox extends PopupPanel implements DragListener, ClickHandler
         box.addStyleDependentName(DRAGGING_STYLE);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DragListener#onDrag(Widget, int, int)
-     */
+    @Override
     public void onDrag(Widget sender, int x, int y)
     {
         if (sender == caption) {
@@ -284,11 +264,7 @@ public class DialogBox extends PopupPanel implements DragListener, ClickHandler
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DragListener#onDragEnd(Widget, int, int)
-     */
+    @Override
     public void onDragEnd(Widget sender, int x, int y)
     {
         contentPlaceHolder.setVisible(false);
@@ -296,11 +272,7 @@ public class DialogBox extends PopupPanel implements DragListener, ClickHandler
         box.removeStyleDependentName(DRAGGING_STYLE);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickHandler#onClick(ClickEvent)
-     */
+    @Override
     public void onClick(ClickEvent event)
     {
         if (event.getSource() == closeIcon) {

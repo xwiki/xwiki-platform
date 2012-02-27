@@ -80,11 +80,7 @@ public class DeferredUpdater implements TimerListener
         timer.schedule(delay);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see TimerListener#onElapsed(Timer)
-     */
+    @Override
     public void onElapsed(Timer sender)
     {
         try {

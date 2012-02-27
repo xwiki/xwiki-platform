@@ -79,11 +79,7 @@ public class XWikiAnnotationRightService implements AnnotationRightService
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.rights.AnnotationRightService#canAddAnnotation(java.lang.String, java.lang.String)
-     */
+    @Override
     public boolean canAddAnnotation(String target, String userName)
     {
         // if the user has comment right on the document represented by the target
@@ -97,12 +93,7 @@ public class XWikiAnnotationRightService implements AnnotationRightService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.rights.AnnotationRightService#canEditAnnotation(java.lang.String, java.lang.String,
-     *      java.lang.String)
-     */
+    @Override
     public boolean canEditAnnotation(String annotationId, String target, String userName)
     {
         // if the user has edit right on the document represented by the target, or is the author of the annotation
@@ -123,22 +114,13 @@ public class XWikiAnnotationRightService implements AnnotationRightService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.rights.AnnotationRightService#canViewAnnotatedTarget(java.lang.String,
-     *      java.lang.String)
-     */
+    @Override
     public boolean canViewAnnotatedTarget(String target, String userName)
     {
         return canViewAnnotations(target, userName);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.rights.AnnotationRightService#canViewAnnotations(java.lang.String, java.lang.String)
-     */
+    @Override
     public boolean canViewAnnotations(String target, String userName)
     {
         // if user can view the target, it should be able to view annotations on it

@@ -29,28 +29,10 @@ import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.extension.job.plan.ExtensionPlanAction.Action;
 import org.xwiki.extension.job.plan.ExtensionPlanNode;
-import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.test.AbstractExtensionHandlerTest;
-import org.xwiki.extension.test.ConfigurableDefaultCoreExtensionRepository;
 
 public class InstallPlanJobTest extends AbstractExtensionHandlerTest
 {
-    private ConfigurableDefaultCoreExtensionRepository coreRepository;
-
-    @Override
-    public void setUp() throws Exception
-    {
-        super.setUp();
-
-        // lookup
-
-        this.coreRepository =
-            (ConfigurableDefaultCoreExtensionRepository) getComponentManager().lookup(CoreExtensionRepository.class);
-
-        // resources
-
-    }
-
     @Test
     public void testInstallPlanWithSimpleRemoteExtensionOnRoot() throws Throwable
     {

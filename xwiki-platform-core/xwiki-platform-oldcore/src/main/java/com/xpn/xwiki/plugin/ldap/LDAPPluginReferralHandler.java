@@ -67,11 +67,7 @@ public class LDAPPluginReferralHandler implements LDAPAuthHandler
         this.xcontext = context;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.novell.ldap.LDAPAuthHandler#getAuthProvider(java.lang.String, int)
-     */
+    @Override
     public LDAPAuthProvider getAuthProvider(String host, int port)
     {
         try {

@@ -78,18 +78,14 @@ public class XWikiRCSNodeContent extends AbstractSimpleClass
     {
         this.patch = patch;
     }
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String toString()
     {
         return new ToStringBuilder(this)
             .append("id", getId())
             .toString();
     }
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int compareTo(XWikiRCSNodeContent o)
     {
         return getId().getVersion().compareTo(o.getId().getVersion());

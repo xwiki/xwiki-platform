@@ -69,11 +69,7 @@ public class StaticFilesBundle extends AbstractFilesystemBundle implements Bundl
         setPriority(400);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Bundle#getTranslation(String, String)
-     */
+    @Override
     public String getTranslation(String key, String language)
     {
         Properties props = getStaticBundle(language);

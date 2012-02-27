@@ -37,14 +37,12 @@ import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Tag;
 import org.xwiki.rest.model.jaxb.Tags;
 
-import com.xpn.xwiki.XWikiException;
-
 @Component("org.xwiki.rest.resources.tags.TagsResource")
 @Path("/wikis/{wikiName}/tags")
 public class TagsResource extends XWikiResource
 {
     @GET
-    public Tags getTags(@PathParam("wikiName") String wikiName) throws XWikiException, QueryException
+    public Tags getTags(@PathParam("wikiName") String wikiName) throws QueryException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 

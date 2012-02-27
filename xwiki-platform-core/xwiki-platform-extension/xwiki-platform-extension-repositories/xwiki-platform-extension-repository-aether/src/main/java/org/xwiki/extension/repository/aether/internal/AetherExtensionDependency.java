@@ -21,7 +21,6 @@ package org.xwiki.extension.repository.aether.internal;
 
 import org.sonatype.aether.graph.Dependency;
 import org.xwiki.extension.AbstractExtensionDependency;
-import org.xwiki.extension.version.InvalidVersionRangeException;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 
 public class AetherExtensionDependency extends AbstractExtensionDependency
@@ -31,7 +30,6 @@ public class AetherExtensionDependency extends AbstractExtensionDependency
     public static final String PKEY_MAVEN_DEPENDENCY = "maven.Dependency";
 
     public AetherExtensionDependency(Dependency aetherDependency, org.apache.maven.model.Dependency mavenDependency)
-        throws InvalidVersionRangeException
     {
         super(AetherUtils.createExtensionId(aetherDependency.getArtifact()).getId(), new DefaultVersionConstraint(
             aetherDependency.getArtifact().getVersion()));

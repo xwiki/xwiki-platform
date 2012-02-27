@@ -37,11 +37,6 @@ public class AllowDeny
      */
     public UsersGroups deny = new UsersGroups();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {

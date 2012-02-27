@@ -269,11 +269,6 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
         return instance;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#forceValidDocumentName()
-     */
     @Override
     public boolean forceValidDocumentName()
     {
@@ -281,11 +276,6 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#check(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     protected void check(XWikiContext context) throws XWikiException
     {
@@ -299,11 +289,6 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.util.AbstractXClassManager#updateBaseClass(com.xpn.xwiki.objects.classes.BaseClass)
-     */
     @Override
     protected boolean updateBaseClass(BaseClass baseClass)
     {
@@ -327,11 +312,6 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
         return needsUpdate;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#updateClassTemplateDocument(com.xpn.xwiki.doc.XWikiDocument)
-     */
     @Override
     protected boolean updateClassTemplateDocument(XWikiDocument doc)
     {
@@ -422,12 +402,6 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
         return wiki;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#getXObjectDocument(java.lang.String,
-     *      int, boolean, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public XWikiServer getXObjectDocument(String itemName, int objectId, boolean validate, XWikiContext context)
         throws XWikiException

@@ -51,11 +51,6 @@ public class TextAreaClass extends StringClass
         this(null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.classes.StringClass#newProperty()
-     */
     @Override
     public BaseProperty newProperty()
     {
@@ -161,12 +156,6 @@ public class TextAreaClass extends StringClass
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.classes.StringClass#displayEdit(java.lang.StringBuffer, java.lang.String,
-     *      java.lang.String, com.xpn.xwiki.objects.BaseCollection, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
@@ -205,12 +194,6 @@ public class TextAreaClass extends StringClass
         buffer.append(textarea.toString());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.classes.PropertyClass#displayView(java.lang.StringBuffer, java.lang.String,
-     *      java.lang.String, com.xpn.xwiki.objects.BaseCollection, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {

@@ -33,7 +33,6 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
 import org.xwiki.extension.ExtensionLicenseManager;
-import org.xwiki.extension.InvalidExtensionException;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionAuthor;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
@@ -48,7 +47,7 @@ import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 public class XWikiExtension extends AbstractExtension
 {
     public XWikiExtension(XWikiExtensionRepository repository, ExtensionVersion extension,
-        ExtensionLicenseManager licenseManager) throws InvalidExtensionException
+        ExtensionLicenseManager licenseManager)
     {
         super(repository, new ExtensionId(extension.getId(), extension.getVersion()), extension.getType());
 

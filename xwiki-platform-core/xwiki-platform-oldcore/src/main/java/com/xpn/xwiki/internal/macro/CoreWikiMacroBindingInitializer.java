@@ -74,13 +74,7 @@ public class CoreWikiMacroBindingInitializer implements WikiMacroBindingInitiali
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.macro.wikibridge.WikiMacroBindingInitializer#initialize(org.xwiki.model.reference.DocumentReference,
-     *      org.xwiki.rendering.macro.wikibridge.WikiMacroParameters, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext, java.util.Map)
-     */
+    @Override
     public void initialize(DocumentReference macroDocumentReference, WikiMacroParameters parameters,
         String macroContent, MacroTransformationContext context, Map<String, Object> macroBinding)
     {

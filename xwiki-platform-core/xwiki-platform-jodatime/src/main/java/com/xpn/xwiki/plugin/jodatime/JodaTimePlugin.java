@@ -42,10 +42,11 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
  */
 public class JodaTimePlugin extends XWikiDefaultPlugin
 {
+    
     /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
+     * @param name the plugin name, usually ignored, since plugins have a fixed name
+     * @param className the name of this class, ignored
+     * @param context the current request context
      */
     public JodaTimePlugin(String name, String className, XWikiContext context)
     {
@@ -53,22 +54,12 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
         init(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
-     */
     @Override
     public String getName()
     {
         return "jodatime";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {

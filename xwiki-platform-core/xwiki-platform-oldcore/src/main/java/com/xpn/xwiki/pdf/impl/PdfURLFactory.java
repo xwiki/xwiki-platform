@@ -87,11 +87,6 @@ public class PdfURLFactory extends XWikiServletURLFactory
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiURLFactory.createSkinURL(String, String, XWikiContext)
-     */
     @Override
     public URL createSkinURL(String filename, String skin, XWikiContext context)
     {
@@ -111,11 +106,6 @@ public class PdfURLFactory extends XWikiServletURLFactory
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiURLFactory.createResourceURL(String, boolean, XWikiContext)
-     */
     @Override
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
     {

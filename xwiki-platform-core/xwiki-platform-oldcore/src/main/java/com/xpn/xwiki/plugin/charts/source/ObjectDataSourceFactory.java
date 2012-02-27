@@ -44,6 +44,7 @@ public class ObjectDataSourceFactory implements DataSourceFactory
         return uniqueInstance;
     }
 
+    @Override
     public DataSource create(Map params, XWikiContext context) throws DataSourceException
     {
 
@@ -67,14 +68,10 @@ public class ObjectDataSourceFactory implements DataSourceFactory
         int number;
         try {
             String s = (String) params.get("object_number");
-            if (className != null) {
-                try {
-                    number = Integer.parseInt(s);
-                } catch (NumberFormatException e) {
-                    throw new DataSourceException(e);
-                }
-            } else {
-                throw new DataSourceException("source=type:object implies the presence of a class argument");
+            try {
+                number = Integer.parseInt(s);
+            } catch (NumberFormatException e) {
+                throw new DataSourceException(e);
             }
         } catch (NumberFormatException e) {
             throw new DataSourceException(e);

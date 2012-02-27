@@ -28,22 +28,26 @@ public class XWikiJSPRenderer implements XWikiRenderer
     {
     }
 
+    @Override
     public String render(String content, XWikiDocument contentdoc, XWikiDocument doc, XWikiContext context)
     {
         return content;
     }
 
+    @Override
     public void flushCache()
     {
         // To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
     public String convertMultiLine(String macroname, String params, String data, String allcontent,
         XWikiVirtualMacro macro, XWikiContext context)
     {
         return allcontent;
     }
 
+    @Override
     public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro,
         XWikiContext context)
     {

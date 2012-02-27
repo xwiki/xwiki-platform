@@ -40,6 +40,7 @@ public class DefaultDocumentAccessBridgeTest extends AbstractBridgedXWikiCompone
 
     private Mock mockURLFactory;
 
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();

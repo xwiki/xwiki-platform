@@ -38,101 +38,75 @@ public class StatusListener implements SchedulerListener, JobListener
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(StatusListener.class);
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void jobScheduled(Trigger trigger)
     {
         LOGGER.info("Task [{}] scheduled", trigger.getJobName());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void jobUnscheduled(String name, String group)
     {
         LOGGER.info("Task [{}] unscheduled", name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void triggerFinalized(Trigger trigger)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void triggersPaused(String trigger, String group)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void triggersResumed(String trigger, String group)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void jobsPaused(String name, String group)
     {
         LOGGER.info("Task [{}] paused", name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void jobsResumed(String name, String group)
     {
         LOGGER.info("Task [{}] resumed", name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void schedulerError(String message, SchedulerException error)
     {
         LOGGER.error(message, error);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void schedulerShutdown()
     {
         LOGGER.warn("Scheduler is shutting down");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getName()
     {
         return "StatusListener";
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void jobToBeExecuted(JobExecutionContext context)
     {
         LOGGER.info("Task [{}] is about to be executed", context.getJobDetail().getName());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void jobExecutionVetoed(JobExecutionContext context)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void jobWasExecuted(JobExecutionContext context, JobExecutionException e)
     {
         LOGGER.info("Task [{}] executed: ", context.getJobDetail().getName(), e);

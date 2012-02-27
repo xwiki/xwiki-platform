@@ -233,23 +233,13 @@ public class PdfExportImpl implements PdfExport
         this.tidy.setConfigurationFromProps(TIDY_CONFIGURATION);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PdfExport#exportToPDF(XWikiDocument, OutputStream, XWikiContext)
-     * @since 1.0
-     */
+    @Override
     public void exportToPDF(XWikiDocument doc, OutputStream out, XWikiContext context) throws XWikiException
     {
         export(doc, out, ExportType.PDF, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PdfExport#export(XWikiDocument, OutputStream, com.xpn.xwiki.pdf.api.PdfExport.ExportType, XWikiContext)
-     * @since 3.0M2
-     */
+    @Override
     public void export(XWikiDocument doc, OutputStream out, ExportType type, XWikiContext context)
         throws XWikiException
     {
@@ -286,12 +276,7 @@ public class PdfExportImpl implements PdfExport
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PdfExport#exportHtml(String, OutputStream, com.xpn.xwiki.pdf.api.PdfExport.ExportType, XWikiContext)
-     * @since 3.0M2
-     */
+    @Override
     public void exportHtml(String html, OutputStream out, ExportType type, XWikiContext context) throws XWikiException
     {
         exportXHTML(applyCSS(convertToStrictXHtml(html), context), out, type, context);

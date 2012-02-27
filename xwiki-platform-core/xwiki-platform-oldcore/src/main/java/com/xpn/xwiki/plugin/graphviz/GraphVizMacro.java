@@ -87,21 +87,12 @@ public class GraphVizMacro extends BaseLocaleMacro
     /** Attribute value close quote. */
     private static final String CLOSE_QUOTE = "\" ";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.radeox.macro.LocaleMacro#getLocaleKey()
-     */
+    @Override
     public String getLocaleKey()
     {
         return "macro.graphviz";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.radeox.macro.BaseMacro#execute(Writer, MacroParameter)
-     */
     @Override
     public void execute(Writer writer, MacroParameter params) throws IllegalArgumentException, IOException
     {

@@ -35,11 +35,6 @@ import com.xpn.xwiki.XWikiException;
  */
 public class SaveAndContinueAction extends XWikiAction
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#action(XWikiContext)
-     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -83,11 +78,6 @@ public class SaveAndContinueAction extends XWikiAction
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#render(XWikiContext)
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

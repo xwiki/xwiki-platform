@@ -101,6 +101,7 @@ public class XWikiRadeoxRenderer implements XWikiRenderer
         return fp;
     }
 
+    @Override
     public String render(String content, XWikiDocument contentdoc, XWikiDocument contextdoc, XWikiContext context)
     {
         Util util = context.getUtil();
@@ -133,6 +134,7 @@ public class XWikiRadeoxRenderer implements XWikiRenderer
         return preTagSubst.insertNonWikiText(result);
     }
 
+    @Override
     public void flushCache()
     {
         // No need to flush anything yet
@@ -148,6 +150,7 @@ public class XWikiRadeoxRenderer implements XWikiRenderer
         this.removePre = removePre;
     }
 
+    @Override
     public String convertMultiLine(String macroname, String params, String data, String allcontent,
         XWikiVirtualMacro macro, XWikiContext context)
     {
@@ -172,6 +175,7 @@ public class XWikiRadeoxRenderer implements XWikiRenderer
         return result;
     }
 
+    @Override
     public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro,
         XWikiContext context)
     {

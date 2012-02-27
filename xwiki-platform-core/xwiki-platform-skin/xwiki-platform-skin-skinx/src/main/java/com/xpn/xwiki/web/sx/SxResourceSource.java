@@ -45,21 +45,13 @@ public class SxResourceSource implements SxSource
         this.resourceName = resourceName;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SxSource#getCachePolicy()
-     */
+    @Override
     public CachePolicy getCachePolicy()
     {
         return CachePolicy.DEFAULT;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SxSource#getContent()
-     */
+    @Override
     public String getContent()
     {
         try {
@@ -73,11 +65,7 @@ public class SxResourceSource implements SxSource
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SxSource#getLastModifiedDate()
-     */
+    @Override
     public long getLastModifiedDate()
     {
         // There is no easy way to know the last modification date of a resource file.

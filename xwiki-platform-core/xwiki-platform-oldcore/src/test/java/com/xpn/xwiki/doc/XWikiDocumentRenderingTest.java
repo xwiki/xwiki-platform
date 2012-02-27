@@ -110,6 +110,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.mockXWikiRenderingEngine.stubs().method("interpretText").will(
             new CustomStub("Implements XWikiRenderingEngine.interpretText")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     return invocation.parameterValues.get(0);
@@ -185,7 +186,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         assertEquals("<p>Space.Page</p>", this.document.getRenderedContent(getContext()));
     }
 
-    public void testGetRenderedTitleWithTitle() throws XWikiException
+    public void testGetRenderedTitleWithTitle()
     {
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
@@ -211,7 +212,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         assertEquals("title", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
     }
 
-    public void testGetRenderedTitleWithoutTitleHTML() throws XWikiException
+    public void testGetRenderedTitleWithoutTitleHTML()
     {
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
@@ -248,7 +249,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
     }
 
-    public void testGetRenderedTitleWithoutTitlePLAIN() throws XWikiException
+    public void testGetRenderedTitleWithoutTitlePLAIN()
     {
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
@@ -263,7 +264,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         assertEquals("value", this.document.getRenderedTitle(Syntax.PLAIN_1_0, getContext()));
     }
 
-    public void testGetRenderedTitleNoTitleAndContent() throws XWikiException
+    public void testGetRenderedTitleNoTitleAndContent()
     {
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
@@ -273,7 +274,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
     /**
      * Make sure title extracted from content is protected from cycles
      */
-    public void testGetRenderedTitleRecursive() throws XWikiException
+    public void testGetRenderedTitleRecursive()
     {
         this.document.setSyntax(Syntax.XWIKI_2_0);
         this.document.setContent("= {{groovy}}print doc.getDisplayTitle(){{/groovy}}");

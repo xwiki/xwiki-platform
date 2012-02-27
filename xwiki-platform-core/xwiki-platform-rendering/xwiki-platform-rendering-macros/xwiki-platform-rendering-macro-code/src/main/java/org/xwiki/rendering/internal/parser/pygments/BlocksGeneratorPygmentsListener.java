@@ -69,12 +69,7 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
         return this.blocks;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.parser.pygments.PygmentsListener#format(java.lang.String, java.lang.String,
-     *      java.util.Map)
-     */
+    @Override
     public void format(String tokenType, String value, Map<String, Object> style)
     {
         if (value == null || value.length() == 0) {

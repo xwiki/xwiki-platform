@@ -37,6 +37,7 @@ public class ChartImpl implements Chart
         this.pageURL = pageURL;
     }
 
+    @Override
     public String getTitle()
     {
         return params.getString("title");
@@ -50,6 +51,7 @@ public class ChartImpl implements Chart
         }
     }
 
+    @Override
     public String getPageURL()
     {
         return pageURL;
@@ -60,6 +62,7 @@ public class ChartImpl implements Chart
         this.pageURL = pageURL;
     }
 
+    @Override
     public String getImageURL()
     {
         return imageURL;
@@ -70,6 +73,7 @@ public class ChartImpl implements Chart
         this.imageURL = imageURL;
     }
 
+    @Override
     public ChartParams getParameters()
     {
         return params;

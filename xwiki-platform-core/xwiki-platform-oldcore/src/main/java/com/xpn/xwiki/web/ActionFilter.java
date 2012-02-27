@@ -83,22 +83,14 @@ public class ActionFilter implements Filter
      */
     private ServletContext servletContext;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Filter#init(FilterConfig)
-     */
+    @Override
     public void init(FilterConfig filterConfig) throws ServletException
     {
         this.servletContext = filterConfig.getServletContext();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
-     */
     @SuppressWarnings("unchecked")
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
         ServletException
     {
@@ -128,11 +120,7 @@ public class ActionFilter implements Filter
         chain.doFilter(request, response);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Filter#destroy()
-     */
+    @Override
     public void destroy()
     {
         // No finalization needed.

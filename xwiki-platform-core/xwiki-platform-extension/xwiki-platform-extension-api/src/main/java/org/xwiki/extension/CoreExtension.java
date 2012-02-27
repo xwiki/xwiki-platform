@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension;
 
+import java.net.URL;
+
 /**
  * Represent an extension which can't be modified (uninstalled, upgraded).
  * <p>
@@ -37,6 +39,11 @@ public interface CoreExtension extends Extension
      * @see #isGuessed()
      */
     String PKEY_GUESSED = "core.guessed";
+
+    /**
+     * @return the {@link URL} pointing to the core extension file
+     */
+    URL getURL();
 
     /**
      * @return true if the extension is "guessed" which means that it's id or version are not 100% sure. It generally

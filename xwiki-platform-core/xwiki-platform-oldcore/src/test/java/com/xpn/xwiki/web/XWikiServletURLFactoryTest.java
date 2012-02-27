@@ -99,11 +99,6 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         database.put(document.getFullName(), document);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {
@@ -113,23 +108,27 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
 
         XWiki xwiki = new XWiki()
         {
+            @Override
             public XWikiDocument getDocument(String fullname, XWikiContext context) throws XWikiException
             {
                 return XWikiServletURLFactoryTest.this.getDocument(Utils.getComponent(DocumentReferenceResolver.class,
                     "currentmixed").resolve(fullname));
             }
 
+            @Override
             public XWikiDocument getDocument(DocumentReference documentReference, XWikiContext context)
                 throws XWikiException
             {
                 return XWikiServletURLFactoryTest.this.getDocument(documentReference);
             }
 
+            @Override
             public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
             {
                 return defaultValue;
             }
 
+            @Override
             protected void registerWikiMacros()
             {
 
@@ -142,6 +141,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         mockXWikiRequest.stubs().method("getScheme").will(returnValue("http"));
         mockXWikiRequest.stubs().method("isSecure").will(new CustomStub("Implements ServletRequest.isSecure")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 return secure;
@@ -151,6 +151,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         mockXWikiRequest.stubs().method("getContextPath").will(returnValue("/xwiki"));
         mockXWikiRequest.stubs().method("getHeader").will(new CustomStub("Implements HttpServletRequest.getHeader")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 String headerName = (String) invocation.parameterValues.get(0);

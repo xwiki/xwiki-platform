@@ -87,11 +87,6 @@ public class OfficeExporter extends PdfExportImpl
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PdfExportImpl#exportXHTML(String, OutputStream, ExportType, XWikiContext)
-     */
     @Override
     protected void exportXHTML(String xhtml, OutputStream out, ExportType type, XWikiContext context)
         throws XWikiException

@@ -96,6 +96,7 @@ public class DefaultPackager implements Packager, Initializable
 
     private SAXParserFactory parserFactory;
 
+    @Override
     public void initialize() throws InitializationException
     {
         this.parserFactory = SAXParserFactory.newInstance();

@@ -66,11 +66,7 @@ public abstract class AbstractWikiEvent extends AbstractFilterableEvent implemen
     
     // WikiEvent
     
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.bridge.event.WikiEvent#getWikiId()
-     */
+    @Override
     public String getWikiId()
     {
         return getEventFilter().getFilter();

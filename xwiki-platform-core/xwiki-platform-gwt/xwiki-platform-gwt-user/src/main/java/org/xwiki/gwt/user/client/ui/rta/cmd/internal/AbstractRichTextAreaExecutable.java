@@ -44,21 +44,13 @@ public abstract class AbstractRichTextAreaExecutable implements Executable
         this.rta = rta;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         return isSupported() && rta.isEnabled();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isSupported()
-     */
+    @Override
     public boolean isSupported()
     {
         return rta.isAttached() && rta.getDocument() != null;

@@ -59,9 +59,7 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
      */
     protected OpenOfficeManager mockOpenOfficeManager;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     @SuppressWarnings("unchecked")
     protected void registerComponents() throws Exception
     {

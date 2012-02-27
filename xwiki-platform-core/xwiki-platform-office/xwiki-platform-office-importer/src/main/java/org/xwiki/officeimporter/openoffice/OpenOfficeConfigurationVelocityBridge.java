@@ -19,7 +19,6 @@
  */
 package org.xwiki.officeimporter.openoffice;
 
-
 /**
  * A link between {@link OpenOfficeConfiguration} and velocity scripts.
  * 
@@ -45,35 +44,32 @@ public class OpenOfficeConfigurationVelocityBridge
 
     /**
      * @return type of the openoffice server used by officeimporter.
-     * 
      * @see OpenOfficeConfiguration#getServerType()
      */
     public int getServerType()
     {
         return ooConfig.getServerType();
     }
-    
+
     /**
      * @return port number used for connecting to the openoffice server instance.
-     * 
      * @see OpenOfficeConfiguration#getServerPort()
      */
     public int getServerPort()
     {
         return ooConfig.getServerPort();
     }
-    
+
     /**
-     * {@inheritDoc}
+     * @return whether office server should be started / connected automatically with XWiki Enterprise
      */
     public boolean isAutoStart()
     {
         return ooConfig.isAutoStart();
     }
-    
+
     /**
      * @return path to openoffice server installation.
-     * 
      * @see OpenOfficeConfiguration#getHomePath()
      */
     public String getHomePath()
@@ -83,17 +79,15 @@ public class OpenOfficeConfigurationVelocityBridge
 
     /**
      * @return path to openoffice execution profile.
-     * 
      * @see OpenOfficeConfiguration#getProfilePath()
      */
     public String getProfilePath()
     {
         return ooConfig.getProfilePath();
     }
-    
+
     /**
      * @return maximum number of simultaneous conversion tasks to be handled by a single oo process instance.
-     * 
      * @see OpenOfficeConfiguration#getMaxTasksPerProcess()
      */
     public int getMaxTasksPerProcess()
@@ -103,11 +97,10 @@ public class OpenOfficeConfigurationVelocityBridge
 
     /**
      * @return timeout for document conversion tasks.
-     * 
      * @see OpenOfficeConfiguration#getTaskExecutionTimeout()
      */
     public long getTaskExecutionTimeout()
     {
         return ooConfig.getTaskExecutionTimeout();
-    }        
+    }
 }

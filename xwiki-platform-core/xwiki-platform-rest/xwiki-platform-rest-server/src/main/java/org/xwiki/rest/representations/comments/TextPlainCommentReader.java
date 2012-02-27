@@ -43,12 +43,13 @@ import org.xwiki.rest.representations.TextPlainReader;
 @Consumes(MediaType.TEXT_PLAIN)
 public class TextPlainCommentReader extends TextPlainReader<Comment>
 {
-
+    @Override
     public boolean isReadable(Class< ? > type, Type genericType, Annotation[] annotations, MediaType mediaType)
     {
         return Comment.class.isAssignableFrom(type);
     }
 
+    @Override
     public Comment readFrom(Class<Comment> type, Type genericType, Annotation[] annotations, MediaType mediaType,
         MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException,
         WebApplicationException

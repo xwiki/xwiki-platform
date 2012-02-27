@@ -111,11 +111,6 @@ public class CreateAction extends XWikiAction
      */
     private static final String VELOCITY_CONTEXT_KEY = "vcontext";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#render(XWikiContext)
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

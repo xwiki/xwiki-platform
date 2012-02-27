@@ -68,6 +68,7 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
         }
     }
 
+    @Override
     public XWikiURLFactory createURLFactory(int mode, XWikiContext context)
     {
         XWikiURLFactory urlf = null;

@@ -28,11 +28,6 @@ import org.xwiki.observation.event.Event;
  */
 public class StepProgressEvent implements Event
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.event.Event#matches(java.lang.Object)
-     */
     @Override
     public boolean matches(Object arg0)
     {

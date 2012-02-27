@@ -486,7 +486,7 @@ public final class StatsUtil
                 // If session is longer than 30 minutes we should invalidate it
                 // and create a new one
                 valid = false;
-            } else if (visitObject != null && !context.getUser().equals(visitObject.getName())) {
+            } else if (!context.getUser().equals(visitObject.getName())) {
                 // If the user is not the same, we should invalidate the session
                 // and create a new one
                 valid = false;

@@ -19,29 +19,11 @@
  */
 package com.xpn.xwiki.render;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Locale;
-import java.util.Map;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.util.ArrayList;
 
-import javax.portlet.PortalContext;
-import javax.portlet.PortletMode;
-import javax.portlet.PortletPreferences;
-import javax.portlet.PortletSession;
-import javax.portlet.WindowState;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.jmock.Mock;
 
@@ -50,12 +32,11 @@ import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiServletContext;
-import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiServletContext;
+import com.xpn.xwiki.web.XWikiServletRequestStub;
 
 /**
  * Unit tests for {@link DefaultXWikiRenderingEngine}.
@@ -68,11 +49,6 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
 
     private XWiki xwiki;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {
@@ -95,30 +71,36 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
         
         xwiki = new XWiki(config, getContext(), engineContext, false)
         {
+            @Override
             public String getSkin(XWikiContext context)
             {
                 return "skin";
             }
 
+            @Override
             public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
             {
                 return defaultValue;
             }
 
+            @Override
             public String getSpacePreference(String prefname, String defaultValue, XWikiContext context)
             {
                 return defaultValue;
             }
 
+            @Override
             protected void registerWikiMacros()
             {
 
             }
 
+            @Override
             public XWikiRightService getRightService()
             {
                 return new XWikiRightServiceImpl()
                 {
+                    @Override
                     public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
                     {
                         return true;

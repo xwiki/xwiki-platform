@@ -143,51 +143,31 @@ public class ListBox<T> extends Composite implements HasSelectionHandlers<ListIt
         setSelectedItem(null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasSelectionHandlers#addSelectionHandler(SelectionHandler)
-     */
+    @Override
     public HandlerRegistration addSelectionHandler(SelectionHandler<ListItem<T>> handler)
     {
         return addHandler(handler, SelectionEvent.getType());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasDoubleClickHandlers#addDoubleClickHandler(DoubleClickHandler)
-     */
+    @Override
     public HandlerRegistration addDoubleClickHandler(DoubleClickHandler handler)
     {
         return addDomHandler(handler, DoubleClickEvent.getType());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasAllKeyHandlers#addKeyDownHandler(KeyDownHandler)
-     */
+    @Override
     public HandlerRegistration addKeyDownHandler(KeyDownHandler handler)
     {
         return addDomHandler(handler, KeyDownEvent.getType());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasAllKeyHandlers#addKeyPressHandler(KeyPressHandler)
-     */
+    @Override
     public HandlerRegistration addKeyPressHandler(KeyPressHandler handler)
     {
         return addDomHandler(handler, KeyPressEvent.getType());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasAllKeyHandlers#addKeyUpHandler(KeyUpHandler)
-     */
+    @Override
     public HandlerRegistration addKeyUpHandler(KeyUpHandler handler)
     {
         return addDomHandler(handler, KeyUpEvent.getType());
@@ -221,11 +201,7 @@ public class ListBox<T> extends Composite implements HasSelectionHandlers<ListIt
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickHandler#onClick(ClickEvent)
-     */
+    @Override
     public void onClick(ClickEvent event)
     {
         if (event.getSource() == getWidget()) {
@@ -251,11 +227,7 @@ public class ListBox<T> extends Composite implements HasSelectionHandlers<ListIt
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyDownHandler#onKeyDown(KeyDownEvent)
-     */
+    @Override
     public void onKeyDown(KeyDownEvent event)
     {
         if (event.getSource() == getWidget()) {
@@ -264,11 +236,7 @@ public class ListBox<T> extends Composite implements HasSelectionHandlers<ListIt
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
-     */
+    @Override
     public void onKeyPress(KeyPressEvent event)
     {
         if (event.getSource() == getWidget()) {
@@ -279,11 +247,7 @@ public class ListBox<T> extends Composite implements HasSelectionHandlers<ListIt
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-     */
+    @Override
     public void onKeyUp(KeyUpEvent event)
     {
         ignoreNextKeyPress = false;
@@ -379,33 +343,25 @@ public class ListBox<T> extends Composite implements HasSelectionHandlers<ListIt
         return list.getWidgetCount();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int getTabIndex()
     {
         return ((Focusable) getWidget()).getTabIndex();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setTabIndex(int index)
     {
         ((Focusable) getWidget()).setTabIndex(index);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setFocus(boolean focused)
     {
         ((Focusable) getWidget()).setFocus(focused);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setAccessKey(char key)
     {
         ((Focusable) getWidget()).setAccessKey(key);

@@ -35,12 +35,6 @@ public class XWikiRequestProcessor extends org.apache.struts.action.RequestProce
 {
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiRequestProcessor.class);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.apache.struts.action.RequestProcessor#processPath(javax.servlet.http.HttpServletRequest,
-     *      javax.servlet.http.HttpServletResponse)
-     */
     @Override
     protected String processPath(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
         throws IOException

@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.doc.merge.MergeUtils;
 
@@ -31,33 +30,18 @@ public class BaseStringProperty extends BaseProperty
     /** The value of the string. */
     private String value;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#getValue()
-     */
     @Override
     public String getValue()
     {
         return this.value;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#setValue(java.lang.Object)
-     */
     @Override
     public void setValue(Object value)
     {
         this.value = (String) value;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#toText()
-     */
     @Override
     public String toText()
     {
@@ -69,11 +53,6 @@ public class BaseStringProperty extends BaseProperty
         return "";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -93,11 +72,6 @@ public class BaseStringProperty extends BaseProperty
         return getValue().equals(((BaseStringProperty) obj).getValue());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#clone()
-     */
     @Override
     public BaseStringProperty clone()
     {
@@ -110,6 +84,6 @@ public class BaseStringProperty extends BaseProperty
     @Override
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
-        setValue(MergeUtils.mergeString((String) previousValue, (String) newValue, (String) getValue(), mergeResult));
+        setValue(MergeUtils.mergeString((String) previousValue, (String) newValue, getValue(), mergeResult));
     }
 }

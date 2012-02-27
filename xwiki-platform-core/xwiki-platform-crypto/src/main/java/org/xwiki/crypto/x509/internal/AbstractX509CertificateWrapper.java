@@ -65,22 +65,12 @@ public abstract class AbstractX509CertificateWrapper extends X509Certificate
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.Certificate#hashCode()
-     */
     @Override
     public int hashCode()
     {
         return this.certificate.hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.Certificate#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -93,63 +83,36 @@ public abstract class AbstractX509CertificateWrapper extends X509Certificate
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Extension#hasUnsupportedCriticalExtension()
-     */
+    @Override
     public boolean hasUnsupportedCriticalExtension()
     {
         return this.certificate.hasUnsupportedCriticalExtension();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Extension#getCriticalExtensionOIDs()
-     */
+    @Override
     public Set<String> getCriticalExtensionOIDs()
     {
         return this.certificate.getCriticalExtensionOIDs();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Extension#getNonCriticalExtensionOIDs()
-     */
+    @Override
     public Set<String> getNonCriticalExtensionOIDs()
     {
         return this.certificate.getNonCriticalExtensionOIDs();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#checkValidity()
-     */
     @Override
     public void checkValidity() throws CertificateExpiredException, CertificateNotYetValidException
     {
         this.certificate.checkValidity();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.Certificate#getEncoded()
-     */
     @Override
     public byte[] getEncoded() throws CertificateEncodingException
     {
         return this.certificate.getEncoded();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.Certificate#verify(java.security.PublicKey)
-     */
     @Override
     public void verify(PublicKey key) throws CertificateException, NoSuchAlgorithmException, InvalidKeyException,
         NoSuchProviderException, SignatureException
@@ -157,22 +120,12 @@ public abstract class AbstractX509CertificateWrapper extends X509Certificate
         this.certificate.verify(key);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#checkValidity(java.util.Date)
-     */
     @Override
     public void checkValidity(Date date) throws CertificateExpiredException, CertificateNotYetValidException
     {
         this.certificate.checkValidity(date);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.Certificate#verify(java.security.PublicKey, java.lang.String)
-     */
     @Override
     public void verify(PublicKey key, String sigProvider) throws CertificateException, NoSuchAlgorithmException,
         InvalidKeyException, NoSuchProviderException, SignatureException
@@ -180,241 +133,132 @@ public abstract class AbstractX509CertificateWrapper extends X509Certificate
         this.certificate.verify(key, sigProvider);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Extension#getExtensionValue(java.lang.String)
-     */
+    @Override
     public byte[] getExtensionValue(String oid)
     {
         return this.certificate.getExtensionValue(oid);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getVersion()
-     */
     @Override
     public int getVersion()
     {
         return this.certificate.getVersion();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getSerialNumber()
-     */
     @Override
     public BigInteger getSerialNumber()
     {
         return this.certificate.getSerialNumber();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.Certificate#getPublicKey()
-     */
     @Override
     public PublicKey getPublicKey()
     {
         return this.certificate.getPublicKey();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getIssuerDN()
-     */
     @Override
     public Principal getIssuerDN()
     {
         return this.certificate.getIssuerDN();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getIssuerX500Principal()
-     */
     @Override
     public X500Principal getIssuerX500Principal()
     {
         return this.certificate.getIssuerX500Principal();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getSubjectDN()
-     */
     @Override
     public Principal getSubjectDN()
     {
         return this.certificate.getSubjectDN();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getSubjectX500Principal()
-     */
     @Override
     public X500Principal getSubjectX500Principal()
     {
         return this.certificate.getSubjectX500Principal();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getNotBefore()
-     */
     @Override
     public Date getNotBefore()
     {
         return this.certificate.getNotBefore();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getNotAfter()
-     */
     @Override
     public Date getNotAfter()
     {
         return this.certificate.getNotAfter();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getTBSCertificate()
-     */
     @Override
     public byte[] getTBSCertificate() throws CertificateEncodingException
     {
         return this.certificate.getTBSCertificate();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getSignature()
-     */
     @Override
     public byte[] getSignature()
     {
         return this.certificate.getSignature();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getSigAlgName()
-     */
     @Override
     public String getSigAlgName()
     {
         return this.certificate.getSigAlgName();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getSigAlgOID()
-     */
     @Override
     public String getSigAlgOID()
     {
         return this.certificate.getSigAlgOID();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getSigAlgParams()
-     */
     @Override
     public byte[] getSigAlgParams()
     {
         return this.certificate.getSigAlgParams();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getIssuerUniqueID()
-     */
     @Override
     public boolean[] getIssuerUniqueID()
     {
         return this.certificate.getIssuerUniqueID();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getSubjectUniqueID()
-     */
     @Override
     public boolean[] getSubjectUniqueID()
     {
         return this.certificate.getSubjectUniqueID();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getKeyUsage()
-     */
     @Override
     public boolean[] getKeyUsage()
     {
         return this.certificate.getKeyUsage();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getExtendedKeyUsage()
-     */
     @Override
     public List<String> getExtendedKeyUsage() throws CertificateParsingException
     {
         return this.certificate.getExtendedKeyUsage();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getBasicConstraints()
-     */
     @Override
     public int getBasicConstraints()
     {
         return this.certificate.getBasicConstraints();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getSubjectAlternativeNames()
-     */
     @Override
     public Collection<List< ? >> getSubjectAlternativeNames() throws CertificateParsingException
     {
         return this.certificate.getSubjectAlternativeNames();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.security.cert.X509Certificate#getIssuerAlternativeNames()
-     */
     @Override
     public Collection<List< ? >> getIssuerAlternativeNames() throws CertificateParsingException
     {

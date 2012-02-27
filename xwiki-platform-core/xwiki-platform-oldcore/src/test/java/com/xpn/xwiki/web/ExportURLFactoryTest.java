@@ -21,7 +21,6 @@ package com.xpn.xwiki.web;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;

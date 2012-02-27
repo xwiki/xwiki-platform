@@ -70,11 +70,6 @@ public class XWikiAttachmentArchive implements Cloneable
         // Do nothing as this is here only to please hibernate.
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#clone()
-     */
     @Override
     public Object clone()
     {

@@ -30,11 +30,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 {
     private DutchWebGuidelinesValidator validator;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();

@@ -106,8 +106,7 @@ public class WikiMacroDescriptor implements MacroDescriptor
      * @param contentDescriptor macro content description.
      * @param parameterDescriptors parameter descriptors.
      * @since 2.2M1
-     * @deprecated since 2.3M1 use {@link WikiMacroDescriptor(MacroId, String, String, String, WikiMacroVisibility,
-     *             ContentDescriptor, List<WikiMacroParameterDescriptor>)} instead
+     * @deprecated since 2.3M1 use {@link #WikiMacroDescriptor(MacroId, String, String, String, WikiMacroVisibility, ContentDescriptor, List)} instead
      */
     @Deprecated
     public WikiMacroDescriptor(String name, String description, String defaultCategory, WikiMacroVisibility visibility,
@@ -121,49 +120,37 @@ public class WikiMacroDescriptor implements MacroDescriptor
         this.visibility = visibility;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public MacroId getId()
     {
         return this.id;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getName()
     {
         return this.name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDescription()
     {
         return this.description;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public ContentDescriptor getContentDescriptor()
     {
         return this.contentDescriptor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Class< ? > getParametersBeanClass()
     {
         return WikiMacroParameters.class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Map<String, ParameterDescriptor> getParameterDescriptorMap()
     {
         // Note: use a linked hash map to preserve the parameter order.
@@ -178,9 +165,7 @@ public class WikiMacroDescriptor implements MacroDescriptor
         return descriptors;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDefaultCategory()
     {
         return this.defaultCategory;

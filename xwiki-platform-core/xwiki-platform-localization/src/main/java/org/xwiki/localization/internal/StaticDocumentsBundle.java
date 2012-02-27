@@ -74,21 +74,14 @@ public class StaticDocumentsBundle extends AbstractWikiBundle implements Bundle,
      */
     private Map<String, String[]> staticBundleNames = new HashMap<String, String[]>();
 
-    /**
-     * {@inheritDoc}
-     * @see Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         // Set the Bundle priority
         setPriority(300);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Bundle#getTranslation(String, String)
-     */
+    @Override
     public String getTranslation(String key, String language)
     {
         String translation = key;

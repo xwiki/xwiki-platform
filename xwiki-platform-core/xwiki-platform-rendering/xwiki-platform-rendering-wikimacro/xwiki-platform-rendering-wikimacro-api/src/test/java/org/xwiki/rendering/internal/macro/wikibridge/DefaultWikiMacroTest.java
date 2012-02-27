@@ -76,11 +76,6 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
     private WikiModel mockWikiModel;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#setUp()
-     */
     @Override
     @Before
     public void setUp() throws Exception
@@ -113,11 +108,6 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         }});
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#registerComponents()
-     */
     @Override
     protected void registerComponents() throws Exception
     {

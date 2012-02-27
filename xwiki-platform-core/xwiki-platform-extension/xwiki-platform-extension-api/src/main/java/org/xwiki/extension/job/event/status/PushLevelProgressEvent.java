@@ -49,11 +49,6 @@ public class PushLevelProgressEvent implements Event
         this.steps = steps;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.event.Event#matches(java.lang.Object)
-     */
     @Override
     public boolean matches(Object arg0)
     {

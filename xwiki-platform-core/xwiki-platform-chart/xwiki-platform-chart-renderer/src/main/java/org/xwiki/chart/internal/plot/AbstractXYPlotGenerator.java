@@ -38,9 +38,7 @@ import org.xwiki.chart.model.ChartModel;
  */
 public abstract class AbstractXYPlotGenerator implements PlotGenerator
 {
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Plot generate(ChartModel model, Map<String, String> parameters)
     {
         NumberAxis domainAxis = new NumberAxis();

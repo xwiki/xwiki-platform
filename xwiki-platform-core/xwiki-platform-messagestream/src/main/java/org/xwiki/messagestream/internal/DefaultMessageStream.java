@@ -88,9 +88,7 @@ public class DefaultMessageStream implements MessageStream
     @Inject
     private DocumentAccessBridge bridge;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void postPublicMessage(String message)
     {
         Event e = createMessageEvent(message, "publicMessage");
@@ -103,9 +101,7 @@ public class DefaultMessageStream implements MessageStream
         this.stream.addEvent(e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void postPersonalMessage(String message)
     {
         Event e = createMessageEvent(message, "personalMessage");
@@ -117,9 +113,7 @@ public class DefaultMessageStream implements MessageStream
         this.stream.addEvent(e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void postDirectMessageToUser(String message, DocumentReference user)
     {
         Event e = createMessageEvent(message, "directMessage");
@@ -129,9 +123,7 @@ public class DefaultMessageStream implements MessageStream
         this.stream.addEvent(e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void postMessageToGroup(String message, DocumentReference group) throws IllegalAccessError
     {
         Event e = createMessageEvent(message, "groupMessage");
@@ -141,9 +133,7 @@ public class DefaultMessageStream implements MessageStream
         this.stream.addEvent(e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Event> getRecentPersonalMessages()
     {
         DocumentReference currentUser = new DocumentReference(
@@ -151,9 +141,7 @@ public class DefaultMessageStream implements MessageStream
         return getRecentPersonalMessages(currentUser, 30, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Event> getRecentPersonalMessages(int limit, int offset)
     {
         DocumentReference currentUser = new DocumentReference(
@@ -161,17 +149,13 @@ public class DefaultMessageStream implements MessageStream
         return getRecentPersonalMessages(currentUser, limit, offset);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Event> getRecentPersonalMessages(DocumentReference author)
     {
         return getRecentPersonalMessages(author, 30, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Event> getRecentPersonalMessages(DocumentReference author, int limit, int offset)
     {
         List<Event> result = new ArrayList<Event>();
@@ -189,17 +173,13 @@ public class DefaultMessageStream implements MessageStream
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Event> getRecentDirectMessages()
     {
         return getRecentDirectMessages(30, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Event> getRecentDirectMessages(int limit, int offset)
     {
         List<Event> result = new ArrayList<Event>();
@@ -219,17 +199,13 @@ public class DefaultMessageStream implements MessageStream
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Event> getRecentMessagesForGroup(DocumentReference group)
     {
         return getRecentMessagesForGroup(group, 30, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Event> getRecentMessagesForGroup(DocumentReference group, int limit, int offset)
     {
         List<Event> result = new ArrayList<Event>();
@@ -247,9 +223,7 @@ public class DefaultMessageStream implements MessageStream
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void deleteMessage(String id)
     {
         Query q;

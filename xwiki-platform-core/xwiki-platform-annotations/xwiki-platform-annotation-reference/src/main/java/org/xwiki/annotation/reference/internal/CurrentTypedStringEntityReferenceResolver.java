@@ -47,11 +47,6 @@ public class CurrentTypedStringEntityReferenceResolver extends AbstractTypedStri
     @Named("current")
     private EntityReferenceResolver<String> referenceResolver;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.reference.internal.AbstractTypedStringEntityReferenceResolver #getResolver()
-     */
     @Override
     protected EntityReferenceResolver<String> getResolver()
     {

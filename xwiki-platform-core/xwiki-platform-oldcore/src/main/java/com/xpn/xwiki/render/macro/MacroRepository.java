@@ -67,12 +67,12 @@ public class MacroRepository extends org.radeox.macro.PluginRepository
 
     protected List loaders;
 
-    public synchronized static com.xpn.xwiki.render.macro.MacroRepository getInstance()
+    public synchronized static MacroRepository getInstance()
     {
         if (null == instance) {
             instance = new com.xpn.xwiki.render.macro.MacroRepository();
         }
-        return (com.xpn.xwiki.render.macro.MacroRepository) instance;
+        return instance;
     }
 
     protected void initialize(InitialRenderContext context)

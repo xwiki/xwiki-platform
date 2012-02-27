@@ -20,7 +20,6 @@
 package com.xpn.xwiki.user.impl.xwiki;
 
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -584,11 +583,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DefaultPersistentLoginManager#rememberingLogin(javax.servlet.http.HttpServletRequest)
-     */
     @Override
     public boolean rememberingLogin(HttpServletRequest request)
     {

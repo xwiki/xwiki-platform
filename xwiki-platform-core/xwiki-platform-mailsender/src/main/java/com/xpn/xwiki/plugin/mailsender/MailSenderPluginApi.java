@@ -55,11 +55,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         super(plugin, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#sendHtmlMessage(String, String, String, String, String, String, String, java.util.List)
-     */
+    @Override
     public int sendHtmlMessage(String from, String to, String cc, String bcc, String subject, String body,
         String alternative, List<Attachment> attachments)
     {
@@ -75,11 +71,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         return sendMail(email);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#sendTextMessage(String, String, String, String)
-     */
+    @Override
     public int sendTextMessage(String from, String to, String subject, String message)
     {
         Mail email = new Mail();
@@ -90,11 +82,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         return sendMail(email);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#sendTextMessage(String, String, String, String, String, String, java.util.List)
-     */
+    @Override
     public int sendTextMessage(String from, String to, String cc, String bcc, String subject, String message,
         List<Attachment> attachments)
     {
@@ -109,11 +97,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         return sendMail(email);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#sendRawMessage(String, String, String)
-     */
+    @Override
     public int sendRawMessage(String from, String to, String rawMessage)
     {
         Mail email = new Mail();
@@ -124,11 +108,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         return sendMail(email);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#sendMessageFromTemplate(String, String, String, String, String, String, VelocityContext)
-     */
+    @Override
     public int sendMessageFromTemplate(String from, String to, String cc, String bcc, String language,
         String documentFullName, VelocityContext vcontext)
     {
@@ -145,21 +125,13 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#createMail()
-     */
+    @Override
     public Mail createMail()
     {
         return new Mail();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#sendMail(Mail)
-     */
+    @Override
     public int sendMail(Mail mail)
     {
         int result = 0;
@@ -177,21 +149,13 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#createMailConfiguration(com.xpn.xwiki.api.XWiki)
-     */
+    @Override
     public MailConfiguration createMailConfiguration(XWiki xwiki)
     {
         return new MailConfiguration(xwiki);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#sendMail(Mail, MailConfiguration)
-     */
+    @Override
     public int sendMail(Mail mail, MailConfiguration mailConfiguration)
     {
         int result = 0;

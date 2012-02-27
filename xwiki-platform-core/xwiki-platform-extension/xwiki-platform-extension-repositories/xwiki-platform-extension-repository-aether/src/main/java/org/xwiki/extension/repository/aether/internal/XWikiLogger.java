@@ -30,190 +30,114 @@ class XWikiLogger implements org.codehaus.plexus.logging.Logger
         this.logger = logger;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#debug(java.lang.String)
-     */
+    @Override
     public void debug(String message)
     {
         this.logger.debug(message);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#debug(java.lang.String, java.lang.Throwable)
-     */
+    @Override
     public void debug(String message, Throwable throwable)
     {
         this.logger.debug(message, throwable);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#info(java.lang.String)
-     */
+    @Override
     public void info(String message)
     {
         this.logger.info(message);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#info(java.lang.String, java.lang.Throwable)
-     */
+    @Override
     public void info(String message, Throwable throwable)
     {
         this.logger.info(message, throwable);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#warn(java.lang.String)
-     */
+    @Override
     public void warn(String message)
     {
         this.logger.warn(message);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#warn(java.lang.String, java.lang.Throwable)
-     */
+    @Override
     public void warn(String message, Throwable throwable)
     {
         this.logger.warn(message, throwable);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#fatalError(java.lang.String)
-     */
+    @Override
     public void fatalError(String message)
     {
         this.logger.error(message);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#fatalError(java.lang.String, java.lang.Throwable)
-     */
+    @Override
     public void fatalError(String message, Throwable throwable)
     {
         this.logger.error(message, throwable);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#error(java.lang.String)
-     */
+    @Override
     public void error(String message)
     {
         this.logger.error(message);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#error(java.lang.String, java.lang.Throwable)
-     */
+    @Override
     public void error(String message, Throwable throwable)
     {
         this.logger.error(message, throwable);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#isDebugEnabled()
-     */
+    @Override
     public boolean isDebugEnabled()
     {
         return this.logger.isDebugEnabled();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#isInfoEnabled()
-     */
+    @Override
     public boolean isInfoEnabled()
     {
         return this.logger.isInfoEnabled();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#isWarnEnabled()
-     */
+    @Override
     public boolean isWarnEnabled()
     {
         return this.logger.isWarnEnabled();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#isErrorEnabled()
-     */
+    @Override
     public boolean isErrorEnabled()
     {
         return this.logger.isErrorEnabled();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#isFatalErrorEnabled()
-     */
+    @Override
     public boolean isFatalErrorEnabled()
     {
         return this.logger.isErrorEnabled();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#setThreshold(int)
-     */
+    @Override
     public void setThreshold(int treshold)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#getThreshold()
-     */
+    @Override
     public int getThreshold()
     {
         return LEVEL_DEBUG;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#getChildLogger(java.lang.String)
-     */
+    @Override
     public org.codehaus.plexus.logging.Logger getChildLogger(String name)
     {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.codehaus.plexus.logging.Logger#getName()
-     */
+    @Override
     public String getName()
     {
         return "xwiki logger";

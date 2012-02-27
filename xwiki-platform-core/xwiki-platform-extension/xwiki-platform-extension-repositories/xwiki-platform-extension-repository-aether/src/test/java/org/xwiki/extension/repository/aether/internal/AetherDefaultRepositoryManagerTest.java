@@ -68,6 +68,7 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
 
     private RepositoryUtil repositoryUtil;
 
+    @Override
     @Before
     public void setUp() throws Exception
     {

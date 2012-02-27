@@ -42,11 +42,6 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 @Singleton
 public class TestRssMacro extends RssMacro
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
-     */
     @Override
     public List<Block> execute(RssMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException

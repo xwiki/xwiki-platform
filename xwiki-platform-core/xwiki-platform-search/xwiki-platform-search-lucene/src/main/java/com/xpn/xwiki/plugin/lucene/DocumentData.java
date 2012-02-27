@@ -68,7 +68,7 @@ public class DocumentData extends AbstractDocumentData
     }
 
     /**
-     * @return a string containing the result of {@link AbstractIndexData#getFullText} plus the full text content of
+     * Append a string containing the result of {@link AbstractIndexData#getFullText} plus the full text content of
      *         this document (in the given language)
      */
     @Override

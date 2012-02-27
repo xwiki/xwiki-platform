@@ -50,19 +50,13 @@ public class AttachmentURLConnection extends URLConnection
         this.documentAccessBridge = documentAccessBridge;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see JarURLConnection#connect()
-     */
+    @Override
     public void connect()
     {
         // Don't do anything since we don't need to connect to get the data...
     }
 
-    /**
-     * {@inheritDoc}
-     * @see JarURLConnection#getInputStream()
-     */
+    @Override
     public InputStream getInputStream()
     {
         try {

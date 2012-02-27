@@ -80,6 +80,7 @@ public class ResourceExtensionRepository extends AbstractExtensionRepository imp
         return extensionId.getId() + '-' + extensionId.getVersion().getValue() + '.' + type;
     }
 
+    @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
         InputStream descriptor;
@@ -109,6 +110,7 @@ public class ResourceExtensionRepository extends AbstractExtensionRepository imp
             .getVersionConstraint().getValue())));
     }
 
+    @Override
     public boolean exists(ExtensionId extensionId)
     {
         try {

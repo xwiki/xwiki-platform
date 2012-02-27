@@ -19,9 +19,6 @@
  */
 package com.xpn.xwiki.plugin.mail;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
@@ -29,28 +26,30 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 public class MailPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
-    private static Logger LOGGER = LoggerFactory.getLogger(com.xpn.xwiki.plugin.mail.MailPlugin.class);
-
     public MailPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
         init(context);
     }
 
+    @Override
     public String getName()
     {
         return "mail";
     }
 
+    @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new MailPluginApi((MailPlugin) plugin, context);
     }
 
+    @Override
     public void flushCache()
     {
     }
 
+    @Override
     public void init(XWikiContext context)
     {
         super.init(context);

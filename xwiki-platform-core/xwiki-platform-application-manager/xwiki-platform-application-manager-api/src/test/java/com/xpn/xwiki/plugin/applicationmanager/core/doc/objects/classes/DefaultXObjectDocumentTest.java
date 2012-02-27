@@ -55,11 +55,6 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
     private Map<String, XWikiDocument> documents = new HashMap<String, XWikiDocument>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {
@@ -77,6 +72,7 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
@@ -91,6 +87,7 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
         this.mockXWikiStore.stubs().method("saveXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.saveXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);

@@ -48,9 +48,7 @@ public class MacroContentTableBlockDataSourceTest extends AbstractMockingCompone
     @MockingRequirement
     private MacroContentTableBlockDataSource source;
 
-    /**
-     * @see org.xwiki.test.AbstractMockingComponentTestCase#configure()
-     */
+    @Override
     public void configure() throws Exception
     {
         // Mock components
@@ -68,11 +66,13 @@ public class MacroContentTableBlockDataSourceTest extends AbstractMockingCompone
                 will(returnValue("xwiki/2.0"));
             allowing(cm).lookup(Parser.class, "xwiki/2.0");
                 will(returnValue(new Parser() {
+                    @Override
                     public Syntax getSyntax()
                     {
                         return Syntax.XWIKI_2_0;
                     }
 
+                    @Override
                     public XDOM parse(Reader source) throws ParseException
                     {
                         return new XDOM(Collections.<Block>emptyList());

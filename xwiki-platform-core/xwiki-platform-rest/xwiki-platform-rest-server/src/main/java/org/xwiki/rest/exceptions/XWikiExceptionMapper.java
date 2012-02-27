@@ -37,6 +37,7 @@ import com.xpn.xwiki.XWikiException;
 @Provider
 public class XWikiExceptionMapper implements ExceptionMapper<XWikiException>, XWikiRestComponent
 {
+    @Override
     public Response toResponse(XWikiException exception)
     {
         if (exception.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {

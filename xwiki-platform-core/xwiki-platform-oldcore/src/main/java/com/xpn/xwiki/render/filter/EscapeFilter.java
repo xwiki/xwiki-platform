@@ -49,16 +49,18 @@ import org.radeox.filter.regex.LocaleRegexTokenFilter;
 import org.radeox.regex.MatchResult;
 import org.radeox.util.Encoder;
 
-/*
+/**
  * Transforms multiple \ into single backspaces and escapes other characters.
  */
 public class EscapeFilter extends LocaleRegexTokenFilter implements CacheFilter
 {
+    @Override
     protected String getLocaleKey()
     {
         return "filter.escape";
     }
 
+    @Override
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
     {
         buffer.append(handleMatch(result, context));                    

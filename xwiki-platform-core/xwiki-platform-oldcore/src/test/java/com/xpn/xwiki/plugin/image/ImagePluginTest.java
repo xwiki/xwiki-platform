@@ -38,6 +38,7 @@ public class ImagePluginTest extends AbstractBridgedXWikiComponentTestCase
 {
     private ImagePlugin plugin;
 
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();

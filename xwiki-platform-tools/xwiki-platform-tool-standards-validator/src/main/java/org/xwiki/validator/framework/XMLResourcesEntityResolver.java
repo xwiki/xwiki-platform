@@ -44,11 +44,7 @@ public class XMLResourcesEntityResolver implements EntityResolver
      */
     private static final String ENTITIES_ROOT = "/entities";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xml.sax.EntityResolver#resolveEntity(java.lang.String, java.lang.String)
-     */
+    @Override
     public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException
     {
         int index = systemId.lastIndexOf(URL_SEPARATOR);

@@ -108,68 +108,52 @@ public class DefaultQuery implements Query
         this.isNamed = true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getStatement()
     {
         return statement;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getLanguage()
     {
         return language;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean isNamed()
     {
         return isNamed;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Query setWiki(String wiki)
     {
         this.wiki = wiki;
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getWiki()
     {
         return wiki;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Query bindValue(String var, Object val)
     {
         namedParameters.put(var, val);
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Query bindValue(int index, Object val)
     {
         positionalParameters.put(index, val);
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Query bindValues(List<Object> values)
     {
         for (int i = 0; i < values.size(); i++) {
@@ -178,59 +162,45 @@ public class DefaultQuery implements Query
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int getLimit()
     {
         return limit;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int getOffset()
     {
         return offset;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Query setLimit(int limit)
     {
         this.limit = limit;
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Query setOffset(int offset)
     {
         this.offset = offset;
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Map<String, Object> getNamedParameters()
     {
         return namedParameters;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Map<Integer, Object> getPositionalParameters()
     {
         return positionalParameters;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public <T> List<T> execute() throws QueryException
     {
         return getExecuter().execute(this);

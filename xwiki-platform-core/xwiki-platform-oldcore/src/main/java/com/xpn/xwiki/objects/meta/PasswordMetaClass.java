@@ -60,6 +60,7 @@ public class PasswordMetaClass extends StringMetaClass
         safeput(ALGORITHM_KEY, encryptAlgorithm_class);
     }
 
+    @Override
     public BaseCollection newObject(XWikiContext context)
     {
         return new PasswordClass();

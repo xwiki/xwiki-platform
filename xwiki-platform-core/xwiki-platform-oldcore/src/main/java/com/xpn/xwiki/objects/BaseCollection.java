@@ -74,13 +74,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseCollection.class);
 
     /**
-     * Used to compute document identifier.
-     */
-    @SuppressWarnings("unchecked")
-    private EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local/uid");
-
-    /**
      * The meaning of this reference fields depends on the element represented. Examples:
      * <ul>
      * <li>If this BaseCollection instance represents an XObject then refers to the document where the XObject's XClass
@@ -221,31 +214,19 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         setXClassReference(xClassReference);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ObjectInterface#safeget(java.lang.String)
-     */
+    @Override
     public PropertyInterface safeget(String name)
     {
         return (PropertyInterface) getFields().get(name);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ObjectInterface#get(java.lang.String)
-     */
+    @Override
     public PropertyInterface get(String name) throws XWikiException
     {
         return safeget(name);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ObjectInterface#safeput(java.lang.String, com.xpn.xwiki.objects.PropertyInterface)
-     */
+    @Override
     public void safeput(String name, PropertyInterface property)
     {
         addField(name, property);
@@ -255,11 +236,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ObjectInterface#put(java.lang.String, com.xpn.xwiki.objects.PropertyInterface)
-     */
+    @Override
     public void put(String name, PropertyInterface property) throws XWikiException
     {
         safeput(name, property);
@@ -295,6 +272,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * @see com.xpn.xwiki.objects.ObjectInterface#getxWikiClass(com.xpn.xwiki.XWikiContext)
      * @deprecated since 2.2M1 use {@link #getXClass(com.xpn.xwiki.XWikiContext)}
      */
+    @Override
     @Deprecated
     public BaseClass getxWikiClass(XWikiContext context)
     {
@@ -576,11 +554,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         return it;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseElement#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object coll)
     {
@@ -616,11 +589,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseElement#clone()
-     */
     @Override
     public BaseCollection clone()
     {
@@ -738,11 +706,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         this.fieldsToRemove = fieldsToRemove;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ObjectInterface#toXML(com.xpn.xwiki.objects.classes.BaseClass)
-     */
+    @Override
     public abstract Element toXML(BaseClass bclass);
 
     public String toXMLString()
@@ -762,11 +726,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {
@@ -788,12 +747,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         return map;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BaseElement#setDocumentReference(org.xwiki.model.reference.DocumentReference)
-     * @since 2.2.3
-     */
     @Override
     public void setDocumentReference(DocumentReference reference)
     {
@@ -804,12 +757,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         this.xClassReferenceCache = null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BaseElement#setName(String)
-     * @since 2.2.3
-     */
     @Override
     public void setName(String name)
     {

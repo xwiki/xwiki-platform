@@ -79,6 +79,20 @@ public class DefaultCoreExtension extends AbstractExtension implements CoreExten
     // CoreExtension
 
     @Override
+    public URL getURL()
+    {
+        return getProperty(PKEY_URL, null);
+    }
+
+    /**
+     * @param url the {@link URL} pointing to the core extension file
+     */
+    public void setURL(URL url)
+    {
+        putProperty(PKEY_URL, url);
+    }
+
+    @Override
     public boolean isGuessed()
     {
         return getProperty(PKEY_GUESSED, false);

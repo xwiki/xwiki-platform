@@ -24,8 +24,8 @@ import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.Project;
 
 /**
- * Allow logging Ant messages to the console. This is used by the {@link
- * org.xwiki.test.integration.XWikiTestSetup} class which uses Ant tasks to start/stop XWiki.
+ * Allow logging Ant messages to the console. This is used by the {@link org.xwiki.test.integration.XWikiTestSetup}
+ * class which uses Ant tasks to start/stop XWiki.
  */
 public class AntBuildListener implements BuildListener
 {
@@ -39,36 +39,43 @@ public class AntBuildListener implements BuildListener
         this.isDebugModeOn = isDebugModeOn;
     }
 
+    @Override
     public void buildStarted(BuildEvent event)
     {
         // Voluntarily do nothing
     }
 
+    @Override
     public void buildFinished(BuildEvent event)
     {
         // Voluntarily do nothing
     }
 
+    @Override
     public void targetStarted(BuildEvent event)
     {
         // Voluntarily do nothing
     }
 
+    @Override
     public void targetFinished(BuildEvent event)
     {
         // Voluntarily do nothing
     }
 
+    @Override
     public void taskStarted(BuildEvent event)
     {
         // Voluntarily do nothing
     }
 
+    @Override
     public void taskFinished(BuildEvent event)
     {
         // Voluntarily do nothing
     }
 
+    @Override
     public void messageLogged(BuildEvent event)
     {
         if ((event.getPriority() != Project.MSG_DEBUG) || isDebugModeOn) {

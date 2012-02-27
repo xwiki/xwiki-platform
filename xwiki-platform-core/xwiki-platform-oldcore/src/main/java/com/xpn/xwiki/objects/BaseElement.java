@@ -21,8 +21,6 @@ package com.xpn.xwiki.objects;
 
 import java.io.Serializable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -41,9 +39,6 @@ import com.xpn.xwiki.web.Utils;
  */
 public abstract class BaseElement<R extends EntityReference> implements ElementInterface, Serializable
 {
-    /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseElement.class);
-
     /**
      * Full reference of this element.
      * 

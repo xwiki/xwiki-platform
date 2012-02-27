@@ -42,44 +42,24 @@ public class CSRFTokenScriptService implements CSRFToken, ScriptService
     @Inject
     private CSRFToken csrf;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CSRFToken#isTokenValid(String)
-     */
     @Override
     public String getToken()
     {
         return this.csrf.getToken();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CSRFToken#clearToken()
-     */
     @Override
     public void clearToken()
     {
         this.csrf.clearToken();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CSRFToken#isTokenValid(String)
-     */
     @Override
     public boolean isTokenValid(String token)
     {
         return this.csrf.isTokenValid(token);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CSRFToken#getResubmissionURL()
-     */
     @Override
     public String getResubmissionURL()
     {

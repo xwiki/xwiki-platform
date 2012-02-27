@@ -1032,12 +1032,7 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.bridge.DocumentModelBridge#getDocumentReference()
-     * @since 2.2M1
-     */
+    @Override
     public DocumentReference getDocumentReference()
     {
         return this.documentReference;

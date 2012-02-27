@@ -64,11 +64,6 @@ public class SpaceNormalizerContentAltererTest extends AbstractComponentTestCase
         this.altered = altered;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#setUp()
-     */
     @Override
     public void setUp() throws Exception
     {

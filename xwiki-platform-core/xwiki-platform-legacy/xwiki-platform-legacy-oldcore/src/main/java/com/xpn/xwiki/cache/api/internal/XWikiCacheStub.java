@@ -34,21 +34,25 @@ public class XWikiCacheStub implements XWikiCache
         this.cache = cache;
     }
 
+    @Override
     public void cancelUpdate(String key)
     {
 
     }
 
+    @Override
     public void flushAll()
     {
         this.cache.removeAll();
     }
 
+    @Override
     public void flushEntry(String key)
     {
         this.cache.remove(key);
     }
 
+    @Override
     public Object getFromCache(String key) throws XWikiCacheNeedsRefreshException
     {
         Object value = this.cache.get(key);
@@ -60,22 +64,25 @@ public class XWikiCacheStub implements XWikiCache
         return value;
     }
 
-    public Object getFromCache(String key, int refeshPeriod)
-        throws XWikiCacheNeedsRefreshException
+    @Override
+    public Object getFromCache(String key, int refeshPeriod) throws XWikiCacheNeedsRefreshException
     {
         return getFromCache(key);
     }
 
+    @Override
     public int getNumberEntries()
     {
         return 0;
     }
 
+    @Override
     public void putInCache(String key, Object obj)
     {
         this.cache.set(key, obj);
     }
 
+    @Override
     public void setCapacity(int capacity)
     {
 

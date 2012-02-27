@@ -154,12 +154,7 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer
         return content;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.XWikiRenderer#render(java.lang.String, com.xpn.xwiki.doc.XWikiDocument,
-     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public String render(String content, XWikiDocument contentdoc, XWikiDocument doc, XWikiContext context)
     {
         boolean insidePRE = false;
@@ -250,11 +245,7 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer
         return preTagSubst.insertNonWikiText(result);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.XWikiRenderer#flushCache()
-     */
+    @Override
     public void flushCache()
     {
         // To change body of implemented methods use File | Settings | File Templates.
@@ -340,24 +331,14 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer
         this.renderWiki = renderWiki;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.XWikiRenderer#convertMultiLine(java.lang.String, java.lang.String, java.lang.String,
-     *      java.lang.String, com.xpn.xwiki.render.XWikiVirtualMacro, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public String convertMultiLine(String macroname, String params, String data, String allcontent,
         XWikiVirtualMacro macro, XWikiContext context)
     {
         return allcontent;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.XWikiRenderer#convertSingleLine(java.lang.String, java.lang.String, java.lang.String,
-     *      com.xpn.xwiki.render.XWikiVirtualMacro, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro,
         XWikiContext context)
     {

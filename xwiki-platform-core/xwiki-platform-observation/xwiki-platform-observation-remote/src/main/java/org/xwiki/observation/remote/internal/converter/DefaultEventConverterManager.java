@@ -63,6 +63,7 @@ public class DefaultEventConverterManager implements EventConverterManager, Init
         // sort local events converters by priority
         Collections.sort(this.localEventConverters, new Comparator<LocalEventConverter>()
         {
+            @Override
             public int compare(LocalEventConverter eventConverter1, LocalEventConverter eventConverter2)
             {
                 return eventConverter1.getPriority() - eventConverter2.getPriority();
@@ -72,6 +73,7 @@ public class DefaultEventConverterManager implements EventConverterManager, Init
         // sort remote events converters by priority
         Collections.sort(this.remoteEventConverters, new Comparator<RemoteEventConverter>()
         {
+            @Override
             public int compare(RemoteEventConverter eventConverter1, RemoteEventConverter eventConverter2)
             {
                 return eventConverter1.getPriority() - eventConverter2.getPriority();

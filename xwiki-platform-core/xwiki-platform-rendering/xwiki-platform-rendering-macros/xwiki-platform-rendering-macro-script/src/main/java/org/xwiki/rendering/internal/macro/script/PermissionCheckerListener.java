@@ -53,21 +53,12 @@ public class PermissionCheckerListener extends AbstractScriptCheckerListener
     @Inject
     private DocumentAccessBridge documentAccessBridge;
     
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return "permissionchecker";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.macro.script.AbstractScriptCheckerListener#check(org.xwiki.observation.event.CancelableEvent, org.xwiki.rendering.transformation.MacroTransformationContext, org.xwiki.rendering.macro.script.ScriptMacroParameters)
-     */
     @Override
     protected void check(CancelableEvent event, MacroTransformationContext context,
         ScriptMacroParameters parameters)

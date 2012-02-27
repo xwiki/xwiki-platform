@@ -47,9 +47,7 @@ public class DefaultChartGeneratorTest extends AbstractComponentTestCase
      */
     private ChartModel model;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected void registerComponents() throws Exception
     {
         Short dataArray[][] = { {1, 2, 3}, {1, 3, 5}};

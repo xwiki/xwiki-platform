@@ -131,7 +131,7 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     }
 
     @Test
-    public void testInstallTwice() throws ResolveException, InstallException
+    public void testInstallTwice() throws InstallException
     {
         // Change status
         this.localExtensionRepository.installExtension(this.resources.installed, "namespace",
@@ -176,8 +176,7 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     }
 
     @Test
-    public void testUninstallExtension() throws ResolveException, LocalExtensionRepositoryException,
-        UninstallException, InstallException
+    public void testUninstallExtension() throws UninstallException, InstallException
     {
         // uninstall from root
 

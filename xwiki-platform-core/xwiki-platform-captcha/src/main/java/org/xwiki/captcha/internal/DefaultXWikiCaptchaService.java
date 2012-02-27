@@ -53,11 +53,7 @@ public class DefaultXWikiCaptchaService implements XWikiCaptchaService
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.captcha.XWikiCaptchaService#getCaptchaVerifier(java.lang.String)
-     */
+    @Override
     public CaptchaVerifier getCaptchaVerifier(String captchaName) throws CaptchaVerifierNotFoundException
     {
         CaptchaVerifier captchaVerifier;
@@ -71,11 +67,7 @@ public class DefaultXWikiCaptchaService implements XWikiCaptchaService
         return captchaVerifier;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.captcha.XWikiCaptchaService#listCaptchaNames()
-     */
+    @Override
     public List<String> listCaptchaNames()
     {
         List<String> captchaNames = new ArrayList<String>();
@@ -87,11 +79,7 @@ public class DefaultXWikiCaptchaService implements XWikiCaptchaService
         return captchaNames;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.captcha.XWikiCaptchaService#isEnabled()
-     */
+    @Override
     @Deprecated
     public boolean isEnabled()
     {

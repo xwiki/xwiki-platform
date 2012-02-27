@@ -45,6 +45,7 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
 
     private CommonsConfigurationSource source;
 
+    @Override
     @Before
     public void setUp() throws Exception
     {

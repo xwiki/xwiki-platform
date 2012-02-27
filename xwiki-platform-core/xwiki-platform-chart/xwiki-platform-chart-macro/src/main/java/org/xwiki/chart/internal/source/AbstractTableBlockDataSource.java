@@ -104,9 +104,7 @@ public abstract class AbstractTableBlockDataSource implements ChartDataSource
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public ChartModel buildModel(String macroContent, Map<String, String> macroParameters)
         throws MacroExecutionException
     {

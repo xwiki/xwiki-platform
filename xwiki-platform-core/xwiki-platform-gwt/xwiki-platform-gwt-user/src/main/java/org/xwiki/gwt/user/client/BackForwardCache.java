@@ -137,22 +137,14 @@ public class BackForwardCache implements Updatable
         return map;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Updatable#canUpdate()
-     */
+    @Override
     public boolean canUpdate()
     {
         // Don't update if the cacheable element is orphan or not dirty.
         return cacheable.getParentNode() != null && cacheable.getPropertyBoolean(PROPERTY_DIRTY);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Updatable#update()
-     */
+    @Override
     public void update()
     {
         cacheable.setPropertyString(PROPERTY_VALUE, serialize(getMap()));

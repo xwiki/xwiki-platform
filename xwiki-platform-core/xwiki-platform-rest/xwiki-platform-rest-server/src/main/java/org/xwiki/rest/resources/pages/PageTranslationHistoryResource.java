@@ -38,7 +38,6 @@ import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.History;
 import org.xwiki.rest.model.jaxb.HistorySummary;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 
 /**
@@ -53,7 +52,7 @@ public class PageTranslationHistoryResource extends XWikiResource
         @PathParam("spaceName") String spaceName, @PathParam("pageName") String pageName,
         @PathParam("language") String language, @QueryParam("start") @DefaultValue("0") Integer start,
         @QueryParam("number") @DefaultValue("-1") Integer number,
-        @QueryParam("order") @DefaultValue("desc") String order) throws XWikiException, QueryException
+        @QueryParam("order") @DefaultValue("desc") String order) throws QueryException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 

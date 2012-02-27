@@ -49,11 +49,7 @@ public class AbstractXWikiURL implements XWikiURL
         setType(type);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.url.XWikiURL#getType()
-     */
+    @Override
     public XWikiURLType getType()
     {
         return this.type;
@@ -76,31 +72,19 @@ public class AbstractXWikiURL implements XWikiURL
         this.parameters.put(name, list);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.url.XWikiURL#getParameters()
-     */
+    @Override
     public Map<String, List<String>> getParameters()
     {
         return Collections.unmodifiableMap(this.parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see XWikiURL#getParameterValues(String)
-     */
+    @Override
     public List<String> getParameterValues(String name)
     {
         return this.parameters.get(name);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see XWikiURL#getParameterValue(String)
-     */
+    @Override
     public String getParameterValue(String name)
     {
         String result = null;

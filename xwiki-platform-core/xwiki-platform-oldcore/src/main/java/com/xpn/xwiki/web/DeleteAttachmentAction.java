@@ -42,11 +42,6 @@ import com.xpn.xwiki.util.Util;
  */
 public class DeleteAttachmentAction extends XWikiAction
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiAction#action(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -157,11 +152,6 @@ public class DeleteAttachmentAction extends XWikiAction
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiAction#render(XWikiContext)
-     */
     @Override
     public String render(XWikiContext context)
     {

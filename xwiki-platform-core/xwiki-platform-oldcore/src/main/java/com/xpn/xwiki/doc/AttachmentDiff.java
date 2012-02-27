@@ -64,9 +64,7 @@ public class AttachmentDiff
         this.newVersion = newVersion;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String toString()
     {
         StringBuffer buf = new StringBuffer(fileName);

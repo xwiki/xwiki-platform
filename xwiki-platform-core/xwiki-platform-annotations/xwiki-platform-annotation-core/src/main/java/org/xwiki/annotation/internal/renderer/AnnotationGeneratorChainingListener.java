@@ -110,11 +110,6 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
         this.selectionAlterer = selectionAlterer;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.QueueListener#onWord(java.lang.String)
-     */
     @Override
     public void onWord(String word)
     {
@@ -126,11 +121,6 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
         eventsMapping.put(plainTextContent.length() - 1, getLast());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.QueueListener#onSpecialSymbol(char)
-     */
     @Override
     public void onSpecialSymbol(char symbol)
     {
@@ -139,11 +129,6 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
         eventsMapping.put(plainTextContent.length() - 1, getLast());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.QueueListener#onVerbatim(java.lang.String, boolean, java.util.Map)
-     */
     @Override
     public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
@@ -170,11 +155,6 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.QueueListener#onRawText(java.lang.String, org.xwiki.rendering.syntax.Syntax)
-     */
     @Override
     public void onRawText(String text, Syntax syntax)
     {
@@ -354,11 +334,6 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.QueueListener#consumeEvents(org.xwiki.rendering.listener.Listener)
-     */
     @Override
     public void consumeEvents(Listener listener)
     {
@@ -374,11 +349,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.ChainingListener#getListenerChain()
-     */
+    @Override
     public ListenerChain getListenerChain()
     {
         return chain;
@@ -395,9 +366,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.renderer.AnnotationGeneratorListener#getAnnotationEvents()
+     * @return the bookmarks where annotation events take place
      */
     public SortedMap<Integer, List<AnnotationEvent>> getAnnotationEvents()
     {

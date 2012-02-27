@@ -36,6 +36,7 @@ public class RenderingScriptServiceTest extends AbstractComponentTestCase
 {
     private RenderingScriptService rss;
 
+    @Override
     @Before
     public void setUp() throws Exception
     {

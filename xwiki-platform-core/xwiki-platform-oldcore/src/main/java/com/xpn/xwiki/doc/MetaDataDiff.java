@@ -55,9 +55,7 @@ public class MetaDataDiff
         this.newValue = newValue;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(field);
         buf.append(": ");

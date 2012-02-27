@@ -97,22 +97,12 @@ public class ImagePlugin extends XWikiDefaultPlugin
         init(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#getPluginApi(XWikiPluginInterface, XWikiContext)
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new ImagePluginAPI((ImagePlugin) plugin, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#getName()
-     */
     @Override
     public String getName()
     {
@@ -182,11 +172,6 @@ public class ImagePlugin extends XWikiDefaultPlugin
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#flushCache()
-     */
     @Override
     public void flushCache()
     {

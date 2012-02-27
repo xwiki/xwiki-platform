@@ -43,12 +43,13 @@ import org.xwiki.rest.representations.TextPlainReader;
 @Consumes(MediaType.TEXT_PLAIN)
 public class TextPlainPageReader extends TextPlainReader<Page>
 {
-
+    @Override
     public boolean isReadable(Class< ? > type, Type genericType, Annotation[] annotations, MediaType mediaType)
     {
         return Page.class.isAssignableFrom(type);
     }
 
+    @Override
     public Page readFrom(Class<Page> type, Type genericType, Annotation[] annotations, MediaType mediaType,
         MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException,
         WebApplicationException

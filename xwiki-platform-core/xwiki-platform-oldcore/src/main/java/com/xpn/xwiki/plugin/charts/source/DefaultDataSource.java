@@ -79,6 +79,7 @@ public class DefaultDataSource implements DataSource
     /**
      * The number of rows of this data source
      */
+    @Override
     public int getRowCount()
     {
         return data.length;
@@ -87,6 +88,7 @@ public class DefaultDataSource implements DataSource
     /**
      * The number of columns of this data source
      */
+    @Override
     public int getColumnCount()
     {
         if (data.length > 0) {
@@ -101,6 +103,7 @@ public class DefaultDataSource implements DataSource
      * @throws RowIndexOutOfBoundsException
      * @throws ColumnIndexOutOfBoundsException
      */
+    @Override
     public Number getCell(int rowIndex, int colIndex) throws DataSourceException
     {
         checkRowIndex(rowIndex);
@@ -125,6 +128,7 @@ public class DefaultDataSource implements DataSource
      * @return A whole row
      * @throws RowIndexOutOfBoundsException
      */
+    @Override
     public Number[] getRow(int rowIndex) throws DataSourceException
     {
         checkRowIndex(rowIndex);
@@ -135,6 +139,7 @@ public class DefaultDataSource implements DataSource
      * @return A whole column
      * @throws ColumnIndexOutOfBoundsException
      */
+    @Override
     public Number[] getColumn(int colIndex) throws DataSourceException
     {
         checkColumnIndex(colIndex);
@@ -148,6 +153,7 @@ public class DefaultDataSource implements DataSource
     /**
      * @return A matrix containing the all data source values
      */
+    @Override
     public Number[][] getAllCells() throws DataSourceException
     {
         return data;
@@ -156,6 +162,7 @@ public class DefaultDataSource implements DataSource
     /**
      * @return true when this data source has a header row
      */
+    @Override
     public boolean hasHeaderRow() throws DataSourceException
     {
         return headerRow != null;
@@ -164,6 +171,7 @@ public class DefaultDataSource implements DataSource
     /**
      * @return true when this data source has a header column
      */
+    @Override
     public boolean hasHeaderColumn() throws DataSourceException
     {
         return headerColumn != null;
@@ -174,6 +182,7 @@ public class DefaultDataSource implements DataSource
      * @throws NoHeaderRowException
      * @throws ColumnIndexOutOfBoundsException
      */
+    @Override
     public String getHeaderRowValue(int columnIndex) throws DataSourceException
     {
         checkHeaderRow();
@@ -185,6 +194,7 @@ public class DefaultDataSource implements DataSource
      * @return The whole header row
      * @throws NoHeaderRowException
      */
+    @Override
     public String[] getHeaderRow() throws DataSourceException
     {
         checkHeaderRow();
@@ -196,6 +206,7 @@ public class DefaultDataSource implements DataSource
      * @throws NoHeaderColumnException
      * @throws RowIndexOutOfBoundsException
      */
+    @Override
     public String getHeaderColumnValue(int rowIndex) throws DataSourceException
     {
         checkHeaderColumn();
@@ -207,6 +218,7 @@ public class DefaultDataSource implements DataSource
      * @return The whole header column
      * @throws NoHeaderColumnException
      */
+    @Override
     public String[] getHeaderColumn() throws DataSourceException
     {
         checkHeaderColumn();

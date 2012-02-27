@@ -42,8 +42,6 @@ public class AetherExtensionFile implements ExtensionFile
 
     private Artifact artifact;
 
-    private String type;
-
     private AetherExtensionRepository repository;
 
     static class AetherExtensionFileInputStream extends FileInputStream
@@ -66,12 +64,11 @@ public class AetherExtensionFile implements ExtensionFile
     }
 
     public AetherExtensionFile(Artifact artifact, AetherExtensionRepository repository,
-        PlexusComponentManager plexusComponentManager, String type)
+        PlexusComponentManager plexusComponentManager)
     {
         this.repository = repository;
         this.plexusComponentManager = plexusComponentManager;
         this.artifact = artifact;
-        this.type = type;
     }
 
     @Override

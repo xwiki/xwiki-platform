@@ -121,11 +121,6 @@ public class DefaultJobProgress implements EventListener, JobProgress
         return this.name;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
     @Override
     public List<Event> getEvents()
     {

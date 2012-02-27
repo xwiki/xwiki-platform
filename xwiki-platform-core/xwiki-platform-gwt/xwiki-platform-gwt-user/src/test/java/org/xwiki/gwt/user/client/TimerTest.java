@@ -68,11 +68,7 @@ public class TimerTest extends UserTestCase
             this.lock = lock;
         }
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @see TimerListener#onElapsed(Timer)
-         */
+        @Override
         public void onElapsed(Timer sender)
         {
             assertEquals(timer, sender);

@@ -64,7 +64,7 @@ public class DefaultDocumentCacheTest extends AbstractBridgedComponentTestCase
         this.document.setOriginalDocument(this.document.clone());
 
         this.mockXWiki = getMockery().mock(XWiki.class);
-        getContext().setWiki((XWiki) this.mockXWiki);
+        getContext().setWiki(this.mockXWiki);
         
         getMockery().checking(new Expectations() {{
             allowing(mockXWiki).getDocument(document.getDocumentReference(), getContext()); will(returnValue(document));
@@ -80,7 +80,7 @@ public class DefaultDocumentCacheTest extends AbstractBridgedComponentTestCase
     }
 
     @Test
-    public void testGetSet() throws InterruptedException
+    public void testGetSet()
     {
         this.cache.set("data", this.document.getDocumentReference());
         this.cache.set("data2", this.document.getDocumentReference(), "ext1", "ext2");

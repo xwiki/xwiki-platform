@@ -22,7 +22,7 @@ package com.xpn.xwiki.plugin.activitystream.api;
 import com.xpn.xwiki.XWikiException;
 
 /**
- * Exception to use in the activity stream plugin. It extends {@link XWikiException}. 
+ * Exception to use in the activity stream plugin. It extends {@link XWikiException}.
  * 
  * @version $Id$
  */
@@ -35,15 +35,14 @@ public class ActivityStreamException extends XWikiException
     public static final int MODULE_PLUGIN_ACTIVITY_STREAM = 102;
 
     /**
-     * @see XWikiException#XWikiException().
+     * @see XWikiException#XWikiException()
      */
     public ActivityStreamException()
     {
     }
 
     /**
-     * @see XWikiException#XWikiException(int, int, String).
-     * 
+     * @see XWikiException#XWikiException(int, int, String)
      * @param module source of the exception
      * @param code error code to use
      * @param message message to display
@@ -54,8 +53,7 @@ public class ActivityStreamException extends XWikiException
     }
 
     /**
-     * @see XWikiException#XWikiException(int, int, String, Throwable).
-     * 
+     * @see XWikiException#XWikiException(int, int, String, Throwable)
      * @param module source of the exception
      * @param code error code to use
      * @param message message to display
@@ -67,13 +65,11 @@ public class ActivityStreamException extends XWikiException
     }
 
     /**
-     * @see Exception#Exception(Throwable).
-     * 
+     * @see Exception#Exception(Throwable)
      * @param e wrapped exception
      */
     public ActivityStreamException(XWikiException e)
     {
-        super();
         setModule(e.getModule());
         setCode(e.getCode());
         setException(e.getException());

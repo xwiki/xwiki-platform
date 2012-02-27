@@ -110,6 +110,7 @@ public class EditorElement extends BaseElement
     {
         getUtil().waitUntilCondition(new ExpectedCondition<WebElement>()
         {
+            @Override
             public WebElement apply(WebDriver driver)
             {
                 try {

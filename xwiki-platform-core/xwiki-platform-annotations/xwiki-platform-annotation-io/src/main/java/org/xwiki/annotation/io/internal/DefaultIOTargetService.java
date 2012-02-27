@@ -64,11 +64,7 @@ public class DefaultIOTargetService implements IOTargetService
     @Inject
     private EntityReferenceSerializer<String> serializer;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.io.IOTargetService#getSource(java.lang.String)
-     */
+    @Override
     public String getSource(String reference) throws IOServiceException
     {
         try {
@@ -96,11 +92,7 @@ public class DefaultIOTargetService implements IOTargetService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.io.IOTargetService#getSourceSyntax(java.lang.String)
-     */
+    @Override
     public String getSourceSyntax(String reference) throws IOServiceException
     {
         try {

@@ -39,6 +39,7 @@ public class StaticListMetaClass extends ListMetaClass
         safeput("values", values_class);
     }
 
+    @Override
     public BaseCollection newObject(XWikiContext context)
     {
         return new StaticListClass();

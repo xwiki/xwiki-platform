@@ -126,9 +126,7 @@ public class TargetDocumentDescriptor
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean equals(Object obj)
     {
         boolean equals = false;
@@ -139,9 +137,7 @@ public class TargetDocumentDescriptor
         return equals;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int hashCode()
     {
         return getDocumentReference().hashCode();

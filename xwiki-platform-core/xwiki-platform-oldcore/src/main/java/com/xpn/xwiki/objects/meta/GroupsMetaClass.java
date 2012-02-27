@@ -41,6 +41,7 @@ public class GroupsMetaClass extends ListMetaClass
         safeput("usesList", uselist_class);
     }
 
+    @Override
     public BaseCollection newObject(XWikiContext context)
     {
         return new GroupsClass();

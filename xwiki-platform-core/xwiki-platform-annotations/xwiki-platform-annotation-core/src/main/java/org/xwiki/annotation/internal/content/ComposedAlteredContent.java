@@ -55,11 +55,7 @@ public class ComposedAlteredContent implements AlteredContent
         this.altered = altered;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.content.AlteredContent#getInitialOffset(int)
-     */
+    @Override
     public int getInitialOffset(int i)
     {
         int tmp = altered.getInitialOffset(i);
@@ -67,31 +63,19 @@ public class ComposedAlteredContent implements AlteredContent
         return rez;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.content.AlteredContent#getInitialLength()
-     */
+    @Override
     public int getInitialLength()
     {
         return initial.getInitialLength();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.content.AlteredContent#getContent()
-     */
+    @Override
     public CharSequence getContent()
     {
         return altered.getContent();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.content.AlteredContent#getAlteredOffset(int)
-     */
+    @Override
     public int getAlteredOffset(int i)
     {
         int tmp = initial.getAlteredOffset(i);

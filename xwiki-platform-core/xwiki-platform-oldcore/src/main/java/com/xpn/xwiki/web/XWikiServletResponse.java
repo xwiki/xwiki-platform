@@ -43,76 +43,91 @@ public class XWikiServletResponse implements XWikiResponse
         this.response = response;
     }
 
+    @Override
     public HttpServletResponse getHttpServletResponse()
     {
         return this.response;
     }
 
+    @Override
     public void sendRedirect(String redirect) throws IOException
     {
         this.response.sendRedirect(redirect);
     }
 
+    @Override
     public void setContentType(String type)
     {
         this.response.setContentType(type);
     }
 
+    @Override
     public void setBufferSize(int i)
     {
         this.response.setBufferSize(i);
     }
 
+    @Override
     public int getBufferSize()
     {
         return this.response.getBufferSize();
     }
 
+    @Override
     public void flushBuffer() throws IOException
     {
         this.response.flushBuffer();
     }
 
+    @Override
     public void resetBuffer()
     {
         this.response.resetBuffer();
     }
 
+    @Override
     public boolean isCommitted()
     {
         return this.response.isCommitted();
     }
 
+    @Override
     public void reset()
     {
         this.response.reset();
     }
 
+    @Override
     public void setContentLength(int length)
     {
         this.response.setContentLength(length);
     }
 
+    @Override
     public String getCharacterEncoding()
     {
         return this.response.getCharacterEncoding();
     }
 
+    @Override
     public ServletOutputStream getOutputStream() throws IOException
     {
         return this.response.getOutputStream();
     }
 
+    @Override
     public PrintWriter getWriter() throws IOException
     {
         return this.response.getWriter();
     }
 
+    @Override
     public void setCharacterEncoding(String s)
     {
         this.response.setCharacterEncoding(s);
     }
 
+    @Override
     public void addCookie(Cookie cookie)
     {
         this.response.addCookie(cookie);
@@ -132,6 +147,7 @@ public class XWikiServletResponse implements XWikiResponse
      * @param request The servlet request needed to find the cookie to remove
      * @param cookieName The name of the cookie that must be removed.
      */
+    @Override
     public void removeCookie(String cookieName, XWikiRequest request)
     {
         Cookie cookie = request.getCookie(cookieName);
@@ -142,46 +158,55 @@ public class XWikiServletResponse implements XWikiResponse
         }
     }
 
+    @Override
     public void setLocale(Locale locale)
     {
         this.response.setLocale(locale);
     }
 
+    @Override
     public Locale getLocale()
     {
         return this.response.getLocale();
     }
 
+    @Override
     public void setDateHeader(String name, long value)
     {
         this.response.setDateHeader(name, value);
     }
 
+    @Override
     public void setIntHeader(String name, int value)
     {
         this.response.setIntHeader(name, value);
     }
 
+    @Override
     public void setHeader(String name, String value)
     {
         this.response.setHeader(name, value);
     }
 
+    @Override
     public void addHeader(String name, String value)
     {
         this.response.addHeader(name, value);
     }
 
+    @Override
     public void addDateHeader(String name, long value)
     {
         this.response.addDateHeader(name, value);
     }
 
+    @Override
     public void addIntHeader(String name, int value)
     {
         this.response.addIntHeader(name, value);
     }
 
+    @Override
     public void setStatus(int i)
     {
         this.response.setStatus(i);
@@ -190,22 +215,26 @@ public class XWikiServletResponse implements XWikiResponse
     /**
      * @deprecated
      */
+    @Override
     @Deprecated
     public void setStatus(int i, String s)
     {
         this.response.setStatus(i, s);
     }
 
+    @Override
     public boolean containsHeader(String name)
     {
         return this.response.containsHeader(name);
     }
 
+    @Override
     public String encodeURL(String s)
     {
         return this.response.encodeURL(s);
     }
 
+    @Override
     public String encodeRedirectURL(String s)
     {
         return this.response.encodeRedirectURL(s);
@@ -214,6 +243,7 @@ public class XWikiServletResponse implements XWikiResponse
     /**
      * @deprecated
      */
+    @Override
     @Deprecated
     public String encodeUrl(String s)
     {
@@ -223,17 +253,20 @@ public class XWikiServletResponse implements XWikiResponse
     /**
      * @deprecated
      */
+    @Override
     @Deprecated
     public String encodeRedirectUrl(String s)
     {
         return this.response.encodeRedirectUrl(s);
     }
 
+    @Override
     public void sendError(int i, String s) throws IOException
     {
         this.response.sendError(i, s);
     }
 
+    @Override
     public void sendError(int i) throws IOException
     {
         this.response.sendError(i);
@@ -242,61 +275,73 @@ public class XWikiServletResponse implements XWikiResponse
     /*
      * Portlet Functions
      */
+    @Override
     public void addProperty(String s, String s1)
     {
     }
 
+    @Override
     public void setProperty(String s, String s1)
     {
     }
 
+    @Override
     public String getContentType()
     {
         return null;
     }
 
+    @Override
     public OutputStream getPortletOutputStream() throws IOException
     {
         return null;
     }
 
+    @Override
     public PortletURL createRenderURL()
     {
         return null;
     }
 
+    @Override
     public PortletURL createActionURL()
     {
         return null;
     }
 
+    @Override
     public String getNamespace()
     {
         return null;
     }
 
+    @Override
     public void setTitle(String s)
     {
     }
 
+    @Override
     public void setWindowState(WindowState windowState) throws WindowStateException
     {
     }
 
+    @Override
     public void setPortletMode(PortletMode portletMode) throws PortletModeException
     {
     }
 
+    @Override
     public void setRenderParameters(Map map)
     {
     }
 
+    @Override
     public void setRenderParameter(String s, String s1)
     {
     }
 
+    @Override
     public void setRenderParameter(String s, String[] strings)
     {
     }
-
 }

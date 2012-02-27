@@ -47,23 +47,14 @@ public class TestSpacesXHTMLRawBlockMacro extends AbstractNoParameterMacro
         super("Macro that produces a raw XHTML block with only spaces inside.");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(java.lang.Object, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(Object arg0, String arg1, MacroTransformationContext arg2)
         throws MacroExecutionException
     {
         return Arrays.<Block> asList(new RawBlock("    ", Syntax.XHTML_1_0));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return true;

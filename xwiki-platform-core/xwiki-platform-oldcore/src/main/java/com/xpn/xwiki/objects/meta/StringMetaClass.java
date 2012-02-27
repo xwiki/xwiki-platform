@@ -50,6 +50,7 @@ public class StringMetaClass extends PropertyMetaClass
         safeput("picker", picker_class);
     }
 
+    @Override
     public BaseCollection newObject(XWikiContext context)
     {
         return new StringClass();

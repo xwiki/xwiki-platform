@@ -168,11 +168,6 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
         super(rta);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InsertHTMLExecutable#execute(String)
-     */
     @Override
     public boolean execute(String json)
     {
@@ -204,11 +199,6 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
         configDOMWriter.write(config, element);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InsertHTMLExecutable#isExecuted()
-     */
     @Override
     public boolean isExecuted()
     {
@@ -223,11 +213,6 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
         });
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InsertHTMLExecutable#getParameter()
-     */
     @Override
     public String getParameter()
     {

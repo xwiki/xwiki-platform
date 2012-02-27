@@ -182,11 +182,6 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
         return files;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#setUp()
-     */
     @Override
     public void setUp() throws Exception
     {
@@ -195,11 +190,6 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
         annotationMaintainer = getComponentManager().lookup(AnnotationMaintainer.class);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#registerComponents()
-     */
     @Override
     protected void registerComponents() throws Exception
     {

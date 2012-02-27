@@ -103,17 +103,13 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
         setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Block> execute(ChartMacroParameters macroParams, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {

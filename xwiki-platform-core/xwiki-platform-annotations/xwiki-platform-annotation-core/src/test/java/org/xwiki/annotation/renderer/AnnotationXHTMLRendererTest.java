@@ -187,11 +187,6 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
         return files;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#registerComponents()
-     */
     @Override
     protected void registerComponents() throws Exception
     {
@@ -200,11 +195,6 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
         getComponentManager().registerComponent(MockWikiModel.getComponentDescriptor());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#setUp()
-     */
     @Override
     public void setUp() throws Exception
     {

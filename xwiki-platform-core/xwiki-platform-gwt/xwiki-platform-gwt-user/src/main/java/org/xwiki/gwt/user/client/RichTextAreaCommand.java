@@ -88,11 +88,7 @@ public class RichTextAreaCommand implements com.google.gwt.user.client.Command
         this.focus = focus;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.Command#execute()
-     */
+    @Override
     public void execute()
     {
         if (focus) {

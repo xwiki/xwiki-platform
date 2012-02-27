@@ -58,11 +58,7 @@ public class ColumnsLayoutManager implements LayoutManager
     @Named("ssfx")
     private SkinExtension ssfx;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.container.LayoutManager#layoutContainer(org.xwiki.rendering.block.Block)
-     */
+    @Override
     public void layoutContainer(Block container)
     {
         List<GroupBlock> innerGroups =
@@ -109,21 +105,13 @@ public class ColumnsLayoutManager implements LayoutManager
         container.addChild(new GroupBlock(clearFloatsParams));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.container.LayoutManager#getParameter(java.lang.String)
-     */
+    @Override
     public Object getParameter(String parameterName)
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.container.LayoutManager#setParameter(java.lang.String, Object)
-     */
+    @Override
     public void setParameter(String parameterName, Object parameterValue)
     {
     }

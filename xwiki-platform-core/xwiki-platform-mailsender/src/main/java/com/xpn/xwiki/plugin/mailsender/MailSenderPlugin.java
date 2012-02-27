@@ -637,6 +637,36 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * Prepares a Mail Velocity context based on a map of parameters
+     *
+     * @param fromAddr Mail from
+     * @param toAddr Mail to
+     * @param ccAddr Mail cc
+     * @param bccAddr Mail bcc
+     * @param parameters variables to be passed to the velocity context
+     * @return The prepared context
+     */
+    public VelocityContext prepareVelocityContext(String fromAddr, String toAddr, String ccAddr, String bccAddr,
+        Map<String, Object> parameters, XWikiContext context)
+    {
+        VelocityContext vcontext = new VelocityContext((VelocityContext) context.get("vcontext"));
+
+        for(Map.Entry<String, Object> entry : parameters.entrySet()) {
+            vcontext.put(entry.getKey(), entry.getValue());
+        }
+
+        vcontext.put("from.name", fromAddr);
+        vcontext.put("from.address", fromAddr);
+        vcontext.put("to.name", toAddr);
+        vcontext.put("to.address", toAddr);
+        vcontext.put("to.cc", ccAddr);
+        vcontext.put("to.bcc", bccAddr);
+        vcontext.put("bounce", fromAddr);
+
+        return vcontext;
+    }
+
+    /**
      * Send a single Mail
      * 
      * @param mailItem The Mail to send
@@ -828,6 +858,72 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 return 0;
             } catch (Exception e) {
                 LOGGER.error("sendEmailFromTemplate: " + templateDocFullName + " vcontext: " + updatedVelocityContext, e);
+                return ERROR;
+            }
+        } finally {
+            context.setURLFactory(originalURLFactory);
+        }
+    }
+
+    /**
+     * Uses an XWiki document to build the message subject and context, based on variables stored in a map.
+     * Sends the email.
+     *
+     * @param templateDocFullName Full name of the template to be used (example: XWiki.MyEmailTemplate). The template
+     *            needs to have an XWiki.Email object attached
+     * @param from Email sender
+     * @param to Email recipient
+     * @param cc Email Carbon Copy
+     * @param bcc Email Hidden Carbon Copy
+     * @param language Language of the email
+     * @param parameters variables to be passed to the velocity context
+     * @return True if the email has been sent
+     */
+    public int sendMailFromTemplate(String templateDocFullName, String from, String to, String cc, String bcc,
+        String language, Map<String, Object> parameters, XWikiContext context) throws XWikiException
+    {
+        XWikiURLFactory originalURLFactory = context.getURLFactory();
+        try {
+            context.setURLFactory(new ExternalServletURLFactory(context));
+            VelocityContext vcontext = prepareVelocityContext(from, to, cc, bcc, parameters, context);
+            XWiki xwiki = context.getWiki();
+            XWikiDocument doc = xwiki.getDocument(templateDocFullName, context);
+            Document docApi = new Document(doc, context);
+
+            BaseObject obj = doc.getObject(EMAIL_XWIKI_CLASS_NAME, "language", language);
+            if (obj == null) {
+                obj = doc.getObject(EMAIL_XWIKI_CLASS_NAME, "language", "en");
+            }
+            if (obj == null) {
+                LOGGER.error("No mail object found in the document " + templateDocFullName);
+                return ERROR_TEMPLATE_EMAIL_OBJECT_NOT_FOUND;
+            }
+            String subjectContent = obj.getStringValue("subject");
+            String txtContent = obj.getStringValue("text");
+            String htmlContent = obj.getStringValue("html");
+
+            String subject =
+                XWikiVelocityRenderer.evaluate(subjectContent, templateDocFullName, vcontext, context);
+            String msg =
+                XWikiVelocityRenderer.evaluate(txtContent, templateDocFullName, vcontext, context);
+            String html =
+                XWikiVelocityRenderer.evaluate(htmlContent, templateDocFullName, vcontext, context);
+
+            Mail mail = new Mail();
+            mail.setFrom((String) vcontext.get("from.address"));
+            mail.setTo((String) vcontext.get("to.address"));
+            mail.setCc((String) vcontext.get("to.cc"));
+            mail.setBcc((String) vcontext.get("to.bcc"));
+            mail.setSubject(subject);
+            mail.setTextPart(msg);
+            mail.setHtmlPart(html);
+            mail.setAttachments(docApi.getAttachmentList());
+
+            try {
+                sendMail(mail, context);
+                return 0;
+            } catch (Exception e) {
+                LOGGER.error("sendEmailFromTemplate: " + templateDocFullName + " vcontext: " + vcontext, e);
                 return ERROR;
             }
         } finally {
